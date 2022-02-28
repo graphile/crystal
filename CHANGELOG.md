@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.9](https://github.com/graphile/postgraphile/compare/v4.12.8...v4.12.9) (2022-02-28)
+
+### Bug Fixes
+
+- **ws:** update graphql-ws and correct context generic ([#1589](https://github.com/graphile/postgraphile/issues/1589)) ([0a27d22](https://github.com/graphile/postgraphile/commit/0a27d225fb1ab0ebeb3472d177456777cd29fc17))
+
 ## [4.12.8](https://github.com/graphile/postgraphile/compare/v4.12.7...v4.12.8) (2021-12-20)
 
 ### Bug Fixes
