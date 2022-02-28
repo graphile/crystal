@@ -3056,7 +3056,7 @@ export class Aether<
     const pathIdentitiesByPlanId = this.getPathIdentitiesByPlanId();
 
     // See description of BucketDefinition for fuller explanation of this algorithm
-    const bucketByGroupKey: {
+    const bucketByBucketKey: {
       [groupKey: string]: BucketDefinition;
     } = {
       0: this.rootBucket,
@@ -3153,6 +3153,7 @@ export class Aether<
       const polymorphicDetailsList = equivalentPlanIds
         .map((planId) => this.polymorphicDetailsByPlanId[planId])
         .filter(isNotNullish);
+
       const polymorphicDetails = polymorphicDetailsList.reduce(
         (memo, polymorphicDetailsListEntry) => {
           if (memo === undefined) {
@@ -3205,25 +3206,28 @@ export class Aether<
         ?.map((pathIdentity) => this.fieldDigestByPathIdentity[pathIdentity])
         .filter(isNotNullish);
 
-      // __ItemPlan's get their own bucket (these may or may not be in a new group too)
-      if (plan instanceof __ItemPlan) {
-        if (plan.transformPlanId) {
-          const transformPlan = this.plans[
-            plan.transformPlanId
-          ]! as __ListTransformPlan<any, any, any>;
+      const group = groupId ? this.groups[groupId] : null;
+
+      let parent: BucketDefinition | null | undefined = undefined;
+
+      const itemPlan = plan instanceof __ItemPlan ? plan : null;
+      const transformPlan = itemPlan?.transformPlanId
+        ? (this.plans[itemPlan.transformPlanId]! as __ListTransformPlan<
+            any,
+            any,
+            any
+          >)
+        : null;
+
+      const bucketKeyParts: string[] = [];
+
+      if (itemPlan) {
+        bucketKeyParts.push(`item=${itemPlan.id}`);
+        if (transformPlan) {
           processPlan(transformPlan);
-          const parent = this.buckets[transformPlan.bucketId];
-          const newBucket: BucketDefinition = this.newBucket({
-            parent,
-            rootPathIdentities: [], // Transform plan buckets never write output, so we don't need this.
-            itemPlanId,
-            groupId,
-            polymorphicPlanIds,
-            polymorphicTypeNames,
-          });
-          plan.bucketId = newBucket.id;
-          transformPlan.itemPlanId = plan.id;
-          return plan;
+          transformPlan.itemPlanId = itemPlan.id;
+          const potentialParent = this.buckets[transformPlan.bucketId];
+          parent = parent ? deeper(parent, potentialParent) : potentialParent;
         } else {
           /**
            * The plan that returns the items; though this is called "listPlan"
@@ -3232,32 +3236,14 @@ export class Aether<
            */
           const listPlan = this.plans[plan.dependencies[0]]!;
           processPlan(listPlan);
-          const listPlanPathIdentities = pathIdentitiesByPlanId[listPlan.id];
-          if (!listPlanPathIdentities || listPlanPathIdentities.length === 0) {
-            throw new Error(
-              `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by ${listPlan}`,
-            );
-          }
-          const rootPathIdentities = listPlanPathIdentities.map((pi) =>
-            // This ternary is a hack for subscriptions support; see TODO in planSubscription
-            pi === `~` ? pi : `${pi}[]`,
-          );
-          const parent = this.buckets[listPlan.bucketId];
-          const newBucket: BucketDefinition = this.newBucket({
-            parent,
-            rootPathIdentities,
-            itemPlanId,
-            groupId,
-            polymorphicPlanIds,
-            polymorphicTypeNames,
-          });
-          plan.bucketId = newBucket.id;
-          return plan;
+          const potentialParent = this.buckets[listPlan.bucketId];
+          parent = parent ? deeper(parent, potentialParent) : potentialParent;
         }
       }
 
       // Plans that are in a new group (and don't have a bucket already due to being __ItemPlans) get their own bucket
       if (groupId !== undefined) {
+        bucketKeyParts.push(`group=${groupId}`);
         const group = this.groups[plan.primaryGroupId];
         const groupParentPlan = this.plans[group.parentPlanId];
         if (!groupParentPlan) {
@@ -3273,60 +3259,118 @@ export class Aether<
         }
         const depsParentBucket = parents[0] as BucketDefinition | undefined;
         const groupParentBucket = this.buckets[groupParentPlan.bucketId];
-        const parent = depsParentBucket
+        const potentialParent = depsParentBucket
           ? deeper(depsParentBucket, groupParentBucket)
           : groupParentBucket;
-        const groupKey = `${groupId}|${parent.id}|${polymorphicPlanIds ?? ""}|${
-          polymorphicTypeNames?.join(",") ?? ""
-        }`;
-        if (bucketByGroupKey[groupKey]) {
-          plan.bucketId = bucketByGroupKey[groupKey].id;
-          return plan;
-        } else {
-          const rootPathIdentities =
-            group.reason === "mutation"
-              ? [`${ROOT_PATH}>${this.mutationTypeName}.${group.responseKey}`]
-              : pathIdentitiesByPlanId[groupParentPlan.id];
-          if (!rootPathIdentities || rootPathIdentities.length === 0) {
-            throw new Error(
-              `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by group parent plan ${groupParentPlan}`,
-            );
-          }
-          const newBucket: BucketDefinition = this.newBucket({
-            parent,
-            rootPathIdentities,
-            groupId,
-            polymorphicPlanIds,
-            polymorphicTypeNames,
-          });
-          dependencyPlans.forEach((dependencyPlan) =>
-            newBucket.copyPlans.add(dependencyPlan),
-          );
-          bucketByGroupKey[groupKey] = newBucket;
-          plan.bucketId = newBucket.id;
-          return plan;
-        }
+        parent = parent ? deeper(parent, potentialParent) : potentialParent;
       }
 
       // The "planForType" from polymorphic plans get their own buckets
       if (polymorphicPlanIds !== undefined) {
-        const parent = parents.length === 0 ? this.rootBucket : parents[0];
-        const polymorphicPlans = polymorphicPlanIds.map((id) => this.plans[id]);
-        const rootPathIdentities = [
-          ...new Set(
-            polymorphicPlans.flatMap(
-              (polymorphicPlan) => pathIdentitiesByPlanId[polymorphicPlan.id],
-            ),
-          ),
-        ];
-        if (!rootPathIdentities || rootPathIdentities.length === 0) {
+        if (polymorphicTypeNames == null) {
           throw new Error(
-            `Planning issue - polymorphic plans must be associated with one or more path identities, however ${polymorphicPlans} are not.`,
+            `GraphileInternalError<3b9e4942-f401-4755-93e3-046776c32d06>: polymorphicTypeNames was null but polymorphicPlanIds was not`,
+          );
+        }
+        bucketKeyParts.push(
+          `polymorphicPlanIds=${polymorphicPlanIds.join(
+            ",",
+          )};typeNames=${polymorphicTypeNames.join(",")}`,
+        );
+        const potentialParent =
+          parents.length === 0 ? this.rootBucket : parents[0];
+        parent = parent ? deeper(parent, potentialParent) : potentialParent;
+      }
+
+      // Is it not special?
+      if (bucketKeyParts.length === 0) {
+        // Plans with no dependencies go in the root bucket
+        if (parents.length === 0) {
+          plan.bucketId = this.rootBucket.id;
+          return plan;
+        }
+
+        // If there's only one parent bucket, we just reuse that
+        if (parents.length === 1) {
+          plan.bucketId = parents[0].id;
+          return plan;
+        }
+
+        throw new Error(
+          `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
+            parents.length
+          } incompatible buckets: ${parents.map(
+            (bucket) =>
+              `${bucket.id}(i=${bucket.itemPlanId ?? "-"}, g=${
+                bucket.groupId ?? "-"
+              }, t=${bucket.polymorphicTypeNames?.join(",") ?? "-"}, p=${
+                bucket.parent
+              })`,
+          )}`,
+        );
+      }
+
+      // Okay it's special; let's build a bucket for it... unless we already have one
+      const bucketKey = bucketKeyParts.join("|");
+      if (bucketByBucketKey[bucketKey]) {
+        plan.bucketId = bucketByBucketKey[bucketKey].id;
+        return plan;
+      } else {
+        const rootPathIdentities: string[] = (() => {
+          if (group?.reason === "mutation") {
+            return [
+              `${ROOT_PATH}>${this.mutationTypeName}.${group.responseKey}`,
+            ];
+          }
+          if (transformPlan) {
+            return [];
+          }
+          if (itemPlan) {
+            const listPlan = this.plans[plan.dependencies[0]]!;
+            const listPlanPathIdentities = pathIdentitiesByPlanId[listPlan.id];
+            if (
+              !listPlanPathIdentities ||
+              listPlanPathIdentities.length === 0
+            ) {
+              throw new Error(
+                `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by ${listPlan}`,
+              );
+            }
+            return listPlanPathIdentities.map((pi) =>
+              // This ternary is a hack for subscriptions support; see TODO in planSubscription
+              pi === `~` ? pi : `${pi}[]`,
+            );
+          }
+          if (polymorphicPlanIds !== undefined) {
+            const polymorphicPlans = polymorphicPlanIds.map(
+              (id) => this.plans[id],
+            );
+            return [
+              ...new Set(
+                polymorphicPlans.flatMap(
+                  (polymorphicPlan) =>
+                    pathIdentitiesByPlanId[polymorphicPlan.id],
+                ),
+              ),
+            ];
+          }
+          if (group) {
+            const groupParentPlan = this.plans[group.parentPlanId];
+            return pathIdentitiesByPlanId[groupParentPlan.id];
+          }
+          throw new Error(
+            `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the rootPathIdentities to use`,
+          );
+        })();
+        if (!parent) {
+          throw new Error(
+            `GraphileInternalError<af6208af-193d-4dbd-96d7-1cfe63ce1c4c>: could not determine the parent for this bucket`,
           );
         }
         const newBucket: BucketDefinition = this.newBucket({
           parent,
           rootPathIdentities,
+          itemPlanId,
           groupId,
           polymorphicPlanIds,
           polymorphicTypeNames,
@@ -3334,34 +3378,10 @@ export class Aether<
         dependencyPlans.forEach((dependencyPlan) =>
           newBucket.copyPlans.add(dependencyPlan),
         );
+        bucketByBucketKey[bucketKey] = newBucket;
         plan.bucketId = newBucket.id;
         return plan;
       }
-
-      // Plans with no dependencies go in the root bucket
-      if (parents.length === 0) {
-        plan.bucketId = this.rootBucket.id;
-        return plan;
-      }
-
-      // If there's only one parent bucket, we just reuse that
-      if (parents.length === 1) {
-        plan.bucketId = parents[0].id;
-        return plan;
-      }
-
-      throw new Error(
-        `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
-          parents.length
-        } incompatible buckets: ${parents.map(
-          (bucket) =>
-            `${bucket.id}(i=${bucket.itemPlanId ?? "-"}, g=${
-              bucket.groupId ?? "-"
-            }, t=${bucket.polymorphicTypeNames?.join(",") ?? "-"}, p=${
-              bucket.parent
-            })`,
-        )}`,
-      );
     };
 
     // Assign bucketIds
