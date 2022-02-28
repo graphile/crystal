@@ -144,7 +144,10 @@ const dotEscape = (str: string): string => {
   // the escaped string as the width for the node rather than the unescaped
   // string. Thus we replace with similar looking characters.
   return `"${stripAnsi(str.trim())
-    .replace(/[#"]/g, (l) => ({ "#": "ꖛ", '"': "”" }[l as any]))
+    .replace(
+      /[#"<>]/g,
+      (l) => ({ "#": "ꖛ", '"': "”", "<": "ᐸ", ">": "ᐳ" }[l as any]),
+    )
     .replace(/\r?\n/g, "<br />")}"`;
 };
 
