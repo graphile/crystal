@@ -72,6 +72,9 @@ export class __ListTransformPlan<
   public namedType: GraphQLNamedType & GraphQLOutputType;
   private meta: string | null;
 
+  /** Set during query planning.  */
+  public itemPlanId: string | null = null;
+
   constructor(
     options: ListTransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
   ) {

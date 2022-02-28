@@ -499,7 +499,7 @@ function bucketValue(
           }
           return previousValue;
         }
-        return new Array(value.length).fill(undefined);
+        return arrayOfLength(value.length);
       } else if (value == null || value instanceof CrystalError) {
         return value;
       } else {
@@ -3208,7 +3208,9 @@ export class Aether<
       // __ItemPlan's get their own bucket (these may or may not be in a new group too)
       if (plan instanceof __ItemPlan) {
         if (plan.transformPlanId) {
-          const transformPlan = this.plans[plan.transformPlanId]!;
+          const transformPlan = this.plans[
+            plan.transformPlanId
+          ]! as __ListTransformPlan<any, any, any>;
           process(transformPlan);
           const parent = this.buckets[transformPlan.bucketId];
           const newBucket: BucketDefinition = this.newBucket({
@@ -3220,6 +3222,7 @@ export class Aether<
             polymorphicTypeNames,
           });
           plan.bucketId = newBucket.id;
+          transformPlan.itemPlanId = plan.id;
           return plan;
         } else {
           /**
@@ -5734,7 +5737,7 @@ export class Aether<
       definition: this.rootBucket,
       size: input.length,
       input,
-      noDepsList: Object.freeze(new Array(input.length).fill(undefined)),
+      noDepsList: Object.freeze(arrayOfLength(input.length)),
       store: Object.assign(Object.create(null), {
         [this.rootSelectionSetPlan.id]: roots,
         [this.variableValuesPlan.id]: vars,
@@ -5814,6 +5817,104 @@ export class Aether<
       }
     };
 
+    const executeListTransform = (
+      plan: __ListTransformPlan<any, any, any>,
+      dependencies: (readonly any[])[],
+      meta: Record<string, unknown>,
+    ): PromiseOrDirect<any[]> => {
+      const itemPlan = this.plans[plan.itemPlanId!];
+      const itemPlanId = itemPlan.id;
+      const itemBucketDefinition = this.buckets[itemPlan.bucketId];
+      if (!itemBucketDefinition) {
+        throw new Error(
+          `Could not determing the bucket to execute ${plan}'s inner data with`,
+        );
+      }
+      const listPlan = plan.dangerouslyGetListPlan();
+      const lists: any[][] = store[listPlan.id];
+
+      const itemInputs: BucketSetter[] = [];
+      const itemStore: {
+        [planId: string]: any[];
+      } = Object.create(null);
+      itemStore[itemPlanId] = [];
+      for (const plan of itemBucketDefinition.copyPlans) {
+        itemStore[plan.id] = [];
+      }
+
+      const listsLength = lists.length;
+      // TODO: we don't really use this mutableList, maybe we can get rid of it
+      // by refactoring bucket execution?
+      const mutableList = new Array(listsLength);
+      for (let i = 0, l = listsLength; i < l; i++) {
+        const list = lists[i];
+        if (Array.isArray(list)) {
+          const listLength = list.length;
+          const innerList = arrayOfLength(listLength);
+          mutableList.push(innerList);
+          for (let j = 0, m = listLength; j < m; j++) {
+            itemInputs.push(new BucketSetter(innerList, j));
+            itemStore[itemPlanId].push(list[j]);
+            for (const plan of itemBucketDefinition.copyPlans) {
+              itemStore[plan.id].push(bucket.store[plan.id][i]);
+            }
+          }
+        } else {
+          mutableList.push(list);
+        }
+      }
+
+      const itemBucket: Bucket = {
+        definition: itemBucketDefinition,
+        store: itemStore,
+        size: itemInputs.length,
+        noDepsList: itemInputs.map(() => undefined),
+        rootPathIdentity: "", // TODO: what should this be?
+        input: itemInputs,
+        singleTypeName: "",
+      };
+      const result = this.executeBucket(metaByPlanId, itemBucket);
+
+      const performTransform = (): any[] => {
+        const result: any[] = [];
+        const transformDepPlanId =
+          this.transformDependencyPlanIdByTransformPlanId[plan.id];
+        const depResults = itemStore[transformDepPlanId];
+        let offset = 0;
+        for (let i = 0, l = listsLength; i < l; i++) {
+          const list = lists[i];
+          if (Array.isArray(list)) {
+            const valuesCount = list.length;
+            const values = depResults.slice(offset, offset + valuesCount);
+            offset = offset + valuesCount;
+            const initialState = plan.initialState();
+            const reduceResult = list.reduce(
+              (memo, entireItemValue, listEntryIndex) =>
+                plan.reduceCallback(
+                  memo,
+                  entireItemValue,
+                  values[listEntryIndex],
+                ),
+              initialState,
+            );
+            const finalResult = plan.finalizeCallback
+              ? plan.finalizeCallback(reduceResult)
+              : reduceResult;
+            result.push(finalResult);
+          } else {
+            result.push(list);
+          }
+        }
+        return result;
+      };
+
+      if (isPromiseLike(result)) {
+        return result.then(performTransform);
+      } else {
+        return performTransform();
+      }
+    };
+
     /**
      * This function MUST NEVER THROW/REJECT.
      */
@@ -5828,7 +5929,10 @@ export class Aether<
           plan.dependencies.length > 0
             ? plan.dependencies.map((depId) => store[depId])
             : [bucket.noDepsList];
-        const result = plan.execute(dependencies, meta);
+        const result =
+          plan instanceof __ListTransformPlan
+            ? executeListTransform(plan, dependencies, meta)
+            : plan.execute(dependencies, meta);
         if (isPromiseLike(result)) {
           return result.then(
             (values) => {
@@ -5837,7 +5941,7 @@ export class Aether<
             (error) => {
               return completedPlan(
                 plan,
-                new Array(bucket.size).fill(new CrystalError(error)),
+                arrayOfLength(bucket.size, new CrystalError(error)),
               );
             },
           );
@@ -5847,7 +5951,7 @@ export class Aether<
       } catch (error) {
         return completedPlan(
           plan,
-          new Array(bucket.size).fill(new CrystalError(error)),
+          arrayOfLength(bucket.size, new CrystalError(error)),
         );
       }
     };
@@ -6059,7 +6163,7 @@ export class Aether<
               store: child.store,
               size: child.inputs.length,
               input: child.inputs,
-              noDepsList: new Array(child.inputs.length).fill(undefined),
+              noDepsList: arrayOfLength(child.inputs.length),
             };
             const r = this.executeBucket(metaByPlanId, bucket);
             if (isPromiseLike(r)) {
