@@ -9,16 +9,16 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br /><forums>"]]:::plan
-    Access_9["Access[_9∈0]<br /><_3.pgSettings>"]:::plan
-    Access_10["Access[_10∈0]<br /><_3.withPgClient>"]:::plan
-    Object_11["Object[_11∈0]<br /><{pgSettings,withPgClient}>"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
+    Access_9["Access[_9∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_10["Access[_10∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_11["Object[_11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><forums>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br /><__forums__.”id”>"]:::plan
-    PgClassExpression_15["PgClassExpression[_15∈0]<br /><__forums__.”name”>"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__forums__.”id”ᐳ"]:::plan
+    PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__forums__.”name”ᐳ"]:::plan
 
     %% plan dependencies
     Object_11 --> PgSelect_8
@@ -35,11 +35,11 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_13[">forum"]
+    P_13["ᐳforum"]
     PgSelectSingle_13 -.-> P_13
-    P_14[">f…m>id"]
+    P_14["ᐳf…mᐳid"]
     PgClassExpression_14 -.-> P_14
-    P_15[">f…m>name"]
+    P_15["ᐳf…mᐳname"]
     PgClassExpression_15 -.-> P_15
 
     %% allocate buckets
@@ -47,7 +47,7 @@ graph TD
     class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15 bucket0
 
     subgraph "Buckets for queries/super-simple/single-record-via-arg"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.id <-L- _14<br />⠀⠀⠀forum.name <-L- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.id ᐸ-L- _14<br />⠀⠀⠀forum.name ᐸ-L- _15"):::bucket
     style Bucket0 stroke:#696969
     end
 ```

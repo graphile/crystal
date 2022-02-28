@@ -9,29 +9,29 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
-    __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.”name”>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈2@1]<br /><__forums__.”id”>"]:::plan
-    Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
-    PgClassExpression_39["PgClassExpression[_39∈2@1]<br /><__forums__...chived_at”>"]:::plan
-    PgSelect_40[["PgSelect[_40∈2@1]<br /><messages>"]]:::plan
-    __Item_41>"__Item[_41∈3@1]<br /><_40>"]:::itemplan
-    PgSelectSingle_42["PgSelectSingle[_42∈3@1]<br /><messages>"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈3@1]<br /><__messages__.”body”>"]:::plan
-    PgClassExpression_44["PgClassExpression[_44∈3@1]<br /><__messages...author_id”>"]:::plan
-    PgSelect_45[["PgSelect[_45∈3@1]<br /><users>"]]:::plan
-    Access_46["Access[_46∈0]<br /><_3.pgSettings>"]:::plan
-    Access_47["Access[_47∈0]<br /><_3.withPgClient>"]:::plan
-    Object_48["Object[_48∈0]<br /><{pgSettings,withPgClient}>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈2@1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
+    Connection_38["Connection[_38∈0]<br />ᐸ_34ᐳ"]:::plan
+    PgClassExpression_39["PgClassExpression[_39∈2@1]<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
+    PgSelect_40[["PgSelect[_40∈2@1]<br />ᐸmessagesᐳ"]]:::plan
+    __Item_41>"__Item[_41∈3@1]<br />ᐸ_40ᐳ"]:::itemplan
+    PgSelectSingle_42["PgSelectSingle[_42∈3@1]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈3@1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgClassExpression_44["PgClassExpression[_44∈3@1]<br />ᐸ__messages...author_id”ᐳ"]:::plan
+    PgSelect_45[["PgSelect[_45∈3@1]<br />ᐸusersᐳ"]]:::plan
+    Access_46["Access[_46∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_47["Access[_47∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_48["Object[_48∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     First_49["First[_49∈3@1]"]:::plan
-    PgSelectSingle_50["PgSelectSingle[_50∈3@1]<br /><users>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈3@1]<br /><__users__.”username”>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈3@1]<br /><__users__....vatar_url”>"]:::plan
+    PgSelectSingle_50["PgSelectSingle[_50∈3@1]<br />ᐸusersᐳ"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈3@1]<br />ᐸ__users__.”username”ᐳ"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈3@1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
 
     %% plan dependencies
     Object_48 --> PgSelect_17
@@ -63,25 +63,25 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_17[">forums"]
+    P_17["ᐳforums"]
     PgSelect_17 -.-> P_17
-    P_22[">forums[]"]
+    P_22["ᐳforums[]"]
     PgSelectSingle_22 -.-> P_22
-    P_23[">f…]>name"]
+    P_23["ᐳf…]ᐳname"]
     PgClassExpression_23 -.-> P_23
-    P_38[">f…]>messagesConnection"]
+    P_38["ᐳf…]ᐳmessagesConnection"]
     Connection_38 -.-> P_38
-    P_40[">f…]>m…n>nodes"]
+    P_40["ᐳf…]ᐳm…nᐳnodes"]
     PgSelect_40 -.-> P_40
-    P_42[">f…]>m…n>nodes[]"]
+    P_42["ᐳf…]ᐳm…nᐳnodes[]"]
     PgSelectSingle_42 -.-> P_42
-    P_43[">f…]>m…n>n…]>body"]
+    P_43["ᐳf…]ᐳm…nᐳn…]ᐳbody"]
     PgClassExpression_43 -.-> P_43
-    P_50[">f…]>m…n>n…]>author"]
+    P_50["ᐳf…]ᐳm…nᐳn…]ᐳauthor"]
     PgSelectSingle_50 -.-> P_50
-    P_51[">f…]>m…n>n…]>a…r>username"]
+    P_51["ᐳf…]ᐳm…nᐳn…]ᐳa…rᐳusername"]
     PgClassExpression_51 -.-> P_51
-    P_52[">f…]>m…n>n…]>a…r>gravatarUrl"]
+    P_52["ᐳf…]ᐳm…nᐳn…]ᐳa…rᐳgravatarUrl"]
     PgClassExpression_52 -.-> P_52
 
     %% allocate buckets
@@ -97,13 +97,13 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.stream-1"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _48<br />~>Query.forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _48<br />~ᐳQuery.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group1[stream])<br />Deps: _22, _48<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
+    Bucket2("Bucket 2 (group1[stream])<br />Deps: _22, _48<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_41)<br />Deps: _40, _48<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]"):::bucket
+    Bucket3("Bucket 3 (item_41)<br />Deps: _40, _48<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
     end

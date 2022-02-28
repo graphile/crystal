@@ -9,18 +9,18 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_7[["PgSelect[_7∈0]<br /><forum_names>"]]:::plan
-    Access_8["Access[_8∈0]<br /><_3.pgSettings>"]:::plan
-    Access_9["Access[_9∈0]<br /><_3.withPgClient>"]:::plan
-    Object_10["Object[_10∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    __ListTransform_11["__ListTransform[_11∈0]<br /><each:_7>"]:::plan
-    __Item_12>"__Item[_12∈1]<br /><_7>"]:::itemplan
-    PgSelectSingle_13["PgSelectSingle[_13∈1]<br /><text>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈1]<br /><__forum_na...um_names__>"]:::plan
-    __Item_15>"__Item[_15∈2]<br /><_11>"]:::itemplan
-    PgSelectSingle_16["PgSelectSingle[_16∈2]<br /><text>"]:::plan
-    PgClassExpression_17["PgClassExpression[_17∈2]<br /><__forum_na...um_names__>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br />ᐸforum_namesᐳ"]]:::plan
+    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __ListTransform_11["__ListTransform[_11∈0]<br />ᐸeach:_7ᐳ"]:::plan
+    __Item_12>"__Item[_12∈1]<br />ᐸ_7ᐳ"]:::itemplan
+    PgSelectSingle_13["PgSelectSingle[_13∈1]<br />ᐸtextᐳ"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈1]<br />ᐸ__forum_na...um_names__ᐳ"]:::plan
+    __Item_15>"__Item[_15∈2]<br />ᐸ_11ᐳ"]:::itemplan
+    PgSelectSingle_16["PgSelectSingle[_16∈2]<br />ᐸtextᐳ"]:::plan
+    PgClassExpression_17["PgClassExpression[_17∈2]<br />ᐸ__forum_na...um_names__ᐳ"]:::plan
     Lambda_18["Lambda[_18∈2]"]:::plan
 
     %% plan dependencies
@@ -42,11 +42,11 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_11[">FORUM_NAMES"]
+    P_11["ᐳFORUM_NAMES"]
     __ListTransform_11 -.-> P_11
-    P_14[">FORUM_NAMES@_11[]"]
+    P_14["ᐳFORUM_NAMES@_11[]"]
     PgClassExpression_14 -.-> P_14
-    P_18[">FORUM_NAMES[]"]
+    P_18["ᐳFORUM_NAMES[]"]
     Lambda_18 -.-> P_18
 
     %% allocate buckets
@@ -58,12 +58,12 @@ graph TD
     class __Item_15,PgSelectSingle_16,PgClassExpression_17,Lambda_18 bucket2
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀FORUM_NAMES <-L- _11"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀FORUM_NAMES ᐸ-L- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~>Query.FORUM_NAMES[]<br />⠀ROOT <-O- _18"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.FORUM_NAMES[]<br />⠀ROOT ᐸ-O- _18"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     end

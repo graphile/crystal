@@ -9,27 +9,27 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br /><relational_topics>"]]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸrelational_topicsᐳ"]]:::plan
     First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><relational_topics>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br /><__relation...ics__.”id”>"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸrelational_topicsᐳ"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__relation...ics__.”id”ᐳ"]:::plan
     First_20["First[_20∈0]"]:::plan
-    PgSelectSingle_21["PgSelectSingle[_21∈0]<br /><relational_items>"]:::plan
-    PgClassExpression_22["PgClassExpression[_22∈0]<br /><__relation...s__.”type”>"]:::plan
-    PgClassExpression_30["PgClassExpression[_30∈0]<br /><__relation...__.”type2”>"]:::plan
-    PgClassExpression_38["PgClassExpression[_38∈0]<br /><__relation...”position”>"]:::plan
-    PgClassExpression_46["PgClassExpression[_46∈0]<br /><__relation...reated_at”>"]:::plan
-    PgClassExpression_54["PgClassExpression[_54∈0]<br /><__relation...pdated_at”>"]:::plan
-    PgClassExpression_62["PgClassExpression[_62∈0]<br /><__relation..._archived”>"]:::plan
-    Access_65["Access[_65∈0]<br /><_3.pgSettings>"]:::plan
-    Access_66["Access[_66∈0]<br /><_3.withPgClient>"]:::plan
-    Object_67["Object[_67∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    PgClassExpression_70["PgClassExpression[_70∈0]<br /><__relation...chived_at”>"]:::plan
-    PgClassExpression_71["PgClassExpression[_71∈0]<br /><__relation...__.”title”>"]:::plan
-    Map_72["Map[_72∈0]<br /><_13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}>"]:::plan
-    List_73["List[_73∈0]<br /><_72>"]:::plan
+    PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸrelational_itemsᐳ"]:::plan
+    PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
+    PgClassExpression_38["PgClassExpression[_38∈0]<br />ᐸ__relation...”position”ᐳ"]:::plan
+    PgClassExpression_46["PgClassExpression[_46∈0]<br />ᐸ__relation...reated_at”ᐳ"]:::plan
+    PgClassExpression_54["PgClassExpression[_54∈0]<br />ᐸ__relation...pdated_at”ᐳ"]:::plan
+    PgClassExpression_62["PgClassExpression[_62∈0]<br />ᐸ__relation..._archived”ᐳ"]:::plan
+    Access_65["Access[_65∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_66["Access[_66∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_67["Object[_67∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgClassExpression_70["PgClassExpression[_70∈0]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
+    PgClassExpression_71["PgClassExpression[_71∈0]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    Map_72["Map[_72∈0]<br />ᐸ_13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
+    List_73["List[_73∈0]<br />ᐸ_72ᐳ"]:::plan
 
     %% plan dependencies
     Object_67 --> PgSelect_8
@@ -57,25 +57,25 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_13[">relationalTopicById"]
+    P_13["ᐳrelationalTopicById"]
     PgSelectSingle_13 -.-> P_13
-    P_14[">r…d>id"]
+    P_14["ᐳr…dᐳid"]
     PgClassExpression_14 -.-> P_14
-    P_22[">r…d>type"]
+    P_22["ᐳr…dᐳtype"]
     PgClassExpression_22 -.-> P_22
-    P_30[">r…d>type2"]
+    P_30["ᐳr…dᐳtype2"]
     PgClassExpression_30 -.-> P_30
-    P_38[">r…d>position"]
+    P_38["ᐳr…dᐳposition"]
     PgClassExpression_38 -.-> P_38
-    P_46[">r…d>createdAt"]
+    P_46["ᐳr…dᐳcreatedAt"]
     PgClassExpression_46 -.-> P_46
-    P_54[">r…d>updatedAt"]
+    P_54["ᐳr…dᐳupdatedAt"]
     PgClassExpression_54 -.-> P_54
-    P_62[">r…d>isExplicitlyArchived"]
+    P_62["ᐳr…dᐳisExplicitlyArchived"]
     PgClassExpression_62 -.-> P_62
-    P_70[">r…d>archivedAt"]
+    P_70["ᐳr…dᐳarchivedAt"]
     PgClassExpression_70 -.-> P_70
-    P_71[">r…d>title"]
+    P_71["ᐳr…dᐳtitle"]
     PgClassExpression_71 -.-> P_71
 
     %% allocate buckets
@@ -83,7 +83,7 @@ graph TD
     class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,First_20,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72,List_73 bucket0
 
     subgraph "Buckets for queries/interfaces-relational/single-topic-not-topic"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀relationalTopicById <-O- _13<br />⠀⠀⠀relationalTopicById.id <-L- _14<br />⠀⠀⠀relationalTopicById.type <-L- _22<br />⠀⠀⠀relationalTopicById.type2 <-L- _30<br />⠀⠀⠀relationalTopicById.position <-L- _38<br />⠀⠀⠀relationalTopicById.createdAt <-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt <-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived <-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt <-L- _70<br />⠀⠀⠀relationalTopicById.title <-L- _71"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀relationalTopicById ᐸ-O- _13<br />⠀⠀⠀relationalTopicById.id ᐸ-L- _14<br />⠀⠀⠀relationalTopicById.type ᐸ-L- _22<br />⠀⠀⠀relationalTopicById.type2 ᐸ-L- _30<br />⠀⠀⠀relationalTopicById.position ᐸ-L- _38<br />⠀⠀⠀relationalTopicById.createdAt ᐸ-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt ᐸ-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived ᐸ-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt ᐸ-L- _70<br />⠀⠀⠀relationalTopicById.title ᐸ-L- _71"):::bucket
     style Bucket0 stroke:#696969
     end
 ```

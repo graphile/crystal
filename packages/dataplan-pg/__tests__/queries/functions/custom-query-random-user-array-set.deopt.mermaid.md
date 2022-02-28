@@ -9,22 +9,22 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_7[["PgSelect[_7∈0]<br /><random_user_array_set>"]]:::plan
-    Access_8["Access[_8∈0]<br /><_3.pgSettings>"]:::plan
-    Access_9["Access[_9∈0]<br /><_3.withPgClient>"]:::plan
-    Object_10["Object[_10∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    __ListTransform_11["__ListTransform[_11∈0]<br /><partitionByIndex1:_7>"]:::plan
-    __Item_12>"__Item[_12∈1]<br /><_7>"]:::itemplan
-    PgSelectSingle_13["PgSelectSingle[_13∈1]<br /><random_user_array_set>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈1]<br /><__random_u..._set_idx__>"]:::plan
-    __Item_15>"__Item[_15∈2]<br /><_11>"]:::itemplan
-    __ListTransform_16["__ListTransform[_16∈2]<br /><each:_15>"]:::plan
-    __Item_17>"__Item[_17∈3]<br /><_15>"]:::itemplan
-    __Item_18>"__Item[_18∈4]<br /><_16>"]:::itemplan
-    PgSelectSingle_19["PgSelectSingle[_19∈4]<br /><random_user_array_set>"]:::plan
-    PgClassExpression_20["PgClassExpression[_20∈4]<br /><__random_u...”username”>"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈4]<br /><__random_u...vatar_url”>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br />ᐸrandom_user_array_setᐳ"]]:::plan
+    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __ListTransform_11["__ListTransform[_11∈0]<br />ᐸpartitionByIndex1:_7ᐳ"]:::plan
+    __Item_12>"__Item[_12∈1]<br />ᐸ_7ᐳ"]:::itemplan
+    PgSelectSingle_13["PgSelectSingle[_13∈1]<br />ᐸrandom_user_array_setᐳ"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈1]<br />ᐸ__random_u..._set_idx__ᐳ"]:::plan
+    __Item_15>"__Item[_15∈2]<br />ᐸ_11ᐳ"]:::itemplan
+    __ListTransform_16["__ListTransform[_16∈2]<br />ᐸeach:_15ᐳ"]:::plan
+    __Item_17>"__Item[_17∈3]<br />ᐸ_15ᐳ"]:::itemplan
+    __Item_18>"__Item[_18∈4]<br />ᐸ_16ᐳ"]:::itemplan
+    PgSelectSingle_19["PgSelectSingle[_19∈4]<br />ᐸrandom_user_array_setᐳ"]:::plan
+    PgClassExpression_20["PgClassExpression[_20∈4]<br />ᐸ__random_u...”username”ᐳ"]:::plan
+    PgClassExpression_21["PgClassExpression[_21∈4]<br />ᐸ__random_u...vatar_url”ᐳ"]:::plan
 
     %% plan dependencies
     Object_10 --> PgSelect_7
@@ -49,19 +49,19 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_11[">randomUserArraySet"]
+    P_11["ᐳrandomUserArraySet"]
     __ListTransform_11 -.-> P_11
-    P_14[">randomUserArraySet@_11[]"]
+    P_14["ᐳrandomUserArraySet@_11[]"]
     PgClassExpression_14 -.-> P_14
-    P_16[">randomUserArraySet[]"]
+    P_16["ᐳrandomUserArraySet[]"]
     __ListTransform_16 -.-> P_16
-    P_17[">randomUserArraySet[]@_16[]"]
+    P_17["ᐳrandomUserArraySet[]@_16[]"]
     __Item_17 -.-> P_17
-    P_19[">randomUserArraySet[][]"]
+    P_19["ᐳrandomUserArraySet[][]"]
     PgSelectSingle_19 -.-> P_19
-    P_20[">r…]>username"]
+    P_20["ᐳr…]ᐳusername"]
     PgClassExpression_20 -.-> P_20
-    P_21[">r…]>gravatarUrl"]
+    P_21["ᐳr…]ᐳgravatarUrl"]
     PgClassExpression_21 -.-> P_21
 
     %% allocate buckets
@@ -77,18 +77,18 @@ graph TD
     class __Item_18,PgSelectSingle_19,PgClassExpression_20,PgClassExpression_21 bucket4
 
     subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀randomUserArraySet <-A- _11"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀randomUserArraySet ᐸ-A- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~>Query.randomUserArraySet[]<br />⠀ROOT <-O- _16"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.randomUserArraySet[]<br />⠀ROOT ᐸ-O- _16"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     Bucket3("Bucket 3 (item_17)<br />Deps: _15"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (item_18)<br />Deps: _16<br />~>Query.randomUserArraySet[][]<br />⠀ROOT <-O- _19<br />⠀⠀username <-L- _20<br />⠀⠀gravatarUrl <-L- _21"):::bucket
+    Bucket4("Bucket 4 (item_18)<br />Deps: _16<br />~ᐳQuery.randomUserArraySet[][]<br />⠀ROOT ᐸ-O- _19<br />⠀⠀username ᐸ-L- _20<br />⠀⠀gravatarUrl ᐸ-L- _21"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
     end

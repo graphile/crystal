@@ -9,14 +9,14 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
-    Access_18["Access[_18∈0]<br /><_3.pgSettings>"]:::plan
-    Access_19["Access[_19∈0]<br /><_3.withPgClient>"]:::plan
-    Object_20["Object[_20∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.”name”>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
+    Access_18["Access[_18∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_19["Access[_19∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_20["Object[_20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
 
     %% plan dependencies
     Object_20 --> PgSelect_17
@@ -31,11 +31,11 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_17[">a<br />>b"]
+    P_17["ᐳa<br />ᐳb"]
     PgSelect_17 -.-> P_17
-    P_22[">a[]<br />>b[]"]
+    P_22["ᐳa[]<br />ᐳb[]"]
     PgSelectSingle_22 -.-> P_22
-    P_23[">a[]>a<br />>a[]>b<br />>b[]>a<br />>b[]>b"]
+    P_23["ᐳa[]ᐳa<br />ᐳa[]ᐳb<br />ᐳb[]ᐳa<br />ᐳb[]ᐳb"]
     PgClassExpression_23 -.-> P_23
 
     %% allocate buckets
@@ -45,9 +45,9 @@ graph TD
     class __Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
 
     subgraph "Buckets for queries/super-simple/many-field-aliases"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀a <-A- _17<br />⠀⠀b <-A- _17"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀a ᐸ-A- _17<br />⠀⠀b ᐸ-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~>Query.a[]<br />~>Query.b[]<br />⠀ROOT <-O- _22<br />⠀⠀a <-L- _23<br />⠀⠀b <-L- _23"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~ᐳQuery.a[]<br />~ᐳQuery.b[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀a ᐸ-L- _23<br />⠀⠀b ᐸ-L- _23"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

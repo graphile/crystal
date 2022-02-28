@@ -9,26 +9,26 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
-    __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__>"]:::plan
-    PgSelect_24[["PgSelect[_24∈1]<br /><forums_messages_list_set>"]]:::plan
-    Access_25["Access[_25∈0]<br /><_3.pgSettings>"]:::plan
-    Access_26["Access[_26∈0]<br /><_3.withPgClient>"]:::plan
-    Object_27["Object[_27∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    __ListTransform_28["__ListTransform[_28∈1]<br /><partitionByIndex1:_24>"]:::plan
-    __Item_29>"__Item[_29∈2]<br /><_24>"]:::itemplan
-    PgSelectSingle_30["PgSelectSingle[_30∈2]<br /><forums_messages_list_set>"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈2]<br /><__forums_m..._set_idx__>"]:::plan
-    __Item_32>"__Item[_32∈3]<br /><_28>"]:::itemplan
-    __ListTransform_33["__ListTransform[_33∈3]<br /><each:_32>"]:::plan
-    __Item_34>"__Item[_34∈4]<br /><_32>"]:::itemplan
-    __Item_35>"__Item[_35∈5]<br /><_33>"]:::itemplan
-    PgSelectSingle_36["PgSelectSingle[_36∈5]<br /><forums_messages_list_set>"]:::plan
-    PgClassExpression_37["PgClassExpression[_37∈5]<br /><__forums_m...t__.”body”>"]:::plan
-    PgClassExpression_38["PgClassExpression[_38∈5]<br /><__forums_m...”featured”>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__forums__ᐳ"]:::plan
+    PgSelect_24[["PgSelect[_24∈1]<br />ᐸforums_messages_list_setᐳ"]]:::plan
+    Access_25["Access[_25∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_26["Access[_26∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_27["Object[_27∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __ListTransform_28["__ListTransform[_28∈1]<br />ᐸpartitionByIndex1:_24ᐳ"]:::plan
+    __Item_29>"__Item[_29∈2]<br />ᐸ_24ᐳ"]:::itemplan
+    PgSelectSingle_30["PgSelectSingle[_30∈2]<br />ᐸforums_messages_list_setᐳ"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈2]<br />ᐸ__forums_m..._set_idx__ᐳ"]:::plan
+    __Item_32>"__Item[_32∈3]<br />ᐸ_28ᐳ"]:::itemplan
+    __ListTransform_33["__ListTransform[_33∈3]<br />ᐸeach:_32ᐳ"]:::plan
+    __Item_34>"__Item[_34∈4]<br />ᐸ_32ᐳ"]:::itemplan
+    __Item_35>"__Item[_35∈5]<br />ᐸ_33ᐳ"]:::itemplan
+    PgSelectSingle_36["PgSelectSingle[_36∈5]<br />ᐸforums_messages_list_setᐳ"]:::plan
+    PgClassExpression_37["PgClassExpression[_37∈5]<br />ᐸ__forums_m...t__.”body”ᐳ"]:::plan
+    PgClassExpression_38["PgClassExpression[_38∈5]<br />ᐸ__forums_m...”featured”ᐳ"]:::plan
 
     %% plan dependencies
     Object_27 --> PgSelect_17
@@ -58,23 +58,23 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_17[">forums"]
+    P_17["ᐳforums"]
     PgSelect_17 -.-> P_17
-    P_22[">forums[]"]
+    P_22["ᐳforums[]"]
     PgSelectSingle_22 -.-> P_22
-    P_28[">f…]>messagesListSet"]
+    P_28["ᐳf…]ᐳmessagesListSet"]
     __ListTransform_28 -.-> P_28
-    P_31[">f…]>messagesListSet@_28[]"]
+    P_31["ᐳf…]ᐳmessagesListSet@_28[]"]
     PgClassExpression_31 -.-> P_31
-    P_33[">f…]>messagesListSet[]"]
+    P_33["ᐳf…]ᐳmessagesListSet[]"]
     __ListTransform_33 -.-> P_33
-    P_34[">f…]>messagesListSet[]@_33[]"]
+    P_34["ᐳf…]ᐳmessagesListSet[]@_33[]"]
     __Item_34 -.-> P_34
-    P_36[">f…]>messagesListSet[][]"]
+    P_36["ᐳf…]ᐳmessagesListSet[][]"]
     PgSelectSingle_36 -.-> P_36
-    P_37[">f…]>m…]>body"]
+    P_37["ᐳf…]ᐳm…]ᐳbody"]
     PgClassExpression_37 -.-> P_37
-    P_38[">f…]>m…]>featured"]
+    P_38["ᐳf…]ᐳm…]ᐳfeatured"]
     PgClassExpression_38 -.-> P_38
 
     %% allocate buckets
@@ -92,21 +92,21 @@ graph TD
     class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
 
     subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _27<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesListSet <-A- _28"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _27<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀messagesListSet ᐸ-A- _28"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_29)<br />Deps: _24"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_32)<br />Deps: _28<br />~>Query.forums[]>Forum.messagesListSet[]<br />⠀ROOT <-O- _33"):::bucket
+    Bucket3("Bucket 3 (item_32)<br />Deps: _28<br />~ᐳQuery.forums[]ᐳForum.messagesListSet[]<br />⠀ROOT ᐸ-O- _33"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     Bucket4("Bucket 4 (item_34)<br />Deps: _32"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (item_35)<br />Deps: _33<br />~>Query.forums[]>Forum.messagesListSet[][]<br />⠀ROOT <-O- _36<br />⠀⠀body <-L- _37<br />⠀⠀featured <-L- _38"):::bucket
+    Bucket5("Bucket 5 (item_35)<br />Deps: _33<br />~ᐳQuery.forums[]ᐳForum.messagesListSet[][]<br />⠀ROOT ᐸ-O- _36<br />⠀⠀body ᐸ-L- _37<br />⠀⠀featured ᐸ-L- _38"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket3 --> Bucket5
     end

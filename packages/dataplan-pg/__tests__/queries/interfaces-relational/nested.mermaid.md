@@ -9,32 +9,32 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
-    __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
-    PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.”username”>"]:::plan
-    __ListTransform_19["__ListTransform[_19∈1]<br /><each:_15>"]:::plan
-    __Item_20>"__Item[_20∈2]<br /><_373>"]:::itemplan
-    PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><relational_items>"]:::plan
-    __Item_22>"__Item[_22∈3]<br /><_19>"]:::itemplan
-    PgSelectSingle_23["PgSelectSingle[_23∈3]<br /><relational_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈3]<br /><__relation...s__.”type”>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br />ᐸpeopleᐳ"]]:::plan
+    __Item_11>"__Item[_11∈1]<br />ᐸ_7ᐳ"]:::itemplan
+    PgSelectSingle_12["PgSelectSingle[_12∈1]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    __ListTransform_19["__ListTransform[_19∈1]<br />ᐸeach:_15ᐳ"]:::plan
+    __Item_20>"__Item[_20∈2]<br />ᐸ_373ᐳ"]:::itemplan
+    PgSelectSingle_21["PgSelectSingle[_21∈2]<br />ᐸrelational_itemsᐳ"]:::plan
+    __Item_22>"__Item[_22∈3]<br />ᐸ_19ᐳ"]:::itemplan
+    PgSelectSingle_23["PgSelectSingle[_23∈3]<br />ᐸrelational_itemsᐳ"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_25["PgPolymorphic[_25∈3]"]:::plan
     First_38["First[_38∈3]"]:::plan
-    PgSelectSingle_39["PgSelectSingle[_39∈3]<br /><relational_items>"]:::plan
-    PgClassExpression_40["PgClassExpression[_40∈3]<br /><__relation...s__.”type”>"]:::plan
+    PgSelectSingle_39["PgSelectSingle[_39∈3]<br />ᐸrelational_itemsᐳ"]:::plan
+    PgClassExpression_40["PgClassExpression[_40∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_41["PgPolymorphic[_41∈3]"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈3]<br /><__relation...__.”type2”>"]:::plan
-    PgClassExpression_94["PgClassExpression[_94∈3]<br /><__relation...__.”type2”>"]:::plan
-    PgClassExpression_302["PgClassExpression[_302∈3]<br /><__relation...ems__.”id”>"]:::plan
-    PgClassExpression_358["PgClassExpression[_358∈3]<br /><__relation...ems__.”id”>"]:::plan
-    Access_360["Access[_360∈0]<br /><_3.pgSettings>"]:::plan
-    Access_361["Access[_361∈0]<br /><_3.withPgClient>"]:::plan
-    Object_362["Object[_362∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    Map_371["Map[_371∈3]<br /><_23:{”0”:2,”1”:3,”2”:4}>"]:::plan
-    List_372["List[_372∈3]<br /><_371>"]:::plan
-    Access_373["Access[_373∈1]<br /><_11.1>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈3]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
+    PgClassExpression_94["PgClassExpression[_94∈3]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
+    PgClassExpression_302["PgClassExpression[_302∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression_358["PgClassExpression[_358∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    Access_360["Access[_360∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_361["Access[_361∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_362["Object[_362∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Map_371["Map[_371∈3]<br />ᐸ_23:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
+    List_372["List[_372∈3]<br />ᐸ_371ᐳ"]:::plan
+    Access_373["Access[_373∈1]<br />ᐸ_11.1ᐳ"]:::plan
 
     %% plan dependencies
     Object_362 --> PgSelect_7
@@ -70,31 +70,31 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_7[">people"]
+    P_7["ᐳpeople"]
     PgSelect_7 -.-> P_7
-    P_12[">people[]"]
+    P_12["ᐳpeople[]"]
     PgSelectSingle_12 -.-> P_12
-    P_13[">p…]>username"]
+    P_13["ᐳp…]ᐳusername"]
     PgClassExpression_13 -.-> P_13
-    P_19[">p…]>items"]
+    P_19["ᐳp…]ᐳitems"]
     __ListTransform_19 -.-> P_19
-    P_21[">p…]>items@_19[]"]
+    P_21["ᐳp…]ᐳitems@_19[]"]
     PgSelectSingle_21 -.-> P_21
-    P_24[">p…]>i…]>type x5"]
+    P_24["ᐳp…]ᐳi…]ᐳtype x5"]
     PgClassExpression_24 -.-> P_24
-    P_25[">p…]>items[]"]
+    P_25["ᐳp…]ᐳitems[]"]
     PgPolymorphic_25 -.-> P_25
-    P_40[">p…]>i…]>p…t>type x25"]
+    P_40["ᐳp…]ᐳi…]ᐳp…tᐳtype x25"]
     PgClassExpression_40 -.-> P_40
-    P_41[">p…]>i…]>parent x5"]
+    P_41["ᐳp…]ᐳi…]ᐳparent x5"]
     PgPolymorphic_41 -.-> P_41
-    P_51[">p…]>i…]>p…t>type2 x25"]
+    P_51["ᐳp…]ᐳi…]ᐳp…tᐳtype2 x25"]
     PgClassExpression_51 -.-> P_51
-    P_94[">p…]>i…]>type2 x5"]
+    P_94["ᐳp…]ᐳi…]ᐳtype2 x5"]
     PgClassExpression_94 -.-> P_94
-    P_302[">p…]>i…]>id x5"]
+    P_302["ᐳp…]ᐳi…]ᐳid x5"]
     PgClassExpression_302 -.-> P_302
-    P_358[">p…]>i…]>p…t>id x25"]
+    P_358["ᐳp…]ᐳi…]ᐳp…tᐳid x25"]
     PgClassExpression_358 -.-> P_358
 
     %% allocate buckets
@@ -108,15 +108,15 @@ graph TD
     class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgClassExpression_94,PgClassExpression_302,PgClassExpression_358,Map_371,List_372 bucket3
 
     subgraph "Buckets for queries/interfaces-relational/nested"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀people <-A- _7"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _373"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀parent <-O- _41<br />⠀⠀⠀parent.type <-L- _40<br />⠀⠀⠀parent.type2 <-L- _51<br />⠀⠀⠀parent.id <-L- _358<br />⠀⠀type2 <-L- _94<br />⠀⠀id <-L- _302"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀parent ᐸ-O- _41<br />⠀⠀⠀parent.type ᐸ-L- _40<br />⠀⠀⠀parent.type2 ᐸ-L- _51<br />⠀⠀⠀parent.id ᐸ-L- _358<br />⠀⠀type2 ᐸ-L- _94<br />⠀⠀id ᐸ-L- _302"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     end

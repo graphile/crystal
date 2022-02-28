@@ -9,14 +9,14 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    PgSelect_7[["PgSelect[_7∈0]<br /><forum_names>"]]:::plan
-    Access_8["Access[_8∈0]<br /><_3.pgSettings>"]:::plan
-    Access_9["Access[_9∈0]<br /><_3.withPgClient>"]:::plan
-    Object_10["Object[_10∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
-    PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><text>"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1]<br /><__forum_na...um_names__>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br />ᐸforum_namesᐳ"]]:::plan
+    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Item_11>"__Item[_11∈1]<br />ᐸ_7ᐳ"]:::itemplan
+    PgSelectSingle_12["PgSelectSingle[_12∈1]<br />ᐸtextᐳ"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈1]<br />ᐸ__forum_na...um_names__ᐳ"]:::plan
 
     %% plan dependencies
     Object_10 --> PgSelect_7
@@ -31,9 +31,9 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_7[">forumNames"]
+    P_7["ᐳforumNames"]
     PgSelect_7 -.-> P_7
-    P_13[">forumNames[]"]
+    P_13["ᐳforumNames[]"]
     PgClassExpression_13 -.-> P_13
 
     %% allocate buckets
@@ -43,9 +43,9 @@ graph TD
     class __Item_11,PgSelectSingle_12,PgClassExpression_13 bucket1
 
     subgraph "Buckets for queries/functions/custom-query-forum-names"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forumNames <-L- _7"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNames ᐸ-L- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~>Query.forumNames[]<br />⠀ROOT <-O- _13"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNames[]<br />⠀ROOT ᐸ-O- _13"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

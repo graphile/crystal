@@ -9,19 +9,19 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br /><forums>"]]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
     First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><forums>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br /><__forums__>"]:::plan
-    PgSelect_15[["PgSelect[_15∈0]<br /><forums_featured_messages>"]]:::plan
-    Access_16["Access[_16∈0]<br /><_3.pgSettings>"]:::plan
-    Access_17["Access[_17∈0]<br /><_3.withPgClient>"]:::plan
-    Object_18["Object[_18∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    __Item_19>"__Item[_19∈1]<br /><_15>"]:::itemplan
-    PgSelectSingle_20["PgSelectSingle[_20∈1]<br /><forums_featured_messages>"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈1]<br /><__forums_f...s__.”body”>"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__forums__ᐳ"]:::plan
+    PgSelect_15[["PgSelect[_15∈0]<br />ᐸforums_featured_messagesᐳ"]]:::plan
+    Access_16["Access[_16∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_17["Access[_17∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    Object_18["Object[_18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Item_19>"__Item[_19∈1]<br />ᐸ_15ᐳ"]:::itemplan
+    PgSelectSingle_20["PgSelectSingle[_20∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
+    PgClassExpression_21["PgClassExpression[_21∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
 
     %% plan dependencies
     Object_18 --> PgSelect_8
@@ -42,13 +42,13 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_13[">forum"]
+    P_13["ᐳforum"]
     PgSelectSingle_13 -.-> P_13
-    P_15[">f…m>featuredMessages"]
+    P_15["ᐳf…mᐳfeaturedMessages"]
     PgSelect_15 -.-> P_15
-    P_20[">f…m>featuredMessages[]"]
+    P_20["ᐳf…mᐳfeaturedMessages[]"]
     PgSelectSingle_20 -.-> P_20
-    P_21[">f…m>f…]>body"]
+    P_21["ᐳf…mᐳf…]ᐳbody"]
     PgClassExpression_21 -.-> P_21
 
     %% allocate buckets
@@ -58,9 +58,9 @@ graph TD
     class __Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
 
     subgraph "Buckets for queries/functions/computed-column-setof-message"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.featuredMessages <-A- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.featuredMessages ᐸ-A- _15"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_19)<br />Deps: _15<br />~>Query.forum>Forum.featuredMessages[]<br />⠀ROOT <-O- _20<br />⠀⠀body <-L- _21"):::bucket
+    Bucket1("Bucket 1 (item_19)<br />Deps: _15<br />~ᐳQuery.forumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- _20<br />⠀⠀body ᐸ-L- _21"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end
