@@ -1493,6 +1493,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@envelop/validation-cache@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@envelop/validation-cache@npm:4.0.0"
+  dependencies:
+    tiny-lru: 7.0.6
+  peerDependencies:
+    "@envelop/core": ^2.0.0
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: 6816d1e0d9bd109522e9fafedcca4d1d8b0d008d39aa4eb710b588e4942b30f4a85fc689a6d7c95eea015cf0aee2acc73e9eb85d8cc1cb1a4b1e99e537954f87
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^0.4.3":
   version: 0.4.3
   resolution: "@eslint/eslintrc@npm:0.4.3"
@@ -6785,6 +6797,7 @@ __metadata:
     "@dataplan/pg": ^4.7.0
     "@envelop/core": ^2.0.0
     "@envelop/parser-cache": ^4.0.0
+    "@envelop/validation-cache": ^4.0.0
     "@graphile/lru": 4.6.0-alpha.0
     "@types/debug": ^4.1.7
     "@types/express": ^4

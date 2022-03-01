@@ -5,6 +5,7 @@ import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgre
 import type { Plugin } from "@envelop/core";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
+import { useValidationCache } from "@envelop/validation-cache";
 import LRU from "@graphile/lru";
 import chalk from "chalk";
 import fastify from "fastify";
