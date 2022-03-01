@@ -857,7 +857,9 @@ export class Aether<
   /**
    * If true, then this operation doesn't use resolvers.
    */
-  public pure = true;
+  private pure = true;
+  private canPreempt = false;
+  private makeMetaByPlanId: () => CrystalContext["metaByPlanId"];
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -1107,6 +1109,53 @@ export class Aether<
 
     this.walkFinalizedPlans();
     this.preparePrefetches();
+
+    this.canPreempt = (() => {
+      if (!this.pure) {
+        // Cannot currently preempt operations that involve user-supplied resolvers
+        return false;
+      }
+      if (this.operationType !== "query") {
+        // Cannot currently preempt mutation/subscription requests
+        return false;
+      }
+      if (this.groups.length > 1) {
+        // Cannot currently preempt stream/defer/subscription/mutation execution
+        return false;
+      }
+      if (
+        this.buckets.some(
+          (b) =>
+            (b.groupId != null && b.groupId !== 0) ||
+            b.polymorphicPlanIds != null,
+        )
+      ) {
+        // Cannot currently preempt polymorphic/grouped operations
+        return false;
+      }
+      return true;
+    })();
+
+    /*
+     * A JIT'd object constructor, roughly equivalent to:
+
+       const makeMetaByPlanId = () => {
+         const metaByPlanId = {};
+         for (const [planId, plan] of Object.entries(this.plans)) {
+           if (plan && plan.id === planId) {
+             metaByPlanId[plan.id] = Object.create(null);
+           }
+         }
+       }
+    */
+    this.makeMetaByPlanId = new Function(
+      `return { ${Object.entries(this.plans)
+        .map(([planId, plan]) =>
+          plan && plan.id === planId ? `${plan.id}: Object.create(null)` : null,
+        )
+        .filter(isNotNullish)
+        .join(", ")} }`,
+    ) as any;
   }
 
   private newBucket(
@@ -5741,26 +5790,7 @@ export class Aether<
     context: any,
     rootValue: any,
   ): null | PromiseOrDirect<{ [$$data]: any }> {
-    if (!this.pure) {
-      // Cannot currently preempt operations that involve user-supplied resolvers
-      return null;
-    }
-    if (this.operationType !== "query") {
-      // Cannot currently preempt mutation/subscription requests
-      return null;
-    }
-    if (this.groups.length > 1) {
-      // Cannot currently preempt stream/defer/subscription/mutation execution
-      return null;
-    }
-    if (
-      this.buckets.some(
-        (b) =>
-          (b.groupId != null && b.groupId !== 0) ||
-          b.polymorphicPlanIds != null,
-      )
-    ) {
-      // Cannot currently preempt polymorphic/grouped operations
+    if (!this.canPreempt) {
       return null;
     }
     const rootField = this.fieldDigestByPathIdentity[ROOT_PATH];
@@ -5772,13 +5802,11 @@ export class Aether<
 
     // TODO: batch this method so it can process multiple GraphQL requests in parallel
     const batch = [undefined];
-    const input = batch.map(
-      (value, index) => new BucketSetter(ROOT_PATH, batch, index),
-    );
-    const roots = batch.map(() => Object.create(null));
-    const vars = batch.map(() => variableValues);
-    const ctxs = batch.map(() => context);
-    const rvs = batch.map(() => rootValue);
+    const input = [new BucketSetter(ROOT_PATH, batch, 0)];
+    const roots = [Object.create(null)];
+    const vars = [variableValues];
+    const ctxs = [context];
+    const rvs = [rootValue];
     const rootBucket: Bucket = {
       definition: this.rootBucket,
       size: input.length,
@@ -5791,12 +5819,7 @@ export class Aether<
         [this.rootValuePlan.id]: rvs,
       }),
     };
-    const metaByPlanId: CrystalContext["metaByPlanId"] = Object.create(null);
-    for (const [planId, plan] of Object.entries(this.plans)) {
-      if (plan && plan.id === planId) {
-        metaByPlanId[plan.id] = Object.create(null);
-      }
-    }
+    const metaByPlanId = this.makeMetaByPlanId();
     const p = this.executeBucket(metaByPlanId, rootBucket);
     if (isPromiseLike(p)) {
       return p.then((list) => list[0]);
