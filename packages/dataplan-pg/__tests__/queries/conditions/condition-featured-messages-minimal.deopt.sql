@@ -21,8 +21,7 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    (count(*))::text as "0",
-    __messages_identifiers__.idx as "1"
+    __messages_identifiers__.idx as "0"
   from app_public.messages as __messages__
   where
     (
@@ -32,6 +31,8 @@ lateral (
     ) and (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )
+  order by __messages__."id" asc
+  limit 6
 ) as __messages_result__
 
 select __messages_result__.*
@@ -45,7 +46,8 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    __messages_identifiers__.idx as "0"
+    (count(*))::text as "0",
+    __messages_identifiers__.idx as "1"
   from app_public.messages as __messages__
   where
     (
@@ -55,6 +57,4 @@ lateral (
     ) and (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )
-  order by __messages__."id" asc
-  limit 6
 ) as __messages_result__
