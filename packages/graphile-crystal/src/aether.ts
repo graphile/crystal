@@ -566,6 +566,7 @@ function bucketValue(
 class BucketSetter {
   public readonly root: any;
   constructor(
+    public rootPathIdentity: string,
     private parentObject: object | unknown[],
     private parentKey: number | string,
   ) {
@@ -583,7 +584,6 @@ interface Bucket {
    * The bucket definition this bucket adheres to
    */
   definition: BucketDefinition;
-  rootPathIdentity: string;
   /**
    * The number of elements the bucket represents.
    */
@@ -5772,7 +5772,9 @@ export class Aether<
 
     // TODO: batch this method so it can process multiple GraphQL requests in parallel
     const batch = [undefined];
-    const input = batch.map((value, index) => new BucketSetter(batch, index));
+    const input = batch.map(
+      (value, index) => new BucketSetter(ROOT_PATH, batch, index),
+    );
     const roots = batch.map(() => Object.create(null));
     const vars = batch.map(() => variableValues);
     const ctxs = batch.map(() => context);
@@ -5788,7 +5790,6 @@ export class Aether<
         [this.contextPlan.id]: ctxs,
         [this.rootValuePlan.id]: rvs,
       }),
-      rootPathIdentity: ROOT_PATH,
     };
     const metaByPlanId: CrystalContext["metaByPlanId"] = Object.create(null);
     for (const [planId, plan] of Object.entries(this.plans)) {
@@ -5895,7 +5896,14 @@ export class Aether<
           const innerList = arrayOfLength(listLength);
           mutableList.push(innerList);
           for (let j = 0, m = listLength; j < m; j++) {
-            itemInputs.push(new BucketSetter(innerList, j));
+            itemInputs.push(
+              new BucketSetter(
+                // TODO: what should this "rootPathIdentity" be?
+                "",
+                innerList,
+                j,
+              ),
+            );
             itemStore[itemPlanId].push(list[j]);
             for (const plan of itemBucketDefinition.copyPlans) {
               itemStore[plan.id].push(bucket.store[plan.id][i]);
@@ -5911,7 +5919,6 @@ export class Aether<
         store: itemStore,
         size: itemInputs.length,
         noDepsList: itemInputs.map(() => undefined),
-        rootPathIdentity: "", // TODO: what should this be?
         input: itemInputs,
       };
       const result = this.executeBucket(metaByPlanId, itemBucket);
@@ -6012,6 +6019,8 @@ export class Aether<
           ].join(", ")}`,
         );
       }
+
+      // TODO: calculate this at planning time
       const childrenByPathIdentity: {
         [pathIdentity: string]:
           | Array<{
@@ -6023,29 +6032,24 @@ export class Aether<
       } = Object.create(null);
       for (const childBucketDefinition of bucket.definition.children) {
         for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
-          if (
-            childRootPathIdentity === bucket.rootPathIdentity ||
-            childRootPathIdentity.startsWith(bucket.rootPathIdentity + ">") ||
-            childRootPathIdentity.startsWith(bucket.rootPathIdentity + "[]")
-          ) {
-            if (!childrenByPathIdentity[childRootPathIdentity]) {
-              childrenByPathIdentity[childRootPathIdentity] = [];
-            }
-            const entry = {
-              childBucketDefinition,
-              inputs: [],
-              store: Object.create(null),
-            };
-            for (const plan of childBucketDefinition.copyPlans) {
-              entry.store[plan.id] = [];
-            }
-            if (childBucketDefinition.itemPlanId) {
-              entry.store[childBucketDefinition.itemPlanId] = [];
-            }
-            childrenByPathIdentity[childRootPathIdentity]!.push(entry);
+          if (!childrenByPathIdentity[childRootPathIdentity]) {
+            childrenByPathIdentity[childRootPathIdentity] = [];
           }
+          const entry = {
+            childBucketDefinition,
+            inputs: [],
+            store: Object.create(null),
+          };
+          for (const plan of childBucketDefinition.copyPlans) {
+            entry.store[plan.id] = [];
+          }
+          if (childBucketDefinition.itemPlanId) {
+            entry.store[childBucketDefinition.itemPlanId] = [];
+          }
+          childrenByPathIdentity[childRootPathIdentity]!.push(entry);
         }
       }
+
       const processListChildren = (
         nestedPathIdentity: string,
         rawValue: any,
@@ -6068,7 +6072,7 @@ export class Aether<
               throw new Error("Group inside list currently unsupported");
             }
             for (let i = 0, l = value.length; i < l; i++) {
-              child.inputs.push(new BucketSetter(value, i));
+              child.inputs.push(new BucketSetter(nestedPathIdentity, value, i));
               child.store[child.childBucketDefinition.itemPlanId].push(
                 rawValue[i],
               );
@@ -6089,7 +6093,7 @@ export class Aether<
           const concreteType =
             rootOutputMode === "O"
               ? bucket.definition.singleTypeNameByRootPathIdentity![
-                  bucket.rootPathIdentity
+                  setter.rootPathIdentity
                 ]
               : null;
 
@@ -6103,7 +6107,7 @@ export class Aether<
 
           if (isNestedListBucket) {
             if (Array.isArray(value)) {
-              const nestedPathIdentity = bucket.rootPathIdentity + "[]";
+              const nestedPathIdentity = setter.rootPathIdentity + "[]";
               processListChildren(nestedPathIdentity, rawValue, value, index);
             }
           }
@@ -6127,7 +6131,7 @@ export class Aether<
               continue;
             }
             const planId =
-              field.planIdByRootPathIdentity[bucket.rootPathIdentity];
+              field.planIdByRootPathIdentity[setter.rootPathIdentity];
             if (planId == null) {
               continue;
             }
@@ -6172,7 +6176,9 @@ export class Aether<
                         value[$$concreteType],
                       );
                     if (match) {
-                      child.inputs.push(new BucketSetter(obj, responseKey));
+                      child.inputs.push(
+                        new BucketSetter(keyPathIdentity, obj, responseKey),
+                      );
                       for (const plan of child.childBucketDefinition
                         .copyPlans) {
                         child.store[plan.id].push(bucket.store[plan.id][index]);
@@ -6195,14 +6201,14 @@ export class Aether<
             processObject(
               setter.root,
               bucket.definition.outputMap,
-              `${bucket.rootPathIdentity}>${typeName}.`,
+              `${setter.rootPathIdentity}>${typeName}.`,
             );
           }
         }
 
         // And any root buckets
         {
-          const children = childrenByPathIdentity[bucket.rootPathIdentity];
+          const children = childrenByPathIdentity[setter.rootPathIdentity];
           if (children) {
             for (const child of children) {
               throw new Error(
@@ -6224,7 +6230,6 @@ export class Aether<
         for (const child of children!) {
           if (child.inputs.length > 0) {
             const bucket: Bucket = {
-              rootPathIdentity: childRootPathIdentity,
               definition: child.childBucketDefinition,
               store: child.store,
               size: child.inputs.length,
