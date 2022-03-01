@@ -6020,7 +6020,7 @@ export class Aether<
         );
       }
 
-      // TODO: calculate this at planning time
+      // TODO: create a JIT factory for this at planning time
       const childrenByPathIdentity: {
         [pathIdentity: string]:
           | Array<{
@@ -6031,20 +6031,20 @@ export class Aether<
           | undefined;
       } = Object.create(null);
       for (const childBucketDefinition of bucket.definition.children) {
+        const entry = {
+          childBucketDefinition,
+          inputs: [],
+          store: Object.create(null),
+        };
+        for (const plan of childBucketDefinition.copyPlans) {
+          entry.store[plan.id] = [];
+        }
+        if (childBucketDefinition.itemPlanId) {
+          entry.store[childBucketDefinition.itemPlanId] = [];
+        }
         for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
           if (!childrenByPathIdentity[childRootPathIdentity]) {
             childrenByPathIdentity[childRootPathIdentity] = [];
-          }
-          const entry = {
-            childBucketDefinition,
-            inputs: [],
-            store: Object.create(null),
-          };
-          for (const plan of childBucketDefinition.copyPlans) {
-            entry.store[plan.id] = [];
-          }
-          if (childBucketDefinition.itemPlanId) {
-            entry.store[childBucketDefinition.itemPlanId] = [];
           }
           childrenByPathIdentity[childRootPathIdentity]!.push(entry);
         }
