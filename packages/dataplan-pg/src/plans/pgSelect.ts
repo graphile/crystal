@@ -2326,7 +2326,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           const limit = this.first ?? this.last;
           const firstAndLast =
             this.first != null && this.last != null && this.last < this.first;
-          const rowsPlan = access<any[]>(parent2, [selfIndex]);
+          const rowsPlan = access<any[]>(parent2, [selfIndex], []);
           const shouldReverse = this.shouldReverseOrder();
           if ((this.fetchOneExtra || firstAndLast) && limit != null) {
             return lambda(rowsPlan, (rows) => {

@@ -63,6 +63,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 function constructDestructureFunction(
   path: (string | number)[],
+  fallback: any,
 ): (value: any) => any {
   const jitParts: string[] = [];
 
@@ -121,7 +122,7 @@ function constructDestructureFunction(
               : undefined;
         }
       }
-      return current;
+      return current ?? fallback;
     };
   } else {
     // ?.blah?.bog?.["!!!"]?.[0]
@@ -136,7 +137,13 @@ function constructDestructureFunction(
       functionBody,
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
-    return quicklyExtractValueAtPath;
+    if (fallback !== undefined) {
+      const quicklyExtractValueAtPathWithFallback = (value: any): any =>
+        quicklyExtractValueAtPath(value) ?? fallback;
+      return quicklyExtractValueAtPathWithFallback;
+    } else {
+      return quicklyExtractValueAtPath;
+    }
   }
 }
 
@@ -164,11 +171,12 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   constructor(
     parentPlan: ExecutablePlan<unknown>,
     public readonly path: (string | number)[],
+    private fallback?: any,
   ) {
     super();
     this.addDependency(parentPlan);
     this.parentPlanId = parentPlan.id;
-    this.destructure = constructDestructureFunction(path);
+    this.destructure = constructDestructureFunction(path, fallback);
   }
 
   toStringMeta(): string {
@@ -214,7 +222,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   deduplicate(peers: AccessPlan<unknown>[]): AccessPlan<TData> {
     const myPath = JSON.stringify(this.path);
     const peersWithSamePath = peers.filter(
-      (p) => JSON.stringify(p.path) === myPath,
+      (p) => p.fallback === this.fallback && JSON.stringify(p.path) === myPath,
     );
     debugAccessPlanVerbose(
       "%c deduplicate: peers with same path %o = %c",
@@ -231,6 +239,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
 export function access<TData>(
   parentPlan: ExecutablePlan<unknown>,
   path: (string | number)[],
+  fallback?: any,
 ): AccessPlan<TData> {
-  return new AccessPlan<TData>(parentPlan, path);
+  return new AccessPlan<TData>(parentPlan, path, fallback);
 }
