@@ -494,6 +494,9 @@ function bucketValue(
   mode: BucketDefinitionFieldOutputMap["mode"],
   concreteType: string | null,
 ): any {
+  if (value instanceof CrystalError) {
+    return Promise.reject(value.originalError);
+  }
   switch (mode) {
     case "A": {
       if (Array.isArray(value)) {
@@ -506,7 +509,7 @@ function bucketValue(
           return previousValue;
         }
         return arrayOfLength(value.length);
-      } else if (value == null || value instanceof CrystalError) {
+      } else if (value == null) {
         return value;
       } else {
         // TODO: should we fallback to null, or raise an error, or...?
@@ -517,7 +520,7 @@ function bucketValue(
       }
     }
     case "O": {
-      if (value == null || value instanceof CrystalError) {
+      if (value == null) {
         return value;
       } else {
         let o: any;
@@ -544,6 +547,8 @@ function bucketValue(
       }
     }
     case "L": {
+      // TODO: this could actually have a list depth, if it does we should loop
+      // through looking for errors.
       return value;
     }
     default: {
@@ -3619,6 +3624,7 @@ export class Aether<
               : fieldDigest?.listDepth === 0
               ? "O"
               : "A"; // If there's no fieldDigest then it must be an array intermediary result
+            const listDepth = fieldDigest?.listDepth ?? 1;
             const matchingParentPathIdentities =
               bucket.rootPathIdentities.filter(
                 (rpi) =>
@@ -3725,6 +3731,7 @@ export class Aether<
                 spec[fieldName] = {
                   planIdByRootPathIdentity: Object.create(null),
                   mode,
+                  //listDepth,
                   typeName: fieldDigest.namedReturnType.name,
                   children: mode === "O" ? Object.create(null) : null,
                   typeNames: bucket.polymorphicPlanIds ? [] : null,
@@ -6008,7 +6015,8 @@ export class Aether<
         for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
           if (
             childRootPathIdentity === bucket.rootPathIdentity ||
-            childRootPathIdentity.startsWith(bucket.rootPathIdentity + ">")
+            childRootPathIdentity.startsWith(bucket.rootPathIdentity + ">") ||
+            childRootPathIdentity.startsWith(bucket.rootPathIdentity + "[]")
           ) {
             if (!childrenByPathIdentity[childRootPathIdentity]) {
               childrenByPathIdentity[childRootPathIdentity] = [];
@@ -6028,18 +6036,68 @@ export class Aether<
           }
         }
       }
+      const processListChildren = (
+        nestedPathIdentity: string,
+        rawValue: any,
+        value: any,
+        index: number,
+      ) => {
+        const children = childrenByPathIdentity[nestedPathIdentity];
+        if (children) {
+          for (const child of children) {
+            if (child.childBucketDefinition.itemPlanId == null) {
+              throw new Error(
+                `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
+              );
+            }
+            if (child.childBucketDefinition.polymorphicPlanIds) {
+              // TODO: will this ever be supported?
+              throw new Error("Polymorphism inside list currently unsupported");
+            }
+            if (child.childBucketDefinition.groupId != null) {
+              throw new Error("Group inside list currently unsupported");
+            }
+            for (let i = 0, l = value.length; i < l; i++) {
+              child.inputs.push(new BucketSetter(value, i));
+              child.store[child.childBucketDefinition.itemPlanId].push(
+                rawValue[i],
+              );
+              for (const plan of child.childBucketDefinition.copyPlans) {
+                child.store[plan.id].push(bucket.store[plan.id][index]);
+              }
+            }
+          }
+        }
+      };
+
+      // TODO: make this smarter!
+      const isNestedListBucket =
+        bucket.definition.itemPlanId != null &&
+        bucket.definition.children.some((child) =>
+          child.rootPathIdentities.includes(bucket.rootPathIdentity + "[]"),
+        );
       const result = bucket.input.map((setter, index) => {
         if (bucket.definition.rootOutputPlanId != null) {
-          setter.setRoot(
-            bucketValue(
-              setter.root,
-              store[bucket.definition.rootOutputPlanId][index],
-              "O",
-              bucket.definition.singleTypeNameByRootPathIdentity![
-                bucket.rootPathIdentity
-              ],
-            ),
-          );
+          if (isNestedListBucket) {
+            const rawValue = store[bucket.definition.rootOutputPlanId][index];
+            const value = bucketValue(setter.root, rawValue, "A", null);
+            setter.setRoot(value);
+            if (Array.isArray(value)) {
+              const nestedPathIdentity = bucket.rootPathIdentity + "[]";
+              processListChildren(nestedPathIdentity, rawValue, value, index);
+            }
+          } else {
+            setter.setRoot(
+              bucketValue(
+                setter.root,
+                store[bucket.definition.rootOutputPlanId][index],
+                "O",
+                bucket.definition.singleTypeNameByRootPathIdentity![
+                  bucket.rootPathIdentity
+                ],
+              ),
+            );
+          }
         }
         const processObject = (
           obj: undefined | null | object | CrystalError,
@@ -6075,37 +6133,8 @@ export class Aether<
 
             if (field.mode === "A") {
               if (Array.isArray(value)) {
-                const children = childrenByPathIdentity[keyPathIdentity + "[]"];
-                if (children) {
-                  for (const child of children) {
-                    if (child.childBucketDefinition.itemPlanId == null) {
-                      throw new Error(
-                        `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
-                      );
-                    }
-                    if (child.childBucketDefinition.polymorphicPlanIds) {
-                      // TODO: will this ever be supported?
-                      throw new Error(
-                        "Polymorphism inside list currently unsupported",
-                      );
-                    }
-                    if (child.childBucketDefinition.groupId != null) {
-                      throw new Error(
-                        "Group inside list currently unsupported",
-                      );
-                    }
-                    for (let i = 0, l = value.length; i < l; i++) {
-                      child.inputs.push(new BucketSetter(value, i));
-                      child.store[child.childBucketDefinition.itemPlanId].push(
-                        rawValue[i],
-                      );
-                      for (const plan of child.childBucketDefinition
-                        .copyPlans) {
-                        child.store[plan.id].push(bucket.store[plan.id][index]);
-                      }
-                    }
-                  }
-                }
+                const nestedPathIdentity = keyPathIdentity + "[]";
+                processListChildren(nestedPathIdentity, rawValue, value, index);
               }
             } else if (field.mode === "O") {
               const d = value;
@@ -6147,17 +6176,19 @@ export class Aether<
           }
         };
         if (setter.root && !(setter.root instanceof CrystalError)) {
-          const typeName = setter.root[$$concreteType];
-          if (typeName == null) {
-            throw new Error(
-              `Could not determine typeName in bucket ${bucket.definition.id}`,
+          if (!isNestedListBucket) {
+            const typeName = setter.root[$$concreteType];
+            if (typeName == null) {
+              throw new Error(
+                `Could not determine typeName in bucket ${bucket.definition.id}`,
+              );
+            }
+            processObject(
+              setter.root,
+              bucket.definition.outputMap,
+              `${bucket.rootPathIdentity}>${typeName}.`,
             );
           }
-          processObject(
-            setter.root,
-            bucket.definition.outputMap,
-            `${bucket.rootPathIdentity}>${typeName}.`,
-          );
         }
 
         // And any root buckets

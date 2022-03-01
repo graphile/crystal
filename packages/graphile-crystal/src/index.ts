@@ -23,6 +23,9 @@ import {
   InputStaticLeafPlan,
 } from "./input";
 import {
+  $$data,
+  $$setPlanGraph,
+  $$verbatim,
   ArgumentPlanResolver,
   BaseGraphQLArguments,
   BaseGraphQLContext,
@@ -45,8 +48,6 @@ import {
   PolymorphicData,
   PromiseOrDirect,
   TrackedArguments,
-  $$data,
-  $$setPlanGraph,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -107,6 +108,7 @@ import {
   SubscribePlan,
 } from "./plans";
 import { polymorphicWrap, resolveType } from "./polymorphic";
+import { crystalPrepare } from "./prepare";
 import {
   $$crystalWrapped,
   crystalResolve,
@@ -114,7 +116,6 @@ import {
   isCrystalWrapped,
   makeCrystalSubscriber,
 } from "./resolvers";
-import { crystalPrepare } from "./prepare";
 import { stripAnsi } from "./stripAnsi";
 import {
   arraysMatch,
@@ -141,6 +142,9 @@ export {
   __TrackedObjectPlan,
   __ValuePlan,
   $$crystalWrapped,
+  $$data,
+  $$setPlanGraph,
+  $$verbatim,
   access,
   AccessPlan,
   Aether,
@@ -161,6 +165,7 @@ export {
   context,
   crystalEnforce,
   CrystalError,
+  crystalPrepare,
   crystalPrint,
   crystalPrintPathIdentity,
   crystalResolve,
@@ -169,7 +174,6 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   crystalWrapResolve,
-  crystalPrepare,
   debugPlans,
   defer,
   Deferred,
@@ -251,8 +255,6 @@ export {
   subscribe,
   SubscribePlan,
   TrackedArguments,
-  $$data,
-  $$setPlanGraph,
 };
 
 exportAsMany({
