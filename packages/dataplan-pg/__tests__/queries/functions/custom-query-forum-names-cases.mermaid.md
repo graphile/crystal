@@ -49,12 +49,12 @@ graph TD
     class __Item_14 bucket2
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-cases"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNamesCasesList ᐸ-L- _7"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNamesCasesList ᐸ-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNamesCasesList[]<br />⠀ROOT ᐸ-O- _13"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNamesCasesList[]<br />⠀ROOT ᐸ-A- _13"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_14)<br />Deps: _13<br />~ᐳQuery.forumNamesCasesList[][]<br />⠀ROOT ᐸ-O- _14"):::bucket
+    Bucket2("Bucket 2 (item_14)<br />Deps: _13<br />~ᐳQuery.forumNamesCasesList[][]<br />⠀ROOT ᐸ-L- _14"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     end

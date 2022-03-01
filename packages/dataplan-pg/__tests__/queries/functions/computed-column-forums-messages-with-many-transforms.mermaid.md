@@ -140,7 +140,7 @@ graph TD
     Bucket4("Bucket 4 (item_41)<br />Deps: _30"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
-    Bucket5("Bucket 5 (item_42)<br />Deps: _31<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[]<br />⠀ROOT ᐸ-O- _43"):::bucket
+    Bucket5("Bucket 5 (item_42)<br />Deps: _31<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[]<br />⠀ROOT ᐸ-A- _43"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket1 --> Bucket5
     Bucket6("Bucket 6 (item_44)<br />Deps: _42"):::bucket

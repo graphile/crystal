@@ -45,9 +45,9 @@ graph TD
     class __Item_14 bucket1
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-array"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNamesArray ᐸ-L- _13"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNamesArray ᐸ-A- _13"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_14)<br />Deps: _13<br />~ᐳQuery.forumNamesArray[]<br />⠀ROOT ᐸ-O- _14"):::bucket
+    Bucket1("Bucket 1 (item_14)<br />Deps: _13<br />~ᐳQuery.forumNamesArray[]<br />⠀ROOT ᐸ-L- _14"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

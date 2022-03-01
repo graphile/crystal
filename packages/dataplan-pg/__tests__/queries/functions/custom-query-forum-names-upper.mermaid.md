@@ -58,12 +58,12 @@ graph TD
     class __Item_15,PgSelectSingle_16,PgClassExpression_17,Lambda_18 bucket2
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀FORUM_NAMES ᐸ-L- _11"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀FORUM_NAMES ᐸ-A- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.FORUM_NAMES[]<br />⠀ROOT ᐸ-O- _18"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.FORUM_NAMES[]<br />⠀ROOT ᐸ-L- _18"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     end

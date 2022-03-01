@@ -82,7 +82,7 @@ graph TD
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.randomUserArraySet[]<br />⠀ROOT ᐸ-O- _16"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.randomUserArraySet[]<br />⠀ROOT ᐸ-A- _16"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     Bucket3("Bucket 3 (item_17)<br />Deps: _15"):::bucket

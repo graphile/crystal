@@ -43,9 +43,9 @@ graph TD
     class __Item_11,PgSelectSingle_12,PgClassExpression_13 bucket1
 
     subgraph "Buckets for queries/functions/custom-query-forum-names"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNames ᐸ-L- _7"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNames ᐸ-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNames[]<br />⠀ROOT ᐸ-O- _13"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNames[]<br />⠀ROOT ᐸ-L- _13"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end
