@@ -5812,6 +5812,10 @@ export class Aether<
     const inProgressPlans = new Set();
     const pendingPlans = new Set(bucket.definition.plans);
     const store = bucket.store;
+    const rootOutputMode = bucket.definition.rootOutputMode;
+    const isNestedListBucket = rootOutputMode === "A";
+    const isLeafBucket = rootOutputMode === "L";
+    const isObjectBucket = rootOutputMode === "O";
 
     const completedPlan = (
       finishedPlan: ExecutablePlan,
@@ -5888,7 +5892,7 @@ export class Aether<
       const listsLength = lists.length;
       // TODO: we don't really use this mutableList, maybe we can get rid of it
       // by refactoring bucket execution?
-      const mutableList = new Array(listsLength);
+      const mutableList = arrayOfLength(listsLength);
       for (let i = 0, l = listsLength; i < l; i++) {
         const list = lists[i];
         if (Array.isArray(list)) {
@@ -6021,14 +6025,14 @@ export class Aether<
       }
 
       // TODO: create a JIT factory for this at planning time
+      type Child = {
+        childBucketDefinition: BucketDefinition;
+        inputs: BucketSetter[];
+        store: { [planId: string]: any[] };
+      };
+      const children: Array<Child> = [];
       const childrenByPathIdentity: {
-        [pathIdentity: string]:
-          | Array<{
-              childBucketDefinition: BucketDefinition;
-              inputs: BucketSetter[];
-              store: { [planId: string]: any[] };
-            }>
-          | undefined;
+        [pathIdentity: string]: Array<Child> | undefined;
       } = Object.create(null);
       for (const childBucketDefinition of bucket.definition.children) {
         const entry = {
@@ -6036,6 +6040,7 @@ export class Aether<
           inputs: [],
           store: Object.create(null),
         };
+        children.push(entry);
         for (const plan of childBucketDefinition.copyPlans) {
           entry.store[plan.id] = [];
         }
@@ -6059,43 +6064,52 @@ export class Aether<
         const children = childrenByPathIdentity[nestedPathIdentity];
         if (children) {
           for (const child of children) {
-            if (child.childBucketDefinition.itemPlanId == null) {
+            const {
+              inputs: childInputs,
+              store: childStore,
+              childBucketDefinition: {
+                itemPlanId,
+                polymorphicPlanIds,
+                copyPlans,
+                groupId,
+              },
+            } = child;
+            if (itemPlanId == null) {
               throw new Error(
                 `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
               );
             }
-            if (child.childBucketDefinition.polymorphicPlanIds) {
+            if (polymorphicPlanIds) {
               // TODO: will this ever be supported?
               throw new Error("Polymorphism inside list currently unsupported");
             }
-            if (child.childBucketDefinition.groupId != null) {
+            if (groupId != null) {
               throw new Error("Group inside list currently unsupported");
             }
             for (let i = 0, l = value.length; i < l; i++) {
-              child.inputs.push(new BucketSetter(nestedPathIdentity, value, i));
-              child.store[child.childBucketDefinition.itemPlanId].push(
-                rawValue[i],
-              );
-              for (const plan of child.childBucketDefinition.copyPlans) {
-                child.store[plan.id].push(bucket.store[plan.id][index]);
+              childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
+              childStore[itemPlanId].push(rawValue[i]);
+              for (const plan of copyPlans) {
+                childStore[plan.id].push(store[plan.id][index]);
               }
             }
           }
         }
       };
 
-      const isNestedListBucket = bucket.definition.rootOutputMode === "A";
-      const isLeafBucket = bucket.definition.rootOutputMode === "L";
+      const rootOutputStore =
+        bucket.definition.rootOutputPlanId != null
+          ? store[bucket.definition.rootOutputPlanId]
+          : null;
+
       const result = bucket.input.map((setter, index) => {
-        if (bucket.definition.rootOutputPlanId != null) {
-          const rawValue = store[bucket.definition.rootOutputPlanId][index];
-          const rootOutputMode = bucket.definition.rootOutputMode;
-          const concreteType =
-            rootOutputMode === "O"
-              ? bucket.definition.singleTypeNameByRootPathIdentity![
-                  setter.rootPathIdentity
-                ]
-              : null;
+        if (rootOutputStore) {
+          const rawValue = rootOutputStore[index];
+          const concreteType = isObjectBucket
+            ? bucket.definition.singleTypeNameByRootPathIdentity![
+                setter.rootPathIdentity
+              ]
+            : null;
 
           const value = bucketValue(
             setter.root,
@@ -6191,7 +6205,7 @@ export class Aether<
           }
         };
         if (setter.root && !(setter.root instanceof CrystalError)) {
-          if (!isNestedListBucket && !isLeafBucket) {
+          if (isObjectBucket) {
             const typeName = setter.root[$$concreteType];
             if (typeName == null) {
               throw new Error(
@@ -6222,24 +6236,19 @@ export class Aether<
       });
 
       // Now to call any nested buckets
-      // console.dir(childrenByPathIdentity);
       const childPromises: PromiseLike<any>[] = [];
-      for (const [childRootPathIdentity, children] of Object.entries(
-        childrenByPathIdentity,
-      )) {
-        for (const child of children!) {
-          if (child.inputs.length > 0) {
-            const bucket: Bucket = {
-              definition: child.childBucketDefinition,
-              store: child.store,
-              size: child.inputs.length,
-              input: child.inputs,
-              noDepsList: arrayOfLength(child.inputs.length),
-            };
-            const r = this.executeBucket(metaByPlanId, bucket);
-            if (isPromiseLike(r)) {
-              childPromises.push(r);
-            }
+      for (const child of children!) {
+        if (child.inputs.length > 0) {
+          const bucket: Bucket = {
+            definition: child.childBucketDefinition,
+            store: child.store,
+            size: child.inputs.length,
+            input: child.inputs,
+            noDepsList: arrayOfLength(child.inputs.length),
+          };
+          const r = this.executeBucket(metaByPlanId, bucket);
+          if (isPromiseLike(r)) {
+            childPromises.push(r);
           }
         }
       }
