@@ -69,6 +69,8 @@ declare module "graphql" {
 export const $$crystalContext = Symbol("context");
 export const $$planResults = Symbol("planResults");
 export const $$id = Symbol("id");
+// Return the value verbatim, don't execute
+export const $$verbatim = Symbol("verbatim");
 export const $$data = Symbol("data");
 export const $$pathIdentity = Symbol("pathIdentity");
 

@@ -14,6 +14,7 @@ import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import { $$verbatim } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
@@ -184,6 +185,13 @@ function crystalWrapResolveOrSubscribe<
       context,
       info,
     ) {
+      // New executor verbatim data
+      if (source?.[$$verbatim]) {
+        const fieldAlias = info.path.key;
+        if (fieldAlias in source) {
+          return source[fieldAlias];
+        }
+      }
       let possiblyParentCrystalObject: CrystalObject | null = null;
 
       // Note: for the most optimal execution, `rootValue` passed to graphql
