@@ -375,6 +375,11 @@ interface BucketDefinition {
    * that.
    */
   rootOutputPlanId?: string;
+  /**
+   * If this bucket has a plan for setting it's own root object, what type of
+   * processing should it get?.
+   */
+  rootOutputMode?: BucketDefinitionFieldOutputMap["mode"];
 
   /**
    * If this is not a polymorphic bucket, what is the associated type name?
@@ -547,8 +552,6 @@ function bucketValue(
       }
     }
     case "L": {
-      // TODO: this could actually have a list depth, if it does we should loop
-      // through looking for errors.
       return value;
     }
     default: {
@@ -3618,13 +3621,20 @@ export class Aether<
           );
 
           for (const [pathIdentity, plan] of planPathIdentityTuples) {
-            const fieldDigest = this.fieldDigestByPathIdentity[pathIdentity];
-            const mode = fieldDigest?.isLeaf
-              ? "L"
-              : fieldDigest?.listDepth === 0
-              ? "O"
-              : "A"; // If there's no fieldDigest then it must be an array intermediary result
-            const listDepth = fieldDigest?.listDepth ?? 1;
+            let depth = 0;
+            let fieldPathIdentity = pathIdentity;
+            while (fieldPathIdentity.endsWith("[]")) {
+              depth++;
+              fieldPathIdentity = fieldPathIdentity.substring(
+                0,
+                fieldPathIdentity.length - 2,
+              );
+            }
+            const fieldDigest =
+              this.fieldDigestByPathIdentity[fieldPathIdentity];
+            const remainingDepth = fieldDigest.listDepth - depth;
+            const mode =
+              remainingDepth > 0 ? "A" : fieldDigest.isLeaf ? "L" : "O";
             const matchingParentPathIdentities =
               bucket.rootPathIdentities.filter(
                 (rpi) =>
@@ -3677,6 +3687,7 @@ export class Aether<
                 );
               }
               bucket.rootOutputPlanId = plan.id;
+              bucket.rootOutputMode = mode;
             } else {
               let spec = bucket.outputMap;
               for (let i = 0, l = path.length - 1; i < l; i++) {
@@ -3731,7 +3742,6 @@ export class Aether<
                 spec[fieldName] = {
                   planIdByRootPathIdentity: Object.create(null),
                   mode,
-                  //listDepth,
                   typeName: fieldDigest.namedReturnType.name,
                   children: mode === "O" ? Object.create(null) : null,
                   typeNames: bucket.polymorphicPlanIds ? [] : null,
@@ -6070,33 +6080,32 @@ export class Aether<
         }
       };
 
-      // TODO: make this smarter!
-      const isNestedListBucket =
-        bucket.definition.itemPlanId != null &&
-        bucket.definition.children.some((child) =>
-          child.rootPathIdentities.includes(bucket.rootPathIdentity + "[]"),
-        );
+      const isNestedListBucket = bucket.definition.rootOutputMode === "A";
+      const isLeafBucket = bucket.definition.rootOutputMode === "L";
       const result = bucket.input.map((setter, index) => {
         if (bucket.definition.rootOutputPlanId != null) {
+          const rawValue = store[bucket.definition.rootOutputPlanId][index];
+          const rootOutputMode = bucket.definition.rootOutputMode;
+          const concreteType =
+            rootOutputMode === "O"
+              ? bucket.definition.singleTypeNameByRootPathIdentity![
+                  bucket.rootPathIdentity
+                ]
+              : null;
+
+          const value = bucketValue(
+            setter.root,
+            rawValue,
+            rootOutputMode!,
+            concreteType,
+          );
+          setter.setRoot(value);
+
           if (isNestedListBucket) {
-            const rawValue = store[bucket.definition.rootOutputPlanId][index];
-            const value = bucketValue(setter.root, rawValue, "A", null);
-            setter.setRoot(value);
             if (Array.isArray(value)) {
               const nestedPathIdentity = bucket.rootPathIdentity + "[]";
               processListChildren(nestedPathIdentity, rawValue, value, index);
             }
-          } else {
-            setter.setRoot(
-              bucketValue(
-                setter.root,
-                store[bucket.definition.rootOutputPlanId][index],
-                "O",
-                bucket.definition.singleTypeNameByRootPathIdentity![
-                  bucket.rootPathIdentity
-                ],
-              ),
-            );
           }
         }
         const processObject = (
@@ -6176,7 +6185,7 @@ export class Aether<
           }
         };
         if (setter.root && !(setter.root instanceof CrystalError)) {
-          if (!isNestedListBucket) {
+          if (!isNestedListBucket && !isLeafBucket) {
             const typeName = setter.root[$$concreteType];
             if (typeName == null) {
               throw new Error(
@@ -6676,7 +6685,9 @@ export class Aether<
               : ""
           }${bucket.rootPathIdentities.join("\n")}\n${
             bucket.rootOutputPlanId != null
-              ? `⠀ROOT <-O- ${bucket.rootOutputPlanId}\n`
+              ? `⠀ROOT <-${bucket.rootOutputMode ?? "?"}- ${
+                  bucket.rootOutputPlanId
+                }\n`
               : ""
           }${outputMapStuff.join("\n")}`,
         )}):::bucket`,
