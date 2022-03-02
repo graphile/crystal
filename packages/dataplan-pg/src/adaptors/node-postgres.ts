@@ -19,9 +19,13 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
             if (needsTx) {
               await this.startTransaction();
             }
-            const queryObj = opts.arrayMode
-              ? { ...opts, rowMode: "array" }
-              : opts;
+            const { text, name, values, arrayMode } = opts;
+            // TODO: support named queries.
+            const queryObj = {
+              text,
+              values,
+              ...(arrayMode ? { rowMode: "array" } : null),
+            };
             const result = await pgClient.query<TData>(queryObj);
 
             if (needsTx) {

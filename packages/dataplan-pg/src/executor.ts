@@ -91,6 +91,7 @@ export type PgExecutorOptions = {
   rawSqlValues: Array<SQLRawValue | symbol>;
   identifierIndex?: number | null;
   queryValuesSymbol?: symbol | null;
+  name?: string;
 };
 
 export type PgExecutorMutationOptions = {
@@ -137,6 +138,7 @@ export class PgExecutor<TSettings = any> {
     client: PgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
+    name?: string,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -146,6 +148,7 @@ export class PgExecutor<TSettings = any> {
         text,
         values: values as SQLRawValue[],
         arrayMode: true,
+        name,
       });
     } catch (e) {
       error = e;
@@ -221,12 +224,13 @@ ${duration}
     context: PgExecutorContext,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
+    name?: string,
   ) {
     // TODO: we could probably make this more efficient by grouping the
     // deferreds further, DataLoader-style, and running one SQL query for
     // everything.
     return await context.withPgClient(context.pgSettings, (client) =>
-      this._executeWithClient<TData>(client, text, values),
+      this._executeWithClient<TData>(client, text, values, name),
     );
   }
 
@@ -286,7 +290,8 @@ ${duration}
   ): Promise<{
     values: CrystalValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
+    const { text, rawSqlValues, identifierIndex, queryValuesSymbol, name } =
+      common;
 
     const valuesCount = values.length;
     const results: Array<Deferred<Array<TOutput>> | undefined> = [];
@@ -409,6 +414,7 @@ ${duration}
                 context,
                 text,
                 sqlValues,
+                name,
               );
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =

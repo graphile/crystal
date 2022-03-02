@@ -58,6 +58,11 @@ import { PgSelectSinglePlan } from "./pgSelectSingle";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor";
 import { toPg } from "./toPg";
 
+// Maximum identifier length in Postgres is 63 chars, so trim one off. (We
+// could do base64... but meh.)
+const hash = (text: string): string =>
+  createHash("sha256").update(text).digest("hex").substring(0, 63);
+
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
@@ -429,6 +434,9 @@ export class PgSelectPlan<
 
     // If last but not first, reverse order.
     shouldReverseOrder: boolean;
+
+    // For prepared queries
+    name?: string;
   } | null = null;
 
   /**
@@ -1131,7 +1139,7 @@ export class PgSelectPlan<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
     }
-    const { text, rawSqlValues, identifierIndex, shouldReverseOrder } =
+    const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults;
 
     const executionResult = await this.source.executeWithCache(
@@ -1152,6 +1160,7 @@ export class PgSelectPlan<
         rawSqlValues,
         identifierIndex,
         queryValuesSymbol: this.queryValuesSymbol,
+        name,
       },
     );
     debugExecute("%s; result: %c", this, executionResult);
@@ -1817,6 +1826,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           identifierIndex,
           // TODO: when streaming we must not set this to true
           shouldReverseOrder: this.shouldReverseOrder(),
+          name: hash(text),
         };
       }
     }
