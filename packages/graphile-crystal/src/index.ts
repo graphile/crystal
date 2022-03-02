@@ -25,6 +25,7 @@ import {
 import {
   $$bypassGraphQL,
   $$data,
+  $$idempotent,
   $$setPlanGraph,
   $$verbatim,
   ArgumentPlanResolver,
@@ -145,6 +146,7 @@ export {
   $$bypassGraphQL,
   $$crystalWrapped,
   $$data,
+  $$idempotent,
   $$setPlanGraph,
   $$verbatim,
   access,

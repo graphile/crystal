@@ -62,6 +62,10 @@ declare module "graphql" {
   interface GraphQLScalarTypeExtensions {
     graphile?: {
       plan?: ScalarPlanResolver<any, any>;
+      /**
+       * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
+       */
+      idempotent?: boolean;
     };
   }
 }
@@ -80,6 +84,11 @@ export const $$pathIdentity = Symbol("pathIdentity");
 export const $$concreteType = Symbol("concreteType");
 
 export const $$setPlanGraph = Symbol("setPlanGraph");
+
+/**
+ * Set this key on a type if that type's serialization is idempotent.
+ */
+export const $$idempotent = Symbol("idempotent");
 
 export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteType]: TType;

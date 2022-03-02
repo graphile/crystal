@@ -14,21 +14,19 @@ import type {
   OperationDefinitionNode,
 } from "graphql";
 import {
+  assertObjectType,
+  getNamedType,
   GraphQLBoolean,
   GraphQLFloat,
   GraphQLID,
   GraphQLInt,
-  GraphQLString,
-} from "graphql";
-import {
-  assertObjectType,
-  getNamedType,
   GraphQLInterfaceType,
   GraphQLLeafType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
+  GraphQLString,
   GraphQLUnionType,
   isEnumType,
   isInputObjectType,
@@ -84,6 +82,7 @@ import {
   $$concreteType,
   $$crystalContext,
   $$data,
+  $$idempotent,
   $$planResults,
   $$setPlanGraph,
   $$verbatim,
@@ -125,8 +124,6 @@ import {
   ROOT_VALUE_OBJECT,
   sharedNull,
 } from "./utils";
-
-const $$idempotent = Symbol("idempotent");
 
 const verbatimPrototype = Object.assign(Object.create(null), {
   [$$verbatim]: true,
@@ -220,14 +217,24 @@ return typeName => {
   return f(verbatimPrototype, $$concreteType) as any;
 }
 
+const identity = <T>(_: T): T => _;
+identity[$$idempotent] = true;
+
 // TODO: consider memoizing this
 function serializerForEnumType(
   type: GraphQLEnumType,
 ): GraphQLScalarType["serialize"] {
   const values = type.getValues();
   const lookup = new Map();
+  let noTranslationNecessary = true;
   for (const value of values) {
+    if (value.value !== value.name) {
+      noTranslationNecessary = false;
+    }
     lookup.set(value.value, value.name);
+  }
+  if (noTranslationNecessary) {
+    return identity;
   }
   return (value) => lookup.get(value);
 }
@@ -242,7 +249,9 @@ function serializerForScalarType(
     type === GraphQLID ||
     type === GraphQLFloat ||
     type === GraphQLInt ||
-    type === GraphQLBoolean;
+    type === GraphQLBoolean ||
+    type.serialize[$$idempotent] ||
+    type.extensions.graphile?.idempotent;
   if (isIdempotent) {
     sz[$$idempotent] = true;
   }

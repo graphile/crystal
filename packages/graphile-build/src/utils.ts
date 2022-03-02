@@ -1,3 +1,4 @@
+import { $$idempotent } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";
@@ -80,6 +81,11 @@ export const stringScalarSpec = Object.freeze({
     },
     [Kind],
   ),
+  extensions: {
+    graphile: {
+      idempotent: true,
+    },
+  },
 } as Omit<GraphQLScalarTypeConfig<unknown, unknown>, "name" | "description">);
 
 // Copied from GraphQL v14, MIT license (c) GraphQL Contributors.
@@ -163,4 +169,9 @@ export const stringTypeSpec = (
         },
         [Kind],
       ),
+  extensions: {
+    graphile: {
+      idempotent: !coerce || coerce[$$idempotent] ? true : false,
+    },
+  },
 });
