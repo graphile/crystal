@@ -342,7 +342,11 @@ export function executeBucket(
       setter: BucketSetter,
       index: number,
     ) => {
-      if (obj == null || obj instanceof CrystalError) {
+      if (
+        obj === null ||
+        obj === undefined ||
+        obj.constructor === CrystalError
+      ) {
         return;
       }
       const concreteType = setter.concreteType!;
