@@ -71,6 +71,9 @@ export const $$planResults = Symbol("planResults");
 export const $$id = Symbol("id");
 // Return the value verbatim, don't execute
 export const $$verbatim = Symbol("verbatim");
+// If we're sure the data is the right shape and valid, we can set this key and
+// it can be returned directly
+export const $$bypassGraphQL = Symbol("bypassGraphQL");
 export const $$data = Symbol("data");
 export const $$pathIdentity = Symbol("pathIdentity");
 

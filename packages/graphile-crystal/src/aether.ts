@@ -28,6 +28,7 @@ import {
   isNonNullType,
   isObjectType,
   isUnionType,
+  TypeNameMetaFieldDef,
 } from "graphql";
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
@@ -68,6 +69,7 @@ import type {
   TrackedArguments,
 } from "./interfaces";
 import {
+  $$bypassGraphQL,
   $$concreteType,
   $$crystalContext,
   $$data,
@@ -155,6 +157,67 @@ const dotEscape = (str: string): string => {
     )
     .replace(/\r?\n/g, "<br />")}"`;
 };
+
+interface ObjectCreatorFields {
+  [fieldName: string]: "normal" | "__typename";
+}
+
+/**
+ * Returns a function that, given a type name, creates an object with the
+ * fields in the given order and the $$concreteType and any __typename fields
+ * already populated. This is in an effort to make the objects suitable to
+ * return directly without having to go via GraphQL.js
+ */
+function makeObjectCreator(
+  concreteType: string | null,
+  fields: ObjectCreatorFields,
+): (typeName: string | null) => object {
+  const keys = Object.keys(fields);
+  /*
+   * NOTE: because we use `Object.create(verbatimPrototype)` (and
+   * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
+   * set keys such as `__proto__`. This would not be safe if we were to use
+   * `{}` instead.
+   */
+  const unsafeKeys = keys.filter(
+    (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
+  );
+  if (unsafeKeys.length > 0) {
+    throw new Error(`Unsafe keys: ${unsafeKeys.join(",")}`);
+  }
+  const functionBody = `\
+return value => {
+  const typeName = isPolymorphicData(value) ? value[$$concreteType] : concreteType;
+  if (typeName == null) {
+    throw new Error(
+      "Call to bucketValue with 'O' mode but data isn't polymorphic and no concrete type was supplied"
+    );
+  }
+  return Object.assign(Object.create(verbatimPrototype), {
+    [$$concreteType]: typeName,
+    ${Object.entries(fields)
+      .map(([fieldName, type]) => {
+        switch (type) {
+          case "normal":
+            return `${fieldName}: undefined`;
+          case "__typename":
+            return `${fieldName}: typeName`;
+          default: {
+            throw new Error();
+          }
+        }
+      })
+      .join(",\n    ")},
+  });
+}`;
+  const f = new Function(
+    "verbatimPrototype",
+    "isPolymorphicData",
+    "$$concreteType",
+    functionBody,
+  );
+  return f(verbatimPrototype, isPolymorphicData, $$concreteType) as any;
+}
 
 /**
  * Returns true if this "executable plan" isn't actually executable because
@@ -258,6 +321,8 @@ interface FieldDigest {
   namedReturnType: GraphQLNamedType & GraphQLOutputType;
   isPolymorphic: boolean;
   isLeaf: boolean;
+  // True if the field is a `__typename` field
+  isTypeName: boolean;
   listDepth: number;
   returnRaw: boolean;
   planId: string;
@@ -276,6 +341,26 @@ interface PrefetchConfig {
   itemPlan: ExecutablePlan;
 }
 
+interface IBucketDefinitionOutputMode {
+  type: "O" | "A" | "L";
+  notNull: boolean;
+}
+interface BucketDefinitionObjectOutputMode extends IBucketDefinitionOutputMode {
+  type: "O";
+  objectCreator: (typeName: string | null) => object;
+}
+interface BucketDefinitionArrayOutputMode extends IBucketDefinitionOutputMode {
+  type: "A";
+}
+interface BucketDefinitionLeafOutputMode extends IBucketDefinitionOutputMode {
+  type: "L";
+}
+
+type BucketDefinitionOutputMode =
+  | BucketDefinitionObjectOutputMode
+  | BucketDefinitionArrayOutputMode
+  | BucketDefinitionLeafOutputMode;
+
 // TODO: for defer buckets we'll need to copy previous plans across and set
 // their outputs again (if they're duplicated in the deferred selection set as
 // well as the root selection set).
@@ -288,13 +373,9 @@ interface BucketDefinitionFieldOutputMap {
     [rootPathIdentity: string]: string;
   };
   /**
-   * The mode for this field; one of:
-   *
-   * O - object (or null/error)
-   * A - array (or null/error)
-   * L - leaf (anything)
+   * The mode for this field; either object, array or leaf.
    */
-  mode: "O" | "A" | "L";
+  mode: BucketDefinitionOutputMode;
   /**
    * The name of the named GraphQL result type of this field.
    */
@@ -495,42 +576,42 @@ export class CrystalError extends Error {
  */
 function bucketValue(
   value: any,
-  mode: BucketDefinitionFieldOutputMap["mode"],
+  mode: BucketDefinitionOutputMode,
   concreteType: string | null,
+  // This gets called if any of the non-null constraints are failed, or if
+  // there was an error. This triggers processing through the GraphQL.js stack.
+  hasIssues: () => void,
 ): any {
+  const handleNull = (v: undefined | null | CrystalError) => {
+    if (mode.notNull || v != null) {
+      hasIssues();
+    }
+    return v != null ? Promise.reject(v.originalError) : v;
+  };
   if (value instanceof CrystalError) {
-    return Promise.reject(value.originalError);
+    return handleNull(value);
   }
-  switch (mode) {
+  if (value == null) {
+    return handleNull(value);
+  }
+  switch (mode.type) {
     case "A": {
       if (Array.isArray(value)) {
         return arrayOfLength(value.length);
-      } else if (value == null) {
-        return value;
       } else {
-        // TODO: should we fallback to null, or raise an error, or...?
         console.warn(
-          `Hit fallback for value ${inspect(value)} coercion to mode ${mode}`,
+          `Hit fallback for value ${inspect(value)} coercion to mode ${
+            mode.type
+          }`,
         );
-        return null;
+        return handleNull(null);
       }
     }
     case "O": {
-      if (value == null) {
-        return value;
-      } else {
-        const typeName = isPolymorphicData(value)
-          ? value[$$concreteType]
-          : concreteType;
-        if (typeName == null) {
-          throw new Error(
-            `Call to bucketValue with "O" mode but data isn't polymorphic and no concrete type was supplied`,
-          );
-        }
-        return Object.assign(Object.create(verbatimPrototype), {
-          [$$concreteType]: typeName,
-        });
-      }
+      const typeName = isPolymorphicData(value)
+        ? value[$$concreteType]
+        : concreteType;
+      return mode.objectCreator(typeName);
     }
     case "L": {
       return value;
@@ -839,7 +920,22 @@ export class Aether<
    * If true, then this operation doesn't use resolvers.
    */
   private pure = true;
+  /**
+   * If true, then this operation uses `__type` or `__schema` fields and thus
+   * must go through GraphQL.js for resolution.
+   *
+   * NOTE: we're ignoring the `__typename` field deliberately, we can handle
+   * that.
+   */
+  private hasIntrospectionFields = false;
+  /**
+   * True if the operation is simple enough that we can execute all the data
+   * requirements before even hitting GraphQL
+   */
   private canPreempt = false;
+  /**
+   * Factory for metaByPlanId variables.
+   */
   private makeMetaByPlanId: () => CrystalContext["metaByPlanId"];
 
   constructor(
@@ -1391,6 +1487,7 @@ export class Aether<
       namedReturnType: type,
       returnRaw: false,
       isPolymorphic: false,
+      isTypeName: false,
       isLeaf: false,
       planId: this.rootSelectionSetPlan.id,
       itemPlanId: this.rootSelectionSetPlan.id,
@@ -1637,17 +1734,41 @@ export class Aether<
 
       // Tell TypeScript this isn't going to change now.
       const field = firstField;
-
       const fieldName = field.name.value;
-      if (fieldName.startsWith("__")) {
-        // Introspection field, skip
-        continue;
-      }
 
       // This is presumed to exist because the operation passed validation.
       const objectField = objectTypeFields[fieldName];
+
+      if (fieldName.startsWith("__")) {
+        if (fieldName === "__typename") {
+          const fieldDigest: FieldDigest = {
+            parentFieldDigest: null,
+            pathIdentity,
+            itemPathIdentity: pathIdentity,
+            responseKey,
+            returnType: TypeNameMetaFieldDef.type,
+            namedReturnType: getNamedType(TypeNameMetaFieldDef.type),
+            returnRaw: true,
+            isPolymorphic: false,
+            isLeaf: true,
+            isTypeName: true,
+            planId: "__typename",
+            itemPlanId: "__typename",
+            listDepth: 0,
+            childFieldDigests: null,
+          };
+          this.fieldDigestByPathIdentity[pathIdentity] = fieldDigest;
+          fieldDigests.push(fieldDigest);
+        } else {
+          this.hasIntrospectionFields = true;
+        }
+        // Introspection field, skip
+        continue;
+      }
       const fieldType = objectTypeFields[fieldName].type;
       const planResolver = objectField.extensions?.graphile?.plan;
+      const namedReturnType = getNamedType(fieldType);
+      const namedResultTypeIsLeaf = isLeafType(namedReturnType);
 
       /*
        *  When considering resolvers on fields, there's three booleans to
@@ -1710,8 +1831,6 @@ export class Aether<
       const rawResolver = objectField.resolve;
 
       const typePlan = objectType.extensions?.graphile?.Plan;
-      const namedReturnType = getNamedType(fieldType);
-      const namedResultTypeIsLeaf = isLeafType(namedReturnType);
 
       /**
        * This will never be the crystal resolver - only ever the user-supplied
@@ -1898,6 +2017,7 @@ export class Aether<
         returnRaw,
         isPolymorphic,
         isLeaf,
+        isTypeName: false,
         planId: plan.id,
         itemPlanId: itemPlan.id,
         listDepth,
@@ -3663,8 +3783,58 @@ export class Aether<
             const fieldDigest =
               this.fieldDigestByPathIdentity[fieldPathIdentity];
             const remainingDepth = fieldDigest.listDepth - depth;
-            const mode =
-              remainingDepth > 0 ? "A" : fieldDigest.isLeaf ? "L" : "O";
+
+            // Determine the GraphQL type at this level
+            let typeAtThisDepth = fieldDigest.returnType;
+            for (let i = 0; i < depth; i++) {
+              if (isNonNullType(typeAtThisDepth)) {
+                typeAtThisDepth = typeAtThisDepth.ofType;
+              }
+              if (isListType(typeAtThisDepth)) {
+                typeAtThisDepth = typeAtThisDepth.ofType;
+              } else {
+                throw new Error(
+                  `GraphileInternalError<ef22a107-3d2e-4413-9611-e04669f74e4c>: Expected a list type, but instead found ${typeAtThisDepth}`,
+                );
+              }
+            }
+
+            const notNull = isNonNullType(typeAtThisDepth);
+            const mode = ((): BucketDefinitionOutputMode => {
+              if (remainingDepth > 0) {
+                return {
+                  type: "A",
+                  notNull,
+                };
+              } else if (fieldDigest.isLeaf) {
+                return {
+                  type: "L",
+                  notNull,
+                };
+              } else {
+                const fields: ObjectCreatorFields = Object.create(null);
+                if (!fieldDigest.childFieldDigests) {
+                  throw new Error(
+                    `GraphileInternalError<18101261-6949-4de5-b3b9-22919fb4fccf>: Processing an object type, childFieldDigests is expected to exist`,
+                  );
+                }
+                for (const childFieldDigest of fieldDigest.childFieldDigests) {
+                  if (fields[childFieldDigest.responseKey]) {
+                    continue;
+                  }
+                  fields[childFieldDigest.responseKey] =
+                    childFieldDigest.isTypeName ? "__typename" : "normal";
+                }
+                return {
+                  type: "O",
+                  notNull,
+                  objectCreator: makeObjectCreator(
+                    fieldDigest.namedReturnType.name,
+                    fields,
+                  ),
+                };
+              }
+            })();
             const matchingParentPathIdentities =
               bucket.rootPathIdentities.filter(
                 (rpi) =>
@@ -3773,12 +3943,13 @@ export class Aether<
                   planIdByRootPathIdentity: Object.create(null),
                   mode,
                   typeName: fieldDigest.namedReturnType.name,
-                  children: mode === "O" ? Object.create(null) : null,
+                  children: mode.type === "O" ? Object.create(null) : null,
                   typeNames: bucket.polymorphicPlanIds ? [] : null,
                 };
               } else {
                 // Consistency check
-                if (spec[fieldName].mode !== mode) {
+                // TODO:perf: we shouldn't need to keep recreating `mode` in this case - it's unnecessarily expensive
+                if (spec[fieldName].mode.type !== mode.type) {
                   throw new Error(
                     `GraphileInternalError<b2286484-49af-47b3-8e72-4c72c8e488f2>: modes cannot differ here!`,
                   );
@@ -5770,7 +5941,7 @@ export class Aether<
     variableValues: any,
     context: any,
     rootValue: any,
-  ): null | PromiseOrDirect<{ [$$data]: any }> {
+  ): null | PromiseOrDirect<any> {
     if (!this.canPreempt) {
       return null;
     }
@@ -5801,25 +5972,37 @@ export class Aether<
       }),
     };
     const metaByPlanId = this.makeMetaByPlanId();
-    const p = this.executeBucket(metaByPlanId, rootBucket);
+    let requiresGraphQLJS = this.hasIntrospectionFields;
+    const hasIssues = () => {
+      requiresGraphQLJS = true;
+    };
+    const p = this.executeBucket(metaByPlanId, rootBucket, hasIssues);
+    const finalize = (list: any[]) => {
+      const result = list[0];
+      if (!requiresGraphQLJS && typeof result == "object" && result != null) {
+        result[$$bypassGraphQL] = true;
+      }
+      return result;
+    };
     if (isPromiseLike(p)) {
-      return p.then((list) => list[0]);
+      return p.then(finalize);
     } else {
-      return p[0];
+      return finalize(p);
     }
   }
 
   public executeBucket(
     metaByPlanId: CrystalContext["metaByPlanId"],
     bucket: Bucket,
+    hasIssues: () => void,
   ): PromiseOrDirect<Array<any>> {
     const inProgressPlans = new Set();
     const pendingPlans = new Set(bucket.definition.plans);
     const store = bucket.store;
     const rootOutputMode = bucket.definition.rootOutputMode;
-    const isNestedListBucket = rootOutputMode === "A";
-    const isLeafBucket = rootOutputMode === "L";
-    const isObjectBucket = rootOutputMode === "O";
+    const isNestedListBucket = rootOutputMode?.type === "A";
+    const isLeafBucket = rootOutputMode?.type === "L";
+    const isObjectBucket = rootOutputMode?.type === "O";
 
     const completedPlan = (
       finishedPlan: ExecutablePlan,
@@ -5929,7 +6112,7 @@ export class Aether<
         noDepsList: itemInputs.map(() => undefined),
         input: itemInputs,
       };
-      const result = this.executeBucket(metaByPlanId, itemBucket);
+      const result = this.executeBucket(metaByPlanId, itemBucket, hasIssues);
 
       const performTransform = (): any[] => {
         const result: any[] = [];
@@ -6115,7 +6298,12 @@ export class Aether<
               ]
             : null;
 
-          const value = bucketValue(rawValue, rootOutputMode!, concreteType);
+          const value = bucketValue(
+            rawValue,
+            rootOutputMode!,
+            concreteType,
+            hasIssues,
+          );
           setter.setRoot(value);
 
           if (isNestedListBucket) {
@@ -6149,15 +6337,20 @@ export class Aether<
               continue;
             }
             const rawValue = store[planId][index];
-            const value = bucketValue(rawValue, field.mode, field.typeName);
+            const value = bucketValue(
+              rawValue,
+              field.mode,
+              field.typeName,
+              hasIssues,
+            );
             obj[responseKey] = value;
 
-            if (field.mode === "A") {
+            if (field.mode.type === "A") {
               if (Array.isArray(value)) {
                 const nestedPathIdentity = keyPathIdentity + "[]";
                 processListChildren(nestedPathIdentity, rawValue, value, index);
               }
-            } else if (field.mode === "O") {
+            } else if (field.mode.type === "O") {
               const d = value;
               if (d && !(d instanceof CrystalError)) {
                 if (field.children) {
@@ -6240,7 +6433,7 @@ export class Aether<
             input: child.inputs,
             noDepsList: arrayOfLength(child.inputs.length),
           };
-          const r = this.executeBucket(metaByPlanId, bucket);
+          const r = this.executeBucket(metaByPlanId, bucket, hasIssues);
           if (isPromiseLike(r)) {
             childPromises.push(r);
           }
@@ -6677,7 +6870,7 @@ export class Aether<
             ? planIds[0]
             : JSON.stringify(def.planIdByRootPathIdentity);
           outputMapStuff.push(
-            `${path}${fieldName} <-${def.mode}- ${planSource}`,
+            `${path}${fieldName} <-${def.mode.type}- ${planSource}`,
           );
           if (def.children) {
             processObject(def.children, `⠀${path}${fieldName}.`);
@@ -6693,7 +6886,7 @@ export class Aether<
               : ""
           }${bucket.rootPathIdentities.join("\n")}\n${
             bucket.rootOutputPlanId != null
-              ? `⠀ROOT <-${bucket.rootOutputMode ?? "?"}- ${
+              ? `⠀ROOT <-${bucket.rootOutputMode!.type ?? "?"}- ${
                   bucket.rootOutputPlanId
                 }\n`
               : ""
