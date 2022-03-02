@@ -169,7 +169,6 @@ interface ObjectCreatorFields {
  * return directly without having to go via GraphQL.js
  */
 function makeObjectCreator(
-  concreteType: string | null,
   fields: ObjectCreatorFields,
 ): (typeName: string | null) => object {
   const keys = Object.keys(fields);
@@ -186,13 +185,7 @@ function makeObjectCreator(
     throw new Error(`Unsafe keys: ${unsafeKeys.join(",")}`);
   }
   const functionBody = `\
-return value => {
-  const typeName = isPolymorphicData(value) ? value[$$concreteType] : concreteType;
-  if (typeName == null) {
-    throw new Error(
-      "Call to bucketValue with 'O' mode but data isn't polymorphic and no concrete type was supplied"
-    );
-  }
+return typeName => {
   return Object.assign(Object.create(verbatimPrototype), {
     [$$concreteType]: typeName,
     ${Object.entries(fields)
@@ -210,13 +203,8 @@ return value => {
       .join(",\n    ")},
   });
 }`;
-  const f = new Function(
-    "verbatimPrototype",
-    "isPolymorphicData",
-    "$$concreteType",
-    functionBody,
-  );
-  return f(verbatimPrototype, isPolymorphicData, $$concreteType) as any;
+  const f = new Function("verbatimPrototype", "$$concreteType", functionBody);
+  return f(verbatimPrototype, $$concreteType) as any;
 }
 
 /**
@@ -3828,10 +3816,7 @@ export class Aether<
                 return {
                   type: "O",
                   notNull,
-                  objectCreator: makeObjectCreator(
-                    fieldDigest.namedReturnType.name,
-                    fields,
-                  ),
+                  objectCreator: makeObjectCreator(fields),
                 };
               }
             })();
