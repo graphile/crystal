@@ -20,8 +20,10 @@ import {
   SwallowErrorsPlugin,
 } from "graphile-build";
 import {
+  $$bypassGraphQL,
   $$data,
   $$setPlanGraph,
+  bypassGraphQLExecute,
   crystalPrepare,
   crystalPrint,
   stripAnsi,
@@ -45,7 +47,6 @@ import {
 } from "graphql-helix";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
-import pg from "pg";
 import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
@@ -191,6 +192,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
           }
         }
         args.rootValue = await crystalPrepare(args);
+        if ((args.rootValue as any)?.[$$bypassGraphQL]) {
+          setExecuteFn(bypassGraphQLExecute);
+        }
       },
     };
   };
