@@ -6135,6 +6135,20 @@ export class Aether<
     const isNestedListBucket = rootOutputModeType === "A";
     const isLeafBucket = rootOutputModeType === "L";
     const isObjectBucket = rootOutputModeType === "O";
+    const {
+      input,
+      size,
+      noDepsList,
+      definition: {
+        id: bucketId,
+        startPlans,
+        children: childBucketDefinitions,
+        rootOutputPlanId,
+        singleTypeNameByRootPathIdentity,
+        rootOutputModeByRootPathIdentity,
+        outputMap,
+      },
+    } = bucket;
 
     const completedPlan = (
       finishedPlan: ExecutablePlan,
@@ -6148,9 +6162,9 @@ export class Aether<
           )}`,
         );
       }
-      if (result.length !== bucket.size) {
+      if (result.length !== size) {
         throw new Error(
-          `Result array from ${finishedPlan} should have length ${bucket.size}, instead it had length ${result.length}`,
+          `Result array from ${finishedPlan} should have length ${size}, instead it had length ${result.length}`,
         );
       }
       store[finishedPlan.id] = result;
@@ -6229,7 +6243,7 @@ export class Aether<
             );
             itemStore[itemPlanId].push(list[j]);
             for (const plan of itemBucketDefinition.copyPlans) {
-              itemStore[plan.id].push(bucket.store[plan.id][i]);
+              itemStore[plan.id].push(store[plan.id][i]);
             }
           }
         } else {
@@ -6303,7 +6317,7 @@ export class Aether<
         const dependencies =
           plan.dependencies.length > 0
             ? plan.dependencies.map((depId) => store[depId])
-            : [bucket.noDepsList];
+            : [noDepsList];
         const result =
           plan instanceof __ListTransformPlan
             ? executeListTransform(plan, dependencies, meta)
@@ -6316,7 +6330,7 @@ export class Aether<
             (error) => {
               return completedPlan(
                 plan,
-                arrayOfLength(bucket.size, new CrystalError(error)),
+                arrayOfLength(size, new CrystalError(error)),
               );
             },
           );
@@ -6326,12 +6340,12 @@ export class Aether<
       } catch (error) {
         return completedPlan(
           plan,
-          arrayOfLength(bucket.size, new CrystalError(error)),
+          arrayOfLength(size, new CrystalError(error)),
         );
       }
     };
     const starterPromises: PromiseLike<void>[] = [];
-    for (const plan of bucket.definition.startPlans) {
+    for (const plan of startPlans) {
       const r = executePlan(plan);
       if (isPromiseLike(r)) {
         starterPromises.push(r);
@@ -6357,7 +6371,7 @@ export class Aether<
       const childrenByPathIdentity: {
         [pathIdentity: string]: Array<Child> | undefined;
       } = Object.create(null);
-      for (const childBucketDefinition of bucket.definition.children) {
+      for (const childBucketDefinition of childBucketDefinitions) {
         const entry = {
           childBucketDefinition,
           inputs: [],
@@ -6421,26 +6435,20 @@ export class Aether<
       };
 
       const rootOutputStore =
-        bucket.definition.rootOutputPlanId != null
-          ? store[bucket.definition.rootOutputPlanId]
-          : null;
+        rootOutputPlanId != null ? store[rootOutputPlanId] : null;
 
-      const result = bucket.input.map((setter, index) => {
+      const result = input.map((setter, index) => {
         if (rootOutputStore) {
           const rawValue = rootOutputStore[index];
           const concreteType = isObjectBucket
-            ? bucket.definition.singleTypeNameByRootPathIdentity![
-                setter.rootPathIdentity
-              ]
+            ? singleTypeNameByRootPathIdentity![setter.rootPathIdentity]
             : null;
 
           const value = bucketValue(
             setter.parentObject,
             setter.parentKey,
             rawValue,
-            bucket.definition.rootOutputModeByRootPathIdentity![
-              setter.rootPathIdentity
-            ]!,
+            rootOutputModeByRootPathIdentity![setter.rootPathIdentity]!,
             concreteType,
             requestContext,
           );
@@ -6525,7 +6533,7 @@ export class Aether<
                       );
                       for (const plan of child.childBucketDefinition
                         .copyPlans) {
-                        child.store[plan.id].push(bucket.store[plan.id][index]);
+                        child.store[plan.id].push(store[plan.id][index]);
                       }
                     }
                   }
@@ -6540,12 +6548,12 @@ export class Aether<
             const typeName = setterRoot[$$concreteType];
             if (typeName == null) {
               throw new Error(
-                `Could not determine typeName in bucket ${bucket.definition.id}`,
+                `Could not determine typeName in bucket ${bucketId}`,
               );
             }
             processObject(
               setterRoot,
-              bucket.definition.outputMap,
+              outputMap,
               `${setter.rootPathIdentity}>${typeName}.`,
             );
           }
@@ -6570,14 +6578,18 @@ export class Aether<
       const childPromises: PromiseLike<any>[] = [];
       for (const child of children!) {
         if (child.inputs.length > 0) {
-          const bucket: Bucket = {
+          const childBucket: Bucket = {
             definition: child.childBucketDefinition,
             store: child.store,
             size: child.inputs.length,
             input: child.inputs,
             noDepsList: arrayOfLength(child.inputs.length),
           };
-          const r = this.executeBucket(metaByPlanId, bucket, requestContext);
+          const r = this.executeBucket(
+            metaByPlanId,
+            childBucket,
+            requestContext,
+          );
           if (isPromiseLike(r)) {
             childPromises.push(r);
           }
