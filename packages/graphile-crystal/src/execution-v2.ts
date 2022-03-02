@@ -345,22 +345,21 @@ export function executeBucket(
       if (obj == null || obj instanceof CrystalError) {
         return;
       }
+      const concreteType = setter.concreteType!;
+      const rootPathIdentity = setter.rootPathIdentity;
       for (const responseKey of (map as any)[$$keys]) {
         const field = map[responseKey];
         const keyPathIdentity = pathIdentity + responseKey;
         // console.log(keyPathIdentity);
-        if (
-          field.typeNames &&
-          !field.typeNames.includes(setter.getRoot()![$$concreteType])
-        ) {
+        if (field.typeNames && !field.typeNames.includes(concreteType)) {
           continue;
         }
-        const planId = field.planIdByRootPathIdentity[setter.rootPathIdentity];
+        const planId = field.planIdByRootPathIdentity[rootPathIdentity];
         if (planId == null) {
           continue;
         }
         const rawValue = store[planId][index];
-        const mode = field.modeByRootPathIdentity[setter.rootPathIdentity];
+        const mode = field.modeByRootPathIdentity[rootPathIdentity];
         const value = bucketValue(
           obj,
           responseKey,
@@ -390,6 +389,7 @@ export function executeBucket(
             }
             const children = childrenByPathIdentity[keyPathIdentity];
             if (children) {
+              const valueConcreteType = value[$$concreteType];
               for (const child of children) {
                 if (child.childBucketDefinition.itemPlanId != null) {
                   throw new Error("INCONSISTENT!");
@@ -400,7 +400,7 @@ export function executeBucket(
                 const match =
                   !child.childBucketDefinition.polymorphicTypeNames ||
                   child.childBucketDefinition.polymorphicTypeNames.includes(
-                    value[$$concreteType],
+                    valueConcreteType,
                   );
                 if (match) {
                   child.inputs.push(
@@ -472,7 +472,7 @@ export function executeBucket(
         }
       }
 
-      return setter.getRoot();
+      return setterRoot;
     });
 
     // Now to call any nested buckets

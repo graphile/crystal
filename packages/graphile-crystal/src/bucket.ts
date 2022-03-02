@@ -320,17 +320,21 @@ export function bucketValue(
 }
 
 export class BucketSetter {
+  public concreteType: string | undefined;
   constructor(
     public rootPathIdentity: string,
     public parentObject: object | unknown[],
     public parentKey: number | string,
-  ) {}
+  ) {
+    this.concreteType = parentObject[parentKey]?.[$$concreteType];
+  }
 
   public getRoot() {
     return this.parentObject[this.parentKey];
   }
   public setRoot(newRoot: any) {
     this.parentObject[this.parentKey] = newRoot;
+    this.concreteType = newRoot?.[$$concreteType];
   }
 }
 
