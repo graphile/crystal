@@ -191,7 +191,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
             );
           }
         }
-        args.rootValue = await crystalPrepare(args);
+        args.rootValue = await crystalPrepare(args, {
+          experimentalGraphQLBypass: true,
+        });
         if ((args.rootValue as any)?.[$$bypassGraphQL]) {
           setExecuteFn(bypassGraphQLExecute);
         }

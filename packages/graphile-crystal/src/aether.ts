@@ -14,6 +14,13 @@ import type {
   OperationDefinitionNode,
 } from "graphql";
 import {
+  GraphQLBoolean,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLString,
+} from "graphql";
+import {
   assertObjectType,
   getNamedType,
   GraphQLInterfaceType,
@@ -119,6 +126,8 @@ import {
   sharedNull,
 } from "./utils";
 
+const $$idempotent = Symbol("idempotent");
+
 const verbatimPrototype = Object.assign(Object.create(null), {
   [$$verbatim]: true,
 });
@@ -223,12 +232,42 @@ function serializerForEnumType(
   return (value) => lookup.get(value);
 }
 
+function serializerForScalarType(
+  type: GraphQLScalarType,
+): GraphQLScalarType["serialize"] {
+  const sz = type.serialize.bind(type);
+  // All the built in serializers are idempotent - sz(sz(foo)) === sz(foo)
+  const isIdempotent =
+    type === GraphQLString ||
+    type === GraphQLID ||
+    type === GraphQLFloat ||
+    type === GraphQLInt ||
+    type === GraphQLBoolean;
+  if (isIdempotent) {
+    sz[$$idempotent] = true;
+  }
+  return sz;
+}
+
 /**
  * Returns true if this "executable plan" isn't actually executable because
  * it's a special internal plan type whose values get auto-populated
  */
 const isInternalPlan = (plan: ExecutablePlan) =>
   plan instanceof __ValuePlan || plan instanceof __ItemPlan;
+
+interface RequestContext {
+  readonly canBypassGraphQL: boolean;
+  readonly hasIssue: () => void;
+  readonly toSerialize: Array<{
+    /** object (or array) */
+    o: object;
+    /** key (or index) */
+    k: string | number;
+    /** serializer */
+    s: GraphQLScalarType["serialize"];
+  }>;
+}
 
 interface PlanCacheForPlanResultses {
   [planId: string]: PromiseOrDirect<any[]>;
@@ -580,16 +619,18 @@ export class CrystalError extends Error {
  * @internal
  */
 function bucketValue(
+  object: object,
+  key: string | number,
   value: any,
   mode: BucketDefinitionOutputMode,
   concreteType: string | null,
   // This gets called if any of the non-null constraints are failed, or if
   // there was an error. This triggers processing through the GraphQL.js stack.
-  hasIssues: () => void,
+  requestContext: RequestContext,
 ): any {
   const handleNull = (v: undefined | null | CrystalError) => {
     if (mode.notNull || v != null) {
-      hasIssues();
+      requestContext.hasIssue();
     }
     return v != null ? Promise.reject(v.originalError) : v;
   };
@@ -619,7 +660,25 @@ function bucketValue(
       return mode.objectCreator(typeName);
     }
     case "L": {
-      return mode.serialize(value);
+      if (requestContext.canBypassGraphQL) {
+        if (mode.serialize[$$idempotent]) {
+          try {
+            return mode.serialize(value);
+          } catch (e) {
+            return handleNull(new CrystalError(e));
+          }
+        } else {
+          // Queue serialization to take place when we know no errors can occur
+          requestContext.toSerialize.push({
+            o: object,
+            k: key,
+            s: mode.serialize,
+          });
+          return value;
+        }
+      } else {
+        return value;
+      }
     }
     default: {
       const never: never = mode;
@@ -631,17 +690,16 @@ function bucketValue(
 }
 
 class BucketSetter {
-  public readonly root: any;
   constructor(
     public rootPathIdentity: string,
-    private parentObject: object | unknown[],
-    private parentKey: number | string,
-  ) {
-    this.root = parentObject[parentKey];
-  }
+    public parentObject: object | unknown[],
+    public parentKey: number | string,
+  ) {}
 
+  public getRoot() {
+    return this.parentObject[this.parentKey];
+  }
   public setRoot(newRoot: any) {
-    (this.root as any) = newRoot;
     this.parentObject[this.parentKey] = newRoot;
   }
 }
@@ -3813,9 +3871,7 @@ export class Aether<
                 };
               } else if (fieldDigest.isLeaf) {
                 const serialize = isScalarType(fieldDigest.namedReturnType)
-                  ? fieldDigest.namedReturnType.serialize.bind(
-                      fieldDigest.namedReturnType,
-                    )
+                  ? serializerForScalarType(fieldDigest.namedReturnType)
                   : isEnumType(fieldDigest.namedReturnType)
                   ? serializerForEnumType(fieldDigest.namedReturnType)
                   : null;
@@ -5956,6 +6012,8 @@ export class Aether<
     variableValues: any,
     context: any,
     rootValue: any,
+    // Experimental feature!
+    canBypassGraphQL = false,
   ): null | PromiseOrDirect<any> {
     if (!this.canPreempt) {
       return null;
@@ -5987,15 +6045,38 @@ export class Aether<
       }),
     };
     const metaByPlanId = this.makeMetaByPlanId();
-    let requiresGraphQLJS = this.hasIntrospectionFields;
-    const hasIssues = () => {
-      requiresGraphQLJS = true;
+    let requiresGraphQLJS = this.hasIntrospectionFields || !canBypassGraphQL;
+    const requestContext: RequestContext = {
+      canBypassGraphQL,
+      hasIssue() {
+        requiresGraphQLJS = true;
+      },
+      toSerialize: [],
     };
-    const p = this.executeBucket(metaByPlanId, rootBucket, hasIssues);
+    const p = this.executeBucket(metaByPlanId, rootBucket, requestContext);
     const finalize = (list: any[]) => {
       const result = list[0];
       if (!requiresGraphQLJS && typeof result == "object" && result != null) {
-        result[$$bypassGraphQL] = true;
+        // Perform serialization; we only do this here because if an error
+        // occurred we would want GraphQL.js to handle the response, and it
+        // does it's own serialization - we don't want double serialization as
+        // that would lead to further issues.
+        // TODO: once we have our own error handling, we can get rid of
+        // `toSerialize` and perform the serialization inside `bucketValue`
+        // directly.
+        let hasSerializationErrors = false;
+        for (let i = 0, l = requestContext.toSerialize.length; i < l; i++) {
+          const { o, k, s } = requestContext.toSerialize[i];
+          try {
+            o[k] = s(o[k]);
+          } catch (e) {
+            o[k] = Promise.reject(e);
+            hasSerializationErrors = true;
+          }
+        }
+        if (!hasSerializationErrors) {
+          result[$$bypassGraphQL] = true;
+        }
       }
       return result;
     };
@@ -6009,7 +6090,7 @@ export class Aether<
   public executeBucket(
     metaByPlanId: CrystalContext["metaByPlanId"],
     bucket: Bucket,
-    hasIssues: () => void,
+    requestContext: RequestContext,
   ): PromiseOrDirect<Array<any>> {
     const inProgressPlans = new Set();
     const pendingPlans = new Set(bucket.definition.plans);
@@ -6127,7 +6208,11 @@ export class Aether<
         noDepsList: itemInputs.map(() => undefined),
         input: itemInputs,
       };
-      const result = this.executeBucket(metaByPlanId, itemBucket, hasIssues);
+      const result = this.executeBucket(
+        metaByPlanId,
+        itemBucket,
+        requestContext,
+      );
 
       const performTransform = (): any[] => {
         const result: any[] = [];
@@ -6314,10 +6399,12 @@ export class Aether<
             : null;
 
           const value = bucketValue(
+            setter.parentObject,
+            setter.parentKey,
             rawValue,
             rootOutputMode!,
             concreteType,
-            hasIssues,
+            requestContext,
           );
           setter.setRoot(value);
 
@@ -6342,7 +6429,7 @@ export class Aether<
             // console.log(keyPathIdentity);
             if (
               field.typeNames &&
-              !field.typeNames.includes(setter.root![$$concreteType])
+              !field.typeNames.includes(setter.getRoot()![$$concreteType])
             ) {
               continue;
             }
@@ -6353,10 +6440,12 @@ export class Aether<
             }
             const rawValue = store[planId][index];
             const value = bucketValue(
+              obj,
+              responseKey,
               rawValue,
               field.mode,
               field.typeName,
-              hasIssues,
+              requestContext,
             );
             obj[responseKey] = value;
 
@@ -6406,16 +6495,17 @@ export class Aether<
             }
           }
         };
-        if (setter.root && !(setter.root instanceof CrystalError)) {
+        const setterRoot = setter.getRoot();
+        if (setterRoot && !(setterRoot instanceof CrystalError)) {
           if (isObjectBucket) {
-            const typeName = setter.root[$$concreteType];
+            const typeName = setterRoot[$$concreteType];
             if (typeName == null) {
               throw new Error(
                 `Could not determine typeName in bucket ${bucket.definition.id}`,
               );
             }
             processObject(
-              setter.root,
+              setterRoot,
               bucket.definition.outputMap,
               `${setter.rootPathIdentity}>${typeName}.`,
             );
@@ -6434,7 +6524,7 @@ export class Aether<
           }
         }
 
-        return setter.root;
+        return setter.getRoot();
       });
 
       // Now to call any nested buckets
@@ -6448,7 +6538,7 @@ export class Aether<
             input: child.inputs,
             noDepsList: arrayOfLength(child.inputs.length),
           };
-          const r = this.executeBucket(metaByPlanId, bucket, hasIssues);
+          const r = this.executeBucket(metaByPlanId, bucket, requestContext);
           if (isPromiseLike(r)) {
             childPromises.push(r);
           }

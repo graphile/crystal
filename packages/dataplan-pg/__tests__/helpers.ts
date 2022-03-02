@@ -390,13 +390,16 @@ export async function runTestQuery(
     const rootValueRaw =
       options.prepare === false
         ? null
-        : crystalPrepare({
-            schema,
-            document,
-            variableValues,
-            contextValue,
-            rootValue: null,
-          });
+        : crystalPrepare(
+            {
+              schema,
+              document,
+              variableValues,
+              contextValue,
+              rootValue: null,
+            },
+            { experimentalGraphQLBypass: true },
+          );
 
     const rootValue =
       rootValueRaw != null &&

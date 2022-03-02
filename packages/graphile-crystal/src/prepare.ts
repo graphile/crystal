@@ -17,6 +17,9 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 export function crystalPrepare(
   args: ExecutionArgs,
+  options: {
+    experimentalGraphQLBypass?: boolean;
+  } = {},
 ): PromiseOrDirect<CrystalObject | { [$$data]: any }> {
   const {
     schema,
@@ -43,6 +46,7 @@ export function crystalPrepare(
     variableValues,
     context,
     rootValue,
+    options.experimentalGraphQLBypass ?? false,
   );
   if (preemptiveResult) {
     return preemptiveResult;
