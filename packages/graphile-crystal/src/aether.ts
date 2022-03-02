@@ -494,7 +494,6 @@ export class CrystalError extends Error {
  * @internal
  */
 function bucketValue(
-  previousValue: any,
   value: any,
   mode: BucketDefinitionFieldOutputMap["mode"],
   concreteType: string | null,
@@ -505,14 +504,6 @@ function bucketValue(
   switch (mode) {
     case "A": {
       if (Array.isArray(value)) {
-        if (Array.isArray(previousValue)) {
-          if (previousValue.length !== value.length) {
-            throw new Error(
-              `Bucket value was already set to an array, but had the wrong length.`,
-            );
-          }
-          return previousValue;
-        }
         return arrayOfLength(value.length);
       } else if (value == null) {
         return value;
@@ -528,27 +519,17 @@ function bucketValue(
       if (value == null) {
         return value;
       } else {
-        let o: any;
-        if (
-          typeof previousValue === "object" &&
-          previousValue != null &&
-          !(previousValue instanceof CrystalError)
-        ) {
-          o = previousValue;
-        } else {
-          o = Object.create(verbatimPrototype);
+        const typeName = isPolymorphicData(value)
+          ? value[$$concreteType]
+          : concreteType;
+        if (typeName == null) {
+          throw new Error(
+            `Call to bucketValue with "O" mode but data isn't polymorphic and no concrete type was supplied`,
+          );
         }
-        if (isPolymorphicData(value)) {
-          o[$$concreteType] = value[$$concreteType];
-        } else {
-          if (concreteType == null) {
-            throw new Error(
-              `Call to bucketValue with "O" mode but data isn't polymorphic and no concrete type was supplied`,
-            );
-          }
-          o[$$concreteType] = concreteType;
-        }
-        return o;
+        return Object.assign(Object.create(verbatimPrototype), {
+          [$$concreteType]: typeName,
+        });
       }
     }
     case "L": {
@@ -6134,12 +6115,7 @@ export class Aether<
               ]
             : null;
 
-          const value = bucketValue(
-            setter.root,
-            rawValue,
-            rootOutputMode!,
-            concreteType,
-          );
+          const value = bucketValue(rawValue, rootOutputMode!, concreteType);
           setter.setRoot(value);
 
           if (isNestedListBucket) {
@@ -6173,12 +6149,7 @@ export class Aether<
               continue;
             }
             const rawValue = store[planId][index];
-            const value = bucketValue(
-              obj[responseKey],
-              rawValue,
-              field.mode,
-              field.typeName,
-            );
+            const value = bucketValue(rawValue, field.mode, field.typeName);
             obj[responseKey] = value;
 
             if (field.mode === "A") {
