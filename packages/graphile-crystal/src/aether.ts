@@ -3,6 +3,7 @@ import debugFactory from "debug";
 import type {
   FieldNode,
   FragmentDefinitionNode,
+  GraphQLEnumType,
   GraphQLField,
   GraphQLInputField,
   GraphQLInputObjectType,
@@ -16,17 +17,20 @@ import {
   assertObjectType,
   getNamedType,
   GraphQLInterfaceType,
+  GraphQLLeafType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLUnionType,
+  isEnumType,
   isInputObjectType,
   isInterfaceType,
   isLeafType,
   isListType,
   isNonNullType,
   isObjectType,
+  isScalarType,
   isUnionType,
   TypeNameMetaFieldDef,
 } from "graphql";
@@ -207,6 +211,18 @@ return typeName => {
   return f(verbatimPrototype, $$concreteType) as any;
 }
 
+// TODO: consider memoizing this
+function serializerForEnumType(
+  type: GraphQLEnumType,
+): GraphQLScalarType["serialize"] {
+  const values = type.getValues();
+  const lookup = new Map();
+  for (const value of values) {
+    lookup.set(value.value, value.name);
+  }
+  return (value) => lookup.get(value);
+}
+
 /**
  * Returns true if this "executable plan" isn't actually executable because
  * it's a special internal plan type whose values get auto-populated
@@ -342,6 +358,7 @@ interface BucketDefinitionArrayOutputMode extends IBucketDefinitionOutputMode {
 }
 interface BucketDefinitionLeafOutputMode extends IBucketDefinitionOutputMode {
   type: "L";
+  serialize: GraphQLScalarType["serialize"];
 }
 
 type BucketDefinitionOutputMode =
@@ -602,7 +619,7 @@ function bucketValue(
       return mode.objectCreator(typeName);
     }
     case "L": {
-      return value;
+      return mode.serialize(value);
     }
     default: {
       const never: never = mode;
@@ -3795,9 +3812,22 @@ export class Aether<
                   notNull,
                 };
               } else if (fieldDigest.isLeaf) {
+                const serialize = isScalarType(fieldDigest.namedReturnType)
+                  ? fieldDigest.namedReturnType.serialize.bind(
+                      fieldDigest.namedReturnType,
+                    )
+                  : isEnumType(fieldDigest.namedReturnType)
+                  ? serializerForEnumType(fieldDigest.namedReturnType)
+                  : null;
+                if (!serialize) {
+                  throw new Error(
+                    `GraphileInternalError<f98383a6-75c4-4ec8-a75a-b5916489a71f>: Leaves must be scalars or enums! Found ${fieldDigest.namedReturnType}`,
+                  );
+                }
                 return {
                   type: "L",
                   notNull,
+                  serialize,
                 };
               } else {
                 const fields: ObjectCreatorFields = Object.create(null);
