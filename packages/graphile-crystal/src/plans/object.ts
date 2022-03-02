@@ -11,6 +11,12 @@ type DataFromPlan<TPlan extends ExecutablePlan<any>> =
 type DataFromPlans<TPlans extends { [key: string]: ExecutablePlan<any> }> = {
   [key in keyof TPlans]: DataFromPlan<TPlans[key]>;
 };
+type Results<TPlans extends { [key: string]: ExecutablePlan<any> }> = Array<
+  [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]
+>;
+interface Meta<TPlans extends { [key: string]: ExecutablePlan<any> }> {
+  results: Results<TPlans>;
+}
 
 export class ObjectPlan<
   TPlans extends { [key: string]: ExecutablePlan<any> },
@@ -21,9 +27,6 @@ export class ObjectPlan<
   };
   sync = true;
   private keys: Array<keyof TPlans>;
-  private results: Array<
-    [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]
-  > = [];
   constructor(obj: TPlans) {
     super();
     this.keys = Object.keys(obj);
@@ -64,11 +67,12 @@ export class ObjectPlan<
   // TODO: JIT this function
   tupleToObject(
     tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>,
+    meta: Meta<TPlans>,
   ): DataFromPlans<TPlans> {
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
-    outerloop: for (let i = 0, l = this.results.length; i < l; i++) {
-      const [values, obj] = this.results[i];
+    outerloop: for (let i = 0, l = meta.results.length; i < l; i++) {
+      const [values, obj] = meta.results[i];
       // Shortcut for identical tuples (unlikely).
       if (values === tuple) {
         return obj;
@@ -97,7 +101,7 @@ export class ObjectPlan<
     }, {} as Partial<DataFromPlans<TPlans>>) as DataFromPlans<TPlans>;
 
     // Cache newObj so the same tuple values result in the exact same object.
-    this.results.push([tuple, newObj]);
+    meta.results.push([tuple, newObj]);
     return newObj;
   }
 
@@ -109,11 +113,19 @@ export class ObjectPlan<
 
   execute(
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
+    inMeta: any,
   ): Array<DataFromPlans<TPlans>> {
+    if (!inMeta.results) {
+      inMeta.results = [];
+    }
+    const meta: Meta<TPlans> = inMeta;
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.executeSingle!(values.map((v) => v[i]));
+      result[i] = this.executeSingle!(
+        values.map((v) => v[i]),
+        meta,
+      );
     }
     return result;
   }
@@ -121,6 +133,7 @@ export class ObjectPlan<
   executeSingle:
     | ((
         values: Array<DataFromPlans<TPlans>[keyof TPlans]>,
+        meta: Meta<TPlans>,
       ) => DataFromPlans<TPlans>)
     | null = null;
 
