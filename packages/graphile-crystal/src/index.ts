@@ -23,6 +23,7 @@ import {
   InputStaticLeafPlan,
 } from "./input";
 import {
+  $$bypassGraphQL,
   $$data,
   $$setPlanGraph,
   $$verbatim,
@@ -108,7 +109,7 @@ import {
   SubscribePlan,
 } from "./plans";
 import { polymorphicWrap, resolveType } from "./polymorphic";
-import { crystalPrepare } from "./prepare";
+import { bypassGraphQLExecute, crystalPrepare } from "./prepare";
 import {
   $$crystalWrapped,
   crystalResolve,
@@ -141,6 +142,7 @@ export {
   __ListTransformPlan,
   __TrackedObjectPlan,
   __ValuePlan,
+  $$bypassGraphQL,
   $$crystalWrapped,
   $$data,
   $$setPlanGraph,
@@ -157,6 +159,7 @@ export {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BasePlan,
+  bypassGraphQLExecute,
   connection,
   ConnectionCapablePlan,
   ConnectionPlan,
@@ -319,6 +322,7 @@ exportAsMany({
   isCrystalWrapped,
   crystalWrapResolve,
   crystalPrepare,
+  bypassGraphQLExecute,
   crystalResolve,
   makeCrystalSubscriber,
   stripAnsi,

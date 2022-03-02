@@ -1,4 +1,5 @@
 import type { ExecutionArgs } from "graphql";
+import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
 import { establishAether } from "./establishAether";
@@ -53,4 +54,8 @@ export function crystalPrepare(
     rootValue,
   );
   return crystalContext.rootCrystalObject;
+}
+
+export function bypassGraphQLExecute(args: ExecutionArgs): ExecutionResult {
+  return Object.assign(Object.create(null), { data: args.rootValue as any });
 }
