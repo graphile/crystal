@@ -6,7 +6,10 @@ if (process.env.DEBUG) {
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
 import { crystalPrepare } from "graphile-crystal";
-import { $$setPlanGraph } from "graphile-crystal/dist/interfaces";
+import {
+  $$bypassGraphQL,
+  $$setPlanGraph,
+} from "graphile-crystal/dist/interfaces";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,
@@ -402,22 +405,26 @@ export async function runTestQuery(
         ? await rootValueRaw
         : rootValueRaw;
 
-    const result =
-      operationType === "subscription"
-        ? await subscribe({
-            schema,
-            document,
-            variableValues,
-            contextValue,
-            rootValue,
-          })
-        : await execute({
-            schema,
-            document,
-            variableValues,
-            contextValue,
-            rootValue,
-          });
+    const result = rootValue?.[$$bypassGraphQL]
+      ? // JSON.parse/stringify is to throw away the symbols/undefineds as would be done in the GraphQL request
+        Object.assign(Object.create(null), {
+          data: JSON.parse(JSON.stringify(rootValue)),
+        })
+      : operationType === "subscription"
+      ? await subscribe({
+          schema,
+          document,
+          variableValues,
+          contextValue,
+          rootValue,
+        })
+      : await execute({
+          schema,
+          document,
+          variableValues,
+          contextValue,
+          rootValue,
+        });
 
     if (isAsyncIterable(result)) {
       let errors: GraphQLError[] | undefined = undefined;
