@@ -6,15 +6,15 @@ import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
 import type { Aether } from "./aether";
-import { CrystalError, populateValuePlan } from "./aether";
+import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
+import { CrystalError } from "./error";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
-import { $$verbatim } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
@@ -22,6 +22,7 @@ import {
   $$id,
   $$pathIdentity,
   $$planResults,
+  $$verbatim,
 } from "./interfaces";
 import type { PlanResults } from "./planResults";
 import { __ValuePlan } from "./plans";

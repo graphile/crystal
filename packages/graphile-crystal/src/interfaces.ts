@@ -14,8 +14,9 @@ import type {
   SelectionNode,
 } from "graphql";
 
-import type { Aether, CrystalError } from "./aether";
+import type { Aether } from "./aether";
 import type { Deferred } from "./deferred";
+import type { CrystalError } from "./error";
 import type { InputPlan } from "./input";
 import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan";
 import type { PlanResults, PlanResultsBucket } from "./planResults";

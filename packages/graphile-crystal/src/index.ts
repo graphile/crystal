@@ -9,12 +9,13 @@ debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { Aether, CrystalError } from "./aether";
+import { Aether } from "./aether";
 import { ROOT_PATH } from "./constants";
 import { defer, Deferred } from "./deferred";
 // Handy for debugging
 import { isDev, noop } from "./dev";
 import { crystalEnforce } from "./enforceCrystal";
+import { CrystalError } from "./error";
 import { getCurrentParentPathIdentity } from "./global";
 import {
   InputListPlan,

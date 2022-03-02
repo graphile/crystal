@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
 
-import { CrystalError } from "../aether";
+import { CrystalError } from "../error";
 import { ExecutablePlan } from "../plan";
 
 // Do **NOT** allow variables that start with `__`!
