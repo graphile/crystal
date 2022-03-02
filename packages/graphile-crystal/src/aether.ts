@@ -425,10 +425,13 @@ interface BucketDefinitionFieldOutputMap {
   planIdByRootPathIdentity: {
     [rootPathIdentity: string]: string;
   };
+  modeType: BucketDefinitionOutputMode["type"];
   /**
    * The mode for this field; either object, array or leaf.
    */
-  mode: BucketDefinitionOutputMode;
+  modeByRootPathIdentity: {
+    [rootPathIdentity: string]: BucketDefinitionOutputMode;
+  };
   /**
    * The name of the named GraphQL result type of this field.
    */
@@ -513,7 +516,10 @@ interface BucketDefinition {
    * If this bucket has a plan for setting it's own root object, what type of
    * processing should it get?.
    */
-  rootOutputMode?: BucketDefinitionFieldOutputMap["mode"];
+  rootOutputModeType?: BucketDefinitionOutputMode["type"];
+  rootOutputModeByRootPathIdentity?: {
+    [rootPathIdentity: string]: BucketDefinitionOutputMode;
+  };
 
   /**
    * If this is not a polymorphic bucket, what is the associated type name?
@@ -3922,7 +3928,7 @@ export class Aether<
               );
             if (matchingParentPathIdentities.length !== 1) {
               throw new Error(
-                `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec> Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
+                `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec>: Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
                   "', '",
                 )}'`,
               );
@@ -3967,7 +3973,17 @@ export class Aether<
                 );
               }
               bucket.rootOutputPlanId = plan.id;
-              bucket.rootOutputMode = mode;
+              if (!bucket.rootOutputModeByRootPathIdentity) {
+                bucket.rootOutputModeByRootPathIdentity = Object.create(null);
+                bucket.rootOutputModeType = mode.type;
+              } else {
+                if (mode.type !== bucket.rootOutputModeType) {
+                  throw new Error(
+                    `GraphileInternalError<771dc65b-f77d-4a33-8496-62624026e3aa>: root mode mistmatch at ${rootPathIdentity}`,
+                  );
+                }
+              }
+              bucket.rootOutputModeByRootPathIdentity![rootPathIdentity] = mode;
             } else {
               let spec = bucket.outputMap;
               for (let i = 0, l = path.length - 1; i < l; i++) {
@@ -4021,21 +4037,21 @@ export class Aether<
               if (!spec[fieldName]) {
                 spec[fieldName] = {
                   planIdByRootPathIdentity: Object.create(null),
-                  mode,
+                  modeType: mode.type,
+                  modeByRootPathIdentity: Object.create(null),
                   typeName: fieldDigest.namedReturnType.name,
                   children: mode.type === "O" ? Object.create(null) : null,
                   typeNames: bucket.polymorphicPlanIds ? [] : null,
                 };
               } else {
-                // Consistency check
-                // TODO:perf: we shouldn't need to keep recreating `mode` in this case - it's unnecessarily expensive
-                if (spec[fieldName].mode.type !== mode.type) {
+                if (mode.type !== spec[fieldName].modeType) {
                   throw new Error(
-                    `GraphileInternalError<b2286484-49af-47b3-8e72-4c72c8e488f2>: modes cannot differ here!`,
+                    `GraphileInternalError<effa6a63-7ec0-4ed2-b13d-97ca67e8ba9f>: mode mismatch at ${rootPathIdentity}`,
                   );
                 }
               }
               const fieldSpec = spec[fieldName];
+              fieldSpec.modeByRootPathIdentity[rootPathIdentity] = mode;
               if (
                 fieldSpec.planIdByRootPathIdentity[rootPathIdentity] != null &&
                 fieldSpec.planIdByRootPathIdentity[rootPathIdentity] !== plan.id
@@ -6115,10 +6131,10 @@ export class Aether<
     const inProgressPlans = new Set();
     const pendingPlans = new Set(bucket.definition.plans);
     const store = bucket.store;
-    const rootOutputMode = bucket.definition.rootOutputMode;
-    const isNestedListBucket = rootOutputMode?.type === "A";
-    const isLeafBucket = rootOutputMode?.type === "L";
-    const isObjectBucket = rootOutputMode?.type === "O";
+    const rootOutputModeType = bucket.definition.rootOutputModeType;
+    const isNestedListBucket = rootOutputModeType === "A";
+    const isLeafBucket = rootOutputModeType === "L";
+    const isObjectBucket = rootOutputModeType === "O";
 
     const completedPlan = (
       finishedPlan: ExecutablePlan,
@@ -6422,7 +6438,9 @@ export class Aether<
             setter.parentObject,
             setter.parentKey,
             rawValue,
-            rootOutputMode!,
+            bucket.definition.rootOutputModeByRootPathIdentity![
+              setter.rootPathIdentity
+            ]!,
             concreteType,
             requestContext,
           );
@@ -6459,22 +6477,23 @@ export class Aether<
               continue;
             }
             const rawValue = store[planId][index];
+            const mode = field.modeByRootPathIdentity[setter.rootPathIdentity];
             const value = bucketValue(
               obj,
               responseKey,
               rawValue,
-              field.mode,
+              mode,
               field.typeName,
               requestContext,
             );
             obj[responseKey] = value;
 
-            if (field.mode.type === "A") {
+            if (mode.type === "A") {
               if (Array.isArray(value)) {
                 const nestedPathIdentity = keyPathIdentity + "[]";
                 processListChildren(nestedPathIdentity, rawValue, value, index);
               }
-            } else if (field.mode.type === "O") {
+            } else if (mode.type === "O") {
               const d = value;
               if (d && !(d instanceof CrystalError)) {
                 if (field.children) {
@@ -6995,7 +7014,7 @@ export class Aether<
             ? planIds[0]
             : JSON.stringify(def.planIdByRootPathIdentity);
           outputMapStuff.push(
-            `${path}${fieldName} <-${def.mode.type}- ${planSource}`,
+            `${path}${fieldName} <-${def.modeType}- ${planSource}`,
           );
           if (def.children) {
             processObject(def.children, `⠀${path}${fieldName}.`);
@@ -7011,7 +7030,7 @@ export class Aether<
               : ""
           }${bucket.rootPathIdentities.join("\n")}\n${
             bucket.rootOutputPlanId != null
-              ? `⠀ROOT <-${bucket.rootOutputMode!.type ?? "?"}- ${
+              ? `⠀ROOT <-${bucket.rootOutputModeType ?? "?"}- ${
                   bucket.rootOutputPlanId
                 }\n`
               : ""
