@@ -6437,6 +6437,89 @@ export class Aether<
       const rootOutputStore =
         rootOutputPlanId != null ? store[rootOutputPlanId] : null;
 
+      const processObject = (
+        obj: undefined | null | object | CrystalError,
+        map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
+        pathIdentity: string,
+        setter: BucketSetter,
+        index: number,
+      ) => {
+        if (obj == null || obj instanceof CrystalError) {
+          return;
+        }
+        for (const responseKey in map) {
+          const field = map[responseKey];
+          const keyPathIdentity = pathIdentity + responseKey;
+          // console.log(keyPathIdentity);
+          if (
+            field.typeNames &&
+            !field.typeNames.includes(setter.getRoot()![$$concreteType])
+          ) {
+            continue;
+          }
+          const planId =
+            field.planIdByRootPathIdentity[setter.rootPathIdentity];
+          if (planId == null) {
+            continue;
+          }
+          const rawValue = store[planId][index];
+          const mode = field.modeByRootPathIdentity[setter.rootPathIdentity];
+          const value = bucketValue(
+            obj,
+            responseKey,
+            rawValue,
+            mode,
+            field.typeName,
+            requestContext,
+          );
+          obj[responseKey] = value;
+
+          if (mode.type === "A") {
+            if (Array.isArray(value)) {
+              const nestedPathIdentity = keyPathIdentity + "[]";
+              processListChildren(nestedPathIdentity, rawValue, value, index);
+            }
+          } else if (mode.type === "O") {
+            const d = value;
+            if (d && !(d instanceof CrystalError)) {
+              if (field.children) {
+                processObject(
+                  d,
+                  field.children,
+                  `${keyPathIdentity}>${d[$$concreteType]}.`,
+                  setter,
+                  index,
+                );
+              }
+              const children = childrenByPathIdentity[keyPathIdentity];
+              if (children) {
+                for (const child of children) {
+                  if (child.childBucketDefinition.itemPlanId != null) {
+                    throw new Error("INCONSISTENT!");
+                  }
+                  if (child.childBucketDefinition.groupId != null) {
+                    throw new Error("Group inside list currently unsupported");
+                  }
+                  const match =
+                    !child.childBucketDefinition.polymorphicTypeNames ||
+                    child.childBucketDefinition.polymorphicTypeNames.includes(
+                      value[$$concreteType],
+                    );
+                  if (match) {
+                    child.inputs.push(
+                      new BucketSetter(keyPathIdentity, obj, responseKey),
+                    );
+                    for (const plan of child.childBucketDefinition.copyPlans) {
+                      child.store[plan.id].push(store[plan.id][index]);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+
       const result = input.map((setter, index) => {
         if (rootOutputStore) {
           const rawValue = rootOutputStore[index];
@@ -6461,87 +6544,6 @@ export class Aether<
             }
           }
         }
-        const processObject = (
-          obj: undefined | null | object | CrystalError,
-          map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
-          pathIdentity: string,
-        ) => {
-          if (obj == null || obj instanceof CrystalError) {
-            return;
-          }
-          for (const responseKey in map) {
-            const field = map[responseKey];
-            const keyPathIdentity = pathIdentity + responseKey;
-            // console.log(keyPathIdentity);
-            if (
-              field.typeNames &&
-              !field.typeNames.includes(setter.getRoot()![$$concreteType])
-            ) {
-              continue;
-            }
-            const planId =
-              field.planIdByRootPathIdentity[setter.rootPathIdentity];
-            if (planId == null) {
-              continue;
-            }
-            const rawValue = store[planId][index];
-            const mode = field.modeByRootPathIdentity[setter.rootPathIdentity];
-            const value = bucketValue(
-              obj,
-              responseKey,
-              rawValue,
-              mode,
-              field.typeName,
-              requestContext,
-            );
-            obj[responseKey] = value;
-
-            if (mode.type === "A") {
-              if (Array.isArray(value)) {
-                const nestedPathIdentity = keyPathIdentity + "[]";
-                processListChildren(nestedPathIdentity, rawValue, value, index);
-              }
-            } else if (mode.type === "O") {
-              const d = value;
-              if (d && !(d instanceof CrystalError)) {
-                if (field.children) {
-                  processObject(
-                    d,
-                    field.children,
-                    `${keyPathIdentity}>${d[$$concreteType]}.`,
-                  );
-                }
-                const children = childrenByPathIdentity[keyPathIdentity];
-                if (children) {
-                  for (const child of children) {
-                    if (child.childBucketDefinition.itemPlanId != null) {
-                      throw new Error("INCONSISTENT!");
-                    }
-                    if (child.childBucketDefinition.groupId != null) {
-                      throw new Error(
-                        "Group inside list currently unsupported",
-                      );
-                    }
-                    const match =
-                      !child.childBucketDefinition.polymorphicTypeNames ||
-                      child.childBucketDefinition.polymorphicTypeNames.includes(
-                        value[$$concreteType],
-                      );
-                    if (match) {
-                      child.inputs.push(
-                        new BucketSetter(keyPathIdentity, obj, responseKey),
-                      );
-                      for (const plan of child.childBucketDefinition
-                        .copyPlans) {
-                        child.store[plan.id].push(store[plan.id][index]);
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        };
         const setterRoot = setter.getRoot();
         if (setterRoot && !(setterRoot instanceof CrystalError)) {
           if (isObjectBucket) {
@@ -6555,6 +6557,8 @@ export class Aether<
               setterRoot,
               outputMap,
               `${setter.rootPathIdentity}>${typeName}.`,
+              setter,
+              index,
             );
           }
         }
