@@ -219,6 +219,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     plugins: [
       useSchema(schema),
       /*useLogger(),*/ useParserCache(),
+      useValidationCache(),
       useExtendContext(contextCallback),
       useCrystalExecutor(),
       useMoreDetailedErrors(),
