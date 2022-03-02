@@ -6065,16 +6065,27 @@ export class Aether<
         // `toSerialize` and perform the serialization inside `bucketValue`
         // directly.
         let hasSerializationErrors = false;
+        const rollback: any[] = [];
         for (let i = 0, l = requestContext.toSerialize.length; i < l; i++) {
           const { o, k, s } = requestContext.toSerialize[i];
+          const value = o[k];
+          rollback[i] = value;
           try {
-            o[k] = s(o[k]);
+            o[k] = s(value);
           } catch (e) {
-            o[k] = Promise.reject(e);
             hasSerializationErrors = true;
+            break;
           }
         }
-        if (!hasSerializationErrors) {
+        if (hasSerializationErrors) {
+          // To avoid double serialization issues, we need to roll these values
+          // back to their unserialized forms before passing to GraphQL.js
+          for (let i = 0, l = rollback.length; i < l; i++) {
+            const { o, k, s } = requestContext.toSerialize[i];
+            o[k] = rollback[i];
+          }
+        } else {
+          // Safe to bypass GraphQL!
           result[$$bypassGraphQL] = true;
         }
       }
