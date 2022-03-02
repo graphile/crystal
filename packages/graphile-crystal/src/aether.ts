@@ -61,7 +61,7 @@ import {
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { CrystalError } from "./error";
-import { executeBucket } from "./execution-v2";
+import { $$keys, executeBucket } from "./execution-v2";
 import { withGlobalState } from "./global";
 import type { Group } from "./graphqlCollectFields";
 import { getDirectiveArg, graphqlCollectFields } from "./graphqlCollectFields";
@@ -3736,6 +3736,19 @@ export class Aether<
       }
     }
 
+    const setKeys = (map: {
+      [responseKey: string]: BucketDefinitionFieldOutputMap;
+    }): void => {
+      const keys = Object.keys(map);
+      for (const key of keys) {
+        const entry = map[key];
+        if (entry.children) {
+          setKeys(entry.children);
+        }
+      }
+      (map as any)[$$keys] = keys;
+    };
+
     // Track which plans belong in which buckets
     for (const bucket of this.buckets) {
       const plans = Object.entries(this.plans)
@@ -3761,6 +3774,7 @@ export class Aether<
           return false;
         }),
       );
+      setKeys(bucket.outputMap);
     }
   }
 

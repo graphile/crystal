@@ -19,6 +19,9 @@ import type { ExecutablePlan } from "./plan";
 import { __ListTransformPlan } from "./plans";
 import { arrayOfLength, isPromiseLike } from "./utils";
 
+// optimization
+export const $$keys = Symbol("keys");
+
 export function executeBucket(
   aether: Aether,
   metaByPlanId: CrystalContext["metaByPlanId"],
@@ -342,7 +345,7 @@ export function executeBucket(
       if (obj == null || obj instanceof CrystalError) {
         return;
       }
-      for (const responseKey in map) {
+      for (const responseKey of (map as any)[$$keys]) {
         const field = map[responseKey];
         const keyPathIdentity = pathIdentity + responseKey;
         // console.log(keyPathIdentity);
