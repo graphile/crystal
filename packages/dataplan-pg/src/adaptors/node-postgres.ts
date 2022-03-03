@@ -1,8 +1,16 @@
 // TODO: don't import this, it should not be a dependency.
 // ALTERNATIVELY: make this only importable from direct path.
-import type { Pool } from "pg";
+import LRU from "@graphile/lru";
+import type { Pool, QueryArrayConfig, QueryConfig } from "pg";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../executor";
+
+// Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
+const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
+  ? parseInt(process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE, 10)
+  : null;
+const PREPARED_STATEMENT_CACHE_SIZE =
+  !!cacheSizeFromEnv || cacheSizeFromEnv === 0 ? cacheSizeFromEnv : 100;
 
 export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
   return async (pgSettings, callback) => {
@@ -21,11 +29,47 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
             }
             const { text, name, values, arrayMode } = opts;
             // TODO: support named queries.
-            const queryObj = {
-              text,
-              values,
-              ...(arrayMode ? { rowMode: "array" } : null),
-            };
+            const queryObj: QueryConfig | QueryArrayConfig = arrayMode
+              ? {
+                  text,
+                  values,
+                  rowMode: "array",
+                }
+              : {
+                  text,
+                  values,
+                };
+
+            if (PREPARED_STATEMENT_CACHE_SIZE > 0 && name != null) {
+              // Hacking into pgClient internals - this is dangerous, but it's the only way I know to get a prepared statement LRU
+              const connection = (pgClient as any).connection;
+              if (connection && connection.parsedStatements) {
+                if (!connection._graphilePreparedStatementCache) {
+                  connection._graphilePreparedStatementCache = new LRU({
+                    maxLength: PREPARED_STATEMENT_CACHE_SIZE,
+                    dispose(key) {
+                      if (connection.parsedStatements[key]) {
+                        pgClient
+                          .query(`deallocate ${pgClient.escapeIdentifier(key)}`)
+                          .then(() => {
+                            delete connection.parsedStatements[key];
+                          })
+                          .catch((e) => {
+                            // eslint-disable-next-line no-console
+                            console.error("Error releasing prepared query", e);
+                          });
+                      }
+                    },
+                  });
+                }
+                if (!connection._graphilePreparedStatementCache.get(name)) {
+                  // We're relying on dispose to clear out the old ones.
+                  connection._graphilePreparedStatementCache.set(name, true);
+                }
+                queryObj.name = name;
+              }
+            }
+
             const result = await pgClient.query<TData>(queryObj);
 
             if (needsTx) {
