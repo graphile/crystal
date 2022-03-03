@@ -27,6 +27,7 @@ export class ReversePlan<TData> extends ExecutablePlan<readonly TData[]> {
     exportName: "ReversePlan",
   };
   sync = true;
+  allowMultipleOptimizations = true;
 
   constructor(plan: ExecutablePlan<readonly TData[]>) {
     super();

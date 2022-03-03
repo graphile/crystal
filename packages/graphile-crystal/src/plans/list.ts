@@ -14,6 +14,7 @@ export class ListPlan<
     exportName: "ListPlan",
   };
   sync = true;
+  allowMultipleOptimizations = true;
 
   constructor(list: readonly [...TPlanTuple]) {
     super();

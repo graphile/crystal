@@ -167,6 +167,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
 
   private destructure: (value: TData) => any;
   private parentPlanId: string;
+  allowMultipleOptimizations = true;
 
   constructor(
     parentPlan: ExecutablePlan<unknown>,

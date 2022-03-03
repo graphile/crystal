@@ -7,6 +7,7 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
     exportName: "LambdaPlan",
   };
   sync = true;
+  allowMultipleOptimizations = true;
 
   private planDep: number | null;
   constructor(

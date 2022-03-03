@@ -25,6 +25,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     exportName: "NodePlan",
   };
   sync = true;
+  allowMultipleOptimizations = true;
 
   private specPlanDep: number;
 

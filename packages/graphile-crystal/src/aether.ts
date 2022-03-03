@@ -135,6 +135,9 @@ import {
   sharedNull,
 } from "./utils";
 
+// How many times will we try re-optimizing before giving up
+const MAX_OPTIMIZATION_LOOPS = 10;
+
 const verbatimPrototype = Object.assign(Object.create(null), {
   [$$verbatim]: true,
 });
@@ -2563,17 +2566,34 @@ export class Aether<
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    this.processPlans(
-      "optimize",
-      "dependents-first",
-      (plan) => this.optimizePlan(plan),
-      {
-        // TODO: we should be able to optimize this - we know the new and old
-        // plan so we should be able to look at just the original plan's
-        // dependencies and see if they're needed any more or not.
-        onPlanReplacement: (_originalPlan, _replacementPlan) =>
-          this.treeShakePlans(),
-      },
+    const thirdAndFutureLoopReplacedPlans: ExecutablePlan[] = [];
+    for (let loops = 0; loops < MAX_OPTIMIZATION_LOOPS; loops++) {
+      let replacedPlan = false;
+      this.processPlans(
+        "optimize",
+        "dependents-first",
+        (plan) => this.optimizePlan(plan),
+        {
+          onPlanReplacement: (_originalPlan, _replacementPlan) => {
+            replacedPlan = true;
+            if (loops >= 3) {
+              thirdAndFutureLoopReplacedPlans.push(_originalPlan);
+            }
+            // TODO: we should be able to optimize this - we know the new and old
+            // plan so we should be able to look at just the original plan's
+            // dependencies and see if they're needed any more or not.
+            this.treeShakePlans();
+          },
+        },
+      );
+      if (!replacedPlan) {
+        return;
+      }
+    }
+    console.warn(
+      `Optimize plans looped ${MAX_OPTIMIZATION_LOOPS} times, and was still replacing plans at the end - this could indicate a very complex plan, or badly behaved plans. Here are some of the plans that were replaced after the second loop: ${thirdAndFutureLoopReplacedPlans
+        .slice(0, 10)
+        .join(", ")}`,
     );
   }
 
@@ -2685,17 +2705,16 @@ export class Aether<
     return replacementPlan;
   }
 
-  private optimizedPlans = new Set<ExecutablePlan>();
   /**
    * Implements the `OptimizePlan` algorithm.
    */
   private optimizePlan(plan: ExecutablePlan): ExecutablePlan {
-    if (this.optimizedPlans.has(plan)) {
-      throw new Error("Must not optimize plan twice");
+    if (plan.isOptimized && !plan.allowMultipleOptimizations) {
+      return plan;
     }
     const options = this.planOptionsByPlan.get(plan);
     const replacementPlan = plan.optimize({ stream: options?.stream ?? null });
-    this.optimizedPlans.add(plan);
+    plan.isOptimized = true;
     if (debugPlanVerboseEnabled) {
       if (replacementPlan !== plan) {
         debugPlanVerbose(
@@ -5813,7 +5832,7 @@ export class Aether<
           // return `- ${id}: ->${chalk.bold.yellow(String(plan.id))}`;
           return null;
         } else {
-          const optimized = this.optimizedPlans.has(plan);
+          const optimized = plan.isOptimized;
           const finalized = plan.isFinalized;
           return [
             String(id),
@@ -6264,7 +6283,7 @@ export class Aether<
         }
 
         // TODO: check that requestingPlan is allowed to get plans
-        if (this.optimizedPlans.has(requestingPlan)) {
+        if (requestingPlan.isOptimized) {
           throw new Error(
             `Optimized plan ${requestingPlan} is not permitted to request other plans (requested '${id}')`,
           );
@@ -6281,7 +6300,7 @@ export class Aether<
     : (id, _requestingPlan) => this.plans[id];
 
   public isOptimized(plan: ExecutablePlan): boolean {
-    return this.optimizedPlans.has(plan);
+    return plan.isOptimized;
   }
 }
 

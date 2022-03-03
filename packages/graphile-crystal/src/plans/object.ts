@@ -26,6 +26,7 @@ export class ObjectPlan<
     exportName: "ObjectPlan",
   };
   sync = true;
+  allowMultipleOptimizations = true;
   private keys: Array<keyof TPlans>;
   constructor(obj: TPlans) {
     super();

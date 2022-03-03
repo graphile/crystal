@@ -43,6 +43,7 @@ export class MapPlan extends ExecutablePlan {
     exportName: "MapPlan ",
   };
   sync = true;
+  allowMultipleOptimizations = true;
 
   private mapper: (obj: object) => object;
   constructor(

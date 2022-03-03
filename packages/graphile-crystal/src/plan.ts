@@ -238,6 +238,18 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    */
   public bucketId = -1;
 
+  /**
+   * True when `optimize` has been called at least once.
+   */
+  public isOptimized = false;
+  /**
+   * Set this true if your plan's optimize method can be called a second time;
+   * note that in this situation it's likely that your dependencies will not be
+   * what you expect them to be (e.g. a PgSelectSinglePlan might become an
+   * AccessPlan).
+   */
+  public allowMultipleOptimizations = false;
+
   constructor() {
     super();
     if (typeof (this as any).sync !== "boolean") {

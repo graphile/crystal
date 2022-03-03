@@ -7,6 +7,7 @@ export class LastPlan<TData> extends ExecutablePlan<TData> {
     exportName: "LastPlan",
   };
   sync = true;
+  allowMultipleOptimizations = true;
 
   constructor(parentPlan: ExecutablePlan<ReadonlyArray<TData>>) {
     super();
