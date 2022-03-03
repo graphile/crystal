@@ -21,12 +21,10 @@ import { PgInsertPlan } from "./pgInsert";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 import { PgUpdatePlan } from "./pgUpdate";
 
-//const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
-const debugExecute = debugFactory(
-  "datasource:pg:PgClassExpressionPlan:execute",
-);
-//const debugPlanVerbose = debugPlan.extend("verbose");
-const debugExecuteVerbose = debugExecute.extend("verbose");
+// const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
+// const debugExecute = debugFactory( "datasource:pg:PgClassExpressionPlan:execute",);
+// const debugPlanVerbose = debugPlan.extend("verbose");
+// const debugExecuteVerbose = debugExecute.extend("verbose");
 
 /**
  * A plan for selecting a column. Keep in mind that a column might not be a
@@ -238,7 +236,6 @@ export class PgClassExpressionPlan<
           return pg2gql(rawValue);
         }
       });
-      debugExecuteVerbose("%s values: %c, result: %c", this, values, result);
       return result;
     } else {
       throw new Error(

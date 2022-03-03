@@ -107,7 +107,7 @@ type LockCallback<
 > = (plan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgSelectPlan:plan");
-const debugExecute = debugFactory("datasource:pg:PgSelectPlan:execute");
+// const debugExecute = debugFactory("datasource:pg:PgSelectPlan:execute");
 const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
@@ -1163,7 +1163,7 @@ export class PgSelectPlan<
         name,
       },
     );
-    debugExecute("%s; result: %c", this, executionResult);
+    // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
       if (!allVals) {

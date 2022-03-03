@@ -9,6 +9,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
+import { isDev } from "graphile-crystal";
 import { CrystalError, defer, isAsyncIterable } from "graphile-crystal";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
@@ -354,24 +355,30 @@ ${duration}
               const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
               const existingResult = scopedCache.get(identifiersJSON);
               if (existingResult) {
-                debugVerbose(
-                  "%s served %o from cache: %c",
-                  this,
-                  identifiersJSON,
-                  existingResult,
-                );
+                if (debugVerbose.enabled) {
+                  debugVerbose(
+                    "%s served %o from cache: %c",
+                    this,
+                    identifiersJSON,
+                    existingResult,
+                  );
+                }
                 results[resultIndex] = existingResult;
               } else {
-                debugVerbose(
-                  "%s no entry for %o in cache %c",
-                  this,
-                  identifiersJSON,
-                  scopedCache,
-                );
-                assert.ok(
-                  remaining.includes(identifiersJSON) === false,
-                  "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
-                );
+                if (debugVerbose.enabled) {
+                  debugVerbose(
+                    "%s no entry for %o in cache %c",
+                    this,
+                    identifiersJSON,
+                    scopedCache,
+                  );
+                }
+                if (isDev) {
+                  assert.ok(
+                    remaining.includes(identifiersJSON) === false,
+                    "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
+                  );
+                }
                 const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
                 results[resultIndex] = pendingResult;
                 scopedCache.set(identifiersJSON, pendingResult);
@@ -518,19 +525,23 @@ ${duration}
           const existing = batchIndexesByIdentifiersJSON.get(identifiersJSON);
           if (existing) {
             existing.push(batchIndex);
-            debugVerbose(
-              "%s served %o again (%o)",
-              this,
-              identifiersJSON,
-              existing,
-            );
+            if (debugVerbose.enabled) {
+              debugVerbose(
+                "%s served %o again (%o)",
+                this,
+                identifiersJSON,
+                existing,
+              );
+            }
             //results[resultIndex] = existingResult;
           } else {
-            debugVerbose(
-              "%s no entry for %o, allocating",
-              this,
-              identifiersJSON,
-            );
+            if (debugVerbose.enabled) {
+              debugVerbose(
+                "%s no entry for %o, allocating",
+                this,
+                identifiersJSON,
+              );
+            }
             batchIndexesByIdentifiersJSON.set(identifiersJSON, [batchIndex]);
           }
         }
