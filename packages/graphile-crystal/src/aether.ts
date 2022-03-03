@@ -6283,7 +6283,11 @@ export class Aether<
         }
 
         // TODO: check that requestingPlan is allowed to get plans
-        if (requestingPlan.isOptimized) {
+        if (
+          requestingPlan.isOptimized &&
+          (this.phase !== "optimize" ||
+            !requestingPlan.allowMultipleOptimizations)
+        ) {
           throw new Error(
             `Optimized plan ${requestingPlan} is not permitted to request other plans (requested '${id}')`,
           );
