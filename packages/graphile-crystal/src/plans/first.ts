@@ -1,5 +1,6 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
+import { ListPlan } from "./list";
 
 export class FirstPlan<TData> extends ExecutablePlan<TData> {
   static $$export = {
@@ -22,6 +23,15 @@ export class FirstPlan<TData> extends ExecutablePlan<TData> {
 
   deduplicate(peers: FirstPlan<TData>[]): FirstPlan<TData> {
     return peers.length > 0 ? peers[0] : this;
+  }
+
+  optimize() {
+    const parent = this.getDep(0);
+    // The first of a list plan is just the first dependency of the list plan.
+    if (parent instanceof ListPlan) {
+      return this.getPlan(parent.dependencies[0]);
+    }
+    return this;
   }
 }
 
