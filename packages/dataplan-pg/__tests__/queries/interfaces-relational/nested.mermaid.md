@@ -21,7 +21,6 @@ graph TD
     PgSelectSingle_23["PgSelectSingle[_23∈3]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_24["PgClassExpression[_24∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_25["PgPolymorphic[_25∈3]"]:::plan
-    First_38["First[_38∈3]"]:::plan
     PgSelectSingle_39["PgSelectSingle[_39∈3]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_40["PgClassExpression[_40∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_41["PgPolymorphic[_41∈3]"]:::plan
@@ -33,7 +32,6 @@ graph TD
     Access_361["Access[_361∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_362["Object[_362∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Map_371["Map[_371∈3]<br />ᐸ_23:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
-    List_372["List[_372∈3]<br />ᐸ_371ᐳ"]:::plan
     Access_373["Access[_373∈1]<br />ᐸ_11.1ᐳ"]:::plan
 
     %% plan dependencies
@@ -50,8 +48,7 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_24
     PgSelectSingle_23 --> PgPolymorphic_25
     PgClassExpression_24 --> PgPolymorphic_25
-    List_372 --> First_38
-    First_38 --> PgSelectSingle_39
+    Map_371 --> PgSelectSingle_39
     PgSelectSingle_39 --> PgClassExpression_40
     PgSelectSingle_39 --> PgPolymorphic_41
     PgClassExpression_40 --> PgPolymorphic_41
@@ -64,7 +61,6 @@ graph TD
     Access_360 --> Object_362
     Access_361 --> Object_362
     PgSelectSingle_23 --> Map_371
-    Map_371 --> List_372
     __Item_11 --> Access_373
 
     %% plan-to-path relationships
@@ -105,7 +101,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#ffa500
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgClassExpression_94,PgClassExpression_302,PgClassExpression_358,Map_371,List_372 bucket3
+    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgClassExpression_94,PgClassExpression_302,PgClassExpression_358,Map_371 bucket3
 
     subgraph "Buckets for queries/interfaces-relational/nested"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket

@@ -26,7 +26,6 @@ graph TD
     PgSelectSingle_29["PgSelectSingle[_29∈0]<br />ᐸusers_most_recent_forumᐳ"]:::plan
     InputStaticLeaf_30["InputStaticLeaf[_30∈0]"]:::plan
     PgClassExpression_31["PgClassExpression[_31∈0]<br />ᐸ__users_mo...nt_forum__ᐳ"]:::plan
-    First_36["First[_36∈0]"]:::plan
     PgSelectSingle_37["PgSelectSingle[_37∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
     PgClassExpression_38["PgClassExpression[_38∈0]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
     PgSelect_40[["PgSelect[_40∈0]<br />ᐸforums_featured_messagesᐳ"]]:::plan
@@ -37,7 +36,6 @@ graph TD
     PgSelectSingle_45["PgSelectSingle[_45∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
     PgClassExpression_46["PgClassExpression[_46∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
     Map_47["Map[_47∈0]<br />ᐸ_29:{”0”:0}ᐳ"]:::plan
-    List_48["List[_48∈0]<br />ᐸ_47ᐳ"]:::plan
 
     %% plan dependencies
     Object_43 --> PgSelect_8
@@ -58,8 +56,7 @@ graph TD
     PgSelect_24 --> First_28
     First_28 --> PgSelectSingle_29
     PgSelectSingle_29 --> PgClassExpression_31
-    List_48 --> First_36
-    First_36 --> PgSelectSingle_37
+    Map_47 --> PgSelectSingle_37
     PgSelectSingle_37 --> PgClassExpression_38
     Object_43 --> PgSelect_40
     PgClassExpression_31 --> PgSelect_40
@@ -71,7 +68,6 @@ graph TD
     __Item_44 --> PgSelectSingle_45
     PgSelectSingle_45 --> PgClassExpression_46
     PgSelectSingle_29 --> Map_47
-    Map_47 --> List_48
 
     %% plan-to-path relationships
     P_0["~"]
@@ -97,7 +93,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgSelect_24,First_28,PgSelectSingle_29,InputStaticLeaf_30,PgClassExpression_31,First_36,PgSelectSingle_37,PgClassExpression_38,PgSelect_40,Access_41,Access_42,Object_43,Map_47,List_48 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgSelect_24,First_28,PgSelectSingle_29,InputStaticLeaf_30,PgClassExpression_31,PgSelectSingle_37,PgClassExpression_38,PgSelect_40,Access_41,Access_42,Object_43,Map_47 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_44,PgSelectSingle_45,PgClassExpression_46 bucket1
 

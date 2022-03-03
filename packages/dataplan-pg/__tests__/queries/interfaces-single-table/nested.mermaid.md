@@ -23,7 +23,6 @@ graph TD
     Lambda_25["Lambda[_25∈3]"]:::plan
     PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
     PgClassExpression_27["PgClassExpression[_27∈4]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
-    First_32["First[_32∈4]"]:::plan
     PgSelectSingle_33["PgSelectSingle[_33∈4]<br />ᐸsingle_table_itemsᐳ"]:::plan
     PgClassExpression_34["PgClassExpression[_34∈4]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
     Lambda_35["Lambda[_35∈4]"]:::plan
@@ -35,7 +34,6 @@ graph TD
     Access_142["Access[_142∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_143["Object[_143∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Map_167["Map[_167∈4]<br />ᐸ_23:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_168["List[_168∈4]<br />ᐸ_167ᐳ"]:::plan
     Access_169["Access[_169∈1]<br />ᐸ_11.1ᐳ"]:::plan
 
     %% plan dependencies
@@ -54,8 +52,7 @@ graph TD
     Lambda_25 --> PgSingleTablePolymorphic_26
     PgSelectSingle_23 --> PgSingleTablePolymorphic_26
     PgSelectSingle_23 --> PgClassExpression_27
-    List_168 --> First_32
-    First_32 --> PgSelectSingle_33
+    Map_167 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_34
     PgClassExpression_34 --> Lambda_35
     Lambda_35 --> PgSingleTablePolymorphic_36
@@ -68,7 +65,6 @@ graph TD
     Access_141 --> Object_143
     Access_142 --> Object_143
     PgSelectSingle_23 --> Map_167
-    Map_167 --> List_168
     __Item_11 --> Access_169
 
     %% plan-to-path relationships
@@ -111,7 +107,7 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
     classDef bucket4 stroke:#0000ff
-    class PgClassExpression_27,First_32,PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_52,PgClassExpression_54,Map_167,List_168 bucket4
+    class PgClassExpression_27,PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_52,PgClassExpression_54,Map_167 bucket4
     classDef bucket5 stroke:#7fff00
     class PgClassExpression_39 bucket5
 
@@ -130,7 +126,7 @@ graph TD
     Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _22, _23<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀parent ᐸ-O- _36<br />⠀⠀⠀parent.id ᐸ-L- _27<br />⠀⠀⠀parent.type ᐸ-L- _34<br />⠀⠀id ᐸ-L- _52<br />⠀⠀type2 ᐸ-L- _54"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_36[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _32, _33<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTablePost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableChecklistItem.parent<br />⠀⠀type2 ᐸ-L- _39"):::bucket
+    Bucket5("Bucket 5 (polymorphic_36[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _167, _33<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTablePost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableChecklistItem.parent<br />⠀⠀type2 ᐸ-L- _39"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket4 --> Bucket5
     end

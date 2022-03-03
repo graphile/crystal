@@ -30,11 +30,9 @@ graph TD
     PgClassExpression_35["PgClassExpression[_35∈1]<br />ᐸ(__person_...omment_id”ᐳ"]:::plan
     List_36["List[_36∈1]<br />ᐸ_33,_34,_35ᐳ"]:::plan
     PgPolymorphic_37["PgPolymorphic[_37∈1]"]:::plan
-    First_42["First[_42∈1]"]:::plan
     PgSelectSingle_43["PgSelectSingle[_43∈2]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈2]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
     PgClassExpression_45["PgClassExpression[_45∈2]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    First_50["First[_50∈1]"]:::plan
     PgSelectSingle_51["PgSelectSingle[_51∈3]<br />ᐸpostsᐳ"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈3]<br />ᐸ__posts__.”post_id”ᐳ"]:::plan
     PgClassExpression_53["PgClassExpression[_53∈3]<br />ᐸ__posts__.”author_id”ᐳ"]:::plan
@@ -43,7 +41,6 @@ graph TD
     PgSelectSingle_59["PgSelectSingle[_59∈3]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_60["PgClassExpression[_60∈3]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression_61["PgClassExpression[_61∈3]<br />ᐸ__posts__.”body”ᐳ"]:::plan
-    First_66["First[_66∈1]"]:::plan
     PgSelectSingle_67["PgSelectSingle[_67∈4]<br />ᐸcommentsᐳ"]:::plan
     PgClassExpression_68["PgClassExpression[_68∈4]<br />ᐸ__comments...omment_id”ᐳ"]:::plan
     PgClassExpression_69["PgClassExpression[_69∈4]<br />ᐸ__comments...author_id”ᐳ"]:::plan
@@ -61,11 +58,8 @@ graph TD
     PgClassExpression_84["PgClassExpression[_84∈4]<br />ᐸ__posts__.”body”ᐳ"]:::plan
     PgClassExpression_85["PgClassExpression[_85∈4]<br />ᐸ__comments__.”body”ᐳ"]:::plan
     Map_86["Map[_86∈1]<br />ᐸ_22:{”0”:3,”1”:4}ᐳ"]:::plan
-    List_87["List[_87∈1]<br />ᐸ_86ᐳ"]:::plan
     Map_88["Map[_88∈1]<br />ᐸ_22:{”0”:6,”1”:7,”2”:8}ᐳ"]:::plan
-    List_89["List[_89∈1]<br />ᐸ_88ᐳ"]:::plan
     Map_90["Map[_90∈1]<br />ᐸ_22:{”0”:10,”1”:11,”2”:12,”3”:13}ᐳ"]:::plan
-    List_91["List[_91∈1]<br />ᐸ_90ᐳ"]:::plan
     Access_92["Access[_92∈0]<br />ᐸ_12.0ᐳ"]:::plan
 
     %% plan dependencies
@@ -93,12 +87,10 @@ graph TD
     PgClassExpression_35 --> List_36
     PgClassExpression_32 --> PgPolymorphic_37
     List_36 --> PgPolymorphic_37
-    List_87 --> First_42
-    First_42 --> PgSelectSingle_43
+    Map_86 --> PgSelectSingle_43
     PgSelectSingle_43 --> PgClassExpression_44
     PgSelectSingle_43 --> PgClassExpression_45
-    List_89 --> First_50
-    First_50 --> PgSelectSingle_51
+    Map_88 --> PgSelectSingle_51
     PgSelectSingle_51 --> PgClassExpression_52
     PgSelectSingle_51 --> PgClassExpression_53
     Object_81 --> PgSelect_54
@@ -107,8 +99,7 @@ graph TD
     First_58 --> PgSelectSingle_59
     PgSelectSingle_59 --> PgClassExpression_60
     PgSelectSingle_51 --> PgClassExpression_61
-    List_91 --> First_66
-    First_66 --> PgSelectSingle_67
+    Map_90 --> PgSelectSingle_67
     PgSelectSingle_67 --> PgClassExpression_68
     PgSelectSingle_67 --> PgClassExpression_69
     Object_81 --> PgSelect_70
@@ -128,11 +119,8 @@ graph TD
     PgSelectSingle_83 --> PgClassExpression_84
     PgSelectSingle_67 --> PgClassExpression_85
     PgSelectSingle_22 --> Map_86
-    Map_86 --> List_87
     PgSelectSingle_22 --> Map_88
-    Map_88 --> List_89
     PgSelectSingle_22 --> Map_90
-    Map_90 --> List_91
     First_12 --> Access_92
 
     %% plan-to-path relationships
@@ -185,7 +173,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_92 bucket0
     classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,List_36,PgPolymorphic_37,First_42,First_50,First_66,Map_86,List_87,Map_88,List_89,Map_90,List_91 bucket1
+    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,List_36,PgPolymorphic_37,Map_86,Map_88,Map_90 bucket1
     classDef bucket2 stroke:#7f007f
     class PgSelectSingle_43,PgClassExpression_44,PgClassExpression_45 bucket2
     classDef bucket3 stroke:#ffa500
@@ -199,13 +187,13 @@ graph TD
     Bucket1("Bucket 1 (item_21)<br />Deps: _92, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀person ᐸ-O- _30<br />⠀⠀⠀person.username ᐸ-L- _31<br />⠀⠀bookmarkedEntity ᐸ-O- _37"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_37[Person])<br />Deps: _42<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀personId ᐸ-L- _44<br />⠀⠀username ᐸ-L- _45"):::bucket
+    Bucket2("Bucket 2 (polymorphic_37[Person])<br />Deps: _86<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀personId ᐸ-L- _44<br />⠀⠀username ᐸ-L- _45"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_37[Post])<br />Deps: _50, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀postId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀body ᐸ-L- _61"):::bucket
+    Bucket3("Bucket 3 (polymorphic_37[Post])<br />Deps: _88, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀postId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀body ᐸ-L- _61"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_37[Comment])<br />Deps: _66, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀commentId ᐸ-L- _68<br />⠀⠀author ᐸ-O- _75<br />⠀⠀⠀author.username ᐸ-L- _76<br />⠀⠀post ᐸ-O- _83<br />⠀⠀⠀post.body ᐸ-L- _84<br />⠀⠀body ᐸ-L- _85"):::bucket
+    Bucket4("Bucket 4 (polymorphic_37[Comment])<br />Deps: _90, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀commentId ᐸ-L- _68<br />⠀⠀author ᐸ-O- _75<br />⠀⠀⠀author.username ᐸ-L- _76<br />⠀⠀post ᐸ-O- _83<br />⠀⠀⠀post.body ᐸ-L- _84<br />⠀⠀body ᐸ-L- _85"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
     end

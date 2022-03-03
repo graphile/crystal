@@ -23,7 +23,6 @@ graph TD
     __Item_41>"__Item[_41∈2] {1,2}<br />ᐸ_34ᐳ"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈2] {1,2}<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈2] {1,2}<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    First_49["First[_49∈2] {1,2}"]:::plan
     PgSelectSingle_50["PgSelectSingle[_50∈2] {1,2}<br />ᐸusersᐳ"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈2] {1,2}<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈2] {1,2}<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
@@ -34,7 +33,6 @@ graph TD
     Access_62["Access[_62∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_63["Object[_63∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Map_68["Map[_68∈2] {1,2}<br />ᐸ_42:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_69["List[_69∈2] {1,2}<br />ᐸ_68ᐳ"]:::plan
 
     %% plan dependencies
     Object_63 --> PgSelect_17
@@ -51,8 +49,7 @@ graph TD
     PgSelect_34 ==> __Item_41
     __Item_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
-    List_69 --> First_49
-    First_49 --> PgSelectSingle_50
+    Map_68 --> PgSelectSingle_50
     PgSelectSingle_50 --> PgClassExpression_51
     PgSelectSingle_50 --> PgClassExpression_52
     List_57 --> PgCursor_55
@@ -63,7 +60,6 @@ graph TD
     Access_61 --> Object_63
     Access_62 --> Object_63
     PgSelectSingle_42 --> Map_68
-    Map_68 --> List_69
 
     %% plan-to-path relationships
     P_0["~"]
@@ -97,7 +93,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_33,PgSelect_34,PgClassExpression_39 bucket1
     classDef bucket2 stroke:#7f007f
-    class __Item_41,PgSelectSingle_42,PgClassExpression_43,First_49,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,Map_68,List_69 bucket2
+    class __Item_41,PgSelectSingle_42,PgClassExpression_43,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,Map_68 bucket2
     classDef bucket3 stroke:#ffa500
     class PgCursor_55,PgClassExpression_56,List_57 bucket3
 

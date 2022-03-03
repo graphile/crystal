@@ -18,10 +18,8 @@ graph TD
     PgSelectSingle_16["PgSelectSingle[_16∈2]<br />ᐸrelational_commentablesᐳ"]:::plan
     PgClassExpression_17["PgClassExpression[_17∈2]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_18["PgPolymorphic[_18∈2]"]:::plan
-    First_24["First[_24∈2]"]:::plan
     PgSelectSingle_25["PgSelectSingle[_25∈3]<br />ᐸrelational_postsᐳ"]:::plan
     PgClassExpression_26["PgClassExpression[_26∈3]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    First_32["First[_32∈3]"]:::plan
     PgSelectSingle_33["PgSelectSingle[_33∈3]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_34["PgClassExpression[_34∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression_42["PgClassExpression[_42∈3]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
@@ -29,19 +27,15 @@ graph TD
     PgClassExpression_51["PgClassExpression[_51∈3]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈3]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression_53["PgClassExpression[_53∈3]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    First_59["First[_59∈2]"]:::plan
     PgSelectSingle_60["PgSelectSingle[_60∈4]<br />ᐸrelational_checklistsᐳ"]:::plan
     PgClassExpression_61["PgClassExpression[_61∈4]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    First_67["First[_67∈4]"]:::plan
     PgSelectSingle_68["PgSelectSingle[_68∈4]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_69["PgClassExpression[_69∈4]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression_77["PgClassExpression[_77∈4]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
     PgClassExpression_85["PgClassExpression[_85∈4]<br />ᐸ__relation...”position”ᐳ"]:::plan
     PgClassExpression_86["PgClassExpression[_86∈4]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    First_92["First[_92∈2]"]:::plan
     PgSelectSingle_93["PgSelectSingle[_93∈5]<br />ᐸrelational_checklist_itemsᐳ"]:::plan
     PgClassExpression_94["PgClassExpression[_94∈5]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    First_100["First[_100∈5]"]:::plan
     PgSelectSingle_101["PgSelectSingle[_101∈5]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_102["PgClassExpression[_102∈5]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression_110["PgClassExpression[_110∈5]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
@@ -52,17 +46,11 @@ graph TD
     PgClassExpression_119["PgClassExpression[_119∈5]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression_120["PgClassExpression[_120∈5]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
     Map_121["Map[_121∈3]<br />ᐸ_25:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
-    List_122["List[_122∈3]<br />ᐸ_121ᐳ"]:::plan
     Map_123["Map[_123∈2]<br />ᐸ_16:{”0”:1,”1”:2,”2”:3,”3”:4,”4”:5,”5”:6,”6”:7}ᐳ"]:::plan
-    List_124["List[_124∈2]<br />ᐸ_123ᐳ"]:::plan
     Map_125["Map[_125∈4]<br />ᐸ_60:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
-    List_126["List[_126∈4]<br />ᐸ_125ᐳ"]:::plan
     Map_127["Map[_127∈2]<br />ᐸ_16:{”0”:8,”1”:9,”2”:10,”3”:11,”4”:12}ᐳ"]:::plan
-    List_128["List[_128∈2]<br />ᐸ_127ᐳ"]:::plan
     Map_129["Map[_129∈5]<br />ᐸ_93:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
-    List_130["List[_130∈5]<br />ᐸ_129ᐳ"]:::plan
     Map_131["Map[_131∈2]<br />ᐸ_16:{”0”:13,”1”:14,”2”:15,”3”:16,”4”:17,”5”:18}ᐳ"]:::plan
-    List_132["List[_132∈2]<br />ᐸ_131ᐳ"]:::plan
 
     %% plan dependencies
     Object_115 --> PgSelect_8
@@ -75,31 +63,25 @@ graph TD
     PgSelectSingle_16 --> PgClassExpression_17
     PgSelectSingle_16 --> PgPolymorphic_18
     PgClassExpression_17 --> PgPolymorphic_18
-    List_124 --> First_24
-    First_24 --> PgSelectSingle_25
+    Map_123 --> PgSelectSingle_25
     PgSelectSingle_25 --> PgClassExpression_26
-    List_122 --> First_32
-    First_32 --> PgSelectSingle_33
+    Map_121 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_34
     PgSelectSingle_33 --> PgClassExpression_42
     PgSelectSingle_33 --> PgClassExpression_50
     PgSelectSingle_25 --> PgClassExpression_51
     PgSelectSingle_25 --> PgClassExpression_52
     PgSelectSingle_25 --> PgClassExpression_53
-    List_128 --> First_59
-    First_59 --> PgSelectSingle_60
+    Map_127 --> PgSelectSingle_60
     PgSelectSingle_60 --> PgClassExpression_61
-    List_126 --> First_67
-    First_67 --> PgSelectSingle_68
+    Map_125 --> PgSelectSingle_68
     PgSelectSingle_68 --> PgClassExpression_69
     PgSelectSingle_68 --> PgClassExpression_77
     PgSelectSingle_68 --> PgClassExpression_85
     PgSelectSingle_60 --> PgClassExpression_86
-    List_132 --> First_92
-    First_92 --> PgSelectSingle_93
+    Map_131 --> PgSelectSingle_93
     PgSelectSingle_93 --> PgClassExpression_94
-    List_130 --> First_100
-    First_100 --> PgSelectSingle_101
+    Map_129 --> PgSelectSingle_101
     PgSelectSingle_101 --> PgClassExpression_102
     PgSelectSingle_101 --> PgClassExpression_110
     __Value_3 --> Access_113
@@ -110,17 +92,11 @@ graph TD
     PgSelectSingle_93 --> PgClassExpression_119
     PgSelectSingle_93 --> PgClassExpression_120
     PgSelectSingle_25 --> Map_121
-    Map_121 --> List_122
     PgSelectSingle_16 --> Map_123
-    Map_123 --> List_124
     PgSelectSingle_60 --> Map_125
-    Map_125 --> List_126
     PgSelectSingle_16 --> Map_127
-    Map_127 --> List_128
     PgSelectSingle_93 --> Map_129
-    Map_129 --> List_130
     PgSelectSingle_16 --> Map_131
-    Map_131 --> List_132
 
     %% plan-to-path relationships
     P_0["~"]
@@ -174,13 +150,13 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_13,PgSelectSingle_14 bucket1
     classDef bucket2 stroke:#7f007f
-    class __Item_15,PgSelectSingle_16,PgClassExpression_17,PgPolymorphic_18,First_24,First_59,First_92,Map_123,List_124,Map_127,List_128,Map_131,List_132 bucket2
+    class __Item_15,PgSelectSingle_16,PgClassExpression_17,PgPolymorphic_18,Map_123,Map_127,Map_131 bucket2
     classDef bucket3 stroke:#ffa500
-    class PgSelectSingle_25,PgClassExpression_26,First_32,PgSelectSingle_33,PgClassExpression_34,PgClassExpression_42,PgClassExpression_50,PgClassExpression_51,PgClassExpression_52,PgClassExpression_53,Map_121,List_122 bucket3
+    class PgSelectSingle_25,PgClassExpression_26,PgSelectSingle_33,PgClassExpression_34,PgClassExpression_42,PgClassExpression_50,PgClassExpression_51,PgClassExpression_52,PgClassExpression_53,Map_121 bucket3
     classDef bucket4 stroke:#0000ff
-    class PgSelectSingle_60,PgClassExpression_61,First_67,PgSelectSingle_68,PgClassExpression_69,PgClassExpression_77,PgClassExpression_85,PgClassExpression_86,Map_125,List_126 bucket4
+    class PgSelectSingle_60,PgClassExpression_61,PgSelectSingle_68,PgClassExpression_69,PgClassExpression_77,PgClassExpression_85,PgClassExpression_86,Map_125 bucket4
     classDef bucket5 stroke:#7fff00
-    class PgSelectSingle_93,PgClassExpression_94,First_100,PgSelectSingle_101,PgClassExpression_102,PgClassExpression_110,PgClassExpression_118,PgClassExpression_119,PgClassExpression_120,Map_129,List_130 bucket5
+    class PgSelectSingle_93,PgClassExpression_94,PgSelectSingle_101,PgClassExpression_102,PgClassExpression_110,PgClassExpression_118,PgClassExpression_119,PgClassExpression_120,Map_129 bucket5
 
     subgraph "Buckets for queries/interfaces-relational/commentables"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allRelationalCommentablesList ᐸ-A- _12"):::bucket
@@ -191,13 +167,13 @@ graph TD
     Bucket2("Bucket 2 (item_15)<br />Deps: _12<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀ROOT ᐸ-O- _18"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />Deps: _24<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _26<br />⠀⠀type ᐸ-L- _34<br />⠀⠀type2 ᐸ-L- _42<br />⠀⠀position ᐸ-L- _50<br />⠀⠀title ᐸ-L- _51<br />⠀⠀description ᐸ-L- _52<br />⠀⠀note ᐸ-L- _53"):::bucket
+    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />Deps: _123<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _26<br />⠀⠀type ᐸ-L- _34<br />⠀⠀type2 ᐸ-L- _42<br />⠀⠀position ᐸ-L- _50<br />⠀⠀title ᐸ-L- _51<br />⠀⠀description ᐸ-L- _52<br />⠀⠀note ᐸ-L- _53"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />Deps: _59<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _61<br />⠀⠀type ᐸ-L- _69<br />⠀⠀type2 ᐸ-L- _77<br />⠀⠀position ᐸ-L- _85<br />⠀⠀title ᐸ-L- _86"):::bucket
+    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />Deps: _127<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _61<br />⠀⠀type ᐸ-L- _69<br />⠀⠀type2 ᐸ-L- _77<br />⠀⠀position ᐸ-L- _85<br />⠀⠀title ᐸ-L- _86"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />Deps: _92<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _94<br />⠀⠀type ᐸ-L- _102<br />⠀⠀type2 ᐸ-L- _110<br />⠀⠀position ᐸ-L- _118<br />⠀⠀description ᐸ-L- _119<br />⠀⠀note ᐸ-L- _120"):::bucket
+    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />Deps: _131<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _94<br />⠀⠀type ᐸ-L- _102<br />⠀⠀type2 ᐸ-L- _110<br />⠀⠀position ᐸ-L- _118<br />⠀⠀description ᐸ-L- _119<br />⠀⠀note ᐸ-L- _120"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket2 --> Bucket5
     end

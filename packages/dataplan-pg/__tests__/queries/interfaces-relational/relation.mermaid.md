@@ -16,11 +16,9 @@ graph TD
     PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_15["PgPolymorphic[_15∈0]"]:::plan
-    First_28["First[_28∈0]"]:::plan
     PgSelectSingle_29["PgSelectSingle[_29∈0]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic_31["PgPolymorphic[_31∈0]"]:::plan
-    First_45["First[_45∈0]"]:::plan
     PgSelectSingle_46["PgSelectSingle[_46∈0]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_47["PgClassExpression[_47∈0]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression_404["PgClassExpression[_404∈0]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
@@ -29,9 +27,7 @@ graph TD
     Access_495["Access[_495∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_496["Object[_496∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Map_501["Map[_501∈0]<br />ᐸ_29:{”0”:2}ᐳ"]:::plan
-    List_502["List[_502∈0]<br />ᐸ_501ᐳ"]:::plan
     Map_503["Map[_503∈0]<br />ᐸ_13:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
-    List_504["List[_504∈0]<br />ᐸ_503ᐳ"]:::plan
 
     %% plan dependencies
     Object_496 --> PgSelect_8
@@ -41,13 +37,11 @@ graph TD
     PgSelectSingle_13 --> PgClassExpression_14
     PgSelectSingle_13 --> PgPolymorphic_15
     PgClassExpression_14 --> PgPolymorphic_15
-    List_504 --> First_28
-    First_28 --> PgSelectSingle_29
+    Map_503 --> PgSelectSingle_29
     PgSelectSingle_29 --> PgClassExpression_30
     PgSelectSingle_29 --> PgPolymorphic_31
     PgClassExpression_30 --> PgPolymorphic_31
-    List_502 --> First_45
-    First_45 --> PgSelectSingle_46
+    Map_501 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
     PgSelectSingle_13 --> PgClassExpression_404
     PgSelectSingle_29 --> PgClassExpression_484
@@ -56,9 +50,7 @@ graph TD
     Access_494 --> Object_496
     Access_495 --> Object_496
     PgSelectSingle_29 --> Map_501
-    Map_501 --> List_502
     PgSelectSingle_13 --> Map_503
-    Map_503 --> List_504
 
     %% plan-to-path relationships
     P_0["~"]
@@ -78,7 +70,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_28,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,List_502,Map_503,List_504 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,Map_503 bucket0
 
     subgraph "Buckets for queries/interfaces-relational/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀item ᐸ-O- _15<br />⠀⠀⠀item.parent ᐸ-O- _31<br />⠀⠀⠀⠀item.parent.author ᐸ-O- _46<br />⠀⠀⠀⠀⠀item.parent.author.username ᐸ-L- _47<br />⠀⠀⠀⠀item.parent.id ᐸ-L- _484<br />⠀⠀⠀item.id ᐸ-L- _404"):::bucket

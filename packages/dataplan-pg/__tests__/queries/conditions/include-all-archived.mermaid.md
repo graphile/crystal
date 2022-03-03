@@ -20,12 +20,10 @@ graph TD
     Access_42["Access[_42∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_43["Access[_43∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_44["Object[_44∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_45["First[_45∈2]"]:::plan
     PgSelectSingle_46["PgSelectSingle[_46∈2]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_47["PgClassExpression[_47∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_48["PgClassExpression[_48∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
     Map_49["Map[_49∈2]<br />ᐸ_38:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_50["List[_50∈2]<br />ᐸ_49ᐳ"]:::plan
     Access_51["Access[_51∈1]<br />ᐸ_21.1ᐳ"]:::plan
 
     %% plan dependencies
@@ -40,12 +38,10 @@ graph TD
     __Value_3 --> Access_43
     Access_42 --> Object_44
     Access_43 --> Object_44
-    List_50 --> First_45
-    First_45 --> PgSelectSingle_46
+    Map_49 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
     PgSelectSingle_46 --> PgClassExpression_48
     PgSelectSingle_38 --> Map_49
-    Map_49 --> List_50
     __Item_21 --> Access_51
 
     %% plan-to-path relationships
@@ -76,7 +72,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,Access_51 bucket1
     classDef bucket2 stroke:#7f007f
-    class __Item_37,PgSelectSingle_38,PgClassExpression_39,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,Map_49,List_50 bucket2
+    class __Item_37,PgSelectSingle_38,PgClassExpression_39,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,Map_49 bucket2
 
     subgraph "Buckets for queries/conditions/include-all-archived"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket

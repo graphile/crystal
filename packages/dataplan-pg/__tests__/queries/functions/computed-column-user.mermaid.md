@@ -17,12 +17,10 @@ graph TD
     Access_16["Access[_16∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_17["Access[_17∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_18["Object[_18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_19["First[_19∈0]"]:::plan
     PgSelectSingle_20["PgSelectSingle[_20∈0]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_21["PgClassExpression[_21∈0]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
     PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
     Map_23["Map[_23∈0]<br />ᐸ_13:{”0”:0,”1”:1}ᐳ"]:::plan
-    List_24["List[_24∈0]<br />ᐸ_23ᐳ"]:::plan
 
     %% plan dependencies
     Object_18 --> PgSelect_8
@@ -33,12 +31,10 @@ graph TD
     __Value_3 --> Access_17
     Access_16 --> Object_18
     Access_17 --> Object_18
-    List_24 --> First_19
-    First_19 --> PgSelectSingle_20
+    Map_23 --> PgSelectSingle_20
     PgSelectSingle_20 --> PgClassExpression_21
     PgSelectSingle_20 --> PgClassExpression_22
     PgSelectSingle_13 --> Map_23
-    Map_23 --> List_24
 
     %% plan-to-path relationships
     P_0["~"]
@@ -54,7 +50,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,Access_16,Access_17,Object_18,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,Map_23,List_24 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,Access_16,Access_17,Object_18,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,Map_23 bucket0
 
     subgraph "Buckets for queries/functions/computed-column-user"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.randomUser ᐸ-O- _20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- _21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- _22"):::bucket

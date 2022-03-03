@@ -22,11 +22,9 @@ graph TD
     PgClassExpression_19["PgClassExpression[_19∈2]<br />ᐸ__entity_s...omment_id”ᐳ"]:::plan
     List_20["List[_20∈2]<br />ᐸ_17,_18,_19ᐳ"]:::plan
     PgPolymorphic_21["PgPolymorphic[_21∈2]"]:::plan
-    First_26["First[_26∈2]"]:::plan
     PgSelectSingle_27["PgSelectSingle[_27∈3]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_28["PgClassExpression[_28∈3]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
     PgClassExpression_29["PgClassExpression[_29∈3]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    First_34["First[_34∈2]"]:::plan
     PgSelectSingle_35["PgSelectSingle[_35∈4]<br />ᐸpostsᐳ"]:::plan
     PgClassExpression_36["PgClassExpression[_36∈4]<br />ᐸ__posts__.”post_id”ᐳ"]:::plan
     PgClassExpression_37["PgClassExpression[_37∈4]<br />ᐸ__posts__.”author_id”ᐳ"]:::plan
@@ -35,7 +33,6 @@ graph TD
     PgSelectSingle_43["PgSelectSingle[_43∈4]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈4]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression_45["PgClassExpression[_45∈4]<br />ᐸ__posts__.”body”ᐳ"]:::plan
-    First_50["First[_50∈2]"]:::plan
     PgSelectSingle_51["PgSelectSingle[_51∈5]<br />ᐸcommentsᐳ"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈5]<br />ᐸ__comments...omment_id”ᐳ"]:::plan
     PgClassExpression_53["PgClassExpression[_53∈5]<br />ᐸ__comments...author_id”ᐳ"]:::plan
@@ -54,11 +51,8 @@ graph TD
     PgClassExpression_69["PgClassExpression[_69∈5]<br />ᐸ__posts__.”body”ᐳ"]:::plan
     PgClassExpression_70["PgClassExpression[_70∈5]<br />ᐸ__comments__.”body”ᐳ"]:::plan
     Map_71["Map[_71∈2]<br />ᐸ_16:{”0”:0,”1”:1}ᐳ"]:::plan
-    List_72["List[_72∈2]<br />ᐸ_71ᐳ"]:::plan
     Map_73["Map[_73∈2]<br />ᐸ_16:{”0”:3,”1”:4,”2”:5}ᐳ"]:::plan
-    List_74["List[_74∈2]<br />ᐸ_73ᐳ"]:::plan
     Map_75["Map[_75∈2]<br />ᐸ_16:{”0”:7,”1”:8,”2”:9,”3”:10}ᐳ"]:::plan
-    List_76["List[_76∈2]<br />ᐸ_75ᐳ"]:::plan
 
     %% plan dependencies
     Object_65 --> PgSelect_8
@@ -77,12 +71,10 @@ graph TD
     PgClassExpression_19 --> List_20
     PgSelectSingle_16 --> PgPolymorphic_21
     List_20 --> PgPolymorphic_21
-    List_72 --> First_26
-    First_26 --> PgSelectSingle_27
+    Map_71 --> PgSelectSingle_27
     PgSelectSingle_27 --> PgClassExpression_28
     PgSelectSingle_27 --> PgClassExpression_29
-    List_74 --> First_34
-    First_34 --> PgSelectSingle_35
+    Map_73 --> PgSelectSingle_35
     PgSelectSingle_35 --> PgClassExpression_36
     PgSelectSingle_35 --> PgClassExpression_37
     Object_65 --> PgSelect_38
@@ -91,8 +83,7 @@ graph TD
     First_42 --> PgSelectSingle_43
     PgSelectSingle_43 --> PgClassExpression_44
     PgSelectSingle_35 --> PgClassExpression_45
-    List_76 --> First_50
-    First_50 --> PgSelectSingle_51
+    Map_75 --> PgSelectSingle_51
     PgSelectSingle_51 --> PgClassExpression_52
     PgSelectSingle_51 --> PgClassExpression_53
     Object_65 --> PgSelect_54
@@ -113,11 +104,8 @@ graph TD
     PgSelectSingle_67 --> PgClassExpression_69
     PgSelectSingle_51 --> PgClassExpression_70
     PgSelectSingle_16 --> Map_71
-    Map_71 --> List_72
     PgSelectSingle_16 --> Map_73
-    Map_73 --> List_74
     PgSelectSingle_16 --> Map_75
-    Map_75 --> List_76
 
     %% plan-to-path relationships
     P_0["~"]
@@ -161,7 +149,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_13,PgSelectSingle_14 bucket1
     classDef bucket2 stroke:#7f007f
-    class __Item_15,PgSelectSingle_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,List_20,PgPolymorphic_21,First_26,First_34,First_50,Map_71,List_72,Map_73,List_74,Map_75,List_76 bucket2
+    class __Item_15,PgSelectSingle_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,List_20,PgPolymorphic_21,Map_71,Map_73,Map_75 bucket2
     classDef bucket3 stroke:#ffa500
     class PgSelectSingle_27,PgClassExpression_28,PgClassExpression_29 bucket3
     classDef bucket4 stroke:#0000ff
@@ -178,13 +166,13 @@ graph TD
     Bucket2("Bucket 2 (item_15)<br />Deps: _12, _65<br />~ᐳQuery.searchEntities[]<br />⠀ROOT ᐸ-O- _21"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_21[Person])<br />Deps: _26<br />~ᐳQuery.searchEntities[]<br />⠀⠀personId ᐸ-L- _28<br />⠀⠀username ᐸ-L- _29"):::bucket
+    Bucket3("Bucket 3 (polymorphic_21[Person])<br />Deps: _71<br />~ᐳQuery.searchEntities[]<br />⠀⠀personId ᐸ-L- _28<br />⠀⠀username ᐸ-L- _29"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_21[Post])<br />Deps: _34, _65<br />~ᐳQuery.searchEntities[]<br />⠀⠀postId ᐸ-L- _36<br />⠀⠀author ᐸ-O- _43<br />⠀⠀⠀author.username ᐸ-L- _44<br />⠀⠀body ᐸ-L- _45"):::bucket
+    Bucket4("Bucket 4 (polymorphic_21[Post])<br />Deps: _73, _65<br />~ᐳQuery.searchEntities[]<br />⠀⠀postId ᐸ-L- _36<br />⠀⠀author ᐸ-O- _43<br />⠀⠀⠀author.username ᐸ-L- _44<br />⠀⠀body ᐸ-L- _45"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />Deps: _50, _65<br />~ᐳQuery.searchEntities[]<br />⠀⠀commentId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀post ᐸ-O- _67<br />⠀⠀⠀post.postId ᐸ-L- _68<br />⠀⠀⠀post.body ᐸ-L- _69<br />⠀⠀body ᐸ-L- _70"):::bucket
+    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />Deps: _75, _65<br />~ᐳQuery.searchEntities[]<br />⠀⠀commentId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀post ᐸ-O- _67<br />⠀⠀⠀post.postId ᐸ-L- _68<br />⠀⠀⠀post.body ᐸ-L- _69<br />⠀⠀body ᐸ-L- _70"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket2 --> Bucket5
     end

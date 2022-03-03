@@ -27,21 +27,17 @@ graph TD
     PgClassExpression_25["PgClassExpression[_25∈1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     PgClassExpression_26["PgClassExpression[_26∈1]<br />ᐸ(__message... not null)ᐳ"]:::plan
     PgClassExpression_27["PgClassExpression[_27∈1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    First_32["First[_32∈1]"]:::plan
     PgSelectSingle_33["PgSelectSingle[_33∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
     PgClassExpression_36["PgClassExpression[_36∈1]<br />ᐸ(__forums_... not null)ᐳ"]:::plan
     Access_40["Access[_40∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_41["Access[_41∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_42["Object[_42∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_43["First[_43∈1]"]:::plan
     PgSelectSingle_44["PgSelectSingle[_44∈1]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_45["PgClassExpression[_45∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_46["PgClassExpression[_46∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
     Map_47["Map[_47∈1]<br />ᐸ_22:{”0”:4,”1”:5}ᐳ"]:::plan
-    List_48["List[_48∈1]<br />ᐸ_47ᐳ"]:::plan
     Map_49["Map[_49∈1]<br />ᐸ_22:{”0”:7,”1”:8}ᐳ"]:::plan
-    List_50["List[_50∈1]<br />ᐸ_49ᐳ"]:::plan
 
     %% plan dependencies
     InputStaticLeaf_7 --> Lambda_8
@@ -62,22 +58,18 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_25
     PgSelectSingle_22 --> PgClassExpression_26
     PgSelectSingle_22 --> PgClassExpression_27
-    List_48 --> First_32
-    First_32 --> PgSelectSingle_33
+    Map_47 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_35
     PgSelectSingle_33 --> PgClassExpression_36
     __Value_3 --> Access_40
     __Value_3 --> Access_41
     Access_40 --> Object_42
     Access_41 --> Object_42
-    List_50 --> First_43
-    First_43 --> PgSelectSingle_44
+    Map_49 --> PgSelectSingle_44
     PgSelectSingle_44 --> PgClassExpression_45
     PgSelectSingle_44 --> PgClassExpression_46
     PgSelectSingle_22 --> Map_47
-    Map_47 --> List_48
     PgSelectSingle_22 --> Map_49
-    Map_49 --> List_50
 
     %% plan-to-path relationships
     P_0["~"]
@@ -117,7 +109,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class __Value_0,__Value_3,InputStaticLeaf_7,Lambda_8,Access_9,Subscribe_10,Access_40,Access_41,Object_42 bucket0
     classDef bucket1 stroke:#00bfff
-    class __Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,First_32,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,First_43,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46,Map_47,List_48,Map_49,List_50 bucket1
+    class __Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46,Map_47,Map_49 bucket1
 
     subgraph "Buckets for subscriptions/basics/forum-messages"
     Bucket0("Bucket 0 (root)<br />~"):::bucket

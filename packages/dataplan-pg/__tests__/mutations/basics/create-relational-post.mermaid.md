@@ -29,25 +29,19 @@ graph TD
     PgClassExpression_32["PgClassExpression[_32∈1@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
     PgClassExpression_33["PgClassExpression[_33∈1@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression_34["PgClassExpression[_34∈1@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    First_40["First[_40∈1@1]"]:::plan
     PgSelectSingle_41["PgSelectSingle[_41∈1@1]<br />ᐸtextᐳ"]:::plan
     PgClassExpression_42["PgClassExpression[_42∈1@1]<br />ᐸ__relation...le_lower__ᐳ"]:::plan
-    First_48["First[_48∈1@1]"]:::plan
     PgSelectSingle_49["PgSelectSingle[_49∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_50["PgClassExpression[_50∈1@1]<br />ᐸ__relation..._archived”ᐳ"]:::plan
     Access_60["Access[_60∈1@1]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_61["Access[_61∈1@1]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_62["Object[_62∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_63["First[_63∈1@1]"]:::plan
     PgSelectSingle_64["PgSelectSingle[_64∈1@1]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_65["PgClassExpression[_65∈1@1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
     PgClassExpression_66["PgClassExpression[_66∈1@1]<br />ᐸ__people__.”username”ᐳ"]:::plan
     Map_67["Map[_67∈1@1]<br />ᐸ_49:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_68["List[_68∈1@1]<br />ᐸ_67ᐳ"]:::plan
     Map_69["Map[_69∈1@1]<br />ᐸ_30:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
-    List_70["List[_70∈1@1]<br />ᐸ_69ᐳ"]:::plan
     Map_71["Map[_71∈1@1]<br />ᐸ_30:{”0”:7}ᐳ"]:::plan
-    List_72["List[_72∈1@1]<br />ᐸ_71ᐳ"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -70,26 +64,20 @@ graph TD
     PgSelectSingle_30 --> PgClassExpression_32
     PgSelectSingle_30 --> PgClassExpression_33
     PgSelectSingle_30 --> PgClassExpression_34
-    List_72 --> First_40
-    First_40 --> PgSelectSingle_41
+    Map_71 --> PgSelectSingle_41
     PgSelectSingle_41 --> PgClassExpression_42
-    List_70 --> First_48
-    First_48 --> PgSelectSingle_49
+    Map_69 --> PgSelectSingle_49
     PgSelectSingle_49 --> PgClassExpression_50
     __Value_3 --> Access_60
     __Value_3 --> Access_61
     Access_60 --> Object_62
     Access_61 --> Object_62
-    List_68 --> First_63
-    First_63 --> PgSelectSingle_64
+    Map_67 --> PgSelectSingle_64
     PgSelectSingle_64 --> PgClassExpression_65
     PgSelectSingle_64 --> PgClassExpression_66
     PgSelectSingle_49 --> Map_67
-    Map_67 --> List_68
     PgSelectSingle_30 --> Map_69
-    Map_69 --> List_70
     PgSelectSingle_30 --> Map_71
-    Map_71 --> List_72
 
     %% plan-to-path relationships
     P_0["~"]
@@ -123,7 +111,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class __Value_0,__Value_3,__Value_5,__TrackedObject_6 bucket0
     classDef bucket1 stroke:#00bfff
-    class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,First_40,PgSelectSingle_41,PgClassExpression_42,First_48,PgSelectSingle_49,PgClassExpression_50,Access_60,Access_61,Object_62,First_63,PgSelectSingle_64,PgClassExpression_65,PgClassExpression_66,Map_67,List_68,Map_69,List_70,Map_71,List_72 bucket1
+    class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgSelectSingle_41,PgClassExpression_42,PgSelectSingle_49,PgClassExpression_50,Access_60,Access_61,Object_62,PgSelectSingle_64,PgClassExpression_65,PgClassExpression_66,Map_67,Map_69,Map_71 bucket1
 
     subgraph "Buckets for mutations/basics/create-relational-post"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0"):::bucket

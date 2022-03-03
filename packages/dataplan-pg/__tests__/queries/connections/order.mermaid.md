@@ -27,7 +27,6 @@ graph TD
     Access_38["Access[_38∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_39["Access[_39∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_40["Object[_40∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_41["First[_41∈1]"]:::plan
     PgSelectSingle_42["PgSelectSingle[_42∈1]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
@@ -53,7 +52,6 @@ graph TD
     PgSelectSingle_67["PgSelectSingle[_67∈0]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_68["PgClassExpression[_68∈0]<br />ᐸcount(*)ᐳ"]:::plan
     Map_69["Map[_69∈1]<br />ᐸ_29:{”0”:4,”1”:5}ᐳ"]:::plan
-    List_70["List[_70∈1]<br />ᐸ_69ᐳ"]:::plan
 
     %% plan dependencies
     InputStaticLeaf_14 --> Connection_26
@@ -75,8 +73,7 @@ graph TD
     __Value_3 --> Access_39
     Access_38 --> Object_40
     Access_39 --> Object_40
-    List_70 --> First_41
-    First_41 --> PgSelectSingle_42
+    Map_69 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     PgSelectSingle_42 --> PgClassExpression_44
     PgSelect_27 --> Lambda_47
@@ -103,7 +100,6 @@ graph TD
     First_66 --> PgSelectSingle_67
     PgSelectSingle_67 --> PgClassExpression_68
     PgSelectSingle_29 --> Map_69
-    Map_69 --> List_70
 
     %% plan-to-path relationships
     P_0["~"]
@@ -141,7 +137,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class __Value_0,__Value_3,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Connection_26,PgSelect_27,Access_38,Access_39,Object_40,PgPageInfo_45,Lambda_47,Constant_48,First_50,PgSelectSingle_51,PgCursor_52,PgClassExpression_53,PgClassExpression_54,PgClassExpression_55,List_56,Last_58,PgSelectSingle_59,PgCursor_60,PgClassExpression_61,PgClassExpression_62,PgClassExpression_63,List_64,PgSelect_65,First_66,PgSelectSingle_67,PgClassExpression_68 bucket0
     classDef bucket1 stroke:#00bfff
-    class __Item_28,PgSelectSingle_29,PgCursor_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,List_34,PgClassExpression_35,First_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,Map_69,List_70 bucket1
+    class __Item_28,PgSelectSingle_29,PgCursor_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,List_34,PgClassExpression_35,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,Map_69 bucket1
 
     subgraph "Buckets for queries/connections/order"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allMessagesConnection ᐸ-O- _26<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- _27<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- _45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- _47<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- _52<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- _60<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- _68"):::bucket

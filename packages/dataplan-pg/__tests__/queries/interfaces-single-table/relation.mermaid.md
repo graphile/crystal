@@ -18,12 +18,10 @@ graph TD
     Lambda_15["Lambda[_15∈0]"]:::plan
     PgSingleTablePolymorphic_16["PgSingleTablePolymorphic[_16∈0]"]:::plan
     PgClassExpression_17["PgClassExpression[_17∈1]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
-    First_22["First[_22∈1]"]:::plan
     PgSelectSingle_23["PgSelectSingle[_23∈1]<br />ᐸsingle_table_itemsᐳ"]:::plan
     PgClassExpression_24["PgClassExpression[_24∈1]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
     Lambda_25["Lambda[_25∈1]"]:::plan
     PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈1]"]:::plan
-    First_33["First[_33∈2]"]:::plan
     PgSelectSingle_34["PgSelectSingle[_34∈2]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈2]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression_72["PgClassExpression[_72∈1]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
@@ -31,9 +29,7 @@ graph TD
     Access_291["Access[_291∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_292["Object[_292∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Map_297["Map[_297∈2]<br />ᐸ_23:{”0”:1}ᐳ"]:::plan
-    List_298["List[_298∈2]<br />ᐸ_297ᐳ"]:::plan
     Map_299["Map[_299∈1]<br />ᐸ_13:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_300["List[_300∈1]<br />ᐸ_299ᐳ"]:::plan
 
     %% plan dependencies
     Object_292 --> PgSelect_8
@@ -45,14 +41,12 @@ graph TD
     Lambda_15 --> PgSingleTablePolymorphic_16
     PgSelectSingle_13 --> PgSingleTablePolymorphic_16
     PgSelectSingle_13 --> PgClassExpression_17
-    List_300 --> First_22
-    First_22 --> PgSelectSingle_23
+    Map_299 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
     PgClassExpression_24 --> Lambda_25
     Lambda_25 --> PgSingleTablePolymorphic_26
     PgSelectSingle_23 --> PgSingleTablePolymorphic_26
-    List_298 --> First_33
-    First_33 --> PgSelectSingle_34
+    Map_297 --> PgSelectSingle_34
     PgSelectSingle_34 --> PgClassExpression_35
     PgSelectSingle_13 --> PgClassExpression_72
     __Value_3 --> Access_290
@@ -60,9 +54,7 @@ graph TD
     Access_290 --> Object_292
     Access_291 --> Object_292
     PgSelectSingle_23 --> Map_297
-    Map_297 --> List_298
     PgSelectSingle_13 --> Map_299
-    Map_299 --> List_300
 
     %% plan-to-path relationships
     P_0["~"]
@@ -84,9 +76,9 @@ graph TD
     classDef bucket0 stroke:#696969
     class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
     classDef bucket1 stroke:#00bfff
-    class PgClassExpression_17,First_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72,Map_299,List_300 bucket1
+    class PgClassExpression_17,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72,Map_299 bucket1
     classDef bucket2 stroke:#7f007f
-    class First_33,PgSelectSingle_34,PgClassExpression_35,Map_297,List_298 bucket2
+    class PgSelectSingle_34,PgClassExpression_35,Map_297 bucket2
 
     subgraph "Buckets for queries/interfaces-single-table/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀item ᐸ-O- _16"):::bucket
@@ -94,7 +86,7 @@ graph TD
     Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _12, _13<br />~ᐳQuery.item<br />⠀⠀parent ᐸ-O- _26<br />⠀⠀⠀parent.id ᐸ-L- _17<br />⠀⠀id ᐸ-L- _72"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _22, _23<br />~ᐳQuery.itemᐳSingleTablePost.parent<br />~ᐳQuery.itemᐳSingleTableTopic.parent<br />~ᐳQuery.itemᐳSingleTableDivider.parent<br />~ᐳQuery.itemᐳSingleTableChecklist.parent<br />~ᐳQuery.itemᐳSingleTableChecklistItem.parent<br />⠀⠀author ᐸ-O- _34<br />⠀⠀⠀author.username ᐸ-L- _35"):::bucket
+    Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _299, _23<br />~ᐳQuery.itemᐳSingleTablePost.parent<br />~ᐳQuery.itemᐳSingleTableTopic.parent<br />~ᐳQuery.itemᐳSingleTableDivider.parent<br />~ᐳQuery.itemᐳSingleTableChecklist.parent<br />~ᐳQuery.itemᐳSingleTableChecklistItem.parent<br />⠀⠀author ᐸ-O- _34<br />⠀⠀⠀author.username ᐸ-L- _35"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     end

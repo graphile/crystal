@@ -15,7 +15,6 @@ graph TD
     First_12["First[_12∈0]"]:::plan
     PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸrelational_topicsᐳ"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__relation...ics__.”id”ᐳ"]:::plan
-    First_20["First[_20∈0]"]:::plan
     PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
@@ -29,7 +28,6 @@ graph TD
     PgClassExpression_70["PgClassExpression[_70∈0]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
     PgClassExpression_71["PgClassExpression[_71∈0]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
     Map_72["Map[_72∈0]<br />ᐸ_13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
-    List_73["List[_73∈0]<br />ᐸ_72ᐳ"]:::plan
 
     %% plan dependencies
     Object_67 --> PgSelect_8
@@ -37,8 +35,7 @@ graph TD
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    List_73 --> First_20
-    First_20 --> PgSelectSingle_21
+    Map_72 --> PgSelectSingle_21
     PgSelectSingle_21 --> PgClassExpression_22
     PgSelectSingle_21 --> PgClassExpression_30
     PgSelectSingle_21 --> PgClassExpression_38
@@ -52,7 +49,6 @@ graph TD
     PgSelectSingle_21 --> PgClassExpression_70
     PgSelectSingle_13 --> PgClassExpression_71
     PgSelectSingle_13 --> Map_72
-    Map_72 --> List_73
 
     %% plan-to-path relationships
     P_0["~"]
@@ -80,7 +76,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,First_20,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72,List_73 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72 bucket0
 
     subgraph "Buckets for queries/interfaces-relational/single-topic-not-topic"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀relationalTopicById ᐸ-O- _13<br />⠀⠀⠀relationalTopicById.id ᐸ-L- _14<br />⠀⠀⠀relationalTopicById.type ᐸ-L- _22<br />⠀⠀⠀relationalTopicById.type2 ᐸ-L- _30<br />⠀⠀⠀relationalTopicById.position ᐸ-L- _38<br />⠀⠀⠀relationalTopicById.createdAt ᐸ-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt ᐸ-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived ᐸ-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt ᐸ-L- _70<br />⠀⠀⠀relationalTopicById.title ᐸ-L- _71"):::bucket

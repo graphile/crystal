@@ -23,7 +23,6 @@ graph TD
     Access_45["Access[_45∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_46["Access[_46∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     Object_47["Object[_47∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_48["First[_48∈2]"]:::plan
     PgSelectSingle_49["PgSelectSingle[_49∈2]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_50["PgClassExpression[_50∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
@@ -44,7 +43,6 @@ graph TD
     PgSelectSingle_70["PgSelectSingle[_70∈1]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_71["PgClassExpression[_71∈1]<br />ᐸcount(*)ᐳ"]:::plan
     Map_72["Map[_72∈2]<br />ᐸ_41:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_73["List[_73∈2]<br />ᐸ_72ᐳ"]:::plan
     Access_74["Access[_74∈1]<br />ᐸ_21.1ᐳ"]:::plan
     Lambda_75["Lambda[_75∈1]"]:::plan
     Access_76["Access[_76∈1]<br />ᐸ_21.2ᐳ"]:::plan
@@ -63,8 +61,7 @@ graph TD
     __Value_3 --> Access_46
     Access_45 --> Object_47
     Access_46 --> Object_47
-    List_73 --> First_48
-    First_48 --> PgSelectSingle_49
+    Map_72 --> PgSelectSingle_49
     PgSelectSingle_49 --> PgClassExpression_50
     PgSelectSingle_49 --> PgClassExpression_51
     Lambda_75 --> Lambda_55
@@ -82,7 +79,6 @@ graph TD
     First_69 --> PgSelectSingle_70
     PgSelectSingle_70 --> PgClassExpression_71
     PgSelectSingle_41 --> Map_72
-    Map_72 --> List_73
     __Item_21 --> Access_74
     Access_74 --> Lambda_75
     __Item_21 --> Access_76
@@ -129,7 +125,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,Lambda_55,First_57,PgSelectSingle_58,PgCursor_59,PgClassExpression_60,List_61,Last_63,PgSelectSingle_64,PgCursor_65,PgClassExpression_66,List_67,First_69,PgSelectSingle_70,PgClassExpression_71,Access_74,Lambda_75,Access_76 bucket1
     classDef bucket2 stroke:#7f007f
-    class __Item_40,PgSelectSingle_41,PgClassExpression_42,First_48,PgSelectSingle_49,PgClassExpression_50,PgClassExpression_51,Map_72,List_73 bucket2
+    class __Item_40,PgSelectSingle_41,PgClassExpression_42,PgSelectSingle_49,PgClassExpression_50,PgClassExpression_51,Map_72 bucket2
 
     subgraph "Buckets for queries/connections/pagination-when-inlined-backwards-nodes-only"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket

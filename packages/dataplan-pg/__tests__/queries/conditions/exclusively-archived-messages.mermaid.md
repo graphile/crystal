@@ -20,7 +20,6 @@ graph TD
     __Item_40>"__Item[_40∈2]<br />ᐸ_90ᐳ"]:::itemplan
     PgSelectSingle_41["PgSelectSingle[_41∈2]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_42["PgClassExpression[_42∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    First_48["First[_48∈2]"]:::plan
     PgSelectSingle_49["PgSelectSingle[_49∈2]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_50["PgClassExpression[_50∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
@@ -47,7 +46,6 @@ graph TD
     PgSelectSingle_85["PgSelectSingle[_85∈1]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_86["PgClassExpression[_86∈1]<br />ᐸcount(*)ᐳ"]:::plan
     Map_87["Map[_87∈2]<br />ᐸ_41:{”0”:1,”1”:2}ᐳ"]:::plan
-    List_88["List[_88∈2]<br />ᐸ_87ᐳ"]:::plan
     Access_89["Access[_89∈1]<br />ᐸ_21.1ᐳ"]:::plan
     Lambda_90["Lambda[_90∈1]"]:::plan
     Access_91["Access[_91∈1]<br />ᐸ_21.2ᐳ"]:::plan
@@ -62,8 +60,7 @@ graph TD
     Lambda_90 ==> __Item_40
     __Item_40 --> PgSelectSingle_41
     PgSelectSingle_41 --> PgClassExpression_42
-    List_88 --> First_48
-    First_48 --> PgSelectSingle_49
+    Map_87 --> PgSelectSingle_49
     PgSelectSingle_49 --> PgClassExpression_50
     PgSelectSingle_49 --> PgClassExpression_51
     List_56 --> PgCursor_54
@@ -88,7 +85,6 @@ graph TD
     First_84 --> PgSelectSingle_85
     PgSelectSingle_85 --> PgClassExpression_86
     PgSelectSingle_41 --> Map_87
-    Map_87 --> List_88
     __Item_21 --> Access_89
     Access_89 --> Lambda_90
     __Item_21 --> Access_91
@@ -137,7 +133,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,Lambda_69,First_72,PgSelectSingle_73,PgCursor_74,PgClassExpression_75,List_76,Last_78,PgSelectSingle_79,PgCursor_80,PgClassExpression_81,List_82,First_84,PgSelectSingle_85,PgClassExpression_86,Access_89,Lambda_90,Access_91 bucket1
     classDef bucket2 stroke:#7f007f
-    class __Item_40,PgSelectSingle_41,PgClassExpression_42,First_48,PgSelectSingle_49,PgClassExpression_50,PgClassExpression_51,PgCursor_54,PgClassExpression_55,List_56,Map_87,List_88 bucket2
+    class __Item_40,PgSelectSingle_41,PgClassExpression_42,PgSelectSingle_49,PgClassExpression_50,PgClassExpression_51,PgCursor_54,PgClassExpression_55,List_56,Map_87 bucket2
 
     subgraph "Buckets for queries/conditions/exclusively-archived-messages"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
