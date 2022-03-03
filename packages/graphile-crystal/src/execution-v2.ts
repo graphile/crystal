@@ -290,15 +290,22 @@ export function executeBucket(
       }
     }
 
+    /**
+     * Doing repeated key checks in the childrenByPathIdentity object was very
+     * slow (as revealed by a node profile, 500 requests of a particular query
+     * was clocking in at 365ms). Instead checking if something is in an array
+     * is much faster (9.8ms by comparison); thus this variable:
+     */
+    const pathIdentitiesWithChildren = Object.keys(childrenByPathIdentity);
+
     const processListChildren = (
       nestedPathIdentity: string,
       rawValue: any,
       value: any,
       index: number,
     ) => {
-      const children = childrenByPathIdentity[nestedPathIdentity];
-      if (children) {
-        for (const child of children) {
+      if (pathIdentitiesWithChildren.includes(nestedPathIdentity)) {
+        for (const child of childrenByPathIdentity[nestedPathIdentity]!) {
           const {
             inputs: childInputs,
             store: childStore,
@@ -381,7 +388,7 @@ export function executeBucket(
           }
         } else if (mode.type === "O") {
           const d = value;
-          if (d && !(d instanceof CrystalError)) {
+          if (d !== null && d !== undefined && d.constructor !== CrystalError) {
             if (field.children) {
               processObject(
                 d,
@@ -391,10 +398,9 @@ export function executeBucket(
                 index,
               );
             }
-            const children = childrenByPathIdentity[keyPathIdentity];
-            if (children) {
+            if (pathIdentitiesWithChildren.includes(keyPathIdentity)) {
               const valueConcreteType = value[$$concreteType];
-              for (const child of children) {
+              for (const child of childrenByPathIdentity[keyPathIdentity]!) {
                 if (child.childBucketDefinition.itemPlanId != null) {
                   throw new Error("INCONSISTENT!");
                 }
@@ -446,7 +452,7 @@ export function executeBucket(
         }
       }
       const setterRoot = setter.getRoot();
-      if (setterRoot && !(setterRoot instanceof CrystalError)) {
+      if (setterRoot && setterRoot.constructor !== CrystalError) {
         if (isObjectBucket) {
           const typeName = setterRoot[$$concreteType];
           if (typeName == null) {
@@ -466,9 +472,10 @@ export function executeBucket(
 
       // And any root buckets
       {
-        const children = childrenByPathIdentity[setter.rootPathIdentity];
-        if (children) {
-          for (const child of children) {
+        if (pathIdentitiesWithChildren.includes(setter.rootPathIdentity)) {
+          for (const child of childrenByPathIdentity[
+            setter.rootPathIdentity
+          ]!) {
             throw new Error(
               `This should not be able to happen until we support stream/defer`,
             );
