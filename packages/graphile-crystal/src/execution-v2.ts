@@ -155,7 +155,7 @@ export function executeBucket(
       definition: itemBucketDefinition,
       store: itemStore,
       size: itemInputs.length,
-      noDepsList: itemInputs.map(() => undefined),
+      noDepsList: arrayOfLength(itemInputs.length),
       input: itemInputs,
     };
     const result = executeBucket(
@@ -215,10 +215,15 @@ export function executeBucket(
     inProgressPlans.add(plan);
     try {
       const meta = metaByPlanId[plan.id]!;
-      const dependencies =
-        plan.dependencies.length > 0
-          ? plan.dependencies.map((depId) => store[depId])
-          : [noDepsList];
+      const dependencies: any[] = [];
+      const depCount = plan.dependencies.length;
+      if (depCount > 0) {
+        for (let i = 0, l = depCount; i < l; i++) {
+          dependencies[i] = store[plan.dependencies[i]];
+        }
+      } else {
+        dependencies.push(noDepsList);
+      }
       const result =
         plan instanceof __ListTransformPlan
           ? executeListTransform(plan, dependencies, meta)
@@ -420,7 +425,9 @@ export function executeBucket(
       }
     };
 
-    const result = input.map((setter, index) => {
+    const result: any[] = [];
+    for (let index = 0, l = input.length; index < l; index++) {
+      const setter = input[index];
       if (rootOutputStore) {
         const rawValue = rootOutputStore[index];
         const concreteType = isObjectBucket
@@ -476,8 +483,8 @@ export function executeBucket(
         }
       }
 
-      return setterRoot;
-    });
+      result.push(setterRoot);
+    }
 
     // Now to call any nested buckets
     const childPromises: PromiseLike<any>[] = [];
