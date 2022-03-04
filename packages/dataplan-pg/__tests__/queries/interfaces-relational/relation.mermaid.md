@@ -30,25 +30,21 @@ graph TD
     Map_503["Map[_503∈0]<br />ᐸ_13:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_496 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_496 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgPolymorphic_15
-    PgClassExpression_14 --> PgPolymorphic_15
+    PgSelectSingle_13 & PgClassExpression_14 --> PgPolymorphic_15
     Map_503 --> PgSelectSingle_29
     PgSelectSingle_29 --> PgClassExpression_30
-    PgSelectSingle_29 --> PgPolymorphic_31
-    PgClassExpression_30 --> PgPolymorphic_31
+    PgSelectSingle_29 & PgClassExpression_30 --> PgPolymorphic_31
     Map_501 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
     PgSelectSingle_13 --> PgClassExpression_404
     PgSelectSingle_29 --> PgClassExpression_484
     __Value_3 --> Access_494
     __Value_3 --> Access_495
-    Access_494 --> Object_496
-    Access_495 --> Object_496
+    Access_494 & Access_495 --> Object_496
     PgSelectSingle_29 --> Map_501
     PgSelectSingle_13 --> Map_503
 

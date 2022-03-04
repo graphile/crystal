@@ -102,12 +102,9 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_218 --> PgUpdate_13
-    InputStaticLeaf_8 --> PgUpdate_13
-    InputStaticLeaf_11 --> PgUpdate_13
+    Object_218 & InputStaticLeaf_8 & InputStaticLeaf_11 --> PgUpdate_13
     PgUpdate_13 --> PgClassExpression_17
-    Object_218 --> PgSelect_19
-    PgClassExpression_17 --> PgSelect_19
+    Object_218 & PgClassExpression_17 --> PgSelect_19
     PgSelect_19 --> First_23
     First_23 --> PgSelectSingle_24
     PgSelectSingle_24 --> PgClassExpression_25
@@ -121,12 +118,9 @@ graph TD
     Map_223 --> PgSelectSingle_58
     PgSelectSingle_58 --> PgClassExpression_59
     PgSelectSingle_58 --> PgClassExpression_60
-    Object_218 --> PgUpdate_67
-    InputStaticLeaf_62 --> PgUpdate_67
-    InputStaticLeaf_66 --> PgUpdate_67
+    Object_218 & InputStaticLeaf_62 & InputStaticLeaf_66 --> PgUpdate_67
     PgUpdate_67 --> PgClassExpression_71
-    Object_218 --> PgSelect_73
-    PgClassExpression_71 --> PgSelect_73
+    Object_218 & PgClassExpression_71 --> PgSelect_73
     PgSelect_73 --> First_77
     First_77 --> PgSelectSingle_78
     PgSelectSingle_78 --> PgClassExpression_79
@@ -140,12 +134,9 @@ graph TD
     Map_229 --> PgSelectSingle_112
     PgSelectSingle_112 --> PgClassExpression_113
     PgSelectSingle_112 --> PgClassExpression_114
-    Object_218 --> PgUpdate_121
-    InputStaticLeaf_116 --> PgUpdate_121
-    InputStaticLeaf_119 --> PgUpdate_121
+    Object_218 & InputStaticLeaf_116 & InputStaticLeaf_119 --> PgUpdate_121
     PgUpdate_121 --> PgClassExpression_125
-    Object_218 --> PgSelect_127
-    PgClassExpression_125 --> PgSelect_127
+    Object_218 & PgClassExpression_125 --> PgSelect_127
     PgSelect_127 --> First_131
     First_131 --> PgSelectSingle_132
     PgSelectSingle_132 --> PgClassExpression_133
@@ -159,12 +150,9 @@ graph TD
     Map_235 --> PgSelectSingle_166
     PgSelectSingle_166 --> PgClassExpression_167
     PgSelectSingle_166 --> PgClassExpression_168
-    Object_218 --> PgUpdate_175
-    InputStaticLeaf_170 --> PgUpdate_175
-    InputStaticLeaf_173 --> PgUpdate_175
+    Object_218 & InputStaticLeaf_170 & InputStaticLeaf_173 --> PgUpdate_175
     PgUpdate_175 --> PgClassExpression_179
-    Object_218 --> PgSelect_181
-    PgClassExpression_179 --> PgSelect_181
+    Object_218 & PgClassExpression_179 --> PgSelect_181
     PgSelect_181 --> First_185
     First_185 --> PgSelectSingle_186
     PgSelectSingle_186 --> PgClassExpression_187
@@ -177,8 +165,7 @@ graph TD
     PgSelectSingle_205 --> PgClassExpression_206
     __Value_3 --> Access_216
     __Value_3 --> Access_217
-    Access_216 --> Object_218
-    Access_217 --> Object_218
+    Access_216 & Access_217 --> Object_218
     Map_241 --> PgSelectSingle_220
     PgSelectSingle_220 --> PgClassExpression_221
     PgSelectSingle_220 --> PgClassExpression_222
@@ -312,15 +299,12 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _218<br />~ᐳMutation.u1<br />⠀ROOT ᐸ-O- _13<br />⠀⠀id ᐸ-L- _17<br />⠀⠀post ᐸ-O- _24<br />⠀⠀⠀post.id ᐸ-L- _25<br />⠀⠀⠀post.title ᐸ-L- _26<br />⠀⠀⠀post.description ᐸ-L- _27<br />⠀⠀⠀post.note ᐸ-L- _28<br />⠀⠀⠀post.titleLower ᐸ-L- _36<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- _44<br />⠀⠀⠀post.author ᐸ-O- _58<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _59<br />⠀⠀⠀⠀post.author.username ᐸ-L- _60"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _218<br />~ᐳMutation.u2<br />⠀ROOT ᐸ-O- _67<br />⠀⠀id ᐸ-L- _71<br />⠀⠀post ᐸ-O- _78<br />⠀⠀⠀post.id ᐸ-L- _79<br />⠀⠀⠀post.title ᐸ-L- _80<br />⠀⠀⠀post.description ᐸ-L- _81<br />⠀⠀⠀post.note ᐸ-L- _82<br />⠀⠀⠀post.titleLower ᐸ-L- _90<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- _98<br />⠀⠀⠀post.author ᐸ-O- _112<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _113<br />⠀⠀⠀⠀post.author.username ᐸ-L- _114"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (group3[mutation])<br />Deps: _218<br />~ᐳMutation.u3<br />⠀ROOT ᐸ-O- _121<br />⠀⠀id ᐸ-L- _125<br />⠀⠀post ᐸ-O- _132<br />⠀⠀⠀post.id ᐸ-L- _133<br />⠀⠀⠀post.title ᐸ-L- _134<br />⠀⠀⠀post.description ᐸ-L- _135<br />⠀⠀⠀post.note ᐸ-L- _136<br />⠀⠀⠀post.titleLower ᐸ-L- _144<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- _152<br />⠀⠀⠀post.author ᐸ-O- _166<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _167<br />⠀⠀⠀⠀post.author.username ᐸ-L- _168"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket0 --> Bucket3
     Bucket4("Bucket 4 (group4[mutation])<br />Deps: _218<br />~ᐳMutation.u4<br />⠀ROOT ᐸ-O- _175<br />⠀⠀id ᐸ-L- _179<br />⠀⠀post ᐸ-O- _186<br />⠀⠀⠀post.id ᐸ-L- _187<br />⠀⠀⠀post.title ᐸ-L- _188<br />⠀⠀⠀post.description ᐸ-L- _189<br />⠀⠀⠀post.note ᐸ-L- _190<br />⠀⠀⠀post.titleLower ᐸ-L- _198<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- _206<br />⠀⠀⠀post.author ᐸ-O- _220<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _221<br />⠀⠀⠀⠀post.author.username ᐸ-L- _222"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket0 --> Bucket4
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
     end
 ```

@@ -72,8 +72,7 @@ graph TD
     __Item_11 --> PgSelectSingle_12
     PgSelectSingle_12 --> PgClassExpression_13
     PgSelectSingle_12 --> PgClassExpression_14
-    Object_600 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_600 & PgClassExpression_14 --> PgSelect_15
     PgSelect_15 --> __ListTransform_19
     PgSelectSingle_21 -.-> __ListTransform_19
     PgSelect_15 -.-> __Item_20
@@ -82,21 +81,17 @@ graph TD
     __Item_22 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
     PgClassExpression_24 --> Lambda_25
-    Lambda_25 --> PgSingleTablePolymorphic_26
-    PgSelectSingle_23 --> PgSingleTablePolymorphic_26
+    Lambda_25 & PgSelectSingle_23 --> PgSingleTablePolymorphic_26
     PgSelectSingle_23 --> PgClassExpression_27
-    Object_600 --> PgSelect_28
-    PgClassExpression_27 --> PgSelect_28
+    Object_600 & PgClassExpression_27 --> PgSelect_28
     PgSelect_28 --> First_32
     First_32 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_34
     PgClassExpression_34 --> Lambda_35
-    Lambda_35 --> PgSingleTablePolymorphic_36
-    PgSelectSingle_33 --> PgSingleTablePolymorphic_36
+    Lambda_35 & PgSelectSingle_33 --> PgSingleTablePolymorphic_36
     PgSelectSingle_33 --> PgClassExpression_39
     PgSelectSingle_33 --> PgClassExpression_40
-    Object_600 --> PgSelect_41
-    PgClassExpression_40 --> PgSelect_41
+    Object_600 & PgClassExpression_40 --> PgSelect_41
     PgSelect_41 --> First_45
     First_45 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
@@ -112,8 +107,7 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_126
     PgSelectSingle_23 --> PgClassExpression_128
     PgSelectSingle_23 --> PgClassExpression_129
-    Object_600 --> PgSelect_130
-    PgClassExpression_129 --> PgSelect_130
+    Object_600 & PgClassExpression_129 --> PgSelect_130
     PgSelect_130 --> First_134
     First_134 --> PgSelectSingle_135
     PgSelectSingle_135 --> PgClassExpression_136
@@ -128,8 +122,7 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_377
     __Value_3 --> Access_598
     __Value_3 --> Access_599
-    Access_598 --> Object_600
-    Access_599 --> Object_600
+    Access_598 & Access_599 --> Object_600
 
     %% plan-to-path relationships
     P_0["~"]
@@ -224,18 +217,17 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _600<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19, _600<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _26<br />⠀⠀type ᐸ-L- _24"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _22, _23, _600<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀parent ᐸ-O- _36<br />⠀⠀⠀parent.id ᐸ-L- _27<br />⠀⠀⠀parent.type ᐸ-L- _34<br />⠀⠀id ᐸ-L- _126<br />⠀⠀type2 ᐸ-L- _128<br />⠀⠀author ᐸ-O- _135<br />⠀⠀⠀author.username ᐸ-L- _136<br />⠀⠀position ᐸ-L- _137<br />⠀⠀createdAt ᐸ-L- _138<br />⠀⠀updatedAt ᐸ-L- _139<br />⠀⠀isExplicitlyArchived ᐸ-L- _140<br />⠀⠀archivedAt ᐸ-L- _141<br />⠀⠀title ᐸ-L- _142<br />⠀⠀description ᐸ-L- _259<br />⠀⠀note ᐸ-L- _260<br />⠀⠀color ᐸ-L- _377"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket3 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_36[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _32, _33, _600<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTablePost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳSingleTableChecklistItem.parent<br />⠀⠀type2 ᐸ-L- _39<br />⠀⠀author ᐸ-O- _46<br />⠀⠀⠀author.username ᐸ-L- _47<br />⠀⠀position ᐸ-L- _48<br />⠀⠀createdAt ᐸ-L- _49<br />⠀⠀updatedAt ᐸ-L- _50<br />⠀⠀isExplicitlyArchived ᐸ-L- _51<br />⠀⠀archivedAt ᐸ-L- _52<br />⠀⠀title ᐸ-L- _53<br />⠀⠀description ᐸ-L- _71<br />⠀⠀note ᐸ-L- _72<br />⠀⠀color ᐸ-L- _90"):::bucket
     style Bucket5 stroke:#7fff00
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
+    Bucket3 --> Bucket4
     Bucket4 --> Bucket5
     end
 ```

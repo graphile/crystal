@@ -35,8 +35,7 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     __Value_3 --> Access_25
     __Value_3 --> Access_26
-    Access_25 --> Object_27
-    Access_26 --> Object_27
+    Access_25 & Access_26 --> Object_27
     Access_39 --> __ListTransform_28
     PgClassExpression_31 -.-> __ListTransform_28
     Access_39 -.-> __Item_29
@@ -93,18 +92,16 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀messagesListSet ᐸ-A- _28"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_29)<br />Deps: _39"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_32)<br />Deps: _28<br />~ᐳQuery.forums[]ᐳForum.messagesListSet[]<br />⠀ROOT ᐸ-A- _33"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (item_34)<br />Deps: _32"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket3 --> Bucket4
     Bucket5("Bucket 5 (item_35)<br />Deps: _33<br />~ᐳQuery.forums[]ᐳForum.messagesListSet[][]<br />⠀ROOT ᐸ-O- _36<br />⠀⠀body ᐸ-L- _37<br />⠀⠀featured ᐸ-L- _38"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket3 --> Bucket5
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
+    Bucket3 --> Bucket4 & Bucket5
     end
 ```

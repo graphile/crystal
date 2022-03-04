@@ -30,8 +30,7 @@ graph TD
     Map_72["Map[_72∈0]<br />ᐸ_13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_67 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_67 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
@@ -44,8 +43,7 @@ graph TD
     PgSelectSingle_21 --> PgClassExpression_62
     __Value_3 --> Access_65
     __Value_3 --> Access_66
-    Access_65 --> Object_67
-    Access_66 --> Object_67
+    Access_65 & Access_66 --> Object_67
     PgSelectSingle_21 --> PgClassExpression_70
     PgSelectSingle_13 --> PgClassExpression_71
     PgSelectSingle_13 --> Map_72

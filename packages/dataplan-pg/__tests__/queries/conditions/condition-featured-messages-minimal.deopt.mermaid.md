@@ -37,20 +37,12 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_32
     __Value_3 --> Access_34
     __Value_3 --> Access_35
-    Access_34 --> Object_36
-    Access_35 --> Object_36
-    InputStaticLeaf_23 --> Connection_37
-    InputStaticLeaf_24 --> Connection_37
+    Access_34 & Access_35 --> Object_36
+    InputStaticLeaf_23 & InputStaticLeaf_24 --> Connection_37
     PgSelectSingle_22 --> PgClassExpression_38
-    Object_36 --> PgSelect_40
-    PgClassExpression_32 --> PgSelect_40
-    InputStaticLeaf_26 --> PgSelect_40
-    PgClassExpression_38 --> PgSelect_40
+    Object_36 & PgClassExpression_32 & InputStaticLeaf_26 & PgClassExpression_38 --> PgSelect_40
     PgSelect_40 --> Lambda_41
-    Object_36 --> PgSelect_42
-    PgClassExpression_32 --> PgSelect_42
-    InputStaticLeaf_26 --> PgSelect_42
-    PgClassExpression_38 --> PgSelect_42
+    Object_36 & PgClassExpression_32 & InputStaticLeaf_26 & PgClassExpression_38 --> PgSelect_42
     PgSelect_42 --> First_43
     First_43 --> PgSelectSingle_44
     PgSelectSingle_44 --> PgClassExpression_45

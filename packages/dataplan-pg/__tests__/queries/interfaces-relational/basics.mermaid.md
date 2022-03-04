@@ -45,8 +45,7 @@ graph TD
     __ListTransform_19 ==> __Item_22
     __Item_22 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
-    PgSelectSingle_23 --> PgPolymorphic_25
-    PgClassExpression_24 --> PgPolymorphic_25
+    PgSelectSingle_23 & PgClassExpression_24 --> PgPolymorphic_25
     PgSelectSingle_23 --> PgClassExpression_35
     PgSelectSingle_23 --> PgClassExpression_36
     PgSelectSingle_23 --> PgClassExpression_37
@@ -56,8 +55,7 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_86
     __Value_3 --> Access_88
     __Value_3 --> Access_89
-    Access_88 --> Object_90
-    Access_89 --> Object_90
+    Access_88 & Access_89 --> Object_90
     __Item_11 --> Access_101
 
     %% plan-to-path relationships
@@ -107,12 +105,11 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _101"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀type2 ᐸ-L- _35<br />⠀⠀position ᐸ-L- _36<br />⠀⠀createdAt ᐸ-L- _37<br />⠀⠀updatedAt ᐸ-L- _38<br />⠀⠀isExplicitlyArchived ᐸ-L- _39<br />⠀⠀archivedAt ᐸ-L- _40<br />⠀⠀id ᐸ-L- _86"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
     end
 ```

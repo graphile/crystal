@@ -37,19 +37,15 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_33
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
     PgSelectSingle_22 --> PgClassExpression_39
-    Object_48 --> PgSelect_40
-    PgClassExpression_33 --> PgSelect_40
-    PgClassExpression_39 --> PgSelect_40
+    Object_48 & PgClassExpression_33 & PgClassExpression_39 --> PgSelect_40
     PgSelect_40 ==> __Item_41
     __Item_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     __Value_3 --> Access_46
     __Value_3 --> Access_47
-    Access_46 --> Object_48
-    Access_47 --> Object_48
+    Access_46 & Access_47 --> Object_48
     Map_53 --> PgSelectSingle_50
     PgSelectSingle_50 --> PgClassExpression_51
     PgSelectSingle_50 --> PgClassExpression_52
@@ -94,12 +90,12 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _48<br />~ᐳQuery.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group1[stream])<br />Deps: _22, _48<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_41)<br />Deps: _40<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]"):::bucket
     style Bucket3 stroke:#ffa500
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     end
 ```

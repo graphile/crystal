@@ -43,8 +43,7 @@ graph TD
     __Item_11 --> PgSelectSingle_12
     PgSelectSingle_12 --> PgClassExpression_13
     PgSelectSingle_12 --> PgClassExpression_14
-    Object_362 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_362 & PgClassExpression_14 --> PgSelect_15
     PgSelect_15 --> __ListTransform_19
     PgSelectSingle_21 -.-> __ListTransform_19
     PgSelect_15 -.-> __Item_20
@@ -52,24 +51,20 @@ graph TD
     __ListTransform_19 ==> __Item_22
     __Item_22 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
-    PgSelectSingle_23 --> PgPolymorphic_25
-    PgClassExpression_24 --> PgPolymorphic_25
+    PgSelectSingle_23 & PgClassExpression_24 --> PgPolymorphic_25
     PgSelectSingle_23 --> PgClassExpression_33
-    Object_362 --> PgSelect_34
-    PgClassExpression_33 --> PgSelect_34
+    Object_362 & PgClassExpression_33 --> PgSelect_34
     PgSelect_34 --> First_38
     First_38 --> PgSelectSingle_39
     PgSelectSingle_39 --> PgClassExpression_40
-    PgSelectSingle_39 --> PgPolymorphic_41
-    PgClassExpression_40 --> PgPolymorphic_41
+    PgSelectSingle_39 & PgClassExpression_40 --> PgPolymorphic_41
     PgSelectSingle_39 --> PgClassExpression_51
     PgSelectSingle_23 --> PgClassExpression_94
     PgSelectSingle_23 --> PgClassExpression_302
     PgSelectSingle_39 --> PgClassExpression_358
     __Value_3 --> Access_360
     __Value_3 --> Access_361
-    Access_360 --> Object_362
-    Access_361 --> Object_362
+    Access_360 & Access_361 --> Object_362
 
     %% plan-to-path relationships
     P_0["~"]
@@ -116,12 +111,11 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _362<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19, _362<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀parent ᐸ-O- _41<br />⠀⠀⠀parent.type ᐸ-L- _40<br />⠀⠀⠀parent.type2 ᐸ-L- _51<br />⠀⠀⠀parent.id ᐸ-L- _358<br />⠀⠀type2 ᐸ-L- _94<br />⠀⠀id ᐸ-L- _302"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
     end
 ```

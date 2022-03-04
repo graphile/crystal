@@ -58,16 +58,13 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_33
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
-    Object_62 --> PgSelect_39
-    PgClassExpression_33 --> PgSelect_39
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
+    Object_62 & PgClassExpression_33 --> PgSelect_39
     PgSelect_39 ==> __Item_40
     __Item_40 --> PgSelectSingle_41
     PgSelectSingle_41 --> PgClassExpression_42
     PgSelectSingle_41 --> PgClassExpression_43
-    Object_62 --> PgSelect_44
-    PgClassExpression_43 --> PgSelect_44
+    Object_62 & PgClassExpression_43 --> PgSelect_44
     PgSelect_44 --> First_48
     First_48 --> PgSelectSingle_49
     PgSelectSingle_49 --> PgClassExpression_50
@@ -77,8 +74,7 @@ graph TD
     PgClassExpression_55 --> List_56
     __Value_3 --> Access_60
     __Value_3 --> Access_61
-    Access_60 --> Object_62
-    Access_61 --> Object_62
+    Access_60 & Access_61 --> Object_62
     PgSelect_39 --> Lambda_70
     PgSelect_39 --> First_72
     First_72 --> PgSelectSingle_73
@@ -90,8 +86,7 @@ graph TD
     List_82 --> PgCursor_80
     PgSelectSingle_79 --> PgClassExpression_81
     PgClassExpression_81 --> List_82
-    Object_62 --> PgSelect_83
-    PgClassExpression_33 --> PgSelect_83
+    Object_62 & PgClassExpression_33 --> PgSelect_83
     PgSelect_83 --> First_84
     First_84 --> PgSelectSingle_85
     PgSelectSingle_85 --> PgClassExpression_86
@@ -147,9 +142,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _62, _38, _67, _68<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesConnection ᐸ-O- _38<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- _39<br />⠀⠀⠀messagesConnection.edges ᐸ-A- _39<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _67<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- _70<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- _74<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- _80<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _86"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_40)<br />Deps: _39, _62<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- _41<br />⠀⠀node ᐸ-O- _41<br />⠀⠀⠀node.body ᐸ-L- _42<br />⠀⠀⠀node.author ᐸ-O- _49<br />⠀⠀⠀⠀node.author.username ᐸ-L- _50<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- _51<br />⠀⠀body ᐸ-L- _42<br />⠀⠀author ᐸ-O- _49<br />⠀⠀⠀author.username ᐸ-L- _50<br />⠀⠀⠀author.gravatarUrl ᐸ-L- _51<br />⠀⠀cursor ᐸ-L- _54"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

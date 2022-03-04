@@ -34,22 +34,15 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_28 --> PgInsert_13
-    Constant_11 --> PgInsert_13
-    Constant_12 --> PgInsert_13
+    Object_28 & Constant_11 & Constant_12 --> PgInsert_13
     PgInsert_13 --> PgClassExpression_17
-    Object_28 --> PgInsert_18
-    PgClassExpression_17 --> PgInsert_18
-    InputStaticLeaf_8 --> PgInsert_18
-    InputStaticLeaf_10 --> PgInsert_18
+    Object_28 & PgClassExpression_17 & InputStaticLeaf_8 & InputStaticLeaf_10 --> PgInsert_18
     PgInsert_18 --> PgClassExpression_22
     PgInsert_18 --> PgClassExpression_23
-    Object_28 --> PgSelect_25
-    PgClassExpression_23 --> PgSelect_25
+    Object_28 & PgClassExpression_23 --> PgSelect_25
     __Value_3 --> Access_26
     __Value_3 --> Access_27
-    Access_26 --> Object_28
-    Access_27 --> Object_28
+    Access_26 & Access_27 --> Object_28
     PgSelect_25 --> First_29
     First_29 --> PgSelectSingle_30
     PgSelectSingle_30 --> PgClassExpression_31

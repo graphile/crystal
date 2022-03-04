@@ -66,49 +66,37 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_180 --> PgSelect_9
-    Constant_7 --> PgSelect_9
-    Constant_8 --> PgSelect_9
-    Object_180 --> PgSelect_15
-    Constant_13 --> PgSelect_15
-    Constant_14 --> PgSelect_15
-    Object_180 --> PgSelect_21
-    Constant_19 --> PgSelect_21
-    Constant_20 --> PgSelect_21
+    Object_180 & Constant_7 & Constant_8 --> PgSelect_9
+    Object_180 & Constant_13 & Constant_14 --> PgSelect_15
+    Object_180 & Constant_19 & Constant_20 --> PgSelect_21
     PgSelect_21 --> First_25
     First_25 --> PgSelectSingle_26
     PgSelectSingle_26 --> PgClassExpression_27
-    Object_180 --> PgSelect_29
-    InputStaticLeaf_28 --> PgSelect_29
+    Object_180 & InputStaticLeaf_28 --> PgSelect_29
     PgSelect_29 --> First_33
     First_33 --> PgSelectSingle_34
     PgSelectSingle_34 --> PgClassExpression_35
-    PgSelectSingle_34 --> PgPolymorphic_36
-    PgClassExpression_35 --> PgPolymorphic_36
+    PgSelectSingle_34 & PgClassExpression_35 --> PgPolymorphic_36
     Map_184 --> PgSelectSingle_51
     PgSelectSingle_51 --> PgClassExpression_53
     PgSelectSingle_51 --> PgClassExpression_54
     PgSelectSingle_51 --> PgClassExpression_55
     PgSelectSingle_34 --> PgClassExpression_72
-    Object_180 --> PgSelect_81
-    InputStaticLeaf_80 --> PgSelect_81
+    Object_180 & InputStaticLeaf_80 --> PgSelect_81
     PgSelect_81 --> First_85
     First_85 --> PgSelectSingle_86
     PgSelectSingle_86 --> PgClassExpression_87
-    PgSelectSingle_86 --> PgPolymorphic_88
-    PgClassExpression_87 --> PgPolymorphic_88
+    PgSelectSingle_86 & PgClassExpression_87 --> PgPolymorphic_88
     Map_186 --> PgSelectSingle_103
     PgSelectSingle_103 --> PgClassExpression_105
     PgSelectSingle_103 --> PgClassExpression_106
     PgSelectSingle_103 --> PgClassExpression_107
     PgSelectSingle_86 --> PgClassExpression_124
-    Object_180 --> PgSelect_133
-    InputStaticLeaf_132 --> PgSelect_133
+    Object_180 & InputStaticLeaf_132 --> PgSelect_133
     PgSelect_133 --> First_137
     First_137 --> PgSelectSingle_138
     PgSelectSingle_138 --> PgClassExpression_139
-    PgSelectSingle_138 --> PgPolymorphic_140
-    PgClassExpression_139 --> PgPolymorphic_140
+    PgSelectSingle_138 & PgClassExpression_139 --> PgPolymorphic_140
     Map_188 --> PgSelectSingle_155
     PgSelectSingle_155 --> PgClassExpression_157
     PgSelectSingle_155 --> PgClassExpression_158
@@ -116,8 +104,7 @@ graph TD
     PgSelectSingle_138 --> PgClassExpression_176
     __Value_3 --> Access_178
     __Value_3 --> Access_179
-    Access_178 --> Object_180
-    Access_179 --> Object_180
+    Access_178 & Access_179 --> Object_180
     PgSelectSingle_34 --> Map_184
     PgSelectSingle_86 --> Map_186
     PgSelectSingle_138 --> Map_188
@@ -177,15 +164,13 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _3, _5<br />~ᐳMutation.createThreeRelationalPostsComputed<br />⠀ROOT ᐸ-O- _27<br />⠀⠀query ᐸ-O- _5<br />⠀⠀⠀query.i1 ᐸ-O- _36<br />⠀⠀⠀⠀query.i1.id ᐸ-L- _72<br />⠀⠀⠀query.i2 ᐸ-O- _88<br />⠀⠀⠀⠀query.i2.id ᐸ-L- _124<br />⠀⠀⠀query.i3 ᐸ-O- _140<br />⠀⠀⠀⠀query.i3.id ᐸ-L- _176"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_36[RelationalPost])<br />Deps: _184<br />~ᐳMutation.createThreeRelationalPostsComputedᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- _53<br />⠀⠀description ᐸ-L- _54<br />⠀⠀note ᐸ-L- _55"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_88[RelationalPost])<br />Deps: _186<br />~ᐳMutation.createThreeRelationalPostsComputedᐳCreateRelationalPostPayload.queryᐳQuery.i2<br />⠀⠀title ᐸ-L- _105<br />⠀⠀description ᐸ-L- _106<br />⠀⠀note ᐸ-L- _107"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_140[RelationalPost])<br />Deps: _188<br />~ᐳMutation.createThreeRelationalPostsComputedᐳCreateRelationalPostPayload.queryᐳQuery.i3<br />⠀⠀title ᐸ-L- _157<br />⠀⠀description ᐸ-L- _158<br />⠀⠀note ᐸ-L- _159"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket1 --> Bucket4
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4
     end
 ```

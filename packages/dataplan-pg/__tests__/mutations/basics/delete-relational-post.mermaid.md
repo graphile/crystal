@@ -58,12 +58,10 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_86 --> PgDelete_9
-    InputStaticLeaf_8 --> PgDelete_9
+    Object_86 & InputStaticLeaf_8 --> PgDelete_9
     PgDelete_9 --> PgClassExpression_13
     PgDelete_9 --> PgClassExpression_14
-    Object_86 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_86 & PgClassExpression_14 --> PgSelect_15
     PgSelect_15 --> First_19
     First_19 --> PgSelectSingle_20
     PgSelectSingle_20 --> PgClassExpression_21
@@ -76,12 +74,10 @@ graph TD
     Map_91 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
     PgSelectSingle_46 --> PgClassExpression_48
-    Object_86 --> PgDelete_51
-    InputStaticLeaf_50 --> PgDelete_51
+    Object_86 & InputStaticLeaf_50 --> PgDelete_51
     PgDelete_51 --> PgClassExpression_55
     PgDelete_51 --> PgClassExpression_56
-    Object_86 --> PgSelect_57
-    PgClassExpression_56 --> PgSelect_57
+    Object_86 & PgClassExpression_56 --> PgSelect_57
     PgSelect_57 --> First_61
     First_61 --> PgSelectSingle_62
     PgSelectSingle_62 --> PgClassExpression_63
@@ -93,8 +89,7 @@ graph TD
     Map_99 --> PgSelectSingle_81
     __Value_3 --> Access_84
     __Value_3 --> Access_85
-    Access_84 --> Object_86
-    Access_85 --> Object_86
+    Access_84 & Access_85 --> Object_86
     Map_97 --> PgSelectSingle_88
     PgSelectSingle_88 --> PgClassExpression_89
     PgSelectSingle_88 --> PgClassExpression_90
@@ -166,9 +161,8 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _86<br />~ᐳMutation.d1<br />⠀ROOT ᐸ-O- _9<br />⠀⠀id ᐸ-L- _13<br />⠀⠀post ᐸ-O- _20<br />⠀⠀⠀post.id ᐸ-L- _21<br />⠀⠀⠀post.title ᐸ-L- _22<br />⠀⠀⠀post.description ᐸ-L- _23<br />⠀⠀⠀post.note ᐸ-L- _24<br />⠀⠀⠀post.titleLower ᐸ-L- _32<br />⠀⠀⠀post.author ᐸ-O- _46<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _47<br />⠀⠀⠀⠀post.author.username ᐸ-L- _48"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _86<br />~ᐳMutation.d2<br />⠀ROOT ᐸ-O- _51<br />⠀⠀id ᐸ-L- _55<br />⠀⠀post ᐸ-O- _62<br />⠀⠀⠀post.id ᐸ-L- _63<br />⠀⠀⠀post.title ᐸ-L- _64<br />⠀⠀⠀post.description ᐸ-L- _65<br />⠀⠀⠀post.note ᐸ-L- _66<br />⠀⠀⠀post.titleLower ᐸ-L- _74<br />⠀⠀⠀post.author ᐸ-O- _88<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _89<br />⠀⠀⠀⠀post.author.username ᐸ-L- _90"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
+    Bucket0 --> Bucket1 & Bucket2
     end
 ```

@@ -55,8 +55,7 @@ graph TD
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
     Lambda_90 ==> __Item_40
     __Item_40 --> PgSelectSingle_41
     PgSelectSingle_41 --> PgClassExpression_42
@@ -68,8 +67,7 @@ graph TD
     PgClassExpression_55 --> List_56
     __Value_3 --> Access_60
     __Value_3 --> Access_61
-    Access_60 --> Object_62
-    Access_61 --> Object_62
+    Access_60 & Access_61 --> Object_62
     Lambda_90 --> Lambda_70
     Lambda_90 --> First_72
     First_72 --> PgSelectSingle_73
@@ -140,9 +138,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _38, _67, _68<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesConnection ᐸ-O- _38<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _67<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- _70<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- _74<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- _80<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _86<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- _90<br />⠀⠀⠀messagesConnection.edges ᐸ-A- _90"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_40)<br />Deps: _90<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- _41<br />⠀⠀node ᐸ-O- _41<br />⠀⠀⠀node.body ᐸ-L- _42<br />⠀⠀⠀node.author ᐸ-O- _49<br />⠀⠀⠀⠀node.author.username ᐸ-L- _50<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- _51<br />⠀⠀body ᐸ-L- _42<br />⠀⠀author ᐸ-O- _49<br />⠀⠀⠀author.username ᐸ-L- _50<br />⠀⠀⠀author.gravatarUrl ᐸ-L- _51<br />⠀⠀cursor ᐸ-L- _54"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

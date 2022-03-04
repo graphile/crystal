@@ -63,8 +63,7 @@ graph TD
     Access_92["Access[_92∈0]<br />ᐸ_12.0ᐳ"]:::plan
 
     %% plan dependencies
-    Object_81 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_81 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
@@ -73,8 +72,7 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_24
-    Object_81 --> PgSelect_25
-    PgClassExpression_24 --> PgSelect_25
+    Object_81 & PgClassExpression_24 --> PgSelect_25
     PgSelect_25 --> First_29
     First_29 --> PgSelectSingle_30
     PgSelectSingle_30 --> PgClassExpression_31
@@ -82,19 +80,15 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_33
     PgSelectSingle_22 --> PgClassExpression_34
     PgSelectSingle_22 --> PgClassExpression_35
-    PgClassExpression_33 --> List_36
-    PgClassExpression_34 --> List_36
-    PgClassExpression_35 --> List_36
-    PgClassExpression_32 --> PgPolymorphic_37
-    List_36 --> PgPolymorphic_37
+    PgClassExpression_33 & PgClassExpression_34 & PgClassExpression_35 --> List_36
+    PgClassExpression_32 & List_36 --> PgPolymorphic_37
     Map_86 --> PgSelectSingle_43
     PgSelectSingle_43 --> PgClassExpression_44
     PgSelectSingle_43 --> PgClassExpression_45
     Map_88 --> PgSelectSingle_51
     PgSelectSingle_51 --> PgClassExpression_52
     PgSelectSingle_51 --> PgClassExpression_53
-    Object_81 --> PgSelect_54
-    PgClassExpression_53 --> PgSelect_54
+    Object_81 & PgClassExpression_53 --> PgSelect_54
     PgSelect_54 --> First_58
     First_58 --> PgSelectSingle_59
     PgSelectSingle_59 --> PgClassExpression_60
@@ -102,18 +96,15 @@ graph TD
     Map_90 --> PgSelectSingle_67
     PgSelectSingle_67 --> PgClassExpression_68
     PgSelectSingle_67 --> PgClassExpression_69
-    Object_81 --> PgSelect_70
-    PgClassExpression_69 --> PgSelect_70
+    Object_81 & PgClassExpression_69 --> PgSelect_70
     PgSelect_70 --> First_74
     First_74 --> PgSelectSingle_75
     PgSelectSingle_75 --> PgClassExpression_76
     PgSelectSingle_67 --> PgClassExpression_77
-    Object_81 --> PgSelect_78
-    PgClassExpression_77 --> PgSelect_78
+    Object_81 & PgClassExpression_77 --> PgSelect_78
     __Value_3 --> Access_79
     __Value_3 --> Access_80
-    Access_79 --> Object_81
-    Access_80 --> Object_81
+    Access_79 & Access_80 --> Object_81
     PgSelect_78 --> First_82
     First_82 --> PgSelectSingle_83
     PgSelectSingle_83 --> PgClassExpression_84
@@ -186,15 +177,13 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _92, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀person ᐸ-O- _30<br />⠀⠀⠀person.username ᐸ-L- _31<br />⠀⠀bookmarkedEntity ᐸ-O- _37"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_37[Person])<br />Deps: _86<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀personId ᐸ-L- _44<br />⠀⠀username ᐸ-L- _45"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_37[Post])<br />Deps: _88, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀postId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀body ᐸ-L- _61"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_37[Comment])<br />Deps: _90, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀commentId ᐸ-L- _68<br />⠀⠀author ᐸ-O- _75<br />⠀⠀⠀author.username ᐸ-L- _76<br />⠀⠀post ᐸ-O- _83<br />⠀⠀⠀post.body ᐸ-L- _84<br />⠀⠀body ᐸ-L- _85"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket1 --> Bucket4
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4
     end
 ```

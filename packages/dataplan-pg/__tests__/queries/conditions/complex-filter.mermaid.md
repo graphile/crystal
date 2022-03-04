@@ -26,16 +26,13 @@ graph TD
     Access_42["Access[_42∈1]<br />ᐸ_21.1ᐳ"]:::plan
 
     %% plan dependencies
-    Object_36 --> PgSelect_17
-    InputStaticLeaf_15 --> PgSelect_17
-    InputStaticLeaf_30 --> PgSelect_17
+    Object_36 & InputStaticLeaf_15 & InputStaticLeaf_30 --> PgSelect_17
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     __Value_3 --> Access_34
     __Value_3 --> Access_35
-    Access_34 --> Object_36
-    Access_35 --> Object_36
+    Access_34 & Access_35 --> Object_36
     Access_42 ==> __Item_38
     __Item_38 --> PgSelectSingle_39
     PgSelectSingle_39 --> PgClassExpression_40
@@ -73,9 +70,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesList ᐸ-A- _42"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_38)<br />Deps: _42<br />~ᐳQuery.forums[]ᐳForum.messagesList[]<br />⠀ROOT ᐸ-O- _39<br />⠀⠀body ᐸ-L- _40<br />⠀⠀featured ᐸ-L- _41"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

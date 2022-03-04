@@ -36,8 +36,7 @@ graph TD
     PgSelectSingle_38 --> PgClassExpression_39
     __Value_3 --> Access_42
     __Value_3 --> Access_43
-    Access_42 --> Object_44
-    Access_43 --> Object_44
+    Access_42 & Access_43 --> Object_44
     Map_49 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
     PgSelectSingle_46 --> PgClassExpression_48
@@ -79,9 +78,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesList ᐸ-A- _51"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_37)<br />Deps: _51<br />~ᐳQuery.forums[]ᐳForum.messagesList[]<br />⠀ROOT ᐸ-O- _38<br />⠀⠀body ᐸ-L- _39<br />⠀⠀author ᐸ-O- _46<br />⠀⠀⠀author.username ᐸ-L- _47<br />⠀⠀⠀author.gravatarUrl ᐸ-L- _48"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

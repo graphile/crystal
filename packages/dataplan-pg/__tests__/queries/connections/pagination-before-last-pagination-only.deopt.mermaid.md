@@ -34,16 +34,9 @@ graph TD
     %% plan dependencies
     __Value_3 --> Access_21
     __Value_3 --> Access_22
-    Access_21 --> Object_23
-    Access_22 --> Object_23
-    InputStaticLeaf_14 --> Connection_24
-    InputStaticLeaf_15 --> Connection_24
-    InputStaticLeaf_16 --> Connection_24
-    InputStaticLeaf_17 --> Connection_24
-    Object_23 --> PgSelect_27
-    Lambda_28 --> PgSelect_27
-    PgValidateParsedCursor_30 --> PgSelect_27
-    ToPg_32 --> PgSelect_27
+    Access_21 & Access_22 --> Object_23
+    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_24
+    Object_23 & Lambda_28 & PgValidateParsedCursor_30 & ToPg_32 --> PgSelect_27
     InputStaticLeaf_17 --> Lambda_28
     PgSelect_27 --> Lambda_29
     Lambda_28 --> PgValidateParsedCursor_30

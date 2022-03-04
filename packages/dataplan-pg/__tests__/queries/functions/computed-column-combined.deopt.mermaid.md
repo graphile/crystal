@@ -38,32 +38,26 @@ graph TD
     Map_47["Map[_47∈0]<br />ᐸ_29:{”0”:0}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_43 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_43 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    Object_43 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_43 & PgClassExpression_14 --> PgSelect_15
     PgSelect_15 --> First_19
     First_19 --> PgSelectSingle_20
     PgSelectSingle_20 --> PgClassExpression_21
     PgSelectSingle_20 --> PgClassExpression_22
     PgSelectSingle_20 --> PgClassExpression_23
-    Object_43 --> PgSelect_24
-    PgClassExpression_23 --> PgSelect_24
-    InputStaticLeaf_30 --> PgSelect_24
+    Object_43 & PgClassExpression_23 & InputStaticLeaf_30 --> PgSelect_24
     PgSelect_24 --> First_28
     First_28 --> PgSelectSingle_29
     PgSelectSingle_29 --> PgClassExpression_31
     Map_47 --> PgSelectSingle_37
     PgSelectSingle_37 --> PgClassExpression_38
-    Object_43 --> PgSelect_40
-    PgClassExpression_31 --> PgSelect_40
+    Object_43 & PgClassExpression_31 --> PgSelect_40
     __Value_3 --> Access_41
     __Value_3 --> Access_42
-    Access_41 --> Object_43
-    Access_42 --> Object_43
+    Access_41 & Access_42 --> Object_43
     PgSelect_40 ==> __Item_44
     __Item_44 --> PgSelectSingle_45
     PgSelectSingle_45 --> PgClassExpression_46

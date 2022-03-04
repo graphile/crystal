@@ -59,25 +59,19 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_33
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
     PgSelectSingle_22 --> PgClassExpression_39
-    Object_64 --> PgSelect_40
-    PgClassExpression_33 --> PgSelect_40
-    PgClassExpression_39 --> PgSelect_40
+    Object_64 & PgClassExpression_33 & PgClassExpression_39 --> PgSelect_40
     PgSelect_40 ==> __Item_41
     __Item_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     PgSelectSingle_42 --> PgClassExpression_44
-    Object_64 --> PgSelect_45
-    PgClassExpression_44 --> PgSelect_45
+    Object_64 & PgClassExpression_44 --> PgSelect_45
     PgSelect_45 --> First_49
     First_49 --> PgSelectSingle_50
     PgSelectSingle_50 --> PgClassExpression_51
     PgSelectSingle_50 --> PgClassExpression_52
-    Object_64 --> PgSelect_53
-    PgClassExpression_33 --> PgSelect_53
-    PgClassExpression_39 --> PgSelect_53
+    Object_64 & PgClassExpression_33 & PgClassExpression_39 --> PgSelect_53
     PgSelect_53 ==> __Item_54
     __Item_54 --> PgSelectSingle_55
     List_58 --> PgCursor_56
@@ -85,19 +79,15 @@ graph TD
     PgClassExpression_57 --> List_58
     PgSelectSingle_55 --> PgClassExpression_59
     PgSelectSingle_55 --> PgClassExpression_60
-    Object_64 --> PgSelect_61
-    PgClassExpression_60 --> PgSelect_61
+    Object_64 & PgClassExpression_60 --> PgSelect_61
     __Value_3 --> Access_62
     __Value_3 --> Access_63
-    Access_62 --> Object_64
-    Access_63 --> Object_64
+    Access_62 & Access_63 --> Object_64
     PgSelect_61 --> First_65
     First_65 --> PgSelectSingle_66
     PgSelectSingle_66 --> PgClassExpression_67
     PgSelectSingle_66 --> PgClassExpression_68
-    Object_64 --> PgSelect_72
-    PgClassExpression_33 --> PgSelect_72
-    PgClassExpression_39 --> PgSelect_72
+    Object_64 & PgClassExpression_33 & PgClassExpression_39 --> PgSelect_72
     PgSelect_72 --> First_73
     First_73 --> PgSelectSingle_74
     PgSelectSingle_74 --> PgClassExpression_75
@@ -167,18 +157,17 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _64<br />~ᐳQuery.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group1[stream])<br />Deps: _64, _33, _39<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_41)<br />Deps: _40, _64<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket2 --> Bucket3
     Bucket4("Bucket 4 (group2[stream])<br />Deps: _64, _33, _39<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket1 --> Bucket4
     Bucket5("Bucket 5 (item_54)<br />Deps: _53, _64<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket
     style Bucket5 stroke:#7fff00
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket4
+    Bucket2 --> Bucket3
     Bucket4 --> Bucket5
     end
 ```

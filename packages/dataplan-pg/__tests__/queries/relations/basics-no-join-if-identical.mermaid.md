@@ -24,8 +24,7 @@ graph TD
     Map_24["Map[_24∈0]<br />ᐸ_13:{”0”:2}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_20 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_20 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
@@ -33,8 +32,7 @@ graph TD
     PgSelectSingle_13 --> PgClassExpression_16
     __Value_3 --> Access_18
     __Value_3 --> Access_19
-    Access_18 --> Object_20
-    Access_19 --> Object_20
+    Access_18 & Access_19 --> Object_20
     Map_24 --> PgSelectSingle_22
     PgSelectSingle_13 --> Map_24
 

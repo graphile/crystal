@@ -54,14 +54,8 @@ graph TD
     PgClassExpression_76["PgClassExpression[_76∈0]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    InputStaticLeaf_14 --> Connection_24
-    InputStaticLeaf_15 --> Connection_24
-    InputStaticLeaf_16 --> Connection_24
-    InputStaticLeaf_17 --> Connection_24
-    Object_40 --> PgSelect_25
-    Lambda_26 --> PgSelect_25
-    PgValidateParsedCursor_27 --> PgSelect_25
-    ToPg_29 --> PgSelect_25
+    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_24
+    Object_40 & Lambda_26 & PgValidateParsedCursor_27 & ToPg_29 --> PgSelect_25
     InputStaticLeaf_16 --> Lambda_26
     Lambda_26 --> PgValidateParsedCursor_27
     Lambda_26 --> Access_28
@@ -73,12 +67,10 @@ graph TD
     PgClassExpression_33 --> List_34
     PgSelectSingle_31 --> PgClassExpression_35
     PgSelectSingle_31 --> PgClassExpression_36
-    Object_40 --> PgSelect_37
-    PgClassExpression_36 --> PgSelect_37
+    Object_40 & PgClassExpression_36 --> PgSelect_37
     __Value_3 --> Access_38
     __Value_3 --> Access_39
-    Access_38 --> Object_40
-    Access_39 --> Object_40
+    Access_38 & Access_39 --> Object_40
     PgSelect_37 --> First_41
     First_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43

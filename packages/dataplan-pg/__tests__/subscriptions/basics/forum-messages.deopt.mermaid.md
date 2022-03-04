@@ -45,15 +45,13 @@ graph TD
     %% plan dependencies
     InputStaticLeaf_7 --> Lambda_8
     __Value_3 --> Access_9
-    Access_9 --> Subscribe_10
-    Lambda_8 --> Subscribe_10
+    Access_9 & Lambda_8 --> Subscribe_10
     Subscribe_10 ==> __Item_11
     __Item_11 --> JSONParse_12
     JSONParse_12 --> Access_14
     Access_14 --> Lambda_15
     JSONParse_12 --> Access_16
-    Object_42 --> PgSelect_17
-    Access_16 --> PgSelect_17
+    Object_42 & Access_16 --> PgSelect_17
     PgSelect_17 --> First_21
     First_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
@@ -61,19 +59,16 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_25
     PgSelectSingle_22 --> PgClassExpression_26
     PgSelectSingle_22 --> PgClassExpression_27
-    Object_42 --> PgSelect_28
-    PgClassExpression_27 --> PgSelect_28
+    Object_42 & PgClassExpression_27 --> PgSelect_28
     PgSelect_28 --> First_32
     First_32 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_35
     PgSelectSingle_33 --> PgClassExpression_36
     PgSelectSingle_22 --> PgClassExpression_38
-    Object_42 --> PgSelect_39
-    PgClassExpression_38 --> PgSelect_39
+    Object_42 & PgClassExpression_38 --> PgSelect_39
     __Value_3 --> Access_40
     __Value_3 --> Access_41
-    Access_40 --> Object_42
-    Access_41 --> Object_42
+    Access_40 & Access_41 --> Object_42
     PgSelect_39 --> First_43
     First_43 --> PgSelectSingle_44
     PgSelectSingle_44 --> PgClassExpression_45

@@ -31,10 +31,8 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_23
     __Value_3 --> Access_35
     __Value_3 --> Access_36
-    Access_35 --> Object_37
-    Access_36 --> Object_37
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
+    Access_35 & Access_36 --> Object_37
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
     P_0["~"]

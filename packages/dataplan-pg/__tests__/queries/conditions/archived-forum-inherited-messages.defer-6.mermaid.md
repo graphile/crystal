@@ -39,14 +39,12 @@ graph TD
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
     Access_68 ==> __Item_41
     __Item_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     PgSelectSingle_42 --> PgClassExpression_44
-    Object_63 --> PgSelect_45
-    PgClassExpression_44 --> PgSelect_45
+    Object_63 & PgClassExpression_44 --> PgSelect_45
     PgSelect_45 --> First_49
     First_49 --> PgSelectSingle_50
     PgSelectSingle_50 --> PgClassExpression_51
@@ -56,8 +54,7 @@ graph TD
     PgClassExpression_56 --> List_57
     __Value_3 --> Access_61
     __Value_3 --> Access_62
-    Access_61 --> Object_63
-    Access_62 --> Object_63
+    Access_61 & Access_62 --> Object_63
     __Item_21 --> Access_68
 
     %% plan-to-path relationships
@@ -99,9 +96,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _63<br />~ᐳQuery.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_41)<br />Deps: _68, _63<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

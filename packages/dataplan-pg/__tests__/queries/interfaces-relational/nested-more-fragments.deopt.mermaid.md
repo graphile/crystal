@@ -111,8 +111,7 @@ graph TD
     __Item_11 --> PgSelectSingle_12
     PgSelectSingle_12 --> PgClassExpression_13
     PgSelectSingle_12 --> PgClassExpression_14
-    Object_804 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_804 & PgClassExpression_14 --> PgSelect_15
     PgSelect_15 --> __ListTransform_19
     PgSelectSingle_21 -.-> __ListTransform_19
     PgSelect_15 -.-> __Item_20
@@ -120,28 +119,22 @@ graph TD
     __ListTransform_19 ==> __Item_22
     __Item_22 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
-    PgSelectSingle_23 --> PgPolymorphic_25
-    PgClassExpression_24 --> PgPolymorphic_25
-    Object_804 --> PgSelect_27
-    PgClassExpression_657 --> PgSelect_27
+    PgSelectSingle_23 & PgClassExpression_24 --> PgPolymorphic_25
+    Object_804 & PgClassExpression_657 --> PgSelect_27
     PgSelect_27 --> First_31
     First_31 --> PgSelectSingle_32
     PgSelectSingle_23 --> PgClassExpression_33
-    Object_804 --> PgSelect_34
-    PgClassExpression_33 --> PgSelect_34
+    Object_804 & PgClassExpression_33 --> PgSelect_34
     PgSelect_34 --> First_38
     First_38 --> PgSelectSingle_39
     PgSelectSingle_39 --> PgClassExpression_40
-    PgSelectSingle_39 --> PgPolymorphic_41
-    PgClassExpression_40 --> PgPolymorphic_41
-    Object_804 --> PgSelect_43
-    PgClassExpression_772 --> PgSelect_43
+    PgSelectSingle_39 & PgClassExpression_40 --> PgPolymorphic_41
+    Object_804 & PgClassExpression_772 --> PgSelect_43
     PgSelect_43 --> First_47
     First_47 --> PgSelectSingle_48
     PgSelectSingle_39 --> PgClassExpression_51
     PgSelectSingle_39 --> PgClassExpression_52
-    Object_804 --> PgSelect_53
-    PgClassExpression_52 --> PgSelect_53
+    Object_804 & PgClassExpression_52 --> PgSelect_53
     PgSelect_53 --> First_57
     First_57 --> PgSelectSingle_58
     PgSelectSingle_58 --> PgClassExpression_59
@@ -151,34 +144,29 @@ graph TD
     PgSelectSingle_39 --> PgClassExpression_63
     PgSelectSingle_39 --> PgClassExpression_64
     PgSelectSingle_48 --> PgClassExpression_65
-    Object_804 --> PgSelect_67
-    PgClassExpression_772 --> PgSelect_67
+    Object_804 & PgClassExpression_772 --> PgSelect_67
     PgSelect_67 --> First_71
     First_71 --> PgSelectSingle_72
     PgSelectSingle_72 --> PgClassExpression_89
     PgSelectSingle_72 --> PgClassExpression_90
     PgSelectSingle_72 --> PgClassExpression_91
-    Object_804 --> PgSelect_93
-    PgClassExpression_772 --> PgSelect_93
+    Object_804 & PgClassExpression_772 --> PgSelect_93
     PgSelect_93 --> First_97
     First_97 --> PgSelectSingle_98
     PgSelectSingle_98 --> PgClassExpression_115
     PgSelectSingle_98 --> PgClassExpression_116
-    Object_804 --> PgSelect_118
-    PgClassExpression_772 --> PgSelect_118
+    Object_804 & PgClassExpression_772 --> PgSelect_118
     PgSelect_118 --> First_122
     First_122 --> PgSelectSingle_123
     PgSelectSingle_123 --> PgClassExpression_140
-    Object_804 --> PgSelect_142
-    PgClassExpression_772 --> PgSelect_142
+    Object_804 & PgClassExpression_772 --> PgSelect_142
     PgSelect_142 --> First_146
     First_146 --> PgSelectSingle_147
     PgSelectSingle_147 --> PgClassExpression_164
     PgSelectSingle_147 --> PgClassExpression_165
     PgSelectSingle_23 --> PgClassExpression_168
     PgSelectSingle_23 --> PgClassExpression_169
-    Object_804 --> PgSelect_170
-    PgClassExpression_169 --> PgSelect_170
+    Object_804 & PgClassExpression_169 --> PgSelect_170
     PgSelect_170 --> First_174
     First_174 --> PgSelectSingle_175
     PgSelectSingle_175 --> PgClassExpression_176
@@ -188,34 +176,29 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_180
     PgSelectSingle_23 --> PgClassExpression_181
     PgSelectSingle_32 --> PgClassExpression_182
-    Object_804 --> PgSelect_184
-    PgClassExpression_657 --> PgSelect_184
+    Object_804 & PgClassExpression_657 --> PgSelect_184
     PgSelect_184 --> First_188
     First_188 --> PgSelectSingle_189
     PgSelectSingle_189 --> PgClassExpression_339
     PgSelectSingle_189 --> PgClassExpression_340
     PgSelectSingle_189 --> PgClassExpression_341
-    Object_804 --> PgSelect_343
-    PgClassExpression_657 --> PgSelect_343
+    Object_804 & PgClassExpression_657 --> PgSelect_343
     PgSelect_343 --> First_347
     First_347 --> PgSelectSingle_348
     PgSelectSingle_348 --> PgClassExpression_498
     PgSelectSingle_348 --> PgClassExpression_499
-    Object_804 --> PgSelect_501
-    PgClassExpression_657 --> PgSelect_501
+    Object_804 & PgClassExpression_657 --> PgSelect_501
     PgSelect_501 --> First_505
     First_505 --> PgSelectSingle_506
     PgSelectSingle_506 --> PgClassExpression_656
     PgSelectSingle_23 --> PgClassExpression_657
-    Object_804 --> PgSelect_658
-    PgClassExpression_657 --> PgSelect_658
+    Object_804 & PgClassExpression_657 --> PgSelect_658
     PgSelect_658 --> First_662
     First_662 --> PgSelectSingle_663
     PgSelectSingle_39 --> PgClassExpression_772
     __Value_3 --> Access_802
     __Value_3 --> Access_803
-    Access_802 --> Object_804
-    Access_803 --> Object_804
+    Access_802 & Access_803 --> Object_804
     PgSelectSingle_663 --> PgClassExpression_813
     PgSelectSingle_663 --> PgClassExpression_814
 
@@ -348,42 +331,32 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _804<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19, _804<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀parent ᐸ-O- _41<br />⠀⠀⠀parent.type ᐸ-L- _40<br />⠀⠀⠀parent.type2 ᐸ-L- _51<br />⠀⠀⠀parent.author ᐸ-O- _58<br />⠀⠀⠀⠀parent.author.username ᐸ-L- _59<br />⠀⠀⠀parent.position ᐸ-L- _60<br />⠀⠀⠀parent.createdAt ᐸ-L- _61<br />⠀⠀⠀parent.updatedAt ᐸ-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived ᐸ-L- _63<br />⠀⠀⠀parent.archivedAt ᐸ-L- _64<br />⠀⠀⠀parent.id ᐸ-L- _772<br />⠀⠀type2 ᐸ-L- _168<br />⠀⠀author ᐸ-O- _175<br />⠀⠀⠀author.username ᐸ-L- _176<br />⠀⠀position ᐸ-L- _177<br />⠀⠀createdAt ᐸ-L- _178<br />⠀⠀updatedAt ᐸ-L- _179<br />⠀⠀isExplicitlyArchived ᐸ-L- _180<br />⠀⠀archivedAt ᐸ-L- _181<br />⠀⠀id ᐸ-L- _657"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />Deps: _31<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _182"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket3 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />Deps: _47<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _65"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket3 --> Bucket5
     Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />Deps: _71<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _89<br />⠀⠀description ᐸ-L- _90<br />⠀⠀note ᐸ-L- _91"):::bucket
     style Bucket6 stroke:#ff1493
-    Bucket3 --> Bucket6
     Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />Deps: _97<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _115<br />⠀⠀color ᐸ-L- _116"):::bucket
     style Bucket7 stroke:#808000
-    Bucket3 --> Bucket7
     Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />Deps: _122<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _140"):::bucket
     style Bucket8 stroke:#dda0dd
-    Bucket3 --> Bucket8
     Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />Deps: _146<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀description ᐸ-L- _164<br />⠀⠀note ᐸ-L- _165"):::bucket
     style Bucket9 stroke:#ff0000
-    Bucket3 --> Bucket9
     Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />Deps: _188<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _339<br />⠀⠀description ᐸ-L- _340<br />⠀⠀note ᐸ-L- _341"):::bucket
     style Bucket10 stroke:#ffff00
-    Bucket3 --> Bucket10
     Bucket11("Bucket 11 (polymorphic_25[RelationalDivider])<br />Deps: _347<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _498<br />⠀⠀color ᐸ-L- _499"):::bucket
     style Bucket11 stroke:#00ffff
-    Bucket3 --> Bucket11
     Bucket12("Bucket 12 (polymorphic_25[RelationalChecklist])<br />Deps: _505<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _656"):::bucket
     style Bucket12 stroke:#4169e1
-    Bucket3 --> Bucket12
     Bucket13("Bucket 13 (polymorphic_25[RelationalChecklistItem])<br />Deps: _662<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀description ᐸ-L- _813<br />⠀⠀note ᐸ-L- _814"):::bucket
     style Bucket13 stroke:#3cb371
-    Bucket3 --> Bucket13
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
+    Bucket3 --> Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13
     end
 ```

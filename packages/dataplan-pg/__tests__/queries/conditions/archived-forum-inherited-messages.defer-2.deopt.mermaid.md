@@ -42,18 +42,14 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_33
-    Object_63 --> PgSelect_34
-    PgClassExpression_33 --> PgSelect_34
-    PgClassExpression_39 --> PgSelect_34
-    InputStaticLeaf_24 --> Connection_38
-    InputStaticLeaf_25 --> Connection_38
+    Object_63 & PgClassExpression_33 & PgClassExpression_39 --> PgSelect_34
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
     PgSelectSingle_22 --> PgClassExpression_39
     PgSelect_34 ==> __Item_41
     __Item_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     PgSelectSingle_42 --> PgClassExpression_44
-    Object_63 --> PgSelect_45
-    PgClassExpression_44 --> PgSelect_45
+    Object_63 & PgClassExpression_44 --> PgSelect_45
     PgSelect_45 --> First_49
     First_49 --> PgSelectSingle_50
     PgSelectSingle_50 --> PgClassExpression_51
@@ -63,8 +59,7 @@ graph TD
     PgClassExpression_56 --> List_57
     __Value_3 --> Access_61
     __Value_3 --> Access_62
-    Access_61 --> Object_63
-    Access_62 --> Object_63
+    Access_61 & Access_62 --> Object_63
 
     %% plan-to-path relationships
     P_0["~"]
@@ -107,12 +102,12 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _63<br />~ᐳQuery.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group1[defer])<br />Deps: _22, _63<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_41)<br />Deps: _34, _63<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket
     style Bucket3 stroke:#ffa500
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     end
 ```

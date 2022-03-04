@@ -23,14 +23,12 @@ graph TD
     Access_22["Access[_22∈0]<br />ᐸ_12.0ᐳ"]:::plan
 
     %% plan dependencies
-    Object_18 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_18 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     __Value_3 --> Access_16
     __Value_3 --> Access_17
-    Access_16 --> Object_18
-    Access_17 --> Object_18
+    Access_16 & Access_17 --> Object_18
     Access_22 ==> __Item_19
     __Item_19 --> PgSelectSingle_20
     PgSelectSingle_20 --> PgClassExpression_21

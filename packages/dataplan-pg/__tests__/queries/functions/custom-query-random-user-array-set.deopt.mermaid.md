@@ -30,8 +30,7 @@ graph TD
     Object_10 --> PgSelect_7
     __Value_3 --> Access_8
     __Value_3 --> Access_9
-    Access_8 --> Object_10
-    Access_9 --> Object_10
+    Access_8 & Access_9 --> Object_10
     PgSelect_7 --> __ListTransform_11
     PgClassExpression_14 -.-> __ListTransform_11
     PgSelect_7 -.-> __Item_12
@@ -81,15 +80,13 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.randomUserArraySet[]<br />⠀ROOT ᐸ-A- _16"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (item_17)<br />Deps: _15"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket2 --> Bucket3
     Bucket4("Bucket 4 (item_18)<br />Deps: _16<br />~ᐳQuery.randomUserArraySet[][]<br />⠀ROOT ᐸ-O- _19<br />⠀⠀username ᐸ-L- _20<br />⠀⠀gravatarUrl ᐸ-L- _21"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket2 --> Bucket4
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket2 --> Bucket3 & Bucket4
     end
 ```

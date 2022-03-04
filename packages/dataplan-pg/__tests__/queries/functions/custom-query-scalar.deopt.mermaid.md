@@ -30,22 +30,18 @@ graph TD
     PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
 
     %% plan dependencies
-    Object_11 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_11 & InputStaticLeaf_7 --> PgSelect_8
     __Value_3 --> Access_9
     __Value_3 --> Access_10
-    Access_9 --> Object_11
-    Access_10 --> Object_11
+    Access_9 & Access_10 --> Object_11
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    Object_11 --> PgSelect_16
-    InputStaticLeaf_15 --> PgSelect_16
+    Object_11 & InputStaticLeaf_15 --> PgSelect_16
     PgSelect_16 --> First_20
     First_20 --> PgSelectSingle_21
     PgSelectSingle_21 --> PgClassExpression_22
-    Object_11 --> PgSelect_24
-    InputStaticLeaf_23 --> PgSelect_24
+    Object_11 & InputStaticLeaf_23 --> PgSelect_24
     PgSelect_24 --> First_28
     First_28 --> PgSelectSingle_29
     PgSelectSingle_29 --> PgClassExpression_30

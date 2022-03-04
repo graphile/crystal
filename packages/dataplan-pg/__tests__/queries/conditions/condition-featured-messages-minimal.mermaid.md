@@ -30,16 +30,13 @@ graph TD
     Access_48["Access[_48∈1]<br />ᐸ_21.1ᐳ"]:::plan
 
     %% plan dependencies
-    Object_36 --> PgSelect_17
-    InputStaticLeaf_26 --> PgSelect_17
+    Object_36 & InputStaticLeaf_26 --> PgSelect_17
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     __Value_3 --> Access_34
     __Value_3 --> Access_35
-    Access_34 --> Object_36
-    Access_35 --> Object_36
-    InputStaticLeaf_23 --> Connection_37
-    InputStaticLeaf_24 --> Connection_37
+    Access_34 & Access_35 --> Object_36
+    InputStaticLeaf_23 & InputStaticLeaf_24 --> Connection_37
     Lambda_47 --> Lambda_41
     Access_48 --> First_43
     First_43 --> PgSelectSingle_44

@@ -34,24 +34,19 @@ graph TD
     Object_496["Object[_496∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_496 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_496 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgPolymorphic_15
-    PgClassExpression_14 --> PgPolymorphic_15
+    PgSelectSingle_13 & PgClassExpression_14 --> PgPolymorphic_15
     PgSelectSingle_13 --> PgClassExpression_23
-    Object_496 --> PgSelect_24
-    PgClassExpression_23 --> PgSelect_24
+    Object_496 & PgClassExpression_23 --> PgSelect_24
     PgSelect_24 --> First_28
     First_28 --> PgSelectSingle_29
     PgSelectSingle_29 --> PgClassExpression_30
-    PgSelectSingle_29 --> PgPolymorphic_31
-    PgClassExpression_30 --> PgPolymorphic_31
+    PgSelectSingle_29 & PgClassExpression_30 --> PgPolymorphic_31
     PgSelectSingle_29 --> PgClassExpression_40
-    Object_496 --> PgSelect_41
-    PgClassExpression_40 --> PgSelect_41
+    Object_496 & PgClassExpression_40 --> PgSelect_41
     PgSelect_41 --> First_45
     First_45 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
@@ -59,8 +54,7 @@ graph TD
     PgSelectSingle_29 --> PgClassExpression_484
     __Value_3 --> Access_494
     __Value_3 --> Access_495
-    Access_494 --> Object_496
-    Access_495 --> Object_496
+    Access_494 & Access_495 --> Object_496
 
     %% plan-to-path relationships
     P_0["~"]

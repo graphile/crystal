@@ -62,12 +62,10 @@ graph TD
     __ListTransform_19 ==> __Item_22
     __Item_22 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
-    PgSelectSingle_23 --> PgPolymorphic_25
-    PgClassExpression_24 --> PgPolymorphic_25
+    PgSelectSingle_23 & PgClassExpression_24 --> PgPolymorphic_25
     Map_763 --> PgSelectSingle_39
     PgSelectSingle_39 --> PgClassExpression_40
-    PgSelectSingle_39 --> PgPolymorphic_41
-    PgClassExpression_40 --> PgPolymorphic_41
+    PgSelectSingle_39 & PgClassExpression_40 --> PgPolymorphic_41
     PgSelectSingle_39 --> PgClassExpression_51
     Map_761 --> PgSelectSingle_58
     PgSelectSingle_58 --> PgClassExpression_59
@@ -88,8 +86,7 @@ graph TD
     PgSelectSingle_39 --> PgClassExpression_722
     __Value_3 --> Access_750
     __Value_3 --> Access_751
-    Access_750 --> Object_752
-    Access_751 --> Object_752
+    Access_750 & Access_751 --> Object_752
     PgSelectSingle_39 --> Map_761
     PgSelectSingle_23 --> Map_763
     PgSelectSingle_23 --> Map_765
@@ -168,12 +165,11 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _767"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀parent ᐸ-O- _41<br />⠀⠀⠀parent.type ᐸ-L- _40<br />⠀⠀⠀parent.type2 ᐸ-L- _51<br />⠀⠀⠀parent.author ᐸ-O- _58<br />⠀⠀⠀⠀parent.author.username ᐸ-L- _59<br />⠀⠀⠀parent.position ᐸ-L- _60<br />⠀⠀⠀parent.createdAt ᐸ-L- _61<br />⠀⠀⠀parent.updatedAt ᐸ-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived ᐸ-L- _63<br />⠀⠀⠀parent.archivedAt ᐸ-L- _64<br />⠀⠀⠀parent.id ᐸ-L- _722<br />⠀⠀type2 ᐸ-L- _159<br />⠀⠀author ᐸ-O- _166<br />⠀⠀⠀author.username ᐸ-L- _167<br />⠀⠀position ᐸ-L- _168<br />⠀⠀createdAt ᐸ-L- _169<br />⠀⠀updatedAt ᐸ-L- _170<br />⠀⠀isExplicitlyArchived ᐸ-L- _171<br />⠀⠀archivedAt ᐸ-L- _172<br />⠀⠀id ᐸ-L- _614"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
     end
 ```

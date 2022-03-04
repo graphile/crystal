@@ -29,13 +29,10 @@ graph TD
     PgClassExpression_23["PgClassExpression[_23∈0]<br />ᐸ__single_t...__.”title”ᐳ"]:::plan
 
     %% plan dependencies
-    Object_12 --> PgSelect_9
-    InputStaticLeaf_7 --> PgSelect_9
-    Constant_8 --> PgSelect_9
+    Object_12 & InputStaticLeaf_7 & Constant_8 --> PgSelect_9
     __Value_3 --> Access_10
     __Value_3 --> Access_11
-    Access_10 --> Object_12
-    Access_11 --> Object_12
+    Access_10 & Access_11 --> Object_12
     PgSelect_9 --> First_13
     First_13 --> PgSelectSingle_14
     PgSelectSingle_14 --> PgClassExpression_15

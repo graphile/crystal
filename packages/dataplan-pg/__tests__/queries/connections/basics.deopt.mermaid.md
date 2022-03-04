@@ -51,10 +51,7 @@ graph TD
 
     %% plan dependencies
     Object_36 --> PgSelect_20
-    InputStaticLeaf_14 --> Connection_24
-    InputStaticLeaf_15 --> Connection_24
-    InputStaticLeaf_16 --> Connection_24
-    InputStaticLeaf_17 --> Connection_24
+    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_24
     PgSelect_20 ==> __Item_26
     __Item_26 --> PgSelectSingle_27
     List_30 --> PgCursor_28
@@ -62,12 +59,10 @@ graph TD
     PgClassExpression_29 --> List_30
     PgSelectSingle_27 --> PgClassExpression_31
     PgSelectSingle_27 --> PgClassExpression_32
-    Object_36 --> PgSelect_33
-    PgClassExpression_32 --> PgSelect_33
+    Object_36 & PgClassExpression_32 --> PgSelect_33
     __Value_3 --> Access_34
     __Value_3 --> Access_35
-    Access_34 --> Object_36
-    Access_35 --> Object_36
+    Access_34 & Access_35 --> Object_36
     PgSelect_33 --> First_37
     First_37 --> PgSelectSingle_38
     PgSelectSingle_38 --> PgClassExpression_39

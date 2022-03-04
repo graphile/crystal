@@ -44,14 +44,12 @@ graph TD
     Object_20 --> PgSelect_17
     __Value_3 --> Access_18
     __Value_3 --> Access_19
-    Access_18 --> Object_20
-    Access_19 --> Object_20
+    Access_18 & Access_19 --> Object_20
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     Object_20 --> PgSelect_24
-    PgSelect_24 --> __ListTransform_28
-    PgClassExpression_35 --> __ListTransform_28
+    PgSelect_24 & PgClassExpression_35 --> __ListTransform_28
     Lambda_37 -.-> __ListTransform_28
     __ListTransform_28 --> __ListTransform_29
     PgClassExpression_40 -.-> __ListTransform_29
@@ -63,8 +61,7 @@ graph TD
     __Item_32 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_34
     PgSelectSingle_22 --> PgClassExpression_35
-    PgClassExpression_34 --> List_36
-    PgClassExpression_35 --> List_36
+    PgClassExpression_34 & PgClassExpression_35 --> List_36
     List_36 --> Lambda_37
     __ListTransform_28 -.-> __Item_38
     __Item_38 --> PgSelectSingle_39
@@ -130,24 +127,20 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _24<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesWithManyTransforms ᐸ-A- _31"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_32)<br />Deps: _24, _35"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_38)<br />Deps: _28"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (item_41)<br />Deps: _30"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket1 --> Bucket4
     Bucket5("Bucket 5 (item_42)<br />Deps: _31<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[]<br />⠀ROOT ᐸ-A- _43"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket1 --> Bucket5
     Bucket6("Bucket 6 (item_44)<br />Deps: _42"):::bucket
     style Bucket6 stroke:#ff1493
-    Bucket5 --> Bucket6
     Bucket7("Bucket 7 (item_45)<br />Deps: _43<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[][]<br />⠀ROOT ᐸ-O- _46<br />⠀⠀body ᐸ-L- _47<br />⠀⠀featured ᐸ-L- _48"):::bucket
     style Bucket7 stroke:#808000
-    Bucket5 --> Bucket7
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5
+    Bucket5 --> Bucket6 & Bucket7
     end
 ```

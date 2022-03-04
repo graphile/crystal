@@ -35,18 +35,15 @@ graph TD
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_32
-    Object_44 --> PgSelect_33
-    PgClassExpression_32 --> PgSelect_33
+    Object_44 & PgClassExpression_32 --> PgSelect_33
     PgSelect_33 ==> __Item_37
     __Item_37 --> PgSelectSingle_38
     PgSelectSingle_38 --> PgClassExpression_39
     PgSelectSingle_38 --> PgClassExpression_40
-    Object_44 --> PgSelect_41
-    PgClassExpression_40 --> PgSelect_41
+    Object_44 & PgClassExpression_40 --> PgSelect_41
     __Value_3 --> Access_42
     __Value_3 --> Access_43
-    Access_42 --> Object_44
-    Access_43 --> Object_44
+    Access_42 & Access_43 --> Object_44
     PgSelect_41 --> First_45
     First_45 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
@@ -87,9 +84,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _44<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesList ᐸ-A- _33"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_37)<br />Deps: _33, _44<br />~ᐳQuery.forums[]ᐳForum.messagesList[]<br />⠀ROOT ᐸ-O- _38<br />⠀⠀body ᐸ-L- _39<br />⠀⠀author ᐸ-O- _46<br />⠀⠀⠀author.username ᐸ-L- _47<br />⠀⠀⠀author.gravatarUrl ᐸ-L- _48"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

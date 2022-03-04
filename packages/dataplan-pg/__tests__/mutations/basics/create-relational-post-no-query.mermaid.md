@@ -117,103 +117,73 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_363 --> PgInsert_13
-    Constant_11 --> PgInsert_13
-    Constant_12 --> PgInsert_13
+    Object_363 & Constant_11 & Constant_12 --> PgInsert_13
     PgInsert_13 --> PgClassExpression_17
-    Object_363 --> PgInsert_18
-    PgClassExpression_17 --> PgInsert_18
-    InputStaticLeaf_8 --> PgInsert_18
-    InputStaticLeaf_9 --> PgInsert_18
-    InputStaticLeaf_10 --> PgInsert_18
+    Object_363 & PgClassExpression_17 & InputStaticLeaf_8 & InputStaticLeaf_9 & InputStaticLeaf_10 --> PgInsert_18
     PgInsert_18 --> PgClassExpression_22
-    Object_363 --> PgInsert_29
-    Constant_27 --> PgInsert_29
-    Constant_28 --> PgInsert_29
+    Object_363 & Constant_27 & Constant_28 --> PgInsert_29
     PgInsert_29 --> PgClassExpression_33
-    Object_363 --> PgInsert_34
-    PgClassExpression_33 --> PgInsert_34
-    InputStaticLeaf_24 --> PgInsert_34
-    InputStaticLeaf_25 --> PgInsert_34
-    InputStaticLeaf_26 --> PgInsert_34
+    Object_363 & PgClassExpression_33 & InputStaticLeaf_24 & InputStaticLeaf_25 & InputStaticLeaf_26 --> PgInsert_34
     PgInsert_34 --> PgClassExpression_38
-    Object_363 --> PgSelect_40
-    InputStaticLeaf_39 --> PgSelect_40
+    Object_363 & InputStaticLeaf_39 --> PgSelect_40
     PgSelect_40 --> First_44
     First_44 --> PgSelectSingle_45
     PgSelectSingle_45 --> PgClassExpression_46
-    PgSelectSingle_45 --> PgPolymorphic_47
-    PgClassExpression_46 --> PgPolymorphic_47
+    PgSelectSingle_45 & PgClassExpression_46 --> PgPolymorphic_47
     Map_367 --> PgSelectSingle_62
     PgSelectSingle_62 --> PgClassExpression_64
     PgSelectSingle_62 --> PgClassExpression_65
     PgSelectSingle_62 --> PgClassExpression_66
     PgSelectSingle_45 --> PgClassExpression_83
-    Object_363 --> PgSelect_92
-    InputStaticLeaf_91 --> PgSelect_92
+    Object_363 & InputStaticLeaf_91 --> PgSelect_92
     PgSelect_92 --> First_96
     First_96 --> PgSelectSingle_97
     PgSelectSingle_97 --> PgClassExpression_98
-    PgSelectSingle_97 --> PgPolymorphic_99
-    PgClassExpression_98 --> PgPolymorphic_99
+    PgSelectSingle_97 & PgClassExpression_98 --> PgPolymorphic_99
     Map_369 --> PgSelectSingle_114
     PgSelectSingle_114 --> PgClassExpression_116
     PgSelectSingle_114 --> PgClassExpression_117
     PgSelectSingle_114 --> PgClassExpression_118
     PgSelectSingle_97 --> PgClassExpression_135
-    Object_363 --> PgSelect_144
-    InputStaticLeaf_143 --> PgSelect_144
+    Object_363 & InputStaticLeaf_143 --> PgSelect_144
     PgSelect_144 --> First_148
     First_148 --> PgSelectSingle_149
     PgSelectSingle_149 --> PgClassExpression_150
-    PgSelectSingle_149 --> PgPolymorphic_151
-    PgClassExpression_150 --> PgPolymorphic_151
+    PgSelectSingle_149 & PgClassExpression_150 --> PgPolymorphic_151
     Map_371 --> PgSelectSingle_166
     PgSelectSingle_166 --> PgClassExpression_168
     PgSelectSingle_166 --> PgClassExpression_169
     PgSelectSingle_166 --> PgClassExpression_170
     PgSelectSingle_149 --> PgClassExpression_187
-    Object_363 --> PgInsert_201
-    Constant_199 --> PgInsert_201
-    Constant_200 --> PgInsert_201
+    Object_363 & Constant_199 & Constant_200 --> PgInsert_201
     PgInsert_201 --> PgClassExpression_205
-    Object_363 --> PgInsert_206
-    PgClassExpression_205 --> PgInsert_206
-    InputStaticLeaf_196 --> PgInsert_206
-    InputStaticLeaf_197 --> PgInsert_206
-    InputStaticLeaf_198 --> PgInsert_206
+    Object_363 & PgClassExpression_205 & InputStaticLeaf_196 & InputStaticLeaf_197 & InputStaticLeaf_198 --> PgInsert_206
     PgInsert_206 --> PgClassExpression_210
-    Object_363 --> PgSelect_212
-    InputStaticLeaf_211 --> PgSelect_212
+    Object_363 & InputStaticLeaf_211 --> PgSelect_212
     PgSelect_212 --> First_216
     First_216 --> PgSelectSingle_217
     PgSelectSingle_217 --> PgClassExpression_218
-    PgSelectSingle_217 --> PgPolymorphic_219
-    PgClassExpression_218 --> PgPolymorphic_219
+    PgSelectSingle_217 & PgClassExpression_218 --> PgPolymorphic_219
     Map_373 --> PgSelectSingle_234
     PgSelectSingle_234 --> PgClassExpression_236
     PgSelectSingle_234 --> PgClassExpression_237
     PgSelectSingle_234 --> PgClassExpression_238
     PgSelectSingle_217 --> PgClassExpression_255
-    Object_363 --> PgSelect_264
-    InputStaticLeaf_263 --> PgSelect_264
+    Object_363 & InputStaticLeaf_263 --> PgSelect_264
     PgSelect_264 --> First_268
     First_268 --> PgSelectSingle_269
     PgSelectSingle_269 --> PgClassExpression_270
-    PgSelectSingle_269 --> PgPolymorphic_271
-    PgClassExpression_270 --> PgPolymorphic_271
+    PgSelectSingle_269 & PgClassExpression_270 --> PgPolymorphic_271
     Map_375 --> PgSelectSingle_286
     PgSelectSingle_286 --> PgClassExpression_288
     PgSelectSingle_286 --> PgClassExpression_289
     PgSelectSingle_286 --> PgClassExpression_290
     PgSelectSingle_269 --> PgClassExpression_307
-    Object_363 --> PgSelect_316
-    InputStaticLeaf_315 --> PgSelect_316
+    Object_363 & InputStaticLeaf_315 --> PgSelect_316
     PgSelect_316 --> First_320
     First_320 --> PgSelectSingle_321
     PgSelectSingle_321 --> PgClassExpression_322
-    PgSelectSingle_321 --> PgPolymorphic_323
-    PgClassExpression_322 --> PgPolymorphic_323
+    PgSelectSingle_321 & PgClassExpression_322 --> PgPolymorphic_323
     Map_377 --> PgSelectSingle_338
     PgSelectSingle_338 --> PgClassExpression_340
     PgSelectSingle_338 --> PgClassExpression_341
@@ -221,8 +191,7 @@ graph TD
     PgSelectSingle_321 --> PgClassExpression_359
     __Value_3 --> Access_361
     __Value_3 --> Access_362
-    Access_361 --> Object_363
-    Access_362 --> Object_363
+    Access_361 & Access_362 --> Object_363
     PgSelectSingle_45 --> Map_367
     PgSelectSingle_97 --> Map_369
     PgSelectSingle_149 --> Map_371
@@ -329,30 +298,24 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _363<br />~ᐳMutation.p1<br />⠀ROOT ᐸ-O- _22"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _363, _5<br />~ᐳMutation.p2<br />⠀ROOT ᐸ-O- _38<br />⠀⠀query ᐸ-O- _5<br />⠀⠀⠀query.i1 ᐸ-O- _47<br />⠀⠀⠀⠀query.i1.id ᐸ-L- _83<br />⠀⠀⠀query.i2 ᐸ-O- _99<br />⠀⠀⠀⠀query.i2.id ᐸ-L- _135<br />⠀⠀⠀query.i3 ᐸ-O- _151<br />⠀⠀⠀⠀query.i3.id ᐸ-L- _187"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_47[RelationalPost])<br />Deps: _367<br />~ᐳMutation.p2ᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- _64<br />⠀⠀description ᐸ-L- _65<br />⠀⠀note ᐸ-L- _66"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket2 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_99[RelationalPost])<br />Deps: _369<br />~ᐳMutation.p2ᐳCreateRelationalPostPayload.queryᐳQuery.i2<br />⠀⠀title ᐸ-L- _116<br />⠀⠀description ᐸ-L- _117<br />⠀⠀note ᐸ-L- _118"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket2 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_151[RelationalPost])<br />Deps: _371<br />~ᐳMutation.p2ᐳCreateRelationalPostPayload.queryᐳQuery.i3<br />⠀⠀title ᐸ-L- _168<br />⠀⠀description ᐸ-L- _169<br />⠀⠀note ᐸ-L- _170"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket2 --> Bucket5
     Bucket6("Bucket 6 (group3[mutation])<br />Deps: _363, _5<br />~ᐳMutation.p3<br />⠀ROOT ᐸ-O- _210<br />⠀⠀query ᐸ-O- _5<br />⠀⠀⠀query.i1 ᐸ-O- _219<br />⠀⠀⠀⠀query.i1.id ᐸ-L- _255<br />⠀⠀⠀query.i2 ᐸ-O- _271<br />⠀⠀⠀⠀query.i2.id ᐸ-L- _307<br />⠀⠀⠀query.i3 ᐸ-O- _323<br />⠀⠀⠀⠀query.i3.id ᐸ-L- _359"):::bucket
     style Bucket6 stroke:#ff1493
-    Bucket0 --> Bucket6
     Bucket7("Bucket 7 (polymorphic_219[RelationalPost])<br />Deps: _373<br />~ᐳMutation.p3ᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- _236<br />⠀⠀description ᐸ-L- _237<br />⠀⠀note ᐸ-L- _238"):::bucket
     style Bucket7 stroke:#808000
-    Bucket6 --> Bucket7
     Bucket8("Bucket 8 (polymorphic_271[RelationalPost])<br />Deps: _375<br />~ᐳMutation.p3ᐳCreateRelationalPostPayload.queryᐳQuery.i2<br />⠀⠀title ᐸ-L- _288<br />⠀⠀description ᐸ-L- _289<br />⠀⠀note ᐸ-L- _290"):::bucket
     style Bucket8 stroke:#dda0dd
-    Bucket6 --> Bucket8
     Bucket9("Bucket 9 (polymorphic_323[RelationalPost])<br />Deps: _377<br />~ᐳMutation.p3ᐳCreateRelationalPostPayload.queryᐳQuery.i3<br />⠀⠀title ᐸ-L- _340<br />⠀⠀description ᐸ-L- _341<br />⠀⠀note ᐸ-L- _342"):::bucket
     style Bucket9 stroke:#ff0000
-    Bucket6 --> Bucket9
+    Bucket0 --> Bucket1 & Bucket2 & Bucket6
+    Bucket2 --> Bucket3 & Bucket4 & Bucket5
+    Bucket6 --> Bucket7 & Bucket8 & Bucket9
     end
 ```

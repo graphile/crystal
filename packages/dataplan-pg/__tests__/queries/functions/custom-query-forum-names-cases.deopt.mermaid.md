@@ -23,8 +23,7 @@ graph TD
     Object_10 --> PgSelect_7
     __Value_3 --> Access_8
     __Value_3 --> Access_9
-    Access_8 --> Object_10
-    Access_9 --> Object_10
+    Access_8 & Access_9 --> Object_10
     PgSelect_7 ==> __Item_11
     __Item_11 --> PgSelectSingle_12
     PgSelectSingle_12 --> PgClassExpression_13
@@ -53,9 +52,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNamesCasesList[]<br />⠀ROOT ᐸ-A- _13"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_14)<br />Deps: _13<br />~ᐳQuery.forumNamesCasesList[][]<br />⠀ROOT ᐸ-L- _14"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

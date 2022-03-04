@@ -32,27 +32,23 @@ graph TD
     Map_299["Map[_299∈1]<br />ᐸ_13:{”0”:1,”1”:2}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_292 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_292 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
     PgClassExpression_14 --> Lambda_15
-    Lambda_15 --> PgSingleTablePolymorphic_16
-    PgSelectSingle_13 --> PgSingleTablePolymorphic_16
+    Lambda_15 & PgSelectSingle_13 --> PgSingleTablePolymorphic_16
     PgSelectSingle_13 --> PgClassExpression_17
     Map_299 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
     PgClassExpression_24 --> Lambda_25
-    Lambda_25 --> PgSingleTablePolymorphic_26
-    PgSelectSingle_23 --> PgSingleTablePolymorphic_26
+    Lambda_25 & PgSelectSingle_23 --> PgSingleTablePolymorphic_26
     Map_297 --> PgSelectSingle_34
     PgSelectSingle_34 --> PgClassExpression_35
     PgSelectSingle_13 --> PgClassExpression_72
     __Value_3 --> Access_290
     __Value_3 --> Access_291
-    Access_290 --> Object_292
-    Access_291 --> Object_292
+    Access_290 & Access_291 --> Object_292
     PgSelectSingle_23 --> Map_297
     PgSelectSingle_13 --> Map_299
 
@@ -85,9 +81,9 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _12, _13<br />~ᐳQuery.item<br />⠀⠀parent ᐸ-O- _26<br />⠀⠀⠀parent.id ᐸ-L- _17<br />⠀⠀id ᐸ-L- _72"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _299, _23<br />~ᐳQuery.itemᐳSingleTablePost.parent<br />~ᐳQuery.itemᐳSingleTableTopic.parent<br />~ᐳQuery.itemᐳSingleTableDivider.parent<br />~ᐳQuery.itemᐳSingleTableChecklist.parent<br />~ᐳQuery.itemᐳSingleTableChecklistItem.parent<br />⠀⠀author ᐸ-O- _34<br />⠀⠀⠀author.username ᐸ-L- _35"):::bucket
     style Bucket2 stroke:#7f007f
+    Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
 ```

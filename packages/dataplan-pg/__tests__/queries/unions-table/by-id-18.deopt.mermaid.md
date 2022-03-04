@@ -51,47 +51,39 @@ graph TD
     PgClassExpression_64["PgClassExpression[_64∈5]<br />ᐸ__union_ch...s__.”note”ᐳ"]:::plan
 
     %% plan dependencies
-    Object_11 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_11 & InputStaticLeaf_7 --> PgSelect_8
     __Value_3 --> Access_9
     __Value_3 --> Access_10
-    Access_9 --> Object_11
-    Access_10 --> Object_11
+    Access_9 & Access_10 --> Object_11
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgPolymorphic_15
-    PgClassExpression_14 --> PgPolymorphic_15
+    PgSelectSingle_13 & PgClassExpression_14 --> PgPolymorphic_15
     PgSelectSingle_13 --> PgClassExpression_16
-    Object_11 --> PgSelect_17
-    PgClassExpression_16 --> PgSelect_17
+    Object_11 & PgClassExpression_16 --> PgSelect_17
     PgSelect_17 --> First_21
     First_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_24
-    Object_11 --> PgSelect_26
-    PgClassExpression_16 --> PgSelect_26
+    Object_11 & PgClassExpression_16 --> PgSelect_26
     PgSelect_26 --> First_30
     First_30 --> PgSelectSingle_31
     PgSelectSingle_31 --> PgClassExpression_32
     PgSelectSingle_31 --> PgClassExpression_33
     PgSelectSingle_31 --> PgClassExpression_34
     PgSelectSingle_31 --> PgClassExpression_35
-    Object_11 --> PgSelect_37
-    PgClassExpression_16 --> PgSelect_37
+    Object_11 & PgClassExpression_16 --> PgSelect_37
     PgSelect_37 --> First_41
     First_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     PgSelectSingle_42 --> PgClassExpression_44
     PgSelectSingle_42 --> PgClassExpression_45
-    Object_11 --> PgSelect_47
-    PgClassExpression_16 --> PgSelect_47
+    Object_11 & PgClassExpression_16 --> PgSelect_47
     PgSelect_47 --> First_51
     First_51 --> PgSelectSingle_52
     PgSelectSingle_52 --> PgClassExpression_53
     PgSelectSingle_52 --> PgClassExpression_54
-    Object_11 --> PgSelect_56
-    PgClassExpression_16 --> PgSelect_56
+    Object_11 & PgClassExpression_16 --> PgSelect_56
     PgSelect_56 --> First_60
     First_60 --> PgSelectSingle_61
     PgSelectSingle_61 --> PgClassExpression_62
@@ -151,18 +143,14 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />Deps: _21<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _23<br />⠀⠀title ᐸ-L- _24"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />Deps: _30<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _32<br />⠀⠀title ᐸ-L- _33<br />⠀⠀description ᐸ-L- _34<br />⠀⠀note ᐸ-L- _35"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />Deps: _41<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _43<br />⠀⠀title ᐸ-L- _44<br />⠀⠀color ᐸ-L- _45"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket0 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />Deps: _51<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _53<br />⠀⠀title ᐸ-L- _54"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket0 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />Deps: _60<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _62<br />⠀⠀description ᐸ-L- _63<br />⠀⠀note ᐸ-L- _64"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket0 --> Bucket5
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5
     end
 ```

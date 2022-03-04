@@ -79,65 +79,41 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_202 --> PgInsert_9
-    Constant_7 --> PgInsert_9
-    Constant_8 --> PgInsert_9
+    Object_202 & Constant_7 & Constant_8 --> PgInsert_9
     PgInsert_9 --> PgClassExpression_13
-    Object_202 --> PgInsert_17
-    PgClassExpression_13 --> PgInsert_17
-    Constant_14 --> PgInsert_17
-    Constant_15 --> PgInsert_17
-    Constant_16 --> PgInsert_17
-    Object_202 --> PgInsert_23
-    Constant_21 --> PgInsert_23
-    Constant_22 --> PgInsert_23
+    Object_202 & PgClassExpression_13 & Constant_14 & Constant_15 & Constant_16 --> PgInsert_17
+    Object_202 & Constant_21 & Constant_22 --> PgInsert_23
     PgInsert_23 --> PgClassExpression_27
-    Object_202 --> PgInsert_31
-    PgClassExpression_27 --> PgInsert_31
-    Constant_28 --> PgInsert_31
-    Constant_29 --> PgInsert_31
-    Constant_30 --> PgInsert_31
-    Object_202 --> PgInsert_37
-    Constant_35 --> PgInsert_37
-    Constant_36 --> PgInsert_37
+    Object_202 & PgClassExpression_27 & Constant_28 & Constant_29 & Constant_30 --> PgInsert_31
+    Object_202 & Constant_35 & Constant_36 --> PgInsert_37
     PgInsert_37 --> PgClassExpression_41
-    Object_202 --> PgInsert_45
-    PgClassExpression_41 --> PgInsert_45
-    Constant_42 --> PgInsert_45
-    Constant_43 --> PgInsert_45
-    Constant_44 --> PgInsert_45
+    Object_202 & PgClassExpression_41 & Constant_42 & Constant_43 & Constant_44 --> PgInsert_45
     PgInsert_45 --> PgClassExpression_49
-    Object_202 --> PgSelect_51
-    InputStaticLeaf_50 --> PgSelect_51
+    Object_202 & InputStaticLeaf_50 --> PgSelect_51
     PgSelect_51 --> First_55
     First_55 --> PgSelectSingle_56
     PgSelectSingle_56 --> PgClassExpression_57
-    PgSelectSingle_56 --> PgPolymorphic_58
-    PgClassExpression_57 --> PgPolymorphic_58
+    PgSelectSingle_56 & PgClassExpression_57 --> PgPolymorphic_58
     Map_206 --> PgSelectSingle_73
     PgSelectSingle_73 --> PgClassExpression_75
     PgSelectSingle_73 --> PgClassExpression_76
     PgSelectSingle_73 --> PgClassExpression_77
     PgSelectSingle_56 --> PgClassExpression_94
-    Object_202 --> PgSelect_103
-    InputStaticLeaf_102 --> PgSelect_103
+    Object_202 & InputStaticLeaf_102 --> PgSelect_103
     PgSelect_103 --> First_107
     First_107 --> PgSelectSingle_108
     PgSelectSingle_108 --> PgClassExpression_109
-    PgSelectSingle_108 --> PgPolymorphic_110
-    PgClassExpression_109 --> PgPolymorphic_110
+    PgSelectSingle_108 & PgClassExpression_109 --> PgPolymorphic_110
     Map_208 --> PgSelectSingle_125
     PgSelectSingle_125 --> PgClassExpression_127
     PgSelectSingle_125 --> PgClassExpression_128
     PgSelectSingle_125 --> PgClassExpression_129
     PgSelectSingle_108 --> PgClassExpression_146
-    Object_202 --> PgSelect_155
-    InputStaticLeaf_154 --> PgSelect_155
+    Object_202 & InputStaticLeaf_154 --> PgSelect_155
     PgSelect_155 --> First_159
     First_159 --> PgSelectSingle_160
     PgSelectSingle_160 --> PgClassExpression_161
-    PgSelectSingle_160 --> PgPolymorphic_162
-    PgClassExpression_161 --> PgPolymorphic_162
+    PgSelectSingle_160 & PgClassExpression_161 --> PgPolymorphic_162
     Map_210 --> PgSelectSingle_177
     PgSelectSingle_177 --> PgClassExpression_179
     PgSelectSingle_177 --> PgClassExpression_180
@@ -145,8 +121,7 @@ graph TD
     PgSelectSingle_160 --> PgClassExpression_198
     __Value_3 --> Access_200
     __Value_3 --> Access_201
-    Access_200 --> Object_202
-    Access_201 --> Object_202
+    Access_200 & Access_201 --> Object_202
     PgSelectSingle_56 --> Map_206
     PgSelectSingle_108 --> Map_208
     PgSelectSingle_160 --> Map_210
@@ -206,15 +181,13 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _3, _5<br />~ᐳMutation.createThreeRelationalPosts<br />⠀ROOT ᐸ-O- _49<br />⠀⠀query ᐸ-O- _5<br />⠀⠀⠀query.i1 ᐸ-O- _58<br />⠀⠀⠀⠀query.i1.id ᐸ-L- _94<br />⠀⠀⠀query.i2 ᐸ-O- _110<br />⠀⠀⠀⠀query.i2.id ᐸ-L- _146<br />⠀⠀⠀query.i3 ᐸ-O- _162<br />⠀⠀⠀⠀query.i3.id ᐸ-L- _198"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_58[RelationalPost])<br />Deps: _206<br />~ᐳMutation.createThreeRelationalPostsᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- _75<br />⠀⠀description ᐸ-L- _76<br />⠀⠀note ᐸ-L- _77"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_110[RelationalPost])<br />Deps: _208<br />~ᐳMutation.createThreeRelationalPostsᐳCreateRelationalPostPayload.queryᐳQuery.i2<br />⠀⠀title ᐸ-L- _127<br />⠀⠀description ᐸ-L- _128<br />⠀⠀note ᐸ-L- _129"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_162[RelationalPost])<br />Deps: _210<br />~ᐳMutation.createThreeRelationalPostsᐳCreateRelationalPostPayload.queryᐳQuery.i3<br />⠀⠀title ᐸ-L- _179<br />⠀⠀description ᐸ-L- _180<br />⠀⠀note ᐸ-L- _181"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket1 --> Bucket4
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4
     end
 ```

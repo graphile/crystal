@@ -52,14 +52,8 @@ graph TD
     Map_77["Map[_77∈1]<br />ᐸ_31:{”0”:2,”1”:3}ᐳ"]:::plan
 
     %% plan dependencies
-    InputStaticLeaf_14 --> Connection_24
-    InputStaticLeaf_15 --> Connection_24
-    InputStaticLeaf_16 --> Connection_24
-    InputStaticLeaf_17 --> Connection_24
-    Object_40 --> PgSelect_25
-    Lambda_26 --> PgSelect_25
-    PgValidateParsedCursor_27 --> PgSelect_25
-    ToPg_29 --> PgSelect_25
+    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_24
+    Object_40 & Lambda_26 & PgValidateParsedCursor_27 & ToPg_29 --> PgSelect_25
     InputStaticLeaf_16 --> Lambda_26
     Lambda_26 --> PgValidateParsedCursor_27
     Lambda_26 --> Access_28
@@ -72,8 +66,7 @@ graph TD
     PgSelectSingle_31 --> PgClassExpression_35
     __Value_3 --> Access_38
     __Value_3 --> Access_39
-    Access_38 --> Object_40
-    Access_39 --> Object_40
+    Access_38 & Access_39 --> Object_40
     Map_77 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
     PgSelectSingle_42 --> PgClassExpression_44

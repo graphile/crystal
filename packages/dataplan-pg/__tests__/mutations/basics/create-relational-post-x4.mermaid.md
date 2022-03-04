@@ -86,80 +86,51 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_112 --> PgInsert_13
-    Constant_11 --> PgInsert_13
-    Constant_12 --> PgInsert_13
+    Object_112 & Constant_11 & Constant_12 --> PgInsert_13
     PgInsert_13 --> PgClassExpression_17
-    Object_112 --> PgInsert_18
-    PgClassExpression_17 --> PgInsert_18
-    InputStaticLeaf_8 --> PgInsert_18
-    InputStaticLeaf_9 --> PgInsert_18
-    InputStaticLeaf_10 --> PgInsert_18
+    Object_112 & PgClassExpression_17 & InputStaticLeaf_8 & InputStaticLeaf_9 & InputStaticLeaf_10 --> PgInsert_18
     PgInsert_18 --> PgClassExpression_22
     PgInsert_18 --> PgClassExpression_23
-    Object_112 --> PgSelect_25
-    PgClassExpression_23 --> PgSelect_25
+    Object_112 & PgClassExpression_23 --> PgSelect_25
     PgSelect_25 --> First_29
     First_29 --> PgSelectSingle_30
     PgSelectSingle_30 --> PgClassExpression_31
     PgSelectSingle_30 --> PgClassExpression_32
     PgSelectSingle_30 --> PgClassExpression_33
     PgSelectSingle_30 --> PgClassExpression_34
-    Object_112 --> PgInsert_41
-    Constant_39 --> PgInsert_41
-    Constant_40 --> PgInsert_41
+    Object_112 & Constant_39 & Constant_40 --> PgInsert_41
     PgInsert_41 --> PgClassExpression_45
-    Object_112 --> PgInsert_46
-    PgClassExpression_45 --> PgInsert_46
-    InputStaticLeaf_36 --> PgInsert_46
-    InputStaticLeaf_37 --> PgInsert_46
-    InputStaticLeaf_38 --> PgInsert_46
+    Object_112 & PgClassExpression_45 & InputStaticLeaf_36 & InputStaticLeaf_37 & InputStaticLeaf_38 --> PgInsert_46
     PgInsert_46 --> PgClassExpression_50
     PgInsert_46 --> PgClassExpression_51
-    Object_112 --> PgSelect_53
-    PgClassExpression_51 --> PgSelect_53
+    Object_112 & PgClassExpression_51 --> PgSelect_53
     PgSelect_53 --> First_57
     First_57 --> PgSelectSingle_58
     PgSelectSingle_58 --> PgClassExpression_59
     PgSelectSingle_58 --> PgClassExpression_60
     PgSelectSingle_58 --> PgClassExpression_61
     PgSelectSingle_58 --> PgClassExpression_62
-    Object_112 --> PgInsert_69
-    Constant_67 --> PgInsert_69
-    Constant_68 --> PgInsert_69
+    Object_112 & Constant_67 & Constant_68 --> PgInsert_69
     PgInsert_69 --> PgClassExpression_73
-    Object_112 --> PgInsert_74
-    PgClassExpression_73 --> PgInsert_74
-    InputStaticLeaf_64 --> PgInsert_74
-    InputStaticLeaf_65 --> PgInsert_74
-    InputStaticLeaf_66 --> PgInsert_74
+    Object_112 & PgClassExpression_73 & InputStaticLeaf_64 & InputStaticLeaf_65 & InputStaticLeaf_66 --> PgInsert_74
     PgInsert_74 --> PgClassExpression_78
     PgInsert_74 --> PgClassExpression_79
-    Object_112 --> PgSelect_81
-    PgClassExpression_79 --> PgSelect_81
+    Object_112 & PgClassExpression_79 --> PgSelect_81
     PgSelect_81 --> First_85
     First_85 --> PgSelectSingle_86
     PgSelectSingle_86 --> PgClassExpression_87
     PgSelectSingle_86 --> PgClassExpression_88
     PgSelectSingle_86 --> PgClassExpression_89
     PgSelectSingle_86 --> PgClassExpression_90
-    Object_112 --> PgInsert_97
-    Constant_95 --> PgInsert_97
-    Constant_96 --> PgInsert_97
+    Object_112 & Constant_95 & Constant_96 --> PgInsert_97
     PgInsert_97 --> PgClassExpression_101
-    Object_112 --> PgInsert_102
-    PgClassExpression_101 --> PgInsert_102
-    InputStaticLeaf_92 --> PgInsert_102
-    InputStaticLeaf_93 --> PgInsert_102
-    InputStaticLeaf_94 --> PgInsert_102
+    Object_112 & PgClassExpression_101 & InputStaticLeaf_92 & InputStaticLeaf_93 & InputStaticLeaf_94 --> PgInsert_102
     PgInsert_102 --> PgClassExpression_106
     PgInsert_102 --> PgClassExpression_107
-    Object_112 --> PgSelect_109
-    PgClassExpression_107 --> PgSelect_109
+    Object_112 & PgClassExpression_107 --> PgSelect_109
     __Value_3 --> Access_110
     __Value_3 --> Access_111
-    Access_110 --> Object_112
-    Access_111 --> Object_112
+    Access_110 & Access_111 --> Object_112
     PgSelect_109 --> First_113
     First_113 --> PgSelectSingle_114
     PgSelectSingle_114 --> PgClassExpression_115
@@ -244,15 +215,12 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _112<br />~ᐳMutation.p1<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀post ᐸ-O- _30<br />⠀⠀⠀post.id ᐸ-L- _31<br />⠀⠀⠀post.title ᐸ-L- _32<br />⠀⠀⠀post.description ᐸ-L- _33<br />⠀⠀⠀post.note ᐸ-L- _34"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _112<br />~ᐳMutation.p2<br />⠀ROOT ᐸ-O- _50<br />⠀⠀id ᐸ-L- _51<br />⠀⠀post ᐸ-O- _58<br />⠀⠀⠀post.id ᐸ-L- _59<br />⠀⠀⠀post.title ᐸ-L- _60<br />⠀⠀⠀post.description ᐸ-L- _61<br />⠀⠀⠀post.note ᐸ-L- _62"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (group3[mutation])<br />Deps: _112<br />~ᐳMutation.p3<br />⠀ROOT ᐸ-O- _78<br />⠀⠀id ᐸ-L- _79<br />⠀⠀post ᐸ-O- _86<br />⠀⠀⠀post.id ᐸ-L- _87<br />⠀⠀⠀post.title ᐸ-L- _88<br />⠀⠀⠀post.description ᐸ-L- _89<br />⠀⠀⠀post.note ᐸ-L- _90"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket0 --> Bucket3
     Bucket4("Bucket 4 (group4[mutation])<br />Deps: _112<br />~ᐳMutation.p4<br />⠀ROOT ᐸ-O- _106<br />⠀⠀id ᐸ-L- _107<br />⠀⠀post ᐸ-O- _114<br />⠀⠀⠀post.id ᐸ-L- _115<br />⠀⠀⠀post.title ᐸ-L- _116<br />⠀⠀⠀post.description ᐸ-L- _117<br />⠀⠀⠀post.note ᐸ-L- _118"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket0 --> Bucket4
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
     end
 ```

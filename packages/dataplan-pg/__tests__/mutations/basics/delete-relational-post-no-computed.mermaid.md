@@ -24,15 +24,12 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_12 --> PgDelete_9
-    InputStaticLeaf_8 --> PgDelete_9
+    Object_12 & InputStaticLeaf_8 --> PgDelete_9
     __Value_3 --> Access_10
     __Value_3 --> Access_11
-    Access_10 --> Object_12
-    Access_11 --> Object_12
+    Access_10 & Access_11 --> Object_12
     PgDelete_9 --> PgClassExpression_13
-    Object_12 --> PgDelete_16
-    InputStaticLeaf_15 --> PgDelete_16
+    Object_12 & InputStaticLeaf_15 --> PgDelete_16
     PgDelete_16 --> PgClassExpression_20
 
     %% plan-to-path relationships
@@ -60,9 +57,8 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _12<br />~ᐳMutation.d1<br />⠀ROOT ᐸ-O- _9<br />⠀⠀id ᐸ-L- _13"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _12<br />~ᐳMutation.d2<br />⠀ROOT ᐸ-O- _16<br />⠀⠀id ᐸ-L- _20"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
+    Bucket0 --> Bucket1 & Bucket2
     end
 ```

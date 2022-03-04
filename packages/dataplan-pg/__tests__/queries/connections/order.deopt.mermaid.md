@@ -56,10 +56,7 @@ graph TD
     PgClassExpression_68["PgClassExpression[_68∈0]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    InputStaticLeaf_14 --> Connection_26
-    InputStaticLeaf_15 --> Connection_26
-    InputStaticLeaf_16 --> Connection_26
-    InputStaticLeaf_17 --> Connection_26
+    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_26
     Object_40 --> PgSelect_27
     PgSelect_27 ==> __Item_28
     __Item_28 --> PgSelectSingle_29
@@ -67,17 +64,13 @@ graph TD
     PgSelectSingle_29 --> PgClassExpression_31
     PgSelectSingle_29 --> PgClassExpression_32
     PgSelectSingle_29 --> PgClassExpression_33
-    PgClassExpression_31 --> List_34
-    PgClassExpression_32 --> List_34
-    PgClassExpression_33 --> List_34
+    PgClassExpression_31 & PgClassExpression_32 & PgClassExpression_33 --> List_34
     PgSelectSingle_29 --> PgClassExpression_35
     PgSelectSingle_29 --> PgClassExpression_36
-    Object_40 --> PgSelect_37
-    PgClassExpression_36 --> PgSelect_37
+    Object_40 & PgClassExpression_36 --> PgSelect_37
     __Value_3 --> Access_38
     __Value_3 --> Access_39
-    Access_38 --> Object_40
-    Access_39 --> Object_40
+    Access_38 & Access_39 --> Object_40
     PgSelect_37 --> First_41
     First_41 --> PgSelectSingle_42
     PgSelectSingle_42 --> PgClassExpression_43
@@ -89,18 +82,14 @@ graph TD
     PgSelectSingle_51 --> PgClassExpression_53
     PgSelectSingle_51 --> PgClassExpression_54
     PgSelectSingle_51 --> PgClassExpression_55
-    PgClassExpression_53 --> List_56
-    PgClassExpression_54 --> List_56
-    PgClassExpression_55 --> List_56
+    PgClassExpression_53 & PgClassExpression_54 & PgClassExpression_55 --> List_56
     PgSelect_27 --> Last_58
     Last_58 --> PgSelectSingle_59
     List_64 --> PgCursor_60
     PgSelectSingle_59 --> PgClassExpression_61
     PgSelectSingle_59 --> PgClassExpression_62
     PgSelectSingle_59 --> PgClassExpression_63
-    PgClassExpression_61 --> List_64
-    PgClassExpression_62 --> List_64
-    PgClassExpression_63 --> List_64
+    PgClassExpression_61 & PgClassExpression_62 & PgClassExpression_63 --> List_64
     Object_40 --> PgSelect_65
     PgSelect_65 --> First_66
     First_66 --> PgSelectSingle_67

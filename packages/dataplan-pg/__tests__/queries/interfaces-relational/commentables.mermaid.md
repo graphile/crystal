@@ -61,8 +61,7 @@ graph TD
     __ListTransform_12 ==> __Item_15
     __Item_15 --> PgSelectSingle_16
     PgSelectSingle_16 --> PgClassExpression_17
-    PgSelectSingle_16 --> PgPolymorphic_18
-    PgClassExpression_17 --> PgPolymorphic_18
+    PgSelectSingle_16 & PgClassExpression_17 --> PgPolymorphic_18
     Map_123 --> PgSelectSingle_25
     PgSelectSingle_25 --> PgClassExpression_26
     Map_121 --> PgSelectSingle_33
@@ -86,8 +85,7 @@ graph TD
     PgSelectSingle_101 --> PgClassExpression_110
     __Value_3 --> Access_113
     __Value_3 --> Access_114
-    Access_113 --> Object_115
-    Access_114 --> Object_115
+    Access_113 & Access_114 --> Object_115
     PgSelectSingle_101 --> PgClassExpression_118
     PgSelectSingle_93 --> PgClassExpression_119
     PgSelectSingle_93 --> PgClassExpression_120
@@ -163,18 +161,15 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _12<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀ROOT ᐸ-O- _18"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />Deps: _123<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _26<br />⠀⠀type ᐸ-L- _34<br />⠀⠀type2 ᐸ-L- _42<br />⠀⠀position ᐸ-L- _50<br />⠀⠀title ᐸ-L- _51<br />⠀⠀description ᐸ-L- _52<br />⠀⠀note ᐸ-L- _53"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket2 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />Deps: _127<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _61<br />⠀⠀type ᐸ-L- _69<br />⠀⠀type2 ᐸ-L- _77<br />⠀⠀position ᐸ-L- _85<br />⠀⠀title ᐸ-L- _86"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket2 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />Deps: _131<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀id ᐸ-L- _94<br />⠀⠀type ᐸ-L- _102<br />⠀⠀type2 ᐸ-L- _110<br />⠀⠀position ᐸ-L- _118<br />⠀⠀description ᐸ-L- _119<br />⠀⠀note ᐸ-L- _120"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket2 --> Bucket5
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket2 --> Bucket3 & Bucket4 & Bucket5
     end
 ```

@@ -45,17 +45,14 @@ graph TD
     Map_73["Map[_73∈0]<br />ᐸ_13:{”0”:12,”1”:13,”2”:14}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_11 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_11 & InputStaticLeaf_7 --> PgSelect_8
     __Value_3 --> Access_9
     __Value_3 --> Access_10
-    Access_9 --> Object_11
-    Access_10 --> Object_11
+    Access_9 & Access_10 --> Object_11
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgPolymorphic_15
-    PgClassExpression_14 --> PgPolymorphic_15
+    PgSelectSingle_13 & PgClassExpression_14 --> PgPolymorphic_15
     Map_65 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     PgSelectSingle_22 --> PgClassExpression_24
@@ -134,18 +131,14 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />Deps: _65<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _23<br />⠀⠀title ᐸ-L- _24"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />Deps: _67<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _32<br />⠀⠀title ᐸ-L- _33<br />⠀⠀description ᐸ-L- _34<br />⠀⠀note ᐸ-L- _35"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />Deps: _69<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _43<br />⠀⠀title ᐸ-L- _44<br />⠀⠀color ᐸ-L- _45"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket0 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />Deps: _71<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _53<br />⠀⠀title ᐸ-L- _54"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket0 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />Deps: _73<br />~ᐳQuery.item18<br />⠀⠀id ᐸ-L- _62<br />⠀⠀description ᐸ-L- _63<br />⠀⠀note ᐸ-L- _64"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket0 --> Bucket5
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5
     end
 ```

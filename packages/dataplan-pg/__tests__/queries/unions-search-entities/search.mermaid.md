@@ -49,8 +49,7 @@ graph TD
     Map_81["Map[_81∈2]<br />ᐸ_16:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11}ᐳ"]:::plan
 
     %% plan dependencies
-    Object_65 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_65 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> __ListTransform_12
     PgSelectSingle_14 -.-> __ListTransform_12
     PgSelect_8 -.-> __Item_13
@@ -60,11 +59,8 @@ graph TD
     PgSelectSingle_16 --> PgClassExpression_17
     PgSelectSingle_16 --> PgClassExpression_18
     PgSelectSingle_16 --> PgClassExpression_19
-    PgClassExpression_17 --> List_20
-    PgClassExpression_18 --> List_20
-    PgClassExpression_19 --> List_20
-    PgSelectSingle_16 --> PgPolymorphic_21
-    List_20 --> PgPolymorphic_21
+    PgClassExpression_17 & PgClassExpression_18 & PgClassExpression_19 --> List_20
+    PgSelectSingle_16 & List_20 --> PgPolymorphic_21
     Map_71 --> PgSelectSingle_27
     PgSelectSingle_27 --> PgClassExpression_28
     PgSelectSingle_27 --> PgClassExpression_29
@@ -79,8 +75,7 @@ graph TD
     PgSelectSingle_59 --> PgClassExpression_60
     __Value_3 --> Access_63
     __Value_3 --> Access_64
-    Access_63 --> Object_65
-    Access_64 --> Object_65
+    Access_63 & Access_64 --> Object_65
     Map_79 --> PgSelectSingle_67
     PgSelectSingle_67 --> PgClassExpression_68
     PgSelectSingle_67 --> PgClassExpression_69
@@ -147,18 +142,15 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _12<br />~ᐳQuery.searchEntities[]<br />⠀ROOT ᐸ-O- _21"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket0 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_21[Person])<br />Deps: _71<br />~ᐳQuery.searchEntities[]<br />⠀⠀personId ᐸ-L- _28<br />⠀⠀username ᐸ-L- _29"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket2 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_21[Post])<br />Deps: _75<br />~ᐳQuery.searchEntities[]<br />⠀⠀postId ᐸ-L- _36<br />⠀⠀author ᐸ-O- _43<br />⠀⠀⠀author.username ᐸ-L- _44<br />⠀⠀body ᐸ-L- _45"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket2 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_21[Comment])<br />Deps: _81<br />~ᐳQuery.searchEntities[]<br />⠀⠀commentId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀post ᐸ-O- _67<br />⠀⠀⠀post.postId ᐸ-L- _68<br />⠀⠀⠀post.body ᐸ-L- _69<br />⠀⠀body ᐸ-L- _70"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket2 --> Bucket5
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket2 --> Bucket3 & Bucket4 & Bucket5
     end
 ```

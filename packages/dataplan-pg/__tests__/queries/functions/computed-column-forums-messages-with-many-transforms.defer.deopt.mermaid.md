@@ -44,14 +44,12 @@ graph TD
     Object_20 --> PgSelect_17
     __Value_3 --> Access_18
     __Value_3 --> Access_19
-    Access_18 --> Object_20
-    Access_19 --> Object_20
+    Access_18 & Access_19 --> Object_20
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
     Object_20 --> PgSelect_24
-    PgSelect_24 --> __ListTransform_28
-    PgClassExpression_35 --> __ListTransform_28
+    PgSelect_24 & PgClassExpression_35 --> __ListTransform_28
     Lambda_37 -.-> __ListTransform_28
     __ListTransform_28 --> __ListTransform_29
     PgClassExpression_40 -.-> __ListTransform_29
@@ -63,8 +61,7 @@ graph TD
     __Item_32 --> PgSelectSingle_33
     PgSelectSingle_33 --> PgClassExpression_34
     PgSelectSingle_22 --> PgClassExpression_35
-    PgClassExpression_34 --> List_36
-    PgClassExpression_35 --> List_36
+    PgClassExpression_34 & PgClassExpression_35 --> List_36
     List_36 --> Lambda_37
     __ListTransform_28 -.-> __Item_38
     __Item_38 --> PgSelectSingle_39
@@ -132,27 +129,23 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _20<br />~ᐳQuery.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group1[defer])<br />Deps: _20, _22<br />~ᐳQuery.forums[]"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_32)<br />Deps: _24, _35"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket2 --> Bucket3
     Bucket4("Bucket 4 (item_38)<br />Deps: _28"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket2 --> Bucket4
     Bucket5("Bucket 5 (item_41)<br />Deps: _30"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket2 --> Bucket5
     Bucket6("Bucket 6 (item_42)<br />Deps: _31<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[]"):::bucket
     style Bucket6 stroke:#ff1493
-    Bucket2 --> Bucket6
     Bucket7("Bucket 7 (item_44)<br />Deps: _42"):::bucket
     style Bucket7 stroke:#808000
-    Bucket6 --> Bucket7
     Bucket8("Bucket 8 (item_45)<br />Deps: _43<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[][]"):::bucket
     style Bucket8 stroke:#dda0dd
-    Bucket6 --> Bucket8
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3 & Bucket4 & Bucket5 & Bucket6
+    Bucket6 --> Bucket7 & Bucket8
     end
 ```

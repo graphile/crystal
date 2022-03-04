@@ -21,12 +21,10 @@ graph TD
     PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__forums__.”name”ᐳ"]:::plan
 
     %% plan dependencies
-    Object_11 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_11 & InputStaticLeaf_7 --> PgSelect_8
     __Value_3 --> Access_9
     __Value_3 --> Access_10
-    Access_9 --> Object_11
-    Access_10 --> Object_11
+    Access_9 & Access_10 --> Object_11
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14

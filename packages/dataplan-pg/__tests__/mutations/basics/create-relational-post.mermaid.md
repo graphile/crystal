@@ -45,19 +45,12 @@ graph TD
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
-    Object_62 --> PgInsert_13
-    Constant_11 --> PgInsert_13
-    Constant_12 --> PgInsert_13
+    Object_62 & Constant_11 & Constant_12 --> PgInsert_13
     PgInsert_13 --> PgClassExpression_17
-    Object_62 --> PgInsert_18
-    PgClassExpression_17 --> PgInsert_18
-    InputStaticLeaf_8 --> PgInsert_18
-    InputStaticLeaf_9 --> PgInsert_18
-    InputStaticLeaf_10 --> PgInsert_18
+    Object_62 & PgClassExpression_17 & InputStaticLeaf_8 & InputStaticLeaf_9 & InputStaticLeaf_10 --> PgInsert_18
     PgInsert_18 --> PgClassExpression_22
     PgInsert_18 --> PgClassExpression_23
-    Object_62 --> PgSelect_25
-    PgClassExpression_23 --> PgSelect_25
+    Object_62 & PgClassExpression_23 --> PgSelect_25
     PgSelect_25 --> First_29
     First_29 --> PgSelectSingle_30
     PgSelectSingle_30 --> PgClassExpression_31
@@ -70,8 +63,7 @@ graph TD
     PgSelectSingle_49 --> PgClassExpression_50
     __Value_3 --> Access_60
     __Value_3 --> Access_61
-    Access_60 --> Object_62
-    Access_61 --> Object_62
+    Access_60 & Access_61 --> Object_62
     Map_67 --> PgSelectSingle_64
     PgSelectSingle_64 --> PgClassExpression_65
     PgSelectSingle_64 --> PgClassExpression_66

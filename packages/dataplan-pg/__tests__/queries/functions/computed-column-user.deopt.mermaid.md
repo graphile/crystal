@@ -25,17 +25,14 @@ graph TD
     PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
 
     %% plan dependencies
-    Object_18 --> PgSelect_8
-    InputStaticLeaf_7 --> PgSelect_8
+    Object_18 & InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
     First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    Object_18 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_18 & PgClassExpression_14 --> PgSelect_15
     __Value_3 --> Access_16
     __Value_3 --> Access_17
-    Access_16 --> Object_18
-    Access_17 --> Object_18
+    Access_16 & Access_17 --> Object_18
     PgSelect_15 --> First_19
     First_19 --> PgSelectSingle_20
     PgSelectSingle_20 --> PgClassExpression_21

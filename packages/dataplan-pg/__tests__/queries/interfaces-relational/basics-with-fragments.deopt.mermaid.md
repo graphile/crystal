@@ -64,8 +64,7 @@ graph TD
     __Item_11 --> PgSelectSingle_12
     PgSelectSingle_12 --> PgClassExpression_13
     PgSelectSingle_12 --> PgClassExpression_14
-    Object_97 --> PgSelect_15
-    PgClassExpression_14 --> PgSelect_15
+    Object_97 & PgClassExpression_14 --> PgSelect_15
     PgSelect_15 --> __ListTransform_19
     PgSelectSingle_21 -.-> __ListTransform_19
     PgSelect_15 -.-> __Item_20
@@ -73,10 +72,8 @@ graph TD
     __ListTransform_19 ==> __Item_22
     __Item_22 --> PgSelectSingle_23
     PgSelectSingle_23 --> PgClassExpression_24
-    PgSelectSingle_23 --> PgPolymorphic_25
-    PgClassExpression_24 --> PgPolymorphic_25
-    Object_97 --> PgSelect_27
-    PgClassExpression_93 --> PgSelect_27
+    PgSelectSingle_23 & PgClassExpression_24 --> PgPolymorphic_25
+    Object_97 & PgClassExpression_93 --> PgSelect_27
     PgSelect_27 --> First_31
     First_31 --> PgSelectSingle_32
     PgSelectSingle_23 --> PgClassExpression_35
@@ -86,31 +83,26 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_39
     PgSelectSingle_23 --> PgClassExpression_40
     PgSelectSingle_32 --> PgClassExpression_41
-    Object_97 --> PgSelect_43
-    PgClassExpression_93 --> PgSelect_43
+    Object_97 & PgClassExpression_93 --> PgSelect_43
     PgSelect_43 --> First_47
     First_47 --> PgSelectSingle_48
     PgSelectSingle_48 --> PgClassExpression_57
     PgSelectSingle_48 --> PgClassExpression_58
     PgSelectSingle_48 --> PgClassExpression_59
-    Object_97 --> PgSelect_61
-    PgClassExpression_93 --> PgSelect_61
+    Object_97 & PgClassExpression_93 --> PgSelect_61
     PgSelect_61 --> First_65
     First_65 --> PgSelectSingle_66
     PgSelectSingle_66 --> PgClassExpression_75
     PgSelectSingle_66 --> PgClassExpression_76
-    Object_97 --> PgSelect_78
-    PgClassExpression_93 --> PgSelect_78
+    Object_97 & PgClassExpression_93 --> PgSelect_78
     PgSelect_78 --> First_82
     First_82 --> PgSelectSingle_83
     PgSelectSingle_83 --> PgClassExpression_92
     PgSelectSingle_23 --> PgClassExpression_93
-    Object_97 --> PgSelect_94
-    PgClassExpression_93 --> PgSelect_94
+    Object_97 & PgClassExpression_93 --> PgSelect_94
     __Value_3 --> Access_95
     __Value_3 --> Access_96
-    Access_95 --> Object_97
-    Access_96 --> Object_97
+    Access_95 & Access_96 --> Object_97
     PgSelect_94 --> First_98
     First_98 --> PgSelectSingle_99
     PgSelectSingle_99 --> PgClassExpression_108
@@ -191,27 +183,22 @@ graph TD
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _97<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
-    Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
     style Bucket2 stroke:#7f007f
-    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19, _97<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀type2 ᐸ-L- _35<br />⠀⠀position ᐸ-L- _36<br />⠀⠀createdAt ᐸ-L- _37<br />⠀⠀updatedAt ᐸ-L- _38<br />⠀⠀isExplicitlyArchived ᐸ-L- _39<br />⠀⠀archivedAt ᐸ-L- _40<br />⠀⠀id ᐸ-L- _93"):::bucket
     style Bucket3 stroke:#ffa500
-    Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />Deps: _31<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _41"):::bucket
     style Bucket4 stroke:#0000ff
-    Bucket3 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_25[RelationalPost])<br />Deps: _47<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _57<br />⠀⠀description ᐸ-L- _58<br />⠀⠀note ᐸ-L- _59"):::bucket
     style Bucket5 stroke:#7fff00
-    Bucket3 --> Bucket5
     Bucket6("Bucket 6 (polymorphic_25[RelationalDivider])<br />Deps: _65<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _75<br />⠀⠀color ᐸ-L- _76"):::bucket
     style Bucket6 stroke:#ff1493
-    Bucket3 --> Bucket6
     Bucket7("Bucket 7 (polymorphic_25[RelationalChecklist])<br />Deps: _82<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _92"):::bucket
     style Bucket7 stroke:#808000
-    Bucket3 --> Bucket7
     Bucket8("Bucket 8 (polymorphic_25[RelationalChecklistItem])<br />Deps: _98<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀description ᐸ-L- _108<br />⠀⠀note ᐸ-L- _109"):::bucket
     style Bucket8 stroke:#dda0dd
-    Bucket3 --> Bucket8
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3
+    Bucket3 --> Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8
     end
 ```

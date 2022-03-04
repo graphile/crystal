@@ -22,8 +22,7 @@ graph TD
     Object_20 --> PgSelect_17
     __Value_3 --> Access_18
     __Value_3 --> Access_19
-    Access_18 --> Object_20
-    Access_19 --> Object_20
+    Access_18 & Access_19 --> Object_20
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
