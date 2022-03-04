@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -e
+for I in */*/*.mermaid.md; do
+  echo $I;
+  cat $I | head -n -1 | tail -n +2 | yarn mmdc -o "${I/.mermaid.md/.mermaid.png}" -b transparent;
+done

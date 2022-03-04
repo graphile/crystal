@@ -62,6 +62,7 @@
   ],
   "devDependencies": {
     "@dataplan/json": "4.7.0",
+    "@mermaid-js/mermaid-cli": "^8.14.0",
     "@types/jest": "^27.0.3",
     "@types/json5": "^2.2.0",
     "@types/nodemon": "1.19.1",

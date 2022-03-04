@@ -12,6 +12,9 @@ tsconfig.tsbuildinfo
 _LOCAL
 .DS_Store
 
+# mermaid pngs
+packages/dataplan-pg/__tests__/**/*.mermaid.png
+
 # yarn2 stuff
 .yarn/*
 !.yarn/releases
