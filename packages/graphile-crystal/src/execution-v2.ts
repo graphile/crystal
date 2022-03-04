@@ -343,19 +343,12 @@ export function executeBucket(
       rootOutputPlanId != null ? store[rootOutputPlanId] : null;
 
     const processObject = (
-      obj: undefined | null | object | CrystalError,
+      obj: object,
       map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
       pathIdentity: string,
       setter: BucketSetter,
       index: number,
     ) => {
-      if (
-        obj === null ||
-        obj === undefined ||
-        obj.constructor === CrystalError
-      ) {
-        return;
-      }
       const concreteType = setter.concreteType!;
       const rootPathIdentity = setter.rootPathIdentity;
       for (const responseKey of (map as any)[$$keys]) {

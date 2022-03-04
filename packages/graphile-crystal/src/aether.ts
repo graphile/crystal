@@ -3768,8 +3768,9 @@ export class Aether<
       (map as any)[$$keys] = keys;
     };
 
-    // Track which plans belong in which buckets
+    // Finalize the buckets (perform any precomputation we can)
     for (const bucket of this.buckets) {
+      // Track which plans belong in which buckets
       const plans = Object.entries(this.plans)
         .filter(
           ([planId, plan]) =>
@@ -3780,6 +3781,7 @@ export class Aether<
         )
         .map((t) => t[1]);
       bucket.plans = plans;
+
       // Start plans are the plans that have no dependencies within this bucket
       bucket.startPlans = plans.filter((p) =>
         p.dependencies.every((depId) => {
@@ -3793,6 +3795,8 @@ export class Aether<
           return false;
         }),
       );
+
+      // Pre-calculate the Object.keys of the outputMap (recursively)
       setKeys(bucket.outputMap);
     }
   }
