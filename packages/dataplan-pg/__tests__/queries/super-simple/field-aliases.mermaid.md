@@ -9,23 +9,23 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
+    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
     PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object_20["Object[_20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_18["Access[_18∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_19["Access[_19∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_20["Object[_20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
 
     %% plan dependencies
+    PgSelectSingle_22 --> PgClassExpression_23
+    __Item_21 --> PgSelectSingle_22
+    PgSelect_17 ==> __Item_21
     Object_20 --> PgSelect_17
+    Access_18 & Access_19 --> Object_20
     __Value_3 --> Access_18
     __Value_3 --> Access_19
-    Access_18 & Access_19 --> Object_20
-    PgSelect_17 ==> __Item_21
-    __Item_21 --> PgSelectSingle_22
-    PgSelectSingle_22 --> PgClassExpression_23
 
     %% plan-to-path relationships
     P_0["~"]

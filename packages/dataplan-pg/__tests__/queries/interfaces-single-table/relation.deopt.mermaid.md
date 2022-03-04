@@ -9,54 +9,54 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
-    Lambda_15["Lambda[_15∈0]"]:::plan
     PgSingleTablePolymorphic_16["PgSingleTablePolymorphic[_16∈0]"]:::plan
-    PgClassExpression_17["PgClassExpression[_17∈1]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
-    PgSelect_18[["PgSelect[_18∈1]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    First_22["First[_22∈1]"]:::plan
-    PgSelectSingle_23["PgSelectSingle[_23∈1]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈1]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
-    Lambda_25["Lambda[_25∈1]"]:::plan
+    Lambda_15["Lambda[_15∈0]"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
     PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈1]"]:::plan
-    PgClassExpression_28["PgClassExpression[_28∈2]<br />ᐸ__single_t...author_id”ᐳ"]:::plan
-    PgSelect_29[["PgSelect[_29∈2]<br />ᐸpeopleᐳ"]]:::plan
-    First_33["First[_33∈2]"]:::plan
-    PgSelectSingle_34["PgSelectSingle[_34∈2]<br />ᐸpeopleᐳ"]:::plan
+    Lambda_25["Lambda[_25∈1]"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈1]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈2]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgSelectSingle_34["PgSelectSingle[_34∈2]<br />ᐸpeopleᐳ"]:::plan
+    First_33["First[_33∈2]"]:::plan
+    PgSelect_29[["PgSelect[_29∈2]<br />ᐸpeopleᐳ"]]:::plan
+    PgClassExpression_28["PgClassExpression[_28∈2]<br />ᐸ__single_t...author_id”ᐳ"]:::plan
+    PgSelectSingle_23["PgSelectSingle[_23∈1]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    First_22["First[_22∈1]"]:::plan
+    PgSelect_18[["PgSelect[_18∈1]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgClassExpression_17["PgClassExpression[_17∈1]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
     PgClassExpression_72["PgClassExpression[_72∈1]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    First_12["First[_12∈0]"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    Object_292["Object[_292∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_290["Access[_290∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_291["Access[_291∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_292["Object[_292∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
 
     %% plan dependencies
-    Object_292 & InputStaticLeaf_7 --> PgSelect_8
-    PgSelect_8 --> First_12
-    First_12 --> PgSelectSingle_13
-    PgSelectSingle_13 --> PgClassExpression_14
-    PgClassExpression_14 --> Lambda_15
     Lambda_15 & PgSelectSingle_13 --> PgSingleTablePolymorphic_16
-    PgSelectSingle_13 --> PgClassExpression_17
-    Object_292 & PgClassExpression_17 --> PgSelect_18
-    PgSelect_18 --> First_22
-    First_22 --> PgSelectSingle_23
-    PgSelectSingle_23 --> PgClassExpression_24
-    PgClassExpression_24 --> Lambda_25
+    PgClassExpression_14 --> Lambda_15
+    PgSelectSingle_13 --> PgClassExpression_14
     Lambda_25 & PgSelectSingle_23 --> PgSingleTablePolymorphic_26
-    PgSelectSingle_23 --> PgClassExpression_28
-    Object_292 & PgClassExpression_28 --> PgSelect_29
-    PgSelect_29 --> First_33
-    First_33 --> PgSelectSingle_34
+    PgClassExpression_24 --> Lambda_25
+    PgSelectSingle_23 --> PgClassExpression_24
     PgSelectSingle_34 --> PgClassExpression_35
+    First_33 --> PgSelectSingle_34
+    PgSelect_29 --> First_33
+    Object_292 & PgClassExpression_28 --> PgSelect_29
+    PgSelectSingle_23 --> PgClassExpression_28
+    First_22 --> PgSelectSingle_23
+    PgSelect_18 --> First_22
+    Object_292 & PgClassExpression_17 --> PgSelect_18
+    PgSelectSingle_13 --> PgClassExpression_17
     PgSelectSingle_13 --> PgClassExpression_72
+    First_12 --> PgSelectSingle_13
+    PgSelect_8 --> First_12
+    Object_292 & InputStaticLeaf_7 --> PgSelect_8
+    Access_290 & Access_291 --> Object_292
     __Value_3 --> Access_290
     __Value_3 --> Access_291
-    Access_290 & Access_291 --> Object_292
 
     %% plan-to-path relationships
     P_0["~"]

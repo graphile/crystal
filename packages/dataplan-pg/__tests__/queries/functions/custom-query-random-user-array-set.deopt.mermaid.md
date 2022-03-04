@@ -9,41 +9,41 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    PgSelect_7[["PgSelect[_7∈0]<br />ᐸrandom_user_array_setᐳ"]]:::plan
-    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    __ListTransform_11["__ListTransform[_11∈0]<br />ᐸpartitionByIndex1:_7ᐳ"]:::plan
-    __Item_12>"__Item[_12∈1]<br />ᐸ_7ᐳ"]:::itemplan
-    PgSelectSingle_13["PgSelectSingle[_13∈1]<br />ᐸrandom_user_array_setᐳ"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈1]<br />ᐸ__random_u..._set_idx__ᐳ"]:::plan
-    __Item_15>"__Item[_15∈2]<br />ᐸ_11ᐳ"]:::itemplan
-    __ListTransform_16["__ListTransform[_16∈2]<br />ᐸeach:_15ᐳ"]:::plan
-    __Item_17>"__Item[_17∈3]<br />ᐸ_15ᐳ"]:::itemplan
-    __Item_18>"__Item[_18∈4]<br />ᐸ_16ᐳ"]:::itemplan
-    PgSelectSingle_19["PgSelectSingle[_19∈4]<br />ᐸrandom_user_array_setᐳ"]:::plan
     PgClassExpression_20["PgClassExpression[_20∈4]<br />ᐸ__random_u...”username”ᐳ"]:::plan
     PgClassExpression_21["PgClassExpression[_21∈4]<br />ᐸ__random_u...vatar_url”ᐳ"]:::plan
+    PgSelectSingle_19["PgSelectSingle[_19∈4]<br />ᐸrandom_user_array_setᐳ"]:::plan
+    __Item_18>"__Item[_18∈4]<br />ᐸ_16ᐳ"]:::itemplan
+    __ListTransform_16["__ListTransform[_16∈2]<br />ᐸeach:_15ᐳ"]:::plan
+    __Item_17>"__Item[_17∈3]<br />ᐸ_15ᐳ"]:::itemplan
+    __Item_15>"__Item[_15∈2]<br />ᐸ_11ᐳ"]:::itemplan
+    __ListTransform_11["__ListTransform[_11∈0]<br />ᐸpartitionByIndex1:_7ᐳ"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈1]<br />ᐸ__random_u..._set_idx__ᐳ"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈1]<br />ᐸrandom_user_array_setᐳ"]:::plan
+    __Item_12>"__Item[_12∈1]<br />ᐸ_7ᐳ"]:::itemplan
+    PgSelect_7[["PgSelect[_7∈0]<br />ᐸrandom_user_array_setᐳ"]]:::plan
+    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
 
     %% plan dependencies
-    Object_10 --> PgSelect_7
-    __Value_3 --> Access_8
-    __Value_3 --> Access_9
-    Access_8 & Access_9 --> Object_10
-    PgSelect_7 --> __ListTransform_11
-    PgClassExpression_14 -.-> __ListTransform_11
-    PgSelect_7 -.-> __Item_12
-    __Item_12 --> PgSelectSingle_13
-    PgSelectSingle_13 --> PgClassExpression_14
-    __ListTransform_11 ==> __Item_15
+    PgSelectSingle_19 --> PgClassExpression_20
+    PgSelectSingle_19 --> PgClassExpression_21
+    __Item_18 --> PgSelectSingle_19
+    __ListTransform_16 ==> __Item_18
     __Item_15 --> __ListTransform_16
     __Item_17 -.-> __ListTransform_16
     __Item_15 -.-> __Item_17
-    __ListTransform_16 ==> __Item_18
-    __Item_18 --> PgSelectSingle_19
-    PgSelectSingle_19 --> PgClassExpression_20
-    PgSelectSingle_19 --> PgClassExpression_21
+    __ListTransform_11 ==> __Item_15
+    PgSelect_7 --> __ListTransform_11
+    PgClassExpression_14 -.-> __ListTransform_11
+    PgSelectSingle_13 --> PgClassExpression_14
+    __Item_12 --> PgSelectSingle_13
+    PgSelect_7 -.-> __Item_12
+    Object_10 --> PgSelect_7
+    Access_8 & Access_9 --> Object_10
+    __Value_3 --> Access_8
+    __Value_3 --> Access_9
 
     %% plan-to-path relationships
     P_0["~"]

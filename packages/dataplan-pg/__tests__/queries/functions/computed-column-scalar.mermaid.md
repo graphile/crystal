@@ -9,43 +9,43 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
-    InputStaticLeaf_14["InputStaticLeaf[_14∈0]"]:::plan
-    PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
     PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
-    InputStaticLeaf_23["InputStaticLeaf[_23∈0]"]:::plan
-    PgSelectSingle_30["PgSelectSingle[_30∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    Map_41["Map[_41∈0]<br />ᐸ_13:{”0”:0}ᐳ"]:::plan
     PgClassExpression_31["PgClassExpression[_31∈0]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
-    InputStaticLeaf_32["InputStaticLeaf[_32∈0]"]:::plan
+    PgSelectSingle_30["PgSelectSingle[_30∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    Map_43["Map[_43∈0]<br />ᐸ_13:{”0”:1}ᐳ"]:::plan
+    PgClassExpression_40["PgClassExpression[_40∈0]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
+    PgSelectSingle_39["PgSelectSingle[_39∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    Map_45["Map[_45∈0]<br />ᐸ_13:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
+    First_12["First[_12∈0]"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object_37["Object[_37∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_35["Access[_35∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_36["Access[_36∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_37["Object[_37∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgSelectSingle_39["PgSelectSingle[_39∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
-    PgClassExpression_40["PgClassExpression[_40∈0]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
-    Map_41["Map[_41∈0]<br />ᐸ_13:{”0”:0}ᐳ"]:::plan
-    Map_43["Map[_43∈0]<br />ᐸ_13:{”0”:1}ᐳ"]:::plan
-    Map_45["Map[_45∈0]<br />ᐸ_13:{”0”:2}ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    InputStaticLeaf_14["InputStaticLeaf[_14∈0]"]:::plan
+    InputStaticLeaf_23["InputStaticLeaf[_23∈0]"]:::plan
+    InputStaticLeaf_32["InputStaticLeaf[_32∈0]"]:::plan
 
     %% plan dependencies
-    Object_37 & InputStaticLeaf_7 & InputStaticLeaf_14 & InputStaticLeaf_23 & InputStaticLeaf_32 --> PgSelect_8
-    PgSelect_8 --> First_12
-    First_12 --> PgSelectSingle_13
-    Map_41 --> PgSelectSingle_21
     PgSelectSingle_21 --> PgClassExpression_22
-    Map_43 --> PgSelectSingle_30
+    Map_41 --> PgSelectSingle_21
+    PgSelectSingle_13 --> Map_41
     PgSelectSingle_30 --> PgClassExpression_31
+    Map_43 --> PgSelectSingle_30
+    PgSelectSingle_13 --> Map_43
+    PgSelectSingle_39 --> PgClassExpression_40
+    Map_45 --> PgSelectSingle_39
+    PgSelectSingle_13 --> Map_45
+    First_12 --> PgSelectSingle_13
+    PgSelect_8 --> First_12
+    Object_37 & InputStaticLeaf_7 & InputStaticLeaf_14 & InputStaticLeaf_23 & InputStaticLeaf_32 --> PgSelect_8
+    Access_35 & Access_36 --> Object_37
     __Value_3 --> Access_35
     __Value_3 --> Access_36
-    Access_35 & Access_36 --> Object_37
-    Map_45 --> PgSelectSingle_39
-    PgSelectSingle_39 --> PgClassExpression_40
-    PgSelectSingle_13 --> Map_41
-    PgSelectSingle_13 --> Map_43
-    PgSelectSingle_13 --> Map_45
 
     %% plan-to-path relationships
     P_0["~"]

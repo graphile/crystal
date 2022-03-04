@@ -9,26 +9,26 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_10["Access[_10∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_11["Object[_11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__forums__.”id”ᐳ"]:::plan
     PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
+    First_12["First[_12∈0]"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object_11["Object[_11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access_9["Access[_9∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_10["Access[_10∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
 
     %% plan dependencies
-    Object_11 & InputStaticLeaf_7 --> PgSelect_8
-    __Value_3 --> Access_9
-    __Value_3 --> Access_10
-    Access_9 & Access_10 --> Object_11
-    PgSelect_8 --> First_12
-    First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
     PgSelectSingle_13 --> PgClassExpression_15
+    First_12 --> PgSelectSingle_13
+    PgSelect_8 --> First_12
+    Object_11 & InputStaticLeaf_7 --> PgSelect_8
+    Access_9 & Access_10 --> Object_11
+    __Value_3 --> Access_9
+    __Value_3 --> Access_10
 
     %% plan-to-path relationships
     P_0["~"]

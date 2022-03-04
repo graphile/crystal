@@ -9,32 +9,32 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸmessagesᐳ"]]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__messages__.”id”ᐳ"]:::plan
     PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     PgClassExpression_16["PgClassExpression[_16∈0]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    Access_18["Access[_18∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_19["Access[_19∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_20["Object[_20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgSelectSingle_22["PgSelectSingle[_22∈0]<br />ᐸforumsᐳ"]:::plan
     Map_24["Map[_24∈0]<br />ᐸ_13:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸmessagesᐳ"]:::plan
+    First_12["First[_12∈0]"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸmessagesᐳ"]]:::plan
+    Object_20["Object[_20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access_18["Access[_18∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_19["Access[_19∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
 
     %% plan dependencies
-    Object_20 & InputStaticLeaf_7 --> PgSelect_8
-    PgSelect_8 --> First_12
-    First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
     PgSelectSingle_13 --> PgClassExpression_15
     PgSelectSingle_13 --> PgClassExpression_16
-    __Value_3 --> Access_18
-    __Value_3 --> Access_19
-    Access_18 & Access_19 --> Object_20
     Map_24 --> PgSelectSingle_22
     PgSelectSingle_13 --> Map_24
+    First_12 --> PgSelectSingle_13
+    PgSelect_8 --> First_12
+    Object_20 & InputStaticLeaf_7 --> PgSelect_8
+    Access_18 & Access_19 --> Object_20
+    __Value_3 --> Access_18
+    __Value_3 --> Access_19
 
     %% plan-to-path relationships
     P_0["~"]

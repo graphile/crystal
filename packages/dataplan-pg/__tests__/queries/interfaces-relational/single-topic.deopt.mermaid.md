@@ -9,44 +9,44 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸrelational_topicsᐳ"]]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸrelational_topicsᐳ"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__relation...ics__.”id”ᐳ"]:::plan
-    PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
     PgClassExpression_38["PgClassExpression[_38∈0]<br />ᐸ__relation...”position”ᐳ"]:::plan
     PgClassExpression_46["PgClassExpression[_46∈0]<br />ᐸ__relation...reated_at”ᐳ"]:::plan
     PgClassExpression_54["PgClassExpression[_54∈0]<br />ᐸ__relation...pdated_at”ᐳ"]:::plan
     PgClassExpression_62["PgClassExpression[_62∈0]<br />ᐸ__relation..._archived”ᐳ"]:::plan
+    PgClassExpression_70["PgClassExpression[_70∈0]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
+    PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸrelational_itemsᐳ"]:::plan
+    Map_72["Map[_72∈0]<br />ᐸ_13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
+    PgClassExpression_71["PgClassExpression[_71∈0]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸrelational_topicsᐳ"]:::plan
+    First_12["First[_12∈0]"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br />ᐸrelational_topicsᐳ"]]:::plan
+    Object_67["Object[_67∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_65["Access[_65∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_66["Access[_66∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_67["Object[_67∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgClassExpression_70["PgClassExpression[_70∈0]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
-    PgClassExpression_71["PgClassExpression[_71∈0]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    Map_72["Map[_72∈0]<br />ᐸ_13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
 
     %% plan dependencies
-    Object_67 & InputStaticLeaf_7 --> PgSelect_8
-    PgSelect_8 --> First_12
-    First_12 --> PgSelectSingle_13
     PgSelectSingle_13 --> PgClassExpression_14
-    Map_72 --> PgSelectSingle_21
     PgSelectSingle_21 --> PgClassExpression_22
     PgSelectSingle_21 --> PgClassExpression_30
     PgSelectSingle_21 --> PgClassExpression_38
     PgSelectSingle_21 --> PgClassExpression_46
     PgSelectSingle_21 --> PgClassExpression_54
     PgSelectSingle_21 --> PgClassExpression_62
+    PgSelectSingle_21 --> PgClassExpression_70
+    Map_72 --> PgSelectSingle_21
+    PgSelectSingle_13 --> Map_72
+    PgSelectSingle_13 --> PgClassExpression_71
+    First_12 --> PgSelectSingle_13
+    PgSelect_8 --> First_12
+    Object_67 & InputStaticLeaf_7 --> PgSelect_8
+    Access_65 & Access_66 --> Object_67
     __Value_3 --> Access_65
     __Value_3 --> Access_66
-    Access_65 & Access_66 --> Object_67
-    PgSelectSingle_21 --> PgClassExpression_70
-    PgSelectSingle_13 --> PgClassExpression_71
-    PgSelectSingle_13 --> Map_72
 
     %% plan-to-path relationships
     P_0["~"]

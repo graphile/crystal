@@ -9,28 +9,28 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
-    InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
     PgDelete_9[["PgDelete[_9∈1@1]"]]:::sideeffectplan
+    PgClassExpression_20["PgClassExpression[_20∈2@2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgDelete_16[["PgDelete[_16∈2@2]"]]:::sideeffectplan
+    Object_12["Object[_12∈0] {1,2}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_10["Access[_10∈0] {1,2}<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_11["Access[_11∈0] {1,2}<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_12["Object[_12∈0] {1,2}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
+    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
+    InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
     InputStaticLeaf_15["InputStaticLeaf[_15∈2@2]"]:::plan
-    PgDelete_16[["PgDelete[_16∈2@2]"]]:::sideeffectplan
-    PgClassExpression_20["PgClassExpression[_20∈2@2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
+    PgDelete_9 --> PgClassExpression_13
     Object_12 & InputStaticLeaf_8 --> PgDelete_9
+    PgDelete_16 --> PgClassExpression_20
+    Object_12 & InputStaticLeaf_15 --> PgDelete_16
+    Access_10 & Access_11 --> Object_12
     __Value_3 --> Access_10
     __Value_3 --> Access_11
-    Access_10 & Access_11 --> Object_12
-    PgDelete_9 --> PgClassExpression_13
-    Object_12 & InputStaticLeaf_15 --> PgDelete_16
-    PgDelete_16 --> PgClassExpression_20
+    __Value_5 --> __TrackedObject_6
 
     %% plan-to-path relationships
     P_0["~"]

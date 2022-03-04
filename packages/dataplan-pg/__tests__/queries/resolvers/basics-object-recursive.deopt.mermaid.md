@@ -9,26 +9,26 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈0]<br />ᐸ__random_u...”username”ᐳ"]:::plan
+    PgSelectSingle_12["PgSelectSingle[_12∈0]<br />ᐸusersᐳ"]:::plan
+    First_11["First[_11∈0]"]:::plan
     PgSelect_7[["PgSelect[_7∈0]<br />ᐸrandom_userᐳ"]]:::plan
+    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_11["First[_11∈0]"]:::plan
-    PgSelectSingle_12["PgSelectSingle[_12∈0]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈0]<br />ᐸ__random_u...”username”ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value_15["__Value[_15∈0]"]:::plan
     __Value_16["__Value[_16∈0]"]:::plan
     __Value_17["__Value[_17∈0]"]:::plan
 
     %% plan dependencies
+    PgSelectSingle_12 --> PgClassExpression_13
+    First_11 --> PgSelectSingle_12
+    PgSelect_7 --> First_11
     Object_10 --> PgSelect_7
+    Access_8 & Access_9 --> Object_10
     __Value_3 --> Access_8
     __Value_3 --> Access_9
-    Access_8 & Access_9 --> Object_10
-    PgSelect_7 --> First_11
-    First_11 --> PgSelectSingle_12
-    PgSelectSingle_12 --> PgClassExpression_13
 
     %% plan-to-path relationships
     P_0["~"]

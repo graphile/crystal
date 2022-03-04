@@ -9,15 +9,6 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    Constant_8["Constant[_8∈0]"]:::plan
-    PgSelect_9[["PgSelect[_9∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Access_10["Access[_10∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_11["Access[_11∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_12["Object[_12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_13["First[_13∈0]"]:::plan
-    PgSelectSingle_14["PgSelectSingle[_14∈0]<br />ᐸsingle_table_itemsᐳ"]:::plan
     PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
     PgClassExpression_16["PgClassExpression[_16∈0]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
     PgClassExpression_17["PgClassExpression[_17∈0]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
@@ -27,14 +18,17 @@ graph TD
     PgClassExpression_21["PgClassExpression[_21∈0]<br />ᐸ__single_t..._archived”ᐳ"]:::plan
     PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__single_t...chived_at”ᐳ"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈0]<br />ᐸ__single_t...__.”title”ᐳ"]:::plan
+    PgSelectSingle_14["PgSelectSingle[_14∈0]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    First_13["First[_13∈0]"]:::plan
+    PgSelect_9[["PgSelect[_9∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    Object_12["Object[_12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access_10["Access[_10∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_11["Access[_11∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    Constant_8["Constant[_8∈0]"]:::plan
 
     %% plan dependencies
-    Object_12 & InputStaticLeaf_7 & Constant_8 --> PgSelect_9
-    __Value_3 --> Access_10
-    __Value_3 --> Access_11
-    Access_10 & Access_11 --> Object_12
-    PgSelect_9 --> First_13
-    First_13 --> PgSelectSingle_14
     PgSelectSingle_14 --> PgClassExpression_15
     PgSelectSingle_14 --> PgClassExpression_16
     PgSelectSingle_14 --> PgClassExpression_17
@@ -44,6 +38,12 @@ graph TD
     PgSelectSingle_14 --> PgClassExpression_21
     PgSelectSingle_14 --> PgClassExpression_22
     PgSelectSingle_14 --> PgClassExpression_23
+    First_13 --> PgSelectSingle_14
+    PgSelect_9 --> First_13
+    Object_12 & InputStaticLeaf_7 & Constant_8 --> PgSelect_9
+    Access_10 & Access_11 --> Object_12
+    __Value_3 --> Access_10
+    __Value_3 --> Access_11
 
     %% plan-to-path relationships
     P_0["~"]

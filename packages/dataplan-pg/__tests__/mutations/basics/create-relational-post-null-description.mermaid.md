@@ -9,47 +9,47 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
+    PgClassExpression_22["PgClassExpression[_22∈1@1]<br />ᐸ__relational_posts__ᐳ"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈1@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈1@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈1@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
+    PgSelectSingle_30["PgSelectSingle[_30∈1@1]<br />ᐸrelational_postsᐳ"]:::plan
+    First_29["First[_29∈1@1]"]:::plan
+    PgSelect_25[["PgSelect[_25∈1@1]<br />ᐸrelational_postsᐳ"]]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1@1]<br />ᐸ(__relatio...ts__).”id”ᐳ"]:::plan
+    PgInsert_18[["PgInsert[_18∈1@1]"]]:::sideeffectplan
+    PgClassExpression_17["PgClassExpression[_17∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgInsert_13[["PgInsert[_13∈1@1]"]]:::sideeffectplan
+    Object_28["Object[_28∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access_26["Access[_26∈1@1]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_27["Access[_27∈1@1]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
+    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
     InputStaticLeaf_9["InputStaticLeaf[_9∈1@1]"]:::plan
     InputStaticLeaf_10["InputStaticLeaf[_10∈1@1]"]:::plan
     Constant_11["Constant[_11∈1@1]"]:::plan
     Constant_12["Constant[_12∈1@1]"]:::plan
-    PgInsert_13[["PgInsert[_13∈1@1]"]]:::sideeffectplan
-    PgClassExpression_17["PgClassExpression[_17∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    PgInsert_18[["PgInsert[_18∈1@1]"]]:::sideeffectplan
-    PgClassExpression_22["PgClassExpression[_22∈1@1]<br />ᐸ__relational_posts__ᐳ"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1@1]<br />ᐸ(__relatio...ts__).”id”ᐳ"]:::plan
-    PgSelect_25[["PgSelect[_25∈1@1]<br />ᐸrelational_postsᐳ"]]:::plan
-    Access_26["Access[_26∈1@1]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_27["Access[_27∈1@1]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_28["Object[_28∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_29["First[_29∈1@1]"]:::plan
-    PgSelectSingle_30["PgSelectSingle[_30∈1@1]<br />ᐸrelational_postsᐳ"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈1@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈1@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
-    Object_28 & Constant_11 & Constant_12 --> PgInsert_13
-    PgInsert_13 --> PgClassExpression_17
-    Object_28 & PgClassExpression_17 & InputStaticLeaf_8 & InputStaticLeaf_9 & InputStaticLeaf_10 --> PgInsert_18
     PgInsert_18 --> PgClassExpression_22
-    PgInsert_18 --> PgClassExpression_23
-    Object_28 & PgClassExpression_23 --> PgSelect_25
-    __Value_3 --> Access_26
-    __Value_3 --> Access_27
-    Access_26 & Access_27 --> Object_28
-    PgSelect_25 --> First_29
-    First_29 --> PgSelectSingle_30
     PgSelectSingle_30 --> PgClassExpression_31
     PgSelectSingle_30 --> PgClassExpression_32
     PgSelectSingle_30 --> PgClassExpression_33
     PgSelectSingle_30 --> PgClassExpression_34
+    First_29 --> PgSelectSingle_30
+    PgSelect_25 --> First_29
+    Object_28 & PgClassExpression_23 --> PgSelect_25
+    PgInsert_18 --> PgClassExpression_23
+    Object_28 & PgClassExpression_17 & InputStaticLeaf_8 & InputStaticLeaf_9 & InputStaticLeaf_10 --> PgInsert_18
+    PgInsert_13 --> PgClassExpression_17
+    Object_28 & Constant_11 & Constant_12 --> PgInsert_13
+    Access_26 & Access_27 --> Object_28
+    __Value_3 --> Access_26
+    __Value_3 --> Access_27
+    __Value_5 --> __TrackedObject_6
 
     %% plan-to-path relationships
     P_0["~"]

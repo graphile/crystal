@@ -9,81 +9,81 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
-    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
-    InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
-    Connection_38["Connection[_38∈0]<br />ᐸ_34ᐳ"]:::plan
-    PgSelect_39[["PgSelect[_39∈1]<br />ᐸmessagesᐳ"]]:::plan
-    __Item_40>"__Item[_40∈2]<br />ᐸ_39ᐳ"]:::itemplan
-    PgSelectSingle_41["PgSelectSingle[_41∈2]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression_42["PgClassExpression[_42∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈2]<br />ᐸ__messages...author_id”ᐳ"]:::plan
-    PgSelect_44[["PgSelect[_44∈2]<br />ᐸusersᐳ"]]:::plan
-    Access_45["Access[_45∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_46["Access[_46∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_47["Object[_47∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    First_48["First[_48∈2]"]:::plan
-    PgSelectSingle_49["PgSelectSingle[_49∈2]<br />ᐸusersᐳ"]:::plan
     PgClassExpression_50["PgClassExpression[_50∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
+    PgSelectSingle_49["PgSelectSingle[_49∈2]<br />ᐸusersᐳ"]:::plan
+    First_48["First[_48∈2]"]:::plan
+    PgSelect_44[["PgSelect[_44∈2]<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈2]<br />ᐸ__messages...author_id”ᐳ"]:::plan
+    PgSelectSingle_41["PgSelectSingle[_41∈2]<br />ᐸmessagesᐳ"]:::plan
+    __Item_40>"__Item[_40∈2]<br />ᐸ_39ᐳ"]:::itemplan
+    Lambda_55["Lambda[_55∈1]<br />ᐸlistHasMoreᐳ"]:::plan
+    PgCursor_59["PgCursor[_59∈1]"]:::plan
+    List_61["List[_61∈1]<br />ᐸ_60ᐳ"]:::plan
+    PgClassExpression_60["PgClassExpression[_60∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgSelectSingle_58["PgSelectSingle[_58∈1]<br />ᐸmessagesᐳ"]:::plan
+    First_57["First[_57∈1]"]:::plan
+    PgCursor_65["PgCursor[_65∈1]"]:::plan
+    List_67["List[_67∈1]<br />ᐸ_66ᐳ"]:::plan
+    PgClassExpression_66["PgClassExpression[_66∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgSelectSingle_64["PgSelectSingle[_64∈1]<br />ᐸmessagesᐳ"]:::plan
+    Last_63["Last[_63∈1]"]:::plan
+    PgSelect_39[["PgSelect[_39∈1]<br />ᐸmessagesᐳ"]]:::plan
+    PgClassExpression_71["PgClassExpression[_71∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    PgSelectSingle_70["PgSelectSingle[_70∈1]<br />ᐸmessagesᐳ"]:::plan
+    First_69["First[_69∈1]"]:::plan
+    PgSelect_68[["PgSelect[_68∈1]<br />ᐸmessagesᐳ"]]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
+    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
+    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object_47["Object[_47∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access_45["Access[_45∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
+    Access_46["Access[_46∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    Connection_38["Connection[_38∈0]<br />ᐸ_34ᐳ"]:::plan
+    InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
+    InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
     PgPageInfo_52["PgPageInfo[_52∈0]"]:::plan
     Constant_53["Constant[_53∈0]"]:::plan
-    Lambda_55["Lambda[_55∈1]<br />ᐸlistHasMoreᐳ"]:::plan
-    First_57["First[_57∈1]"]:::plan
-    PgSelectSingle_58["PgSelectSingle[_58∈1]<br />ᐸmessagesᐳ"]:::plan
-    PgCursor_59["PgCursor[_59∈1]"]:::plan
-    PgClassExpression_60["PgClassExpression[_60∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    List_61["List[_61∈1]<br />ᐸ_60ᐳ"]:::plan
-    Last_63["Last[_63∈1]"]:::plan
-    PgSelectSingle_64["PgSelectSingle[_64∈1]<br />ᐸmessagesᐳ"]:::plan
-    PgCursor_65["PgCursor[_65∈1]"]:::plan
-    PgClassExpression_66["PgClassExpression[_66∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    List_67["List[_67∈1]<br />ᐸ_66ᐳ"]:::plan
-    PgSelect_68[["PgSelect[_68∈1]<br />ᐸmessagesᐳ"]]:::plan
-    First_69["First[_69∈1]"]:::plan
-    PgSelectSingle_70["PgSelectSingle[_70∈1]<br />ᐸmessagesᐳ"]:::plan
-    PgClassExpression_71["PgClassExpression[_71∈1]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    Object_47 --> PgSelect_17
-    PgSelect_17 ==> __Item_21
-    __Item_21 --> PgSelectSingle_22
     PgSelectSingle_22 --> PgClassExpression_23
-    PgSelectSingle_22 --> PgClassExpression_33
-    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
-    Object_47 & PgClassExpression_33 --> PgSelect_39
-    PgSelect_39 ==> __Item_40
-    __Item_40 --> PgSelectSingle_41
     PgSelectSingle_41 --> PgClassExpression_42
-    PgSelectSingle_41 --> PgClassExpression_43
-    Object_47 & PgClassExpression_43 --> PgSelect_44
-    __Value_3 --> Access_45
-    __Value_3 --> Access_46
-    Access_45 & Access_46 --> Object_47
-    PgSelect_44 --> First_48
-    First_48 --> PgSelectSingle_49
     PgSelectSingle_49 --> PgClassExpression_50
     PgSelectSingle_49 --> PgClassExpression_51
+    First_48 --> PgSelectSingle_49
+    PgSelect_44 --> First_48
+    Object_47 & PgClassExpression_43 --> PgSelect_44
+    PgSelectSingle_41 --> PgClassExpression_43
+    __Item_40 --> PgSelectSingle_41
+    PgSelect_39 ==> __Item_40
     PgSelect_39 --> Lambda_55
-    PgSelect_39 --> First_57
-    First_57 --> PgSelectSingle_58
     List_61 --> PgCursor_59
-    PgSelectSingle_58 --> PgClassExpression_60
     PgClassExpression_60 --> List_61
-    PgSelect_39 --> Last_63
-    Last_63 --> PgSelectSingle_64
+    PgSelectSingle_58 --> PgClassExpression_60
+    First_57 --> PgSelectSingle_58
+    PgSelect_39 --> First_57
     List_67 --> PgCursor_65
-    PgSelectSingle_64 --> PgClassExpression_66
     PgClassExpression_66 --> List_67
-    Object_47 & PgClassExpression_33 --> PgSelect_68
-    PgSelect_68 --> First_69
-    First_69 --> PgSelectSingle_70
+    PgSelectSingle_64 --> PgClassExpression_66
+    Last_63 --> PgSelectSingle_64
+    PgSelect_39 --> Last_63
+    Object_47 & PgClassExpression_33 --> PgSelect_39
     PgSelectSingle_70 --> PgClassExpression_71
+    First_69 --> PgSelectSingle_70
+    PgSelect_68 --> First_69
+    Object_47 & PgClassExpression_33 --> PgSelect_68
+    PgSelectSingle_22 --> PgClassExpression_33
+    __Item_21 --> PgSelectSingle_22
+    PgSelect_17 ==> __Item_21
+    Object_47 --> PgSelect_17
+    Access_45 & Access_46 --> Object_47
+    __Value_3 --> Access_45
+    __Value_3 --> Access_46
+    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
     P_0["~"]

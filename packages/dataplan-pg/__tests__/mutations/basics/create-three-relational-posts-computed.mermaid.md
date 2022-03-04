@@ -9,105 +9,105 @@ graph TD
 
     %% define plans
     __Value_0["__Value[_0∈0]"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
-    Constant_7["Constant[_7∈1@1]"]:::plan
-    Constant_8["Constant[_8∈1@1]"]:::plan
     PgSelect_9[["PgSelect[_9∈1@1]<br />ᐸrelational_postsᐳ"]]:::sideeffectplan
-    Constant_13["Constant[_13∈1@1]"]:::plan
-    Constant_14["Constant[_14∈1@1]"]:::plan
     PgSelect_15[["PgSelect[_15∈1@1]<br />ᐸrelational_postsᐳ"]]:::sideeffectplan
-    Constant_19["Constant[_19∈1@1]"]:::plan
-    Constant_20["Constant[_20∈1@1]"]:::plan
-    PgSelect_21[["PgSelect[_21∈1@1]<br />ᐸrelational_postsᐳ"]]:::sideeffectplan
-    First_25["First[_25∈1@1]"]:::plan
-    PgSelectSingle_26["PgSelectSingle[_26∈1@1]<br />ᐸrelational_postsᐳ"]:::plan
     PgClassExpression_27["PgClassExpression[_27∈1@1]<br />ᐸ__relational_posts__ᐳ"]:::plan
-    InputStaticLeaf_28["InputStaticLeaf[_28∈1@1]"]:::plan
-    PgSelect_29[["PgSelect[_29∈1@1]<br />ᐸrelational_itemsᐳ"]]:::plan
-    First_33["First[_33∈1@1]"]:::plan
-    PgSelectSingle_34["PgSelectSingle[_34∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgSelectSingle_26["PgSelectSingle[_26∈1@1]<br />ᐸrelational_postsᐳ"]:::plan
+    First_25["First[_25∈1@1]"]:::plan
+    PgSelect_21[["PgSelect[_21∈1@1]<br />ᐸrelational_postsᐳ"]]:::sideeffectplan
     PgPolymorphic_36["PgPolymorphic[_36∈1@1]"]:::plan
-    PgSelectSingle_51["PgSelectSingle[_51∈2@1]<br />ᐸrelational_postsᐳ"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgClassExpression_72["PgClassExpression[_72∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgClassExpression_53["PgClassExpression[_53∈2@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
     PgClassExpression_54["PgClassExpression[_54∈2@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression_55["PgClassExpression[_55∈2@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    PgClassExpression_72["PgClassExpression[_72∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    InputStaticLeaf_80["InputStaticLeaf[_80∈1@1]"]:::plan
-    PgSelect_81[["PgSelect[_81∈1@1]<br />ᐸrelational_itemsᐳ"]]:::plan
-    First_85["First[_85∈1@1]"]:::plan
-    PgSelectSingle_86["PgSelectSingle[_86∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression_87["PgClassExpression[_87∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgSelectSingle_51["PgSelectSingle[_51∈2@1]<br />ᐸrelational_postsᐳ"]:::plan
+    Map_184["Map[_184∈1@1]<br />ᐸ_34:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
+    PgSelectSingle_34["PgSelectSingle[_34∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
+    First_33["First[_33∈1@1]"]:::plan
+    PgSelect_29[["PgSelect[_29∈1@1]<br />ᐸrelational_itemsᐳ"]]:::plan
     PgPolymorphic_88["PgPolymorphic[_88∈1@1]"]:::plan
-    PgSelectSingle_103["PgSelectSingle[_103∈3@1]<br />ᐸrelational_postsᐳ"]:::plan
+    PgClassExpression_87["PgClassExpression[_87∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgClassExpression_124["PgClassExpression[_124∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgClassExpression_105["PgClassExpression[_105∈3@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
     PgClassExpression_106["PgClassExpression[_106∈3@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression_107["PgClassExpression[_107∈3@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    PgClassExpression_124["PgClassExpression[_124∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    InputStaticLeaf_132["InputStaticLeaf[_132∈1@1]"]:::plan
-    PgSelect_133[["PgSelect[_133∈1@1]<br />ᐸrelational_itemsᐳ"]]:::plan
-    First_137["First[_137∈1@1]"]:::plan
-    PgSelectSingle_138["PgSelectSingle[_138∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression_139["PgClassExpression[_139∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgSelectSingle_103["PgSelectSingle[_103∈3@1]<br />ᐸrelational_postsᐳ"]:::plan
+    Map_186["Map[_186∈1@1]<br />ᐸ_86:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
+    PgSelectSingle_86["PgSelectSingle[_86∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
+    First_85["First[_85∈1@1]"]:::plan
+    PgSelect_81[["PgSelect[_81∈1@1]<br />ᐸrelational_itemsᐳ"]]:::plan
     PgPolymorphic_140["PgPolymorphic[_140∈1@1]"]:::plan
-    PgSelectSingle_155["PgSelectSingle[_155∈4@1]<br />ᐸrelational_postsᐳ"]:::plan
+    PgClassExpression_139["PgClassExpression[_139∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgClassExpression_176["PgClassExpression[_176∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgClassExpression_157["PgClassExpression[_157∈4@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
     PgClassExpression_158["PgClassExpression[_158∈4@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression_159["PgClassExpression[_159∈4@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    PgClassExpression_176["PgClassExpression[_176∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgSelectSingle_155["PgSelectSingle[_155∈4@1]<br />ᐸrelational_postsᐳ"]:::plan
+    Map_188["Map[_188∈1@1]<br />ᐸ_138:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
+    PgSelectSingle_138["PgSelectSingle[_138∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
+    First_137["First[_137∈1@1]"]:::plan
+    PgSelect_133[["PgSelect[_133∈1@1]<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object_180["Object[_180∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Access_178["Access[_178∈1@1]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_179["Access[_179∈1@1]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    Object_180["Object[_180∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Map_184["Map[_184∈1@1]<br />ᐸ_34:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
-    Map_186["Map[_186∈1@1]<br />ᐸ_86:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
-    Map_188["Map[_188∈1@1]<br />ᐸ_138:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
+    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
+    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Constant_7["Constant[_7∈1@1]"]:::plan
+    Constant_8["Constant[_8∈1@1]"]:::plan
+    Constant_13["Constant[_13∈1@1]"]:::plan
+    Constant_14["Constant[_14∈1@1]"]:::plan
+    Constant_19["Constant[_19∈1@1]"]:::plan
+    Constant_20["Constant[_20∈1@1]"]:::plan
+    InputStaticLeaf_28["InputStaticLeaf[_28∈1@1]"]:::plan
+    InputStaticLeaf_80["InputStaticLeaf[_80∈1@1]"]:::plan
+    InputStaticLeaf_132["InputStaticLeaf[_132∈1@1]"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_180 & Constant_7 & Constant_8 --> PgSelect_9
     Object_180 & Constant_13 & Constant_14 --> PgSelect_15
-    Object_180 & Constant_19 & Constant_20 --> PgSelect_21
-    PgSelect_21 --> First_25
-    First_25 --> PgSelectSingle_26
     PgSelectSingle_26 --> PgClassExpression_27
-    Object_180 & InputStaticLeaf_28 --> PgSelect_29
-    PgSelect_29 --> First_33
-    First_33 --> PgSelectSingle_34
-    PgSelectSingle_34 --> PgClassExpression_35
+    First_25 --> PgSelectSingle_26
+    PgSelect_21 --> First_25
+    Object_180 & Constant_19 & Constant_20 --> PgSelect_21
     PgSelectSingle_34 & PgClassExpression_35 --> PgPolymorphic_36
-    Map_184 --> PgSelectSingle_51
+    PgSelectSingle_34 --> PgClassExpression_35
+    PgSelectSingle_34 --> PgClassExpression_72
     PgSelectSingle_51 --> PgClassExpression_53
     PgSelectSingle_51 --> PgClassExpression_54
     PgSelectSingle_51 --> PgClassExpression_55
-    PgSelectSingle_34 --> PgClassExpression_72
-    Object_180 & InputStaticLeaf_80 --> PgSelect_81
-    PgSelect_81 --> First_85
-    First_85 --> PgSelectSingle_86
-    PgSelectSingle_86 --> PgClassExpression_87
+    Map_184 --> PgSelectSingle_51
+    PgSelectSingle_34 --> Map_184
+    First_33 --> PgSelectSingle_34
+    PgSelect_29 --> First_33
+    Object_180 & InputStaticLeaf_28 --> PgSelect_29
     PgSelectSingle_86 & PgClassExpression_87 --> PgPolymorphic_88
-    Map_186 --> PgSelectSingle_103
+    PgSelectSingle_86 --> PgClassExpression_87
+    PgSelectSingle_86 --> PgClassExpression_124
     PgSelectSingle_103 --> PgClassExpression_105
     PgSelectSingle_103 --> PgClassExpression_106
     PgSelectSingle_103 --> PgClassExpression_107
-    PgSelectSingle_86 --> PgClassExpression_124
-    Object_180 & InputStaticLeaf_132 --> PgSelect_133
-    PgSelect_133 --> First_137
-    First_137 --> PgSelectSingle_138
-    PgSelectSingle_138 --> PgClassExpression_139
+    Map_186 --> PgSelectSingle_103
+    PgSelectSingle_86 --> Map_186
+    First_85 --> PgSelectSingle_86
+    PgSelect_81 --> First_85
+    Object_180 & InputStaticLeaf_80 --> PgSelect_81
     PgSelectSingle_138 & PgClassExpression_139 --> PgPolymorphic_140
-    Map_188 --> PgSelectSingle_155
+    PgSelectSingle_138 --> PgClassExpression_139
+    PgSelectSingle_138 --> PgClassExpression_176
     PgSelectSingle_155 --> PgClassExpression_157
     PgSelectSingle_155 --> PgClassExpression_158
     PgSelectSingle_155 --> PgClassExpression_159
-    PgSelectSingle_138 --> PgClassExpression_176
+    Map_188 --> PgSelectSingle_155
+    PgSelectSingle_138 --> Map_188
+    First_137 --> PgSelectSingle_138
+    PgSelect_133 --> First_137
+    Object_180 & InputStaticLeaf_132 --> PgSelect_133
+    Access_178 & Access_179 --> Object_180
     __Value_3 --> Access_178
     __Value_3 --> Access_179
-    Access_178 & Access_179 --> Object_180
-    PgSelectSingle_34 --> Map_184
-    PgSelectSingle_86 --> Map_186
-    PgSelectSingle_138 --> Map_188
+    __Value_5 --> __TrackedObject_6
 
     %% plan-to-path relationships
     P_0["~"]
