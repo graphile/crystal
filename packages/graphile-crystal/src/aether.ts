@@ -6082,45 +6082,43 @@ export class Aether<
 
     graph.push("");
     graph.push("    %% define plans");
-    for (const [id, plan] of Object.entries(this.plans)) {
-      if (plan && plan.id === id) {
-        planId(plan);
-      }
-    }
+    this.processPlans("printingPlans", "dependents-first", (plan) => {
+      planId(plan);
+      return plan;
+    });
 
     graph.push("");
     graph.push("    %% plan dependencies");
-    for (const [id, plan] of Object.entries(this.plans)) {
-      if (plan && plan.id === id) {
-        const planNode = planId(plan);
-        const depNodes = plan.dependencies.map((depId) => {
-          return planId(this.plans[depId]);
-        });
-        const transformItemPlanNode =
-          plan instanceof __ListTransformPlan
-            ? planId(
-                this.plans[
-                  this.transformDependencyPlanIdByTransformPlanId[plan.id]
-                ],
-              )
-            : null;
-        if (depNodes.length > 0) {
-          if (plan instanceof __ItemPlan) {
-            const [firstDep, ...rest] = depNodes;
-            const arrow = plan.transformPlanId == null ? "==>" : "-.->";
-            graph.push(`    ${firstDep} ${arrow} ${planNode}`);
-            if (rest.length > 0) {
-              graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
-            }
-          } else {
-            graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+    this.processPlans("printingPlanDeps", "dependents-first", (plan) => {
+      const planNode = planId(plan);
+      const depNodes = plan.dependencies.map((depId) => {
+        return planId(this.plans[depId]);
+      });
+      const transformItemPlanNode =
+        plan instanceof __ListTransformPlan
+          ? planId(
+              this.plans[
+                this.transformDependencyPlanIdByTransformPlanId[plan.id]
+              ],
+            )
+          : null;
+      if (depNodes.length > 0) {
+        if (plan instanceof __ItemPlan) {
+          const [firstDep, ...rest] = depNodes;
+          const arrow = plan.transformPlanId == null ? "==>" : "-.->";
+          graph.push(`    ${firstDep} ${arrow} ${planNode}`);
+          if (rest.length > 0) {
+            graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
           }
-        }
-        if (transformItemPlanNode) {
-          graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
+        } else {
+          graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
         }
       }
-    }
+      if (transformItemPlanNode) {
+        graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
+      }
+      return plan;
+    });
 
     graph.push("");
     graph.push("    %% plan-to-path relationships");
