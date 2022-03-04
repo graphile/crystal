@@ -792,7 +792,7 @@ export class Aether<
     this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: [0],
     });
-    this.pathIdentityByParentPathIdentity[ROOT_PATH] = {};
+    this.pathIdentityByParentPathIdentity[ROOT_PATH] = Object.create(null);
     this.groups.push({
       id: 0,
       parent: null,
@@ -804,21 +804,21 @@ export class Aether<
       switch (this.operationType) {
         case "query": {
           this.pathIdentityByParentPathIdentity[ROOT_PATH][this.queryTypeName] =
-            {};
+            Object.create(null);
           this.planQuery();
           break;
         }
         case "mutation": {
           this.pathIdentityByParentPathIdentity[ROOT_PATH][
             this.mutationTypeName!
-          ] = {};
+          ] = Object.create(null);
           this.planMutation();
           break;
         }
         case "subscription": {
           this.pathIdentityByParentPathIdentity[ROOT_PATH][
             this.subscriptionTypeName!
-          ] = {};
+          ] = Object.create(null);
           this.planSubscription();
           break;
         }
@@ -947,7 +947,7 @@ export class Aether<
      * A JIT'd object constructor, roughly equivalent to:
 
        const makeMetaByPlanId = () => {
-         const metaByPlanId = {};
+         const metaByPlanId = Object.create(null);
          for (const [planId, plan] of Object.entries(this.plans)) {
            if (plan && plan.id === planId) {
              metaByPlanId[plan.id] = Object.create(null);
@@ -978,7 +978,7 @@ export class Aether<
   ): BucketDefinition {
     const id = this.buckets.length;
     const singleTypeNameByRootPathIdentity: BucketDefinition["singleTypeNameByRootPathIdentity"] =
-      spec.polymorphicTypeNames ? null : {};
+      spec.polymorphicTypeNames ? null : Object.create(null);
     if (singleTypeNameByRootPathIdentity) {
       for (const rootPathIdentity of spec.rootPathIdentities) {
         if (rootPathIdentity == ROOT_PATH) {
@@ -1712,7 +1712,8 @@ export class Aether<
       parentTreeNode.children.push(treeNode);
 
       if (!namedResultTypeIsLeaf) {
-        this.pathIdentityByParentPathIdentity[pathIdentity] = {};
+        this.pathIdentityByParentPathIdentity[pathIdentity] =
+          Object.create(null);
       }
 
       // Now we're building the child plans, the parentPathIdentity becomes
@@ -1988,7 +1989,7 @@ export class Aether<
         }
         this.pathIdentityByParentPathIdentity[fieldPathIdentity][
           fieldType.name
-        ] = {};
+        ] = Object.create(null);
         const { fieldDigests } = this.planSelectionSet(
           pathIdentity,
           fieldPathIdentity,
@@ -2045,7 +2046,7 @@ export class Aether<
             }
             this.pathIdentityByParentPathIdentity[fieldPathIdentity][
               possibleObjectType.name
-            ] = {};
+            ] = Object.create(null);
 
             const { fieldDigests: localFieldDigests } = this.planSelectionSet(
               pathIdentity,
@@ -4989,7 +4990,7 @@ export class Aether<
           }
           return memo;
         },
-        {},
+        Object.create(null),
       ),
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore We'll set this in just a moment...
@@ -5987,7 +5988,7 @@ export class Aether<
       ``,
     ];
 
-    const pathIdMap = {};
+    const pathIdMap = Object.create(null);
     let pathCounter = 0;
     const pathId = (pathIdentity: string, isItemPlan = false): string => {
       if (!pathIdMap[pathIdentity]) {
@@ -6008,7 +6009,7 @@ export class Aether<
       return pathIdMap[pathIdentity];
     };
 
-    const planIdMap = {};
+    const planIdMap = Object.create(null);
     const planDependencies: string[] = [];
     const planId = (plan: ExecutablePlan): string => {
       if (!planIdMap[plan.id]) {
@@ -6133,7 +6134,7 @@ export class Aether<
             memo[crystalPathIdentity]++;
             return memo;
           },
-          {} as { [crystalPrintPathIdentity: string]: number },
+          Object.create(null) as { [crystalPrintPathIdentity: string]: number },
         );
         const text = Object.entries(crystalPathIdentities)
           .sort((a, z) => z[1] - a[1])
