@@ -452,22 +452,23 @@ export function executeBucket(
         }
       }
       const setterRoot = setter.getRoot();
-      if (setterRoot && setterRoot.constructor !== CrystalError) {
-        if (isObjectBucket) {
-          const typeName = setterRoot[$$concreteType];
-          if (typeName == null) {
-            throw new Error(
-              `Could not determine typeName in bucket ${bucketId}`,
-            );
-          }
-          processObject(
-            setterRoot,
-            outputMap,
-            `${setter.rootPathIdentity}>${typeName}.`,
-            setter,
-            index,
-          );
+      if (
+        isObjectBucket &&
+        setterRoot !== null &&
+        setterRoot !== undefined &&
+        setterRoot.constructor !== CrystalError
+      ) {
+        const typeName = setterRoot[$$concreteType];
+        if (typeName == null) {
+          throw new Error(`Could not determine typeName in bucket ${bucketId}`);
         }
+        processObject(
+          setterRoot,
+          outputMap,
+          `${setter.rootPathIdentity}>${typeName}.`,
+          setter,
+          index,
+        );
       }
 
       // And any root buckets
