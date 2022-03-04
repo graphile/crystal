@@ -6104,15 +6104,18 @@ export class Aether<
                 ],
               )
             : null;
-        depNodes.forEach((depNode, index) => {
-          const arrow =
-            plan instanceof __ItemPlan && index === 0
-              ? plan.transformPlanId == null
-                ? "==>"
-                : "-.->"
-              : "-->";
-          graph.push(`    ${depNode} ${arrow} ${planNode}`);
-        });
+        if (depNodes.length > 0) {
+          if (plan instanceof __ItemPlan) {
+            const [firstDep, ...rest] = depNodes;
+            const arrow = plan.transformPlanId == null ? "==>" : "-.->";
+            graph.push(`    ${firstDep} ${arrow} ${planNode}`);
+            if (rest.length > 0) {
+              graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
+            }
+          } else {
+            graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+          }
+        }
         if (transformItemPlanNode) {
           graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
         }
@@ -6250,8 +6253,11 @@ export class Aether<
         )}):::bucket`,
       );
       graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
-      if (bucket.parent) {
-        graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
+    }
+    for (const bucket of this.buckets) {
+      const childNodes = bucket.children.map((c) => `Bucket${c.id}`);
+      if (childNodes.length > 0) {
+        graph.push(`    Bucket${bucket.id} --> ${childNodes.join(" & ")}`);
       }
     }
     graph.push("    end");
