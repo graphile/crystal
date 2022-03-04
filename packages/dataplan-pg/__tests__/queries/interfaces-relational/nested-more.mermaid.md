@@ -150,25 +150,19 @@ graph TD
     P_722["ᐳp…]ᐳi…]ᐳp…tᐳid x25"]
     PgClassExpression_722 -.-> P_722
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_750,Access_751,Object_752 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_11,PgSelectSingle_12,PgClassExpression_13,__ListTransform_19,Access_767 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_20,PgSelectSingle_21 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_159,PgSelectSingle_166,PgClassExpression_167,PgClassExpression_168,PgClassExpression_169,PgClassExpression_170,PgClassExpression_171,PgClassExpression_172,PgClassExpression_614,PgClassExpression_722,Map_761,Map_763,Map_765 bucket3
-
     subgraph "Buckets for queries/interfaces-relational/nested-more"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_750,Access_751,Object_752 bucket0
     Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13,__ListTransform_19,Access_767 bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _767"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_20,PgSelectSingle_21 bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀parent ᐸ-O- _41<br />⠀⠀⠀parent.type ᐸ-L- _40<br />⠀⠀⠀parent.type2 ᐸ-L- _51<br />⠀⠀⠀parent.author ᐸ-O- _58<br />⠀⠀⠀⠀parent.author.username ᐸ-L- _59<br />⠀⠀⠀parent.position ᐸ-L- _60<br />⠀⠀⠀parent.createdAt ᐸ-L- _61<br />⠀⠀⠀parent.updatedAt ᐸ-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived ᐸ-L- _63<br />⠀⠀⠀parent.archivedAt ᐸ-L- _64<br />⠀⠀⠀parent.id ᐸ-L- _722<br />⠀⠀type2 ᐸ-L- _159<br />⠀⠀author ᐸ-O- _166<br />⠀⠀⠀author.username ᐸ-L- _167<br />⠀⠀position ᐸ-L- _168<br />⠀⠀createdAt ᐸ-L- _169<br />⠀⠀updatedAt ᐸ-L- _170<br />⠀⠀isExplicitlyArchived ᐸ-L- _171<br />⠀⠀archivedAt ᐸ-L- _172<br />⠀⠀id ᐸ-L- _614"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_159,PgSelectSingle_166,PgClassExpression_167,PgClassExpression_168,PgClassExpression_169,PgClassExpression_170,PgClassExpression_171,PgClassExpression_172,PgClassExpression_614,PgClassExpression_722,Map_761,Map_763,Map_765 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     end

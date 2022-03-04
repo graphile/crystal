@@ -110,29 +110,22 @@ graph TD
     P_56["ᐳp…]ᐳi…]ᐳcolor"]
     PgClassExpression_56 -.-> P_56
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_16,Access_17,Object_18 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_20,PgSelectSingle_21 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
-    classDef bucket4 stroke:#0000ff
-    class PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,PgClassExpression_45,PgClassExpression_46,PgClassExpression_56 bucket4
-
     subgraph "Buckets for queries/interfaces-single-table/basics-with-fragments"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_16,Access_17,Object_18 bucket0
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _18<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_20,PgSelectSingle_21 bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _26<br />⠀⠀type ᐸ-L- _24"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
     Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _22, _23<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀id ᐸ-L- _27<br />⠀⠀type2 ᐸ-L- _29<br />⠀⠀position ᐸ-L- _30<br />⠀⠀createdAt ᐸ-L- _31<br />⠀⠀updatedAt ᐸ-L- _32<br />⠀⠀isExplicitlyArchived ᐸ-L- _33<br />⠀⠀archivedAt ᐸ-L- _34<br />⠀⠀title ᐸ-L- _35<br />⠀⠀description ᐸ-L- _45<br />⠀⠀note ᐸ-L- _46<br />⠀⠀color ᐸ-L- _56"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,PgClassExpression_45,PgClassExpression_46,PgClassExpression_56 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     Bucket3 --> Bucket4

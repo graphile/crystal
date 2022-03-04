@@ -50,12 +50,9 @@ graph TD
     P_22["ᐳf…mᐳr…rᐳgravatarUrl"]
     PgClassExpression_22 -.-> P_22
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22 bucket0
-
     subgraph "Buckets for queries/functions/computed-column-user"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.randomUser ᐸ-O- _20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- _21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- _22"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22 bucket0
     end
 ```

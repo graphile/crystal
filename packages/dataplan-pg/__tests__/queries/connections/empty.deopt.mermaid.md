@@ -52,17 +52,13 @@ graph TD
     P_42["ᐳf…]ᐳm…nᐳp…oᐳhasPreviousPage"]
     Constant_42 -.-> P_42
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Access_35,Access_36,Object_37,Connection_38,PgPageInfo_40,Constant_41,Constant_42 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
-
     subgraph "Buckets for queries/connections/empty"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Access_35,Access_36,Object_37,Connection_38,PgPageInfo_40,Constant_41,Constant_42 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _38, _40, _41, _42<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesConnection ᐸ-O- _38<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _40<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _41<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- _42"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
     Bucket0 --> Bucket1
     end
 ```

@@ -135,33 +135,25 @@ graph TD
     P_70["ᐳs…]ᐳbody"]
     PgClassExpression_70 -.-> P_70
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,__ListTransform_12,Access_63,Access_64,Object_65 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_13,PgSelectSingle_14 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_15,PgSelectSingle_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,List_20,PgPolymorphic_21,Map_71,Map_73,Map_75 bucket2
-    classDef bucket3 stroke:#ffa500
-    class PgSelectSingle_27,PgClassExpression_28,PgClassExpression_29 bucket3
-    classDef bucket4 stroke:#0000ff
-    class PgSelectSingle_35,PgClassExpression_36,PgClassExpression_37,PgSelect_38,First_42,PgSelectSingle_43,PgClassExpression_44,PgClassExpression_45 bucket4
-    classDef bucket5 stroke:#7fff00
-    class PgSelectSingle_51,PgClassExpression_52,PgClassExpression_53,PgSelect_54,First_58,PgSelectSingle_59,PgClassExpression_60,PgClassExpression_61,PgSelect_62,First_66,PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgClassExpression_70 bucket5
-
     subgraph "Buckets for queries/unions-search-entities/search"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀searchEntities ᐸ-A- _12"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,__ListTransform_12,Access_63,Access_64,Object_65 bucket0
     Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_13,PgSelectSingle_14 bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _12, _65<br />~ᐳQuery.searchEntities[]<br />⠀ROOT ᐸ-O- _21"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_15,PgSelectSingle_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,List_20,PgPolymorphic_21,Map_71,Map_73,Map_75 bucket2
     Bucket3("Bucket 3 (polymorphic_21[Person])<br />Deps: _71<br />~ᐳQuery.searchEntities[]<br />⠀⠀personId ᐸ-L- _28<br />⠀⠀username ᐸ-L- _29"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelectSingle_27,PgClassExpression_28,PgClassExpression_29 bucket3
     Bucket4("Bucket 4 (polymorphic_21[Post])<br />Deps: _73, _65<br />~ᐳQuery.searchEntities[]<br />⠀⠀postId ᐸ-L- _36<br />⠀⠀author ᐸ-O- _43<br />⠀⠀⠀author.username ᐸ-L- _44<br />⠀⠀body ᐸ-L- _45"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelectSingle_35,PgClassExpression_36,PgClassExpression_37,PgSelect_38,First_42,PgSelectSingle_43,PgClassExpression_44,PgClassExpression_45 bucket4
     Bucket5("Bucket 5 (polymorphic_21[Comment])<br />Deps: _75, _65<br />~ᐳQuery.searchEntities[]<br />⠀⠀commentId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀post ᐸ-O- _67<br />⠀⠀⠀post.postId ᐸ-L- _68<br />⠀⠀⠀post.body ᐸ-L- _69<br />⠀⠀body ᐸ-L- _70"):::bucket
-    style Bucket5 stroke:#7fff00
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgSelectSingle_51,PgClassExpression_52,PgClassExpression_53,PgSelect_54,First_58,PgSelectSingle_59,PgClassExpression_60,PgClassExpression_61,PgSelect_62,First_66,PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgClassExpression_70 bucket5
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3 & Bucket4 & Bucket5
     end

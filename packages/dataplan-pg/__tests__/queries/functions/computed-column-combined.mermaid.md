@@ -75,17 +75,13 @@ graph TD
     P_49["ᐳf…mᐳr…rᐳm…mᐳfeaturedMessages"]
     Access_49 -.-> P_49
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgSelectSingle_29,InputStaticLeaf_30,PgSelectSingle_37,PgClassExpression_38,Access_41,Access_42,Object_43,Map_47,Access_49,Map_50,Map_52 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_44,PgSelectSingle_45,PgClassExpression_46 bucket1
-
     subgraph "Buckets for queries/functions/computed-column-combined"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.randomUser ᐸ-O- _20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- _21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- _22<br />⠀⠀⠀⠀forum.randomUser.mostRecentForum ᐸ-O- _29<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.uniqueAuthorCount ᐸ-L- _38<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.featuredMessages ᐸ-A- _49"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgSelectSingle_29,InputStaticLeaf_30,PgSelectSingle_37,PgClassExpression_38,Access_41,Access_42,Object_43,Map_47,Access_49,Map_50,Map_52 bucket0
     Bucket1("Bucket 1 (item_44)<br />Deps: _49<br />~ᐳQuery.forumᐳForum.randomUserᐳUser.mostRecentForumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- _45<br />⠀⠀body ᐸ-L- _46"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_44,PgSelectSingle_45,PgClassExpression_46 bucket1
     Bucket0 --> Bucket1
     end
 ```

@@ -92,25 +92,19 @@ graph TD
     P_86["ᐳp…]ᐳi…]ᐳid x5"]
     PgClassExpression_86 -.-> P_86
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_88,Access_89,Object_90 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_20,PgSelectSingle_21 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgClassExpression_35,PgClassExpression_36,PgClassExpression_37,PgClassExpression_38,PgClassExpression_39,PgClassExpression_40,PgClassExpression_86 bucket3
-
     subgraph "Buckets for queries/interfaces-relational/basics"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_88,Access_89,Object_90 bucket0
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _90<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_20,PgSelectSingle_21 bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀type2 ᐸ-L- _35<br />⠀⠀position ᐸ-L- _36<br />⠀⠀createdAt ᐸ-L- _37<br />⠀⠀updatedAt ᐸ-L- _38<br />⠀⠀isExplicitlyArchived ᐸ-L- _39<br />⠀⠀archivedAt ᐸ-L- _40<br />⠀⠀id ᐸ-L- _86"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgClassExpression_35,PgClassExpression_36,PgClassExpression_37,PgClassExpression_38,PgClassExpression_39,PgClassExpression_40,PgClassExpression_86 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     end

@@ -75,33 +75,25 @@ graph TD
     P_38["ᐳf…]ᐳm…]ᐳfeatured"]
     PgClassExpression_38 -.-> P_38
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_17,Access_25,Access_26,Object_27 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgSelect_24,__ListTransform_28 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_29,PgSelectSingle_30,PgClassExpression_31 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_32,__ListTransform_33 bucket3
-    classDef bucket4 stroke:#0000ff
-    class __Item_34 bucket4
-    classDef bucket5 stroke:#7fff00
-    class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
-
     subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,Access_25,Access_26,Object_27 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _27<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀messagesListSet ᐸ-A- _28"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23,PgSelect_24,__ListTransform_28 bucket1
     Bucket2("Bucket 2 (item_29)<br />Deps: _24"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_29,PgSelectSingle_30,PgClassExpression_31 bucket2
     Bucket3("Bucket 3 (item_32)<br />Deps: _28<br />~ᐳQuery.forums[]ᐳForum.messagesListSet[]<br />⠀ROOT ᐸ-A- _33"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_32,__ListTransform_33 bucket3
     Bucket4("Bucket 4 (item_34)<br />Deps: _32"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item_34 bucket4
     Bucket5("Bucket 5 (item_35)<br />Deps: _33<br />~ᐳQuery.forums[]ᐳForum.messagesListSet[][]<br />⠀ROOT ᐸ-O- _36<br />⠀⠀body ᐸ-L- _37<br />⠀⠀featured ᐸ-L- _38"):::bucket
-    style Bucket5 stroke:#7fff00
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     Bucket3 --> Bucket4 & Bucket5

@@ -72,12 +72,9 @@ graph TD
     P_71["ᐳr…dᐳtitle"]
     PgClassExpression_71 -.-> P_71
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72 bucket0
-
     subgraph "Buckets for queries/interfaces-relational/single-topic-not-topic"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀relationalTopicById ᐸ-O- _13<br />⠀⠀⠀relationalTopicById.id ᐸ-L- _14<br />⠀⠀⠀relationalTopicById.type ᐸ-L- _22<br />⠀⠀⠀relationalTopicById.type2 ᐸ-L- _30<br />⠀⠀⠀relationalTopicById.position ᐸ-L- _38<br />⠀⠀⠀relationalTopicById.createdAt ᐸ-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt ᐸ-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived ᐸ-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt ᐸ-L- _70<br />⠀⠀⠀relationalTopicById.title ᐸ-L- _71"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72 bucket0
     end
 ```

@@ -68,17 +68,13 @@ graph TD
     P_34["ᐳc…tᐳpostᐳnote"]
     PgClassExpression_34 -.-> P_34
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,__Value_5,__TrackedObject_6 bucket0
-    classDef bucket1 stroke:#00bfff
-    class InputStaticLeaf_8,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,Access_26,Access_27,Object_28,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket1
-
     subgraph "Buckets for mutations/basics/create-relational-post-default-description"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,__Value_5,__TrackedObject_6 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _3<br />~ᐳMutation.createRelationalPost<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀post ᐸ-O- _30<br />⠀⠀⠀post.id ᐸ-L- _31<br />⠀⠀⠀post.title ᐸ-L- _32<br />⠀⠀⠀post.description ᐸ-L- _33<br />⠀⠀⠀post.note ᐸ-L- _34"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,InputStaticLeaf_8,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,Access_26,Access_27,Object_28,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket1
     Bucket0 --> Bucket1
     end
 ```

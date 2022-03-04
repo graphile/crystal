@@ -99,17 +99,13 @@ graph TD
     P_66["ᐳc…tᐳpostᐳa…rᐳusername"]
     PgClassExpression_66 -.-> P_66
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,__Value_5,__TrackedObject_6 bucket0
-    classDef bucket1 stroke:#00bfff
-    class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgSelectSingle_41,PgClassExpression_42,PgSelectSingle_49,PgClassExpression_50,Access_60,Access_61,Object_62,PgSelectSingle_64,PgClassExpression_65,PgClassExpression_66,Map_67,Map_69,Map_71 bucket1
-
     subgraph "Buckets for mutations/basics/create-relational-post"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,__Value_5,__TrackedObject_6 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _3<br />~ᐳMutation.createRelationalPost<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀post ᐸ-O- _30<br />⠀⠀⠀post.id ᐸ-L- _31<br />⠀⠀⠀post.title ᐸ-L- _32<br />⠀⠀⠀post.description ᐸ-L- _33<br />⠀⠀⠀post.note ᐸ-L- _34<br />⠀⠀⠀post.titleLower ᐸ-L- _42<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- _50<br />⠀⠀⠀post.author ᐸ-O- _64<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _65<br />⠀⠀⠀⠀post.author.username ᐸ-L- _66"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgSelectSingle_41,PgClassExpression_42,PgSelectSingle_49,PgClassExpression_50,Access_60,Access_61,Object_62,PgSelectSingle_64,PgClassExpression_65,PgClassExpression_66,Map_67,Map_69,Map_71 bucket1
     Bucket0 --> Bucket1
     end
 ```

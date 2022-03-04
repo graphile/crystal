@@ -44,12 +44,9 @@ graph TD
     P_17["ᐳr…rᐳu…sᐳselfᐳselfᐳmd5<br />ᐳr…rᐳu…sᐳselfᐳselfᐳsha256"]
     __Value_17 -.-> P_17
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13,__Value_15,__Value_16,__Value_17 bucket0
-
     subgraph "Buckets for queries/resolvers/basics-object-recursive"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀randomUser ᐸ-O- _12<br />⠀⠀⠀randomUser.username ᐸ-L- _13<br />⠀⠀⠀randomUser.usernameHashes ᐸ-O- _13<br />⠀⠀⠀⠀randomUser.usernameHashes.md5 ᐸ-L- _15<br />⠀⠀⠀⠀randomUser.usernameHashes.self ᐸ-O- _15<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.MD5 ᐸ-L- _16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self ᐸ-O- _16<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.md5 ᐸ-L- _17<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.sha256 ᐸ-L- _17<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256 ᐸ-L- _16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256_2 ᐸ-L- _16<br />⠀⠀⠀⠀randomUser.usernameHashes.sha256 ᐸ-L- _15"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13,__Value_15,__Value_16,__Value_17 bucket0
     end
 ```

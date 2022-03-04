@@ -83,25 +83,19 @@ graph TD
     P_55["ᐳf…]ᐳm…nᐳe…]ᐳcursor"]
     PgCursor_55 -.-> P_55
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_61,Access_62,Object_63 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_33,PgSelect_34,PgClassExpression_39 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_41,PgSelectSingle_42,PgClassExpression_43,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,Map_68 bucket2
-    classDef bucket3 stroke:#ffa500
-    class PgCursor_55,PgClassExpression_56,List_57 bucket3
-
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-3"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_61,Access_62,Object_63 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _63<br />~ᐳQuery.forums[]"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_33,PgSelect_34,PgClassExpression_39 bucket1
     Bucket2("Bucket 2 (item_41)<br />Deps: _34<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_41,PgSelectSingle_42,PgClassExpression_43,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,Map_68 bucket2
     Bucket3("Bucket 3 (group2[defer])<br />Deps: _42<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgCursor_55,PgClassExpression_56,List_57 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

@@ -38,12 +38,9 @@ graph TD
     P_15["ᐳr…rᐳu…sᐳmd5<br />ᐳr…rᐳu…sᐳsha256"]
     __Value_15 -.-> P_15
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13,__Value_15 bucket0
-
     subgraph "Buckets for queries/resolvers/basics-object"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀randomUser ᐸ-O- _12<br />⠀⠀⠀randomUser.username ᐸ-L- _13<br />⠀⠀⠀randomUser.usernameHashes ᐸ-O- _13<br />⠀⠀⠀⠀randomUser.usernameHashes.md5 ᐸ-L- _15<br />⠀⠀⠀⠀randomUser.usernameHashes.sha256 ᐸ-L- _15"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13,__Value_15 bucket0
     end
 ```

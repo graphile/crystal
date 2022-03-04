@@ -104,41 +104,31 @@ graph TD
     P_48["ᐳf…]ᐳm…]ᐳfeatured"]
     PgClassExpression_48 -.-> P_48
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_17,Access_18,Access_19,Object_20,PgSelect_24 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,__ListTransform_28,__ListTransform_29,Lambda_30,__ListTransform_31,PgClassExpression_35 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_32,PgSelectSingle_33,PgClassExpression_34,List_36,Lambda_37 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_38,PgSelectSingle_39,PgClassExpression_40 bucket3
-    classDef bucket4 stroke:#0000ff
-    class __Item_41 bucket4
-    classDef bucket5 stroke:#7fff00
-    class __Item_42,__ListTransform_43 bucket5
-    classDef bucket6 stroke:#ff1493
-    class __Item_44 bucket6
-    classDef bucket7 stroke:#808000
-    class __Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket7
-
     subgraph "Buckets for queries/functions/computed-column-forums-messages-with-many-transforms"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,Access_18,Access_19,Object_20,PgSelect_24 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _24<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesWithManyTransforms ᐸ-A- _31"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23,__ListTransform_28,__ListTransform_29,Lambda_30,__ListTransform_31,PgClassExpression_35 bucket1
     Bucket2("Bucket 2 (item_32)<br />Deps: _24, _35"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_32,PgSelectSingle_33,PgClassExpression_34,List_36,Lambda_37 bucket2
     Bucket3("Bucket 3 (item_38)<br />Deps: _28"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_38,PgSelectSingle_39,PgClassExpression_40 bucket3
     Bucket4("Bucket 4 (item_41)<br />Deps: _30"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item_41 bucket4
     Bucket5("Bucket 5 (item_42)<br />Deps: _31<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[]<br />⠀ROOT ᐸ-A- _43"):::bucket
-    style Bucket5 stroke:#7fff00
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item_42,__ListTransform_43 bucket5
     Bucket6("Bucket 6 (item_44)<br />Deps: _42"):::bucket
-    style Bucket6 stroke:#ff1493
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item_44 bucket6
     Bucket7("Bucket 7 (item_45)<br />Deps: _43<br />~ᐳQuery.forums[]ᐳForum.messagesWithManyTransforms[][]<br />⠀ROOT ᐸ-O- _46<br />⠀⠀body ᐸ-L- _47<br />⠀⠀featured ᐸ-L- _48"):::bucket
-    style Bucket7 stroke:#808000
+    classDef bucket7 stroke:#808000
+    class Bucket7,__Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket7
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5
     Bucket5 --> Bucket6 & Bucket7

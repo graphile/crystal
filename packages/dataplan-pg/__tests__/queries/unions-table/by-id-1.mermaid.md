@@ -112,33 +112,25 @@ graph TD
     P_64["ᐳi…1ᐳnote"]
     PgClassExpression_64 -.-> P_64
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,Map_65,Map_67,Map_69,Map_71,Map_73 bucket0
-    classDef bucket1 stroke:#00bfff
-    class PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24 bucket1
-    classDef bucket2 stroke:#7f007f
-    class PgSelectSingle_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35 bucket2
-    classDef bucket3 stroke:#ffa500
-    class PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgClassExpression_45 bucket3
-    classDef bucket4 stroke:#0000ff
-    class PgSelectSingle_52,PgClassExpression_53,PgClassExpression_54 bucket4
-    classDef bucket5 stroke:#7fff00
-    class PgSelectSingle_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64 bucket5
-
     subgraph "Buckets for queries/unions-table/by-id-1"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀item1 ᐸ-O- _15"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,Map_65,Map_67,Map_69,Map_71,Map_73 bucket0
     Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />Deps: _65<br />~ᐳQuery.item1<br />⠀⠀id ᐸ-L- _23<br />⠀⠀title ᐸ-L- _24"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24 bucket1
     Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />Deps: _67<br />~ᐳQuery.item1<br />⠀⠀id ᐸ-L- _32<br />⠀⠀title ᐸ-L- _33<br />⠀⠀description ᐸ-L- _34<br />⠀⠀note ᐸ-L- _35"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgSelectSingle_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35 bucket2
     Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />Deps: _69<br />~ᐳQuery.item1<br />⠀⠀id ᐸ-L- _43<br />⠀⠀title ᐸ-L- _44<br />⠀⠀color ᐸ-L- _45"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgClassExpression_45 bucket3
     Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />Deps: _71<br />~ᐳQuery.item1<br />⠀⠀id ᐸ-L- _53<br />⠀⠀title ᐸ-L- _54"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelectSingle_52,PgClassExpression_53,PgClassExpression_54 bucket4
     Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />Deps: _73<br />~ᐳQuery.item1<br />⠀⠀id ᐸ-L- _62<br />⠀⠀description ᐸ-L- _63<br />⠀⠀note ᐸ-L- _64"):::bucket
-    style Bucket5 stroke:#7fff00
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgSelectSingle_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64 bucket5
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5
     end
 ```

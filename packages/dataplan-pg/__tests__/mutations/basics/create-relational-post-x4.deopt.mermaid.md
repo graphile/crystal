@@ -198,29 +198,22 @@ graph TD
     P_118["ᐳp4ᐳpostᐳnote"]
     PgClassExpression_118 -.-> P_118
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_110,Access_111,Object_112 bucket0
-    classDef bucket1 stroke:#00bfff
-    class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket1
-    classDef bucket2 stroke:#7f007f
-    class InputStaticLeaf_36,InputStaticLeaf_37,InputStaticLeaf_38,Constant_39,Constant_40,PgInsert_41,PgClassExpression_45,PgInsert_46,PgClassExpression_50,PgClassExpression_51,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62 bucket2
-    classDef bucket3 stroke:#ffa500
-    class InputStaticLeaf_64,InputStaticLeaf_65,InputStaticLeaf_66,Constant_67,Constant_68,PgInsert_69,PgClassExpression_73,PgInsert_74,PgClassExpression_78,PgClassExpression_79,PgSelect_81,First_85,PgSelectSingle_86,PgClassExpression_87,PgClassExpression_88,PgClassExpression_89,PgClassExpression_90 bucket3
-    classDef bucket4 stroke:#0000ff
-    class InputStaticLeaf_92,InputStaticLeaf_93,InputStaticLeaf_94,Constant_95,Constant_96,PgInsert_97,PgClassExpression_101,PgInsert_102,PgClassExpression_106,PgClassExpression_107,PgSelect_109,First_113,PgSelectSingle_114,PgClassExpression_115,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118 bucket4
-
     subgraph "Buckets for mutations/basics/create-relational-post-x4"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_110,Access_111,Object_112 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _112<br />~ᐳMutation.p1<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀post ᐸ-O- _30<br />⠀⠀⠀post.id ᐸ-L- _31<br />⠀⠀⠀post.title ᐸ-L- _32<br />⠀⠀⠀post.description ᐸ-L- _33<br />⠀⠀⠀post.note ᐸ-L- _34"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _112<br />~ᐳMutation.p2<br />⠀ROOT ᐸ-O- _50<br />⠀⠀id ᐸ-L- _51<br />⠀⠀post ᐸ-O- _58<br />⠀⠀⠀post.id ᐸ-L- _59<br />⠀⠀⠀post.title ᐸ-L- _60<br />⠀⠀⠀post.description ᐸ-L- _61<br />⠀⠀⠀post.note ᐸ-L- _62"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,InputStaticLeaf_36,InputStaticLeaf_37,InputStaticLeaf_38,Constant_39,Constant_40,PgInsert_41,PgClassExpression_45,PgInsert_46,PgClassExpression_50,PgClassExpression_51,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62 bucket2
     Bucket3("Bucket 3 (group3[mutation])<br />Deps: _112<br />~ᐳMutation.p3<br />⠀ROOT ᐸ-O- _78<br />⠀⠀id ᐸ-L- _79<br />⠀⠀post ᐸ-O- _86<br />⠀⠀⠀post.id ᐸ-L- _87<br />⠀⠀⠀post.title ᐸ-L- _88<br />⠀⠀⠀post.description ᐸ-L- _89<br />⠀⠀⠀post.note ᐸ-L- _90"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,InputStaticLeaf_64,InputStaticLeaf_65,InputStaticLeaf_66,Constant_67,Constant_68,PgInsert_69,PgClassExpression_73,PgInsert_74,PgClassExpression_78,PgClassExpression_79,PgSelect_81,First_85,PgSelectSingle_86,PgClassExpression_87,PgClassExpression_88,PgClassExpression_89,PgClassExpression_90 bucket3
     Bucket4("Bucket 4 (group4[mutation])<br />Deps: _112<br />~ᐳMutation.p4<br />⠀ROOT ᐸ-O- _106<br />⠀⠀id ᐸ-L- _107<br />⠀⠀post ᐸ-O- _114<br />⠀⠀⠀post.id ᐸ-L- _115<br />⠀⠀⠀post.title ᐸ-L- _116<br />⠀⠀⠀post.description ᐸ-L- _117<br />⠀⠀⠀post.note ᐸ-L- _118"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,InputStaticLeaf_92,InputStaticLeaf_93,InputStaticLeaf_94,Constant_95,Constant_96,PgInsert_97,PgClassExpression_101,PgInsert_102,PgClassExpression_106,PgClassExpression_107,PgSelect_109,First_113,PgSelectSingle_114,PgClassExpression_115,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118 bucket4
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
     end
 ```

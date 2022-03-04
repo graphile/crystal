@@ -296,65 +296,49 @@ graph TD
     P_814["ᐳp…]ᐳi…]ᐳnote"]
     PgClassExpression_814 -.-> P_814
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_802,Access_803,Object_804 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_20,PgSelectSingle_21 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelect_27,First_31,PgClassExpression_33,PgSelect_34,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgSelect_43,First_47,PgClassExpression_51,PgClassExpression_52,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64,PgSelect_67,First_71,PgSelect_93,First_97,PgSelect_118,First_122,PgSelect_142,First_146,PgClassExpression_168,PgClassExpression_169,PgSelect_170,First_174,PgSelectSingle_175,PgClassExpression_176,PgClassExpression_177,PgClassExpression_178,PgClassExpression_179,PgClassExpression_180,PgClassExpression_181,PgSelect_184,First_188,PgSelect_343,First_347,PgSelect_501,First_505,PgClassExpression_657,PgSelect_658,First_662,PgClassExpression_772 bucket3
-    classDef bucket4 stroke:#0000ff
-    class PgSelectSingle_32,PgClassExpression_182 bucket4
-    classDef bucket5 stroke:#7fff00
-    class PgSelectSingle_48,PgClassExpression_65 bucket5
-    classDef bucket6 stroke:#ff1493
-    class PgSelectSingle_72,PgClassExpression_89,PgClassExpression_90,PgClassExpression_91 bucket6
-    classDef bucket7 stroke:#808000
-    class PgSelectSingle_98,PgClassExpression_115,PgClassExpression_116 bucket7
-    classDef bucket8 stroke:#dda0dd
-    class PgSelectSingle_123,PgClassExpression_140 bucket8
-    classDef bucket9 stroke:#ff0000
-    class PgSelectSingle_147,PgClassExpression_164,PgClassExpression_165 bucket9
-    classDef bucket10 stroke:#ffff00
-    class PgSelectSingle_189,PgClassExpression_339,PgClassExpression_340,PgClassExpression_341 bucket10
-    classDef bucket11 stroke:#00ffff
-    class PgSelectSingle_348,PgClassExpression_498,PgClassExpression_499 bucket11
-    classDef bucket12 stroke:#4169e1
-    class PgSelectSingle_506,PgClassExpression_656 bucket12
-    classDef bucket13 stroke:#3cb371
-    class PgSelectSingle_663,PgClassExpression_813,PgClassExpression_814 bucket13
-
     subgraph "Buckets for queries/interfaces-relational/nested-more-fragments"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_802,Access_803,Object_804 bucket0
     Bucket1("Bucket 1 (item_11)<br />Deps: _7, _804<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
     Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_20,PgSelectSingle_21 bucket2
     Bucket3("Bucket 3 (item_22)<br />Deps: _19, _804<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _25<br />⠀⠀type ᐸ-L- _24<br />⠀⠀parent ᐸ-O- _41<br />⠀⠀⠀parent.type ᐸ-L- _40<br />⠀⠀⠀parent.type2 ᐸ-L- _51<br />⠀⠀⠀parent.author ᐸ-O- _58<br />⠀⠀⠀⠀parent.author.username ᐸ-L- _59<br />⠀⠀⠀parent.position ᐸ-L- _60<br />⠀⠀⠀parent.createdAt ᐸ-L- _61<br />⠀⠀⠀parent.updatedAt ᐸ-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived ᐸ-L- _63<br />⠀⠀⠀parent.archivedAt ᐸ-L- _64<br />⠀⠀⠀parent.id ᐸ-L- _772<br />⠀⠀type2 ᐸ-L- _168<br />⠀⠀author ᐸ-O- _175<br />⠀⠀⠀author.username ᐸ-L- _176<br />⠀⠀position ᐸ-L- _177<br />⠀⠀createdAt ᐸ-L- _178<br />⠀⠀updatedAt ᐸ-L- _179<br />⠀⠀isExplicitlyArchived ᐸ-L- _180<br />⠀⠀archivedAt ᐸ-L- _181<br />⠀⠀id ᐸ-L- _657"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelect_27,First_31,PgClassExpression_33,PgSelect_34,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgSelect_43,First_47,PgClassExpression_51,PgClassExpression_52,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64,PgSelect_67,First_71,PgSelect_93,First_97,PgSelect_118,First_122,PgSelect_142,First_146,PgClassExpression_168,PgClassExpression_169,PgSelect_170,First_174,PgSelectSingle_175,PgClassExpression_176,PgClassExpression_177,PgClassExpression_178,PgClassExpression_179,PgClassExpression_180,PgClassExpression_181,PgSelect_184,First_188,PgSelect_343,First_347,PgSelect_501,First_505,PgClassExpression_657,PgSelect_658,First_662,PgClassExpression_772 bucket3
     Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />Deps: _31<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _182"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelectSingle_32,PgClassExpression_182 bucket4
     Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />Deps: _47<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _65"):::bucket
-    style Bucket5 stroke:#7fff00
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgSelectSingle_48,PgClassExpression_65 bucket5
     Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />Deps: _71<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _89<br />⠀⠀description ᐸ-L- _90<br />⠀⠀note ᐸ-L- _91"):::bucket
-    style Bucket6 stroke:#ff1493
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,PgSelectSingle_72,PgClassExpression_89,PgClassExpression_90,PgClassExpression_91 bucket6
     Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />Deps: _97<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _115<br />⠀⠀color ᐸ-L- _116"):::bucket
-    style Bucket7 stroke:#808000
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgSelectSingle_98,PgClassExpression_115,PgClassExpression_116 bucket7
     Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />Deps: _122<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀title ᐸ-L- _140"):::bucket
-    style Bucket8 stroke:#dda0dd
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8,PgSelectSingle_123,PgClassExpression_140 bucket8
     Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />Deps: _146<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalPost.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalTopic.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalDivider.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklist.parent<br />~ᐳQuery.people[]ᐳPerson.items[]ᐳRelationalChecklistItem.parent<br />⠀⠀description ᐸ-L- _164<br />⠀⠀note ᐸ-L- _165"):::bucket
-    style Bucket9 stroke:#ff0000
+    classDef bucket9 stroke:#ff0000
+    class Bucket9,PgSelectSingle_147,PgClassExpression_164,PgClassExpression_165 bucket9
     Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />Deps: _188<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _339<br />⠀⠀description ᐸ-L- _340<br />⠀⠀note ᐸ-L- _341"):::bucket
-    style Bucket10 stroke:#ffff00
+    classDef bucket10 stroke:#ffff00
+    class Bucket10,PgSelectSingle_189,PgClassExpression_339,PgClassExpression_340,PgClassExpression_341 bucket10
     Bucket11("Bucket 11 (polymorphic_25[RelationalDivider])<br />Deps: _347<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _498<br />⠀⠀color ᐸ-L- _499"):::bucket
-    style Bucket11 stroke:#00ffff
+    classDef bucket11 stroke:#00ffff
+    class Bucket11,PgSelectSingle_348,PgClassExpression_498,PgClassExpression_499 bucket11
     Bucket12("Bucket 12 (polymorphic_25[RelationalChecklist])<br />Deps: _505<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- _656"):::bucket
-    style Bucket12 stroke:#4169e1
+    classDef bucket12 stroke:#4169e1
+    class Bucket12,PgSelectSingle_506,PgClassExpression_656 bucket12
     Bucket13("Bucket 13 (polymorphic_25[RelationalChecklistItem])<br />Deps: _662<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀description ᐸ-L- _813<br />⠀⠀note ᐸ-L- _814"):::bucket
-    style Bucket13 stroke:#3cb371
+    classDef bucket13 stroke:#3cb371
+    class Bucket13,PgSelectSingle_663,PgClassExpression_813,PgClassExpression_814 bucket13
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     Bucket3 --> Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13

@@ -106,33 +106,25 @@ graph TD
     P_111["ᐳa…]ᐳposition"]
     PgClassExpression_111 -.-> P_111
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_8,__ListTransform_12,Access_106,Access_107,Object_108 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_13,PgSelectSingle_14 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_15,PgSelectSingle_16,PgClassExpression_17,PgPolymorphic_18,Map_114,Map_118,Map_122 bucket2
-    classDef bucket3 stroke:#ffa500
-    class PgSelectSingle_25,PgSelectSingle_32,PgClassExpression_33,PgClassExpression_41,PgClassExpression_49,Map_112 bucket3
-    classDef bucket4 stroke:#0000ff
-    class PgSelectSingle_56,PgSelectSingle_63,PgClassExpression_64,PgClassExpression_72,PgClassExpression_80,Map_116 bucket4
-    classDef bucket5 stroke:#7fff00
-    class PgSelectSingle_87,PgSelectSingle_94,PgClassExpression_95,PgClassExpression_103,PgClassExpression_111,Map_120 bucket5
-
     subgraph "Buckets for queries/interfaces-relational/commentables-simple"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allRelationalCommentablesList ᐸ-A- _12"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_8,__ListTransform_12,Access_106,Access_107,Object_108 bucket0
     Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_13,PgSelectSingle_14 bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _12<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀ROOT ᐸ-O- _18"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_15,PgSelectSingle_16,PgClassExpression_17,PgPolymorphic_18,Map_114,Map_118,Map_122 bucket2
     Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />Deps: _114<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀type ᐸ-L- _33<br />⠀⠀type2 ᐸ-L- _41<br />⠀⠀position ᐸ-L- _49"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelectSingle_25,PgSelectSingle_32,PgClassExpression_33,PgClassExpression_41,PgClassExpression_49,Map_112 bucket3
     Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />Deps: _118<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀type ᐸ-L- _64<br />⠀⠀type2 ᐸ-L- _72<br />⠀⠀position ᐸ-L- _80"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelectSingle_56,PgSelectSingle_63,PgClassExpression_64,PgClassExpression_72,PgClassExpression_80,Map_116 bucket4
     Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />Deps: _122<br />~ᐳQuery.allRelationalCommentablesList[]<br />⠀⠀type ᐸ-L- _95<br />⠀⠀type2 ᐸ-L- _103<br />⠀⠀position ᐸ-L- _111"):::bucket
-    style Bucket5 stroke:#7fff00
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgSelectSingle_87,PgSelectSingle_94,PgClassExpression_95,PgClassExpression_103,PgClassExpression_111,Map_120 bucket5
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3 & Bucket4 & Bucket5
     end

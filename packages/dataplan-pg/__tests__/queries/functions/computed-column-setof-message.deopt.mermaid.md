@@ -48,17 +48,13 @@ graph TD
     P_21["ᐳf…mᐳf…]ᐳbody"]
     PgClassExpression_21 -.-> P_21
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
-
     subgraph "Buckets for queries/functions/computed-column-setof-message"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.featuredMessages ᐸ-A- _15"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18 bucket0
     Bucket1("Bucket 1 (item_19)<br />Deps: _15<br />~ᐳQuery.forumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- _20<br />⠀⠀body ᐸ-L- _21"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
     Bucket0 --> Bucket1
     end
 ```

@@ -160,29 +160,22 @@ graph TD
     P_92["ᐳp…dᐳpersonBookmarksList"]
     Access_92 -.-> P_92
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_92 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,List_36,PgPolymorphic_37,Map_86,Map_88,Map_90 bucket1
-    classDef bucket2 stroke:#7f007f
-    class PgSelectSingle_43,PgClassExpression_44,PgClassExpression_45 bucket2
-    classDef bucket3 stroke:#ffa500
-    class PgSelectSingle_51,PgClassExpression_52,PgClassExpression_53,PgSelect_54,First_58,PgSelectSingle_59,PgClassExpression_60,PgClassExpression_61 bucket3
-    classDef bucket4 stroke:#0000ff
-    class PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgSelect_70,First_74,PgSelectSingle_75,PgClassExpression_76,PgClassExpression_77,PgSelect_78,First_82,PgSelectSingle_83,PgClassExpression_84,PgClassExpression_85 bucket4
-
     subgraph "Buckets for queries/unions-table/bookmarks"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀personByPersonId ᐸ-O- _13<br />⠀⠀⠀personByPersonId.personId ᐸ-L- _14<br />⠀⠀⠀personByPersonId.username ᐸ-L- _15<br />⠀⠀⠀personByPersonId.personBookmarksList ᐸ-A- _92"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_92 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _92, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀id ᐸ-L- _23<br />⠀⠀person ᐸ-O- _30<br />⠀⠀⠀person.username ᐸ-L- _31<br />⠀⠀bookmarkedEntity ᐸ-O- _37"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,List_36,PgPolymorphic_37,Map_86,Map_88,Map_90 bucket1
     Bucket2("Bucket 2 (polymorphic_37[Person])<br />Deps: _86<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀personId ᐸ-L- _44<br />⠀⠀username ᐸ-L- _45"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgSelectSingle_43,PgClassExpression_44,PgClassExpression_45 bucket2
     Bucket3("Bucket 3 (polymorphic_37[Post])<br />Deps: _88, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀postId ᐸ-L- _52<br />⠀⠀author ᐸ-O- _59<br />⠀⠀⠀author.username ᐸ-L- _60<br />⠀⠀body ᐸ-L- _61"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelectSingle_51,PgClassExpression_52,PgClassExpression_53,PgSelect_54,First_58,PgSelectSingle_59,PgClassExpression_60,PgClassExpression_61 bucket3
     Bucket4("Bucket 4 (polymorphic_37[Comment])<br />Deps: _90, _81<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀commentId ᐸ-L- _68<br />⠀⠀author ᐸ-O- _75<br />⠀⠀⠀author.username ᐸ-L- _76<br />⠀⠀post ᐸ-O- _83<br />⠀⠀⠀post.body ᐸ-L- _84<br />⠀⠀body ᐸ-L- _85"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgSelect_70,First_74,PgSelectSingle_75,PgClassExpression_76,PgClassExpression_77,PgSelect_78,First_82,PgSelectSingle_83,PgClassExpression_84,PgClassExpression_85 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4
     end

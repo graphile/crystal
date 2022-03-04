@@ -108,17 +108,13 @@ graph TD
     P_46["ᐳf…eᐳm…eᐳa…rᐳgravatarUrl"]
     PgClassExpression_46 -.-> P_46
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,Lambda_8,Access_9,Subscribe_10,Access_40,Access_41,Object_42 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgSelect_28,First_32,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,PgClassExpression_38,PgSelect_39,First_43,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46 bucket1
-
     subgraph "Buckets for subscriptions/basics/forum-messages"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,Lambda_8,Access_9,Subscribe_10,Access_40,Access_41,Object_42 bucket0
     Bucket1("Bucket 1 (item_11)<br />Deps: _10, _42<br />~"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgSelect_28,First_32,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,PgClassExpression_38,PgSelect_39,First_43,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46 bucket1
     Bucket0 --> Bucket1
     end
 ```

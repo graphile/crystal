@@ -63,29 +63,22 @@ graph TD
     P_21["ᐳr…]ᐳgravatarUrl"]
     PgClassExpression_21 -.-> P_21
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_12,PgSelectSingle_13,PgClassExpression_14 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_15,__ListTransform_16 bucket2
-    classDef bucket3 stroke:#ffa500
-    class __Item_17 bucket3
-    classDef bucket4 stroke:#0000ff
-    class __Item_18,PgSelectSingle_19,PgClassExpression_20,PgClassExpression_21 bucket4
-
     subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀randomUserArraySet ᐸ-A- _11"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_12,PgSelectSingle_13,PgClassExpression_14 bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.randomUserArraySet[]<br />⠀ROOT ᐸ-A- _16"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_15,__ListTransform_16 bucket2
     Bucket3("Bucket 3 (item_17)<br />Deps: _15"):::bucket
-    style Bucket3 stroke:#ffa500
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item_17 bucket3
     Bucket4("Bucket 4 (item_18)<br />Deps: _16<br />~ᐳQuery.randomUserArraySet[][]<br />⠀ROOT ᐸ-O- _19<br />⠀⠀username ᐸ-L- _20<br />⠀⠀gravatarUrl ᐸ-L- _21"):::bucket
-    style Bucket4 stroke:#0000ff
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item_18,PgSelectSingle_19,PgClassExpression_20,PgClassExpression_21 bucket4
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3 & Bucket4
     end

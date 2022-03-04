@@ -64,12 +64,9 @@ graph TD
     P_484["ᐳitemᐳp…tᐳid x25"]
     PgClassExpression_484 -.-> P_484
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,Map_503 bucket0
-
     subgraph "Buckets for queries/interfaces-relational/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀item ᐸ-O- _15<br />⠀⠀⠀item.parent ᐸ-O- _31<br />⠀⠀⠀⠀item.parent.author ᐸ-O- _46<br />⠀⠀⠀⠀⠀item.parent.author.username ᐸ-L- _47<br />⠀⠀⠀⠀item.parent.id ᐸ-L- _484<br />⠀⠀⠀item.id ᐸ-L- _404"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,Map_503 bucket0
     end
 ```

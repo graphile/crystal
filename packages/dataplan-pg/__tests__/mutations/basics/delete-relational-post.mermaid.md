@@ -148,21 +148,16 @@ graph TD
     P_90["ᐳd2ᐳpostᐳa…rᐳusername"]
     PgClassExpression_90 -.-> P_90
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_84,Access_85,Object_86 bucket0
-    classDef bucket1 stroke:#00bfff
-    class InputStaticLeaf_8,PgDelete_9,PgClassExpression_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgClassExpression_24,PgSelectSingle_31,PgClassExpression_32,PgSelectSingle_39,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,Map_91,Map_93,Map_95 bucket1
-    classDef bucket2 stroke:#7f007f
-    class InputStaticLeaf_50,PgDelete_51,PgClassExpression_55,PgClassExpression_56,PgSelect_57,First_61,PgSelectSingle_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_65,PgClassExpression_66,PgSelectSingle_73,PgClassExpression_74,PgSelectSingle_81,PgSelectSingle_88,PgClassExpression_89,PgClassExpression_90,Map_97,Map_99,Map_101 bucket2
-
     subgraph "Buckets for mutations/basics/delete-relational-post"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_84,Access_85,Object_86 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: _86<br />~ᐳMutation.d1<br />⠀ROOT ᐸ-O- _9<br />⠀⠀id ᐸ-L- _13<br />⠀⠀post ᐸ-O- _20<br />⠀⠀⠀post.id ᐸ-L- _21<br />⠀⠀⠀post.title ᐸ-L- _22<br />⠀⠀⠀post.description ᐸ-L- _23<br />⠀⠀⠀post.note ᐸ-L- _24<br />⠀⠀⠀post.titleLower ᐸ-L- _32<br />⠀⠀⠀post.author ᐸ-O- _46<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _47<br />⠀⠀⠀⠀post.author.username ᐸ-L- _48"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,InputStaticLeaf_8,PgDelete_9,PgClassExpression_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgClassExpression_24,PgSelectSingle_31,PgClassExpression_32,PgSelectSingle_39,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,Map_91,Map_93,Map_95 bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: _86<br />~ᐳMutation.d2<br />⠀ROOT ᐸ-O- _51<br />⠀⠀id ᐸ-L- _55<br />⠀⠀post ᐸ-O- _62<br />⠀⠀⠀post.id ᐸ-L- _63<br />⠀⠀⠀post.title ᐸ-L- _64<br />⠀⠀⠀post.description ᐸ-L- _65<br />⠀⠀⠀post.note ᐸ-L- _66<br />⠀⠀⠀post.titleLower ᐸ-L- _74<br />⠀⠀⠀post.author ᐸ-O- _88<br />⠀⠀⠀⠀post.author.personId ᐸ-L- _89<br />⠀⠀⠀⠀post.author.username ᐸ-L- _90"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,InputStaticLeaf_50,PgDelete_51,PgClassExpression_55,PgClassExpression_56,PgSelect_57,First_61,PgSelectSingle_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_65,PgClassExpression_66,PgSelectSingle_73,PgClassExpression_74,PgSelectSingle_81,PgSelectSingle_88,PgClassExpression_89,PgClassExpression_90,Map_97,Map_99,Map_101 bucket2
     Bucket0 --> Bucket1 & Bucket2
     end
 ```

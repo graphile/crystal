@@ -37,17 +37,13 @@ graph TD
     P_23["ᐳf…]ᐳa<br />ᐳf…]ᐳb"]
     PgClassExpression_23 -.-> P_23
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_17,Access_18,Access_19,Object_20 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
-
     subgraph "Buckets for queries/super-simple/field-aliases"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,Access_18,Access_19,Object_20 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀a ᐸ-L- _23<br />⠀⠀b ᐸ-L- _23"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
     Bucket0 --> Bucket1
     end
 ```

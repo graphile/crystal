@@ -37,17 +37,13 @@ graph TD
     P_14["ᐳforumNamesArray[]"]
     __Item_14 -.-> P_14
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_14 bucket1
-
     subgraph "Buckets for queries/functions/custom-query-forum-names-array"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNamesArray ᐸ-A- _13"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13 bucket0
     Bucket1("Bucket 1 (item_14)<br />Deps: _13<br />~ᐳQuery.forumNamesArray[]<br />⠀ROOT ᐸ-L- _14"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_14 bucket1
     Bucket0 --> Bucket1
     end
 ```

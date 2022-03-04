@@ -41,17 +41,13 @@ graph TD
     P_14["ᐳr…]ᐳgravatarUrl"]
     PgClassExpression_14 -.-> P_14
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14 bucket1
-
     subgraph "Buckets for queries/functions/custom-query-random-user-array"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀randomUserArray ᐸ-A- _7"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10 bucket0
     Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.randomUserArray[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀gravatarUrl ᐸ-L- _14"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14 bucket1
     Bucket0 --> Bucket1
     end
 ```

@@ -48,21 +48,16 @@ graph TD
     P_18["ᐳFORUM_NAMES[]"]
     Lambda_18 -.-> P_18
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_12,PgSelectSingle_13,PgClassExpression_14 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_15,PgSelectSingle_16,PgClassExpression_17,Lambda_18 bucket2
-
     subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀FORUM_NAMES ᐸ-A- _11"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
     Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_12,PgSelectSingle_13,PgClassExpression_14 bucket1
     Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~ᐳQuery.FORUM_NAMES[]<br />⠀ROOT ᐸ-L- _18"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_15,PgSelectSingle_16,PgClassExpression_17,Lambda_18 bucket2
     Bucket0 --> Bucket1 & Bucket2
     end
 ```

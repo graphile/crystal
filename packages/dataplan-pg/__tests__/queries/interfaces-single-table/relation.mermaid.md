@@ -68,21 +68,16 @@ graph TD
     P_72["ᐳitemᐳid x5"]
     PgClassExpression_72 -.-> P_72
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
-    classDef bucket1 stroke:#00bfff
-    class PgClassExpression_17,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72,Map_299 bucket1
-    classDef bucket2 stroke:#7f007f
-    class PgSelectSingle_34,PgClassExpression_35,Map_297 bucket2
-
     subgraph "Buckets for queries/interfaces-single-table/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀item ᐸ-O- _16"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
     Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _12, _13<br />~ᐳQuery.item<br />⠀⠀parent ᐸ-O- _26<br />⠀⠀⠀parent.id ᐸ-L- _17<br />⠀⠀id ᐸ-L- _72"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgClassExpression_17,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72,Map_299 bucket1
     Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _299, _23<br />~ᐳQuery.itemᐳSingleTablePost.parent<br />~ᐳQuery.itemᐳSingleTableTopic.parent<br />~ᐳQuery.itemᐳSingleTableDivider.parent<br />~ᐳQuery.itemᐳSingleTableChecklist.parent<br />~ᐳQuery.itemᐳSingleTableChecklistItem.parent<br />⠀⠀author ᐸ-O- _34<br />⠀⠀⠀author.username ᐸ-L- _35"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgSelectSingle_34,PgClassExpression_35,Map_297 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

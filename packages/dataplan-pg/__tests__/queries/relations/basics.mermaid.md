@@ -54,12 +54,9 @@ graph TD
     P_24["ᐳm…eᐳf…mᐳname"]
     PgClassExpression_24 -.-> P_24
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,PgClassExpression_16,Access_18,Access_19,Object_20,PgSelectSingle_22,PgClassExpression_24,Map_25 bucket0
-
     subgraph "Buckets for queries/relations/basics"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀message ᐸ-O- _13<br />⠀⠀⠀message.id ᐸ-L- _14<br />⠀⠀⠀message.body ᐸ-L- _15<br />⠀⠀⠀message.forum ᐸ-O- _22<br />⠀⠀⠀⠀message.forum.id ᐸ-L- _16<br />⠀⠀⠀⠀message.forum.name ᐸ-L- _24"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,PgClassExpression_16,Access_18,Access_19,Object_20,PgSelectSingle_22,PgClassExpression_24,Map_25 bucket0
     end
 ```

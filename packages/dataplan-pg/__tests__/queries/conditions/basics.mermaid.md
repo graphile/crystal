@@ -51,21 +51,16 @@ graph TD
     P_41["ᐳf…]ᐳmessagesList"]
     Access_41 -.-> P_41
 
-    %% allocate buckets
-    classDef bucket0 stroke:#696969
-    class __Value_0,__Value_3,PgSelect_17,Access_34,Access_35,Object_36 bucket0
-    classDef bucket1 stroke:#00bfff
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,Access_41 bucket1
-    classDef bucket2 stroke:#7f007f
-    class __Item_38,PgSelectSingle_39,PgClassExpression_40 bucket2
-
     subgraph "Buckets for queries/conditions/basics"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
-    style Bucket0 stroke:#696969
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,Access_34,Access_35,Object_36 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesList ᐸ-A- _41"):::bucket
-    style Bucket1 stroke:#00bfff
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23,Access_41 bucket1
     Bucket2("Bucket 2 (item_38)<br />Deps: _41<br />~ᐳQuery.forums[]ᐳForum.messagesList[]<br />⠀ROOT ᐸ-O- _39<br />⠀⠀body ᐸ-L- _40"):::bucket
-    style Bucket2 stroke:#7f007f
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item_38,PgSelectSingle_39,PgClassExpression_40 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
