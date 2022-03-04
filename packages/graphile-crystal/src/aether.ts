@@ -6170,26 +6170,11 @@ export class Aether<
     */
 
     graph.push("");
-    graph.push("    %% allocate buckets");
+    graph.push("    subgraph Buckets");
     for (const bucket of this.buckets) {
       const plans = Object.entries(this.plans).filter(
         ([id, plan]) => plan && plan.id === id && plan.bucketId === bucket.id,
       );
-      if (plans.length > 0) {
-        graph.push(
-          `    classDef bucket${bucket.id} stroke:${color(bucket.id)}`,
-        );
-        graph.push(
-          `    class ${plans.map(([, plan]) => planId(plan)).join(",")} bucket${
-            bucket.id
-          }`,
-        );
-      }
-    }
-
-    graph.push("");
-    graph.push("    subgraph Buckets");
-    for (const bucket of this.buckets) {
       const raisonDEtre = (() => {
         if (
           bucket.groupId === 0 &&
@@ -6252,7 +6237,13 @@ export class Aether<
           }${outputMapStuff.join("\n")}`,
         )}):::bucket`,
       );
-      graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
+      graph.push(`    classDef bucket${bucket.id} stroke:${color(bucket.id)}`);
+      graph.push(
+        `    class ${[
+          `Bucket${bucket.id}`,
+          ...plans.map(([, plan]) => planId(plan)),
+        ].join(",")} bucket${bucket.id}`,
+      );
     }
     for (const bucket of this.buckets) {
       const childNodes = bucket.children.map((c) => `Bucket${c.id}`);
