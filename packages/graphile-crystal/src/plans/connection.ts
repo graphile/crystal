@@ -218,6 +218,10 @@ export class ConnectionPlan<
     return plan.pageInfo(this);
   }
 
+  public optimize() {
+    return constant(EMPTY_OBJECT);
+  }
+
   public execute(
     values: Array<CrystalValuesList<any>>,
   ): CrystalResultsList<Record<string, never>> {
