@@ -390,7 +390,7 @@ export class PgSelectPlan<
    * If true, we will not attempt to inline this into the parent query.
    * Default false.
    */
-  private isInliningForbidden = false;
+  private isInliningForbidden: boolean;
 
   /**
    * The list of things we're selecting.
