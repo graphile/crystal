@@ -6028,9 +6028,11 @@ export class Aether<
           plan.groupIds.length === 1 && plan.groupIds[0] === plan.primaryGroupId
             ? ""
             : ` {${plan.groupIds}}`;
-        const planString = `${planName}[${plan.id}∈${plan.bucketId}${
-          plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""
-        }]${groups}${meta ? `\n<${meta}>` : ""}`;
+        const planString = `${planName}[${plan.id.replace(/^_/, "")}${
+          this.buckets.length > 1 ? `∈${plan.bucketId}` : ""
+        }${plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""}]${groups}${
+          meta ? `\n<${meta}>` : ""
+        }`;
         const [lBrace, rBrace] =
           plan instanceof __ItemPlan
             ? [">", "]"]
@@ -6209,7 +6211,7 @@ export class Aether<
           const planIds = Object.values(def.planIdByRootPathIdentity);
           const allIdsSame = planIds.every((id) => id === planIds[0]);
           const planSource = allIdsSame
-            ? planIds[0]
+            ? planIds[0].replace(/^_/, "")
             : JSON.stringify(def.planIdByRootPathIdentity);
           outputMapStuff.push(
             `${path}${fieldName} <-${def.modeType}- ${planSource}`,
@@ -6224,13 +6226,15 @@ export class Aether<
         `    Bucket${bucket.id}(${dotEscape(
           `Bucket ${bucket.id} (${raisonDEtre})\n${
             bucket.copyPlans.size > 0
-              ? `Deps: ${[...bucket.copyPlans].map((p) => p.id).join(", ")}\n`
+              ? `Deps: ${[...bucket.copyPlans]
+                  .map((p) => p.id.replace(/^_/, ""))
+                  .join(", ")}\n`
               : ""
           }${bucket.rootPathIdentities.join("\n")}\n${
             bucket.rootOutputPlanId != null
-              ? `⠀ROOT <-${bucket.rootOutputModeType ?? "?"}- ${
-                  bucket.rootOutputPlanId
-                }\n`
+              ? `⠀ROOT <-${
+                  bucket.rootOutputModeType ?? "?"
+                }- ${bucket.rootOutputPlanId.replace(/^_/, "")}\n`
               : ""
           }${outputMapStuff.join("\n")}`,
         )}):::bucket`,
