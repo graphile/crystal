@@ -30,9 +30,7 @@ graph TD
     Access_61["Access[_61∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_62["Access[_62∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Connection_38["Connection[_38∈2@1]<br />ᐸ_34ᐳ"]:::plan
-    InputStaticLeaf_24["InputStaticLeaf[_24∈2@1]"]:::plan
-    InputStaticLeaf_25["InputStaticLeaf[_25∈2@1]"]:::plan
+    Constant_70["Constant[_70∈2@1]"]:::plan
 
     %% plan dependencies
     PgSelectSingle_22 --> PgClassExpression_23
@@ -55,7 +53,6 @@ graph TD
     Access_61 & Access_62 --> Object_63
     __Value_3 --> Access_61
     __Value_3 --> Access_62
-    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
     P_0["~"]
@@ -68,8 +65,6 @@ graph TD
     PgClassExpression_23 -.-> P_23
     P_34["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     PgSelect_34 -.-> P_34
-    P_38["ᐳf…]ᐳmessagesConnection"]
-    Connection_38 -.-> P_38
     P_42["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
     PgSelectSingle_42 -.-> P_42
     P_43["ᐳf…]ᐳm…nᐳn…]ᐳbody<br />ᐳf…]ᐳm…nᐳe…]ᐳnodeᐳbody"]
@@ -82,6 +77,8 @@ graph TD
     PgClassExpression_52 -.-> P_52
     P_55["ᐳf…]ᐳm…nᐳe…]ᐳcursor"]
     PgCursor_55 -.-> P_55
+    P_70["ᐳf…]ᐳmessagesConnection"]
+    Constant_70 -.-> P_70
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-1"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
@@ -92,7 +89,7 @@ graph TD
     class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
     Bucket2("Bucket 2 (group1[defer])<br />Deps: _22, _63<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,InputStaticLeaf_24,InputStaticLeaf_25,PgClassExpression_33,PgSelect_34,Connection_38,PgClassExpression_39 bucket2
+    class Bucket2,PgClassExpression_33,PgSelect_34,PgClassExpression_39,Constant_70 bucket2
     Bucket3("Bucket 3 (item_41)<br />Deps: _34<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item_41,PgSelectSingle_42,PgClassExpression_43,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,PgCursor_55,PgClassExpression_56,List_57,Map_68 bucket3

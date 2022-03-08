@@ -19,15 +19,12 @@ graph TD
     Access_21["Access[_21∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_22["Access[_22∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Connection_24["Connection[_24∈0]<br />ᐸ_20ᐳ"]:::plan
-    InputStaticLeaf_14["InputStaticLeaf[_14∈0]"]:::plan
-    InputStaticLeaf_15["InputStaticLeaf[_15∈0]"]:::plan
-    InputStaticLeaf_16["InputStaticLeaf[_16∈0]"]:::plan
     PgValidateParsedCursor_30["PgValidateParsedCursor[_30∈0]"]:::plan
     ToPg_32["ToPg[_32∈0]"]:::plan
     Access_31["Access[_31∈0]<br />ᐸ_28.1ᐳ"]:::plan
     Lambda_28["Lambda[_28∈0]<br />ᐸparseCursorᐳ"]:::plan
     InputStaticLeaf_17["InputStaticLeaf[_17∈0]"]:::plan
+    Constant_37["Constant[_37∈0]"]:::plan
     PgPageInfo_25["PgPageInfo[_25∈0]"]:::plan
     Constant_26["Constant[_26∈0]"]:::plan
 
@@ -41,7 +38,6 @@ graph TD
     Access_21 & Access_22 --> Object_23
     __Value_3 --> Access_21
     __Value_3 --> Access_22
-    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_24
     Lambda_28 --> PgValidateParsedCursor_30
     Access_31 --> ToPg_32
     Lambda_28 --> Access_31
@@ -50,8 +46,6 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_24["ᐳallMessagesConnection"]
-    Connection_24 -.-> P_24
     P_25["ᐳa…nᐳpageInfo"]
     PgPageInfo_25 -.-> P_25
     P_26["ᐳa…nᐳp…oᐳhasNextPage"]
@@ -60,10 +54,12 @@ graph TD
     Lambda_29 -.-> P_29
     P_36["ᐳa…nᐳtotalCount"]
     PgClassExpression_36 -.-> P_36
+    P_37["ᐳallMessagesConnection"]
+    Constant_37 -.-> P_37
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allMessagesConnection ᐸ-O- _24<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- _25<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- _26<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- _29<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- _36"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allMessagesConnection ᐸ-O- _37<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- _25<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- _26<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- _29<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- _36"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Access_21,Access_22,Object_23,Connection_24,PgPageInfo_25,Constant_26,PgSelect_27,Lambda_28,Lambda_29,PgValidateParsedCursor_30,Access_31,ToPg_32,PgSelect_33,First_34,PgSelectSingle_35,PgClassExpression_36 bucket0
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_17,Access_21,Access_22,Object_23,PgPageInfo_25,Constant_26,PgSelect_27,Lambda_28,Lambda_29,PgValidateParsedCursor_30,Access_31,ToPg_32,PgSelect_33,First_34,PgSelectSingle_35,PgClassExpression_36,Constant_37 bucket0
     end
 ```

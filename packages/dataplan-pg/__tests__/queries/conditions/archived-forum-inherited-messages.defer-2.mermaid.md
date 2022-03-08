@@ -30,9 +30,7 @@ graph TD
     Access_61["Access[_61∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_62["Access[_62∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Connection_38["Connection[_38∈0]<br />ᐸ_34ᐳ"]:::plan
-    InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
-    InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
+    Constant_70["Constant[_70∈0]"]:::plan
 
     %% plan dependencies
     PgSelectSingle_22 --> PgClassExpression_23
@@ -55,7 +53,6 @@ graph TD
     Access_61 & Access_62 --> Object_63
     __Value_3 --> Access_61
     __Value_3 --> Access_62
-    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
     P_0["~"]
@@ -68,8 +65,6 @@ graph TD
     PgClassExpression_23 -.-> P_23
     P_34["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     PgSelect_34 -.-> P_34
-    P_38["ᐳf…]ᐳmessagesConnection"]
-    Connection_38 -.-> P_38
     P_42["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
     PgSelectSingle_42 -.-> P_42
     P_43["ᐳf…]ᐳm…nᐳn…]ᐳbody<br />ᐳf…]ᐳm…nᐳe…]ᐳnodeᐳbody"]
@@ -82,11 +77,13 @@ graph TD
     PgClassExpression_52 -.-> P_52
     P_55["ᐳf…]ᐳm…nᐳe…]ᐳcursor"]
     PgCursor_55 -.-> P_55
+    P_70["ᐳf…]ᐳmessagesConnection"]
+    Constant_70 -.-> P_70
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-2"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_61,Access_62,Object_63 bucket0
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,Access_61,Access_62,Object_63,Constant_70 bucket0
     Bucket1("Bucket 1 (item_21)<br />Deps: _17, _63<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1

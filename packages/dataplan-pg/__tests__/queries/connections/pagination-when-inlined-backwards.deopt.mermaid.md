@@ -46,9 +46,7 @@ graph TD
     Access_60["Access[_60∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_61["Access[_61∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Connection_38["Connection[_38∈0]<br />ᐸ_34ᐳ"]:::plan
-    InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
-    InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
+    Constant_87["Constant[_87∈0]"]:::plan
     PgPageInfo_67["PgPageInfo[_67∈0]"]:::plan
     Constant_68["Constant[_68∈0]"]:::plan
 
@@ -89,7 +87,6 @@ graph TD
     Access_60 & Access_61 --> Object_62
     __Value_3 --> Access_60
     __Value_3 --> Access_61
-    InputStaticLeaf_24 & InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
     P_0["~"]
@@ -100,8 +97,6 @@ graph TD
     PgSelectSingle_22 -.-> P_22
     P_23["ᐳf…]ᐳname"]
     PgClassExpression_23 -.-> P_23
-    P_38["ᐳf…]ᐳmessagesConnection"]
-    Connection_38 -.-> P_38
     P_39["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     PgSelect_39 -.-> P_39
     P_41["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
@@ -128,12 +123,14 @@ graph TD
     PgCursor_80 -.-> P_80
     P_86["ᐳf…]ᐳm…nᐳtotalCount"]
     PgClassExpression_86 -.-> P_86
+    P_87["ᐳf…]ᐳmessagesConnection"]
+    Constant_87 -.-> P_87
 
     subgraph "Buckets for queries/connections/pagination-when-inlined-backwards"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_60,Access_61,Object_62,PgPageInfo_67,Constant_68 bucket0
-    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _62, _38, _67, _68<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesConnection ᐸ-O- _38<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- _39<br />⠀⠀⠀messagesConnection.edges ᐸ-A- _39<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _67<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- _70<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- _74<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- _80<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _86"):::bucket
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,Access_60,Access_61,Object_62,PgPageInfo_67,Constant_68,Constant_87 bucket0
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _62, _87, _67, _68<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀name ᐸ-L- _23<br />⠀⠀messagesConnection ᐸ-O- _87<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- _39<br />⠀⠀⠀messagesConnection.edges ᐸ-A- _39<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _67<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- _70<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- _74<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- _80<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _86"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_33,PgSelect_39,Lambda_70,First_72,PgSelectSingle_73,PgCursor_74,PgClassExpression_75,List_76,Last_78,PgSelectSingle_79,PgCursor_80,PgClassExpression_81,List_82,PgSelect_83,First_84,PgSelectSingle_85,PgClassExpression_86 bucket1
     Bucket2("Bucket 2 (item_40)<br />Deps: _39, _62<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- _41<br />⠀⠀node ᐸ-O- _41<br />⠀⠀⠀node.body ᐸ-L- _42<br />⠀⠀⠀node.author ᐸ-O- _49<br />⠀⠀⠀⠀node.author.username ᐸ-L- _50<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- _51<br />⠀⠀body ᐸ-L- _42<br />⠀⠀author ᐸ-O- _49<br />⠀⠀⠀author.username ᐸ-L- _50<br />⠀⠀⠀author.gravatarUrl ᐸ-L- _51<br />⠀⠀cursor ᐸ-L- _54"):::bucket

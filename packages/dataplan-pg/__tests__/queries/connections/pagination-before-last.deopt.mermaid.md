@@ -41,15 +41,12 @@ graph TD
     Access_38["Access[_38∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_39["Access[_39∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Connection_24["Connection[_24∈0]<br />ᐸ_20ᐳ"]:::plan
-    InputStaticLeaf_14["InputStaticLeaf[_14∈0]"]:::plan
-    InputStaticLeaf_15["InputStaticLeaf[_15∈0]"]:::plan
-    InputStaticLeaf_16["InputStaticLeaf[_16∈0]"]:::plan
     PgValidateParsedCursor_27["PgValidateParsedCursor[_27∈0]"]:::plan
     ToPg_29["ToPg[_29∈0]"]:::plan
     Access_28["Access[_28∈0]<br />ᐸ_26.1ᐳ"]:::plan
     Lambda_26["Lambda[_26∈0]<br />ᐸparseCursorᐳ"]:::plan
     InputStaticLeaf_17["InputStaticLeaf[_17∈0]"]:::plan
+    Constant_77["Constant[_77∈0]"]:::plan
     PgPageInfo_45["PgPageInfo[_45∈0]"]:::plan
     Constant_46["Constant[_46∈0]"]:::plan
 
@@ -85,7 +82,6 @@ graph TD
     Access_38 & Access_39 --> Object_40
     __Value_3 --> Access_38
     __Value_3 --> Access_39
-    InputStaticLeaf_14 & InputStaticLeaf_15 & InputStaticLeaf_16 & InputStaticLeaf_17 --> Connection_24
     Lambda_26 --> PgValidateParsedCursor_27
     Access_28 --> ToPg_29
     Lambda_26 --> Access_28
@@ -94,8 +90,6 @@ graph TD
     %% plan-to-path relationships
     P_0["~"]
     __Value_0 -.-> P_0
-    P_24["ᐳallMessagesConnection"]
-    Connection_24 -.-> P_24
     P_25["ᐳa…nᐳedges"]
     PgSelect_25 -.-> P_25
     P_31["ᐳa…nᐳedges[]<br />ᐳa…nᐳe…]ᐳnode"]
@@ -122,11 +116,13 @@ graph TD
     PgCursor_67 -.-> P_67
     P_76["ᐳa…nᐳtotalCount"]
     PgClassExpression_76 -.-> P_76
+    P_77["ᐳallMessagesConnection"]
+    Constant_77 -.-> P_77
 
     subgraph "Buckets for queries/connections/pagination-before-last"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allMessagesConnection ᐸ-O- _24<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- _45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- _46<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- _49<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- _57<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- _67<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- _76"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allMessagesConnection ᐸ-O- _77<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- _45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- _46<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- _49<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- _57<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- _67<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- _76"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Connection_24,PgSelect_25,Lambda_26,PgValidateParsedCursor_27,Access_28,ToPg_29,Access_38,Access_39,Object_40,PgPageInfo_45,Constant_46,Lambda_49,First_55,PgSelectSingle_56,PgCursor_57,PgClassExpression_61,List_62,Last_65,PgSelectSingle_66,PgCursor_67,PgClassExpression_71,List_72,PgSelect_73,First_74,PgSelectSingle_75,PgClassExpression_76 bucket0
+    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_17,PgSelect_25,Lambda_26,PgValidateParsedCursor_27,Access_28,ToPg_29,Access_38,Access_39,Object_40,PgPageInfo_45,Constant_46,Lambda_49,First_55,PgSelectSingle_56,PgCursor_57,PgClassExpression_61,List_62,Last_65,PgSelectSingle_66,PgCursor_67,PgClassExpression_71,List_72,PgSelect_73,First_74,PgSelectSingle_75,PgClassExpression_76,Constant_77 bucket0
     Bucket1("Bucket 1 (item_30)<br />Deps: _25, _40<br />~ᐳQuery.allMessagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- _31<br />⠀⠀node ᐸ-O- _31<br />⠀⠀⠀node.body ᐸ-L- _35<br />⠀⠀⠀node.author ᐸ-O- _42<br />⠀⠀⠀⠀node.author.username ᐸ-L- _43<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- _44<br />⠀⠀cursor ᐸ-L- _32"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item_30,PgSelectSingle_31,PgCursor_32,PgClassExpression_33,List_34,PgClassExpression_35,PgClassExpression_36,PgSelect_37,First_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44 bucket1

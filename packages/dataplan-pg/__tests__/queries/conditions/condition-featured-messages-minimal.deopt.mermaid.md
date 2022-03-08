@@ -24,10 +24,8 @@ graph TD
     Access_34["Access[_34∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
     Access_35["Access[_35∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
     __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Connection_37["Connection[_37∈0]<br />ᐸ_33ᐳ"]:::plan
-    InputStaticLeaf_23["InputStaticLeaf[_23∈0]"]:::plan
-    InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_26["InputStaticLeaf[_26∈0]"]:::plan
+    Constant_46["Constant[_46∈0]"]:::plan
     PgPageInfo_39["PgPageInfo[_39∈0]"]:::plan
 
     %% plan dependencies
@@ -45,7 +43,6 @@ graph TD
     Access_34 & Access_35 --> Object_36
     __Value_3 --> Access_34
     __Value_3 --> Access_35
-    InputStaticLeaf_23 & InputStaticLeaf_24 --> Connection_37
 
     %% plan-to-path relationships
     P_0["~"]
@@ -54,20 +51,20 @@ graph TD
     PgSelect_17 -.-> P_17
     P_22["ᐳforums[]"]
     PgSelectSingle_22 -.-> P_22
-    P_37["ᐳf…]ᐳmessagesConnection"]
-    Connection_37 -.-> P_37
     P_39["ᐳf…]ᐳm…nᐳpageInfo"]
     PgPageInfo_39 -.-> P_39
     P_41["ᐳf…]ᐳm…nᐳp…oᐳhasNextPage"]
     Lambda_41 -.-> P_41
     P_45["ᐳf…]ᐳm…nᐳtotalCount"]
     PgClassExpression_45 -.-> P_45
+    P_46["ᐳf…]ᐳmessagesConnection"]
+    Constant_46 -.-> P_46
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_23,InputStaticLeaf_24,InputStaticLeaf_26,Access_34,Access_35,Object_36,Connection_37,PgPageInfo_39 bucket0
-    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _36, _26, _37, _39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀messagesConnection ᐸ-O- _37<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _45"):::bucket
+    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_26,Access_34,Access_35,Object_36,PgPageInfo_39,Constant_46 bucket0
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _36, _26, _46, _39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀messagesConnection ᐸ-O- _46<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _45"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item_21,PgSelectSingle_22,PgClassExpression_32,PgClassExpression_38,PgSelect_40,Lambda_41,PgSelect_42,First_43,PgSelectSingle_44,PgClassExpression_45 bucket1
     Bucket0 --> Bucket1
