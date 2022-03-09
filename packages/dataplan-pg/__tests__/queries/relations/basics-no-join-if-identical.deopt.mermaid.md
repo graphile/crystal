@@ -8,53 +8,53 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgSelectSingle_22["PgSelectSingle[_22∈0]<br />ᐸforumsᐳ"]:::plan
-    First_21["First[_21∈0]"]:::plan
-    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
-    PgClassExpression_16["PgClassExpression[_16∈0]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸmessagesᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸmessagesᐳ"]]:::plan
-    Object_20["Object[_20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_18["Access[_18∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_19["Access[_19∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgClassExpression15["PgClassExpression[15]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgSelectSingle22["PgSelectSingle[22]<br />ᐸforumsᐳ"]:::plan
+    First21["First[21]"]:::plan
+    PgSelect17[["PgSelect[17]<br />ᐸforumsᐳ"]]:::plan
+    PgClassExpression16["PgClassExpression[16]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸmessagesᐳ"]:::plan
+    First12["First[12]"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸmessagesᐳ"]]:::plan
+    Object20["Object[20]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access18["Access[18]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access19["Access[19]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgClassExpression_15
-    First_21 --> PgSelectSingle_22
-    PgSelect_17 --> First_21
-    Object_20 & PgClassExpression_16 --> PgSelect_17
-    PgSelectSingle_13 --> PgClassExpression_16
-    First_12 --> PgSelectSingle_13
-    PgSelect_8 --> First_12
-    Object_20 & InputStaticLeaf_7 --> PgSelect_8
-    Access_18 & Access_19 --> Object_20
-    __Value_3 --> Access_18
-    __Value_3 --> Access_19
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression15
+    First21 --> PgSelectSingle22
+    PgSelect17 --> First21
+    Object20 & PgClassExpression16 --> PgSelect17
+    PgSelectSingle13 --> PgClassExpression16
+    First12 --> PgSelectSingle13
+    PgSelect8 --> First12
+    Object20 & InputStaticLeaf7 --> PgSelect8
+    Access18 & Access19 --> Object20
+    __Value3 --> Access18
+    __Value3 --> Access19
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_13["ᐳmessage"]
-    PgSelectSingle_13 -.-> P_13
-    P_14["ᐳm…eᐳid"]
-    PgClassExpression_14 -.-> P_14
-    P_15["ᐳm…eᐳbody"]
-    PgClassExpression_15 -.-> P_15
-    P_16["ᐳm…eᐳf…mᐳid"]
-    PgClassExpression_16 -.-> P_16
-    P_22["ᐳm…eᐳforum"]
-    PgSelectSingle_22 -.-> P_22
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳmessage"]
+    PgSelectSingle13 -.-> P13
+    P14["ᐳm…eᐳid"]
+    PgClassExpression14 -.-> P14
+    P15["ᐳm…eᐳbody"]
+    PgClassExpression15 -.-> P15
+    P16["ᐳm…eᐳf…mᐳid"]
+    PgClassExpression16 -.-> P16
+    P22["ᐳm…eᐳforum"]
+    PgSelectSingle22 -.-> P22
 
     subgraph "Buckets for queries/relations/basics-no-join-if-identical"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀message ᐸ-O- _13<br />⠀⠀⠀message.id ᐸ-L- _14<br />⠀⠀⠀message.body ᐸ-L- _15<br />⠀⠀⠀message.forum ᐸ-O- _22<br />⠀⠀⠀⠀message.forum.id ᐸ-L- _16"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀message ᐸ-O- 13<br />⠀⠀⠀message.id ᐸ-L- 14<br />⠀⠀⠀message.body ᐸ-L- 15<br />⠀⠀⠀message.forum ᐸ-O- 22<br />⠀⠀⠀⠀message.forum.id ᐸ-L- 16"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,PgClassExpression_16,PgSelect_17,Access_18,Access_19,Object_20,First_21,PgSelectSingle_22 bucket0
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgSelect17,Access18,Access19,Object20,First21,PgSelectSingle22 bucket0
     end
 ```

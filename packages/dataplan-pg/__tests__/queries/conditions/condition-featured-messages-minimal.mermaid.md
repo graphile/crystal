@@ -8,63 +8,63 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈1]<br />ᐸcount(*)ᐳ"]:::plan
-    PgSelectSingle_44["PgSelectSingle[_44∈1]<br />ᐸmessagesᐳ"]:::plan
-    First_43["First[_43∈1]"]:::plan
-    Access_48["Access[_48∈1]<br />ᐸ_21.1ᐳ"]:::plan
-    Lambda_41["Lambda[_41∈1]<br />ᐸlistHasMoreᐳ"]:::plan
-    Lambda_47["Lambda[_47∈1]"]:::plan
-    Access_46["Access[_46∈1]<br />ᐸ_21.0ᐳ"]:::plan
-    __Item_21>"__Item[_21∈1]<br />ᐸ_17ᐳ"]:::itemplan
-    PgSelect_17[["PgSelect[_17∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object_36["Object[_36∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_34["Access[_34∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_35["Access[_35∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_26["InputStaticLeaf[_26∈0]"]:::plan
-    Constant_49["Constant[_49∈0]"]:::plan
-    PgPageInfo_39["PgPageInfo[_39∈0]"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression45["PgClassExpression[45∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸmessagesᐳ"]:::plan
+    First43["First[43∈1]"]:::plan
+    Access48["Access[48∈1]<br />ᐸ21.1ᐳ"]:::plan
+    Lambda41["Lambda[41∈1]<br />ᐸlistHasMoreᐳ"]:::plan
+    Lambda47["Lambda[47∈1]"]:::plan
+    Access46["Access[46∈1]<br />ᐸ21.0ᐳ"]:::plan
+    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
+    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object36["Object[36∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access34["Access[34∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access35["Access[35∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf26["InputStaticLeaf[26∈0]"]:::plan
+    Constant49["Constant[49∈0]"]:::plan
+    PgPageInfo39["PgPageInfo[39∈0]"]:::plan
 
     %% plan dependencies
-    __Item_21 --> PgSelectSingle_22
-    PgSelectSingle_44 --> PgClassExpression_45
-    First_43 --> PgSelectSingle_44
-    Access_48 --> First_43
-    __Item_21 --> Access_48
-    Lambda_47 --> Lambda_41
-    Access_46 --> Lambda_47
-    __Item_21 --> Access_46
-    PgSelect_17 ==> __Item_21
-    Object_36 & InputStaticLeaf_26 --> PgSelect_17
-    Access_34 & Access_35 --> Object_36
-    __Value_3 --> Access_34
-    __Value_3 --> Access_35
+    __Item21 --> PgSelectSingle22
+    PgSelectSingle44 --> PgClassExpression45
+    First43 --> PgSelectSingle44
+    Access48 --> First43
+    __Item21 --> Access48
+    Lambda47 --> Lambda41
+    Access46 --> Lambda47
+    __Item21 --> Access46
+    PgSelect17 ==> __Item21
+    Object36 & InputStaticLeaf26 --> PgSelect17
+    Access34 & Access35 --> Object36
+    __Value3 --> Access34
+    __Value3 --> Access35
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_17["ᐳforums"]
-    PgSelect_17 -.-> P_17
-    P_22["ᐳforums[]"]
-    PgSelectSingle_22 -.-> P_22
-    P_39["ᐳf…]ᐳm…nᐳpageInfo"]
-    PgPageInfo_39 -.-> P_39
-    P_41["ᐳf…]ᐳm…nᐳp…oᐳhasNextPage"]
-    Lambda_41 -.-> P_41
-    P_45["ᐳf…]ᐳm…nᐳtotalCount"]
-    PgClassExpression_45 -.-> P_45
-    P_49["ᐳf…]ᐳmessagesConnection"]
-    Constant_49 -.-> P_49
+    P0["~"]
+    __Value0 -.-> P0
+    P17["ᐳforums"]
+    PgSelect17 -.-> P17
+    P22["ᐳforums[]"]
+    PgSelectSingle22 -.-> P22
+    P39["ᐳf…]ᐳm…nᐳpageInfo"]
+    PgPageInfo39 -.-> P39
+    P41["ᐳf…]ᐳm…nᐳp…oᐳhasNextPage"]
+    Lambda41 -.-> P41
+    P45["ᐳf…]ᐳm…nᐳtotalCount"]
+    PgClassExpression45 -.-> P45
+    P49["ᐳf…]ᐳmessagesConnection"]
+    Constant49 -.-> P49
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forums ᐸ-A- _17"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_17,InputStaticLeaf_26,Access_34,Access_35,Object_36,PgPageInfo_39,Constant_49 bucket0
-    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _49, _39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- _22<br />⠀⠀messagesConnection ᐸ-O- _49<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- _41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- _45"):::bucket
+    class Bucket0,__Value0,__Value3,PgSelect17,InputStaticLeaf26,Access34,Access35,Object36,PgPageInfo39,Constant49 bucket0
+    Bucket1("Bucket 1 (item21)<br />Deps: 17, 49, 39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀messagesConnection ᐸ-O- 49<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 45"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item_21,PgSelectSingle_22,Lambda_41,First_43,PgSelectSingle_44,PgClassExpression_45,Access_46,Lambda_47,Access_48 bucket1
+    class Bucket1,__Item21,PgSelectSingle22,Lambda41,First43,PgSelectSingle44,PgClassExpression45,Access46,Lambda47,Access48 bucket1
     Bucket0 --> Bucket1
     end
 ```

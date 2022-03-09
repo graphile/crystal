@@ -8,57 +8,57 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸunique_author_countᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸunique_author_countᐳ"]]:::plan
-    PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
-    PgSelectSingle_21["PgSelectSingle[_21∈0]<br />ᐸunique_author_countᐳ"]:::plan
-    First_20["First[_20∈0]"]:::plan
-    PgSelect_16[["PgSelect[_16∈0]<br />ᐸunique_author_countᐳ"]]:::plan
-    PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
-    PgSelectSingle_29["PgSelectSingle[_29∈0]<br />ᐸunique_author_countᐳ"]:::plan
-    First_28["First[_28∈0]"]:::plan
-    PgSelect_24[["PgSelect[_24∈0]<br />ᐸunique_author_countᐳ"]]:::plan
-    Object_11["Object[_11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_10["Access[_10∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    InputStaticLeaf_15["InputStaticLeaf[_15∈0]"]:::plan
-    InputStaticLeaf_23["InputStaticLeaf[_23∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸunique_author_countᐳ"]:::plan
+    First12["First[12]"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸunique_author_countᐳ"]]:::plan
+    PgClassExpression22["PgClassExpression[22]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
+    PgSelectSingle21["PgSelectSingle[21]<br />ᐸunique_author_countᐳ"]:::plan
+    First20["First[20]"]:::plan
+    PgSelect16[["PgSelect[16]<br />ᐸunique_author_countᐳ"]]:::plan
+    PgClassExpression30["PgClassExpression[30]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
+    PgSelectSingle29["PgSelectSingle[29]<br />ᐸunique_author_countᐳ"]:::plan
+    First28["First[28]"]:::plan
+    PgSelect24[["PgSelect[24]<br />ᐸunique_author_countᐳ"]]:::plan
+    Object11["Object[11]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    InputStaticLeaf15["InputStaticLeaf[15]"]:::plan
+    InputStaticLeaf23["InputStaticLeaf[23]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_13 --> PgClassExpression_14
-    First_12 --> PgSelectSingle_13
-    PgSelect_8 --> First_12
-    Object_11 & InputStaticLeaf_7 --> PgSelect_8
-    PgSelectSingle_21 --> PgClassExpression_22
-    First_20 --> PgSelectSingle_21
-    PgSelect_16 --> First_20
-    Object_11 & InputStaticLeaf_15 --> PgSelect_16
-    PgSelectSingle_29 --> PgClassExpression_30
-    First_28 --> PgSelectSingle_29
-    PgSelect_24 --> First_28
-    Object_11 & InputStaticLeaf_23 --> PgSelect_24
-    Access_9 & Access_10 --> Object_11
-    __Value_3 --> Access_9
-    __Value_3 --> Access_10
+    PgSelectSingle13 --> PgClassExpression14
+    First12 --> PgSelectSingle13
+    PgSelect8 --> First12
+    Object11 & InputStaticLeaf7 --> PgSelect8
+    PgSelectSingle21 --> PgClassExpression22
+    First20 --> PgSelectSingle21
+    PgSelect16 --> First20
+    Object11 & InputStaticLeaf15 --> PgSelect16
+    PgSelectSingle29 --> PgClassExpression30
+    First28 --> PgSelectSingle29
+    PgSelect24 --> First28
+    Object11 & InputStaticLeaf23 --> PgSelect24
+    Access9 & Access10 --> Object11
+    __Value3 --> Access9
+    __Value3 --> Access10
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_14["ᐳall"]
-    PgClassExpression_14 -.-> P_14
-    P_22["ᐳfeatured"]
-    PgClassExpression_22 -.-> P_22
-    P_30["ᐳunfeatured"]
-    PgClassExpression_30 -.-> P_30
+    P0["~"]
+    __Value0 -.-> P0
+    P14["ᐳall"]
+    PgClassExpression14 -.-> P14
+    P22["ᐳfeatured"]
+    PgClassExpression22 -.-> P22
+    P30["ᐳunfeatured"]
+    PgClassExpression30 -.-> P30
 
     subgraph "Buckets for queries/functions/custom-query-scalar"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀all ᐸ-L- _14<br />⠀⠀featured ᐸ-L- _22<br />⠀⠀unfeatured ᐸ-L- _30"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀all ᐸ-L- 14<br />⠀⠀featured ᐸ-L- 22<br />⠀⠀unfeatured ᐸ-L- 30"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,InputStaticLeaf_15,PgSelect_16,First_20,PgSelectSingle_21,PgClassExpression_22,InputStaticLeaf_23,PgSelect_24,First_28,PgSelectSingle_29,PgClassExpression_30 bucket0
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,InputStaticLeaf15,PgSelect16,First20,PgSelectSingle21,PgClassExpression22,InputStaticLeaf23,PgSelect24,First28,PgSelectSingle29,PgClassExpression30 bucket0
     end
 ```

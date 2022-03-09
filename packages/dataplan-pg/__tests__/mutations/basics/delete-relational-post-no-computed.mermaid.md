@@ -8,52 +8,52 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgDelete_9[["PgDelete[_9∈1@1]"]]:::sideeffectplan
-    PgClassExpression_20["PgClassExpression[_20∈2@2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgDelete_16[["PgDelete[_16∈2@2]"]]:::sideeffectplan
-    Object_12["Object[_12∈0] {1,2}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_10["Access[_10∈0] {1,2}<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_11["Access[_11∈0] {1,2}<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
-    __Value_5["__Value[_5∈0]<br />ᐸrootValueᐳ"]:::plan
-    InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
-    InputStaticLeaf_15["InputStaticLeaf[_15∈2@2]"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    PgClassExpression13["PgClassExpression[13∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgDelete9[["PgDelete[9∈1@1]"]]:::sideeffectplan
+    PgClassExpression20["PgClassExpression[20∈2@2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgDelete16[["PgDelete[16∈2@2]"]]:::sideeffectplan
+    Object12["Object[12∈0] {1,2}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access10["Access[10∈0] {1,2}<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access11["Access[11∈0] {1,2}<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    InputStaticLeaf8["InputStaticLeaf[8∈1@1]"]:::plan
+    InputStaticLeaf15["InputStaticLeaf[15∈2@2]"]:::plan
 
     %% plan dependencies
-    PgDelete_9 --> PgClassExpression_13
-    Object_12 & InputStaticLeaf_8 --> PgDelete_9
-    PgDelete_16 --> PgClassExpression_20
-    Object_12 & InputStaticLeaf_15 --> PgDelete_16
-    Access_10 & Access_11 --> Object_12
-    __Value_3 --> Access_10
-    __Value_3 --> Access_11
-    __Value_5 --> __TrackedObject_6
+    PgDelete9 --> PgClassExpression13
+    Object12 & InputStaticLeaf8 --> PgDelete9
+    PgDelete16 --> PgClassExpression20
+    Object12 & InputStaticLeaf15 --> PgDelete16
+    Access10 & Access11 --> Object12
+    __Value3 --> Access10
+    __Value3 --> Access11
+    __Value5 --> __TrackedObject6
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_9["ᐳd1"]
-    PgDelete_9 -.-> P_9
-    P_13["ᐳd1ᐳid"]
-    PgClassExpression_13 -.-> P_13
-    P_16["ᐳd2"]
-    PgDelete_16 -.-> P_16
-    P_20["ᐳd2ᐳid"]
-    PgClassExpression_20 -.-> P_20
+    P0["~"]
+    __Value0 -.-> P0
+    P9["ᐳd1"]
+    PgDelete9 -.-> P9
+    P13["ᐳd1ᐳid"]
+    PgClassExpression13 -.-> P13
+    P16["ᐳd2"]
+    PgDelete16 -.-> P16
+    P20["ᐳd2ᐳid"]
+    PgClassExpression20 -.-> P20
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_10,Access_11,Object_12 bucket0
-    Bucket1("Bucket 1 (group1[mutation])<br />Deps: _12<br />~ᐳMutation.d1<br />⠀ROOT ᐸ-O- _9<br />⠀⠀id ᐸ-L- _13"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6,Access10,Access11,Object12 bucket0
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 12<br />~ᐳMutation.d1<br />⠀ROOT ᐸ-O- 9<br />⠀⠀id ᐸ-L- 13"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,InputStaticLeaf_8,PgDelete_9,PgClassExpression_13 bucket1
-    Bucket2("Bucket 2 (group2[mutation])<br />Deps: _12<br />~ᐳMutation.d2<br />⠀ROOT ᐸ-O- _16<br />⠀⠀id ᐸ-L- _20"):::bucket
+    class Bucket1,InputStaticLeaf8,PgDelete9,PgClassExpression13 bucket1
+    Bucket2("Bucket 2 (group2[mutation])<br />Deps: 12<br />~ᐳMutation.d2<br />⠀ROOT ᐸ-O- 16<br />⠀⠀id ᐸ-L- 20"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,InputStaticLeaf_15,PgDelete_16,PgClassExpression_20 bucket2
+    class Bucket2,InputStaticLeaf15,PgDelete16,PgClassExpression20 bucket2
     Bucket0 --> Bucket1 & Bucket2
     end
 ```

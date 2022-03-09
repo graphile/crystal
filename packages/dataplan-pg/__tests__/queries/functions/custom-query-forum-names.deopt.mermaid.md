@@ -8,40 +8,40 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1]<br />ᐸ__forum_na...um_names__ᐳ"]:::plan
-    PgSelectSingle_12["PgSelectSingle[_12∈1]<br />ᐸtextᐳ"]:::plan
-    __Item_11>"__Item[_11∈1]<br />ᐸ_7ᐳ"]:::itemplan
-    PgSelect_7[["PgSelect[_7∈0]<br />ᐸforum_namesᐳ"]]:::plan
-    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__forum_na...um_names__ᐳ"]:::plan
+    PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸtextᐳ"]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
+    PgSelect7[["PgSelect[7∈0]<br />ᐸforum_namesᐳ"]]:::plan
+    Object10["Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access8["Access[8∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access9["Access[9∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_12 --> PgClassExpression_13
-    __Item_11 --> PgSelectSingle_12
-    PgSelect_7 ==> __Item_11
-    Object_10 --> PgSelect_7
-    Access_8 & Access_9 --> Object_10
-    __Value_3 --> Access_8
-    __Value_3 --> Access_9
+    PgSelectSingle12 --> PgClassExpression13
+    __Item11 --> PgSelectSingle12
+    PgSelect7 ==> __Item11
+    Object10 --> PgSelect7
+    Access8 & Access9 --> Object10
+    __Value3 --> Access8
+    __Value3 --> Access9
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_7["ᐳforumNames"]
-    PgSelect_7 -.-> P_7
-    P_13["ᐳforumNames[]"]
-    PgClassExpression_13 -.-> P_13
+    P0["~"]
+    __Value0 -.-> P0
+    P7["ᐳforumNames"]
+    PgSelect7 -.-> P7
+    P13["ᐳforumNames[]"]
+    PgClassExpression13 -.-> P13
 
     subgraph "Buckets for queries/functions/custom-query-forum-names"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forumNames ᐸ-A- _7"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forumNames ᐸ-A- 7"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10 bucket0
-    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.forumNames[]<br />⠀ROOT ᐸ-L- _13"):::bucket
+    class Bucket0,__Value0,__Value3,PgSelect7,Access8,Access9,Object10 bucket0
+    Bucket1("Bucket 1 (item11)<br />Deps: 7<br />~ᐳQuery.forumNames[]<br />⠀ROOT ᐸ-L- 13"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13 bucket1
+    class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13 bucket1
     Bucket0 --> Bucket1
     end
 ```

@@ -8,47 +8,47 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈0]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
-    PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
-    PgSelectSingle_20["PgSelectSingle[_20∈0]<br />ᐸusersᐳ"]:::plan
-    Map_23["Map[_23∈0]<br />ᐸ_13:{”0”:0,”1”:1}ᐳ"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object_18["Object[_18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_16["Access[_16∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_17["Access[_17∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgClassExpression21["PgClassExpression[21]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
+    PgSelectSingle20["PgSelectSingle[20]<br />ᐸusersᐳ"]:::plan
+    Map23["Map[23]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸforumsᐳ"]:::plan
+    First12["First[12]"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸforumsᐳ"]]:::plan
+    Object18["Object[18]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access16["Access[16]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access17["Access[17]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_20 --> PgClassExpression_21
-    PgSelectSingle_20 --> PgClassExpression_22
-    Map_23 --> PgSelectSingle_20
-    PgSelectSingle_13 --> Map_23
-    First_12 --> PgSelectSingle_13
-    PgSelect_8 --> First_12
-    Object_18 & InputStaticLeaf_7 --> PgSelect_8
-    Access_16 & Access_17 --> Object_18
-    __Value_3 --> Access_16
-    __Value_3 --> Access_17
+    PgSelectSingle20 --> PgClassExpression21
+    PgSelectSingle20 --> PgClassExpression22
+    Map23 --> PgSelectSingle20
+    PgSelectSingle13 --> Map23
+    First12 --> PgSelectSingle13
+    PgSelect8 --> First12
+    Object18 & InputStaticLeaf7 --> PgSelect8
+    Access16 & Access17 --> Object18
+    __Value3 --> Access16
+    __Value3 --> Access17
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_13["ᐳforum"]
-    PgSelectSingle_13 -.-> P_13
-    P_20["ᐳf…mᐳrandomUser"]
-    PgSelectSingle_20 -.-> P_20
-    P_21["ᐳf…mᐳr…rᐳusername"]
-    PgClassExpression_21 -.-> P_21
-    P_22["ᐳf…mᐳr…rᐳgravatarUrl"]
-    PgClassExpression_22 -.-> P_22
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳforum"]
+    PgSelectSingle13 -.-> P13
+    P20["ᐳf…mᐳrandomUser"]
+    PgSelectSingle20 -.-> P20
+    P21["ᐳf…mᐳr…rᐳusername"]
+    PgClassExpression21 -.-> P21
+    P22["ᐳf…mᐳr…rᐳgravatarUrl"]
+    PgClassExpression22 -.-> P22
 
     subgraph "Buckets for queries/functions/computed-column-user"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.randomUser ᐸ-O- _20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- _21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- _22"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.randomUser ᐸ-O- 20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- 21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- 22"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,Access_16,Access_17,Object_18,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,Map_23 bucket0
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,Access16,Access17,Object18,PgSelectSingle20,PgClassExpression21,PgClassExpression22,Map23 bucket0
     end
 ```

@@ -8,113 +8,113 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    Lambda_15["Lambda[_15∈1]"]:::plan
-    Access_14["Access[_14∈1]<br />ᐸ_12.opᐳ"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
-    PgClassExpression_25["PgClassExpression[_25∈1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression_26["PgClassExpression[_26∈1]<br />ᐸ(__message... not null)ᐳ"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgClassExpression_36["PgClassExpression[_36∈1]<br />ᐸ(__forums_... not null)ᐳ"]:::plan
-    PgSelectSingle_33["PgSelectSingle[_33∈1]<br />ᐸforumsᐳ"]:::plan
-    First_32["First[_32∈1]"]:::plan
-    PgSelect_28[["PgSelect[_28∈1]<br />ᐸforumsᐳ"]]:::plan
-    PgClassExpression_27["PgClassExpression[_27∈1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
-    PgClassExpression_46["PgClassExpression[_46∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
-    PgSelectSingle_44["PgSelectSingle[_44∈1]<br />ᐸusersᐳ"]:::plan
-    First_43["First[_43∈1]"]:::plan
-    PgSelect_39[["PgSelect[_39∈1]<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression_38["PgClassExpression[_38∈1]<br />ᐸ__messages...author_id”ᐳ"]:::plan
-    PgSelectSingle_22["PgSelectSingle[_22∈1]<br />ᐸmessagesᐳ"]:::plan
-    First_21["First[_21∈1]"]:::plan
-    PgSelect_17[["PgSelect[_17∈1]<br />ᐸmessagesᐳ"]]:::plan
-    Access_16["Access[_16∈1]<br />ᐸ_12.idᐳ"]:::plan
-    JSONParse_12["JSONParse[_12∈1]<br />ᐸ_11ᐳ"]:::plan
-    __Item_11>"__Item[_11∈1]<br />ᐸ_10ᐳ"]:::itemplan
-    Subscribe_10["Subscribe[_10∈0]"]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.pgSubscriberᐳ"]:::plan
-    Object_42["Object[_42∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_40["Access[_40∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_41["Access[_41∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    Lambda_8["Lambda[_8∈0]"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    Lambda15["Lambda[15∈1]"]:::plan
+    Access14["Access[14∈1]<br />ᐸ12.opᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24∈1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
+    PgClassExpression25["PgClassExpression[25∈1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgClassExpression26["PgClassExpression[26∈1]<br />ᐸ(__message... not null)ᐳ"]:::plan
+    PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ(__forums_... not null)ᐳ"]:::plan
+    PgSelectSingle33["PgSelectSingle[33∈1]<br />ᐸforumsᐳ"]:::plan
+    First32["First[32∈1]"]:::plan
+    PgSelect28[["PgSelect[28∈1]<br />ᐸforumsᐳ"]]:::plan
+    PgClassExpression27["PgClassExpression[27∈1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
+    PgClassExpression45["PgClassExpression[45∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
+    PgClassExpression46["PgClassExpression[46∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
+    PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸusersᐳ"]:::plan
+    First43["First[43∈1]"]:::plan
+    PgSelect39[["PgSelect[39∈1]<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸ__messages...author_id”ᐳ"]:::plan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸmessagesᐳ"]:::plan
+    First21["First[21∈1]"]:::plan
+    PgSelect17[["PgSelect[17∈1]<br />ᐸmessagesᐳ"]]:::plan
+    Access16["Access[16∈1]<br />ᐸ12.idᐳ"]:::plan
+    JSONParse12["JSONParse[12∈1]<br />ᐸ11ᐳ"]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ10ᐳ"]:::itemplan
+    Subscribe10["Subscribe[10∈0]"]:::plan
+    Access9["Access[9∈0]<br />ᐸ3.pgSubscriberᐳ"]:::plan
+    Object42["Object[42∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access40["Access[40∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access41["Access[41∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Lambda8["Lambda[8∈0]"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
-    Access_14 --> Lambda_15
-    JSONParse_12 --> Access_14
-    PgSelectSingle_22 --> PgClassExpression_23
-    PgSelectSingle_22 --> PgClassExpression_24
-    PgSelectSingle_22 --> PgClassExpression_25
-    PgSelectSingle_22 --> PgClassExpression_26
-    PgSelectSingle_33 --> PgClassExpression_35
-    PgSelectSingle_33 --> PgClassExpression_36
-    First_32 --> PgSelectSingle_33
-    PgSelect_28 --> First_32
-    Object_42 & PgClassExpression_27 --> PgSelect_28
-    PgSelectSingle_22 --> PgClassExpression_27
-    PgSelectSingle_44 --> PgClassExpression_45
-    PgSelectSingle_44 --> PgClassExpression_46
-    First_43 --> PgSelectSingle_44
-    PgSelect_39 --> First_43
-    Object_42 & PgClassExpression_38 --> PgSelect_39
-    PgSelectSingle_22 --> PgClassExpression_38
-    First_21 --> PgSelectSingle_22
-    PgSelect_17 --> First_21
-    Object_42 & Access_16 --> PgSelect_17
-    JSONParse_12 --> Access_16
-    __Item_11 --> JSONParse_12
-    Subscribe_10 ==> __Item_11
-    Access_9 & Lambda_8 --> Subscribe_10
-    __Value_3 --> Access_9
-    Access_40 & Access_41 --> Object_42
-    __Value_3 --> Access_40
-    __Value_3 --> Access_41
-    InputStaticLeaf_7 --> Lambda_8
+    Access14 --> Lambda15
+    JSONParse12 --> Access14
+    PgSelectSingle22 --> PgClassExpression23
+    PgSelectSingle22 --> PgClassExpression24
+    PgSelectSingle22 --> PgClassExpression25
+    PgSelectSingle22 --> PgClassExpression26
+    PgSelectSingle33 --> PgClassExpression35
+    PgSelectSingle33 --> PgClassExpression36
+    First32 --> PgSelectSingle33
+    PgSelect28 --> First32
+    Object42 & PgClassExpression27 --> PgSelect28
+    PgSelectSingle22 --> PgClassExpression27
+    PgSelectSingle44 --> PgClassExpression45
+    PgSelectSingle44 --> PgClassExpression46
+    First43 --> PgSelectSingle44
+    PgSelect39 --> First43
+    Object42 & PgClassExpression38 --> PgSelect39
+    PgSelectSingle22 --> PgClassExpression38
+    First21 --> PgSelectSingle22
+    PgSelect17 --> First21
+    Object42 & Access16 --> PgSelect17
+    JSONParse12 --> Access16
+    __Item11 --> JSONParse12
+    Subscribe10 ==> __Item11
+    Access9 & Lambda8 --> Subscribe10
+    __Value3 --> Access9
+    Access40 & Access41 --> Object42
+    __Value3 --> Access40
+    __Value3 --> Access41
+    InputStaticLeaf7 --> Lambda8
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_10["~"]
-    Subscribe_10 -.-> P_10
-    P_12["ᐳforumMessage"]
-    JSONParse_12 -.-> P_12
-    P_15["ᐳf…eᐳoperationType"]
-    Lambda_15 -.-> P_15
-    P_22["ᐳf…eᐳmessage"]
-    PgSelectSingle_22 -.-> P_22
-    P_23["ᐳf…eᐳm…eᐳid"]
-    PgClassExpression_23 -.-> P_23
-    P_24["ᐳf…eᐳm…eᐳfeatured"]
-    PgClassExpression_24 -.-> P_24
-    P_25["ᐳf…eᐳm…eᐳbody"]
-    PgClassExpression_25 -.-> P_25
-    P_26["ᐳf…eᐳm…eᐳisArchived"]
-    PgClassExpression_26 -.-> P_26
-    P_27["ᐳf…eᐳm…eᐳf…mᐳid"]
-    PgClassExpression_27 -.-> P_27
-    P_33["ᐳf…eᐳm…eᐳforum<br />ᐳf…eᐳm…eᐳf…mᐳself"]
-    PgSelectSingle_33 -.-> P_33
-    P_35["ᐳf…eᐳm…eᐳf…mᐳname<br />ᐳf…eᐳm…eᐳf…mᐳselfᐳname"]
-    PgClassExpression_35 -.-> P_35
-    P_36["ᐳf…eᐳm…eᐳf…mᐳisArchived"]
-    PgClassExpression_36 -.-> P_36
-    P_44["ᐳf…eᐳm…eᐳauthor"]
-    PgSelectSingle_44 -.-> P_44
-    P_45["ᐳf…eᐳm…eᐳa…rᐳusername"]
-    PgClassExpression_45 -.-> P_45
-    P_46["ᐳf…eᐳm…eᐳa…rᐳgravatarUrl"]
-    PgClassExpression_46 -.-> P_46
+    P0["~"]
+    __Value0 -.-> P0
+    P10["~"]
+    Subscribe10 -.-> P10
+    P12["ᐳforumMessage"]
+    JSONParse12 -.-> P12
+    P15["ᐳf…eᐳoperationType"]
+    Lambda15 -.-> P15
+    P22["ᐳf…eᐳmessage"]
+    PgSelectSingle22 -.-> P22
+    P23["ᐳf…eᐳm…eᐳid"]
+    PgClassExpression23 -.-> P23
+    P24["ᐳf…eᐳm…eᐳfeatured"]
+    PgClassExpression24 -.-> P24
+    P25["ᐳf…eᐳm…eᐳbody"]
+    PgClassExpression25 -.-> P25
+    P26["ᐳf…eᐳm…eᐳisArchived"]
+    PgClassExpression26 -.-> P26
+    P27["ᐳf…eᐳm…eᐳf…mᐳid"]
+    PgClassExpression27 -.-> P27
+    P33["ᐳf…eᐳm…eᐳforum<br />ᐳf…eᐳm…eᐳf…mᐳself"]
+    PgSelectSingle33 -.-> P33
+    P35["ᐳf…eᐳm…eᐳf…mᐳname<br />ᐳf…eᐳm…eᐳf…mᐳselfᐳname"]
+    PgClassExpression35 -.-> P35
+    P36["ᐳf…eᐳm…eᐳf…mᐳisArchived"]
+    PgClassExpression36 -.-> P36
+    P44["ᐳf…eᐳm…eᐳauthor"]
+    PgSelectSingle44 -.-> P44
+    P45["ᐳf…eᐳm…eᐳa…rᐳusername"]
+    PgClassExpression45 -.-> P45
+    P46["ᐳf…eᐳm…eᐳa…rᐳgravatarUrl"]
+    PgClassExpression46 -.-> P46
 
     subgraph "Buckets for subscriptions/basics/forum-messages"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,Lambda_8,Access_9,Subscribe_10,Access_40,Access_41,Object_42 bucket0
-    Bucket1("Bucket 1 (item_11)<br />Deps: _10, _42<br />~"):::bucket
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,Lambda8,Access9,Subscribe10,Access40,Access41,Object42 bucket0
+    Bucket1("Bucket 1 (item11)<br />Deps: 10, 42<br />~"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgSelect_28,First_32,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,PgClassExpression_38,PgSelect_39,First_43,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46 bucket1
+    class Bucket1,__Item11,JSONParse12,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgSelect28,First32,PgSelectSingle33,PgClassExpression35,PgClassExpression36,PgClassExpression38,PgSelect39,First43,PgSelectSingle44,PgClassExpression45,PgClassExpression46 bucket1
     Bucket0 --> Bucket1
     end
 ```

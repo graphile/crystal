@@ -8,124 +8,124 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgCursor_32["PgCursor[_32∈1]"]:::plan
-    List_34["List[_34∈1]<br />ᐸ_33ᐳ"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
-    PgClassExpression_44["PgClassExpression[_44∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
-    PgSelectSingle_42["PgSelectSingle[_42∈1]<br />ᐸusersᐳ"]:::plan
-    First_41["First[_41∈1]"]:::plan
-    PgSelect_37[["PgSelect[_37∈1]<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression_36["PgClassExpression[_36∈1]<br />ᐸ__messages...author_id”ᐳ"]:::plan
-    PgSelectSingle_31["PgSelectSingle[_31∈1]<br />ᐸmessagesᐳ"]:::plan
-    __Item_30>"__Item[_30∈1]<br />ᐸ_25ᐳ"]:::itemplan
-    Lambda_48["Lambda[_48∈0]<br />ᐸlistHasMoreᐳ"]:::plan
-    PgCursor_57["PgCursor[_57∈0]"]:::plan
-    List_62["List[_62∈0]<br />ᐸ_61ᐳ"]:::plan
-    PgClassExpression_61["PgClassExpression[_61∈0]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    PgSelectSingle_56["PgSelectSingle[_56∈0]<br />ᐸmessagesᐳ"]:::plan
-    First_55["First[_55∈0]"]:::plan
-    PgCursor_67["PgCursor[_67∈0]"]:::plan
-    List_72["List[_72∈0]<br />ᐸ_71ᐳ"]:::plan
-    PgClassExpression_71["PgClassExpression[_71∈0]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    PgSelectSingle_66["PgSelectSingle[_66∈0]<br />ᐸmessagesᐳ"]:::plan
-    Last_65["Last[_65∈0]"]:::plan
-    PgSelect_25[["PgSelect[_25∈0]<br />ᐸmessagesᐳ"]]:::plan
-    PgClassExpression_76["PgClassExpression[_76∈0]<br />ᐸcount(*)ᐳ"]:::plan
-    PgSelectSingle_75["PgSelectSingle[_75∈0]<br />ᐸmessagesᐳ"]:::plan
-    First_74["First[_74∈0]"]:::plan
-    PgSelect_73[["PgSelect[_73∈0]<br />ᐸmessagesᐳ"]]:::plan
-    Object_40["Object[_40∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_38["Access[_38∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_39["Access[_39∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    PgValidateParsedCursor_27["PgValidateParsedCursor[_27∈0]"]:::plan
-    ToPg_29["ToPg[_29∈0]"]:::plan
-    Access_28["Access[_28∈0]<br />ᐸ_26.1ᐳ"]:::plan
-    Lambda_26["Lambda[_26∈0]<br />ᐸparseCursorᐳ"]:::plan
-    InputStaticLeaf_17["InputStaticLeaf[_17∈0]"]:::plan
-    Constant_77["Constant[_77∈0]"]:::plan
-    PgPageInfo_45["PgPageInfo[_45∈0]"]:::plan
-    Constant_52["Constant[_52∈0]"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    PgCursor32["PgCursor[32∈1]"]:::plan
+    List34["List[34∈1]<br />ᐸ33ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgClassExpression43["PgClassExpression[43∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
+    PgClassExpression44["PgClassExpression[44∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
+    PgSelectSingle42["PgSelectSingle[42∈1]<br />ᐸusersᐳ"]:::plan
+    First41["First[41∈1]"]:::plan
+    PgSelect37[["PgSelect[37∈1]<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ__messages...author_id”ᐳ"]:::plan
+    PgSelectSingle31["PgSelectSingle[31∈1]<br />ᐸmessagesᐳ"]:::plan
+    __Item30>"__Item[30∈1]<br />ᐸ25ᐳ"]:::itemplan
+    Lambda48["Lambda[48∈0]<br />ᐸlistHasMoreᐳ"]:::plan
+    PgCursor57["PgCursor[57∈0]"]:::plan
+    List62["List[62∈0]<br />ᐸ61ᐳ"]:::plan
+    PgClassExpression61["PgClassExpression[61∈0]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgSelectSingle56["PgSelectSingle[56∈0]<br />ᐸmessagesᐳ"]:::plan
+    First55["First[55∈0]"]:::plan
+    PgCursor67["PgCursor[67∈0]"]:::plan
+    List72["List[72∈0]<br />ᐸ71ᐳ"]:::plan
+    PgClassExpression71["PgClassExpression[71∈0]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgSelectSingle66["PgSelectSingle[66∈0]<br />ᐸmessagesᐳ"]:::plan
+    Last65["Last[65∈0]"]:::plan
+    PgSelect25[["PgSelect[25∈0]<br />ᐸmessagesᐳ"]]:::plan
+    PgClassExpression76["PgClassExpression[76∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    PgSelectSingle75["PgSelectSingle[75∈0]<br />ᐸmessagesᐳ"]:::plan
+    First74["First[74∈0]"]:::plan
+    PgSelect73[["PgSelect[73∈0]<br />ᐸmessagesᐳ"]]:::plan
+    Object40["Object[40∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access38["Access[38∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access39["Access[39∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    PgValidateParsedCursor27["PgValidateParsedCursor[27∈0]"]:::plan
+    ToPg29["ToPg[29∈0]"]:::plan
+    Access28["Access[28∈0]<br />ᐸ26.1ᐳ"]:::plan
+    Lambda26["Lambda[26∈0]<br />ᐸparseCursorᐳ"]:::plan
+    InputStaticLeaf17["InputStaticLeaf[17∈0]"]:::plan
+    Constant77["Constant[77∈0]"]:::plan
+    PgPageInfo45["PgPageInfo[45∈0]"]:::plan
+    Constant52["Constant[52∈0]"]:::plan
 
     %% plan dependencies
-    List_34 --> PgCursor_32
-    PgClassExpression_33 --> List_34
-    PgSelectSingle_31 --> PgClassExpression_33
-    PgSelectSingle_31 --> PgClassExpression_35
-    PgSelectSingle_42 --> PgClassExpression_43
-    PgSelectSingle_42 --> PgClassExpression_44
-    First_41 --> PgSelectSingle_42
-    PgSelect_37 --> First_41
-    Object_40 & PgClassExpression_36 --> PgSelect_37
-    PgSelectSingle_31 --> PgClassExpression_36
-    __Item_30 --> PgSelectSingle_31
-    PgSelect_25 ==> __Item_30
-    PgSelect_25 --> Lambda_48
-    List_62 --> PgCursor_57
-    PgClassExpression_61 --> List_62
-    PgSelectSingle_56 --> PgClassExpression_61
-    First_55 --> PgSelectSingle_56
-    PgSelect_25 --> First_55
-    List_72 --> PgCursor_67
-    PgClassExpression_71 --> List_72
-    PgSelectSingle_66 --> PgClassExpression_71
-    Last_65 --> PgSelectSingle_66
-    PgSelect_25 --> Last_65
-    Object_40 & Lambda_26 & PgValidateParsedCursor_27 & ToPg_29 --> PgSelect_25
-    PgSelectSingle_75 --> PgClassExpression_76
-    First_74 --> PgSelectSingle_75
-    PgSelect_73 --> First_74
-    Object_40 --> PgSelect_73
-    Access_38 & Access_39 --> Object_40
-    __Value_3 --> Access_38
-    __Value_3 --> Access_39
-    Lambda_26 --> PgValidateParsedCursor_27
-    Access_28 --> ToPg_29
-    Lambda_26 --> Access_28
-    InputStaticLeaf_17 --> Lambda_26
+    List34 --> PgCursor32
+    PgClassExpression33 --> List34
+    PgSelectSingle31 --> PgClassExpression33
+    PgSelectSingle31 --> PgClassExpression35
+    PgSelectSingle42 --> PgClassExpression43
+    PgSelectSingle42 --> PgClassExpression44
+    First41 --> PgSelectSingle42
+    PgSelect37 --> First41
+    Object40 & PgClassExpression36 --> PgSelect37
+    PgSelectSingle31 --> PgClassExpression36
+    __Item30 --> PgSelectSingle31
+    PgSelect25 ==> __Item30
+    PgSelect25 --> Lambda48
+    List62 --> PgCursor57
+    PgClassExpression61 --> List62
+    PgSelectSingle56 --> PgClassExpression61
+    First55 --> PgSelectSingle56
+    PgSelect25 --> First55
+    List72 --> PgCursor67
+    PgClassExpression71 --> List72
+    PgSelectSingle66 --> PgClassExpression71
+    Last65 --> PgSelectSingle66
+    PgSelect25 --> Last65
+    Object40 & Lambda26 & PgValidateParsedCursor27 & ToPg29 --> PgSelect25
+    PgSelectSingle75 --> PgClassExpression76
+    First74 --> PgSelectSingle75
+    PgSelect73 --> First74
+    Object40 --> PgSelect73
+    Access38 & Access39 --> Object40
+    __Value3 --> Access38
+    __Value3 --> Access39
+    Lambda26 --> PgValidateParsedCursor27
+    Access28 --> ToPg29
+    Lambda26 --> Access28
+    InputStaticLeaf17 --> Lambda26
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_25["ᐳa…nᐳedges"]
-    PgSelect_25 -.-> P_25
-    P_31["ᐳa…nᐳedges[]<br />ᐳa…nᐳe…]ᐳnode"]
-    PgSelectSingle_31 -.-> P_31
-    P_32["ᐳa…nᐳe…]ᐳcursor"]
-    PgCursor_32 -.-> P_32
-    P_35["ᐳa…nᐳe…]ᐳnodeᐳbody"]
-    PgClassExpression_35 -.-> P_35
-    P_42["ᐳa…nᐳe…]ᐳnodeᐳauthor"]
-    PgSelectSingle_42 -.-> P_42
-    P_43["ᐳa…nᐳe…]ᐳnodeᐳa…rᐳusername"]
-    PgClassExpression_43 -.-> P_43
-    P_44["ᐳa…nᐳe…]ᐳnodeᐳa…rᐳgravatarUrl"]
-    PgClassExpression_44 -.-> P_44
-    P_45["ᐳa…nᐳpageInfo"]
-    PgPageInfo_45 -.-> P_45
-    P_48["ᐳa…nᐳp…oᐳhasNextPage"]
-    Lambda_48 -.-> P_48
-    P_52["ᐳa…nᐳp…oᐳhasPreviousPage"]
-    Constant_52 -.-> P_52
-    P_57["ᐳa…nᐳp…oᐳstartCursor"]
-    PgCursor_57 -.-> P_57
-    P_67["ᐳa…nᐳp…oᐳendCursor"]
-    PgCursor_67 -.-> P_67
-    P_76["ᐳa…nᐳtotalCount"]
-    PgClassExpression_76 -.-> P_76
-    P_77["ᐳallMessagesConnection"]
-    Constant_77 -.-> P_77
+    P0["~"]
+    __Value0 -.-> P0
+    P25["ᐳa…nᐳedges"]
+    PgSelect25 -.-> P25
+    P31["ᐳa…nᐳedges[]<br />ᐳa…nᐳe…]ᐳnode"]
+    PgSelectSingle31 -.-> P31
+    P32["ᐳa…nᐳe…]ᐳcursor"]
+    PgCursor32 -.-> P32
+    P35["ᐳa…nᐳe…]ᐳnodeᐳbody"]
+    PgClassExpression35 -.-> P35
+    P42["ᐳa…nᐳe…]ᐳnodeᐳauthor"]
+    PgSelectSingle42 -.-> P42
+    P43["ᐳa…nᐳe…]ᐳnodeᐳa…rᐳusername"]
+    PgClassExpression43 -.-> P43
+    P44["ᐳa…nᐳe…]ᐳnodeᐳa…rᐳgravatarUrl"]
+    PgClassExpression44 -.-> P44
+    P45["ᐳa…nᐳpageInfo"]
+    PgPageInfo45 -.-> P45
+    P48["ᐳa…nᐳp…oᐳhasNextPage"]
+    Lambda48 -.-> P48
+    P52["ᐳa…nᐳp…oᐳhasPreviousPage"]
+    Constant52 -.-> P52
+    P57["ᐳa…nᐳp…oᐳstartCursor"]
+    PgCursor57 -.-> P57
+    P67["ᐳa…nᐳp…oᐳendCursor"]
+    PgCursor67 -.-> P67
+    P76["ᐳa…nᐳtotalCount"]
+    PgClassExpression76 -.-> P76
+    P77["ᐳallMessagesConnection"]
+    Constant77 -.-> P77
 
     subgraph "Buckets for queries/connections/pagination-before-end"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀allMessagesConnection ᐸ-O- _77<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- _45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- _52<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- _57<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- _67<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- _76"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allMessagesConnection ᐸ-O- 77<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- 25<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- 45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- 48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- 52<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- 57<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- 67<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- 76"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_17,PgSelect_25,Lambda_26,PgValidateParsedCursor_27,Access_28,ToPg_29,Access_38,Access_39,Object_40,PgPageInfo_45,Lambda_48,Constant_52,First_55,PgSelectSingle_56,PgCursor_57,PgClassExpression_61,List_62,Last_65,PgSelectSingle_66,PgCursor_67,PgClassExpression_71,List_72,PgSelect_73,First_74,PgSelectSingle_75,PgClassExpression_76,Constant_77 bucket0
-    Bucket1("Bucket 1 (item_30)<br />Deps: _25, _40<br />~ᐳQuery.allMessagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- _31<br />⠀⠀node ᐸ-O- _31<br />⠀⠀⠀node.body ᐸ-L- _35<br />⠀⠀⠀node.author ᐸ-O- _42<br />⠀⠀⠀⠀node.author.username ᐸ-L- _43<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- _44<br />⠀⠀cursor ᐸ-L- _32"):::bucket
+    class Bucket0,__Value0,__Value3,InputStaticLeaf17,PgSelect25,Lambda26,PgValidateParsedCursor27,Access28,ToPg29,Access38,Access39,Object40,PgPageInfo45,Lambda48,Constant52,First55,PgSelectSingle56,PgCursor57,PgClassExpression61,List62,Last65,PgSelectSingle66,PgCursor67,PgClassExpression71,List72,PgSelect73,First74,PgSelectSingle75,PgClassExpression76,Constant77 bucket0
+    Bucket1("Bucket 1 (item30)<br />Deps: 25, 40<br />~ᐳQuery.allMessagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- 31<br />⠀⠀node ᐸ-O- 31<br />⠀⠀⠀node.body ᐸ-L- 35<br />⠀⠀⠀node.author ᐸ-O- 42<br />⠀⠀⠀⠀node.author.username ᐸ-L- 43<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- 44<br />⠀⠀cursor ᐸ-L- 32"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item_30,PgSelectSingle_31,PgCursor_32,PgClassExpression_33,List_34,PgClassExpression_35,PgClassExpression_36,PgSelect_37,First_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44 bucket1
+    class Bucket1,__Item30,PgSelectSingle31,PgCursor32,PgClassExpression33,List34,PgClassExpression35,PgClassExpression36,PgSelect37,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44 bucket1
     Bucket0 --> Bucket1
     end
 ```

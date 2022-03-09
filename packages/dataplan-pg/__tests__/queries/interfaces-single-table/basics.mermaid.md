@@ -8,106 +8,106 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgSelectSingle_12["PgSelectSingle[_12∈1]<br />ᐸpeopleᐳ"]:::plan
-    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
-    Lambda_25["Lambda[_25∈3]"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈3]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
-    PgClassExpression_27["PgClassExpression[_27∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
-    PgClassExpression_29["PgClassExpression[_29∈4]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
-    PgClassExpression_30["PgClassExpression[_30∈4]<br />ᐸ__single_t...”position”ᐳ"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈4]<br />ᐸ__single_t...reated_at”ᐳ"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈4]<br />ᐸ__single_t...pdated_at”ᐳ"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈4]<br />ᐸ__single_t..._archived”ᐳ"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈4]<br />ᐸ__single_t...chived_at”ᐳ"]:::plan
-    PgSelectSingle_23["PgSelectSingle[_23∈3]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    __Item_22>"__Item[_22∈3]<br />ᐸ_19ᐳ"]:::itemplan
-    __ListTransform_19["__ListTransform[_19∈1]<br />ᐸeach:_15ᐳ"]:::plan
-    PgSelectSingle_21["PgSelectSingle[_21∈2]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    __Item_20>"__Item[_20∈2]<br />ᐸ_67ᐳ"]:::itemplan
-    Access_67["Access[_67∈1]<br />ᐸ_11.1ᐳ"]:::plan
-    __Item_11>"__Item[_11∈1]<br />ᐸ_7ᐳ"]:::itemplan
-    PgSelect_7[["PgSelect[_7∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Object_18["Object[_18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_16["Access[_16∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_17["Access[_17∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
+    PgSingleTablePolymorphic26["PgSingleTablePolymorphic[26∈3]"]:::plan
+    Lambda25["Lambda[25∈3]"]:::plan
+    PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
+    PgClassExpression27["PgClassExpression[27∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
+    PgClassExpression29["PgClassExpression[29∈4]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
+    PgClassExpression30["PgClassExpression[30∈4]<br />ᐸ__single_t...”position”ᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈4]<br />ᐸ__single_t...reated_at”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈4]<br />ᐸ__single_t...pdated_at”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈4]<br />ᐸ__single_t..._archived”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈4]<br />ᐸ__single_t...chived_at”ᐳ"]:::plan
+    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
+    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
+    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    __Item20>"__Item[20∈2]<br />ᐸ67ᐳ"]:::itemplan
+    Access67["Access[67∈1]<br />ᐸ11.1ᐳ"]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
+    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
+    Object18["Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access16["Access[16∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access17["Access[17∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_12 --> PgClassExpression_13
-    __Item_11 --> PgSelectSingle_12
-    Lambda_25 & PgSelectSingle_23 --> PgSingleTablePolymorphic_26
-    PgClassExpression_24 --> Lambda_25
-    PgSelectSingle_23 --> PgClassExpression_24
-    PgSelectSingle_23 --> PgClassExpression_27
-    PgSelectSingle_23 --> PgClassExpression_29
-    PgSelectSingle_23 --> PgClassExpression_30
-    PgSelectSingle_23 --> PgClassExpression_31
-    PgSelectSingle_23 --> PgClassExpression_32
-    PgSelectSingle_23 --> PgClassExpression_33
-    PgSelectSingle_23 --> PgClassExpression_34
-    __Item_22 --> PgSelectSingle_23
-    __ListTransform_19 ==> __Item_22
-    Access_67 --> __ListTransform_19
-    PgSelectSingle_21 -.-> __ListTransform_19
-    __Item_20 --> PgSelectSingle_21
-    Access_67 -.-> __Item_20
-    __Item_11 --> Access_67
-    PgSelect_7 ==> __Item_11
-    Object_18 --> PgSelect_7
-    Access_16 & Access_17 --> Object_18
-    __Value_3 --> Access_16
-    __Value_3 --> Access_17
+    PgSelectSingle12 --> PgClassExpression13
+    __Item11 --> PgSelectSingle12
+    Lambda25 & PgSelectSingle23 --> PgSingleTablePolymorphic26
+    PgClassExpression24 --> Lambda25
+    PgSelectSingle23 --> PgClassExpression24
+    PgSelectSingle23 --> PgClassExpression27
+    PgSelectSingle23 --> PgClassExpression29
+    PgSelectSingle23 --> PgClassExpression30
+    PgSelectSingle23 --> PgClassExpression31
+    PgSelectSingle23 --> PgClassExpression32
+    PgSelectSingle23 --> PgClassExpression33
+    PgSelectSingle23 --> PgClassExpression34
+    __Item22 --> PgSelectSingle23
+    __ListTransform19 ==> __Item22
+    Access67 --> __ListTransform19
+    PgSelectSingle21 -.-> __ListTransform19
+    __Item20 --> PgSelectSingle21
+    Access67 -.-> __Item20
+    __Item11 --> Access67
+    PgSelect7 ==> __Item11
+    Object18 --> PgSelect7
+    Access16 & Access17 --> Object18
+    __Value3 --> Access16
+    __Value3 --> Access17
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_7["ᐳpeople"]
-    PgSelect_7 -.-> P_7
-    P_12["ᐳpeople[]"]
-    PgSelectSingle_12 -.-> P_12
-    P_13["ᐳp…]ᐳusername"]
-    PgClassExpression_13 -.-> P_13
-    P_19["ᐳp…]ᐳitems"]
-    __ListTransform_19 -.-> P_19
-    P_21["ᐳp…]ᐳitems@_19[]"]
-    PgSelectSingle_21 -.-> P_21
-    P_24["ᐳp…]ᐳi…]ᐳtype x5"]
-    PgClassExpression_24 -.-> P_24
-    P_26["ᐳp…]ᐳitems[]"]
-    PgSingleTablePolymorphic_26 -.-> P_26
-    P_27["ᐳp…]ᐳi…]ᐳid x5"]
-    PgClassExpression_27 -.-> P_27
-    P_29["ᐳp…]ᐳi…]ᐳtype2 x5"]
-    PgClassExpression_29 -.-> P_29
-    P_30["ᐳp…]ᐳi…]ᐳposition x5"]
-    PgClassExpression_30 -.-> P_30
-    P_31["ᐳp…]ᐳi…]ᐳcreatedAt x5"]
-    PgClassExpression_31 -.-> P_31
-    P_32["ᐳp…]ᐳi…]ᐳupdatedAt x5"]
-    PgClassExpression_32 -.-> P_32
-    P_33["ᐳp…]ᐳi…]ᐳisExplicitlyArchived x5"]
-    PgClassExpression_33 -.-> P_33
-    P_34["ᐳp…]ᐳi…]ᐳarchivedAt x5"]
-    PgClassExpression_34 -.-> P_34
+    P0["~"]
+    __Value0 -.-> P0
+    P7["ᐳpeople"]
+    PgSelect7 -.-> P7
+    P12["ᐳpeople[]"]
+    PgSelectSingle12 -.-> P12
+    P13["ᐳp…]ᐳusername"]
+    PgClassExpression13 -.-> P13
+    P19["ᐳp…]ᐳitems"]
+    __ListTransform19 -.-> P19
+    P21["ᐳp…]ᐳitems@19[]"]
+    PgSelectSingle21 -.-> P21
+    P24["ᐳp…]ᐳi…]ᐳtype x5"]
+    PgClassExpression24 -.-> P24
+    P26["ᐳp…]ᐳitems[]"]
+    PgSingleTablePolymorphic26 -.-> P26
+    P27["ᐳp…]ᐳi…]ᐳid x5"]
+    PgClassExpression27 -.-> P27
+    P29["ᐳp…]ᐳi…]ᐳtype2 x5"]
+    PgClassExpression29 -.-> P29
+    P30["ᐳp…]ᐳi…]ᐳposition x5"]
+    PgClassExpression30 -.-> P30
+    P31["ᐳp…]ᐳi…]ᐳcreatedAt x5"]
+    PgClassExpression31 -.-> P31
+    P32["ᐳp…]ᐳi…]ᐳupdatedAt x5"]
+    PgClassExpression32 -.-> P32
+    P33["ᐳp…]ᐳi…]ᐳisExplicitlyArchived x5"]
+    PgClassExpression33 -.-> P33
+    P34["ᐳp…]ᐳi…]ᐳarchivedAt x5"]
+    PgClassExpression34 -.-> P34
 
     subgraph "Buckets for queries/interfaces-single-table/basics"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀people ᐸ-A- _7"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀people ᐸ-A- 7"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_16,Access_17,Object_18 bucket0
-    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- _12<br />⠀⠀username ᐸ-L- _13<br />⠀⠀items ᐸ-A- _19"):::bucket
+    class Bucket0,__Value0,__Value3,PgSelect7,Access16,Access17,Object18 bucket0
+    Bucket1("Bucket 1 (item11)<br />Deps: 7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- 12<br />⠀⠀username ᐸ-L- 13<br />⠀⠀items ᐸ-A- 19"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item_11,PgSelectSingle_12,PgClassExpression_13,__ListTransform_19,Access_67 bucket1
-    Bucket2("Bucket 2 (item_20)<br />Deps: _67"):::bucket
+    class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13,__ListTransform19,Access67 bucket1
+    Bucket2("Bucket 2 (item20)<br />Deps: 67"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item_20,PgSelectSingle_21 bucket2
-    Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- _26<br />⠀⠀type ᐸ-L- _24"):::bucket
+    class Bucket2,__Item20,PgSelectSingle21 bucket2
+    Bucket3("Bucket 3 (item22)<br />Deps: 19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- 26<br />⠀⠀type ᐸ-L- 24"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
-    Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _22, _23<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀id ᐸ-L- _27<br />⠀⠀type2 ᐸ-L- _29<br />⠀⠀position ᐸ-L- _30<br />⠀⠀createdAt ᐸ-L- _31<br />⠀⠀updatedAt ᐸ-L- _32<br />⠀⠀isExplicitlyArchived ᐸ-L- _33<br />⠀⠀archivedAt ᐸ-L- _34"):::bucket
+    class Bucket3,__Item22,PgSelectSingle23,PgClassExpression24,Lambda25,PgSingleTablePolymorphic26 bucket3
+    Bucket4("Bucket 4 (polymorphic26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: 22, 23<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀id ᐸ-L- 27<br />⠀⠀type2 ᐸ-L- 29<br />⠀⠀position ᐸ-L- 30<br />⠀⠀createdAt ᐸ-L- 31<br />⠀⠀updatedAt ᐸ-L- 32<br />⠀⠀isExplicitlyArchived ᐸ-L- 33<br />⠀⠀archivedAt ᐸ-L- 34"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket4
+    class Bucket4,PgClassExpression27,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     Bucket3 --> Bucket4

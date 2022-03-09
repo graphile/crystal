@@ -8,45 +8,45 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈0]<br />ᐸ__random_u...”username”ᐳ"]:::plan
-    PgSelectSingle_12["PgSelectSingle[_12∈0]<br />ᐸusersᐳ"]:::plan
-    First_11["First[_11∈0]"]:::plan
-    PgSelect_7[["PgSelect[_7∈0]<br />ᐸrandom_userᐳ"]]:::plan
-    Object_10["Object[_10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_8["Access[_8∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value_15["__Value[_15∈0]"]:::plan
-    __Value_16["__Value[_16∈0]"]:::plan
-    __Value_17["__Value[_17∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgClassExpression13["PgClassExpression[13]<br />ᐸ__random_u...”username”ᐳ"]:::plan
+    PgSelectSingle12["PgSelectSingle[12]<br />ᐸusersᐳ"]:::plan
+    First11["First[11]"]:::plan
+    PgSelect7[["PgSelect[7]<br />ᐸrandom_userᐳ"]]:::plan
+    Object10["Object[10]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access8["Access[8]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access9["Access[9]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    __Value15["__Value[15]"]:::plan
+    __Value16["__Value[16]"]:::plan
+    __Value17["__Value[17]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_12 --> PgClassExpression_13
-    First_11 --> PgSelectSingle_12
-    PgSelect_7 --> First_11
-    Object_10 --> PgSelect_7
-    Access_8 & Access_9 --> Object_10
-    __Value_3 --> Access_8
-    __Value_3 --> Access_9
+    PgSelectSingle12 --> PgClassExpression13
+    First11 --> PgSelectSingle12
+    PgSelect7 --> First11
+    Object10 --> PgSelect7
+    Access8 & Access9 --> Object10
+    __Value3 --> Access8
+    __Value3 --> Access9
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_12["ᐳrandomUser"]
-    PgSelectSingle_12 -.-> P_12
-    P_13["ᐳr…rᐳusername<br />ᐳr…rᐳusernameHashes"]
-    PgClassExpression_13 -.-> P_13
-    P_15["ᐳr…rᐳu…sᐳmd5<br />ᐳr…rᐳu…sᐳself<br />ᐳr…rᐳu…sᐳsha256"]
-    __Value_15 -.-> P_15
-    P_16["ᐳr…rᐳu…sᐳselfᐳMD5<br />ᐳr…rᐳu…sᐳselfᐳself<br />ᐳr…rᐳu…sᐳselfᐳSHA256<br />ᐳr…rᐳu…sᐳselfᐳSHA256_2"]
-    __Value_16 -.-> P_16
-    P_17["ᐳr…rᐳu…sᐳselfᐳselfᐳmd5<br />ᐳr…rᐳu…sᐳselfᐳselfᐳsha256"]
-    __Value_17 -.-> P_17
+    P0["~"]
+    __Value0 -.-> P0
+    P12["ᐳrandomUser"]
+    PgSelectSingle12 -.-> P12
+    P13["ᐳr…rᐳusername<br />ᐳr…rᐳusernameHashes"]
+    PgClassExpression13 -.-> P13
+    P15["ᐳr…rᐳu…sᐳmd5<br />ᐳr…rᐳu…sᐳself<br />ᐳr…rᐳu…sᐳsha256"]
+    __Value15 -.-> P15
+    P16["ᐳr…rᐳu…sᐳselfᐳMD5<br />ᐳr…rᐳu…sᐳselfᐳself<br />ᐳr…rᐳu…sᐳselfᐳSHA256<br />ᐳr…rᐳu…sᐳselfᐳSHA256_2"]
+    __Value16 -.-> P16
+    P17["ᐳr…rᐳu…sᐳselfᐳselfᐳmd5<br />ᐳr…rᐳu…sᐳselfᐳselfᐳsha256"]
+    __Value17 -.-> P17
 
     subgraph "Buckets for queries/resolvers/basics-object-recursive"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀randomUser ᐸ-O- _12<br />⠀⠀⠀randomUser.username ᐸ-L- _13<br />⠀⠀⠀randomUser.usernameHashes ᐸ-O- _13<br />⠀⠀⠀⠀randomUser.usernameHashes.md5 ᐸ-L- _15<br />⠀⠀⠀⠀randomUser.usernameHashes.self ᐸ-O- _15<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.MD5 ᐸ-L- _16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self ᐸ-O- _16<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.md5 ᐸ-L- _17<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.sha256 ᐸ-L- _17<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256 ᐸ-L- _16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256_2 ᐸ-L- _16<br />⠀⠀⠀⠀randomUser.usernameHashes.sha256 ᐸ-L- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀randomUser ᐸ-O- 12<br />⠀⠀⠀randomUser.username ᐸ-L- 13<br />⠀⠀⠀randomUser.usernameHashes ᐸ-O- 13<br />⠀⠀⠀⠀randomUser.usernameHashes.md5 ᐸ-L- 15<br />⠀⠀⠀⠀randomUser.usernameHashes.self ᐸ-O- 15<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.MD5 ᐸ-L- 16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self ᐸ-O- 16<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.md5 ᐸ-L- 17<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.sha256 ᐸ-L- 17<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256 ᐸ-L- 16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256_2 ᐸ-L- 16<br />⠀⠀⠀⠀randomUser.usernameHashes.sha256 ᐸ-L- 15"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13,__Value_15,__Value_16,__Value_17 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,__Value15,__Value16,__Value17 bucket0
     end
 ```

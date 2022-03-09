@@ -8,41 +8,41 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__forums__.”id”ᐳ"]:::plan
-    PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object_11["Object[_11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_9["Access[_9∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_10["Access[_10∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__forums__.”id”ᐳ"]:::plan
+    PgClassExpression15["PgClassExpression[15]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸforumsᐳ"]:::plan
+    First12["First[12]"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸforumsᐳ"]]:::plan
+    Object11["Object[11]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgClassExpression_15
-    First_12 --> PgSelectSingle_13
-    PgSelect_8 --> First_12
-    Object_11 & InputStaticLeaf_7 --> PgSelect_8
-    Access_9 & Access_10 --> Object_11
-    __Value_3 --> Access_9
-    __Value_3 --> Access_10
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression15
+    First12 --> PgSelectSingle13
+    PgSelect8 --> First12
+    Object11 & InputStaticLeaf7 --> PgSelect8
+    Access9 & Access10 --> Object11
+    __Value3 --> Access9
+    __Value3 --> Access10
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_13["ᐳforum"]
-    PgSelectSingle_13 -.-> P_13
-    P_14["ᐳf…mᐳid"]
-    PgClassExpression_14 -.-> P_14
-    P_15["ᐳf…mᐳname"]
-    PgClassExpression_15 -.-> P_15
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳforum"]
+    PgSelectSingle13 -.-> P13
+    P14["ᐳf…mᐳid"]
+    PgClassExpression14 -.-> P14
+    P15["ᐳf…mᐳname"]
+    PgClassExpression15 -.-> P15
 
     subgraph "Buckets for queries/super-simple/single-record-via-arg"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.id ᐸ-L- _14<br />⠀⠀⠀forum.name ᐸ-L- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.id ᐸ-L- 14<br />⠀⠀⠀forum.name ᐸ-L- 15"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15 bucket0
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15 bucket0
     end
 ```

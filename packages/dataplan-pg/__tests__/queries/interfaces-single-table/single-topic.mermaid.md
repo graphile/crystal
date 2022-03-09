@@ -8,70 +8,70 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_15["PgClassExpression[_15∈0]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
-    PgClassExpression_16["PgClassExpression[_16∈0]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
-    PgClassExpression_17["PgClassExpression[_17∈0]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
-    PgClassExpression_18["PgClassExpression[_18∈0]<br />ᐸ__single_t...”position”ᐳ"]:::plan
-    PgClassExpression_19["PgClassExpression[_19∈0]<br />ᐸ__single_t...reated_at”ᐳ"]:::plan
-    PgClassExpression_20["PgClassExpression[_20∈0]<br />ᐸ__single_t...pdated_at”ᐳ"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈0]<br />ᐸ__single_t..._archived”ᐳ"]:::plan
-    PgClassExpression_22["PgClassExpression[_22∈0]<br />ᐸ__single_t...chived_at”ᐳ"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈0]<br />ᐸ__single_t...__.”title”ᐳ"]:::plan
-    PgSelectSingle_14["PgSelectSingle[_14∈0]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    First_13["First[_13∈0]"]:::plan
-    PgSelect_9[["PgSelect[_9∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Object_12["Object[_12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_10["Access[_10∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_11["Access[_11∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    Constant_8["Constant[_8∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgClassExpression15["PgClassExpression[15]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
+    PgClassExpression16["PgClassExpression[16]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
+    PgClassExpression17["PgClassExpression[17]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
+    PgClassExpression18["PgClassExpression[18]<br />ᐸ__single_t...”position”ᐳ"]:::plan
+    PgClassExpression19["PgClassExpression[19]<br />ᐸ__single_t...reated_at”ᐳ"]:::plan
+    PgClassExpression20["PgClassExpression[20]<br />ᐸ__single_t...pdated_at”ᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21]<br />ᐸ__single_t..._archived”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22]<br />ᐸ__single_t...chived_at”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23]<br />ᐸ__single_t...__.”title”ᐳ"]:::plan
+    PgSelectSingle14["PgSelectSingle[14]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    First13["First[13]"]:::plan
+    PgSelect9[["PgSelect[9]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    Object12["Object[12]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access10["Access[10]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access11["Access[11]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    Constant8["Constant[8]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_14 --> PgClassExpression_15
-    PgSelectSingle_14 --> PgClassExpression_16
-    PgSelectSingle_14 --> PgClassExpression_17
-    PgSelectSingle_14 --> PgClassExpression_18
-    PgSelectSingle_14 --> PgClassExpression_19
-    PgSelectSingle_14 --> PgClassExpression_20
-    PgSelectSingle_14 --> PgClassExpression_21
-    PgSelectSingle_14 --> PgClassExpression_22
-    PgSelectSingle_14 --> PgClassExpression_23
-    First_13 --> PgSelectSingle_14
-    PgSelect_9 --> First_13
-    Object_12 & InputStaticLeaf_7 & Constant_8 --> PgSelect_9
-    Access_10 & Access_11 --> Object_12
-    __Value_3 --> Access_10
-    __Value_3 --> Access_11
+    PgSelectSingle14 --> PgClassExpression15
+    PgSelectSingle14 --> PgClassExpression16
+    PgSelectSingle14 --> PgClassExpression17
+    PgSelectSingle14 --> PgClassExpression18
+    PgSelectSingle14 --> PgClassExpression19
+    PgSelectSingle14 --> PgClassExpression20
+    PgSelectSingle14 --> PgClassExpression21
+    PgSelectSingle14 --> PgClassExpression22
+    PgSelectSingle14 --> PgClassExpression23
+    First13 --> PgSelectSingle14
+    PgSelect9 --> First13
+    Object12 & InputStaticLeaf7 & Constant8 --> PgSelect9
+    Access10 & Access11 --> Object12
+    __Value3 --> Access10
+    __Value3 --> Access11
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_14["ᐳsingleTableTopicById"]
-    PgSelectSingle_14 -.-> P_14
-    P_15["ᐳs…dᐳid"]
-    PgClassExpression_15 -.-> P_15
-    P_16["ᐳs…dᐳtype"]
-    PgClassExpression_16 -.-> P_16
-    P_17["ᐳs…dᐳtype2"]
-    PgClassExpression_17 -.-> P_17
-    P_18["ᐳs…dᐳposition"]
-    PgClassExpression_18 -.-> P_18
-    P_19["ᐳs…dᐳcreatedAt"]
-    PgClassExpression_19 -.-> P_19
-    P_20["ᐳs…dᐳupdatedAt"]
-    PgClassExpression_20 -.-> P_20
-    P_21["ᐳs…dᐳisExplicitlyArchived"]
-    PgClassExpression_21 -.-> P_21
-    P_22["ᐳs…dᐳarchivedAt"]
-    PgClassExpression_22 -.-> P_22
-    P_23["ᐳs…dᐳtitle"]
-    PgClassExpression_23 -.-> P_23
+    P0["~"]
+    __Value0 -.-> P0
+    P14["ᐳsingleTableTopicById"]
+    PgSelectSingle14 -.-> P14
+    P15["ᐳs…dᐳid"]
+    PgClassExpression15 -.-> P15
+    P16["ᐳs…dᐳtype"]
+    PgClassExpression16 -.-> P16
+    P17["ᐳs…dᐳtype2"]
+    PgClassExpression17 -.-> P17
+    P18["ᐳs…dᐳposition"]
+    PgClassExpression18 -.-> P18
+    P19["ᐳs…dᐳcreatedAt"]
+    PgClassExpression19 -.-> P19
+    P20["ᐳs…dᐳupdatedAt"]
+    PgClassExpression20 -.-> P20
+    P21["ᐳs…dᐳisExplicitlyArchived"]
+    PgClassExpression21 -.-> P21
+    P22["ᐳs…dᐳarchivedAt"]
+    PgClassExpression22 -.-> P22
+    P23["ᐳs…dᐳtitle"]
+    PgClassExpression23 -.-> P23
 
     subgraph "Buckets for queries/interfaces-single-table/single-topic"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀singleTableTopicById ᐸ-O- _14<br />⠀⠀⠀singleTableTopicById.id ᐸ-L- _15<br />⠀⠀⠀singleTableTopicById.type ᐸ-L- _16<br />⠀⠀⠀singleTableTopicById.type2 ᐸ-L- _17<br />⠀⠀⠀singleTableTopicById.position ᐸ-L- _18<br />⠀⠀⠀singleTableTopicById.createdAt ᐸ-L- _19<br />⠀⠀⠀singleTableTopicById.updatedAt ᐸ-L- _20<br />⠀⠀⠀singleTableTopicById.isExplicitlyArchived ᐸ-L- _21<br />⠀⠀⠀singleTableTopicById.archivedAt ᐸ-L- _22<br />⠀⠀⠀singleTableTopicById.title ᐸ-L- _23"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀singleTableTopicById ᐸ-O- 14<br />⠀⠀⠀singleTableTopicById.id ᐸ-L- 15<br />⠀⠀⠀singleTableTopicById.type ᐸ-L- 16<br />⠀⠀⠀singleTableTopicById.type2 ᐸ-L- 17<br />⠀⠀⠀singleTableTopicById.position ᐸ-L- 18<br />⠀⠀⠀singleTableTopicById.createdAt ᐸ-L- 19<br />⠀⠀⠀singleTableTopicById.updatedAt ᐸ-L- 20<br />⠀⠀⠀singleTableTopicById.isExplicitlyArchived ᐸ-L- 21<br />⠀⠀⠀singleTableTopicById.archivedAt ᐸ-L- 22<br />⠀⠀⠀singleTableTopicById.title ᐸ-L- 23"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,Constant_8,PgSelect_9,Access_10,Access_11,Object_12,First_13,PgSelectSingle_14,PgClassExpression_15,PgClassExpression_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,PgClassExpression_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23 bucket0
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,Constant8,PgSelect9,Access10,Access11,Object12,First13,PgSelectSingle14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket0
     end
 ```

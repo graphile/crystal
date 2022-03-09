@@ -8,65 +8,65 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgPolymorphic_15["PgPolymorphic[_15∈0]"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgClassExpression_404["PgClassExpression[_404∈0]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    PgPolymorphic_31["PgPolymorphic[_31∈0]"]:::plan
-    PgClassExpression_30["PgClassExpression[_30∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgClassExpression_484["PgClassExpression[_484∈0]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    PgClassExpression_47["PgClassExpression[_47∈0]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgSelectSingle_46["PgSelectSingle[_46∈0]<br />ᐸpeopleᐳ"]:::plan
-    Map_501["Map[_501∈0]<br />ᐸ_29:{”0”:2}ᐳ"]:::plan
-    PgSelectSingle_29["PgSelectSingle[_29∈0]<br />ᐸrelational_itemsᐳ"]:::plan
-    Map_503["Map[_503∈0]<br />ᐸ_13:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸrelational_itemsᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object_496["Object[_496∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_494["Access[_494∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_495["Access[_495∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    __Value0["__Value[0]"]:::plan
+    PgPolymorphic15["PgPolymorphic[15]"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgClassExpression404["PgClassExpression[404]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgPolymorphic31["PgPolymorphic[31]"]:::plan
+    PgClassExpression30["PgClassExpression[30]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgClassExpression484["PgClassExpression[484]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression47["PgClassExpression[47]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgSelectSingle46["PgSelectSingle[46]<br />ᐸpeopleᐳ"]:::plan
+    Map501["Map[501]<br />ᐸ29:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle29["PgSelectSingle[29]<br />ᐸrelational_itemsᐳ"]:::plan
+    Map503["Map[503]<br />ᐸ13:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrelational_itemsᐳ"]:::plan
+    First12["First[12]"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object496["Object[496]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access494["Access[494]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access495["Access[495]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_13 & PgClassExpression_14 --> PgPolymorphic_15
-    PgSelectSingle_13 --> PgClassExpression_14
-    PgSelectSingle_13 --> PgClassExpression_404
-    PgSelectSingle_29 & PgClassExpression_30 --> PgPolymorphic_31
-    PgSelectSingle_29 --> PgClassExpression_30
-    PgSelectSingle_29 --> PgClassExpression_484
-    PgSelectSingle_46 --> PgClassExpression_47
-    Map_501 --> PgSelectSingle_46
-    PgSelectSingle_29 --> Map_501
-    Map_503 --> PgSelectSingle_29
-    PgSelectSingle_13 --> Map_503
-    First_12 --> PgSelectSingle_13
-    PgSelect_8 --> First_12
-    Object_496 & InputStaticLeaf_7 --> PgSelect_8
-    Access_494 & Access_495 --> Object_496
-    __Value_3 --> Access_494
-    __Value_3 --> Access_495
+    PgSelectSingle13 & PgClassExpression14 --> PgPolymorphic15
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression404
+    PgSelectSingle29 & PgClassExpression30 --> PgPolymorphic31
+    PgSelectSingle29 --> PgClassExpression30
+    PgSelectSingle29 --> PgClassExpression484
+    PgSelectSingle46 --> PgClassExpression47
+    Map501 --> PgSelectSingle46
+    PgSelectSingle29 --> Map501
+    Map503 --> PgSelectSingle29
+    PgSelectSingle13 --> Map503
+    First12 --> PgSelectSingle13
+    PgSelect8 --> First12
+    Object496 & InputStaticLeaf7 --> PgSelect8
+    Access494 & Access495 --> Object496
+    __Value3 --> Access494
+    __Value3 --> Access495
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_15["ᐳitem"]
-    PgPolymorphic_15 -.-> P_15
-    P_31["ᐳitemᐳparent x5"]
-    PgPolymorphic_31 -.-> P_31
-    P_46["ᐳitemᐳp…tᐳauthor x25"]
-    PgSelectSingle_46 -.-> P_46
-    P_47["ᐳitemᐳp…tᐳa…rᐳusername x25"]
-    PgClassExpression_47 -.-> P_47
-    P_404["ᐳitemᐳid x5"]
-    PgClassExpression_404 -.-> P_404
-    P_484["ᐳitemᐳp…tᐳid x25"]
-    PgClassExpression_484 -.-> P_484
+    P0["~"]
+    __Value0 -.-> P0
+    P15["ᐳitem"]
+    PgPolymorphic15 -.-> P15
+    P31["ᐳitemᐳparent x5"]
+    PgPolymorphic31 -.-> P31
+    P46["ᐳitemᐳp…tᐳauthor x25"]
+    PgSelectSingle46 -.-> P46
+    P47["ᐳitemᐳp…tᐳa…rᐳusername x25"]
+    PgClassExpression47 -.-> P47
+    P404["ᐳitemᐳid x5"]
+    PgClassExpression404 -.-> P404
+    P484["ᐳitemᐳp…tᐳid x25"]
+    PgClassExpression484 -.-> P484
 
     subgraph "Buckets for queries/interfaces-relational/relation"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀item ᐸ-O- _15<br />⠀⠀⠀item.parent ᐸ-O- _31<br />⠀⠀⠀⠀item.parent.author ᐸ-O- _46<br />⠀⠀⠀⠀⠀item.parent.author.username ᐸ-L- _47<br />⠀⠀⠀⠀item.parent.id ᐸ-L- _484<br />⠀⠀⠀item.id ᐸ-L- _404"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀item ᐸ-O- 15<br />⠀⠀⠀item.parent ᐸ-O- 31<br />⠀⠀⠀⠀item.parent.author ᐸ-O- 46<br />⠀⠀⠀⠀⠀item.parent.author.username ᐸ-L- 47<br />⠀⠀⠀⠀item.parent.id ᐸ-L- 484<br />⠀⠀⠀item.id ᐸ-L- 404"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,Map_503 bucket0
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgSelectSingle29,PgClassExpression30,PgPolymorphic31,PgSelectSingle46,PgClassExpression47,PgClassExpression404,PgClassExpression484,Access494,Access495,Object496,Map501,Map503 bucket0
     end
 ```

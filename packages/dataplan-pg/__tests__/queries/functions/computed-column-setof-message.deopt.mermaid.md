@@ -8,53 +8,53 @@ graph TD
 
 
     %% define plans
-    __Value_0["__Value[_0∈0]"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
-    PgSelectSingle_20["PgSelectSingle[_20∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
-    __Item_19>"__Item[_19∈1]<br />ᐸ_15ᐳ"]:::itemplan
-    PgSelect_15[["PgSelect[_15∈0]<br />ᐸforums_featured_messagesᐳ"]]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br />ᐸ__forums__ᐳ"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈0]<br />ᐸforumsᐳ"]:::plan
-    First_12["First[_12∈0]"]:::plan
-    PgSelect_8[["PgSelect[_8∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object_18["Object[_18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access_16["Access[_16∈0]<br />ᐸ_3.pgSettingsᐳ"]:::plan
-    Access_17["Access[_17∈0]<br />ᐸ_3.withPgClientᐳ"]:::plan
-    __Value_3["__Value[_3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
+    __Value0["__Value[0∈0]"]:::plan
+    PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
+    PgSelectSingle20["PgSelectSingle[20∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
+    __Item19>"__Item[19∈1]<br />ᐸ15ᐳ"]:::itemplan
+    PgSelect15[["PgSelect[15∈0]<br />ᐸforums_featured_messagesᐳ"]]:::plan
+    PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__forums__ᐳ"]:::plan
+    PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸforumsᐳ"]:::plan
+    First12["First[12∈0]"]:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object18["Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access16["Access[16∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access17["Access[17∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
-    PgSelectSingle_20 --> PgClassExpression_21
-    __Item_19 --> PgSelectSingle_20
-    PgSelect_15 ==> __Item_19
-    Object_18 & PgClassExpression_14 --> PgSelect_15
-    PgSelectSingle_13 --> PgClassExpression_14
-    First_12 --> PgSelectSingle_13
-    PgSelect_8 --> First_12
-    Object_18 & InputStaticLeaf_7 --> PgSelect_8
-    Access_16 & Access_17 --> Object_18
-    __Value_3 --> Access_16
-    __Value_3 --> Access_17
+    PgSelectSingle20 --> PgClassExpression21
+    __Item19 --> PgSelectSingle20
+    PgSelect15 ==> __Item19
+    Object18 & PgClassExpression14 --> PgSelect15
+    PgSelectSingle13 --> PgClassExpression14
+    First12 --> PgSelectSingle13
+    PgSelect8 --> First12
+    Object18 & InputStaticLeaf7 --> PgSelect8
+    Access16 & Access17 --> Object18
+    __Value3 --> Access16
+    __Value3 --> Access17
 
     %% plan-to-path relationships
-    P_0["~"]
-    __Value_0 -.-> P_0
-    P_13["ᐳforum"]
-    PgSelectSingle_13 -.-> P_13
-    P_15["ᐳf…mᐳfeaturedMessages"]
-    PgSelect_15 -.-> P_15
-    P_20["ᐳf…mᐳfeaturedMessages[]"]
-    PgSelectSingle_20 -.-> P_20
-    P_21["ᐳf…mᐳf…]ᐳbody"]
-    PgClassExpression_21 -.-> P_21
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳforum"]
+    PgSelectSingle13 -.-> P13
+    P15["ᐳf…mᐳfeaturedMessages"]
+    PgSelect15 -.-> P15
+    P20["ᐳf…mᐳfeaturedMessages[]"]
+    PgSelectSingle20 -.-> P20
+    P21["ᐳf…mᐳf…]ᐳbody"]
+    PgClassExpression21 -.-> P21
 
     subgraph "Buckets for queries/functions/computed-column-setof-message"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- _0<br />⠀⠀forum ᐸ-O- _13<br />⠀⠀⠀forum.featuredMessages ᐸ-A- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.featuredMessages ᐸ-A- 15"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18 bucket0
-    Bucket1("Bucket 1 (item_19)<br />Deps: _15<br />~ᐳQuery.forumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- _20<br />⠀⠀body ᐸ-L- _21"):::bucket
+    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgSelect15,Access16,Access17,Object18 bucket0
+    Bucket1("Bucket 1 (item19)<br />Deps: 15<br />~ᐳQuery.forumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- 20<br />⠀⠀body ᐸ-L- 21"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
+    class Bucket1,__Item19,PgSelectSingle20,PgClassExpression21 bucket1
     Bucket0 --> Bucket1
     end
 ```
