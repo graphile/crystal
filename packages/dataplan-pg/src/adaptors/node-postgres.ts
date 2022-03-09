@@ -17,7 +17,9 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
     const pgClient = await pool.connect();
     /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
     let txLevel = 0;
-    const pgSettingsEntries = pgSettings ? Object.entries(pgSettings) : [];
+    const pgSettingsEntries = pgSettings
+      ? Object.entries(pgSettings).map(([k, v]) => [k, String(v)])
+      : [];
     /** If transactions become unpaired, prevent any further usage */
     let catastrophicFailure: Error | null = null;
 
@@ -105,8 +107,8 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
             await pgClient.query("begin");
             if (pgSettingsEntries.length > 0) {
               await pgClient.query({
-                text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json)",
-                values: [pgSettingsEntries],
+                text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el",
+                values: [JSON.stringify(pgSettingsEntries)],
               });
             }
           } else {
