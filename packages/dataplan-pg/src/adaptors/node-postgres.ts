@@ -18,15 +18,22 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
     /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
     let txLevel = 0;
     const pgSettingsEntries = pgSettings ? Object.entries(pgSettings) : [];
+    /** If transactions become unpaired, prevent any further usage */
+    let catastrophicFailure: Error | null = null;
 
     try {
       const client: PgClient = {
         async query<TData>(opts: PgClientQuery) {
+          if (catastrophicFailure !== null) {
+            throw catastrophicFailure;
+          }
           const needsTx = txLevel === 0 && pgSettingsEntries.length > 0;
+          if (needsTx) {
+            // NOTE: this is **NOT** inside the 'try' because if we fail to start
+            // the transaction then we must not release it.
+            await this.startTransaction();
+          }
           try {
-            if (needsTx) {
-              await this.startTransaction();
-            }
             const { text, name, values, arrayMode } = opts;
             // TODO: support named queries.
             const queryObj: QueryConfig | QueryArrayConfig = arrayMode
@@ -78,12 +85,22 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
             return result;
           } catch (e) {
             if (needsTx) {
-              await this.rollbackTransaction();
+              try {
+                await this.rollbackTransaction();
+              } catch (rollbackError) {
+                console.error(
+                  `Error occurred during rollback: ${rollbackError.message}`,
+                );
+                throw e;
+              }
             }
             throw e;
           }
         },
         async startTransaction() {
+          if (catastrophicFailure !== null) {
+            throw catastrophicFailure;
+          }
           if (txLevel === 0) {
             await pgClient.query("begin");
             if (pgSettingsEntries.length > 0) {
@@ -101,18 +118,28 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
           txLevel--;
           if (txLevel === 0) {
             await pgClient.query({ text: "commit" });
-          } else {
+          } else if (txLevel > 0) {
             await pgClient.query({ text: `release savepoint tx${txLevel}` });
+          } else {
+            catastrophicFailure = new Error(
+              `Catastrophic failure: txLevel is ${txLevel}; you have unbalanced startTransaction/commitTransaction/rollbackTransaction calls. Unsafe to continue; this Postgres client is now inactivated.`,
+            );
+            throw catastrophicFailure;
           }
         },
         async rollbackTransaction() {
           txLevel--;
           if (txLevel === 0) {
             await pgClient.query({ text: "rollback" });
-          } else {
+          } else if (txLevel > 0) {
             await pgClient.query({
               text: `rollback to savepoint tx${txLevel}`,
             });
+          } else {
+            catastrophicFailure = new Error(
+              `Catastrophic failure: txLevel is ${txLevel}; you have unbalanced startTransaction/commitTransaction/rollbackTransaction calls. Unsafe to continue; this Postgres client is now inactivated.`,
+            );
+            throw catastrophicFailure;
           }
         },
       };
