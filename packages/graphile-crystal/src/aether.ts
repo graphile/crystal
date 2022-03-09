@@ -4889,7 +4889,7 @@ export class Aether<
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
       );
     }
-    const modifierPlanId = `_${this.modifierPlanCount++}`;
+    const modifierPlanId = `${this.modifierPlanCount++}`;
     this.modifierPlans.push(plan);
     return modifierPlanId;
   }
