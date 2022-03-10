@@ -105,7 +105,6 @@ export function executeBucket(
   const isObjectBucket = rootOutputModeType === "O";
   const {
     input,
-    size,
     noDepsList,
     definition: {
       id: bucketId,
@@ -117,6 +116,7 @@ export function executeBucket(
       outputMap,
     },
   } = bucket;
+  const size = input.length;
 
   const completedPlan = (
     finishedPlan: ExecutablePlan,
@@ -233,7 +233,6 @@ export function executeBucket(
     const itemBucket: Bucket = {
       definition: itemBucketDefinition,
       store: itemStore,
-      size: itemInputs.length,
       noDepsList: arrayOfLength(itemInputs.length),
       input: itemInputs,
       errors: itemErrors,
@@ -590,7 +589,6 @@ export function executeBucket(
           definition: child.childBucketDefinition,
           store: child.store,
           errors: child.errors,
-          size: child.inputs.length,
           input: child.inputs,
           noDepsList: arrayOfLength(child.inputs.length),
         };

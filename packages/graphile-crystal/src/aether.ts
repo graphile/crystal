@@ -5746,7 +5746,6 @@ export class Aether<
     const rvs = [rootValue];
     const rootBucket: Bucket = {
       definition: this.rootBucket,
-      size: input.length,
       input,
       noDepsList: Object.freeze(arrayOfLength(input.length)),
       store: Object.assign(Object.create(null), {

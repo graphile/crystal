@@ -344,10 +344,6 @@ export interface Bucket {
    */
   definition: BucketDefinition;
   /**
-   * The number of elements the bucket represents.
-   */
-  size: number;
-  /**
    * Same length as the bucket has 'size'
    */
   input: BucketSetter[];
