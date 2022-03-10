@@ -26,7 +26,7 @@ function writeListValueIntoChildBucket(
   store: {
     [planId: string]: any[];
   },
-  child: Pick<Bucket, "store" | "errors" | "definition" | "input">,
+  child: Pick<Bucket, "store" | "definition" | "input" | "hasErrors">,
   rootPathIdentity: string,
   index: number,
   parentObject: object | unknown[],
@@ -35,7 +35,6 @@ function writeListValueIntoChildBucket(
 ): void {
   const {
     store: itemStore,
-    errors: itemErrors,
     input: itemInputs,
     definition: { copyPlanIds, itemPlanId: rawItemPlanId },
   } = child;
@@ -49,42 +48,13 @@ function writeListValueIntoChildBucket(
     ),
   );
   const l = itemStore[itemPlanId].push(entry);
-  // Update itemErrors[itemPlanId]
   if (entry && entry.constructor === CrystalError) {
     // It's an error - make sure it's represented
-    const itemError = itemErrors[itemPlanId];
-    if (itemError === false) {
-      if (parentKey === 0) {
-        itemErrors[itemPlanId] = true;
-      } else {
-        itemErrors[itemPlanId] = [parentKey];
-      }
-    } else if (itemError === true) {
-      // Noop
-    } else {
-      // TODO: assert isArray
-      itemError.push(parentKey);
-    }
-  } else {
-    // It's not an error, make sure this is noted
-    const itemError = itemErrors[itemPlanId];
-    if (itemError === true) {
-      // All previous indexes were errors, but this one isn't.
-      itemErrors[itemPlanId] = Array.from({ length: l - 1 }, (v, k) => k);
-    }
+    child.hasErrors = true;
   }
   for (const planId of copyPlanIds) {
     const val = store[planId][index];
     itemStore[planId].push(val);
-    const itemError = itemErrors[planId];
-    if (
-      typeof itemError !== "boolean" &&
-      val &&
-      val.constructor === CrystalError
-    ) {
-      // Must be an array
-      itemError.push(l - 1);
-    }
   }
 }
 
@@ -97,7 +67,6 @@ export function executeBucket(
   const inProgressPlans = new Set();
   const pendingPlans = new Set(bucket.definition.plans);
   const store = bucket.store;
-  const errors = bucket.errors;
   const rootOutputModeType = bucket.definition.rootOutputModeType;
   const isNestedListBucket = rootOutputModeType === "A";
   const isLeafBucket = rootOutputModeType === "L";
@@ -152,8 +121,7 @@ export function executeBucket(
   const completedPlan = (
     finishedPlan: ExecutablePlan,
     result: CrystalValuesList<any>,
-    depErrorIndexes: boolean | number[],
-    wasExecutedSync = false,
+    noNewErrors = false,
   ): void | Promise<void> => {
     if (!Array.isArray(result)) {
       throw new Error(
@@ -168,38 +136,21 @@ export function executeBucket(
         `Result array from ${finishedPlan} should have length ${size}, instead it had length ${result.length}`,
       );
     }
-    if (finishedPlan.sync && wasExecutedSync) {
+    if (finishedPlan.sync && noNewErrors) {
       // It promises not to add new errors, and not to include promises in the result array
       store[finishedPlan.id] = result;
-      errors[finishedPlan.id] = depErrorIndexes;
       return reallyCompletedPlan(finishedPlan);
     } else {
       // Need to complete promises, check for errors, etc
       return Promise.allSettled(result).then((rs) => {
-        let errorIndexes: boolean | number[] = false;
         const finalResult = rs.map((t, i) => {
           if (t.status === "fulfilled") {
-            if (errorIndexes === true) {
-              // Everything else was an error
-              errorIndexes = Array.from({ length: i }, (v, k) => k);
-            }
             return t.value;
           } else {
-            if (errorIndexes === false) {
-              if (i === 0) {
-                errorIndexes = true;
-              } else {
-                errorIndexes = [i];
-              }
-            } else if (errorIndexes === true) {
-              // noop
-            } else {
-              errorIndexes.push(i);
-            }
+            bucket.hasErrors = true;
             return new CrystalError(t.reason);
           }
         });
-        errors[finishedPlan.id] = errorIndexes;
         store[finishedPlan.id] = result;
         return reallyCompletedPlan(finishedPlan);
       });
@@ -226,23 +177,10 @@ export function executeBucket(
     const itemStore: {
       [planId: string]: any[];
     } = Object.create(null);
-    const itemErrors: {
-      [planId: string]: boolean | number[];
-    } = Object.create(null);
     itemStore[itemPlanId] = [];
-
-    // Start with no errors, but this may change later
-    itemErrors[itemPlanId] = false;
 
     for (const planId of itemBucketDefinition.copyPlanIds) {
       itemStore[planId] = [];
-
-      // If all or none are errors, this property will continue to be true even as we scale up/down the entries
-      if (typeof errors[planId] === "boolean") {
-        itemErrors[planId] = errors[planId];
-      } else {
-        itemErrors[planId] = [];
-      }
     }
 
     const itemBucket: Bucket = {
@@ -250,7 +188,7 @@ export function executeBucket(
       store: itemStore,
       noDepsList: arrayOfLength(itemInputs.length),
       input: itemInputs,
-      errors: itemErrors,
+      hasErrors: bucket.hasErrors,
     };
 
     const listsLength = lists.length;
@@ -334,35 +272,13 @@ export function executeBucket(
       const meta = metaByPlanId[plan.id]!;
       const dependencies: any[] = [];
       const depCount = plan.dependencies.length;
-      let depErrorIndexes: boolean | number[] = false;
       if (depCount > 0) {
         for (let i = 0, l = depCount; i < l; i++) {
           const depId = plan.dependencies[i];
           dependencies[i] = store[depId];
-          const errorsForDep = errors[depId];
-          if (errorsForDep === false) {
-            // noop
-          } else if (errorsForDep === true) {
-            depErrorIndexes = true;
-          } else {
-            if (depErrorIndexes === true) {
-              // noop
-            } else if (depErrorIndexes === false) {
-              depErrorIndexes = [...errorsForDep];
-            } else {
-              for (const errorIndex of errorsForDep) {
-                if (!depErrorIndexes.includes(errorIndex)) {
-                  depErrorIndexes.push(errorIndex);
-                }
-              }
-            }
-          }
         }
       } else {
         dependencies.push(noDepsList);
-      }
-      if (typeof depErrorIndexes !== "boolean") {
-        depErrorIndexes.sort((a, z) => a - z);
       }
       const result =
         plan instanceof __ListTransformPlan
@@ -371,18 +287,17 @@ export function executeBucket(
       if (isPromiseLike(result)) {
         return result.then(
           (values) => {
-            return completedPlan(plan, values, depErrorIndexes);
+            return completedPlan(plan, values);
           },
           (error) => {
             return completedPlan(
               plan,
               arrayOfLength(size, new CrystalError(error)),
-              depErrorIndexes,
             );
           },
         );
       } else {
-        return completedPlan(plan, result, depErrorIndexes, true);
+        return completedPlan(plan, result, true);
       }
     } catch (error) {
       return completedPlan(
@@ -410,7 +325,7 @@ export function executeBucket(
     }
 
     // TODO: create a JIT factory for this at planning time
-    type Child = Pick<Bucket, "definition" | "input" | "store" | "errors">;
+    type Child = Pick<Bucket, "definition" | "input" | "store" | "hasErrors">;
     const children: Array<Child> = [];
     const childrenByPathIdentity: {
       [pathIdentity: string]: Array<Child> | undefined;
@@ -420,18 +335,14 @@ export function executeBucket(
         definition: childBucketDefinition,
         input: [],
         store: Object.create(null),
-        errors: Object.create(null),
+        hasErrors: bucket.hasErrors,
       };
       children.push(entry);
       for (const planId of childBucketDefinition.copyPlanIds) {
         entry.store[planId] = [];
-        entry.errors[planId] =
-          typeof errors[planId] === "boolean" ? errors[planId] : [];
       }
       if (childBucketDefinition.itemPlanId) {
         entry.store[childBucketDefinition.itemPlanId] = [];
-        // Start with no errors, but this may change later
-        entry.errors[childBucketDefinition.itemPlanId] = false;
       }
       for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
         if (!childrenByPathIdentity[childRootPathIdentity]) {
@@ -460,7 +371,6 @@ export function executeBucket(
           const {
             input: childInputs,
             store: childStore,
-            errors: childErrors,
             definition: { itemPlanId, polymorphicPlanIds, groupId },
           } = child;
           if (itemPlanId == null) {
@@ -640,9 +550,9 @@ export function executeBucket(
         const childBucket: Bucket = {
           definition: child.definition,
           store: child.store,
-          errors: child.errors,
           input: child.input,
           noDepsList: arrayOfLength(child.input.length),
+          hasErrors: bucket.hasErrors,
         };
         const r = executeBucket(
           aether,
