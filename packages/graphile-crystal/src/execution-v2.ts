@@ -48,10 +48,6 @@ function writeListValueIntoChildBucket(
     ),
   );
   const l = itemStore[itemPlanId].push(entry);
-  if (entry && entry.constructor === CrystalError) {
-    // It's an error - make sure it's represented
-    child.hasErrors = true;
-  }
   for (const planId of copyPlanIds) {
     const val = store[planId][index];
     itemStore[planId].push(val);
