@@ -26,21 +26,20 @@ function writeValueIntoChildBucket(
   store: {
     [planId: string]: any[];
   },
-  copyPlans: Set<ExecutablePlan<any>>,
+  child: Pick<Bucket, "store" | "errors" | "definition" | "input">,
   rootPathIdentity: string,
   index: number,
-  itemStore: {
-    [planId: string]: any[];
-  },
-  itemErrors: {
-    [planId: string]: boolean | number[];
-  },
-  itemInputs: BucketSetter[],
   parentObject: object | unknown[],
   parentKey: number,
   entry: any,
   itemPlanId: string,
 ): void {
+  const {
+    store: itemStore,
+    errors: itemErrors,
+    input: itemInputs,
+    definition: { copyPlans },
+  } = child;
   itemInputs.push(
     new BucketSetter(
       // TODO: what should this "rootPathIdentity" be?
@@ -204,6 +203,14 @@ export function executeBucket(
       }
     }
 
+    const itemBucket: Bucket = {
+      definition: itemBucketDefinition,
+      store: itemStore,
+      noDepsList: arrayOfLength(itemInputs.length),
+      input: itemInputs,
+      errors: itemErrors,
+    };
+
     const listsLength = lists.length;
     for (let i = 0, l = listsLength; i < l; i++) {
       const list = lists[i];
@@ -213,12 +220,9 @@ export function executeBucket(
         for (let j = 0, m = listLength; j < m; j++) {
           writeValueIntoChildBucket(
             store,
-            itemBucketDefinition.copyPlans,
+            itemBucket,
             "",
             i,
-            itemStore,
-            itemErrors,
-            itemInputs,
             innerList,
             j,
             list[j],
@@ -230,13 +234,6 @@ export function executeBucket(
       }
     }
 
-    const itemBucket: Bucket = {
-      definition: itemBucketDefinition,
-      store: itemStore,
-      noDepsList: arrayOfLength(itemInputs.length),
-      input: itemInputs,
-      errors: itemErrors,
-    };
     const result = executeBucket(
       aether,
       metaByPlanId,
@@ -344,20 +341,15 @@ export function executeBucket(
     }
 
     // TODO: create a JIT factory for this at planning time
-    type Child = {
-      childBucketDefinition: BucketDefinition;
-      inputs: BucketSetter[];
-      store: { [planId: string]: any[] };
-      errors: { [planId: string]: boolean | number[] };
-    };
+    type Child = Pick<Bucket, "definition" | "input" | "store" | "errors">;
     const children: Array<Child> = [];
     const childrenByPathIdentity: {
       [pathIdentity: string]: Array<Child> | undefined;
     } = Object.create(null);
     for (const childBucketDefinition of childBucketDefinitions) {
-      const entry = {
-        childBucketDefinition,
-        inputs: [],
+      const entry: Child = {
+        definition: childBucketDefinition,
+        input: [],
         store: Object.create(null),
         errors: Object.create(null),
       };
@@ -397,15 +389,10 @@ export function executeBucket(
       if (pathIdentitiesWithChildren.includes(nestedPathIdentity)) {
         for (const child of childrenByPathIdentity[nestedPathIdentity]!) {
           const {
-            inputs: childInputs,
+            input: childInputs,
             store: childStore,
             errors: childErrors,
-            childBucketDefinition: {
-              itemPlanId,
-              polymorphicPlanIds,
-              copyPlans,
-              groupId,
-            },
+            definition: { itemPlanId, polymorphicPlanIds, copyPlans, groupId },
           } = child;
           if (itemPlanId == null) {
             throw new Error(
@@ -422,12 +409,9 @@ export function executeBucket(
           for (let i = 0, l = value.length; i < l; i++) {
             writeValueIntoChildBucket(
               store,
-              copyPlans,
+              child,
               nestedPathIdentity,
               index,
-              childStore,
-              childErrors,
-              childInputs,
               value,
               i,
               rawValue[i],
@@ -493,22 +477,22 @@ export function executeBucket(
             if (pathIdentitiesWithChildren.includes(keyPathIdentity)) {
               const valueConcreteType = value[$$concreteType];
               for (const child of childrenByPathIdentity[keyPathIdentity]!) {
-                if (child.childBucketDefinition.itemPlanId != null) {
+                if (child.definition.itemPlanId != null) {
                   throw new Error("INCONSISTENT!");
                 }
-                if (child.childBucketDefinition.groupId != null) {
+                if (child.definition.groupId != null) {
                   throw new Error("Group inside list currently unsupported");
                 }
                 const match =
-                  !child.childBucketDefinition.polymorphicTypeNames ||
-                  child.childBucketDefinition.polymorphicTypeNames.includes(
+                  !child.definition.polymorphicTypeNames ||
+                  child.definition.polymorphicTypeNames.includes(
                     valueConcreteType,
                   );
                 if (match) {
-                  child.inputs.push(
+                  child.input.push(
                     new BucketSetter(keyPathIdentity, obj, responseKey),
                   );
-                  for (const plan of child.childBucketDefinition.copyPlans) {
+                  for (const plan of child.definition.copyPlans) {
                     child.store[plan.id].push(store[plan.id][index]);
                   }
                 }
@@ -584,13 +568,13 @@ export function executeBucket(
     // Now to call any nested buckets
     const childPromises: PromiseLike<any>[] = [];
     for (const child of children!) {
-      if (child.inputs.length > 0) {
+      if (child.input.length > 0) {
         const childBucket: Bucket = {
-          definition: child.childBucketDefinition,
+          definition: child.definition,
           store: child.store,
           errors: child.errors,
-          input: child.inputs,
-          noDepsList: arrayOfLength(child.inputs.length),
+          input: child.input,
+          noDepsList: arrayOfLength(child.input.length),
         };
         const r = executeBucket(
           aether,
