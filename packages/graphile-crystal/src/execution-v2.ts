@@ -22,38 +22,6 @@ import { arrayOfLength, isPromiseLike } from "./utils";
 // optimization
 export const $$keys = Symbol("keys");
 
-function writeListValueIntoChildBucket(
-  store: {
-    [planId: string]: any[];
-  },
-  child: Pick<Bucket, "store" | "definition" | "input" | "hasErrors">,
-  rootPathIdentity: string,
-  index: number,
-  parentObject: object | unknown[],
-  parentKey: number,
-  entry: any,
-): void {
-  const {
-    store: itemStore,
-    input: itemInputs,
-    definition: { copyPlanIds, itemPlanId: rawItemPlanId },
-  } = child;
-  const itemPlanId = rawItemPlanId!;
-  itemInputs.push(
-    new BucketSetter(
-      // TODO: what should this "rootPathIdentity" be?
-      rootPathIdentity,
-      parentObject,
-      parentKey,
-    ),
-  );
-  const l = itemStore[itemPlanId].push(entry);
-  for (const planId of copyPlanIds) {
-    const val = store[planId][index];
-    itemStore[planId].push(val);
-  }
-}
-
 export function executeBucket(
   aether: Aether,
   metaByPlanId: CrystalContext["metaByPlanId"],
@@ -186,6 +154,7 @@ export function executeBucket(
       input: itemInputs,
       hasErrors: bucket.hasErrors,
     };
+    const { copyPlanIds } = itemBucketDefinition;
 
     const listsLength = lists.length;
     for (let i = 0, l = listsLength; i < l; i++) {
@@ -194,15 +163,19 @@ export function executeBucket(
         const listLength = list.length;
         const innerList = arrayOfLength(listLength);
         for (let j = 0, m = listLength; j < m; j++) {
-          writeListValueIntoChildBucket(
-            store,
-            itemBucket,
-            "",
-            i,
-            innerList,
-            j,
-            list[j],
+          itemInputs.push(
+            new BucketSetter(
+              // TODO: what should this "rootPathIdentity" be?
+              "",
+              innerList,
+              j,
+            ),
           );
+          const l = itemStore[itemPlanId].push(list[j]);
+          for (const planId of copyPlanIds) {
+            const val = store[planId][i];
+            itemStore[planId].push(val);
+          }
         }
       } else {
         // Noop
@@ -367,7 +340,12 @@ export function executeBucket(
           const {
             input: childInputs,
             store: childStore,
-            definition: { itemPlanId, polymorphicPlanIds, groupId },
+            definition: {
+              itemPlanId,
+              polymorphicPlanIds,
+              groupId,
+              copyPlanIds,
+            },
           } = child;
           if (itemPlanId == null) {
             throw new Error(
@@ -382,15 +360,12 @@ export function executeBucket(
             throw new Error("Group inside list currently unsupported");
           }
           for (let i = 0, l = value.length; i < l; i++) {
-            writeListValueIntoChildBucket(
-              store,
-              child,
-              nestedPathIdentity,
-              index,
-              value,
-              i,
-              rawValue[i],
-            );
+            childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
+            const l = childStore[itemPlanId].push(rawValue[i]);
+            for (const planId of copyPlanIds) {
+              const val = store[planId][index];
+              childStore[planId].push(val);
+            }
           }
         }
       }
