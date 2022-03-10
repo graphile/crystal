@@ -11,6 +11,7 @@ import type {
 import { BucketSetter, bucketValue } from "./bucket";
 import type {
   CrystalContext,
+  CrystalResultsList,
   CrystalValuesList,
   PromiseOrDirect,
 } from "./interfaces";
@@ -21,6 +22,35 @@ import { arrayOfLength, isPromiseLike } from "./utils";
 
 // optimization
 export const $$keys = Symbol("keys");
+
+/**
+ * Takes a list of `results` (shorter than `resultCount`) and an object with
+ * errors and indexes; returns a list of length `resultCount` with the results
+ * from `results` but with errors injected at the indexes specified in
+ * `errors`.
+ *
+ * ASSERT: `results.length + Object.values(errors).length === resultCount`
+ *
+ * @internal
+ */
+function mergeErrorsBackIn(
+  results: ReadonlyArray<any>,
+  errors: { [index: number]: CrystalError },
+  resultCount: number,
+): any[] {
+  const finalResults: any[] = [];
+  let resultIndex = 0;
+
+  for (let i = 0; i < resultCount; i++) {
+    const error = errors[i];
+    if (error) {
+      finalResults[i] = error;
+    } else {
+      finalResults[i] = results[resultIndex++];
+    }
+  }
+  return finalResults;
+}
 
 export function executeBucket(
   aether: Aether,
@@ -230,6 +260,58 @@ export function executeBucket(
     }
   };
 
+  // Slow mode...
+  function reallyExecutePlanWithErrors(
+    plan: ExecutablePlan,
+    dependencies: ReadonlyArray<any>[],
+    meta: Record<string, unknown>,
+  ) {
+    const errors: { [index: number]: CrystalError } = Object.create(null);
+    let hasErrors = false;
+    for (const depList of dependencies) {
+      for (let index = 0, l = depList.length; index < l; index++) {
+        const v = depList[index];
+        if (v && v.constructor === CrystalError) {
+          if (!errors[index]) {
+            hasErrors = true;
+            errors[index] = v;
+          }
+        }
+      }
+    }
+    if (hasErrors) {
+      const dependenciesWithoutErrors = dependencies.map((depList) =>
+        depList.filter((_, index) => !errors[index]),
+      );
+      const resultWithoutErrors =
+        plan instanceof __ListTransformPlan
+          ? executeListTransform(plan, dependenciesWithoutErrors, meta)
+          : plan.execute(dependenciesWithoutErrors, meta);
+      return isPromiseLike(resultWithoutErrors)
+        ? resultWithoutErrors.then((r) =>
+            mergeErrorsBackIn(r, errors, dependencies[0].length),
+          )
+        : mergeErrorsBackIn(
+            resultWithoutErrors,
+            errors,
+            dependencies[0].length,
+          );
+    } else {
+      return reallyExecutePlanWithNoErrors(plan, dependencies, meta);
+    }
+  }
+
+  // Fast mode!
+  function reallyExecutePlanWithNoErrors(
+    plan: ExecutablePlan,
+    dependencies: ReadonlyArray<any>[],
+    meta: Record<string, unknown>,
+  ) {
+    return plan instanceof __ListTransformPlan
+      ? executeListTransform(plan, dependencies, meta)
+      : plan.execute(dependencies, meta);
+  }
+
   /**
    * This function MUST NEVER THROW/REJECT.
    */
@@ -240,7 +322,7 @@ export function executeBucket(
     inProgressPlans.add(plan);
     try {
       const meta = metaByPlanId[plan.id]!;
-      const dependencies: any[] = [];
+      const dependencies: ReadonlyArray<any>[] = [];
       const depCount = plan.dependencies.length;
       if (depCount > 0) {
         for (let i = 0, l = depCount; i < l; i++) {
@@ -250,10 +332,9 @@ export function executeBucket(
       } else {
         dependencies.push(noDepsList);
       }
-      const result =
-        plan instanceof __ListTransformPlan
-          ? executeListTransform(plan, dependencies, meta)
-          : plan.execute(dependencies, meta);
+      const result = bucket.hasErrors
+        ? reallyExecutePlanWithErrors(plan, dependencies, meta)
+        : reallyExecutePlanWithNoErrors(plan, dependencies, meta);
       if (isPromiseLike(result)) {
         return result.then(
           (values) => {
