@@ -107,7 +107,8 @@ export function executeBucket(
     } else {
       // Need to complete promises, check for errors, etc
       return Promise.allSettled(result).then((rs) => {
-        const finalResult = rs.map((t, i) => {
+        // Deliberate shadowing
+        const result = rs.map((t, i) => {
           if (t.status === "fulfilled") {
             return t.value;
           } else {
@@ -269,6 +270,7 @@ export function executeBucket(
         return completedPlan(plan, result, true);
       }
     } catch (error) {
+      bucket.hasErrors = true;
       return completedPlan(
         plan,
         arrayOfLength(size, new CrystalError(error)),
