@@ -1017,7 +1017,7 @@ export class Aether<
       outputMap: Object.create(null),
       ancestors: spec.parent ? [...spec.parent.ancestors, spec.parent] : [],
       children: [],
-      copyPlans: new Set(),
+      copyPlanIds: [],
       plans: [],
       startPlans: [],
     };
@@ -3287,9 +3287,11 @@ export class Aether<
           polymorphicPlanIds,
           polymorphicTypeNames,
         });
-        dependencyPlans.forEach((dependencyPlan) =>
-          newBucket.copyPlans.add(dependencyPlan),
-        );
+        dependencyPlans.forEach((dependencyPlan) => {
+          if (!newBucket.copyPlanIds.includes(dependencyPlan.id)) {
+            newBucket.copyPlanIds.push(dependencyPlan.id);
+          }
+        });
         bucketByBucketKey[bucketKey] = newBucket;
         plan.bucketId = newBucket.id;
         return plan;
@@ -3356,7 +3358,7 @@ export class Aether<
       }
     }
 
-    // Now to set up the bucket's `copyPlans`
+    // Now to set up the bucket's `copyPlanIds`
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan != null && plan.id === id) {
         for (const depId of plan.dependencies) {
@@ -3364,7 +3366,9 @@ export class Aether<
           if (dep.bucketId !== plan.bucketId) {
             let bucket = this.buckets[plan.bucketId];
             while (bucket.id !== dep.bucketId) {
-              bucket.copyPlans.add(dep);
+              if (!bucket.copyPlanIds.includes(dep.id)) {
+                bucket.copyPlanIds.push(dep.id);
+              }
               if (!bucket.parent) {
                 throw new Error(
                   `${plan} (bucket ${plan.bucketId}) depends on ${dep} (bucket ${dep.bucketId}), but bucket ${dep.bucketId} does not appear in bucket ${plan.bucketId}'s ancestors.`,
@@ -3737,7 +3741,9 @@ export class Aether<
               }
               fieldSpec.planIdByRootPathIdentity[rootPathIdentity] = plan.id;
               if (plan.bucketId !== bucket.id) {
-                bucket.copyPlans.add(plan);
+                if (!bucket.copyPlanIds.includes(plan.id)) {
+                  bucket.copyPlanIds.push(plan.id);
+                }
               }
               if (
                 fieldSpec.typeNames &&
@@ -6230,9 +6236,9 @@ export class Aether<
       graph.push(
         `    Bucket${bucket.id}(${dotEscape(
           `Bucket ${bucket.id} (${raisonDEtre})\n${
-            bucket.copyPlans.size > 0
-              ? `Deps: ${[...bucket.copyPlans]
-                  .map((p) => p.id.replace(/^_/, ""))
+            bucket.copyPlanIds.length > 0
+              ? `Deps: ${bucket.copyPlanIds
+                  .map((pId) => this.plans[pId].id.replace(/^_/, ""))
                   .join(", ")}\n`
               : ""
           }${bucket.rootPathIdentities.join("\n")}\n${

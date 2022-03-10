@@ -215,7 +215,7 @@ export interface BucketDefinition {
    * be "copied across" to this bucket because plans in this bucket still
    * reference them?
    */
-  copyPlans: Set<ExecutablePlan>;
+  copyPlanIds: string[];
 
   plans: ExecutablePlan[];
   startPlans: ExecutablePlan[];
