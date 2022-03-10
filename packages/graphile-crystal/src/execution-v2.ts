@@ -117,24 +117,9 @@ export function executeBucket(
   } = bucket;
   const size = input.length;
 
-  const completedPlan = (
+  const reallyCompletedPlan = (
     finishedPlan: ExecutablePlan,
-    result: CrystalValuesList<any>,
   ): void | Promise<void> => {
-    if (!Array.isArray(result)) {
-      throw new Error(
-        `Result from ${finishedPlan} should be an array, instead received ${inspect(
-          result,
-          { colors: true },
-        )}`,
-      );
-    }
-    if (result.length !== size) {
-      throw new Error(
-        `Result array from ${finishedPlan} should have length ${size}, instead it had length ${result.length}`,
-      );
-    }
-    store[finishedPlan.id] = result;
     inProgressPlans.delete(finishedPlan);
     pendingPlans.delete(finishedPlan);
     if (pendingPlans.size === 0) {
@@ -161,6 +146,63 @@ export function executeBucket(
       return Promise.all(promises) as Promise<any> as Promise<void>;
     } else {
       return;
+    }
+  };
+
+  const completedPlan = (
+    finishedPlan: ExecutablePlan,
+    result: CrystalValuesList<any>,
+    depErrorIndexes: boolean | number[],
+    wasExecutedSync = false,
+  ): void | Promise<void> => {
+    if (!Array.isArray(result)) {
+      throw new Error(
+        `Result from ${finishedPlan} should be an array, instead received ${inspect(
+          result,
+          { colors: true },
+        )}`,
+      );
+    }
+    if (result.length !== size) {
+      throw new Error(
+        `Result array from ${finishedPlan} should have length ${size}, instead it had length ${result.length}`,
+      );
+    }
+    if (finishedPlan.sync && wasExecutedSync) {
+      // It promises not to add new errors, and not to include promises in the result array
+      store[finishedPlan.id] = result;
+      errors[finishedPlan.id] = depErrorIndexes;
+      return reallyCompletedPlan(finishedPlan);
+    } else {
+      // Need to complete promises, check for errors, etc
+      return Promise.allSettled(result).then((rs) => {
+        let errorIndexes: boolean | number[] = false;
+        const finalResult = rs.map((t, i) => {
+          if (t.status === "fulfilled") {
+            if (errorIndexes === true) {
+              // Everything else was an error
+              errorIndexes = Array.from({ length: i }, (v, k) => k);
+            }
+            return t.value;
+          } else {
+            if (errorIndexes === false) {
+              if (i === 0) {
+                errorIndexes = true;
+              } else {
+                errorIndexes = [i];
+              }
+            } else if (errorIndexes === true) {
+              // noop
+            } else {
+              errorIndexes.push(i);
+            }
+            return new CrystalError(t.reason);
+          }
+        });
+        errors[finishedPlan.id] = errorIndexes;
+        store[finishedPlan.id] = result;
+        return reallyCompletedPlan(finishedPlan);
+      });
     }
   };
 
@@ -292,12 +334,35 @@ export function executeBucket(
       const meta = metaByPlanId[plan.id]!;
       const dependencies: any[] = [];
       const depCount = plan.dependencies.length;
+      let depErrorIndexes: boolean | number[] = false;
       if (depCount > 0) {
         for (let i = 0, l = depCount; i < l; i++) {
-          dependencies[i] = store[plan.dependencies[i]];
+          const depId = plan.dependencies[i];
+          dependencies[i] = store[depId];
+          const errorsForDep = errors[depId];
+          if (errorsForDep === false) {
+            // noop
+          } else if (errorsForDep === true) {
+            depErrorIndexes = true;
+          } else {
+            if (depErrorIndexes === true) {
+              // noop
+            } else if (depErrorIndexes === false) {
+              depErrorIndexes = [...errorsForDep];
+            } else {
+              for (const errorIndex of errorsForDep) {
+                if (!depErrorIndexes.includes(errorIndex)) {
+                  depErrorIndexes.push(errorIndex);
+                }
+              }
+            }
+          }
         }
       } else {
         dependencies.push(noDepsList);
+      }
+      if (typeof depErrorIndexes !== "boolean") {
+        depErrorIndexes.sort((a, z) => a - z);
       }
       const result =
         plan instanceof __ListTransformPlan
@@ -306,20 +371,25 @@ export function executeBucket(
       if (isPromiseLike(result)) {
         return result.then(
           (values) => {
-            return completedPlan(plan, values);
+            return completedPlan(plan, values, depErrorIndexes);
           },
           (error) => {
             return completedPlan(
               plan,
               arrayOfLength(size, new CrystalError(error)),
+              depErrorIndexes,
             );
           },
         );
       } else {
-        return completedPlan(plan, result);
+        return completedPlan(plan, result, depErrorIndexes, true);
       }
     } catch (error) {
-      return completedPlan(plan, arrayOfLength(size, new CrystalError(error)));
+      return completedPlan(
+        plan,
+        arrayOfLength(size, new CrystalError(error)),
+        true,
+      );
     }
   };
   const starterPromises: PromiseLike<void>[] = [];
