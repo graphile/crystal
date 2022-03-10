@@ -22,6 +22,73 @@ import { arrayOfLength, isPromiseLike } from "./utils";
 // optimization
 export const $$keys = Symbol("keys");
 
+function writeValueIntoChildBucket(
+  store: {
+    [planId: string]: any[];
+  },
+  copyPlans: Set<ExecutablePlan<any>>,
+  rootPathIdentity: string,
+  index: number,
+  itemStore: {
+    [planId: string]: any[];
+  },
+  itemErrors: {
+    [planId: string]: boolean | number[];
+  },
+  itemInputs: BucketSetter[],
+  parentObject: object | unknown[],
+  parentKey: number,
+  entry: any,
+  itemPlanId: string,
+): void {
+  itemInputs.push(
+    new BucketSetter(
+      // TODO: what should this "rootPathIdentity" be?
+      rootPathIdentity,
+      parentObject,
+      parentKey,
+    ),
+  );
+  const l = itemStore[itemPlanId].push(entry);
+  // Update itemErrors[itemPlanId]
+  if (entry && entry.constructor === CrystalError) {
+    // It's an error - make sure it's represented
+    const itemError = itemErrors[itemPlanId];
+    if (itemError === false) {
+      if (parentKey === 0) {
+        itemErrors[itemPlanId] = true;
+      } else {
+        itemErrors[itemPlanId] = [parentKey];
+      }
+    } else if (itemError === true) {
+      // Noop
+    } else {
+      // TODO: assert isArray
+      itemError.push(parentKey);
+    }
+  } else {
+    // It's not an error, make sure this is noted
+    const itemError = itemErrors[itemPlanId];
+    if (itemError === true) {
+      // All previous indexes were errors, but this one isn't.
+      itemErrors[itemPlanId] = Array.from({ length: l - 1 }, (v, k) => k);
+    }
+  }
+  for (const plan of copyPlans) {
+    const val = store[plan.id][index];
+    itemStore[plan.id].push(val);
+    const itemError = itemErrors[plan.id];
+    if (
+      typeof itemError !== "boolean" &&
+      val &&
+      val.constructor === CrystalError
+    ) {
+      // Must be an array
+      itemError.push(l - 1);
+    }
+  }
+}
+
 export function executeBucket(
   aether: Aether,
   metaByPlanId: CrystalContext["metaByPlanId"],
@@ -31,6 +98,7 @@ export function executeBucket(
   const inProgressPlans = new Set();
   const pendingPlans = new Set(bucket.definition.plans);
   const store = bucket.store;
+  const errors = bucket.errors;
   const rootOutputModeType = bucket.definition.rootOutputModeType;
   const isNestedListBucket = rootOutputModeType === "A";
   const isLeafBucket = rootOutputModeType === "L";
@@ -117,37 +185,48 @@ export function executeBucket(
     const itemStore: {
       [planId: string]: any[];
     } = Object.create(null);
+    const itemErrors: {
+      [planId: string]: boolean | number[];
+    } = Object.create(null);
     itemStore[itemPlanId] = [];
+
+    // Start with no errors, but this may change later
+    itemErrors[itemPlanId] = false;
+
     for (const plan of itemBucketDefinition.copyPlans) {
       itemStore[plan.id] = [];
+
+      // If all or none are errors, this property will continue to be true even as we scale up/down the entries
+      if (typeof errors[plan.id] === "boolean") {
+        itemErrors[plan.id] = errors[plan.id];
+      } else {
+        itemErrors[plan.id] = [];
+      }
     }
 
     const listsLength = lists.length;
-    // TODO: we don't really use this mutableList, maybe we can get rid of it
-    // by refactoring bucket execution?
-    const mutableList = arrayOfLength(listsLength);
     for (let i = 0, l = listsLength; i < l; i++) {
       const list = lists[i];
       if (Array.isArray(list)) {
         const listLength = list.length;
         const innerList = arrayOfLength(listLength);
-        mutableList.push(innerList);
         for (let j = 0, m = listLength; j < m; j++) {
-          itemInputs.push(
-            new BucketSetter(
-              // TODO: what should this "rootPathIdentity" be?
-              "",
-              innerList,
-              j,
-            ),
+          writeValueIntoChildBucket(
+            store,
+            itemBucketDefinition.copyPlans,
+            "",
+            i,
+            itemStore,
+            itemErrors,
+            itemInputs,
+            innerList,
+            j,
+            list[j],
+            itemPlanId,
           );
-          itemStore[itemPlanId].push(list[j]);
-          for (const plan of itemBucketDefinition.copyPlans) {
-            itemStore[plan.id].push(store[plan.id][i]);
-          }
         }
       } else {
-        mutableList.push(list);
+        // Noop
       }
     }
 
@@ -157,6 +236,7 @@ export function executeBucket(
       size: itemInputs.length,
       noDepsList: arrayOfLength(itemInputs.length),
       input: itemInputs,
+      errors: itemErrors,
     };
     const result = executeBucket(
       aether,
@@ -269,6 +349,7 @@ export function executeBucket(
       childBucketDefinition: BucketDefinition;
       inputs: BucketSetter[];
       store: { [planId: string]: any[] };
+      errors: { [planId: string]: boolean | number[] };
     };
     const children: Array<Child> = [];
     const childrenByPathIdentity: {
@@ -279,13 +360,18 @@ export function executeBucket(
         childBucketDefinition,
         inputs: [],
         store: Object.create(null),
+        errors: Object.create(null),
       };
       children.push(entry);
       for (const plan of childBucketDefinition.copyPlans) {
         entry.store[plan.id] = [];
+        entry.errors[plan.id] =
+          typeof errors[plan.id] === "boolean" ? errors[plan.id] : [];
       }
       if (childBucketDefinition.itemPlanId) {
         entry.store[childBucketDefinition.itemPlanId] = [];
+        // Start with no errors, but this may change later
+        entry.errors[childBucketDefinition.itemPlanId] = false;
       }
       for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
         if (!childrenByPathIdentity[childRootPathIdentity]) {
@@ -314,6 +400,7 @@ export function executeBucket(
           const {
             inputs: childInputs,
             store: childStore,
+            errors: childErrors,
             childBucketDefinition: {
               itemPlanId,
               polymorphicPlanIds,
@@ -334,11 +421,19 @@ export function executeBucket(
             throw new Error("Group inside list currently unsupported");
           }
           for (let i = 0, l = value.length; i < l; i++) {
-            childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
-            childStore[itemPlanId].push(rawValue[i]);
-            for (const plan of copyPlans) {
-              childStore[plan.id].push(store[plan.id][index]);
-            }
+            writeValueIntoChildBucket(
+              store,
+              copyPlans,
+              nestedPathIdentity,
+              index,
+              childStore,
+              childErrors,
+              childInputs,
+              value,
+              i,
+              rawValue[i],
+              itemPlanId,
+            );
           }
         }
       }
@@ -494,6 +589,7 @@ export function executeBucket(
         const childBucket: Bucket = {
           definition: child.childBucketDefinition,
           store: child.store,
+          errors: child.errors,
           size: child.inputs.length,
           input: child.inputs,
           noDepsList: arrayOfLength(child.inputs.length),

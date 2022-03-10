@@ -5755,6 +5755,12 @@ export class Aether<
         [this.contextPlan.id]: ctxs,
         [this.rootValuePlan.id]: rvs,
       }),
+      errors: Object.assign(Object.create(null), {
+        [this.rootSelectionSetPlan.id]: false,
+        [this.variableValuesPlan.id]: false,
+        [this.contextPlan.id]: false,
+        [this.rootValuePlan.id]: false,
+      }),
     };
     const metaByPlanId = this.makeMetaByPlanId();
     let requiresGraphQLJS = this.hasIntrospectionFields || !canBypassGraphQL;

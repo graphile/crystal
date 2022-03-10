@@ -361,4 +361,10 @@ export interface Bucket {
    * `size`.
    */
   store: { [planId: string]: any[] };
+  /**
+   * For each executed plan, 'false' if no errors are present, 'true' if every
+   * result is an error, or a list of the indexes of the errors if there are
+   * some errors.
+   */
+  errors: { [planId: string]: false | true | number[] };
 }
