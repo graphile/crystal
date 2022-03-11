@@ -142,6 +142,7 @@ export function executeBucket(
           if (t.status === "fulfilled") {
             return t.value;
           } else {
+            requestContext.hasIssue();
             bucket.hasErrors = true;
             return new CrystalError(t.reason);
           }
@@ -267,19 +268,19 @@ export function executeBucket(
     meta: Record<string, unknown>,
   ) {
     const errors: { [index: number]: CrystalError } = Object.create(null);
-    let hasErrors = false;
+    let foundErrors = false;
     for (const depList of dependencies) {
       for (let index = 0, l = depList.length; index < l; index++) {
         const v = depList[index];
         if (v && v.constructor === CrystalError) {
           if (!errors[index]) {
-            hasErrors = true;
+            foundErrors = true;
             errors[index] = v;
           }
         }
       }
     }
-    if (hasErrors) {
+    if (foundErrors) {
       const dependenciesWithoutErrors = dependencies.map((depList) =>
         depList.filter((_, index) => !errors[index]),
       );
@@ -351,6 +352,7 @@ export function executeBucket(
         return completedPlan(plan, result, true);
       }
     } catch (error) {
+      requestContext.hasIssue();
       bucket.hasErrors = true;
       return completedPlan(
         plan,
