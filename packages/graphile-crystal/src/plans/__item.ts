@@ -13,7 +13,7 @@ export class __ItemPlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "__ItemPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   /**
    * @internal

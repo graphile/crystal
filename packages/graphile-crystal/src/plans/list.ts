@@ -13,7 +13,7 @@ export class ListPlan<
     moduleName: "graphile-crystal",
     exportName: "ListPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
   constructor(list: readonly [...TPlanTuple]) {

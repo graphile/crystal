@@ -20,7 +20,7 @@ export class SubscribePlan<
     moduleName: "graphile-crystal",
     exportName: "SubscribePlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   /**
    * The id for the PostgreSQL context plan.

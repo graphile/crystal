@@ -45,7 +45,7 @@ export class PgPolymorphicPlan<
     moduleName: "@dataplan/pg",
     exportName: "PgPolymorphicPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   private typeSpecifierPlanId: number;
   private itemPlanId: number;

@@ -74,7 +74,7 @@ export class PgSelectSinglePlan<
     moduleName: "@dataplan/pg",
     exportName: "PgSelectSinglePlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
   public readonly itemPlanId: number;

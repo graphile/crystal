@@ -13,7 +13,7 @@ export class ToPgPlan extends ExecutablePlan<any> {
     moduleName: "graphile-crystal",
     exportName: "ToPgPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
   constructor(
     $value: ExecutablePlan<any>,
     private codec: PgTypeCodec<any, any, any>,

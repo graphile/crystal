@@ -26,7 +26,7 @@ export class ReversePlan<TData> extends ExecutablePlan<readonly TData[]> {
     moduleName: "graphile-crystal",
     exportName: "ReversePlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
   constructor(plan: ExecutablePlan<readonly TData[]>) {

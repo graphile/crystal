@@ -25,7 +25,7 @@ export class ObjectPlan<
     moduleName: "graphile-crystal",
     exportName: "ObjectPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
   allowMultipleOptimizations = true;
   private keys: Array<keyof TPlans>;
   constructor(obj: TPlans) {

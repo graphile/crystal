@@ -35,7 +35,7 @@ export class PgSingleTablePolymorphicPlan<
     moduleName: "@dataplan/pg",
     exportName: "PgSingleTablePolymorphicPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   private typePlanId: number;
   private rowPlanId: number;

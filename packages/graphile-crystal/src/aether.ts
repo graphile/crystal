@@ -1188,7 +1188,7 @@ export class Aether<
             this.dangerouslyGetPlan(id),
           );
           const asyncOrSideEffectPlans = intermediatePlans.filter(
-            (plan) => !plan.sync || plan.hasSideEffects,
+            (plan) => !plan.isSyncAndSafe || plan.hasSideEffects,
           );
           if (asyncOrSideEffectPlans.length > 0) {
             continue;
@@ -1802,11 +1802,13 @@ export class Aether<
             const $newListItem = newPlan.itemPlanCallback($listItem);
 
             if (
-              newPlan.sync &&
-              (!$__listItem.sync || !$listItem.sync || !$newListItem.sync)
+              newPlan.isSyncAndSafe &&
+              (!$__listItem.isSyncAndSafe ||
+                !$listItem.isSyncAndSafe ||
+                !$newListItem.isSyncAndSafe)
             ) {
               // TODO: log this deopt?
-              newPlan.sync = false;
+              newPlan.isSyncAndSafe = false;
             }
             return $newListItem;
           });
@@ -4299,9 +4301,9 @@ export class Aether<
       const planOptions = this.planOptionsByPlan.get(plan);
       const isSubscribe = plan.id === this.subscriptionPlanId;
 
-      // If plan is sync, execute, store and return results (there's no risk of a race condition)
+      // If plan is sync and safe then execute, store and return results (there's no risk of a race condition)
       if (
-        plan.sync &&
+        plan.isSyncAndSafe &&
         !(plan instanceof __ListTransformPlan) &&
         !(isSubscribe || planOptions?.stream)
       ) {
@@ -4314,7 +4316,7 @@ export class Aether<
           ) as CrystalResultsList<any>;
           if (typeof (executionResults as any).then === "function") {
             throw new Error(
-              `${plan} claims to be synchronous, but it returned a promise; please set 'sync = false'`,
+              `${plan} claims to be synchronous, but it returned a promise; please set 'isSyncAndSafe = false'`,
             );
           }
         } catch (e) {
@@ -6042,7 +6044,7 @@ export class Aether<
         const [lBrace, rBrace] =
           plan instanceof __ItemPlan
             ? [">", "]"]
-            : plan.sync
+            : plan.isSyncAndSafe
             ? ["[", "]"]
             : ["[[", "]]"];
         const planClass = plan.hasSideEffects

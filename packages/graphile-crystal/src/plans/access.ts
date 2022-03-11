@@ -163,7 +163,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "AccessPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   private destructure: (value: TData) => any;
   private parentPlanId: string;

@@ -143,15 +143,25 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   public _recursiveDependencyIds = new Set<string>();
 
   /**
-   * Set true if your plan executes synchronously (i.e. no
-   * async/await/promises); this allows us to avoid deferreds and is a
-   * performance optimisation.
+   * Setting this true is a performance optimisation, but it comes with strong
+   * rules; we do not test you comply with these rules (as that would undo the
+   * performance gains) but should you break them the behaviour is undefined
+   * (and, basically, the schema may no longer be GraphQL compliant).
    *
-   * If you don't set this, we'll try and guess it by whether your `execute`
-   * function is `async` or not; this will fail if you have a sync function
-   * that returns promises.
+   * Do not set this true unless the following hold:
+   *
+   * - The `execute` method must be a regular (not async) function
+   * - The `execute` method must NEVER return a promise
+   * - The values within the list returned from `execute` must NEVER include
+   *   promises or CrystalError objects
+   *
+   * It's acceptable for the `execute` method to throw if it needs to.
+   *
+   * This optimisation applies to the majority of the built in plans and allows
+   * the engine to execute without needing to resolve any promises which saves
+   * precious event-loop ticks.
    */
-  public sync!: boolean;
+  public isSyncAndSafe!: boolean;
 
   /**
    * The ids for plans this plan will need data from in order to execute. NOTE:
@@ -252,19 +262,6 @@ export class ExecutablePlan<TData = any> extends BasePlan {
 
   constructor() {
     super();
-    if (typeof (this as any).sync !== "boolean") {
-      // Take a guess
-      this.sync = this.execute.constructor.name !== "AsyncFunction";
-    }
-    if (
-      this.sync === true &&
-      this.execute.constructor.name === "AsyncFunction"
-    ) {
-      throw new Error(
-        `${this} claims to be synchronous, however the execute method is asynchronous`,
-      );
-    }
-
     this.id = this.aether._addPlan(this);
   }
 
@@ -352,6 +349,30 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    */
   public optimize(_options: PlanOptimizeOptions): ExecutablePlan {
     return this;
+  }
+
+  public finalize() {
+    if (typeof (this as any).isSyncAndSafe !== "boolean") {
+      // Take a guess
+      const isAsync = this.execute.constructor.name === "AsyncFunction";
+      if (isAsync) {
+        this.isSyncAndSafe = false;
+      } else {
+        console.warn(
+          `${this} uses a regular (non-async) function for 'execute'; if it never returns a promise and the list it returns never includes a promise then setting \`${this}.isSyncAndSafe = true\` will improve performance. If this is not true, set \`${this}.isSyncAndSafe = false\` to dismiss this message.`,
+        );
+        this.isSyncAndSafe = false;
+      }
+    }
+    if (
+      this.isSyncAndSafe === true &&
+      this.execute.constructor.name === "AsyncFunction"
+    ) {
+      throw new Error(
+        `${this} claims to be synchronous, however the execute method is asynchronous`,
+      );
+    }
+    super.finalize();
   }
 
   /**

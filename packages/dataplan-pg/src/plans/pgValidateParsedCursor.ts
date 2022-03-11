@@ -14,7 +14,7 @@ export class PgValidateParsedCursorPlan extends ExecutablePlan<undefined> {
     exportName: "PgValidateParsedCursorPlan",
   };
 
-  sync = true;
+  isSyncAndSafe = true;
 
   constructor(
     $parsedCursorPlan: ExecutablePlan<readonly any[] | null>,

@@ -53,7 +53,7 @@ export class PgClassExpressionPlan<
     exportName: "PgClassExpressionPlan",
   };
 
-  sync = true;
+  isSyncAndSafe = true;
 
   // TODO: rename to 'row'?
   /**

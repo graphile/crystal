@@ -33,7 +33,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     exportName: "PgPageInfoPlan",
   };
 
-  sync = true;
+  isSyncAndSafe = true;
 
   private connectionPlanId: string;
 

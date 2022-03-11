@@ -45,7 +45,7 @@ export class PgDeletePlan<
     moduleName: "@dataplan/pg",
     exportName: "PgDeletePlan",
   };
-  sync = false;
+  isSyncAndSafe = false;
 
   hasSideEffects = true;
 

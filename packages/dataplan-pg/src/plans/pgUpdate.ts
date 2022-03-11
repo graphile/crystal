@@ -50,7 +50,7 @@ export class PgUpdatePlan<
     moduleName: "@dataplan/pg",
     exportName: "PgUpdatePlan",
   };
-  sync = false;
+  isSyncAndSafe = false;
 
   hasSideEffects = true;
 

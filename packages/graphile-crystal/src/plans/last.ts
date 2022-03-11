@@ -7,7 +7,7 @@ export class LastPlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "LastPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
   constructor(parentPlan: ExecutablePlan<ReadonlyArray<TData>>) {

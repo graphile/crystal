@@ -269,7 +269,7 @@ export class PgSelectPlan<
     exportName: "PgSelectPlan",
   };
 
-  sync = false;
+  isSyncAndSafe = false;
 
   // FROM
   private readonly from: SQL | ((...args: SQL[]) => SQL);

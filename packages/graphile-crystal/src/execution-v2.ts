@@ -130,7 +130,7 @@ export function executeBucket(
         `Result array from ${finishedPlan} should have length ${size}, instead it had length ${result.length}`,
       );
     }
-    if (finishedPlan.sync && noNewErrors) {
+    if (finishedPlan.isSyncAndSafe && noNewErrors) {
       // It promises not to add new errors, and not to include promises in the result array
       store[finishedPlan.id] = result;
       return reallyCompletedPlan(finishedPlan);

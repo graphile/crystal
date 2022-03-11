@@ -24,7 +24,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     moduleName: "graphile-crystal",
     exportName: "NodePlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
   private specPlanDep: number;

@@ -12,7 +12,7 @@ export class PgCursorPlan<
     moduleName: "@dataplan/pg",
     exportName: "PgCursorPlan",
   };
-  sync = true;
+  isSyncAndSafe = true;
 
   private cursorValuesDepId: number;
   private classSinglePlanId: string;
