@@ -1,7 +1,8 @@
 import type { GraphQLScalarType } from "graphql";
 import { inspect } from "util";
 
-import { CrystalError } from ".";
+import type { CrystalError } from ".";
+import { isCrystalError, newCrystalError } from "./error";
 import { $$concreteType, $$idempotent } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
 import { isPolymorphicData } from "./polymorphic";
@@ -264,7 +265,7 @@ export function bucketValue(
     }
     return v != null ? Promise.reject(v.originalError) : v;
   };
-  if (value instanceof CrystalError) {
+  if (isCrystalError(value)) {
     return handleNull(value);
   }
   if (value == null) {
@@ -295,7 +296,7 @@ export function bucketValue(
           try {
             return mode.serialize(value);
           } catch (e) {
-            return handleNull(new CrystalError(e));
+            return handleNull(newCrystalError(e));
           }
         } else {
           // Queue serialization to take place when we know no errors can occur

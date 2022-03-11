@@ -1,7 +1,7 @@
 import { inspect } from "util";
 
 import type { Aether } from ".";
-import { CrystalError } from ".";
+import type { CrystalError } from ".";
 import type {
   Bucket,
   BucketDefinition,
@@ -9,6 +9,7 @@ import type {
   RequestContext,
 } from "./bucket";
 import { BucketSetter, bucketValue } from "./bucket";
+import { isCrystalError, newCrystalError } from "./error";
 import type {
   CrystalContext,
   CrystalResultsList,
@@ -144,7 +145,7 @@ export function executeBucket(
           } else {
             requestContext.hasIssue();
             bucket.hasErrors = true;
-            return new CrystalError(t.reason);
+            return newCrystalError(t.reason);
           }
         });
         store[finishedPlan.id] = result;
@@ -272,7 +273,7 @@ export function executeBucket(
     for (const depList of dependencies) {
       for (let index = 0, l = depList.length; index < l; index++) {
         const v = depList[index];
-        if (v && v.constructor === CrystalError) {
+        if (isCrystalError(v)) {
           if (!errors[index]) {
             foundErrors = true;
             errors[index] = v;
@@ -344,7 +345,7 @@ export function executeBucket(
           (error) => {
             return completedPlan(
               plan,
-              arrayOfLength(size, new CrystalError(error)),
+              arrayOfLength(size, newCrystalError(error)),
             );
           },
         );
@@ -356,7 +357,7 @@ export function executeBucket(
       bucket.hasErrors = true;
       return completedPlan(
         plan,
-        arrayOfLength(size, new CrystalError(error)),
+        arrayOfLength(size, newCrystalError(error)),
         true,
       );
     }
@@ -498,7 +499,7 @@ export function executeBucket(
           }
         } else if (mode.type === "O") {
           const d = value;
-          if (d !== null && d !== undefined && d.constructor !== CrystalError) {
+          if (d != null && !isCrystalError(d)) {
             if (field.children) {
               processObject(
                 d,
@@ -564,12 +565,7 @@ export function executeBucket(
         }
       }
       const setterRoot = setter.getRoot();
-      if (
-        isObjectBucket &&
-        setterRoot !== null &&
-        setterRoot !== undefined &&
-        setterRoot.constructor !== CrystalError
-      ) {
+      if (isObjectBucket && setterRoot != null && !isCrystalError(setterRoot)) {
         const typeName = setterRoot[$$concreteType];
         if (typeName == null) {
           throw new Error(`Could not determine typeName in bucket ${bucketId}`);

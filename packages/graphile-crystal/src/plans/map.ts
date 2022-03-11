@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
 
-import { CrystalError } from "../error";
+import type { CrystalError } from "../error";
+import { isCrystalError } from "../error";
 import { ExecutablePlan } from "../plan";
 
 // Do **NOT** allow variables that start with `__`!
@@ -27,7 +28,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   }
   // Fallback to slow conversion
   return (obj: object | null | CrystalError): object | null | CrystalError => {
-    if (!obj || obj instanceof CrystalError) {
+    if (obj == null || isCrystalError(obj)) {
       return obj;
     }
     return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {

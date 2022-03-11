@@ -3,14 +3,14 @@ import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
+  CrystalError,
   CrystalResultStreamList,
   CrystalValuesList,
   Deferred,
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { isDev } from "graphile-crystal";
-import { CrystalError, defer, isAsyncIterable } from "graphile-crystal";
+import { defer, isAsyncIterable, isDev } from "graphile-crystal";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 
@@ -488,7 +488,7 @@ ${duration}
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
-    const streams: Array<AsyncIterable<TOutput> | CrystalError | null> = [];
+    const streams: Array<AsyncIterable<TOutput> | Promise<never> | null> = [];
 
     // Group by context
     const groupMap = new Map<
@@ -739,7 +739,7 @@ ${duration}
           if (isAsyncIterable(streams[resultIndex])) {
             streams[resultIndex]![Symbol.asyncIterator].throw?.(e);
           }
-          streams[resultIndex] = new CrystalError(e);
+          streams[resultIndex] = Promise.reject(e);
         });
       });
       promises.push(promise);

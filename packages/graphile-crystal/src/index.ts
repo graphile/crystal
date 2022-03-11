@@ -15,7 +15,7 @@ import { defer, Deferred } from "./deferred";
 // Handy for debugging
 import { isDev, noop } from "./dev";
 import { crystalEnforce } from "./enforceCrystal";
-import { CrystalError } from "./error";
+import { CrystalError, isCrystalError } from "./error";
 import { getCurrentParentPathIdentity } from "./global";
 import {
   InputListPlan,
@@ -206,6 +206,7 @@ export {
   InputObjectTypeSpec,
   InputPlan,
   InputStaticLeafPlan,
+  isCrystalError,
   isCrystalWrapped,
   isDev,
   isExecutablePlan,
@@ -292,7 +293,7 @@ exportAsMany({
   constant,
   ConstantPlan,
   context,
-  CrystalError,
+  isCrystalError,
   debugPlans,
   each,
   groupBy,

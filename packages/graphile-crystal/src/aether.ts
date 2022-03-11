@@ -60,7 +60,8 @@ import {
 } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
-import { CrystalError } from "./error";
+import type { CrystalError} from "./error";
+import { isCrystalError, newCrystalError } from "./error";
 import { $$keys, executeBucket } from "./execution-v2";
 import { withGlobalState } from "./global";
 import type { Group } from "./graphqlCollectFields";
@@ -3950,7 +3951,7 @@ export class Aether<
     if (plan instanceof __ItemPlan) {
       // Shortcut evaluation because __ItemPlan cannot be executed.
       return planResultses.map((planResults) =>
-        planResults == null || planResults instanceof CrystalError
+        planResults == null || isCrystalError(planResults)
           ? planResults
           : planResults.get(plan.bucketId, plan.id),
       );
@@ -3979,7 +3980,7 @@ export class Aether<
     ) {
       result[planResultsesIndex] = undefined;
       const planResults = planResultses[planResultsesIndex];
-      if (planResults == null || planResults instanceof CrystalError) {
+      if (planResults == null || isCrystalError(planResults)) {
         result[planResultsesIndex] = planResults;
         continue;
       }
@@ -4154,7 +4155,7 @@ export class Aether<
           dependencyValuesList[dependencyIndex] = await promise;
         } catch (e) {
           // An error has occurred; we can short-circuit execution.
-          const crystalError = new CrystalError(e);
+          const crystalError = newCrystalError(e);
           for (const list of pendingPlanResultsAndIndexListList) {
             for (const item of list) {
               result[item.planResultsesIndex] = crystalError;
@@ -4234,10 +4235,7 @@ export class Aether<
           ) {
             const dependencyValues = dependencyValuesList[dependencyIndex];
             const dependencyValue = dependencyValues[pendingPlanResultsesIndex];
-            if (
-              dependencyValue &&
-              dependencyValue.constructor === CrystalError
-            ) {
+            if (isCrystalError(dependencyValue)) {
               error = dependencyValue;
               break;
             }
@@ -4320,7 +4318,7 @@ export class Aether<
             );
           }
         } catch (e) {
-          crystalError = new CrystalError(e);
+          crystalError = newCrystalError(e);
         }
         if (debugExecuteEnabled)
           console.timeLog(`plan\t${plan}`, "pre executable loop");
@@ -4424,7 +4422,7 @@ export class Aether<
     if (plan instanceof __ItemPlan) {
       // Shortcut evaluation because __ItemPlan cannot be executed.
       return planResultses.map((planResults) =>
-        planResults == null || planResults instanceof CrystalError
+        planResults == null || isCrystalError(planResults)
           ? planResults
           : planResults.get(plan.bucketId, plan.id),
       );
@@ -4450,7 +4448,7 @@ export class Aether<
 
     for (let i = 0; i < planResultsesLength; i++) {
       const planResults = planResultses[i];
-      if (planResults == null || planResults instanceof CrystalError) {
+      if (planResults == null || isCrystalError(planResults)) {
         result[i] = planResults;
         continue;
       }
@@ -4552,7 +4550,7 @@ export class Aether<
         }
       },
       (error) => {
-        const crystalError = new CrystalError(error);
+        const crystalError = newCrystalError(error);
         for (let i = 0; i < pendingPlanResultsesLength; i++) {
           // Execution complete; delete from cache
           const planResults = pendingPlanResultses[i];
@@ -4665,7 +4663,7 @@ export class Aether<
       for (let j = 0; j < dependenciesCount; j++) {
         const dependencyValues = dependencyValuesList[j];
         const dependencyValue = dependencyValues[i];
-        if (dependencyValue instanceof CrystalError) {
+        if (isCrystalError(dependencyValue)) {
           error = dependencyValue;
           break;
         }
@@ -4770,7 +4768,7 @@ export class Aether<
           try {
             result[underlyingIndex] = await rawPendingResult;
           } catch (e: any) {
-            result[underlyingIndex] = new CrystalError(e);
+            result[underlyingIndex] = newCrystalError(e);
           }
         }
         // TODO: do we need 'else if (isAsyncIterable(rawPendingResult)) { ... }'
@@ -5101,7 +5099,7 @@ export class Aether<
               const planResults = planResultses[i];
               if (planResults == null) {
                 result[i] = null;
-              } else if (planResults instanceof CrystalError) {
+              } else if (isCrystalError(planResults)) {
                 result[i] = Promise.reject(planResults.originalError);
               } else {
                 const data = planResults.get(layerPlan.bucketId, layerPlan.id);
@@ -5127,7 +5125,7 @@ export class Aether<
       const pendingPlanResultsesIndexes: Array<[number, number]> = [];
       const layerResults = planResultses.map(
         (planResults, planResultsesIndex) => {
-          if (planResults == null || planResults instanceof CrystalError) {
+          if (planResults == null || isCrystalError(planResults)) {
             return planResults;
           }
           if (planResults.has(layerPlan.bucketId, layerPlan.id)) {
@@ -5348,10 +5346,9 @@ export class Aether<
           // No following layers; map the result
           const finalResult: Array<PlanResults | CrystalError | null> = [];
           for (let i = 0; i < planResultsesLength; i++) {
-            finalResult[i] =
-              layerResults[i] instanceof CrystalError
-                ? layerResults[i]
-                : planResultses[i];
+            finalResult[i] = isCrystalError(layerResults[i])
+              ? layerResults[i]
+              : planResultses[i];
           }
           return processResults(finalResult, planCacheForPlanResultses);
         } else {
@@ -5365,7 +5362,7 @@ export class Aether<
             finalResultIndex < planResultsesLength;
             finalResultIndex++
           ) {
-            if (layerResults[finalResultIndex] instanceof CrystalError) {
+            if (isCrystalError(layerResults[finalResultIndex])) {
               finalResult[finalResultIndex] = Promise.reject(
                 layerResults[finalResultIndex].originalError,
               );
@@ -5539,7 +5536,7 @@ export class Aether<
               const childPlanResults = childPlanResultses[i];
               if (childPlanResults == null) {
                 result[i] = null;
-              } else if (childPlanResults instanceof CrystalError) {
+              } else if (isCrystalError(childPlanResults)) {
                 result[i] = Promise.reject(childPlanResults.originalError);
               } else {
                 const data = childPlanResults.get(
@@ -5547,7 +5544,7 @@ export class Aether<
                   itemPlan.id,
                 );
 
-                if (data == null || data instanceof CrystalError) {
+                if (data == null || isCrystalError(data)) {
                   result[i] = data;
                 } else if (isPolymorphic) {
                   hasAtLeastOneNonError = true;
