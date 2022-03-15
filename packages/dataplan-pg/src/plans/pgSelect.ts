@@ -2260,15 +2260,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
               // it's a LEFT JOIN).
               ...(where !== sql.blank ? [where] : []),
             ];
-            table.joins.push(
-              {
-                type: "left",
-                source: this.fromExpression(),
-                alias: this.alias,
-                conditions,
-              },
-              ...this.joins,
-            );
             this.mergePlaceholdersInto(table);
             for (const [a, b] of this._symbolSubstitutes.entries()) {
               if (isDev) {
@@ -2283,6 +2274,15 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
               }
               table._symbolSubstitutes.set(a, b);
             }
+            table.joins.push(
+              {
+                type: "left",
+                source: this.fromExpression(),
+                alias: this.alias,
+                conditions,
+              },
+              ...this.joins,
+            );
             const actualKeyByDesiredKey = this.mergeSelectsWith(table);
             // We return a list here because our children are going to use a
             // `first` plan on us.
