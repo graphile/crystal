@@ -1,7 +1,6 @@
 import { inspect } from "util";
 
-import type { Aether } from ".";
-import type { CrystalError } from ".";
+import type { Aether, CrystalError } from ".";
 import type {
   Bucket,
   BucketDefinition,
@@ -343,6 +342,8 @@ export function executeBucket(
             return completedPlan(plan, values);
           },
           (error) => {
+            bucket.hasErrors = true;
+            requestContext.hasIssue();
             return completedPlan(
               plan,
               arrayOfLength(size, newCrystalError(error)),
