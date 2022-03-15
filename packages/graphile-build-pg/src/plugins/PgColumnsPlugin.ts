@@ -288,7 +288,7 @@ export const PgColumnsPlugin: Plugin = {
                 plan: makePlan(),
               },
             },
-            `Adding '${columnName}' column field for PgTypeCodec ${pgCodec.name}`,
+            `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
           );
         }
         return fields;
