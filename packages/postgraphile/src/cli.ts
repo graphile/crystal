@@ -1,11 +1,13 @@
 #!/usr/bin/env node
+import { exportSchema } from "graphile-exporter";
 import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
-import type { RequestListener } from "http";
+import type { IncomingMessage, RequestListener } from "http";
 import { createServer } from "http";
 import parseArgs from "minimist";
 import { resolve } from "path";
 
+import type { ContextCallback } from "./interfaces";
 import { postgraphile } from "./middleware";
 import { defaultPreset } from "./preset";
 import {
@@ -56,7 +58,7 @@ async function main() {
   const preset: Preset = {
     extends: userPreset ? [userPreset] : [defaultPreset],
   };
-  let contextCallback;
+  let contextCallback: ContextCallback | null = null;
 
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
@@ -74,7 +76,7 @@ async function main() {
 
   const config = resolvePresets([preset]);
 
-  if (!contextCallback) {
+  if (contextCallback === null) {
     const withPgClient = config.gather?.pgDatabases?.[0]?.withPgClient;
     if (!withPgClient) {
       console.dir(config);
@@ -82,6 +84,16 @@ async function main() {
     }
     const contextValue = { withPgClient };
     contextCallback = () => contextValue;
+  }
+
+  if (config.server?.pgSettings) {
+    const oldContextCallback = contextCallback;
+    contextCallback = (req: IncomingMessage): object => {
+      return {
+        ...oldContextCallback(req),
+        pgSettings: config.server!.pgSettings!(req),
+      };
+    };
   }
 
   const schemaResult = await makeSchema(config, contextCallback);

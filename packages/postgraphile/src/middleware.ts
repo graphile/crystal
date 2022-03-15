@@ -166,7 +166,7 @@ export function postgraphile(schemaResult: SchemaResult) {
         sendResult(res, { errors });
         return;
       }
-      const contextValue = contextCallback();
+      const contextValue = contextCallback(req);
 
       const args: ExecutionArgs = {
         schema,

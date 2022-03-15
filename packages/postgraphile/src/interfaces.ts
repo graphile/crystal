@@ -2,7 +2,7 @@ import type { ResolvedPreset } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 import type { IncomingMessage } from "http";
 
-export type ContextCallback = () => object;
+export type ContextCallback = (req: IncomingMessage) => object;
 
 export interface SchemaResult {
   schema: GraphQLSchema;
