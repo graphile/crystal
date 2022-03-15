@@ -147,10 +147,18 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         return this.camelCase(this.customQuery(details) + "-list");
       },
       computedColumn(options, details) {
-        // TODO: remove prefix from name?
-        return this.camelCase(
-          details.source.extensions?.tags?.name ?? details.source.name,
-        );
+        const explicitName = details.source.extensions?.tags?.name;
+        if (explicitName) {
+          return this.camelCase(explicitName);
+        }
+        const name = details.source.name;
+        const codecName = details.source.parameters[0].codec.name;
+        const legacyPrefix = codecName + "_";
+        if (name.startsWith(legacyPrefix)) {
+          return this.camelCase(name.substring(legacyPrefix.length));
+        } else {
+          return this.camelCase(name);
+        }
       },
       computedColumnConnection(options, details) {
         return this.computedColumn(details);

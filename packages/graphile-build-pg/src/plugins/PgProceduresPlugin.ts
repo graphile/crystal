@@ -93,12 +93,12 @@ export const PgProceduresPlugin: Plugin = {
       functionSourceName(options, { databaseName, pgProc }) {
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
-        return this.camelCase(`${schemaPrefix}${pgProc.proname}`);
+        return `${schemaPrefix}${pgProc.proname}`;
       },
       functionRecordReturnCodecName(options, { databaseName, pgProc }) {
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
-        return this.camelCase(`${schemaPrefix}${pgProc.proname}`);
+        return `${schemaPrefix}${pgProc.proname}`;
       },
     },
   },
