@@ -39,6 +39,7 @@
     { "path": "packages/graphile-crystal" },
     { "path": "packages/graphile-exporter" },
     { "path": "packages/graphile-plugin" },
-    { "path": "packages/dataplan-pg" }
+    { "path": "packages/dataplan-pg" },
+    { "path": "packages/postgraphile" }
   ]
 }

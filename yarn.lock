@@ -2488,7 +2488,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/minimist@npm:^1.2.0":
+"@types/minimist@npm:^1, @types/minimist@npm:^1.2.0":
   version: 1.2.2
   resolution: "@types/minimist@npm:1.2.2"
   checksum: b8da83c66eb4aac0440e64674b19564d9d86c80ae273144db9681e5eeff66f238ade9515f5006ffbfa955ceff8b89ad2bd8ec577d7caee74ba101431fb07045d
@@ -6895,7 +6895,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphile-build-pg@workspace:packages/graphile-build-pg":
+"graphile-build-pg@5.0.0-alpha.0, graphile-build-pg@workspace:packages/graphile-build-pg":
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
   dependencies:
@@ -9955,6 +9955,37 @@ __metadata:
   checksum: e3f694924b7c8c03dc9fa40b2312e17787998ac6e20fccace11efa1146046eb9931541bfd247b3ec5535e730d902a5aee7c32681d5bf9a00fc74a72039a3e609
   languageName: node
   linkType: hard
+
+"postgraphile@workspace:packages/postgraphile":
+  version: 0.0.0-use.local
+  resolution: "postgraphile@workspace:packages/postgraphile"
+  dependencies:
+    "@graphile/lru": 4.6.0-alpha.0
+    "@types/debug": ^4.1.7
+    "@types/express": ^4
+    "@types/jest": ^27.0.3
+    "@types/jsonwebtoken": ^8
+    "@types/minimist": ^1
+    "@types/node": ^16.11.15
+    "@types/nodemon": 1.19.1
+    debug: ^4.3.3
+    graphile-build: 5.0.0-alpha.0
+    graphile-build-pg: 5.0.0-alpha.0
+    graphile-crystal: 4.7.0
+    graphile-exporter: ^0.0.1
+    graphile-plugin: ^5.0.0-alpha.0
+    graphql: 16.1.0-experimental-stream-defer.6
+    jest: ^27.4.5
+    jsonwebtoken: ^8.5.1
+    minimist: ^1.2.5
+    nodemon: ^2.0.15
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typescript: next
+  bin:
+    postgraphile: ./dist/cli.js
+  languageName: unknown
+  linkType: soft
 
 "postgres-array@npm:~2.0.0":
   version: 2.0.0

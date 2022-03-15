@@ -117,6 +117,14 @@ module.exports = {
       },
     },
 
+    // Rules for JavaScript only
+    {
+      files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
+      rules: {
+        "tsdoc/syntax": "off",
+      },
+    },
+
     // Stricter rules for source code
     {
       files: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
