@@ -87,11 +87,7 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
         previous,
         preset,
       );
-      extend(
-        inflectors,
-        { [inflectorName]: inflector },
-        `Adding inflectors from ${plugin.name}`,
-      );
+      inflectors[inflectorName as any] = inflector;
     },
   );
 
