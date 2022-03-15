@@ -23,6 +23,7 @@ import {
   InputObjectPlan,
   InputStaticLeafPlan,
   isAsyncIterable,
+  isPromiseLike,
   lambda,
   list,
   map,
@@ -1166,7 +1167,7 @@ export class PgSelectPlan<
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
-      if (!allVals) {
+      if (allVals == null || isPromiseLike(allVals)) {
         return allVals;
       }
       const limit = this.first ?? this.last;
