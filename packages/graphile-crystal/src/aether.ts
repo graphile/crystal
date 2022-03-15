@@ -60,7 +60,7 @@ import {
 } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
-import type { CrystalError} from "./error";
+import type { CrystalError } from "./error";
 import { isCrystalError, newCrystalError } from "./error";
 import { $$keys, executeBucket } from "./execution-v2";
 import { withGlobalState } from "./global";
@@ -212,19 +212,19 @@ function makeObjectCreator(
 return typeName => {
   return Object.assign(Object.create(verbatimPrototype), {
     [$$concreteType]: typeName,
-    ${Object.entries(fields)
-      .map(([fieldName, type]) => {
-        switch (type) {
-          case "normal":
-            return `${fieldName}: undefined`;
-          case "__typename":
-            return `${fieldName}: typeName`;
-          default: {
-            throw new Error();
-          }
-        }
-      })
-      .join(",\n    ")},
+${Object.entries(fields)
+  .map(([fieldName, type]) => {
+    switch (type) {
+      case "normal":
+        return `    ${fieldName}: undefined,\n`;
+      case "__typename":
+        return `    ${fieldName}: typeName,\n`;
+      default: {
+        throw new Error();
+      }
+    }
+  })
+  .join("")}
   });
 }`;
   const f = new Function("verbatimPrototype", "$$concreteType", functionBody);
