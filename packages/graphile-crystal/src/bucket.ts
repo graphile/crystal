@@ -263,7 +263,7 @@ export function bucketValue(
     if (mode.notNull || v != null) {
       requestContext.hasIssue();
     }
-    return v != null ? Promise.reject(v.originalError) : v;
+    return v != null ? v : v;
   };
   if (isCrystalError(value)) {
     return handleNull(value);
