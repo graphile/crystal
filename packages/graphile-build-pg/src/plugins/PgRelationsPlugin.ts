@@ -43,6 +43,7 @@ declare global {
           foreignClass: PgClass;
           foreignColumns: PgAttribute[];
           isUnique: boolean;
+          isBackwards: boolean;
         },
       ): string;
       singleRelation(this: Inflection, details: RelationDetails): string;
@@ -85,23 +86,23 @@ export const PgRelationsPlugin: Plugin = {
           foreignClass,
           foreignColumns,
           isUnique,
+          isBackwards,
         },
       ) {
         const remoteName = this.tableSourceName({
           databaseName,
           pgClass: foreignClass,
         });
-        const columns =
-          pgConstraint.getClass() === localClass
-            ? // We have a column referencing another table
-              localColumns
-            : // The other table has a constraint that references us; this is the backwards relation.
-              foreignColumns;
+        const columns = !isBackwards
+          ? // We have a column referencing another table
+            localColumns
+          : // The other table has a constraint that references us; this is the backwards relation.
+            foreignColumns;
         const columnNames = columns.map((col) => col.attname);
         return this.camelCase(
-          `${
-            isUnique ? remoteName : this.pluralize(remoteName)
-          }-by-${columnNames.join("-and-")}`,
+          `${isUnique ? remoteName : this.pluralize(remoteName)}-by-${
+            isBackwards ? "their" : "my"
+          }-${columnNames.join("-and-")}`,
         );
       },
 
@@ -207,7 +208,17 @@ export const PgRelationsPlugin: Plugin = {
             foreignClass,
             foreignColumns: foreignColumns as PgAttribute[],
             isUnique,
+            isBackwards,
           });
+          if (relations[relationName]) {
+            throw new Error(
+              `Attempted to add a relation named '${relationName}' for constraint '${
+                pgConstraint.conname
+              }' on '${pgClass.getNamespace()!.nspname}.${
+                pgClass.relname
+              }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`,
+            );
+          }
           relations[relationName] = {
             localColumns: localColumns.map((c) => c!.attname),
             remoteColumns: foreignColumns.map((c) => c!.attname),
