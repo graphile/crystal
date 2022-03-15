@@ -15,11 +15,13 @@ import { crystalObjectToString } from "./resolvers";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
+export interface CrystalPrepareOptions {
+  experimentalGraphQLBypass?: boolean;
+}
+
 export function crystalPrepare(
   args: ExecutionArgs,
-  options: {
-    experimentalGraphQLBypass?: boolean;
-  } = {},
+  options: CrystalPrepareOptions = {},
 ): PromiseOrDirect<CrystalObject | { [$$data]: any }> {
   const {
     schema,

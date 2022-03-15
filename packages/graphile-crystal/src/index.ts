@@ -111,7 +111,11 @@ import {
   SubscribePlan,
 } from "./plans";
 import { polymorphicWrap, resolveType } from "./polymorphic";
-import { bypassGraphQLExecute, crystalPrepare } from "./prepare";
+import {
+  bypassGraphQLExecute,
+  crystalPrepare,
+  CrystalPrepareOptions,
+} from "./prepare";
 import {
   $$crystalWrapped,
   crystalResolve,
@@ -172,6 +176,7 @@ export {
   crystalEnforce,
   CrystalError,
   crystalPrepare,
+  CrystalPrepareOptions,
   crystalPrint,
   crystalPrintPathIdentity,
   crystalResolve,
