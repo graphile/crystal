@@ -66,6 +66,7 @@ export {
   PgEnumTypeCodec,
   PgTypeCodec,
   PgTypeCodecExtensions,
+  PgTypedExecutablePlan,
 } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {

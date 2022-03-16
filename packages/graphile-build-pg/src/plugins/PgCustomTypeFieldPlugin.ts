@@ -11,8 +11,14 @@ import type {
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
+  PgTypedExecutablePlan,
 } from "@dataplan/pg";
-import { PgClassExpressionPlan, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
+import {
+  pgClassExpression,
+  PgClassExpressionPlan,
+  PgSelectSinglePlan,
+  TYPES,
+} from "@dataplan/pg";
 import type {
   __TrackedObjectPlan,
   ExecutablePlan,
@@ -474,6 +480,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                         PgSelectSinglePlan,
                         argDetailsSimple,
                         isNotNullish,
+                        pgClassExpression,
                         source,
                       ) =>
                       ($row: ExecutablePlan, args: TrackedArguments<any>) => {
@@ -494,12 +501,36 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                             })
                             .filter(isNotNullish),
                         ];
+                        if (
+                          source.isUnique &&
+                          !source.codec.columns &&
+                          typeof source.source === "function"
+                        ) {
+                          // This is a scalar computed column, let's inline the expression
+                          const placeholders = selectArgs.map((arg, i) => {
+                            if (i === 0) {
+                              return $row.getClassPlan().alias;
+                            } else if ("pgCodec" in arg && arg.pgCodec) {
+                              return $row.placeholder(arg.plan, arg.pgCodec);
+                            } else {
+                              return $row.placeholder(
+                                arg.plan as PgTypedExecutablePlan<any>,
+                              );
+                            }
+                          });
+                          return pgClassExpression(
+                            $row,
+                            source.codec,
+                          )`${source.source(...placeholders)}`;
+                        }
+                        // TODO: or here, if scalar add select to `$row`?
                         return source.execute(selectArgs);
                       },
                     [
                       PgSelectSinglePlan,
                       argDetailsSimple,
                       isNotNullish,
+                      pgClassExpression,
                       source,
                     ],
                   );
