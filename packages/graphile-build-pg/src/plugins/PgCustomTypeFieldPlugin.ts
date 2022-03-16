@@ -570,7 +570,8 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                 // If the source still has an array type, then it's a 'setof
                 // foo[]' which __MUST NOT USE__ GraphQL connections; see:
                 // https://relay.dev/graphql/connections.htm#sec-Node
-                const canUseConnection = !source.sqlPartitionByIndex;
+                const canUseConnection =
+                  !source.sqlPartitionByIndex && !source.isList;
 
                 const behavior = getBehavior(source.extensions) ?? [
                   ...(canUseConnection

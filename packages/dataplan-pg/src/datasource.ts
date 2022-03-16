@@ -195,6 +195,13 @@ export interface PgSourceOptions<
   isUnique?: boolean;
   sqlPartitionByIndex?: SQL;
   isMutation?: boolean;
+  /**
+   * If true, this indicates that this was originally a list (array) and thus
+   * should be treated as having a predetermined and reasonable length rather
+   * than being unbounded. It's just a hint to schema generation, it doesn't
+   * affect planning.
+   */
+  isList?: boolean;
 }
 
 /**
@@ -344,6 +351,13 @@ export class PgSource<
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
   public readonly isMutation: boolean;
+  /**
+   * If true, this indicates that this was originally a list (array) and thus
+   * should be treated as having a predetermined and reasonable length rather
+   * than being unbounded. It's just a hint to schema generation, it doesn't
+   * affect planning.
+   */
+  public readonly isList: boolean;
 
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
 
@@ -401,6 +415,7 @@ export class PgSource<
       sqlPartitionByIndex,
       isMutation,
       selectAuth,
+      isList,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -421,6 +436,7 @@ export class PgSource<
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
     this.isMutation = !!isMutation;
+    this.isList = !!isList;
     this.selectAuth = selectAuth;
 
     // parameters is null iff source is not a function
@@ -555,6 +571,7 @@ export class PgSource<
         isUnique: false, // set now, not unique
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
+        isList: true,
       });
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
