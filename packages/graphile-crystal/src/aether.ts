@@ -138,6 +138,8 @@ import {
   sharedNull,
 } from "./utils";
 
+const isTest = process.env.NODE_ENV === "test";
+
 /**
  * Once the plan has been requested once from context, we can just return the
  * same plan over and over without rebuilding it each time.
@@ -933,9 +935,9 @@ export class Aether<
       // Only build the plan once
       if (this[$$contextPlanCache] == null) {
         this[$$contextPlanCache] = this.printPlanGraph({
-          includePaths: false,
+          includePaths: isTest,
           printPathRelations: false,
-          concise: true,
+          concise: !isTest,
         });
       }
       (this.context as any)[$$setPlanGraph](this[$$contextPlanCache]);
