@@ -5776,6 +5776,7 @@ export class Aether<
           },
           variableValues: this.variableValues,
         });
+        // TODO: ideally this would also JSON.stringify so this doesn't need to be done every time.
         this[$$introspectionResponseCache] = Object.assign(
           Object.create(null),
           result,
