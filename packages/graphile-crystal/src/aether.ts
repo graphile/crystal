@@ -136,6 +136,8 @@ import {
   sharedNull,
 } from "./utils";
 
+const $$contextPlanCache = Symbol("contextPlanCache");
+
 // How many times will we try re-optimizing before giving up
 const MAX_OPTIMIZATION_LOOPS = 10;
 
@@ -669,6 +671,8 @@ export class Aether<
    */
   private makeMetaByPlanId: () => CrystalContext["metaByPlanId"];
 
+  private [$$contextPlanCache]: any = null;
+
   constructor(
     public readonly schema: GraphQLSchema,
     // Note: whereas the `NewAether` algorithm refers to `document` and
@@ -910,7 +914,13 @@ export class Aether<
     }
 
     if (typeof (this.context as any)?.[$$setPlanGraph] === "function") {
-      (this.context as any)[$$setPlanGraph](this.printPlanGraph());
+      // Only build the plan once
+      if (this[$$contextPlanCache] == null) {
+        this[$$contextPlanCache] = this.printPlanGraph({
+          printPathRelations: false,
+        });
+      }
+      (this.context as any)[$$setPlanGraph](this[$$contextPlanCache]);
     }
 
     this.phase = "ready";
