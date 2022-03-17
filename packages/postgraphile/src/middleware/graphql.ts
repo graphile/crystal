@@ -126,8 +126,6 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
       return { type: "graphql", statusCode: 200, payload: { errors } };
     }
 
-    console.dir(contextValue);
-
     const args: ExecutionArgs = {
       schema,
       document,

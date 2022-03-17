@@ -77,7 +77,7 @@ async function main() {
   if (rawPort != null) {
     preset.server!.port = parseInt(rawPort, 10);
   }
-  if (plan != null) {
+  if (plan === true) {
     preset.server!.exposePlan = true;
   }
 
@@ -86,7 +86,6 @@ async function main() {
   if (contextCallback === null) {
     const withPgClient = config.gather?.pgDatabases?.[0]?.withPgClient;
     if (!withPgClient) {
-      console.dir(config);
       throw new Error("Could not determine the withPgClient to use");
     }
     const contextValue = { withPgClient };
@@ -99,7 +98,12 @@ async function main() {
     contextCallback = (req: IncomingMessage): object => {
       return {
         ...oldContextCallback(req),
-        ...(pgSettings ? { pgSettings } : null),
+        ...(pgSettings
+          ? {
+              pgSettings:
+                typeof pgSettings === "function" ? pgSettings(req) : pgSettings,
+            }
+          : null),
       };
     };
   }
