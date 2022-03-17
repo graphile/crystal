@@ -917,7 +917,9 @@ export class Aether<
       // Only build the plan once
       if (this[$$contextPlanCache] == null) {
         this[$$contextPlanCache] = this.printPlanGraph({
+          includePaths: false,
           printPathRelations: false,
+          concise: true,
         });
       }
       (this.context as any)[$$setPlanGraph](this[$$contextPlanCache]);
@@ -5981,8 +5983,12 @@ export class Aether<
 
   public printPlanGraph({
     printPathRelations = false,
+    includePaths = true,
+    concise = false,
   }: {
     printPathRelations?: boolean;
+    includePaths?: boolean;
+    concise?: boolean;
   } = {}): string {
     const pathIdentitiesByPlanId = this.getPathIdentitiesByPlanId();
 
@@ -5994,7 +6000,7 @@ export class Aether<
     const itemplanStyle = `fill:#fff,stroke-width:6px,color:#000`;
     const sideeffectplanStyle = `fill:#f00,stroke-width:6px,color:#000`;
     const graph = [
-      `graph TD`,
+      `${concise ? "flowchart" : "graph"} TD`,
       `    classDef path fill:#eee,stroke:#000,color:#000`,
       `    classDef plan ${planStyle}`,
       `    classDef itemplan ${itemplanStyle}`,
@@ -6024,6 +6030,15 @@ export class Aether<
       return pathIdMap[pathIdentity];
     };
 
+    const squish = (str: string, start = 8, end = 8): string => {
+      if (str.length > start + end + 4) {
+        return `${str.substring(0, start)}...${str.substring(
+          str.length - end,
+        )}`;
+      }
+      return str;
+    };
+
     const planIdMap = Object.create(null);
     const planDependencies: string[] = [];
     const planId = (plan: ExecutablePlan): string => {
@@ -6031,7 +6046,8 @@ export class Aether<
         const planName = plan.constructor.name.replace(/Plan$/, "");
         const planNode = `${planName}${plan.id}`;
         planIdMap[plan.id] = planNode;
-        const meta = plan.toStringMeta();
+        const rawMeta = plan.toStringMeta();
+        const meta = concise && rawMeta ? squish(rawMeta) : rawMeta;
         const style =
           plan instanceof __ItemPlan
             ? itemplanStyle
@@ -6106,6 +6122,7 @@ export class Aether<
 
     graph.push("");
     graph.push("    %% plan dependencies");
+    const chainByDep: { [depNode: string]: string } = {};
     this.processPlans("printingPlanDeps", "dependents-first", (plan) => {
       const planNode = planId(plan);
       const depNodes = plan.dependencies.map((depId) => {
@@ -6128,7 +6145,22 @@ export class Aether<
             graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
           }
         } else {
-          graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+          if (
+            concise &&
+            plan.dependentPlans.length === 0 &&
+            depNodes.length === 1
+          ) {
+            // Try alternating the nodes so they render closer together
+            const depNode = depNodes[0];
+            if (chainByDep[depNode] === undefined) {
+              graph.push(`    ${depNode} --> ${planNode}`);
+            } else {
+              graph.push(`    ${chainByDep[depNode]} o--o ${planNode}`);
+            }
+            chainByDep[depNode] = planNode;
+          } else {
+            graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+          }
         }
       }
       if (transformItemPlanNode) {
@@ -6137,30 +6169,35 @@ export class Aether<
       return plan;
     });
 
-    graph.push("");
-    graph.push("    %% plan-to-path relationships");
-    {
-      for (const [pathPlanId, pathIdentities] of Object.entries(
-        pathIdentitiesByPlanId,
-      )) {
-        const crystalPathIdentities = pathIdentities.reduce(
-          (memo, pathIdentity) => {
-            const crystalPathIdentity = crystalPrintPathIdentity(pathIdentity);
-            if (!memo[crystalPathIdentity]) {
-              memo[crystalPathIdentity] = 0;
-            }
-            memo[crystalPathIdentity]++;
-            return memo;
-          },
-          Object.create(null) as { [crystalPrintPathIdentity: string]: number },
-        );
-        const text = Object.entries(crystalPathIdentities)
-          .sort((a, z) => z[1] - a[1])
-          .map(([id, count]) => `${id}${count > 1 ? ` x${count}` : ""}`)
-          .join("\n");
-        const pathNode = `P${pathPlanId}`;
-        graph.push(`    ${pathNode}[${dotEscape(text)}]`);
-        graph.push(`    ${planId(this.plans[pathPlanId])} -.-> ${pathNode}`);
+    if (includePaths) {
+      graph.push("");
+      graph.push("    %% plan-to-path relationships");
+      {
+        for (const [pathPlanId, pathIdentities] of Object.entries(
+          pathIdentitiesByPlanId,
+        )) {
+          const crystalPathIdentities = pathIdentities.reduce(
+            (memo, pathIdentity) => {
+              const crystalPathIdentity =
+                crystalPrintPathIdentity(pathIdentity);
+              if (!memo[crystalPathIdentity]) {
+                memo[crystalPathIdentity] = 0;
+              }
+              memo[crystalPathIdentity]++;
+              return memo;
+            },
+            Object.create(null) as {
+              [crystalPrintPathIdentity: string]: number;
+            },
+          );
+          const text = Object.entries(crystalPathIdentities)
+            .sort((a, z) => z[1] - a[1])
+            .map(([id, count]) => `${id}${count > 1 ? ` x${count}` : ""}`)
+            .join("\n");
+          const pathNode = `P${pathPlanId}`;
+          graph.push(`    ${pathNode}[${dotEscape(text)}]`);
+          graph.push(`    ${planId(this.plans[pathPlanId])} -.-> ${pathNode}`);
+        }
       }
     }
     /*
@@ -6232,7 +6269,10 @@ export class Aether<
             `${path}${fieldName} <-${def.modeType}- ${planSource}`,
           );
           if (def.children) {
-            processObject(def.children, `⠀${path}${fieldName}.`);
+            processObject(
+              def.children,
+              `⠀${concise ? path.replace(/[^⠀]/g, "") : path + fieldName}.`,
+            );
           }
         }
       };
@@ -6245,7 +6285,12 @@ export class Aether<
                   .map((pId) => this.plans[pId].id.replace(/^_/, ""))
                   .join(", ")}\n`
               : ""
-          }${bucket.rootPathIdentities.join("\n")}\n${
+          }${(concise
+            ? bucket.rootPathIdentities.map((p) =>
+                crystalPrintPathIdentity(p, 2, 3),
+              )
+            : bucket.rootPathIdentities
+          ).join("\n")}\n${
             bucket.rootOutputPlanId != null
               ? `⠀ROOT <-${
                   bucket.rootOutputModeType ?? "?"
