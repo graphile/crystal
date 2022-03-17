@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { $$setPlanGraph } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
@@ -8,7 +9,7 @@ import parseArgs from "minimist";
 import { resolve } from "path";
 
 import type { ContextCallback } from "./interfaces";
-import { postgraphile } from "./middleware";
+import { postgraphile } from "./middleware/index.js";
 import { defaultPreset } from "./preset";
 import {
   makePgDatabasesAndContextFromConnectionString,
@@ -33,11 +34,13 @@ async function tryLoadPreset(configPath?: string): Promise<Preset | null> {
 async function main() {
   const argv = parseArgs(process.argv.slice(2), {
     string: ["connection", "schema", "port", "config"],
+    boolean: ["plan"],
     alias: {
       connection: ["c"],
       schema: ["s"],
       port: ["p"],
       config: ["C"],
+      plan: ["P"],
     },
     stopEarly: true,
     unknown: (arg) => {
@@ -50,6 +53,7 @@ async function main() {
     schema: rawSchema,
     port: rawPort,
     config: configFileLocation,
+    plan,
   } = argv;
   const schemas = rawSchema?.split(",");
 
@@ -69,9 +73,12 @@ async function main() {
     preset.gather = preset.gather || { pgDatabases: [] };
     preset.gather!.pgDatabases = newPgDatabases;
   }
+  preset.server = preset.server || {};
   if (rawPort != null) {
-    preset.server = preset.server || {};
     preset.server!.port = parseInt(rawPort, 10);
+  }
+  if (plan != null) {
+    preset.server!.exposePlan = true;
   }
 
   const config = resolvePresets([preset]);
@@ -86,12 +93,13 @@ async function main() {
     contextCallback = () => contextValue;
   }
 
-  if (config.server?.pgSettings) {
+  const pgSettings = config.server?.pgSettings;
+  if (pgSettings || !contextCallback) {
     const oldContextCallback = contextCallback;
     contextCallback = (req: IncomingMessage): object => {
       return {
         ...oldContextCallback(req),
-        pgSettings: config.server!.pgSettings!(req),
+        ...(pgSettings ? { pgSettings } : null),
       };
     };
   }
