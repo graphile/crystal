@@ -28,7 +28,10 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 <script>
-  mermaid.initialize({ startOnLoad: true, maxTextSize: 1000000 });
+  mermaid.initialize({
+    startOnLoad: true,
+    maxTextSize: 1000000,
+  });
   let ticks = 0;
   let found = false;
   const interval = setInterval(() => {
