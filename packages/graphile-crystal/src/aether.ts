@@ -15,6 +15,7 @@ import type {
 } from "graphql";
 import {
   assertObjectType,
+  executeSync,
   getNamedType,
   GraphQLBoolean,
   GraphQLFloat,
@@ -37,6 +38,7 @@ import {
   isObjectType,
   isScalarType,
   isUnionType,
+  Kind,
   TypeNameMetaFieldDef,
 } from "graphql";
 import { isAsyncIterable } from "iterall";
@@ -136,7 +138,16 @@ import {
   sharedNull,
 } from "./utils";
 
+/**
+ * Once the plan has been requested once from context, we can just return the
+ * same plan over and over without rebuilding it each time.
+ */
 const $$contextPlanCache = Symbol("contextPlanCache");
+/**
+ * If the request is an introspection-only request, we can cache the result and
+ * return it over and over without rebuilding it each itme.
+ */
+const $$introspectionResponseCache = Symbol("introspectionResponseCache");
 
 // How many times will we try re-optimizing before giving up
 const MAX_OPTIMIZATION_LOOPS = 10;
@@ -662,6 +673,10 @@ export class Aether<
    */
   private hasIntrospectionFields = false;
   /**
+   * If true, this request is purely for introspection.
+   */
+  private hasNonIntrospectionFields = false;
+  /**
    * True if the operation is simple enough that we can execute all the data
    * requirements before even hitting GraphQL
    */
@@ -672,6 +687,7 @@ export class Aether<
   private makeMetaByPlanId: () => CrystalContext["metaByPlanId"];
 
   private [$$contextPlanCache]: any = null;
+  private [$$introspectionResponseCache]: any = null;
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -1507,6 +1523,8 @@ export class Aether<
         }
         // Introspection field, skip
         continue;
+      } else {
+        this.hasNonIntrospectionFields = true;
       }
       const fieldType = objectTypeFields[fieldName].type;
       const planResolver = objectField.extensions?.graphile?.plan;
@@ -5746,6 +5764,25 @@ export class Aether<
   ): null | PromiseOrDirect<any> {
     if (!this.canPreempt) {
       return null;
+    }
+    if (!this.hasNonIntrospectionFields) {
+      // This is an introspection-only request. Perform it once; return it forever.
+      if (!this[$$introspectionResponseCache]) {
+        const result = executeSync({
+          schema: this.schema,
+          document: {
+            kind: Kind.DOCUMENT,
+            definitions: [this.operation, ...Object.values(this.fragments)],
+          },
+          variableValues: this.variableValues,
+        });
+        this[$$introspectionResponseCache] = Object.assign(
+          Object.create(null),
+          result,
+          { [$$bypassGraphQL]: true },
+        );
+      }
+      return this[$$introspectionResponseCache];
     }
     const rootField = this.fieldDigestByPathIdentity[ROOT_PATH];
     if (!rootField.childFieldDigests) {
