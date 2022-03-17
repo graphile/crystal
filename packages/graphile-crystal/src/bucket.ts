@@ -226,7 +226,7 @@ export interface BucketDefinition {
  * @internal
  */
 export interface RequestContext {
-  readonly canBypassGraphQL: boolean;
+  readonly shouldTryToBypassGraphQL: boolean;
   readonly hasIssue: () => void;
   readonly toSerialize: Array<{
     /** object (or array) */
@@ -291,7 +291,7 @@ export function bucketValue(
       return mode.objectCreator(typeName);
     }
     case "L": {
-      if (requestContext.canBypassGraphQL) {
+      if (requestContext.shouldTryToBypassGraphQL) {
         if (mode.serialize[$$idempotent]) {
           try {
             return mode.serialize(value);

@@ -5742,7 +5742,7 @@ export class Aether<
     context: any,
     rootValue: any,
     // Experimental feature!
-    canBypassGraphQL = false,
+    shouldTryToBypassGraphQL = false,
   ): null | PromiseOrDirect<any> {
     if (!this.canPreempt) {
       return null;
@@ -5774,9 +5774,10 @@ export class Aether<
       hasErrors: false,
     };
     const metaByPlanId = this.makeMetaByPlanId();
-    let requiresGraphQLJS = this.hasIntrospectionFields || !canBypassGraphQL;
+    let requiresGraphQLJS =
+      this.hasIntrospectionFields || !shouldTryToBypassGraphQL;
     const requestContext: RequestContext = {
-      canBypassGraphQL,
+      shouldTryToBypassGraphQL,
       hasIssue() {
         requiresGraphQLJS = true;
       },
