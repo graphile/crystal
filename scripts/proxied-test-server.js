@@ -56,7 +56,7 @@
   server.on('upgrade', (req, socket, head) => {
     if (req.url.match(/^\/api(\/|$)/)) {
       proxy.ws(req, socket, head, {
-        target: `ws://localhost:5000${req.url.substr(4)}`,
+        target: `ws://localhost:5000${req.url.slice(4)}`,
         ignorePath: true,
       });
     }
