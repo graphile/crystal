@@ -7,24 +7,23 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    (select json_agg(_._) from (
-      select json_build_array(
-        __person_bookmarks__."id"::text,
-        __people__."username",
-        __person_bookmarks__."bookmarked_entity"::text,
-        __people_2."person_id"::text,
-        __people_2."username",
-        ((__person_bookmarks__."bookmarked_entity")."person_id")::text,
-        __posts__."post_id"::text,
-        __people_3."username",
-        __posts__."body",
-        ((__person_bookmarks__."bookmarked_entity")."post_id")::text,
-        __comments__."comment_id"::text,
-        __people_4."username",
-        __posts_2."body",
-        __comments__."body",
-        ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
-      ) as _
+    (select json_agg(_) from (
+      select
+        __person_bookmarks__."id"::text as "0",
+        __people__."username" as "1",
+        __person_bookmarks__."bookmarked_entity"::text as "2",
+        __people_2."person_id"::text as "3",
+        __people_2."username" as "4",
+        ((__person_bookmarks__."bookmarked_entity")."person_id")::text as "5",
+        __posts__."post_id"::text as "6",
+        __people_3."username" as "7",
+        __posts__."body" as "8",
+        ((__person_bookmarks__."bookmarked_entity")."post_id")::text as "9",
+        __comments__."comment_id"::text as "10",
+        __people_4."username" as "11",
+        __posts_2."body" as "12",
+        __comments__."body" as "13",
+        ((__person_bookmarks__."bookmarked_entity")."comment_id")::text as "14"
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
       left outer join interfaces_and_unions.people as __people__
       on (__person_bookmarks__."person_id"::"int4" = __people__."person_id")

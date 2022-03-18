@@ -1,9 +1,8 @@
 select
   __forums__."name" as "0",
-  (select json_agg(_._) from (
-    select json_build_array(
-      (count(*))::text
-    ) as _
+  (select json_agg(_) from (
+    select
+      (count(*))::text as "0"
     from app_public.messages as __messages__
     where
       (

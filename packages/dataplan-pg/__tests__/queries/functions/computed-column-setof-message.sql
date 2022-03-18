@@ -7,10 +7,9 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    (select json_agg(_._) from (
-      select json_build_array(
-        __forums_featured_messages__."body"
-      ) as _
+    (select json_agg(_) from (
+      select
+        __forums_featured_messages__."body" as "0"
       from app_public.forums_featured_messages(__forums__) as __forums_featured_messages__
       where (
         true /* authorization checks */
