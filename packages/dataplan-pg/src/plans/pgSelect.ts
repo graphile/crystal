@@ -1564,9 +1564,6 @@ export class PgSelectPlan<
     sql: SQL;
     extraSelectIndexes: number[];
   } {
-    if (options.asJsonAgg && !options.asArray) {
-      throw new Error("asJsonAgg can only be set when asArray is set");
-    }
     if (!this.isTrusted) {
       this.source.applyAuthorizationChecksToPlan(this);
     }
@@ -1592,7 +1589,7 @@ export class PgSelectPlan<
 
     const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limit}${offset}`;
     const query = options.asJsonAgg
-      ? sql`select json_agg(_._) from (${sql.indent(baseQuery)}) _`
+      ? sql`select json_agg(_) from (${sql.indent(baseQuery)}) _`
       : baseQuery;
 
     return { sql: query, extraSelectIndexes };
@@ -1718,8 +1715,9 @@ export class PgSelectPlan<
 
           const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
           /*
-           * This wrapper query is necessary so that queries that have a
-           * limit/offset get the limit/offset applied _per identifier group_.
+           * IMPORTANT: this wrapper query is necessary so that queries that
+           * have a limit/offset get the limit/offset applied _per identifier
+           * group_; that's why this cannot just be another "from" clause.
            */
           const query = sql`select ${wrapperAlias}.*
 from (${sql.indent(sql`\
@@ -2324,7 +2322,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           });
           this.mergePlaceholdersInto(table);
           const { sql: query } = this.buildQuery({
-            asArray: true,
+            // No need to do arrays; the json_agg handles this for us - we can
+            // return objects with numeric keys just fine and JS will be fine
+            // with it.
+            asArray: false,
             asJsonAgg: true,
           });
           const selfIndex = table.selectAndReturnIndex(sql`(${query})`);
