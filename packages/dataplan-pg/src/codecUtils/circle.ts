@@ -13,7 +13,7 @@ export interface PgCircle {
 export function parseCircle(f: string): PgCircle {
   if (f[0] === "<" && f[f.length - 1] === ">") {
     const [x, y, r] = f
-      .substring(1, f.length - 1)
+      .slice(1, f.length - 1)
       .replace(/[()]/g, "")
       .split(",")
       .map((f) => parseFloat(f));

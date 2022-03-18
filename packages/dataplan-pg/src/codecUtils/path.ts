@@ -19,7 +19,7 @@ export function parsePath(f: string): PgPath {
   }
   if (isOpen !== null) {
     const xsAndYs = f
-      .substring(1, f.length - 1)
+      .slice(1, f.length - 1)
       .replace(/[()]/g, "")
       .split(",")
       .map((f) => parseFloat(f));

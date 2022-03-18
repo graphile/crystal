@@ -117,9 +117,9 @@ function trimDef(def: string): string {
     return str;
   } else {
     return (
-      str.substring(0, 0 + PREFIX_LENGTH) +
+      str.slice(0, 0 + PREFIX_LENGTH) +
       "..." +
-      str.substring(str.length - SUFFIX_LENGTH)
+      str.slice(str.length - SUFFIX_LENGTH)
     );
   }
 }
@@ -1264,7 +1264,7 @@ Object.defineProperty(${
       //
       // Guessing it must be a property method declaration then; let's try adding the `function` keyword
       const modifiedDefinition = funcString.startsWith("async ")
-        ? "async function " + funcString.substring(6)
+        ? "async function " + funcString.slice(6)
         : "function " + funcString;
       const result = parseExpression(modifiedDefinition, {
         sourceType: "module",

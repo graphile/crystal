@@ -10,7 +10,7 @@ export interface PgPoint {
 export function parsePoint(f: string): PgPoint {
   if (f[0] === "(" && f[f.length - 1] === ")") {
     const [x, y] = f
-      .substring(1, f.length - 1)
+      .slice(1, f.length - 1)
       .split(",")
       .map((f) => parseFloat(f));
     return { x, y };

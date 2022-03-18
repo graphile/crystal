@@ -62,7 +62,7 @@ import { toPg } from "./toPg";
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)
 const hash = (text: string): string =>
-  createHash("sha256").update(text).digest("hex").substring(0, 63);
+  createHash("sha256").update(text).digest("hex").slice(0, 63);
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -1462,7 +1462,7 @@ export class PgSelectPlan<
         ),
       ),
     );
-    const digest = hash.digest("hex").substring(0, 10);
+    const digest = hash.digest("hex").slice(0, 10);
     return digest;
   }
 

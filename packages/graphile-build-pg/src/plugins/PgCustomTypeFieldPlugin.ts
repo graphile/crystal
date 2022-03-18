@@ -161,7 +161,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         const codecName = details.source.parameters[0].codec.name;
         const legacyPrefix = codecName + "_";
         if (name.startsWith(legacyPrefix)) {
-          return this.camelCase(name.substring(legacyPrefix.length));
+          return this.camelCase(name.slice(legacyPrefix.length));
         } else {
           return this.camelCase(name);
         }

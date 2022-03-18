@@ -10,7 +10,7 @@ export interface PgLine {
 export function parseLine(f: string): PgLine {
   if (f[0] === "{" && f[f.length - 1] === "}") {
     const [A, B, C] = f
-      .substring(1, f.length - 1)
+      .slice(1, f.length - 1)
       .split(",")
       .map((f) => parseFloat(f));
     // Lines have the form Ax + By + C = 0.

@@ -10,7 +10,7 @@ export interface PgLseg {
 export function parseLseg(f: string): PgLseg {
   if (f[0] === "[" && f[f.length - 1] === "]") {
     const [x1, y1, x2, y2] = f
-      .substring(1, f.length - 1)
+      .slice(1, f.length - 1)
       .replace(/[()]/g, "")
       .split(",")
       .map((f) => parseFloat(f));

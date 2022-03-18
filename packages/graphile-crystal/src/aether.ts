@@ -2990,7 +2990,7 @@ export class Aether<
       list.sort((a, z) => a.length - z.length);
     }
     const keys = Object.keys(pathIdentitiesByPlanId).sort(
-      (a, z) => parseInt(a.substring(1), 10) - parseInt(z.substring(1), 10),
+      (a, z) => parseInt(a.slice(1), 10) - parseInt(z.slice(1), 10),
     );
     // Return pathIdentitiesByPlanId but with sorted keys
     return keys.reduce((memo, key) => {
@@ -3561,7 +3561,7 @@ export class Aether<
             let fieldPathIdentity = pathIdentity;
             while (fieldPathIdentity.endsWith("[]")) {
               depth++;
-              fieldPathIdentity = fieldPathIdentity.substring(
+              fieldPathIdentity = fieldPathIdentity.slice(
                 0,
                 fieldPathIdentity.length - 2,
               );
@@ -3644,7 +3644,7 @@ export class Aether<
             const rootPathIdentity = matchingParentPathIdentities[0];
             const rootPathIdentityIndex =
               bucket.rootPathIdentities.indexOf(rootPathIdentity);
-            const remainingPath = pathIdentity.substring(
+            const remainingPath = pathIdentity.slice(
               rootPathIdentity.length + 1,
             );
             const parts = remainingPath
@@ -5995,7 +5995,7 @@ export class Aether<
       const plan = this.plans[planId];
       lines.push(
         "  ".repeat(depth) +
-          `${fieldPathIdentity.substring(
+          `${fieldPathIdentity.slice(
             parentFieldPathIdentity.length,
           )}: ${plan}`,
       );
@@ -6004,7 +6004,7 @@ export class Aether<
         if (
           childFieldPathIdentity.startsWith(fieldPathIdentity) &&
           /^(\[\])*>|@/.test(
-            childFieldPathIdentity.substring(fieldPathIdentity.length),
+            childFieldPathIdentity.slice(fieldPathIdentity.length),
           )
         ) {
           print(childFieldPathIdentity, fieldPathIdentity);
@@ -6073,7 +6073,7 @@ export class Aether<
 
     const squish = (str: string, start = 8, end = 8): string => {
       if (str.length > start + end + 4) {
-        return `${str.substring(0, start)}...${str.substring(
+        return `${str.slice(0, start)}...${str.slice(
           str.length - end,
         )}`;
       }
@@ -6541,11 +6541,11 @@ function deeper(
 
 function getParentPathIdentity(pathIdentity: string): string | null {
   if (pathIdentity.endsWith("[]")) {
-    return pathIdentity.substring(0, pathIdentity.length - 2);
+    return pathIdentity.slice(0, pathIdentity.length - 2);
   } else {
     const i = pathIdentity.lastIndexOf(">");
     if (i >= 0) {
-      return pathIdentity.substring(0, i);
+      return pathIdentity.slice(0, i);
     } else {
       return null;
     }
