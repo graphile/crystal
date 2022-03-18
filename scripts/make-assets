@@ -19,7 +19,7 @@ async function main() {
       tier = [];
       tiers.push(tier);
     } else if (line.startsWith('* ') || line.startsWith('- ')) {
-      tier.push(line.substr(2).replace(/\s?\(.*$/, ''));
+      tier.push(line.slice(2).replace(/\s?\(.*$/, ''));
     }
   }
   tiers.reverse();
