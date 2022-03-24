@@ -31,12 +31,12 @@ import type {
   GraphQLObjectType,
   GraphQLSchema,
 } from "graphql";
+import type { PgClass, PgNamespace } from "pg-introspection";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import type { PgClass, PgNamespace } from "../introspection";
 import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin";
 
 declare global {

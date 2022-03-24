@@ -1,0 +1,49 @@
+{
+  "name": "pg-introspection",
+  "version": "0.0.0",
+  "description": "Strongly typed PostgreSQL introspection library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "pretest": "node dist/index.js",
+    "test": "jest -i",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-engine.git"
+  },
+  "keywords": [
+    "pg",
+    "postgres",
+    "postgresql",
+    "introspection",
+    "pg_class",
+    "pg_constraint",
+    "pg_attribute",
+    "pg_proc"
+  ],
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-engine/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/pg-introspection",
+  "devDependencies": {
+    "@types/debug": "4.1.7",
+    "@types/jest": "^27.0.3",
+    "@types/node": "16.11.15",
+    "jest": "^27.4.5",
+    "ts-node": "^10.4.0",
+    "typescript": "next"
+  },
+  "dependencies": {
+    "tslib": "^2.3.1"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=14.17"
+  }
+}

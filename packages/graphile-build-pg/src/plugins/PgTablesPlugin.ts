@@ -10,11 +10,11 @@ import { PgSelectSinglePlan, PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import type { PgClass, PgNamespace } from "pg-introspection";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import type { PgClass, PgNamespace } from "../introspection";
 
 declare global {
   namespace GraphileEngine {

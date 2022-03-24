@@ -12,10 +12,10 @@ import { connection } from "graphile-crystal";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
+import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import type { PgAttribute, PgClass, PgConstraint } from "../introspection.js";
 
 interface RelationDetails {
   source: PgSource<any, any, any, any>;

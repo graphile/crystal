@@ -11,11 +11,11 @@ import type {
 import { PgSource, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import { version } from "../index";
-import type { PgProc } from "../introspection";
 
 interface ComputedColumnDetails {
   source: PgSource<any, any, any, PgSourceParameter[]>;

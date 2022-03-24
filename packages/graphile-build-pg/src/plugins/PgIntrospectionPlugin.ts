@@ -13,9 +13,6 @@ import type {
   PluginGatherConfig,
   PluginHook,
 } from "graphile-plugin";
-
-import { augmentIntrospection } from "../augmentIntrospection";
-import { version } from "../index";
 import type {
   Introspection,
   PgAttribute,
@@ -33,8 +30,13 @@ import type {
   PgRange,
   PgRoles,
   PgType,
-} from "../introspection";
-import { makeIntrospectionQuery } from "../introspection";
+} from "pg-introspection";
+import {
+  makeIntrospectionQuery,
+  parseIntrospectionResults,
+} from "pg-introspection";
+
+import { version } from "../index";
 
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
@@ -460,9 +462,7 @@ export const PgIntrospectionPlugin: Plugin = {
             if (!row) {
               throw new Error("Introspection failed");
             }
-            const introspection = augmentIntrospection(
-              JSON.parse(row.introspection),
-            );
+            const introspection = parseIntrospectionResults(row.introspection);
             return { database, introspection };
           }),
         );

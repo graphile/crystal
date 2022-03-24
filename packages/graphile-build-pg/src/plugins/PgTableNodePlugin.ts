@@ -12,11 +12,11 @@ import { access, constant, list } from "graphile-crystal";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";
+import type { PgClass, PgNamespace } from "pg-introspection";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import type { PgClass, PgNamespace } from "../introspection";
 
 interface State {}
 interface Cache {}

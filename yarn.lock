@@ -6922,6 +6922,7 @@ __metadata:
     graphql-helix: ^1.11.0
     jest: ^27.4.5
     jsonwebtoken: ^8.5.1
+    pg-introspection: ^0.0.0
     ts-node: ^10.4.0
     tslib: ^2.3.1
     typescript: next
@@ -9790,6 +9791,20 @@ __metadata:
   checksum: a1e3a05a69005ddb73e5f324b6b4e689868a447c5fa280b44cd4d04e6916a344ac289e0b8d2695d66e8e89a7fba023affb9e0e94778770ada5df43f003d664c9
   languageName: node
   linkType: hard
+
+"pg-introspection@^0.0.0, pg-introspection@workspace:packages/pg-introspection":
+  version: 0.0.0-use.local
+  resolution: "pg-introspection@workspace:packages/pg-introspection"
+  dependencies:
+    "@types/debug": 4.1.7
+    "@types/jest": ^27.0.3
+    "@types/node": 16.11.15
+    jest: ^27.4.5
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typescript: next
+  languageName: unknown
+  linkType: soft
 
 "pg-pool@npm:^3.4.1":
   version: 3.4.1

@@ -15,6 +15,7 @@
     { "path": "../graphile-build" },
     { "path": "../graphile-crystal" },
     { "path": "../graphile-exporter" },
-    { "path": "../graphile-plugin" }
+    { "path": "../graphile-plugin" },
+    { "path": "../pg-introspection" }
   ]
 }
