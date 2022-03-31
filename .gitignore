@@ -20,3 +20,7 @@ packages/dataplan-pg/__tests__/**/*.mermaid.png
 !.yarn/releases
 !.yarn/plugins
 .pnp.*
+
+# Benjie's stuff
+Session.vim
+WHAT_ARE_YOU_DOING.md
