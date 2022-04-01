@@ -5,6 +5,15 @@ import type { Notification, Pool, PoolClient } from "pg";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * This class provides helpers for Postgres' LISTEN/NOTIFY pub/sub
+ * implementation. We aggregate all LISTEN/NOTIFY events so that we can supply
+ * them all via a single pgClient. We grab and release this client from/to the
+ * pool automatically. If the Postgres connection is interrupted then we'll
+ * automatically reconnect and re-establish the LISTENs, however _events can be
+ * lost_ when this happens, so you should be careful that Postgres connections
+ * will not be prematurely terminated in general.
+ */
 export class PgSubscriber<
   TTopics extends { [key: string]: string } = { [key: string]: string },
 > implements CrystalSubscriber<TTopics>

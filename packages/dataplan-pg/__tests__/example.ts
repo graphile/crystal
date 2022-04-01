@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
+
+/*
+ * TODO: THIS FILE IS SUPER OUT OF DATE... WE SHOULD DELETE IT?
+ */
+
 /*
  * Regular forum. Except, some forums are private.
  *

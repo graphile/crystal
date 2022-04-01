@@ -3,16 +3,19 @@ import { inspect } from "util";
 import type { PgPoint } from "./point";
 import { stringifyPoint } from "./point";
 
-// https://www.postgresql.org/docs/current/datatype-geometric.html#id-1.5.7.16.9
-
 export interface PgPolygon {
   points: PgPoint[];
 }
 
+/**
+ * Parses the Postgres polygon syntax.
+ *
+ * https://www.postgresql.org/docs/current/datatype-geometric.html#id-1.5.7.16.9
+ */
 export function parsePolygon(f: string): PgPolygon {
   if (f[0] === "(" && f[f.length - 1] === ")") {
     const xsAndYs = f
-      .slice(1, f.length - 1)
+      //.slice(1, f.length - 1)
       .replace(/[()]/g, "")
       .split(",")
       .map((f) => parseFloat(f));
@@ -31,6 +34,11 @@ export function parsePolygon(f: string): PgPolygon {
   }
 }
 
+/**
+ * Stringifies to the Postgres polygon syntax.
+ *
+ * https://www.postgresql.org/docs/current/datatype-geometric.html#id-1.5.7.16.9
+ */
 export function stringifyPolygon(polygon: PgPolygon): string {
   return polygon.points.map(stringifyPoint).join(",");
 }

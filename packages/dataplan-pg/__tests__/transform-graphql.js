@@ -1,11 +1,30 @@
+/*
+ * This file is critical to how the dataplan-pg integration tests work.
+ *
+ * We create `.test.graphql` GraphQL documents and these are then "transformed"
+ * into standard Jest tests (see below). At the top of these .test.graphql files
+ * a number of checks/configurations can be specified:
+ *
+ * - Lines starting `##` are where our assertions are added; these are useful to
+ *   ensure that anything that wants a concrete assertion (i.e. not a snapshot
+ *   that can be overwritten) can be checked.
+ * - Lines starting `#>` are configurations, we expect `<key>: <value>` where
+ *   `key` is a plain string and value is a JSON5 value
+ *   - `directPg`: use a direct connection to PG rather than our helper which tracks queries
+ *   - `checkErrorSnapshots`: if set `false` then we'll not test the errors
+ * - Lines starting `#!` are to be added to the "callback", this is typically
+ *   useful for subscription tests that need to trigger events, etc
+ */
+
 // IMPORTANT: after editing this file, you must run `yarn jest --clearCache`
 // because the transformed code gets cached.
+
 const JSON5 = require("json5");
 
 exports.process = (src, path) => {
   const lines = src.split("\n");
   const config = Object.create(null);
-  config.checkErrorShapshots = true;
+  config.checkErrorSnapshots = true;
   const assertions = [];
   const documentLines = [];
   const scripts = [];
@@ -24,7 +43,7 @@ exports.process = (src, path) => {
       const assertion = line.substr(2);
       assertions.push(assertion);
       if (/expect\(errors\).toBeFalsy\(\)/.test(assertion)) {
-        config.checkErrorShapshots = false;
+        config.checkErrorSnapshots = false;
       }
     } else if (line.startsWith("#!")) {
       scripts.push(line.substr(2));
@@ -124,7 +143,7 @@ it('matches data snapshot', () => assertSnapshotsMatch('result', {
   result: result1,
 }));
 
-if (config.checkErrorShapshots) {
+if (config.checkErrorSnapshots) {
   it('matches errors snapshot', () => assertSnapshotsMatch('errors', {
     document,
     path,

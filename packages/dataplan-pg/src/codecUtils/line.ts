@@ -1,12 +1,15 @@
 import { inspect } from "util";
 
-// https://www.postgresql.org/docs/current/datatype-geometric.html#DATATYPE-LINE
-
 export interface PgLine {
   a: { x: number; y: number };
   b: { x: number; y: number };
 }
 
+/**
+ * Parses the Postgres line syntax.
+ *
+ * https://www.postgresql.org/docs/current/datatype-geometric.html#DATATYPE-LINE
+ */
 export function parseLine(f: string): PgLine {
   if (f[0] === "{" && f[f.length - 1] === "}") {
     const [A, B, C] = f
@@ -25,6 +28,11 @@ export function parseLine(f: string): PgLine {
   }
 }
 
+/**
+ * Stringifies to the Postgres line syntax.
+ *
+ * https://www.postgresql.org/docs/current/datatype-geometric.html#DATATYPE-LINE
+ */
 export function stringifyLine(line: PgLine): string {
   return `${line.a.x},${line.a.y},${line.b.x},${line.b.y}`;
 }

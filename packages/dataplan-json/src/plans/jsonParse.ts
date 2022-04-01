@@ -6,7 +6,7 @@ import type {
 } from "graphile-crystal";
 import { access, ExecutablePlan } from "graphile-crystal";
 
-type JSONValue =
+export type JSONValue =
   | string
   | number
   | boolean
@@ -14,6 +14,10 @@ type JSONValue =
   | { [key: string]: JSONValue }
   | Array<JSONValue>;
 
+/**
+ * This plan accepts as JSON string as its only input and will result in the
+ * parsed JSON object (or array, boolean, string, etc).
+ */
 export class JSONParsePlan<
   TJSON extends JSONValue,
 > extends ExecutablePlan<TJSON> {
@@ -21,7 +25,9 @@ export class JSONParsePlan<
     moduleName: "@dataplan/json",
     exportName: "JSONParsePlan",
   };
-  isSyncAndSafe = true;
+  // We're not safe because if parsing JSON fails we'll include a rejected
+  // promise.
+  isSyncAndSafe = false;
 
   constructor($stringPlan: ExecutablePlan<string | null>) {
     super();
@@ -49,7 +55,11 @@ export class JSONParsePlan<
   execute(values: [CrystalValuesList<string>]): CrystalResultsList<TJSON> {
     return values[0].map((v) => {
       if (typeof v === "string") {
-        return JSON.parse(v);
+        try {
+          return JSON.parse(v);
+        } catch (e) {
+          return Promise.reject(e);
+        }
       } else if (v == null) {
         return null;
       } else {
@@ -65,6 +75,10 @@ export class JSONParsePlan<
   }
 }
 
+/**
+ * This plan accepts as JSON string as its only input and will result in the
+ * parsed JSON object (or array, boolean, string, etc).
+ */
 export function jsonParse<TJSON extends JSONValue>(
   $string: ExecutablePlan<string | null>,
 ): JSONParsePlan<TJSON> {

@@ -7,6 +7,11 @@ export interface PgHStore {
 // NOTE: I don't believe this is vulnerable to prototype polution since we do
 //   `Object.create(null)` and you can only set the value to a string or null.
 
+/**
+ * Parses the Postgres HStore syntax
+ *
+ * @see {@link https://www.postgresql.org/docs/14/hstore.html#id-1.11.7.25.5}
+ */
 export function parseHstore(hstoreString: string): PgHStore {
   const hstore: PgHStore = Object.create(null);
   // Parse via a simple character-wise scanner
@@ -147,6 +152,11 @@ function toHstoreString(str: string | null): string {
   return str == null ? "NULL" : '"' + str.replace(/(["\\])/g, "\\$1") + '"';
 }
 
+/**
+ * Stringifies to the Postgres HStore syntax
+ *
+ * @see {@link https://www.postgresql.org/docs/14/hstore.html#id-1.11.7.25.5}
+ */
 export function stringifyHstore(o: PgHStore | null): string | null {
   if (o == null) {
     return null;

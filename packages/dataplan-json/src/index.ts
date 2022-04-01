@@ -1,1 +1,1 @@
-export { jsonParse, JSONParsePlan } from "./plans/jsonParse";
+export { jsonParse, JSONParsePlan, JSONValue } from "./plans/jsonParse";

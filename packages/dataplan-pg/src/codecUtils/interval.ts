@@ -1,3 +1,7 @@
+/**
+ * The representation of an 'interval' from Postgres. All entries are integers
+ * _except_ `seconds` which is floating point
+ */
 export interface PgInterval {
   years: number;
   months: number;
@@ -28,6 +32,12 @@ const INTERVAL = new RegExp(
     "$",
 );
 
+/**
+ * Parses Postgres' 'interval' syntax. Note we only support
+ * `intervalstyle = 'postgres'` right now.
+ *
+ * @see {@link https://www.postgresql.org/docs/14/datatype-datetime.html#DATATYPE-INTERVAL-OUTPUT}
+ */
 export function parseInterval(interval: string): PgInterval {
   const [, years, months, days, plusMinusTime, hours, minutes, seconds] =
     INTERVAL.exec(interval || "") || [];
@@ -45,6 +55,11 @@ export function parseInterval(interval: string): PgInterval {
   };
 }
 
+/**
+ * Stringifies to Postgres' 'interval' syntax
+ *
+ * @see {@link https://www.postgresql.org/docs/14/datatype-datetime.html#DATATYPE-INTERVAL-INPUT}
+ */
 export function stringifyInterval(interval: PgInterval): string {
   const keys = ["seconds", "minutes", "hours", "days", "months", "years"];
   const parts = [];

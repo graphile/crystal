@@ -1,8 +1,11 @@
+// It's helpful to see the full error stack
 Error.stackTraceLimit = Infinity;
+
 if (process.env.DEBUG) {
   // When debug is set, outputting the console logs makes the tests slow.
   jest.setTimeout(30000);
 }
+
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
 import { crystalPrepare } from "graphile-crystal";
@@ -36,8 +39,14 @@ import { PgSubscriber } from "../src";
 import { makeExampleSchema } from "../src/examples/exampleSchema";
 import type { PgClientResult } from "../src/executor";
 
+/**
+ * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
+ * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
+ * we'll do the default behaviour of comparing to existing snapshots.
+ */
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
+/** Sorts two GraphQLError paths. */
 const pathCompare = (
   path1: readonly (string | number)[],
   path2: readonly (string | number)[],
@@ -69,9 +78,13 @@ const pathCompare = (
   return path1.length - path2.length;
 };
 
+/** Schema with optimizations enabled */
 let optimizedSchema!: GraphQLSchema;
+/** Schema with optimizations disabled */
 let deoptimizedSchema!: GraphQLSchema;
+/** Postgres pool */
 let testPool: Pool | null = null;
+
 beforeAll(() => {
   optimizedSchema = makeExampleSchema();
   deoptimizedSchema = makeExampleSchema({ deoptimize: true });
@@ -90,6 +103,15 @@ afterAll(async () => {
   optimizedSchema = deoptimizedSchema = null;
 });
 
+/**
+ * Make a test "withPgClient" that writes queries issued into the passed
+ * 'queries' array.
+ *
+ * Manages transactions automatically - if pgSettings are supplied then the
+ * entire thing will be wrapped in a transaction and calls  to startTransaction
+ * will trigger a savepoint, otherwise no transaction is required initially and
+ * startTransaction will simply issue 'BEGIN'.
+ */
 function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
   return async (pgSettings, callback) => {
     const poolClient = await testPool.connect();
@@ -548,6 +570,11 @@ export async function runTestQuery(
   }
 }
 
+/**
+ * If UPDATE_SNAPSHOTS is set then wrotes the given snapshot to the given
+ * filePath, otherwise it asserts that the snapshot matches the previous
+ * snapshot.
+ */
 async function snapshot(actual: string, filePath: string) {
   let expected: string | null = null;
   try {
@@ -576,6 +603,10 @@ afterAll(() => {
   sqlSnapshotAliases.clear();
 });
 
+/**
+ * Replace non-deterministic parts of the query with more deterministic
+ * equivalents.
+ */
 function makeSQLSnapshotSafe(sql: string): string {
   return sql.replace(/__cursor_[0-9]+__/g, (t) => {
     const substitute = sqlSnapshotAliases.get(t);
@@ -591,6 +622,10 @@ function makeSQLSnapshotSafe(sql: string): string {
 
 const UUID_REGEXP = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 
+/**
+ * Replaces non-deterministic parts of the response with more deterministic
+ * equivalents.
+ */
 function makeResultSnapshotSafe(
   data: any,
   replacements = { uuid: new Map<string, number>(), uuidCounter: 1 },
@@ -623,6 +658,10 @@ function makeResultSnapshotSafe(
   }
 }
 
+/**
+ * Build the snapshot for the given mode ('only') and then assert it matches
+ * (or store it).
+ */
 export const assertSnapshotsMatch = async (
   only: "sql" | "result" | "errors" | "mermaid",
   props: {

@@ -3,13 +3,16 @@ import { inspect } from "util";
 import type { PgPoint } from "./point";
 import { stringifyPoint } from "./point";
 
-// https://www.postgresql.org/docs/current/datatype-geometric.html#id-1.5.7.16.9
-
 export interface PgPath {
   isOpen: boolean;
   points: PgPoint[];
 }
 
+/**
+ * Parses the Postgres path syntax.
+ *
+ * https://www.postgresql.org/docs/current/datatype-geometric.html#id-1.5.7.16.9
+ */
 export function parsePath(f: string): PgPath {
   let isOpen = null;
   if (f[0] === "(" && f[f.length - 1] === ")") {
@@ -39,6 +42,11 @@ export function parsePath(f: string): PgPath {
   }
 }
 
+/**
+ * Stringifies to the Postgres path syntax.
+ *
+ * https://www.postgresql.org/docs/current/datatype-geometric.html#id-1.5.7.16.9
+ */
 export function stringifyPath(path: PgPath): string {
   const openParen = path.isOpen ? "[" : "(";
   const closeParen = path.isOpen ? "]" : ")";
