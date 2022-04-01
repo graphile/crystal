@@ -5998,9 +5998,7 @@ export class Aether<
       const plan = this.plans[planId];
       lines.push(
         "  ".repeat(depth) +
-          `${fieldPathIdentity.slice(
-            parentFieldPathIdentity.length,
-          )}: ${plan}`,
+          `${fieldPathIdentity.slice(parentFieldPathIdentity.length)}: ${plan}`,
       );
       depth++;
       for (const childFieldPathIdentity of fieldPathIdentities) {
@@ -6076,9 +6074,7 @@ export class Aether<
 
     const squish = (str: string, start = 8, end = 8): string => {
       if (str.length > start + end + 4) {
-        return `${str.slice(0, start)}...${str.slice(
-          str.length - end,
-        )}`;
+        return `${str.slice(0, start)}...${str.slice(str.length - end)}`;
       }
       return str;
     };
