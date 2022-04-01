@@ -1,9 +1,5 @@
 # GraphQL Cursor Connection Pagination in @dataplan/pg
 
-> TODO: THIS CONTENT IS ALREADY OUT OF DATE. Update it.
-
-**DO NOT READ THIS, IT'S NOT UP TO DATE (and potentially also wrong).**
-
 _Please familiarize yourself with the
 [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
 before reading this._
@@ -20,6 +16,12 @@ also typically request the `totalCount` via the connection directly.
 
 Satisfying `startCursor` and `endCursor` merely involves resolving the cursors
 of the returned nodes and returning the first and last ones.
+
+As for satisfying `hasNextPage` / `hasPreviousPage` we honour the spec text and
+the intent of the spec; i.e. we only figure out if there's another page in the
+_current direction of pagination_ (i.e. if `first` is set then `hasNextPage`, if
+`last` is set then `hasPreviousPage`) and we set the opposite field to be
+`null`.
 
 There's lots of different ways of calculating `hasNextPage` and
 `hasPreviousPage` and different approaches may be more or less appropriate
@@ -238,7 +240,7 @@ Determining if you have a previous page can be determined via an `EXISTS`
 subquery seeing if anything exists "before or matching the after"; something
 like:
 
-```
+```sql
 select exists(
   select 1
   from <source>
@@ -252,8 +254,10 @@ Note: the spec states
 > If the server can efficiently determine that elements exist prior to after,
 > return true. [Otherwise] return false.
 
-So if this looks too complex (e.g. it's using complex filters or unindexed
-filters) then it's acceptable to return `false` in all cases.
+So if we have to do extra work then it's acceptable to return `false` in all
+cases.
+
+Current strategy: return `false` in all cases.
 
 ### `hasNextPage`
 
@@ -271,5 +275,5 @@ set). (And if both are set then it doesn't care about either.)
 
 It has become much more clear that the intent is that you fetch an extra node,
 and if it exists then you can set `true` otherwise you set `false`. This is
-option 2 from the "If last is set" list above; so we're going to go with that
+option 3 from the "If last is set" list above; so we're going to go with that
 initially but we may want to revise this in future.
