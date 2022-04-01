@@ -6,58 +6,63 @@ sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 
-- Story.ai
 - Surge
+- Story.ai
 - Chad Furman
-- Postlight
-- Openbase
+- The Guild
+- Fanatics
+- Enzuzo
 - Politics Rewired
 
 ## Leaders
 
-- Qwick
-- Joe Dennis
 - Robert Claypool
+- Joe Dennis
+- Qwick
 - domonda
 - Jack Dinker
-- nigelrmtaylor
 - DocIQ
+- nigelrmtaylor
 - Principia Mentis
-- Cameron Ellis
 - HR-ON
-- Ian Stewart
 - Luxor Labs
-- Qloo
-- Axinom
-- Taiste
-- William Baxter
+- Dovetail
 - PostHog
+- Taiste
+- Axinom
 - Notably
 - Nathanael Beisiegel
+- William Baxter
+- SuperRare Labs
+- latch.bio
 
 ## Supporters
 
+- Postlight
+- Philipp Litzenberger
 - Sam Levin
 - Matt Bretl
-- Philipp Litzenberger
 - Chris Watland
 - Mark
-- innovation.rocks
-- James Rascoe
+- svarmony
 - Simon Elliott
+- James Rascoe
 - CJ Lazell
 - Mansoor Razzaq
-- Alvin Ali Khaled
-- Andrew Poland
+- Jimmy Liu
 - Keith Layne
 - Olli Selamaa
 - Paul Melnikow
+- Alvin Ali Khaled
 - Dani Kenan
-- Benjamin Berman
-- Jimmy Liu
+- Stéphane Klein
 - Splitgraph
 - Kadi Kraman
-- Stéphane Klein
+- Andrew Poland
 - OnThisSpot
+- Benjamin Berman
 - Zymego
 - ARK
+- Sen Palanisami
+- nick
+- CartoLab
