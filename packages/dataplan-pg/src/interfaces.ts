@@ -44,8 +44,16 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
   value: TFromPostgres,
 ) => TForJavaScript;
 
+/**
+ * Custom metadata for a codec
+ */
 export interface PgTypeCodecExtensions {}
 
+/**
+ * A codec for a Postgres type, tells us how to convert to-and-from Postgres
+ * (including changes to the SQL statement itself). Also includes metadata
+ * about the type, for example any of the attributes it has.
+ */
 export interface PgTypeCodec<
   TColumns extends PgTypeColumns | undefined,
   TFromPostgres,
@@ -146,34 +154,53 @@ export interface PgTypeCodec<
    */
   rangeOfCodec?: PgTypeCodec<undefined, any, any, undefined>;
 
+  /**
+   * Arbitrary metadata
+   */
   extensions?: Partial<PgTypeCodecExtensions>;
 }
 
+/**
+ * A PgTypeCodec specifically for enums
+ */
 export interface PgEnumTypeCodec<TValue extends string>
   extends PgTypeCodec<undefined, string, TValue> {
   values: TValue[];
 }
 
+/**
+ * A PgTypedExecutablePlan has a 'pgCodec' property which means we don't need
+ * to also state the pgCodec to use, this can be an added convenience.
+ */
 export interface PgTypedExecutablePlan<
   TCodec extends PgTypeCodec<any, any, any>,
 > extends ExecutablePlan<any> {
   pgCodec: TCodec;
 }
 
+/**
+ * The information required to specify an entry in an 'ORDER BY' clause.
+ */
 export interface PgOrderSpec {
+  /** The expression we're ordering by. */
   fragment: SQL;
+  /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
   codec: PgTypeCodec<any, any, any>;
   direction: "ASC" | "DESC";
+  /** `NULLS FIRST` or `NULLS LAST` or nothing */
   nulls?: "FIRST" | "LAST" | null;
 }
 
+/**
+ * The information required to specify an entry in a `GROUP BY` clause.
+ */
 export interface PgGroupSpec {
   fragment: SQL;
   // codec: PgTypeCodec<any, any, any>;
   // TODO: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
-export type TuplePlanMap<
+type TuplePlanMap<
   TColumns extends { [column: string]: any },
   TTuple extends ReadonlyArray<keyof TColumns>,
 > = {
@@ -191,6 +218,14 @@ export type TuplePlanMap<
   };
 };
 
+/**
+ * Represents a spec like `{user_id: ExecutablePlan}` or
+ * `{organization_id: ExecutablePlan, item_id: ExecutablePlan}`. The keys in
+ * the spec can be any of the columns in TColumns, however there must be at
+ * least one of the unique sets of columns represented (as specified in
+ * TUniqueColumns) - you can then add arbitrary additional columns if you need
+ * to.
+ */
 export type PlanByUniques<
   TColumns extends PgTypeColumns | undefined,
   TUniqueColumns extends ReadonlyArray<

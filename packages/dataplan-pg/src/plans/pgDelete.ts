@@ -31,6 +31,9 @@ interface PgDeletePlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
+/**
+ * Deletes a row in the database, can return columns from the deleted row.
+ */
 export class PgDeletePlan<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
@@ -348,6 +351,9 @@ export class PgDeletePlan<
   }
 }
 
+/**
+ * Delete a row in `source` identified by the `getBy` unique condition.
+ */
 export function pgDelete<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,

@@ -5,6 +5,11 @@ import sql from "pg-sql2";
 import { TYPES } from "../codecs";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
+/**
+ * Given a PgSelectSinglePlan, this will build a cursor by looking at all the
+ * orders applied and then fetching them and building a cursor string from
+ * them.
+ */
 export class PgCursorPlan<
   TPlan extends PgSelectSinglePlan<any, any, any, any>,
 > extends ExecutablePlan<any> {

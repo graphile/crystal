@@ -27,9 +27,10 @@ import { PgUpdatePlan } from "./pgUpdate";
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 /**
- * A plan for selecting a column. Keep in mind that a column might not be a
- * scalar (could be a list, compound type, JSON, geometry, etc), so this might
- * not be a "leaf"; it might be used as the input of another layer of plan.
+ * A plan for selecting a column or column-like expression. Keep in mind that
+ * a column might not be a scalar (could be a list, compound type, JSON,
+ * geometry, etc), so this might not be a "leaf". The result of this might be used as the input
+ * of another layer of plan.
  */
 export class PgClassExpressionPlan<
     TExpressionColumns extends PgTypeColumns | undefined,
@@ -272,6 +273,11 @@ export class PgClassExpressionPlan<
   }
 }
 
+/**
+ * This higher order function takes a table and codec as input and returns a
+ * tagged template literal function that you can use to build an SQL expression
+ * that will be selected.
+ */
 function pgClassExpression<
   TExpressionColumns extends PgTypeColumns | undefined,
   TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,

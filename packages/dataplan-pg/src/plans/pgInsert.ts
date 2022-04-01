@@ -35,6 +35,9 @@ interface PgInsertPlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
+/**
+ * Inserts a row into source with the given specified column values.
+ */
 export class PgInsertPlan<
     TColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<
@@ -376,6 +379,9 @@ export class PgInsertPlan<
   }
 }
 
+/**
+ * Inserts a row into source with the given specified column values.
+ */
 export function pgInsert<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,

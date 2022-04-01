@@ -9,6 +9,8 @@ function sqlPrint(fragment: SQL): string {
   return formatSQLForDebugging(text);
 }
 
+// TODO: polluting the global 'debug' namespace might be a bad idea...
+// Registers the '%S' SQL formatter with the 'debug' module.
 debugFactory.formatters.S = sqlPrint;
 
 export {
