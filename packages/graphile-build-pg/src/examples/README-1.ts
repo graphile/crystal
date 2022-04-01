@@ -1,5 +1,14 @@
 /* eslint-disable no-restricted-syntax */
 
+/*
+ * This is more a test script than an example, I've used it heavily whilst
+ * developing so it has grown in scope and is a bit of a mess. Nonetheless it
+ * demonstrates how to build a Graphile Build schema that leverages
+ * dataplanner, @dataplan/pg, graphile-build-pg, envelop, fastify, helix, and
+ * even has a mermaid-js endpoint for viewing the execution and output plan of
+ * the latest query.
+ */
+
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import type { Plugin } from "@envelop/core";
@@ -93,7 +102,11 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       },
     },
   ]);
+
+  // Perform the "inflection" phase
   const shared = { inflection: buildInflection(config) };
+
+  // Perform the "data gathering" phase
   const input = await gather(config, shared);
   /*
   console.log("Sources:");
@@ -107,6 +120,8 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
         .join("\n  "),
   );
   */
+
+  // Perform the "schema build" phase
   const schema = buildSchema(config, input, shared);
 
   // Output our schema
@@ -114,6 +129,8 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   console.log("");
   console.log("");
   console.log("");
+
+  // The GraphQL query we'll be using
   const source = /* GraphQL */ `
     {
       allPosts {
@@ -124,7 +141,13 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       }
     }
   `;
+
+  // The 'rootValue' we'll be passing to GraphQL
   const rootValue = null;
+
+  // This will store the latest plan graph for use by our mermaid-js endpoint;
+  // we populate this by passing $$setPlanGraph as part of the context to our
+  // GraphQL operation which will have DataPlanner populate it for us.
   let graph: string | null = null;
   const contextValue = {
     withPgClient,
@@ -132,9 +155,11 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       graph = _graph;
     },
   };
+
+  // Our operation requires no variables
   const variableValues = {};
 
-  // Run our query
+  // Run our query on our initial schema
   const result = await graphql({
     schema,
     source,
@@ -148,7 +173,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     process.exit(1);
   }
 
-  // Export schema
+  // Export the GraphQL schema to an executable file
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
   const exportFileLocation = `${__dirname}/../../temp.mjs`;
   await exportSchema(schema, exportFileLocation, {
@@ -161,8 +186,10 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   // output code
   //console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
-  // run code
+  // Import this exported schema so that we can test it
   const { schema: schema2 } = await import(exportFileLocation.toString());
+
+  // Rerun the previous operation, using the freshly imported schema
   const result2 = await graphql({
     schema: schema2,
     source,
@@ -170,11 +197,18 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     variableValues,
     contextValue,
   });
+
   if ("errors" in result2) {
     console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
     process.exit(1);
   }
 
+  /**
+   * An Envelop plugin that uses DataPlanner to prepare the GraphQL query. If
+   * the query supports it, we'll also replace the execute function for this
+   * request only so that we can return the precomputed result without having
+   * to actually call into GraphQL.
+   */
   const useCrystalExecutor = (): Plugin => {
     return {
       async onExecute({ args, executeFn, setExecuteFn }) {
@@ -195,12 +229,17 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
           experimentalGraphQLBypass: true,
         });
         if ((args.rootValue as any)?.[$$bypassGraphQL]) {
+          console.log("BYPASS!");
           setExecuteFn(bypassGraphQLExecute);
         }
       },
     };
   };
 
+  /**
+   * An Envelop plugin that will make any GraphQL errors easier to read from
+   * inside of GraphiQL.
+   */
   const useMoreDetailedErrors = (): Plugin => ({
     onExecute: () => ({
       onExecuteDone({ result }) {
@@ -216,19 +255,27 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       },
     }),
   });
+
   const contextCallback = () => contextValue;
+
+  // Our envelop setup, with all the plugins we need
   const getEnveloped = envelop({
     plugins: [
       useSchema(schema),
-      /*useLogger(),*/ useParserCache(),
+      // Logger disabled on performance grounds (for benchmarking)
+      // useLogger(),
+      useParserCache(),
       useValidationCache(),
       useExtendContext(contextCallback),
       useCrystalExecutor(),
       useMoreDetailedErrors(),
     ],
   });
+
+  // Create our fastify (server) app
   const app = fastify();
 
+  /** Escaping of HTML entities for mermaid */
   function escapeHTMLEntities(str: string): string {
     return str.replace(
       /[&"<>]/g,
@@ -237,10 +284,12 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     );
   }
 
+  // Serve the mermaid-js resources
   app.register(fastifyStatic, {
     root: `${__dirname}/../../../../node_modules/mermaid/dist`,
   });
 
+  // The root URL ('/') serves GraphiQL
   app.route({
     method: ["GET"],
     url: "/",
@@ -249,6 +298,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     },
   });
 
+  // The '/plan' URL serves mermaid-js rendering our latest query plan
   app.route({
     method: ["GET"],
     url: "/plan",
@@ -274,8 +324,7 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
     },
   });
 
-  app.listen(4000);
-
+  // The GraphQL route is at '/graphql' as usual
   app.route({
     method: ["POST"],
     url: "/graphql",
@@ -317,6 +366,7 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
     console.log(`GraphQL server is running...`);
   });
   console.log("Running a GraphQL API server at http://localhost:4000/graphql");
+
   // Keep alive forever.
   return new Promise(() => {});
 })()
