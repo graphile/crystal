@@ -557,6 +557,10 @@ export class PgSelectSinglePlan<
   }
 }
 
+/**
+ * Given a plan that represents a single record (via
+ * PgSelectSinglePlan.record()) this turns it back into a PgSelectSinglePlan
+ */
 export function pgSelectSingleFromRecord<
   TColumns extends PgTypeColumns,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,

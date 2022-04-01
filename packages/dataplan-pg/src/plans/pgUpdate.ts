@@ -36,6 +36,9 @@ interface PgUpdatePlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
+/**
+ * Update a single row identified by the 'getBy' argument.
+ */
 export class PgUpdatePlan<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
@@ -425,6 +428,9 @@ export class PgUpdatePlan<
   }
 }
 
+/**
+ * Update a single row identified by the 'getBy' argument.
+ */
 export function pgUpdate<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,

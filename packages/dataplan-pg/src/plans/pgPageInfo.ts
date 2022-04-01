@@ -15,11 +15,16 @@ import type { PgCursorPlan } from "./pgCursor";
 import type { PgSelectPlan } from "./pgSelect";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
-// PLEASE SEE pgPageInfo.md!
+/*
+ * **IMPORTANT**: see pgPageInfo.md for reasoning behind decisions made in this file
+ */
 
+// Reduce GC overhead by reusing the same empty object over and over.
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 /**
+ * Represents the PageInfo for a Relay-style GraphQL Connection.
+ *
  * Invoking PgPageInfoPlan should have no direct overhead (e.g.
  * `pageInfo { __typename }` is free); cost should not be incurred until one of
  * the submethods is called.
@@ -148,6 +153,9 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
   }
 }
 
+/**
+ * Represents the PageInfo for a Relay-style GraphQL Connection.
+ */
 export function pgPageInfo<TPlan extends PgSelectPlan<any, any, any, any>>(
   connectionPlan: ConnectionPlan<any, TPlan, any>,
 ): PgPageInfoPlan<TPlan> {

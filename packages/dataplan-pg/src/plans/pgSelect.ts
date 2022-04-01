@@ -243,10 +243,6 @@ interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
  * `HAVING` or functions that implicitly turn the query into an aggregate. We
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
- *
- * I currently don't expect this to be used to select sets of scalars, but it
- * could be used for that purpose so long as we name the scalars (i.e. create
- * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgSelectPlan<
     TColumns extends PgTypeColumns | undefined,
@@ -2642,6 +2638,9 @@ Object.defineProperty(pgSelect, "$$export", {
   },
 });
 
+/**
+ * Turns a list of records (e.g. from PgSelectSinglePlan.record()) back into a PgSelect.
+ */
 export function pgSelectFromRecords<
   TColumns extends PgTypeColumns,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,

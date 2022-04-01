@@ -18,6 +18,10 @@ import type { PgTypeCodec } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
+/**
+ * A map from the potential concrete types a polymorphic item may be, how to
+ * determine which one is correct, and how to handle it if it matches.
+ */
 export interface PgPolymorphicTypeMap<
   TItemPlan extends
     | PgSelectSinglePlan<any, any, any, any>
@@ -31,6 +35,12 @@ export interface PgPolymorphicTypeMap<
   };
 }
 
+/**
+ * This class is used for dealing with polymorphism; you feed it a plan
+ * representing an item, a second plan indicating the type of that item, and a
+ * PgPolymorphicTypeMap that helps figure out which type the item is and how to
+ * handle it.
+ */
 export class PgPolymorphicPlan<
     TItemPlan extends
       | PgSelectSinglePlan<any, any, any, any>
@@ -135,6 +145,12 @@ export class PgPolymorphicPlan<
   }
 }
 
+/**
+ * This class is used for dealing with polymorphism; you feed it a plan
+ * representing an item, a second plan indicating the type of that item, and a
+ * PgPolymorphicTypeMap that helps figure out which type the item is and how to
+ * handle it.
+ */
 export function pgPolymorphic<
   TItemPlan extends
     | PgSelectSinglePlan<any, any, any, any>

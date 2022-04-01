@@ -4,7 +4,10 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { PgTypeCodec } from "../interfaces";
 
 /**
- * This would have been a lambda, but we want to be able to deduplicate it.
+ * Converts the given value to the representation suitable for feeding into the
+ * PostgreSQL driver.
+ *
+ * @remarks This would have been a lambda, but we want to be able to deduplicate it.
  *
  * @internal
  */
@@ -35,6 +38,12 @@ export class ToPgPlan extends ExecutablePlan<any> {
   }
 }
 
+/**
+ * Converts the given value to the representation suitable for feeding into the
+ * PostgreSQL driver.
+ *
+ * @internal
+ */
 export function toPg(
   $value: ExecutablePlan<any>,
   codec: PgTypeCodec<any, any, any>,

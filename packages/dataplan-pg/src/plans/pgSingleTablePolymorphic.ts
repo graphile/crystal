@@ -16,6 +16,13 @@ import type {
 } from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
+/**
+ * This polymorphic plan is to support polymorphism from a single PostgreSQL
+ * table, typically these tables will have a "type" (or similar) column that
+ * details the type of the data in the row. This class accepts a plan that
+ * resolves to the GraphQLObjectType type name (a string), and a second plan
+ * that represents a row from this table.
+ */
 export class PgSingleTablePolymorphicPlan<
     TColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<

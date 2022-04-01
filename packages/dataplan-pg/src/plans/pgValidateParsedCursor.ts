@@ -72,6 +72,9 @@ export class PgValidateParsedCursorPlan extends ExecutablePlan<undefined> {
   }
 }
 
+/**
+ * Validates the given cursor matches the given details.
+ */
 export const pgValidateParsedCursor = (
   $parsedCursorPlan: ExecutablePlan<readonly any[] | null>,
   digest: string,
