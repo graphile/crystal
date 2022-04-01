@@ -8,7 +8,7 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { connection } from "graphile-crystal";
+import { arraysMatch, connection } from "graphile-crystal";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
@@ -210,16 +210,8 @@ export const PgRelationsPlugin: Plugin = {
             isUnique,
             isBackwards,
           });
-          if (relations[relationName]) {
-            throw new Error(
-              `Attempted to add a relation named '${relationName}' for constraint '${
-                pgConstraint.conname
-              }' on '${pgClass.getNamespace()!.nspname}.${
-                pgClass.relname
-              }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`,
-            );
-          }
-          relations[relationName] = {
+          const existingRelation = relations[relationName];
+          const newRelation: PgSourceRelation<any, any> = {
             localColumns: localColumns.map((c) => c!.attname),
             remoteColumns: foreignColumns.map((c) => c!.attname),
             source: foreignSource,
@@ -227,6 +219,34 @@ export const PgRelationsPlugin: Plugin = {
             isBackwards,
             extensions: { tags: {} },
           };
+          if (existingRelation) {
+            const isEquivalent =
+              existingRelation.isUnique === newRelation.isUnique &&
+              existingRelation.isBackwards === newRelation.isBackwards &&
+              arraysMatch(
+                existingRelation.localColumns,
+                newRelation.localColumns,
+              ) &&
+              arraysMatch(
+                existingRelation.remoteColumns,
+                newRelation.remoteColumns,
+              ) &&
+              existingRelation.source === newRelation.source;
+            const message = `Attempted to add a relation named '${relationName}' for ${
+              isEquivalent ? "equivalent " : ""
+            }constraint '${pgConstraint.conname}' on '${
+              pgClass.getNamespace()!.nspname
+            }.${
+              pgClass.relname
+            }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`;
+            if (isEquivalent) {
+              console.warn(message);
+              return;
+            } else {
+              throw new Error(message);
+            }
+          }
+          relations[relationName] = newRelation;
         };
 
         for (const constraint of constraints) {
