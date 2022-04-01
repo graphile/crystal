@@ -5785,7 +5785,10 @@ export class Aether<
           { [$$bypassGraphQL]: true },
         );
       }
-      return this[$$introspectionResponseCache];
+      if (this[$$introspectionResponseCache].errors) {
+        return null;
+      }
+      return this[$$introspectionResponseCache].data;
     }
     const rootField = this.fieldDigestByPathIdentity[ROOT_PATH];
     if (!rootField.childFieldDigests) {
