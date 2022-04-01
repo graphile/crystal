@@ -33,4 +33,30 @@ And please give some love to our featured sponsors 🤩:
 
 ## Documentation
 
-TODO!
+Add to your eslintrc:
+
+```json5
+{
+  //...
+  plugins: [
+    //...
+    "graphile-exporter",
+    //...
+  ],
+  extends: [
+    // ...
+    "plugin:graphile-exporter/recommended",
+  ],
+  // ...
+}
+```
+
+NOTE: this plugin will automatically add `EXPORTABLE` callbacks in places where
+it things it's suitable, but it currently does not add the EXPORTABLE import to
+the file. You'll need to add that yourself:
+
+```ts
+import { EXPORTABLE } from "graphile-exporter";
+```
+
+TODO: more docs!

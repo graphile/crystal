@@ -1,6 +1,6 @@
 /*
- * Heavily inspired by eslint-plugin-react-hoosk which is Copyright (c)
- * Facebook, Inc. and its affiliates and licensed under the MIT license.
+ * Derived from eslint-plugin-react-hooks which is Copyright (c) Facebook, Inc.
+ * and its affiliates and licensed under the MIT license.
  */
 
 import type {
