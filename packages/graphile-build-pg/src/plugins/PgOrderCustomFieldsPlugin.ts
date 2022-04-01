@@ -5,10 +5,10 @@ import type {
   PgSelectPlan,
   PgSelectSinglePlan,
   PgSource,
-  PgSourceColumn,
-  PgSourceColumns,
   PgSourceParameter,
   PgTypeCodec,
+  PgTypeColumn,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import { getEnumValueConfig } from "graphile-crystal";

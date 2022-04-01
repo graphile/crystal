@@ -60,10 +60,10 @@ import type {
   PgExecutorContextPlans,
   PgInsertPlan,
   PgSelectPlan,
-  PgSourceColumn,
-  PgSourceColumnVia,
   PgSubscriber,
   PgTypeCodec,
+  PgTypeColumn,
+  PgTypeColumnVia,
   WithPgClient,
 } from "../";
 import {
@@ -90,8 +90,8 @@ import {
   recordType,
   TYPES,
 } from "../";
+import type { PgTypeColumns } from "../codecs";
 import { listOfType } from "../codecs";
-import type { PgSourceColumns } from "../datasource";
 import { PgPageInfoPlan } from "../plans/pgPageInfo";
 import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic";
 
@@ -288,15 +288,15 @@ export function makeExampleSchema(
     TOptions extends {
       codec: PgTypeCodec<any, any, any>;
       notNull?: boolean;
-      expression?: PgSourceColumn<any>["expression"];
+      expression?: PgTypeColumn<any>["expression"];
       // TODO: we could make TypeScript understand the relations on the object
       // rather than just being string.
-      via?: PgSourceColumnVia;
-      identicalVia?: PgSourceColumnVia;
+      via?: PgTypeColumnVia;
+      identicalVia?: PgTypeColumnVia;
     },
   >(
     options: TOptions,
-  ): PgSourceColumn<
+  ): PgTypeColumn<
     NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
   > => {
     const { notNull, codec, expression, via, identicalVia } = options;
@@ -1881,7 +1881,7 @@ export function makeExampleSchema(
     ],
   );
 
-  function attrField<TColumns extends PgSourceColumns>(
+  function attrField<TColumns extends PgTypeColumns>(
     attrName: keyof TColumns,
     type: GraphQLOutputType,
   ) {
@@ -3337,14 +3337,14 @@ export function makeExampleSchema(
 
   // NOTE: the `| any`s below are because of co/contravariance woes.
   type CommonRelationalItemColumns = {
-    id: PgSourceColumn<number>;
-    type: PgSourceColumn<string>;
-    type2: PgSourceColumn<string>;
-    position: PgSourceColumn<string>;
-    created_at: PgSourceColumn<Date>;
-    updated_at: PgSourceColumn<Date>;
-    is_explicitly_archived: PgSourceColumn<boolean>;
-    archived_at: PgSourceColumn<Date>;
+    id: PgTypeColumn<number>;
+    type: PgTypeColumn<string>;
+    type2: PgTypeColumn<string>;
+    position: PgTypeColumn<string>;
+    created_at: PgTypeColumn<Date>;
+    updated_at: PgTypeColumn<Date>;
+    is_explicitly_archived: PgTypeColumn<boolean>;
+    archived_at: PgTypeColumn<Date>;
   };
   const commonRelationalItemFields = () => ({
     id: attrField<CommonRelationalItemColumns>("id", GraphQLInt),

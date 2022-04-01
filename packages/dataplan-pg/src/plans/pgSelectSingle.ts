@@ -3,11 +3,10 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLPlaceholderNode } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type { PgTypeColumn, PgTypeColumns } from "../codecs";
 import { TYPES } from "../codecs";
 import type {
   PgSource,
-  PgSourceColumn,
-  PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
@@ -56,12 +55,12 @@ const CHEAP_COLUMN_TYPES = new Set([
  * expressions.
  */
 export class PgSelectSinglePlan<
-    TColumns extends PgSourceColumns | undefined,
+    TColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<
       PgSourceUnique<Exclude<TColumns, undefined>>
     >,
     TRelations extends {
-      [identifier: string]: TColumns extends PgSourceColumns
+      [identifier: string]: TColumns extends PgTypeColumns
         ? PgSourceRelation<TColumns, any>
         : never;
     },
@@ -170,7 +169,7 @@ export class PgSelectSinglePlan<
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const dataSourceColumn: PgSourceColumn | undefined =
+    const dataSourceColumn: PgTypeColumn | undefined =
       this.source.codec.columns?.[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
@@ -205,7 +204,7 @@ export class PgSelectSinglePlan<
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingColumn = (
         Object.entries($fromPlan.source.codec.columns) as Array<
-          [string, PgSourceColumn]
+          [string, PgTypeColumn]
         >
       ).find(([name, col]) => {
         if (col.identicalVia) {
@@ -263,7 +262,7 @@ export class PgSelectSinglePlan<
   }
 
   public select<
-    TExpressionColumns extends PgSourceColumns | undefined,
+    TExpressionColumns extends PgTypeColumns | undefined,
     TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
   >(
     fragment: SQL,
@@ -307,7 +306,7 @@ export class PgSelectSinglePlan<
   private existingSingleRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
   ): PgSelectSinglePlan<
-    TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
+    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
       ? TRelations[TRelationName]["source"]["TColumns"]
       : any,
     TRelations[TRelationName]["source"]["TUniques"],
@@ -343,7 +342,7 @@ export class PgSelectSinglePlan<
     any
     // TODO: fix the return type
     /*
-    TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
+    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
       ? TRelations[TRelationName]["source"]["TColumns"]
       : any,
     TRelations[TRelationName]["source"]["TUniques"],
@@ -386,7 +385,7 @@ export class PgSelectSinglePlan<
   public manyRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
   ): PgSelectPlan<
-    TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
+    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
       ? TRelations[TRelationName]["source"]["TColumns"]
       : any,
     TRelations[TRelationName]["source"]["TUniques"],
@@ -434,7 +433,7 @@ export class PgSelectSinglePlan<
    * Returns a plan representing the result of an expression.
    */
   expression<
-    TExpressionColumns extends PgSourceColumns | undefined,
+    TExpressionColumns extends PgTypeColumns | undefined,
     TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
   >(
     expression: SQL,
@@ -484,7 +483,7 @@ export class PgSelectSinglePlan<
     }
   }
 
-  private nonNullColumn: { column: PgSourceColumn; attr: string } | null = null;
+  private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const columns = this.source.codec.columns;
@@ -559,10 +558,10 @@ export class PgSelectSinglePlan<
 }
 
 export function pgSelectSingleFromRecord<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgTypeColumns,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },

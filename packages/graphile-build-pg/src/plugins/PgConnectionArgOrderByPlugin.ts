@@ -4,8 +4,8 @@ import type {
   PgConditionPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
-  PgSourceColumns,
   PgTypeCodec,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import { getEnumValueConfig } from "graphile-crystal";

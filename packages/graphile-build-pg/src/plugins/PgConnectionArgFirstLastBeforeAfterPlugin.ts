@@ -4,7 +4,7 @@ import type {
   PgConditionPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
-  PgSourceColumns,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";

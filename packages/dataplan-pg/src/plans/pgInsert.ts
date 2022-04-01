@@ -4,10 +4,9 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
+import type { PgTypeColumn, PgTypeColumns } from "../codecs";
 import type {
   PgSource,
-  PgSourceColumn,
-  PgSourceColumns,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
@@ -37,12 +36,12 @@ interface PgInsertPlanFinalizeResults {
 }
 
 export class PgInsertPlan<
-    TColumns extends PgSourceColumns | undefined,
+    TColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<
       PgSourceUnique<Exclude<TColumns, undefined>>
     >,
     TRelations extends {
-      [identifier: string]: TColumns extends PgSourceColumns
+      [identifier: string]: TColumns extends PgTypeColumns
         ? PgSourceRelation<TColumns, any>
         : never;
     },
@@ -169,10 +168,10 @@ export class PgInsertPlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns[TAttr] extends PgSourceColumn
+    TColumns[TAttr] extends PgTypeColumn
       ? TColumns[TAttr]["codec"]["columns"]
       : any,
-    TColumns[TAttr] extends PgSourceColumn ? TColumns[TAttr]["codec"] : any,
+    TColumns[TAttr] extends PgTypeColumn ? TColumns[TAttr]["codec"] : any,
     TColumns,
     TUniques,
     TRelations
@@ -180,7 +179,7 @@ export class PgInsertPlan<
     if (!this.source.codec.columns) {
       throw new Error(`Cannot call .get() when there's no columns.`);
     }
-    const dataSourceColumn: PgSourceColumn =
+    const dataSourceColumn: PgTypeColumn =
       this.source.codec.columns[attr as string];
     if (!dataSourceColumn) {
       throw new Error(
@@ -378,10 +377,10 @@ export class PgInsertPlan<
 }
 
 export function pgInsert<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -390,7 +389,7 @@ export function pgInsert<
   columns?: {
     [key in keyof TColumns]?:
       | PgTypedExecutablePlan<
-          TColumns extends PgSourceColumns ? TColumns[key]["codec"] : any
+          TColumns extends PgTypeColumns ? TColumns[key]["codec"] : any
         >
       | ExecutablePlan<any>;
   },

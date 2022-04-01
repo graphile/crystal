@@ -7,8 +7,8 @@ import type {
 import { ExecutablePlan, polymorphicWrap } from "graphile-crystal";
 import type { GraphQLObjectType } from "graphql";
 
+import type { PgTypeColumns } from "../codecs";
 import type {
-  PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
@@ -17,12 +17,12 @@ import type {
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgSingleTablePolymorphicPlan<
-    TColumns extends PgSourceColumns | undefined,
+    TColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<
       PgSourceUnique<Exclude<TColumns, undefined>>
     >,
     TRelations extends {
-      [identifier: string]: TColumns extends PgSourceColumns
+      [identifier: string]: TColumns extends PgTypeColumns
         ? PgSourceRelation<TColumns, any>
         : never;
     },
@@ -76,10 +76,10 @@ export class PgSingleTablePolymorphicPlan<
 }
 
 export function pgSingleTablePolymorphic<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },

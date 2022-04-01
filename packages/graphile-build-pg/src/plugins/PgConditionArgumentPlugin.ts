@@ -4,7 +4,7 @@ import type {
   PgConditionPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
-  PgSourceColumns,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
@@ -76,7 +76,7 @@ export const PgConditionArgumentPlugin: Plugin = {
                 ),
                 fields: (context) => {
                   const { fieldWithHooks } = context;
-                  const columns: PgSourceColumns = codec.columns;
+                  const columns: PgTypeColumns = codec.columns;
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
                       const behavior = getBehavior(column.extensions);

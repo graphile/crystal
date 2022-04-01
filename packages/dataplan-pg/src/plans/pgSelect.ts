@@ -34,10 +34,10 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
+import type { PgTypeColumns } from "../codecs";
 import { listOfType } from "../codecs";
 import type {
   PgSource,
-  PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
@@ -97,10 +97,10 @@ function isStaticInputPlan(
 
 type LockableParameter = "orderBy" | "first" | "last" | "offset" | "groupBy";
 type LockCallback<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -192,7 +192,7 @@ function assertSensible(plan: ExecutablePlan): void {
 
 export type PgSelectMode = "normal" | "aggregate";
 
-interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
+interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
@@ -249,12 +249,12 @@ interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgSelectPlan<
-    TColumns extends PgSourceColumns | undefined,
+    TColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<
       PgSourceUnique<Exclude<TColumns, undefined>>
     >,
     TRelations extends {
-      [identifier: string]: TColumns extends PgSourceColumns
+      [identifier: string]: TColumns extends PgTypeColumns
         ? PgSourceRelation<TColumns, any>
         : never;
     },
@@ -2413,7 +2413,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    */
   single(
     options?: PgSelectSinglePlanOptions,
-  ): TColumns extends PgSourceColumns
+  ): TColumns extends PgTypeColumns
     ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
     : PgClassExpressionPlan<
         undefined,
@@ -2443,7 +2443,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    */
   listItem(
     itemPlan: ExecutablePlan,
-  ): TColumns extends PgSourceColumns
+  ): TColumns extends PgTypeColumns
     ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
     : PgClassExpressionPlan<
         undefined,
@@ -2621,10 +2621,10 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any, any, any, any>) {
 }
 
 export function pgSelect<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -2643,10 +2643,10 @@ Object.defineProperty(pgSelect, "$$export", {
 });
 
 export function pgSelectFromRecords<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgTypeColumns,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },

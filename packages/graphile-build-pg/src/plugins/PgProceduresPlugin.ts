@@ -3,10 +3,10 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
-  PgSourceColumns,
   PgSourceExtensions,
   PgSourceParameter,
   PgTypeCodec,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
@@ -176,7 +176,7 @@ export const PgProceduresPlugin: Plugin = {
             // return type of this function.
 
             const numberOfArguments = allArgTypes.length ?? 0;
-            const columns: PgSourceColumns = {};
+            const columns: PgTypeColumns = {};
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
               const argName = pgProc.proargnames?.[i] || `column${i + 1}`;

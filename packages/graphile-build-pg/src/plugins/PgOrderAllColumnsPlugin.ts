@@ -4,10 +4,10 @@ import type {
   PgConditionPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
-  PgSourceColumn,
-  PgSourceColumns,
   PgSourceUnique,
   PgTypeCodec,
+  PgTypeColumn,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import { getEnumValueConfig } from "graphile-crystal";
@@ -27,7 +27,7 @@ declare global {
         details: {
           codec: PgTypeCodec<any, any, any, any>;
           columnName: string;
-          column: PgSourceColumn;
+          column: PgTypeColumn;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -63,7 +63,7 @@ export const PgOrderAllColumnsPlugin: Plugin = {
         ) {
           return values;
         }
-        const columns = pgCodec.columns as PgSourceColumns;
+        const columns = pgCodec.columns as PgTypeColumns;
         const sources = build.input.pgSources.filter(
           (s) => s.codec === pgCodec && !s.parameters,
         );

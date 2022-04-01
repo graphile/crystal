@@ -1,10 +1,6 @@
 import "graphile-build";
 
-import type {
-  PgEnumTypeCodec,
-  PgSourceColumns,
-  PgTypeCodec,
-} from "@dataplan/pg";
+import type { PgEnumTypeCodec, PgTypeCodec, PgTypeColumns } from "@dataplan/pg";
 import {
   domainOfCodec,
   enumType,
@@ -250,7 +246,7 @@ export const PgCodecsPlugin: Plugin = {
             );
           }
 
-          const columns: PgSourceColumns = {};
+          const columns: PgTypeColumns = {};
           const allAttributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
               databaseName,
@@ -719,9 +715,8 @@ export const PgCodecsPlugin: Plugin = {
             // Process all the columns (if any), then exit.
             if (codec.columns) {
               for (const columnName in codec.columns) {
-                const columnCodec = (codec.columns as PgSourceColumns)[
-                  columnName
-                ].codec;
+                const columnCodec = (codec.columns as PgTypeColumns)[columnName]
+                  .codec;
                 walkCodec(columnCodec, visited);
               }
 

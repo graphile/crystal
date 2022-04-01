@@ -4,9 +4,9 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type { PgTypeColumns } from "../codecs";
 import type {
   PgSource,
-  PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
@@ -32,14 +32,14 @@ import { PgUpdatePlan } from "./pgUpdate";
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 export class PgClassExpressionPlan<
-    TExpressionColumns extends PgSourceColumns | undefined,
+    TExpressionColumns extends PgTypeColumns | undefined,
     TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any, any>,
-    TSourceColumns extends PgSourceColumns | undefined,
+    TSourceColumns extends PgTypeColumns | undefined,
     TUniques extends ReadonlyArray<
       PgSourceUnique<Exclude<TSourceColumns, undefined>>
     >,
     TRelations extends {
-      [identifier: string]: TSourceColumns extends PgSourceColumns
+      [identifier: string]: TSourceColumns extends PgTypeColumns
         ? PgSourceRelation<TSourceColumns, any>
         : never;
     },
@@ -141,9 +141,7 @@ export class PgClassExpressionPlan<
     const expr = sql.compile(this.expression);
     if (expr.text.length > 23) {
       return (
-        expr.text.slice(0, 10) +
-        "..." +
-        expr.text.slice(expr.text.length - 10)
+        expr.text.slice(0, 10) + "..." + expr.text.slice(expr.text.length - 10)
       );
     } else {
       return expr.text;
@@ -275,14 +273,14 @@ export class PgClassExpressionPlan<
 }
 
 function pgClassExpression<
-  TExpressionColumns extends PgSourceColumns | undefined,
+  TExpressionColumns extends PgTypeColumns | undefined,
   TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  TSourceColumns extends PgSourceColumns | undefined,
+  TSourceColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<
     PgSourceUnique<Exclude<TSourceColumns, undefined>>
   >,
   TRelations extends {
-    [identifier: string]: TSourceColumns extends PgSourceColumns
+    [identifier: string]: TSourceColumns extends PgTypeColumns
       ? PgSourceRelation<TSourceColumns, any>
       : never;
   },

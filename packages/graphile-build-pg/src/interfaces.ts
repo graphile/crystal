@@ -14,12 +14,12 @@ declare module "@dataplan/pg" {
     tags: Partial<PgSourceTags>;
   }
 
-  interface PgSourceColumnTags extends PgSmartTagsDict {
+  interface PgTypeColumnTags extends PgSmartTagsDict {
     name: string;
     behavior: string | string[];
   }
-  interface PgSourceColumnExtensions {
-    tags: Partial<PgSourceColumnTags>;
+  interface PgTypeColumnExtensions {
+    tags: Partial<PgTypeColumnTags>;
   }
 
   interface PgTypeCodecTags extends PgSmartTagsDict {

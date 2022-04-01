@@ -4,10 +4,9 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
+import type { PgTypeColumn, PgTypeColumns } from "../codecs";
 import type {
   PgSource,
-  PgSourceColumn,
-  PgSourceColumns,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
@@ -38,10 +37,10 @@ interface PgUpdatePlanFinalizeResults {
 }
 
 export class PgUpdatePlan<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -156,7 +155,7 @@ export class PgUpdatePlan<
       }
       const value = getBy![name as any];
       const depId = this.addDependency(value);
-      const column = this.source.codec.columns![name] as PgSourceColumn;
+      const column = this.source.codec.columns![name] as PgTypeColumn;
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
@@ -184,9 +183,7 @@ export class PgUpdatePlan<
         );
       }
     }
-    const { codec: pgCodec } = this.source.codec.columns![
-      name
-    ] as PgSourceColumn;
+    const { codec: pgCodec } = this.source.codec.columns![name] as PgTypeColumn;
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
   }
@@ -207,15 +204,13 @@ export class PgUpdatePlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns extends PgSourceColumns
-      ? TColumns[TAttr]["codec"]["columns"]
-      : any,
-    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : any,
+    TColumns extends PgTypeColumns ? TColumns[TAttr]["codec"]["columns"] : any,
+    TColumns extends PgTypeColumns ? TColumns[TAttr]["codec"] : any,
     TColumns,
     TUniques,
     TRelations
   > {
-    const dataSourceColumn: PgSourceColumn =
+    const dataSourceColumn: PgTypeColumn =
       this.source.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
@@ -431,10 +426,10 @@ export class PgUpdatePlan<
 }
 
 export function pgUpdate<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },

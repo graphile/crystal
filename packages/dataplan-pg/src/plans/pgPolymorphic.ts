@@ -13,7 +13,7 @@ import {
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { PgSourceColumns } from "../datasource";
+import type { PgTypeColumns } from "../codecs";
 import type { PgTypeCodec } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";

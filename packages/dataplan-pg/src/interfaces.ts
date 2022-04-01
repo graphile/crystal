@@ -1,8 +1,8 @@
 import type { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
+import type { PgTypeColumns } from "./codecs";
 import type {
-  PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
@@ -17,10 +17,10 @@ import type { PgUpdatePlan } from "./plans/pgUpdate";
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSinglePlan<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -47,7 +47,7 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
 export interface PgTypeCodecExtensions {}
 
 export interface PgTypeCodec<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TFromPostgres,
   TFromJavaScript = TFromPostgres,
   TArrayItemCodec extends
@@ -192,10 +192,10 @@ export type TuplePlanMap<
 };
 
 export type PlanByUniques<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniqueColumns extends ReadonlyArray<
     PgSourceUnique<Exclude<TColumns, undefined>>
   >,
-> = TColumns extends PgSourceColumns
+> = TColumns extends PgTypeColumns
   ? TuplePlanMap<TColumns, TUniqueColumns[number]["columns"] & string[]>[number]
   : undefined;

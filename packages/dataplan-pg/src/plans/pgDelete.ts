@@ -4,10 +4,9 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
+import type { PgTypeColumn, PgTypeColumns } from "../codecs";
 import type {
   PgSource,
-  PgSourceColumn,
-  PgSourceColumns,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
@@ -33,10 +32,10 @@ interface PgDeletePlanFinalizeResults {
 }
 
 export class PgDeletePlan<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -139,7 +138,7 @@ export class PgDeletePlan<
       }
       const value = getBy![name as any];
       const depId = this.addDependency(value);
-      const column = this.source.codec.columns![name] as PgSourceColumn;
+      const column = this.source.codec.columns![name] as PgTypeColumn;
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
@@ -152,15 +151,13 @@ export class PgDeletePlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns extends PgSourceColumns
-      ? TColumns[TAttr]["codec"]["columns"]
-      : any,
-    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : any,
+    TColumns extends PgTypeColumns ? TColumns[TAttr]["codec"]["columns"] : any,
+    TColumns extends PgTypeColumns ? TColumns[TAttr]["codec"] : any,
     TColumns,
     TUniques,
     TRelations
   > {
-    const dataSourceColumn: PgSourceColumn =
+    const dataSourceColumn: PgTypeColumn =
       this.source.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
@@ -352,10 +349,10 @@ export class PgDeletePlan<
 }
 
 export function pgDelete<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },

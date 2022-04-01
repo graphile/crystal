@@ -17,6 +17,12 @@ import { EXPORTABLE } from "graphile-exporter";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type {
+  PgTypeColumnExtensions,
+  PgTypeColumns,
+  PgTypeColumnVia,
+  PgTypeColumnViaExplicit,
+} from "./codecs";
 import { TYPES } from "./codecs";
 import type {
   PgClientResult,
@@ -36,91 +42,12 @@ import type {
   PgSelectSinglePlanOptions,
 } from "./plans/pgSelectSingle";
 
-export type PgSourceColumns = {
-  [columnName: string]: PgSourceColumn<any>;
-};
-
-// TODO: feels like we should be able to type these more strongly
-export type PgSourceColumnViaExplicit = { relation: string; attribute: string };
-export type PgSourceColumnVia = string | PgSourceColumnViaExplicit;
-
-export interface PgSourceColumnExtensions {}
-
-export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
-  /**
-   * How to translate to/from PG and how to cast.
-   */
-  codec: PgTypeCodec<any, TCanonical, TInput>;
-
-  /**
-   * Is the column/attribute guaranteed to not be null?
-   */
-  notNull: boolean;
-  hasDefault?: boolean;
-
-  /**
-   * The SQL expression for a derivative attributes, e.g.:
-   *
-   * ```js
-   * expression: (alias) => sql`${alias}.first_name || ' ' || ${alias}.last_name`
-   * ```
-   */
-  expression?: (alias: SQL) => SQL;
-
-  // TODO: we could make TypeScript understand the relations on the object
-  // rather than just being string.
-  /**
-   * If this column actually exists on a relation rather than locally, the name
-   * of the (unique) relation this column belongs to.
-   */
-  via?: PgSourceColumnVia;
-
-  /**
-   * If the column exists identically on a relation and locally (e.g.
-   * `posts.author_id` and `users.id` have exactly the same value due to a
-   * foreign key reference) then the plans can choose which one to grab.
-   *
-   * @remarks
-   *
-   * ```
-   * create table users (id serial primary key);
-   * create table posts (id serial primary key, author_id int references users);
-   * create table comments (id serial primary key, user_id int references users);
-   * create table pets (id serial primary key, owner_id int references users);
-   * ```
-   *
-   * Here:
-   * - posts.author_id *identical via* 'author.id'
-   * - comments.user_id *identical via* 'user.id'
-   * - pets.owner_id *identical via* 'owner.id'
-   *
-   * Note however that `users.id` is not *identical via* anything, because
-   * these are all plural relationships. So identicalVia is generally one-way
-   * (except in 1-to-1 relationships).
-   */
-  identicalVia?: PgSourceColumnVia;
-  // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
-  // multiple foreign key references?
-
-  /**
-   * Set this true if you're using column-level select privileges and there are
-   * roles accessible that do not have permission to select it. This will tell
-   * us not to auto-select it to more efficiently resolve row nullability
-   * questions - we'll only try when the user explicitly tells us to.
-   */
-  restrictedAccess?: boolean;
-
-  description?: string;
-
-  extensions?: Partial<PgSourceColumnExtensions>;
-}
-
 export type PgSourceRowAttribute<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgTypeColumns,
   TAttribute extends keyof TColumns,
 > = ReturnType<TColumns[TAttribute]["codec"]["fromPg"]>;
-export type PgSourceRow<TColumns extends PgSourceColumns | undefined> =
-  TColumns extends PgSourceColumns
+export type PgSourceRow<TColumns extends PgTypeColumns | undefined> =
+  TColumns extends PgTypeColumns
     ? {
         [key in keyof TColumns]: PgSourceRowAttribute<TColumns, key>;
       }
@@ -130,8 +57,8 @@ export interface PgSourceRelationExtensions {}
 export interface PgSourceUniqueExtensions {}
 
 export interface PgSourceRelation<
-  TLocalColumns extends PgSourceColumns,
-  TRemoteColumns extends PgSourceColumns,
+  TLocalColumns extends PgTypeColumns,
+  TRemoteColumns extends PgTypeColumns,
 > {
   source:
     | PgSourceBuilder<TRemoteColumns, any, any>
@@ -154,7 +81,7 @@ export interface PgSourceParameter {
 }
 
 export interface PgSourceUnique<
-  TColumns extends PgSourceColumns = PgSourceColumns,
+  TColumns extends PgTypeColumns = PgTypeColumns,
 > {
   columns: ReadonlyArray<keyof TColumns & string>;
   isPrimary?: boolean;
@@ -162,10 +89,10 @@ export interface PgSourceUnique<
 }
 
 export interface PgSourceOptions<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -209,7 +136,7 @@ export interface PgSourceOptions<
  * the relations at a later step to avoid circular references.
  */
 export class PgSourceBuilder<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
@@ -245,7 +172,7 @@ export class PgSourceBuilder<
 
   build<
     TRelations extends {
-      [identifier: string]: TColumns extends PgSourceColumns
+      [identifier: string]: TColumns extends PgTypeColumns
         ? PgSourceRelation<TColumns, any>
         : never;
     },
@@ -303,10 +230,10 @@ let temporarySourceCounter = 0;
  * view, materialized view, setof function call, join, etc. Anything table-like.
  */
 export class PgSource<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },
@@ -361,7 +288,7 @@ export class PgSource<
 
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
 
-  static fromCodec<TColumns extends PgSourceColumns>(
+  static fromCodec<TColumns extends PgTypeColumns>(
     executor: PgExecutor,
     codec: PgTypeCodec<TColumns, any, any>,
   ): PgSource<TColumns, any, any, undefined> {
@@ -672,9 +599,9 @@ export class PgSource<
   }
 
   public resolveVia(
-    via: PgSourceColumnVia,
+    via: PgTypeColumnVia,
     attr: string,
-  ): PgSourceColumnViaExplicit {
+  ): PgTypeColumnViaExplicit {
     if (!via) {
       throw new Error("No via to resolve");
     }
@@ -732,7 +659,7 @@ export class PgSource<
     spec: PlanByUniques<TColumns, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): TColumns extends PgSourceColumns
+  ): TColumns extends PgTypeColumns
     ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
     : PgClassExpressionPlan<
         undefined,

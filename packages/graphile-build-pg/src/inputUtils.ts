@@ -2,10 +2,10 @@ import "graphile-build";
 
 import type {
   PgSource,
-  PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
   PgTypeCodec,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 
@@ -103,10 +103,10 @@ function walkCodec(
 }
 
 function resolveSource<
-  TColumns extends PgSourceColumns | undefined,
+  TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
+    [identifier: string]: TColumns extends PgTypeColumns
       ? PgSourceRelation<TColumns, any>
       : never;
   },

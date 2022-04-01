@@ -34,7 +34,6 @@ import {
   stringifyPoint,
   stringifyPolygon,
 } from "./codecUtils";
-import type { PgSourceColumns } from "./datasource";
 import { exportAs } from "./exportAs";
 import type {
   PgDecode,
@@ -46,6 +45,84 @@ import type {
 
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
+
+export type PgTypeColumnViaExplicit = { relation: string; attribute: string };
+export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
+
+export interface PgTypeColumnExtensions {}
+
+export interface PgTypeColumn<TCanonical = any, TInput = TCanonical> {
+  /**
+   * How to translate to/from PG and how to cast.
+   */
+  codec: PgTypeCodec<any, TCanonical, TInput>;
+
+  /**
+   * Is the column/attribute guaranteed to not be null?
+   */
+  notNull: boolean;
+  hasDefault?: boolean;
+
+  /**
+   * The SQL expression for a derivative attributes, e.g.:
+   *
+   * ```js
+   * expression: (alias) => sql`${alias}.first_name || ' ' || ${alias}.last_name`
+   * ```
+   */
+  expression?: (alias: SQL) => SQL;
+
+  // TODO: we could make TypeScript understand the relations on the object
+  // rather than just being string.
+  /**
+   * If this column actually exists on a relation rather than locally, the name
+   * of the (unique) relation this column belongs to.
+   */
+  via?: PgTypeColumnVia;
+
+  /**
+   * If the column exists identically on a relation and locally (e.g.
+   * `posts.author_id` and `users.id` have exactly the same value due to a
+   * foreign key reference) then the plans can choose which one to grab.
+   *
+   * @remarks
+   *
+   * ```
+   * create table users (id serial primary key);
+   * create table posts (id serial primary key, author_id int references users);
+   * create table comments (id serial primary key, user_id int references users);
+   * create table pets (id serial primary key, owner_id int references users);
+   * ```
+   *
+   * Here:
+   * - posts.author_id *identical via* 'author.id'
+   * - comments.user_id *identical via* 'user.id'
+   * - pets.owner_id *identical via* 'owner.id'
+   *
+   * Note however that `users.id` is not *identical via* anything, because
+   * these are all plural relationships. So identicalVia is generally one-way
+   * (except in 1-to-1 relationships).
+   */
+  identicalVia?: PgTypeColumnVia;
+  // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
+  // multiple foreign key references?
+
+  /**
+   * Set this true if you're using column-level select privileges and there are
+   * roles accessible that do not have permission to select it. This will tell
+   * us not to auto-select it to more efficiently resolve row nullability
+   * questions - we'll only try when the user explicitly tells us to.
+   */
+  restrictedAccess?: boolean;
+
+  description?: string;
+
+  extensions?: Partial<PgTypeColumnExtensions>;
+}
+
+export type PgTypeColumns = {
+  [columnName: string]: PgTypeColumn<any>;
+};
 
 /**
  * Returns a PgTypeCodec for the given builtin Postgres scalar type, optionally

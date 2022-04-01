@@ -2,8 +2,8 @@ import type {
   PgClassSinglePlan,
   PgDeletePlan,
   PgSource,
-  PgSourceColumn,
   PgSourceUnique,
+  PgTypeColumn,
   PgUpdatePlan,
 } from "@dataplan/pg";
 import { pgDelete, pgInsert, pgUpdate } from "@dataplan/pg";
@@ -475,7 +475,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                               (memo, columnName) => {
                                 const column = source.codec.columns[
                                   columnName
-                                ] as PgSourceColumn;
+                                ] as PgTypeColumn;
                                 memo[
                                   inflection.column({
                                     columnName,

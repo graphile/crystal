@@ -7,9 +7,9 @@ import type {
   PgSelectPlan,
   PgSelectSinglePlan,
   PgSetPlan,
-  PgSourceColumn,
-  PgSourceColumns,
   PgTypeCodec,
+  PgTypeColumn,
+  PgTypeColumns,
 } from "@dataplan/pg";
 import {
   pgSelectFromRecords,
@@ -52,7 +52,7 @@ declare global {
         this: GraphileEngine.Inflection,
         details: {
           columnName: string;
-          column: PgSourceColumn;
+          column: PgTypeColumn;
           codec: PgTypeCodec<any, any, any>;
           skipRowId?: boolean;
         },
@@ -67,7 +67,7 @@ declare global {
         this: GraphileEngine.Inflection,
         details: {
           columnName: string;
-          column: PgSourceColumn;
+          column: PgTypeColumn;
           codec: PgTypeCodec<any, any, any>;
         },
       ): string;
@@ -79,7 +79,7 @@ declare global {
       isPgBaseInput?: boolean;
       isPgRowType?: boolean;
       isPgCompoundType?: boolean;
-      pgColumn?: PgSourceColumn;
+      pgColumn?: PgTypeColumn;
     }
   }
 }
@@ -318,7 +318,7 @@ export const PgColumnsPlugin: Plugin = {
           return fields;
         }
 
-        return Object.entries(pgCodec.columns as PgSourceColumns).reduce(
+        return Object.entries(pgCodec.columns as PgTypeColumns).reduce(
           (memo, [columnName, column]) =>
             build.recoverable(memo, () => {
               const behavior = getBehavior(column.extensions);
