@@ -1,4 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
+
+/*
+ * This is a hand-rolled GraphQL schema that we used throughout the development
+ * of DataPlanner; it's used for the @dataplan/pg tests and demonstrates common
+ * patterns as well as edge cases. This is NOT meant to be an example of how
+ * _you_ should write a schema, in particular it's (deliberately) quite
+ * inconsistent and has many ways of achieving the same goals. I would not
+ * recommend reading it in full, but dipping in to particular places you're
+ * interested in might be useful.
+ */
+
 import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";

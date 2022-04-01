@@ -59,6 +59,12 @@ export interface PgClientResult<TData> {
   rowCount: number;
 }
 
+/**
+ * This is a generic interface that your Postgres client must honor; have a
+ * look at adaptors/node-postgres.ts for an example of a compliant
+ * implementation that uses the `pg` module, but you should be able to write
+ * an adaptor for many different Postgres drivers.
+ */
 export interface PgClient {
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
 
@@ -109,7 +115,9 @@ export type PgExecutorSubscribeOptions = {
 /**
  * Represents a PostgreSQL database connection, can be used for issuing queries
  * to the database. Used by PgSource but also directly by things like
- * PgSimpleFunctionCallPlan. Was once PgDataSource itself.
+ * PgSimpleFunctionCallPlan. Was once PgDataSource itself. Multiple PgExecutors
+ * can exist in the same schema. PgExecutor is also responsible for things like
+ * caching.
  */
 export class PgExecutor<TSettings = any> {
   public name: string;

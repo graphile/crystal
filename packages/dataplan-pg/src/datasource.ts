@@ -42,6 +42,9 @@ import type {
   PgSelectSinglePlanOptions,
 } from "./plans/pgSelectSingle";
 
+// TODO: PgSourceRow and PgSourceRowAttribute are lies; we don't use them even
+// though we claim to. Everything that references them needs to be typed in a
+// different way.
 export type PgSourceRowAttribute<
   TColumns extends PgTypeColumns,
   TAttribute extends keyof TColumns,
@@ -53,41 +56,109 @@ export type PgSourceRow<TColumns extends PgTypeColumns | undefined> =
       }
     : undefined;
 
+/**
+ * Extra metadata you can attach to a source relation.
+ */
 export interface PgSourceRelationExtensions {}
+/**
+ * Extra metadata you can attach to a unique constraint.
+ */
 export interface PgSourceUniqueExtensions {}
 
+/**
+ * Describes a relation to another source
+ */
 export interface PgSourceRelation<
   TLocalColumns extends PgTypeColumns,
   TRemoteColumns extends PgTypeColumns,
 > {
+  /**
+   * The remote source this relation relates to.
+   */
   source:
     | PgSourceBuilder<TRemoteColumns, any, any>
     | PgSource<TRemoteColumns, any, any, any>;
+
+  /**
+   * The columns locally used in this relationship.
+   */
   localColumns: readonly (keyof TLocalColumns)[];
 
+  /**
+   * The remote columns that are joined against.
+   */
   remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
+
+  /**
+   * If true then there's at most one record this relationship will find.
+   */
   isUnique: boolean;
+
+  /**
+   * If true then this is a reverse lookup, so multiple rows may be found
+   * (unless isUnique is true).
+   */
   isBackwards?: boolean;
+
+  /**
+   * Space for you to add your own metadata.
+   */
   extensions?: PgSourceRelationExtensions;
 }
 
+/**
+ * Space for extra metadata about this source
+ */
 export interface PgSourceExtensions {}
 
+/**
+ * If this is a functional (rather than static) source, this describes one of
+ * the parameters it accepts.
+ */
 export interface PgSourceParameter {
+  /**
+   * Name of the parameter, if null then we must use positional rather than
+   * named arguments
+   */
   name: string | null;
+  /**
+   * The type of this parameter
+   */
   codec: PgTypeCodec<any, any, any>;
+  /**
+   * If true, then this parameter must be supplied, otherwise it's optional.
+   */
   required: boolean;
+  /**
+   * If true and the parameter is supplied, then the parameter must not be
+   * null.
+   */
   notNull?: boolean;
 }
 
+/**
+ * Description of a unique constraint on a PgSource.
+ */
 export interface PgSourceUnique<
   TColumns extends PgTypeColumns = PgTypeColumns,
 > {
+  /**
+   * The columns that are unique
+   */
   columns: ReadonlyArray<keyof TColumns & string>;
+  /**
+   * If this is true, this represents the "primary key" of the source.
+   */
   isPrimary?: boolean;
+  /**
+   * Space for you to add your own metadata
+   */
   extensions?: PgSourceUniqueExtensions;
 }
 
+/**
+ * Configuration options for your PgSource
+ */
 export interface PgSourceOptions<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
@@ -98,7 +169,15 @@ export interface PgSourceOptions<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
+  /**
+   * The associated codec for thsi source
+   */
   codec: PgTypeCodec<TColumns, any, any, any>;
+  /**
+   * The PgExecutor to use when servicing this source; different executors can
+   * have different caching rules. A plan that uses one executor cannot be
+   * inlined into a plan for a different executor.
+   */
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
@@ -131,6 +210,7 @@ export interface PgSourceOptions<
   isList?: boolean;
 }
 
+// TODO: is there a better way?
 /**
  * This class hacks around TypeScript inference issues by allowing us to define
  * the relations at a later step to avoid circular references.
@@ -226,8 +306,8 @@ const $$codecSource = Symbol("codecSource");
 let temporarySourceCounter = 0;
 
 /**
- * PG class data source represents a PostgreSQL data source. This could be a table,
- * view, materialized view, setof function call, join, etc. Anything table-like.
+ * PgSource represents any source of SELECT-able data in Postgres: tables,
+ * views, functions, etc.
  */
 export class PgSource<
   TColumns extends PgTypeColumns | undefined,
@@ -856,6 +936,7 @@ export interface PgEnumSourceOptions<TValue extends string> {
   extensions?: PgEnumSourceExtensions;
 }
 
+// TODO: is this the best way of solving the problem of enums vs sources?
 export class PgEnumSource<TValue extends string> {
   public readonly codec: PgEnumTypeCodec<TValue>;
   public readonly extensions: PgEnumSourceExtensions | undefined;
