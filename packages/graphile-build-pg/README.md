@@ -6,9 +6,20 @@
 ![MIT license](https://img.shields.io/npm/l/graphile-build-pg.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-`graphile-build-pg` is a collection of Graphile Engine plugins that allow you to
-extend your GraphQL schema with high-performance types and fields based on
-resources found in your PostgreSQL database schema.
+`graphile-build-pg` is a collection of graphile-build plugins that extend your
+GraphQL schema with types and fields based on the tables, views, functions and
+other resources in your PostgreSQL database.
+
+This is achieved by introspecting your database with [pg-introspection][] and
+then building [@dataplan/pg][] data sources for these entities. Then our plugins
+inspect these data sources and create the relevant GraphQL types, fields, and
+[dataplanner][] plan resolver functions. The result is a high-performance,
+powerful, auto-generated but highly flexible GraphQL schema.
+
+If you don't want to use your database introspection results to generate the
+schema, you can instead build the data sources yourself giving you full control
+over what goes into your GraphQL API whilst still saving you significant effort
+versus writing the schema without auto-generation.
 
 <!-- SPONSORS_BEGIN -->
 
@@ -36,41 +47,13 @@ And please give some love to our featured sponsors 🤩:
 
 ## About
 
-Thanks to Graphile Crystal's query planning capabilities, the plugins in this
-package do not exhibit the N+1 query problem common in many database-based
-GraphQL APIs; for all but the flattest GraphQL queries these plugins typically
-significantly outperform `DataLoader`-based solutions - and the more complex
-your GraphQL query becomes the greater the benefit.
+Thanks to DataPlanner's query planning capabilities, the plugins in this package
+do not exhibit the N+1 query problem common in many database-based GraphQL APIs;
+for all but the flattest GraphQL queries these plugins typically significantly
+outperform `DataLoader`-based solutions - and the more complex your GraphQL
+query becomes the greater the benefit.
 
 An example of an application built on `graphile-build-pg` is
 [PostGraphile](https://github.com/graphile/postgraphile) which with one command
 connects to your PostgreSQL database and provides a full highly performant
 standards-compliant GraphQL API.
-
-### Export: `defaultPlugins`
-
-An array of `graphile-build` plugins in the correct order to generate a
-well-thought-out GraphQL object tree based on your PostgreSQL schema. This is
-the array that `postgraphile-core` uses.
-
-### Manual usage
-
-```js
-import { defaultPlugins, getBuilder } from "graphile-build";
-import { defaultPlugins as pgDefaultPlugins } from "graphile-build-pg";
-
-async function getSchema(
-  pgConfig = process.env.DATABASE_URL,
-  pgSchemas = ["public"],
-  additionalPlugins = [],
-) {
-  return getBuilder(
-    [...defaultPlugins, ...pgDefaultPlugins, ...additionalPlugins],
-    {
-      pgConfig,
-      pgSchemas,
-      pgExtendedTypes: true,
-    },
-  );
-}
-```
