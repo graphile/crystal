@@ -47,15 +47,26 @@ import type {
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
+/**
+ * Returns a PgTypeCodec for the given builtin Postgres scalar type, optionally
+ * pass the following config:
+ *
+ * - castFromPg: how to wrap the SQL fragment that represents this type so that
+ *   it's cast to a suitable type for us to receive via the relevant Postgres
+ *   driver
+ * - listCastFromPg: as castFromPg, but for usage when the expression type is a
+ *   list of this type
+ * - fromPg: parse the value from Postgres into JS format
+ * - toPg: serialize the value from JS into a format Postgres will understand
+ *
+ * @param type - the name of the Postgres type - see the `pg_type` table
+ * @param options - the configuration options described above
+ */
 function t<TFromJavaScript = any, TFromPostgres = string>(
   type: string,
-  {
-    castFromPg,
-    listCastFromPg,
-    fromPg,
-    toPg,
-  }: Cast<TFromJavaScript, TFromPostgres> = {},
+  options: Cast<TFromJavaScript, TFromPostgres> = {},
 ): PgTypeCodec<undefined, TFromPostgres, TFromJavaScript> {
+  const { castFromPg, listCastFromPg, fromPg, toPg } = options;
   return {
     name: type,
     sqlType: sql.identifier(...type.split(".")),
@@ -68,7 +79,18 @@ function t<TFromJavaScript = any, TFromPostgres = string>(
   };
 }
 
-export function recordType<TColumns extends PgSourceColumns>(
+// TODO: Move extensions,isAnonymous into a config object for consistency with other functions in this file.
+/**
+ * Returns a PgTypeCodec that represents a composite type (a type with
+ * attributes).
+ *
+ * @param name - the name of this type
+ * @param identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
+ * @param columns - the attributes this composite type has
+ * @param extensions - an optional object that you can use to associate arbitrary data with this type
+ * @param isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
+ */
+export function recordType<TColumns extends PgTypeColumns>(
   name: string,
   identifier: SQL,
   columns: TColumns,
@@ -88,6 +110,14 @@ export function recordType<TColumns extends PgSourceColumns>(
 exportAs(recordType, "recordType");
 
 // TODO: rename to enumCodec
+/**
+ * Returns a PgTypeCodec that represents a Postgres enum type.
+ *
+ * @param name - the name of the enum
+ * @param identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
+ * @param value - a list of the values that this enum can represent
+ * @param extensions - an optional object that you can use to associate arbitrary data with this type
+ */
 export function enumType<TValue extends string>(
   name: string,
   identifier: SQL,
@@ -115,6 +145,19 @@ export function isEnumCodec<TValue extends string = string>(
 const $$listCodec = Symbol("listCodec");
 
 // TODO: rename to listOfCodec
+/**
+ * Given a PgTypeCodec, this returns a new PgTypeCodec that represents a list
+ * of the former.
+ *
+ * List codecs CANNOT BE NESTED - Postgres array types don't have defined
+ * dimensionality, so an array of an array of a type doesn't really make sense
+ * to Postgres, it being the same as an array of the type.
+ *
+ * @param innerCodec - the codec that represents the "inner type" of the array
+ * @param extensions - an optional object that you can use to associate arbitrary data with this type
+ * @param typeDelim - the delimeter used to separate entries in this list when Postgres stringifies it
+ * @param identifier - a pg-sql2 fragment that represents the name of this type
+ */
 export function listOfType<
   TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
 >(
@@ -187,25 +230,31 @@ export function listOfType<
 }
 exportAs(listOfType, "listOfType");
 
+/**
+ * Represents a PostgreSQL `DOMAIN` over the given codec
+ *
+ * @param innerCodec - the codec that represents the "inner type" of the domain
+ * @param name - the name of the domain
+ * @param identifier - a pg-sql2 fragment that represents the name of this type
+ * @param config - extra details about this domain
+ */
 export function domainOfCodec<
   TInnerCodec extends PgTypeCodec<any, any, any, any>,
 >(
   innerCodec: TInnerCodec,
   name: string,
   identifier: SQL,
-  {
-    extensions,
-    notNull,
-  }: {
+  config: {
     extensions?: Partial<PgTypeCodecExtensions>;
     notNull?: boolean | null;
-  },
+  } = {},
 ): PgTypeCodec<
   TInnerCodec extends PgTypeCodec<infer U, any, any, any> ? U : any,
   TInnerCodec extends PgTypeCodec<any, infer U, any, any> ? U : any,
   TInnerCodec extends PgTypeCodec<any, any, infer U, any> ? U : any,
   TInnerCodec extends PgTypeCodec<any, any, any, infer U> ? U : any
 > {
+  const { extensions, notNull } = config;
   return {
     // Generally same as underlying type:
     ...innerCodec,
@@ -237,23 +286,29 @@ function escapeRangeValue(
   return `"${encoded.replace(/"/g, '""')}"`;
 }
 
+/**
+ * Returns a PgTypeCodec that represents a range of the given inner PgTypeCodec
+ * type.
+ *
+ * @param innerCodec - the PgTypeCodec that represents the bounds of this range
+ * @param name - the name of the range
+ * @param identifier - a pg-sql2 fragment that represents the name of this type
+ * @param config - extra details about this range
+ */
 export function rangeOfCodec<
   TInnerCodec extends PgTypeCodec<undefined, any, any, undefined>,
 >(
   innerCodec: TInnerCodec,
   name: string,
   identifier: SQL,
-  {
-    extensions,
-  }: {
-    extensions?: Partial<PgTypeCodecExtensions>;
-  },
+  config: { extensions?: Partial<PgTypeCodecExtensions> } = {},
 ): PgTypeCodec<
   undefined,
   any, // TODO
   any, // TODO
   undefined
 > {
+  const { extensions } = config;
   return {
     name,
     sqlType: identifier,
@@ -303,6 +358,9 @@ export function rangeOfCodec<
 }
 exportAs(rangeOfCodec, "rangeOfCodec");
 
+/**
+ * Helper type for common casting methods.
+ */
 type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   castFromPg?(frag: SQL): SQL;
   listCastFromPg?(frag: SQL): SQL;
@@ -310,10 +368,17 @@ type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
 };
 
+/**
+ * When we can use the raw representation directly, typically suitable for
+ * text, varchar, char, etc
+ */
 const verbatim: Cast = {
   castFromPg: (frag: SQL): SQL => frag,
 };
 
+/**
+ * Casts to something else before casting to text; e.g. `${expression}::numeric::text`
+ */
 const castVia = (via: SQL): Cast => ({
   castFromPg(frag) {
     return sql`${sql.parens(frag)}::${via}::text`;
@@ -325,6 +390,9 @@ const castVia = (via: SQL): Cast => ({
 const viaNumeric = castVia(sql`numeric`);
 // const viaJson = castVia(sql`json`);
 
+/**
+ * Casts using to_char to format dates; also handles arrays via unnest.
+ */
 const viaDateFormat = (format: string): Cast => {
   const sqlFormat = sql.literal(format);
   return {
@@ -341,6 +409,11 @@ const viaDateFormat = (format: string): Cast => {
 
 const parseAsInt = (n: string) => parseInt(n, 10);
 
+/**
+ * Built in PostgreSQL types that we support; note the keys are the "ergonomic"
+ * names (like 'bigint'), but the values use the underlying PostgreSQL true
+ * names (those that would be found in the `pg_type` table).
+ */
 export const TYPES = {
   void: t<void>("void"), // void: 2278
   boolean: t<boolean>("bool", { fromPg: (value) => value === "true" }),
@@ -407,6 +480,10 @@ export const TYPES = {
 } as const;
 exportAs(TYPES, "TYPES");
 
+/**
+ * For supported builtin type names ('void', 'bool', etc) that will be found in
+ * the `pg_catalog` table this will return a PgTypeCodec.
+ */
 export function getCodecByPgCatalogTypeName(
   pgCatalogTypeName: string,
 ): PgTypeCodec<undefined, any, any, undefined> | null {
