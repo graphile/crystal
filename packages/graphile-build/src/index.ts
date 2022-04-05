@@ -188,9 +188,13 @@ export const gather = async (
   return output as GraphileEngine.BuildInput;
 };
 
+/**
+ * Gets a SchemaBuilder object for the given preset and inflection.  It's rare
+ * you would need this, typically you'll want `buildSchema` instead.
+ */
 export const getBuilder = (
   preset: Preset,
-  inflection: GraphileEngine.Inflection,
+  inflection: GraphileEngine.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const config = resolvePresets([preset]);
   const { plugins, schema: options } = config;
@@ -203,16 +207,17 @@ export const getBuilder = (
   return builder;
 };
 
+/**
+ * Builds a GraphQL schema according to the given preset and input data.
+ */
 export const buildSchema = (
   preset: Preset,
   input: GraphileEngine.BuildInput,
-  {
-    inflection,
-  }: {
-    inflection: GraphileEngine.Inflection;
-  } = { inflection: buildInflection(preset) },
+  options: {
+    inflection?: GraphileEngine.Inflection;
+  } = {},
 ): GraphQLSchema => {
-  const builder = getBuilder(preset, inflection);
+  const builder = getBuilder(preset, options.inflection);
   return builder.buildSchema(input);
 };
 
@@ -228,4 +233,5 @@ export {
 };
 export { GatherPluginContext } from "./interfaces.js";
 export { defaultPreset } from "./preset";
+// TODO: remove this hack!
 export const version = require("../package.json").version;

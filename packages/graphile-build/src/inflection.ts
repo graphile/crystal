@@ -2,6 +2,10 @@ import pluralize from "pluralize";
 
 import { camelCase, constantCase, upperCamelCase } from "./utils.js";
 
+/**
+ * Builds the base inflection object that will be passed into the inflection
+ * phase to build the final inflectors.
+ */
 export const makeInitialInflection = () => ({
   pluralize,
   singularize: pluralize.singular,
@@ -21,6 +25,7 @@ export const makeInitialInflection = () => ({
    * - Subscription
    * - Node
    * - PageInfo
+   * - ...
    *
    * graphile-build-pg:
    *
@@ -35,6 +40,7 @@ export const makeInitialInflection = () => ({
    * - JSON
    * - UUID
    * - InternetAddress
+   * - ...
    *
    * Other plugins may add their own builtins too; try and avoid conflicts!
    */
@@ -51,7 +57,7 @@ export const makeInitialInflection = () => ({
    *
    * Name is defined in GraphQL to match this regexp:
    *
-   * /^[_A-Za-z][_0-9A-Za-z]*$/
+   *     /^[_A-Za-z][_0-9A-Za-z]*$/
    *
    * See: https://graphql.github.io/graphql-spec/June2018/#sec-Appendix-Grammar-Summary.Lexical-Tokens
    */
@@ -80,8 +86,12 @@ export const makeInitialInflection = () => ({
    * equivalent input type?
    */
   inputType: (typeName: string) => {
-    return `${typeName}Input`;
+    return typeName + `Input`;
   },
 });
 
+/**
+ * The base inflection object that will be passed into the inflection phase to
+ * build the final inflectors.
+ */
 export type InflectionBase = ReturnType<typeof makeInitialInflection>;

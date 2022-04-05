@@ -25,6 +25,7 @@ import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { stringTypeSpec, wrapDescription } from "./utils.js";
 
+// TODO: the versioning!
 const version = "TODO";
 /*
 import { readFileSync } from "fs";

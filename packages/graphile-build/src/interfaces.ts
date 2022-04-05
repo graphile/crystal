@@ -24,15 +24,48 @@ import type {
   GraphQLSchemaConfig,
 } from "graphql";
 
+/**
+ * The details in the 'info' object passed as the first argument to all gather
+ * hooks and helpers.
+ */
 export interface GatherPluginContext<
   TState extends { [key: string]: any },
   TCache extends { [key: string]: any },
 > {
+  /**
+   * The (completed) inflection object, to help you name things your data
+   * gathering produces.
+   */
   inflection: GraphileEngine.Inflection;
+
+  /**
+   * The 'gather' phase options from the resolved preset.
+   */
   options: GraphileEngine.GraphileBuildGatherOptions;
+
+  /**
+   * The `helpers` that all the gather plugins make available to you.
+   */
   helpers: GatherHelpers;
+
+  /**
+   * The state for this plugin specifically. State exists only for a single
+   * 'gather' phase and is then discarded.
+   */
   state: TState;
+
+  /**
+   * The cache for this plugin specifically. The cache persists between
+   * multiple 'gather' phases and can be a useful place to cache expensive
+   * computation so later builds are faster. NOTE: cache is _not_ persisted, it
+   * only exists whilst the code is in memory.
+   */
   cache: TCache;
+
+  /**
+   * Triggers the given hook with the given event (used to broadcast to other
+   * gather plugins so they can make their own changes/additions).
+   */
   process: AsyncHooks<GatherHooks>["process"];
 }
 
