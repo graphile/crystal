@@ -27,6 +27,7 @@ import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
 
+// TODO: version this.
 export const defaultPreset: Preset = {
   plugins: [
     PgBasicsPlugin,

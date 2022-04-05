@@ -22,7 +22,8 @@ declare global {
 
 export const PgRowByUniquePlugin: Plugin = {
   name: "PgRowByUniquePlugin",
-  description: "Adds accessors for rows by uniques",
+  description:
+    "Adds accessors for rows by their unique constraints (technically the @dataplan/pg data sources' 'uniques' property)",
   version: version,
 
   inflection: {
@@ -109,6 +110,7 @@ export const PgRowByUniquePlugin: Plugin = {
                      * more performant, but it also makes the code nicer to
                      * read in the exported code.
                      */
+                    // eslint-disable-next-line graphile-exporter/exhaustive-deps
                     EXPORTABLE(
                       new Function(
                         "source",

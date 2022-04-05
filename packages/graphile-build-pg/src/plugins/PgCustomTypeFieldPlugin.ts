@@ -123,7 +123,7 @@ function getArgDetailsFromParameters(
 export const PgCustomTypeFieldPlugin: Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
-    "Adds fields to types for custom type field functions (aka 'computed column functions')",
+    "Adds GraphQL fields based on PostgreSQL functions (in PostGraphile v4 these were called 'custom query functions', 'custom mutation functions' and 'computed column functions'",
   version: version,
 
   inflection: {
@@ -247,6 +247,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
 
           const isVoid = source.codec === TYPES.void;
 
+          // TODO:
           /*
           const resultFieldName = inflection.functionMutationResultFieldName(
             proc,

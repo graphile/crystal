@@ -39,7 +39,8 @@ interface Cache {}
 
 export const PgJWTPlugin: Plugin = {
   name: "PgJWTPlugin",
-  description: "Converts a Postgres JWT object type into a signed JWT",
+  description:
+    "Converts a Postgres JWT object type into a GraphQL scalar type containing a signed JWT",
   version: version,
 
   before: ["PgCodecsPlugin", "PgTablesPlugin"],
@@ -139,7 +140,8 @@ export const PgJWTPlugin: Plugin = {
             extensions: {
               graphile: {
                 plan: EXPORTABLE(
-                  (columnNames, object) => function plan($record) {
+                  (columnNames, object) =>
+                    function plan($record) {
                       const spec = columnNames.reduce((memo, columnName) => {
                         memo[columnName] = $record.get(columnName);
                         return memo;

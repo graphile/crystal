@@ -28,7 +28,8 @@ declare global {
 
 export const PgTypesPlugin: Plugin = {
   name: "PgTypesPlugin",
-  description: "Registers some standard types",
+  description:
+    "Registers the GraphQL types for a number of standard PostgreSQL types",
   version: version,
   after: ["CommonTypesPlugin", "PgBasicsPlugin"],
 

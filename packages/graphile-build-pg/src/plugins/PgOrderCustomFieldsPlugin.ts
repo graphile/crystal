@@ -36,7 +36,7 @@ declare global {
 
 export const PgOrderCustomFieldsPlugin: Plugin = {
   name: "PgOrderCustomFieldsPlugin",
-  description: "Adds ordering my 'computed column' functions",
+  description: "Adds ordering by 'computed column' functions",
   version: version,
 
   before: ["PgOrderAllColumnsPlugin"],

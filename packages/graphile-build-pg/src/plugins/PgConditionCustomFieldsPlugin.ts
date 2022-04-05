@@ -22,7 +22,8 @@ declare global {
 
 export const PgConditionCustomFieldsPlugin: Plugin = {
   name: "PgConditionCustomFieldsPlugin",
-  description: "Add conditions based on 'filterable' functions",
+  description:
+    "Add GraphQL conditions based on 'filterable' PostgreSQL functions",
   version: version,
 
   schema: {

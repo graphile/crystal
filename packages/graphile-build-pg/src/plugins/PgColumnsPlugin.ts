@@ -112,7 +112,8 @@ const getSource = EXPORTABLE(
 
 export const PgColumnsPlugin: Plugin = {
   name: "PgColumnsPlugin",
-  description: "Adds columns to composite types",
+  description:
+    "Adds PostgreSQL columns (attributes) to the relevant GraphQL object/input object types",
   version: version,
   // TODO: Requires PgTablesPlugin
 

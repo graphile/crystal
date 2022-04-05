@@ -85,7 +85,8 @@ interface Cache {}
 
 export const PgProceduresPlugin: Plugin = {
   name: "PgProceduresPlugin",
-  description: "Generates sources for the PostgreSQL procedures it finds",
+  description:
+    "Generates @dataplan/pg sources for the PostgreSQL functions/procedures it finds",
   version: version,
 
   inflection: {

@@ -70,7 +70,8 @@ export const PgTableNodePlugin: Plugin = {
           build.registerNodeIdHandler(tableTypeName, {
             codecName: "base64JSON",
             plan: clean
-              ? EXPORTABLE(
+              ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                EXPORTABLE(
                   new Function(
                     "list",
                     "constant",
@@ -96,7 +97,8 @@ export const PgTableNodePlugin: Plugin = {
                   [constant, list, pk, tableTypeName],
                 ),
             get: clean
-              ? EXPORTABLE(
+              ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                EXPORTABLE(
                   new Function(
                     "pgSource",
                     "access",

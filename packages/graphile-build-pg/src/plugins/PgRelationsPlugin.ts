@@ -69,9 +69,11 @@ declare module "graphile-plugin" {
 interface State {}
 interface Cache {}
 
+// TODO: split this into one plugin for gathering and another for schema
 export const PgRelationsPlugin: Plugin = {
   name: "PgRelationsPlugin",
-  description: "Creates links between types representing PostgreSQL tables",
+  description:
+    "Creates relationships between the @dataplan/pg data sources, and mirrors these relationships into the GraphQL schema",
   version,
 
   inflection: {

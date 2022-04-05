@@ -63,7 +63,7 @@ declare global {
 
 export const PgAllRowsPlugin: Plugin = {
   name: "PgAllRowsPlugin",
-  description: "Adds 'all rows' accessors for all tables.",
+  description: "Adds 'all rows' accessors for all table-like datasources.",
   version: version,
   // TODO: Requires PgTablesPlugin
 

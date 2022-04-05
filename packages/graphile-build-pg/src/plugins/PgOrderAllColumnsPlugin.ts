@@ -35,6 +35,7 @@ declare global {
   }
 }
 
+// TODO: respect indexes - via behavior?
 export const PgOrderAllColumnsPlugin: Plugin = {
   name: "PgOrderAllColumnsPlugin",
   description: "Allows ordering by table columns",

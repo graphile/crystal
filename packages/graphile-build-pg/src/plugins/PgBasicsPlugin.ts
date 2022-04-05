@@ -35,11 +35,37 @@ type SetGraphQLTypeForPgCodec = (
 declare global {
   namespace GraphileEngine {
     interface Build {
+      /**
+       * A store of metadata for given codecs. Currently internal as this API
+       * may change.
+       *
+       * @internal
+       */
       pgCodecMetaLookup: PgTypeCodecMetaLookup;
+
+      /**
+       * Do we already have a GraphQL type to use for the given codec in the
+       * given situation?
+       */
       hasGraphQLTypeForPgCodec: HasGraphQLTypeForPgCodec;
+      /**
+       * Get the GraphQL type for the given codec in the given situation.
+       */
       getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec;
+      /**
+       * Get the GraphQL type name (string) for the given codec in the given
+       * situation.
+       */
       getGraphQLTypeNameByPgCodec: GetGraphQLTypeNameByPgCodec;
+      /**
+       * Set the GraphQL type to use for the given codec in the given
+       * situation. If this has already been set, will throw an error.
+       */
       setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec;
+
+      /**
+       * pg-sql2 access on Build to avoid duplicate module issues.
+       */
       sql: typeof sql;
     }
   }

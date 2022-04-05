@@ -627,10 +627,23 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                   ],
                 );
 
+                /**
+                 * If every column is a safe identifier then we can create an
+                 * optimised function, otherwise we must play it safe and not
+                 * do that.
+                 */
                 const clean = uniqueColumns.every(
                   ([columnName, fieldName]) =>
                     isSafeIdentifier(columnName) && isSafeIdentifier(fieldName),
                 );
+
+                /**
+                 * Builds a pgUpdate/pgDelete spec describing the row to
+                 * update/delete as a string containing raw JS code if it's
+                 * safe to do so. This enables us to create an optimised
+                 * function for the plan resolver, especially good for the
+                 * exported schema.
+                 */
                 const specFromArgsString = clean
                   ? `{ ${uniqueColumns
                       .map(
@@ -641,6 +654,11 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                       )
                       .join(", ")} }`
                   : null;
+
+                /**
+                 * The fallback to `specFromArgsString`; builds a
+                 * pgUpdate/pgDelete spec describing the row to update/delete.
+                 */
                 const specFromArgs = EXPORTABLE(
                   (uniqueColumns) => (args: TrackedArguments) => {
                     return uniqueColumns.reduce(
@@ -685,7 +703,8 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                         plan:
                           mode === "update"
                             ? specFromArgsString
-                              ? EXPORTABLE(
+                              ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                                EXPORTABLE(
                                   new Function(
                                     "object",
                                     "pgUpdate",
@@ -710,7 +729,8 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                                   [object, pgUpdate, source, specFromArgs],
                                 ) as any)
                             : specFromArgsString
-                            ? EXPORTABLE(
+                            ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                              EXPORTABLE(
                                 new Function(
                                   "object",
                                   "pgDelete",

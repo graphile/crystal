@@ -4,24 +4,36 @@ import type {
   PgSource,
   PgSourceParameter,
   PgSourceRelation,
+  PgSourceUnique,
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 
-import type { PgSourceUnique } from "../../../node_modules/@dataplan/pg/src/datasource";
-
+/**
+ * Metadata for a specific PgTypeCodec
+ */
 export interface PgTypeCodecMeta {
+  /**
+   * Given a `situation` such as 'input', 'output', 'patch', etc. returns the
+   * name of the GraphQL type to use for this PgTypeCodec.
+   */
   typeNameBySituation: {
     [situation: string]: string;
   };
 }
 
+/**
+ * A map from PgTypeCodec to its associated metadata.
+ */
 export type PgTypeCodecMetaLookup = Map<
   PgTypeCodec<any, any, any>,
   PgTypeCodecMeta
 >;
 
+/**
+ * Creates an empty meta object for the given codec.
+ */
 export function makePgTypeCodecMeta(
   _codec: PgTypeCodec<any, any, any>,
 ): PgTypeCodecMeta {
@@ -49,6 +61,9 @@ export function getCodecMetaLookupFromInput(
 }
 
 /**
+ * Walks the given source's codecs/relations and pushes all discovered codecs
+ * into `metaLookup`
+ *
  * @internal
  */
 function walkSource(
@@ -76,6 +91,9 @@ function walkSource(
 }
 
 /**
+ * Adds the given codec to `metaLookup` and also walks the related codecs (for
+ * columns, and inner-codecs).
+ *
  * @internal
  */
 function walkCodec(
@@ -102,6 +120,10 @@ function walkCodec(
   }
 }
 
+/**
+ * Where a source might be a PgSource or a PgSourceBuilder, this ensures we
+ * return a PgSource.
+ */
 function resolveSource<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,

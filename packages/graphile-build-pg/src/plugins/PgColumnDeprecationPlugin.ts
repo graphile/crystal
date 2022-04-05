@@ -2,12 +2,6 @@ import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index";
 
-declare module "@dataplan/pg" {
-  interface PgTypeCodecTags {
-    deprecated: string | string[];
-  }
-}
-
 export const PgColumnDeprecationPlugin: Plugin = {
   name: "PgColumnDeprecationPlugin",
   description: "Marks a column as deprecated if it has the deprecated tag",

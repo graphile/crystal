@@ -28,6 +28,7 @@ interface State {
     Map<string, Promise<PgTypeCodec<any, any, any, any> | null>>
   >;
 }
+
 declare global {
   namespace GraphileEngine {
     interface Inflection {
@@ -99,7 +100,7 @@ declare module "graphile-plugin" {
 
 export const PgCodecsPlugin: Plugin = {
   name: "PgCodecsPlugin",
-  description: "Turns types into codecs",
+  description: "Turns PostgreSQL types into @dataplan/pg codecs",
   version: version,
 
   inflection: {

@@ -1,8 +1,7 @@
 import type { PgInsertPlan, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
 import type { ObjectPlan } from "graphile-crystal";
-import { constant } from "graphile-crystal";
-import { ExecutablePlan, object } from "graphile-crystal";
+import { constant, ExecutablePlan, object } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
@@ -46,7 +45,7 @@ const isInsertable = (source: PgSource<any, any, any, any>) => {
 
 export const PgMutationCreatePlugin: Plugin = {
   name: "PgMutationCreatePlugin",
-  description: "Adds 'create' mutation for supported sources",
+  description: "Adds 'create' mutation for supported table-like sources",
   version: version,
 
   inflection: {
