@@ -1,5 +1,13 @@
 # DataPlanner technical overview
 
+---
+
+**INSTEAD** of reading this, Benjie's prepared a video that gives a much better
+overview. Direct message Jem/Benjie via the Graphile Discord, Twitter, or email
+us for access. https://discord.gg/graphile
+
+---
+
 DataPlanner is a planning and execution engine for GraphQL:
 
 1. planning:
