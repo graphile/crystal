@@ -8,7 +8,7 @@ import { isValidObjectType } from "../utils.js";
 export const RegisterQueryNodePlugin: Plugin = {
   name: "RegisterQueryNodePlugin",
   version: "1.0.0",
-  description: `Registers the 'Query' type as a 'Node' type`,
+  description: `Registers the 'Query' type as a 'Node' type. You probably don't want this.`,
 
   schema: {
     hooks: {

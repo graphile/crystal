@@ -17,7 +17,7 @@ import { isValidObjectType } from "../utils.js";
  */
 export const MutationPlugin: Plugin = {
   name: "MutationPlugin",
-  description: "",
+  description: "Adds the 'Mutation' type to the GraphQL schema",
   version: version,
   schema: {
     hooks: {

@@ -22,6 +22,7 @@ import {
   TrimEmptyDescriptionsPlugin,
 } from "./plugins/index.js";
 
+// TODO: version this
 export const defaultPreset: Preset = {
   plugins: [
     QueryPlugin,

@@ -18,7 +18,8 @@ declare global {
 
 export const CommonTypesPlugin: Plugin = {
   name: "CommonTypesPlugin",
-  description: "Registers common utility types like BigInt, Datetime, UUID",
+  description:
+    "Registers common GraphQL utility types like BigInt, Datetime, UUID",
   version: version,
 
   schema: {

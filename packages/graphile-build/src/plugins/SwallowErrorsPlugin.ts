@@ -16,7 +16,8 @@ import swallowError from "../swallowError.js";
  */
 export const SwallowErrorsPlugin: Plugin = {
   name: "SwallowErrorsPlugin",
-  description: "",
+  description:
+    "Adding this plugin will cause 'recoverable' errors to be 'swallowed' - i.e. schema build will continue despite certain errors. You should not use this in a production schema but it can be useful for development.",
   version: version,
   schema: {
     hooks: {

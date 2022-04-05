@@ -64,6 +64,10 @@ export type NewWithHooksFunction = <
   Plan?: { new (...args: any[]): ExecutablePlan<any> } | null,
 ) => TType;
 
+/**
+ * Returns a 'newWithHooks' function suitable for creating GraphQL types with
+ * the graphile-build plugin system applied.
+ */
 export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
   newWithHooks: NewWithHooksFunction;
 } {

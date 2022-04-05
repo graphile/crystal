@@ -15,6 +15,8 @@ import { version } from "..";
 export const ClientMutationIdDescriptionPlugin: Plugin = {
   name: "ClientMutationIdDescriptionPlugin",
   version,
+  description:
+    "Adds descriptions to 'clientMutationId' fields and mutation 'input' arguments that don't already have them",
   schema: {
     hooks: {
       GraphQLInputObjectType_fields_field: {

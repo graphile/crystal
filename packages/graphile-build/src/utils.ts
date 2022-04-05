@@ -6,6 +6,11 @@ import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";
 
+/**
+ * Loops over all the given `keys` and binds the method of that name on `obj`
+ * to `obj` so that destructuring `build`/etc won't relate in broken `this`
+ * references.
+ */
 const bindAll = (obj: object, keys: Array<string>) => {
   keys.forEach((key) => {
     if (
@@ -31,6 +36,10 @@ export const constantCaseAll = (str: string) =>
     .replace(/^[0-9]/, "_$&") // GraphQL enums must not start with a number
     .toUpperCase();
 
+/**
+ * Applies the given format function `fn` to a string, but maintains any
+ * leading/trailing underscores.
+ */
 export const formatInsideUnderscores =
   (fn: (input: string) => string) => (str: string) => {
     // Guaranteed to match all strings, and to contain 3 capture groups.
@@ -69,6 +78,11 @@ export function isValidObjectType(
   );
 }
 
+/**
+ * A GraphQL scalar spec for a scalar that'll be treated as a verbatim string
+ * in and out (i.e. the type name is really just a hint to the user); purely a
+ * convenience.
+ */
 export const stringScalarSpec = Object.freeze({
   serialize: EXPORTABLE(() => (value) => String(value), []),
   parseValue: EXPORTABLE(() => (value) => String(value), []),
@@ -89,6 +103,10 @@ export const stringScalarSpec = Object.freeze({
 } as Omit<GraphQLScalarTypeConfig<unknown, unknown>, "name" | "description">);
 
 // Copied from GraphQL v14, MIT license (c) GraphQL Contributors.
+/**
+ * Word-wraps the given text to maxLen; for consistency with older GraphQL
+ * schemas.
+ */
 function breakLine(line: string, maxLen: number): Array<string> {
   const parts = line.split(new RegExp(`((?: |^).{15,${maxLen - 40}}(?= |$))`));
   if (parts.length < 4) {

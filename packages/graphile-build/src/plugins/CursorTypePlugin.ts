@@ -13,7 +13,7 @@ declare global {
 
 export const CursorTypePlugin: Plugin = {
   name: "CursorTypePlugin",
-  description: "",
+  description: "Registers the 'Cursor' scalar type for cursor pagination",
   version,
   schema: {
     hooks: {

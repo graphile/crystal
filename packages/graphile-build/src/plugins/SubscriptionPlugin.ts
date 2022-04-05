@@ -17,7 +17,8 @@ import { isValidObjectType } from "../utils.js";
  */
 export const SubscriptionPlugin: Plugin = {
   name: "SubscriptionPlugin",
-  description: "",
+  description:
+    "Adds the 'Subscription' type to handle 'subscription' operations. Only use this if you want realtime features in your GraphQL API.",
   version: version,
   schema: {
     hooks: {

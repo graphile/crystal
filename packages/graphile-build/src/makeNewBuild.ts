@@ -35,6 +35,9 @@ const version: string = JSON.parse(
 ).version;
 */
 
+/**
+ * Makes a new 'Build' object suitable to be passed through the 'build' hook.
+ */
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,
   input: GraphileEngine.BuildInput,

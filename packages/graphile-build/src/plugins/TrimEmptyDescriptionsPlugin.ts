@@ -6,6 +6,11 @@ import type {
   GraphQLInputFieldConfig,
 } from "graphql";
 
+/**
+ * Sets the 'description' attribute to null if it's the empty string; useful
+ * for cleaning up the schema as printing a schema with a lot of empty string
+ * descriptions is u.g.l.y.
+ */
 function rmEmptyTypeDescription<
   T extends
     | GraphileEngine.GraphileObjectTypeConfig<any, any>
@@ -14,12 +19,18 @@ function rmEmptyTypeDescription<
     | GraphileEngine.GraphileInterfaceTypeConfig<any, any>
     | GraphQLEnumTypeConfig,
 >(type: T): T {
+  // TODO: should we trim before comparison?
   if (type.description === "") {
     type.description = null;
   }
   return type;
 }
 
+/**
+ * Sets the 'description' attribute to null if it's the empty string; useful
+ * for cleaning up the schema as printing a schema with a lot of empty string
+ * descriptions is u.g.l.y.
+ */
 function rmEmptyFieldDescription<
   T extends GraphQLFieldConfig<any, any> | GraphQLInputFieldConfig,
 >(field: T): T {
@@ -29,6 +40,11 @@ function rmEmptyFieldDescription<
   return field;
 }
 
+/**
+ * Sets the 'description' attribute to null if it's the empty string; useful
+ * for cleaning up the schema as printing a schema with a lot of empty string
+ * descriptions is u.g.l.y.
+ */
 function rmEmptyArgDescriptions<T extends GraphQLFieldConfigArgumentMap>(
   args: T,
 ): T {

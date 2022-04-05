@@ -11,7 +11,8 @@ import { version } from "../index";
  */
 export const MutationPayloadQueryPlugin: Plugin = {
   name: "MutationPayloadQueryPlugin",
-  description: "",
+  description:
+    "Adds the 'query' field to mutation payloads; useful for follow-up queries after a mutation",
   version,
   schema: {
     hooks: {

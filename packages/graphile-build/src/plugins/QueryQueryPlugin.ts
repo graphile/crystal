@@ -10,7 +10,8 @@ import { version } from "../index";
  */
 export const QueryQueryPlugin: Plugin = {
   name: "QueryQueryPlugin",
-  description: "",
+  description:
+    "Adds a 'query' field to the Query type giving access to the Query type again. You probably don't want this unless you need to support Relay Classic.",
   version: version,
   schema: {
     hooks: {
