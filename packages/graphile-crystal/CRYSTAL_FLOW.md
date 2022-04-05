@@ -1,4 +1,14 @@
-# Graphile Crystal
+# Graphile Crystal - OUT OF DATE
+
+**THIS SPECIFICATION IS OUT OF DATE.** We've significantly redone how DataPlanner (previously known as Graphile Crystal)
+works; if you're interested in implementing this technology into another language please get in touch and we can look at
+bringing the spec back up to date.
+
+**THIS SPECIFICATION IS POOR QUALITY.** There's a lot of JS-isms in this spec, it's specifically because I (Benjie)
+wrote it for myself to help me think through the problems I was addressing. I didn't really write it for anyone else at
+the time.
+
+_Read on at your own risk._
 
 # Step 1. Planning phase
 
