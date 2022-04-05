@@ -3,12 +3,19 @@
 // License MIT (Copyright (c) 2017 Maximilian Stoiber)
 // Based on https://github.com/apollographql/graphql-subscriptions/blob/master/src/event-emitter-to-async-iterator.ts
 
+/**
+ * The default behaviour when an error occurs (i.e. throw the error!)
+ */
 const defaultOnError = (err: Error) => {
   throw err;
 };
 
 type StrongAsyncIterableIterator<T> = Required<AsyncIterableIterator<T>>;
 
+/**
+ * Builds an AsyncIterator from a callback; much safer than an async generator
+ * because it will not get frozen waiting for a promise to resolve.
+ */
 export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   listener: (
     callback: (value: CallbackInput) => void,

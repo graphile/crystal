@@ -5,9 +5,9 @@ import type {
   GraphileFieldConfig,
   OutputPlanForType,
 } from "graphile-crystal";
-import { inputObjectFieldSpec } from "graphile-crystal";
 import {
   crystalWrapResolve,
+  inputObjectFieldSpec,
   makeCrystalSubscriber,
   objectSpec,
 } from "graphile-crystal";

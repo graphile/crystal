@@ -1,5 +1,9 @@
 import "./global.js";
 
+/**
+ * Returns a new object with arrays for each supported schema hook, ready for
+ * hook functions to be registered into it.
+ */
 export function makeSchemaBuilderHooks<
   TBuild extends GraphileEngine.Build = GraphileEngine.Build,
 >(): GraphileEngine.SchemaBuilderHooks<TBuild> {

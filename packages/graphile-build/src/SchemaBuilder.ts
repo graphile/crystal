@@ -19,6 +19,10 @@ const INIT_OBJECT: GraphileEngine.InitObject = Object.freeze(
 
 const INDENT = "  ";
 
+/**
+ * The class responsible for building a GraphQL schema from graphile-build
+ * plugins by orchestrating the various callback functions.
+ */
 class SchemaBuilder<
   TBuild extends GraphileEngine.Build = GraphileEngine.Build,
 > extends EventEmitter {
@@ -28,6 +32,10 @@ class SchemaBuilder<
 
   _currentPluginName: string | null | undefined;
 
+  /**
+   * Given a Build object, a GraphQL type constructor and a spec, applies the
+   * hooks to the spec and then constructs the type, returning the result.
+   */
   newWithHooks: NewWithHooksFunction;
 
   constructor(
@@ -49,12 +57,16 @@ class SchemaBuilder<
     this.newWithHooks = makeNewWithHooks({ builder: this }).newWithHooks;
   }
 
+  /**
+   * @internal
+   */
   _setPluginName(name: string | null | undefined) {
     this._currentPluginName = name;
   }
 
   /**
-   * Every hook `fn` takes three arguments:
+   * Registers 'fn' as a hook for the given 'hookName'. Every hook `fn` takes
+   * three arguments:
    *
    * - obj - the object currently being inspected
    * - build - the current build object (which contains a number of utilities
@@ -63,8 +75,8 @@ class SchemaBuilder<
    *
    * The function must return a replacement object for `obj` or `obj` itself.
    * Generally we advice that you return the object itself, modifying it as
-   * necessary. Modifying the object is significantly faster than returning a
-   * clone.
+   * necessary. In JavaScript, modifying an object object tends to be
+   * significantly faster than returning a modified clone.
    */
   hook<THookName extends keyof GraphileEngine.SchemaBuilderHooks<TBuild>>(
     hookName: THookName,
@@ -82,6 +94,10 @@ class SchemaBuilder<
     this.hooks[hookName].push(fn as any);
   }
 
+  /**
+   * Applies the given 'hookName' hooks to the given 'input' and returns the
+   * result, which is typically a derivative of 'input'.
+   */
   applyHooks<THookName extends keyof GraphileEngine.SchemaBuilderHooks<TBuild>>(
     hookName: THookName,
     input: Parameters<
@@ -172,6 +188,9 @@ class SchemaBuilder<
     }
   }
 
+  /**
+   * Create the 'Build' object.
+   */
   createBuild(input: GraphileEngine.BuildInput): TBuild {
     const initialBuild = makeNewBuild(
       this,
@@ -196,6 +215,10 @@ class SchemaBuilder<
     return finalBuild;
   }
 
+  /**
+   * Given the `input` (result of the "gather" phase), builds the GraphQL
+   * schema synchronously.
+   */
   buildSchema(input: GraphileEngine.BuildInput): GraphQLSchema {
     const build = this.createBuild(input);
     const schemaSpec: Partial<GraphQLSchemaConfig> = {

@@ -38,17 +38,45 @@ import type {
 import type { InflectionBase } from "./inflection.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
+/*
+ * To make it easier for plugins to extend our builtin types we put them all in
+ * the global `GraphileEngine` namespace. Anywhere you need to extend these
+ * types you can do so via:
+ *
+ * ```
+ * declare global {
+ *   namespace GraphileEngine {
+ *     // Your extensions here
+ *   }
+ * }
+ * ```
+ */
+
 declare global {
   namespace GraphileEngine {
+    /**
+     * Input to the 'schema build' phase, this is typically the output of the
+     * gather phase.
+     */
     interface BuildInput {
       // Expand this interface with declaration merging
     }
 
-    interface DirectiveMap {
-      [directiveName: string]: {
+    /**
+     * Details of a single directive application. We typically store a list of
+     * these into an array. Note that we don't use a map for this because:
+     *
+     * 1. the same directive may be used more than once, and
+     * 2. the order of directives may be significant.
+     */
+    interface DirectiveDetails {
+      directiveName: string;
+      args: {
         [directiveArgument: string]: any;
       };
     }
+
+    // Options in the config
 
     interface GraphileBuildInflectionOptions {}
     interface GraphileBuildGatherOptions {}
@@ -64,6 +92,11 @@ declare global {
        */
       simpleCollections?: "only" | "both" | "omit";
     }
+
+    // TODO: context should probably be passed as a generic instead?
+    /**
+     * The GraphQL context our schemas expect.
+     */
     interface GraphileResolverContext {}
 
     /**
@@ -71,43 +104,16 @@ declare global {
      */
     type InitObject = Record<string, never>;
 
-    type TriggerChangeType = () => void;
+    // type TriggerChangeType = () => void;
 
     /**
-     * This contains all the possibilities for lookahead data when raw (submitted
-     * directly from `addDataGenerator` functions, etc). It's up to the plugins
-     * that define these entries to declare them using declaration merging.
-     *
-     * NOTE: the types of these entries are concrete (e.g. `usesCursor: boolean`)
-     * because we need the concrete types to build ResolvedLookAhead. We then use
-     * `Partial<LookAheadData>` in the relevant places if we need fields to be
-     * optional.
+     * All of the inflectors live in this object. Inflectors take a range of
+     * inputs and return a string that can be used as the name for the relevant
+     * type, field, argument, enum value, etc.
      */
-    interface LookAheadData {}
-
-    /**
-     * This contains all the possibilities for lookahead data, once "baked". It's
-     * an object that maps from key (string) to an array of entries for that type.
-     *
-     * We made this generic so that TypeScript has to look it up _after_ the
-     * declaration merging has taken place, rather than computing it as an empty
-     * object ahead of time.
-     */
-    type ResolvedLookAhead<T extends LookAheadData = LookAheadData> = {
-      [P in keyof T]?:
-        | Array<
-            T[P] extends undefined | null | infer DataType
-              ? DataType extends Array<infer ElementType>
-                ? ElementType
-                : DataType
-              : never
-          >
-        | null
-        | undefined;
-    };
-
     interface Inflection extends InflectionBase {}
 
+    /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GraphileFieldConfigMap<
       TParentPlan extends ExecutablePlan<any> | null,
       TContext extends BaseGraphQLContext,
@@ -121,6 +127,7 @@ declare global {
       >;
     };
 
+    /** Our take on GraphQLObjectTypeConfig that allows for plans */
     interface GraphileObjectTypeConfig<
       TParentPlan extends ExecutablePlan<any> | null,
       TContext extends BaseGraphQLContext,
@@ -140,6 +147,7 @@ declare global {
           ) => GraphQLInterfaceType[]);
     }
 
+    /** Our take on GraphQLInputObjectTypeConfig that allows for plans */
     interface GraphileInputObjectTypeConfig
       extends Omit<GraphQLInputObjectTypeConfig, "fields"> {
       fields?:
@@ -149,6 +157,7 @@ declare global {
           ) => GraphileInputFieldConfigMap<any, any>);
     }
 
+    /** Our take on GraphQLUnionTypeConfig that allows for plans */
     interface GraphileUnionTypeConfig<TSource, TContext>
       extends Omit<GraphQLUnionTypeConfig<TSource, TContext>, "types"> {
       types?:
@@ -156,6 +165,7 @@ declare global {
         | ((context: ContextGraphQLUnionTypeTypes) => GraphQLObjectType[]);
     }
 
+    /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
     interface GraphileInterfaceTypeConfig<TSource, TContext>
       extends Omit<GraphQLInterfaceTypeConfig<TSource, TContext>, "fields"> {
       fields?:
@@ -165,6 +175,10 @@ declare global {
           ) => GraphQLFieldConfigMap<TSource, TContext>);
     }
 
+    /**
+     * The absolute bare bones `Build` object that graphile-build makes before
+     * calling any hooks.
+     */
     interface BuildBase {
       /**
        * The options that graphile-build was called with.
@@ -183,7 +197,7 @@ declare global {
       };
 
       /**
-       * Input from the "data gathering phase" that plugins can use to
+       * Input from the "data gathering" phase that plugins can use to
        * influence what types/fields/etc are added to the GraphQL schema.
        */
       input: BuildInput;
@@ -369,16 +383,34 @@ declare global {
       recoverable<T>(fallback: T, callback: () => T): T;
     }
 
+    /**
+     * The `Build` object is passed to every schema hook (as the second
+     * argument); it contains useful helpers and utilities and can also store
+     * metadata. It is populated by the 'plugin' hook in various plugins, so
+     * there's no concrete list of all the things in the build object other
+     * than actually inspecting it.
+     */
     interface Build extends BuildBase {
       // QueryPlugin
       $$isQuery: symbol;
     }
 
+    /**
+     * When we register a type, field or argument, we associate a 'scope' with
+     * it so that other plugins can easily recognise it. All specialised scopes
+     * inherit this Scope interface.
+     */
     interface Scope {
       __origin?: string | null | undefined;
-      directives?: DirectiveMap;
+      directives?: DirectiveDetails[];
     }
 
+    /**
+     * A specialised `Context` object is passed to every schema hook (as the
+     * third argument) based on the hook being called. The context contains
+     * details about _why_ the hook was called. All specialised contexts
+     * inherit this basic Context interface.
+     */
     interface Context {
       scope: Scope;
       type:
@@ -447,7 +479,7 @@ declare global {
     interface ScopeGraphQLObjectTypeFieldsField
       extends ScopeGraphQLObjectTypeFields {
       fieldName: string;
-      fieldDirectives?: DirectiveMap;
+      fieldDirectives?: DirectiveDetails[];
       isCursorField?: boolean;
     }
     interface ContextGraphQLObjectTypeFieldsField
@@ -556,6 +588,9 @@ declare global {
       type: "finalize";
     }
 
+    /**
+     * A type that represents all possible scopes.
+     */
     type SomeScope =
       | Scope
       | ScopeBuild
@@ -578,6 +613,9 @@ declare global {
       | ScopeGraphQLEnumTypeValuesValue
       | ScopeFinalize;
 
+    /**
+     * A Graphile-Build hook function.
+     */
     type Hook<
       Type,
       TContext extends Context,
@@ -587,6 +625,15 @@ declare global {
       displayName?: string;
     };
 
+    /**
+     * A function that instructs graphile-build to create a field with the
+     * given name and apply all the hooks to it. All fields will have hooks
+     * called against them whether they're created with this method or not, but
+     * it gives a chance to get access to extra details (i.e. the field
+     * context) and to set the specialised scope for the field so that other
+     * plugins can hook it. It's highly recommended you use this for all
+     * non-trivial fields.
+     */
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
       TContext extends BaseGraphQLContext,
@@ -626,10 +673,14 @@ declare global {
           ) => GraphileInputFieldConfig<any, any, any, any, any>),
     ) => GraphileInputFieldConfig<any, any, any, any, any>;
 
-    type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
+    // type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
 
-    type SchemaListener = (newSchema: GraphQLSchema) => void;
+    // type SchemaListener = (newSchema: GraphQLSchema) => void;
 
+    /**
+     * These are all of the hooks that graphile-build supports and the types of
+     * the various parameters to the hook function.
+     */
     interface SchemaBuilderHooks<
       TBuild extends GraphileEngine.Build = GraphileEngine.Build,
     > {
@@ -822,6 +873,11 @@ declare global {
 
 export type ConstructorForType<TType extends GraphQLNamedType | GraphQLSchema> =
   { new (): TType };
+
+/**
+ * The minimal spec required to be fed to `newWithHooks`; typically this is
+ * just the `name` of the type and everything else is optional.
+ */
 export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
   TType extends GraphQLSchema
     ? Partial<GraphQLSchemaConfig>
@@ -845,5 +901,7 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
     ? Partial<GraphileEngine.GraphileInputObjectTypeConfig> & { name: string }
     : never;
 
+// TODO: this returning `never` for non-GraphQLSchema seems wrong... why is it
+// not causing issues?
 export type ScopeForType<TType extends GraphQLNamedType | GraphQLSchema> =
   TType extends GraphQLSchema ? GraphileEngine.ScopeGraphQLSchema : never;
