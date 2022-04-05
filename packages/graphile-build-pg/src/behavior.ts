@@ -1,3 +1,5 @@
+import "./interfaces";
+
 import type {
   PgSourceExtensions,
   PgSourceRelationExtensions,

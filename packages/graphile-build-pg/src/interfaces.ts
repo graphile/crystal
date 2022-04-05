@@ -1,35 +1,44 @@
-declare module "@dataplan/pg" {
-  interface PgSourceTags extends PgSmartTagsDict {
-    name: string;
-    behavior: string | string[];
-  }
-  interface PgSourceExtensions {
-    tags: Partial<PgSourceTags>;
-  }
+export interface PgSourceTags extends PgSmartTagsDict {
+  name: string;
+  behavior: string | string[];
+}
 
-  interface PgSourceRelationTags extends PgSmartTagsDict {
-    behavior: string | string[];
-  }
-  interface PgSourceRelationExtensions {
-    tags: Partial<PgSourceTags>;
-  }
+export interface PgSourceRelationTags extends PgSmartTagsDict {
+  behavior: string | string[];
+}
 
-  interface PgTypeColumnTags extends PgSmartTagsDict {
-    name: string;
-    behavior: string | string[];
-  }
-  interface PgTypeColumnExtensions {
-    tags: Partial<PgTypeColumnTags>;
-  }
+export interface PgTypeColumnTags extends PgSmartTagsDict {
+  name: string;
+  behavior: string | string[];
+}
 
-  interface PgTypeCodecTags extends PgSmartTagsDict {
-    behavior: string | string[];
-  }
-  interface PgTypeCodecExtensions {
-    tags: Partial<PgTypeCodecTags>;
-  }
+export interface PgTypeCodecTags extends PgSmartTagsDict {
+  behavior: string | string[];
+  deprecated: string | string[];
 }
 
 export interface PgSmartTagsDict {
   [tagName: string]: null | true | string | string[];
+}
+
+/*
+ * Declaration merging to add graphile-build-pg 'tags' to @dataplan/pg
+ * extensions so we can easily use them with TypeScript.
+ */
+declare module "@dataplan/pg" {
+  interface PgSourceExtensions {
+    tags: Partial<PgSourceTags>;
+  }
+
+  interface PgSourceRelationExtensions {
+    tags: Partial<PgSourceTags>;
+  }
+
+  interface PgTypeColumnExtensions {
+    tags: Partial<PgTypeColumnTags>;
+  }
+
+  interface PgTypeCodecExtensions {
+    tags: Partial<PgTypeCodecTags>;
+  }
 }

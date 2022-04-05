@@ -1,6 +1,13 @@
 export { defaultPreset } from "./preset";
 export const version = require("../package.json").version;
 
+export {
+  PgSmartTagsDict,
+  PgSourceRelationTags,
+  PgSourceTags,
+  PgTypeCodecTags,
+  PgTypeColumnTags,
+} from "./interfaces";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin";
 export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin";
