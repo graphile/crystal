@@ -8,19 +8,34 @@ import type { ExecutablePlan } from "./plan";
 import { isPolymorphicData } from "./polymorphic";
 import { arrayOfLength } from "./utils";
 
+/**
+ * This is an interface other interfaces inherit from, it should never be used
+ * directly.
+ */
 export interface IBucketDefinitionOutputMode {
+  /**
+   * O - outputs an object
+   * A - outputs an array
+   * L - outputs a leaf
+   */
   type: "O" | "A" | "L";
   notNull: boolean;
 }
+
+/** For objects */
 export interface BucketDefinitionObjectOutputMode
   extends IBucketDefinitionOutputMode {
   type: "O";
   objectCreator: (typeName: string | null) => object;
 }
+
+/** For arrays (a.k.a. lists) */
 export interface BucketDefinitionArrayOutputMode
   extends IBucketDefinitionOutputMode {
   type: "A";
 }
+
+/** For leaves - enums and scalars */
 export interface BucketDefinitionLeafOutputMode
   extends IBucketDefinitionOutputMode {
   type: "L";
@@ -320,6 +335,15 @@ export function bucketValue(
   }
 }
 
+/**
+ * An indirection that allows replacing the root value (e.g. if an error
+ * occurs).
+ *
+ * @remarks
+ *
+ * This will become more complex when we add error handling into the execution
+ * V2 code; currently we just defer that to GraphQL.js.
+ */
 export class BucketSetter {
   public concreteType: string | undefined;
   constructor(
@@ -339,6 +363,10 @@ export class BucketSetter {
   }
 }
 
+/**
+ * A run-time bucket (incarnation of a BucketDefinition), this is where plan
+ * results are stored so that they can be fed into the next plans to run.
+ */
 export interface Bucket {
   /**
    * The bucket definition this bucket adheres to

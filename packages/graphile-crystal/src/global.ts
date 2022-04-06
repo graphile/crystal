@@ -27,6 +27,15 @@ function getGlobalState(): GlobalState {
 }
 
 /**
+ * This function sets a global state and then invokes the callback, restoring
+ * the global state afterwards. This allows code inside the callback to easily
+ * access a wealth of information without us having to hand the information all
+ * the way through the call tree - this is not dissimilar to how React hooks
+ * work.
+ *
+ * Calls to this function must never be nested (doing so will throw an
+ * error).
+ *
  * @internal
  */
 export function withGlobalState<T>(

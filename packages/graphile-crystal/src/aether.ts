@@ -418,12 +418,23 @@ interface FieldDigest {
   childFieldDigests: null | FieldDigest[];
 }
 
+/**
+ * "Prefetching" was a performance optimisation we used for a while before
+ * moving to execution V2. This won't be needed once execution V2 is complete.
+ *
+ * TODO: phase this out.
+ *
+ * @internal
+ */
 interface PrefetchConfig {
   fieldDigest: FieldDigest;
   plan: ExecutablePlan;
   itemPlan: ExecutablePlan;
 }
 
+/**
+ * See Aether.groups
+ */
 interface GroupAndChildren extends Group {
   id: number;
   parent: GroupAndChildren | null;
@@ -438,12 +449,42 @@ export class Aether<
   TContext extends BaseGraphQLContext = any,
   TRootValue extends BaseGraphQLRootValue = any,
 > {
+  /**
+   * What state is the Aether in?
+   *
+   * 1. init
+   * 2. plan
+   * 3. validate
+   * 4. deduplicate
+   * 5. optimize
+   * 6. finalize
+   * 7. ready
+   *
+   * Once in 'ready' state we can execute the plan.
+   */
   private phase: AetherPhase = "init";
 
   /**
+   * A new 'group' is introduced whenever a field must evaluated at a later
+   * time:
+   *
+   * - a deferred fragment's fields should run at a later time than its parent
+   *   selection set,
+   * - a streamed field's selection set should run at a later time than the
+   *   field itself,
+   * - a mutation's payload selection set should run at a later time than the
+   *   mutation,
+   * - a second mutation should run after the previous mutation's selection set
+   *   has completed.
+   *
+   * When plans are in different groups they cannot be deduplicated, and this
+   * should also be factored into optimisation decisions.
+   *
    * @internal
    */
   public groups: Array<GroupAndChildren> = [];
+
+  // TODO: can we remove TreeNodes now?
   private rootTreeNode: TreeNode = {
     pathIdentity: ROOT_PATH,
     fieldPathIdentity: ROOT_PATH,
@@ -451,14 +492,39 @@ export class Aether<
     parent: null,
     children: [],
   };
-  private rootBucket: BucketDefinition;
+
   /**
+   * The bucket at the root of the GraphQL request, all other buckets
+   * are ancestors of this bucket.
+   */
+  private rootBucket: BucketDefinition;
+
+  /**
+   * All the bucket definitions needed for this Aether.
+   *
    * @internal
    */
   public readonly buckets: BucketDefinition[] = [];
 
+  /**
+   * Debatable optimisation vs getting the length of this.plans
+   *
+   * @internal
+   */
   private planCount = 0;
+  /** @internal */
   private modifierPlanCount = 0;
+
+  /**
+   * The full list of ExecutablePlans that this Aether has created.
+   *
+   * @remarks
+   *
+   * Note that although this says that the type of the field is non-nullable we
+   * may in fact store nulls, but we will only do so as the result of tree
+   * shaking and it should generally be assumed that having done so nothing
+   * can reference the deleted plan and thus no error will occur.
+   */
   private readonly plans: {
     [key: string]: ExecutablePlan;
   } = Object.create(sharedNull);
@@ -472,6 +538,10 @@ export class Aether<
   public readonly modifierPlans: ModifierPlan<any>[] = [];
 
   /**
+   * This is a execution-time (rather than planning time) property - it's for
+   * batching together requests from the same path identity so that multiple
+   * requests can all be executed at once.
+   *
    * @internal
    */
   public readonly batchByPathIdentity: {
@@ -502,6 +572,9 @@ export class Aether<
     [pathIdentity: string]: string | undefined;
   };
   /**
+   * True if the field at the given path identity has no plan resolver
+   * function.
+   *
    * @internal
    */
   public readonly isUnplannedByPathIdentity: {
@@ -612,6 +685,10 @@ export class Aether<
     [pathIdentity: string]: number[] | undefined;
   };
 
+  /**
+   * Details of any plan options for the given plan; currently only used for
+   * the `@stream` directive.
+   */
   private readonly planOptionsByPlan = new Map<ExecutablePlan, PlanOptions>();
 
   // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
@@ -678,7 +755,7 @@ export class Aether<
   };
 
   /**
-   * If true, then this operation doesn't use resolvers.
+   * If true, then this operation doesn't use (custom) resolvers.
    */
   private pure = true;
   /**
@@ -690,7 +767,7 @@ export class Aether<
    */
   private hasIntrospectionFields = false;
   /**
-   * If true, this request is purely for introspection.
+   * If true, this request is purely for introspection (so maybe we can cache it...)
    */
   private hasNonIntrospectionFields = false;
   /**
@@ -759,7 +836,7 @@ export class Aether<
     );
 
     this.phase = "plan";
-    /** with global state */
+    /** with global state (think: React hooks) */
     const wgs = withGlobalState.bind(null, {
       aether: this,
       parentPathIdentity: GLOBAL_PATH,
@@ -1072,6 +1149,10 @@ export class Aether<
     return bucket;
   }
 
+  /**
+   * Called by `graphqlCollectFields` when a new boundary is met -
+   * mutations/mutation payloads/stream/defer.
+   */
   public addGroup(group: Group): number {
     if (!group.parent) {
       throw new Error("Only the root group may have no parent");
@@ -1128,6 +1209,7 @@ export class Aether<
     });
   }
 
+  // TODO: phase this out.
   private preparePrefetches() {
     // Work through all the path identities, making sure that parents are
     // processed before children.
@@ -1686,6 +1768,7 @@ export class Aether<
           ),
         );
 
+        // TODO: Check SameStreamDirective still exists in @stream spec at release.
         /*
          * `SameStreamDirective`
          * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)

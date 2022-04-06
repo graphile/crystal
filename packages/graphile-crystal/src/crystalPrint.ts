@@ -9,6 +9,13 @@ import { isCrystalObject } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import { isDeferred, isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils";
 
+/*
+ * This file contains utilities used with the `debug` module primarily (but
+ * also used elsewhere) that are useful for outputting DataPlanner stuff in a
+ * more helpful way - typically with more relevant detail and colours to help
+ * you (me) digest things.
+ */
+
 const COLORS = [
   //chalk.black,
   chalk.yellow,
@@ -191,6 +198,11 @@ export function crystalPrint(
   return _crystalPrint(symbol, new Set());
 }
 
+/**
+ * An ANSI-aware pad function; strips ANSI sequences from the string, figures
+ * out how much it needs to pad it by, and then pads the original string by
+ * that amount.
+ */
 export function ansiPad(
   ansiString: string,
   targetLength: number,
@@ -211,6 +223,12 @@ export function ansiPad(
   }
 }
 
+/**
+ * Prints a _lossy_ representation of a path identity. Path identities can get
+ * really long really fast, which makes working with them a challenge; this
+ * utility can help shrink them down so that they're useful for humans, though
+ * they can be potentially misleading due to their deliberate data loss.
+ */
 export function crystalPrintPathIdentity(
   pathIdentity: string,
   l = 1,

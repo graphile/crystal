@@ -5,12 +5,14 @@
  * https://github.com/facebook/jest/issues/2549
  */
 
+/** Equivalent to `assert.ok(...)` */
 export function ok(val: any, message: string): asserts val {
   if (!val) {
     throw new Error(message);
   }
 }
 
+/** Equivalent to `assert.strictEqual(...)` */
 export function strictEqual<T>(
   actual: any,
   expected: T,

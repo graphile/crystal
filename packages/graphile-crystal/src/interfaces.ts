@@ -464,6 +464,10 @@ export interface FieldAndGroup {
 export interface PlanStreamOptions {
   initialCount: number;
 }
+/**
+ * Additional details about the planning for a field; currently only relates to
+ * the `@stream` directive.
+ */
 export interface PlanOptions {
   stream: PlanStreamOptions | null;
 }
