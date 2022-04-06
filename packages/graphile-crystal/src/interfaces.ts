@@ -87,7 +87,10 @@ export const $$concreteType = Symbol("concreteType");
 export const $$setPlanGraph = Symbol("setPlanGraph");
 
 /**
- * Set this key on a type if that type's serialization is idempotent.
+ * Set this key on a type if that type's serialization is idempotent (that is
+ * to say `serialize(serialize(thing)) === serialize(thing)`). This means we
+ * don't have to "roll-back" serialization if we need to fallback to graphql-js
+ * execution.
  */
 export const $$idempotent = Symbol("idempotent");
 

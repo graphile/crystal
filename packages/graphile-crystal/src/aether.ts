@@ -224,6 +224,12 @@ const identity = <T>(_: T): T => _;
 identity[$$idempotent] = true;
 
 // TODO: consider memoizing this
+/**
+ * When outputting a value directly (bypassing GraphQL) we must still serialize
+ * it; this returns a suitable serializer for enum types. Note: if the enum's
+ * values and keys are the same then it will return the identity function as an
+ * optimization.
+ */
 function serializerForEnumType(
   type: GraphQLEnumType,
 ): GraphQLScalarType["serialize"] {
@@ -242,6 +248,15 @@ function serializerForEnumType(
   return (value) => lookup.get(value);
 }
 
+/**
+ * When outputting a value directly (bypassing GraphQL) we must still serialize
+ * it; this returns a suitable serializer for scalar types. Note: in case we
+ * need to rollback to graphql-js execution we do not want to open ourselves to
+ * double serialization errors, so we automatically roll back serialization
+ * _unless_ the serializer is marked as idempotent. Where possible, it is best
+ * to use idempotent serializers for this reason. An idempotent serializer is
+ * one where `serialize(serialize(value)) === serialize(value)` for all values.
+ */
 function serializerForScalarType(
   type: GraphQLScalarType,
 ): GraphQLScalarType["serialize"] {
@@ -354,22 +369,48 @@ function assertPolymorphicPlan(
   );
 }
 
+/**
+ * The FieldDigest stores a wealth of information about a specific field within
+ * a GraphQL selection set.
+ */
 interface FieldDigest {
   parentFieldDigest: FieldDigest | null;
+
+  /**
+   * Where the field was in the GraphQL request.
+   */
   pathIdentity: string;
+
+  /**
+   * Often the same as the `pathIdentity` but has `[]`s appended for each
+   * layer of lists the field type has.
+   */
   itemPathIdentity: string;
+
+  /**
+   * The name of the attribute this field will be output as in the GraphQL
+   * response.
+   */
   responseKey: string;
+
   returnType: GraphQLOutputType;
   namedReturnType: GraphQLNamedType & GraphQLOutputType;
   isPolymorphic: boolean;
   isLeaf: boolean;
-  // True if the field is a `__typename` field
+  /** True if the field is a `__typename` field */
   isTypeName: boolean;
+
+  /** How many GraphQLLists are involved in the return type of the field */
   listDepth: number;
+  /**
+   * True if the field is a leaf _or_ if the user has their own resolver for it, false otherwise.
+   */
   returnRaw: boolean;
   planId: string;
   itemPlanId: string;
   /**
+   * The field digests that are related to the selection set for this field.
+   *
    * Important: this does **NOT** represent the response keys, it represents
    * all the fields that are selected on the child selection set - the same
    * response key might be represented multiple times for polymorphic fields.
