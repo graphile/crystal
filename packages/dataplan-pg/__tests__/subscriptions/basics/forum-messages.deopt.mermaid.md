@@ -31,7 +31,7 @@ graph TD
     First21["First[21∈1]"]:::plan
     PgSelect17[["PgSelect[17∈1]<br />ᐸmessagesᐳ"]]:::plan
     Access16["Access[16∈1]<br />ᐸ12.idᐳ"]:::plan
-    JSONParse12["JSONParse[12∈1]<br />ᐸ11ᐳ"]:::plan
+    JSONParse12[["JSONParse[12∈1]<br />ᐸ11ᐳ"]]:::plan
     __Item11>"__Item[11∈1]<br />ᐸ10ᐳ"]:::itemplan
     Subscribe10["Subscribe[10∈0]"]:::plan
     Access9["Access[9∈0]<br />ᐸ3.pgSubscriberᐳ"]:::plan
