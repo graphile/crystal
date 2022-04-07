@@ -22,20 +22,27 @@ import type { Aether } from "./aether";
 import * as assert from "./assert";
 import type { CrystalResultsList, CrystalValuesList } from "./interfaces";
 import { ExecutablePlan } from "./plan";
-import { __TrackedObjectPlan, constant } from "./plans";
+import {
+  __InputListPlan,
+  __InputStaticLeafPlan,
+  __TrackedObjectPlan,
+  constant,
+} from "./plans";
 import { arrayOfLength, defaultValueToValueNode } from "./utils";
 
 // TODO: should this have `__` prefix?
 export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
-  | InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
-  | InputStaticLeafPlan // .eval(), .evalIs()
+  | __InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
+  | __InputStaticLeafPlan // .eval(), .evalIs()
   | InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
 
-function assertInputPlan(itemPlan: unknown): asserts itemPlan is InputPlan {
+export function assertInputPlan(
+  itemPlan: unknown,
+): asserts itemPlan is InputPlan {
   if (itemPlan instanceof __TrackedObjectPlan) return;
-  if (itemPlan instanceof InputListPlan) return;
-  if (itemPlan instanceof InputStaticLeafPlan) return;
+  if (itemPlan instanceof __InputListPlan) return;
+  if (itemPlan instanceof __InputStaticLeafPlan) return;
   if (itemPlan instanceof InputObjectPlan) return;
   throw new Error(`Expected an InputPlan, but found ${itemPlan}`);
 }
@@ -111,9 +118,9 @@ export function inputPlan(
     const valuePlan = inputPlan(aether, innerType, inputValue);
     return inputNonNullPlan(aether, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    return new InputListPlan(inputType, inputValue);
+    return new __InputListPlan(inputType, inputValue);
   } else if (isLeafType(inputType)) {
-    return new InputStaticLeafPlan(inputType, inputValue);
+    return new __InputStaticLeafPlan(inputType, inputValue);
   } else if (inputType instanceof GraphQLInputObjectType) {
     return new InputObjectPlan(inputType, inputValue);
   } else {
@@ -172,151 +179,6 @@ function inputVariablePlan(
  */
 function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
   return innerPlan;
-}
-
-/**
- * Implements `InputListPlan`.
- */
-export class InputListPlan extends ExecutablePlan {
-  static $$export = {
-    moduleName: "graphile-crystal",
-    exportName: "InputListPlan",
-  };
-  isSyncAndSafe = true;
-
-  private itemPlanIds: string[] = [];
-  private outOfBoundsPlanId: string;
-
-  constructor(
-    inputType: GraphQLList<GraphQLInputType>,
-    private readonly inputValues: ValueNode | undefined,
-  ) {
-    super();
-    assert.ok(
-      inputType instanceof GraphQLList,
-      "Expected inputType to be a List",
-    );
-    const innerType = inputType.ofType;
-    // TODO: should we coerce to list here?
-    if (inputValues && inputValues.kind === "ListValue") {
-      const values = inputValues.values;
-      for (
-        let inputValueIndex = 0, inputValuesLength = values.length;
-        inputValueIndex < inputValuesLength;
-        inputValueIndex++
-      ) {
-        const inputValue = values[inputValueIndex];
-        const innerPlan = inputPlan(this.aether, innerType, inputValue);
-        this.itemPlanIds.push(innerPlan.id);
-        this.addDependency(innerPlan);
-      }
-    }
-    // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
-    // `InputNonNullPlan`, but maybe it's not safe any more?
-    this.outOfBoundsPlanId = inputPlan(this.aether, innerType, undefined).id;
-  }
-
-  optimize() {
-    const { inputValues } = this;
-    if (inputValues?.kind === "NullValue") {
-      return constant(null);
-    } else {
-      const itemPlansLength = this.itemPlanIds.length;
-      const list: any[] = [];
-      for (
-        let itemPlanIndex = 0;
-        itemPlanIndex < itemPlansLength;
-        itemPlanIndex++
-      ) {
-        const itemPlanId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.aether.dangerouslyGetPlan(itemPlanId);
-        assertInputPlan(itemPlan);
-        const value = itemPlan.eval();
-        list[itemPlanIndex] = value;
-      }
-      return constant(list);
-    }
-  }
-
-  execute(): any[] {
-    throw new Error(
-      "InputListPlan should never execute; it should have been optimized away.",
-    );
-  }
-
-  at(index: number): InputPlan {
-    const itemPlanId = this.itemPlanIds[index];
-    const outOfBoundsPlan = this.getPlan(this.outOfBoundsPlanId);
-    const itemPlan = itemPlanId ? this.getPlan(itemPlanId) : outOfBoundsPlan;
-    assertInputPlan(itemPlan);
-    return itemPlan;
-  }
-
-  eval(): any[] | null {
-    if (this.inputValues?.kind === "NullValue") {
-      return null;
-    }
-    const itemPlansLength = this.itemPlanIds.length;
-    const list: any[] = [];
-    for (
-      let itemPlanIndex = 0;
-      itemPlanIndex < itemPlansLength;
-      itemPlanIndex++
-    ) {
-      const itemPlanId = this.itemPlanIds[itemPlanIndex];
-      const itemPlan = this.getPlan(itemPlanId);
-      assertInputPlan(itemPlan);
-      const value = itemPlan.eval();
-      list[itemPlanIndex] = value;
-    }
-    return list;
-  }
-
-  evalIs(value: null | undefined): boolean {
-    if (value === undefined) {
-      return this.inputValues === value;
-    } else if (value === null) {
-      return this.inputValues?.kind === "NullValue";
-    } else {
-      throw new Error(
-        "InputListPlan cannot evalIs values other than null and undefined currently",
-      );
-    }
-  }
-}
-
-/**
- * Implements `InputStaticLeafPlan`
- */
-export class InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
-  static $$export = {
-    moduleName: "graphile-crystal",
-    exportName: "InputStaticLeafPlan",
-  };
-  isSyncAndSafe = true;
-
-  private readonly coercedValue: any;
-  constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
-    super();
-    // `coerceInputValue` throws on coercion failure. NOTE: it's only safe for
-    // us to call coerceInputValue because we already know this is a scalar and
-    // *not* a variable. Otherwise we'd need to process it via
-    // aether.trackedVariableValuesPlan.
-    // TODO: validate this is safe.
-    this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
-  }
-
-  execute(values: [CrystalValuesList<TLeaf>]): CrystalResultsList<TLeaf> {
-    return arrayOfLength(values[0].length, this.coercedValue);
-  }
-
-  eval(): TLeaf {
-    return this.coercedValue;
-  }
-
-  evalIs(expectedValue: unknown): boolean {
-    return this.coercedValue === expectedValue;
-  }
 }
 
 /**

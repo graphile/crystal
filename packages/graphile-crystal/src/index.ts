@@ -18,12 +18,7 @@ import { isDev, noop } from "./dev";
 import { crystalEnforce } from "./enforceCrystal";
 import { CrystalError, isCrystalError } from "./error";
 import { getCurrentParentPathIdentity } from "./global";
-import {
-  InputListPlan,
-  InputObjectPlan,
-  InputPlan,
-  InputStaticLeafPlan,
-} from "./input";
+import { InputObjectPlan, InputPlan } from "./input";
 import {
   $$bypassGraphQL,
   $$data,
@@ -69,6 +64,7 @@ import {
   StreamablePlan,
 } from "./plan";
 import {
+  __InputStaticLeafPlan,
   __ItemPlan,
   __ListTransformPlan,
   __TrackedObjectPlan,
@@ -111,6 +107,7 @@ import {
   subscribe,
   SubscribePlan,
 } from "./plans";
+import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
 import {
   bypassGraphQLExecute,
@@ -144,8 +141,9 @@ import {
 } from "./utils";
 
 export { isAsyncIterable } from "iterall";
-
 export {
+  __InputListPlan,
+  __InputStaticLeafPlan,
   __ItemPlan,
   __ListTransformPlan,
   __TrackedObjectPlan,
@@ -206,13 +204,11 @@ export {
   GraphileInputObjectType,
   GraphileObjectType,
   groupBy,
-  InputListPlan,
   InputObjectFieldPlanResolver,
   inputObjectFieldSpec,
   InputObjectPlan,
   InputObjectTypeSpec,
   InputPlan,
-  InputStaticLeafPlan,
   isCrystalError,
   isCrystalWrapped,
   isDev,
@@ -280,9 +276,9 @@ exportAsMany({
   ROOT_PATH,
   defer,
   crystalEnforce,
-  InputListPlan,
+  __InputListPlan,
   InputObjectPlan,
-  InputStaticLeafPlan,
+  __InputStaticLeafPlan,
   assertListCapablePlan,
   isExecutablePlan,
   isListCapablePlan,

@@ -21,7 +21,7 @@ import type {
   CrystalSubscriber,
   ExecutablePlan,
   InputObjectPlan,
-  InputStaticLeafPlan,
+  __InputStaticLeafPlan,
   ListPlan,
 } from "graphile-crystal";
 import {
@@ -2315,7 +2315,7 @@ export function makeExampleSchema(
           function plan(
             $parent: ExecutablePlan<any>,
             $field: TFieldPlan,
-            $value: InputStaticLeafPlan | __TrackedObjectPlan,
+            $value: __InputStaticLeafPlan | __TrackedObjectPlan,
           ) {
             const $messages = getClassPlan($field);
             if ($value.evalIs("YES")) {
@@ -4635,7 +4635,7 @@ export function makeExampleSchema(
         subscribePlan: EXPORTABLE(
           (context, jsonParse, lambda, subscribe) =>
             function subscribePlan(_$root, args) {
-              const $forumId = args.forumId as InputStaticLeafPlan<number>;
+              const $forumId = args.forumId as __InputStaticLeafPlan<number>;
               const $topic = lambda($forumId, (id) => `forum:${id}:message`);
               const $pgSubscriber = context<OurGraphQLContext>().get(
                 "pgSubscriber",

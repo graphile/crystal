@@ -19,9 +19,9 @@ import {
   access,
   ExecutablePlan,
   first,
-  InputListPlan,
+  __InputListPlan,
   InputObjectPlan,
-  InputStaticLeafPlan,
+  __InputStaticLeafPlan,
   isAsyncIterable,
   isPromiseLike,
   lambda,
@@ -87,10 +87,10 @@ const parseCursor = (cursor: string | null) => {
 
 function isStaticInputPlan(
   dep: ExecutablePlan,
-): dep is InputListPlan | InputStaticLeafPlan | InputObjectPlan {
+): dep is __InputListPlan | __InputStaticLeafPlan | InputObjectPlan {
   return (
-    dep instanceof InputListPlan ||
-    dep instanceof InputStaticLeafPlan ||
+    dep instanceof __InputListPlan ||
+    dep instanceof __InputStaticLeafPlan ||
     dep instanceof InputObjectPlan
   );
 }
@@ -1011,7 +1011,7 @@ export class PgSelectPlan<
 
   private addCursorPlan(
     beforeOrAfter: "before" | "after",
-    $cursorPlan: InputStaticLeafPlan<string | null>,
+    $cursorPlan: __InputStaticLeafPlan<string | null>,
   ): void {
     this.assertCursorPaginationAllowed();
 
@@ -1100,12 +1100,12 @@ export class PgSelectPlan<
     return finalCondition;
   }
 
-  setAfter($cursorPlan: InputStaticLeafPlan<string>): void {
+  setAfter($cursorPlan: __InputStaticLeafPlan<string>): void {
     this.assertCursorPaginationAllowed();
     this.addCursorPlan("after", $cursorPlan);
   }
 
-  setBefore($cursorPlan: InputStaticLeafPlan<string>): void {
+  setBefore($cursorPlan: __InputStaticLeafPlan<string>): void {
     this.assertCursorPaginationAllowed();
     this.addCursorPlan("before", $cursorPlan);
   }

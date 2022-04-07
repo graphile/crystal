@@ -46,6 +46,8 @@ export { reverse, reverseArray, ReversePlan } from "./reverse";
 export { subscribe, SubscribePlan } from "./subscribe";
 
 // Internal plans
+export { __InputListPlan } from "./__inputList";
+export { __InputStaticLeafPlan } from "./__inputStaticLeaf";
 export { __ItemPlan } from "./__item";
 export { __TrackedObjectPlan } from "./__trackedObject";
 export { __ValuePlan } from "./__value";
