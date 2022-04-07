@@ -149,6 +149,11 @@ export function establishAether<
   let cacheByOperation = schema[$$cacheByOperation];
 
   let cache = cacheByOperation?.get(operation);
+
+  // These two variables to make it easy to trim the linked list later.
+  let count = 0;
+  let lastButOneItem: LinkedList<Aether> | null = null;
+
   if (cache) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
@@ -173,6 +178,8 @@ export function establishAether<
         return linkedItem.value;
       }
 
+      count++;
+      lastButOneItem = previousItem;
       previousItem = linkedItem;
       linkedItem = linkedItem.next;
     }
@@ -201,12 +208,18 @@ export function establishAether<
     };
     cacheByOperation.set(operation, cache);
   } else {
+    // TODO: make this configurable
+    if (count >= 50) {
+      // Remove the tail to ensure we never grow too big
+      lastButOneItem!.next = null;
+      count--;
+    }
+
     // Add new aether to top of the linked list.
     cache.possibleAethers = {
       value: aether,
       next: cache.possibleAethers,
     };
-    // TODO: trim off tail of list?
   }
 
   return aether;
