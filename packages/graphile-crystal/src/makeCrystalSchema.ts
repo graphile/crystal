@@ -28,6 +28,12 @@ import type { ExecutablePlan } from "./plan";
 import { resolveType } from "./polymorphic";
 import { crystalResolve, crystalWrapResolve } from "./resolvers";
 
+// TODO:TS: improve the types here!
+/**
+ * When defining a field with `typeDefs/plans` you can declare the field plan
+ * directly, or you can define a configuration object that accepts the plan and
+ * more.
+ */
 type FieldPlans =
   | ExecutablePlanResolver<any, any, any, any>
   | {
@@ -40,20 +46,32 @@ type FieldPlans =
       };
     };
 
+/**
+ * The plans/config for each field of a GraphQL object type.
+ */
 type ObjectPlans = {
   __Plan?: { new (...args: any[]): ExecutablePlan<any> };
 } & {
   [fieldName: string]: FieldPlans;
 };
 
+/**
+ * The plans for each field of a GraphQL input object type.
+ */
 type InputObjectPlans = {
   [fieldName: string]: InputObjectFieldPlanResolver<any, any, any, any>;
 };
 
+/**
+ * The plan config for an interface or union type.
+ */
 type InterfaceOrUnionPlans = {
   __resolveType?: (o: unknown) => string;
 };
 
+/**
+ * The config for a GraphQL scalar type.
+ */
 type ScalarPlans = {
   serialize?: GraphQLScalarSerializer<any>;
   parseValue?: GraphQLScalarValueParser<any>;
@@ -61,6 +79,9 @@ type ScalarPlans = {
   plan?: ScalarPlanResolver<any, any>;
 };
 
+/**
+ * The values/configs for the entries in a GraphQL enum type.
+ */
 type EnumPlans = {
   // The internal value for the enum
   [enumValueName: string]:
@@ -74,6 +95,9 @@ type EnumPlans = {
       };
 };
 
+/**
+ * A map from GraphQL named type to the config for that type.
+ */
 interface CrystalPlans {
   [typeName: string]:
     | ObjectPlans
@@ -83,6 +107,10 @@ interface CrystalPlans {
     | EnumPlans;
 }
 
+/**
+ * Takes a GraphQL schema definition in Interface Definition Language (IDL/SDL)
+ * syntax and configs for the types in it and returns a GraphQL schema.
+ */
 export function makeCrystalSchema(details: {
   typeDefs: string;
   plans: CrystalPlans;

@@ -13,6 +13,10 @@ export function context<
   return aether().contextPlan;
 }
 
+/**
+ * Turns on debug mode, calls the callback, and then turns debug mode back off
+ * again.
+ */
 export function debugPlans<T>(callback: () => T): T {
   const oldDebug = getDebug();
   setDebug(true);

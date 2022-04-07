@@ -1,6 +1,9 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 
+/**
+ * Calls the given lambda function for each tuple
+ */
 export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
   static $$export = {
     moduleName: "graphile-crystal",

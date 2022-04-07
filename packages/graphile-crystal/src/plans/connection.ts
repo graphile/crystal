@@ -4,6 +4,10 @@ import { ExecutablePlan } from "../plan";
 import { arrayOfLength } from "../utils";
 import { constant } from "./constant";
 
+/**
+ * Describes what a plan needs to implement in order to be suitable for
+ * supplying what the `PageInfo` type requires.
+ */
 export interface PageInfoCapablePlan extends ExecutablePlan<any> {
   hasNextPage(): ExecutablePlan<boolean>;
   hasPreviousPage(): ExecutablePlan<boolean>;
@@ -11,6 +15,10 @@ export interface PageInfoCapablePlan extends ExecutablePlan<any> {
   endCursor(): ExecutablePlan<string | null>;
 }
 
+/**
+ * Describes what a plan needs to implement in order to be suitable for
+ * supplying what a ConnectionPlan requires.
+ */
 export interface ConnectionCapablePlan<TItemPlan extends ExecutablePlan<any>>
   extends ExecutablePlan<
     ReadonlyArray<TItemPlan extends ExecutablePlan<infer U> ? U : any>
@@ -32,6 +40,10 @@ export interface ConnectionCapablePlan<TItemPlan extends ExecutablePlan<any>>
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
+/**
+ * Handles GraphQL cursor pagination in a standard and consistent way
+ * indepdenent of data source.
+ */
 export class ConnectionPlan<
   TItemPlan extends ExecutablePlan<any>,
   TPlan extends ConnectionCapablePlan<TItemPlan>,
@@ -274,6 +286,10 @@ export class EdgePlan<
   }
 }
 
+/**
+ * Wraps a collection fetch to provide the utilities for working with GraphQL
+ * cursor connections.
+ */
 export function connection<
   TItemPlan extends ExecutablePlan<any>,
   TPlan extends ConnectionCapablePlan<TItemPlan>,

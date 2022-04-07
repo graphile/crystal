@@ -16,6 +16,7 @@ export interface PlanResultsBucket {
 }
 
 // TODO: rewrite this comment to refer to bucketId rather than commonAncestorPathIdentity
+// TODO: completely remove this API if we can as part of replacing execution-v1 with execution-v2
 /**
  * PlanResults stores the results from plan execution. A `PlanResults` instance
  * is typically accessed via the `CrystalObject` to which it belongs, however

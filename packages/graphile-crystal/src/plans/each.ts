@@ -34,6 +34,9 @@ const eachCallbackForListPlan = (
   return result;
 };
 
+/**
+ * Transforms a list by wrapping each element in the list with the given mapper.
+ */
 export function each<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TResultItemPlan extends ExecutablePlan<any>,

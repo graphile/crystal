@@ -29,7 +29,10 @@ function isTemplateStringsArray(data: any): data is TemplateStringsArray {
   );
 }
 
-// Call this as a template string or as a function. Only intended for handling scalar values, not arrays/objects/etc.
+/**
+ * Call this as a template string or as a function. Only intended for handling
+ * scalar values, not arrays/objects/etc.
+ */
 export function constant(
   strings: TemplateStringsArray & [string],
 ): ConstantPlan<string>;

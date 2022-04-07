@@ -237,6 +237,10 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   }
 }
 
+/**
+ * Access the property at path `path` in the value returned from `parentPlan`,
+ * falling back to `fallback` if it were null-ish.
+ */
 export function access<TData>(
   parentPlan: ExecutablePlan<unknown>,
   path: (string | number)[],
