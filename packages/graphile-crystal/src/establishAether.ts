@@ -213,6 +213,7 @@ export function establishAether<
       // Remove the tail to ensure we never grow too big
       lastButOneItem!.next = null;
       count--;
+      // TODO: we should announce this so that people know there's something that needs fixing in their schema (too much eval?)
     }
 
     // Add new aether to top of the linked list.
