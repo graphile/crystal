@@ -1,4 +1,8 @@
 /**
+ * Marks that `thing` is exported from the `graphile-crystal` module as
+ * `exportName` so that `graphile-exporter` can convert references to `thing`
+ * into an `import` statement.
+ *
  * @internal
  */
 export function exportAs<T>(thing: T, exportName: string): T {
@@ -9,6 +13,10 @@ export function exportAs<T>(thing: T, exportName: string): T {
 }
 
 /**
+ * Marks that each value in `all` is exported from the `graphile-crystal`
+ * module as the key in the `all` object so that `graphile-exporter` can
+ * convert references to these values into `import` statements.
+ *
  * @internal
  */
 export function exportAsMany(all: { [key: string]: any }): void {

@@ -5,6 +5,7 @@ import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import { exportAsMany } from "./exportAs";
 import { makeCrystalSchema } from "./makeCrystalSchema";
 
+// TODO: doing this here feels "naughty".
 debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
