@@ -1,3 +1,6 @@
+/**
+ * A promise that can be `.resolve()`-ed or `.reject()`-ed at a later time.
+ */
 export interface Deferred<T> extends PromiseLike<T> {
   resolve: (input: T | PromiseLike<T>) => void;
   reject: (error: Error) => void;
@@ -5,6 +8,10 @@ export interface Deferred<T> extends PromiseLike<T> {
 
 function NOOP() {}
 
+/**
+ * Returns a promise that can be `.resolve()`-ed or `.reject()`-ed at a later
+ * time.
+ */
 export function defer<T = void>(): Deferred<T> {
   let resolve!: (input: T | PromiseLike<T>) => void;
   let reject!: (error: Error) => void;

@@ -16,6 +16,7 @@ import type {
 } from "./interfaces";
 
 const debug = debugFactory("crystal:establishAether");
+
 type Fragments = {
   [key: string]: FragmentDefinitionNode;
 };
@@ -25,6 +26,14 @@ interface LinkedList<T> {
   next: LinkedList<T> | null;
 }
 
+/**
+ * This represents the list of possible aethers for a specific document.
+ *
+ * @remarks
+ *
+ * It also includes the fragments for validation, but generally we trust that
+ * if the OperationDefinitionNode is the same then the request is equivalent.
+ */
 interface Cache {
   /**
    * Implemented as a linked list so the hot aethers can be kept at the top of the
@@ -34,8 +43,16 @@ interface Cache {
   possibleAethers: LinkedList<Aether>;
   fragments: Fragments;
 }
+
+/**
+ * The starting point for finding/storing the relevant Aether for a request.
+ */
 type CacheByOperation = LRU<OperationDefinitionNode, Cache>;
 
+/**
+ * This is a development-only validation to check fragments do, in fact, match
+ * - even if the objects themselves differ.
+ */
 function reallyAssertFragmentsMatch(
   oldFragments: Fragments,
   fragments: Fragments,
@@ -100,6 +117,11 @@ export function isAetherCompatible<
   return true;
 }
 
+/**
+ * We store the cache directly onto the GraphQLSchema so that it gets garbage
+ * collected along with the schema when it's not needed any more. To do so, we
+ * attach it using this symbol.
+ */
 const $$cacheByOperation = Symbol("cacheByOperation");
 
 /**
@@ -128,7 +150,9 @@ export function establishAether<
 
   let cache = cacheByOperation?.get(operation);
   if (cache) {
+    // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
+
     let previousItem: LinkedList<Aether> | null = null;
     let linkedItem: LinkedList<Aether> | null = cache.possibleAethers;
     while (linkedItem) {
@@ -144,12 +168,17 @@ export function establishAether<
           // linkedItem is now head of chain
           cache.possibleAethers = linkedItem;
         }
+
+        // We found a suitable Aether - use that!
         return linkedItem.value;
       }
+
       previousItem = linkedItem;
       linkedItem = linkedItem.next;
     }
   }
+
+  // No suitable Aether found, time to make one.
   const aether = new Aether(
     schema,
     operation,

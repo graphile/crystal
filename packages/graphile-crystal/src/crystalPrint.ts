@@ -161,6 +161,12 @@ export function crystalColor(text: string, n: number): string {
 const symbolsByAlias = new Map<string, symbol[]>();
 let symbolClear: NodeJS.Timer | null = null;
 
+/**
+ * Returns a text description for a symbol that helps differentiate similar
+ * symbols by keeping track of the symbols/descriptions it has seen and adding
+ * numeric identifiers to the output. Only tracks symbols over a short period
+ * so counts will reset very frequently.
+ */
 function crystalPrintSymbol(symbol: symbol): string {
   const description = _crystalSymbolDescription(symbol);
   if (!symbolClear) {
@@ -185,6 +191,9 @@ function crystalPrintSymbol(symbol: symbol): string {
   return `${description}${chalk.gray(`:${idx + 1}`)}`;
 }
 
+/**
+ * Prints something crystal-style (i.e. concise, coloured, with helpful detail)
+ */
 export function crystalPrint(
   symbol:
     | symbol

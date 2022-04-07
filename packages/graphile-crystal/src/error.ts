@@ -1,3 +1,10 @@
+/**
+ * Internally we wrap errors that occur in a CrystalError; this allows us to do
+ * simple `instanceof` checks to see if a value is an actual value or an error.
+ * Users should never use this class; it's for internal usage only.
+ *
+ * @internal
+ */
 export interface CrystalError extends Error {
   originalError: Error;
 }
@@ -29,6 +36,10 @@ export function newCrystalError(error: Error) {
   return new _CrystalError(error);
 }
 
+/**
+ * Is the given value a CrystalError? This is the only public API that people
+ * should use for looking at CrystalErrors.
+ */
 export function isCrystalError(value: any): value is CrystalError {
   return value != null && value.constructor === _CrystalError;
 }
