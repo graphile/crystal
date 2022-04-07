@@ -20,7 +20,7 @@ import {
   ExecutablePlan,
   first,
   __InputListPlan,
-  InputObjectPlan,
+  __InputObjectPlan,
   __InputStaticLeafPlan,
   isAsyncIterable,
   isPromiseLike,
@@ -87,11 +87,11 @@ const parseCursor = (cursor: string | null) => {
 
 function isStaticInputPlan(
   dep: ExecutablePlan,
-): dep is __InputListPlan | __InputStaticLeafPlan | InputObjectPlan {
+): dep is __InputListPlan | __InputStaticLeafPlan | __InputObjectPlan {
   return (
     dep instanceof __InputListPlan ||
     dep instanceof __InputStaticLeafPlan ||
-    dep instanceof InputObjectPlan
+    dep instanceof __InputObjectPlan
   );
 }
 

@@ -22,7 +22,7 @@ import {
 import type {
   __TrackedObjectPlan,
   ExecutablePlan,
-  InputObjectPlan,
+  __InputObjectPlan,
   InputPlan,
 } from "graphile-crystal";
 import {
@@ -456,7 +456,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                               const plan = (
                                 args.input as
                                   | __TrackedObjectPlan
-                                  | InputObjectPlan
+                                  | __InputObjectPlan
                               ).get(argName);
                               if (!required && plan.evalIs(undefined)) {
                                 return null;

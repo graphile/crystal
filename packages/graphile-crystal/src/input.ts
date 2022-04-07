@@ -28,6 +28,7 @@ import {
   __TrackedObjectPlan,
   constant,
 } from "./plans";
+import { __InputObjectPlan } from "./plans/__inputObject";
 import { arrayOfLength, defaultValueToValueNode } from "./utils";
 
 // TODO: should this have `__` prefix?
@@ -35,7 +36,7 @@ export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
   | __InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafPlan // .eval(), .evalIs()
-  | InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
+  | __InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
 
 export function assertInputPlan(
   itemPlan: unknown,
@@ -43,7 +44,7 @@ export function assertInputPlan(
   if (itemPlan instanceof __TrackedObjectPlan) return;
   if (itemPlan instanceof __InputListPlan) return;
   if (itemPlan instanceof __InputStaticLeafPlan) return;
-  if (itemPlan instanceof InputObjectPlan) return;
+  if (itemPlan instanceof __InputObjectPlan) return;
   throw new Error(`Expected an InputPlan, but found ${itemPlan}`);
 }
 
@@ -122,7 +123,7 @@ export function inputPlan(
   } else if (isLeafType(inputType)) {
     return new __InputStaticLeafPlan(inputType, inputValue);
   } else if (inputType instanceof GraphQLInputObjectType) {
-    return new InputObjectPlan(inputType, inputValue);
+    return new __InputObjectPlan(inputType, inputValue);
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -179,123 +180,4 @@ function inputVariablePlan(
  */
 function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
   return innerPlan;
-}
-
-/**
- * Implements `InputObjectPlan`
- */
-export class InputObjectPlan extends ExecutablePlan {
-  static $$export = {
-    moduleName: "graphile-crystal",
-    exportName: "InputObjectPlan",
-  };
-  isSyncAndSafe = true;
-
-  private inputFields: {
-    [fieldName: string]: { dependencyIndex: number; plan: InputPlan };
-  } = Object.create(null);
-  constructor(
-    private inputObjectType: GraphQLInputObjectType,
-    private inputValues: ValueNode | undefined,
-  ) {
-    super();
-    const inputFieldDefinitions = inputObjectType.getFields();
-    const inputFields =
-      inputValues?.kind === "ObjectValue" ? inputValues.fields : undefined;
-    for (const inputFieldName in inputFieldDefinitions) {
-      const inputFieldDefinition = inputFieldDefinitions[inputFieldName];
-      const inputFieldType = inputFieldDefinition.type;
-      const defaultValue = defaultValueToValueNode(
-        inputFieldType,
-        inputFieldDefinition.defaultValue,
-      );
-      const inputFieldValue = inputFields?.find(
-        (val) => val.name.value === inputFieldName,
-      );
-      const plan = inputPlan(
-        this.aether,
-        inputFieldType,
-        inputFieldValue?.value,
-        defaultValue,
-      );
-      this.inputFields[inputFieldName] = {
-        plan,
-        dependencyIndex: this.addDependency(plan),
-      };
-    }
-  }
-
-  optimize() {
-    if (this.inputValues?.kind === "NullValue") {
-      return constant(null);
-    }
-    return this;
-  }
-
-  execute(values: any[][]): any[] {
-    const count = values[0].length;
-    const results = [];
-    for (let i = 0; i < count; i++) {
-      const resultValues = Object.create(null);
-      for (const inputFieldName in this.inputFields) {
-        const dependencyIndex =
-          this.inputFields[inputFieldName].dependencyIndex;
-        if (dependencyIndex == null) {
-          throw new Error("inputFieldPlan has gone missing.");
-        }
-        const value = values[dependencyIndex][i];
-        resultValues[inputFieldName] = value;
-      }
-      results[i] = resultValues;
-    }
-    return results;
-  }
-
-  get(attrName: string): InputPlan {
-    const plan = this.inputFields[attrName]?.plan;
-    if (plan === undefined) {
-      throw new Error(
-        `Tried to '.get("${attrName}")', but no such attribute exists on ${this.inputObjectType.name}`,
-      );
-    }
-    return plan;
-  }
-
-  eval(): any {
-    if (this.inputValues?.kind === "NullValue") {
-      return null;
-    }
-    const resultValues = Object.create(null);
-    for (const inputFieldName in this.inputFields) {
-      const inputFieldPlan = this.inputFields[inputFieldName].plan;
-      resultValues[inputFieldName] = inputFieldPlan.eval();
-    }
-    return resultValues;
-  }
-
-  evalIs(value: null | undefined): boolean {
-    if (value === undefined) {
-      return this.inputValues === value;
-    } else if (value === null) {
-      return this.inputValues?.kind === "NullValue";
-    } else {
-      throw new Error(
-        "InputObjectPlan cannot evalIs values other than null and undefined currently",
-      );
-    }
-  }
-
-  // Written without consulting spec.
-  evalHas(attrName: string): boolean {
-    if (!this.inputValues) {
-      return false;
-    }
-    if (this.inputValues.kind === "NullValue") {
-      return false;
-    }
-    if (!(attrName in this.inputFields)) {
-      return false;
-    }
-    return !this.inputFields[attrName].plan.evalIs(undefined);
-  }
 }

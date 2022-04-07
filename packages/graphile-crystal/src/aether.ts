@@ -74,7 +74,7 @@ import {
   typesUsedInSelections,
 } from "./graphqlMergeSelectionSets";
 import type { InputPlan } from "./input";
-import { InputObjectPlan, inputPlan } from "./input";
+import { inputPlan } from "./input";
 import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
@@ -119,7 +119,7 @@ import {
 } from "./plan";
 import type { PlanResultsBucket } from "./planResults";
 import { PlanResults } from "./planResults";
-import type { ConstantPlan } from "./plans";
+import { __InputObjectPlan, ConstantPlan } from "./plans";
 import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { __ListTransformPlan } from "./plans/listTransform";
 import { assertPolymorphicData, isPolymorphicData } from "./polymorphic";
@@ -2368,8 +2368,8 @@ export class Aether<
     parentPlan: ExecutablePlan | ModifierPlan<any>,
   ): void {
     assert.ok(
-      trackedValuePlan instanceof InputObjectPlan,
-      "Expected trackedValuePlan to be an InputObjectPlan",
+      trackedValuePlan instanceof __InputObjectPlan,
+      "Expected trackedValuePlan to be an __InputObjectPlan",
     );
     const inputFieldSpecs = inputObjectType.getFields();
     // Input fields are applied in the order that they are specified in the

@@ -18,7 +18,7 @@ import { isDev, noop } from "./dev";
 import { crystalEnforce } from "./enforceCrystal";
 import { CrystalError, isCrystalError } from "./error";
 import { getCurrentParentPathIdentity } from "./global";
-import { InputObjectPlan, InputPlan } from "./input";
+import { InputPlan } from "./input";
 import {
   $$bypassGraphQL,
   $$data,
@@ -64,6 +64,7 @@ import {
   StreamablePlan,
 } from "./plan";
 import {
+  __InputObjectPlan,
   __InputStaticLeafPlan,
   __ItemPlan,
   __ListTransformPlan,
@@ -143,6 +144,7 @@ import {
 export { isAsyncIterable } from "iterall";
 export {
   __InputListPlan,
+  __InputObjectPlan,
   __InputStaticLeafPlan,
   __ItemPlan,
   __ListTransformPlan,
@@ -206,7 +208,6 @@ export {
   groupBy,
   InputObjectFieldPlanResolver,
   inputObjectFieldSpec,
-  InputObjectPlan,
   InputObjectTypeSpec,
   InputPlan,
   isCrystalError,
@@ -277,7 +278,7 @@ exportAsMany({
   defer,
   crystalEnforce,
   __InputListPlan,
-  InputObjectPlan,
+  __InputObjectPlan,
   __InputStaticLeafPlan,
   assertListCapablePlan,
   isExecutablePlan,

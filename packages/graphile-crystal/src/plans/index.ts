@@ -47,6 +47,7 @@ export { subscribe, SubscribePlan } from "./subscribe";
 
 // Internal plans
 export { __InputListPlan } from "./__inputList";
+export { __InputObjectPlan } from "./__inputObject";
 export { __InputStaticLeafPlan } from "./__inputStaticLeaf";
 export { __ItemPlan } from "./__item";
 export { __TrackedObjectPlan } from "./__trackedObject";

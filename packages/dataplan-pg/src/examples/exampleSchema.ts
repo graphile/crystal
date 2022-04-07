@@ -20,7 +20,7 @@ import type {
   BaseGraphQLRootValue,
   CrystalSubscriber,
   ExecutablePlan,
-  InputObjectPlan,
+  __InputObjectPlan,
   __InputStaticLeafPlan,
   ListPlan,
 } from "graphile-crystal";
@@ -4435,7 +4435,7 @@ export function makeExampleSchema(
               });
               const $itemId = $item.get("id");
               // TODO: make this TypeScript stuff automatic
-              const $input = args.input as InputObjectPlan;
+              const $input = args.input as __InputObjectPlan;
               const $post = pgInsert(relationalPostsSource, {
                 id: $itemId,
               });
@@ -4545,8 +4545,8 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (pgUpdate, relationalPostsSource) =>
             function plan(_$root, args) {
-              const $input = args.input as InputObjectPlan;
-              const $patch = $input.get("patch") as InputObjectPlan;
+              const $input = args.input as __InputObjectPlan;
+              const $patch = $input.get("patch") as __InputObjectPlan;
               const $post = pgUpdate(relationalPostsSource, {
                 id: $input.get("id"),
               });
@@ -4576,7 +4576,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (pgDelete, relationalPostsSource) =>
             function plan(_$root, args) {
-              const $input = args.input as InputObjectPlan;
+              const $input = args.input as __InputObjectPlan;
               const $post = pgDelete(relationalPostsSource, {
                 id: $input.get("id"),
               });

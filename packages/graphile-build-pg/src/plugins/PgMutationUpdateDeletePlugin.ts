@@ -10,7 +10,7 @@ import { pgDelete, pgInsert, pgUpdate } from "@dataplan/pg";
 import type {
   __TrackedObjectPlan,
   ExecutablePlan,
-  InputObjectPlan,
+  __InputObjectPlan,
   InputPlan,
   TrackedArguments,
 } from "graphile-crystal";
@@ -664,7 +664,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                     return uniqueColumns.reduce(
                       (memo, [columnName, fieldName]) => {
                         memo[columnName] = (
-                          args.input as __TrackedObjectPlan | InputObjectPlan
+                          args.input as __TrackedObjectPlan | __InputObjectPlan
                         ).get(fieldName);
                         return memo;
                       },
