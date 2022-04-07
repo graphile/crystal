@@ -52,6 +52,23 @@ function mergeErrorsBackIn(
   return finalResults;
 }
 
+/**
+ * The execution v2 strategy resolves around "Buckets"; this method executes
+ * all of the plans in the given bucket and then returns the output data. If
+ * all the plans are synchronous then the result will be the data directly,
+ * otherwise a promise will be returned.
+ *
+ * @privateRemarks
+ *
+ * Because this is performance critical code it unfortunately makes more sense
+ * right now to have one massive function that contains the values in a closure
+ * than to pass all the values around to lots of separate functions. To try and
+ * make this more manageable we've relied on JavaScript hoisting the function
+ * definitions and have pushed the sub-functions to the bottom of the various
+ * scopes. Sorry.
+ *
+ * @internal
+ */
 export function executeBucket(
   aether: Aether,
   metaByPlanId: CrystalContext["metaByPlanId"],
@@ -80,9 +97,25 @@ export function executeBucket(
   } = bucket;
   const size = input.length;
 
-  const reallyCompletedPlan = (
+  const starterPromises: PromiseLike<void>[] = [];
+  for (const plan of startPlans) {
+    const r = executePlan(plan);
+    if (isPromiseLike(r)) {
+      starterPromises.push(r);
+    }
+  }
+
+  if (starterPromises.length > 0) {
+    return Promise.all(starterPromises).then(produceOutput);
+  } else {
+    return produceOutput();
+  }
+
+  // Function definitions below here
+
+  function reallyCompletedPlan(
     finishedPlan: ExecutablePlan,
-  ): void | Promise<void> => {
+  ): void | Promise<void> {
     inProgressPlans.delete(finishedPlan);
     pendingPlans.delete(finishedPlan);
     if (pendingPlans.size === 0) {
@@ -110,13 +143,13 @@ export function executeBucket(
     } else {
       return;
     }
-  };
+  }
 
-  const completedPlan = (
+  function completedPlan(
     finishedPlan: ExecutablePlan,
     result: CrystalValuesList<any>,
     noNewErrors = false,
-  ): void | Promise<void> => {
+  ): void | Promise<void> {
     if (!Array.isArray(result)) {
       throw new Error(
         `Result from ${finishedPlan} should be an array, instead received ${inspect(
@@ -151,13 +184,13 @@ export function executeBucket(
         return reallyCompletedPlan(finishedPlan);
       });
     }
-  };
+  }
 
-  const executeListTransform = (
+  function executeListTransform(
     plan: __ListTransformPlan<any, any, any>,
     dependencies: (readonly any[])[],
     meta: Record<string, unknown>,
-  ): PromiseOrDirect<any[]> => {
+  ): PromiseOrDirect<any[]> {
     const itemPlan = aether.dangerouslyGetPlan(plan.itemPlanId!);
     const itemPlanId = itemPlan.id;
     const itemBucketDefinition = aether.buckets[itemPlan.bucketId];
@@ -221,7 +254,15 @@ export function executeBucket(
       requestContext,
     );
 
-    const performTransform = (): any[] => {
+    if (isPromiseLike(result)) {
+      return result.then(performTransform);
+    } else {
+      return performTransform();
+    }
+
+    // Internal functions below here
+
+    function performTransform(): any[] {
       const result: any[] = [];
       const transformDepPlanId =
         aether.transformDependencyPlanIdByTransformPlanId[plan.id];
@@ -252,14 +293,8 @@ export function executeBucket(
         }
       }
       return result;
-    };
-
-    if (isPromiseLike(result)) {
-      return result.then(performTransform);
-    } else {
-      return performTransform();
     }
-  };
+  }
 
   // Slow mode...
   function reallyExecutePlanWithErrors(
@@ -316,7 +351,7 @@ export function executeBucket(
   /**
    * This function MUST NEVER THROW/REJECT.
    */
-  const executePlan = (plan: ExecutablePlan): void | PromiseLike<void> => {
+  function executePlan(plan: ExecutablePlan): void | PromiseLike<void> {
     if (inProgressPlans.has(plan)) {
       return;
     }
@@ -362,16 +397,9 @@ export function executeBucket(
         true,
       );
     }
-  };
-  const starterPromises: PromiseLike<void>[] = [];
-  for (const plan of startPlans) {
-    const r = executePlan(plan);
-    if (isPromiseLike(r)) {
-      starterPromises.push(r);
-    }
   }
 
-  const produceOutput = (): PromiseOrDirect<Array<any>> => {
+  function produceOutput(): PromiseOrDirect<Array<any>> {
     if (pendingPlans.size > 0) {
       throw new Error(
         `produceOutput called before all plans were complete! Remaining plans were: ${[
@@ -416,128 +444,8 @@ export function executeBucket(
      */
     const pathIdentitiesWithChildren = Object.keys(childrenByPathIdentity);
 
-    const processListChildren = (
-      nestedPathIdentity: string,
-      rawValue: any,
-      value: any,
-      index: number,
-    ) => {
-      if (pathIdentitiesWithChildren.includes(nestedPathIdentity)) {
-        for (const child of childrenByPathIdentity[nestedPathIdentity]!) {
-          const {
-            input: childInputs,
-            store: childStore,
-            definition: {
-              itemPlanId,
-              polymorphicPlanIds,
-              groupId,
-              copyPlanIds,
-            },
-          } = child;
-          if (itemPlanId == null) {
-            throw new Error(
-              `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
-            );
-          }
-          if (polymorphicPlanIds) {
-            // TODO: will this ever be supported?
-            throw new Error("Polymorphism inside list currently unsupported");
-          }
-          if (groupId != null) {
-            throw new Error("Group inside list currently unsupported");
-          }
-          for (let i = 0, l = value.length; i < l; i++) {
-            childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
-            const l = childStore[itemPlanId].push(rawValue[i]);
-            for (const planId of copyPlanIds) {
-              const val = store[planId][index];
-              childStore[planId].push(val);
-            }
-          }
-        }
-      }
-    };
-
     const rootOutputStore =
       rootOutputPlanId != null ? store[rootOutputPlanId] : null;
-
-    const processObject = (
-      obj: object,
-      map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
-      pathIdentity: string,
-      setter: BucketSetter,
-      index: number,
-    ) => {
-      const concreteType = setter.concreteType!;
-      const rootPathIdentity = setter.rootPathIdentity;
-      for (const responseKey of (map as any)[$$keys]) {
-        const field = map[responseKey];
-        const keyPathIdentity = pathIdentity + responseKey;
-        // console.log(keyPathIdentity);
-        if (field.typeNames && !field.typeNames.includes(concreteType)) {
-          continue;
-        }
-        const planId = field.planIdByRootPathIdentity[rootPathIdentity];
-        if (planId == null) {
-          continue;
-        }
-        const rawValue = store[planId][index];
-        const mode = field.modeByRootPathIdentity[rootPathIdentity];
-        const value = bucketValue(
-          obj,
-          responseKey,
-          rawValue,
-          mode,
-          field.typeName,
-          requestContext,
-        );
-        obj[responseKey] = value;
-
-        if (mode.type === "A") {
-          if (Array.isArray(value)) {
-            const nestedPathIdentity = keyPathIdentity + "[]";
-            processListChildren(nestedPathIdentity, rawValue, value, index);
-          }
-        } else if (mode.type === "O") {
-          const d = value;
-          if (d != null && !isCrystalError(d)) {
-            if (field.children) {
-              processObject(
-                d,
-                field.children,
-                `${keyPathIdentity}>${d[$$concreteType]}.`,
-                setter,
-                index,
-              );
-            }
-            if (pathIdentitiesWithChildren.includes(keyPathIdentity)) {
-              const valueConcreteType = value[$$concreteType];
-              for (const child of childrenByPathIdentity[keyPathIdentity]!) {
-                if (child.definition.itemPlanId != null) {
-                  throw new Error("INCONSISTENT!");
-                }
-                if (child.definition.groupId != null) {
-                  throw new Error("Group inside list currently unsupported");
-                }
-                const match =
-                  !child.definition.polymorphicTypeNames ||
-                  child.definition.polymorphicTypeNames.includes(
-                    valueConcreteType,
-                  );
-                if (match) {
-                  child.input.push(
-                    new BucketSetter(keyPathIdentity, obj, responseKey),
-                  );
-                  for (const planId of child.definition.copyPlanIds) {
-                    child.store[planId].push(store[planId][index]);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    };
 
     const result: any[] = [];
     for (let index = 0, l = input.length; index < l; index++) {
@@ -624,11 +532,127 @@ export function executeBucket(
     } else {
       return result;
     }
-  };
 
-  if (starterPromises.length > 0) {
-    return Promise.all(starterPromises).then(produceOutput);
-  } else {
-    return produceOutput();
+    // Function definitions below here
+
+    function processListChildren(
+      nestedPathIdentity: string,
+      rawValue: any,
+      value: any,
+      index: number,
+    ) {
+      if (pathIdentitiesWithChildren.includes(nestedPathIdentity)) {
+        for (const child of childrenByPathIdentity[nestedPathIdentity]!) {
+          const {
+            input: childInputs,
+            store: childStore,
+            definition: {
+              itemPlanId,
+              polymorphicPlanIds,
+              groupId,
+              copyPlanIds,
+            },
+          } = child;
+          if (itemPlanId == null) {
+            throw new Error(
+              `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
+            );
+          }
+          if (polymorphicPlanIds) {
+            // TODO: will this ever be supported?
+            throw new Error("Polymorphism inside list currently unsupported");
+          }
+          if (groupId != null) {
+            throw new Error("Group inside list currently unsupported");
+          }
+          for (let i = 0, l = value.length; i < l; i++) {
+            childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
+            const l = childStore[itemPlanId].push(rawValue[i]);
+            for (const planId of copyPlanIds) {
+              const val = store[planId][index];
+              childStore[planId].push(val);
+            }
+          }
+        }
+      }
+    }
+
+    function processObject(
+      obj: object,
+      map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
+      pathIdentity: string,
+      setter: BucketSetter,
+      index: number,
+    ) {
+      const concreteType = setter.concreteType!;
+      const rootPathIdentity = setter.rootPathIdentity;
+      for (const responseKey of (map as any)[$$keys]) {
+        const field = map[responseKey];
+        const keyPathIdentity = pathIdentity + responseKey;
+        // console.log(keyPathIdentity);
+        if (field.typeNames && !field.typeNames.includes(concreteType)) {
+          continue;
+        }
+        const planId = field.planIdByRootPathIdentity[rootPathIdentity];
+        if (planId == null) {
+          continue;
+        }
+        const rawValue = store[planId][index];
+        const mode = field.modeByRootPathIdentity[rootPathIdentity];
+        const value = bucketValue(
+          obj,
+          responseKey,
+          rawValue,
+          mode,
+          field.typeName,
+          requestContext,
+        );
+        obj[responseKey] = value;
+
+        if (mode.type === "A") {
+          if (Array.isArray(value)) {
+            const nestedPathIdentity = keyPathIdentity + "[]";
+            processListChildren(nestedPathIdentity, rawValue, value, index);
+          }
+        } else if (mode.type === "O") {
+          const d = value;
+          if (d != null && !isCrystalError(d)) {
+            if (field.children) {
+              processObject(
+                d,
+                field.children,
+                `${keyPathIdentity}>${d[$$concreteType]}.`,
+                setter,
+                index,
+              );
+            }
+            if (pathIdentitiesWithChildren.includes(keyPathIdentity)) {
+              const valueConcreteType = value[$$concreteType];
+              for (const child of childrenByPathIdentity[keyPathIdentity]!) {
+                if (child.definition.itemPlanId != null) {
+                  throw new Error("INCONSISTENT!");
+                }
+                if (child.definition.groupId != null) {
+                  throw new Error("Group inside list currently unsupported");
+                }
+                const match =
+                  !child.definition.polymorphicTypeNames ||
+                  child.definition.polymorphicTypeNames.includes(
+                    valueConcreteType,
+                  );
+                if (match) {
+                  child.input.push(
+                    new BucketSetter(keyPathIdentity, obj, responseKey),
+                  );
+                  for (const planId of child.definition.copyPlanIds) {
+                    child.store[planId].push(store[planId][index]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
