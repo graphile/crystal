@@ -2,7 +2,7 @@ import assert from "assert";
 import type { GraphQLInputType, ValueNode } from "graphql";
 import { GraphQLList } from "graphql";
 
-import type { InputPlan} from "../input";
+import type { InputPlan } from "../input";
 import { assertInputPlan, inputPlan } from "../input";
 import { ExecutablePlan } from "../plan";
 import { constant } from "./constant";

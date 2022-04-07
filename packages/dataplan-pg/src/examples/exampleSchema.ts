@@ -14,14 +14,14 @@ import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
+  __InputObjectPlan,
+  __InputStaticLeafPlan,
   __TrackedObjectPlan,
   AccessPlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   CrystalSubscriber,
   ExecutablePlan,
-  __InputObjectPlan,
-  __InputStaticLeafPlan,
   ListPlan,
 } from "graphile-crystal";
 import {

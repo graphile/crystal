@@ -7,14 +7,15 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import {
+  buildASTSchema,
   isEnumType,
   isInputObjectType,
   isInterfaceType,
   isObjectType,
   isScalarType,
   isUnionType,
+  parse,
 } from "graphql";
-import { buildASTSchema, parse } from "graphql";
 
 import type {
   ArgumentPlanResolver,

@@ -23,6 +23,11 @@ import type { PlanResults, PlanResultsBucket } from "./planResults";
 import type { __TrackedObjectPlan } from "./plans";
 import type { GraphileInputObjectType, GraphileObjectType } from "./utils";
 
+/*
+ * We register certain things (plans, etc) into the GraphQL "extensions"
+ * property on the various GraphQL configs (type, field, argument, etc); this
+ * uses declaration merging so that these can be accessed with types.
+ */
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
     graphile?: {
@@ -74,14 +79,19 @@ declare module "graphql" {
 export const $$crystalContext = Symbol("context");
 export const $$planResults = Symbol("planResults");
 export const $$id = Symbol("id");
-// Return the value verbatim, don't execute
+/** Return the value verbatim, don't execute */
 export const $$verbatim = Symbol("verbatim");
-// If we're sure the data is the right shape and valid, we can set this key and
-// it can be returned directly
+/**
+ * If we're sure the data is the right shape and valid, we can set this key and
+ * it can be returned directly
+ */
 export const $$bypassGraphQL = Symbol("bypassGraphQL");
 export const $$data = Symbol("data");
 export const $$pathIdentity = Symbol("pathIdentity");
 
+/**
+ * The "GraphQLObjectType" type name, useful when dealing with polymorphism.
+ */
 export const $$concreteType = Symbol("concreteType");
 
 export const $$setPlanGraph = Symbol("setPlanGraph");
@@ -94,6 +104,11 @@ export const $$setPlanGraph = Symbol("setPlanGraph");
  */
 export const $$idempotent = Symbol("idempotent");
 
+// TODO: remove <TData>
+/**
+ * When dealing with a polymorphic thing we need to be able to determine what
+ * the concrete type of it is, we use the $$concreteType property for that.
+ */
 export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteType]: TType;
 }
@@ -102,7 +117,11 @@ export interface IndexByListItemPlanId {
   [listItemPlanId: string]: number;
 }
 
-// TODO: remove <TData>
+/**
+ * This is part of execution-v1 which is deprecated; we're moving to execution
+ * v2 which uses buckets instead of crystal objects and has a significantly
+ * reduced garbage collection cost.
+ */
 export interface CrystalObject {
   toString(): string;
   [$$data]: {
@@ -137,6 +156,7 @@ export interface CrystalObject {
   [$$planResults]: PlanResults;
 }
 
+/** Execution-v1 batching; soon to be replaced. */
 export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;
@@ -146,6 +166,10 @@ export interface Batch {
   entries: Array<[CrystalObject, Deferred<any>]>;
 }
 
+/**
+ * Details about a specific batch being executed. Execution-v1; soon to be
+ * replaced.
+ */
 export interface CrystalContext {
   aether: Aether;
 
@@ -209,6 +233,12 @@ export type ExecutablePlanResolver<
   },
 ) => TResultPlan;
 
+/**
+ * Fields on input objects can have plans; the plan resolver is passed a parent plan
+ * (from an argument, or from a parent input object) or null if none, and an
+ * input plan that represents the value the user will pass to this field. The
+ * resolver must return either a ModifierPlan or null.
+ */
 export type InputObjectFieldPlanResolver<
   TContext extends BaseGraphQLContext,
   TInput extends InputPlan,
@@ -224,6 +254,13 @@ export type InputObjectFieldPlanResolver<
   },
 ) => TResultPlan;
 
+/**
+ * Arguments can have plans; the plan resolver is passed the parent plan (the
+ * plan that represents the _parent_ field of the field the arg is defined on),
+ * the field plan (the plan that represents the field the arg is defined on)
+ * and an input plan that represents the value the user will pass to this
+ * argument. The resolver must return either a ModifierPlan or null.
+ */
 export type ArgumentPlanResolver<
   TContext extends BaseGraphQLContext,
   TInput extends InputPlan,
@@ -241,6 +278,10 @@ export type ArgumentPlanResolver<
   },
 ) => TResultPlan;
 
+/**
+ * GraphQLScalarTypes can have plans, these are passed the field plan and must
+ * return an executable plan.
+ */
 export type ScalarPlanResolver<
   TParentPlan extends ExecutablePlan<any>,
   TResultPlan extends ExecutablePlan<any>,
@@ -384,6 +425,9 @@ export type GraphileFieldConfig<
   >;
 };
 
+/**
+ * Basically GraphQLFieldConfigArgumentMap but allowing for args to have plans.
+ */
 export type GraphileFieldConfigArgumentMap<
   _TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
@@ -400,6 +444,9 @@ export type GraphileFieldConfigArgumentMap<
   >;
 };
 
+/**
+ * Basically GraphQLArgumentConfig but allowing for a plan.
+ */
 export type GraphileArgumentConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
@@ -422,6 +469,9 @@ export type GraphileArgumentConfig<
     : never;
 };
 
+/**
+ * Basically GraphQLInputFieldConfig but allowing for the field to have a plan.
+ */
 export type GraphileInputFieldConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
@@ -438,6 +488,9 @@ export type GraphileInputFieldConfig<
   >;
 };
 
+/**
+ * The args passed to a field plan resolver, the values are plans.
+ */
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
@@ -461,6 +514,9 @@ export interface FieldAndGroup {
   field: FieldNode;
 }
 
+/**
+ * `@stream` directive meta.
+ */
 export interface PlanStreamOptions {
   initialCount: number;
 }
@@ -469,9 +525,15 @@ export interface PlanStreamOptions {
  * the `@stream` directive.
  */
 export interface PlanOptions {
+  /**
+   * Details for the `@stream` directive.
+   */
   stream: PlanStreamOptions | null;
 }
 
+/**
+ * Options passed to the `optimize` method of a plan to give more context.
+ */
 export interface PlanOptimizeOptions {
   stream: PlanStreamOptions | null;
 }
