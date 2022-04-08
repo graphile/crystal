@@ -148,17 +148,13 @@ export const ConnectionPlugin: Plugin = {
                             ),
                           ),
                           plan: EXPORTABLE(
-                            (each) =>
+                            () =>
                               function plan(
                                 $connection: ConnectionPlan<any, any, any>,
                               ) {
-                                return each(
-                                  $connection.cloneSubplanWithPagination(),
-                                  ($intermediate) =>
-                                    $connection.itemPlan($intermediate),
-                                );
+                                return $connection.cloneSubplanWithPagination();
                               },
-                            [each],
+                            [],
                           ) as any,
                         }),
                       ),
