@@ -9,39 +9,39 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
-    Lambda29["Lambda[29]<br />ᐸlistHasMoreᐳ"]:::plan
-    PgSelect27[["PgSelect[27]<br />ᐸmessagesᐳ"]]:::plan
-    PgClassExpression36["PgClassExpression[36]<br />ᐸcount(*)ᐳ"]:::plan
-    PgSelectSingle35["PgSelectSingle[35]<br />ᐸmessagesᐳ"]:::plan
-    First34["First[34]"]:::plan
-    PgSelect33[["PgSelect[33]<br />ᐸmessagesᐳ"]]:::plan
-    Object23["Object[23]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf17["__InputStaticLeaf[17]"]:::plan
     Access21["Access[21]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access22["Access[22]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    PgValidateParsedCursor30["PgValidateParsedCursor[30]"]:::plan
-    ToPg32["ToPg[32]"]:::plan
-    Access31["Access[31]<br />ᐸ28.1ᐳ"]:::plan
-    Lambda28["Lambda[28]<br />ᐸparseCursorᐳ"]:::plan
-    __InputStaticLeaf17["__InputStaticLeaf[17]"]:::plan
+    Object23["Object[23]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Constant37["Constant[37]"]:::plan
     PgPageInfo25["PgPageInfo[25]"]:::plan
     Constant26["Constant[26]"]:::plan
+    Lambda28["Lambda[28]<br />ᐸparseCursorᐳ"]:::plan
+    PgValidateParsedCursor30["PgValidateParsedCursor[30]"]:::plan
+    Access31["Access[31]<br />ᐸ28.1ᐳ"]:::plan
+    ToPg32["ToPg[32]"]:::plan
+    PgSelect27[["PgSelect[27]<br />ᐸmessagesᐳ"]]:::plan
+    Lambda29["Lambda[29]<br />ᐸlistHasMoreᐳ"]:::plan
+    PgSelect33[["PgSelect[33]<br />ᐸmessagesᐳ"]]:::plan
+    First34["First[34]"]:::plan
+    PgSelectSingle35["PgSelectSingle[35]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression36["PgClassExpression[36]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelect27 --> Lambda29
-    Object23 & Lambda28 & PgValidateParsedCursor30 & ToPg32 --> PgSelect27
-    PgSelectSingle35 --> PgClassExpression36
-    First34 --> PgSelectSingle35
-    PgSelect33 --> First34
-    Object23 --> PgSelect33
-    Access21 & Access22 --> Object23
     __Value3 --> Access21
     __Value3 --> Access22
-    Lambda28 --> PgValidateParsedCursor30
-    Access31 --> ToPg32
-    Lambda28 --> Access31
+    Access21 & Access22 --> Object23
     __InputStaticLeaf17 --> Lambda28
+    Lambda28 --> PgValidateParsedCursor30
+    Lambda28 --> Access31
+    Access31 --> ToPg32
+    Object23 & Lambda28 & PgValidateParsedCursor30 & ToPg32 --> PgSelect27
+    PgSelect27 --> Lambda29
+    Object23 --> PgSelect33
+    PgSelect33 --> First34
+    First34 --> PgSelectSingle35
+    PgSelectSingle35 --> PgClassExpression36
 
     %% plan-to-path relationships
     P0["~"]

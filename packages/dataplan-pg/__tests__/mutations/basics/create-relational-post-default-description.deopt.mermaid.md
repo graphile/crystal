@@ -9,46 +9,46 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression22["PgClassExpression[22∈1@1]<br />ᐸ__relational_posts__ᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈1@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    PgClassExpression33["PgClassExpression[33∈1@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
-    PgClassExpression34["PgClassExpression[34∈1@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    PgSelectSingle30["PgSelectSingle[30∈1@1]<br />ᐸrelational_postsᐳ"]:::plan
-    First29["First[29∈1@1]"]:::plan
-    PgSelect25[["PgSelect[25∈1@1]<br />ᐸrelational_postsᐳ"]]:::plan
-    PgClassExpression23["PgClassExpression[23∈1@1]<br />ᐸ(__relatio...ts__).”id”ᐳ"]:::plan
-    PgInsert18[["PgInsert[18∈1@1]"]]:::sideeffectplan
-    PgClassExpression17["PgClassExpression[17∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    PgInsert13[["PgInsert[13∈1@1]"]]:::sideeffectplan
-    Object28["Object[28∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access26["Access[26∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access27["Access[27∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
     __InputStaticLeaf10["__InputStaticLeaf[10∈1@1]"]:::plan
     Constant11["Constant[11∈1@1]"]:::plan
     Constant12["Constant[12∈1@1]"]:::plan
+    Access26["Access[26∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access27["Access[27∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object28["Object[28∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgInsert13[["PgInsert[13∈1@1]"]]:::sideeffectplan
+    PgClassExpression17["PgClassExpression[17∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgInsert18[["PgInsert[18∈1@1]"]]:::sideeffectplan
+    PgClassExpression22["PgClassExpression[22∈1@1]<br />ᐸ__relational_posts__ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1@1]<br />ᐸ(__relatio...ts__).”id”ᐳ"]:::plan
+    PgSelect25[["PgSelect[25∈1@1]<br />ᐸrelational_postsᐳ"]]:::plan
+    First29["First[29∈1@1]"]:::plan
+    PgSelectSingle30["PgSelectSingle[30∈1@1]<br />ᐸrelational_postsᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈1@1]<br />ᐸ__relation...scription”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈1@1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
 
     %% plan dependencies
+    __Value5 --> __TrackedObject6
+    __Value3 --> Access26
+    __Value3 --> Access27
+    Access26 & Access27 --> Object28
+    Object28 & Constant11 & Constant12 --> PgInsert13
+    PgInsert13 --> PgClassExpression17
+    Object28 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf10 --> PgInsert18
     PgInsert18 --> PgClassExpression22
+    PgInsert18 --> PgClassExpression23
+    Object28 & PgClassExpression23 --> PgSelect25
+    PgSelect25 --> First29
+    First29 --> PgSelectSingle30
     PgSelectSingle30 --> PgClassExpression31
     PgSelectSingle30 --> PgClassExpression32
     PgSelectSingle30 --> PgClassExpression33
     PgSelectSingle30 --> PgClassExpression34
-    First29 --> PgSelectSingle30
-    PgSelect25 --> First29
-    Object28 & PgClassExpression23 --> PgSelect25
-    PgInsert18 --> PgClassExpression23
-    Object28 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf10 --> PgInsert18
-    PgInsert13 --> PgClassExpression17
-    Object28 & Constant11 & Constant12 --> PgInsert13
-    Access26 & Access27 --> Object28
-    __Value3 --> Access26
-    __Value3 --> Access27
-    __Value5 --> __TrackedObject6
 
     %% plan-to-path relationships
     P0["~"]

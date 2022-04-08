@@ -9,64 +9,64 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    Lambda15["Lambda[15∈1]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    Lambda8["Lambda[8∈0]"]:::plan
+    Access9["Access[9∈0]<br />ᐸ3.pgSubscriberᐳ"]:::plan
+    Subscribe10["Subscribe[10∈0]"]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ10ᐳ"]:::itemplan
+    JSONParse12[["JSONParse[12∈1]<br />ᐸ11ᐳ"]]:::plan
     Access14["Access[14∈1]<br />ᐸ12.opᐳ"]:::plan
+    Lambda15["Lambda[15∈1]"]:::plan
+    Access16["Access[16∈1]<br />ᐸ12.idᐳ"]:::plan
+    Access40["Access[40∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access41["Access[41∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object42["Object[42∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect17[["PgSelect[17∈1]<br />ᐸmessagesᐳ"]]:::plan
+    First21["First[21∈1]"]:::plan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__messages__.”id”ᐳ"]:::plan
     PgClassExpression24["PgClassExpression[24∈1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
     PgClassExpression25["PgClassExpression[25∈1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     PgClassExpression26["PgClassExpression[26∈1]<br />ᐸ(__message... not null)ᐳ"]:::plan
     PgClassExpression27["PgClassExpression[27∈1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
+    Map47["Map[47∈1]<br />ᐸ22:{”0”:4,”1”:5}ᐳ"]:::plan
+    PgSelectSingle33["PgSelectSingle[33∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
     PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ(__forums_... not null)ᐳ"]:::plan
-    PgSelectSingle33["PgSelectSingle[33∈1]<br />ᐸforumsᐳ"]:::plan
-    Map47["Map[47∈1]<br />ᐸ22:{”0”:4,”1”:5}ᐳ"]:::plan
+    Map49["Map[49∈1]<br />ᐸ22:{”0”:7,”1”:8}ᐳ"]:::plan
+    PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸusersᐳ"]:::plan
     PgClassExpression45["PgClassExpression[45∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression46["PgClassExpression[46∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
-    PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸusersᐳ"]:::plan
-    Map49["Map[49∈1]<br />ᐸ22:{”0”:7,”1”:8}ᐳ"]:::plan
-    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸmessagesᐳ"]:::plan
-    First21["First[21∈1]"]:::plan
-    PgSelect17[["PgSelect[17∈1]<br />ᐸmessagesᐳ"]]:::plan
-    Access16["Access[16∈1]<br />ᐸ12.idᐳ"]:::plan
-    JSONParse12[["JSONParse[12∈1]<br />ᐸ11ᐳ"]]:::plan
-    __Item11>"__Item[11∈1]<br />ᐸ10ᐳ"]:::itemplan
-    Subscribe10["Subscribe[10∈0]"]:::plan
-    Access9["Access[9∈0]<br />ᐸ3.pgSubscriberᐳ"]:::plan
-    Object42["Object[42∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access40["Access[40∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access41["Access[41∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Lambda8["Lambda[8∈0]"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
-    Access14 --> Lambda15
+    __InputStaticLeaf7 --> Lambda8
+    __Value3 --> Access9
+    Access9 & Lambda8 --> Subscribe10
+    Subscribe10 ==> __Item11
+    __Item11 --> JSONParse12
     JSONParse12 --> Access14
+    Access14 --> Lambda15
+    JSONParse12 --> Access16
+    __Value3 --> Access40
+    __Value3 --> Access41
+    Access40 & Access41 --> Object42
+    Object42 & Access16 --> PgSelect17
+    PgSelect17 --> First21
+    First21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression24
     PgSelectSingle22 --> PgClassExpression25
     PgSelectSingle22 --> PgClassExpression26
     PgSelectSingle22 --> PgClassExpression27
+    PgSelectSingle22 --> Map47
+    Map47 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression35
     PgSelectSingle33 --> PgClassExpression36
-    Map47 --> PgSelectSingle33
-    PgSelectSingle22 --> Map47
+    PgSelectSingle22 --> Map49
+    Map49 --> PgSelectSingle44
     PgSelectSingle44 --> PgClassExpression45
     PgSelectSingle44 --> PgClassExpression46
-    Map49 --> PgSelectSingle44
-    PgSelectSingle22 --> Map49
-    First21 --> PgSelectSingle22
-    PgSelect17 --> First21
-    Object42 & Access16 --> PgSelect17
-    JSONParse12 --> Access16
-    __Item11 --> JSONParse12
-    Subscribe10 ==> __Item11
-    Access9 & Lambda8 --> Subscribe10
-    __Value3 --> Access9
-    Access40 & Access41 --> Object42
-    __Value3 --> Access40
-    __Value3 --> Access41
-    __InputStaticLeaf7 --> Lambda8
 
     %% plan-to-path relationships
     P0["~"]

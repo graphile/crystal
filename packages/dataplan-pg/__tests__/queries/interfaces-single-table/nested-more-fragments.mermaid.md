@@ -9,19 +9,33 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access598["Access[598∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access599["Access[599∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object600["Object[600∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
     PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
-    PgSingleTablePolymorphic26["PgSingleTablePolymorphic[26∈3]"]:::plan
-    Lambda25["Lambda[25∈3]"]:::plan
+    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    Access617["Access[617∈1]<br />ᐸ11.1ᐳ"]:::plan
+    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
+    __Item20>"__Item[20∈2]<br />ᐸ617ᐳ"]:::itemplan
+    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
+    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸsingle_table_itemsᐳ"]:::plan
     PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
+    Lambda25["Lambda[25∈3]"]:::plan
+    PgSingleTablePolymorphic26["PgSingleTablePolymorphic[26∈3]"]:::plan
     PgClassExpression27["PgClassExpression[27∈4]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
-    PgSingleTablePolymorphic36["PgSingleTablePolymorphic[36∈4]"]:::plan
-    Lambda35["Lambda[35∈4]"]:::plan
+    Map613["Map[613∈4]<br />ᐸ23:{”0”:1,”1”:2,”2”:3,”3”:4,”4”:5,”5”:6,”6”:7,”7”:8,”8”:9,”9”:10,”10”:11,”11”:12}ᐳ"]:::plan
+    PgSelectSingle33["PgSelectSingle[33∈4]<br />ᐸsingle_table_itemsᐳ"]:::plan
     PgClassExpression34["PgClassExpression[34∈4]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
+    Lambda35["Lambda[35∈4]"]:::plan
+    PgSingleTablePolymorphic36["PgSingleTablePolymorphic[36∈4]"]:::plan
     PgClassExpression39["PgClassExpression[39∈5]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
-    PgClassExpression47["PgClassExpression[47∈5]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgSelectSingle46["PgSelectSingle[46∈5]<br />ᐸpeopleᐳ"]:::plan
     Map611["Map[611∈5]<br />ᐸ33:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle46["PgSelectSingle[46∈5]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression47["PgClassExpression[47∈5]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression48["PgClassExpression[48∈5]<br />ᐸ__single_t...”position”ᐳ"]:::plan
     PgClassExpression49["PgClassExpression[49∈5]<br />ᐸ__single_t...reated_at”ᐳ"]:::plan
     PgClassExpression50["PgClassExpression[50∈5]<br />ᐸ__single_t...pdated_at”ᐳ"]:::plan
@@ -31,13 +45,11 @@ graph TD
     PgClassExpression71["PgClassExpression[71∈5]<br />ᐸ__single_t...scription”ᐳ"]:::plan
     PgClassExpression72["PgClassExpression[72∈5]<br />ᐸ__single_t...s__.”note”ᐳ"]:::plan
     PgClassExpression90["PgClassExpression[90∈5]<br />ᐸ__single_t...__.”color”ᐳ"]:::plan
-    PgSelectSingle33["PgSelectSingle[33∈4]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    Map613["Map[613∈4]<br />ᐸ23:{”0”:1,”1”:2,”2”:3,”3”:4,”4”:5,”5”:6,”6”:7,”7”:8,”8”:9,”9”:10,”10”:11,”11”:12}ᐳ"]:::plan
     PgClassExpression126["PgClassExpression[126∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
     PgClassExpression128["PgClassExpression[128∈4]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
-    PgClassExpression136["PgClassExpression[136∈4]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgSelectSingle135["PgSelectSingle[135∈4]<br />ᐸpeopleᐳ"]:::plan
     Map615["Map[615∈4]<br />ᐸ23:{”0”:16}ᐳ"]:::plan
+    PgSelectSingle135["PgSelectSingle[135∈4]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression136["PgClassExpression[136∈4]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression137["PgClassExpression[137∈4]<br />ᐸ__single_t...”position”ᐳ"]:::plan
     PgClassExpression138["PgClassExpression[138∈4]<br />ᐸ__single_t...reated_at”ᐳ"]:::plan
     PgClassExpression139["PgClassExpression[139∈4]<br />ᐸ__single_t...pdated_at”ᐳ"]:::plan
@@ -47,33 +59,35 @@ graph TD
     PgClassExpression259["PgClassExpression[259∈4]<br />ᐸ__single_t...scription”ᐳ"]:::plan
     PgClassExpression260["PgClassExpression[260∈4]<br />ᐸ__single_t...s__.”note”ᐳ"]:::plan
     PgClassExpression377["PgClassExpression[377∈4]<br />ᐸ__single_t...__.”color”ᐳ"]:::plan
-    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
-    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    __Item20>"__Item[20∈2]<br />ᐸ617ᐳ"]:::itemplan
-    Access617["Access[617∈1]<br />ᐸ11.1ᐳ"]:::plan
-    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
-    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Object600["Object[600∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access598["Access[598∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access599["Access[599∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle12 --> PgClassExpression13
+    __Value3 --> Access598
+    __Value3 --> Access599
+    Access598 & Access599 --> Object600
+    Object600 --> PgSelect7
+    PgSelect7 ==> __Item11
     __Item11 --> PgSelectSingle12
-    Lambda25 & PgSelectSingle23 --> PgSingleTablePolymorphic26
-    PgClassExpression24 --> Lambda25
+    PgSelectSingle12 --> PgClassExpression13
+    __Item11 --> Access617
+    Access617 --> __ListTransform19
+    PgSelectSingle21 -.-> __ListTransform19
+    Access617 -.-> __Item20
+    __Item20 --> PgSelectSingle21
+    __ListTransform19 ==> __Item22
+    __Item22 --> PgSelectSingle23
     PgSelectSingle23 --> PgClassExpression24
+    PgClassExpression24 --> Lambda25
+    Lambda25 & PgSelectSingle23 --> PgSingleTablePolymorphic26
     PgSelectSingle23 --> PgClassExpression27
-    Lambda35 & PgSelectSingle33 --> PgSingleTablePolymorphic36
-    PgClassExpression34 --> Lambda35
+    PgSelectSingle23 --> Map613
+    Map613 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression34
+    PgClassExpression34 --> Lambda35
+    Lambda35 & PgSelectSingle33 --> PgSingleTablePolymorphic36
     PgSelectSingle33 --> PgClassExpression39
-    PgSelectSingle46 --> PgClassExpression47
-    Map611 --> PgSelectSingle46
     PgSelectSingle33 --> Map611
+    Map611 --> PgSelectSingle46
+    PgSelectSingle46 --> PgClassExpression47
     PgSelectSingle33 --> PgClassExpression48
     PgSelectSingle33 --> PgClassExpression49
     PgSelectSingle33 --> PgClassExpression50
@@ -83,13 +97,11 @@ graph TD
     PgSelectSingle33 --> PgClassExpression71
     PgSelectSingle33 --> PgClassExpression72
     PgSelectSingle33 --> PgClassExpression90
-    Map613 --> PgSelectSingle33
-    PgSelectSingle23 --> Map613
     PgSelectSingle23 --> PgClassExpression126
     PgSelectSingle23 --> PgClassExpression128
-    PgSelectSingle135 --> PgClassExpression136
-    Map615 --> PgSelectSingle135
     PgSelectSingle23 --> Map615
+    Map615 --> PgSelectSingle135
+    PgSelectSingle135 --> PgClassExpression136
     PgSelectSingle23 --> PgClassExpression137
     PgSelectSingle23 --> PgClassExpression138
     PgSelectSingle23 --> PgClassExpression139
@@ -99,18 +111,6 @@ graph TD
     PgSelectSingle23 --> PgClassExpression259
     PgSelectSingle23 --> PgClassExpression260
     PgSelectSingle23 --> PgClassExpression377
-    __Item22 --> PgSelectSingle23
-    __ListTransform19 ==> __Item22
-    Access617 --> __ListTransform19
-    PgSelectSingle21 -.-> __ListTransform19
-    __Item20 --> PgSelectSingle21
-    Access617 -.-> __Item20
-    __Item11 --> Access617
-    PgSelect7 ==> __Item11
-    Object600 --> PgSelect7
-    Access598 & Access599 --> Object600
-    __Value3 --> Access598
-    __Value3 --> Access599
 
     %% plan-to-path relationships
     P0["~"]

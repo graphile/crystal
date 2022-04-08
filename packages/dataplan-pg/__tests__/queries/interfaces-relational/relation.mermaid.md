@@ -9,44 +9,44 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
-    PgPolymorphic15["PgPolymorphic[15]"]:::plan
-    PgClassExpression14["PgClassExpression[14]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgClassExpression404["PgClassExpression[404]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    PgPolymorphic31["PgPolymorphic[31]"]:::plan
-    PgClassExpression30["PgClassExpression[30]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgClassExpression484["PgClassExpression[484]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
-    PgClassExpression47["PgClassExpression[47]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgSelectSingle46["PgSelectSingle[46]<br />ᐸpeopleᐳ"]:::plan
-    Map501["Map[501]<br />ᐸ29:{”0”:2}ᐳ"]:::plan
-    PgSelectSingle29["PgSelectSingle[29]<br />ᐸrelational_itemsᐳ"]:::plan
-    Map503["Map[503]<br />ᐸ13:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrelational_itemsᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object496["Object[496]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access494["Access[494]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access495["Access[495]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access494["Access[494]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access495["Access[495]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object496["Object[496]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸrelational_itemsᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrelational_itemsᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgPolymorphic15["PgPolymorphic[15]"]:::plan
+    PgClassExpression404["PgClassExpression[404]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    Map503["Map[503]<br />ᐸ13:{”0”:2,”1”:3,”2”:4}ᐳ"]:::plan
+    PgSelectSingle29["PgSelectSingle[29]<br />ᐸrelational_itemsᐳ"]:::plan
+    PgClassExpression30["PgClassExpression[30]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgPolymorphic31["PgPolymorphic[31]"]:::plan
+    PgClassExpression484["PgClassExpression[484]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    Map501["Map[501]<br />ᐸ29:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle46["PgSelectSingle[46]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression47["PgClassExpression[47]<br />ᐸ__people__.”username”ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle13 & PgClassExpression14 --> PgPolymorphic15
-    PgSelectSingle13 --> PgClassExpression14
-    PgSelectSingle13 --> PgClassExpression404
-    PgSelectSingle29 & PgClassExpression30 --> PgPolymorphic31
-    PgSelectSingle29 --> PgClassExpression30
-    PgSelectSingle29 --> PgClassExpression484
-    PgSelectSingle46 --> PgClassExpression47
-    Map501 --> PgSelectSingle46
-    PgSelectSingle29 --> Map501
-    Map503 --> PgSelectSingle29
-    PgSelectSingle13 --> Map503
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object496 & __InputStaticLeaf7 --> PgSelect8
-    Access494 & Access495 --> Object496
     __Value3 --> Access494
     __Value3 --> Access495
+    Access494 & Access495 --> Object496
+    Object496 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 & PgClassExpression14 --> PgPolymorphic15
+    PgSelectSingle13 --> PgClassExpression404
+    PgSelectSingle13 --> Map503
+    Map503 --> PgSelectSingle29
+    PgSelectSingle29 --> PgClassExpression30
+    PgSelectSingle29 & PgClassExpression30 --> PgPolymorphic31
+    PgSelectSingle29 --> PgClassExpression484
+    PgSelectSingle29 --> Map501
+    Map501 --> PgSelectSingle46
+    PgSelectSingle46 --> PgClassExpression47
 
     %% plan-to-path relationships
     P0["~"]

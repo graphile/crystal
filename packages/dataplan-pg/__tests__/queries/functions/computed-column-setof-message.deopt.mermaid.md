@@ -9,32 +9,32 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
-    PgSelectSingle20["PgSelectSingle[20∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
-    __Item19>"__Item[19∈1]<br />ᐸ15ᐳ"]:::itemplan
-    PgSelect15[["PgSelect[15∈0]<br />ᐸforums_featured_messagesᐳ"]]:::plan
-    PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__forums__ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸforumsᐳ"]:::plan
-    First12["First[12∈0]"]:::plan
-    PgSelect8[["PgSelect[8∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object18["Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access16["Access[16∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access17["Access[17∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    Access16["Access[16∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access17["Access[17∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object18["Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸforumsᐳ"]]:::plan
+    First12["First[12∈0]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__forums__ᐳ"]:::plan
+    PgSelect15[["PgSelect[15∈0]<br />ᐸforums_featured_messagesᐳ"]]:::plan
+    __Item19>"__Item[19∈1]<br />ᐸ15ᐳ"]:::itemplan
+    PgSelectSingle20["PgSelectSingle[20∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle20 --> PgClassExpression21
-    __Item19 --> PgSelectSingle20
-    PgSelect15 ==> __Item19
-    Object18 & PgClassExpression14 --> PgSelect15
-    PgSelectSingle13 --> PgClassExpression14
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object18 & __InputStaticLeaf7 --> PgSelect8
-    Access16 & Access17 --> Object18
     __Value3 --> Access16
     __Value3 --> Access17
+    Access16 & Access17 --> Object18
+    Object18 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    Object18 & PgClassExpression14 --> PgSelect15
+    PgSelect15 ==> __Item19
+    __Item19 --> PgSelectSingle20
+    PgSelectSingle20 --> PgClassExpression21
 
     %% plan-to-path relationships
     P0["~"]

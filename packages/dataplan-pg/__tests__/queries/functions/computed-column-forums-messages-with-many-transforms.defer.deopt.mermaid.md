@@ -9,72 +9,72 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgClassExpression47["PgClassExpression[47∈8@1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression48["PgClassExpression[48∈8@1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
-    PgSelectSingle46["PgSelectSingle[46∈8@1]<br />ᐸmessagesᐳ"]:::plan
-    __Item45>"__Item[45∈8@1]<br />ᐸ43ᐳ"]:::itemplan
-    __ListTransform43["__ListTransform[43∈6@1]<br />ᐸeach:42ᐳ"]:::plan
-    __Item44>"__Item[44∈7@1]<br />ᐸ42ᐳ"]:::itemplan
-    __Item42>"__Item[42∈6@1]<br />ᐸ31ᐳ"]:::itemplan
-    __ListTransform31["__ListTransform[31∈2@1]<br />ᐸeach:30ᐳ"]:::plan
-    __Item41>"__Item[41∈5@1]<br />ᐸ30ᐳ"]:::itemplan
-    Lambda30["Lambda[30∈2@1]"]:::plan
-    __ListTransform29["__ListTransform[29∈2@1]<br />ᐸgroupBy:28ᐳ"]:::plan
-    PgClassExpression40["PgClassExpression[40∈4@1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
-    PgSelectSingle39["PgSelectSingle[39∈4@1]<br />ᐸmessagesᐳ"]:::plan
-    __Item38>"__Item[38∈4@1]<br />ᐸ28ᐳ"]:::itemplan
-    __ListTransform28["__ListTransform[28∈2@1]<br />ᐸfilter:24ᐳ"]:::plan
-    Lambda37["Lambda[37∈3@1]"]:::plan
-    List36["List[36∈3@1]<br />ᐸ34,35ᐳ"]:::plan
-    PgClassExpression34["PgClassExpression[34∈3@1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    PgSelectSingle33["PgSelectSingle[33∈3@1]<br />ᐸmessagesᐳ"]:::plan
-    __Item32>"__Item[32∈3@1]<br />ᐸ24ᐳ"]:::itemplan
-    PgClassExpression35["PgClassExpression[35∈2@1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
-    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
-    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
-    PgSelect24[["PgSelect[24∈2@1]<br />ᐸmessagesᐳ"]]:::plan
-    Object20["Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     Access18["Access[18∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access19["Access[19∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Object20["Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgSelect24[["PgSelect[24∈2@1]<br />ᐸmessagesᐳ"]]:::plan
+    PgClassExpression35["PgClassExpression[35∈2@1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
+    __ListTransform28["__ListTransform[28∈2@1]<br />ᐸfilter:24ᐳ"]:::plan
+    __ListTransform29["__ListTransform[29∈2@1]<br />ᐸgroupBy:28ᐳ"]:::plan
+    Lambda30["Lambda[30∈2@1]"]:::plan
+    __ListTransform31["__ListTransform[31∈2@1]<br />ᐸeach:30ᐳ"]:::plan
+    __Item32>"__Item[32∈3@1]<br />ᐸ24ᐳ"]:::itemplan
+    PgSelectSingle33["PgSelectSingle[33∈3@1]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈3@1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
+    List36["List[36∈3@1]<br />ᐸ34,35ᐳ"]:::plan
+    Lambda37["Lambda[37∈3@1]"]:::plan
+    __Item38>"__Item[38∈4@1]<br />ᐸ28ᐳ"]:::itemplan
+    PgSelectSingle39["PgSelectSingle[39∈4@1]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈4@1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
+    __Item41>"__Item[41∈5@1]<br />ᐸ30ᐳ"]:::itemplan
+    __Item42>"__Item[42∈6@1]<br />ᐸ31ᐳ"]:::itemplan
+    __ListTransform43["__ListTransform[43∈6@1]<br />ᐸeach:42ᐳ"]:::plan
+    __Item44>"__Item[44∈7@1]<br />ᐸ42ᐳ"]:::itemplan
+    __Item45>"__Item[45∈8@1]<br />ᐸ43ᐳ"]:::itemplan
+    PgSelectSingle46["PgSelectSingle[46∈8@1]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression47["PgClassExpression[47∈8@1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgClassExpression48["PgClassExpression[48∈8@1]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
 
     %% plan dependencies
+    __Value3 --> Access18
+    __Value3 --> Access19
+    Access18 & Access19 --> Object20
+    Object20 --> PgSelect17
+    PgSelect17 ==> __Item21
+    __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
-    PgSelectSingle46 --> PgClassExpression47
-    PgSelectSingle46 --> PgClassExpression48
-    __Item45 --> PgSelectSingle46
-    __ListTransform43 ==> __Item45
+    Object20 --> PgSelect24
+    PgSelectSingle22 --> PgClassExpression35
+    PgSelect24 & PgClassExpression35 --> __ListTransform28
+    Lambda37 -.-> __ListTransform28
+    __ListTransform28 --> __ListTransform29
+    PgClassExpression40 -.-> __ListTransform29
+    __ListTransform29 --> Lambda30
+    Lambda30 --> __ListTransform31
+    __Item41 -.-> __ListTransform31
+    PgSelect24 -.-> __Item32
+    PgClassExpression35 --> __Item32
+    __Item32 --> PgSelectSingle33
+    PgSelectSingle33 --> PgClassExpression34
+    PgClassExpression34 & PgClassExpression35 --> List36
+    List36 --> Lambda37
+    __ListTransform28 -.-> __Item38
+    __Item38 --> PgSelectSingle39
+    PgSelectSingle39 --> PgClassExpression40
+    Lambda30 -.-> __Item41
+    __ListTransform31 ==> __Item42
     __Item42 --> __ListTransform43
     __Item44 -.-> __ListTransform43
     __Item42 -.-> __Item44
-    __ListTransform31 ==> __Item42
-    Lambda30 --> __ListTransform31
-    __Item41 -.-> __ListTransform31
-    Lambda30 -.-> __Item41
-    __ListTransform29 --> Lambda30
-    __ListTransform28 --> __ListTransform29
-    PgClassExpression40 -.-> __ListTransform29
-    PgSelectSingle39 --> PgClassExpression40
-    __Item38 --> PgSelectSingle39
-    __ListTransform28 -.-> __Item38
-    PgSelect24 & PgClassExpression35 --> __ListTransform28
-    Lambda37 -.-> __ListTransform28
-    List36 --> Lambda37
-    PgClassExpression34 & PgClassExpression35 --> List36
-    PgSelectSingle33 --> PgClassExpression34
-    __Item32 --> PgSelectSingle33
-    PgSelect24 -.-> __Item32
-    PgClassExpression35 --> __Item32
-    PgSelectSingle22 --> PgClassExpression35
-    __Item21 --> PgSelectSingle22
-    PgSelect17 ==> __Item21
-    Object20 --> PgSelect17
-    Object20 --> PgSelect24
-    Access18 & Access19 --> Object20
-    __Value3 --> Access18
-    __Value3 --> Access19
+    __ListTransform43 ==> __Item45
+    __Item45 --> PgSelectSingle46
+    PgSelectSingle46 --> PgClassExpression47
+    PgSelectSingle46 --> PgClassExpression48
 
     %% plan-to-path relationships
     P0["~"]

@@ -9,42 +9,42 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
-    PgClassExpression14["PgClassExpression[14]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸunique_author_countᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸunique_author_countᐳ"]]:::plan
-    PgClassExpression22["PgClassExpression[22]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21]<br />ᐸunique_author_countᐳ"]:::plan
-    First20["First[20]"]:::plan
-    PgSelect16[["PgSelect[16]<br />ᐸunique_author_countᐳ"]]:::plan
-    PgClassExpression30["PgClassExpression[30]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
-    PgSelectSingle29["PgSelectSingle[29]<br />ᐸunique_author_countᐳ"]:::plan
-    First28["First[28]"]:::plan
-    PgSelect24[["PgSelect[24]<br />ᐸunique_author_countᐳ"]]:::plan
-    Object11["Object[11]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object11["Object[11]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸunique_author_countᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸunique_author_countᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
     __InputStaticLeaf15["__InputStaticLeaf[15]"]:::plan
+    PgSelect16[["PgSelect[16]<br />ᐸunique_author_countᐳ"]]:::plan
+    First20["First[20]"]:::plan
+    PgSelectSingle21["PgSelectSingle[21]<br />ᐸunique_author_countᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
     __InputStaticLeaf23["__InputStaticLeaf[23]"]:::plan
+    PgSelect24[["PgSelect[24]<br />ᐸunique_author_countᐳ"]]:::plan
+    First28["First[28]"]:::plan
+    PgSelectSingle29["PgSelectSingle[29]<br />ᐸunique_author_countᐳ"]:::plan
+    PgClassExpression30["PgClassExpression[30]<br />ᐸ__unique_a...or_count__ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle13 --> PgClassExpression14
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object11 & __InputStaticLeaf7 --> PgSelect8
-    PgSelectSingle21 --> PgClassExpression22
-    First20 --> PgSelectSingle21
-    PgSelect16 --> First20
-    Object11 & __InputStaticLeaf15 --> PgSelect16
-    PgSelectSingle29 --> PgClassExpression30
-    First28 --> PgSelectSingle29
-    PgSelect24 --> First28
-    Object11 & __InputStaticLeaf23 --> PgSelect24
-    Access9 & Access10 --> Object11
     __Value3 --> Access9
     __Value3 --> Access10
+    Access9 & Access10 --> Object11
+    Object11 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    Object11 & __InputStaticLeaf15 --> PgSelect16
+    PgSelect16 --> First20
+    First20 --> PgSelectSingle21
+    PgSelectSingle21 --> PgClassExpression22
+    Object11 & __InputStaticLeaf23 --> PgSelect24
+    PgSelect24 --> First28
+    First28 --> PgSelectSingle29
+    PgSelectSingle29 --> PgClassExpression30
 
     %% plan-to-path relationships
     P0["~"]

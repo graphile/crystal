@@ -9,36 +9,36 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
-    PgClassExpression14["PgClassExpression[14]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    PgClassExpression15["PgClassExpression[15]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression24["PgClassExpression[24]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgSelectSingle22["PgSelectSingle[22]<br />ᐸforumsᐳ"]:::plan
-    First21["First[21]"]:::plan
-    PgSelect17[["PgSelect[17]<br />ᐸforumsᐳ"]]:::plan
-    PgClassExpression16["PgClassExpression[16]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸmessagesᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸmessagesᐳ"]]:::plan
-    Object20["Object[20]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access18["Access[18]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access19["Access[19]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access18["Access[18]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access19["Access[19]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object20["Object[20]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸmessagesᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    PgClassExpression15["PgClassExpression[15]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgClassExpression16["PgClassExpression[16]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
+    PgSelect17[["PgSelect[17]<br />ᐸforumsᐳ"]]:::plan
+    First21["First[21]"]:::plan
+    PgSelectSingle22["PgSelectSingle[22]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24]<br />ᐸ__forums__.”name”ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle13 --> PgClassExpression14
-    PgSelectSingle13 --> PgClassExpression15
-    PgSelectSingle22 --> PgClassExpression24
-    First21 --> PgSelectSingle22
-    PgSelect17 --> First21
-    Object20 & PgClassExpression16 --> PgSelect17
-    PgSelectSingle13 --> PgClassExpression16
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object20 & __InputStaticLeaf7 --> PgSelect8
-    Access18 & Access19 --> Object20
     __Value3 --> Access18
     __Value3 --> Access19
+    Access18 & Access19 --> Object20
+    Object20 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression15
+    PgSelectSingle13 --> PgClassExpression16
+    Object20 & PgClassExpression16 --> PgSelect17
+    PgSelect17 --> First21
+    First21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression24
 
     %% plan-to-path relationships
     P0["~"]

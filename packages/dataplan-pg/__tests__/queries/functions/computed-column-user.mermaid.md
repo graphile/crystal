@@ -9,30 +9,30 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
-    PgClassExpression21["PgClassExpression[21]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
-    PgClassExpression22["PgClassExpression[22]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
-    PgSelectSingle20["PgSelectSingle[20]<br />ᐸusersᐳ"]:::plan
-    Map23["Map[23]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸforumsᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸforumsᐳ"]]:::plan
-    Object18["Object[18]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access16["Access[16]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access17["Access[17]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access16["Access[16]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access17["Access[17]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object18["Object[18]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸforumsᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸforumsᐳ"]:::plan
+    Map23["Map[23]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle20["PgSelectSingle[20]<br />ᐸusersᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle20 --> PgClassExpression21
-    PgSelectSingle20 --> PgClassExpression22
-    Map23 --> PgSelectSingle20
-    PgSelectSingle13 --> Map23
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object18 & __InputStaticLeaf7 --> PgSelect8
-    Access16 & Access17 --> Object18
     __Value3 --> Access16
     __Value3 --> Access17
+    Access16 & Access17 --> Object18
+    Object18 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> Map23
+    Map23 --> PgSelectSingle20
+    PgSelectSingle20 --> PgClassExpression21
+    PgSelectSingle20 --> PgClassExpression22
 
     %% plan-to-path relationships
     P0["~"]

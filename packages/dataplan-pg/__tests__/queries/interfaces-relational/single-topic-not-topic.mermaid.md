@@ -9,7 +9,17 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access65["Access[65]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access66["Access[66]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object67["Object[67]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸrelational_topicsᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrelational_topicsᐳ"]:::plan
     PgClassExpression14["PgClassExpression[14]<br />ᐸ__relation...ics__.”id”ᐳ"]:::plan
+    Map72["Map[72]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
+    PgSelectSingle21["PgSelectSingle[21]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression22["PgClassExpression[22]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression30["PgClassExpression[30]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
     PgClassExpression38["PgClassExpression[38]<br />ᐸ__relation...”position”ᐳ"]:::plan
@@ -17,20 +27,18 @@ graph TD
     PgClassExpression54["PgClassExpression[54]<br />ᐸ__relation...pdated_at”ᐳ"]:::plan
     PgClassExpression62["PgClassExpression[62]<br />ᐸ__relation..._archived”ᐳ"]:::plan
     PgClassExpression70["PgClassExpression[70]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21]<br />ᐸrelational_itemsᐳ"]:::plan
-    Map72["Map[72]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
     PgClassExpression71["PgClassExpression[71]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrelational_topicsᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸrelational_topicsᐳ"]]:::plan
-    Object67["Object[67]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access65["Access[65]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access66["Access[66]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
+    __Value3 --> Access65
+    __Value3 --> Access66
+    Access65 & Access66 --> Object67
+    Object67 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> Map72
+    Map72 --> PgSelectSingle21
     PgSelectSingle21 --> PgClassExpression22
     PgSelectSingle21 --> PgClassExpression30
     PgSelectSingle21 --> PgClassExpression38
@@ -38,15 +46,7 @@ graph TD
     PgSelectSingle21 --> PgClassExpression54
     PgSelectSingle21 --> PgClassExpression62
     PgSelectSingle21 --> PgClassExpression70
-    Map72 --> PgSelectSingle21
-    PgSelectSingle13 --> Map72
     PgSelectSingle13 --> PgClassExpression71
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object67 & __InputStaticLeaf7 --> PgSelect8
-    Access65 & Access66 --> Object67
-    __Value3 --> Access65
-    __Value3 --> Access66
 
     %% plan-to-path relationships
     P0["~"]

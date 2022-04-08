@@ -9,32 +9,32 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access18["Access[18]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access19["Access[19]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object20["Object[20]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸmessagesᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression14["PgClassExpression[14]<br />ᐸ__messages__.”id”ᐳ"]:::plan
     PgClassExpression15["PgClassExpression[15]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     PgClassExpression16["PgClassExpression[16]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
-    PgSelectSingle22["PgSelectSingle[22]<br />ᐸforumsᐳ"]:::plan
     Map24["Map[24]<br />ᐸ13:{”0”:2}ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸmessagesᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸmessagesᐳ"]]:::plan
-    Object20["Object[20]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access18["Access[18]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access19["Access[19]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    PgSelectSingle22["PgSelectSingle[22]<br />ᐸforumsᐳ"]:::plan
 
     %% plan dependencies
+    __Value3 --> Access18
+    __Value3 --> Access19
+    Access18 & Access19 --> Object20
+    Object20 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> PgClassExpression15
     PgSelectSingle13 --> PgClassExpression16
-    Map24 --> PgSelectSingle22
     PgSelectSingle13 --> Map24
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object20 & __InputStaticLeaf7 --> PgSelect8
-    Access18 & Access19 --> Object20
-    __Value3 --> Access18
-    __Value3 --> Access19
+    Map24 --> PgSelectSingle22
 
     %% plan-to-path relationships
     P0["~"]

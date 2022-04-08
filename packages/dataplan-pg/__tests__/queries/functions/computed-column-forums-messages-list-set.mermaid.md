@@ -9,47 +9,47 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression37["PgClassExpression[37∈5]<br />ᐸ__forums_m...t__.”body”ᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38∈5]<br />ᐸ__forums_m...”featured”ᐳ"]:::plan
-    PgSelectSingle36["PgSelectSingle[36∈5]<br />ᐸforums_messages_list_setᐳ"]:::plan
-    __Item35>"__Item[35∈5]<br />ᐸ33ᐳ"]:::itemplan
-    __ListTransform33["__ListTransform[33∈3]<br />ᐸeach:32ᐳ"]:::plan
-    __Item34>"__Item[34∈4]<br />ᐸ32ᐳ"]:::itemplan
-    __Item32>"__Item[32∈3]<br />ᐸ28ᐳ"]:::itemplan
-    __ListTransform28["__ListTransform[28∈1]<br />ᐸpartitionByIndex1:24ᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈2]<br />ᐸ__forums_m..._set_idx__ᐳ"]:::plan
-    PgSelectSingle30["PgSelectSingle[30∈2]<br />ᐸforums_messages_list_setᐳ"]:::plan
-    __Item29>"__Item[29∈2]<br />ᐸ39ᐳ"]:::itemplan
-    Access39["Access[39∈1]<br />ᐸ21.0ᐳ"]:::plan
-    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
-    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object27["Object[27∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     Access25["Access[25∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access26["Access[26∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Object27["Object[27∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
+    Access39["Access[39∈1]<br />ᐸ21.0ᐳ"]:::plan
+    __ListTransform28["__ListTransform[28∈1]<br />ᐸpartitionByIndex1:24ᐳ"]:::plan
+    __Item29>"__Item[29∈2]<br />ᐸ39ᐳ"]:::itemplan
+    PgSelectSingle30["PgSelectSingle[30∈2]<br />ᐸforums_messages_list_setᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈2]<br />ᐸ__forums_m..._set_idx__ᐳ"]:::plan
+    __Item32>"__Item[32∈3]<br />ᐸ28ᐳ"]:::itemplan
+    __ListTransform33["__ListTransform[33∈3]<br />ᐸeach:32ᐳ"]:::plan
+    __Item34>"__Item[34∈4]<br />ᐸ32ᐳ"]:::itemplan
+    __Item35>"__Item[35∈5]<br />ᐸ33ᐳ"]:::itemplan
+    PgSelectSingle36["PgSelectSingle[36∈5]<br />ᐸforums_messages_list_setᐳ"]:::plan
+    PgClassExpression37["PgClassExpression[37∈5]<br />ᐸ__forums_m...t__.”body”ᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈5]<br />ᐸ__forums_m...”featured”ᐳ"]:::plan
 
     %% plan dependencies
+    __Value3 --> Access25
+    __Value3 --> Access26
+    Access25 & Access26 --> Object27
+    Object27 --> PgSelect17
+    PgSelect17 ==> __Item21
     __Item21 --> PgSelectSingle22
-    PgSelectSingle36 --> PgClassExpression37
-    PgSelectSingle36 --> PgClassExpression38
-    __Item35 --> PgSelectSingle36
-    __ListTransform33 ==> __Item35
+    __Item21 --> Access39
+    Access39 --> __ListTransform28
+    PgClassExpression31 -.-> __ListTransform28
+    Access39 -.-> __Item29
+    __Item29 --> PgSelectSingle30
+    PgSelectSingle30 --> PgClassExpression31
+    __ListTransform28 ==> __Item32
     __Item32 --> __ListTransform33
     __Item34 -.-> __ListTransform33
     __Item32 -.-> __Item34
-    __ListTransform28 ==> __Item32
-    Access39 --> __ListTransform28
-    PgClassExpression31 -.-> __ListTransform28
-    PgSelectSingle30 --> PgClassExpression31
-    __Item29 --> PgSelectSingle30
-    Access39 -.-> __Item29
-    __Item21 --> Access39
-    PgSelect17 ==> __Item21
-    Object27 --> PgSelect17
-    Access25 & Access26 --> Object27
-    __Value3 --> Access25
-    __Value3 --> Access26
+    __ListTransform33 ==> __Item35
+    __Item35 --> PgSelectSingle36
+    PgSelectSingle36 --> PgClassExpression37
+    PgSelectSingle36 --> PgClassExpression38
 
     %% plan-to-path relationships
     P0["~"]

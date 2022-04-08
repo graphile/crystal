@@ -9,35 +9,35 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression40["PgClassExpression[40∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression41["PgClassExpression[41∈2]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
-    PgSelectSingle39["PgSelectSingle[39∈2]<br />ᐸmessagesᐳ"]:::plan
-    __Item38>"__Item[38∈2]<br />ᐸ42ᐳ"]:::itemplan
-    Access42["Access[42∈1]<br />ᐸ21.1ᐳ"]:::plan
-    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
-    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object36["Object[36∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access34["Access[34∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access35["Access[35∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
+    Access34["Access[34∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access35["Access[35∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object36["Object[36∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     __InputStaticLeaf30["__InputStaticLeaf[30∈0]"]:::plan
+    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    Access42["Access[42∈1]<br />ᐸ21.1ᐳ"]:::plan
+    __Item38>"__Item[38∈2]<br />ᐸ42ᐳ"]:::itemplan
+    PgSelectSingle39["PgSelectSingle[39∈2]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    PgClassExpression41["PgClassExpression[41∈2]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle22 --> PgClassExpression23
-    __Item21 --> PgSelectSingle22
-    PgSelectSingle39 --> PgClassExpression40
-    PgSelectSingle39 --> PgClassExpression41
-    __Item38 --> PgSelectSingle39
-    Access42 ==> __Item38
-    __Item21 --> Access42
-    PgSelect17 ==> __Item21
-    Object36 & __InputStaticLeaf15 & __InputStaticLeaf30 --> PgSelect17
-    Access34 & Access35 --> Object36
     __Value3 --> Access34
     __Value3 --> Access35
+    Access34 & Access35 --> Object36
+    Object36 & __InputStaticLeaf15 & __InputStaticLeaf30 --> PgSelect17
+    PgSelect17 ==> __Item21
+    __Item21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression23
+    __Item21 --> Access42
+    Access42 ==> __Item38
+    __Item38 --> PgSelectSingle39
+    PgSelectSingle39 --> PgClassExpression40
+    PgSelectSingle39 --> PgClassExpression41
 
     %% plan-to-path relationships
     P0["~"]

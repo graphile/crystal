@@ -9,43 +9,43 @@ graph TD
 
     %% define plans
     __Value0["__Value[0]"]:::plan
-    PgClassExpression22["PgClassExpression[22]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21]<br />ᐸforums_unique_author_countᐳ"]:::plan
-    Map41["Map[41]<br />ᐸ13:{”0”:0}ᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
-    PgSelectSingle30["PgSelectSingle[30]<br />ᐸforums_unique_author_countᐳ"]:::plan
-    Map43["Map[43]<br />ᐸ13:{”0”:1}ᐳ"]:::plan
-    PgClassExpression40["PgClassExpression[40]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
-    PgSelectSingle39["PgSelectSingle[39]<br />ᐸforums_unique_author_countᐳ"]:::plan
-    Map45["Map[45]<br />ᐸ13:{”0”:2}ᐳ"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸforumsᐳ"]:::plan
-    First12["First[12]"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸforumsᐳ"]]:::plan
-    Object37["Object[37]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access35["Access[35]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access36["Access[36]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access35["Access[35]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access36["Access[36]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object37["Object[37]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     __InputStaticLeaf14["__InputStaticLeaf[14]"]:::plan
     __InputStaticLeaf23["__InputStaticLeaf[23]"]:::plan
     __InputStaticLeaf32["__InputStaticLeaf[32]"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸforumsᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸforumsᐳ"]:::plan
+    Map41["Map[41]<br />ᐸ13:{”0”:0}ᐳ"]:::plan
+    PgSelectSingle21["PgSelectSingle[21]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
+    Map43["Map[43]<br />ᐸ13:{”0”:1}ᐳ"]:::plan
+    PgSelectSingle30["PgSelectSingle[30]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
+    Map45["Map[45]<br />ᐸ13:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle39["PgSelectSingle[39]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40]<br />ᐸ__forums_u...or_count__ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle21 --> PgClassExpression22
-    Map41 --> PgSelectSingle21
-    PgSelectSingle13 --> Map41
-    PgSelectSingle30 --> PgClassExpression31
-    Map43 --> PgSelectSingle30
-    PgSelectSingle13 --> Map43
-    PgSelectSingle39 --> PgClassExpression40
-    Map45 --> PgSelectSingle39
-    PgSelectSingle13 --> Map45
-    First12 --> PgSelectSingle13
-    PgSelect8 --> First12
-    Object37 & __InputStaticLeaf7 & __InputStaticLeaf14 & __InputStaticLeaf23 & __InputStaticLeaf32 --> PgSelect8
-    Access35 & Access36 --> Object37
     __Value3 --> Access35
     __Value3 --> Access36
+    Access35 & Access36 --> Object37
+    Object37 & __InputStaticLeaf7 & __InputStaticLeaf14 & __InputStaticLeaf23 & __InputStaticLeaf32 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> Map41
+    Map41 --> PgSelectSingle21
+    PgSelectSingle21 --> PgClassExpression22
+    PgSelectSingle13 --> Map43
+    Map43 --> PgSelectSingle30
+    PgSelectSingle30 --> PgClassExpression31
+    PgSelectSingle13 --> Map45
+    Map45 --> PgSelectSingle39
+    PgSelectSingle39 --> PgClassExpression40
 
     %% plan-to-path relationships
     P0["~"]

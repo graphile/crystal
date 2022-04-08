@@ -9,9 +9,23 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access88["Access[88∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access89["Access[89∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object90["Object[90∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
+    PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgPolymorphic25["PgPolymorphic[25∈3]"]:::plan
+    PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
+    PgSelect15[["PgSelect[15∈1]<br />ᐸrelational_itemsᐳ"]]:::plan
+    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
+    __Item20>"__Item[20∈2]<br />ᐸ15ᐳ"]:::itemplan
+    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸrelational_itemsᐳ"]:::plan
+    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
+    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgPolymorphic25["PgPolymorphic[25∈3]"]:::plan
     PgClassExpression86["PgClassExpression[86∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgClassExpression35["PgClassExpression[35∈3]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
     PgClassExpression36["PgClassExpression[36∈3]<br />ᐸ__relation...”position”ᐳ"]:::plan
@@ -19,25 +33,25 @@ graph TD
     PgClassExpression38["PgClassExpression[38∈3]<br />ᐸ__relation...pdated_at”ᐳ"]:::plan
     PgClassExpression39["PgClassExpression[39∈3]<br />ᐸ__relation..._archived”ᐳ"]:::plan
     PgClassExpression40["PgClassExpression[40∈3]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
-    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸrelational_itemsᐳ"]:::plan
-    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
-    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸrelational_itemsᐳ"]:::plan
-    __Item20>"__Item[20∈2]<br />ᐸ15ᐳ"]:::itemplan
-    PgSelect15[["PgSelect[15∈1]<br />ᐸrelational_itemsᐳ"]]:::plan
-    PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
-    PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
-    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
-    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Object90["Object[90∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Access88["Access[88∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access89["Access[89∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
 
     %% plan dependencies
+    __Value3 --> Access88
+    __Value3 --> Access89
+    Access88 & Access89 --> Object90
+    Object90 --> PgSelect7
+    PgSelect7 ==> __Item11
+    __Item11 --> PgSelectSingle12
     PgSelectSingle12 --> PgClassExpression13
-    PgSelectSingle23 & PgClassExpression24 --> PgPolymorphic25
+    PgSelectSingle12 --> PgClassExpression14
+    Object90 & PgClassExpression14 --> PgSelect15
+    PgSelect15 --> __ListTransform19
+    PgSelectSingle21 -.-> __ListTransform19
+    PgSelect15 -.-> __Item20
+    __Item20 --> PgSelectSingle21
+    __ListTransform19 ==> __Item22
+    __Item22 --> PgSelectSingle23
     PgSelectSingle23 --> PgClassExpression24
+    PgSelectSingle23 & PgClassExpression24 --> PgPolymorphic25
     PgSelectSingle23 --> PgClassExpression86
     PgSelectSingle23 --> PgClassExpression35
     PgSelectSingle23 --> PgClassExpression36
@@ -45,20 +59,6 @@ graph TD
     PgSelectSingle23 --> PgClassExpression38
     PgSelectSingle23 --> PgClassExpression39
     PgSelectSingle23 --> PgClassExpression40
-    __Item22 --> PgSelectSingle23
-    __ListTransform19 ==> __Item22
-    PgSelect15 --> __ListTransform19
-    PgSelectSingle21 -.-> __ListTransform19
-    __Item20 --> PgSelectSingle21
-    PgSelect15 -.-> __Item20
-    Object90 & PgClassExpression14 --> PgSelect15
-    PgSelectSingle12 --> PgClassExpression14
-    __Item11 --> PgSelectSingle12
-    PgSelect7 ==> __Item11
-    Object90 --> PgSelect7
-    Access88 & Access89 --> Object90
-    __Value3 --> Access88
-    __Value3 --> Access89
 
     %% plan-to-path relationships
     P0["~"]

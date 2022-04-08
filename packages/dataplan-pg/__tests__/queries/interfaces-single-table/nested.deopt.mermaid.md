@@ -9,64 +9,64 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    PgSingleTablePolymorphic26["PgSingleTablePolymorphic[26∈3]"]:::plan
-    Lambda25["Lambda[25∈3]"]:::plan
-    PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
-    PgSingleTablePolymorphic36["PgSingleTablePolymorphic[36∈4]"]:::plan
-    Lambda35["Lambda[35∈4]"]:::plan
-    PgClassExpression34["PgClassExpression[34∈4]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
-    PgClassExpression39["PgClassExpression[39∈5]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
-    PgSelectSingle33["PgSelectSingle[33∈4]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    First32["First[32∈4]"]:::plan
-    PgSelect28[["PgSelect[28∈4]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    PgClassExpression27["PgClassExpression[27∈4]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
-    PgClassExpression52["PgClassExpression[52∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
-    PgClassExpression54["PgClassExpression[54∈4]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
-    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
-    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸsingle_table_itemsᐳ"]:::plan
-    __Item20>"__Item[20∈2]<br />ᐸ15ᐳ"]:::itemplan
-    PgSelect15[["PgSelect[15∈1]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
-    PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
-    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
-    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Object143["Object[143∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     Access141["Access[141∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access142["Access[142∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Object143["Object[143∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
+    __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
+    PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
+    PgSelect15[["PgSelect[15∈1]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    __ListTransform19["__ListTransform[19∈1]<br />ᐸeach:15ᐳ"]:::plan
+    __Item20>"__Item[20∈2]<br />ᐸ15ᐳ"]:::itemplan
+    PgSelectSingle21["PgSelectSingle[21∈2]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    __Item22>"__Item[22∈3]<br />ᐸ19ᐳ"]:::itemplan
+    PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
+    Lambda25["Lambda[25∈3]"]:::plan
+    PgSingleTablePolymorphic26["PgSingleTablePolymorphic[26∈3]"]:::plan
+    PgClassExpression27["PgClassExpression[27∈4]<br />ᐸ__single_t...parent_id”ᐳ"]:::plan
+    PgSelect28[["PgSelect[28∈4]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    First32["First[32∈4]"]:::plan
+    PgSelectSingle33["PgSelectSingle[33∈4]<br />ᐸsingle_table_itemsᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈4]<br />ᐸ__single_t...s__.”type”ᐳ"]:::plan
+    Lambda35["Lambda[35∈4]"]:::plan
+    PgSingleTablePolymorphic36["PgSingleTablePolymorphic[36∈4]"]:::plan
+    PgClassExpression39["PgClassExpression[39∈5]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
+    PgClassExpression52["PgClassExpression[52∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"]:::plan
+    PgClassExpression54["PgClassExpression[54∈4]<br />ᐸ__single_t...__.”type2”ᐳ"]:::plan
 
     %% plan dependencies
-    PgSelectSingle12 --> PgClassExpression13
-    Lambda25 & PgSelectSingle23 --> PgSingleTablePolymorphic26
-    PgClassExpression24 --> Lambda25
-    PgSelectSingle23 --> PgClassExpression24
-    Lambda35 & PgSelectSingle33 --> PgSingleTablePolymorphic36
-    PgClassExpression34 --> Lambda35
-    PgSelectSingle33 --> PgClassExpression34
-    PgSelectSingle33 --> PgClassExpression39
-    First32 --> PgSelectSingle33
-    PgSelect28 --> First32
-    Object143 & PgClassExpression27 --> PgSelect28
-    PgSelectSingle23 --> PgClassExpression27
-    PgSelectSingle23 --> PgClassExpression52
-    PgSelectSingle23 --> PgClassExpression54
-    __Item22 --> PgSelectSingle23
-    __ListTransform19 ==> __Item22
-    PgSelect15 --> __ListTransform19
-    PgSelectSingle21 -.-> __ListTransform19
-    __Item20 --> PgSelectSingle21
-    PgSelect15 -.-> __Item20
-    Object143 & PgClassExpression14 --> PgSelect15
-    PgSelectSingle12 --> PgClassExpression14
-    __Item11 --> PgSelectSingle12
-    PgSelect7 ==> __Item11
-    Object143 --> PgSelect7
-    Access141 & Access142 --> Object143
     __Value3 --> Access141
     __Value3 --> Access142
+    Access141 & Access142 --> Object143
+    Object143 --> PgSelect7
+    PgSelect7 ==> __Item11
+    __Item11 --> PgSelectSingle12
+    PgSelectSingle12 --> PgClassExpression13
+    PgSelectSingle12 --> PgClassExpression14
+    Object143 & PgClassExpression14 --> PgSelect15
+    PgSelect15 --> __ListTransform19
+    PgSelectSingle21 -.-> __ListTransform19
+    PgSelect15 -.-> __Item20
+    __Item20 --> PgSelectSingle21
+    __ListTransform19 ==> __Item22
+    __Item22 --> PgSelectSingle23
+    PgSelectSingle23 --> PgClassExpression24
+    PgClassExpression24 --> Lambda25
+    Lambda25 & PgSelectSingle23 --> PgSingleTablePolymorphic26
+    PgSelectSingle23 --> PgClassExpression27
+    Object143 & PgClassExpression27 --> PgSelect28
+    PgSelect28 --> First32
+    First32 --> PgSelectSingle33
+    PgSelectSingle33 --> PgClassExpression34
+    PgClassExpression34 --> Lambda35
+    Lambda35 & PgSelectSingle33 --> PgSingleTablePolymorphic36
+    PgSelectSingle33 --> PgClassExpression39
+    PgSelectSingle23 --> PgClassExpression52
+    PgSelectSingle23 --> PgClassExpression54
 
     %% plan-to-path relationships
     P0["~"]

@@ -9,28 +9,28 @@ graph TD
 
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
-    PgClassExpression13["PgClassExpression[13∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgDelete9[["PgDelete[9∈1@1]"]]:::sideeffectplan
-    PgClassExpression20["PgClassExpression[20∈2@2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgDelete16[["PgDelete[16∈2@2]"]]:::sideeffectplan
-    Object12["Object[12∈0] {1,2}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
     Access10["Access[10∈0] {1,2}<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access11["Access[11∈0] {1,2}<br />ᐸ3.withPgClientᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
+    Object12["Object[12∈0] {1,2}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgDelete9[["PgDelete[9∈1@1]"]]:::sideeffectplan
+    PgClassExpression13["PgClassExpression[13∈1@1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
     __InputStaticLeaf15["__InputStaticLeaf[15∈2@2]"]:::plan
+    PgDelete16[["PgDelete[16∈2@2]"]]:::sideeffectplan
+    PgClassExpression20["PgClassExpression[20∈2@2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
 
     %% plan dependencies
-    PgDelete9 --> PgClassExpression13
-    Object12 & __InputStaticLeaf8 --> PgDelete9
-    PgDelete16 --> PgClassExpression20
-    Object12 & __InputStaticLeaf15 --> PgDelete16
-    Access10 & Access11 --> Object12
+    __Value5 --> __TrackedObject6
     __Value3 --> Access10
     __Value3 --> Access11
-    __Value5 --> __TrackedObject6
+    Access10 & Access11 --> Object12
+    Object12 & __InputStaticLeaf8 --> PgDelete9
+    PgDelete9 --> PgClassExpression13
+    Object12 & __InputStaticLeaf15 --> PgDelete16
+    PgDelete16 --> PgClassExpression20
 
     %% plan-to-path relationships
     P0["~"]
