@@ -3,6 +3,7 @@
 `listTransform` enables you to transform the results of a plan that returns a
 list (array); there's quite a few reasons you might want to do this:
 
+- mapping
 - aggregation
 - partitioning
 - grouping

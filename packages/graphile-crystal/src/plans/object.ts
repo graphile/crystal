@@ -18,6 +18,10 @@ interface Meta<TPlans extends { [key: string]: ExecutablePlan<any> }> {
   results: Results<TPlans>;
 }
 
+/**
+ * A plan that represents an object using the keys given and the values being
+ * the results of the associated plans.
+ */
 export class ObjectPlan<
   TPlans extends { [key: string]: ExecutablePlan<any> },
 > extends ExecutablePlan<DataFromPlans<TPlans>> {
@@ -162,6 +166,10 @@ export class ObjectPlan<
   }
 }
 
+/**
+ * A plan that represents an object using the keys given and the values being
+ * the results of the associated plans.
+ */
 export function object<TPlans extends { [key: string]: ExecutablePlan<any> }>(
   obj: TPlans,
 ): ObjectPlan<TPlans> {

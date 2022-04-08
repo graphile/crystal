@@ -31,6 +31,14 @@ import { ROOT_VALUE_OBJECT, sharedNull } from "./utils";
 const debug = debugFactory("crystal:resolvers");
 const debugVerbose = debug.extend("verbose");
 
+/*
+ * **IMPORTANT**: This whole file is part of execution-v1 and is being phased out.
+ */
+
+/**
+ * Takes a path from GraphQLResolveInfo and returns the equivalent "path
+ * identity". This is part of execution-v1 so is being phased out.
+ */
 function pathToPathIdentity(initialPath: Path): string {
   /**
    * We're building the pathIdentity from the end backwards, so this represents
@@ -59,6 +67,9 @@ export interface CrystalWrapDetails<
   isSubscribe: boolean;
 }
 
+/**
+ * Returns true if the given resolver is already crystal wrapped.
+ */
 export function isCrystalWrapped<T>(
   t: T,
 ): t is T & { [$$crystalWrapped]: CrystalWrapDetails } {
@@ -92,6 +103,10 @@ const getAetherFromResolver = <TContext extends object>(
   return aether;
 };
 
+/**
+ * Makes a CrystalObject to represent the value we received from the parent
+ * resolver, since that was not using crystal.
+ */
 function makeParentCrystalObject(
   batch: Batch,
   info: GraphQLResolveInfo,
@@ -155,6 +170,10 @@ function makeParentCrystalObject(
   }
 }
 
+/**
+ * Wraps the given resolver function (or the default resolver) in a
+ * Crystal-aware resolver.
+ */
 function crystalWrapResolveOrSubscribe<
   TSource extends object | null | undefined,
   TContext extends object,
@@ -336,6 +355,9 @@ export function makeCrystalSubscriber<
   return crystalWrapResolveOrSubscribe(undefined, true);
 }
 
+/**
+ * For debugging.
+ */
 export function crystalObjectToString(this: CrystalObject) {
   return chalk.bold.blue(
     `CO(${chalk.bold.yellow(

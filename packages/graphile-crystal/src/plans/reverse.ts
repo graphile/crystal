@@ -46,6 +46,9 @@ export class ReversePlan<TData> extends ExecutablePlan<readonly TData[]> {
   }
 }
 
+/**
+ * Reverses a list.
+ */
 export function reverse<TData>(
   plan: ExecutablePlan<readonly TData[]>,
 ): ReversePlan<TData> {

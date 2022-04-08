@@ -62,6 +62,15 @@ export function assertNullPrototype(
   }
 }
 
+// TODO: it's possible for this to generate `LIST(INT, FLOAT, STRING)` which is
+// not possible in GraphQL since lists have a single defined type. We may want
+// to address this.
+/**
+ * Converts a JSON value into the equivalent ValueNode _without_ checking that
+ * it's compatible with the expected type. Typically only used with scalars
+ * (since they can use any ValueNode) - other parts of the GraphQL schema
+ * should use explicitly compatible ValueNodes.
+ */
 function dangerousRawValueToValueNode(value: JSON): ValueNode {
   if (value == null) {
     return { kind: Kind.NULL };
@@ -104,6 +113,10 @@ function dangerousRawValueToValueNode(value: JSON): ValueNode {
   throw new Error(`Unhandled type when converting custom scalar to ValueNode`);
 }
 
+/**
+ * Takes a value (typically a JSON-compatible value) and converts it into a
+ * ValueNode that's compatible with the given GraphQL type.
+ */
 function rawValueToValueNode(
   type: GraphQLInputType,
   value: any,
@@ -229,6 +242,10 @@ function rawValueToValueNode(
   throw new Error(`Encountered unexpected type when processing defaultValue`);
 }
 
+/**
+ * Specifically allows for the `defaultValue` to be undefined, but otherwise
+ * defers to {@link valueToValueNode}
+ */
 export function defaultValueToValueNode(
   type: GraphQLInputType,
   defaultValue: unknown,
@@ -251,6 +268,9 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
   );
 }
 
+/**
+ * Is "thenable".
+ */
 export function isPromiseLike<T>(
   t: T | Promise<T> | PromiseLike<T>,
 ): t is PromiseLike<T> {
@@ -259,6 +279,9 @@ export function isPromiseLike<T>(
   );
 }
 
+/**
+ * Is a promise that can be externally resolved.
+ */
 export function isDeferred<T>(
   t: T | Promise<T> | Deferred<T>,
 ): t is Deferred<T> {
@@ -269,6 +292,10 @@ export function isDeferred<T>(
   );
 }
 
+/**
+ * Returns true if array1 and array2 have the same length, and every pair of
+ * values within them pass the `comparator` check (which defaults to `===`).
+ */
 export function arraysMatch<T>(
   array1: ReadonlyArray<T>,
   array2: ReadonlyArray<T>,
@@ -285,6 +312,7 @@ export function arraysMatch<T>(
   }
   return true;
 }
+
 type ObjectTypeFields<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
@@ -427,6 +455,11 @@ export function objectFieldSpec<
   };
 }
 
+/**
+ * "Constrainted identity function" for field configs.
+ *
+ * @see {@link https://kentcdodds.com/blog/how-to-write-a-constrained-identity-function-in-typescript}
+ */
 export function newGraphileFieldConfigBuilder<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,

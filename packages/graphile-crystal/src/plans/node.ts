@@ -16,6 +16,12 @@ import { access } from "./access";
 import { constant } from "./constant";
 import { lambda } from "./lambda";
 
+/**
+ * A plan to get a Node by it's global object identifier (string). Accepts an
+ * object specifying the supported codecs, an object map detailing the
+ * typeNames supported and their details (codec to use, how to find the record,
+ * etc), and finally the Node id string plan.
+ */
 export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   extends ExecutablePlan
   implements PolymorphicPlan
@@ -103,6 +109,12 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   };
 }
 
+/**
+ * A plan to get a Node by it's global object identifier (string). Accepts an
+ * object specifying the supported codecs, an object map detailing the
+ * typeNames supported and their details (codec to use, how to find the record,
+ * etc), and finally the Node id string plan.
+ */
 export function node<TCodecs extends { [key: string]: NodeIdCodec<any> }>(
   codecs: TCodecs,
   possibleTypes: {

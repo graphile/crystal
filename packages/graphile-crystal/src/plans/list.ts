@@ -86,6 +86,10 @@ export class ListPlan<
   }
 }
 
+/**
+ * Takes a list of plans and turns it into a single plan that represents the
+ * list of their values.
+ */
 export function list<TPlanTuple extends ExecutablePlan<any>[]>(
   list: TPlanTuple,
 ): ListPlan<TPlanTuple> {

@@ -8,6 +8,11 @@ import { ExecutablePlan, isExecutablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
 import { constant } from "./constant";
 
+/**
+ * Subscribes to the given `pubsubOrPlan` to get realtime updates on a given
+ * topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
+ * callback.
+ */
 export class SubscribePlan<
     TTopics extends { [topic: string]: any },
     TTopic extends keyof TTopics,
@@ -68,6 +73,11 @@ export class SubscribePlan<
   }
 }
 
+/**
+ * Subscribes to the given `pubsubOrPlan` to get realtime updates on a given
+ * topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
+ * callback.
+ */
 export function subscribe<
   TTopics extends { [topic: string]: any },
   TTopic extends keyof TTopics,

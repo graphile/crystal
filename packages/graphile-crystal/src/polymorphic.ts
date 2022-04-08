@@ -21,6 +21,10 @@ export function assertPolymorphicData(
   }
 }
 
+// TODO: this doesn't really wrap any more... rename it.
+/**
+ * Returns an object with the given concrete type.
+ */
 export function polymorphicWrap<TType extends string>(
   type: TType,
 ): PolymorphicData<TType> {
@@ -30,11 +34,15 @@ export function polymorphicWrap<TType extends string>(
       `Expected a GraphQLObjectType name, but received ${inspect(type)}`,
     );
   }
-  return {
+  return Object.assign(Object.create(null), {
     [$$concreteType]: type,
-  };
+  });
 }
 
+/**
+ * All polymorphic objects in Graphile Crystal have a $$concreteType property
+ * which contains the GraphQL object's type name; we simply return that.
+ */
 export function resolveType(o: unknown): string {
   assertPolymorphicData(o);
   return o[$$concreteType];

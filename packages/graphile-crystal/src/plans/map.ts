@@ -38,6 +38,10 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   };
 }
 
+/**
+ * A plan that returns an object resulting from extracting the given
+ * `actualKey` from the input and storing it as the `desiredKey` in the output.
+ */
 export class MapPlan extends ExecutablePlan {
   static $$export = {
     moduleName: "graphile-crystal",
@@ -48,11 +52,11 @@ export class MapPlan extends ExecutablePlan {
 
   private mapper: (obj: object) => object;
   constructor(
-    parentPlan: ExecutablePlan,
+    $plan: ExecutablePlan,
     private actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
-    this.addDependency(parentPlan);
+    this.addDependency($plan);
     this.mapper = makeMapper(actualKeyByDesiredKey);
   }
 
@@ -79,9 +83,16 @@ export class MapPlan extends ExecutablePlan {
   }
 }
 
+// TODO: people think of 'map' in turns of mapping over an array, or Maps,
+// rather than a mathematical-style mapping of the keys of an object. We should
+// rename this - objectMap or something?
+/**
+ * A plan that returns an object resulting from extracting the given
+ * `actualKey` from the input and storing it as the `desiredKey` in the output.
+ */
 export function map(
-  p: ExecutablePlan,
+  $plan: ExecutablePlan,
   actualKeyByDesiredKey: { [desiredKey: string]: string },
 ): MapPlan {
-  return new MapPlan(p, actualKeyByDesiredKey);
+  return new MapPlan($plan, actualKeyByDesiredKey);
 }

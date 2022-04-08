@@ -44,6 +44,11 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
   }
 }
 
+/**
+ * A plan that takes the input `$plan` and feeds each value through the `fn`
+ * callback. Note: if you need to pass more than one value, pass a `ListPlan`
+ * as the `$plan` argument.
+ */
 export function lambda<TIn, TOut>(
   $plan: ExecutablePlan<TIn> | null | undefined,
   fn: (value: TIn) => TOut,

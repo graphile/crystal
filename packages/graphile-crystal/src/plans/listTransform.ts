@@ -44,9 +44,13 @@ export interface ListTransformOptions<
 /**
  * **Experimental.**
  *
- * A "special" plan that has custom handling in Crystal.
+ * A "special" plan that has custom handling in Crystal. Used for turning lists
+ * into other things (or maybe more lists!).
  *
  * @internal
+ *
+ * It's recommended that you don't use this directly, please use one of the
+ * functions that uses this under the hood such as `filter()`.
  */
 export class __ListTransformPlan<
   TListPlan extends ExecutablePlan<readonly any[]>,
@@ -197,6 +201,9 @@ export class __ListTransformPlan<
 
 /**
  * **Experimental.**
+ *
+ * A "special" plan that has custom handling in Crystal. Used for turning lists
+ * into other things (or maybe more lists!).
  *
  * @see ./listTransform.md
  */
