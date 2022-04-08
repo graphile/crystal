@@ -2237,12 +2237,14 @@ export function makeExampleSchema(
       edges: {
         type: new GraphQLList(MessageEdge),
         plan: EXPORTABLE(
-          () =>
-            function plan($connection) {
+          (each) => function plan($connection) {
               // return context();
-              return $connection.cloneSubplanWithPagination();
+              return each(
+                $connection.cloneSubplanWithPagination(),
+                ($intermediate) => $connection.wrapEdge($intermediate),
+              );
             },
-          [],
+          [each],
         ),
       },
       nodes: newGraphileFieldConfigBuilder<
