@@ -218,7 +218,7 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    %% define plans");
-  aether.processPlans("printingPlans", "dependents-first", (plan) => {
+  aether.processPlans("printingPlans", "dependencies-first", (plan) => {
     planId(plan);
     return plan;
   });
@@ -226,7 +226,7 @@ export function printPlanGraph(
   graph.push("");
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = {};
-  aether.processPlans("printingPlanDeps", "dependents-first", (plan) => {
+  aether.processPlans("printingPlanDeps", "dependencies-first", (plan) => {
     const planNode = planId(plan);
     const depNodes = plan.dependencies.map((depId) => {
       return planId(plans[depId]);
