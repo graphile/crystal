@@ -721,7 +721,7 @@ export const assertSnapshotsMatch = async (
       .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
   } else if (only === "mermaid") {
-    const mermaidFileName = basePath + (ext || "") + ".mermaid.md";
+    const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");
     }
@@ -733,7 +733,7 @@ export const assertSnapshotsMatch = async (
     } else {
       lines.splice(i, 1, `    subgraph "Buckets for ${relativePath}"`);
     }
-    const content = `\`\`\`mermaid\n${lines.join("\n")}\n\`\`\`\n`;
+    const content = `${lines.join("\n")}\n`;
     await snapshot(content, mermaidFileName);
   } else {
     throw new Error(

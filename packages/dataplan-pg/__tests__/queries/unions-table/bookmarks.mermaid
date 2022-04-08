@@ -1,0 +1,164 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    Access79["Access[79∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access80["Access[80∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object81["Object[81∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸpeopleᐳ"]]:::plan
+    First12["First[12∈0]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
+    PgClassExpression15["PgClassExpression[15∈0]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    Access100["Access[100∈0]<br />ᐸ12.0ᐳ"]:::plan
+    __Item21>"__Item[21∈1]<br />ᐸ100ᐳ"]:::itemplan
+    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸperson_bookmarksᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__person_b...rks__.”id”ᐳ"]:::plan
+    Map86["Map[86∈1]<br />ᐸ22:{”0”:1}ᐳ"]:::plan
+    PgSelectSingle30["PgSelectSingle[30∈1]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__person_b...ed_entity”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ(__person_...person_id”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈1]<br />ᐸ(__person_....”post_id”ᐳ"]:::plan
+    PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ(__person_...omment_id”ᐳ"]:::plan
+    List36["List[36∈1]<br />ᐸ33,34,35ᐳ"]:::plan
+    PgPolymorphic37["PgPolymorphic[37∈1]"]:::plan
+    Map88["Map[88∈1]<br />ᐸ22:{”0”:3,”1”:4}ᐳ"]:::plan
+    PgSelectSingle43["PgSelectSingle[43∈2]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression44["PgClassExpression[44∈2]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
+    PgClassExpression45["PgClassExpression[45∈2]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    Map92["Map[92∈1]<br />ᐸ22:{”0”:6,”1”:7,”2”:8}ᐳ"]:::plan
+    PgSelectSingle51["PgSelectSingle[51∈3]<br />ᐸpostsᐳ"]:::plan
+    PgClassExpression52["PgClassExpression[52∈3]<br />ᐸ__posts__.”post_id”ᐳ"]:::plan
+    Map90["Map[90∈3]<br />ᐸ51:{”0”:1}ᐳ"]:::plan
+    PgSelectSingle59["PgSelectSingle[59∈3]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression60["PgClassExpression[60∈3]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgClassExpression61["PgClassExpression[61∈3]<br />ᐸ__posts__.”body”ᐳ"]:::plan
+    Map98["Map[98∈1]<br />ᐸ22:{”0”:10,”1”:11,”2”:12,”3”:13}ᐳ"]:::plan
+    PgSelectSingle67["PgSelectSingle[67∈4]<br />ᐸcommentsᐳ"]:::plan
+    PgClassExpression68["PgClassExpression[68∈4]<br />ᐸ__comments...omment_id”ᐳ"]:::plan
+    Map94["Map[94∈4]<br />ᐸ67:{”0”:1}ᐳ"]:::plan
+    PgSelectSingle75["PgSelectSingle[75∈4]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression76["PgClassExpression[76∈4]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    Map96["Map[96∈4]<br />ᐸ67:{”0”:2}ᐳ"]:::plan
+    PgSelectSingle83["PgSelectSingle[83∈4]<br />ᐸpostsᐳ"]:::plan
+    PgClassExpression84["PgClassExpression[84∈4]<br />ᐸ__posts__.”body”ᐳ"]:::plan
+    PgClassExpression85["PgClassExpression[85∈4]<br />ᐸ__comments__.”body”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access79
+    __Value3 --> Access80
+    Access79 & Access80 --> Object81
+    Object81 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression15
+    First12 --> Access100
+    Access100 ==> __Item21
+    __Item21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression23
+    PgSelectSingle22 --> Map86
+    Map86 --> PgSelectSingle30
+    PgSelectSingle30 --> PgClassExpression31
+    PgSelectSingle22 --> PgClassExpression32
+    PgSelectSingle22 --> PgClassExpression33
+    PgSelectSingle22 --> PgClassExpression34
+    PgSelectSingle22 --> PgClassExpression35
+    PgClassExpression33 & PgClassExpression34 & PgClassExpression35 --> List36
+    PgClassExpression32 & List36 --> PgPolymorphic37
+    PgSelectSingle22 --> Map88
+    Map88 --> PgSelectSingle43
+    PgSelectSingle43 --> PgClassExpression44
+    PgSelectSingle43 --> PgClassExpression45
+    PgSelectSingle22 --> Map92
+    Map92 --> PgSelectSingle51
+    PgSelectSingle51 --> PgClassExpression52
+    PgSelectSingle51 --> Map90
+    Map90 --> PgSelectSingle59
+    PgSelectSingle59 --> PgClassExpression60
+    PgSelectSingle51 --> PgClassExpression61
+    PgSelectSingle22 --> Map98
+    Map98 --> PgSelectSingle67
+    PgSelectSingle67 --> PgClassExpression68
+    PgSelectSingle67 --> Map94
+    Map94 --> PgSelectSingle75
+    PgSelectSingle75 --> PgClassExpression76
+    PgSelectSingle67 --> Map96
+    Map96 --> PgSelectSingle83
+    PgSelectSingle83 --> PgClassExpression84
+    PgSelectSingle67 --> PgClassExpression85
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳpersonByPersonId"]
+    PgSelectSingle13 -.-> P13
+    P14["ᐳp…dᐳpersonId"]
+    PgClassExpression14 -.-> P14
+    P15["ᐳp…dᐳusername"]
+    PgClassExpression15 -.-> P15
+    P22["ᐳp…dᐳpersonBookmarksList[]"]
+    PgSelectSingle22 -.-> P22
+    P23["ᐳp…dᐳp…]ᐳid"]
+    PgClassExpression23 -.-> P23
+    P30["ᐳp…dᐳp…]ᐳperson"]
+    PgSelectSingle30 -.-> P30
+    P31["ᐳp…dᐳp…]ᐳp…nᐳusername"]
+    PgClassExpression31 -.-> P31
+    P37["ᐳp…dᐳp…]ᐳbookmarkedEntity"]
+    PgPolymorphic37 -.-> P37
+    P44["ᐳp…dᐳp…]ᐳb…yᐳpersonId"]
+    PgClassExpression44 -.-> P44
+    P45["ᐳp…dᐳp…]ᐳb…yᐳusername"]
+    PgClassExpression45 -.-> P45
+    P52["ᐳp…dᐳp…]ᐳb…yᐳpostId"]
+    PgClassExpression52 -.-> P52
+    P59["ᐳp…dᐳp…]ᐳb…yᐳauthor"]
+    PgSelectSingle59 -.-> P59
+    P60["ᐳp…dᐳp…]ᐳb…yᐳa…rᐳusername"]
+    PgClassExpression60 -.-> P60
+    P61["ᐳp…dᐳp…]ᐳb…yᐳbody"]
+    PgClassExpression61 -.-> P61
+    P68["ᐳp…dᐳp…]ᐳb…yᐳcommentId"]
+    PgClassExpression68 -.-> P68
+    P75["ᐳp…dᐳp…]ᐳb…yᐳauthor"]
+    PgSelectSingle75 -.-> P75
+    P76["ᐳp…dᐳp…]ᐳb…yᐳa…rᐳusername"]
+    PgClassExpression76 -.-> P76
+    P83["ᐳp…dᐳp…]ᐳb…yᐳpost"]
+    PgSelectSingle83 -.-> P83
+    P84["ᐳp…dᐳp…]ᐳb…yᐳpostᐳbody"]
+    PgClassExpression84 -.-> P84
+    P85["ᐳp…dᐳp…]ᐳb…yᐳbody"]
+    PgClassExpression85 -.-> P85
+    P100["ᐳp…dᐳpersonBookmarksList"]
+    Access100 -.-> P100
+
+    subgraph "Buckets for queries/unions-table/bookmarks"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀personByPersonId ᐸ-O- 13<br />⠀⠀⠀personByPersonId.personId ᐸ-L- 14<br />⠀⠀⠀personByPersonId.username ᐸ-L- 15<br />⠀⠀⠀personByPersonId.personBookmarksList ᐸ-A- 100"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,Access79,Access80,Object81,Access100 bucket0
+    Bucket1("Bucket 1 (item21)<br />Deps: 100<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀id ᐸ-L- 23<br />⠀⠀person ᐸ-O- 30<br />⠀⠀⠀person.username ᐸ-L- 31<br />⠀⠀bookmarkedEntity ᐸ-O- 37"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,List36,PgPolymorphic37,Map86,Map88,Map92,Map98 bucket1
+    Bucket2("Bucket 2 (polymorphic37[Person])<br />Deps: 88<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀personId ᐸ-L- 44<br />⠀⠀username ᐸ-L- 45"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgSelectSingle43,PgClassExpression44,PgClassExpression45 bucket2
+    Bucket3("Bucket 3 (polymorphic37[Post])<br />Deps: 92<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀postId ᐸ-L- 52<br />⠀⠀author ᐸ-O- 59<br />⠀⠀⠀author.username ᐸ-L- 60<br />⠀⠀body ᐸ-L- 61"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgClassExpression60,PgClassExpression61,Map90 bucket3
+    Bucket4("Bucket 4 (polymorphic37[Comment])<br />Deps: 98<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]ᐳPersonBookmark.bookmarkedEntity<br />⠀⠀commentId ᐸ-L- 68<br />⠀⠀author ᐸ-O- 75<br />⠀⠀⠀author.username ᐸ-L- 76<br />⠀⠀post ᐸ-O- 83<br />⠀⠀⠀post.body ᐸ-L- 84<br />⠀⠀body ᐸ-L- 85"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelectSingle67,PgClassExpression68,PgSelectSingle75,PgClassExpression76,PgSelectSingle83,PgClassExpression84,PgClassExpression85,Map94,Map96 bucket4
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4
+    end
