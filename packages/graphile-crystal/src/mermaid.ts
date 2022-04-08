@@ -148,7 +148,9 @@ export function printPlanGraph(
       const planNode = `${planName}${plan.id}`;
       planIdMap[plan.id] = planNode;
       const rawMeta = plan.toStringMeta();
-      const meta = concise && rawMeta ? squish(rawMeta) : rawMeta;
+      const strippedMeta = rawMeta != null ? stripAnsi(rawMeta) : null;
+      const meta =
+        concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
       const style =
         plan instanceof __ItemPlan
           ? itemplanStyle
