@@ -40,7 +40,7 @@ graph TD
     Access41["Access[41∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     Lambda8["Lambda[8∈0]"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
     Access14 --> Lambda15
@@ -72,7 +72,7 @@ graph TD
     Access40 & Access41 --> Object42
     __Value3 --> Access40
     __Value3 --> Access41
-    InputStaticLeaf7 --> Lambda8
+    __InputStaticLeaf7 --> Lambda8
 
     %% plan-to-path relationships
     P0["~"]
@@ -111,7 +111,7 @@ graph TD
     subgraph "Buckets for subscriptions/basics/forum-messages"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,Lambda8,Access9,Subscribe10,Access40,Access41,Object42 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,Lambda8,Access9,Subscribe10,Access40,Access41,Object42 bucket0
     Bucket1("Bucket 1 (item11)<br />Deps: 10, 42<br />~"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,JSONParse12,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgSelect28,First32,PgSelectSingle33,PgClassExpression35,PgClassExpression36,PgClassExpression38,PgSelect39,First43,PgSelectSingle44,PgClassExpression45,PgClassExpression46 bucket1

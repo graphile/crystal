@@ -20,7 +20,7 @@ graph TD
     Access16["Access[16]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access17["Access[17]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
     PgSelectSingle20 --> PgClassExpression21
@@ -29,7 +29,7 @@ graph TD
     PgSelectSingle13 --> Map23
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object18 & InputStaticLeaf7 --> PgSelect8
+    Object18 & __InputStaticLeaf7 --> PgSelect8
     Access16 & Access17 --> Object18
     __Value3 --> Access16
     __Value3 --> Access17
@@ -49,6 +49,6 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-user"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.randomUser ᐸ-O- 20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- 21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- 22"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,Access16,Access17,Object18,PgSelectSingle20,PgClassExpression21,PgClassExpression22,Map23 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,Access16,Access17,Object18,PgSelectSingle20,PgClassExpression21,PgClassExpression22,Map23 bucket0
     end
 ```

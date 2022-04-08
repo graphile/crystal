@@ -47,7 +47,7 @@ graph TD
     Access61["Access[61∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access62["Access[62∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf27["InputStaticLeaf[27∈0]"]:::plan
+    __InputStaticLeaf27["__InputStaticLeaf[27∈0]"]:::plan
     Constant88["Constant[88∈0]"]:::plan
     PgPageInfo68["PgPageInfo[68∈0]"]:::plan
     Constant71["Constant[71∈0]"]:::plan
@@ -77,11 +77,11 @@ graph TD
     PgSelectSingle80 --> PgClassExpression82
     Last79 --> PgSelectSingle80
     PgSelect40 --> Last79
-    Object63 & PgClassExpression33 & InputStaticLeaf27 & PgClassExpression39 --> PgSelect40
+    Object63 & PgClassExpression33 & __InputStaticLeaf27 & PgClassExpression39 --> PgSelect40
     PgSelectSingle86 --> PgClassExpression87
     First85 --> PgSelectSingle86
     PgSelect84 --> First85
-    Object63 & PgClassExpression33 & InputStaticLeaf27 & PgClassExpression39 --> PgSelect84
+    Object63 & PgClassExpression33 & __InputStaticLeaf27 & PgClassExpression39 --> PgSelect84
     PgSelectSingle22 --> PgClassExpression33
     PgSelectSingle22 --> PgClassExpression39
     __Item21 --> PgSelectSingle22
@@ -132,7 +132,7 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,InputStaticLeaf27,Access61,Access62,Object63,PgPageInfo68,Constant71,Constant88 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf27,Access61,Access62,Object63,PgPageInfo68,Constant71,Constant88 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 63, 27, 88, 68, 71<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀name ᐸ-L- 23<br />⠀⠀messagesConnection ᐸ-O- 88<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- 40<br />⠀⠀⠀messagesConnection.edges ᐸ-A- 40<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 70<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- 71<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- 75<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- 81<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 87"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression33,PgClassExpression39,PgSelect40,Lambda70,First73,PgSelectSingle74,PgCursor75,PgClassExpression76,List77,Last79,PgSelectSingle80,PgCursor81,PgClassExpression82,List83,PgSelect84,First85,PgSelectSingle86,PgClassExpression87 bucket1

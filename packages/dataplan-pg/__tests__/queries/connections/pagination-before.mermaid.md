@@ -43,7 +43,7 @@ graph TD
     ToPg29["ToPg[29∈0]"]:::plan
     Access28["Access[28∈0]<br />ᐸ26.1ᐳ"]:::plan
     Lambda26["Lambda[26∈0]<br />ᐸparseCursorᐳ"]:::plan
-    InputStaticLeaf17["InputStaticLeaf[17∈0]"]:::plan
+    __InputStaticLeaf17["__InputStaticLeaf[17∈0]"]:::plan
     Constant79["Constant[79∈0]"]:::plan
     PgPageInfo45["PgPageInfo[45∈0]"]:::plan
     Constant52["Constant[52∈0]"]:::plan
@@ -81,7 +81,7 @@ graph TD
     Lambda26 --> PgValidateParsedCursor27
     Access28 --> ToPg29
     Lambda26 --> Access28
-    InputStaticLeaf17 --> Lambda26
+    __InputStaticLeaf17 --> Lambda26
 
     %% plan-to-path relationships
     P0["~"]
@@ -118,7 +118,7 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-before"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allMessagesConnection ᐸ-O- 79<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- 25<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- 45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- 48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- 52<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- 57<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- 67<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- 76"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf17,PgSelect25,Lambda26,PgValidateParsedCursor27,Access28,ToPg29,Access38,Access39,Object40,PgPageInfo45,Lambda48,Constant52,First55,PgSelectSingle56,PgCursor57,PgClassExpression61,List62,Last65,PgSelectSingle66,PgCursor67,PgClassExpression71,List72,PgSelect73,First74,PgSelectSingle75,PgClassExpression76,Constant79 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf17,PgSelect25,Lambda26,PgValidateParsedCursor27,Access28,ToPg29,Access38,Access39,Object40,PgPageInfo45,Lambda48,Constant52,First55,PgSelectSingle56,PgCursor57,PgClassExpression61,List62,Last65,PgSelectSingle66,PgCursor67,PgClassExpression71,List72,PgSelect73,First74,PgSelectSingle75,PgClassExpression76,Constant79 bucket0
     Bucket1("Bucket 1 (item30)<br />Deps: 25<br />~ᐳQuery.allMessagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- 31<br />⠀⠀node ᐸ-O- 31<br />⠀⠀⠀node.body ᐸ-L- 35<br />⠀⠀⠀node.author ᐸ-O- 42<br />⠀⠀⠀⠀node.author.username ᐸ-L- 43<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- 44<br />⠀⠀cursor ᐸ-L- 32"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item30,PgSelectSingle31,PgCursor32,PgClassExpression33,List34,PgClassExpression35,PgSelectSingle42,PgClassExpression43,PgClassExpression44,Map77 bucket1

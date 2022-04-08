@@ -24,8 +24,8 @@ graph TD
     Access34["Access[34∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access35["Access[35∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf15["InputStaticLeaf[15∈0]"]:::plan
-    InputStaticLeaf30["InputStaticLeaf[30∈0]"]:::plan
+    __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
+    __InputStaticLeaf30["__InputStaticLeaf[30∈0]"]:::plan
 
     %% plan dependencies
     PgSelectSingle22 --> PgClassExpression23
@@ -33,12 +33,12 @@ graph TD
     PgSelectSingle39 --> PgClassExpression41
     __Item38 --> PgSelectSingle39
     PgSelect33 ==> __Item38
-    Object36 & PgClassExpression32 & InputStaticLeaf30 & PgClassExpression37 --> PgSelect33
+    Object36 & PgClassExpression32 & __InputStaticLeaf30 & PgClassExpression37 --> PgSelect33
     PgSelectSingle22 --> PgClassExpression32
     PgSelectSingle22 --> PgClassExpression37
     __Item21 --> PgSelectSingle22
     PgSelect17 ==> __Item21
-    Object36 & InputStaticLeaf15 --> PgSelect17
+    Object36 & __InputStaticLeaf15 --> PgSelect17
     Access34 & Access35 --> Object36
     __Value3 --> Access34
     __Value3 --> Access35
@@ -64,7 +64,7 @@ graph TD
     subgraph "Buckets for queries/conditions/complex-filter"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf15,PgSelect17,InputStaticLeaf30,Access34,Access35,Object36 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf15,PgSelect17,__InputStaticLeaf30,Access34,Access35,Object36 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 36, 30<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀name ᐸ-L- 23<br />⠀⠀messagesList ᐸ-A- 33"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression32,PgSelect33,PgClassExpression37 bucket1

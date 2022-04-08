@@ -19,14 +19,14 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    InputStaticLeaf8["InputStaticLeaf[8∈1@1]"]:::plan
-    InputStaticLeaf15["InputStaticLeaf[15∈2@2]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
+    __InputStaticLeaf15["__InputStaticLeaf[15∈2@2]"]:::plan
 
     %% plan dependencies
     PgDelete9 --> PgClassExpression13
-    Object12 & InputStaticLeaf8 --> PgDelete9
+    Object12 & __InputStaticLeaf8 --> PgDelete9
     PgDelete16 --> PgClassExpression20
-    Object12 & InputStaticLeaf15 --> PgDelete16
+    Object12 & __InputStaticLeaf15 --> PgDelete16
     Access10 & Access11 --> Object12
     __Value3 --> Access10
     __Value3 --> Access11
@@ -50,10 +50,10 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6,Access10,Access11,Object12 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 12<br />~ᐳMutation.d1<br />⠀ROOT ᐸ-O- 9<br />⠀⠀id ᐸ-L- 13"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,InputStaticLeaf8,PgDelete9,PgClassExpression13 bucket1
+    class Bucket1,__InputStaticLeaf8,PgDelete9,PgClassExpression13 bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: 12<br />~ᐳMutation.d2<br />⠀ROOT ᐸ-O- 16<br />⠀⠀id ᐸ-L- 20"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,InputStaticLeaf15,PgDelete16,PgClassExpression20 bucket2
+    class Bucket2,__InputStaticLeaf15,PgDelete16,PgClassExpression20 bucket2
     Bucket0 --> Bucket1 & Bucket2
     end
 ```

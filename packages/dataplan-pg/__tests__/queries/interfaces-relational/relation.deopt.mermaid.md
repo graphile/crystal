@@ -31,7 +31,7 @@ graph TD
     Access494["Access[494]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access495["Access[495]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
     PgSelectSingle13 & PgClassExpression14 --> PgPolymorphic15
@@ -51,7 +51,7 @@ graph TD
     PgSelectSingle13 --> PgClassExpression23
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object496 & InputStaticLeaf7 --> PgSelect8
+    Object496 & __InputStaticLeaf7 --> PgSelect8
     Access494 & Access495 --> Object496
     __Value3 --> Access494
     __Value3 --> Access495
@@ -75,6 +75,6 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀item ᐸ-O- 15<br />⠀⠀⠀item.parent ᐸ-O- 31<br />⠀⠀⠀⠀item.parent.author ᐸ-O- 46<br />⠀⠀⠀⠀⠀item.parent.author.username ᐸ-L- 47<br />⠀⠀⠀⠀item.parent.id ᐸ-L- 484<br />⠀⠀⠀item.id ᐸ-L- 404"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgClassExpression23,PgSelect24,First28,PgSelectSingle29,PgClassExpression30,PgPolymorphic31,PgClassExpression40,PgSelect41,First45,PgSelectSingle46,PgClassExpression47,PgClassExpression404,PgClassExpression484,Access494,Access495,Object496 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgClassExpression23,PgSelect24,First28,PgSelectSingle29,PgClassExpression30,PgPolymorphic31,PgClassExpression40,PgSelect41,First45,PgSelectSingle46,PgClassExpression47,PgClassExpression404,PgClassExpression484,Access494,Access495,Object496 bucket0
     end
 ```

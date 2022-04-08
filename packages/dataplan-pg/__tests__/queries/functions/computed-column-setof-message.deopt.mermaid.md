@@ -21,7 +21,7 @@ graph TD
     Access16["Access[16∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access17["Access[17∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
     PgSelectSingle20 --> PgClassExpression21
@@ -31,7 +31,7 @@ graph TD
     PgSelectSingle13 --> PgClassExpression14
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object18 & InputStaticLeaf7 --> PgSelect8
+    Object18 & __InputStaticLeaf7 --> PgSelect8
     Access16 & Access17 --> Object18
     __Value3 --> Access16
     __Value3 --> Access17
@@ -51,7 +51,7 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-setof-message"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.featuredMessages ᐸ-A- 15"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgSelect15,Access16,Access17,Object18 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgSelect15,Access16,Access17,Object18 bucket0
     Bucket1("Bucket 1 (item19)<br />Deps: 15<br />~ᐳQuery.forumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- 20<br />⠀⠀body ᐸ-L- 21"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item19,PgSelectSingle20,PgClassExpression21 bucket1

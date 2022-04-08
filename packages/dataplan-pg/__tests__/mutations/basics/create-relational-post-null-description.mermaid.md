@@ -27,9 +27,9 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    InputStaticLeaf8["InputStaticLeaf[8∈1@1]"]:::plan
-    InputStaticLeaf9["InputStaticLeaf[9∈1@1]"]:::plan
-    InputStaticLeaf10["InputStaticLeaf[10∈1@1]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈1@1]"]:::plan
+    __InputStaticLeaf10["__InputStaticLeaf[10∈1@1]"]:::plan
     Constant11["Constant[11∈1@1]"]:::plan
     Constant12["Constant[12∈1@1]"]:::plan
 
@@ -43,7 +43,7 @@ graph TD
     PgSelect25 --> First29
     Object28 & PgClassExpression23 --> PgSelect25
     PgInsert18 --> PgClassExpression23
-    Object28 & PgClassExpression17 & InputStaticLeaf8 & InputStaticLeaf9 & InputStaticLeaf10 --> PgInsert18
+    Object28 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf9 & __InputStaticLeaf10 --> PgInsert18
     PgInsert13 --> PgClassExpression17
     Object28 & Constant11 & Constant12 --> PgInsert13
     Access26 & Access27 --> Object28
@@ -75,7 +75,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.createRelationalPost<br />⠀ROOT ᐸ-O- 22<br />⠀⠀id ᐸ-L- 23<br />⠀⠀post ᐸ-O- 30<br />⠀⠀⠀post.id ᐸ-L- 31<br />⠀⠀⠀post.title ᐸ-L- 32<br />⠀⠀⠀post.description ᐸ-L- 33<br />⠀⠀⠀post.note ᐸ-L- 34"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,InputStaticLeaf8,InputStaticLeaf9,InputStaticLeaf10,Constant11,Constant12,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,Access26,Access27,Object28,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket1
+    class Bucket1,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,Access26,Access27,Object28,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket1
     Bucket0 --> Bucket1
     end
 ```

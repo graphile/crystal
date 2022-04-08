@@ -29,7 +29,7 @@ graph TD
     Access290["Access[290∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access291["Access[291∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
     Lambda15 & PgSelectSingle13 --> PgSingleTablePolymorphic16
@@ -47,7 +47,7 @@ graph TD
     PgSelectSingle13 --> PgClassExpression72
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object292 & InputStaticLeaf7 --> PgSelect8
+    Object292 & __InputStaticLeaf7 --> PgSelect8
     Access290 & Access291 --> Object292
     __Value3 --> Access290
     __Value3 --> Access291
@@ -71,7 +71,7 @@ graph TD
     subgraph "Buckets for queries/interfaces-single-table/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀item ᐸ-O- 16"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,Lambda15,PgSingleTablePolymorphic16,Access290,Access291,Object292 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,Lambda15,PgSingleTablePolymorphic16,Access290,Access291,Object292 bucket0
     Bucket1("Bucket 1 (polymorphic16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: 12, 13<br />~ᐳQuery.item<br />⠀⠀parent ᐸ-O- 26<br />⠀⠀⠀parent.id ᐸ-L- 17<br />⠀⠀id ᐸ-L- 72"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression17,PgSelectSingle23,PgClassExpression24,Lambda25,PgSingleTablePolymorphic26,PgClassExpression72,Map299 bucket1

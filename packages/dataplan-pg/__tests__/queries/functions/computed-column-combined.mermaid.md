@@ -29,8 +29,8 @@ graph TD
     Access41["Access[41∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access42["Access[42∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
-    InputStaticLeaf30["InputStaticLeaf[30∈0]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf30["__InputStaticLeaf[30∈0]"]:::plan
 
     %% plan dependencies
     PgSelectSingle20 --> PgClassExpression21
@@ -48,7 +48,7 @@ graph TD
     PgSelectSingle13 --> Map52
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object43 & InputStaticLeaf7 & InputStaticLeaf30 --> PgSelect8
+    Object43 & __InputStaticLeaf7 & __InputStaticLeaf30 --> PgSelect8
     Access41 & Access42 --> Object43
     __Value3 --> Access41
     __Value3 --> Access42
@@ -78,7 +78,7 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-combined"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.randomUser ᐸ-O- 20<br />⠀⠀⠀⠀forum.randomUser.username ᐸ-L- 21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl ᐸ-L- 22<br />⠀⠀⠀⠀forum.randomUser.mostRecentForum ᐸ-O- 29<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.uniqueAuthorCount ᐸ-L- 38<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.featuredMessages ᐸ-A- 49"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgSelectSingle29,InputStaticLeaf30,PgSelectSingle37,PgClassExpression38,Access41,Access42,Object43,Map47,Access49,Map50,Map52 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgSelectSingle29,__InputStaticLeaf30,PgSelectSingle37,PgClassExpression38,Access41,Access42,Object43,Map47,Access49,Map50,Map52 bucket0
     Bucket1("Bucket 1 (item44)<br />Deps: 49<br />~ᐳQuery.forumᐳForum.randomUserᐳUser.mostRecentForumᐳForum.featuredMessages[]<br />⠀ROOT ᐸ-O- 45<br />⠀⠀body ᐸ-L- 46"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item44,PgSelectSingle45,PgClassExpression46 bucket1

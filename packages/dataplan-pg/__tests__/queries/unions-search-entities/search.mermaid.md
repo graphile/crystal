@@ -46,7 +46,7 @@ graph TD
     Access63["Access[63∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access64["Access[64∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
     PgSelectSingle16 & List20 --> PgPolymorphic21
@@ -82,7 +82,7 @@ graph TD
     PgSelectSingle14 -.-> __ListTransform12
     __Item13 --> PgSelectSingle14
     PgSelect8 -.-> __Item13
-    Object65 & InputStaticLeaf7 --> PgSelect8
+    Object65 & __InputStaticLeaf7 --> PgSelect8
     Access63 & Access64 --> Object65
     __Value3 --> Access63
     __Value3 --> Access64
@@ -126,7 +126,7 @@ graph TD
     subgraph "Buckets for queries/unions-search-entities/search"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀searchEntities ᐸ-A- 12"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,__ListTransform12,Access63,Access64,Object65 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,__ListTransform12,Access63,Access64,Object65 bucket0
     Bucket1("Bucket 1 (item13)<br />Deps: 8"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1

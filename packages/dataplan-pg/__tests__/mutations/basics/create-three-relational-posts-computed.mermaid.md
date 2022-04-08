@@ -60,9 +60,9 @@ graph TD
     Constant14["Constant[14∈1@1]"]:::plan
     Constant19["Constant[19∈1@1]"]:::plan
     Constant20["Constant[20∈1@1]"]:::plan
-    InputStaticLeaf28["InputStaticLeaf[28∈1@1]"]:::plan
-    InputStaticLeaf80["InputStaticLeaf[80∈1@1]"]:::plan
-    InputStaticLeaf132["InputStaticLeaf[132∈1@1]"]:::plan
+    __InputStaticLeaf28["__InputStaticLeaf[28∈1@1]"]:::plan
+    __InputStaticLeaf80["__InputStaticLeaf[80∈1@1]"]:::plan
+    __InputStaticLeaf132["__InputStaticLeaf[132∈1@1]"]:::plan
 
     %% plan dependencies
     Object180 & Constant7 & Constant8 --> PgSelect9
@@ -81,7 +81,7 @@ graph TD
     PgSelectSingle34 --> Map184
     First33 --> PgSelectSingle34
     PgSelect29 --> First33
-    Object180 & InputStaticLeaf28 --> PgSelect29
+    Object180 & __InputStaticLeaf28 --> PgSelect29
     PgSelectSingle86 & PgClassExpression87 --> PgPolymorphic88
     PgSelectSingle86 --> PgClassExpression87
     PgSelectSingle86 --> PgClassExpression124
@@ -92,7 +92,7 @@ graph TD
     PgSelectSingle86 --> Map186
     First85 --> PgSelectSingle86
     PgSelect81 --> First85
-    Object180 & InputStaticLeaf80 --> PgSelect81
+    Object180 & __InputStaticLeaf80 --> PgSelect81
     PgSelectSingle138 & PgClassExpression139 --> PgPolymorphic140
     PgSelectSingle138 --> PgClassExpression139
     PgSelectSingle138 --> PgClassExpression176
@@ -103,7 +103,7 @@ graph TD
     PgSelectSingle138 --> Map188
     First137 --> PgSelectSingle138
     PgSelect133 --> First137
-    Object180 & InputStaticLeaf132 --> PgSelect133
+    Object180 & __InputStaticLeaf132 --> PgSelect133
     Access178 & Access179 --> Object180
     __Value3 --> Access178
     __Value3 --> Access179
@@ -153,7 +153,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3, 5<br />~ᐳMutation.createThreeRelationalPostsComputed<br />⠀ROOT ᐸ-O- 27<br />⠀⠀query ᐸ-O- 5<br />⠀⠀⠀query.i1 ᐸ-O- 36<br />⠀⠀⠀⠀query.i1.id ᐸ-L- 72<br />⠀⠀⠀query.i2 ᐸ-O- 88<br />⠀⠀⠀⠀query.i2.id ᐸ-L- 124<br />⠀⠀⠀query.i3 ᐸ-O- 140<br />⠀⠀⠀⠀query.i3.id ᐸ-L- 176"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Constant7,Constant8,PgSelect9,Constant13,Constant14,PgSelect15,Constant19,Constant20,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,InputStaticLeaf28,PgSelect29,First33,PgSelectSingle34,PgClassExpression35,PgPolymorphic36,PgClassExpression72,InputStaticLeaf80,PgSelect81,First85,PgSelectSingle86,PgClassExpression87,PgPolymorphic88,PgClassExpression124,InputStaticLeaf132,PgSelect133,First137,PgSelectSingle138,PgClassExpression139,PgPolymorphic140,PgClassExpression176,Access178,Access179,Object180,Map184,Map186,Map188 bucket1
+    class Bucket1,Constant7,Constant8,PgSelect9,Constant13,Constant14,PgSelect15,Constant19,Constant20,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,__InputStaticLeaf28,PgSelect29,First33,PgSelectSingle34,PgClassExpression35,PgPolymorphic36,PgClassExpression72,__InputStaticLeaf80,PgSelect81,First85,PgSelectSingle86,PgClassExpression87,PgPolymorphic88,PgClassExpression124,__InputStaticLeaf132,PgSelect133,First137,PgSelectSingle138,PgClassExpression139,PgPolymorphic140,PgClassExpression176,Access178,Access179,Object180,Map184,Map186,Map188 bucket1
     Bucket2("Bucket 2 (polymorphic36[RelationalPost])<br />Deps: 184<br />~ᐳMutation.createThreeRelationalPostsComputedᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- 53<br />⠀⠀description ᐸ-L- 54<br />⠀⠀note ᐸ-L- 55"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelectSingle51,PgClassExpression53,PgClassExpression54,PgClassExpression55 bucket2

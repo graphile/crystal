@@ -25,10 +25,10 @@ graph TD
     Access35["Access[35]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access36["Access[36]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
-    InputStaticLeaf14["InputStaticLeaf[14]"]:::plan
-    InputStaticLeaf23["InputStaticLeaf[23]"]:::plan
-    InputStaticLeaf32["InputStaticLeaf[32]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    __InputStaticLeaf14["__InputStaticLeaf[14]"]:::plan
+    __InputStaticLeaf23["__InputStaticLeaf[23]"]:::plan
+    __InputStaticLeaf32["__InputStaticLeaf[32]"]:::plan
 
     %% plan dependencies
     PgSelectSingle21 --> PgClassExpression22
@@ -42,7 +42,7 @@ graph TD
     PgSelectSingle13 --> Map45
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object37 & InputStaticLeaf7 & InputStaticLeaf14 & InputStaticLeaf23 & InputStaticLeaf32 --> PgSelect8
+    Object37 & __InputStaticLeaf7 & __InputStaticLeaf14 & __InputStaticLeaf23 & __InputStaticLeaf32 --> PgSelect8
     Access35 & Access36 --> Object37
     __Value3 --> Access35
     __Value3 --> Access36
@@ -62,6 +62,6 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-scalar"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.all ᐸ-L- 22<br />⠀⠀⠀forum.featured ᐸ-L- 31<br />⠀⠀⠀forum.unfeatured ᐸ-L- 40"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,InputStaticLeaf14,PgSelectSingle21,PgClassExpression22,InputStaticLeaf23,PgSelectSingle30,PgClassExpression31,InputStaticLeaf32,Access35,Access36,Object37,PgSelectSingle39,PgClassExpression40,Map41,Map43,Map45 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,__InputStaticLeaf14,PgSelectSingle21,PgClassExpression22,__InputStaticLeaf23,PgSelectSingle30,PgClassExpression31,__InputStaticLeaf32,Access35,Access36,Object37,PgSelectSingle39,PgClassExpression40,Map41,Map43,Map45 bucket0
     end
 ```

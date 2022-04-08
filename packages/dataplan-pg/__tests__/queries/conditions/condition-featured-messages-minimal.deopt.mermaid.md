@@ -24,17 +24,17 @@ graph TD
     Access34["Access[34∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access35["Access[35∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf26["InputStaticLeaf[26∈0]"]:::plan
+    __InputStaticLeaf26["__InputStaticLeaf[26∈0]"]:::plan
     Constant46["Constant[46∈0]"]:::plan
     PgPageInfo39["PgPageInfo[39∈0]"]:::plan
 
     %% plan dependencies
     PgSelect40 --> Lambda41
-    Object36 & PgClassExpression32 & InputStaticLeaf26 & PgClassExpression38 --> PgSelect40
+    Object36 & PgClassExpression32 & __InputStaticLeaf26 & PgClassExpression38 --> PgSelect40
     PgSelectSingle44 --> PgClassExpression45
     First43 --> PgSelectSingle44
     PgSelect42 --> First43
-    Object36 & PgClassExpression32 & InputStaticLeaf26 & PgClassExpression38 --> PgSelect42
+    Object36 & PgClassExpression32 & __InputStaticLeaf26 & PgClassExpression38 --> PgSelect42
     PgSelectSingle22 --> PgClassExpression32
     PgSelectSingle22 --> PgClassExpression38
     __Item21 --> PgSelectSingle22
@@ -63,7 +63,7 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,InputStaticLeaf26,Access34,Access35,Object36,PgPageInfo39,Constant46 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf26,Access34,Access35,Object36,PgPageInfo39,Constant46 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 36, 26, 46, 39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀messagesConnection ᐸ-O- 46<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 45"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression32,PgClassExpression38,PgSelect40,Lambda41,PgSelect42,First43,PgSelectSingle44,PgClassExpression45 bucket1

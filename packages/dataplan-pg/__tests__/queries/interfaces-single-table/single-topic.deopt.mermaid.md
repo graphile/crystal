@@ -25,7 +25,7 @@ graph TD
     Access10["Access[10]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access11["Access[11]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
     Constant8["Constant[8]"]:::plan
 
     %% plan dependencies
@@ -40,7 +40,7 @@ graph TD
     PgSelectSingle14 --> PgClassExpression23
     First13 --> PgSelectSingle14
     PgSelect9 --> First13
-    Object12 & InputStaticLeaf7 & Constant8 --> PgSelect9
+    Object12 & __InputStaticLeaf7 & Constant8 --> PgSelect9
     Access10 & Access11 --> Object12
     __Value3 --> Access10
     __Value3 --> Access11
@@ -72,6 +72,6 @@ graph TD
     subgraph "Buckets for queries/interfaces-single-table/single-topic"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀singleTableTopicById ᐸ-O- 14<br />⠀⠀⠀singleTableTopicById.id ᐸ-L- 15<br />⠀⠀⠀singleTableTopicById.type ᐸ-L- 16<br />⠀⠀⠀singleTableTopicById.type2 ᐸ-L- 17<br />⠀⠀⠀singleTableTopicById.position ᐸ-L- 18<br />⠀⠀⠀singleTableTopicById.createdAt ᐸ-L- 19<br />⠀⠀⠀singleTableTopicById.updatedAt ᐸ-L- 20<br />⠀⠀⠀singleTableTopicById.isExplicitlyArchived ᐸ-L- 21<br />⠀⠀⠀singleTableTopicById.archivedAt ᐸ-L- 22<br />⠀⠀⠀singleTableTopicById.title ᐸ-L- 23"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,Constant8,PgSelect9,Access10,Access11,Object12,First13,PgSelectSingle14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,Constant8,PgSelect9,Access10,Access11,Object12,First13,PgSelectSingle14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket0
     end
 ```

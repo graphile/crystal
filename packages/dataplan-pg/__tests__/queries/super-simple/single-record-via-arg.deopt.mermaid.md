@@ -18,14 +18,14 @@ graph TD
     Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> PgClassExpression15
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object11 & InputStaticLeaf7 --> PgSelect8
+    Object11 & __InputStaticLeaf7 --> PgSelect8
     Access9 & Access10 --> Object11
     __Value3 --> Access9
     __Value3 --> Access10
@@ -43,6 +43,6 @@ graph TD
     subgraph "Buckets for queries/super-simple/single-record-via-arg"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forum ᐸ-O- 13<br />⠀⠀⠀forum.id ᐸ-L- 14<br />⠀⠀⠀forum.name ᐸ-L- 15"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15 bucket0
     end
 ```

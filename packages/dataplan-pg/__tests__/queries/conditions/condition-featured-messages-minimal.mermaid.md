@@ -23,7 +23,7 @@ graph TD
     Access34["Access[34∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access35["Access[35∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf26["InputStaticLeaf[26∈0]"]:::plan
+    __InputStaticLeaf26["__InputStaticLeaf[26∈0]"]:::plan
     Constant49["Constant[49∈0]"]:::plan
     PgPageInfo39["PgPageInfo[39∈0]"]:::plan
 
@@ -37,7 +37,7 @@ graph TD
     Access46 --> Lambda47
     __Item21 --> Access46
     PgSelect17 ==> __Item21
-    Object36 & InputStaticLeaf26 --> PgSelect17
+    Object36 & __InputStaticLeaf26 --> PgSelect17
     Access34 & Access35 --> Object36
     __Value3 --> Access34
     __Value3 --> Access35
@@ -61,7 +61,7 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,InputStaticLeaf26,Access34,Access35,Object36,PgPageInfo39,Constant49 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf26,Access34,Access35,Object36,PgPageInfo39,Constant49 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 49, 39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀messagesConnection ᐸ-O- 49<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 45"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,Lambda41,First43,PgSelectSingle44,PgClassExpression45,Access46,Lambda47,Access48 bucket1

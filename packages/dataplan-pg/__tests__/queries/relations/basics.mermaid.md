@@ -22,7 +22,7 @@ graph TD
     Access18["Access[18]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access19["Access[19]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
 
     %% plan dependencies
     PgSelectSingle13 --> PgClassExpression14
@@ -33,7 +33,7 @@ graph TD
     PgSelectSingle13 --> Map25
     First12 --> PgSelectSingle13
     PgSelect8 --> First12
-    Object20 & InputStaticLeaf7 --> PgSelect8
+    Object20 & __InputStaticLeaf7 --> PgSelect8
     Access18 & Access19 --> Object20
     __Value3 --> Access18
     __Value3 --> Access19
@@ -57,6 +57,6 @@ graph TD
     subgraph "Buckets for queries/relations/basics"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀message ᐸ-O- 13<br />⠀⠀⠀message.id ᐸ-L- 14<br />⠀⠀⠀message.body ᐸ-L- 15<br />⠀⠀⠀message.forum ᐸ-O- 22<br />⠀⠀⠀⠀message.forum.id ᐸ-L- 16<br />⠀⠀⠀⠀message.forum.name ᐸ-L- 24"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,PgClassExpression16,Access18,Access19,Object20,PgSelectSingle22,PgClassExpression24,Map25 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,PgClassExpression16,Access18,Access19,Object20,PgSelectSingle22,PgClassExpression24,Map25 bucket0
     end
 ```

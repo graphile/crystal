@@ -99,14 +99,14 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    InputStaticLeaf8["InputStaticLeaf[8∈1@1]"]:::plan
-    InputStaticLeaf11["InputStaticLeaf[11∈1@1]"]:::plan
-    InputStaticLeaf62["InputStaticLeaf[62∈2@2]"]:::plan
-    InputStaticLeaf66["InputStaticLeaf[66∈2@2]"]:::plan
-    InputStaticLeaf116["InputStaticLeaf[116∈3@3]"]:::plan
-    InputStaticLeaf119["InputStaticLeaf[119∈3@3]"]:::plan
-    InputStaticLeaf170["InputStaticLeaf[170∈4@4]"]:::plan
-    InputStaticLeaf173["InputStaticLeaf[173∈4@4]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
+    __InputStaticLeaf11["__InputStaticLeaf[11∈1@1]"]:::plan
+    __InputStaticLeaf62["__InputStaticLeaf[62∈2@2]"]:::plan
+    __InputStaticLeaf66["__InputStaticLeaf[66∈2@2]"]:::plan
+    __InputStaticLeaf116["__InputStaticLeaf[116∈3@3]"]:::plan
+    __InputStaticLeaf119["__InputStaticLeaf[119∈3@3]"]:::plan
+    __InputStaticLeaf170["__InputStaticLeaf[170∈4@4]"]:::plan
+    __InputStaticLeaf173["__InputStaticLeaf[173∈4@4]"]:::plan
 
     %% plan dependencies
     PgSelectSingle24 --> PgClassExpression25
@@ -129,7 +129,7 @@ graph TD
     PgSelect19 --> First23
     Object218 & PgClassExpression17 --> PgSelect19
     PgUpdate13 --> PgClassExpression17
-    Object218 & InputStaticLeaf8 & InputStaticLeaf11 --> PgUpdate13
+    Object218 & __InputStaticLeaf8 & __InputStaticLeaf11 --> PgUpdate13
     PgSelectSingle78 --> PgClassExpression79
     PgSelectSingle78 --> PgClassExpression80
     PgSelectSingle78 --> PgClassExpression81
@@ -150,7 +150,7 @@ graph TD
     PgSelect73 --> First77
     Object218 & PgClassExpression71 --> PgSelect73
     PgUpdate67 --> PgClassExpression71
-    Object218 & InputStaticLeaf62 & InputStaticLeaf66 --> PgUpdate67
+    Object218 & __InputStaticLeaf62 & __InputStaticLeaf66 --> PgUpdate67
     PgSelectSingle132 --> PgClassExpression133
     PgSelectSingle132 --> PgClassExpression134
     PgSelectSingle132 --> PgClassExpression135
@@ -171,7 +171,7 @@ graph TD
     PgSelect127 --> First131
     Object218 & PgClassExpression125 --> PgSelect127
     PgUpdate121 --> PgClassExpression125
-    Object218 & InputStaticLeaf116 & InputStaticLeaf119 --> PgUpdate121
+    Object218 & __InputStaticLeaf116 & __InputStaticLeaf119 --> PgUpdate121
     PgSelectSingle186 --> PgClassExpression187
     PgSelectSingle186 --> PgClassExpression188
     PgSelectSingle186 --> PgClassExpression189
@@ -192,7 +192,7 @@ graph TD
     PgSelect181 --> First185
     Object218 & PgClassExpression179 --> PgSelect181
     PgUpdate175 --> PgClassExpression179
-    Object218 & InputStaticLeaf170 & InputStaticLeaf173 --> PgUpdate175
+    Object218 & __InputStaticLeaf170 & __InputStaticLeaf173 --> PgUpdate175
     Access216 & Access217 --> Object218
     __Value3 --> Access216
     __Value3 --> Access217
@@ -304,16 +304,16 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6,Access216,Access217,Object218 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 218<br />~ᐳMutation.u1<br />⠀ROOT ᐸ-O- 13<br />⠀⠀id ᐸ-L- 17<br />⠀⠀post ᐸ-O- 24<br />⠀⠀⠀post.id ᐸ-L- 25<br />⠀⠀⠀post.title ᐸ-L- 26<br />⠀⠀⠀post.description ᐸ-L- 27<br />⠀⠀⠀post.note ᐸ-L- 28<br />⠀⠀⠀post.titleLower ᐸ-L- 36<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- 44<br />⠀⠀⠀post.author ᐸ-O- 58<br />⠀⠀⠀⠀post.author.personId ᐸ-L- 59<br />⠀⠀⠀⠀post.author.username ᐸ-L- 60"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,InputStaticLeaf8,InputStaticLeaf11,PgUpdate13,PgClassExpression17,PgSelect19,First23,PgSelectSingle24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression44,PgClassExpression52,PgSelect53,First57,PgSelectSingle58,PgClassExpression59,PgClassExpression60,Map223,Map225 bucket1
+    class Bucket1,__InputStaticLeaf8,__InputStaticLeaf11,PgUpdate13,PgClassExpression17,PgSelect19,First23,PgSelectSingle24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression44,PgClassExpression52,PgSelect53,First57,PgSelectSingle58,PgClassExpression59,PgClassExpression60,Map223,Map225 bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: 218<br />~ᐳMutation.u2<br />⠀ROOT ᐸ-O- 67<br />⠀⠀id ᐸ-L- 71<br />⠀⠀post ᐸ-O- 78<br />⠀⠀⠀post.id ᐸ-L- 79<br />⠀⠀⠀post.title ᐸ-L- 80<br />⠀⠀⠀post.description ᐸ-L- 81<br />⠀⠀⠀post.note ᐸ-L- 82<br />⠀⠀⠀post.titleLower ᐸ-L- 90<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- 98<br />⠀⠀⠀post.author ᐸ-O- 112<br />⠀⠀⠀⠀post.author.personId ᐸ-L- 113<br />⠀⠀⠀⠀post.author.username ᐸ-L- 114"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,InputStaticLeaf62,InputStaticLeaf66,PgUpdate67,PgClassExpression71,PgSelect73,First77,PgSelectSingle78,PgClassExpression79,PgClassExpression80,PgClassExpression81,PgClassExpression82,PgSelectSingle89,PgClassExpression90,PgSelectSingle97,PgClassExpression98,PgClassExpression106,PgSelect107,First111,PgSelectSingle112,PgClassExpression113,PgClassExpression114,Map227,Map229 bucket2
+    class Bucket2,__InputStaticLeaf62,__InputStaticLeaf66,PgUpdate67,PgClassExpression71,PgSelect73,First77,PgSelectSingle78,PgClassExpression79,PgClassExpression80,PgClassExpression81,PgClassExpression82,PgSelectSingle89,PgClassExpression90,PgSelectSingle97,PgClassExpression98,PgClassExpression106,PgSelect107,First111,PgSelectSingle112,PgClassExpression113,PgClassExpression114,Map227,Map229 bucket2
     Bucket3("Bucket 3 (group3[mutation])<br />Deps: 218<br />~ᐳMutation.u3<br />⠀ROOT ᐸ-O- 121<br />⠀⠀id ᐸ-L- 125<br />⠀⠀post ᐸ-O- 132<br />⠀⠀⠀post.id ᐸ-L- 133<br />⠀⠀⠀post.title ᐸ-L- 134<br />⠀⠀⠀post.description ᐸ-L- 135<br />⠀⠀⠀post.note ᐸ-L- 136<br />⠀⠀⠀post.titleLower ᐸ-L- 144<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- 152<br />⠀⠀⠀post.author ᐸ-O- 166<br />⠀⠀⠀⠀post.author.personId ᐸ-L- 167<br />⠀⠀⠀⠀post.author.username ᐸ-L- 168"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,InputStaticLeaf116,InputStaticLeaf119,PgUpdate121,PgClassExpression125,PgSelect127,First131,PgSelectSingle132,PgClassExpression133,PgClassExpression134,PgClassExpression135,PgClassExpression136,PgSelectSingle143,PgClassExpression144,PgSelectSingle151,PgClassExpression152,PgClassExpression160,PgSelect161,First165,PgSelectSingle166,PgClassExpression167,PgClassExpression168,Map231,Map233 bucket3
+    class Bucket3,__InputStaticLeaf116,__InputStaticLeaf119,PgUpdate121,PgClassExpression125,PgSelect127,First131,PgSelectSingle132,PgClassExpression133,PgClassExpression134,PgClassExpression135,PgClassExpression136,PgSelectSingle143,PgClassExpression144,PgSelectSingle151,PgClassExpression152,PgClassExpression160,PgSelect161,First165,PgSelectSingle166,PgClassExpression167,PgClassExpression168,Map231,Map233 bucket3
     Bucket4("Bucket 4 (group4[mutation])<br />Deps: 218<br />~ᐳMutation.u4<br />⠀ROOT ᐸ-O- 175<br />⠀⠀id ᐸ-L- 179<br />⠀⠀post ᐸ-O- 186<br />⠀⠀⠀post.id ᐸ-L- 187<br />⠀⠀⠀post.title ᐸ-L- 188<br />⠀⠀⠀post.description ᐸ-L- 189<br />⠀⠀⠀post.note ᐸ-L- 190<br />⠀⠀⠀post.titleLower ᐸ-L- 198<br />⠀⠀⠀post.isExplicitlyArchived ᐸ-L- 206<br />⠀⠀⠀post.author ᐸ-O- 220<br />⠀⠀⠀⠀post.author.personId ᐸ-L- 221<br />⠀⠀⠀⠀post.author.username ᐸ-L- 222"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,InputStaticLeaf170,InputStaticLeaf173,PgUpdate175,PgClassExpression179,PgSelect181,First185,PgSelectSingle186,PgClassExpression187,PgClassExpression188,PgClassExpression189,PgClassExpression190,PgSelectSingle197,PgClassExpression198,PgSelectSingle205,PgClassExpression206,PgClassExpression214,PgSelect215,First219,PgSelectSingle220,PgClassExpression221,PgClassExpression222,Map235,Map237 bucket4
+    class Bucket4,__InputStaticLeaf170,__InputStaticLeaf173,PgUpdate175,PgClassExpression179,PgSelect181,First185,PgSelectSingle186,PgClassExpression187,PgClassExpression188,PgClassExpression189,PgClassExpression190,PgSelectSingle197,PgClassExpression198,PgSelectSingle205,PgClassExpression206,PgClassExpression214,PgSelect215,First219,PgSelectSingle220,PgClassExpression221,PgClassExpression222,Map235,Map237 bucket4
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
     end
 ```

@@ -99,35 +99,35 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    InputStaticLeaf8["InputStaticLeaf[8∈1@1]"]:::plan
-    InputStaticLeaf9["InputStaticLeaf[9∈1@1]"]:::plan
-    InputStaticLeaf10["InputStaticLeaf[10∈1@1]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈1@1]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈1@1]"]:::plan
+    __InputStaticLeaf10["__InputStaticLeaf[10∈1@1]"]:::plan
     Constant11["Constant[11∈1@1]"]:::plan
     Constant12["Constant[12∈1@1]"]:::plan
-    InputStaticLeaf24["InputStaticLeaf[24∈2@2]"]:::plan
-    InputStaticLeaf25["InputStaticLeaf[25∈2@2]"]:::plan
-    InputStaticLeaf26["InputStaticLeaf[26∈2@2]"]:::plan
+    __InputStaticLeaf24["__InputStaticLeaf[24∈2@2]"]:::plan
+    __InputStaticLeaf25["__InputStaticLeaf[25∈2@2]"]:::plan
+    __InputStaticLeaf26["__InputStaticLeaf[26∈2@2]"]:::plan
     Constant27["Constant[27∈2@2]"]:::plan
     Constant28["Constant[28∈2@2]"]:::plan
-    InputStaticLeaf39["InputStaticLeaf[39∈2@2]"]:::plan
-    InputStaticLeaf91["InputStaticLeaf[91∈2@2]"]:::plan
-    InputStaticLeaf143["InputStaticLeaf[143∈2@2]"]:::plan
-    InputStaticLeaf196["InputStaticLeaf[196∈6@3]"]:::plan
-    InputStaticLeaf197["InputStaticLeaf[197∈6@3]"]:::plan
-    InputStaticLeaf198["InputStaticLeaf[198∈6@3]"]:::plan
+    __InputStaticLeaf39["__InputStaticLeaf[39∈2@2]"]:::plan
+    __InputStaticLeaf91["__InputStaticLeaf[91∈2@2]"]:::plan
+    __InputStaticLeaf143["__InputStaticLeaf[143∈2@2]"]:::plan
+    __InputStaticLeaf196["__InputStaticLeaf[196∈6@3]"]:::plan
+    __InputStaticLeaf197["__InputStaticLeaf[197∈6@3]"]:::plan
+    __InputStaticLeaf198["__InputStaticLeaf[198∈6@3]"]:::plan
     Constant199["Constant[199∈6@3]"]:::plan
     Constant200["Constant[200∈6@3]"]:::plan
-    InputStaticLeaf211["InputStaticLeaf[211∈6@3]"]:::plan
-    InputStaticLeaf263["InputStaticLeaf[263∈6@3]"]:::plan
-    InputStaticLeaf315["InputStaticLeaf[315∈6@3]"]:::plan
+    __InputStaticLeaf211["__InputStaticLeaf[211∈6@3]"]:::plan
+    __InputStaticLeaf263["__InputStaticLeaf[263∈6@3]"]:::plan
+    __InputStaticLeaf315["__InputStaticLeaf[315∈6@3]"]:::plan
 
     %% plan dependencies
     PgInsert18 --> PgClassExpression22
-    Object363 & PgClassExpression17 & InputStaticLeaf8 & InputStaticLeaf9 & InputStaticLeaf10 --> PgInsert18
+    Object363 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf9 & __InputStaticLeaf10 --> PgInsert18
     PgInsert13 --> PgClassExpression17
     Object363 & Constant11 & Constant12 --> PgInsert13
     PgInsert34 --> PgClassExpression38
-    Object363 & PgClassExpression33 & InputStaticLeaf24 & InputStaticLeaf25 & InputStaticLeaf26 --> PgInsert34
+    Object363 & PgClassExpression33 & __InputStaticLeaf24 & __InputStaticLeaf25 & __InputStaticLeaf26 --> PgInsert34
     PgInsert29 --> PgClassExpression33
     Object363 & Constant27 & Constant28 --> PgInsert29
     PgSelectSingle45 & PgClassExpression46 --> PgPolymorphic47
@@ -141,7 +141,7 @@ graph TD
     PgSelectSingle45 --> PgClassExpression83
     First44 --> PgSelectSingle45
     PgSelect40 --> First44
-    Object363 & InputStaticLeaf39 --> PgSelect40
+    Object363 & __InputStaticLeaf39 --> PgSelect40
     PgSelectSingle97 & PgClassExpression98 --> PgPolymorphic99
     PgSelectSingle97 --> PgClassExpression98
     PgSelectSingle114 --> PgClassExpression116
@@ -153,7 +153,7 @@ graph TD
     PgSelectSingle97 --> PgClassExpression135
     First96 --> PgSelectSingle97
     PgSelect92 --> First96
-    Object363 & InputStaticLeaf91 --> PgSelect92
+    Object363 & __InputStaticLeaf91 --> PgSelect92
     PgSelectSingle149 & PgClassExpression150 --> PgPolymorphic151
     PgSelectSingle149 --> PgClassExpression150
     PgSelectSingle166 --> PgClassExpression168
@@ -165,9 +165,9 @@ graph TD
     PgSelectSingle149 --> PgClassExpression187
     First148 --> PgSelectSingle149
     PgSelect144 --> First148
-    Object363 & InputStaticLeaf143 --> PgSelect144
+    Object363 & __InputStaticLeaf143 --> PgSelect144
     PgInsert206 --> PgClassExpression210
-    Object363 & PgClassExpression205 & InputStaticLeaf196 & InputStaticLeaf197 & InputStaticLeaf198 --> PgInsert206
+    Object363 & PgClassExpression205 & __InputStaticLeaf196 & __InputStaticLeaf197 & __InputStaticLeaf198 --> PgInsert206
     PgInsert201 --> PgClassExpression205
     Object363 & Constant199 & Constant200 --> PgInsert201
     PgSelectSingle217 & PgClassExpression218 --> PgPolymorphic219
@@ -181,7 +181,7 @@ graph TD
     PgSelectSingle217 --> PgClassExpression255
     First216 --> PgSelectSingle217
     PgSelect212 --> First216
-    Object363 & InputStaticLeaf211 --> PgSelect212
+    Object363 & __InputStaticLeaf211 --> PgSelect212
     PgSelectSingle269 & PgClassExpression270 --> PgPolymorphic271
     PgSelectSingle269 --> PgClassExpression270
     PgSelectSingle286 --> PgClassExpression288
@@ -193,7 +193,7 @@ graph TD
     PgSelectSingle269 --> PgClassExpression307
     First268 --> PgSelectSingle269
     PgSelect264 --> First268
-    Object363 & InputStaticLeaf263 --> PgSelect264
+    Object363 & __InputStaticLeaf263 --> PgSelect264
     PgSelectSingle321 & PgClassExpression322 --> PgPolymorphic323
     PgSelectSingle321 --> PgClassExpression322
     PgSelectSingle338 --> PgClassExpression340
@@ -205,7 +205,7 @@ graph TD
     PgSelectSingle321 --> PgClassExpression359
     First320 --> PgSelectSingle321
     PgSelect316 --> First320
-    Object363 & InputStaticLeaf315 --> PgSelect316
+    Object363 & __InputStaticLeaf315 --> PgSelect316
     Access361 & Access362 --> Object363
     __Value3 --> Access361
     __Value3 --> Access362
@@ -289,10 +289,10 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6,Access361,Access362,Object363 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 363<br />~ᐳMutation.p1<br />⠀ROOT ᐸ-O- 22"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,InputStaticLeaf8,InputStaticLeaf9,InputStaticLeaf10,Constant11,Constant12,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22 bucket1
+    class Bucket1,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22 bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />Deps: 363, 5<br />~ᐳMutation.p2<br />⠀ROOT ᐸ-O- 38<br />⠀⠀query ᐸ-O- 5<br />⠀⠀⠀query.i1 ᐸ-O- 47<br />⠀⠀⠀⠀query.i1.id ᐸ-L- 83<br />⠀⠀⠀query.i2 ᐸ-O- 99<br />⠀⠀⠀⠀query.i2.id ᐸ-L- 135<br />⠀⠀⠀query.i3 ᐸ-O- 151<br />⠀⠀⠀⠀query.i3.id ᐸ-L- 187"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,InputStaticLeaf24,InputStaticLeaf25,InputStaticLeaf26,Constant27,Constant28,PgInsert29,PgClassExpression33,PgInsert34,PgClassExpression38,InputStaticLeaf39,PgSelect40,First44,PgSelectSingle45,PgClassExpression46,PgPolymorphic47,PgSelect57,First61,PgClassExpression83,InputStaticLeaf91,PgSelect92,First96,PgSelectSingle97,PgClassExpression98,PgPolymorphic99,PgSelect109,First113,PgClassExpression135,InputStaticLeaf143,PgSelect144,First148,PgSelectSingle149,PgClassExpression150,PgPolymorphic151,PgSelect161,First165,PgClassExpression187 bucket2
+    class Bucket2,__InputStaticLeaf24,__InputStaticLeaf25,__InputStaticLeaf26,Constant27,Constant28,PgInsert29,PgClassExpression33,PgInsert34,PgClassExpression38,__InputStaticLeaf39,PgSelect40,First44,PgSelectSingle45,PgClassExpression46,PgPolymorphic47,PgSelect57,First61,PgClassExpression83,__InputStaticLeaf91,PgSelect92,First96,PgSelectSingle97,PgClassExpression98,PgPolymorphic99,PgSelect109,First113,PgClassExpression135,__InputStaticLeaf143,PgSelect144,First148,PgSelectSingle149,PgClassExpression150,PgPolymorphic151,PgSelect161,First165,PgClassExpression187 bucket2
     Bucket3("Bucket 3 (polymorphic47[RelationalPost])<br />Deps: 61<br />~ᐳMutation.p2ᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- 64<br />⠀⠀description ᐸ-L- 65<br />⠀⠀note ᐸ-L- 66"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelectSingle62,PgClassExpression64,PgClassExpression65,PgClassExpression66 bucket3
@@ -304,7 +304,7 @@ graph TD
     class Bucket5,PgSelectSingle166,PgClassExpression168,PgClassExpression169,PgClassExpression170 bucket5
     Bucket6("Bucket 6 (group3[mutation])<br />Deps: 363, 5<br />~ᐳMutation.p3<br />⠀ROOT ᐸ-O- 210<br />⠀⠀query ᐸ-O- 5<br />⠀⠀⠀query.i1 ᐸ-O- 219<br />⠀⠀⠀⠀query.i1.id ᐸ-L- 255<br />⠀⠀⠀query.i2 ᐸ-O- 271<br />⠀⠀⠀⠀query.i2.id ᐸ-L- 307<br />⠀⠀⠀query.i3 ᐸ-O- 323<br />⠀⠀⠀⠀query.i3.id ᐸ-L- 359"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,InputStaticLeaf196,InputStaticLeaf197,InputStaticLeaf198,Constant199,Constant200,PgInsert201,PgClassExpression205,PgInsert206,PgClassExpression210,InputStaticLeaf211,PgSelect212,First216,PgSelectSingle217,PgClassExpression218,PgPolymorphic219,PgSelect229,First233,PgClassExpression255,InputStaticLeaf263,PgSelect264,First268,PgSelectSingle269,PgClassExpression270,PgPolymorphic271,PgSelect281,First285,PgClassExpression307,InputStaticLeaf315,PgSelect316,First320,PgSelectSingle321,PgClassExpression322,PgPolymorphic323,PgSelect333,First337,PgClassExpression359 bucket6
+    class Bucket6,__InputStaticLeaf196,__InputStaticLeaf197,__InputStaticLeaf198,Constant199,Constant200,PgInsert201,PgClassExpression205,PgInsert206,PgClassExpression210,__InputStaticLeaf211,PgSelect212,First216,PgSelectSingle217,PgClassExpression218,PgPolymorphic219,PgSelect229,First233,PgClassExpression255,__InputStaticLeaf263,PgSelect264,First268,PgSelectSingle269,PgClassExpression270,PgPolymorphic271,PgSelect281,First285,PgClassExpression307,__InputStaticLeaf315,PgSelect316,First320,PgSelectSingle321,PgClassExpression322,PgPolymorphic323,PgSelect333,First337,PgClassExpression359 bucket6
     Bucket7("Bucket 7 (polymorphic219[RelationalPost])<br />Deps: 233<br />~ᐳMutation.p3ᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- 236<br />⠀⠀description ᐸ-L- 237<br />⠀⠀note ᐸ-L- 238"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgSelectSingle234,PgClassExpression236,PgClassExpression237,PgClassExpression238 bucket7

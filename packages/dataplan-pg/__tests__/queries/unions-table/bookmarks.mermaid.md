@@ -52,7 +52,7 @@ graph TD
     Access79["Access[79∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access80["Access[80∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    InputStaticLeaf7["InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
 
     %% plan dependencies
     PgSelectSingle13 --> PgClassExpression14
@@ -93,7 +93,7 @@ graph TD
     Access100 ==> __Item21
     First12 --> Access100
     PgSelect8 --> First12
-    Object81 & InputStaticLeaf7 --> PgSelect8
+    Object81 & __InputStaticLeaf7 --> PgSelect8
     Access79 & Access80 --> Object81
     __Value3 --> Access79
     __Value3 --> Access80
@@ -147,7 +147,7 @@ graph TD
     subgraph "Buckets for queries/unions-table/bookmarks"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀personByPersonId ᐸ-O- 13<br />⠀⠀⠀personByPersonId.personId ᐸ-L- 14<br />⠀⠀⠀personByPersonId.username ᐸ-L- 15<br />⠀⠀⠀personByPersonId.personBookmarksList ᐸ-A- 100"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,Access79,Access80,Object81,Access100 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,Access79,Access80,Object81,Access100 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 100<br />~ᐳQuery.personByPersonIdᐳPerson.personBookmarksList[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀id ᐸ-L- 23<br />⠀⠀person ᐸ-O- 30<br />⠀⠀⠀person.username ᐸ-L- 31<br />⠀⠀bookmarkedEntity ᐸ-O- 37"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,List36,PgPolymorphic37,Map86,Map88,Map92,Map98 bucket1

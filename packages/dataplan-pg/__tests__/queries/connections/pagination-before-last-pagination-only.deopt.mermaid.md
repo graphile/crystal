@@ -23,7 +23,7 @@ graph TD
     ToPg32["ToPg[32]"]:::plan
     Access31["Access[31]<br />ᐸ28.1ᐳ"]:::plan
     Lambda28["Lambda[28]<br />ᐸparseCursorᐳ"]:::plan
-    InputStaticLeaf17["InputStaticLeaf[17]"]:::plan
+    __InputStaticLeaf17["__InputStaticLeaf[17]"]:::plan
     Constant37["Constant[37]"]:::plan
     PgPageInfo25["PgPageInfo[25]"]:::plan
     Constant26["Constant[26]"]:::plan
@@ -41,7 +41,7 @@ graph TD
     Lambda28 --> PgValidateParsedCursor30
     Access31 --> ToPg32
     Lambda28 --> Access31
-    InputStaticLeaf17 --> Lambda28
+    __InputStaticLeaf17 --> Lambda28
 
     %% plan-to-path relationships
     P0["~"]
@@ -60,6 +60,6 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allMessagesConnection ᐸ-O- 37<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- 25<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- 26<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- 29<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- 36"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,InputStaticLeaf17,Access21,Access22,Object23,PgPageInfo25,Constant26,PgSelect27,Lambda28,Lambda29,PgValidateParsedCursor30,Access31,ToPg32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36,Constant37 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf17,Access21,Access22,Object23,PgPageInfo25,Constant26,PgSelect27,Lambda28,Lambda29,PgValidateParsedCursor30,Access31,ToPg32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36,Constant37 bucket0
     end
 ```
