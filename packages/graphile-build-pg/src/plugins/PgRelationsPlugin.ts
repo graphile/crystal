@@ -451,7 +451,7 @@ export const PgRelationsPlugin: Plugin = {
         )})`,
     )
     .join(", ")} });
-  return connection($records, $item => $item, $item => $item.cursor());
+  return connection($records);
 }`,
                   ) as any,
                   [otherSource, connection],
@@ -470,12 +470,7 @@ export const PgRelationsPlugin: Plugin = {
                         },
                         {},
                       );
-                      return connection(
-                        otherSource.find(spec),
-                        ($item) => $item,
-                        ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                          $item.cursor(),
-                      );
+                      return connection(otherSource.find(spec));
                     },
                   [connection, localColumns, otherSource, remoteColumns],
                 );

@@ -1,4 +1,8 @@
-import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
+import type {
+  CrystalResultsList,
+  CrystalValuesList,
+  EdgeCapablePlan,
+} from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLPlaceholderNode } from "pg-sql2";
 import sql from "pg-sql2";
@@ -67,7 +71,9 @@ export class PgSelectSinglePlan<
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
   extends ExecutablePlan<PgSourceRow<TColumns> | null>
-  implements PgTypedExecutablePlan<PgTypeCodec<TColumns, any, any>>
+  implements
+    PgTypedExecutablePlan<PgTypeCodec<TColumns, any, any>>,
+    EdgeCapablePlan<any>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -457,6 +463,13 @@ export class PgSelectSinglePlan<
   public cursor(): PgCursorPlan<this> {
     const cursorPlan = new PgCursorPlan<this>(this);
     return cursorPlan;
+  }
+
+  /**
+   * For compatibility with EdgeCapablePlan.
+   */
+  public node(): this {
+    return this;
   }
 
   deduplicate(

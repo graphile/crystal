@@ -1,4 +1,4 @@
-import type { PageInfoCapablePlan } from "graphile-crystal";
+import type { EdgeCapablePlan, PageInfoCapablePlan } from "graphile-crystal";
 import {
   ConnectionPlan,
   each,
@@ -55,7 +55,9 @@ export const ConnectionPlugin: Plugin = {
                   ...scope,
                   isConnectionEdgeType: true,
                 },
-                EdgePlan,
+                ExecutablePlan as unknown as {
+                  new (...args: any[]): EdgeCapablePlan<any>;
+                },
                 () => ({
                   description: build.wrapDescription(
                     `A \`${typeName}\` edge in the connection.`,
@@ -80,7 +82,7 @@ export const ConnectionPlugin: Plugin = {
                           ),
                           type: Cursor,
                           plan: EXPORTABLE(
-                            () => ($edge: EdgePlan<any, any, any>) =>
+                            () => ($edge: EdgeCapablePlan<any>) =>
                               $edge.cursor(),
                             [],
                           ),
@@ -97,8 +99,7 @@ export const ConnectionPlugin: Plugin = {
                           ),
                           type: nullableIf(!nonNullNode, NodeType),
                           plan: EXPORTABLE(
-                            () => ($edge: EdgePlan<any, any, any>) =>
-                              $edge.node(),
+                            () => ($edge: EdgeCapablePlan<any>) => $edge.node(),
                             [],
                           ),
                         }),
@@ -152,7 +153,7 @@ export const ConnectionPlugin: Plugin = {
                               function plan(
                                 $connection: ConnectionPlan<any, any, any>,
                               ) {
-                                return $connection.cloneSubplanWithPagination();
+                                return $connection.nodes();
                               },
                             [],
                           ) as any,
@@ -173,17 +174,13 @@ export const ConnectionPlugin: Plugin = {
                             ),
                           ),
                           plan: EXPORTABLE(
-                            (each) =>
+                            () =>
                               function plan(
                                 $connection: ConnectionPlan<any, any, any>,
                               ) {
-                                return each(
-                                  $connection.cloneSubplanWithPagination(),
-                                  ($intermediate) =>
-                                    $connection.wrapEdge($intermediate),
-                                );
+                                return $connection.edges();
                               },
-                            [each],
+                            [],
                           ) as any,
                         }),
                       ),

@@ -20,9 +20,9 @@ import {
   TYPES,
 } from "@dataplan/pg";
 import type {
+  __InputObjectPlan,
   __TrackedObjectPlan,
   ExecutablePlan,
-  __InputObjectPlan,
   InputPlan,
 } from "graphile-crystal";
 import {
@@ -647,18 +647,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                                         $parent,
                                         args,
                                       ) as PgSelectPlan<any, any, any, any>;
-                                    return connection(
-                                      $select,
-                                      ($item) => $item,
-                                      (
-                                        $item: PgSelectSinglePlan<
-                                          any,
-                                          any,
-                                          any,
-                                          any
-                                        >,
-                                      ) => $item.cursor(),
-                                    );
+                                    return connection($select);
                                   },
                                 [connection, getSelectPlanFromParentAndArgs],
                               ),

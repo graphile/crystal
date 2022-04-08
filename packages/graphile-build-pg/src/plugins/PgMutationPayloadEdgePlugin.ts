@@ -220,12 +220,7 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                         ) as GraphQLEnumType,
                       );
 
-                      const $connection = connection(
-                        $select,
-                        ($item) => $item,
-                        ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                          $item.cursor(),
-                      ) as any;
+                      const $connection = connection($select) as any;
                       const $single = $select.single();
                       return new EdgePlan($connection, $single);
                     },

@@ -34,6 +34,7 @@ import {
   context,
   crystalEnforce,
   each,
+  EdgePlan,
   filter,
   getEnumValueConfig,
   groupBy,
@@ -2237,14 +2238,11 @@ export function makeExampleSchema(
       edges: {
         type: new GraphQLList(MessageEdge),
         plan: EXPORTABLE(
-          (each) => function plan($connection) {
-              // return context();
-              return each(
-                $connection.cloneSubplanWithPagination(),
-                ($intermediate) => $connection.wrapEdge($intermediate),
-              );
+          () =>
+            function plan($connection) {
+              return $connection.edges();
             },
-          [each],
+          [],
         ),
       },
       nodes: newGraphileFieldConfigBuilder<
@@ -2255,8 +2253,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           () =>
             function plan($connection) {
-              // return context();
-              return $connection.cloneSubplanWithPagination();
+              return $connection.nodes() as any;
             },
           [],
         ),
@@ -2714,12 +2711,7 @@ export function makeExampleSchema(
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
-              const $connectionPlan = connection(
-                $messages,
-                ($item) => $item,
-                ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                  $item.cursor(),
-              );
+              const $connectionPlan = connection($messages);
               // $connectionPlan.orderBy... ?
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
@@ -3807,12 +3799,7 @@ export function makeExampleSchema(
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
-              const $connectionPlan = connection(
-                $messages,
-                ($item) => $item,
-                ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                  $item.cursor(),
-              );
+              const $connectionPlan = connection($messages);
               // $connectionPlan.orderBy... ?
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.

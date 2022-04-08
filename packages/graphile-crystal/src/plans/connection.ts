@@ -3,6 +3,7 @@ import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 import { arrayOfLength } from "../utils";
 import { constant } from "./constant";
+import { each } from "./each";
 
 /**
  * Describes what a plan needs to implement in order to be suitable for
@@ -64,14 +65,18 @@ export class ConnectionPlan<
   private _beforeDepId: number | null = null;
   private _afterDepId: number | null = null;
 
+  // TODO:TS: if subplan is `ConnectionCapablePlan<EdgeCapablePlan<any>>` then `itemPlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
     subplan: TPlan,
-    public readonly itemPlan: ($item: TItemPlan) => TNodePlan,
-    public readonly cursorPlan: (
+    public readonly itemPlan?: ($item: TItemPlan) => TNodePlan,
+    public readonly cursorPlan?: (
       $item: TItemPlan,
-    ) => ExecutablePlan<string | null>,
+    ) => ExecutablePlan<string | null> | undefined,
   ) {
     super();
+    if (!cursorPlan) {
+      // TODO: Assert that the `itemPlan` has a `.cursor()` method.
+    }
     // This is a _soft_ reference to the plan; we're not adding it as a
     // dependency since we do not actually need it to execute; it's our
     // children that need access to it.
@@ -183,9 +188,10 @@ export class ConnectionPlan<
    * This cannot be called before 'finalizeArguments' has been called.
    */
   public cloneSubplanWithPagination(
-    ...args: Parameters<TPlan["clone"]>
+    // TODO:TS: ugh. The `|[]` shouldn't be needed.
+    ...args: Parameters<TPlan["clone"]> | []
   ): TPlan {
-    const clonedPlan = this.cloneSubplanWithoutPagination(...args);
+    const clonedPlan = this.cloneSubplanWithoutPagination(...(args as any));
 
     {
       const plan = this.getBefore();
@@ -221,6 +227,27 @@ export class ConnectionPlan<
     return clonedPlan;
   }
 
+  public edges() {
+    if (this.cursorPlan || this.itemPlan) {
+      return each(this.cloneSubplanWithPagination(), ($intermediate) =>
+        this.wrapEdge($intermediate as any),
+      );
+    } else {
+      // Assuming the subplan is an EdgeCapablePlan
+      return this.cloneSubplanWithPagination();
+    }
+  }
+
+  public nodes() {
+    if (this.itemPlan) {
+      return each(this.cloneSubplanWithPagination(), ($intermediate) =>
+        this.itemPlan!($intermediate as any),
+      );
+    } else {
+      return this.cloneSubplanWithPagination();
+    }
+  }
+
   public wrapEdge($edge: TItemPlan): EdgePlan<TItemPlan, TPlan, TNodePlan> {
     return new EdgePlan(this, $edge);
   }
@@ -242,11 +269,20 @@ export class ConnectionPlan<
   }
 }
 
+export interface EdgeCapablePlan<TNodePlan extends ExecutablePlan<any>>
+  extends ExecutablePlan<any> {
+  node(): TNodePlan;
+  cursor(): ExecutablePlan<string | null>;
+}
+
 export class EdgePlan<
-  TItemPlan extends ExecutablePlan<any>,
-  TPlan extends ConnectionCapablePlan<TItemPlan>,
-  TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
-> extends ExecutablePlan {
+    TItemPlan extends ExecutablePlan<any>,
+    TPlan extends ConnectionCapablePlan<TItemPlan>,
+    TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  >
+  extends ExecutablePlan
+  implements EdgeCapablePlan<TNodePlan>
+{
   static $$export = {
     moduleName: "graphile-crystal",
     exportName: "EdgePlan",
@@ -264,20 +300,29 @@ export class EdgePlan<
     this.addDependency($item);
   }
 
-  getConnectionPlan(): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
+  private getConnectionPlan(): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
     return this.getPlan(this.connectionPlanId) as any;
   }
 
-  getItemPlan(): TItemPlan {
+  private getItemPlan(): TItemPlan {
     return this.getDep(0) as any;
   }
 
   node(): TNodePlan {
-    return this.getConnectionPlan().itemPlan(this.getItemPlan());
+    const $item = this.getItemPlan();
+    return this.getConnectionPlan().itemPlan?.($item) ?? ($item as any);
   }
 
   cursor(): ExecutablePlan<string | null> {
-    return this.getConnectionPlan().cursorPlan(this.getItemPlan());
+    const $item = this.getItemPlan();
+    const $cursor =
+      this.getConnectionPlan().cursorPlan?.($item) ??
+      ($item as ExecutablePlan & { cursor?: () => ExecutablePlan }).cursor?.();
+    if ($cursor) {
+      return $cursor;
+    } else {
+      throw new Error(`No cursor plan known for '${$item}'`);
+    }
   }
 
   execute(values: Array<CrystalValuesList<any>>): CrystalResultsList<any> {
@@ -296,8 +341,8 @@ export function connection<
   TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 >(
   plan: TPlan,
-  itemPlan: ($item: TItemPlan) => TNodePlan,
-  cursorPlan: ($item: TItemPlan) => ExecutablePlan<string | null>,
+  itemPlan?: ($item: TItemPlan) => TNodePlan,
+  cursorPlan?: ($item: TItemPlan) => ExecutablePlan<string | null>,
 ): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
   return new ConnectionPlan(plan, itemPlan, cursorPlan);
 }

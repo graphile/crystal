@@ -30,6 +30,7 @@ export {
   connection,
   ConnectionCapablePlan,
   ConnectionPlan,
+  EdgeCapablePlan,
   EdgePlan,
   PageInfoCapablePlan,
 } from "./connection";

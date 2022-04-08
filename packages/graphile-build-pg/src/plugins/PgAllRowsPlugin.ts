@@ -175,12 +175,7 @@ export const PgAllRowsPlugin: Plugin = {
                       plan: EXPORTABLE(
                         (connection, source) =>
                           function plan() {
-                            return connection(
-                              source.find(),
-                              ($item) => $item,
-                              ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                                $item.cursor(),
-                            );
+                            return connection(source.find());
                           },
                         [connection, source],
                       ),
