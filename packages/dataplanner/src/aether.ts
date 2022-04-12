@@ -150,8 +150,10 @@ const isTest = process.env.NODE_ENV === "test";
 /**
  * Once the plan has been requested once from context, we can just return the
  * same plan over and over without rebuilding it each time.
+ *
+ * @internal
  */
-const $$contextPlanCache = Symbol("contextPlanCache");
+export const $$contextPlanCache = Symbol("contextPlanCache");
 /**
  * If the request is an introspection-only request, we can cache the result and
  * return it over and over without rebuilding it each itme.
@@ -1026,18 +1028,6 @@ export class Aether<
         "\n" + this.printPlansByPath(),
       );
       debugPlan(`Plan graph: %s`, "\n" + this.printPlanGraph());
-    }
-
-    if (typeof (this.context as any)?.[$$setPlanGraph] === "function") {
-      // Only build the plan once
-      if (this[$$contextPlanCache] == null) {
-        this[$$contextPlanCache] = this.printPlanGraph({
-          includePaths: isTest,
-          printPathRelations: false,
-          concise: !isTest,
-        });
-      }
-      (this.context as any)[$$setPlanGraph](this[$$contextPlanCache]);
     }
 
     this.phase = "ready";

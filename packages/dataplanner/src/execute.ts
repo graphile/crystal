@@ -18,6 +18,9 @@ import { isPromiseLike } from "./utils";
  */
 export function execute(
   args: ExecutionArgs,
+  options: {
+    experimentalGraphQLBypass?: boolean;
+  } = {},
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -35,7 +38,7 @@ export function execute(
     }
   }
   const rootValue = dataplannerPrepare(args, {
-    experimentalGraphQLBypass: true,
+    experimentalGraphQLBypass: options.experimentalGraphQLBypass ?? true,
   });
   if (isPromiseLike(rootValue)) {
     return rootValue.then((rootValue) =>

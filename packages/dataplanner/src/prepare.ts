@@ -2,6 +2,7 @@ import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
+import { $$contextPlanCache } from "./aether";
 import { establishAether } from "./establishAether";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces";
 import {
@@ -9,11 +10,13 @@ import {
   $$crystalContext,
   $$pathIdentity,
   $$planResults,
+  $$setPlanGraph,
 } from "./interfaces";
 import { PlanResults } from "./planResults";
 import { crystalObjectToString } from "./resolvers";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
+const isTest = process.env.NODE_ENV === "test";
 
 export interface CrystalPrepareOptions {
   /**
@@ -57,6 +60,18 @@ export function dataplannerPrepare(
     context: context as any,
     rootValue,
   });
+
+  if (typeof (context as any)?.[$$setPlanGraph] === "function") {
+    // Only build the plan once
+    if (aether[$$contextPlanCache] == null) {
+      aether[$$contextPlanCache] = aether.printPlanGraph({
+        includePaths: isTest,
+        printPathRelations: false,
+        concise: !isTest,
+      });
+    }
+    (context as any)[$$setPlanGraph](aether[$$contextPlanCache]);
+  }
 
   const preemptiveResult = aether.executePreemptive(
     variableValues,
