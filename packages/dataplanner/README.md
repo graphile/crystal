@@ -10,7 +10,7 @@ reduced server load, and happier customers.
 DataPlanner can be used as an alternative to the "execute" method of GraphQL.js
 for the very best performance results, or can be used from within the "execute"
 method via our automatic resolver-planner bridging (you can install this into an
-existing schema with the `enforceCrystal` method below).
+existing schema with the `dataplannerEnforce` method below).
 
 When DataPlanner sees a GraphQL request for the first time it will "plan" the
 request: figuring out the data requirements, the steps that need to be taken,
@@ -28,7 +28,8 @@ requirements:
 
 - GraphQL.js v16+
 - every resolver in the schema must[1] be wrapped with DataPlanner's resolver
-  wrapper; this can be achieved manually, or by calling `enforceCrystal(schema)`
+  wrapper; this can be achieved manually, or by calling
+  `dataplannerEnforce(schema)`
 - you must not override the default GraphQL field resolver
 - for every request:
   - `context` must be an object (anything suitable to be used as the key to a
@@ -54,7 +55,7 @@ between executions as possible. In particular, this means you should:
 
 ## API
 
-### `enforceCrystal(schema)`
+### `dataplannerEnforce(schema)`
 
 Ensures every resolver in `schema` is wrapped in crystal. BEWARE - do not do
 this if resolvers may already be wrapped, dual-wrapping resolvers will result in
