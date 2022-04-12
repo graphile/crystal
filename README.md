@@ -1,3 +1,42 @@
+# SPONSORS-ONLY PERIOD
+
+**Hello and thanks for being one of the first people to look at PostGraphile and
+Graphile Engine V5!**
+
+Though this repository is MIT licensed, we're not ready for it to go public yet.
+**Please do not share this code** beyond your company/organization. Preferably,
+don't even share details of the new features!
+
+**STATUS**: you should assume everything in this repository is highly unstable
+and liable to change. This is a technology preview to help us shape the best
+possible software for GraphQL, it's not ready for you to run in production...
+yet!
+
+**GETTING STARTED**: I'm afraid since our focus has been on the core technology,
+the "awesome DX" parts haven't been finished yet (and in some cases haven't even
+been started!) We suggest that you start by cloning down the repository, then
+running the following:
+
+```
+yarn
+yarn watch
+```
+
+This'll keep the compiled code up to date. Then go to
+[packages/graphile-build-pg/src/examples/README.md][] and follow the guidance
+there, try out a couple examples, etc.
+
+**DOCS**: I've put a fair amount of effort into documenting various of the
+functions/variables in the codebase, but there's very little in the way of
+user-docs right now. Further, quite a lot of stuff is in flux (e.g. we're moving
+from "execution-v1" to "execution-v2"), so I've not bothered to document stuff
+I'm planning to remove before release. Please don't hesitate to ask me questions
+in the #🔮 channel [on Discord](https://discord.gg/graphile), or file an issue.
+I won't be investing significant time in documentation until the codebase is a
+little further along.
+
+---
+
 # Graphile GraphQL Monorepo
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
