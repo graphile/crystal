@@ -8,7 +8,7 @@ import type {
 import {
   dataplannerResolver,
   inputObjectFieldSpec,
-  makeCrystalSubscriber,
+  dataplannerSubscriber,
   objectSpec,
 } from "dataplanner";
 import type {
@@ -327,7 +327,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 const { subscribe, resolve } = fieldSpec;
                 fieldSpec.resolve = dataplannerResolver(resolve);
                 if (!subscribe && scope.isRootSubscription) {
-                  fieldSpec.subscribe = makeCrystalSubscriber();
+                  fieldSpec.subscribe = dataplannerSubscriber();
                 }
 
                 // IMPORTANT: **nothing** can modify the resolver from here - i.e.

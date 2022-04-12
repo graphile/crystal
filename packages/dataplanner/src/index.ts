@@ -122,7 +122,7 @@ import {
   crystalResolve,
   dataplannerResolver,
   isCrystalWrapped,
-  makeCrystalSubscriber,
+  dataplannerSubscriber,
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import {
@@ -232,7 +232,7 @@ export {
   ListPlan,
   listTransform,
   makeCrystalSchema,
-  makeCrystalSubscriber,
+  dataplannerSubscriber,
   makeMapper,
   map,
   MapPlan,
@@ -338,7 +338,7 @@ exportAsMany({
   crystalPrepare,
   bypassGraphQLExecute,
   crystalResolve,
-  makeCrystalSubscriber,
+  dataplannerSubscriber,
   stripAnsi,
   arraysMatch,
   inputObjectFieldSpec,

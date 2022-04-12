@@ -1108,7 +1108,7 @@ function func(
     if (crystalSpec.isSubscribe) {
       const iMakeCrystalSubscriber = file.import(
         "dataplanner",
-        "makeCrystalSubscriber",
+        "dataplannerSubscriber",
       );
       return t.callExpression(iMakeCrystalSubscriber, []);
     } else {

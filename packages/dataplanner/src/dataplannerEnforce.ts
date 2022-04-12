@@ -5,7 +5,7 @@ import { isObjectType } from "graphql";
 import {
   dataplannerResolver,
   isCrystalWrapped,
-  makeCrystalSubscriber,
+  dataplannerSubscriber,
 } from "./resolvers";
 
 const debug = debugFactory("dataplanner:enforce");
@@ -55,7 +55,7 @@ export function dataplannerEnforce(schema: GraphQLSchema): GraphQLSchema {
                 objectType.name,
                 fieldName,
               );
-              field.subscribe = makeCrystalSubscriber();
+              field.subscribe = dataplannerSubscriber();
             }
           }
         }

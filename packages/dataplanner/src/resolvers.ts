@@ -342,12 +342,10 @@ export function dataplannerResolver<
 export const crystalResolve = dataplannerResolver(undefined);
 
 /**
- * Given a `subscribe` function, wraps the function so that it can perform the
- * `ResolveFieldValueCrystal` algorithm.
- *
- * @param subscribe - The subscribe function.
+ * Returns a `subscribe` subscription resolver function that's capable of the
+ * DataPlanner algorithms.
  */
-export function makeCrystalSubscriber<
+export function dataplannerSubscriber<
   TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any },
