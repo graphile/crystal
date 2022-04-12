@@ -12,10 +12,10 @@ debugFactory.formatters.p = (pathIdentity) =>
 
 import { Aether } from "./aether";
 import { ROOT_PATH } from "./constants";
+import { dataplannerEnforce } from "./dataplannerEnforce";
 import { defer, Deferred } from "./deferred";
 // Handy for debugging
 import { isDev, noop } from "./dev";
-import { crystalEnforce } from "./enforceCrystal";
 import { CrystalError, isCrystalError } from "./error";
 import { execute } from "./execute";
 import { getCurrentParentPathIdentity } from "./global";
@@ -177,7 +177,6 @@ export {
   constant,
   ConstantPlan,
   context,
-  crystalEnforce,
   CrystalError,
   crystalPrepare,
   CrystalPrepareOptions,
@@ -189,6 +188,7 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   crystalWrapResolve,
+  dataplannerEnforce,
   debugPlans,
   defer,
   Deferred,
@@ -280,7 +280,7 @@ exportAsMany({
   Aether,
   ROOT_PATH,
   defer,
-  crystalEnforce,
+  dataplannerEnforce,
   execute,
   __InputListPlan,
   __InputObjectPlan,

@@ -14,7 +14,7 @@ const debug = debugFactory("dataplanner:enforce");
  * Ensures that all `resolve` and `subscribe` field methods in `schema` are
  * ✨wrapped in crystals✨.
  */
-export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
+export function dataplannerEnforce(schema: GraphQLSchema): GraphQLSchema {
   const subscriptionType = schema.getSubscriptionType();
   const types = Object.values(schema.getTypeMap());
   for (const objectType of types) {

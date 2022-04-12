@@ -12,7 +12,6 @@
 
 import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
-import { writeFileSync } from "fs";
 import type {
   __InputObjectPlan,
   __InputStaticLeafPlan,
@@ -32,7 +31,7 @@ import {
   ConnectionPlan,
   constant,
   context,
-  crystalEnforce,
+  dataplannerEnforce,
   each,
   EdgePlan,
   filter,
@@ -47,6 +46,7 @@ import {
   resolveType,
   subscribe,
 } from "dataplanner";
+import { writeFileSync } from "fs";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -4645,7 +4645,7 @@ export function makeExampleSchema(
     },
   });
 
-  return crystalEnforce(
+  return dataplannerEnforce(
     new GraphQLSchema({
       query: Query,
       mutation: Mutation,
