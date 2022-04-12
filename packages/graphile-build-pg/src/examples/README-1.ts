@@ -22,7 +22,7 @@ import {
   $$setPlanGraph,
   crystalPrepare,
   crystalPrint,
-  execute as crystalExecute,
+  execute as dataplannerExecute,
   stripAnsi,
 } from "dataplanner";
 import fastify from "fastify";
@@ -208,7 +208,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
    */
   const useDataPlanner = (): Plugin => ({
     async onExecute(opts) {
-      opts.setExecuteFn(crystalExecute);
+      opts.setExecuteFn(dataplannerExecute);
     },
   });
 

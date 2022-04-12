@@ -5,7 +5,7 @@ import {
   $$data,
   $$setPlanGraph,
   crystalPrint,
-  execute as crystalExecute,
+  execute as dataplannerExecute,
   isAsyncIterable,
   stripAnsi,
 } from "dataplanner";
@@ -133,7 +133,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
       operationName,
     };
 
-    const result = await crystalExecute(args);
+    const result = await dataplannerExecute(args);
     if (isAsyncIterable(result)) {
       throw new Error("We don't yet support async iterables");
     }
