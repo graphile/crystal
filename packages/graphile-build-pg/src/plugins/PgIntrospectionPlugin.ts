@@ -2,9 +2,9 @@ import "graphile-build";
 
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
-import type { GatherPluginContext } from "graphile-build";
 import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
+import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE } from "graphile-exporter";
 import type {
   GatherHelpers,

@@ -4,8 +4,8 @@ import { isObjectType } from "graphql";
 
 import {
   dataplannerResolver,
-  isCrystalWrapped,
   dataplannerSubscriber,
+  isCrystalWrapped,
 } from "./resolvers";
 
 const debug = debugFactory("dataplanner:enforce");

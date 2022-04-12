@@ -8,9 +8,9 @@ import type {
 } from "@dataplan/pg";
 import { pgDelete, pgInsert, pgUpdate } from "@dataplan/pg";
 import type {
+  __InputObjectPlan,
   __TrackedObjectPlan,
   ExecutablePlan,
-  __InputObjectPlan,
   InputPlan,
   TrackedArguments,
 } from "dataplanner";

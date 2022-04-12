@@ -3,8 +3,8 @@ import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
-import { writeFile } from "fs/promises";
 import { $$crystalWrapped, isCrystalWrapped } from "dataplanner";
+import { writeFile } from "fs/promises";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,

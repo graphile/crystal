@@ -114,15 +114,15 @@ import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
 import {
   bypassGraphQLExecute,
-  dataplannerPrepare,
   CrystalPrepareOptions,
+  dataplannerPrepare,
 } from "./prepare";
 import {
   $$crystalWrapped,
   crystalResolve,
   dataplannerResolver,
-  isCrystalWrapped,
   dataplannerSubscriber,
+  isCrystalWrapped,
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import {
@@ -178,7 +178,6 @@ export {
   ConstantPlan,
   context,
   CrystalError,
-  dataplannerPrepare,
   CrystalPrepareOptions,
   crystalPrint,
   crystalPrintPathIdentity,
@@ -187,8 +186,10 @@ export {
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
-  dataplannerResolver,
   dataplannerEnforce,
+  dataplannerPrepare,
+  dataplannerResolver,
+  dataplannerSubscriber,
   debugPlans,
   defer,
   Deferred,
@@ -232,7 +233,6 @@ export {
   ListPlan,
   listTransform,
   makeCrystalSchema,
-  dataplannerSubscriber,
   makeMapper,
   map,
   MapPlan,

@@ -1,6 +1,5 @@
 import assert from "assert";
 import { createHash } from "crypto";
-import debugFactory from "debug";
 import type {
   __ItemPlan,
   ConnectionCapablePlan,
@@ -15,13 +14,13 @@ import type {
   StreamablePlan,
 } from "dataplanner";
 import {
+  __InputListPlan,
+  __InputObjectPlan,
+  __InputStaticLeafPlan,
   __TrackedObjectPlan,
   access,
   ExecutablePlan,
   first,
-  __InputListPlan,
-  __InputObjectPlan,
-  __InputStaticLeafPlan,
   isAsyncIterable,
   isPromiseLike,
   lambda,
@@ -31,6 +30,7 @@ import {
   reverse,
   reverseArray,
 } from "dataplanner";
+import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 

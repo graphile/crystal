@@ -20,8 +20,8 @@ import chalk from "chalk";
 import {
   $$data,
   $$setPlanGraph,
-  dataplannerPrepare,
   crystalPrint,
+  dataplannerPrepare,
   execute as dataplannerExecute,
   stripAnsi,
 } from "dataplanner";
