@@ -51,7 +51,7 @@ export class ConnectionPlan<
   TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > extends ExecutablePlan<unknown> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "ConnectionPlan",
   };
   isSyncAndSafe = true;
@@ -284,7 +284,7 @@ export class EdgePlan<
   implements EdgeCapablePlan<TNodePlan>
 {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "EdgePlan",
   };
   isSyncAndSafe = true;

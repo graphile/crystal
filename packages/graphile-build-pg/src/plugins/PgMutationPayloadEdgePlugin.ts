@@ -12,7 +12,7 @@ import type {
   PgUpdatePlan,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { ObjectPlan, TrackedArguments } from "graphile-crystal";
+import type { ObjectPlan, TrackedArguments } from "dataplanner";
 import {
   access,
   connection,
@@ -22,7 +22,7 @@ import {
   getEnumValueConfig,
   list,
   ListPlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type {

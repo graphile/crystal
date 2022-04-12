@@ -10,7 +10,7 @@ import { ExecutablePlan } from "../plan";
  */
 export class __ItemPlan<TData> extends ExecutablePlan<TData> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "__ItemPlan",
   };
   isSyncAndSafe = true;

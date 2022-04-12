@@ -7,8 +7,8 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { ListPlan } from "graphile-crystal";
-import { access, constant, list } from "graphile-crystal";
+import type { ListPlan } from "dataplanner";
+import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";

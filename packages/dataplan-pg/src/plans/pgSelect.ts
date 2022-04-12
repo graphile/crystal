@@ -13,7 +13,7 @@ import type {
   PlanOptimizeOptions,
   PlanStreamOptions,
   StreamablePlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   __TrackedObjectPlan,
   access,
@@ -30,7 +30,7 @@ import {
   planGroupsOverlap,
   reverse,
   reverseArray,
-} from "graphile-crystal";
+} from "dataplanner";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 

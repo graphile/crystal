@@ -12,7 +12,7 @@
   "include": ["src"],
   "references": [
     { "path": "../lru" },
-    { "path": "../graphile-crystal" },
+    { "path": "../dataplanner" },
     { "path": "../graphile-exporter" },
     { "path": "../graphile-plugin" }
   ]

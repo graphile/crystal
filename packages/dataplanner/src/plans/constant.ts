@@ -7,7 +7,7 @@ import { arrayOfLength } from "../utils";
  */
 export class ConstantPlan<TData> extends ExecutablePlan<TData> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "ConstantPlan",
   };
   isSyncAndSafe = true;

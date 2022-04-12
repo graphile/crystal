@@ -2,14 +2,14 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
   PageInfoCapablePlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   ConnectionPlan,
   constant,
   ExecutablePlan,
   first,
   last,
-} from "graphile-crystal";
+} from "dataplanner";
 
 import type { PgCursorPlan } from "./pgCursor";
 import type { PgSelectPlan } from "./pgSelect";

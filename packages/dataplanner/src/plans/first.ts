@@ -4,7 +4,7 @@ import { ListPlan } from "./list";
 
 export class FirstPlan<TData> extends ExecutablePlan<TData> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "FirstPlan",
   };
   isSyncAndSafe = true;

@@ -33,7 +33,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
-    "graphile-crystal": "*",
+    "dataplanner": "*",
     "graphql": "*"
   },
   "files": [

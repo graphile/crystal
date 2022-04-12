@@ -1,6 +1,6 @@
 import debugFactory from "debug";
-import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { ExecutablePlan } from "graphile-crystal";
+import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
+import { ExecutablePlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 

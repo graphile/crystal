@@ -1,6 +1,6 @@
 import assert from "assert";
-import type { BasePlan, ExecutablePlan } from "graphile-crystal";
-import { ModifierPlan } from "graphile-crystal";
+import type { BasePlan, ExecutablePlan } from "dataplanner";
+import { ModifierPlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 
 import type { PgTypeCodec } from "../interfaces";

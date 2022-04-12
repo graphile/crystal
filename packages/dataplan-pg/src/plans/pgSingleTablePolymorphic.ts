@@ -3,8 +3,8 @@ import type {
   CrystalValuesList,
   PolymorphicData,
   PolymorphicPlan,
-} from "graphile-crystal";
-import { ExecutablePlan, polymorphicWrap } from "graphile-crystal";
+} from "dataplanner";
+import { ExecutablePlan, polymorphicWrap } from "dataplanner";
 import type { GraphQLObjectType } from "graphql";
 
 import type { PgTypeColumns } from "../codecs";

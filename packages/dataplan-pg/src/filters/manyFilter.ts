@@ -1,4 +1,4 @@
-import { ModifierPlan } from "graphile-crystal";
+import { ModifierPlan } from "dataplanner";
 import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource";

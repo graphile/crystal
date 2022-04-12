@@ -4,13 +4,13 @@ import type {
   ExecutablePlan,
   GraphileFieldConfig,
   OutputPlanForType,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   crystalWrapResolve,
   inputObjectFieldSpec,
   makeCrystalSubscriber,
   objectSpec,
-} from "graphile-crystal";
+} from "dataplanner";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,

@@ -9,7 +9,7 @@ import { access } from "./access";
  */
 export class __ValuePlan<TData> extends ExecutablePlan<TData> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "__ValuePlan",
   };
   isSyncAndSafe = true;

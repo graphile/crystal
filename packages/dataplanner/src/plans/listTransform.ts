@@ -59,7 +59,7 @@ export class __ListTransformPlan<
   TItemPlan extends ExecutablePlan | undefined = undefined,
 > extends ExecutablePlan<TMemo> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "__ListTransformPlan",
   };
   isSyncAndSafe = true;

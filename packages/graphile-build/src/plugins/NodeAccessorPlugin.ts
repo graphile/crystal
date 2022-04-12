@@ -3,8 +3,8 @@ import type {
   NodeIdCodec,
   NodeIdHandler,
   TrackedArguments,
-} from "graphile-crystal";
-import { lambda } from "graphile-crystal";
+} from "dataplanner";
+import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";

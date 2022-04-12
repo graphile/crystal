@@ -7,7 +7,7 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../graphile-crystal" },
+    { "path": "../dataplanner" },
     { "path": "../jest-serializer-simple" }
   ]
 }

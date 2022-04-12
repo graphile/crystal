@@ -7,8 +7,8 @@ import type {
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan } from "graphile-crystal";
-import { getEnumValueConfig } from "graphile-crystal";
+import type { ConnectionPlan, InputPlan } from "dataplanner";
+import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLEnumType, GraphQLInputType, GraphQLSchema } from "graphql";

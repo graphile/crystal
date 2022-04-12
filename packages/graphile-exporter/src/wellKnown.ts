@@ -1,7 +1,7 @@
 import crypto from "crypto";
 // eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import * as _crypto from "crypto";
-import * as crystalStar from "graphile-crystal";
+import * as crystalStar from "dataplanner";
 import * as graphqlStar from "graphql";
 import util, * as utilStar from "util";
 
@@ -41,7 +41,7 @@ function makeWellKnownFromOptions(options: ExportOptions) {
   // TODO: fill this out a bit...
   wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
   wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
-  exportAll(crystalStar, "graphile-crystal");
+  exportAll(crystalStar, "dataplanner");
   exportAll(graphqlStar, "graphql");
   exportAll(utilStar, "util");
 

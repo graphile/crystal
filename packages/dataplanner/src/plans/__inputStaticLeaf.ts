@@ -10,7 +10,7 @@ import { arrayOfLength } from "../utils";
  */
 export class __InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "__InputStaticLeafPlan",
   };
   isSyncAndSafe = true;

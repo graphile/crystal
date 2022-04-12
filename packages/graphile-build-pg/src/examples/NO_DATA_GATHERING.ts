@@ -21,7 +21,7 @@ import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
 } from "graphile-build";
-import { context, object } from "graphile-crystal";
+import { context, object } from "dataplanner";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";

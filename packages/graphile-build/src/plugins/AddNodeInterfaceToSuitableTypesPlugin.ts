@@ -1,5 +1,5 @@
-import type { ExecutablePlan } from "graphile-crystal";
-import { constant, lambda, node, NodePlan } from "graphile-crystal";
+import type { ExecutablePlan } from "dataplanner";
+import { constant, lambda, node, NodePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";

@@ -13,7 +13,7 @@
   "references": [
     { "path": "../dataplan-pg" },
     { "path": "../graphile-build" },
-    { "path": "../graphile-crystal" },
+    { "path": "../dataplanner" },
     { "path": "../graphile-exporter" },
     { "path": "../graphile-plugin" },
     { "path": "../pg-introspection" }

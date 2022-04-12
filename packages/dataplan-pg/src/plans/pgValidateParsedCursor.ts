@@ -1,5 +1,5 @@
-import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { ExecutablePlan, isDev } from "graphile-crystal";
+import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
+import { ExecutablePlan, isDev } from "dataplanner";
 
 /**
  * Lightweight plan to validate cursor. We couldn't do this with a lambda

@@ -1,7 +1,7 @@
 import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
-} from "graphile-crystal";
+} from "dataplanner";
 import type {
   AsyncHooks,
   GatherHelpers,

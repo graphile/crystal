@@ -27,7 +27,7 @@ import type { AccessPlan } from "./access";
  */
 export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "__TrackedObjectPlan",
   };
   isSyncAndSafe = true;

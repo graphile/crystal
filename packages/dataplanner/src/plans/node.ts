@@ -27,7 +27,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   implements PolymorphicPlan
 {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "NodePlan",
   };
   isSyncAndSafe = true;

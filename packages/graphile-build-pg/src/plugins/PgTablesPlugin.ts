@@ -7,7 +7,7 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSelectSinglePlan, PgSourceBuilder } from "@dataplan/pg";
-import { ExecutablePlan } from "graphile-crystal";
+import { ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { PgClass, PgNamespace } from "pg-introspection";

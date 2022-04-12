@@ -9,8 +9,8 @@ import type {
   Deferred,
   ExecutablePlan,
   ObjectPlan,
-} from "graphile-crystal";
-import { defer, isAsyncIterable, isDev } from "graphile-crystal";
+} from "dataplanner";
+import { defer, isAsyncIterable, isDev } from "dataplanner";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 

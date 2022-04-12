@@ -3,13 +3,13 @@ import type {
   CrystalValuesList,
   PolymorphicData,
   PolymorphicPlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   arraysMatch,
   ExecutablePlan,
   isDev,
   polymorphicWrap,
-} from "graphile-crystal";
+} from "dataplanner";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 

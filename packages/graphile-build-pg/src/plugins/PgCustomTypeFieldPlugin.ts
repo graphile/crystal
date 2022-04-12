@@ -24,15 +24,15 @@ import type {
   __TrackedObjectPlan,
   ExecutablePlan,
   InputPlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   __ListTransformPlan,
   connection,
   constant,
   object,
   ObjectPlan,
-} from "graphile-crystal";
-import type { TrackedArguments } from "graphile-crystal/src/interfaces";
+} from "dataplanner";
+import type { TrackedArguments } from "dataplanner/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";

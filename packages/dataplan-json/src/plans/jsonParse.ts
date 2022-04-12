@@ -3,8 +3,8 @@ import type {
   AccessPlan,
   CrystalResultsList,
   CrystalValuesList,
-} from "graphile-crystal";
-import { access, ExecutablePlan } from "graphile-crystal";
+} from "dataplanner";
+import { access, ExecutablePlan } from "dataplanner";
 
 export type JSONValue =
   | string

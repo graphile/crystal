@@ -23,7 +23,7 @@ import type {
   CrystalSubscriber,
   ExecutablePlan,
   ListPlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   __ListTransformPlan,
   __ValuePlan,
@@ -46,7 +46,7 @@ import {
   object,
   resolveType,
   subscribe,
-} from "graphile-crystal";
+} from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLOutputType } from "graphql";
 import {

@@ -2,8 +2,8 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
   EdgeCapablePlan,
-} from "graphile-crystal";
-import { ExecutablePlan } from "graphile-crystal";
+} from "dataplanner";
+import { ExecutablePlan } from "dataplanner";
 import type { SQL, SQLPlaceholderNode } from "pg-sql2";
 import sql from "pg-sql2";
 

@@ -1,4 +1,4 @@
-import { aether } from "graphile-crystal";
+import { aether } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 

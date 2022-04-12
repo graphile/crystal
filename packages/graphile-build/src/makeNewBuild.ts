@@ -1,7 +1,7 @@
 import "./global.js";
 
 import chalk from "chalk";
-import type { ExecutablePlan } from "graphile-crystal";
+import type { ExecutablePlan } from "dataplanner";
 import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLBoolean,

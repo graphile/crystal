@@ -1,4 +1,4 @@
-import { __ValuePlan } from "graphile-crystal";
+import { __ValuePlan } from "dataplanner";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index.js";

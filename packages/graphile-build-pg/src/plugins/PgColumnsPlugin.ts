@@ -16,7 +16,7 @@ import {
   pgSelectSingleFromRecord,
   PgSource,
 } from "@dataplan/pg";
-import type { InputPlan } from "graphile-crystal";
+import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLNonNull, GraphQLType } from "graphql";

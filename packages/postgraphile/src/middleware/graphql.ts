@@ -1,6 +1,6 @@
 import LRU from "@graphile/lru";
 import { createHash } from "crypto";
-import type { CrystalPrepareOptions } from "graphile-crystal";
+import type { CrystalPrepareOptions } from "dataplanner";
 import {
   $$data,
   $$setPlanGraph,
@@ -8,7 +8,7 @@ import {
   execute as crystalExecute,
   isAsyncIterable,
   stripAnsi,
-} from "graphile-crystal";
+} from "dataplanner";
 import type {
   DocumentNode,
   ExecutionArgs,

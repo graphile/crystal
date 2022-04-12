@@ -160,7 +160,7 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  */
 export class AccessPlan<TData> extends ExecutablePlan<TData> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "AccessPlan",
   };
   isSyncAndSafe = true;

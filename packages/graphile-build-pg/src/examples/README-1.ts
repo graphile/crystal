@@ -35,7 +35,7 @@ import {
   crystalPrint,
   execute as crystalExecute,
   stripAnsi,
-} from "graphile-crystal";
+} from "dataplanner";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import type { DocumentNode, Source } from "graphql";

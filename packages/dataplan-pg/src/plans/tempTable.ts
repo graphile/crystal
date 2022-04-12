@@ -1,5 +1,5 @@
-import type { ExecutablePlan } from "graphile-crystal";
-import { BasePlan } from "graphile-crystal";
+import type { ExecutablePlan } from "dataplanner";
+import { BasePlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 

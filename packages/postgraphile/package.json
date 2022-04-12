@@ -40,10 +40,10 @@
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.15",
+    "dataplanner": "4.7.0",
     "debug": "^4.3.3",
     "graphile-build": "5.0.0-alpha.0",
     "graphile-build-pg": "5.0.0-alpha.0",
-    "graphile-crystal": "4.7.0",
     "graphile-exporter": "^0.0.1",
     "graphile-plugin": "^5.0.0-alpha.0",
     "graphql": "16.1.0-experimental-stream-defer.6",

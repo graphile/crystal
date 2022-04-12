@@ -11,7 +11,7 @@ import { constant } from "./constant";
  */
 export class __InputObjectPlan extends ExecutablePlan {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "__InputObjectPlan",
   };
   isSyncAndSafe = true;

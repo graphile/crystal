@@ -13,8 +13,8 @@ import type {
   __InputObjectPlan,
   InputPlan,
   TrackedArguments,
-} from "graphile-crystal";
-import { constant, lambda, object, ObjectPlan } from "graphile-crystal";
+} from "dataplanner";
+import { constant, lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type {

@@ -1,5 +1,5 @@
-import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { ExecutablePlan, list } from "graphile-crystal";
+import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
+import { ExecutablePlan, list } from "dataplanner";
 import sql from "pg-sql2";
 
 import { TYPES } from "../codecs";

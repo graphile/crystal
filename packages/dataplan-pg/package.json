@@ -45,7 +45,7 @@
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.15",
-    "graphile-crystal": "4.7.0",
+    "dataplanner": "4.7.0",
     "pg-sql2": "4.7.0",
     "postgres-range": "^1.1.1",
     "tslib": "^2.3.1"

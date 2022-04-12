@@ -2,7 +2,7 @@ import "graphile-build";
 import "./PgTablesPlugin";
 
 import type { PgSelectSinglePlan, PgSource } from "@dataplan/pg";
-import { connection } from "graphile-crystal";
+import { connection } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";

@@ -16,7 +16,7 @@ because you're changing your schema in broad ways it helps to guarantee
 consistency.
 
 Graphile Build has strong built-in support for
-[DataPlanner](../graphile-crystal/README.md) so you can make an exceptionally
+[DataPlanner](../dataplanner/README.md) so you can make an exceptionally
 performant auto-generated (or generator-assisted) GraphQL API.
 
 [PostGraphile](https://github.com/graphile/postgraphile) uses Graphile Build and

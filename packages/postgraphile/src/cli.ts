@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { $$setPlanGraph } from "graphile-crystal";
+import { $$setPlanGraph } from "dataplanner";
 import { exportSchema } from "graphile-exporter";
 import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";

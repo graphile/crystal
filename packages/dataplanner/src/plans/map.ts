@@ -44,7 +44,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
  */
 export class MapPlan extends ExecutablePlan {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "MapPlan ",
   };
   isSyncAndSafe = true;

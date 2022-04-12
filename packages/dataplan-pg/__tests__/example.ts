@@ -22,8 +22,8 @@ import type {
   __TrackedObjectPlan,
   __ValuePlan,
   BaseGraphQLContext,
-} from "graphile-crystal";
-import { stripAnsi } from "graphile-crystal";
+} from "dataplanner";
+import { stripAnsi } from "dataplanner";
 import type { ExecutionResult } from "graphql";
 import { graphql } from "graphql";
 import { resolve } from "path";

@@ -4,7 +4,7 @@ import type {
   CrystalResultStreamList,
   CrystalValuesList,
   ObjectPlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import {
   __ValuePlan,
   arraysMatch,
@@ -12,7 +12,7 @@ import {
   ExecutablePlan,
   getCurrentParentPathIdentity,
   partitionByIndex,
-} from "graphile-crystal";
+} from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";

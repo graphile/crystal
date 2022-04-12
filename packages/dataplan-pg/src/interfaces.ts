@@ -1,4 +1,4 @@
-import type { ExecutablePlan } from "graphile-crystal";
+import type { ExecutablePlan } from "dataplanner";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgTypeColumns } from "./codecs";

@@ -1,4 +1,4 @@
-import { $$setPlanGraph, stripAnsi } from "graphile-crystal";
+import { $$setPlanGraph, stripAnsi } from "dataplanner";
 import type { ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";

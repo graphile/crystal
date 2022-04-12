@@ -22,7 +22,7 @@ export class SubscribePlan<
   implements StreamablePlan<TTopics[TTopic]>
 {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "SubscribePlan",
   };
   isSyncAndSafe = true;

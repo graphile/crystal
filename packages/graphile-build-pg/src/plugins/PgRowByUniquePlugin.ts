@@ -1,5 +1,5 @@
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
-import type { TrackedArguments } from "graphile-crystal";
+import type { TrackedArguments } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";

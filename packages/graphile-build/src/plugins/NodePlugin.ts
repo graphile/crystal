@@ -1,5 +1,5 @@
-import type { NodeIdCodec, NodeIdHandler } from "graphile-crystal";
-import { constant, node, NodePlan, resolveType } from "graphile-crystal";
+import type { NodeIdCodec, NodeIdHandler } from "dataplanner";
+import { constant, node, NodePlan, resolveType } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";

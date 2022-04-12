@@ -11,9 +11,9 @@ interface CommonOptions {
 }
 
 const KNOWN_IMPORTS: Array<[string, string]> = [
-  ["graphile-crystal", "BasePlan"],
-  ["graphile-crystal", "ExecutablePlan"],
-  ["graphile-crystal", "ModifierPlan"],
+  ["dataplanner", "BasePlan"],
+  ["dataplanner", "ExecutablePlan"],
+  ["dataplanner", "ModifierPlan"],
 ];
 
 export const ExportSubclasses: Rule.RuleModule = {

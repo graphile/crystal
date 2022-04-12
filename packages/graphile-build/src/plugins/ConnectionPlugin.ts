@@ -1,10 +1,10 @@
-import type { EdgeCapablePlan, PageInfoCapablePlan } from "graphile-crystal";
+import type { EdgeCapablePlan, PageInfoCapablePlan } from "dataplanner";
 import {
   ConnectionPlan,
   each,
   EdgePlan,
   ExecutablePlan,
-} from "graphile-crystal";
+} from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";

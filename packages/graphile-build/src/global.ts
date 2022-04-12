@@ -7,7 +7,7 @@ import type {
   GraphileInputFieldConfig,
   GraphileInputFieldConfigMap,
   OutputPlanForType,
-} from "graphile-crystal";
+} from "dataplanner";
 import type {
   GraphQLEnumType,
   GraphQLEnumTypeConfig,

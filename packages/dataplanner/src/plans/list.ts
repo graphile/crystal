@@ -10,7 +10,7 @@ export class ListPlan<
   TPlanTuple extends readonly ExecutablePlan<any>[],
 > extends ExecutablePlan<UnwrapPlanTuple<TPlanTuple>> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "ListPlan",
   };
   isSyncAndSafe = true;

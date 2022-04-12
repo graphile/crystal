@@ -1,7 +1,7 @@
 import type { PgInsertPlan, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
-import type { ObjectPlan } from "graphile-crystal";
-import { constant, ExecutablePlan, object } from "graphile-crystal";
+import type { ObjectPlan } from "dataplanner";
+import { constant, ExecutablePlan, object } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";

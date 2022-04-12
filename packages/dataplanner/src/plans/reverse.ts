@@ -23,7 +23,7 @@ export function reverseArray<TData = any>(list: readonly TData[]): TData[] {
  */
 export class ReversePlan<TData> extends ExecutablePlan<readonly TData[]> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "ReversePlan",
   };
   isSyncAndSafe = true;

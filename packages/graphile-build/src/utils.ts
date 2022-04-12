@@ -1,4 +1,4 @@
-import { $$idempotent } from "graphile-crystal";
+import { $$idempotent } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";

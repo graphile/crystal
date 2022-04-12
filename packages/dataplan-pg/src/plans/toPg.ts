@@ -1,5 +1,5 @@
-import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { ExecutablePlan } from "graphile-crystal";
+import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
+import { ExecutablePlan } from "dataplanner";
 
 import type { PgTypeCodec } from "../interfaces";
 
@@ -13,7 +13,7 @@ import type { PgTypeCodec } from "../interfaces";
  */
 export class ToPgPlan extends ExecutablePlan<any> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "ToPgPlan",
   };
   isSyncAndSafe = true;

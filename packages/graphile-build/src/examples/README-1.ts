@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { readFile } from "fs/promises";
-import { lambda } from "graphile-crystal";
+import { lambda } from "dataplanner";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";

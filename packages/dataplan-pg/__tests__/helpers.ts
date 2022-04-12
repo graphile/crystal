@@ -7,12 +7,12 @@ if (process.env.DEBUG) {
 }
 
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext } from "graphile-crystal";
-import { crystalPrepare } from "graphile-crystal";
+import type { BaseGraphQLContext } from "dataplanner";
+import { crystalPrepare } from "dataplanner";
 import {
   $$bypassGraphQL,
   $$setPlanGraph,
-} from "graphile-crystal/dist/interfaces";
+} from "dataplanner/dist/interfaces";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,

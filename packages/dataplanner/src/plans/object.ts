@@ -26,7 +26,7 @@ export class ObjectPlan<
   TPlans extends { [key: string]: ExecutablePlan<any> },
 > extends ExecutablePlan<DataFromPlans<TPlans>> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "ObjectPlan",
   };
   isSyncAndSafe = true;

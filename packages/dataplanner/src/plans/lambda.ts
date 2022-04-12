@@ -6,7 +6,7 @@ import { ExecutablePlan } from "../plan";
  */
 export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
   static $$export = {
-    moduleName: "graphile-crystal",
+    moduleName: "dataplanner",
     exportName: "LambdaPlan",
   };
   isSyncAndSafe = true;

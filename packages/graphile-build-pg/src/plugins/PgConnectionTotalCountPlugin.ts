@@ -3,7 +3,7 @@ import "./PgBasicsPlugin";
 
 import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
-import type { ConnectionPlan } from "graphile-crystal";
+import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 

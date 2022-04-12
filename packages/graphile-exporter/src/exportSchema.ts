@@ -4,7 +4,7 @@ import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
 import { writeFile } from "fs/promises";
-import { $$crystalWrapped, isCrystalWrapped } from "graphile-crystal";
+import { $$crystalWrapped, isCrystalWrapped } from "dataplanner";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
@@ -1107,14 +1107,14 @@ function func(
   if (crystalSpec) {
     if (crystalSpec.isSubscribe) {
       const iMakeCrystalSubscriber = file.import(
-        "graphile-crystal",
+        "dataplanner",
         "makeCrystalSubscriber",
       );
       return t.callExpression(iMakeCrystalSubscriber, []);
     } else {
       if (crystalSpec.original) {
         const iCrystalWrapResolve = file.import(
-          "graphile-crystal",
+          "dataplanner",
           "crystalWrapResolve",
         );
 
@@ -1128,7 +1128,7 @@ function func(
         ]);
       } else {
         const iCrystalResolve = file.import(
-          "graphile-crystal",
+          "dataplanner",
           "crystalResolve",
         );
         return iCrystalResolve;
@@ -1658,7 +1658,7 @@ function exportSchemaTypeDefs({
   file.addStatements(typeDefs);
   file.addStatements(plans);
   const makeCrystalSchemaAST = file.import(
-    "graphile-crystal",
+    "dataplanner",
     "makeCrystalSchema",
   );
 
