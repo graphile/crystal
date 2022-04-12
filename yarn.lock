@@ -2391,6 +2391,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/interpret@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@types/interpret@npm:1.1.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 326ae4a82edfb768b47aec4c9eb7544b13c84de729960c17d34e97e004a17245827b68d4fee3ea1a1a242eb679f82f93c03f033a87a6b3dae0486488591f87fc
+  languageName: node
+  linkType: hard
+
 "@types/istanbul-lib-coverage@npm:*, @types/istanbul-lib-coverage@npm:^2.0.0, @types/istanbul-lib-coverage@npm:^2.0.1":
   version: 2.0.3
   resolution: "@types/istanbul-lib-coverage@npm:2.0.3"
@@ -7013,11 +7022,13 @@ __metadata:
   resolution: "graphile-plugin@workspace:packages/graphile-plugin"
   dependencies:
     "@types/debug": ^4.1.7
+    "@types/interpret": ^1.1.1
     "@types/jest": ^27.0.3
     "@types/node": ^16.11.15
     "@types/semver": ^7.3.9
     chalk: ^4.1.2
     debug: ^4.3.3
+    interpret: ^2.2.0
     jest: ^27.4.5
     semver: ^7.3.5
     ts-node: ^10.4.0
@@ -7419,6 +7430,13 @@ __metadata:
   version: 2.0.3
   resolution: "internmap@npm:2.0.3"
   checksum: 7ca41ec6aba8f0072fc32fa8a023450a9f44503e2d8e403583c55714b25efd6390c38a87161ec456bf42d7bc83aab62eb28f5aef34876b1ac4e60693d5e1d241
+  languageName: node
+  linkType: hard
+
+"interpret@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "interpret@npm:2.2.0"
+  checksum: f51efef7cb8d02da16408ffa3504cd6053014c5aeb7bb8c223727e053e4235bf565e45d67028b0c8740d917c603807aa3c27d7bd2f21bf20b6417e2bb3e5fd6e
   languageName: node
   linkType: hard
 

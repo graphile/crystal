@@ -28,10 +28,12 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
+    "@types/interpret": "^1.1.1",
     "@types/node": "^16.11.15",
     "@types/semver": "^7.3.9",
     "chalk": "^4.1.2",
     "debug": "^4.3.3",
+    "interpret": "^2.2.0",
     "semver": "^7.3.5",
     "tslib": "^2.3.1"
   },

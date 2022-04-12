@@ -6,4 +6,5 @@ export type {
   Preset,
   ResolvedPreset,
 } from "./interfaces.js";
+export { loadConfig } from "./loadConfig.js";
 export { resolvePresets } from "./resolvePresets.js";

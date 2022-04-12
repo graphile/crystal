@@ -2,7 +2,7 @@
 import { $$setPlanGraph } from "dataplanner";
 import { exportSchema } from "graphile-exporter";
 import type { Preset } from "graphile-plugin";
-import { resolvePresets } from "graphile-plugin";
+import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { IncomingMessage, RequestListener } from "http";
 import { createServer } from "http";
 import parseArgs from "minimist";
@@ -15,21 +15,6 @@ import {
   makePgDatabasesAndContextFromConnectionString,
   makeSchema,
 } from "./schema";
-
-async function tryLoadPreset(configPath?: string): Promise<Preset | null> {
-  try {
-    return (
-      await import(resolve(process.cwd(), configPath ?? "graphile.config.js"))
-    ).default;
-  } catch (e) {
-    if (configPath != null) {
-      throw e;
-    }
-    console.error(e);
-    // TODO: if file exists but errored, throw the error
-    return null;
-  }
-}
 
 async function main() {
   const argv = parseArgs(process.argv.slice(2), {
@@ -58,7 +43,7 @@ async function main() {
   const schemas = rawSchema?.split(",");
 
   // Try and load the preset
-  const userPreset = await tryLoadPreset(configFileLocation);
+  const userPreset = await loadConfig(configFileLocation);
   const preset: Preset = {
     extends: userPreset ? [userPreset] : [defaultPreset],
   };
@@ -86,7 +71,9 @@ async function main() {
   if (contextCallback === null) {
     const withPgClient = config.gather?.pgDatabases?.[0]?.withPgClient;
     if (!withPgClient) {
-      throw new Error("Could not determine the withPgClient to use");
+      throw new Error(
+        "Please specify `-c` so we know which database to connect to (or populate the configuration with the relevant options)",
+      );
     }
     const contextValue = { withPgClient };
     contextCallback = () => contextValue;
