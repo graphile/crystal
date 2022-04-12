@@ -17,6 +17,14 @@ import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
 import LRU from "@graphile/lru";
 import chalk from "chalk";
+import {
+  $$data,
+  $$setPlanGraph,
+  crystalPrepare,
+  crystalPrint,
+  execute as crystalExecute,
+  stripAnsi,
+} from "dataplanner";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
 import { readFile } from "fs/promises";
@@ -28,14 +36,6 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import {
-  $$data,
-  $$setPlanGraph,
-  crystalPrepare,
-  crystalPrint,
-  execute as crystalExecute,
-  stripAnsi,
-} from "dataplanner";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import type { DocumentNode, Source } from "graphql";
@@ -206,7 +206,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
    * An Envelop plugin that uses DataPlanner to prepare and execute the GraphQL
    * query.
    */
-  const useCrystalExecutor = (): Plugin => ({
+  const useDataPlanner = (): Plugin => ({
     async onExecute(opts) {
       opts.setExecuteFn(crystalExecute);
     },
@@ -243,7 +243,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       useParserCache(),
       useValidationCache(),
       useExtendContext(contextCallback),
-      useCrystalExecutor(),
+      useDataPlanner(),
       useMoreDetailedErrors(),
     ],
   });
