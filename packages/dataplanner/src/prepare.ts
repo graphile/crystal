@@ -33,7 +33,7 @@ export interface CrystalPrepareOptions {
  * enable the `experimentalGraphQLBypass` (if this is the case then the
  * `$$bypassGraphQL` key will be set on the result object).
  */
-export function crystalPrepare(
+export function dataplannerPrepare(
   args: ExecutionArgs,
   options: CrystalPrepareOptions = {},
 ): PromiseOrDirect<CrystalObject | { [$$data]: any }> {

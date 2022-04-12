@@ -9,12 +9,12 @@ import { inspect } from "util";
 
 import type { PromiseOrDirect } from "./interfaces";
 import { $$bypassGraphQL } from "./interfaces";
-import { bypassGraphQLExecute, crystalPrepare } from "./prepare";
+import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare";
 import { isPromiseLike } from "./utils";
 
 /**
  * Use this instead of GraphQL.js' execute method and we'll automatically
- * run crystalPrepare for you and handle the result.
+ * run dataplannerPrepare for you and handle the result.
  */
 export function execute(
   args: ExecutionArgs,
@@ -34,7 +34,7 @@ export function execute(
       );
     }
   }
-  const rootValue = crystalPrepare(args, {
+  const rootValue = dataplannerPrepare(args, {
     experimentalGraphQLBypass: true,
   });
   if (isPromiseLike(rootValue)) {

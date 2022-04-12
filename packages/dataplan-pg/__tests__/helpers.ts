@@ -8,7 +8,7 @@ if (process.env.DEBUG) {
 
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "dataplanner";
-import { crystalPrepare } from "dataplanner";
+import { dataplannerPrepare } from "dataplanner";
 import {
   $$bypassGraphQL,
   $$setPlanGraph,
@@ -412,7 +412,7 @@ export async function runTestQuery(
     const rootValueRaw =
       options.prepare === false
         ? null
-        : crystalPrepare(
+        : dataplannerPrepare(
             {
               schema,
               document,
