@@ -1115,7 +1115,7 @@ function func(
       if (crystalSpec.original) {
         const iCrystalWrapResolve = file.import(
           "dataplanner",
-          "crystalWrapResolve",
+          "dataplannerResolver",
         );
 
         return t.callExpression(iCrystalWrapResolve, [

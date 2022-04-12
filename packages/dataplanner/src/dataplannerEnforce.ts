@@ -3,7 +3,7 @@ import type { GraphQLSchema } from "graphql";
 import { isObjectType } from "graphql";
 
 import {
-  crystalWrapResolve,
+  dataplannerResolver,
   isCrystalWrapped,
   makeCrystalSubscriber,
 } from "./resolvers";
@@ -35,7 +35,7 @@ export function dataplannerEnforce(schema: GraphQLSchema): GraphQLSchema {
               objectType.name,
               fieldName,
             );
-            field.resolve = crystalWrapResolve(resolve);
+            field.resolve = dataplannerResolver(resolve);
           }
 
           // Wrap `subscribe` if appropriate

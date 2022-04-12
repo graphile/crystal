@@ -120,7 +120,7 @@ import {
 import {
   $$crystalWrapped,
   crystalResolve,
-  crystalWrapResolve,
+  dataplannerResolver,
   isCrystalWrapped,
   makeCrystalSubscriber,
 } from "./resolvers";
@@ -187,7 +187,7 @@ export {
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
-  crystalWrapResolve,
+  dataplannerResolver,
   dataplannerEnforce,
   debugPlans,
   defer,
@@ -334,7 +334,7 @@ exportAsMany({
   resolveType,
   $$crystalWrapped,
   isCrystalWrapped,
-  crystalWrapResolve,
+  dataplannerResolver,
   crystalPrepare,
   bypassGraphQLExecute,
   crystalResolve,

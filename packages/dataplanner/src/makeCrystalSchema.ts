@@ -26,7 +26,7 @@ import type {
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
 import { resolveType } from "./polymorphic";
-import { crystalResolve, crystalWrapResolve } from "./resolvers";
+import { crystalResolve, dataplannerResolver } from "./resolvers";
 
 // TODO:TS: improve the types here!
 /**
@@ -167,12 +167,12 @@ export function makeCrystalSchema(details: {
           (field.extensions as any).graphile = graphileExtensions;
           if (fieldSpec.resolve || fieldSpec.plan) {
             field.resolve = fieldSpec.resolve
-              ? crystalWrapResolve(fieldSpec.resolve)
+              ? dataplannerResolver(fieldSpec.resolve)
               : crystalResolve;
           }
           if (fieldSpec.subscribe || fieldSpec.subscribePlan) {
             field.subscribe = fieldSpec.subscribe
-              ? crystalWrapResolve(fieldSpec.subscribe)
+              ? dataplannerResolver(fieldSpec.subscribe)
               : crystalResolve;
           }
           if (fieldSpec.plan) {

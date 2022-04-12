@@ -6,7 +6,7 @@ import type {
   OutputPlanForType,
 } from "dataplanner";
 import {
-  crystalWrapResolve,
+  dataplannerResolver,
   inputObjectFieldSpec,
   makeCrystalSubscriber,
   objectSpec,
@@ -325,7 +325,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               // Perform the Graphile Crystal magic
               for (const fieldSpec of Object.values(fieldsSpec)) {
                 const { subscribe, resolve } = fieldSpec;
-                fieldSpec.resolve = crystalWrapResolve(resolve);
+                fieldSpec.resolve = dataplannerResolver(resolve);
                 if (!subscribe && scope.isRootSubscription) {
                   fieldSpec.subscribe = makeCrystalSubscriber();
                 }

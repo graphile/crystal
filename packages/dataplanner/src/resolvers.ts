@@ -174,7 +174,7 @@ function makeParentCrystalObject(
  * Wraps the given resolver function (or the default resolver) in a
  * Crystal-aware resolver.
  */
-function crystalWrapResolveOrSubscribe<
+function dataplannerResolverOrSubscriber<
   TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any },
@@ -326,20 +326,20 @@ function crystalWrapResolveOrSubscribe<
  *
  * @param resolve - The resolver function.
  */
-export function crystalWrapResolve<
+export function dataplannerResolver<
   TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any },
 >(
   resolve: GraphQLFieldResolver<TSource, TContext, TArgs> | undefined,
 ): GraphQLFieldResolver<TSource, TContext, TArgs> {
-  return crystalWrapResolveOrSubscribe(resolve, false);
+  return dataplannerResolverOrSubscriber(resolve, false);
 }
 
 /**
  * If you don't need to wrap a resolver, you can use this to save memory.
  */
-export const crystalResolve = crystalWrapResolve(undefined);
+export const crystalResolve = dataplannerResolver(undefined);
 
 /**
  * Given a `subscribe` function, wraps the function so that it can perform the
@@ -352,7 +352,7 @@ export function makeCrystalSubscriber<
   TContext extends object,
   TArgs = { [argName: string]: any },
 >(): GraphQLFieldResolver<TSource, TContext, TArgs> {
-  return crystalWrapResolveOrSubscribe(undefined, true);
+  return dataplannerResolverOrSubscriber(undefined, true);
 }
 
 /**
