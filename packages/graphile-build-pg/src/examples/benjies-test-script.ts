@@ -15,19 +15,13 @@ import type { Plugin } from "@envelop/core";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import LRU from "@graphile/lru";
-import chalk from "chalk";
 import {
-  $$data,
   $$setPlanGraph,
-  crystalPrint,
-  dataplannerPrepare,
   execute as dataplannerExecute,
   stripAnsi,
 } from "dataplanner";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
-import { readFile } from "fs/promises";
 import {
   buildInflection,
   buildSchema,
@@ -38,15 +32,7 @@ import {
 } from "graphile-build";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
-import type { DocumentNode, Source } from "graphql";
-import {
-  execute,
-  graphql,
-  GraphQLError,
-  parse,
-  printSchema,
-  validate,
-} from "graphql";
+import { graphql } from "graphql";
 import {
   getGraphQLParameters,
   processRequest,

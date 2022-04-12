@@ -4,7 +4,7 @@
  * schema against.
  */
 
-import { WithPgClient } from "@dataplan/pg";
+import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import {
   defaultPreset as graphileBuildPreset,
