@@ -2,7 +2,7 @@
 
 # PostGraphile
 
-![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?label=GitHub%20sponsors)(https://github.com/sponsors/benjie)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?label=GitHub%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
