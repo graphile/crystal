@@ -1,9 +1,8 @@
 # graphile-plugin
 
-<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support Graphile development on Patreon"><img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" /></a></span>
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
+[![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Package on npm](https://img.shields.io/npm/v/graphile-plugin.svg?style=flat)](https://www.npmjs.com/package/graphile-plugin)
-![MIT license](https://img.shields.io/npm/l/graphile-plugin.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
 `graphile-plugin` provides a standard plugin interface and helpers that can be

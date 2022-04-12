@@ -1,24 +1,17 @@
-# graphile-build-pg
+# @dataplan/pg
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
+[![Follow](https://img.shields.io/badge/twitter-@DataPlannerHQ-blueviolet.svg)](https://twitter.com/DataPlannerHQ)
 
-`graphile-build-pg` is a collection of graphile-build plugins that extend your
-GraphQL schema with types and fields based on the tables, views, functions and
-other resources in your PostgreSQL database.
+_**A cutting-edge planning and execution engine for GraphQL**_
 
-This is achieved by introspecting your database with [pg-introspection][] and
-then building [@dataplan/pg][] data sources for these entities. Then our plugins
-inspect these data sources and create the relevant GraphQL types, fields, and
-[dataplanner][] plan resolver functions. The result is a high-performance,
-powerful, auto-generated but highly flexible GraphQL schema.
+[DataPlanner][dataplanner] understands GraphQL and (with your help) it understands your
+business logic; this allows it to orchestrate a GraphQL request's data
+requirements in an extremely efficient manner, leading to excellent performance, reduced server load, and happier customers.
 
-If you don't want to use your database introspection results to generate the
-schema, you can instead build the data sources yourself giving you full control
-over what goes into your GraphQL API whilst still saving you significant effort
-versus writing the schema without auto-generation.
+*@dataplan/pg is plan classes for interacting with PostgreSQL*
 
 <!-- SPONSORS_BEGIN -->
 
@@ -45,16 +38,4 @@ And please give some love to our featured sponsors 🤩:
 <em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
-
-## About
-
-Thanks to DataPlanner's query planning capabilities, the plugins in this package
-do not exhibit the N+1 query problem common in many database-based GraphQL APIs;
-for all but the flattest GraphQL queries these plugins typically significantly
-outperform `DataLoader`-based solutions - and the more complex your GraphQL
-query becomes the greater the benefit.
-
-An example of an application built on `graphile-build-pg` is
-[PostGraphile](https://github.com/graphile/postgraphile) which with one command
-connects to your PostgreSQL database and provides a full highly performant
-standards-compliant GraphQL API.
+[dataplanner]: packages/dataplanner/

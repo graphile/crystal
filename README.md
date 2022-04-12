@@ -1,5 +1,10 @@
 # Graphile GraphQL Monorepo
 
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
+[![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
+[![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
+[![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
+
 At Graphile we love GraphQL so much we named ourself for our love of it! This
 repository houses many of the Graphile packages that relate to GraphQL; the two
 headline projects are **DataPlanner** and **PostGraphile** but there's many
@@ -87,6 +92,10 @@ And please give some love to our featured sponsors 🤩:
 
 ## Development
 
+### Requirements
+Node 16 or above
+
+### Set up
 We use `yarn` to manage this monorepo; we strongly recommend that you only use
 `yarn` when dealing with it - not `npm`, `pnpm` or similar. (Not because these
 technologies are in any way inferior to `yarn`, simply because they're not 100%
