@@ -2,7 +2,7 @@ import debugFactory from "debug";
 
 import { ExecutablePlan } from "../plan";
 
-const debugObjectPlan = debugFactory("crystal:ObjectPlan");
+const debugObjectPlan = debugFactory("dataplanner:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
 type DataFromPlan<TPlan extends ExecutablePlan<any>> =

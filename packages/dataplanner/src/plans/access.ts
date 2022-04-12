@@ -147,7 +147,7 @@ function constructDestructureFunction(
   }
 }
 
-const debugAccessPlan = debugFactory("crystal:AccessPlan");
+const debugAccessPlan = debugFactory("dataplanner:AccessPlan");
 const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
 
 /**

@@ -337,7 +337,7 @@ const EMPTY_ARRAY = Object.freeze([] as any[]);
 // For logging indentation
 let depth = 0;
 
-const debugAether = debugFactory("crystal:aether");
+const debugAether = debugFactory("dataplanner:aether");
 const debugPlan_ = debugAether.extend("plan");
 const debugPlanVerbose_ = debugPlan_.extend("verbose");
 const debugExecute_ = debugAether.extend("execute");

@@ -15,7 +15,7 @@ import type {
   BaseGraphQLVariables,
 } from "./interfaces";
 
-const debug = debugFactory("crystal:establishAether");
+const debug = debugFactory("dataplanner:establishAether");
 
 type Fragments = {
   [key: string]: FragmentDefinitionNode;

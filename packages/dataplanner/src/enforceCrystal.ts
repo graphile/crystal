@@ -8,7 +8,7 @@ import {
   makeCrystalSubscriber,
 } from "./resolvers";
 
-const debug = debugFactory("crystal:enforce");
+const debug = debugFactory("dataplanner:enforce");
 
 /**
  * Ensures that all `resolve` and `subscribe` field methods in `schema` are

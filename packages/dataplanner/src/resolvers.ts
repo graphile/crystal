@@ -28,7 +28,7 @@ import type { PlanResults } from "./planResults";
 import { __ValuePlan } from "./plans";
 import { ROOT_VALUE_OBJECT, sharedNull } from "./utils";
 
-const debug = debugFactory("crystal:resolvers");
+const debug = debugFactory("dataplanner:resolvers");
 const debugVerbose = debug.extend("verbose");
 
 /*
