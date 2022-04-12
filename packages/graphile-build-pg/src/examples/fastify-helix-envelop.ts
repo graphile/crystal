@@ -11,55 +11,22 @@
  * /plan - the mermaid-js diagram of the plan for the last query executed
  */
 
-import type { WithPgClient } from "@dataplan/pg";
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import LRU from "@graphile/lru";
 import chalk from "chalk";
-import {
-  $$data,
-  $$setPlanGraph,
-  crystalPrint,
-  dataplannerPrepare,
-  execute as dataplannerExecute,
-  stripAnsi,
-} from "dataplanner";
+import { $$setPlanGraph } from "dataplanner";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
-import { readFile } from "fs/promises";
-import {
-  buildInflection,
-  buildSchema,
-  defaultPreset as graphileBuildPreset,
-  gather,
-  QueryQueryPlugin,
-  SwallowErrorsPlugin,
-} from "graphile-build";
-import { exportSchema } from "graphile-exporter";
-import type { Plugin } from "graphile-plugin";
+import { buildInflection, buildSchema, gather } from "graphile-build";
 import { resolvePresets } from "graphile-plugin";
-import type { DocumentNode, Source } from "graphql";
-import {
-  execute,
-  graphql,
-  GraphQLError,
-  parse,
-  printSchema,
-  validate,
-} from "graphql";
 import {
   getGraphQLParameters,
   processRequest,
   renderGraphiQL,
   sendResult,
 } from "graphql-helix";
-import * as jsonwebtoken from "jsonwebtoken";
-import { Pool } from "pg";
-import { inspect } from "util";
 
-import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 import { makeSharedPresetAndClient } from "./config";
 import { getPool } from "./config.js";
 import { useDataPlanner, useMoreDetailedErrors } from "./utils/envelop.js";
