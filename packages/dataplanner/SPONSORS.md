@@ -6,49 +6,64 @@ Graphile ecosystem. Find out
 
 ## Featured
 
+- Surge
+- Story.ai
 - Chad Furman
-- Storyscript
-- Postlight
+- The Guild
+- Fanatics
+- Dovetail
+- Enzuzo
 
 ## Leaders
 
-- Joe Dennis
-- domonda
 - Robert Claypool
-- James Allain
-- Stagency
-- Jack Dinker
-- 8th Light
-- Nigel Taylor
-- DocIQ
-- Principia Mentis
+- Joe Dennis
 - Qwick
-- Partners in School Innovation
-- OpenLaw NZ
-- Sterblue
+- domonda
+- Jack Dinker
+- Politics Rewired
+- DocIQ
+- nigelrmtaylor
+- Principia Mentis
 - HR-ON
-- Ian Stewart
-- Janakan Arulkumarasan
+- Luxor Labs
+- PostHog
+- Taiste
+- Axinom
+- Notably
+- Nathanael Beisiegel
+- William Baxter
+- SuperRare Labs
+- IaSQL
+- latch.bio
 
 ## Supporters
 
-- Daniel Einspanjer
+- Postlight
+- Philipp Litzenberger
 - Sam Levin
-- stlbucket
 - Matt Bretl
 - Chris Watland
+- Mark
+- svarmony
+- Simon Elliott
 - James Rascoe
-- Mark Lipscombe
-- Michel Pelletier
-- Frank
-- Mark Rapoza
-- innovation.rocks
-- cybere
-- Daniel Woelfel
-- Philipp Litzenberger
-- Bjørn Michelsen
-- CJ
-- Ben Botwin
-- Cameron Ellis
+- CJ Lazell
 - Mansoor Razzaq
-- Borut Jures
+- Jimmy Liu
+- Keith Layne
+- Olli Selamaa
+- Paul Melnikow
+- Alvin Ali Khaled
+- Dani Kenan
+- Stéphane Klein
+- Splitgraph
+- Kadi Kraman
+- Andrew Poland
+- OnThisSpot
+- Benjamin Berman
+- Zymego
+- ARK
+- Sen Palanisami
+- nick
+- CartoLab

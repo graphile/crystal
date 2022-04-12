@@ -11,6 +11,7 @@ Graphile ecosystem. Find out
 - Chad Furman
 - The Guild
 - Fanatics
+- Dovetail
 - Enzuzo
 
 ## Leaders
@@ -20,13 +21,12 @@ Graphile ecosystem. Find out
 - Qwick
 - domonda
 - Jack Dinker
+- Politics Rewired
 - DocIQ
 - nigelrmtaylor
-- Politics Rewired
 - Principia Mentis
 - HR-ON
 - Luxor Labs
-- Dovetail
 - PostHog
 - Taiste
 - Axinom
@@ -34,6 +34,7 @@ Graphile ecosystem. Find out
 - Nathanael Beisiegel
 - William Baxter
 - SuperRare Labs
+- IaSQL
 - latch.bio
 
 ## Supporters

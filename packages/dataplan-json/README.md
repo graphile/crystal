@@ -7,11 +7,12 @@
 
 _**A cutting-edge planning and execution engine for GraphQL**_
 
-[DataPlanner][dataplanner] understands GraphQL and (with your help) it understands your
-business logic; this allows it to orchestrate a GraphQL request's data
-requirements in an extremely efficient manner, leading to excellent performance, reduced server load, and happier customers.
+[DataPlanner][dataplanner] understands GraphQL and (with your help) it
+understands your business logic; this allows it to orchestrate a GraphQL
+request's data requirements in an extremely efficient manner, leading to
+excellent performance, reduced server load, and happier customers.
 
-*@dataplan/json is plan classes for encoding/decoding JSON*
+_@dataplan/json is plan classes for encoding/decoding JSON_
 
 <!-- SPONSORS_BEGIN -->
 
@@ -32,6 +33,7 @@ And please give some love to our featured sponsors 🤩:
 <td align="center"><a href="https://www.the-guild.dev/"><img src="https://graphile.org/images/sponsors/theguild.png" width="90" height="90" alt="The Guild" /><br />The Guild</a> *</td>
 </tr><tr>
 <td align="center"><a href="https://www.fanatics.com/"><img src="https://graphile.org/images/sponsors/fanatics.png" width="90" height="90" alt="Fanatics" /><br />Fanatics</a> *</td>
+<td align="center"><a href="https://dovetailapp.com/"><img src="https://graphile.org/images/sponsors/dovetail.png" width="90" height="90" alt="Dovetail" /><br />Dovetail</a> *</td>
 <td align="center"><a href="https://www.enzuzo.com/"><img src="https://graphile.org/images/sponsors/enzuzo.png" width="90" height="90" alt="Enzuzo" /><br />Enzuzo</a> *</td>
 </tr></table>
 

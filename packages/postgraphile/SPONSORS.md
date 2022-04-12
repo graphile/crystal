@@ -13,6 +13,8 @@ Graphile ecosystem. Find out
 - Fanatics
 - Dovetail
 - Enzuzo
+- Politics Rewired
+- IaSQL
 
 ## Leaders
 
@@ -21,7 +23,6 @@ Graphile ecosystem. Find out
 - Qwick
 - domonda
 - Jack Dinker
-- Politics Rewired
 - DocIQ
 - nigelrmtaylor
 - Principia Mentis
@@ -34,7 +35,6 @@ Graphile ecosystem. Find out
 - Nathanael Beisiegel
 - William Baxter
 - SuperRare Labs
-- IaSQL
 - latch.bio
 
 ## Supporters
