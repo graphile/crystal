@@ -24,3 +24,5 @@ packages/dataplan-pg/__tests__/**/*.mermaid.png
 # Benjie's stuff
 Session.vim
 WHAT_ARE_YOU_DOING.md
+packages/graphile-build-pg/webpacked
+packages/graphile-build-pg/exported-schema-for-webpack.mjs
