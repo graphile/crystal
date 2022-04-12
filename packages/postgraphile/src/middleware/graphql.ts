@@ -2,12 +2,10 @@ import LRU from "@graphile/lru";
 import { createHash } from "crypto";
 import type { CrystalPrepareOptions } from "graphile-crystal";
 import {
-  $$bypassGraphQL,
   $$data,
   $$setPlanGraph,
-  bypassGraphQLExecute,
-  crystalPrepare,
   crystalPrint,
+  execute as crystalExecute,
   isAsyncIterable,
   stripAnsi,
 } from "graphile-crystal";
@@ -135,17 +133,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
       operationName,
     };
 
-    args.rootValue = await crystalPrepare(args, prepareOptions);
-
-    if ((args.rootValue as any)?.[$$bypassGraphQL]) {
-      return {
-        type: "graphql",
-        statusCode: 200,
-        payload: { data: args.rootValue as Record<string, any> },
-      };
-    }
-
-    const result = await execute(args);
+    const result = await crystalExecute(args);
     if (isAsyncIterable(result)) {
       throw new Error("We don't yet support async iterables");
     }

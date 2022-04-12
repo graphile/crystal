@@ -29,12 +29,11 @@ import {
   SwallowErrorsPlugin,
 } from "graphile-build";
 import {
-  $$bypassGraphQL,
   $$data,
   $$setPlanGraph,
-  bypassGraphQLExecute,
   crystalPrepare,
   crystalPrint,
+  execute as crystalExecute,
   stripAnsi,
 } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
@@ -204,37 +203,14 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   }
 
   /**
-   * An Envelop plugin that uses DataPlanner to prepare the GraphQL query. If
-   * the query supports it, we'll also replace the execute function for this
-   * request only so that we can return the precomputed result without having
-   * to actually call into GraphQL.
+   * An Envelop plugin that uses DataPlanner to prepare and execute the GraphQL
+   * query.
    */
-  const useCrystalExecutor = (): Plugin => {
-    return {
-      async onExecute({ args, executeFn, setExecuteFn }) {
-        if (process.env.NODE_ENV === "development") {
-          if (
-            args.rootValue != null &&
-            (typeof args.rootValue !== "object" ||
-              Object.keys(args.rootValue).length > 0)
-          ) {
-            throw new Error(
-              `Crystal executor doesn't support there being a rootValue (found ${inspect(
-                args.rootValue,
-              )})`,
-            );
-          }
-        }
-        args.rootValue = await crystalPrepare(args, {
-          experimentalGraphQLBypass: true,
-        });
-        if ((args.rootValue as any)?.[$$bypassGraphQL]) {
-          console.log("BYPASS!");
-          setExecuteFn(bypassGraphQLExecute);
-        }
-      },
-    };
-  };
+  const useCrystalExecutor = (): Plugin => ({
+    async onExecute(opts) {
+      opts.setExecuteFn(crystalExecute);
+    },
+  });
 
   /**
    * An Envelop plugin that will make any GraphQL errors easier to read from

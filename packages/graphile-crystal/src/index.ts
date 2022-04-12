@@ -17,6 +17,7 @@ import { defer, Deferred } from "./deferred";
 import { isDev, noop } from "./dev";
 import { crystalEnforce } from "./enforceCrystal";
 import { CrystalError, isCrystalError } from "./error";
+import { execute } from "./execute";
 import { getCurrentParentPathIdentity } from "./global";
 import { InputPlan } from "./input";
 import {
@@ -196,6 +197,7 @@ export {
   EdgePlan,
   ExecutablePlan,
   ExecutablePlanResolver,
+  execute,
   filter,
   first,
   FirstPlan,
@@ -279,6 +281,7 @@ exportAsMany({
   ROOT_PATH,
   defer,
   crystalEnforce,
+  execute,
   __InputListPlan,
   __InputObjectPlan,
   __InputStaticLeafPlan,
