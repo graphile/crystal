@@ -285,8 +285,9 @@ export async function enhanceHttpServerWithWebSockets<
           };
           const operation = getOperationAST(finalParams.query, finalParams.operationName);
           const isSubscription = !!operation && operation.operation === 'subscription';
-          const context = await getContext(socket, opId, isSubscription);
-          Object.assign(params.context, context);
+
+          // We used to call `getContext` here, now we just persist this side effect instead.
+          await reqResFromSocket(socket);
 
           // You are strongly encouraged to use
           // `postgraphile:validationRules:static` if possible - you should
@@ -313,6 +314,9 @@ export async function enhanceHttpServerWithWebSockets<
               return Promise.reject(error);
             }
           }
+
+          const context = await getContext(socket, opId, isSubscription);
+          Object.assign(params.context, context);
 
           return finalParams;
         },
@@ -407,8 +411,9 @@ export async function enhanceHttpServerWithWebSockets<
             ? getOperationAST(args.document, hookedArgs.operationName)
             : null;
           const isSubscription = !!operation && operation.operation === 'subscription';
-          const context = await getContext(ctx.extra.socket, msg.id, isSubscription);
-          Object.assign(hookedArgs.contextValue, context);
+
+          // We used to call `getContext` here, now we just persist this side effect instead.
+          await reqResFromSocket(ctx.extra.socket);
 
           // when supplying custom execution args from the
           // onSubscribe, you're trusted to do the validation
@@ -445,6 +450,9 @@ export async function enhanceHttpServerWithWebSockets<
               return moreValidationErrors;
             }
           }
+
+          const context = await getContext(ctx.extra.socket, msg.id, isSubscription);
+          Object.assign(hookedArgs.contextValue, context);
 
           return hookedArgs;
         },
