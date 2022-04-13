@@ -84,7 +84,7 @@ export async function enhanceHttpServerWithWebSockets<
 
   const schema = await getGraphQLSchema();
 
-  const keepalivePromisesByContextKey: { [contextKey: string]: Deferred<void> | null } = {};
+  const keepalivePromisesByContextKey: { [contextKey: string]: Deferred<void> } = {};
 
   // IMPORTANT: if you change this, be sure to change `releaseAllContextsForSocket` too
   const contextKey = (ws: WebSocket, opId: string): string => ws['postgraphileId'] + '|' + opId;
@@ -93,7 +93,7 @@ export async function enhanceHttpServerWithWebSockets<
     for (const [key, promise] of Object.entries(keepalivePromisesByContextKey)) {
       if (key.startsWith(ws['postgraphileId'] + '|') && promise) {
         promise.resolve();
-        keepalivePromisesByContextKey[key] = null;
+        delete keepalivePromisesByContextKey[key];
       }
     }
   };
@@ -102,7 +102,7 @@ export async function enhanceHttpServerWithWebSockets<
     const promise = keepalivePromisesByContextKey[contextKey(ws, opId)];
     if (promise) {
       promise.resolve();
-      keepalivePromisesByContextKey[contextKey(ws, opId)] = null;
+      delete keepalivePromisesByContextKey[contextKey(ws, opId)];
     }
   };
 
