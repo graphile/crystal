@@ -8,6 +8,13 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.10](https://github.com/graphile/postgraphile/compare/v4.12.9...v4.12.10) (2022-04-13)
+
+### Bug Fixes
+
+- **ws:** getting context should be the very last thing ([#1615](https://github.com/graphile/postgraphile/issues/1615)) ([1b10ce6](https://github.com/graphile/postgraphile/commit/1b10ce65e748d1061280b15110dc37635509db1f))
+- **ws:** release all socket's contexts on close ([#1612](https://github.com/graphile/postgraphile/issues/1612)) ([8ef3e81](https://github.com/graphile/postgraphile/commit/8ef3e818ec6bd966f4ce0967a14ec709fdbd6fd3))
+
 ## [4.12.9](https://github.com/graphile/postgraphile/compare/v4.12.8...v4.12.9) (2022-02-28)
 
 ### Bug Fixes
