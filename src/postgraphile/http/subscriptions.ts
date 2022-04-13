@@ -284,15 +284,12 @@ export async function enhanceHttpServerWithWebSockets<
                 : parse(hookedParams.query),
           };
           if (!finalParams.query) {
-            return [
-              // same error that graphql.validate would throw if the document is missing
-              new GraphQLError('Must provide document'),
-            ];
+            return Promise.reject(new Error('Must provide document'));
           }
 
           const operation = getOperationAST(finalParams.query, finalParams.operationName);
           if (!operation) {
-            return [new GraphQLError('Unable to identify operation')];
+            return Promise.reject(new Error('Unable to identify operation'));
           }
 
           const isSubscription = operation.operation === 'subscription';
