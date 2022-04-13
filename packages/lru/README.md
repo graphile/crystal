@@ -24,12 +24,13 @@ const lru = new LRU({
   },
 });
 
+const ANY_KEY_HERE = { foo: "bar" };
 const ANY_VALUE_HERE = { randomNumber: () => 4 };
 // Store a value
-lru.set("<string_key_here>", ANY_VALUE_HERE);
+lru.set(ANY_KEY_HERE, ANY_VALUE_HERE);
 
 // Retrieve a value
-const value = lru.get("<string_key_here>");
+const value = lru.get(ANY_KEY_HERE);
 
 // Clear the cache
 lru.reset();
