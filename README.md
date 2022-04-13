@@ -91,7 +91,7 @@ Here's a rough breakdown of the main packages:
   - **[graphile-build-pg][]** - plugins for `graphile-build` that understand
     `@dataplan/pg` (i.e. PostgreSQL) data sources and can generate types,
     relations, mutations, etc for these database resources.
-- **[graphile-lru][]** - an _obsessively_ performant least-recently-used cache
+- **[@graphile/lru][]** - an _obsessively_ performant least-recently-used cache
   (possibly the fastest general purpose LRU cache in Node.js) with a
   ridiculously tiny feature set; you almost certainly want @isaacs' `lru-cache`
   instead of this.
@@ -190,6 +190,6 @@ If you want to work in a Docker environment you can follow
 [postgraphile]: packages/postgraphile/
 [graphile-build]: packages/graphile-build/
 [graphile-build-pg]: packages/graphile-build-pg/
-[graphile-lru]: packages/graphile-lru/
+[@graphile/lru]: packages/lru/
 [pg-sql2]: packages/pg-sql2/
 [pg-introspection]: packages/pg-introspection/
