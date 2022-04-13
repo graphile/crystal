@@ -1505,7 +1505,7 @@ select json_build_object(
 
   'catalog_by_oid',
   (
-    select json_object_agg(oid, relname order by relname asc)
+    select json_object_agg(oid::text, relname order by relname asc)
     from pg_class
     where relnamespace = (
       select oid
