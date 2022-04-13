@@ -284,6 +284,13 @@ export async function enhanceHttpServerWithWebSockets<
                 : parse(hookedParams.query),
           };
           const operation = getOperationAST(finalParams.query, finalParams.operationName);
+          if (!operation) {
+            return [
+              // same error that graphql.validate would throw if the document is missing
+              new GraphQLError('Must provide document.'),
+            ];
+          }
+
           const isSubscription = !!operation && operation.operation === 'subscription';
           const context = await getContext(socket, opId, isSubscription);
           Object.assign(params.context, context);
@@ -406,6 +413,13 @@ export async function enhanceHttpServerWithWebSockets<
           const operation = args.document
             ? getOperationAST(args.document, hookedArgs.operationName)
             : null;
+          if (!operation) {
+            return [
+              // same error that graphql.validate would throw if the document is missing
+              new GraphQLError('Must provide document.'),
+            ];
+          }
+
           const isSubscription = !!operation && operation.operation === 'subscription';
           const context = await getContext(ctx.extra.socket, msg.id, isSubscription);
           Object.assign(hookedArgs.contextValue, context);
