@@ -283,8 +283,15 @@ export async function enhanceHttpServerWithWebSockets<
                 ? hookedParams.query
                 : parse(hookedParams.query),
           };
+          if (!finalParams.query) {
+            return Promise.reject(new Error('Must provide document'));
+          }
+
           const operation = getOperationAST(finalParams.query, finalParams.operationName);
-          const isSubscription = !!operation && operation.operation === 'subscription';
+          if (!operation) {
+            return Promise.reject(new Error('Unable to identify operation'));
+          }
+          const isSubscription = operation.operation === 'subscription';
 
           // We used to call `getContext` here, now we just persist this side effect instead.
           await reqResFromSocket(socket);
@@ -407,10 +414,18 @@ export async function enhanceHttpServerWithWebSockets<
                 options,
               })
             : args) as ExecutionArgs;
-          const operation = args.document
-            ? getOperationAST(args.document, hookedArgs.operationName)
-            : null;
-          const isSubscription = !!operation && operation.operation === 'subscription';
+          if (!args.document) {
+            return [
+              // same error that graphql.validate would throw if the document is missing
+              new GraphQLError('Must provide document'),
+            ];
+          }
+
+          const operation = getOperationAST(args.document, hookedArgs.operationName);
+          if (!operation) {
+            return [new GraphQLError('Unable to identify operation')];
+          }
+          const isSubscription = operation.operation === 'subscription';
 
           // We used to call `getContext` here, now we just persist this side effect instead.
           await reqResFromSocket(ctx.extra.socket);
