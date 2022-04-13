@@ -11,8 +11,10 @@ sponsor](https://graphile.org/sponsor/).
 - Chad Furman
 - The Guild
 - Fanatics
+- Dovetail
 - Enzuzo
 - Politics Rewired
+- IaSQL
 
 ## Leaders
 
@@ -26,7 +28,6 @@ sponsor](https://graphile.org/sponsor/).
 - Principia Mentis
 - HR-ON
 - Luxor Labs
-- Dovetail
 - PostHog
 - Taiste
 - Axinom
