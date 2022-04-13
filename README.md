@@ -23,8 +23,8 @@ yarn watch
 ```
 
 This'll keep the compiled code up to date. Then go to
-[packages/graphile-build-pg/src/examples/README.md][] and follow the guidance
-there, try out a couple examples, etc.
+[packages/graphile-build-pg/src/examples/README.md](packages/graphile-build-pg/src/examples/README.md)
+and follow the guidance there, try out a couple examples, etc.
 
 **DOCS**: I've put a fair amount of effort into documenting various of the
 functions/variables in the codebase, but there's very little in the way of
