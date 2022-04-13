@@ -286,7 +286,7 @@ export async function enhanceHttpServerWithWebSockets<
           if (!finalParams.query) {
             return [
               // same error that graphql.validate would throw if the document is missing
-              new GraphQLError('Must provide document.'),
+              new GraphQLError('Must provide document'),
             ];
           }
 
@@ -417,7 +417,7 @@ export async function enhanceHttpServerWithWebSockets<
           if (!args.document) {
             return [
               // same error that graphql.validate would throw if the document is missing
-              new GraphQLError('Must provide document.'),
+              new GraphQLError('Must provide document'),
             ];
           }
 
