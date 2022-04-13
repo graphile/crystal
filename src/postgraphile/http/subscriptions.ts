@@ -286,6 +286,9 @@ export async function enhanceHttpServerWithWebSockets<
           const operation = getOperationAST(finalParams.query, finalParams.operationName);
           const isSubscription = !!operation && operation.operation === 'subscription';
 
+          // We used to call `getContext` here, now we just persist this side effect instead.
+          await reqResFromSocket(socket);
+
           // You are strongly encouraged to use
           // `postgraphile:validationRules:static` if possible - you should
           // only use this one if you need access to variables.
@@ -408,6 +411,9 @@ export async function enhanceHttpServerWithWebSockets<
             ? getOperationAST(args.document, hookedArgs.operationName)
             : null;
           const isSubscription = !!operation && operation.operation === 'subscription';
+
+          // We used to call `getContext` here, now we just persist this side effect instead.
+          await reqResFromSocket(ctx.extra.socket);
 
           // when supplying custom execution args from the
           // onSubscribe, you're trusted to do the validation
