@@ -7,10 +7,6 @@ This is an obsessively optimized LRU cache for Node.js, it forgoes features in
 favour of performance, and is very marginally faster than node-lru-cache in
 certain circumstances.
 
-It is, however, quite straightforward. So if you want to study how an LRU works,
-this is a simple example. It uses a doubly-linked-list and tracks both the head
-and the tail.
-
 ## Usage
 
 ```js

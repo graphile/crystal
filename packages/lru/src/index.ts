@@ -1,8 +1,35 @@
+/*
+ * I know this is ridiculous, but I've seen in the past that the length of keys
+ * in objects can have a marginal impact on performance. @graphile/lru is
+ * obsessively optimized, so we'll take every smidging of performance we can
+ * get. As such, all non-public keys are single letters. To try and keep things
+ * from being too confusing, we try not to use the same letter in two places.
+ * Letters:
+ *
+ * Letter | Place | longName
+ * ------ | ----- | --------
+ * a      | LRU   | add
+ * c      | LRU   | cache
+ * d      | LRU   | dispose
+ * h      | LRU   | head
+ * k      | Node  | key
+ * m      | LRU   | maxLength
+ * n      | Node  | next
+ * p      | Node  | previous
+ * r      | LRU   | raise (aka "hoist")
+ * t      | LRU   | tail
+ * v      | Node  | value
+ */
+
 interface Node<KeyType, ValueType> {
-  key: KeyType;
-  value: ValueType;
-  next: Node<KeyType, ValueType> | null;
-  prev: Node<KeyType, ValueType> | null;
+  /** key */
+  k: KeyType;
+  /** value */
+  v: ValueType;
+  /** next */
+  n: Node<KeyType, ValueType> | null;
+  /** previous */
+  p: Node<KeyType, ValueType> | null;
 }
 
 interface LRUOptions<KeyType, ValueType> {
@@ -15,11 +42,16 @@ interface LRUOptions<KeyType, ValueType> {
  */
 export default class LRU<KeyType = any, ValueType = any> {
   public length: number;
-  private _maxLength: number;
-  private _head: Node<KeyType, ValueType> | null;
-  private _tail: Node<KeyType, ValueType> | null;
-  private _cache: Map<KeyType, Node<KeyType, ValueType>>;
-  private _dispose: ((key: KeyType, value: ValueType) => void) | null;
+  /** max length */
+  private m: number;
+  /** head */
+  private h: Node<KeyType, ValueType> | null;
+  /** tail */
+  private t: Node<KeyType, ValueType> | null;
+  /** cache */
+  private c: Map<KeyType, Node<KeyType, ValueType>>;
+  /** dispose */
+  private d: ((key: KeyType, value: ValueType) => void) | null;
 
   constructor({ maxLength, dispose }: LRUOptions<KeyType, ValueType>) {
     if (maxLength < 2) {
@@ -30,97 +62,99 @@ export default class LRU<KeyType = any, ValueType = any> {
     }
 
     this.length = 0;
-    this._maxLength = maxLength;
-    this._head = null;
-    this._tail = null;
-    this._cache = new Map();
-    this._dispose = dispose || null;
+    this.m = maxLength;
+    this.h = null;
+    this.t = null;
+    this.c = new Map();
+    this.d = dispose || null;
 
     this.reset();
   }
 
   public reset() {
-    const values = this._cache.values();
-    this._cache.clear();
-    this._head = null;
-    this._tail = null;
+    const values = this.c.values();
+    this.c.clear();
+    this.h = null;
+    this.t = null;
     this.length = 0;
-    if (this._dispose) {
+    if (this.d) {
       for (const hit of values) {
-        this._dispose(hit.key, hit.value);
+        this.d(hit.k, hit.v);
       }
     }
   }
 
   public get(key: KeyType): ValueType | undefined {
-    const hit = this._cache.get(key);
+    const hit = this.c.get(key);
     if (hit) {
-      this._hoist(hit);
-      return hit.value;
+      this.r(hit);
+      return hit.v;
     }
     return undefined;
   }
 
   public set(key: KeyType, value: ValueType): void {
-    const hit = this._cache.get(key);
+    const hit = this.c.get(key);
     if (hit) {
-      hit.value = value;
+      hit.v = value;
     } else {
       const newHead: Node<KeyType, ValueType> = {
-        key,
-        value,
-        next: null,
-        prev: null,
+        k: key,
+        v: value,
+        n: null,
+        p: null,
       };
-      this._cache.set(key, newHead);
-      this._add(newHead);
+      this.c.set(key, newHead);
+      this.a(newHead);
     }
   }
 
-  private _hoist(newHead: Node<KeyType, ValueType>) {
-    if (newHead === this._head) {
+  /** hoist (aka "raise") */
+  private r(newHead: Node<KeyType, ValueType>) {
+    if (newHead === this.h) {
       return;
     }
-    if (!this._head) {
-      this._head = this._tail = newHead;
+    if (!this.h) {
+      this.h = this.t = newHead;
       return;
     }
     // Remove newHead from old position
-    newHead.prev!.next = newHead.next;
-    if (newHead.next) {
-      newHead.next.prev = newHead.prev;
+    newHead.p!.n = newHead.n;
+    if (newHead.n) {
+      newHead.n.p = newHead.p;
     } else {
-      // It was the _tail, now newHead.prev is the _tail
-      this._tail = newHead.prev;
+      // It was the t, now newHead.prev is the t
+      this.t = newHead.p;
     }
     // Add newHead at top
-    newHead.next = this._head;
-    this._head.prev = newHead;
-    this._head = newHead;
-    newHead.prev = null;
+    newHead.n = this.h;
+    this.h.p = newHead;
+    this.h = newHead;
+    newHead.p = null;
   }
 
-  private _add(newHead: Node<KeyType, ValueType>) {
-    if (!this._head) {
-      this._head = this._tail = newHead;
+  /** add */
+  private a(newHead: Node<KeyType, ValueType>) {
+    if (!this.h) {
+      this.h = this.t = newHead;
       this.length = 1;
       return;
     }
-    this._head.prev = newHead;
-    newHead.next = this._head;
-    this._head = newHead;
-    if (this.length === this._maxLength) {
-      // Remove the _tail
-      const oldTail = this._tail!;
-      this._cache.delete(oldTail.key);
-      this._tail = oldTail.prev;
-      this._tail!.next = null;
-      if (this._dispose) {
-        this._dispose(oldTail.key, oldTail.value);
+    this.h.p = newHead;
+    newHead.n = this.h;
+    this.h = newHead;
+    if (this.length === this.m) {
+      // Remove the t
+      const oldTail = this.t!;
+      this.c.delete(oldTail.k);
+      this.t = oldTail.p;
+      this.t!.n = null;
+      if (this.d) {
+        this.d(oldTail.k, oldTail.v);
       }
     } else {
       if (this.length === 0) {
-        this._tail = newHead;
+        this.t = newHead;
       }
       this.length++;
     }

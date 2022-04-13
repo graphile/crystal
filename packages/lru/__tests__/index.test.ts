@@ -7,20 +7,20 @@ function testLinkedList(cache: LRU, expectedList: string[] | null = null) {
     expect(cache.length).toEqual(expectedList.length);
   }
   let previous = null;
-  let current = cache["_head"];
+  let current = cache["h"];
   // eslint-disable-next-line no-constant-condition
   for (let index = 0; index < cache.length; index++) {
     expect(current).toBeTruthy();
     assert(current);
-    expect(current.prev).toBe(previous);
+    expect(current.p).toBe(previous);
     if (expectedList) {
-      expect(current.key).toEqual(expectedList[index]);
+      expect(current.k).toEqual(expectedList[index]);
     }
     previous = current;
-    current = current.next;
+    current = current.n;
   }
   expect(current).toBe(null);
-  expect(cache["_tail"]).toBe(previous);
+  expect(cache["t"]).toBe(previous);
 }
 
 it("set 1", () => {
