@@ -88,6 +88,15 @@ export async function enhanceHttpServerWithWebSockets<
 
   const contextKey = (ws: WebSocket, opId: string): string => ws['postgraphileId'] + '|' + opId;
 
+  const releaseAllContextsForSocket = (ws: WebSocket): void => {
+    for (const [key, promise] of Object.entries(keepalivePromisesByContextKey)) {
+      if (key.startsWith(ws['postgraphileId']) && promise) {
+        promise.resolve();
+        keepalivePromisesByContextKey[key] = null;
+      }
+    }
+  };
+
   const releaseContextForSocketAndOpId = (ws: WebSocket, opId: string): void => {
     const promise = keepalivePromisesByContextKey[contextKey(ws, opId)];
     if (promise) {
@@ -308,6 +317,9 @@ export async function enhanceHttpServerWithWebSockets<
         onOperationComplete(socket: WebSocket, opId: string) {
           releaseContextForSocketAndOpId(socket, opId);
         },
+        onDisconnect(socket: WebSocket) {
+          releaseAllContextsForSocket(socket);
+        },
 
         /*
          * Heroku times out after 55s:
@@ -450,6 +462,9 @@ export async function enhanceHttpServerWithWebSockets<
         },
         onComplete(ctx, msg) {
           releaseContextForSocketAndOpId(ctx.extra.socket, msg.id);
+        },
+        onClose(ctx) {
+          releaseAllContextsForSocket(ctx.extra.socket);
         },
       },
       v1Wss,
