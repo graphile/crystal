@@ -86,6 +86,7 @@ export async function enhanceHttpServerWithWebSockets<
 
   const keepalivePromisesByContextKey: { [contextKey: string]: Deferred<void> | null } = {};
 
+  // IMPORTANT: if you change this, be sure to change `releaseAllContextsForSocket` too
   const contextKey = (ws: WebSocket, opId: string): string => ws['postgraphileId'] + '|' + opId;
 
   const releaseAllContextsForSocket = (ws: WebSocket): void => {
