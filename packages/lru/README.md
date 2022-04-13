@@ -4,8 +4,10 @@
 instead.**
 
 This is an obsessively optimized LRU cache for Node.js, it forgoes features in
-favour of performance, and is very marginally faster than node-lru-cache in
-certain circumstances.
+favour of performance, and is very marginally faster than node-lru-cache v6 in
+certain circumstances (namely those that we care about inside the Graphile
+internals). A performance comparison versus node-lru-cache v7 has not yet been
+performed.
 
 ## Usage
 
