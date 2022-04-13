@@ -90,7 +90,7 @@ export async function enhanceHttpServerWithWebSockets<
 
   const releaseAllContextsForSocket = (ws: WebSocket): void => {
     for (const [key, promise] of Object.entries(keepalivePromisesByContextKey)) {
-      if (key.startsWith(ws['postgraphileId']) && promise) {
+      if (key.startsWith(ws['postgraphileId'] + '|') && promise) {
         promise.resolve();
         keepalivePromisesByContextKey[key] = null;
       }
