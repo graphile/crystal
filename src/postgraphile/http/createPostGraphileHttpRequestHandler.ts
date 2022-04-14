@@ -14,7 +14,12 @@ import {
 import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { pluginHookFromOptions } from '../pluginHook';
-import { HttpRequestHandler, mixed, CreateRequestHandlerOptions, ExplainOptions } from '../../interfaces';
+import {
+  HttpRequestHandler,
+  mixed,
+  CreateRequestHandlerOptions,
+  ExplainOptions,
+} from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import LRU from '@graphile/lru';
@@ -124,14 +129,14 @@ function parseExplainOptions(req: IncomingMessage): ExplainOptions {
         if (['text', 'xml', 'json', 'yaml'].includes(value)) {
           explainOptions[option] = value;
         } else {
-          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`)
+          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`);
         }
         break;
       default:
         if (['true', 'false'].includes(value)) {
           explainOptions[option] = value === 'true';
         } else {
-          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`)
+          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`);
         }
     }
   }

@@ -1,12 +1,12 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import {Pool, PoolClient, QueryConfig, QueryResult} from 'pg';
+import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
 import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
-import {$$pgClient} from '../postgres/inventory/pgClientFromContext';
-import {pluginHookFromOptions} from './pluginHook';
+import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
+import { pluginHookFromOptions } from './pluginHook';
 import { ExplainOptions, mixed, WithPostGraphileContextOptions } from '../interfaces';
-import {formatSQLForDebugging} from 'postgraphile-core';
+import { formatSQLForDebugging } from 'postgraphile-core';
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
@@ -473,7 +473,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
-    pgClient.startExplain = (options) => {
+    pgClient.startExplain = options => {
       pgClient._explainResults = [];
       pgClient._explainOptions = options;
     };
@@ -496,7 +496,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             }
             const plan = result
               .map((r: any) => r[firstKey])
-              .map((r: any) => typeof r === 'string' ? r : JSON.stringify(r, null, 2))
+              .map((r: any) => (typeof r === 'string' ? r : JSON.stringify(r, null, 2)))
               .join('\n');
             return {
               ...rest,
@@ -541,8 +541,9 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
               // Build the EXPLAIN command
               let explainCommand = 'explain';
-              const explainOptionClauses = Object.entries(pgClient._explainOptions ?? {})
-                .map(([option, value]) => `${option} ${value}`);
+              const explainOptionClauses = Object.entries(pgClient._explainOptions ?? {}).map(
+                ([option, value]) => `${option} ${value}`,
+              );
               if (explainOptionClauses.length > 0) {
                 explainCommand = `${explainCommand} (${explainOptionClauses.join(', ')})`;
               }
