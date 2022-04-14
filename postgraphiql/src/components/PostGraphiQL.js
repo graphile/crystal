@@ -94,6 +94,10 @@ function buildExplainOptionsHeader(explainOptions) {
     .map(([option, value]) => `${option}=${value}`).join(',')
 }
 
+function writeToClipboard(content) {
+  return navigator.clipboard.writeText(content);
+}
+
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
  * Including a JWT setter and live schema udpate capabilities.
@@ -903,12 +907,16 @@ class PostGraphiQL extends React.PureComponent {
                           <a href="https://www.postgresql.org/docs/current/sql-explain.html">
                             EXPLAIN
                           </a>{' '}
-                          on executed query:
+                          on executed query:{' '}
+                          <button className="copy-button" onClick={() => writeToClipboard(res.plan)}>copy</button>
                         </h4>
                         <pre className="explain-plan">
                           <code>{res.plan}</code>
                         </pre>
-                        <h4>Executed SQL query:</h4>
+                        <h4>
+                          Executed SQL query:{' '}
+                          <button className="copy-button" onClick={() => writeToClipboard(res.query)}>copy</button>
+                        </h4>
                         <pre className="explain-sql">
                           <code>{formatSQL(res.query)}</code>
                         </pre>
