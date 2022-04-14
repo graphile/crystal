@@ -1,12 +1,12 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
+import {Pool, PoolClient, QueryConfig, QueryResult} from 'pg';
 import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
-import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
-import { pluginHookFromOptions } from './pluginHook';
-import { mixed, WithPostGraphileContextOptions } from '../interfaces';
-import { formatSQLForDebugging } from 'postgraphile-core';
+import {$$pgClient} from '../postgres/inventory/pgClientFromContext';
+import {pluginHookFromOptions} from './pluginHook';
+import { ExplainOptions, mixed, WithPostGraphileContextOptions } from '../interfaces';
+import {formatSQLForDebugging} from 'postgraphile-core';
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
@@ -78,6 +78,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgDefaultRole,
     pgSettings,
     explain,
+    explainOptions,
     queryDocumentAst,
     operationName,
     pgForceTransaction,
@@ -214,7 +215,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     return withAuthenticatedPgClient(async pgClient => {
       let results: Promise<Array<ExplainResult>> | null = null;
       if (explain) {
-        pgClient.startExplain();
+        pgClient.startExplain(explainOptions);
       }
       try {
         return await callback({
@@ -454,7 +455,8 @@ type ExplainResult = Omit<RawExplainResult, 'result'> & {
 declare module 'pg' {
   interface ClientBase {
     _explainResults: Array<RawExplainResult> | null;
-    startExplain: () => void;
+    _explainOptions: ExplainOptions | null;
+    startExplain: (options: ExplainOptions) => void;
     stopExplain: () => Promise<Array<ExplainResult>>;
   }
 }
@@ -471,13 +473,15 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
-    pgClient.startExplain = () => {
+    pgClient.startExplain = (options) => {
       pgClient._explainResults = [];
+      pgClient._explainOptions = options;
     };
 
     pgClient.stopExplain = async () => {
       const results = pgClient._explainResults;
       pgClient._explainResults = null;
+      pgClient._explainOptions = null;
       if (!results) {
         return Promise.resolve([]);
       }
@@ -490,7 +494,10 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             if (!firstKey) {
               return null;
             }
-            const plan = result.map((r: any) => r[firstKey]).join('\n');
+            const plan = result
+              .map((r: any) => r[firstKey])
+              .map((r: any) => typeof r === 'string' ? r : JSON.stringify(r, null, 2))
+              .join('\n');
             return {
               ...rest,
               plan,
@@ -532,8 +539,15 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             const query = a && a.text ? a.text : a;
             const values = a && a.text ? a.values : b;
             if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
+              // Build the EXPLAIN command
+              let explainCommand = 'explain';
+              const explainOptionClauses = Object.entries(pgClient._explainOptions ?? {})
+                .map(([option, value]) => `${option} ${value}`);
+              if (explainOptionClauses.length > 0) {
+                explainCommand = `${explainCommand} (${explainOptionClauses.join(', ')})`;
+              }
               // Explain it
-              const explain = `explain ${query}`;
+              const explain = `${explainCommand} ${query}`;
               pgClient._explainResults.push({
                 query,
                 result: pgClient[$$pgClientOrigQuery]

@@ -383,6 +383,18 @@ export interface HttpRequestHandler<
   release: () => Promise<void>;
 }
 
+export type ExplainOptions = {
+  analyze?: boolean;
+  verbose?: boolean;
+  costs?: boolean;
+  settings?: boolean;
+  buffers?: boolean;
+  wal?: boolean;
+  timing?: boolean;
+  summary?: boolean;
+  format?: 'text' | 'xml' | 'json' | 'yaml';
+};
+
 /**
  * Options passed to the `withPostGraphileContext` function
  */
@@ -397,6 +409,7 @@ export interface WithPostGraphileContextOptions {
   pgDefaultRole?: string;
   pgSettings?: { [key: string]: mixed };
   explain?: boolean;
+  explainOptions: ExplainOptions;
   queryDocumentAst?: DocumentNode;
   operationName?: string;
   pgForceTransaction?: boolean;
