@@ -14,7 +14,7 @@ import {
 import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { pluginHookFromOptions } from '../pluginHook';
-import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
+import { HttpRequestHandler, mixed, CreateRequestHandlerOptions, ExplainOptions } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import LRU from '@graphile/lru';
@@ -110,6 +110,34 @@ const isPostGraphileDevelopmentMode = process.env.POSTGRAPHILE_ENV === 'developm
 const debugGraphql = Debugger('postgraphile:graphql');
 const debugRequest = Debugger('postgraphile:request');
 
+function parseExplainOptions(req: IncomingMessage): ExplainOptions {
+  const explainOptions = {};
+  const header = req.headers['x-postgraphile-explain-options'];
+  if (!header) {
+    return explainOptions;
+  }
+  const headerValues = typeof header === 'string' ? header.split(',') : header;
+  for (const headerValue of headerValues) {
+    const [option, value] = headerValue.split('=').map(s => s.toLowerCase().trim());
+    switch (option) {
+      case 'format':
+        if (['text', 'xml', 'json', 'yaml'].includes(value)) {
+          explainOptions[option] = value;
+        } else {
+          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`)
+        }
+        break;
+      default:
+        if (['true', 'false'].includes(value)) {
+          explainOptions[option] = value === 'true';
+        } else {
+          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`)
+        }
+    }
+  }
+  return explainOptions;
+}
+
 /**
  * We need to be able to share the withPostGraphileContext logic between HTTP
  * and websockets
@@ -150,6 +178,7 @@ function withPostGraphileContextFromReqResGenerator(
         jwtToken,
         pgSettings,
         explain: allowExplain && req.headers['x-postgraphile-explain'] === 'on',
+        explainOptions: parseExplainOptions(req),
         ...moreOptions,
       },
       context => {
@@ -1175,6 +1204,7 @@ function addCORSHeaders(res: PostGraphileResponse): void {
       'Content-Length',
       // For our 'Explain' feature
       'X-PostGraphile-Explain',
+      'X-PostGraphile-Explain-Options',
     ].join(', '),
   );
   res.setHeader('Access-Control-Expose-Headers', ['X-GraphQL-Event-Stream'].join(', '));
