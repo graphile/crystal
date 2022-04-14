@@ -1,12 +1,11 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
-import { getOperationAST, parse } from 'graphql';
+import {buildClientSchema, getIntrospectionQuery, getOperationAST, GraphQLObjectType, isType, parse} from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
-import { buildClientSchema, getIntrospectionQuery, isType, GraphQLObjectType } from 'graphql';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
-import { createClient } from 'graphql-ws';
+import {SubscriptionClient} from 'subscriptions-transport-ws';
+import {createClient} from 'graphql-ws';
 import formatSQL from '../formatSQL';
 
 const defaultQuery = `\
@@ -81,7 +80,19 @@ const STORAGE_KEYS = {
   SAVE_HEADERS_TEXT: 'PostGraphiQL:saveHeadersText',
   HEADERS_TEXT: 'PostGraphiQL:headersText',
   EXPLAIN: 'PostGraphiQL:explain',
+  EXPLAIN_OPTIONS: 'PostGraphiQL:explainOptions',
 };
+
+function explainOptionRequiresAnalyze(option) {
+  return ['wal', 'timing'].includes(option);
+}
+
+function buildExplainOptionsHeader(explainOptions) {
+  const analyzeEnabled = explainOptions.analyze;
+  return Object.entries(explainOptions)
+    .filter(([option]) => !explainOptionRequiresAnalyze(option) || analyzeEnabled)
+    .map(([option, value]) => `${option}=${value}`).join(',')
+}
 
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
@@ -101,11 +112,21 @@ class PostGraphiQL extends React.PureComponent {
     headersText: this._storage.get(STORAGE_KEYS.HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
     explain: this._storage.get(STORAGE_KEYS.EXPLAIN) === 'true',
     explainResult: null,
+    explainOptions: this.parseFromStorage(STORAGE_KEYS.EXPLAIN_OPTIONS) || {
+      costs: true,
+      timing: true,
+      format: 'text'
+    },
     headersTextValid: true,
-    explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
+    explorerIsOpen: this._storage.get('explorerIsOpen') !== 'false',
     haveActiveSubscription: false,
     socketStatus: POSTGRAPHILE_CONFIG.websockets === 'none' ? null : 'pending',
   };
+
+  parseFromStorage(key) {
+    const value = this._storage.get(key);
+    return value ? JSON.parse(value) : undefined;
+  }
 
   restartRequested = false;
   restartSubscriptionsClient = () => {
@@ -375,6 +396,7 @@ class PostGraphiQL extends React.PureComponent {
           ...(this.state.explain && POSTGRAPHILE_CONFIG.allowExplain
             ? { 'X-PostGraphile-Explain': 'on' }
             : null),
+          'X-PostGraphile-Explain-Options': buildExplainOptionsHeader(this.state.explainOptions)
         },
         extraHeaders,
       ),
@@ -663,6 +685,22 @@ class PostGraphiQL extends React.PureComponent {
     );
   };
 
+  handleToggleExplainOption = (option) => {
+    this.handleSetExplainOption(option, !this.state.explainOptions[option]);
+  };
+
+  handleSetExplainOption = (option, value) => {
+    this.setState(
+      oldState => ({
+        explainOptions: {
+          ...oldState.explainOptions,
+          [option]: value
+        }
+      }),
+      () => this._storage.set(STORAGE_KEYS.EXPLAIN_OPTIONS, JSON.stringify(this.state.explainOptions))
+    );
+  };
+
   renderSocketStatus() {
     const { socketStatus, error } = this.state;
     if (socketStatus === null) {
@@ -815,11 +853,38 @@ class PostGraphiQL extends React.PureComponent {
               />
 
               {POSTGRAPHILE_CONFIG.allowExplain ? (
-                <GraphiQL.Button
-                  label={this.state.explain ? 'Explain ON' : 'Explain disabled'}
-                  title="View the SQL statements that this query invokes"
-                  onClick={this.handleToggleExplain}
-                />
+                  <GraphiQL.Group>
+                    <GraphiQL.Button
+                      label={`Explain ${this.state.explain ? 'ON' : 'OFF'}`}
+                      title="View the SQL statements that this query invokes"
+                      onClick={this.handleToggleExplain}
+                    />
+                    <GraphiQL.Menu label="Options" title="">
+                      {['analyze', 'verbose', 'costs', 'settings', 'buffers', 'wal', 'timing', 'summary']
+                        .map(option => {
+                          const enabled = !!this.state.explainOptions[option];
+                          const icon = enabled ? '\u2611' : '\u2610';
+                          const requiresAnalyze = explainOptionRequiresAnalyze(option);
+                          const warningIndicator = enabled && requiresAnalyze && !this.state.explainOptions.analyze ? '*' : '';
+                          return <GraphiQL.MenuItem
+                            key={option}
+                            label={`${icon} ${warningIndicator}${option.toUpperCase()}`}
+                            title={requiresAnalyze ? 'Requires ANALYZE' : undefined}
+                            onSelect={() => this.handleToggleExplainOption(option)}
+                          />;
+                        }
+                      )}
+                    </GraphiQL.Menu>
+                    <GraphiQL.Menu label="Format" title="">
+                      {['text', 'json', 'yaml', 'xml'].map(format =>
+                        <GraphiQL.MenuItem
+                          key={format}
+                          label={`${format.toUpperCase()} ${this.state.explainOptions.format === format ? '\u2713' : ''}`}
+                          onSelect={() => this.handleSetExplainOption('format', format)}
+                        />
+                      )}
+                    </GraphiQL.Menu>
+                  </GraphiQL.Group>
               ) : null}
               <GraphiQL.Button
                 label={'Headers ' + (this.state.saveHeadersText ? 'SAVED' : 'unsaved')}
