@@ -147,7 +147,7 @@ export const PgRelationsPlugin: Plugin = {
     helpers: {},
     initialState: (): State => ({}),
     hooks: {
-      async "pgTables:PgSourceBuilder:relations"(
+      async pgTables_PgSourceBuilder_relations(
         info,
         { pgClass, databaseName, relations },
       ) {

@@ -161,82 +161,82 @@ declare module "graphile-plugin" {
   }
 
   interface GatherHooks {
-    "pgIntrospection:namespace": PluginHook<
+    pgIntrospection_namespace: PluginHook<
       (event: {
         entity: PgNamespace;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:class": PluginHook<
+    pgIntrospection_class: PluginHook<
       (event: {
         entity: PgClass;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:attribute": PluginHook<
+    pgIntrospection_attribute: PluginHook<
       (event: {
         entity: PgAttribute;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:constraint": PluginHook<
+    pgIntrospection_constraint: PluginHook<
       (event: {
         entity: PgConstraint;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:proc": PluginHook<
+    pgIntrospection_proc: PluginHook<
       (event: { entity: PgProc; databaseName: string }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:role": PluginHook<
+    pgIntrospection_role: PluginHook<
       (event: {
         entity: PgRoles;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:auth_member": PluginHook<
+    pgIntrospection_auth_member: PluginHook<
       (event: {
         entity: PgAuthMembers;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:type": PluginHook<
+    pgIntrospection_type: PluginHook<
       (event: { entity: PgType; databaseName: string }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:enum": PluginHook<
+    pgIntrospection_enum: PluginHook<
       (event: { entity: PgEnum; databaseName: string }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:extension": PluginHook<
+    pgIntrospection_extension: PluginHook<
       (event: {
         entity: PgExtension;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:index": PluginHook<
+    pgIntrospection_index: PluginHook<
       (event: {
         entity: PgIndex;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:language": PluginHook<
+    pgIntrospection_language: PluginHook<
       (event: {
         entity: PgLanguage;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:range": PluginHook<
+    pgIntrospection_range: PluginHook<
       (event: {
         entity: PgRange;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:depend": PluginHook<
+    pgIntrospection_depend: PluginHook<
       (event: {
         entity: PgDepend;
         databaseName: string;
       }) => PromiseOrDirect<void>
     >;
-    "pgIntrospection:description": PluginHook<
+    pgIntrospection_description: PluginHook<
       (event: {
         entity: PgDescription;
         databaseName: string;
@@ -519,21 +519,21 @@ export const PgIntrospectionPlugin: Plugin = {
             return Promise.all(promises);
           }
 
-          await announce("pgIntrospection:namespace", namespaces);
-          await announce("pgIntrospection:class", classes);
-          await announce("pgIntrospection:attribute", attributes);
-          await announce("pgIntrospection:constraint", constraints);
-          await announce("pgIntrospection:proc", procs);
-          await announce("pgIntrospection:role", roles);
-          await announce("pgIntrospection:auth_member", auth_members);
-          await announce("pgIntrospection:type", types);
-          await announce("pgIntrospection:enum", enums);
-          await announce("pgIntrospection:extension", extensions);
-          await announce("pgIntrospection:index", indexes);
-          await announce("pgIntrospection:language", languages);
-          await announce("pgIntrospection:range", ranges);
-          await announce("pgIntrospection:depend", depends);
-          await announce("pgIntrospection:description", descriptions);
+          await announce("pgIntrospection_namespace", namespaces);
+          await announce("pgIntrospection_class", classes);
+          await announce("pgIntrospection_attribute", attributes);
+          await announce("pgIntrospection_constraint", constraints);
+          await announce("pgIntrospection_proc", procs);
+          await announce("pgIntrospection_role", roles);
+          await announce("pgIntrospection_auth_member", auth_members);
+          await announce("pgIntrospection_type", types);
+          await announce("pgIntrospection_enum", enums);
+          await announce("pgIntrospection_extension", extensions);
+          await announce("pgIntrospection_index", indexes);
+          await announce("pgIntrospection_language", languages);
+          await announce("pgIntrospection_range", ranges);
+          await announce("pgIntrospection_depend", depends);
+          await announce("pgIntrospection_description", descriptions);
         }),
       );
     },

@@ -128,7 +128,7 @@ declare module "graphile-plugin" {
   }
 
   interface GatherHooks {
-    "pgTables:PgSourceBuilder:relations": PluginHook<
+    pgTables_PgSourceBuilder_relations: PluginHook<
       (event: {
         sourceBuilder: PgSourceBuilder<any, any, any>;
         pgClass: PgClass;
@@ -136,7 +136,7 @@ declare module "graphile-plugin" {
         relations: PgSourceRelations;
       }) => Promise<void>
     >;
-    "pgTables:PgSource": PluginHook<
+    pgTables_PgSource: PluginHook<
       (event: {
         source: PgSource<any, any, any, any>;
         pgClass: PgClass;
@@ -223,7 +223,7 @@ export const PgTablesPlugin: Plugin = {
           const relations: PgSourceRelations = {};
           const { pgClass, databaseName } =
             info.state.detailsBySourceBuilder.get(sourceBuilder)!;
-          await info.process("pgTables:PgSourceBuilder:relations", {
+          await info.process("pgTables_PgSourceBuilder_relations", {
             sourceBuilder,
             pgClass,
             relations,
@@ -233,7 +233,7 @@ export const PgTablesPlugin: Plugin = {
             (relations, sourceBuilder) => sourceBuilder.build({ relations }),
             [relations, sourceBuilder],
           );
-          await info.process("pgTables:PgSource", {
+          await info.process("pgTables_PgSource", {
             source,
             pgClass,
             databaseName,
@@ -364,7 +364,7 @@ export const PgTablesPlugin: Plugin = {
       detailsBySourceBuilder: new Map(),
     }),
     hooks: {
-      async "pgIntrospection:class"({ helpers }, event) {
+      async pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, databaseName } = event;
         helpers.pgTables.getSourceBuilder(databaseName, pgClass);
       },

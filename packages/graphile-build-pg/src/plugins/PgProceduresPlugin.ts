@@ -65,7 +65,7 @@ declare module "graphile-plugin" {
   }
 
   interface GatherHooks {
-    "pgProcedures:PgSource": PluginHook<
+    pgProcedures_PgSource: PluginHook<
       (event: {
         source: PgSource<any, any, any, any>;
         pgProc: PgProc;
@@ -469,7 +469,7 @@ export const PgProceduresPlugin: Plugin = {
       sourceByPgProcByDatabase: new Map(),
     }),
     hooks: {
-      async "pgIntrospection:proc"({ helpers }, event) {
+      async pgIntrospection_proc({ helpers }, event) {
         const { entity: pgProc, databaseName } = event;
         helpers.pgProcedures.getSource(databaseName, pgProc);
       },
@@ -487,7 +487,7 @@ export const PgProceduresPlugin: Plugin = {
           if (!source) {
             continue;
           }
-          await info.process("pgProcedures:PgSource", {
+          await info.process("pgProcedures_PgSource", {
             source,
             pgProc,
             databaseName,
