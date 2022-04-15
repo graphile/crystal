@@ -31,8 +31,8 @@ import type { GraphileInputObjectType, GraphileObjectType } from "./utils";
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
     graphile?: {
-      plan?: ExecutablePlanResolver<any, any, any, any>;
-      subscribePlan?: ExecutablePlanResolver<any, any, any, any>;
+      plan?: FieldPlanResolver<any, any, any>;
+      subscribePlan?: FieldPlanResolver<any, any, any>;
     };
   }
 
@@ -202,7 +202,6 @@ export interface BaseGraphQLArguments {
 }
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
-// TODO: rename ExecutablePlanResolver to FieldPlanResolver?
 /**
  * Plan resolvers are like regular resolvers except they're called beforehand,
  * they return plans rather than values, and they only run once for lists
@@ -220,8 +219,7 @@ export type BaseGraphQLInputObject = BaseGraphQLArguments;
  * We're using `TrackedObject<...>` so we can later consider caching these
  * executions.
  */
-export type ExecutablePlanResolver<
-  TContext extends BaseGraphQLContext,
+export type FieldPlanResolver<
   TArgs extends BaseGraphQLArguments,
   TParentPlan extends ExecutablePlan<any> | null,
   TResultPlan extends ExecutablePlan<any>,
@@ -410,13 +408,8 @@ export type GraphileFieldConfig<
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
-  plan?: ExecutablePlanResolver<TContext, TArgs, TParentPlan, TFieldPlan>;
-  subscribePlan?: ExecutablePlanResolver<
-    TContext,
-    TArgs,
-    TParentPlan,
-    TFieldPlan
-  >;
+  plan?: FieldPlanResolver<TArgs, TParentPlan, TFieldPlan>;
+  subscribePlan?: FieldPlanResolver<TArgs, TParentPlan, TFieldPlan>;
   args?: GraphileFieldConfigArgumentMap<
     TType,
     TContext,

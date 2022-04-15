@@ -20,7 +20,7 @@ import {
 import type {
   ArgumentPlanResolver,
   EnumPlanResolver,
-  ExecutablePlanResolver,
+  FieldPlanResolver,
   InputObjectFieldPlanResolver,
   ScalarPlanResolver,
 } from "./interfaces";
@@ -35,10 +35,10 @@ import { crystalResolve, dataplannerResolver } from "./resolvers";
  * more.
  */
 type FieldPlans =
-  | ExecutablePlanResolver<any, any, any, any>
+  | FieldPlanResolver<any, any, any>
   | {
-      plan?: ExecutablePlanResolver<any, any, any, any>;
-      subscribePlan?: ExecutablePlanResolver<any, any, any, any>;
+      plan?: FieldPlanResolver<any, any, any>;
+      subscribePlan?: FieldPlanResolver<any, any, any>;
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
