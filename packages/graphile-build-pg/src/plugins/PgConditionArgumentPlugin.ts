@@ -80,6 +80,7 @@ export const PgConditionArgumentPlugin: Plugin = {
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
                       const behavior = getBehavior(column.extensions);
+                      // TODO: should this be filterBy?
                       if (behavior && !behavior.includes("filter")) {
                         return memo;
                       }
