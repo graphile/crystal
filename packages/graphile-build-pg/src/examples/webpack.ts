@@ -15,7 +15,7 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import { exportSchema } from "graphile-exporter";
+import { exportSchema } from "graphile-export";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import * as jsonwebtoken from "jsonwebtoken";

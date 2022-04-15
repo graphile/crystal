@@ -1432,7 +1432,7 @@ __metadata:
     "@types/node": ^16.11.15
     "@types/nodemon": 1.19.1
     dataplanner: 4.7.0
-    graphile-exporter: ^0.0.1
+    graphile-export: ^0.0.1
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5
     jest-serializer-simple: 4.6.0
@@ -5802,9 +5802,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-graphile-exporter@workspace:packages/eslint-plugin-graphile-exporter":
+"eslint-plugin-graphile-export@workspace:packages/eslint-plugin-graphile-export":
   version: 0.0.0-use.local
-  resolution: "eslint-plugin-graphile-exporter@workspace:packages/eslint-plugin-graphile-exporter"
+  resolution: "eslint-plugin-graphile-export@workspace:packages/eslint-plugin-graphile-export"
   dependencies:
     "@babel/types": ^7.16.0
     "@types/eslint": ^7.29.0
@@ -6952,7 +6952,7 @@ __metadata:
     fastify: ^3.27.2
     fastify-static: ^4.5.0
     graphile-build: 5.0.0-alpha.0
-    graphile-exporter: ^0.0.1
+    graphile-export: ^0.0.1
     graphile-plugin: ^5.0.0-alpha.0
     graphql: 16.1.0-experimental-stream-defer.6
     graphql-helix: ^1.11.0
@@ -6978,7 +6978,7 @@ __metadata:
     chalk: ^4.1.2
     dataplanner: 4.7.0
     debug: ^4.3.3
-    graphile-exporter: ^0.0.1
+    graphile-export: ^0.0.1
     graphile-plugin: ^5.0.0-alpha.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5
@@ -6992,9 +6992,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-exporter@^0.0.1, graphile-exporter@workspace:packages/graphile-exporter":
+"graphile-export@^0.0.1, graphile-export@workspace:packages/graphile-export":
   version: 0.0.0-use.local
-  resolution: "graphile-exporter@workspace:packages/graphile-exporter"
+  resolution: "graphile-export@workspace:packages/graphile-export"
   dependencies:
     "@babel/generator": ^7.16.5
     "@babel/parser": ^7.16.6
@@ -10005,7 +10005,7 @@ __metadata:
     debug: ^4.3.3
     graphile-build: 5.0.0-alpha.0
     graphile-build-pg: 5.0.0-alpha.0
-    graphile-exporter: ^0.0.1
+    graphile-export: ^0.0.1
     graphile-plugin: ^5.0.0-alpha.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5

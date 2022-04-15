@@ -63,7 +63,7 @@ database. Our main focusses are performance, automatic best-practices and
 customisability/extensibility. Use this if you have a PostgreSQL database and
 you want to use it as the "source of truth" for an auto-generated GraphQL API
 (which you can still make significant changes to). **NOTE**: thanks to
-[graphile-exporter][] you can also use this as a starting point for an API that
+[graphile-export][] you can also use this as a starting point for an API that
 you then manage yourself.
 
 ## Project summaries
@@ -74,11 +74,11 @@ Here's a rough breakdown of the main packages:
   for GraphQL; see above for full description.
   - **[@dataplan/pg][]** - plan classes for interacting with PostgreSQL
   - **[@dataplan/json][]** - plan classes for encoding/decoding JSON
-- **[graphile-exporter][]** - a package that can (under the right circumstances)
+- **[graphile-export][]** - a package that can (under the right circumstances)
   export an in-memory dynamically-constructed GraphQL schema to raw JavaScript
   source code that can be imported and executed
-  - **[eslint-plugin-graphile-exporter][]** - an ESLint plugin that helps you
-    write code compatible with graphile-exporter
+  - **[eslint-plugin-graphile-export][]** - an ESLint plugin that helps you
+    write code compatible with graphile-export
 - **[jest-serializer-graphql-schema][]** - a simple Jest serializer that
   understands GraphQL schemas and thus does not fill snapshots with `\"\"\"`
   etc.
@@ -183,8 +183,8 @@ If you want to work in a Docker environment you can follow
 [dataplanner]: packages/dataplanner/
 [@dataplan/pg]: packages/dataplan-pg/
 [@dataplan/json]: packages/dataplan-json/
-[graphile-exporter]: packages/graphile-exporter/
-[eslint-plugin-graphile-exporter]: packages/eslint-plugin-graphile-exporter/
+[graphile-export]: packages/graphile-export/
+[eslint-plugin-graphile-export]: packages/eslint-plugin-graphile-export/
 [jest-serializer-graphql-schema]: packages/jest-serializer-graphql-schema/
 [graphile-plugin]: packages/graphile-plugin/
 [postgraphile]: packages/postgraphile/

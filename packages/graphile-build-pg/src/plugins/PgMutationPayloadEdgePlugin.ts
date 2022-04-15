@@ -23,7 +23,7 @@ import {
   list,
   ListPlan,
 } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type {
   GraphQLEnumType,

@@ -41,7 +41,7 @@
     "chalk": "^4.1.2",
     "dataplanner": "4.7.0",
     "debug": "^4.3.3",
-    "graphile-exporter": "^0.0.1",
+    "graphile-export": "^0.0.1",
     "graphile-plugin": "^5.0.0-alpha.0",
     "pluralize": "^7.0.0",
     "semver": "^7.3.5",

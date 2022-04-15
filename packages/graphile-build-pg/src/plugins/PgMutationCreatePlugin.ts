@@ -2,7 +2,7 @@ import type { PgInsertPlan, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
 import type { ObjectPlan } from "dataplanner";
 import { constant, ExecutablePlan, object } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 

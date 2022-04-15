@@ -8,16 +8,16 @@ import { NoNested } from "./NoNested";
 
 export const configs = {
   recommended: {
-    plugins: ["graphile-exporter"],
+    plugins: ["graphile-export"],
     rules: {
-      "graphile-exporter/exhaustive-deps": [
+      "graphile-export/exhaustive-deps": [
         "error",
         {
           disableAutofix: false,
           sortExports: true,
         },
       ],
-      "graphile-exporter/export-methods": [
+      "graphile-export/export-methods": [
         "error",
         {
           disableAutofix: false,
@@ -34,19 +34,19 @@ export const configs = {
           ],
         },
       ],
-      "graphile-exporter/export-instances": [
+      "graphile-export/export-instances": [
         "error",
         {
           disableAutofix: false,
         },
       ],
-      "graphile-exporter/export-subclasses": [
+      "graphile-export/export-subclasses": [
         "error",
         {
           disableAutofix: false,
         },
       ],
-      "graphile-exporter/no-nested": [
+      "graphile-export/no-nested": [
         "error",
         {
           disableAutofix: false,

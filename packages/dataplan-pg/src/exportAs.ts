@@ -1,5 +1,5 @@
 /**
- * Adds the `$$export` property to `thing` so that `graphile-exporter` will
+ * Adds the `$$export` property to `thing` so that `graphile-export` will
  * know that this thing can be imported from `@dataplan/pg` rather than having
  * to try and write it out.
  */

@@ -33,7 +33,7 @@ import {
   ObjectPlan,
 } from "dataplanner";
 import type { TrackedArguments } from "dataplanner/src/interfaces";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 

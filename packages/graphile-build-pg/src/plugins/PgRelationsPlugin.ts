@@ -9,7 +9,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";

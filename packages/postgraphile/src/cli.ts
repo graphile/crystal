@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { $$setPlanGraph } from "dataplanner";
-import { exportSchema } from "graphile-exporter";
+import { exportSchema } from "graphile-export";
 import type { Preset } from "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { IncomingMessage, RequestListener } from "http";

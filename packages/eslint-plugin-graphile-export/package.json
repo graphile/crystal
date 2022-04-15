@@ -1,7 +1,7 @@
 {
-  "name": "eslint-plugin-graphile-exporter",
+  "name": "eslint-plugin-graphile-export",
   "version": "0.0.1",
-  "description": "ESLint plugin to help ensure your schema is exportable by graphile-exporter",
+  "description": "ESLint plugin to help ensure your schema is exportable by graphile-export",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

@@ -17,7 +17,7 @@ import {
   PgSource,
 } from "@dataplan/pg";
 import type { InputPlan } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
 import sql from "pg-sql2";

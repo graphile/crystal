@@ -207,7 +207,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       );
       if (!scope) {
         throw new Error(
-          "eslint-plugin-graphile-exporter: could not determine scope",
+          "eslint-plugin-graphile-export: could not determine scope",
         );
       }
       const monitoredScopes = new Set<Scope.Scope>();

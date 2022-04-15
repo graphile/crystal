@@ -14,7 +14,7 @@
     { "path": "../graphile-build" },
     { "path": "../graphile-build-pg" },
     { "path": "../dataplanner" },
-    { "path": "../graphile-exporter" },
+    { "path": "../graphile-export" },
     { "path": "../graphile-plugin" }
   ]
 }

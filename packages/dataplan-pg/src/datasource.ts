@@ -1,4 +1,4 @@
-/* eslint-disable graphile-exporter/export-instances */
+/* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
 import type {
   CrystalResultStreamList,
@@ -13,7 +13,7 @@ import {
   getCurrentParentPathIdentity,
   partitionByIndex,
 } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 

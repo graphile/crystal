@@ -1,12 +1,28 @@
-# eslint-plugin-graphile-exporter
+# graphile-export
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-`eslint-plugin-schema-exporter` is an ESLint plugin to help ensure you've listed
-all your scopes for functions.
+`graphile-export` can export an in-memory GraphQL schema constructed with
+various types of tooling to an on disk executable schema using (eventually) a
+variety of formats. This is particularly useful if you want to remove the "build
+time" dependencies of building your schema and have a highly optimised runtime
+that does not require those dependencies. It's also useful for converting from
+one schema builder to another - `graphile-export` is indifferent what tool was
+used to build the schema (so long as it's a valid GraphQL.js schema), but can
+export the schema to various tools.
+
+## Caveats
+
+Currently only one exporter (graphql.js) is implemented, but more will be
+coming.
+
+Though all GraphQL.js schemas can be exported, in many cases the resolvers will
+not be fully functional due to missing dependencies.
+
+TODO: explain why, and how to fix.
 
 <!-- SPONSORS_BEGIN -->
 
@@ -37,30 +53,4 @@ And please give some love to our featured sponsors 🤩:
 
 ## Documentation
 
-Add to your eslintrc:
-
-```json5
-{
-  //...
-  plugins: [
-    //...
-    "graphile-exporter",
-    //...
-  ],
-  extends: [
-    // ...
-    "plugin:graphile-exporter/recommended",
-  ],
-  // ...
-}
-```
-
-NOTE: this plugin will automatically add `EXPORTABLE` callbacks in places where
-it things it's suitable, but it currently does not add the EXPORTABLE import to
-the file. You'll need to add that yourself:
-
-```ts
-import { EXPORTABLE } from "graphile-exporter";
-```
-
-TODO: more docs!
+TODO!

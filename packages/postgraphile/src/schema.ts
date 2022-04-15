@@ -96,7 +96,7 @@ export async function makeSchema(
 }
 
 /*
-import { exportSchema } from "graphile-exporter";
+import { exportSchema } from "graphile-export";
 
   const exportFileLocation = `${__dirname}/../../temp.mjs`;
   await exportSchema(schema, exportFileLocation, {

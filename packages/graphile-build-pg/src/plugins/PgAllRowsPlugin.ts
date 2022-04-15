@@ -3,7 +3,7 @@ import "./PgTablesPlugin";
 
 import type { PgSelectSinglePlan, PgSource } from "@dataplan/pg";
 import { connection } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 

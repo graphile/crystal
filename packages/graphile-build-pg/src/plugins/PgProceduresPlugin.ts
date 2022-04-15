@@ -9,7 +9,7 @@ import type {
   PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";

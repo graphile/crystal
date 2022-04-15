@@ -5,7 +5,7 @@ import type {
   TrackedArguments,
 } from "dataplanner";
 import { lambda } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 

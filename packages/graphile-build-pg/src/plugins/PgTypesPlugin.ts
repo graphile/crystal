@@ -3,7 +3,7 @@ import "./PgBasicsPlugin";
 import "../interfaces";
 
 import type { PgHStore } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 

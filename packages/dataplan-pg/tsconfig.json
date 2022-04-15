@@ -10,7 +10,7 @@
   "references": [
     { "path": "../dataplan-json" },
     { "path": "../dataplanner" },
-    { "path": "../graphile-exporter" },
+    { "path": "../graphile-export" },
     { "path": "../pg-sql2" },
     { "path": "../jest-serializer-simple" }
   ]

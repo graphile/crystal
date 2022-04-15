@@ -15,7 +15,7 @@ import type {
   TrackedArguments,
 } from "dataplanner";
 import { constant, lambda, object, ObjectPlan } from "dataplanner";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type {
   GraphQLFieldConfigMap,
@@ -703,7 +703,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                         plan:
                           mode === "update"
                             ? specFromArgsString
-                              ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                              ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
                                   new Function(
                                     "object",
@@ -729,7 +729,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                                   [object, pgUpdate, source, specFromArgs],
                                 ) as any)
                             : specFromArgsString
-                            ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                            ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
                                 new Function(
                                   "object",

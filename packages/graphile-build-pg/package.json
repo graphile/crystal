@@ -42,7 +42,7 @@
     "dataplanner": "4.7.0",
     "debug": "^4.3.3",
     "graphile-build": "5.0.0-alpha.0",
-    "graphile-exporter": "^0.0.1",
+    "graphile-export": "^0.0.1",
     "graphile-plugin": "^5.0.0-alpha.0",
     "jsonwebtoken": "^8.5.1",
     "pg-introspection": "^0.0.0",

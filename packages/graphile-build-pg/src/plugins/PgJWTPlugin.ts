@@ -1,7 +1,7 @@
 import type { PgSource, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "dataplanner";
 import { object } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { GatherHooks, Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 import { sign as signJwt } from "jsonwebtoken";

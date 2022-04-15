@@ -6,7 +6,7 @@
  */
 
 import { buildInflection, buildSchema, gather } from "graphile-build";
-import { exportSchema } from "graphile-exporter";
+import { exportSchema } from "graphile-export";
 import { resolvePresets } from "graphile-plugin";
 import * as jsonwebtoken from "jsonwebtoken";
 

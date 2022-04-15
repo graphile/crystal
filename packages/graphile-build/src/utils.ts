@@ -1,5 +1,5 @@
 import { $$idempotent } from "dataplanner";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";
 import camelCaseAll from "lodash/camelCase.js";

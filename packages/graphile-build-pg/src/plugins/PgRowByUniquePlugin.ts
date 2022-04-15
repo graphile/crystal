@@ -1,6 +1,6 @@
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "dataplanner";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
@@ -110,7 +110,7 @@ export const PgRowByUniquePlugin: Plugin = {
                      * more performant, but it also makes the code nicer to
                      * read in the exported code.
                      */
-                    // eslint-disable-next-line graphile-exporter/exhaustive-deps
+                    // eslint-disable-next-line graphile-export/exhaustive-deps
                     EXPORTABLE(
                       new Function(
                         "source",

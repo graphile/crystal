@@ -9,7 +9,7 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ListPlan } from "dataplanner";
 import { access, constant, list } from "dataplanner";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";
 import type { PgClass, PgNamespace } from "pg-introspection";
@@ -70,7 +70,7 @@ export const PgTableNodePlugin: Plugin = {
           build.registerNodeIdHandler(tableTypeName, {
             codecName: "base64JSON",
             plan: clean
-              ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+              ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
                   new Function(
                     "list",
@@ -97,7 +97,7 @@ export const PgTableNodePlugin: Plugin = {
                   [constant, list, pk, tableTypeName],
                 ),
             get: clean
-              ? // eslint-disable-next-line graphile-exporter/exhaustive-deps
+              ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
                   new Function(
                     "pgSource",

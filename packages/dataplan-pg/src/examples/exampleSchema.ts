@@ -47,7 +47,7 @@ import {
   subscribe,
 } from "dataplanner";
 import { writeFileSync } from "fs";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,

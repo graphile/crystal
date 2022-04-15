@@ -1031,7 +1031,7 @@ function convertToIdentifierViaAST(
       );
   if (ast.type === "Identifier") {
     console.warn(
-      `graphile-exporter error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
+      `graphile-export error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
     );
   }
   file.addStatements(
@@ -1729,7 +1729,7 @@ export async function exportSchema(
   options: ExportOptions = {},
 ): Promise<void> {
   const { code } = await exportSchemaAsString(schema, options);
-  const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-methods, graphile-exporter/exhaustive-deps */\n`;
+  const HEADER = `/* eslint-disable graphile-export/export-instances, graphile-export/export-methods, graphile-export/exhaustive-deps */\n`;
   const toFormat = HEADER + code;
   if (options.prettier) {
     const prettier = await import("prettier");
