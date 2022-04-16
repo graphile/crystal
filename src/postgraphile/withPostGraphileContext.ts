@@ -1,12 +1,12 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
+import {Pool, PoolClient, QueryConfig, QueryResult} from 'pg';
 import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
-import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
-import { pluginHookFromOptions } from './pluginHook';
-import { ExplainOptions, mixed, WithPostGraphileContextOptions } from '../interfaces';
-import { formatSQLForDebugging } from 'postgraphile-core';
+import {$$pgClient} from '../postgres/inventory/pgClientFromContext';
+import {pluginHookFromOptions} from './pluginHook';
+import {ExplainOptions, mixed, WithPostGraphileContextOptions} from '../interfaces';
+import {formatSQLForDebugging} from 'postgraphile-core';
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
@@ -535,6 +535,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
           }
 
+          let explainPromise = Promise.resolve();
           if (pgClient._explainResults) {
             const query = a && a.text ? a.text : a;
             const values = a && a.text ? a.values : b;
@@ -549,18 +550,34 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
               }
               // Explain it
               const explain = `${explainCommand} ${query}`;
+              explainPromise = pgClient[$$pgClientOrigQuery]
+                // Create a savepoint before running the EXPLAIN, so we can roll back to it to avoid running mutations
+                // twice when ANALYZE is enabled.
+                .call(this, 'savepoint postgraphile_explain')
+                .then(
+                  // Savepoint created - we are in a transaction, which means this is a mutation. We need to roll back
+                  // to the savepoint after running the EXPLAIN.
+                  () => pgClient[$$pgClientOrigQuery].call(this, explain, values)
+                    .then((data: any) => pgClient[$$pgClientOrigQuery]
+                      .call(this, 'rollback to savepoint postgraphile_explain')
+                      .then(() => data)),
+                  // Failed to create savepoint - we are not in a transaction, which means this is a query. No need to
+                  // rollback the EXPLAIN.
+                  () => pgClient[$$pgClientOrigQuery].call(this, explain, values)
+                )
+                .then((data: any) => data.rows)
+                // swallow errors during explain
+                .catch(() => null);
               pgClient._explainResults.push({
                 query,
-                result: pgClient[$$pgClientOrigQuery]
-                  .call(this, explain, values)
-                  .then((data: any) => data.rows)
-                  // swallow errors during explain
-                  .catch(() => null),
+                result: explainPromise,
               });
             }
           }
 
-          const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
+          // Chain the original query's call to the EXPLAIN query's promise to ensure it's executed after the EXPLAIN
+          // query is rolled back.
+          const promiseResult = explainPromise.then(() => pgClient[$$pgClientOrigQuery].apply(this, args));
 
           if (debugPgError.enabled) {
             // Report the error with our Postgres debugger.
