@@ -550,28 +550,25 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
               }
               // Explain it
               const explain = `${explainCommand} ${query}`;
-              explainPromise = pgClient[$$pgClientOrigQuery]
-                // Create a savepoint before running the EXPLAIN, so we can roll back to it to avoid running mutations
-                // twice when ANALYZE is enabled.
+
+              // IMPORTANT: the following 3 queries MUST BE ISSUED SYNCHRONOUSLY to ensure other concurrent queries
+              // aren't interleaved.
+
+              // Create a savepoint before running the EXPLAIN, so we can roll back to it to avoid running mutations
+              // twice when ANALYZE is enabled.
+              // This query will fail if there isn't an active transaction. That's fine because that means this is a
+              // query, so we don't need to roll it back anyway.
+              pgClient[$$pgClientOrigQuery]
                 .call(this, 'savepoint postgraphile_explain')
-                .then(
-                  // Savepoint created - we are in a transaction, which means this is a mutation. We need to roll back
-                  // to the savepoint after running the EXPLAIN.
-                  () =>
-                    pgClient[$$pgClientOrigQuery]
-                      .call(this, explain, values)
-                      .then((data: any) =>
-                        pgClient[$$pgClientOrigQuery]
-                          .call(this, 'rollback to savepoint postgraphile_explain')
-                          .then(() => data),
-                      ),
-                  // Failed to create savepoint - we are not in a transaction, which means this is a query. No need to
-                  // rollback the EXPLAIN.
-                  () => pgClient[$$pgClientOrigQuery].call(this, explain, values),
-                )
+                .catch(() => {});
+              explainPromise = pgClient[$$pgClientOrigQuery]
+                .call(this, explain, values)
                 .then((data: any) => data.rows)
                 // swallow errors during explain
                 .catch(() => null);
+              pgClient[$$pgClientOrigQuery]
+                .call(this, 'rollback to savepoint postgraphile_explain')
+                .catch(() => {});
               pgClient._explainResults.push({
                 query,
                 result: explainPromise,
