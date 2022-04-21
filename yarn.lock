@@ -7335,6 +7335,7 @@ __metadata:
     "@types/react-dom": ^18
     graphile-plugin: ^5.0.0-alpha.0
     graphiql: ^1.8.7
+    graphiql-explorer: ^0.9.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5
     react: ^18.0.0
@@ -7369,6 +7370,17 @@ __metadata:
     typescript: next
   languageName: unknown
   linkType: soft
+
+"graphiql-explorer@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "graphiql-explorer@npm:0.9.0"
+  peerDependencies:
+    graphql: ^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
+    react: ^15.6.0 || ^16.0.0
+    react-dom: ^15.6.0 || ^16.0.0
+  checksum: e36832645fb781993c3154db50dd50189c83964e219507d24628057b97bf3b75c03d119ba6af976e3a78b6a539cbaae29640a9b400f9aade9b380942e0c58669
+  languageName: node
+  linkType: hard
 
 "graphiql@npm:^1.8.7":
   version: 1.8.7
@@ -10473,6 +10485,7 @@ __metadata:
     graphile-build: 5.0.0-alpha.0
     graphile-build-pg: 5.0.0-alpha.0
     graphile-export: ^0.0.1
+    graphile-inspect: "workspace:packages/graphile-inspect"
     graphile-plugin: ^5.0.0-alpha.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5

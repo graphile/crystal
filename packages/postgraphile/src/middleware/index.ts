@@ -7,6 +7,7 @@ import type { SchemaResult } from "../interfaces.js";
 import { makeGraphQLHandler } from "./graphql.js";
 import type { HandlerResult } from "./interfaces.js";
 import { makePlanHandler } from "./plan.js";
+import { makeGraphiQLHandler } from "./graphiql.js";
 
 function getBodyFromRequest(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -26,11 +27,13 @@ export function postgraphile(schemaResult: SchemaResult) {
   const { contextCallback } = schemaResult;
   const graphqlHandler = makeGraphQLHandler(schemaResult);
   const planHandler = makePlanHandler(schemaResult);
+  const graphiqlHandler = makeGraphiQLHandler(schemaResult);
   const {
     graphqlPath = "/graphql",
 
-    graphiql = false,
-    graphiqlPath = "/graphiql",
+    graphiql = true,
+    graphiqlOnGraphQLGET = true,
+    graphiqlPath = "/",
 
     exposePlan = false,
     planPath = "/plan",
@@ -62,14 +65,16 @@ export function postgraphile(schemaResult: SchemaResult) {
         const { payload, statusCode = 200 } = handlerResult;
         res.writeHead(statusCode, {
           "Content-Type":
-            handlerResult.type === "html" ? "text/html" : "text/plain",
+            handlerResult.type === "html"
+              ? "text/html; charset=utf-8"
+              : "text/plain; charset=utf-8",
         });
         res.end(payload);
         break;
       }
       default: {
         const never: never = handlerResult;
-        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
         res.end("Unexpected input to sendResult");
       }
     }
@@ -121,7 +126,17 @@ export function postgraphile(schemaResult: SchemaResult) {
       return;
     }
 
-    if (graphiql && req.url === graphiqlPath && req.method === "GET") {
+    if (
+      graphiql &&
+      (req.url === graphiqlPath ||
+        (graphiqlOnGraphQLGET && req.url === graphqlPath)) &&
+      req.method === "GET"
+    ) {
+      (async () => {
+        const result = await graphiqlHandler();
+        sendResult(res, result);
+      })().catch(handleError);
+      return;
       sendResult(res, {
         type: "text",
         payload: "We don't have GraphiQL support yet...",

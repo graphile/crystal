@@ -22,6 +22,8 @@ export interface ServerOptions {
   graphqlPath?: string;
 
   graphiql?: boolean;
+  /** If true, then we will render GraphiQL on GET requests to the /graphql endpoint */
+  graphiqlOnGraphQLGET?: boolean;
   /** The path at which GraphiQL will be available; usually / */
   graphiqlPath?: string;
 
