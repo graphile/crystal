@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "target": "es2018",
+    "lib": ["dom"],
+
+    "noUncheckedIndexedAccess": false,
+    "moduleResolution": "Nodenext",
+    "module": "nodenext"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../lru" },
+    { "path": "../dataplanner" },
+    { "path": "../graphile-export" },
+    { "path": "../graphile-plugin" }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "name": "graphile-inspect",
+  "version": "0.0.0",
+  "description": "Graphile-flavoured GraphiQL distribution",
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "test": "jest -i",
+    "bundle": "webpack",
+    "prepack": "tsc -b && yarn bundle"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/postgraphile.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "graphiql"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/postgraphile/issues"
+  },
+  "homepage": "https://graphile.org/inspect/",
+  "dependencies": {
+    "@types/node": "^16.11.15",
+    "graphile-plugin": "^5.0.0-alpha.0",
+    "graphiql": "^1.8.7",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tslib": "^2.3.1"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "peerDependencies": {
+    "graphql": "*"
+  },
+  "files": [
+    "dist",
+    "bundle",
+    "index.js"
+  ],
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/jest": "^27.0.3",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "graphql": "16.1.0-experimental-stream-defer.6",
+    "jest": "^27.4.5",
+    "ts-loader": "^9.2.8",
+    "ts-node": "^10.4.0",
+    "typescript": "next",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  }
+}
