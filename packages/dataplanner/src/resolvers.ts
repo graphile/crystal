@@ -205,7 +205,8 @@ function dataplannerResolverOrSubscriber<
       context,
       info,
     ) {
-      // New executor verbatim data
+      // If $$verbatim is specified then we can just return the relevant entry
+      // directly.
       if (source?.[$$verbatim]) {
         const fieldAlias = info.path.key;
         if (fieldAlias in source) {
@@ -221,11 +222,18 @@ function dataplannerResolverOrSubscriber<
       // `rootValue`s for multiple parallel executions (must be within the same
       // aether) - e.g. as a result of multiple identical subscription
       // operations.
-      if (source?.[$$data]) {
+
+      /**
+       * Sometimes we're able to precompute _some_ data for the parent, if so
+       * we store it in $$data. Note: in some cases we still need to pass this
+       * data through the original resolver.
+       */
+      const precomputedData = source?.[$$data];
+      if (precomputedData != null) {
         const fieldAlias = info.path.key;
-        if (fieldAlias in source[$$data]) {
+        if (fieldAlias in precomputedData) {
           // Short-circuit execution - we already have results
-          const result = source[$$data][fieldAlias];
+          const result = precomputedData[fieldAlias];
           if (userSpecifiedResolver !== undefined) {
             return userSpecifiedResolver(result, argumentValues, context, info);
             // NOTE: this cannot occur if the field is unplanned, so no need to handle that
@@ -234,6 +242,10 @@ function dataplannerResolverOrSubscriber<
           }
         }
       }
+
+      // At this point, we know the data has not been predetermined, so we need
+      // to calculate it via a batch.
+
       if (isCrystalObject(source)) {
         possiblyParentCrystalObject = source;
       }
