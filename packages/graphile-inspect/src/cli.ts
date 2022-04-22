@@ -5,16 +5,25 @@ import { hideBin } from "yargs/helpers";
 import url from "url";
 
 function options(yargs: Argv) {
-  return yargs.option("port", {
-    alias: "p",
-    type: "number",
-    description: "port number to run the server on",
-    default: 1337,
-  });
+  return yargs
+    .option("port", {
+      alias: "p",
+      type: "number",
+      description: "port number to run the server on",
+      default: 1337,
+    })
+    .option("endpoint", {
+      alias: "e",
+      type: "string",
+      description: "the endpoint to connect to",
+      default: "http://localhost:5000/graphql",
+    });
 }
 
-function run(argv: any) {
-  const { port = 1337 } = argv;
+type InspectArgv = ReturnType<typeof options> extends Argv<infer U> ? U : never;
+
+function run(argv: InspectArgv) {
+  const { port, endpoint } = argv;
   const server = createServer((req, res) => {
     if (req.url !== "/") {
       res.writeHead(308, undefined, { Location: "/" });
@@ -24,11 +33,17 @@ function run(argv: any) {
     res.writeHead(200, undefined, {
       "Content-Type": "text/html; charset=utf-8",
     });
-    res.end(graphileInspectHTML({}));
+    res.end(
+      graphileInspectHTML({
+        endpoint,
+      }),
+    );
   });
 
   server.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+    console.log(
+      `Serving Graphile Inspect at http://localhost:${port} for GraphQL API at '${argv.endpoint}'`,
+    );
   });
 }
 

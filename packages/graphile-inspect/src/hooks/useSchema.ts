@@ -65,7 +65,13 @@ export const useSchema = (
       .catch((error) => {
         console.error("Error occurred when updating the schema:");
         console.error(error);
-        setError(error);
+        setError(
+          new Error(
+            `Introspecting the GraphQL schema failed; please check the endpoint and try again.\n${String(
+              error,
+            )}`,
+          ),
+        );
       })
       .finally(() => {
         refetchStatusRef.current.inProgress = false;

@@ -58,7 +58,7 @@ export interface GraphileInspectServerConfig {
   /**
    * The URL to the GraphQL endpoint.
    */
-  url?: string;
+  endpoint?: string;
   editorTheme?: GraphiQLProps["editorTheme"];
 }
 

@@ -4,13 +4,13 @@ export interface GraphileInspectProps {
   /**
    * The URL to the GraphQL endpoint.
    */
-  url?: string;
+  endpoint?: string;
 
   /**
    * If set, we'll try and monitor this URL via `EventSource` for schema
    * changes.
    */
-  streamUrl?: string;
+  streamEndpoint?: string;
 
   /**
    * The fetcher function to issue GraphQL requests.

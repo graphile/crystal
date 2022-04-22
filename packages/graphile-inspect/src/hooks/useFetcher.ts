@@ -4,7 +4,7 @@ import { createGraphiQLFetcher } from "@graphiql/toolkit";
 
 export const useFetcher = (props: GraphileInspectProps) => {
   const url =
-    props.url ??
+    props.endpoint ??
     (typeof window !== "undefined" ? window.location.origin : "") + "/graphql";
   const fetcher = useMemo(
     () =>
