@@ -56,10 +56,12 @@
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.3",
+    "@types/nodemon": "1.19.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^27.4.5",
+    "nodemon": "^2.0.15",
     "ts-loader": "^9.2.8",
     "ts-node": "^10.4.0",
     "typescript": "next",
