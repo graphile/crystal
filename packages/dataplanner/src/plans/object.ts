@@ -57,7 +57,9 @@ export class ObjectPlan<
     if (idx < 0) {
       if (!allowMissing) {
         throw new Error(
-          `${this}: failed to retrieve plan for key '${key}' - we have no such key`,
+          `${this}: failed to retrieve plan for key '${String(
+            key,
+          )}' - we have no such key`,
         );
       }
       return null as any;
@@ -157,9 +159,9 @@ export class ObjectPlan<
     const index = this.keys.indexOf(key);
     if (index < 0) {
       throw new Error(
-        `This ObjectPlan doesn't have key '${key}'; supported keys: '${this.keys.join(
-          "', '",
-        )}'`,
+        `This ObjectPlan doesn't have key '${String(
+          key,
+        )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
     return this.getPlan(this.dependencies[index]) as TPlans[TKey];

@@ -245,20 +245,33 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
 function makeIdentifierNode(
   names: Array<string | SymbolAndName>,
 ): SQLIdentifierNode {
-  return Object.freeze({ type: "IDENTIFIER", names, [$$trusted]: true });
+  return Object.freeze({
+    type: "IDENTIFIER",
+    names,
+    [$$trusted]: true as true,
+  });
 }
 
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
-  return Object.freeze({ type: "VALUE", value: rawValue, [$$trusted]: true });
+  return Object.freeze({
+    type: "VALUE",
+    value: rawValue,
+    [$$trusted]: true as true,
+  });
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
-  return Object.freeze({ type: "INDENT", content, [$$trusted]: true });
+  return Object.freeze({ type: "INDENT", content, [$$trusted]: true as true });
 }
 
 function makeParensNode(content: SQL, force = false): SQLParensNode {
-  return Object.freeze({ type: "PARENS", content, force, [$$trusted]: true });
+  return Object.freeze({
+    type: "PARENS",
+    content,
+    force,
+    [$$trusted]: true as true,
+  });
 }
 
 function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
@@ -266,7 +279,7 @@ function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
     type: "SYMBOL_ALIAS",
     a: getSymbolAndName(a),
     b: getSymbolAndName(b),
-    [$$trusted]: true,
+    [$$trusted]: true as true,
   });
 }
 
@@ -278,7 +291,7 @@ function makePlaceholderNode(
     type: "PLACEHOLDER",
     symbol,
     fallback,
-    [$$trusted]: true,
+    [$$trusted]: true as true,
   });
 }
 

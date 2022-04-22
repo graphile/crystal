@@ -152,7 +152,9 @@ export class PgUpdatePlan<
       if (isDev) {
         if (this.getBys.some((col) => col.name === name)) {
           throw new Error(
-            `Column '${name}' was specified more than once in ${this}'s getBy spec`,
+            `Column '${String(
+              name,
+            )}' was specified more than once in ${this}'s getBy spec`,
           );
         }
       }
@@ -182,7 +184,7 @@ export class PgUpdatePlan<
     if (isDev) {
       if (this.columns.some((col) => col.name === name)) {
         throw new Error(
-          `Column '${name}' was specified more than once in ${this}`,
+          `Column '${String(name)}' was specified more than once in ${this}`,
         );
       }
     }
@@ -217,7 +219,7 @@ export class PgUpdatePlan<
       this.source.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
-        `${this.source} does not define an attribute named '${attr}'`,
+        `${this.source} does not define an attribute named '${String(attr)}'`,
       );
     }
 

@@ -6,7 +6,7 @@
 // TODO: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
 import LRU from "@graphile/lru";
-import type { Pool, QueryArrayConfig, QueryConfig } from "pg";
+import type { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../executor";
 
@@ -123,7 +123,10 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
               }
             }
 
-            const result = await pgClient.query<TData>(queryObj);
+            // TODO: fix the never
+            const result = await pgClient.query<
+              TData extends QueryResultRow ? TData : never
+            >(queryObj);
 
             if (needsTx) {
               await this.commitTransaction();

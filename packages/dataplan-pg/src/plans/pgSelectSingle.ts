@@ -179,7 +179,7 @@ export class PgSelectSinglePlan<
       this.source.codec.columns?.[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
-        `${this.source} does not define an attribute named '${attr}'`,
+        `${this.source} does not define an attribute named '${String(attr)}'`,
       );
     }
 
@@ -363,7 +363,9 @@ export class PgSelectSinglePlan<
     const relation = this.source.getRelation(relationIdentifier);
     if (!relation || !relation.isUnique) {
       throw new Error(
-        `${relationIdentifier} is not a unique relation on ${this.source}`,
+        `${String(relationIdentifier)} is not a unique relation on ${
+          this.source
+        }`,
       );
     }
     const rawRelationSource = relation.source;
@@ -401,7 +403,7 @@ export class PgSelectSinglePlan<
     const relation = this.source.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
-        `${relationIdentifier} is not a relation on ${this.source}`,
+        `${String(relationIdentifier)} is not a relation on ${this.source}`,
       );
     }
     const rawRelationSource = relation.source;

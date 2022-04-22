@@ -842,12 +842,16 @@ export class PgSelectPlan<
     const relation = this.source.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
-        `${this.source} does not have a relation named '${relationIdentifier}'`,
+        `${this.source} does not have a relation named '${String(
+          relationIdentifier,
+        )}'`,
       );
     }
     if (!relation.isUnique) {
       throw new Error(
-        `${this.source} relation '${relationIdentifier}' is not unique so cannot be used with singleRelation`,
+        `${this.source} relation '${String(
+          relationIdentifier,
+        )}' is not unique so cannot be used with singleRelation`,
       );
     }
     const { source: rawRelationSource, localColumns, remoteColumns } = relation;

@@ -82,7 +82,7 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
           `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
         );
       }
-      const inflector = replacementFunction.bind(
+      const inflector = (replacementFunction as any).bind(
         inflectors as GraphileEngine.Inflection,
         previous,
         preset,

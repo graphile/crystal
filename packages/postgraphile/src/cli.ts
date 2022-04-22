@@ -5,6 +5,8 @@ import type { Preset } from "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { IncomingMessage, RequestListener } from "http";
 import { createServer } from "http";
+// TODO: bug in TypeScript claiming allowSyntheticDefaultImports is required but then ignoring that setting.
+// @ts-ignore
 import parseArgs from "minimist";
 import { resolve } from "path";
 
@@ -28,7 +30,7 @@ async function main() {
       plan: ["P"],
     },
     stopEarly: true,
-    unknown: (arg) => {
+    unknown: (arg: string) => {
       throw new Error(`Argument '${arg}' not understood`);
     },
   });

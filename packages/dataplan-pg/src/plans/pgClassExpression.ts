@@ -162,25 +162,33 @@ export class PgClassExpressionPlan<
     const columns = this.pgCodec.columns;
     if (!columns) {
       throw new Error(
-        `Cannot call ${this}.get('${attributeName}') because this does not represent a composite type (check your pgCodec).`,
+        `Cannot call ${this}.get('${String(
+          attributeName,
+        )}') because this does not represent a composite type (check your pgCodec).`,
       );
     }
     const column = columns[attributeName as string];
     if (!column) {
       throw new Error(
-        `Cannot call ${this}.get('${attributeName}') because this does not have that column; supported columns: '${Object.keys(
+        `Cannot call ${this}.get('${String(
+          attributeName,
+        )}') because this does not have that column; supported columns: '${Object.keys(
           columns,
         ).join("', '")}'.`,
       );
     }
     if (column.via) {
       throw new Error(
-        `Cannot call ${this}.get('${attributeName}') because 'via' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
+        `Cannot call ${this}.get('${String(
+          attributeName,
+        )}') because 'via' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
     if (column.expression) {
       throw new Error(
-        `Cannot call ${this}.get('${attributeName}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
+        `Cannot call ${this}.get('${String(
+          attributeName,
+        )}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
     const sqlExpr = pgClassExpression(this.getParentPlan(), column.codec);

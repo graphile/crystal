@@ -112,7 +112,7 @@ export function wellKnown(
   return undefined;
 }
 
-function isSameNamespace<TNamespace>(
+function isSameNamespace<TNamespace extends object>(
   thing: unknown,
   namespace: TNamespace,
 ): thing is TNamespace {

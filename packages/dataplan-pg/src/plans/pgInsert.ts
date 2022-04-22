@@ -142,13 +142,15 @@ export class PgInsertPlan<
     if (isDev) {
       if (this.columns.some((col) => col.name === name)) {
         throw new Error(
-          `Column '${name}' was specified more than once in ${this}`,
+          `Column '${String(name)}' was specified more than once in ${this}`,
         );
       }
     }
     const column = (this.source.codec.columns as NonNullable<TColumns>)?.[name];
     if (!column) {
-      throw new Error(`Column ${name} not found in ${this.source.codec}`);
+      throw new Error(
+        `Column ${String(name)} not found in ${this.source.codec}`,
+      );
     }
     const { codec: pgCodec } = column;
     const depId = this.addDependency(value);
@@ -186,7 +188,7 @@ export class PgInsertPlan<
       this.source.codec.columns[attr as string];
     if (!dataSourceColumn) {
       throw new Error(
-        `${this.source} does not define an attribute named '${attr}'`,
+        `${this.source} does not define an attribute named '${String(attr)}'`,
       );
     }
 

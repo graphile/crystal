@@ -806,7 +806,9 @@ export class PgSource<
       const column = columns[key];
       if ("via" in column && column.via) {
         throw new Error(
-          `Attribute '${key}' is defined with a 'via' and thus cannot be used as an identifier for '.find()' or '.get()' calls (requested keys: '${keys.join(
+          `Attribute '${String(
+            key,
+          )}' is defined with a 'via' and thus cannot be used as an identifier for '.find()' or '.get()' calls (requested keys: '${keys.join(
             "', '",
           )}').`,
         );
@@ -817,7 +819,7 @@ export class PgSource<
         throw new Error(
           `Attempted to call ${this}.find({${keys.join(
             ", ",
-          )}}) but failed to provide a plan for '${key}'`,
+          )}}) but failed to provide a plan for '${String(key)}'`,
         );
       }
       return {
