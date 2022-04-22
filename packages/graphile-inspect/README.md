@@ -5,6 +5,10 @@ Graphile-flavoured GraphiQL.
 ## Usage - bundle
 
 ```html
+<!-- optionally import Prettier for query formatting -->
+<script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
+<script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>
+<!-- Required below here -->
 <div id="graphile-inspect-root"></div>
 <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
 <script

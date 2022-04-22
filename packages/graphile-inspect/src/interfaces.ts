@@ -1,3 +1,5 @@
+import { GraphiQLProps } from "graphiql";
+
 export interface GraphileInspectProps {
   /**
    * The URL to the GraphQL endpoint.

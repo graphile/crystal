@@ -12,7 +12,7 @@
   "scripts": {
     "test": "jest -i",
     "bundle": "webpack",
-    "prepack": "tsc -b && yarn bundle"
+    "prepack": "tsc -b && yarn bundle --mode=production"
   },
   "repository": {
     "type": "git",

@@ -34,6 +34,8 @@ const graphiQLHeader = `\
 <head>
 <meta charset="utf-8" />
 <title>Graphile Inspect</title>
+<script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
+<script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>
 </head>
 <body style="margin: 0;">
 <div style="height: 100vh;" id="graphile-inspect-root"></div>
