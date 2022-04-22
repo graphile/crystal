@@ -1,4 +1,4 @@
-import GraphiQL from "graphiql";
+import { GraphiQL } from "graphiql";
 import { useCallback } from "react";
 
 declare global {

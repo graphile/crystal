@@ -1,19 +1,19 @@
 import React, { FC, useCallback, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
-import GraphiQL, { GraphiQLProps } from "graphiql";
+import { GraphiQL, GraphiQLProps } from "graphiql";
 // @ts-ignore
 import GraphiQLExplorer from "graphiql-explorer";
-import { useStorage } from "./hooks/useStorage";
-import { useFetcher } from "./hooks/useFetcher";
-import { useSchema } from "./hooks/useSchema";
-import { GraphileInspectProps } from "./interfaces";
-import { defaultQuery } from "./defaultQuery";
-import { GraphileInspectFooter } from "./components/Footer";
-import { ErrorPopup } from "./components/ErrorPopup";
-import { useExplorer } from "./hooks/useExplorer";
-import { usePrettify } from "./hooks/usePrettify";
-import { useQuery } from "./hooks/useQuery";
+import { useStorage } from "./hooks/useStorage.js";
+import { useFetcher } from "./hooks/useFetcher.js";
+import { useSchema } from "./hooks/useSchema.js";
+import { GraphileInspectProps } from "./interfaces.js";
+import { defaultQuery } from "./defaultQuery.js";
+import { GraphileInspectFooter } from "./components/Footer.js";
+import { ErrorPopup } from "./components/ErrorPopup.js";
+import { useExplorer } from "./hooks/useExplorer.js";
+import { usePrettify } from "./hooks/usePrettify.js";
+import { useQuery } from "./hooks/useQuery.js";
 
 const GraphiQLAny = GraphiQL as any;
 

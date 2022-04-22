@@ -1,2 +1,2 @@
-export { GraphileInspectProps } from "./interfaces";
-export { GraphileInspect } from "./graphile-inspect";
+export { GraphileInspectProps } from "./interfaces.js";
+export { GraphileInspect } from "./graphile-inspect.js";

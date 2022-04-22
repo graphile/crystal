@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { GraphiQLProps } from "graphiql";
 import * as path from "path";
+import { fileURLToPath } from "node:url";
 
 function escapeHTMLEntities(str: string): string {
   return str.replace(
@@ -12,7 +13,10 @@ function escapeHTMLEntities(str: string): string {
 
 // TODO: make this 'readFileSync' call webpackable
 const graphiQLContent = readFileSync(
-  path.resolve(__dirname, "../bundle/graphile-inspect.min.js"),
+  path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "../bundle/graphile-inspect.min.js",
+  ),
   "utf8",
 );
 
