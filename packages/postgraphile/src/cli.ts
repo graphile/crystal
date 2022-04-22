@@ -10,13 +10,13 @@ import { createServer } from "http";
 import parseArgs from "minimist";
 import { resolve } from "path";
 
-import type { ContextCallback } from "./interfaces";
+import type { ContextCallback } from "./interfaces.js";
 import { postgraphile } from "./middleware/index.js";
-import { defaultPreset } from "./preset";
+import { defaultPreset } from "./preset.js";
 import {
   makePgDatabasesAndContextFromConnectionString,
   makeSchema,
-} from "./schema";
+} from "./schema.js";
 
 async function main() {
   const argv = parseArgs(process.argv.slice(2), {

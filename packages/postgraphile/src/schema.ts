@@ -4,7 +4,9 @@ import { buildInflection, buildSchema, gather } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
-import { Pool } from "pg";
+import pg from "pg";
+
+const { Pool } = pg;
 
 import type { ContextCallback, SchemaResult } from "./interfaces.js";
 import { defaultPreset as postgraphilePreset } from "./preset.js";

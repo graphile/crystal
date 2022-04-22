@@ -5,8 +5,8 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
     "jsx": "react-jsx",
-    "target": "es2018",
-    "lib": ["dom"],
+    "target": "es2021",
+    "lib": ["dom", "es2021"],
 
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "Nodenext",

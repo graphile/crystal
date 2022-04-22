@@ -1,5 +1,5 @@
-import type { SchemaResult } from "../interfaces";
-import type { HandlerResult } from "./interfaces";
+import type { SchemaResult } from "../interfaces.js";
+import type { HandlerResult } from "./interfaces.js";
 
 function escapeHTMLEntities(str: string): string {
   return str.replace(

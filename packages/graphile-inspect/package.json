@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "node": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "node": "./dist/server.js"
     }
   },
   "scripts": {

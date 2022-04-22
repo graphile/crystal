@@ -1,4 +1,4 @@
-import LRU from "@graphile/lru";
+import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
 import type { CrystalPrepareOptions } from "dataplanner";
 import {

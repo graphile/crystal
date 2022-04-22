@@ -7324,7 +7324,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-inspect@workspace:packages/graphile-inspect":
+"graphile-inspect@0.0.0, graphile-inspect@workspace:packages/graphile-inspect":
   version: 0.0.0-use.local
   resolution: "graphile-inspect@workspace:packages/graphile-inspect"
   dependencies:
@@ -10485,7 +10485,7 @@ __metadata:
     graphile-build: 5.0.0-alpha.0
     graphile-build-pg: 5.0.0-alpha.0
     graphile-export: ^0.0.1
-    graphile-inspect: "workspace:packages/graphile-inspect"
+    graphile-inspect: 0.0.0
     graphile-plugin: ^5.0.0-alpha.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5

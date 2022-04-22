@@ -40,7 +40,7 @@ interface LRUOptions<KeyType, ValueType> {
 /**
  * An tiny LRU cache with maximum count, identical weighting and no expiration.
  */
-export default class LRU<KeyType = any, ValueType = any> {
+export class LRU<KeyType = any, ValueType = any> {
   public length: number;
   /** max length */
   private m: number;
@@ -160,3 +160,4 @@ export default class LRU<KeyType = any, ValueType = any> {
     }
   }
 }
+export default LRU;

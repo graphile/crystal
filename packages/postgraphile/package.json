@@ -2,7 +2,7 @@
   "name": "postgraphile",
   "version": "5.0.0-alpha.0",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
-  "type": "commonjs",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -45,7 +45,7 @@
     "graphile-build": "5.0.0-alpha.0",
     "graphile-build-pg": "5.0.0-alpha.0",
     "graphile-export": "^0.0.1",
-    "graphile-inspect": "workspace:packages/graphile-inspect",
+    "graphile-inspect": "0.0.0",
     "graphile-plugin": "^5.0.0-alpha.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jsonwebtoken": "^8.5.1",

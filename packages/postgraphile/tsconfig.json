@@ -6,7 +6,7 @@
     "outDir": "./dist",
 
     "noUncheckedIndexedAccess": false,
-    "moduleResolution": "Nodenext",
+    "moduleResolution": "nodenext",
     "module": "nodenext"
   },
   "include": ["src"],
@@ -15,6 +15,7 @@
     { "path": "../graphile-build-pg" },
     { "path": "../dataplanner" },
     { "path": "../graphile-export" },
+    { "path": "../graphile-inspect" },
     { "path": "../graphile-plugin" }
   ]
 }
