@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "description": "Graphile-flavoured GraphiQL distribution",
   "type": "commonjs",
+  "bin": {
+    "graphile-inspect": "./dist/cli.js",
+    "grin": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -38,6 +42,7 @@
     "graphile-plugin": "^5.0.0-alpha.0",
     "graphiql": "^1.8.7",
     "graphiql-explorer": "^0.9.0",
+    "minimist": "^1.2.6",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "tslib": "^2.3.1"
@@ -56,6 +61,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.3",
+    "@types/minimist": "^1",
     "@types/nodemon": "1.19.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",

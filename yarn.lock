@@ -7330,6 +7330,7 @@ __metadata:
   dependencies:
     "@types/debug": ^4.1.7
     "@types/jest": ^27.0.3
+    "@types/minimist": ^1
     "@types/node": ^16.11.15
     "@types/nodemon": 1.19.1
     "@types/react": ^18
@@ -7339,6 +7340,7 @@ __metadata:
     graphiql-explorer: ^0.9.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5
+    minimist: ^1.2.6
     nodemon: ^2.0.15
     react: ^18.0.0
     react-dom: ^18.0.0

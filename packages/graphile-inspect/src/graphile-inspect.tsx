@@ -10,7 +10,7 @@ import { useSchema } from "./hooks/useSchema";
 import { GraphileInspectProps } from "./interfaces";
 import { defaultQuery } from "./defaultQuery";
 import { GraphileInspectFooter } from "./components/Footer";
-import { ErrorPopup } from "./components/Error";
+import { ErrorPopup } from "./components/ErrorPopup";
 import { useExplorer } from "./hooks/useExplorer";
 import { usePrettify } from "./hooks/usePrettify";
 import { useQuery } from "./hooks/useQuery";
@@ -22,7 +22,8 @@ function noop() {}
 export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const fetcher = useFetcher(props);
   const storage = useStorage();
-  const { schema, error } = useSchema(props, fetcher);
+  const [error, setError] = useState<Error | null>(null);
+  const { schema } = useSchema(props, fetcher, setError);
   const [query, setQuery] = useQuery(props, storage);
   const graphiqlRef = useRef<GraphiQL | null>(null);
   const graphiql = graphiqlRef.current;
@@ -40,7 +41,6 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
         display: "flex",
       }}
     >
-      {error ? <ErrorPopup error={error} /> : null}
       <GraphiQLExplorer
         schema={schema}
         query={query}
@@ -107,6 +107,9 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
           <GraphileInspectFooter />
         </GraphiQL.Footer>
       </GraphiQLAny>
+      {error ? (
+        <ErrorPopup error={error} onClose={() => setError(null)} />
+      ) : null}
     </div>
   );
 };

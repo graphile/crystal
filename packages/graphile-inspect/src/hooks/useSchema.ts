@@ -4,16 +4,27 @@ import {
   getIntrospectionQuery,
   GraphQLSchema,
 } from "graphql";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GraphileInspectProps } from "../interfaces";
+import { useGraphQLChangeStream } from "./useGraphQLChangeStream";
 
 export const useSchema = (
   props: GraphileInspectProps,
   fetcher: GraphiQLProps["fetcher"],
+  setError: (error: Error | null) => void,
 ) => {
   const [schema, setSchema] = useState<GraphQLSchema | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  useEffect(() => {
+  const refetchStatusRef = useRef({
+    inProgress: false,
+    fetchAgain: null as null | typeof refetch,
+  });
+  const refetch = useCallback(() => {
+    if (refetchStatusRef.current.inProgress) {
+      refetchStatusRef.current.fetchAgain = refetch;
+      return;
+    }
+    refetchStatusRef.current.inProgress = true;
+    refetchStatusRef.current.fetchAgain = null;
     (async () => {
       // Fetch the schema using our introspection query and report once that has
       // finished.
@@ -31,7 +42,7 @@ export const useSchema = (
       } else {
         payload = result;
       }
-      const { data } = payload;
+      const { data, errors } = payload;
 
       // Use the data we got back from GraphQL to build a client schema (a
       // schema without resolvers).
@@ -42,15 +53,25 @@ export const useSchema = (
       // Do some hacky stuff to GraphiQL.
       // this._updateGraphiQLDocExplorerNavStack(schema);
 
-      // tslint:disable-next-line no-console
-      console.log("PostGraphile: Schema updated");
-    })().catch((error) => {
-      // tslint:disable-next-line no-console
-      console.error("Error occurred when updating the schema:");
-      // tslint:disable-next-line no-console
-      console.error(error);
-      setError(error);
-    });
-  }, []);
-  return { schema, error };
+      console.log("Graphile Inspect: Schema updated");
+    })()
+      .catch((error) => {
+        console.error("Error occurred when updating the schema:");
+        console.error(error);
+        setError(error);
+      })
+      .finally(() => {
+        refetchStatusRef.current.inProgress = false;
+        if (refetchStatusRef.current.fetchAgain) {
+          refetchStatusRef.current.fetchAgain();
+        }
+      });
+  }, [setError]);
+  useGraphQLChangeStream(props, refetch);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  return { schema };
 };
