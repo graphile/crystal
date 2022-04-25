@@ -1,10 +1,12 @@
 import type { FC } from "react";
 
 import type { ExplainHelpers } from "../hooks/useExplain.js";
+import type { ExplainResults } from "../hooks/useFetcher.js";
 
-export const Explain: FC<{ helpers: ExplainHelpers }> = ({
-  helpers: { setShowExplain },
-}) => {
+export const Explain: FC<{
+  helpers: ExplainHelpers;
+  results: ExplainResults | null;
+}> = ({ helpers: { setShowExplain }, results }) => {
   return (
     <>
       <div className="doc-explorer-title-bar">
@@ -18,7 +20,14 @@ export const Explain: FC<{ helpers: ExplainHelpers }> = ({
             ✕
           </button>
         </div>
-        <div className="doc-explorer-contents"></div>
+      </div>
+      <div className="doc-explorer-contents">
+        {!results ? (
+          <p>
+            There are no explain results to display - perhaps you have not yet
+            ran an operation against a server that supports this feature?
+          </p>
+        ) : null}
       </div>
     </>
   );

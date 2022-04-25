@@ -30,7 +30,7 @@ function noop() {}
 export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
-  const fetcher = useFetcher(props, { explain });
+  const { fetcher, explainResults } = useFetcher(props, { explain });
   const explainHelpers = useExplain(storage);
   const { showExplain, explainSize, explainAtBottom, setShowExplain } =
     explainHelpers;
@@ -154,7 +154,7 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
                   (
                     <span>
                       {storage.get("explain") === "true" ? check : nocheck}
-                      Explain SQL queries (if available)
+                      Explain (show execution details if available)
                     </span>
                   ) as any
                 }
@@ -179,22 +179,24 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
             <GraphileInspectFooter />
           </GraphiQL.Footer>
         </GraphiQLAny>
-        {error ? (
-          <ErrorPopup error={error} onClose={() => setError(null)} />
-        ) : null}
       </div>
       {showExplain ? <ExplainDragBar helpers={explainHelpers} /> : null}
       {showExplain ? (
         <div
           style={{
             flex: `0 0 ${explainSize - DRAG_WIDTH}px`,
+            position: "relative",
+            minWidth: 300,
             ...(explainAtBottom
               ? { maxWidth: "none", maxHeight: "80%" }
               : { maxWidth: "60%", maxHeight: "none" }),
           }}
         >
-          <Explain helpers={explainHelpers} />
+          <Explain helpers={explainHelpers} results={explainResults} />
         </div>
+      ) : null}
+      {error ? (
+        <ErrorPopup error={error} onClose={() => setError(null)} />
       ) : null}
     </div>
   );
