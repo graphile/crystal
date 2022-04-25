@@ -9,6 +9,8 @@ import type {
 import { reportProblem } from "./common";
 import { hasExportableParent } from "./NoNested";
 
+const dev = process.env.GRAPHILE_ENV === "development";
+
 interface CommonOptions {
   disableAutofix: boolean;
   methods: string[];
@@ -225,17 +227,19 @@ function processNode(
           ((node as any).value?.type === "FunctionExpression" ||
             (node as any).value?.type === "ArrowFunctionExpression"))
       ) {
-        console.debug(
-          `Spotted '${match}' on object defined at ${
-            parentObject.loc
-              ? `${context.getPhysicalFilename()}:${
-                  parentObject.loc.start.line
-                }:${parentObject.loc.start.column}`
-              : "unknown location"
-          }, but it had disallowed keys: ${disallowedSiblingKeys.join(
-            ", ",
-          )} (all keys: ${parentObjectKeys.join(", ")})`,
-        );
+        if (dev) {
+          console.debug(
+            `Spotted '${match}' on object defined at ${
+              parentObject.loc
+                ? `${context.getPhysicalFilename()}:${
+                    parentObject.loc.start.line
+                  }:${parentObject.loc.start.column}`
+                : "unknown location"
+            }, but it had disallowed keys: ${disallowedSiblingKeys.join(
+              ", ",
+            )} (all keys: ${parentObjectKeys.join(", ")})`,
+          );
+        }
       }
     }
   }
