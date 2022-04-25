@@ -73,5 +73,5 @@ export const useStorage = (): GraphileInspectStorage => {
         }
       },
     };
-  }, [storage, revision]);
+  }, [storage, revision, cache]);
 };

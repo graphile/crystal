@@ -82,7 +82,7 @@ export const useSchema = (
           refetchStatusRef.current.fetchAgain();
         }
       });
-  }, [setError]);
+  }, [fetcher, setError]);
   useGraphQLChangeStream(props, refetch);
 
   useEffect(() => {

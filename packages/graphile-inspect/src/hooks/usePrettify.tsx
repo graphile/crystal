@@ -2,8 +2,8 @@ import type { GraphiQL } from "graphiql";
 import { useCallback } from "react";
 
 declare global {
-  var prettier: any;
-  var prettierPlugins: any;
+  const prettier: any;
+  const prettierPlugins: any;
 }
 
 /**
@@ -20,6 +20,7 @@ export const usePrettify = (
     }
     const editor = graphiql.getQueryEditor();
     if (
+      editor &&
       typeof window.prettier !== "undefined" &&
       typeof window.prettierPlugins !== "undefined"
     ) {

@@ -9,7 +9,7 @@ export const useGraphQLChangeStream = (
   const [error, setError] = useState<Error | null>(null);
   const eventSource = useMemo(() => {
     return props.streamEndpoint ? new EventSource(props.streamEndpoint) : null;
-  }, []);
+  }, [props.streamEndpoint]);
 
   // Starts listening to the event stream at the `sourceUrl`.
   useEffect(() => {

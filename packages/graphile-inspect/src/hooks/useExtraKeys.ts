@@ -69,7 +69,7 @@ export const useExtraKeys = (
         el.scrollIntoView();
       }
     },
-    [],
+    [query],
   );
 
   useEffect(() => {
@@ -79,5 +79,5 @@ export const useExtraKeys = (
         "Shift-Alt-LeftClick": handleInspectOperation,
       });
     }
-  }, [editor]);
+  }, [editor, handleInspectOperation]);
 };
