@@ -42,14 +42,14 @@ const graphiQLHeader = `\
 <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
 <script>${escapeJS(graphiQLContent)}</script>
 <script>
-  const { React, ReactDOM, GraphileInspect } = GraphileInspectBundle;
+  const { React, createRoot, GraphileInspect } = GraphileInspectBundle;
   const tree = React.createElement(GraphileInspect, `;
 
 const graphiQLFooter = `\
 );
   const container = document.getElementById("graphile-inspect-root");
-  const root = ReactDOM.createRoot(container);
-  root.render(tree, root);
+  const root = createRoot(container);
+  root.render(tree);
 </script>
 </body>
 </html>

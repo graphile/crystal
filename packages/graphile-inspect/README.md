@@ -16,13 +16,13 @@ Graphile-flavoured GraphiQL.
   src="https://unpkg.com/graphile-inspect/bundle/graphile-inspect.min.js"
 ></script>
 <script>
-  const { React, ReactDOM, GraphileInspect } = GraphileInspectBundle;
+  const { React, createRoot, GraphileInspect } = GraphileInspectBundle;
   const tree = React.createElement(GraphileInspect, {
     target: "/graphql",
   });
   const container = document.getElementById("graphile-inspect-root");
-  const root = ReactDOM.createRoot(container);
-  root.render(tree, root);
+  const root = createRoot(container);
+  root.render(tree);
 </script>
 ```
 

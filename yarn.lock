@@ -2767,12 +2767,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18":
-  version: 18.0.1
-  resolution: "@types/react-dom@npm:18.0.1"
+"@types/react-dom@npm:^18.0.0":
+  version: 18.0.2
+  resolution: "@types/react-dom@npm:18.0.2"
   dependencies:
     "@types/react": "*"
-  checksum: 6c183e2e50240b77ed767cd968fe061ef4f2b47f84da5ec9e412a767d68c9a004d1f6ccca4295a5aa2c3ee723377e59006a2031f3767c00d8ac9e240a51bb142
+  checksum: 2b0b138d8634ccfd8a86b17cb5414b122ee0cb6f650377d772f6008761a27e4c2531c08e3cab71aaa19b6893af6a508c664aa314db3ebcff5b8179173c9c9307
   languageName: node
   linkType: hard
 
@@ -7388,7 +7388,7 @@ __metadata:
     "@types/node": ^16.11.15
     "@types/nodemon": 1.19.1
     "@types/react": ^18
-    "@types/react-dom": ^18
+    "@types/react-dom": ^18.0.0
     "@types/yargs": ^17.0.10
     graphile-plugin: ^5.0.0-alpha.0
     graphiql: ^1.8.7

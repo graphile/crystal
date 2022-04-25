@@ -71,7 +71,7 @@
     "@types/jest": "^27.0.3",
     "@types/nodemon": "1.19.1",
     "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^18.0.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "http-proxy": "^1.18.1",
     "jest": "^27.4.5",

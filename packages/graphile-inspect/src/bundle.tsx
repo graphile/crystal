@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 export * from "./index.js";
-export { React, ReactDOM };
+export { createRoot, React };
