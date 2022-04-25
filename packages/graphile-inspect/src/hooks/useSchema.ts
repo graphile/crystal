@@ -1,10 +1,11 @@
-import type { GraphiQLProps } from "graphiql";
+import type { GraphiQL, GraphiQLProps } from "graphiql";
 import type { GraphQLSchema } from "graphql";
 import { buildClientSchema, getIntrospectionQuery } from "graphql";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";
+import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
 
 export const useSchema = (
@@ -12,6 +13,7 @@ export const useSchema = (
   fetcher: GraphiQLProps["fetcher"],
   setError: Dispatch<SetStateAction<Error | null>>,
   streamEndpoint: string | null,
+  graphiqlRef: React.MutableRefObject<GraphiQL | null>,
 ) => {
   const [schema, setSchema] = useState<GraphQLSchema | null>(null);
   const refetchStatusRef = useRef({
@@ -51,7 +53,9 @@ export const useSchema = (
       setError(null);
 
       // Do some hacky stuff to GraphiQL.
-      // this._updateGraphiQLDocExplorerNavStack(schema);
+      if (graphiqlRef.current) {
+        updateGraphiQLDocExplorerNavStack(schema, graphiqlRef.current);
+      }
 
       console.log("Graphile Inspect: Schema updated");
     })()
@@ -72,7 +76,7 @@ export const useSchema = (
           refetchStatusRef.current.fetchAgain();
         }
       });
-  }, [fetcher, setError]);
+  }, [fetcher, graphiqlRef, setError]);
   useGraphQLChangeStream(props, refetch, streamEndpoint);
 
   useEffect(() => {

@@ -37,10 +37,16 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const { showExplain, explainSize, explainAtBottom, setShowExplain } =
     explainHelpers;
   const [error, setError] = useState<Error | null>(null);
-  const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   const [query, setQuery] = useQuery(props, storage);
   const { graphiqlRef, graphiql, onToggleDocs, onToggleHistory } =
     useGraphiQL(props);
+  const { schema } = useSchema(
+    props,
+    fetcher,
+    setError,
+    streamEndpoint,
+    graphiqlRef,
+  );
   useExtraKeys(props, graphiql, query);
   const { onRunOperation, explorerIsOpen, onToggleExplorer } = useExplorer(
     graphiql,
