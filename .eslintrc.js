@@ -10,7 +10,7 @@ module.exports = {
     //'plugin:@typescript-eslint/recommended-requiring-type-checking',
     "plugin:import/errors",
     "plugin:import/typescript",
-    "plugin:graphile-exporter/recommended",
+    "plugin:graphile-export/recommended",
     "prettier",
   ],
   plugins: [
@@ -19,7 +19,8 @@ module.exports = {
     "tsdoc",
     "simple-import-sort",
     "import",
-    "graphile-exporter",
+    "graphile-export",
+    "react-hooks",
   ],
   env: {
     jest: true,
@@ -147,6 +148,18 @@ module.exports = {
 
         // We don't normally care about race conditions in tests
         "require-atomic-updates": "off",
+      },
+    },
+
+    // React rules
+    {
+      files: [
+        "packages/graphile-inspect/src/**/*.ts",
+        "packages/graphile-inspect/src/**/*.tsx",
+      ],
+      rules: {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn",
       },
     },
   ],
