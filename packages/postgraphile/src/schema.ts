@@ -4,7 +4,7 @@ import { buildInflection, buildSchema, gather } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
-import pg from "pg";
+import * as pg from "pg";
 
 const { Pool } = pg;
 

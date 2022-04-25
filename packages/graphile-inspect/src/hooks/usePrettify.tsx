@@ -2,8 +2,10 @@ import type { GraphiQL } from "graphiql";
 import { useCallback } from "react";
 
 declare global {
-  const prettier: any;
-  const prettierPlugins: any;
+  interface Window {
+    prettier: any;
+    prettierPlugins: any;
+  }
 }
 
 /**
