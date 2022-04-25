@@ -1,4 +1,4 @@
-import { FC } from "react";
+import type { FC } from "react";
 
 // TODO: this needs proper design and accessibility considerations
 

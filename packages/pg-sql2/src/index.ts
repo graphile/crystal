@@ -248,7 +248,7 @@ function makeIdentifierNode(
   return Object.freeze({
     type: "IDENTIFIER",
     names,
-    [$$trusted]: true as true,
+    [$$trusted]: true as const,
   });
 }
 
@@ -257,12 +257,12 @@ function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
     type: "VALUE",
     value: rawValue,
-    [$$trusted]: true as true,
+    [$$trusted]: true as const,
   });
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
-  return Object.freeze({ type: "INDENT", content, [$$trusted]: true as true });
+  return Object.freeze({ type: "INDENT", content, [$$trusted]: true as const });
 }
 
 function makeParensNode(content: SQL, force = false): SQLParensNode {
@@ -270,7 +270,7 @@ function makeParensNode(content: SQL, force = false): SQLParensNode {
     type: "PARENS",
     content,
     force,
-    [$$trusted]: true as true,
+    [$$trusted]: true as const,
   });
 }
 
@@ -279,7 +279,7 @@ function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
     type: "SYMBOL_ALIAS",
     a: getSymbolAndName(a),
     b: getSymbolAndName(b),
-    [$$trusted]: true as true,
+    [$$trusted]: true as const,
   });
 }
 
@@ -291,7 +291,7 @@ function makePlaceholderNode(
     type: "PLACEHOLDER",
     symbol,
     fallback,
-    [$$trusted]: true as true,
+    [$$trusted]: true as const,
   });
 }
 

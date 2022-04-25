@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { GraphileInspectProps } from "../interfaces.js";
+
+import type { GraphileInspectProps } from "../interfaces.js";
 
 export const useGraphQLChangeStream = (
   props: GraphileInspectProps,

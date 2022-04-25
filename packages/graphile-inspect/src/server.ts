@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
-import { GraphiQLProps } from "graphiql";
-import * as path from "path";
+import type { GraphiQLProps } from "graphiql";
 import { fileURLToPath } from "node:url";
+import * as path from "path";
 
 function escapeHTMLEntities(str: string): string {
   return str.replace(

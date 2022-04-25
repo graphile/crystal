@@ -1,7 +1,8 @@
 import { useState } from "react";
+
 import { defaultQuery } from "../defaultQuery.js";
-import { GraphileInspectProps } from "../interfaces.js";
-import { GraphileInspectStorage } from "./useStorage.js";
+import type { GraphileInspectProps } from "../interfaces.js";
+import type { GraphileInspectStorage } from "./useStorage.js";
 
 export const useQuery = (
   props: GraphileInspectProps,

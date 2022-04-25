@@ -1,4 +1,4 @@
-import { FC } from "react";
+import type { FC } from "react";
 
 export const GraphileInspectFooter: FC = () => (
   <div style={{ padding: 7 }}>

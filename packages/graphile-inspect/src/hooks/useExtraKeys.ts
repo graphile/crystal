@@ -1,8 +1,9 @@
-import { GraphiQL } from "graphiql";
-import { Editor as CodeMirrorEditor, Position } from "codemirror";
+import type { Editor as CodeMirrorEditor, Position } from "codemirror";
+import type { GraphiQL } from "graphiql";
 import { parse } from "graphql";
 import { useCallback, useEffect, useRef } from "react";
-import { GraphileInspectProps } from "../interfaces.js";
+
+import type { GraphileInspectProps } from "../interfaces.js";
 
 export const useExtraKeys = (
   props: GraphileInspectProps,

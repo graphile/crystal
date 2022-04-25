@@ -1,18 +1,21 @@
-import { GraphiQLProps } from "graphiql";
+import type { GraphiQLProps } from "graphiql";
+import type {
+  GraphQLSchema} from "graphql";
 import {
   buildClientSchema,
-  getIntrospectionQuery,
-  GraphQLSchema,
+  getIntrospectionQuery
 } from "graphql";
-import {
+import type {
   Dispatch,
-  SetStateAction,
+  SetStateAction} from "react";
+import {
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { GraphileInspectProps } from "../interfaces.js";
+
+import type { GraphileInspectProps } from "../interfaces.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
 
 export const useSchema = (

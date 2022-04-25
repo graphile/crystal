@@ -1,8 +1,10 @@
 import { createServer } from "http";
-import { graphileInspectHTML } from "./server.js";
-import yargs, { Argv } from "yargs";
-import { hideBin } from "yargs/helpers";
 import url from "url";
+import type { Argv } from "yargs";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+
+import { graphileInspectHTML } from "./server.js";
 
 function options(yargs: Argv) {
   return yargs

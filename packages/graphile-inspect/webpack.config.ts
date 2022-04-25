@@ -1,6 +1,7 @@
-import webpack, { Resolver } from "webpack";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Resolver } from "webpack";
+import webpack from "webpack";
 
 const JSX_REGEXP = /\.jsx?$/;
 const NODE_MODULES_REGEXP = /[\/\\]node_modules(?:[\/\\]|$)/;

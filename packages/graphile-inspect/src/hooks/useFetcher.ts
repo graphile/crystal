@@ -1,6 +1,8 @@
+import type { CreateFetcherOptions} from "@graphiql/toolkit";
+import {createGraphiQLFetcher } from "@graphiql/toolkit";
 import { useMemo } from "react";
-import { GraphileInspectProps } from "../interfaces.js";
-import { createGraphiQLFetcher, CreateFetcherOptions } from "@graphiql/toolkit";
+
+import type { GraphileInspectProps } from "../interfaces.js";
 
 export const useFetcher = (
   props: GraphileInspectProps,

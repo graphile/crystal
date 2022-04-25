@@ -1,4 +1,4 @@
-import { GraphiQLProps } from "graphiql";
+import type { GraphiQLProps } from "graphiql";
 
 export interface GraphileInspectProps {
   /**

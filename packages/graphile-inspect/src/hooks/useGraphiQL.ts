@@ -1,6 +1,7 @@
-import { GraphiQL } from "graphiql";
+import type { GraphiQL } from "graphiql";
 import { useRef } from "react";
-import { GraphileInspectProps } from "../interfaces.js";
+
+import type { GraphileInspectProps } from "../interfaces.js";
 
 export const useGraphiQL = (props: GraphileInspectProps) => {
   const graphiqlRef = useRef<GraphiQL | null>(null);

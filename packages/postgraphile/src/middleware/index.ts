@@ -4,10 +4,10 @@ import { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
 import type { SchemaResult } from "../interfaces.js";
+import { makeGraphiQLHandler } from "./graphiql.js";
 import { makeGraphQLHandler } from "./graphql.js";
 import type { HandlerResult } from "./interfaces.js";
 import { makePlanHandler } from "./plan.js";
-import { makeGraphiQLHandler } from "./graphiql.js";
 
 function getBodyFromRequest(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {

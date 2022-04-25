@@ -1,21 +1,22 @@
-import React, { FC, useCallback, useMemo, useRef, useState } from "react";
-import ReactDOM from "react-dom";
-
 import { GraphiQL, GraphiQLProps } from "graphiql";
 // @ts-ignore
 import GraphiQLExplorer from "graphiql-explorer";
-import { useStorage } from "./hooks/useStorage.js";
-import { useFetcher } from "./hooks/useFetcher.js";
-import { useSchema } from "./hooks/useSchema.js";
-import { GraphileInspectProps } from "./interfaces.js";
-import { defaultQuery } from "./defaultQuery.js";
-import { GraphileInspectFooter } from "./components/Footer.js";
+import type { FC} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+
 import { ErrorPopup } from "./components/ErrorPopup.js";
+import { GraphileInspectFooter } from "./components/Footer.js";
+import { defaultQuery } from "./defaultQuery.js";
 import { useExplorer } from "./hooks/useExplorer.js";
+import { useExtraKeys } from "./hooks/useExtraKeys.js";
+import { useFetcher } from "./hooks/useFetcher.js";
+import { useGraphiQL } from "./hooks/useGraphiQL.js";
 import { usePrettify } from "./hooks/usePrettify.js";
 import { useQuery } from "./hooks/useQuery.js";
-import { useGraphiQL } from "./hooks/useGraphiQL.js";
-import { useExtraKeys } from "./hooks/useExtraKeys.js";
+import { useSchema } from "./hooks/useSchema.js";
+import { useStorage } from "./hooks/useStorage.js";
+import type { GraphileInspectProps } from "./interfaces.js";
 
 const GraphiQLAny = GraphiQL as any;
 
