@@ -31,16 +31,19 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
   const fetcher = useFetcher(props, { explain });
-  const explainDetails = useExplain();
-  const { showExplain, explainSize, explainAtBottom } = explainDetails;
+  const explainHelpers = useExplain(storage);
+  const { showExplain, explainSize, explainAtBottom, setShowExplain } =
+    explainHelpers;
   const [error, setError] = useState<Error | null>(null);
   const { schema } = useSchema(props, fetcher, setError);
   const [query, setQuery] = useQuery(props, storage);
   const { graphiqlRef, graphiql, onToggleDocs, onToggleHistory } =
     useGraphiQL(props);
   useExtraKeys(props, graphiql, query);
-  const { onRunOperation, explorerIsOpen, onToggleExplorer } =
-    useExplorer(graphiql);
+  const { onRunOperation, explorerIsOpen, onToggleExplorer } = useExplorer(
+    graphiql,
+    storage,
+  );
   const prettify = usePrettify(graphiqlRef);
 
   return (
@@ -137,6 +140,13 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
                 title="Construct a query with the GraphiQL explorer"
                 onSelect={onToggleExplorer}
               />
+              <GraphiQL.MenuItem
+                label={
+                  (<span>{showExplain ? check : nocheck}Explain</span>) as any
+                }
+                title="Show details of what went on inside your GraphQL operation (if the server supports this)"
+                onSelect={() => setShowExplain(!showExplain)}
+              />
             </GraphiQLMenuAny>
             <GraphiQLMenuAny title="Options" label="Options">
               <GraphiQL.MenuItem
@@ -173,7 +183,7 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
           <ErrorPopup error={error} onClose={() => setError(null)} />
         ) : null}
       </div>
-      {showExplain ? <ExplainDragBar details={explainDetails} /> : null}
+      {showExplain ? <ExplainDragBar helpers={explainHelpers} /> : null}
       {showExplain ? (
         <div
           style={{
@@ -183,7 +193,7 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
               : { maxWidth: "60%", maxHeight: "none" }),
           }}
         >
-          <Explain />
+          <Explain helpers={explainHelpers} />
         </div>
       ) : null}
     </div>

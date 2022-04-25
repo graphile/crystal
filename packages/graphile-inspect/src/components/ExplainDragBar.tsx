@@ -1,7 +1,7 @@
 import type { FC, MouseEventHandler } from "react";
 import { useCallback, useRef } from "react";
 
-import type { ExplainDetails } from "../hooks/useExplain.js";
+import type { ExplainHelpers } from "../hooks/useExplain.js";
 
 function getWindowWidth() {
   return Math.max(
@@ -31,11 +31,11 @@ interface DragDetails {
   startY: number;
 }
 
-export const ExplainDragBar: FC<{ details: ExplainDetails }> = ({
-  details,
+export const ExplainDragBar: FC<{ helpers: ExplainHelpers }> = ({
+  helpers,
 }) => {
-  const detailsRef = useRef(details);
-  detailsRef.current = details;
+  const detailsRef = useRef(helpers);
+  detailsRef.current = helpers;
   const currentDragRef = useRef<DragDetails | null>(null);
   const onMouseDown = useCallback<MouseEventHandler<HTMLDivElement>>((e) => {
     if (currentDragRef.current) {
@@ -99,7 +99,7 @@ export const ExplainDragBar: FC<{ details: ExplainDetails }> = ({
         flex: `0 0 ${DRAG_WIDTH}px`,
         backgroundColor: "rgb(238, 238, 238)",
         border: "1px solid rgb(224, 224, 224)",
-        ...(details.explainAtBottom
+        ...(helpers.explainAtBottom
           ? {
               borderTopWidth: 1,
               borderBottomWidth: 1,
@@ -112,7 +112,7 @@ export const ExplainDragBar: FC<{ details: ExplainDetails }> = ({
               borderLeftWidth: 1,
               borderRightWidth: 1,
             }),
-        cursor: details.explainAtBottom ? "row-resize" : "col-resize",
+        cursor: helpers.explainAtBottom ? "row-resize" : "col-resize",
       }}
       onMouseDown={onMouseDown}
     ></div>
