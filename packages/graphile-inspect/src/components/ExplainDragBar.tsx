@@ -101,12 +101,16 @@ export const ExplainDragBar: FC<{ details: ExplainDetails }> = ({
         border: "1px solid rgb(224, 224, 224)",
         ...(details.explainAtBottom
           ? {
+              borderTopWidth: 1,
+              borderBottomWidth: 1,
               borderLeftWidth: 0,
               borderRightWidth: 0,
             }
           : {
               borderTopWidth: 0,
               borderBottomWidth: 0,
+              borderLeftWidth: 1,
+              borderRightWidth: 1,
             }),
         cursor: details.explainAtBottom ? "row-resize" : "col-resize",
       }}

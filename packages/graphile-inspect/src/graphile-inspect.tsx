@@ -45,19 +45,21 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
 
   return (
     <div
+      className="graphiql-container"
       style={{
         position: "absolute",
         width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: explainAtBottom ? "column" : "row",
+        overflow: "hidden",
       }}
     >
       <div
-        className="graphiql-container"
         style={{
           display: "flex",
           flex: "1 1 100%",
+          overflow: "hidden",
         }}
       >
         <style>
@@ -176,8 +178,9 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
         <div
           style={{
             flex: `0 0 ${explainSize - DRAG_WIDTH}px`,
-            maxWidth: "60%",
-            maxHeight: "80%",
+            ...(explainAtBottom
+              ? { maxWidth: "none", maxHeight: "80%" }
+              : { maxWidth: "60%", maxHeight: "none" }),
           }}
         >
           <Explain />
