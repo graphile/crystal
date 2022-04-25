@@ -80,7 +80,9 @@ export const useFetcher = (
         return;
       }
       // Legacy PostGraphile v4 support
-      const legacy = (result as any).explain;
+      const legacy = (result as any).explain as
+        | Array<{ query: string; plan?: string }>
+        | undefined;
 
       if (result.extensions?.explain) {
         const explain = result.extensions.explain;
@@ -93,14 +95,12 @@ export const useFetcher = (
         }
       } else if (legacy) {
         setExplainResults({
-          operations: [
-            {
-              type: "sql",
-              title: "PostGraphile v4-style explain",
-              query: legacy.query,
-              explain: legacy.plan,
-            },
-          ],
+          operations: legacy.map((l, i) => ({
+            type: "sql",
+            title: `Legacy explain ${i + 1}`,
+            query: l.query,
+            explain: l.plan,
+          })),
         });
       }
     };

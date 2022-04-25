@@ -6,7 +6,8 @@ import type { ExplainResults } from "../hooks/useFetcher.js";
 export const Explain: FC<{
   helpers: ExplainHelpers;
   results: ExplainResults | null;
-}> = ({ helpers: { setShowExplain }, results }) => {
+}> = ({ helpers, results }) => {
+  const { setShowExplain } = helpers;
   return (
     <>
       <div className="doc-explorer-title-bar">
@@ -27,8 +28,27 @@ export const Explain: FC<{
             There are no explain results to display - perhaps you have not yet
             ran an operation against a server that supports this feature?
           </p>
-        ) : null}
+        ) : results.operations.length === 0 ? (
+          <p>Empty explain results</p>
+        ) : (
+          <ExplainMain helpers={helpers} results={results} />
+        )}
       </div>
     </>
+  );
+};
+
+export const ExplainMain: FC<{
+  helpers: ExplainHelpers;
+  results: ExplainResults;
+}> = ({ results }) => {
+  return (
+    <div>
+      <select>
+        {results.operations.map((o, i) => (
+          <option value={i}>{o.title}</option>
+        ))}
+      </select>
+    </div>
   );
 };
