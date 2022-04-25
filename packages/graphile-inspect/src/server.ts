@@ -47,8 +47,9 @@ const graphiQLHeader = `\
 
 const graphiQLFooter = `\
 );
-  const root = document.getElementById("graphile-inspect-root");
-  ReactDOM.render(tree, root);
+  const container = document.getElementById("graphile-inspect-root");
+  const root = ReactDOM.createRoot(container);
+  root.render(tree, root);
 </script>
 </body>
 </html>

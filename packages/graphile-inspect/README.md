@@ -20,8 +20,9 @@ Graphile-flavoured GraphiQL.
   const tree = React.createElement(GraphileInspect, {
     target: "/graphql",
   });
-  const root = document.getElementById("graphile-inspect-root");
-  ReactDOM.render(tree, root);
+  const container = document.getElementById("graphile-inspect-root");
+  const root = ReactDOM.createRoot(container);
+  root.render(tree, root);
 </script>
 ```
 
