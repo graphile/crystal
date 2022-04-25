@@ -1,11 +1,5 @@
 import { useMemo, useState } from "react";
 
-const STORAGE_KEYS = {
-  SAVE_HEADERS_TEXT: "GraphileInspect:saveHeadersText",
-  HEADERS_TEXT: "GraphileInspect:headersText",
-  EXPLAIN: "GraphileInspect:explain",
-};
-
 export interface StoredKeys {
   saveHeaders: "true" | "";
   headers: string;
