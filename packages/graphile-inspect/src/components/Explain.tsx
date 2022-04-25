@@ -1,7 +1,10 @@
 import type { FC } from "react";
+import { useEffect, useState } from "react";
 
 import type { ExplainHelpers } from "../hooks/useExplain.js";
 import type { ExplainResults } from "../hooks/useFetcher.js";
+
+export const formatSQL = (sql: string): string => sql;
 
 export const Explain: FC<{
   helpers: ExplainHelpers;
@@ -42,13 +45,63 @@ export const ExplainMain: FC<{
   helpers: ExplainHelpers;
   results: ExplainResults;
 }> = ({ results }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [results]);
+  const selectedResult = results.operations[selectedIndex];
+  const component = (() => {
+    switch (selectedResult?.type) {
+      case "sql": {
+        return (
+          <div>
+            {selectedResult.explain ? (
+              <>
+                <h4>
+                  Result from SQL{" "}
+                  <a href="https://www.postgresql.org/docs/current/sql-explain.html">
+                    EXPLAIN
+                  </a>{" "}
+                  on executed query:
+                </h4>
+                <pre className="explain-plan">
+                  <code>{selectedResult.explain}</code>
+                </pre>
+              </>
+            ) : null}
+            <h4>Executed SQL query:</h4>
+            <pre className="explain-sql">
+              <code>{formatSQL(selectedResult.query)}</code>
+            </pre>
+          </div>
+        );
+      }
+      case "mermaid-js": {
+        return <div>TODO: diagram</div>;
+      }
+      case undefined: {
+        return (
+          <div>
+            Explain result type '${(selectedResult as any).type}' not yet
+            supported.
+          </div>
+        );
+      }
+      default: {
+        return <div></div>;
+      }
+    }
+  })();
   return (
     <div>
       <select>
         {results.operations.map((o, i) => (
-          <option value={i}>{o.title}</option>
+          <option selected={i === selectedIndex} value={i}>
+            {o.title}
+          </option>
         ))}
       </select>
+      {component}
     </div>
   );
 };
