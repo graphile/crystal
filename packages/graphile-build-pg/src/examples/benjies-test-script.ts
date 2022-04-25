@@ -20,6 +20,7 @@ import {
   execute as dataplannerExecute,
   stripAnsi,
 } from "dataplanner";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
 import {
@@ -286,11 +287,53 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
     },
   });
 
+  const setCORSHeaders = (req: FastifyRequest, res: FastifyReply) => {
+    // We use 'res.raw' because that's what Helix uses and otherwise our
+    // headers don't get set.
+    res.raw.setHeader("Access-Control-Allow-Origin", "*");
+    res.raw.setHeader("Access-Control-Allow-Methods", "HEAD, GET, POST");
+    res.raw.setHeader(
+      "Access-Control-Allow-Headers",
+      [
+        "Origin",
+        "X-Requested-With",
+        // Used by `express-graphql` to determine whether to expose the GraphiQL
+        // interface (`text/html`) or not.
+        "Accept",
+        // Used by PostGraphile for auth purposes.
+        "Authorization",
+        // Used by GraphQL Playground and other Apollo-enabled servers
+        "X-Apollo-Tracing",
+        // The `Content-*` headers are used when making requests with a body,
+        // like in a POST request.
+        "Content-Type",
+        "Content-Length",
+        // For PostGraphile V4's 'Explain' feature
+        "X-PostGraphile-Explain",
+      ].join(", "),
+    );
+    res.raw.setHeader(
+      "Access-Control-Expose-Headers",
+      ["X-GraphQL-Event-Stream"].join(", "),
+    );
+  };
+
   // The GraphQL route is at '/graphql' as usual
+  app.route({
+    method: ["OPTIONS"],
+    url: "/graphql",
+    async handler(req, res) {
+      setCORSHeaders(req, res);
+      res.send();
+    },
+  });
+
   app.route({
     method: ["POST"],
     url: "/graphql",
     async handler(req, res) {
+      setCORSHeaders(req, res);
+
       // Here we can pass the request and make available as part of the "context".
       // The return value is the a GraphQL-proxy that exposes all the functions.
       const { parse, validate, contextFactory, execute, schema } = getEnveloped(

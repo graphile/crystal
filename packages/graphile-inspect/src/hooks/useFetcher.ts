@@ -71,7 +71,9 @@ export const useFetcher = (
     (!props.debugTools || props.debugTools.includes("explain"));
 
   const ourFetch = useMemo<typeof fetch>(() => {
-    return (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
+    return (
+      ...args: Parameters<typeof window.fetch>
+    ): ReturnType<typeof window.fetch> => {
       const result = fetch(...args);
       result.then(
         (response) => {
