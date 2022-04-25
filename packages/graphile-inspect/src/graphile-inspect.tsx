@@ -14,6 +14,8 @@ import { ErrorPopup } from "./components/ErrorPopup.js";
 import { useExplorer } from "./hooks/useExplorer.js";
 import { usePrettify } from "./hooks/usePrettify.js";
 import { useQuery } from "./hooks/useQuery.js";
+import { useGraphiQL } from "./hooks/useGraphiQL.js";
+import { useExtraKeys } from "./hooks/useExtraKeys.js";
 
 const GraphiQLAny = GraphiQL as any;
 
@@ -25,8 +27,8 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const [error, setError] = useState<Error | null>(null);
   const { schema } = useSchema(props, fetcher, setError);
   const [query, setQuery] = useQuery(props, storage);
-  const graphiqlRef = useRef<GraphiQL | null>(null);
-  const graphiql = graphiqlRef.current;
+  const { graphiqlRef, graphiql } = useGraphiQL(props);
+  useExtraKeys(props, graphiql, query);
   const { onRunOperation, explorerIsOpen, onToggleExplorer } =
     useExplorer(graphiql);
   const prettify = usePrettify(graphiqlRef);

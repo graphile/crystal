@@ -24,6 +24,7 @@
   "scripts": {
     "test": "jest -i",
     "webpack": "node --loader ts-node/esm node_modules/.bin/webpack-cli",
+    "watch": "yarn webpack --watch --mode=development",
     "prepack": "tsc -b && yarn webpack --mode=production"
   },
   "repository": {
@@ -64,6 +65,7 @@
     "index.js"
   ],
   "devDependencies": {
+    "@types/codemirror": "^5.60.5",
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.3",
     "@types/nodemon": "1.19.1",

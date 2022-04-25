@@ -2419,6 +2419,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/codemirror@npm:^5.60.5":
+  version: 5.60.5
+  resolution: "@types/codemirror@npm:5.60.5"
+  dependencies:
+    "@types/tern": "*"
+  checksum: 423b6378b6415b626d9f54d37d69477f96940b30a695d4ec36402feb59a96f7ab42d1c17b8472fbb222a0966f6061deee234e37bcd3e34c75836e989dc95929d
+  languageName: node
+  linkType: hard
+
 "@types/connect@npm:*":
   version: 3.4.35
   resolution: "@types/connect@npm:3.4.35"
@@ -2806,6 +2815,15 @@ __metadata:
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: 205fdbe3326b7046d7eaf5e494d8084f2659086a266f3f9cf00bccc549c8e36e407f88168ad4383c8b07099957ad669f75f2532ed4bc70be2b037330f7bae019
+  languageName: node
+  linkType: hard
+
+"@types/tern@npm:*":
+  version: 0.23.4
+  resolution: "@types/tern@npm:0.23.4"
+  dependencies:
+    "@types/estree": "*"
+  checksum: d8fd304f147ed08f1d075f09cb8d440b7f785f69c9ec5c30eadf98132fe3f58f3b1bbbd11283858bb261afac5a2039c1c255f290b0f6e4a47cd6a746f30a6aa8
   languageName: node
   linkType: hard
 
@@ -7337,6 +7355,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "graphile-inspect@workspace:packages/graphile-inspect"
   dependencies:
+    "@types/codemirror": ^5.60.5
     "@types/debug": ^4.1.7
     "@types/jest": ^27.0.3
     "@types/node": ^16.11.15
