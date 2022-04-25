@@ -1,13 +1,11 @@
-import { GraphiQL, GraphiQLProps } from "graphiql";
+import { GraphiQL } from "graphiql";
 // @ts-ignore
 import GraphiQLExplorer from "graphiql-explorer";
-import type { FC} from "react";
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import ReactDOM from "react-dom";
+import type { FC } from "react";
+import React, { useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { GraphileInspectFooter } from "./components/Footer.js";
-import { defaultQuery } from "./defaultQuery.js";
 import { useExplorer } from "./hooks/useExplorer.js";
 import { useExtraKeys } from "./hooks/useExtraKeys.js";
 import { useFetcher } from "./hooks/useFetcher.js";
@@ -19,6 +17,10 @@ import { useStorage } from "./hooks/useStorage.js";
 import type { GraphileInspectProps } from "./interfaces.js";
 
 const GraphiQLAny = GraphiQL as any;
+const GraphiQLMenuAny = GraphiQL.Menu as any;
+const checkCss = { width: "1.5rem", display: "inline-block" };
+const check = <span style={checkCss}>✔</span>;
+const nocheck = <span style={checkCss}></span>;
 
 function noop() {}
 
@@ -29,7 +31,8 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const [error, setError] = useState<Error | null>(null);
   const { schema } = useSchema(props, fetcher, setError);
   const [query, setQuery] = useQuery(props, storage);
-  const { graphiqlRef, graphiql } = useGraphiQL(props);
+  const { graphiqlRef, graphiql, onToggleDocs, onToggleHistory } =
+    useGraphiQL(props);
   useExtraKeys(props, graphiql, query);
   const { onRunOperation, explorerIsOpen, onToggleExplorer } =
     useExplorer(graphiql);
@@ -63,49 +66,82 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
       >
         <GraphiQL.Logo>Graphile Inspect</GraphiQL.Logo>
         <GraphiQL.Toolbar>
-          <GraphiQL.Button
-            onClick={prettify}
-            title="Prettify Query (Shift-Ctrl-P)"
-            label="Prettify"
-          />
-          <GraphiQL.Button
-            onClick={graphiql?.handleToggleHistory ?? noop}
-            title="Show History"
-            label="History"
-          />
-          <GraphiQL.Button
-            label="Explorer"
-            title="Construct a query with the GraphiQL explorer"
-            onClick={onToggleExplorer}
-          />
-          <GraphiQL.Button
-            onClick={graphiql?.handleMergeQuery ?? noop}
-            title="Merge Query (Shift-Ctrl-M)"
-            label="Merge"
-          />
-          <GraphiQL.Button
-            onClick={graphiql?.handleCopyQuery ?? noop}
-            title="Copy Query (Shift-Ctrl-C)"
-            label="Copy"
-          />
-
-          <GraphiQL.Button
-            label={
-              storage.get("explain") === "true"
-                ? "Explain ON"
-                : "Explain disabled"
-            }
-            title="View the SQL statements that this query invokes"
-            onClick={() => storage.toggle("explain")}
-          />
-          <GraphiQL.Button
-            label={
-              "Headers " +
-              (storage.get("saveHeaders") === "true" ? "SAVED" : "unsaved")
-            }
-            title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
-            onClick={() => storage.toggle("saveHeaders")}
-          />
+          <GraphiQLMenuAny title="Utils" label="Utilities">
+            <GraphiQL.MenuItem
+              onSelect={prettify}
+              title="Prettify Query (Shift-Ctrl-P)"
+              label="Prettify"
+            />
+            <GraphiQL.MenuItem
+              onSelect={graphiql?.handleMergeQuery ?? noop}
+              title="Merge Query (Shift-Ctrl-M)"
+              label="Merge"
+            />
+            <GraphiQL.MenuItem
+              onSelect={graphiql?.handleCopyQuery ?? noop}
+              title="Copy Query (Shift-Ctrl-C)"
+              label="Copy"
+            />
+          </GraphiQLMenuAny>
+          <GraphiQLMenuAny title="Panels" label="Panels">
+            <GraphiQL.MenuItem
+              onSelect={onToggleDocs}
+              title="Docs"
+              label={
+                (
+                  <span>
+                    {graphiql?.state.docExplorerOpen ? check : nocheck}
+                    Docs
+                  </span>
+                ) as any
+              }
+            />
+            <GraphiQL.MenuItem
+              onSelect={onToggleHistory}
+              title="History"
+              label={
+                (
+                  <span>
+                    {graphiql?.state.historyPaneOpen ? check : nocheck}
+                    History
+                  </span>
+                ) as any
+              }
+            />
+            <GraphiQL.MenuItem
+              label={
+                (<span>{explorerIsOpen ? check : nocheck}Explorer</span>) as any
+              }
+              title="Construct a query with the GraphiQL explorer"
+              onSelect={onToggleExplorer}
+            />
+          </GraphiQLMenuAny>
+          <GraphiQLMenuAny title="Options" label="Options">
+            <GraphiQL.MenuItem
+              label={
+                (
+                  <span>
+                    {storage.get("explain") === "true" ? check : nocheck}
+                    Explain
+                  </span>
+                ) as any
+              }
+              title="View the SQL statements that this query invokes"
+              onSelect={() => storage.toggle("explain")}
+            />
+            <GraphiQL.MenuItem
+              label={
+                (
+                  <span>
+                    {storage.get("saveHeaders") === "true" ? check : nocheck}
+                    Save headers
+                  </span>
+                ) as any
+              }
+              title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
+              onSelect={() => storage.toggle("saveHeaders")}
+            />
+          </GraphiQLMenuAny>
         </GraphiQL.Toolbar>
         <GraphiQL.Footer>
           <GraphileInspectFooter />
