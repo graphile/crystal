@@ -1,5 +1,5 @@
-import type { CreateFetcherOptions} from "@graphiql/toolkit";
-import {createGraphiQLFetcher } from "@graphiql/toolkit";
+import type { CreateFetcherOptions } from "@graphiql/toolkit";
+import { createGraphiQLFetcher } from "@graphiql/toolkit";
 import { useMemo } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";
@@ -17,7 +17,9 @@ export const useFetcher = (
   const fetcherOptions = useMemo<CreateFetcherOptions>(
     () => ({
       url,
-      ...(explain ? { "X-PostGraphile-Explain": "on" } : null),
+      headers: {
+        ...(explain ? { "X-PostGraphile-Explain": "on" } : null),
+      },
     }),
     [explain, url],
   );
