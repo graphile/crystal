@@ -323,7 +323,7 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
     method: ["OPTIONS"],
     url: "/graphql",
     async handler(req, res) {
-      setCORSHeaders(req, res);
+      // setCORSHeaders(req, res);
       res.send();
     },
   });
@@ -332,7 +332,7 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
     method: ["POST"],
     url: "/graphql",
     async handler(req, res) {
-      setCORSHeaders(req, res);
+      // setCORSHeaders(req, res);
 
       // Here we can pass the request and make available as part of the "context".
       // The return value is the a GraphQL-proxy that exposes all the functions.

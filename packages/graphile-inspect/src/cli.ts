@@ -19,28 +19,78 @@ function options(yargs: Argv) {
       type: "string",
       description: "the endpoint to connect to",
       default: "http://localhost:5000/graphql",
+    })
+    .option("proxy", {
+      alias: "P",
+      type: "boolean",
+      description: "Proxy requests to work around CORS issues",
     });
 }
 
 type InspectArgv = ReturnType<typeof options> extends Argv<infer U> ? U : never;
 
-function run(argv: InspectArgv) {
-  const { port, endpoint } = argv;
+/**
+ * Optionally we proxy the request.
+ */
+async function tryLoadHttpProxy() {
+  try {
+    return (await import("http-proxy")).default;
+  } catch {
+    return null;
+  }
+}
+async function run(argv: InspectArgv) {
+  const { port, endpoint, proxy: enableProxy } = argv;
+  const httpProxy = enableProxy ? await tryLoadHttpProxy() : null;
+  const proxy = httpProxy?.createProxyServer({});
+  if (enableProxy && !proxy) {
+    throw new Error(
+      "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'graphile-inspect'",
+    );
+  }
+  const endpointUrl = new URL(endpoint);
+  const endpointBase = new URL(endpointUrl);
+  endpointBase.pathname = "";
+  endpointBase.search = "";
+  endpointBase.hash = "";
+
+  if (!httpProxy) {
+    console.log(
+      `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'graphile-inspect' and we'll proxy to the API for you`,
+    );
+  }
   const server = createServer((req, res) => {
-    if (req.url !== "/") {
+    if (req.url === "/" && req.headers.accept?.includes("text/html")) {
+      res.writeHead(200, undefined, {
+        "Content-Type": "text/html; charset=utf-8",
+      });
+      console.log({
+        endpoint: proxy ? endpointUrl.pathname + endpointUrl.search : endpoint,
+      });
+      res.end(
+        graphileInspectHTML({
+          endpoint: proxy
+            ? endpointUrl.pathname + endpointUrl.search
+            : endpoint,
+        }),
+      );
+      return;
+    }
+    if (proxy) {
+      proxy.web(req, res, { target: endpointBase });
+      return;
+    } else {
       res.writeHead(308, undefined, { Location: "/" });
       res.end();
       return;
     }
-    res.writeHead(200, undefined, {
-      "Content-Type": "text/html; charset=utf-8",
-    });
-    res.end(
-      graphileInspectHTML({
-        endpoint,
-      }),
-    );
   });
+
+  if (proxy) {
+    server.on("upgrade", (req, socket, head) => {
+      proxy.ws(req, socket, head);
+    });
+  }
 
   server.listen(port, () => {
     console.log(
@@ -52,7 +102,7 @@ function run(argv: InspectArgv) {
 async function main() {
   const argv = await options(yargs(hideBin(process.argv))).argv;
 
-  run(argv);
+  await run(argv);
 }
 
 if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
