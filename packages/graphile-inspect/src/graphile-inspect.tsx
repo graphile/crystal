@@ -22,8 +22,9 @@ const GraphiQLAny = GraphiQL as any;
 function noop() {}
 
 export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
-  const fetcher = useFetcher(props);
   const storage = useStorage();
+  const explain = storage.get("explain") === "true";
+  const fetcher = useFetcher(props, { explain });
   const [error, setError] = useState<Error | null>(null);
   const { schema } = useSchema(props, fetcher, setError);
   const [query, setQuery] = useQuery(props, storage);

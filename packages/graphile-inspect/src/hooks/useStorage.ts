@@ -62,7 +62,7 @@ export const useStorage = (): GraphileInspectStorage => {
         return val ?? null;
       },
       set(key, value) {
-        storage.set(KEYS[key], value);
+        storage.setItem(KEYS[key], value);
         bump(up);
       },
       toggle(key) {
