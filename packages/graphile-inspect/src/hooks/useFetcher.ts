@@ -2,7 +2,7 @@ import type { CreateFetcherOptions } from "@graphiql/toolkit";
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
 import type { Fetcher, FetcherReturnType } from "graphiql";
 import type { ExecutionResult } from "graphql";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";
 
@@ -51,27 +51,57 @@ export const useFetcher = (
   props: GraphileInspectProps,
   options: { explain: boolean },
 ) => {
+  const [streamEndpoint, setStreamEndpoint] = useState<string | null>(null);
   const url =
     props.endpoint ??
     (typeof window !== "undefined" ? window.location.origin : "") + "/graphql";
   const [explainResults, setExplainResults] = useState<ExplainResults | null>(
     null,
   );
+
+  // Reset the stream endpoint every time the URL changes.
+  useEffect(() => {
+    if (url) {
+      setStreamEndpoint(null);
+    }
+  }, [url]);
+
   const explain =
     options.explain &&
     (!props.debugTools || props.debugTools.includes("explain"));
+
+  const ourFetch = useMemo<typeof fetch>(() => {
+    return (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
+      const result = fetch(...args);
+      result.then(
+        (response) => {
+          const stream = response.headers.get("X-GraphQL-Event-Stream");
+          if (typeof stream === "string") {
+            const streamUrl = new URL(stream, url);
+            setStreamEndpoint(streamUrl.toString());
+          }
+        },
+        () => {},
+      );
+
+      return result;
+    };
+  }, [url]);
+
   const fetcherOptions = useMemo<CreateFetcherOptions>(
     () => ({
       url,
       headers: {
         ...(explain ? { "X-PostGraphile-Explain": "on" } : null),
       },
+      fetch: ourFetch,
     }),
-    [explain, url],
+    [explain, url, ourFetch],
   );
+
   const fetcher = useMemo(
-    () => props.fetcher ?? createGraphiQLFetcher(fetcherOptions),
-    [fetcherOptions, props.fetcher],
+    () => createGraphiQLFetcher(fetcherOptions),
+    [fetcherOptions],
   );
 
   const wrappedFetcher = useMemo(() => {
@@ -130,5 +160,5 @@ export const useFetcher = (
     };
   }, [fetcher]);
 
-  return { fetcher: wrappedFetcher, explainResults };
+  return { fetcher: wrappedFetcher, explainResults, streamEndpoint };
 };

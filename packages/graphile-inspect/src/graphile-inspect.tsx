@@ -30,12 +30,14 @@ function noop() {}
 export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
-  const { fetcher, explainResults } = useFetcher(props, { explain });
+  const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
+    explain,
+  });
   const explainHelpers = useExplain(storage);
   const { showExplain, explainSize, explainAtBottom, setShowExplain } =
     explainHelpers;
   const [error, setError] = useState<Error | null>(null);
-  const { schema } = useSchema(props, fetcher, setError);
+  const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   const [query, setQuery] = useQuery(props, storage);
   const { graphiqlRef, graphiql, onToggleDocs, onToggleHistory } =
     useGraphiQL(props);

@@ -1,19 +1,8 @@
 import type { GraphiQLProps } from "graphiql";
-import type {
-  GraphQLSchema} from "graphql";
-import {
-  buildClientSchema,
-  getIntrospectionQuery
-} from "graphql";
-import type {
-  Dispatch,
-  SetStateAction} from "react";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { GraphQLSchema } from "graphql";
+import { buildClientSchema, getIntrospectionQuery } from "graphql";
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
@@ -22,6 +11,7 @@ export const useSchema = (
   props: GraphileInspectProps,
   fetcher: GraphiQLProps["fetcher"],
   setError: Dispatch<SetStateAction<Error | null>>,
+  streamEndpoint: string | null,
 ) => {
   const [schema, setSchema] = useState<GraphQLSchema | null>(null);
   const refetchStatusRef = useRef({
@@ -83,7 +73,7 @@ export const useSchema = (
         }
       });
   }, [fetcher, setError]);
-  useGraphQLChangeStream(props, refetch);
+  useGraphQLChangeStream(props, refetch, streamEndpoint);
 
   useEffect(() => {
     refetch();

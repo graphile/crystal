@@ -5,11 +5,13 @@ import type { GraphileInspectProps } from "../interfaces.js";
 export const useGraphQLChangeStream = (
   props: GraphileInspectProps,
   refetch: () => void,
+  streamEndpoint: string | null,
 ) => {
   const [error, setError] = useState<Error | null>(null);
+
   const eventSource = useMemo(() => {
-    return props.streamEndpoint ? new EventSource(props.streamEndpoint) : null;
-  }, [props.streamEndpoint]);
+    return streamEndpoint ? new EventSource(streamEndpoint) : null;
+  }, [streamEndpoint]);
 
   // Starts listening to the event stream at the `sourceUrl`.
   useEffect(() => {
