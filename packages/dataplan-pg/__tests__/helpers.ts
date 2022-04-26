@@ -522,7 +522,7 @@ export async function runTestQuery(
         ...originalPayloads.slice(1).sort(sortPayloads),
       ];
 
-      return { payloads, errors, queries };
+      return { payloads, errors, queries, extensions: payloads[0].extensions };
     } else {
       // Throw away symbol keys/etc
       const { data, errors, extensions } = JSON.parse(JSON.stringify(result));
@@ -661,9 +661,6 @@ export const assertSnapshotsMatch = async (
 
   const { data, payloads, queries, errors, extensions } = await result;
 
-  const graphString = extensions?.explain?.operations?.find(
-    (op) => op.type === "mermaid-js",
-  )?.diagram;
   const replacements = { uuid: new Map<string, number>(), uuidCounter: 1 };
 
   if (only === "result") {
@@ -709,6 +706,9 @@ export const assertSnapshotsMatch = async (
       .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
   } else if (only === "mermaid") {
+    const graphString = extensions?.explain?.operations?.find(
+      (op) => op.type === "mermaid-js",
+    )?.diagram;
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");
