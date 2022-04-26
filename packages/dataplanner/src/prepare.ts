@@ -1,3 +1,4 @@
+import EventEmitter from "events";
 import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
@@ -5,6 +6,7 @@ import { buildExecutionContext } from "graphql/execution/execute";
 import { $$contextPlanCache } from "./aether";
 import { establishAether } from "./establishAether";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces";
+import { $$eventEmitter } from "./interfaces";
 import { $$extensions } from "./interfaces";
 import { isPromiseLike } from "./utils";
 
@@ -47,23 +49,12 @@ export function dataplannerPrepare(
     // operationName,
     // document,
   } = args;
-  if (typeof rootValue !== "object" || rootValue == null) {
-    throw new Error("DataPlanner requires that the 'rootValue' be an object");
-  }
   const exeContext = buildExecutionContext(args);
 
   // If a list of errors was returned, abort our transform and defer to
   // graphql-js.
   if (Array.isArray(exeContext) || "length" in exeContext) {
     return args.rootValue as any;
-  }
-
-  if (options.explain?.length) {
-    rootValue[$$extensions] = {
-      explain: {
-        operations: [],
-      },
-    };
   }
 
   const { operation, fragments, variableValues } = exeContext;
@@ -107,6 +98,7 @@ export function dataplannerPrepare(
         });
       } else {
         preemptiveResult[$$extensions] = rootValue[$$extensions];
+        preemptiveResult[$$eventEmitter] = rootValue[$$eventEmitter];
         return preemptiveResult;
       }
     } else {

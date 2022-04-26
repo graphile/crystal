@@ -7,6 +7,7 @@ import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
+  ExecutionExtra,
   InputPlan,
   LambdaPlan,
   PlanOptimizeOptions,
@@ -1136,6 +1137,7 @@ export class PgSelectPlan<
    */
   async execute(
     values: Array<CrystalValuesList<any>>,
+    { eventEmitter }: ExecutionExtra,
   ): Promise<CrystalResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
@@ -1162,6 +1164,7 @@ export class PgSelectPlan<
         identifierIndex,
         queryValuesSymbol: this.queryValuesSymbol,
         name,
+        eventEmitter,
       },
     );
     // debugExecute("%s; result: %c", this, executionResult);
@@ -1197,6 +1200,7 @@ export class PgSelectPlan<
    */
   async stream(
     values: Array<CrystalValuesList<any>>,
+    { eventEmitter }: ExecutionExtra,
   ): Promise<CrystalResultStreamList<PgSourceRow<TColumns>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectPlan before finalizing it.");
@@ -1238,6 +1242,7 @@ export class PgSelectPlan<
               rawSqlValues,
               identifierIndex,
               queryValuesSymbol: this.queryValuesSymbol,
+              eventEmitter,
             },
           )
         ).values
@@ -1262,6 +1267,7 @@ export class PgSelectPlan<
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex,
           queryValuesSymbol: this.queryValuesSymbol,
+          eventEmitter,
         },
       )
     ).streams;

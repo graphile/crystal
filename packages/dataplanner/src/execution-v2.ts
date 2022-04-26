@@ -13,6 +13,7 @@ import type {
   CrystalContext,
   CrystalResultsList,
   CrystalValuesList,
+  ExecutionExtra,
   PromiseOrDirect,
 } from "./interfaces";
 import { $$concreteType } from "./interfaces";
@@ -189,7 +190,7 @@ export function executeBucket(
   function executeListTransform(
     plan: __ListTransformPlan<any, any, any>,
     dependencies: (readonly any[])[],
-    meta: Record<string, unknown>,
+    extra: ExecutionExtra,
   ): PromiseOrDirect<any[]> {
     const itemPlan = aether.dangerouslyGetPlan(plan.itemPlanId!);
     const itemPlanId = itemPlan.id;
@@ -300,7 +301,7 @@ export function executeBucket(
   function reallyExecutePlanWithErrors(
     plan: ExecutablePlan,
     dependencies: ReadonlyArray<any>[],
-    meta: Record<string, unknown>,
+    extra: ExecutionExtra,
   ) {
     const errors: { [index: number]: CrystalError } = Object.create(null);
     let foundErrors = false;
@@ -321,8 +322,8 @@ export function executeBucket(
       );
       const resultWithoutErrors =
         plan instanceof __ListTransformPlan
-          ? executeListTransform(plan, dependenciesWithoutErrors, meta)
-          : plan.execute(dependenciesWithoutErrors, meta);
+          ? executeListTransform(plan, dependenciesWithoutErrors, extra)
+          : plan.execute(dependenciesWithoutErrors, extra);
       return isPromiseLike(resultWithoutErrors)
         ? resultWithoutErrors.then((r) =>
             mergeErrorsBackIn(r, errors, dependencies[0].length),
@@ -333,7 +334,7 @@ export function executeBucket(
             dependencies[0].length,
           );
     } else {
-      return reallyExecutePlanWithNoErrors(plan, dependencies, meta);
+      return reallyExecutePlanWithNoErrors(plan, dependencies, extra);
     }
   }
 
@@ -341,11 +342,11 @@ export function executeBucket(
   function reallyExecutePlanWithNoErrors(
     plan: ExecutablePlan,
     dependencies: ReadonlyArray<any>[],
-    meta: Record<string, unknown>,
+    extra: ExecutionExtra,
   ) {
     return plan instanceof __ListTransformPlan
-      ? executeListTransform(plan, dependencies, meta)
-      : plan.execute(dependencies, meta);
+      ? executeListTransform(plan, dependencies, extra)
+      : plan.execute(dependencies, extra);
   }
 
   /**
@@ -358,6 +359,10 @@ export function executeBucket(
     inProgressPlans.add(plan);
     try {
       const meta = metaByPlanId[plan.id]!;
+      const extra = {
+        meta,
+        eventEmitter: requestContext.eventEmitter,
+      };
       const dependencies: ReadonlyArray<any>[] = [];
       const depCount = plan.dependencies.length;
       if (depCount > 0) {
@@ -369,8 +374,8 @@ export function executeBucket(
         dependencies.push(noDepsList);
       }
       const result = bucket.hasErrors
-        ? reallyExecutePlanWithErrors(plan, dependencies, meta)
-        : reallyExecutePlanWithNoErrors(plan, dependencies, meta);
+        ? reallyExecutePlanWithErrors(plan, dependencies, extra)
+        : reallyExecutePlanWithNoErrors(plan, dependencies, extra);
       if (isPromiseLike(result)) {
         return result.then(
           (values) => {

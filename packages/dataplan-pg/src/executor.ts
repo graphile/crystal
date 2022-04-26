@@ -7,6 +7,7 @@ import type {
   CrystalValuesList,
   Deferred,
   ExecutablePlan,
+  ExecutionEventEmitter,
   ObjectPlan,
 } from "dataplanner";
 import { defer, isAsyncIterable, isDev } from "dataplanner";
@@ -99,6 +100,7 @@ export type PgExecutorOptions = {
   identifierIndex?: number | null;
   queryValuesSymbol?: symbol | null;
   name?: string;
+  eventEmitter: ExecutionEventEmitter | undefined;
 };
 
 export type PgExecutorMutationOptions = {
@@ -299,8 +301,23 @@ ${duration}
   ): Promise<{
     values: CrystalValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const { text, rawSqlValues, identifierIndex, queryValuesSymbol, name } =
-      common;
+    const {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      queryValuesSymbol,
+      name,
+      eventEmitter,
+    } = common;
+
+    eventEmitter?.emit("explainOperation", {
+      operation: {
+        type: "sql",
+        title: `SQL query${name ? ` '${name.slice(0, 7)}...'` : ""}`,
+        query: text,
+        explain: undefined, // TODO: add explain output
+      },
+    });
 
     const valuesCount = values.length;
     const results: Array<Deferred<Array<TOutput>> | undefined> = [];

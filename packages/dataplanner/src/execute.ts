@@ -1,3 +1,4 @@
+import EventEmitter from "events";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -8,10 +9,17 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import { $$bypassGraphQL, $$extensions } from "./interfaces";
+import { noop } from "./dev";
+import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces";
+import { $$bypassGraphQL, $$eventEmitter, $$extensions } from "./interfaces";
 import type { CrystalPrepareOptions } from "./prepare";
 import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare";
 import { isPromiseLike } from "./utils";
+
+interface DataPlannerExecuteOptions {
+  experimentalGraphQLBypass?: boolean;
+  explain?: CrystalPrepareOptions["explain"];
+}
 
 /**
  * Use this instead of GraphQL.js' execute method and we'll automatically
@@ -19,10 +27,7 @@ import { isPromiseLike } from "./utils";
  */
 export function execute(
   args: ExecutionArgs,
-  options: {
-    experimentalGraphQLBypass?: boolean;
-    explain?: CrystalPrepareOptions["explain"];
-  } = {},
+  options: DataPlannerExecuteOptions = {},
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -39,19 +44,65 @@ export function execute(
       );
     }
   }
+  if (args.rootValue == null) {
+    args.rootValue = Object.create(null);
+  }
+  if (typeof args.rootValue !== "object" || args.rootValue == null) {
+    throw new Error("DataPlanner requires that the 'rootValue' be an object");
+  }
+  const shouldExplain = !!options.explain?.length;
+  const eventEmitter: ExecutionEventEmitter | undefined = shouldExplain
+    ? new EventEmitter()
+    : undefined;
+  if (shouldExplain) {
+    args.rootValue[$$extensions] = {
+      explain: {
+        operations: [],
+      },
+    };
+  }
+
+  const explainOperations = shouldExplain
+    ? args.rootValue[$$extensions].explain.operations
+    : undefined;
+  const handleExplainOperation = ({
+    operation,
+  }: ExecutionEventMap["explainOperation"]) => {
+    if (options.explain!.includes(operation.type)) {
+      explainOperations.push(operation);
+    }
+  };
+  if (shouldExplain) {
+    args.rootValue[$$eventEmitter] = eventEmitter;
+    eventEmitter!.on("explainOperation", handleExplainOperation);
+  }
+  const unlisten = shouldExplain
+    ? () => {
+        eventEmitter!.removeListener(
+          "explainOperation",
+          handleExplainOperation,
+        );
+      }
+    : undefined;
+
   const rootValue = dataplannerPrepare(args, {
     experimentalGraphQLBypass: options.experimentalGraphQLBypass ?? true,
     explain: options.explain,
   });
+  let next;
   if (isPromiseLike(rootValue)) {
-    return rootValue.then((rootValue) =>
+    next = rootValue.then((rootValue) =>
       executeInner(args, rootValue),
     ) as PromiseOrValue<
       ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
     >;
   } else {
-    return executeInner(args, rootValue);
+    next = executeInner(args, rootValue);
   }
+  if (unlisten) {
+    Promise.resolve(next).finally(unlisten);
+  }
+  return next;
 }
 
 /**

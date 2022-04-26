@@ -22,7 +22,6 @@ import {
   GraphQLID,
   GraphQLInt,
   GraphQLInterfaceType,
-  GraphQLLeafType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -55,11 +54,7 @@ import type {
 import { BucketSetter } from "./bucket";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
-import {
-  ansiPad,
-  crystalPrint,
-  crystalPrintPathIdentity,
-} from "./crystalPrint";
+import { ansiPad, crystalPrint } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import type { CrystalError } from "./error";
@@ -83,13 +78,13 @@ import type {
   CrystalContext,
   CrystalObject,
   CrystalResultsList,
-  CrystalValuesList,
   FieldAndGroup,
   GroupedSelections,
   PlanOptions,
   PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
+import { $$eventEmitter } from "./interfaces";
 import {
   $$bypassGraphQL,
   $$concreteType,
@@ -111,7 +106,6 @@ import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
-  assertModifierPlan,
   ExecutablePlan,
   isListCapablePlan,
   isStreamablePlan,
@@ -123,10 +117,9 @@ import {
   __ItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
-  ConstantPlan,
 } from "./plans";
 import { __ListTransformPlan } from "./plans/listTransform";
-import { assertPolymorphicData, isPolymorphicData } from "./polymorphic";
+import { assertPolymorphicData } from "./polymorphic";
 import {
   $$crystalWrapped,
   isCrystalObject,
@@ -143,8 +136,6 @@ import {
   ROOT_VALUE_OBJECT,
   sharedNull,
 } from "./utils";
-
-const isTest = process.env.NODE_ENV === "test";
 
 /**
  * Once the plan has been requested once from context, we can just return the
@@ -4415,6 +4406,10 @@ export class Aether<
         meta = Object.create(null) as Record<string, unknown>;
         crystalContext.metaByPlanId[plan.id] = meta;
       }
+      const extra = {
+        meta,
+        eventEmitter: crystalContext.eventEmitter,
+      };
       // Note: the `execute` method on plans is responsible for memoizing
       // results into `meta`.
       if (plan instanceof __ItemPlan) {
@@ -4436,7 +4431,7 @@ export class Aether<
         try {
           executionResults = plan.execute(
             dependencyValuesList,
-            meta,
+            extra,
           ) as CrystalResultsList<any>;
           if (typeof (executionResults as any).then === "function") {
             throw new Error(
@@ -4836,6 +4831,10 @@ export class Aether<
       }
       const planOptions = this.planOptionsByPlan.get(plan);
       const isSubscribe = plan.id === this.subscriptionPlanId;
+      const extra = {
+        meta,
+        eventEmitter: crystalContext.eventEmitter,
+      };
       const pendingResults =
         plan instanceof __ListTransformPlan
           ? // __ListTransformPlan gets custom execution.
@@ -4849,10 +4848,10 @@ export class Aether<
           : isSubscribe || planOptions?.stream
           ? await (plan as unknown as StreamablePlan<unknown>).stream(
               dependencyValuesList,
-              meta,
+              extra,
               isSubscribe ? { initialCount: 0 } : planOptions!.stream!,
             )
-          : await plan.execute(dependencyValuesList, meta);
+          : await plan.execute(dependencyValuesList, extra);
       if (plan.debug) {
         console.log(
           `debugPlans(${plan}): called with: ${inspect(dependencyValuesList, {
@@ -5919,6 +5918,7 @@ export class Aether<
         requiresGraphQLJS = true;
       },
       toSerialize: [],
+      eventEmitter: rootValue?.[$$eventEmitter],
     };
     const p = executeBucket(this, metaByPlanId, rootBucket, requestContext);
     const finalize = (list: any[]) => {

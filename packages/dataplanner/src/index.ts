@@ -23,6 +23,7 @@ import { InputPlan } from "./input";
 import {
   $$bypassGraphQL,
   $$data,
+  $$eventEmitter,
   $$idempotent,
   $$verbatim,
   ArgumentPlanResolver,
@@ -34,6 +35,9 @@ import {
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
+  ExecutionEventEmitter,
+  ExecutionEventMap,
+  ExecutionExtra,
   FieldPlanResolver,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -47,6 +51,7 @@ import {
   PolymorphicData,
   PromiseOrDirect,
   TrackedArguments,
+  TypedEventEmitter,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -154,6 +159,7 @@ export {
   $$bypassGraphQL,
   $$crystalWrapped,
   $$data,
+  $$eventEmitter,
   $$idempotent,
   $$verbatim,
   access,
@@ -196,6 +202,9 @@ export {
   EdgePlan,
   ExecutablePlan,
   execute,
+  ExecutionEventEmitter,
+  ExecutionEventMap,
+  ExecutionExtra,
   FieldPlanResolver,
   filter,
   first,
@@ -269,6 +278,7 @@ export {
   subscribe,
   SubscribePlan,
   TrackedArguments,
+  TypedEventEmitter,
 };
 
 exportAsMany({

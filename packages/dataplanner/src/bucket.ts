@@ -3,7 +3,12 @@ import { inspect } from "util";
 
 import type { CrystalError } from ".";
 import { isCrystalError, newCrystalError } from "./error";
-import { $$concreteType, $$idempotent } from "./interfaces";
+import type {
+  ExecutionEventEmitter} from "./interfaces";
+import {
+  $$concreteType,
+  $$idempotent
+} from "./interfaces";
 import type { ExecutablePlan } from "./plan";
 import { isPolymorphicData } from "./polymorphic";
 import { arrayOfLength } from "./utils";
@@ -251,6 +256,8 @@ export interface RequestContext {
     /** serializer */
     s: GraphQLScalarType["serialize"];
   }>;
+
+  readonly eventEmitter: ExecutionEventEmitter | undefined;
 }
 
 /**

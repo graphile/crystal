@@ -15,6 +15,7 @@ import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
+  ExecutionExtra,
   PlanOptimizeOptions,
   PromiseOrDirect,
 } from "./interfaces";
@@ -395,11 +396,11 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    */
   execute(
     values: ReadonlyArray<CrystalValuesList<any>>,
-    meta: Record<string, unknown>,
+    extra: ExecutionExtra,
   ): PromiseOrDirect<CrystalResultsList<TData>> {
     // ESLint/TS: ignore not used.
     values;
-    meta;
+    extra;
     throw new Error(`${this} has not implemented an 'execute' method`);
   }
 }
@@ -451,7 +452,7 @@ export type StreamablePlan<TData> = ExecutablePlan<ReadonlyArray<TData>> & {
    */
   stream(
     values: CrystalValuesList<ReadonlyArray<any>>,
-    meta: Record<string, unknown>,
+    extra: ExecutionExtra,
     streamOptions: {
       initialCount: number;
     },

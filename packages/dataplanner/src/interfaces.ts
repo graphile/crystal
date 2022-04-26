@@ -1,3 +1,4 @@
+import type EventEmitter from "events";
 import type {
   FieldNode,
   GraphQLArgumentConfig,
@@ -106,6 +107,11 @@ export const $$concreteType = Symbol("concreteType");
  */
 export const $$idempotent = Symbol("idempotent");
 
+/**
+ * The event emitter used for outputting execution events.
+ */
+export const $$eventEmitter = Symbol("executionEventEmitter");
+
 // TODO: remove <TData>
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
@@ -184,6 +190,8 @@ export interface CrystalContext {
   };
 
   rootCrystalObject: CrystalObject;
+
+  eventEmitter: ExecutionEventEmitter | undefined;
 }
 
 // These values are just to make reading the code a little clearer
@@ -596,3 +604,55 @@ export type NodeIdHandler<
     >,
   ): TNodePlan;
 };
+
+type BaseEventMap = Record<string, any>;
+type EventMapKey<TEventMap extends BaseEventMap> = string & keyof TEventMap;
+type EventCallback<TPayload> = (params: TPayload) => void;
+
+export interface TypedEventEmitter<TEventMap extends BaseEventMap>
+  extends EventEmitter {
+  addListener<TEventName extends EventMapKey<TEventMap>>(
+    eventName: TEventName,
+    callback: EventCallback<TEventMap[TEventName]>,
+  ): this;
+  on<TEventName extends EventMapKey<TEventMap>>(
+    eventName: TEventName,
+    callback: EventCallback<TEventMap[TEventName]>,
+  ): this;
+  once<TEventName extends EventMapKey<TEventMap>>(
+    eventName: TEventName,
+    callback: EventCallback<TEventMap[TEventName]>,
+  ): this;
+
+  removeListener<TEventName extends EventMapKey<TEventMap>>(
+    eventName: TEventName,
+    callback: EventCallback<TEventMap[TEventName]>,
+  ): this;
+  off<TEventName extends EventMapKey<TEventMap>>(
+    eventName: TEventName,
+    callback: EventCallback<TEventMap[TEventName]>,
+  ): this;
+
+  emit<TEventName extends EventMapKey<TEventMap>>(
+    eventName: TEventName,
+    params: TEventMap[TEventName],
+  ): boolean;
+}
+
+export type ExecutionEventMap = {
+  /**
+   * Something that can be added to the
+   * ExecutionResult.extensions.explain.operations list.
+   */
+  explainOperation: {
+    operation: Record<string, any> & { type: string; title: string };
+  };
+};
+
+export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
+
+// TODO: rename this?
+export interface ExecutionExtra {
+  meta: Record<string, unknown>;
+  eventEmitter: ExecutionEventEmitter | undefined;
+}
