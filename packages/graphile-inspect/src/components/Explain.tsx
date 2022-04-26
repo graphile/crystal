@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import type { ExplainHelpers } from "../hooks/useExplain.js";
 import type { ExplainResults } from "../hooks/useFetcher.js";
+import { Mermaid } from "./Mermaid.js";
 
 export const formatSQL = (sql: string): string => sql;
 
@@ -77,7 +78,7 @@ export const ExplainMain: FC<{
         );
       }
       case "mermaid-js": {
-        return <div>TODO: diagram</div>;
+        return <Mermaid diagram={selectedResult.diagram} />;
       }
       case undefined: {
         return (
