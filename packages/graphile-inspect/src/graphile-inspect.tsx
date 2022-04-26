@@ -1,7 +1,7 @@
 import { GraphiQL } from "graphiql";
 // @ts-ignore
 import GraphiQLExplorer from "graphiql-explorer";
-import type { FC } from "react";
+import { FC, useCallback } from "react";
 import React, { useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
@@ -30,6 +30,12 @@ function noop() {}
 export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
+  const setExplain = useCallback(
+    (newExplain: boolean) => {
+      storage.set("explain", newExplain ? "true" : "");
+    },
+    [storage],
+  );
   const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
     explain,
   });
@@ -200,7 +206,12 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
               : { maxWidth: "60%", maxHeight: "none" }),
           }}
         >
-          <Explain helpers={explainHelpers} results={explainResults} />
+          <Explain
+            explain={explain}
+            setExplain={setExplain}
+            helpers={explainHelpers}
+            results={explainResults}
+          />
         </div>
       ) : null}
       {error ? (

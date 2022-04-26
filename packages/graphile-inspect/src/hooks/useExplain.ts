@@ -22,6 +22,9 @@ export const useExplain = (storage: GraphileInspectStorage): ExplainHelpers => {
   const setShowExplain = useCallback(
     (nextShowExplain: boolean) => {
       _setShowExplain(nextShowExplain);
+      if (nextShowExplain) {
+        storage.set("explain", "true");
+      }
       storage.set("explainIsOpen", nextShowExplain ? "true" : "");
     },
     [storage],

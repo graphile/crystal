@@ -8,9 +8,11 @@ import { Mermaid } from "./Mermaid.js";
 export const formatSQL = (sql: string): string => sql;
 
 export const Explain: FC<{
+  explain: boolean;
+  setExplain: (newExplain: boolean) => void;
   helpers: ExplainHelpers;
   results: ExplainResults | null;
-}> = ({ helpers, results }) => {
+}> = ({ explain, setExplain, helpers, results }) => {
   const { setShowExplain } = helpers;
   return (
     <>
@@ -28,10 +30,17 @@ export const Explain: FC<{
       </div>
       <div className="doc-explorer-contents">
         {!results ? (
-          <p>
-            There are no explain results to display - perhaps you have not yet
-            ran an operation against a server that supports this feature?
-          </p>
+          !explain ? (
+            <>
+              <p>WARNING: you've not enabled the 'explain' functionality</p>
+              <button onClick={() => setExplain(true)}>Enable explain</button>
+            </>
+          ) : (
+            <p>
+              There are no explain results to display - perhaps you have not yet
+              ran an operation against a server that supports this feature?
+            </p>
+          )
         ) : results.operations.length === 0 ? (
           <p>Empty explain results</p>
         ) : (

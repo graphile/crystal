@@ -1,7 +1,7 @@
 import type { CreateFetcherOptions } from "@graphiql/toolkit";
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
-import type { Fetcher, FetcherReturnType } from "graphiql";
-import type { ExecutionResult } from "graphql";
+import type { Fetcher, FetcherParams, FetcherReturnType } from "graphiql";
+import { ExecutionResult, getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";
@@ -45,6 +45,25 @@ const isExplainResultsLike = (explain: any): explain is ExplainResults => {
     Array.isArray((explain as any).operations) &&
     (explain as any).operations.every(isExplainOperationLike)
   );
+};
+
+const isIntrospectionQuery = (params: FetcherParams) => {
+  try {
+    if (params.operationName === "IntrospectionQuery") {
+      return true;
+    }
+    if (params.operationName) {
+      return false;
+    }
+    const ast = parse(params.query);
+    const def = getOperationAST(ast, params.operationName);
+    if (def?.name?.value === "IntrospectionQuery") {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
 };
 
 export const useFetcher = (
@@ -149,6 +168,12 @@ export const useFetcher = (
       ...args: Parameters<Fetcher>
     ): Promise<FetcherReturnType> {
       const result = await fetcher(...args);
+
+      // Short circuit the introspection query so as to not confuse people
+      if (isIntrospectionQuery(args[0])) {
+        return result;
+      }
+
       setTimeout(() => {
         setExplainResults(null);
       }, 0);
