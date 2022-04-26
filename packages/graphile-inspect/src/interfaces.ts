@@ -2,9 +2,14 @@ import type { GraphiQLProps } from "graphiql";
 
 export interface GraphileInspectProps {
   /**
-   * The URL to the GraphQL endpoint.
+   * The URL to the GraphQL endpoint. (http:// or https://)
    */
   endpoint?: string;
+
+  /**
+   * The URL to the GraphQL subscriptions endpoint. (ws:// or wss://)
+   */
+  subscriptionEndpoint?: string;
 
   editorTheme?: GraphiQLProps["editorTheme"];
 

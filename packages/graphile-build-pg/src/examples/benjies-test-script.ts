@@ -40,6 +40,8 @@ import { IncomingMessage } from "http";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
+import * as ws from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -352,6 +354,49 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
 
   app.listen(4000, () => {
     console.log(`GraphQL server is running...`);
+    const wsServer = new ws.Server({
+      server: app.server,
+      path: "/graphql",
+    });
+
+    useServer(
+      {
+        execute: (args: any) => args.rootValue.execute(args),
+        subscribe: (args: any) => args.rootValue.subscribe(args),
+        onSubscribe: async (ctx, msg) => {
+          const {
+            parse,
+            validate,
+            contextFactory,
+            execute,
+            schema,
+            subscribe,
+          } = getEnveloped({
+            connectionParams: ctx.connectionParams,
+            socket: ctx.extra.socket,
+            request: ctx.extra.request,
+          });
+
+          const args = {
+            schema,
+            operationName: msg.payload.operationName,
+            document: parse(msg.payload.query),
+            variableValues: msg.payload.variables,
+            contextValue: await contextFactory(),
+            rootValue: {
+              execute,
+              subscribe,
+            },
+          };
+
+          const errors = validate(args.schema, args.document);
+          if (errors.length) return errors;
+
+          return args;
+        },
+      },
+      wsServer,
+    );
   });
   console.log("Running a GraphQL API server at http://localhost:4000/graphql");
 

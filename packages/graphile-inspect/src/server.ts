@@ -60,6 +60,12 @@ export interface GraphileInspectServerConfig {
    * The URL to the GraphQL endpoint.
    */
   endpoint?: string;
+
+  /**
+   * The URL to the GraphQL subscriptions endpoint. (ws:// or wss://)
+   */
+  subscriptionEndpoint?: string;
+
   editorTheme?: GraphiQLProps["editorTheme"];
   /**
    * The list of debug tools available to the user.

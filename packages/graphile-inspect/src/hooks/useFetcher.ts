@@ -66,6 +66,16 @@ const isIntrospectionQuery = (params: FetcherParams) => {
   }
 };
 
+function makeWsUrl(url: string): string {
+  if (url.startsWith("/")) {
+    return `ws${window.location.protocol === "https:" ? "s" : ""}://${
+      window.location.host
+    }${url}`;
+  } else {
+    return url;
+  }
+}
+
 export const useFetcher = (
   props: GraphileInspectProps,
   options: { explain: boolean },
@@ -74,6 +84,9 @@ export const useFetcher = (
   const url =
     props.endpoint ??
     (typeof window !== "undefined" ? window.location.origin : "") + "/graphql";
+  const subscriptionUrl = props.subscriptionEndpoint
+    ? makeWsUrl(props.subscriptionEndpoint)
+    : undefined;
   const [explainResults, setExplainResults] = useState<ExplainResults | null>(
     null,
   );
@@ -112,6 +125,7 @@ export const useFetcher = (
   const fetcherOptions = useMemo<CreateFetcherOptions>(
     () => ({
       url,
+      subscriptionUrl,
       headers: {
         ...(explain
           ? {
@@ -122,7 +136,7 @@ export const useFetcher = (
       },
       fetch: ourFetch,
     }),
-    [explain, url, ourFetch],
+    [explain, url, subscriptionUrl, ourFetch],
   );
 
   const fetcher = useMemo(

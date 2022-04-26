@@ -20,6 +20,12 @@ function options(yargs: Argv) {
       description: "the endpoint to connect to",
       default: "http://localhost:5000/graphql",
     })
+    .option("subscriptionEndpoint", {
+      alias: "s",
+      type: "string",
+      description: "the endpoint to connect to for subscription operations",
+      default: "ws://localhost:5000/graphql",
+    })
     .option("proxy", {
       alias: "P",
       type: "boolean",
@@ -40,9 +46,9 @@ async function tryLoadHttpProxy() {
   }
 }
 async function run(argv: InspectArgv) {
-  const { port, endpoint, proxy: enableProxy } = argv;
+  const { port, endpoint, subscriptionEndpoint, proxy: enableProxy } = argv;
   const httpProxy = enableProxy ? await tryLoadHttpProxy() : null;
-  const proxy = httpProxy?.createProxyServer({});
+  const proxy = httpProxy?.createProxyServer({ target: endpoint, ws: true });
   if (enableProxy && !proxy) {
     throw new Error(
       "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'graphile-inspect'",
@@ -50,22 +56,27 @@ async function run(argv: InspectArgv) {
   }
   proxy?.on("error", (e, req, res) => {
     console.error("Error occurred whilst attempting to proxy:", e);
-    if ("writeHead" in res && res.writeHead) {
+    if (res && "writeHead" in res && res.writeHead) {
       res.writeHead(500, {
         "Content-Type": "application/json",
       });
 
       res.end('{"errors": [{"message": "Proxying failed"}]}');
-    } else {
+    } else if (res) {
       // Terminate the socket
       res.end();
     }
   });
   const endpointUrl = new URL(endpoint);
+  const subscriptionsEndpointUrl = subscriptionEndpoint
+    ? new URL(subscriptionEndpoint)
+    : undefined;
   const endpointBase = new URL(endpointUrl);
   endpointBase.pathname = "";
   endpointBase.search = "";
   endpointBase.hash = "";
+  const endpointWsBase = new URL(endpointBase);
+  endpointWsBase.protocol = endpointBase.protocol === "https:" ? "wss:" : "ws:";
 
   if (!httpProxy) {
     console.log(
@@ -85,6 +96,11 @@ async function run(argv: InspectArgv) {
           endpoint: proxy
             ? endpointUrl.pathname + endpointUrl.search
             : endpoint,
+          subscriptionEndpoint:
+            proxy && subscriptionsEndpointUrl
+              ? subscriptionsEndpointUrl.pathname +
+                subscriptionsEndpointUrl.search
+              : subscriptionEndpoint,
         }),
       );
       return;
@@ -101,7 +117,9 @@ async function run(argv: InspectArgv) {
 
   if (proxy) {
     server.on("upgrade", (req, socket, head) => {
-      proxy.ws(req, socket, head);
+      proxy.ws(req, socket, head, {
+        target: endpointWsBase,
+      });
     });
   }
 
