@@ -600,7 +600,7 @@ const UUID_REGEXP = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
  */
 function makeResultSnapshotSafe(
   data: any,
-  replacements = { uuid: new Map<string, number>(), uuidCounter: 1 },
+  replacements: { uuid: Map<string, number>; uuidCounter: number },
 ): any {
   if (Array.isArray(data)) {
     return data.map((entry) => makeResultSnapshotSafe(entry, replacements));
@@ -630,6 +630,15 @@ function makeResultSnapshotSafe(
   }
 }
 
+function makePayloadSnapshotSafe(
+  payload: any,
+  replacements: { uuid: Map<string, number>; uuidCounter: number },
+) {
+  const p = { ...payload };
+  delete p.extensions;
+  return makeResultSnapshotSafe(p, replacements);
+}
+
 /**
  * Build the snapshot for the given mode ('only') and then assert it matches
  * (or store it).
@@ -655,12 +664,15 @@ export const assertSnapshotsMatch = async (
   const graphString = extensions?.explain?.operations?.find(
     (op) => op.type === "mermaid-js",
   )?.diagram;
+  const replacements = { uuid: new Map<string, number>(), uuidCounter: 1 };
 
   if (only === "result") {
     const resultFileName = basePath + (ext || "") + ".json5";
     const processedResults = payloads
-      ? payloads.map((payload) => makeResultSnapshotSafe(payload))
-      : makeResultSnapshotSafe(data);
+      ? payloads.map((payload) =>
+          makePayloadSnapshotSafe(payload, replacements),
+        )
+      : makePayloadSnapshotSafe(data, replacements);
     const formattedData =
       //prettier.format(
       JSON5.stringify(processedResults, {
@@ -675,7 +687,7 @@ export const assertSnapshotsMatch = async (
   } else if (only === "errors") {
     const errorsFileName = basePath + (ext || "") + ".errors.json5";
     const processedErrors = errors
-      ? makeResultSnapshotSafe(errors).sort(
+      ? makeResultSnapshotSafe(errors, replacements).sort(
           (e1: GraphQLError, e2: GraphQLError) => {
             return pathCompare(e1.path, e2.path);
           },
