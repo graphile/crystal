@@ -116,11 +116,7 @@ import {
 } from "./plans";
 import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
-import {
-  bypassGraphQLExecute,
-  CrystalPrepareOptions,
-  dataplannerPrepare,
-} from "./prepare";
+import { bypassGraphQLExecute, CrystalPrepareOptions } from "./prepare";
 import {
   $$crystalWrapped,
   crystalResolve,
@@ -191,7 +187,6 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   dataplannerEnforce,
-  dataplannerPrepare,
   dataplannerResolver,
   dataplannerSubscriber,
   debugPlans,
@@ -343,7 +338,6 @@ exportAsMany({
   $$crystalWrapped,
   isCrystalWrapped,
   dataplannerResolver,
-  dataplannerPrepare,
   bypassGraphQLExecute,
   crystalResolve,
   dataplannerSubscriber,

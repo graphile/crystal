@@ -7,8 +7,7 @@ if (process.env.DEBUG) {
 }
 
 import type { BaseGraphQLContext } from "dataplanner";
-import { dataplannerPrepare } from "dataplanner";
-import { $$bypassGraphQL } from "dataplanner/dist/interfaces";
+import { $$bypassGraphQL, execute } from "dataplanner";
 import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
@@ -17,7 +16,6 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import {
-  execute,
   getOperationAST,
   parse,
   subscribe,
@@ -403,47 +401,26 @@ export async function runTestQuery(
       );
     }
 
-    const rootValueRaw =
-      options.prepare === false
-        ? null
-        : dataplannerPrepare(
+    const result =
+      operationType === "subscription"
+        ? await subscribe({
+            schema,
+            document,
+            variableValues,
+            contextValue,
+          })
+        : await execute(
             {
               schema,
               document,
               variableValues,
               contextValue,
-              rootValue: null,
             },
-            { experimentalGraphQLBypass: true, explain: ["mermaid-js"] },
+            {
+              experimentalGraphQLBypass: true,
+              explain: ["mermaid-js"],
+            },
           );
-
-    const rootValue =
-      rootValueRaw != null &&
-      "then" in rootValueRaw &&
-      typeof rootValueRaw.then === "function"
-        ? await rootValueRaw
-        : rootValueRaw;
-
-    const result = rootValue?.[$$bypassGraphQL]
-      ? // JSON.parse/stringify is to throw away the symbols/undefineds as would be done in the GraphQL request
-        Object.assign(Object.create(null), {
-          data: JSON.parse(JSON.stringify(rootValue)),
-        })
-      : operationType === "subscription"
-      ? await subscribe({
-          schema,
-          document,
-          variableValues,
-          contextValue,
-          rootValue,
-        })
-      : await execute({
-          schema,
-          document,
-          variableValues,
-          contextValue,
-          rootValue,
-        });
 
     if (isAsyncIterable(result)) {
       let errors: GraphQLError[] | undefined = undefined;
@@ -547,7 +524,8 @@ export async function runTestQuery(
 
       return { payloads, errors, queries };
     } else {
-      const { data, errors, extensions } = result;
+      // Throw away symbol keys/etc
+      const { data, errors, extensions } = JSON.parse(JSON.stringify(result));
       if (errors) {
         console.error(errors[0].originalError || errors[0]);
       }

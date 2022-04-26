@@ -37,6 +37,8 @@ export interface CrystalPrepareOptions {
  * result from this might be suitable to return to the user directly if you
  * enable the `experimentalGraphQLBypass` (if this is the case then the
  * `$$bypassGraphQL` key will be set on the result object).
+ *
+ * @internal
  */
 export function dataplannerPrepare(
   args: ExecutionArgs,
@@ -76,7 +78,7 @@ export function dataplannerPrepare(
         concise: !isTest,
       });
     }
-    rootValue[$$extensions].explain!.operations.push({
+    rootValue[$$extensions]?.explain?.operations.push({
       type: "mermaid-js",
       title: "Plan",
       diagram: aether[$$contextPlanCache],
