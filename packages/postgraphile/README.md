@@ -14,8 +14,8 @@ GraphQL API backed primarily by a PostgreSQL database. Our main focusses are
 performance, automatic best-practices and customisability/extensibility. Use
 this if you have a PostgreSQL database and you want to use it as the "source of
 truth" for an auto-generated GraphQL API (which you can still make significant
-changes to). **NOTE**: thanks to [graphile-export][] you can also use this as
-a starting point for an API that you then manage yourself.
+changes to). **NOTE**: thanks to [graphile-export][] you can also use this as a
+starting point for an API that you then manage yourself.
 
 <!-- SPONSORS_BEGIN -->
 

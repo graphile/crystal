@@ -39,12 +39,12 @@ import {
   groupBy,
   lambda,
   list,
+  listen,
   newGraphileFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
   resolveType,
-  listen,
 } from "dataplanner";
 import { writeFileSync } from "fs";
 import { EXPORTABLE } from "graphile-export";

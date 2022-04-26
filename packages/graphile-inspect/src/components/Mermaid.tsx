@@ -1,5 +1,6 @@
 import mermaid from "mermaid";
-import { FC, useEffect } from "react";
+import type { FC } from "react";
+import { useEffect } from "react";
 
 (mermaid as any).initialize({
   startOnLoad: true,

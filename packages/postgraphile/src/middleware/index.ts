@@ -95,7 +95,6 @@ export function postgraphile(schemaResult: SchemaResult) {
     };
   };
 
-  let latestPlanDefinition: null | string = null;
   return (req: IncomingMessage, res: ServerResponse, next: any): void => {
     const handleError = makeErrorHandler(req, res, next);
 

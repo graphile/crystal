@@ -1,7 +1,8 @@
 import type { CreateFetcherOptions } from "@graphiql/toolkit";
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
 import type { Fetcher, FetcherParams, FetcherReturnType } from "graphiql";
-import { ExecutionResult, getOperationAST, parse } from "graphql";
+import type { ExecutionResult } from "graphql";
+import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";

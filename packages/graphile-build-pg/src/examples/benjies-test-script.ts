@@ -17,8 +17,8 @@ import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
 import {
   execute as dataplannerExecute,
-  subscribe as dataplannerSubscribe,
   stripAnsi,
+  subscribe as dataplannerSubscribe,
 } from "dataplanner";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
@@ -40,12 +40,12 @@ import {
   renderGraphiQL,
   sendResult,
 } from "graphql-helix";
-import { IncomingMessage } from "http";
+import { useServer } from "graphql-ws/lib/use/ws";
+import type { IncomingMessage } from "http";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
 import * as ws from "ws";
-import { useServer } from "graphql-ws/lib/use/ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 

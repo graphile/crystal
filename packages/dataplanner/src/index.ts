@@ -18,7 +18,6 @@ import { defer, Deferred } from "./deferred";
 import { isDev, noop } from "./dev";
 import { CrystalError, isCrystalError } from "./error";
 import { execute } from "./execute";
-import { subscribe } from "./subscribe";
 import { getCurrentParentPathIdentity } from "./global";
 import { InputPlan } from "./input";
 import {
@@ -98,6 +97,8 @@ import {
   last,
   LastPlan,
   list,
+  listen,
+  ListenPlan,
   ListPlan,
   listTransform,
   makeMapper,
@@ -112,8 +113,6 @@ import {
   reverse,
   reverseArray,
   ReversePlan,
-  listen,
-  ListenPlan,
 } from "./plans";
 import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
@@ -126,6 +125,7 @@ import {
   isCrystalWrapped,
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
+import { subscribe } from "./subscribe";
 import {
   arraysMatch,
   getEnumValueConfig,
@@ -198,7 +198,6 @@ export {
   EdgePlan,
   ExecutablePlan,
   execute,
-  subscribe,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
@@ -234,6 +233,8 @@ export {
   LastPlan,
   list,
   ListCapablePlan,
+  listen,
+  ListenPlan,
   ListPlan,
   listTransform,
   makeCrystalSchema,
@@ -272,8 +273,7 @@ export {
   ROOT_PATH,
   StreamablePlan,
   stripAnsi,
-  listen,
-  ListenPlan,
+  subscribe,
   TrackedArguments,
   TypedEventEmitter,
 };

@@ -1127,10 +1127,7 @@ function func(
           ),
         ]);
       } else {
-        const iCrystalResolve = file.import(
-          "dataplanner",
-          "crystalResolve",
-        );
+        const iCrystalResolve = file.import("dataplanner", "crystalResolve");
         return iCrystalResolve;
       }
     }
@@ -1657,10 +1654,7 @@ function exportSchemaTypeDefs({
 
   file.addStatements(typeDefs);
   file.addStatements(plans);
-  const makeCrystalSchemaAST = file.import(
-    "dataplanner",
-    "makeCrystalSchema",
-  );
+  const makeCrystalSchemaAST = file.import("dataplanner", "makeCrystalSchema");
 
   const schemaAST = t.callExpression(makeCrystalSchemaAST, [
     t.objectExpression(

@@ -1,15 +1,16 @@
 import EventEmitter from "events";
-import {
+import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
-  subscribe as graphqlSubscribe,
 } from "graphql";
-import { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
+import { subscribe as graphqlSubscribe } from "graphql";
+import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { inspect } from "util";
+
+import type { DataPlannerExecuteOptions } from "./execute.js";
 import {
   addExtensionsToExecutionResult,
-  DataPlannerExecuteOptions,
   withDataPlannerArgs,
 } from "./execute.js";
 import { $$extensions, ExecutionEventEmitter } from "./interfaces.js";

@@ -42,13 +42,13 @@ export { groupBy } from "./groupBy";
 export { lambda, LambdaPlan } from "./lambda";
 export { last, LastPlan } from "./last";
 export { list, ListPlan } from "./list";
+export { listen, ListenPlan } from "./listen";
 export { __ListTransformPlan, listTransform } from "./listTransform";
 export { makeMapper, map, MapPlan } from "./map";
 export { node, NodePlan } from "./node";
 export { object, ObjectPlan } from "./object";
 export { partitionByIndex } from "./partitionByIndex";
 export { reverse, reverseArray, ReversePlan } from "./reverse";
-export { listen, ListenPlan } from "./listen";
 
 // Internal plans
 export { __InputListPlan } from "./__inputList";
