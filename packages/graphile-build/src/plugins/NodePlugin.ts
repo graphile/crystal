@@ -1,10 +1,8 @@
 import type { NodeIdCodec, NodeIdHandler } from "dataplanner";
-import { constant, node, NodePlan, resolveType } from "dataplanner";
+import { node, resolveType } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
-
-import { isValidObjectType } from "../utils.js";
 
 declare global {
   namespace GraphileEngine {
@@ -113,9 +111,6 @@ export const NodePlugin: Plugin = {
         } = build;
         const nodeTypeName = build.inflection.builtin("Node");
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
-        const queryTypeName = build.inflection.builtin("Query");
-        const nodeIdCodecs = build[NODE_ID_CODECS];
-        const nodeIdHandlerByTypeName = build[NODE_ID_HANDLER_BY_TYPE_NAME];
         build.registerInterfaceType(
           nodeTypeName,
           {},

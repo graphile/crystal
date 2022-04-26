@@ -1,4 +1,4 @@
-import generate from "@babel/generator";
+// import generate from "@babel/generator";
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 
@@ -61,7 +61,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
           const argPath = argumentsPaths[i];
 
           if (t.isIdentifier(arg)) {
-            const binding = calleePath.scope.bindings[param.name];
+            // const binding = calleePath.scope.bindings[param.name];
 
             // TODO: how do we correctly determine if this is safe?
             if (!calleePath.scope[arg.name]) {
@@ -111,7 +111,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
         path.scope.crawl();
 
         // Replace all things that are only referenced once
-        for (const [bindingName, binding] of Object.entries(
+        for (const [_bindingName, binding] of Object.entries(
           path.scope.bindings,
         )) {
           if (!t.isVariableDeclarator(binding.path.node)) {

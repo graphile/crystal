@@ -7,7 +7,6 @@ import type {
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLObjectType } from "graphql";
 
 import { version } from "../index";
 
@@ -59,8 +58,6 @@ export const NodeAccessorPlugin: Plugin = {
         } = build;
         const {
           scope: { isRootQuery },
-          Self,
-          fieldWithHooks,
         } = context;
         if (!isRootQuery) {
           return fields;

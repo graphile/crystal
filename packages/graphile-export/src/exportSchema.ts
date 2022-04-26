@@ -1084,12 +1084,14 @@ export function objectNullPrototype(
   );
 }
 
+/*
 function iife(statements: t.Statement[]): t.Expression {
   return t.callExpression(
     t.arrowFunctionExpression([], t.blockStatement(statements)),
     [],
   );
 }
+*/
 
 function func(
   file: CodegenFile,
@@ -1217,7 +1219,7 @@ function factoryAst<TTuple extends any[]>(
 function funcToAst(
   fn: AnyFunction,
   locationHint: string,
-  nameHint: string,
+  _nameHint: string,
 ): t.FunctionExpression | t.ArrowFunctionExpression {
   const funcString = fn.toString().trim();
   try {
@@ -1301,9 +1303,7 @@ interface SchemaExportDetails {
  * Exposes a `GraphQLSchema` object built via GraphQL.js constructors
  */
 function exportSchemaGraphQLJS({
-  schema,
   config,
-  options,
   customTypes,
   customDirectives,
   file,
@@ -1357,10 +1357,7 @@ function exportSchemaGraphQLJS({
  */
 function exportSchemaTypeDefs({
   schema,
-  config,
-  options,
   customTypes,
-  customDirectives,
   file,
 }: SchemaExportDetails) {
   const typeDefsExportName = file.makeVariable("typeDefs");
@@ -1544,7 +1541,6 @@ function exportSchemaTypeDefs({
         );
       }
     } else if (type instanceof GraphQLScalarType) {
-      const typeProperties: t.ObjectProperty[] = [];
       const config = type.toConfig();
       const planAST = config.extensions.graphile?.plan
         ? convertToIdentifierViaAST(

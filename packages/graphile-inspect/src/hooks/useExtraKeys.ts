@@ -1,7 +1,7 @@
 import type { Editor as CodeMirrorEditor, Position } from "codemirror";
 import type { GraphiQL } from "graphiql";
 import { parse } from "graphql";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import type { GraphileInspectProps } from "../interfaces.js";
 
