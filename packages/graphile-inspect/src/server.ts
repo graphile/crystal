@@ -39,7 +39,7 @@ const graphiQLHeader = `\
 </head>
 <body style="margin: 0;">
 <div style="height: 100vh;" id="graphile-inspect-root"></div>
-<link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
+<link href="https://unpkg.com/graphiql@1.8.7/graphiql.min.css" rel="stylesheet" />
 <script>${escapeJS(graphiQLContent)}</script>
 <script>
   const { React, createRoot, GraphileInspect } = GraphileInspectBundle;
