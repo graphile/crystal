@@ -94,9 +94,12 @@ export const ExplainMain: FC<{
   })();
   return (
     <div>
-      <select>
+      <select
+        value={String(selectedIndex)}
+        onChange={(e) => setSelectedIndex(parseInt(e.target.value, 10))}
+      >
         {results.operations.map((o, i) => (
-          <option selected={i === selectedIndex} value={i}>
+          <option value={String(i)} key={i}>
             {o.title}
           </option>
         ))}
