@@ -6,6 +6,10 @@ node_modules
 /packages/postgraphile/postgraphiql
 /packages/postgraphile/assets
 /packages/postgraphile/src/assets
+/packages/graphile-inspect/bundle
+/packages/graphile-build-pg/webpacked
+/packages/graphile-build-pg/exported-schema-for-webpack.mjs
+/packages/graphile-build-pg/schema-export-output.mjs
 /wal2json
 dist
 CHANGELOG.md

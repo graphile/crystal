@@ -27,3 +27,4 @@ WHAT_ARE_YOU_DOING.md
 packages/graphile-build-pg/webpacked
 packages/graphile-build-pg/exported-schema-for-webpack.mjs
 packages/graphile-build-pg/schema-export-output.mjs
+packages/graphile-inspect/bundle
