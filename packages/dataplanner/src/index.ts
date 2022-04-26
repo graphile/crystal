@@ -111,8 +111,8 @@ import {
   reverse,
   reverseArray,
   ReversePlan,
-  subscribe,
-  SubscribePlan,
+  listen,
+  ListenPlan,
 } from "./plans";
 import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
@@ -270,8 +270,8 @@ export {
   ROOT_PATH,
   StreamablePlan,
   stripAnsi,
-  subscribe,
-  SubscribePlan,
+  listen,
+  ListenPlan,
   TrackedArguments,
   TypedEventEmitter,
 };
@@ -331,8 +331,8 @@ exportAsMany({
   reverse,
   reverseArray,
   ReversePlan,
-  subscribe,
-  SubscribePlan,
+  listen,
+  ListenPlan,
   polymorphicWrap,
   resolveType,
   $$crystalWrapped,

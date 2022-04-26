@@ -13,7 +13,7 @@ import { constant } from "./constant";
  * topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
  * callback.
  */
-export class SubscribePlan<
+export class ListenPlan<
     TTopics extends { [topic: string]: any },
     TTopic extends keyof TTopics,
     TPayloadPlan extends ExecutablePlan,
@@ -23,7 +23,7 @@ export class SubscribePlan<
 {
   static $$export = {
     moduleName: "dataplanner",
-    exportName: "SubscribePlan",
+    exportName: "ListenPlan",
   };
   isSyncAndSafe = true;
 
@@ -55,9 +55,7 @@ export class SubscribePlan<
   }
 
   execute(): never {
-    throw new Error(
-      "SubscribePlan cannot be executed, it can only be streamed",
-    );
+    throw new Error("ListenPlan cannot be executed, it can only be streamed");
   }
 
   stream(
@@ -78,7 +76,7 @@ export class SubscribePlan<
  * topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
  * callback.
  */
-export function subscribe<
+export function listen<
   TTopics extends { [topic: string]: any },
   TTopic extends keyof TTopics,
   TPayloadPlan extends ExecutablePlan,
@@ -88,8 +86,8 @@ export function subscribe<
     | CrystalSubscriber<TTopics>,
   topicOrPlan: ExecutablePlan<TTopic> | string,
   itemPlan: (itemPlan: __ItemPlan<TTopics[TTopic]>) => TPayloadPlan,
-): SubscribePlan<TTopics, TTopic, TPayloadPlan> {
-  return new SubscribePlan<TTopics, TTopic, TPayloadPlan>(
+): ListenPlan<TTopics, TTopic, TPayloadPlan> {
+  return new ListenPlan<TTopics, TTopic, TPayloadPlan>(
     pubsubOrPlan,
     topicOrPlan,
     itemPlan,

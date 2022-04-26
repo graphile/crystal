@@ -44,7 +44,7 @@ import {
   newObjectTypeBuilder,
   object,
   resolveType,
-  subscribe,
+  listen,
 } from "dataplanner";
 import { writeFileSync } from "fs";
 import { EXPORTABLE } from "graphile-export";
@@ -4622,7 +4622,7 @@ export function makeExampleSchema(
         },
         type: ForumMessageSubscriptionPayload,
         subscribePlan: EXPORTABLE(
-          (context, jsonParse, lambda, subscribe) =>
+          (context, jsonParse, lambda, listen) =>
             function subscribePlan(_$root, args) {
               const $forumId = args.forumId as __InputStaticLeafPlan<number>;
               const $topic = lambda($forumId, (id) => `forum:${id}:message`);
@@ -4630,9 +4630,9 @@ export function makeExampleSchema(
                 "pgSubscriber",
               ) as AccessPlan<CrystalSubscriber>;
 
-              return subscribe($pgSubscriber, $topic, jsonParse);
+              return listen($pgSubscriber, $topic, jsonParse);
             },
-          [context, jsonParse, lambda, subscribe],
+          [context, jsonParse, lambda, listen],
         ),
         plan: EXPORTABLE(
           () =>

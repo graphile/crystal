@@ -48,7 +48,7 @@ export { node, NodePlan } from "./node";
 export { object, ObjectPlan } from "./object";
 export { partitionByIndex } from "./partitionByIndex";
 export { reverse, reverseArray, ReversePlan } from "./reverse";
-export { subscribe, SubscribePlan } from "./subscribe";
+export { listen, ListenPlan } from "./listen";
 
 // Internal plans
 export { __InputListPlan } from "./__inputList";
