@@ -94,7 +94,12 @@ export const useFetcher = (
     () => ({
       url,
       headers: {
-        ...(explain ? { "X-PostGraphile-Explain": "on" } : null),
+        ...(explain
+          ? {
+              "X-PostGraphile-Explain": "on",
+              "X-GraphQL-Explain": "mermaid-js,sql",
+            }
+          : null),
       },
       fetch: ourFetch,
     }),
@@ -144,6 +149,9 @@ export const useFetcher = (
       ...args: Parameters<Fetcher>
     ): Promise<FetcherReturnType> {
       const result = await fetcher(...args);
+      setTimeout(() => {
+        setExplainResults(null);
+      }, 0);
       if ("subscribe" in result) {
         // TODO: support wrapping subscriptions
       } else if ("next" in result && typeof result.next === "function") {

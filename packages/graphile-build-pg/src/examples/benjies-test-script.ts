@@ -36,6 +36,7 @@ import {
   renderGraphiQL,
   sendResult,
 } from "graphql-helix";
+import { IncomingMessage } from "http";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
@@ -184,10 +185,17 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
    */
   const useDataPlanner = (): Plugin => ({
     async onExecute(opts) {
+      const explainHeaders = (
+        (opts.args.contextValue as any)?.req as IncomingMessage | undefined
+      )?.headers["x-graphql-explain"];
+      const explainHeader = Array.isArray(explainHeaders)
+        ? explainHeaders.join(",")
+        : explainHeaders;
+      const explain = explainHeader?.split(",");
       opts.setExecuteFn((args) =>
         dataplannerExecute(args, {
           experimentalGraphQLBypass: true,
-          explain: ["mermaid-js"],
+          explain,
         }),
       );
     },
@@ -284,6 +292,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
         "Content-Length",
         // For PostGraphile V4's 'Explain' feature
         "X-PostGraphile-Explain",
+        "X-GraphQL-Explain",
       ].join(", "),
     );
     res.raw.setHeader(
