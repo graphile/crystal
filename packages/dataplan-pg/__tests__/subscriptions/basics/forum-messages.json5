@@ -29,7 +29,7 @@
       forumMessage: {
         operationType: "insert",
         message: {
-          id: "<UUID 1>",
+          id: "<UUID 2>",
           featured: false,
           body: "New message 2",
           isArchived: false,
