@@ -1,6 +1,12 @@
 [
   {
     message: 'Cannot return null for non-nullable field Hashes.throwNonNullError.',
+    locations: [
+      {
+        line: 11,
+        column: 11,
+      },
+    ],
     path: [
       'randomUser',
       'usernameHashes',
@@ -8,16 +14,15 @@
       'nne',
       'throwNonNullError',
     ],
-    locations: [
-      {
-        line: 11,
-        column: 11,
-      },
-    ],
-    extensions: {},
   },
   {
     message: 'Test',
+    locations: [
+      {
+        line: 16,
+        column: 11,
+      },
+    ],
     path: [
       'randomUser',
       'usernameHashes',
@@ -25,27 +30,19 @@
       'te',
       'throwTestError',
     ],
-    locations: [
-      {
-        line: 16,
-        column: 11,
-      },
-    ],
-    extensions: {},
   },
   {
     message: 'Test',
-    path: [
-      'randomUser',
-      'usernameHashes',
-      'throwTestError',
-    ],
     locations: [
       {
         line: 22,
         column: 7,
       },
     ],
-    extensions: {},
+    path: [
+      'randomUser',
+      'usernameHashes',
+      'throwTestError',
+    ],
   },
 ]
