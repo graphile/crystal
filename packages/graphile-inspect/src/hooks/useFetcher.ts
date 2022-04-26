@@ -119,21 +119,25 @@ export const useFetcher = (
       if (result.extensions?.explain) {
         const explain = result.extensions.explain;
         if (typeof explain === "object" && isExplainResultsLike(explain)) {
-          setExplainResults(explain);
+          setTimeout(() => {
+            setExplainResults(explain);
+          }, 0);
         } else {
           console.warn(
             "The response had `extensions.explain` set, but in an incompatible format.",
           );
         }
       } else if (legacy) {
-        setExplainResults({
-          operations: legacy.map((l, i) => ({
-            type: "sql",
-            title: `Legacy explain ${i + 1}`,
-            query: l.query,
-            explain: l.plan,
-          })),
-        });
+        setTimeout(() => {
+          setExplainResults({
+            operations: legacy.map((l, i) => ({
+              type: "sql",
+              title: `Legacy explain ${i + 1}`,
+              query: l.query,
+              explain: l.plan,
+            })),
+          });
+        }, 0);
       }
     };
     return async function (
@@ -143,8 +147,10 @@ export const useFetcher = (
       if ("subscribe" in result) {
         // TODO: support wrapping subscriptions
       } else if ("next" in result && typeof result.next === "function") {
+        // Return a new iterator, equivalent to the old, but that calls 'processPayload'
         return {
-          ...result,
+          throw: result.throw?.bind(result),
+          return: result.return?.bind(result),
           next(...args) {
             const n = result.next(...args);
             Promise.resolve(n).then(({ done: _done, value }) => {
@@ -154,7 +160,10 @@ export const useFetcher = (
             });
             return n;
           },
-        } as AsyncIterator<any, any, any>;
+          [Symbol.asyncIterator]() {
+            return this;
+          },
+        } as AsyncIterableIterator<any>;
       } else {
         processPayload(result);
       }
