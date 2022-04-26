@@ -2,7 +2,7 @@ import { GraphiQL } from "graphiql";
 // @ts-ignore
 import GraphiQLExplorer from "graphiql-explorer";
 import { FC, useCallback } from "react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { Explain } from "./components/Explain.js";

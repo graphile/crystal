@@ -40,7 +40,8 @@ type InspectArgv = ReturnType<typeof options> extends Argv<infer U> ? U : never;
  */
 async function tryLoadHttpProxy() {
   try {
-    return (await import("http-proxy")).default;
+    return ((await import("http-proxy")) as any)
+      .default as typeof import("http-proxy");
   } catch {
     return null;
   }
