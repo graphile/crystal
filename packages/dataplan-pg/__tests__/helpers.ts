@@ -7,7 +7,7 @@ if (process.env.DEBUG) {
 }
 
 import type { BaseGraphQLContext } from "dataplanner";
-import { $$bypassGraphQL, execute } from "dataplanner";
+import { $$bypassGraphQL, execute, subscribe } from "dataplanner";
 import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
@@ -15,13 +15,7 @@ import type {
   GraphQLError,
   GraphQLSchema,
 } from "graphql";
-import {
-  getOperationAST,
-  parse,
-  subscribe,
-  validate,
-  validateSchema,
-} from "graphql";
+import { getOperationAST, parse, validate, validateSchema } from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";
@@ -403,12 +397,18 @@ export async function runTestQuery(
 
     const result =
       operationType === "subscription"
-        ? await subscribe({
-            schema,
-            document,
-            variableValues,
-            contextValue,
-          })
+        ? await subscribe(
+            {
+              schema,
+              document,
+              variableValues,
+              contextValue,
+            },
+            {
+              experimentalGraphQLBypass: true,
+              explain: ["mermaid-js"],
+            },
+          )
         : await execute(
             {
               schema,

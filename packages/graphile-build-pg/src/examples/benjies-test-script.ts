@@ -15,7 +15,11 @@ import type { Plugin } from "@envelop/core";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import { execute as dataplannerExecute, stripAnsi } from "dataplanner";
+import {
+  execute as dataplannerExecute,
+  subscribe as dataplannerSubscribe,
+  stripAnsi,
+} from "dataplanner";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
@@ -196,6 +200,24 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       const explain = explainHeader?.split(",");
       opts.setExecuteFn((args) =>
         dataplannerExecute(args, {
+          experimentalGraphQLBypass: true,
+          explain,
+        }),
+      );
+    },
+    async onSubscribe(opts) {
+      const ctx = opts.args.contextValue as any;
+      const explainHeaders = (ctx?.req?.headers ||
+        ctx?.request?.headers ||
+        ctx?.connectionParams)?.["x-graphql-explain"];
+      const explainHeader = Array.isArray(explainHeaders)
+        ? String(explainHeaders.join(","))
+        : explainHeaders
+        ? String(explainHeaders)
+        : undefined;
+      const explain = explainHeader?.split(",");
+      opts.setSubscribeFn(async (args) =>
+        dataplannerSubscribe(args, {
           experimentalGraphQLBypass: true,
           explain,
         }),

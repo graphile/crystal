@@ -16,18 +16,18 @@ import type { CrystalPrepareOptions } from "./prepare";
 import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare";
 import { isPromiseLike } from "./utils";
 
-interface DataPlannerExecuteOptions {
+export interface DataPlannerExecuteOptions {
   experimentalGraphQLBypass?: boolean;
   explain?: CrystalPrepareOptions["explain"];
 }
 
 /**
- * Use this instead of GraphQL.js' execute method and we'll automatically
- * run dataplannerPrepare for you and handle the result.
+ * @internal
  */
-export function execute(
+export function withDataPlannerArgs(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
+  callback: typeof executeInner,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -92,17 +92,30 @@ export function execute(
   let next;
   if (isPromiseLike(rootValue)) {
     next = rootValue.then((rootValue) =>
-      executeInner(args, rootValue),
+      callback(args, rootValue),
     ) as PromiseOrValue<
       ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
     >;
   } else {
-    next = executeInner(args, rootValue);
+    next = callback(args, rootValue);
   }
   if (unlisten) {
     Promise.resolve(next).finally(unlisten);
   }
   return next;
+}
+
+/**
+ * Use this instead of GraphQL.js' execute method and we'll automatically
+ * run dataplannerPrepare for you and handle the result.
+ */
+export function execute(
+  args: ExecutionArgs,
+  options: DataPlannerExecuteOptions = {},
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
+> {
+  return withDataPlannerArgs(args, options, executeInner);
 }
 
 /**
@@ -130,7 +143,7 @@ function executeInner(
 /**
  * @internal
  */
-function addExtensionsToExecutionResult<
+export function addExtensionsToExecutionResult<
   T extends ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>,
 >(executionResult: T, rootValue: any): T {
   const extensions = rootValue[$$extensions];

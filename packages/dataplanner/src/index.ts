@@ -18,6 +18,7 @@ import { defer, Deferred } from "./deferred";
 import { isDev, noop } from "./dev";
 import { CrystalError, isCrystalError } from "./error";
 import { execute } from "./execute";
+import { subscribe } from "./subscribe";
 import { getCurrentParentPathIdentity } from "./global";
 import { InputPlan } from "./input";
 import {
@@ -197,6 +198,7 @@ export {
   EdgePlan,
   ExecutablePlan,
   execute,
+  subscribe,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
@@ -285,6 +287,7 @@ exportAsMany({
   defer,
   dataplannerEnforce,
   execute,
+  subscribe,
   __InputListPlan,
   __InputObjectPlan,
   __InputStaticLeafPlan,
