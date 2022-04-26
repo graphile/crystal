@@ -5,8 +5,8 @@
  * developing so it has grown in scope and is a bit of a mess. Nonetheless it
  * demonstrates how to build a Graphile Build schema that leverages
  * dataplanner, @dataplan/pg, graphile-build-pg, envelop, fastify, helix, and
- * even has a mermaid-js endpoint for viewing the execution and output plan of
- * the latest query.
+ * graphile-inspect for viewing the execution and output plan of the latest
+ * query.
  */
 
 import type { WithPgClient } from "@dataplan/pg";
@@ -15,11 +15,7 @@ import type { Plugin } from "@envelop/core";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import {
-  $$setPlanGraph,
-  execute as dataplannerExecute,
-  stripAnsi,
-} from "dataplanner";
+import { execute as dataplannerExecute, stripAnsi } from "dataplanner";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
@@ -131,15 +127,8 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   // The 'rootValue' we'll be passing to GraphQL
   const rootValue = null;
 
-  // This will store the latest plan graph for use by our mermaid-js endpoint;
-  // we populate this by passing $$setPlanGraph as part of the context to our
-  // GraphQL operation which will have DataPlanner populate it for us.
-  let graph: string | null = null;
   const contextValue = {
     withPgClient,
-    [$$setPlanGraph](_graph: string) {
-      graph = _graph;
-    },
   };
 
   // Our operation requires no variables
@@ -257,38 +246,18 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     root: `${__dirname}/../../../../node_modules/mermaid/dist`,
   });
 
+  const { graphileInspectHTML } = await import("graphile-inspect/server");
+
   // The root URL ('/') serves GraphiQL
   app.route({
     method: ["GET"],
     url: "/",
     async handler(req, res) {
-      res.type("text/html").send(renderGraphiQL());
-    },
-  });
-
-  // The '/plan' URL serves mermaid-js rendering our latest query plan
-  app.route({
-    method: ["GET"],
-    url: "/plan",
-    async handler(req, res) {
-      res.type("text/html").send(`\
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>Crystal Example</title>
-</head>
-<body>
-<div class="mermaid">
-${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
-</div>
-<script src="/mermaid.js"></script>
-<script>
-  mermaid.initialize({ startOnLoad: true });
-</script>
-</body>
-</html>
-`);
+      res.type("text/html").send(
+        graphileInspectHTML({
+          endpoint: "/graphql",
+        }),
+      );
     },
   });
 

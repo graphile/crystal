@@ -3,7 +3,6 @@ import { createHash } from "crypto";
 import type { CrystalPrepareOptions } from "dataplanner";
 import {
   $$data,
-  $$setPlanGraph,
   crystalPrint,
   execute as dataplannerExecute,
   isAsyncIterable,
@@ -90,9 +89,11 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
 
 export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const { schema, config } = schemaResult;
+  const { exposePlan = false } = schemaResult.config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const prepareOptions: CrystalPrepareOptions = {
     experimentalGraphQLBypass: true,
+    explain: exposePlan ? ["mermaid-js"] : null,
   };
 
   return async (

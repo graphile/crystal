@@ -33,3 +33,20 @@ import { GraphileInspect } from "graphile-inspect";
 
 React.render(<GraphileInspect target="/graphql" />);
 ```
+
+## Usage - middleware
+
+```js
+import { graphileInspectHTML } from "graphile-inspect/server";
+
+// ...
+
+app.get("/", (req, res, next) => {
+  res.writeHead(200, { "Content-Type": "application/html" });
+  return res.end(
+    graphileInspectHTML({
+      endpoint: "/graphql",
+    }),
+  );
+});
+```

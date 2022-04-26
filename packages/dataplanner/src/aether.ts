@@ -97,7 +97,6 @@ import {
   $$data,
   $$idempotent,
   $$planResults,
-  $$setPlanGraph,
   $$verbatim,
 } from "./interfaces";
 import type { PrintPlanGraphOptions } from "./mermaid";

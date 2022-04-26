@@ -1,4 +1,4 @@
-import { $$setPlanGraph, stripAnsi } from "dataplanner";
+import { stripAnsi } from "dataplanner";
 import type { ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
@@ -7,7 +7,6 @@ import type { SchemaResult } from "../interfaces.js";
 import { makeGraphiQLHandler } from "./graphiql.js";
 import { makeGraphQLHandler } from "./graphql.js";
 import type { HandlerResult } from "./interfaces.js";
-import { makePlanHandler } from "./plan.js";
 
 function getBodyFromRequest(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -26,7 +25,6 @@ function getBodyFromRequest(req: IncomingMessage): Promise<string> {
 export function postgraphile(schemaResult: SchemaResult) {
   const { contextCallback } = schemaResult;
   const graphqlHandler = makeGraphQLHandler(schemaResult);
-  const planHandler = makePlanHandler(schemaResult);
   const graphiqlHandler = makeGraphiQLHandler(schemaResult);
   const {
     graphqlPath = "/graphql",
@@ -36,7 +34,6 @@ export function postgraphile(schemaResult: SchemaResult) {
     graphiqlPath = "/",
 
     exposePlan = false,
-    planPath = "/plan",
   } = schemaResult.config.server ?? {};
 
   const sendResult = (res: ServerResponse, handlerResult: HandlerResult) => {
@@ -107,11 +104,6 @@ export function postgraphile(schemaResult: SchemaResult) {
         const bodyRaw = await getBodyFromRequest(req);
         const body = JSON.parse(bodyRaw);
         const contextValue = contextCallback(req);
-        if (exposePlan) {
-          contextValue[$$setPlanGraph] = (currentPlanDefinition: string) => {
-            latestPlanDefinition = currentPlanDefinition;
-          };
-        }
         const result = await graphqlHandler(contextValue, body);
         sendResult(res, result);
       })().catch((e) => {
@@ -141,21 +133,6 @@ export function postgraphile(schemaResult: SchemaResult) {
         type: "text",
         payload: "We don't have GraphiQL support yet...",
         statusCode: 503,
-      });
-      return;
-    }
-    if (exposePlan && req.url === planPath && req.method === "GET") {
-      (async () => {
-        const result = await planHandler(latestPlanDefinition);
-        sendResult(res, result);
-      })().catch(handleError);
-      return;
-    }
-    if (exposePlan && req.url === planPath + ".txt" && req.method === "GET") {
-      sendResult(res, {
-        statusCode: 200,
-        type: "text",
-        payload: latestPlanDefinition ?? "flowchart TD\n  NoPlanYet",
       });
       return;
     }

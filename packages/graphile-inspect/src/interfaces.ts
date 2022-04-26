@@ -14,5 +14,5 @@ export interface GraphileInspectProps {
    * explain - output the SQL executed
    * plan - output the plan executed
    */
-  debugTools?: ["explain", "plan"];
+  debugTools?: Array<"explain" | "plan">;
 }

@@ -8,7 +8,7 @@ if (process.env.DEBUG) {
 
 import type { BaseGraphQLContext } from "dataplanner";
 import { dataplannerPrepare } from "dataplanner";
-import { $$bypassGraphQL, $$setPlanGraph } from "dataplanner/dist/interfaces";
+import { $$bypassGraphQL } from "dataplanner/dist/interfaces";
 import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
@@ -345,11 +345,12 @@ export async function runTestQuery(
   payloads?: Array<{
     data?: { [key: string]: any };
     errors?: readonly GraphQLError[];
+    extensions?: any;
   }>;
   data?: { [key: string]: any };
   errors?: readonly GraphQLError[];
   queries: PgClientQuery[];
-  graphString: string | null;
+  extensions?: any;
 }> {
   const { variableValues } = config;
   const { path } = options;
@@ -373,14 +374,10 @@ export async function runTestQuery(
       };
   const pgSubscriber = new PgSubscriber(testPool);
   try {
-    let graphString: string | null = null;
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},
       withPgClient,
       pgSubscriber,
-      [$$setPlanGraph](_graphString: string) {
-        graphString = _graphString;
-      },
     };
 
     const schemaValidationErrors = validateSchema(schema);
@@ -548,9 +545,9 @@ export async function runTestQuery(
         ...originalPayloads.slice(1).sort(sortPayloads),
       ];
 
-      return { payloads, errors, queries, graphString };
+      return { payloads, errors, queries };
     } else {
-      const { data, errors } = result;
+      const { data, errors, extensions } = result;
       if (errors) {
         console.error(errors[0].originalError || errors[0]);
       }
@@ -560,7 +557,7 @@ export async function runTestQuery(
             String(errors ? errors[0].originalError || errors[0] : ""),
         );
       }
-      return { data, errors, queries, graphString };
+      return { data, errors, queries, extensions };
     }
   } finally {
     await pgSubscriber.release();
@@ -675,7 +672,11 @@ export const assertSnapshotsMatch = async (
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
   }
 
-  const { data, payloads, queries, errors, graphString } = await result;
+  const { data, payloads, queries, errors, extensions } = await result;
+
+  const graphString = extensions?.explain?.operations?.find(
+    (op) => op.type === "mermaid-js",
+  )?.diagram;
 
   if (only === "result") {
     const resultFileName = basePath + (ext || "") + ".json5";

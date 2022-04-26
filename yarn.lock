@@ -7313,6 +7313,7 @@ __metadata:
     fastify-static: ^4.5.0
     graphile-build: 5.0.0-alpha.0
     graphile-export: ^0.0.1
+    graphile-inspect: "workspace:packages/graphile-inspect"
     graphile-plugin: ^5.0.0-alpha.0
     graphql: 16.1.0-experimental-stream-defer.6
     graphql-helix: ^1.11.0

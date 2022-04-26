@@ -98,8 +98,6 @@ export const $$extensions = Symbol("extensions");
  */
 export const $$concreteType = Symbol("concreteType");
 
-export const $$setPlanGraph = Symbol("setPlanGraph");
-
 /**
  * Set this key on a type if that type's serialization is idempotent (that is
  * to say `serialize(serialize(thing)) === serialize(thing)`). This means we

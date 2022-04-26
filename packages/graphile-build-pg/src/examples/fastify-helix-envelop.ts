@@ -8,16 +8,13 @@
  *
  * / - GraphiQL
  * /graphql - the GraphQL API
- * /plan - the mermaid-js diagram of the plan for the last query executed
  */
 
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
 import chalk from "chalk";
-import { $$setPlanGraph } from "dataplanner";
 import fastify from "fastify";
-import fastifyStatic from "fastify-static";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import { resolvePresets } from "graphile-plugin";
 import {
@@ -30,7 +27,6 @@ import {
 import { makeSharedPresetAndClient } from "./config";
 import { getPool } from "./config.js";
 import { useDataPlanner, useMoreDetailedErrors } from "./utils/envelop.js";
-import { mermaidTemplate } from "./utils/mermaid.js";
 
 const pool = getPool();
 
@@ -71,23 +67,9 @@ async function main() {
   // ---------------------------------------------------------------------------
   // Now we set about creating our GraphQL server
 
-  /**
-   * This will store the latest plan graph in mermaid-js text format for use by
-   * our mermaid-js endpoint. We populate this by passing $$setPlanGraph as
-   * part of the context to our GraphQL operation which will have DataPlanner
-   * populate it for us.
-   */
-  let graph: string | null = null;
-
-  /**
-   * Our GraphQL context, saying how to communicate with Postgres and where the
-   * plan should be written to (for debugging).
-   */
+  /** Our GraphQL context, saying how to communicate with Postgres. */
   const contextValue = {
     withPgClient,
-    [$$setPlanGraph](_graph: string) {
-      graph = _graph;
-    },
   };
 
   /** Our envelop setup, with all the plugins we need */
@@ -115,11 +97,6 @@ async function main() {
   /** Our fastify (server) app */
   const app = fastify();
 
-  // Serve the mermaid-js resources
-  app.register(fastifyStatic, {
-    root: `${__dirname}/../../../../node_modules/mermaid/dist`,
-  });
-
   // The root URL ('/') serves GraphiQL
   app.route({
     method: ["GET"],
@@ -129,12 +106,14 @@ async function main() {
     },
   });
 
-  // The '/plan' URL serves mermaid-js rendering our latest query plan
+  // TODO: remove this and tidy up the example.
+  // The '/plan' URL used to serve mermaid-js rendering our latest query plan;
+  // but we have a dedicated tool now.
   app.route({
     method: ["GET"],
     url: "/plan",
     async handler(req, res) {
-      res.type("text/html").send(mermaidTemplate(graph));
+      res.type("text/plain").send("Please use graphile-inspect");
     },
   });
 
