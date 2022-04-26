@@ -45,6 +45,14 @@ export const useSchema = (
         payload = result;
       }
       const { data, errors } = payload;
+      if (errors) {
+        throw (
+          errors[0] ??
+          new Error(
+            "'errors' was set on the payload, but was empty or contained null? This is forbidden by the GraphQL spec.",
+          )
+        );
+      }
 
       // Use the data we got back from GraphQL to build a client schema (a
       // schema without resolvers).

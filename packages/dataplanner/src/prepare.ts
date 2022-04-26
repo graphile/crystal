@@ -122,6 +122,8 @@ export function dataplannerPrepare(
 // TODO: should we assert `$$bypassGraphQL` in here, or not? Presumably the performance impact would be negligible.
 /**
  * Use this instead of the `execute` method if `$$bypassGraphQL` is set.
+ *
+ * @internal
  */
 export function bypassGraphQLExecute(args: ExecutionArgs): ExecutionResult {
   return Object.assign(Object.create(null), { data: args.rootValue as any });

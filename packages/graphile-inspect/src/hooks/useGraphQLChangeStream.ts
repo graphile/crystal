@@ -49,5 +49,6 @@ export const useGraphQLChangeStream = (
         eventSource.close();
       };
     }
-  }, [eventSource, refetch]);
+  }, [error, eventSource, refetch]);
+  return { error };
 };

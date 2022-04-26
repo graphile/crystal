@@ -4,7 +4,7 @@ import type { Resolver } from "webpack";
 import webpack from "webpack";
 
 const JSX_REGEXP = /\.jsx?$/;
-const NODE_MODULES_REGEXP = /[\/\\]node_modules(?:[\/\\]|$)/;
+const NODE_MODULES_REGEXP = /[/\\]node_modules(?:[/\\]|$)/;
 
 /**
  * Support for resolving `.js` / `.jsx` paths to `.ts` / `.tsx` files,

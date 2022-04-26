@@ -17,7 +17,7 @@ import { defer, Deferred } from "./deferred";
 // Handy for debugging
 import { isDev, noop } from "./dev";
 import { CrystalError, isCrystalError } from "./error";
-import { execute } from "./execute";
+import { DataPlannerExecuteOptions, execute } from "./execute";
 import { getCurrentParentPathIdentity } from "./global";
 import { InputPlan } from "./input";
 import {
@@ -116,7 +116,6 @@ import {
 } from "./plans";
 import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
-import { bypassGraphQLExecute, CrystalPrepareOptions } from "./prepare";
 import {
   $$crystalWrapped,
   crystalResolve,
@@ -171,7 +170,6 @@ export {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BasePlan,
-  bypassGraphQLExecute,
   connection,
   ConnectionCapablePlan,
   ConnectionPlan,
@@ -179,7 +177,6 @@ export {
   ConstantPlan,
   context,
   CrystalError,
-  CrystalPrepareOptions,
   crystalPrint,
   crystalPrintPathIdentity,
   crystalResolve,
@@ -188,6 +185,7 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   dataplannerEnforce,
+  DataPlannerExecuteOptions,
   dataplannerResolver,
   dataplannerSubscriber,
   debugPlans,
@@ -341,7 +339,6 @@ exportAsMany({
   $$crystalWrapped,
   isCrystalWrapped,
   dataplannerResolver,
-  bypassGraphQLExecute,
   crystalResolve,
   dataplannerSubscriber,
   stripAnsi,

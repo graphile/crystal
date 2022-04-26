@@ -1,5 +1,4 @@
 import { stripAnsi } from "dataplanner";
-import type { ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
@@ -32,8 +31,6 @@ export function postgraphile(schemaResult: SchemaResult) {
     graphiql = true,
     graphiqlOnGraphQLGET = true,
     graphiqlPath = "/",
-
-    exposePlan = false,
   } = schemaResult.config.server ?? {};
 
   const sendResult = (res: ServerResponse, handlerResult: HandlerResult) => {
@@ -71,6 +68,7 @@ export function postgraphile(schemaResult: SchemaResult) {
       }
       default: {
         const never: never = handlerResult;
+        console.error(`Did not understand '${never}' passed to sendResult`);
         res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
         res.end("Unexpected input to sendResult");
       }
@@ -87,6 +85,7 @@ export function postgraphile(schemaResult: SchemaResult) {
     }
 
     return (e: Error) => {
+      console.error(e);
       sendResult(res, {
         statusCode: 500,
         type: "text",

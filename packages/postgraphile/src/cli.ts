@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { exportSchema } from "graphile-export";
 import type { Preset } from "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { IncomingMessage, RequestListener } from "http";
@@ -7,7 +6,6 @@ import { createServer } from "http";
 // TODO: bug in TypeScript claiming allowSyntheticDefaultImports is required but then ignoring that setting.
 // @ts-ignore
 import parseArgs from "minimist";
-import { resolve } from "path";
 
 import type { ContextCallback } from "./interfaces.js";
 import { postgraphile } from "./middleware/index.js";
@@ -41,7 +39,6 @@ async function main() {
     config: configFileLocation,
     plan,
   } = argv;
-  const schemas = rawSchema?.split(",");
 
   // Try and load the preset
   const userPreset = await loadConfig(configFileLocation);

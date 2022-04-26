@@ -1,23 +1,11 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { CrystalPrepareOptions } from "dataplanner";
-import {
-  $$data,
-  crystalPrint,
-  execute as dataplannerExecute,
-  isAsyncIterable,
-  stripAnsi,
-} from "dataplanner";
-import type {
-  DocumentNode,
-  ExecutionArgs,
-  ExecutionResult,
-  GraphQLSchema,
-} from "graphql";
-import { execute, GraphQLError, parse, Source, validate } from "graphql";
-import type { IncomingMessage, ServerResponse } from "http";
+import type { DataPlannerExecuteOptions } from "dataplanner";
+import { execute as dataplannerExecute, isAsyncIterable } from "dataplanner";
+import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
+import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type { ContextCallback, SchemaResult } from "../interfaces.js";
+import type { SchemaResult } from "../interfaces.js";
 import type { HandlerResult } from "./interfaces.js";
 
 let lastString: string;
@@ -45,7 +33,7 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
     }
     const hash = query.length > 500 ? calculateQueryHash(query) : query;
 
-    const cached = parseAndValidationCache.get(query);
+    const cached = parseAndValidationCache.get(hash);
     if (cached) {
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = cached;
@@ -70,7 +58,7 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
           ),
         ],
       };
-      parseAndValidationCache.set(query, result);
+      parseAndValidationCache.set(hash, result);
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = result;
       return result;
@@ -79,7 +67,7 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
     const result: ParseAndValidateResult = errors.length
       ? { errors }
       : { document };
-    parseAndValidationCache.set(query, result);
+    parseAndValidationCache.set(hash, result);
     lastParseAndValidateQuery = query;
     lastParseAndValidateResult = result;
     return result;
@@ -89,9 +77,9 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
 
 export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const { schema, config } = schemaResult;
-  const { exposePlan = false } = schemaResult.config.server ?? {};
+  const { exposePlan = false } = config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
-  const prepareOptions: CrystalPrepareOptions = {
+  const dataplannerOptions: DataPlannerExecuteOptions = {
     experimentalGraphQLBypass: true,
     explain: exposePlan ? ["mermaid-js"] : null,
   };
@@ -134,7 +122,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
       operationName,
     };
 
-    const result = await dataplannerExecute(args);
+    const result = await dataplannerExecute(args, dataplannerOptions);
     if (isAsyncIterable(result)) {
       throw new Error("We don't yet support async iterables");
     }

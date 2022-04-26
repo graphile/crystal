@@ -3,14 +3,6 @@ import type { GraphiQLProps } from "graphiql";
 import { fileURLToPath } from "node:url";
 import * as path from "path";
 
-function escapeHTMLEntities(str: string): string {
-  return str.replace(
-    /[&"<>]/g,
-    (l) =>
-      ({ "&": "&amp;", '"': "&quot;", "<": "&lt;", ">": "&gt;" }[l as any]),
-  );
-}
-
 // TODO: make this 'readFileSync' call webpackable
 const graphiQLContent = readFileSync(
   path.resolve(

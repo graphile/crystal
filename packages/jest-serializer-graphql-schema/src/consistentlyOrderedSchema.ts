@@ -305,12 +305,3 @@ function keyValMap<T, V>(
 }
 
 type ObjMap<T> = { [key: string]: T };
-
-function invariant(
-  condition: boolean,
-  message: string,
-): asserts condition is true {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
