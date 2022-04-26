@@ -8,10 +8,7 @@ if (process.env.DEBUG) {
 
 import type { BaseGraphQLContext } from "dataplanner";
 import { dataplannerPrepare } from "dataplanner";
-import {
-  $$bypassGraphQL,
-  $$setPlanGraph,
-} from "dataplanner/dist/interfaces";
+import { $$bypassGraphQL, $$setPlanGraph } from "dataplanner/dist/interfaces";
 import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
@@ -420,7 +417,7 @@ export async function runTestQuery(
               contextValue,
               rootValue: null,
             },
-            { experimentalGraphQLBypass: true },
+            { experimentalGraphQLBypass: true, explain: ["mermaid-js"] },
           );
 
     const rootValue =

@@ -5,7 +5,6 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputType,
   GraphQLList,
-  GraphQLNamedType,
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLScalarType,
@@ -88,6 +87,11 @@ export const $$verbatim = Symbol("verbatim");
 export const $$bypassGraphQL = Symbol("bypassGraphQL");
 export const $$data = Symbol("data");
 export const $$pathIdentity = Symbol("pathIdentity");
+/**
+ * For attaching additional metadata to the GraphQL execution result, for
+ * example details of the plan or SQL queries or similar that were executed.
+ */
+export const $$extensions = Symbol("extensions");
 
 /**
  * The "GraphQLObjectType" type name, useful when dealing with polymorphism.

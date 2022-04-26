@@ -48,6 +48,19 @@ async function run(argv: InspectArgv) {
       "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'graphile-inspect'",
     );
   }
+  proxy?.on("error", (e, req, res) => {
+    console.error("Error occurred whilst attempting to proxy:", e);
+    if ("writeHead" in res && res.writeHead) {
+      res.writeHead(500, {
+        "Content-Type": "application/json",
+      });
+
+      res.end('{"errors": [{"message": "Proxying failed"}]}');
+    } else {
+      // Terminate the socket
+      res.end();
+    }
+  });
   const endpointUrl = new URL(endpoint);
   const endpointBase = new URL(endpointUrl);
   endpointBase.pathname = "";

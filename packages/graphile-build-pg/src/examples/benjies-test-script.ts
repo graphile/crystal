@@ -195,7 +195,12 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
    */
   const useDataPlanner = (): Plugin => ({
     async onExecute(opts) {
-      opts.setExecuteFn(dataplannerExecute);
+      opts.setExecuteFn((args) =>
+        dataplannerExecute(args, {
+          experimentalGraphQLBypass: true,
+          explain: ["mermaid-js"],
+        }),
+      );
     },
   });
 

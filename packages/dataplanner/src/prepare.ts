@@ -5,17 +5,9 @@ import { buildExecutionContext } from "graphql/execution/execute";
 import { $$contextPlanCache } from "./aether";
 import { establishAether } from "./establishAether";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces";
-import {
-  $$concreteType,
-  $$crystalContext,
-  $$pathIdentity,
-  $$planResults,
-  $$setPlanGraph,
-} from "./interfaces";
-import { PlanResults } from "./planResults";
-import { crystalObjectToString } from "./resolvers";
+import { $$extensions } from "./interfaces";
+import { isPromiseLike } from "./utils";
 
-const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const isTest = process.env.NODE_ENV === "test";
 
 export interface CrystalPrepareOptions {
@@ -26,6 +18,14 @@ export interface CrystalPrepareOptions {
    * GraphQL's execute method to actually execute the GraphQL request.
    */
   experimentalGraphQLBypass?: boolean;
+
+  /**
+   * A list of 'explain' types that should be included in `extensions.explain`.
+   *
+   * - `mermaid-js` will cause the mermaid plan to be included
+   * - other values are dependent on the plugins in play
+   */
+  explain?: string[] | null;
 }
 
 /**
@@ -43,14 +43,29 @@ export function dataplannerPrepare(
   const {
     schema,
     contextValue: context,
-    rootValue,
-    operationName,
-    document,
+    rootValue = Object.create(null),
+    // operationName,
+    // document,
   } = args;
-  const exeContext = buildExecutionContext(args);
-  if (Array.isArray(exeContext) || "length" in exeContext) {
-    return EMPTY_OBJECT;
+  if (typeof rootValue !== "object" || rootValue == null) {
+    throw new Error("DataPlanner requires that the 'rootValue' be an object");
   }
+  const exeContext = buildExecutionContext(args);
+
+  // If a list of errors was returned, abort our transform and defer to
+  // graphql-js.
+  if (Array.isArray(exeContext) || "length" in exeContext) {
+    return args.rootValue as any;
+  }
+
+  if (options.explain?.length) {
+    rootValue[$$extensions] = {
+      explain: {
+        operations: [],
+      },
+    };
+  }
+
   const { operation, fragments, variableValues } = exeContext;
   const aether = establishAether({
     schema,
@@ -61,7 +76,7 @@ export function dataplannerPrepare(
     rootValue,
   });
 
-  if (typeof (context as any)?.[$$setPlanGraph] === "function") {
+  if (options.explain?.includes("mermaid-js")) {
     // Only build the plan once
     if (aether[$$contextPlanCache] == null) {
       aether[$$contextPlanCache] = aether.printPlanGraph({
@@ -70,7 +85,11 @@ export function dataplannerPrepare(
         concise: !isTest,
       });
     }
-    (context as any)[$$setPlanGraph](aether[$$contextPlanCache]);
+    rootValue[$$extensions].explain!.operations.push({
+      type: "mermaid-js",
+      title: "Plan",
+      diagram: aether[$$contextPlanCache],
+    });
   }
 
   const preemptiveResult = aether.executePreemptive(
@@ -80,7 +99,19 @@ export function dataplannerPrepare(
     options.experimentalGraphQLBypass ?? false,
   );
   if (preemptiveResult) {
-    return preemptiveResult;
+    if (rootValue[$$extensions]) {
+      if (isPromiseLike(preemptiveResult)) {
+        return preemptiveResult.then((r) => {
+          r[$$extensions] = rootValue[$$extensions];
+          return r;
+        });
+      } else {
+        preemptiveResult[$$extensions] = rootValue[$$extensions];
+        return preemptiveResult;
+      }
+    } else {
+      return preemptiveResult;
+    }
   }
 
   const crystalContext = aether.newCrystalContext(
@@ -88,6 +119,9 @@ export function dataplannerPrepare(
     context as any,
     rootValue,
   );
+  if (rootValue[$$extensions]) {
+    crystalContext.rootCrystalObject[$$extensions] = rootValue[$$extensions];
+  }
   return crystalContext.rootCrystalObject;
 }
 
