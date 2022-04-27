@@ -14,8 +14,8 @@ export function options(yargs: Argv) {
     .option("endpoint", {
       alias: "e",
       type: "string",
-      description: "the endpoint to connect to",
-      default: "http://localhost:5000/graphql",
+      description: "endpoint for query and mutation operations",
+      default: "http://localhost:5678/graphql",
     })
     .option("port", {
       alias: "p",
@@ -31,16 +31,13 @@ export function options(yargs: Argv) {
     .options("subscriptions", {
       alias: "S",
       type: "boolean",
-      description:
-        "enable subscriptions by converting 'endpoint' to a ws:// URL automatically",
+      description: "enable subscriptions, converting --endpoint to a ws:// URL",
       default: false,
     })
     .option("subscription-endpoint", {
       alias: "s",
       type: "string",
-      description:
-        "the endpoint to connect to for subscription operations (overrides -S)",
-      default: "ws://localhost:5000/graphql",
+      description: "endpoint for subscription operations (overrides -S)",
     });
 }
 

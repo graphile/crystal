@@ -2,6 +2,31 @@
 
 Graphile-flavoured GraphiQL.
 
+**PRERELEASE**: this is pre-release software; use at your own risk and do not
+embed into public-facing projects. This will likely change a lot before it's
+ultimately released. This also explains the shocking lack of documentation.
+
+## Usage - CLI
+
+```
+graphile-inspect
+
+Run a Graphile Inspect server
+
+Options:
+      --help                   Show help                                                                      [boolean]
+      --version                Show version number                                                            [boolean]
+  -e, --endpoint               endpoint for query and mutation operations
+                                                                    [string] [default: "http://localhost:5678/graphql"]
+  -p, --port                   port number to run the server on                                [number] [default: 1337]
+  -P, --proxy                  Proxy requests to work around CORS issues                                      [boolean]
+  -S, --subscriptions          enable subscriptions, converting --endpoint to a ws:// URL    [boolean] [default: false]
+  -s, --subscription-endpoint  endpoint for subscription operations (overrides -S)                             [string]
+```
+
+Recommended: something like
+`graphile-inspect -SP -e http://localhost:5678/graphql`
+
 ## Usage - bundle
 
 ```html
