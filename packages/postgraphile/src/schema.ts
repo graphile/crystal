@@ -6,7 +6,7 @@ import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
 import * as pg from "pg";
 
-const Pool = pg.Pool || pg.default.Pool;
+const Pool = pg.Pool || (pg as any).default?.Pool;
 
 import type { ContextCallback, SchemaResult } from "./interfaces.js";
 import { defaultPreset as postgraphilePreset } from "./preset.js";
