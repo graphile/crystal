@@ -110,9 +110,6 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       res.writeHead(200, undefined, {
         "Content-Type": "text/html; charset=utf-8",
       });
-      console.log({
-        endpoint: proxy ? endpointUrl.pathname + endpointUrl.search : endpoint,
-      });
       res.end(
         graphileInspectHTML({
           endpoint: proxy

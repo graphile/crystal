@@ -5,6 +5,9 @@
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
+**PRERELEASE**: this is pre-release software; use at your own risk. This will
+likely change a lot before it's ultimately released.
+
 `graphile-plugin` provides a standard plugin interface and helpers that can be
 used across the entire of the Graphile suite. Primarily users will only use this
 as `import type Plugin from 'graphile-plugin';` so that they can export plugins.

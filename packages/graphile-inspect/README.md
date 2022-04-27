@@ -8,6 +8,21 @@ ultimately released. This also explains the shocking lack of documentation.
 
 ## Usage - CLI
 
+We recommend that you install this alongside `http-proxy`:
+
+```
+yarn add http-proxy graphile-inspect
+```
+
+Then you can run something like the following to automatically proxy requests
+(bypassing CORS issues):
+
+```
+yarn graphile-inspect -SPe http://localhost:5678/graphql
+```
+
+Usage:
+
 ```
 graphile-inspect
 
@@ -23,9 +38,6 @@ Options:
   -S, --subscriptions          enable subscriptions, converting --endpoint to a ws:// URL    [boolean] [default: false]
   -s, --subscription-endpoint  endpoint for subscription operations (overrides -S)                             [string]
 ```
-
-Recommended: something like
-`graphile-inspect -SP -e http://localhost:5678/graphql`
 
 ## Usage - bundle
 
