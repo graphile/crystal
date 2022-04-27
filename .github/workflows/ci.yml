@@ -18,8 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres-version: [11, 12, 13, 14]
-        node-version: [16.x, 18.x]
+        postgres-version: [11] #, 12, 13, 14]
+        node-version: [16.x] #, 18.x]
 
     services:
       postgres:
