@@ -1483,41 +1483,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dataplan/json@npm:4.7.0, @dataplan/json@workspace:packages/dataplan-json":
+"@dataplan/json@workspace:^, @dataplan/json@workspace:packages/dataplan-json":
   version: 0.0.0-use.local
   resolution: "@dataplan/json@workspace:packages/dataplan-json"
   dependencies:
     "@types/jest": "npm:^27.0.3"
     chalk: "npm:^4.1.2"
     jest: "npm:^27.4.5"
-    jest-serializer-simple: "npm:4.6.0"
+    jest-serializer-simple: "workspace:^"
     tslib: "npm:^2.3.1"
     typescript: "npm:next"
   peerDependencies:
-    dataplanner: "*"
+    dataplanner: "workspace:^"
     graphql: "*"
   languageName: unknown
   linkType: soft
 
-"@dataplan/pg@npm:^4.7.0, @dataplan/pg@workspace:packages/dataplan-pg":
+"@dataplan/pg@workspace:^, @dataplan/pg@workspace:packages/dataplan-pg":
   version: 0.0.0-use.local
   resolution: "@dataplan/pg@workspace:packages/dataplan-pg"
   dependencies:
-    "@dataplan/json": "npm:4.7.0"
+    "@dataplan/json": "workspace:^"
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@mermaid-js/mermaid-cli": "npm:^8.14.0"
     "@types/jest": "npm:^27.0.3"
     "@types/json5": "npm:^2.2.0"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
-    dataplanner: "npm:4.7.0"
-    graphile-export: "npm:^0.0.1"
+    dataplanner: "workspace:^"
+    graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
-    jest-serializer-simple: "npm:4.6.0"
+    jest-serializer-simple: "workspace:^"
     json5: "npm:^2.2.0"
     nodemon: "npm:^2.0.15"
-    pg-sql2: "npm:4.7.0"
+    pg-sql2: "workspace:^"
     postgres-range: "npm:^1.1.1"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
@@ -5578,7 +5578,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dataplanner@npm:4.7.0, dataplanner@workspace:packages/dataplanner":
+"dataplanner@workspace:^, dataplanner@workspace:packages/dataplanner":
   version: 0.0.0-use.local
   resolution: "dataplanner@workspace:packages/dataplanner"
   dependencies:
@@ -5595,7 +5595,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     mermaid: "npm:^8.14.0"
     nodemon: "npm:^2.0.15"
-    pg-sql2: "npm:4.7.0"
+    pg-sql2: "workspace:^"
     spec-md: "npm:^3.0.2"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
@@ -7301,11 +7301,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphile-build-pg@npm:5.0.0-alpha.0, graphile-build-pg@workspace:packages/graphile-build-pg":
+"graphile-build-pg@workspace:*, graphile-build-pg@workspace:packages/graphile-build-pg":
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
   dependencies:
-    "@dataplan/pg": "npm:^4.7.0"
+    "@dataplan/pg": "workspace:^"
     "@envelop/core": "npm:^2.0.0"
     "@envelop/parser-cache": "npm:^4.0.0"
     "@envelop/validation-cache": "npm:^4.0.0"
@@ -7315,28 +7315,28 @@ __metadata:
     "@types/jest": "npm:^27.0.3"
     "@types/jsonwebtoken": "npm:^8"
     "@types/node": "npm:^16.11.15"
-    dataplanner: "npm:4.7.0"
+    dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
     express: "npm:^4.17.2"
     express-graphql: "npm:^0.12.0"
     fastify: "npm:^3.27.2"
     fastify-static: "npm:^4.5.0"
-    graphile-build: "npm:5.0.0-alpha.0"
-    graphile-export: "npm:^0.0.1"
-    graphile-inspect: "workspace:packages/graphile-inspect"
-    graphile-plugin: "npm:^5.0.0-alpha.0"
+    graphile-build: "workspace:*"
+    graphile-export: "workspace:^"
+    graphile-inspect: "workspace:^"
+    graphile-plugin: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-helix: "npm:^1.11.0"
     jest: "npm:^27.4.5"
     jsonwebtoken: "npm:^8.5.1"
-    pg-introspection: "npm:^0.0.0"
+    pg-introspection: "workspace:^"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
     typescript: "npm:next"
   languageName: unknown
   linkType: soft
 
-"graphile-build@npm:5.0.0-alpha.0, graphile-build@workspace:packages/graphile-build":
+"graphile-build@workspace:*, graphile-build@workspace:packages/graphile-build":
   version: 0.0.0-use.local
   resolution: "graphile-build@workspace:packages/graphile-build"
   dependencies:
@@ -7347,10 +7347,10 @@ __metadata:
     "@types/pluralize": "npm:^0.0.29"
     "@types/semver": "npm:^7.3.9"
     chalk: "npm:^4.1.2"
-    dataplanner: "npm:4.7.0"
+    dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
-    graphile-export: "npm:^0.0.1"
-    graphile-plugin: "npm:^5.0.0-alpha.0"
+    graphile-export: "workspace:^"
+    graphile-plugin: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
     pluralize: "npm:^7.0.0"
@@ -7363,7 +7363,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-export@npm:^0.0.1, graphile-export@workspace:packages/graphile-export":
+"graphile-export@workspace:^, graphile-export@workspace:packages/graphile-export":
   version: 0.0.0-use.local
   resolution: "graphile-export@workspace:packages/graphile-export"
   dependencies:
@@ -7375,7 +7375,7 @@ __metadata:
     "@types/jest": "npm:^27.0.3"
     "@types/node": "npm:^16.11.15"
     "@types/prettier": "npm:^2"
-    dataplanner: "npm:4.7.0"
+    dataplanner: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
     prettier: "npm:^2.5.1"
@@ -7388,7 +7388,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-inspect@npm:0.0.0, graphile-inspect@workspace:packages/graphile-inspect":
+"graphile-inspect@workspace:^, graphile-inspect@workspace:packages/graphile-inspect":
   version: 0.0.0-use.local
   resolution: "graphile-inspect@workspace:packages/graphile-inspect"
   dependencies:
@@ -7401,7 +7401,7 @@ __metadata:
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18.0.0"
     "@types/yargs": "npm:^17.0.10"
-    graphile-plugin: "npm:^5.0.0-alpha.0"
+    graphile-plugin: "workspace:^"
     graphiql: "npm:^1.8.7"
     graphiql-explorer: "npm:^0.9.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -7425,7 +7425,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-plugin@npm:^5.0.0-alpha.0, graphile-plugin@workspace:packages/graphile-plugin":
+"graphile-plugin@workspace:^, graphile-plugin@workspace:packages/graphile-plugin":
   version: 0.0.0-use.local
   resolution: "graphile-plugin@workspace:packages/graphile-plugin"
   dependencies:
@@ -8708,7 +8708,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"jest-serializer-simple@npm:4.6.0, jest-serializer-simple@workspace:packages/jest-serializer-simple":
+"jest-serializer-simple@workspace:^, jest-serializer-simple@workspace:packages/jest-serializer-simple":
   version: 0.0.0-use.local
   resolution: "jest-serializer-simple@workspace:packages/jest-serializer-simple"
   dependencies:
@@ -10374,7 +10374,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-introspection@npm:^0.0.0, pg-introspection@workspace:packages/pg-introspection":
+"pg-introspection@workspace:^, pg-introspection@workspace:packages/pg-introspection":
   version: 0.0.0-use.local
   resolution: "pg-introspection@workspace:packages/pg-introspection"
   dependencies:
@@ -10404,7 +10404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-sql2@npm:4.7.0, pg-sql2@workspace:packages/pg-sql2":
+"pg-sql2@workspace:^, pg-sql2@workspace:packages/pg-sql2":
   version: 0.0.0-use.local
   resolution: "pg-sql2@workspace:packages/pg-sql2"
   dependencies:
@@ -10571,13 +10571,13 @@ __metadata:
     "@types/jsonwebtoken": "npm:^8"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
-    dataplanner: "npm:4.7.0"
+    dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
-    graphile-build: "npm:5.0.0-alpha.0"
-    graphile-build-pg: "npm:5.0.0-alpha.0"
-    graphile-export: "npm:^0.0.1"
-    graphile-inspect: "npm:0.0.0"
-    graphile-plugin: "npm:^5.0.0-alpha.0"
+    graphile-build: "workspace:*"
+    graphile-build-pg: "workspace:*"
+    graphile-export: "workspace:^"
+    graphile-inspect: "workspace:^"
+    graphile-plugin: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
     jsonwebtoken: "npm:^8.5.1"

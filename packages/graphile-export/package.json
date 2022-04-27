@@ -44,7 +44,7 @@
     "@babel/parser": "^7.16.6",
     "@babel/template": "^7.16.0",
     "@types/node": "^16.11.15",
-    "dataplanner": "4.7.0",
+    "dataplanner": "workspace:^",
     "prettier": "^2.5.1",
     "tslib": "^2.3.1"
   },
