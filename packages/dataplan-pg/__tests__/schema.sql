@@ -68,7 +68,7 @@ insert into app_public.messages (id, forum_id, author_id, body, featured, archiv
 
 -- Custom queries
 create function app_public.unique_author_count(featured bool = null) returns int as $$
-  select count(distinct author_id)
+  select count(distinct author_id)::int
   from app_public.messages
   where (
     unique_author_count.featured is null
