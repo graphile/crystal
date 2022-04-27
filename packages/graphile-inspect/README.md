@@ -18,7 +18,7 @@ Graphile-flavoured GraphiQL.
 <script>
   const { React, createRoot, GraphileInspect } = GraphileInspectBundle;
   const tree = React.createElement(GraphileInspect, {
-    target: "/graphql",
+    endpoint: "/graphql",
   });
   const container = document.getElementById("graphile-inspect-root");
   const root = createRoot(container);
@@ -31,7 +31,7 @@ Graphile-flavoured GraphiQL.
 ```js
 import { GraphileInspect } from "graphile-inspect";
 
-React.render(<GraphileInspect target="/graphql" />);
+React.render(<GraphileInspect endpoint="/graphql" />);
 ```
 
 ## Usage - middleware
