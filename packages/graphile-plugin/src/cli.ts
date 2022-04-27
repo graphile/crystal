@@ -26,7 +26,7 @@ export async function runCli<TArgs>(
       `\
 Graphile's MIT-licensed Open Source Software is made possible thanks to support from our sponsors. To find out more about sponsorship, please visit:
 
-    https://graphile.org/sponsor
+  💖 https://graphile.org/sponsor
 
 Thank you for using our software.`,
     )
