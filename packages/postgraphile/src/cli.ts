@@ -41,6 +41,7 @@ export function options(yargs: Argv) {
       alias: "C",
       type: "string",
       description: "The path to the config file",
+      normalize: true,
     })
     .option("allow-explain", {
       alias: "e",
