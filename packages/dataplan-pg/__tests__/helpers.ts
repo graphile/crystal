@@ -80,6 +80,12 @@ beforeAll(() => {
   testPool = new Pool({
     connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
   });
+  testPool.on("connect", (client) => {
+    client.query(`set TimeZone to 'UTC'`);
+  });
+  testPool.on("error", (e) => {
+    console.error("Pool error:", e);
+  });
 });
 
 afterAll(async () => {
