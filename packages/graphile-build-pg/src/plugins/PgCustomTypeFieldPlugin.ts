@@ -19,6 +19,7 @@ import type {
   __TrackedObjectPlan,
   ExecutablePlan,
   InputPlan,
+  TrackedArguments,
 } from "dataplanner";
 import {
   __ListTransformPlan,
@@ -27,7 +28,6 @@ import {
   object,
   ObjectPlan,
 } from "dataplanner";
-import type { TrackedArguments } from "dataplanner/src/interfaces";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
