@@ -44,6 +44,7 @@
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.15",
+    "@types/pg": "^8.6.2",
     "dataplanner": "workspace:^",
     "debug": "^4.3.3",
     "graphile-build": "workspace:*",
@@ -53,6 +54,7 @@
     "graphile-plugin": "workspace:^",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jsonwebtoken": "^8.5.1",
+    "pg": "^8.7.1",
     "tslib": "^2.3.1"
   },
   "engines": {
