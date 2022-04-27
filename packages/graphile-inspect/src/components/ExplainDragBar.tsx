@@ -54,7 +54,6 @@ export const ExplainDragBar: FC<{ helpers: ExplainHelpers }> = ({
       e.preventDefault();
       const diffX = e.clientX - drag.startX;
       const diffY = e.clientY - drag.startY;
-      console.log(diffX, diffY);
       const deets = detailsRef.current;
       const setW = () =>
         deets.setExplainSize(getWindowWidth() - e.clientX + 0.5 * DRAG_WIDTH);

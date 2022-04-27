@@ -160,7 +160,7 @@ export const useFetcher = (
         if (typeof explain === "object" && isExplainResultsLike(explain)) {
           setTimeout(() => {
             setExplainResults(explain);
-          }, 0);
+          }, 100);
         } else {
           console.warn(
             "The response had `extensions.explain` set, but in an incompatible format.",
@@ -176,7 +176,7 @@ export const useFetcher = (
               explain: l.plan,
             })),
           });
-        }, 0);
+        }, 100);
       }
     };
     return async function (
@@ -191,7 +191,7 @@ export const useFetcher = (
 
       setTimeout(() => {
         setExplainResults(null);
-      }, 0);
+      }, 100);
       if ("subscribe" in result) {
         // TODO: support wrapping subscriptions
       } else if ("next" in result && typeof result.next === "function") {

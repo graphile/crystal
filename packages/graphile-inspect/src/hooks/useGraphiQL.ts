@@ -15,13 +15,13 @@ export const useGraphiQL = (_props: GraphileInspectProps) => {
     graphiql?.handleToggleDocs();
     setTimeout(() => {
       bump(up);
-    }, 0);
+    }, 100);
   }, [graphiql]);
   const onToggleHistory = useCallback(() => {
     graphiql?.handleToggleHistory();
     setTimeout(() => {
       bump(up);
-    }, 0);
+    }, 100);
   }, [graphiql]);
   return { graphiqlRef, graphiql, onToggleDocs, onToggleHistory };
 };
