@@ -55,7 +55,11 @@ export async function loadConfig(
     for (const extension of extensions) {
       if (resolvedPath.endsWith(extension)) {
         registerLoader(jsVariants[extension]);
-        return require(resolvedPath);
+        try {
+          return require(resolvedPath);
+        } catch {
+          /* continue to the next one */
+        }
       }
     }
 

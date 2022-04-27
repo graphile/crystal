@@ -29,7 +29,6 @@ export function options(yargs: Argv) {
       type: "string",
       description:
         "The database schema (or comma separated list of schemas) to expose over GraphQL",
-      default: "public",
     })
     .option("port", {
       alias: "p",
