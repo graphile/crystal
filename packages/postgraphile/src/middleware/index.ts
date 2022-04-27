@@ -97,6 +97,7 @@ export function postgraphile(schemaResult: SchemaResult) {
   return (req: IncomingMessage, res: ServerResponse, next: any): void => {
     const handleError = makeErrorHandler(req, res, next);
 
+    // TODO: consider allowing GraphQL queries over 'GET'
     if (req.url === graphqlPath && req.method === "POST") {
       (async () => {
         const bodyRaw = await getBodyFromRequest(req);
@@ -116,6 +117,7 @@ export function postgraphile(schemaResult: SchemaResult) {
       return;
     }
 
+    // TODO: handle 'HEAD' requests
     if (
       graphiql &&
       (req.url === graphiqlPath ||
@@ -126,12 +128,6 @@ export function postgraphile(schemaResult: SchemaResult) {
         const result = await graphiqlHandler();
         sendResult(res, result);
       })().catch(handleError);
-      return;
-      sendResult(res, {
-        type: "text",
-        payload: "We don't have GraphiQL support yet...",
-        statusCode: 503,
-      });
       return;
     }
 
