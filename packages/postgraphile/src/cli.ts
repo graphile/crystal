@@ -56,7 +56,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     schema: rawSchema,
     port: rawPort,
     config: configFileLocation,
-    allowExplain,
+    allowExplain: rawAllowExplain,
   } = args;
 
   // Try and load the preset
@@ -79,7 +79,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   if (rawPort != null) {
     preset.server!.port = rawPort;
   }
-  if (allowExplain === true) {
+  if (rawAllowExplain === true) {
     preset.server!.exposePlan = true;
   }
 
