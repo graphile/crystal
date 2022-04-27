@@ -6,28 +6,40 @@ import { graphileInspectHTML } from "./server.js";
 
 export function options(yargs: Argv) {
   return yargs
-    .option("port", {
-      alias: "p",
-      type: "number",
-      description: "port number to run the server on",
-      default: 1337,
-    })
+    .usage(
+      "$0 [-SP] [--endpoint http://localhost:5678/graphql] ",
+      "Run a Graphile Inspect server serving a customized GraphiQL connecting to the given GraphQL endpoint",
+    )
     .option("endpoint", {
       alias: "e",
       type: "string",
       description: "the endpoint to connect to",
       default: "http://localhost:5000/graphql",
     })
-    .option("subscription-endpoint", {
-      alias: "s",
-      type: "string",
-      description: "the endpoint to connect to for subscription operations",
-      default: "ws://localhost:5000/graphql",
+    .option("port", {
+      alias: "p",
+      type: "number",
+      description: "port number to run the server on",
+      default: 1337,
     })
     .option("proxy", {
       alias: "P",
       type: "boolean",
       description: "Proxy requests to work around CORS issues",
+    })
+    .options("subscriptions", {
+      alias: "S",
+      type: "boolean",
+      description:
+        "enable subscriptions by converting 'endpoint' to a ws:// URL automatically",
+      default: false,
+    })
+    .option("subscription-endpoint", {
+      alias: "s",
+      type: "string",
+      description:
+        "the endpoint to connect to for subscription operations (overrides -S)",
+      default: "ws://localhost:5000/graphql",
     });
 }
 
@@ -44,7 +56,13 @@ async function tryLoadHttpProxyCreateProxyServer() {
 }
 
 export async function run(args: ArgsFromOptions<typeof options>) {
-  const { port, endpoint, subscriptionEndpoint, proxy: enableProxy } = args;
+  const {
+    port,
+    endpoint,
+    subscriptionEndpoint,
+    subscriptions,
+    proxy: enableProxy,
+  } = args;
   const createProxyServer = enableProxy
     ? await tryLoadHttpProxyCreateProxyServer()
     : null;
@@ -70,6 +88,12 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const endpointUrl = new URL(endpoint);
   const subscriptionsEndpointUrl = subscriptionEndpoint
     ? new URL(subscriptionEndpoint)
+    : subscriptions
+    ? (() => {
+        const url = new URL(endpointUrl);
+        url.protocol = endpointUrl.protocol === "https:" ? "wss:" : "ws:";
+        return url;
+      })()
     : undefined;
   const endpointBase = new URL(endpointUrl);
   endpointBase.pathname = "";

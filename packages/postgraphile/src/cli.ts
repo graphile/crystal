@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import type { Preset } from "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
@@ -15,6 +14,10 @@ import {
 
 export function options(yargs: Argv) {
   return yargs
+    .usage(
+      "$0 [--connection <DB_URL>] [--schema public] [--allow-explain] ...",
+      "Run a PostGraphile server which takes the given database and schema and exposes it as a GraphQL API",
+    )
     .option("connection", {
       alias: "c",
       type: "string",
