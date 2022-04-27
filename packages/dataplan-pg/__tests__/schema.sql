@@ -124,7 +124,7 @@ $$ language sql stable;
 
 -- Computed columns
 create function app_public.forums_unique_author_count(forum app_public.forums, featured bool = null) returns int as $$
-  select count(distinct author_id)
+  select count(distinct author_id)::int
   from app_public.messages
   where forum_id = forum.id
   and (
