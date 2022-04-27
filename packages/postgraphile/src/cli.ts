@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 import type { Preset } from "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
+import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
 import type { IncomingMessage, RequestListener } from "node:http";
 import { createServer } from "node:http";
-import url from "node:url";
-import type { Argv } from "yargs";
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
 
 import type { ContextCallback } from "./interfaces.js";
 import { postgraphile } from "./middleware/index.js";
@@ -41,7 +38,7 @@ export function options(yargs: Argv) {
       type: "string",
       description: "The path to the config file",
     })
-    .option("allowExplain", {
+    .option("allow-explain", {
       alias: "e",
       type: "boolean",
       description:
@@ -49,18 +46,14 @@ export function options(yargs: Argv) {
     });
 }
 
-type PostGraphileArgv = ReturnType<typeof options> extends Argv<infer U>
-  ? U
-  : never;
-
-export async function run(argv: PostGraphileArgv) {
+export async function run(args: ArgsFromOptions<typeof options>) {
   const {
     connection: connectionString,
     schema: rawSchema,
     port: rawPort,
     config: configFileLocation,
     allowExplain,
-  } = argv;
+  } = args;
 
   // Try and load the preset
   const userPreset = await loadConfig(configFileLocation);
@@ -136,14 +129,4 @@ export async function run(argv: PostGraphileArgv) {
     }
   });
   server.listen(port);
-}
-
-if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
-  try {
-    const argv = await options(yargs(hideBin(process.argv))).argv;
-    await run(argv);
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
 }

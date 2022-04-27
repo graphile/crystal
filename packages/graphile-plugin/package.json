@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "node": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "node": "./dist/cli.js"
     }
   },
   "scripts": {

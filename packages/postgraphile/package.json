@@ -13,7 +13,7 @@
       "node": "./dist/cli.js"
     }
   },
-  "bin": "./dist/cli.js",
+  "bin": "./dist/cli-run.js",
   "scripts": {
     "test": "jest -i",
     "prepack": "tsc -b"

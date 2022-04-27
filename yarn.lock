@@ -7420,8 +7420,8 @@ __metadata:
   peerDependencies:
     graphql: "*"
   bin:
-    graphile-inspect: ./dist/cli.js
-    grin: ./dist/cli.js
+    graphile-inspect: ./dist/cli-run.js
+    grin: ./dist/cli-run.js
   languageName: unknown
   linkType: soft
 
@@ -10586,7 +10586,7 @@ __metadata:
     tslib: "npm:^2.3.1"
     typescript: "npm:next"
   bin:
-    postgraphile: ./dist/cli.js
+    postgraphile: ./dist/cli-run.js
   languageName: unknown
   linkType: soft
 

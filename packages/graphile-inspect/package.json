@@ -4,8 +4,8 @@
   "description": "Graphile-flavoured GraphiQL distribution",
   "type": "module",
   "bin": {
-    "graphile-inspect": "./dist/cli.js",
-    "grin": "./dist/cli.js"
+    "graphile-inspect": "./dist/cli-run.js",
+    "grin": "./dist/cli-run.js"
   },
   "exports": {
     ".": {

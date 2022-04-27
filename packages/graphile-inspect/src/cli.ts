@@ -1,9 +1,6 @@
+import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
 import type { createProxyServer } from "http-proxy";
 import { createServer } from "node:http";
-import url from "node:url";
-import type { Argv } from "yargs";
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
 
 import { graphileInspectHTML } from "./server.js";
 
@@ -21,7 +18,7 @@ export function options(yargs: Argv) {
       description: "the endpoint to connect to",
       default: "http://localhost:5000/graphql",
     })
-    .option("subscriptionEndpoint", {
+    .option("subscription-endpoint", {
       alias: "s",
       type: "string",
       description: "the endpoint to connect to for subscription operations",
@@ -33,8 +30,6 @@ export function options(yargs: Argv) {
       description: "Proxy requests to work around CORS issues",
     });
 }
-
-type InspectArgv = ReturnType<typeof options> extends Argv<infer U> ? U : never;
 
 /**
  * Optionally we proxy the request.
@@ -48,8 +43,8 @@ async function tryLoadHttpProxyCreateProxyServer() {
   }
 }
 
-export async function run(argv: InspectArgv) {
-  const { port, endpoint, subscriptionEndpoint, proxy: enableProxy } = argv;
+export async function run(args: ArgsFromOptions<typeof options>) {
+  const { port, endpoint, subscriptionEndpoint, proxy: enableProxy } = args;
   const createProxyServer = enableProxy
     ? await tryLoadHttpProxyCreateProxyServer()
     : null;
@@ -130,17 +125,7 @@ export async function run(argv: InspectArgv) {
 
   server.listen(port, () => {
     console.log(
-      `Serving Graphile Inspect at http://localhost:${port} for GraphQL API at '${argv.endpoint}'`,
+      `Serving Graphile Inspect at http://localhost:${port} for GraphQL API at '${args.endpoint}'`,
     );
   });
-}
-
-if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
-  try {
-    const argv = await options(yargs(hideBin(process.argv))).argv;
-    await run(argv);
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
 }
