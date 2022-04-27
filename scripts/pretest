@@ -59,6 +59,8 @@ grant postgraphile_test_user1 to postgraphile_test_authenticator;
 grant postgraphile_test_user2 to postgraphile_test_authenticator;
 HERE
 
+(cd packages/dataplan-pg && yarn run test:install-schema && cd -)
+
 #psql -Xqv ON_ERROR_STOP=1 -f packages/graphile-utils/__tests__/utils-schema.sql "$TEST_DATABASE_URL"
 #psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/kitchen-sink-schema.sql "$TEST_DATABASE_URL"
 #psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/kitchen-sink-permissions.sql "$TEST_DATABASE_URL"
