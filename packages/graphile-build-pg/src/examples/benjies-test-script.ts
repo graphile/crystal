@@ -277,6 +277,8 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     },
   });
 
+  // CORS headers to allow cross-origin requests; handy for connecting a remote
+  // GraphiQL/similar.
   const setCORSHeaders = (req: FastifyRequest, res: FastifyReply) => {
     // We use 'res.raw' because that's what Helix uses and otherwise our
     // headers don't get set.
