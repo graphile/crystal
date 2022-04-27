@@ -535,7 +535,6 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
           }
 
-          let explainPromise = Promise.resolve();
           if (pgClient._explainResults) {
             const query = a && a.text ? a.text : a;
             const values = a && a.text ? a.values : b;
@@ -561,7 +560,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
               pgClient[$$pgClientOrigQuery]
                 .call(this, 'savepoint postgraphile_explain')
                 .catch(() => {});
-              explainPromise = pgClient[$$pgClientOrigQuery]
+              const explainPromise = pgClient[$$pgClientOrigQuery]
                 .call(this, explain, values)
                 .then((data: any) => data.rows)
                 // swallow errors during explain
@@ -576,11 +575,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
             }
           }
 
-          // Chain the original query's call to the EXPLAIN query's promise to ensure it's executed after the EXPLAIN
-          // query is rolled back.
-          const promiseResult = explainPromise.then(() =>
-            pgClient[$$pgClientOrigQuery].apply(this, args),
-          );
+          const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
 
           if (debugPgError.enabled) {
             // Report the error with our Postgres debugger.
