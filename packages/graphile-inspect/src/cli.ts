@@ -6,9 +6,10 @@ import { graphileInspectHTML } from "./server.js";
 
 export function options(yargs: Argv) {
   return yargs
-    .usage(
-      "$0 [-SP] [--endpoint http://localhost:5678/graphql] ",
-      "Run a Graphile Inspect server serving a customized GraphiQL connecting to the given GraphQL endpoint",
+    .usage("$0", "Run a Graphile Inspect server")
+    .example(
+      "$0 [-SP] [--endpoint http://localhost:5678/graphql]",
+      "Runs a Graphile Inspect server accessing the given GraphQL API, with subscriptions support and automatic proxying (to bypass CORS issues)",
     )
     .option("endpoint", {
       alias: "e",

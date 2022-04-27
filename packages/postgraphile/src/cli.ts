@@ -14,9 +14,10 @@ import {
 
 export function options(yargs: Argv) {
   return yargs
-    .usage(
-      "$0 [--connection <DB_URL>] [--schema public] [--allow-explain] ...",
-      "Run a PostGraphile server which takes the given database and schema and exposes it as a GraphQL API",
+    .usage("$0", "Run a PostGraphile HTTP server")
+    .example(
+      "$0 --connection postgres://localhost:5432/dbname --schema public --allow-explain",
+      "Run PostGraphile connecting to the given PostgreSQL connection string, exposing the 'public' schema as GraphQL and allowing clients to request details of what went on 'under the hood' when executing operations ('explain')",
     )
     .option("connection", {
       alias: "c",
