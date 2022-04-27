@@ -1,10 +1,6 @@
 import type { Expression, Identifier, Method, Property } from "@babel/types";
 import type { Rule } from "eslint";
-import type {
-  Expression as ESTreeExpression,
-  Node as ESTreeNode,
-  PrivateIdentifier,
-} from "estree";
+import type { Node as ESTreeNode } from "estree";
 
 import { reportProblem } from "./common";
 import { hasExportableParent } from "./NoNested";

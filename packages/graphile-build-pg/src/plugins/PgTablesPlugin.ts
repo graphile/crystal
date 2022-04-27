@@ -1,17 +1,11 @@
 import "graphile-build";
 
-import type {
-  PgClassSinglePlan,
-  PgSource,
-  PgSourceRelation,
-  PgTypeCodec,
-} from "@dataplan/pg";
-import { PgSelectSinglePlan, PgSourceBuilder } from "@dataplan/pg";
+import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
+import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { PgClass, PgNamespace } from "pg-introspection";
-import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";

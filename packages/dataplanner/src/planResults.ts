@@ -5,7 +5,6 @@ import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint";
 import { sharedNull } from "./utils";
 
 const isDev = process.env.GRAPHILE_ENV === "development";
-const mapcount = 0;
 let planResultsId = 0;
 
 /**

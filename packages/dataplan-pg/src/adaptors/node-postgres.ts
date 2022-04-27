@@ -24,10 +24,10 @@ const PREPARED_STATEMENT_CACHE_SIZE =
 const $$isSetup = Symbol("isConfiguredForDataplanPg");
 
 /**
- * > JIT compilation is beneficial primarily for long-running CPU-bound
- * > queries. Frequently these will be analytical queries. For short
- * > queries the added overhead of performing JIT compilation will
- * > often be higher than the time it can save.
+ * \> JIT compilation is beneficial primarily for long-running CPU-bound
+ * \> queries. Frequently these will be analytical queries. For short
+ * \> queries the added overhead of performing JIT compilation will
+ * \> often be higher than the time it can save.
  * -- https://www.postgresql.org/docs/14/jit-decision.html
  *
  * `@dataplan/pg` is designed for extremely fast queries, but sometimes
@@ -54,7 +54,7 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
       if (!DONT_DISABLE_JIT) {
         pgClient.query("set jit = off;").catch((e) => {
           console.error(
-            `Error occurred applying @dataplan/pg global Postgres settings`,
+            `Error occurred applying @dataplan/pg global Postgres settings: ${e}`,
           );
         });
       }

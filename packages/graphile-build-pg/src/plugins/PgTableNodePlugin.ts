@@ -1,25 +1,13 @@
 import "graphile-build";
 
-import type {
-  PgSelectSinglePlan,
-  PgSource,
-  PgSourceRelation,
-  PgTypeCodec,
-} from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
+import type { PgSelectSinglePlan } from "@dataplan/pg";
 import type { ListPlan } from "dataplanner";
 import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
-import type { GraphQLInterfaceType } from "graphql";
-import type { PgClass, PgNamespace } from "pg-introspection";
-import sql from "pg-sql2";
+import type { Plugin } from "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-
-interface State {}
-interface Cache {}
 
 export const PgTableNodePlugin: Plugin = {
   name: "PgTableNodePlugin",

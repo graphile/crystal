@@ -25,7 +25,6 @@ import type {
   ScalarPlanResolver,
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
-import { resolveType } from "./polymorphic";
 import { crystalResolve, dataplannerResolver } from "./resolvers";
 
 // TODO:TS: improve the types here!
@@ -138,7 +137,7 @@ export function makeCrystalSchema(details: {
 
       const objSpec = spec as ObjectPlans;
       const fields = type.getFields();
-      for (const [fieldName, fieldSpec] of Object.entries(spec)) {
+      for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
         if (fieldName === "__Plan") {
           (type.extensions as any).graphile = { Plan: fieldSpec };
           continue;

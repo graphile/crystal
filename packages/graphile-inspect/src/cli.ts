@@ -1,4 +1,5 @@
 import { createServer } from "http";
+import type { createProxyServer } from "http-proxy";
 import url from "url";
 import type { Argv } from "yargs";
 import yargs from "yargs";
@@ -38,18 +39,20 @@ type InspectArgv = ReturnType<typeof options> extends Argv<infer U> ? U : never;
 /**
  * Optionally we proxy the request.
  */
-async function tryLoadHttpProxy() {
+async function tryLoadHttpProxyCreateProxyServer() {
   try {
-    return ((await import("http-proxy")) as any)
-      .default as typeof import("http-proxy");
+    return ((await import("http-proxy")) as any).default
+      .createProxyServer as typeof createProxyServer;
   } catch {
     return null;
   }
 }
 async function run(argv: InspectArgv) {
   const { port, endpoint, subscriptionEndpoint, proxy: enableProxy } = argv;
-  const httpProxy = enableProxy ? await tryLoadHttpProxy() : null;
-  const proxy = httpProxy?.createProxyServer({ target: endpoint, ws: true });
+  const createProxyServer = enableProxy
+    ? await tryLoadHttpProxyCreateProxyServer()
+    : null;
+  const proxy = createProxyServer?.({ target: endpoint, ws: true });
   if (enableProxy && !proxy) {
     throw new Error(
       "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'graphile-inspect'",
@@ -79,7 +82,7 @@ async function run(argv: InspectArgv) {
   const endpointWsBase = new URL(endpointBase);
   endpointWsBase.protocol = endpointBase.protocol === "https:" ? "wss:" : "ws:";
 
-  if (!httpProxy) {
+  if (!proxy) {
     console.log(
       `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'graphile-inspect' and we'll proxy to the API for you`,
     );

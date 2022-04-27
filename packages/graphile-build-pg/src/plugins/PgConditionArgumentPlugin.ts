@@ -163,7 +163,6 @@ export const PgConditionArgumentPlugin: Plugin = {
       },
 
       GraphQLObjectType_fields_field_args(args, build, context) {
-        const { sql, extend } = build;
         const {
           scope: {
             fieldName,

@@ -146,7 +146,8 @@ export function establishAether<
 }): Aether<TVariables, TContext, TRootValue> {
   const { schema, operation, fragments, variableValues, context, rootValue } =
     details;
-  let cacheByOperation = schema[$$cacheByOperation];
+  let cacheByOperation: CacheByOperation | undefined =
+    schema[$$cacheByOperation];
 
   let cache = cacheByOperation?.get(operation);
 

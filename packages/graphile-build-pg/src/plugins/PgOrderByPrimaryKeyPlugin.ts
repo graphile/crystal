@@ -1,22 +1,9 @@
 import "./PgTablesPlugin";
 
-import type {
-  PgConditionPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
-  PgSourceUnique,
-  PgTypeCodec,
-  PgTypeColumn,
-  PgTypeColumns,
-} from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan } from "dataplanner";
-import { getEnumValueConfig } from "dataplanner";
+import type { PgSelectPlan, PgSourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLEnumType, GraphQLInputType } from "graphql";
-import { inspect } from "util";
 
-import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 export const PgOrderByPrimaryKeyPlugin: Plugin = {

@@ -4,17 +4,10 @@ import type {
   PolymorphicData,
   PolymorphicPlan,
 } from "dataplanner";
-import {
-  arraysMatch,
-  ExecutablePlan,
-  isDev,
-  polymorphicWrap,
-} from "dataplanner";
+import { ExecutablePlan, isDev, polymorphicWrap } from "dataplanner";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { PgTypeColumns } from "../codecs";
-import type { PgTypeCodec } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 

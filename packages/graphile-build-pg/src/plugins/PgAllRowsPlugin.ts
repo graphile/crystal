@@ -1,7 +1,7 @@
 import "graphile-build";
 import "./PgTablesPlugin";
 
-import type { PgSelectSinglePlan, PgSource } from "@dataplan/pg";
+import type { PgSource } from "@dataplan/pg";
 import { connection } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
@@ -97,7 +97,6 @@ export const PgAllRowsPlugin: Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
-          getOutputTypeByName,
         } = build;
         const { fieldWithHooks } = context;
         if (!context.scope.isRootQuery) {

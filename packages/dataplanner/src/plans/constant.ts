@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
+import type { CrystalResultsList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 import { arrayOfLength } from "../utils";
 

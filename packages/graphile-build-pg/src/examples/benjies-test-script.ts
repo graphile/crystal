@@ -22,7 +22,6 @@ import {
 } from "dataplanner";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
-import fastifyStatic from "fastify-static";
 import {
   buildInflection,
   buildSchema,
@@ -37,7 +36,6 @@ import { graphql } from "graphql";
 import {
   getGraphQLParameters,
   processRequest,
-  renderGraphiQL,
   sendResult,
 } from "graphql-helix";
 import { useServer } from "graphql-ws/lib/use/ws";
@@ -264,20 +262,6 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   // Create our fastify (server) app
   const app = fastify();
 
-  /** Escaping of HTML entities for mermaid */
-  function escapeHTMLEntities(str: string): string {
-    return str.replace(
-      /[&"<>]/g,
-      (l) =>
-        ({ "&": "&amp;", '"': "&quot;", "<": "&lt;", ">": "&gt;" }[l as any]),
-    );
-  }
-
-  // Serve the mermaid-js resources
-  app.register(fastifyStatic, {
-    root: `${__dirname}/../../../../node_modules/mermaid/dist`,
-  });
-
   const { graphileInspectHTML } = await import("graphile-inspect/server");
 
   // The root URL ('/') serves GraphiQL
@@ -330,7 +314,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     method: ["OPTIONS"],
     url: "/graphql",
     async handler(req, res) {
-      // setCORSHeaders(req, res);
+      setCORSHeaders(req, res);
       res.send();
     },
   });
@@ -339,7 +323,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     method: ["POST"],
     url: "/graphql",
     async handler(req, res) {
-      // setCORSHeaders(req, res);
+      setCORSHeaders(req, res);
 
       // Here we can pass the request and make available as part of the "context".
       // The return value is the a GraphQL-proxy that exposes all the functions.

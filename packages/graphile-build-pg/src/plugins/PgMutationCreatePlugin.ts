@@ -201,12 +201,10 @@ export const PgMutationCreatePlugin: Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           inflection,
-          sql,
           graphql: { GraphQLNonNull },
         } = build;
         const {
           scope: { isRootMutation },
-          Self,
           fieldWithHooks,
         } = context;
         if (!isRootMutation) {
@@ -222,7 +220,6 @@ export const PgMutationCreatePlugin: Plugin = {
             const mutationInputType = build.getInputTypeByName(
               inflection.createInputType(source),
             );
-            const tableFieldName = inflection.tableFieldName(source);
 
             return build.extend(
               memo,

@@ -83,7 +83,7 @@ export interface PrintPlanGraphOptions {
 export function printPlanGraph(
   aether: Aether,
   {
-    printPathRelations = false,
+    // printPathRelations = false,
     includePaths = true,
     concise = false,
   }: PrintPlanGraphOptions,
@@ -112,27 +112,6 @@ export function printPlanGraph(
     ``,
   ];
 
-  const pathIdMap = Object.create(null);
-  let pathCounter = 0;
-  const pathId = (pathIdentity: string, isItemPlan = false): string => {
-    if (!pathIdMap[pathIdentity]) {
-      pathIdMap[pathIdentity] = `P${++pathCounter}`;
-      const [lBrace, rBrace] = isItemPlan
-        ? [">", "]"]
-        : aether.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
-        ? ["[/", "\\]"]
-        : aether.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
-        ? ["([", "])"]
-        : ["{{", "}}"];
-      graph.push(
-        `    ${pathIdMap[pathIdentity]}${lBrace}${mermaidEscape(
-          crystalPrintPathIdentity(pathIdentity, 2, 3),
-        )}${rBrace}:::path`,
-      );
-    }
-    return pathIdMap[pathIdentity];
-  };
-
   const squish = (str: string, start = 8, end = 8): string => {
     if (str.length > start + end + 4) {
       return `${str.slice(0, start)}...${str.slice(str.length - end)}`;
@@ -141,7 +120,6 @@ export function printPlanGraph(
   };
 
   const planIdMap = Object.create(null);
-  const planDependencies: string[] = [];
   const planId = (plan: ExecutablePlan): string => {
     if (!planIdMap[plan.id]) {
       const planName = plan.constructor.name.replace(/Plan$/, "");
@@ -151,12 +129,6 @@ export function printPlanGraph(
       const strippedMeta = rawMeta != null ? stripAnsi(rawMeta) : null;
       const meta =
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
-      const style =
-        plan instanceof __ItemPlan
-          ? itemplanStyle
-          : plan.hasSideEffects
-          ? sideeffectplanStyle
-          : planStyle;
 
       const groups =
         plan.groupIds.length === 1 && plan.groupIds[0] === plan.primaryGroupId
@@ -188,6 +160,26 @@ export function printPlanGraph(
   };
 
   /*
+  const pathIdMap = Object.create(null);
+  const pathCounter = 0;
+  const pathId = (pathIdentity: string, isItemPlan = false): string => {
+    if (!pathIdMap[pathIdentity]) {
+      pathIdMap[pathIdentity] = `P${++pathCounter}`;
+      const [lBrace, rBrace] = isItemPlan
+        ? [">", "]"]
+        : aether.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
+        ? ["[/", "\\]"]
+        : aether.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
+        ? ["([", "])"]
+        : ["{{", "}}"];
+      graph.push(
+        `    ${pathIdMap[pathIdentity]}${lBrace}${mermaidEscape(
+          crystalPrintPathIdentity(pathIdentity, 2, 3),
+        )}${rBrace}:::path`,
+      );
+    }
+    return pathIdMap[pathIdentity];
+  };
     graph.push("    %% subgraph fields");
     {
       const recurse = (parent: FieldDigest) => {

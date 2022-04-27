@@ -1,9 +1,7 @@
-import type { PgSource, PgTypeCodec } from "@dataplan/pg";
-import type { TrackedArguments } from "dataplanner";
+import type { PgTypeCodec } from "@dataplan/pg";
 import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GatherHooks, Plugin, PluginGatherConfig } from "graphile-plugin";
-import type { GraphQLObjectType } from "graphql";
+import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { getBehavior } from "../behavior";
@@ -30,7 +28,7 @@ declare global {
 
 declare module "graphile-plugin" {
   interface GatherHelpers {
-    pgJWT: {};
+    pgJWT: Record<string, never>;
   }
 }
 

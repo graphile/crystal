@@ -1,17 +1,10 @@
 import "./PgTablesPlugin";
 
-import type {
-  PgConditionPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
-  PgTypeColumns,
-} from "@dataplan/pg";
+import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLInputType } from "graphql";
 
-import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {

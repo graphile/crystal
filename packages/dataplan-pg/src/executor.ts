@@ -330,11 +330,7 @@ ${duration}
         resultIndex: number;
       }>
     >();
-    for (
-      let resultIndex = 0, l = values.length;
-      resultIndex < l;
-      resultIndex++
-    ) {
+    for (let resultIndex = 0, l = valuesCount; resultIndex < l; resultIndex++) {
       results[resultIndex] = undefined;
       const { context, queryValues } = values[resultIndex];
 

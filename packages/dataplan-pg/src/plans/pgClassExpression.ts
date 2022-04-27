@@ -1,6 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
 import { ExecutablePlan } from "dataplanner";
-import debugFactory from "debug";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 

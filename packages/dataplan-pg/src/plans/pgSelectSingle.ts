@@ -4,7 +4,7 @@ import type {
   EdgeCapablePlan,
 } from "dataplanner";
 import { ExecutablePlan } from "dataplanner";
-import type { SQL, SQLPlaceholderNode } from "pg-sql2";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgTypeColumn, PgTypeColumns } from "../codecs";

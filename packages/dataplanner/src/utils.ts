@@ -1,4 +1,3 @@
-import LRU from "@graphile/lru";
 import type {
   GraphQLEnumValueConfig,
   GraphQLFieldConfig,
@@ -613,7 +612,7 @@ export function getEnumValueConfig(
 /**
  * It's a peculiarity of V8 that `{}` is twice as fast as
  * `Object.create(null)`, but `Object.create(sharedNull)` is the same speed as
- * `{}`. Hat tip to @purge for bringing this to my attention.
+ * `{}`. Hat tip to `@purge` for bringing this to my attention.
  *
  * @internal
  */

@@ -29,7 +29,7 @@ export const PgConditionCustomFieldsPlugin: Plugin = {
   schema: {
     hooks: {
       GraphQLInputObjectType_fields(fields, build, context) {
-        const { extend, inflection, sql } = build;
+        const { inflection, sql } = build;
         const {
           scope: { isPgCondition, pgCodec },
           fieldWithHooks,

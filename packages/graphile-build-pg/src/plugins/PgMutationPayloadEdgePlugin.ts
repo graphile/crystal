@@ -1,39 +1,15 @@
 import "graphile-build";
 
-import type {
-  PgClassSinglePlan,
-  PgDeletePlan,
-  PgInsertPlan,
-  PgSelectSinglePlan,
-  PgSource,
-  PgSourceRelation,
-  PgSourceUnique,
-  PgTypeCodec,
-  PgUpdatePlan,
-} from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
+import type { PgClassSinglePlan, PgSourceUnique } from "@dataplan/pg";
 import type { ObjectPlan, TrackedArguments } from "dataplanner";
-import {
-  access,
-  connection,
-  constant,
-  EdgePlan,
-  first,
-  getEnumValueConfig,
-  list,
-  ListPlan,
-} from "dataplanner";
+import { connection, constant, EdgePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import type { Plugin } from "graphile-plugin";
 import type {
   GraphQLEnumType,
-  GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLSchema,
 } from "graphql";
-import type { PgClass, PgNamespace } from "pg-introspection";
-import sql from "pg-sql2";
-import { inspect } from "util";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -51,9 +27,6 @@ declare global {
     }
   }
 }
-
-interface State {}
-interface Cache {}
 
 export const PgMutationPayloadEdgePlugin: Plugin = {
   name: "PgMutationPayloadEdgePlugin",
@@ -75,7 +48,6 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
         const {
           extend,
           getTypeByName,
-          sql,
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
           options: { simpleCollections },

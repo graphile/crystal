@@ -43,7 +43,7 @@ const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
  */
 export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
   const config = resolvePresets([preset]);
-  const { plugins, inflection: options = {} } = config;
+  const { plugins, inflection: _options = {} } = config;
 
   const inflectors: Partial<GraphileEngine.Inflection> =
     makeInitialInflection();

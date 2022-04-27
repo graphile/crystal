@@ -1,17 +1,15 @@
 import "./PgTablesPlugin";
 
 import type {
-  PgConditionPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
   PgTypeCodec,
-  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLEnumType, GraphQLInputType, GraphQLSchema } from "graphql";
+import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
 import { getBehavior } from "../behavior";
@@ -47,11 +45,7 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
   schema: {
     hooks: {
       init(_, build) {
-        const {
-          graphql: { GraphQLEnumType },
-          inflection,
-          pgCodecMetaLookup,
-        } = build;
+        const { inflection, pgCodecMetaLookup } = build;
         pgCodecMetaLookup.forEach((meta, codec) => {
           if (!codec.columns || codec.isAnonymous) return;
           const behavior = getBehavior(codec.extensions);
@@ -101,7 +95,6 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
         const {
           extend,
           getTypeByName,
-          sql,
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
         } = build;

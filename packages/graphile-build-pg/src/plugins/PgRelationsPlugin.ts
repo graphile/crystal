@@ -82,8 +82,8 @@ export const PgRelationsPlugin: Plugin = {
         options,
         {
           databaseName,
-          pgConstraint,
-          localClass,
+          pgConstraint: _pgConstraint,
+          localClass: _localClass,
           localColumns,
           foreignClass,
           foreignColumns,
@@ -370,6 +370,7 @@ export const PgRelationsPlugin: Plugin = {
               );
             const singleRecordPlan = clean
               ? // Optimise function for both execution and export.
+                // eslint-disable-next-line graphile-export/exhaustive-deps
                 (EXPORTABLE(
                   new Function(
                     "otherSource",
@@ -404,7 +405,8 @@ export const PgRelationsPlugin: Plugin = {
                 );
 
             const listPlan = clean
-              ? (EXPORTABLE(
+              ? // eslint-disable-next-line graphile-export/exhaustive-deps
+                (EXPORTABLE(
                   new Function(
                     "otherSource",
                     `return $messages => otherSource.find({ ${remoteColumns
@@ -438,7 +440,8 @@ export const PgRelationsPlugin: Plugin = {
                 );
 
             const connectionPlan = clean
-              ? (EXPORTABLE(
+              ? // eslint-disable-next-line graphile-export/exhaustive-deps
+                (EXPORTABLE(
                   new Function(
                     "otherSource",
                     "connection",

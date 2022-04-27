@@ -5,14 +5,11 @@ import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
-import type { Aether } from "./aether";
 import { populateValuePlan } from "./aether";
-import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
-import { CrystalError } from "./error";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
 import {
@@ -143,10 +140,6 @@ function makeParentCrystalObject(
         `Expected parent field (which returned non-crystal object) to be a __ValuePlan, instead found ${parentPlan})`,
       );
     }
-
-    // We don't really care about indexes, it's just for debugging. Skipping
-    // for now.
-    const indexes: ReadonlyArray<number> = []; //pathToIndexes(path);
 
     const parentPlanResults = crystalContext.rootCrystalObject[$$planResults];
     const { parentType } = info;

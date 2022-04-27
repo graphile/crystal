@@ -84,12 +84,12 @@ import type {
   PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
-import { $$eventEmitter } from "./interfaces";
 import {
   $$bypassGraphQL,
   $$concreteType,
   $$crystalContext,
   $$data,
+  $$eventEmitter,
   $$idempotent,
   $$planResults,
   $$verbatim,
@@ -323,7 +323,6 @@ type AetherPhase =
   | "finalize"
   | "ready";
 
-const EMPTY_INDEXES = Object.freeze([] as number[]);
 const EMPTY_ARRAY = Object.freeze([] as any[]);
 
 // For logging indentation
@@ -3234,9 +3233,11 @@ export class Aether<
       const polymorphicTypeNames = polymorphicDetails
         ? polymorphicDetails.typeNames
         : undefined;
+      /*
       const fieldDigests = pathIdentitiesByPlanId[plan.id]
         ?.map((pathIdentity) => this.fieldDigestByPathIdentity[pathIdentity])
         .filter(isNotNullish);
+      */
 
       const group = groupId ? this.groups[groupId] : null;
 
@@ -3727,8 +3728,10 @@ export class Aether<
               );
             }
             const rootPathIdentity = matchingParentPathIdentities[0];
+            /*
             const rootPathIdentityIndex =
               bucket.rootPathIdentities.indexOf(rootPathIdentity);
+            */
             const remainingPath = pathIdentity.slice(
               rootPathIdentity.length + 1,
             );
@@ -4927,9 +4930,7 @@ export class Aether<
   ) {
     const itemPlanId = this.transformDependencyPlanIdByTransformPlanId[plan.id];
     const itemPlan = this.dangerouslyGetPlan(itemPlanId);
-    const namedReturnType = plan.namedType;
     const listPlan = plan.dangerouslyGetListPlan();
-    const pathIdentity = itemPlan.parentPathIdentity;
     // TODO: can this be made more efficient?
     const depResults = await this.executeBatchInner(
       crystalContext,
@@ -5042,10 +5043,10 @@ export class Aether<
     const itemPlanId = isSubscribe
       ? this.subscriptionItemPlanId
       : this.itemPlanIdByFieldPathIdentity[fieldPathIdentity];
+    /*
     const returnRaw = isSubscribe
       ? false
       : !!this.returnRawValueByPathIdentity[fieldPathIdentity];
-    /*
     if (planId == null) {
       throw new Error(
         "Support for unplanned resolvers is current unimplemented",
@@ -5085,7 +5086,6 @@ export class Aether<
       itemPlan,
       `Could not find the itemPlan with id '${itemPlanId}' at '${fieldPathIdentity}'`,
     );
-    const namedReturnType = getNamedType(returnType);
     const batch: Batch = {
       // TODO: rename Batch.pathIdentity to fieldPathIdentity
       pathIdentity: fieldPathIdentity,
@@ -5286,7 +5286,7 @@ export class Aether<
           }
           if (Array.isArray(listResult)) {
             // Turn each entry in this listResult into it's own PlanResultses, then execute the new layers.
-            const newPlanResultses = listResult.map((result, i) => {
+            const newPlanResultses = listResult.map((result) => {
               if (result == null) {
                 return null;
               }
@@ -5630,7 +5630,7 @@ export class Aether<
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
     allowPrefetch = true,
   ): PromiseOrDirect<any[]> {
-    const { isPolymorphic, isLeaf, namedReturnType, returnRaw } = fieldDigest;
+    const { isPolymorphic, namedReturnType, returnRaw } = fieldDigest;
     const crystalObjectFromPlanResultsAndTypeName = (
       planResults: PlanResults,
       typeName: string,
@@ -5948,7 +5948,7 @@ export class Aether<
           // To avoid double serialization issues, we need to roll these values
           // back to their unserialized forms before passing to GraphQL.js
           for (let i = 0, l = rollback.length; i < l; i++) {
-            const { o, k, s } = requestContext.toSerialize[i];
+            const { o, k } = requestContext.toSerialize[i];
             o[k] = rollback[i];
           }
         } else {
@@ -6203,6 +6203,8 @@ function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
 }
 
+// TODO: review our use of TreeNode
+/*
 function treeNodePath(
   treeNode: TreeNode,
   startPathIdentity: string,
@@ -6236,6 +6238,7 @@ function treeNodePath(
   }
   return path;
 }
+*/
 
 function isTypePlanned(
   schema: GraphQLSchema,

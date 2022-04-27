@@ -3,8 +3,6 @@ import "./PgTablesPlugin";
 import "../interfaces";
 
 import type {
-  PgInsertPlan,
-  PgSelectPlan,
   PgSelectSinglePlan,
   PgSetPlan,
   PgTypeCodec,
@@ -20,7 +18,6 @@ import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
-import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -297,7 +294,7 @@ export const PgColumnsPlugin: Plugin = {
       GraphQLInputObjectType_fields(fields, build, context) {
         const {
           extend,
-          graphql: { GraphQLString, GraphQLNonNull },
+          graphql: { GraphQLNonNull },
           inflection,
         } = build;
         const {
@@ -326,7 +323,9 @@ export const PgColumnsPlugin: Plugin = {
               if (behavior && !behavior.includes("insertable")) {
                 return memo;
               }
-              const action = isPgBaseInput
+
+              // TODO: should this be used?
+              const _action = isPgBaseInput
                 ? "base"
                 : isPgPatch
                 ? "update"

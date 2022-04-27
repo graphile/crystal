@@ -153,7 +153,7 @@ export const NodePlugin: Plugin = {
           [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
         } = build;
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
-        const nodeType = build.getTypeByName(inflection.builtin("Node")) as
+        const nodeType = getTypeByName(inflection.builtin("Node")) as
           | GraphQLObjectType
           | undefined;
         if (!nodeType) {

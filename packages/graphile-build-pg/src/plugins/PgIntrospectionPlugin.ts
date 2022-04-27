@@ -7,7 +7,6 @@ import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
 import type {
-  GatherHelpers,
   GatherHooks,
   Plugin,
   PluginGatherConfig,

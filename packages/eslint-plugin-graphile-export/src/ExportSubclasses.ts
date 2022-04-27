@@ -1,5 +1,5 @@
 import type { ClassDeclaration, Property } from "@babel/types";
-import type { Linter, Rule } from "eslint";
+import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 import { basename } from "path";
 

@@ -13,12 +13,7 @@ import type {
   PgTypeCodec,
   PgTypedExecutablePlan,
 } from "@dataplan/pg";
-import {
-  pgClassExpression,
-  PgClassExpressionPlan,
-  PgSelectSinglePlan,
-  TYPES,
-} from "@dataplan/pg";
+import { pgClassExpression, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
 import type {
   __InputObjectPlan,
   __TrackedObjectPlan,
@@ -324,8 +319,6 @@ export const PgCustomTypeFieldPlugin: Plugin = {
 
       GraphQLObjectType_fields(fields, build, context) {
         const {
-          getGraphQLTypeByPgCodec,
-          sql,
           graphql: {
             GraphQLList,
             GraphQLNonNull,
@@ -673,7 +666,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                           {
                             description: source.description,
                             // TODO: nullability
-                            type: new build.graphql.GraphQLList(type!),
+                            type: new GraphQLList(type!),
                             args,
                             plan: getSelectPlanFromParentAndArgs as any,
                           },

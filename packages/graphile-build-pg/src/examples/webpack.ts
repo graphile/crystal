@@ -2,11 +2,6 @@
 
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
-import chalk from "chalk";
-import { crystalPrint, stripAnsi } from "dataplanner";
-import express from "express";
-import { graphqlHTTP } from "express-graphql";
-import { readFile } from "fs/promises";
 import {
   buildInflection,
   buildSchema,
@@ -17,10 +12,7 @@ import {
 } from "graphile-build";
 import { exportSchema } from "graphile-export";
 import { resolvePresets } from "graphile-plugin";
-import { graphql, printSchema } from "graphql";
-import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
-import { inspect } from "util";
 import webpack from "webpack";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";

@@ -3,7 +3,6 @@ import { inspect } from "util";
 import type { Aether, CrystalError } from ".";
 import type {
   Bucket,
-  BucketDefinition,
   BucketDefinitionFieldOutputMap,
   RequestContext,
 } from "./bucket";
@@ -11,7 +10,6 @@ import { BucketSetter, bucketValue } from "./bucket";
 import { isCrystalError, newCrystalError } from "./error";
 import type {
   CrystalContext,
-  CrystalResultsList,
   CrystalValuesList,
   ExecutionExtra,
   PromiseOrDirect,
@@ -81,7 +79,7 @@ export function executeBucket(
   const store = bucket.store;
   const rootOutputModeType = bucket.definition.rootOutputModeType;
   const isNestedListBucket = rootOutputModeType === "A";
-  const isLeafBucket = rootOutputModeType === "L";
+  // const isLeafBucket = rootOutputModeType === "L";
   const isObjectBucket = rootOutputModeType === "O";
   const {
     input,
@@ -172,7 +170,7 @@ export function executeBucket(
       // Need to complete promises, check for errors, etc
       return Promise.allSettled(result).then((rs) => {
         // Deliberate shadowing
-        const result = rs.map((t, i) => {
+        const result = rs.map((t) => {
           if (t.status === "fulfilled") {
             return t.value;
           } else {
@@ -189,8 +187,9 @@ export function executeBucket(
 
   function executeListTransform(
     plan: __ListTransformPlan<any, any, any>,
-    dependencies: (readonly any[])[],
-    extra: ExecutionExtra,
+    // TODO: review these unused arguments
+    _dependencies: (readonly any[])[],
+    _extra: ExecutionExtra,
   ): PromiseOrDirect<any[]> {
     const itemPlan = aether.dangerouslyGetPlan(plan.itemPlanId!);
     const itemPlanId = itemPlan.id;
@@ -237,7 +236,7 @@ export function executeBucket(
               j,
             ),
           );
-          const l = itemStore[itemPlanId].push(list[j]);
+          itemStore[itemPlanId].push(list[j]);
           for (const planId of copyPlanIds) {
             const val = store[planId][i];
             itemStore[planId].push(val);
@@ -496,7 +495,7 @@ export function executeBucket(
       // And any root buckets
       {
         if (pathIdentitiesWithChildren.includes(setter.rootPathIdentity)) {
-          for (const child of childrenByPathIdentity[
+          for (const _child of childrenByPathIdentity[
             setter.rootPathIdentity
           ]!) {
             throw new Error(
@@ -572,7 +571,7 @@ export function executeBucket(
           }
           for (let i = 0, l = value.length; i < l; i++) {
             childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
-            const l = childStore[itemPlanId].push(rawValue[i]);
+            childStore[itemPlanId].push(rawValue[i]);
             for (const planId of copyPlanIds) {
               const val = store[planId][index];
               childStore[planId].push(val);

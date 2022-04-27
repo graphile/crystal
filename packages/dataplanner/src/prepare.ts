@@ -1,4 +1,3 @@
-import EventEmitter from "events";
 import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
@@ -6,8 +5,7 @@ import { buildExecutionContext } from "graphql/execution/execute";
 import { $$contextPlanCache } from "./aether";
 import { establishAether } from "./establishAether";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces";
-import { $$eventEmitter } from "./interfaces";
-import { $$extensions } from "./interfaces";
+import { $$eventEmitter, $$extensions } from "./interfaces";
 import { isPromiseLike } from "./utils";
 
 const isTest = process.env.NODE_ENV === "test";

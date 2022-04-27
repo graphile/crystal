@@ -45,7 +45,6 @@ export const PgRowByUniquePlugin: Plugin = {
         } = build;
         const {
           scope: { isRootQuery },
-          Self,
           fieldWithHooks,
         } = context;
         if (!isRootQuery) {

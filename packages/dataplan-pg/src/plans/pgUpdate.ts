@@ -11,11 +11,7 @@ import type {
   PgSourceRow,
   PgSourceUnique,
 } from "../datasource";
-import type {
-  PgTypeCodec,
-  PgTypedExecutablePlan,
-  PlanByUniques,
-} from "../interfaces";
+import type { PgTypeCodec, PlanByUniques } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
 import { PgSetPlan } from "./pgSet";

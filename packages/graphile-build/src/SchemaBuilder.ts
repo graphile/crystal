@@ -2,7 +2,7 @@ import "./global.js";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";
-import type { GraphQLError, GraphQLSchemaConfig } from "graphql";
+import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
 
 import makeNewBuild from "./makeNewBuild.js";

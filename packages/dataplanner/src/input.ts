@@ -1,6 +1,5 @@
 import type {
   GraphQLInputType,
-  GraphQLLeafType,
   GraphQLType,
   ListTypeNode,
   NamedTypeNode,
@@ -14,22 +13,17 @@ import {
   isInputType,
   isLeafType,
   Kind,
-  valueFromAST,
 } from "graphql";
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
 import * as assert from "./assert";
-import type { CrystalResultsList, CrystalValuesList } from "./interfaces";
-import { ExecutablePlan } from "./plan";
 import {
   __InputListPlan,
   __InputStaticLeafPlan,
   __TrackedObjectPlan,
-  constant,
 } from "./plans";
 import { __InputObjectPlan } from "./plans/__inputObject";
-import { arrayOfLength, defaultValueToValueNode } from "./utils";
 
 // TODO: should this have `__` prefix?
 export type InputPlan =

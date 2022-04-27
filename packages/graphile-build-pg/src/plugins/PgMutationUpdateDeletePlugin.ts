@@ -6,7 +6,7 @@ import type {
   PgTypeColumn,
   PgUpdatePlan,
 } from "@dataplan/pg";
-import { pgDelete, pgInsert, pgUpdate } from "@dataplan/pg";
+import { pgDelete, pgUpdate } from "@dataplan/pg";
 import type {
   __InputObjectPlan,
   __TrackedObjectPlan,
@@ -14,14 +14,10 @@ import type {
   InputPlan,
   TrackedArguments,
 } from "dataplanner";
-import { constant, lambda, object, ObjectPlan } from "dataplanner";
+import { lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
-import type {
-  GraphQLFieldConfigMap,
-  GraphQLObjectType,
-  GraphQLOutputType,
-} from "graphql";
+import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -177,7 +173,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
         );
       },
 
-      updateNodeField(options, { source, unique }) {
+      updateNodeField(options, { source, unique: _unique }) {
         return this.camelCase(`update-${this._singularizedSourceName(source)}`);
       },
       updateNodeInputType(options, details) {
@@ -192,7 +188,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
         );
       },
 
-      deleteNodeField(options, { source, unique }) {
+      deleteNodeField(options, { source, unique: _unique }) {
         return this.camelCase(`delete-${this._singularizedSourceName(source)}`);
       },
       deleteNodeInputType(options, details) {
@@ -550,12 +546,10 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           inflection,
-          sql,
           graphql: { GraphQLNonNull },
         } = build;
         const {
           scope: { isRootMutation },
-          Self,
           fieldWithHooks,
         } = context;
         if (!isRootMutation) {
@@ -614,7 +608,6 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                 const payloadType = build.getOutputTypeByName(payloadTypeName);
                 const mutationInputType =
                   build.getInputTypeByName(inputTypeName);
-                const tableFieldName = inflection.tableFieldName(source);
 
                 const uniqueColumns = (unique.columns as string[]).map(
                   (columnName) => [

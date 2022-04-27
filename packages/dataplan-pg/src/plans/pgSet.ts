@@ -1,9 +1,5 @@
-import assert from "assert";
 import type { BasePlan, ExecutablePlan } from "dataplanner";
 import { ModifierPlan } from "dataplanner";
-import type { SQL } from "pg-sql2";
-
-import type { PgTypeCodec } from "../interfaces";
 
 export interface PgSetCapableParentPlan<TKey extends string> extends BasePlan {
   // See PgConditionCapableParentPlan for a similar plan

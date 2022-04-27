@@ -117,7 +117,7 @@ export const $$eventEmitter = Symbol("executionEventEmitter");
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.
  */
-export interface PolymorphicData<TType extends string = string, TData = any> {
+export interface PolymorphicData<TType extends string = string, _TData = any> {
   [$$concreteType]: TType;
 }
 
@@ -241,6 +241,7 @@ export type FieldPlanResolver<
   },
 ) => TResultPlan;
 
+// TODO: review _TContext
 /**
  * Fields on input objects can have plans; the plan resolver is passed a parent plan
  * (from an argument, or from a parent input object) or null if none, and an
@@ -248,7 +249,7 @@ export type FieldPlanResolver<
  * resolver must return either a ModifierPlan or null.
  */
 export type InputObjectFieldPlanResolver<
-  TContext extends BaseGraphQLContext,
+  _TContext extends BaseGraphQLContext,
   TInput extends InputPlan,
   TParentPlan extends ModifierPlan<any> | null,
   TResultPlan extends ModifierPlan<
@@ -262,6 +263,7 @@ export type InputObjectFieldPlanResolver<
   },
 ) => TResultPlan;
 
+// TODO: review _TContext
 /**
  * Arguments can have plans; the plan resolver is passed the parent plan (the
  * plan that represents the _parent_ field of the field the arg is defined on),
@@ -270,7 +272,7 @@ export type InputObjectFieldPlanResolver<
  * argument. The resolver must return either a ModifierPlan or null.
  */
 export type ArgumentPlanResolver<
-  TContext extends BaseGraphQLContext,
+  _TContext extends BaseGraphQLContext,
   TInput extends InputPlan,
   TParentPlan extends ExecutablePlan<any> | null,
   TFieldPlan extends ExecutablePlan<any> | null,

@@ -749,7 +749,7 @@ export const PgCodecsPlugin: Plugin = {
             const underlyingType = codec.rangeOfCodec || codec.domainOfCodec;
             if (isEnumCodec(codec)) {
               const typeName = inflection.enumType(codec);
-              const values = codec.values.reduce((memo, value, i) => {
+              const values = codec.values.reduce((memo, value) => {
                 memo[inflection.enumValue(value, codec)] = {
                   // TODO: description
                   value: value,

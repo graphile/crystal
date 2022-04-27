@@ -1,21 +1,8 @@
 import "./PgTablesPlugin";
 
-import type {
-  PgConditionPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
-  PgSource,
-  PgSourceParameter,
-  PgTypeCodec,
-  PgTypeColumn,
-  PgTypeColumns,
-} from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan } from "dataplanner";
-import { getEnumValueConfig } from "dataplanner";
+import type { PgSelectPlan, PgSource, PgSourceParameter } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLEnumType, GraphQLInputType } from "graphql";
-import { inspect } from "util";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -53,7 +40,7 @@ export const PgOrderCustomFieldsPlugin: Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, sql } = build;
+        const { inflection, sql } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;

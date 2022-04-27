@@ -18,7 +18,6 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  PgTypeColumnExtensions,
   PgTypeColumns,
   PgTypeColumnVia,
   PgTypeColumnViaExplicit,

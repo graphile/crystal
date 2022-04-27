@@ -17,10 +17,11 @@ import sql from "pg-sql2";
 
 import { version } from "../index";
 
-interface ComputedColumnDetails {
+// TODO: these should be used, surely?
+interface _ComputedColumnDetails {
   source: PgSource<any, any, any, PgSourceParameter[]>;
 }
-interface ArgumentDetails {
+interface _ArgumentDetails {
   source: PgSource<any, any, any, PgSourceParameter[]>;
   param: PgSourceParameter;
   index: number;
@@ -202,7 +203,7 @@ export const PgProceduresPlugin: Plugin = {
                   await info.helpers.pgCodecs.getCodecFromType(
                     databaseName,
                     argType,
-                    null,
+                    typeModifier,
                   );
                 if (!columnCodec) {
                   console.warn(

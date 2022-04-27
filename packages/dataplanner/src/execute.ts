@@ -9,7 +9,6 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import { noop } from "./dev";
 import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces";
 import { $$bypassGraphQL, $$eventEmitter, $$extensions } from "./interfaces";
 import type { CrystalPrepareOptions } from "./prepare";
