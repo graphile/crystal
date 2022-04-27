@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import type { Preset } from "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
-import type { IncomingMessage, RequestListener } from "http";
-import { createServer } from "http";
-// TODO: bug in TypeScript claiming allowSyntheticDefaultImports is required but then ignoring that setting.
-// @ts-ignore
-import parseArgs from "minimist";
+import type { IncomingMessage, RequestListener } from "node:http";
+import { createServer } from "node:http";
+import url from "node:url";
+import type { Argv } from "yargs";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 import type { ContextCallback } from "./interfaces.js";
 import { postgraphile } from "./middleware/index.js";
@@ -15,29 +16,50 @@ import {
   makeSchema,
 } from "./schema.js";
 
-async function main() {
-  const argv = parseArgs(process.argv.slice(2), {
-    string: ["connection", "schema", "port", "config"],
-    boolean: ["plan"],
-    alias: {
-      connection: ["c"],
-      schema: ["s"],
-      port: ["p"],
-      config: ["C"],
-      plan: ["P"],
-    },
-    stopEarly: true,
-    unknown: (arg: string) => {
-      throw new Error(`Argument '${arg}' not understood`);
-    },
-  });
+export function options(yargs: Argv) {
+  return yargs
+    .option("connection", {
+      alias: "c",
+      type: "string",
+      description: "The PostgreSQL connection string to connect to",
+    })
+    .option("schema", {
+      alias: "s",
+      type: "string",
+      description:
+        "The database schema (or comma separated list of schemas) to expose over GraphQL",
+      default: "public",
+    })
+    .option("port", {
+      alias: "p",
+      type: "number",
+      description: "The port number on which to run our HTTP server",
+      default: 5678,
+    })
+    .option("config", {
+      alias: "C",
+      type: "string",
+      description: "The path to the config file",
+    })
+    .option("allowExplain", {
+      alias: "e",
+      type: "boolean",
+      description:
+        "Allow visitors to view the plan/SQL queries/etc related to each GraphQL operation",
+    });
+}
 
+type PostGraphileArgv = ReturnType<typeof options> extends Argv<infer U>
+  ? U
+  : never;
+
+export async function run(argv: PostGraphileArgv) {
   const {
     connection: connectionString,
     schema: rawSchema,
     port: rawPort,
     config: configFileLocation,
-    plan,
+    allowExplain,
   } = argv;
 
   // Try and load the preset
@@ -58,9 +80,9 @@ async function main() {
   }
   preset.server = preset.server || {};
   if (rawPort != null) {
-    preset.server!.port = parseInt(rawPort, 10);
+    preset.server!.port = rawPort;
   }
-  if (plan === true) {
+  if (allowExplain === true) {
     preset.server!.exposePlan = true;
   }
 
@@ -116,7 +138,12 @@ async function main() {
   server.listen(port);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
+  try {
+    const argv = await options(yargs(hideBin(process.argv))).argv;
+    await run(argv);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+}

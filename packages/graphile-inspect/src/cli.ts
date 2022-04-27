@@ -1,13 +1,13 @@
-import { createServer } from "http";
 import type { createProxyServer } from "http-proxy";
-import url from "url";
+import { createServer } from "node:http";
+import url from "node:url";
 import type { Argv } from "yargs";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
 import { graphileInspectHTML } from "./server.js";
 
-function options(yargs: Argv) {
+export function options(yargs: Argv) {
   return yargs
     .option("port", {
       alias: "p",
@@ -47,7 +47,8 @@ async function tryLoadHttpProxyCreateProxyServer() {
     return null;
   }
 }
-async function run(argv: InspectArgv) {
+
+export async function run(argv: InspectArgv) {
   const { port, endpoint, subscriptionEndpoint, proxy: enableProxy } = argv;
   const createProxyServer = enableProxy
     ? await tryLoadHttpProxyCreateProxyServer()
@@ -134,16 +135,12 @@ async function run(argv: InspectArgv) {
   });
 }
 
-async function main() {
-  const argv = await options(yargs(hideBin(process.argv))).argv;
-
-  await run(argv);
-}
-
 if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
-  // module was not imported but called directly
-  main().catch((e) => {
+  try {
+    const argv = await options(yargs(hideBin(process.argv))).argv;
+    await run(argv);
+  } catch (e) {
     console.error(e);
     process.exit(1);
-  });
+  }
 }

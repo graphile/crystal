@@ -4,7 +4,7 @@ import { buildInflection, buildSchema, gather } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { Preset } from "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
-import * as pg from "pg";
+import pg from "pg";
 
 const { Pool } = pg;
 
@@ -23,7 +23,7 @@ declare global {
 }
 
 export function makePgDatabasesAndContextFromConnectionString(
-  connectionString: string,
+  connectionString?: string,
   schemas?: string | string[],
 ): [GraphileEngine.GraphileBuildGatherOptions["pgDatabases"], ContextCallback] {
   const pool = new Pool({

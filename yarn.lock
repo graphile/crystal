@@ -2654,7 +2654,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/minimist@npm:^1, @types/minimist@npm:^1.2.0":
+"@types/minimist@npm:^1.2.0":
   version: 1.2.2
   resolution: "@types/minimist@npm:1.2.2"
   checksum: 7fd2a4dc547de09d78c688d79aefcceb54e8c86eb61a5b1a593dfc03bbf1f8589a616ae978585211d078e51abc55b93064b2039c34266db8f277bd6bc03557c3
@@ -10569,7 +10569,6 @@ __metadata:
     "@types/express": "npm:^4"
     "@types/jest": "npm:^27.0.3"
     "@types/jsonwebtoken": "npm:^8"
-    "@types/minimist": "npm:^1"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
     dataplanner: "npm:4.7.0"
@@ -10582,7 +10581,6 @@ __metadata:
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
     jsonwebtoken: "npm:^8.5.1"
-    minimist: "npm:^1.2.5"
     nodemon: "npm:^2.0.15"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
