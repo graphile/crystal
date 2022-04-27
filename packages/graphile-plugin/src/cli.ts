@@ -19,6 +19,8 @@ export async function runCli<TArgs>(
   options: OptionsFunction<TArgs>,
   run: (args: Args<TArgs>) => Promise<void>,
 ) {
-  const argv = await options(yargs(hideBin(process.argv))).argv;
+  const argv = await options(yargs(hideBin(process.argv))).wrap(
+    yargs.terminalWidth(),
+  ).argv;
   await run(argv);
 }
