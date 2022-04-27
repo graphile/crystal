@@ -3,6 +3,7 @@ import chalk from "chalk";
 
 import type { CrystalError } from "../error";
 import { isCrystalError } from "../error";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 
 // Do **NOT** allow variables that start with `__`!
@@ -68,7 +69,7 @@ export class MapPlan extends ExecutablePlan {
     );
   }
 
-  execute(values: any[][]): any[] {
+  execute(values: CrystalValuesList<any[]>): CrystalResultsList<any> {
     return values[0].map(this.mapper);
   }
 

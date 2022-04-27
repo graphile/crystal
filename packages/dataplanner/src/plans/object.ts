@@ -1,5 +1,6 @@
 import debugFactory from "debug";
 
+import type { ExecutionExtra } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 
 const debugObjectPlan = debugFactory("dataplanner:ObjectPlan");
@@ -120,12 +121,13 @@ export class ObjectPlan<
 
   execute(
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
-    inMeta: any,
+    extra: ExecutionExtra,
   ): Array<DataFromPlans<TPlans>> {
+    const { meta: inMeta } = extra;
     if (!inMeta.results) {
       inMeta.results = [];
     }
-    const meta: Meta<TPlans> = inMeta;
+    const meta = inMeta as any as Meta<TPlans>;
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
