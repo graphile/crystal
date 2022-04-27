@@ -97,23 +97,12 @@ async function main() {
   /** Our fastify (server) app */
   const app = fastify();
 
-  // The root URL ('/') serves GraphiQL
+  // The root URL ('/') serves Graphile Inspect (GraphiQL)
   app.route({
     method: ["GET"],
     url: "/",
     async handler(req, res) {
       res.type("text/html").send(renderGraphiQL());
-    },
-  });
-
-  // TODO: remove this and tidy up the example.
-  // The '/plan' URL used to serve mermaid-js rendering our latest query plan;
-  // but we have a dedicated tool now.
-  app.route({
-    method: ["GET"],
-    url: "/plan",
-    async handler(req, res) {
-      res.type("text/plain").send("Please use graphile-inspect");
     },
   });
 
@@ -162,14 +151,11 @@ async function main() {
 
 
 Running a GraphQL API server.
-For GraphiQL (the GraphQL IDE), see     ${chalk.blue.underline(
+For Graphile Inspect (GraphQL IDE), see     ${chalk.blue.underline(
     "http://localhost:4000/",
   )}
 Issue GraphQL queries via HTTP POST to  ${chalk.blue.underline(
     "http://localhost:4000/graphql",
-  )}
-The latest GraphQL request's plan is at ${chalk.blue.underline(
-    "http://localhost:4000/plan",
   )}
 
 `);

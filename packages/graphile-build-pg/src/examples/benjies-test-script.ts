@@ -11,15 +11,10 @@
 
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
-import type { Plugin } from "@envelop/core";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import {
-  execute as dataplannerExecute,
-  stripAnsi,
-  subscribe as dataplannerSubscribe,
-} from "dataplanner";
+import { useDataPlanner, useMoreDetailedErrors } from "dataplanner/envelop";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
 import {
@@ -39,7 +34,6 @@ import {
   sendResult,
 } from "graphql-helix";
 import { useServer } from "graphql-ws/lib/use/ws";
-import type { IncomingMessage } from "http";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
@@ -182,66 +176,6 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
     process.exit(1);
   }
-
-  /**
-   * An Envelop plugin that uses DataPlanner to prepare and execute the GraphQL
-   * query.
-   */
-  const useDataPlanner = (): Plugin => ({
-    async onExecute(opts) {
-      const explainHeaders = (
-        (opts.args.contextValue as any)?.req as IncomingMessage | undefined
-      )?.headers["x-graphql-explain"];
-      const explainHeader = Array.isArray(explainHeaders)
-        ? explainHeaders.join(",")
-        : explainHeaders;
-      const explain = explainHeader?.split(",");
-      opts.setExecuteFn((args) =>
-        dataplannerExecute(args, {
-          experimentalGraphQLBypass: true,
-          explain,
-        }),
-      );
-    },
-    async onSubscribe(opts) {
-      const ctx = opts.args.contextValue as any;
-      const explainHeaders = (ctx?.req?.headers ||
-        ctx?.request?.headers ||
-        ctx?.connectionParams)?.["x-graphql-explain"];
-      const explainHeader = Array.isArray(explainHeaders)
-        ? String(explainHeaders.join(","))
-        : explainHeaders
-        ? String(explainHeaders)
-        : undefined;
-      const explain = explainHeader?.split(",");
-      opts.setSubscribeFn(async (args) =>
-        dataplannerSubscribe(args, {
-          experimentalGraphQLBypass: true,
-          explain,
-        }),
-      );
-    },
-  });
-
-  /**
-   * An Envelop plugin that will make any GraphQL errors easier to read from
-   * inside of GraphiQL.
-   */
-  const useMoreDetailedErrors = (): Plugin => ({
-    onExecute: () => ({
-      onExecuteDone({ result }) {
-        if ("errors" in result && result.errors) {
-          (result.errors as any) = result.errors.map((e) => {
-            const obj = e.toJSON();
-            return Object.assign(obj, {
-              message: stripAnsi(obj.message),
-              extensions: { stack: stripAnsi(e.stack ?? "").split("\n") },
-            });
-          });
-        }
-      },
-    }),
-  });
 
   const contextCallback = () => contextValue;
 
