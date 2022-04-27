@@ -21,7 +21,6 @@ import { resolvePresets } from "graphile-plugin";
 import {
   getGraphQLParameters,
   processRequest,
-  renderGraphiQL,
   sendResult,
 } from "graphql-helix";
 
@@ -97,12 +96,18 @@ async function main() {
   /** Our fastify (server) app */
   const app = fastify();
 
+  const { graphileInspectHTML } = await import("graphile-inspect/server");
+
   // The root URL ('/') serves Graphile Inspect (GraphiQL)
   app.route({
     method: ["GET"],
     url: "/",
     async handler(req, res) {
-      res.type("text/html").send(renderGraphiQL());
+      res.type("text/html").send(
+        graphileInspectHTML({
+          endpoint: "/graphql",
+        }),
+      );
     },
   });
 
