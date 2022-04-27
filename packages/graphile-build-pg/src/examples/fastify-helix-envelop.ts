@@ -6,7 +6,7 @@
  *
  * We serve:
  *
- * / - GraphiQL
+ * / - Graphile Inspect (GraphiQL)
  * /graphql - the GraphQL API
  */
 
@@ -14,6 +14,7 @@ import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
 import chalk from "chalk";
+import { useDataPlanner, useMoreDetailedErrors } from "dataplanner/envelop";
 import fastify from "fastify";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import { resolvePresets } from "graphile-plugin";
@@ -26,7 +27,6 @@ import {
 
 import { makeSharedPresetAndClient } from "./config";
 import { getPool } from "./config.js";
-import { useDataPlanner, useMoreDetailedErrors } from "./utils/envelop.js";
 
 const pool = getPool();
 

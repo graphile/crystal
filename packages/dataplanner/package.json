@@ -4,6 +4,16 @@
   "description": "Look-ahead engine for GraphQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js"
+    },
+    "./envelop": {
+      "types": "./dist/envelop.d.ts",
+      "node": "./dist/envelop.js"
+    }
+  },
   "scripts": {
     "test": "jest -i",
     "prepack": "tsc -b",

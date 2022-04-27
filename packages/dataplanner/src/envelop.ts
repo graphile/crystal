@@ -1,5 +1,7 @@
 import type { Plugin as EnvelopPlugin } from "@envelop/core";
-import { execute as dataplannerExecute, stripAnsi } from "dataplanner";
+
+import { execute as dataplannerExecute } from "./execute.js";
+import { stripAnsi } from "./stripAnsi.js";
 
 /**
  * An Envelop plugin that uses DataPlanner to prepare and execute the GraphQL
