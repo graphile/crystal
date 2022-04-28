@@ -202,8 +202,8 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
             position: "relative",
             minWidth: 300,
             ...(explainAtBottom
-              ? { maxWidth: "none", maxHeight: "80%" }
-              : { maxWidth: "60%", maxHeight: "none" }),
+              ? { maxWidth: "none", maxHeight: "calc(100vh - 8rem)" }
+              : { maxWidth: "calc(100vw - 500px)", maxHeight: "none" }),
           }}
         >
           <Explain
