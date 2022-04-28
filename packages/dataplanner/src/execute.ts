@@ -99,7 +99,7 @@ export function withDataPlannerArgs(
     next = callback(args, rootValue);
   }
   if (unlisten) {
-    Promise.resolve(next).finally(unlisten);
+    Promise.resolve(next).then(unlisten, unlisten);
   }
   return next;
 }
