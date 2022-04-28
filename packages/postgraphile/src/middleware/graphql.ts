@@ -1,7 +1,11 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
 import type { DataPlannerExecuteOptions } from "dataplanner";
-import { execute as dataplannerExecute, isAsyncIterable } from "dataplanner";
+import {
+  $$extensions,
+  execute as dataplannerExecute,
+  isAsyncIterable,
+} from "dataplanner";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
@@ -123,10 +127,21 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
       operationName,
     };
 
-    const result = await dataplannerExecute(args, dataplannerOptions);
-    if (isAsyncIterable(result)) {
-      throw new Error("We don't yet support async iterables");
+    try {
+      const result = await dataplannerExecute(args, dataplannerOptions);
+      if (isAsyncIterable(result)) {
+        throw new Error("We don't yet support async iterables");
+      }
+      return { type: "graphql", statusCode: 200, payload: result };
+    } catch (e) {
+      return {
+        type: "graphql",
+        statusCode: 500,
+        payload: {
+          errors: [new GraphQLError(e.message)],
+          extensions: (args.rootValue as any)?.[$$extensions],
+        },
+      };
     }
-    return { type: "graphql", statusCode: 200, payload: result };
   };
 };
