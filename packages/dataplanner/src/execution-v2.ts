@@ -23,6 +23,28 @@ import { arrayOfLength, isPromiseLike } from "./utils";
 export const $$keys = Symbol("keys");
 
 /**
+ * Calls the callback, catching any errors and turning them into rejected
+ * promises.
+ *
+ * @remarks
+ *
+ * When we're calling functions in loops and they may or may not be async
+ * functions, there's a risk that they may throw and previous promises that may
+ * have been added to an array to be handled later never get handled, causing
+ * an unhandled promise rejection error which crashes the entire Node process.
+ * This is not ideal. Thus we use this method to try to call the function, but
+ * if it throws we turn it into a promise rejection which will not interrupt
+ * the flow of these loops.
+ */
+function rejectOnThrow<T>(cb: () => T): T | Promise<never> {
+  try {
+    return cb();
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}
+
+/**
  * Takes a list of `results` (shorter than `resultCount`) and an object with
  * errors and indexes; returns a list of length `resultCount` with the results
  * from `results` but with errors injected at the indexes specified in
@@ -98,7 +120,7 @@ export function executeBucket(
 
   const starterPromises: PromiseLike<void>[] = [];
   for (const plan of startPlans) {
-    const r = executePlan(plan);
+    const r = rejectOnThrow(() => executePlan(plan));
     if (isPromiseLike(r)) {
       starterPromises.push(r);
     }
@@ -130,8 +152,7 @@ export function executeBucket(
           )
         : false;
       if (isSuitable) {
-        // executePlan never THROW/REJECTs
-        const r = executePlan(potentialNextPlan);
+        const r = rejectOnThrow(() => executePlan(potentialNextPlan));
         if (isPromiseLike(r)) {
           promises.push(r);
         }
@@ -323,15 +344,17 @@ export function executeBucket(
         plan instanceof __ListTransformPlan
           ? executeListTransform(plan, dependenciesWithoutErrors, extra)
           : plan.execute(dependenciesWithoutErrors, extra);
-      return isPromiseLike(resultWithoutErrors)
-        ? resultWithoutErrors.then((r) =>
-            mergeErrorsBackIn(r, errors, dependencies[0].length),
-          )
-        : mergeErrorsBackIn(
-            resultWithoutErrors,
-            errors,
-            dependencies[0].length,
-          );
+      if (isPromiseLike(resultWithoutErrors)) {
+        return resultWithoutErrors.then((r) =>
+          mergeErrorsBackIn(r, errors, dependencies[0].length),
+        );
+      } else {
+        return mergeErrorsBackIn(
+          resultWithoutErrors,
+          errors,
+          dependencies[0].length,
+        );
+      }
     } else {
       return reallyExecutePlanWithNoErrors(plan, dependencies, extra);
     }
@@ -348,8 +371,11 @@ export function executeBucket(
       : plan.execute(dependencies, extra);
   }
 
+  // TODO: this function used to state that it would never throw/reject... but,
+  // no code is perfect... so that just seemed like it was asking for
+  // trouble. Lets make sure if it throws/rejects that nothing bad will happen.
   /**
-   * This function MUST NEVER THROW/REJECT.
+   * This function MIGHT throw or reject, so be sure to handle that.
    */
   function executePlan(plan: ExecutablePlan): void | PromiseLike<void> {
     if (inProgressPlans.has(plan)) {
@@ -519,11 +545,8 @@ export function executeBucket(
           noDepsList: arrayOfLength(child.input.length),
           hasErrors: bucket.hasErrors,
         };
-        const r = executeBucket(
-          aether,
-          metaByPlanId,
-          childBucket,
-          requestContext,
+        const r = rejectOnThrow(() =>
+          executeBucket(aether, metaByPlanId, childBucket, requestContext),
         );
         if (isPromiseLike(r)) {
           childPromises.push(r);
@@ -544,7 +567,7 @@ export function executeBucket(
       rawValue: any,
       value: any,
       index: number,
-    ) {
+    ): void {
       if (pathIdentitiesWithChildren.includes(nestedPathIdentity)) {
         for (const child of childrenByPathIdentity[nestedPathIdentity]!) {
           const {
@@ -587,7 +610,7 @@ export function executeBucket(
       pathIdentity: string,
       setter: BucketSetter,
       index: number,
-    ) {
+    ): void {
       const concreteType = setter.concreteType!;
       const rootPathIdentity = setter.rootPathIdentity;
       for (const responseKey of (map as any)[$$keys]) {
