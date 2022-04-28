@@ -7,6 +7,7 @@ export interface StoredKeys {
   explorerIsOpen: "true" | "";
   explainIsOpen: "true" | "";
   explainAtBottom: "true" | "";
+  explainSize: string;
   query: string;
 }
 
@@ -14,8 +15,9 @@ const KEYS: { [key in keyof StoredKeys]: string } = {
   saveHeaders: "GraphileInspect:saveHeadersText",
   headers: "GraphileInspect:headersText",
   explain: "GraphileInspect:explain",
-  explainIsOpen: "GraphileInspect:explorerIsOpen",
-  explainAtBottom: "GraphileInspect:explorerAtBottom",
+  explainSize: "GraphileInspect:explainSize",
+  explainIsOpen: "GraphileInspect:explainIsOpen",
+  explainAtBottom: "GraphileInspect:explainAtBottom",
   explorerIsOpen: "graphiql:explorerIsOpen",
   query: "graphiql:query",
 };

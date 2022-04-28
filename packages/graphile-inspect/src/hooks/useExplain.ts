@@ -15,7 +15,9 @@ export const useExplain = (storage: GraphileInspectStorage): ExplainHelpers => {
   const [showExplain, _setShowExplain] = useState(
     storage.get("explainIsOpen") === "true",
   );
-  const [explainSize, setExplainSize] = useState(300);
+  const [explainSize, _setExplainSize] = useState(
+    parseInt(storage.get("explainSize") ?? "", 10) || 300,
+  );
   const [explainAtBottom, _setExplainAtBottom] = useState(
     [null, "true"].includes(storage.get("explainAtBottom")),
   );
@@ -33,6 +35,13 @@ export const useExplain = (storage: GraphileInspectStorage): ExplainHelpers => {
     (nextAtBottom: boolean) => {
       _setExplainAtBottom(nextAtBottom);
       storage.set("explainAtBottom", nextAtBottom ? "true" : "");
+    },
+    [storage],
+  );
+  const setExplainSize = useCallback(
+    (nextSize: number) => {
+      _setExplainSize(nextSize);
+      storage.set("explainSize", String(nextSize));
     },
     [storage],
   );
