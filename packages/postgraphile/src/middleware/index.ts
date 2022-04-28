@@ -107,12 +107,22 @@ export function postgraphile(schemaResult: SchemaResult) {
         sendResult(res, result);
       })().catch((e) => {
         // Special error handling for GraphQL route
-        sendResult(res, {
-          type: "graphql",
-          payload: { errors: [e] },
-          statusCode: 500,
-        });
-        console.dir(e);
+        try {
+          console.error(
+            "An error occurred whilst attempting to handle the GraphQL request:",
+          );
+          console.dir(e);
+          sendResult(res, {
+            type: "graphql",
+            payload: { errors: [e] },
+            statusCode: 500,
+          });
+        } catch (e2) {
+          console.error(
+            "An error occurred whilst telling the user than an error occurred:",
+            e2,
+          );
+        }
       });
       return;
     }
