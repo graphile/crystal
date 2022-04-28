@@ -46,3 +46,11 @@ And now populate the database:
 ```
 psql pagila -Xv ON_ERROR_STOP=1 -f pagila-schema.sql -f pagila-data.sql
 ```
+
+And finally, a temporary patch is needed to the data due to incompatible naming
+of two enum values; connect to the pagila DB and run the following statements:
+
+```
+alter type mpaa_rating rename value 'PG-13' TO 'PG13';
+alter type mpaa_rating rename value 'NC-17' TO 'NC17';
+```
