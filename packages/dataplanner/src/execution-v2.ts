@@ -596,16 +596,6 @@ export function executeBucket(
             childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
             childStore[itemPlanId].push(rawValue[i]);
             for (const planId of copyPlanIds) {
-              // TODO: remove this, it was added to track down a bug but it's in a triple loop so is extremely hot
-              if (!store[planId]) {
-                throw new Error(
-                  `GraphileInternalError<a4aedd50-25eb-436f-a0eb-e3e94841ad20>: Expected the store to contain entries for ('${copyPlanIds.join(
-                    "', '",
-                  )}') but there was no entry for '${planId}'. Found instead '${Object.keys(
-                    store,
-                  ).join("', '")}'`,
-                );
-              }
               const val = store[planId][index];
               childStore[planId].push(val);
             }
