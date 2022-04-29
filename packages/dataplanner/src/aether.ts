@@ -3408,11 +3408,7 @@ export class Aether<
           polymorphicPlanIds,
           polymorphicTypeNames,
         });
-        dependencyPlans.forEach((dependencyPlan) => {
-          if (!newBucket.copyPlanIds.includes(dependencyPlan.id)) {
-            newBucket.copyPlanIds.push(dependencyPlan.id);
-          }
-        });
+        addPlanIdsToBucket(newBucket, dependencyPlans);
         bucketByBucketKey[bucketKey] = newBucket;
         plan.bucketId = newBucket.id;
         return plan;
@@ -3482,23 +3478,11 @@ export class Aether<
     // Now to set up the bucket's `copyPlanIds`
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan != null && plan.id === id) {
-        for (const depId of plan.dependencies) {
-          const dep = this.plans[depId];
-          if (dep.bucketId !== plan.bucketId) {
-            let bucket = this.buckets[plan.bucketId];
-            while (bucket.id !== dep.bucketId) {
-              if (!bucket.copyPlanIds.includes(dep.id)) {
-                bucket.copyPlanIds.push(dep.id);
-              }
-              if (!bucket.parent) {
-                throw new Error(
-                  `${plan} (bucket ${plan.bucketId}) depends on ${dep} (bucket ${dep.bucketId}), but bucket ${dep.bucketId} does not appear in bucket ${plan.bucketId}'s ancestors.`,
-                );
-              }
-              bucket = bucket.parent;
-            }
-          }
-        }
+        const bucket = this.buckets[plan.bucketId];
+        const dependencies = plan.dependencies.map(
+          (depId) => this.plans[depId],
+        );
+        addPlanIdsToBucket(bucket, dependencies);
       }
     }
 
@@ -3864,9 +3848,7 @@ export class Aether<
               }
               fieldSpec.planIdByRootPathIdentity[rootPathIdentity] = plan.id;
               if (plan.bucketId !== bucket.id) {
-                if (!bucket.copyPlanIds.includes(plan.id)) {
-                  bucket.copyPlanIds.push(plan.id);
-                }
+                addPlanIdsToBucket(bucket, [plan]);
               }
               if (
                 fieldSpec.typeNames &&
@@ -6319,5 +6301,30 @@ function getParentPathIdentity(pathIdentity: string): string | null {
     } else {
       return null;
     }
+  }
+}
+
+function addPlanIdsToBucket(
+  bucket: BucketDefinition,
+  dependencyPlans: ExecutablePlan[],
+  attemptedBuckets: BucketDefinition[] = [],
+): void {
+  const next: ExecutablePlan[] = [];
+  dependencyPlans.forEach((plan) => {
+    if (plan.bucketId !== bucket.id) {
+      if (!bucket.copyPlanIds.includes(plan.id)) {
+        bucket.copyPlanIds.push(plan.id);
+        next.push(plan);
+      }
+    }
+  });
+  if (next.length) {
+    if (!bucket.parent) {
+      throw new Error(
+        `Attempted to add ${next} to bucket ${attemptedBuckets[0].id}, but did not find their parent buckets in the chain. (i.e. the plan heirarchy is malformed.)`,
+        //`${plan} (bucket ${plan.bucketId}) depends on ${dep} (bucket ${dep.bucketId}), but bucket ${dep.bucketId} does not appear in bucket ${plan.bucketId}'s ancestors.`,
+      );
+    }
+    addPlanIdsToBucket(bucket.parent, next, [...attemptedBuckets, bucket]);
   }
 }
