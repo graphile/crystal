@@ -28,6 +28,8 @@ First step is probably to run PostGraphile, to do so:
 
 ```
 cd packages/postgraphile
+# This next line is optional, among other things it adds indentation to the SQL
+export GRAPHILE_ENV=development
 yarn postgraphile -e -c postgres:///your_db_here
 ```
 
