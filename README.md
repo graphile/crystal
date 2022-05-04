@@ -22,7 +22,22 @@ yarn
 yarn watch
 ```
 
-This'll keep the compiled code up to date. Then go to
+This'll keep the compiled code up to date.
+
+First step is probably to run PostGraphile, to do so:
+
+```
+cd packages/postgraphile
+yarn postgraphile -e -c postgres:///your_db_here
+```
+
+This should run PostGraphile [at http://localhost:5678](http://localhost:5678).
+It may take a good few seconds to load GraphiQL the first time... I should look
+into that. If you go to `Panels > Explain` then when you run queries you'll be
+able to see the DataPlanner query plan (and the SQL queries) in the resizeable
+panel at the bottom.
+
+Should you wish to get your feet a little wetter, have a look at
 [packages/graphile-build-pg/src/examples/README.md](packages/graphile-build-pg/src/examples/README.md)
 and follow the guidance there, try out a couple examples, etc.
 
@@ -34,6 +49,10 @@ I'm planning to remove before release. Please don't hesitate to ask me questions
 in the #🔮 channel [on Discord](https://discord.gg/graphile), or file an issue.
 I won't be investing significant time in documentation until the codebase is a
 little further along.
+
+Also, **please look at the
+[discussions](https://github.com/benjie/postgraphile-private/discussions)** - we
+need your feedback!
 
 ---
 
