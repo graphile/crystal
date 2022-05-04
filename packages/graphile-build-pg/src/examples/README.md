@@ -54,3 +54,5 @@ of two enum values; connect to the pagila DB and run the following statements:
 alter type mpaa_rating rename value 'PG-13' TO 'PG13';
 alter type mpaa_rating rename value 'NC-17' TO 'NC17';
 ```
+
+(In future we'll probably handle that automatically, but we're not there yet.)
