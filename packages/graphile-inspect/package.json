@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "description": "Graphile-flavoured GraphiQL distribution",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
     "graphile-inspect": "./dist/cli-run.js",
     "grin": "./dist/cli-run.js"

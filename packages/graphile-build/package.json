@@ -3,6 +3,8 @@
   "version": "5.0.0-alpha.0",
   "description": "Build a GraphQL schema from plugins",
   "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
