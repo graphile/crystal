@@ -4014,6 +4014,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"brace-expansion@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "brace-expansion@npm:2.0.1"
+  dependencies:
+    balanced-match: "npm:^1.0.0"
+  checksum: 0f8d0d6a165d636fed93a7dd9321a5ae122cac9a672d8a9e01997e4ae09743cb3cbfb0a6e6b32303cda0f1f40617e2c0953f28f59a6f01d6d12c9698a3f0e41b
+  languageName: node
+  linkType: hard
+
 "braces@npm:^3.0.1, braces@npm:^3.0.2, braces@npm:~3.0.2":
   version: 3.0.2
   resolution: "braces@npm:3.0.2"
@@ -7201,7 +7210,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.0.0, glob@npm:^7.1.1, glob@npm:^7.1.2, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.6":
+"glob@npm:^7.0.0, glob@npm:^7.1.1, glob@npm:^7.1.2, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.6, glob@npm:^7.2.0":
   version: 7.2.0
   resolution: "glob@npm:7.2.0"
   dependencies:
@@ -9004,6 +9013,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsonc-parser@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "jsonc-parser@npm:3.0.0"
+  checksum: f8b095759d1d46c45855094329eaab7809db309d9e8ff04c8a099959698296f6fbe44a4763277c2b34a702b3722d78b13b72b320600af9b4abf990b8cd001418
+  languageName: node
+  linkType: hard
+
 "jsonparse@npm:^1.2.0":
   version: 1.3.1
   resolution: "jsonparse@npm:1.3.1"
@@ -9356,6 +9372,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lunr@npm:^2.3.9":
+  version: 2.3.9
+  resolution: "lunr@npm:2.3.9"
+  checksum: 82077c81fc295f8f739452d164b80b8a48f73cceae4265936ec89c4aa56a7025a765da4def556e3d14bf443271f808f75242ad492963f42428a64336a7d2b402
+  languageName: node
+  linkType: hard
+
 "make-dir@npm:^2.1.0":
   version: 2.1.0
   resolution: "make-dir@npm:2.1.0"
@@ -9456,6 +9479,15 @@ __metadata:
   bin:
     markdown-it: bin/markdown-it.js
   checksum: 5d937f600be0135f2881fa7c98abbdcf026731dfb190d700b3f14f556af0fe2fb087cddfc5397216b802634240b871106ae32ad5332ec2e4746797b6525d261a
+  languageName: node
+  linkType: hard
+
+"marked@npm:^4.0.12":
+  version: 4.0.15
+  resolution: "marked@npm:4.0.15"
+  bin:
+    marked: bin/marked.js
+  checksum: 0d29f2bd386078fee41afc128d5eab3d2145afea4ae61062e8794852a805e3b21bb1921533bf47067c65af5ea54331e7b57cf5be1ebc3dc13e10ea4749851caa
   languageName: node
   linkType: hard
 
@@ -9633,6 +9665,15 @@ __metadata:
   dependencies:
     brace-expansion: "npm:^1.1.7"
   checksum: 2579a9237b4947989dd0ebf3fbf6975c06d6fb676e83dde945ed94f18fa09485caa415dc12ae8119132325d533a5872cbf060530a49f236d65e2bcce95a9b23f
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "minimatch@npm:5.0.1"
+  dependencies:
+    brace-expansion: "npm:^2.0.1"
+  checksum: 1c768f6bf115a214eec61cfa4bed358568fa97747f876e5c2fb291880022f8defd3cbdfb5b73dbebad518b4bd88419b3f82f9f680fa3aa814c1aa632ddc55cc0
   languageName: node
   linkType: hard
 
@@ -11360,6 +11401,7 @@ __metadata:
     mock-fs: "npm:^5.1.2"
     pg: "npm:^8.7.1"
     prettier: "npm:^2.5.1"
+    typedoc: "npm:^0.22.15"
     typescript: "npm:next"
     webpack: "npm:^5.65.0"
   languageName: unknown
@@ -11605,6 +11647,17 @@ __metadata:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0"
   checksum: 6be1588a86ed74d05481d09a6ef6a8db44550fda9785ae08c3df06717abc2e5e9a11804b1d0ac9b0641870c5ebf545e18c8d348bc105ba09227e6a32415ea1d6
+  languageName: node
+  linkType: hard
+
+"shiki@npm:^0.10.1":
+  version: 0.10.1
+  resolution: "shiki@npm:0.10.1"
+  dependencies:
+    jsonc-parser: "npm:^3.0.0"
+    vscode-oniguruma: "npm:^1.6.1"
+    vscode-textmate: "npm:5.2.0"
+  checksum: 2c5f47c6c52cd5bfdaa97205866363248a145ac6c749b656858fe06ef55889adf31ca6aab4c360659a2b142c2000874c11dad8607394f5f5cb7c4e8af52c5314
   languageName: node
   linkType: hard
 
@@ -12589,6 +12642,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typedoc@npm:^0.22.15":
+  version: 0.22.15
+  resolution: "typedoc@npm:0.22.15"
+  dependencies:
+    glob: "npm:^7.2.0"
+    lunr: "npm:^2.3.9"
+    marked: "npm:^4.0.12"
+    minimatch: "npm:^5.0.1"
+    shiki: "npm:^0.10.1"
+  peerDependencies:
+    typescript: 4.0.x || 4.1.x || 4.2.x || 4.3.x || 4.4.x || 4.5.x || 4.6.x
+  bin:
+    typedoc: bin/typedoc
+  checksum: 807cb3ac6cd36aaa01f3fc44bb687ff9d9bbf51b3634ab0902c10cc981455d6efb2a3358ada5577eecedaff9419a300509df0aafa6c9388a4f1bbffa34bef958
+  languageName: node
+  linkType: hard
+
 "typescript@npm:next":
   version: 4.7.0-dev.20220422
   resolution: "typescript@npm:4.7.0-dev.20220422"
@@ -12865,6 +12935,20 @@ __metadata:
   version: 3.16.0
   resolution: "vscode-languageserver-types@npm:3.16.0"
   checksum: c47378a6935323c226c6a6392bd530ae90bde8d293f25879510fd31cf60097745250adb31b4c9736ae8e65cc8ded124094585a317d2b25b70c26411d135efc64
+  languageName: node
+  linkType: hard
+
+"vscode-oniguruma@npm:^1.6.1":
+  version: 1.6.2
+  resolution: "vscode-oniguruma@npm:1.6.2"
+  checksum: f0f2612889456a6c86c413d7d87489280819036f2a2f466355efa0514eee02b8573a34f0ed0c07936e8891cb2a184203ae9790e4333b66974598a13fbe618775
+  languageName: node
+  linkType: hard
+
+"vscode-textmate@npm:5.2.0":
+  version: 5.2.0
+  resolution: "vscode-textmate@npm:5.2.0"
+  checksum: adfe4dacaa689351eea44ef97d797dab87dd2c546f51e7c9e61b4b1cd9c2a47f2cc02e0023436f832e9525bd180c82a27f87355b4587816676cd4caca25eaf0f
   languageName: node
   linkType: hard
 
