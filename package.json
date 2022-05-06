@@ -12,8 +12,6 @@
     "clean": "jest --clearCache && rm -Rf packages/*/dist packages/*/bundle packages/*/tsconfig.tsbuildinfo",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md",
-    "docs:gen_": "yarn typedoc --entryPointStrategy packages --mergeModulesMergeMode module packages/graphile-plugin packages/pg-sql2 packages/pg-introspection packages/dataplanner packages/dataplan-json packages/dataplan-pg packages/graphile-export packages/graphile-build packages/graphile-build-pg packages/postgraphile",
-    "docs:gen__": "yarn typedoc --entryPointStrategy packages --mergeModulesMergeMode project .",
     "docs:gen": "yarn typedoc --entryPointStrategy packages .",
     "w": "yarn workspace",
     "-----": "-----",
