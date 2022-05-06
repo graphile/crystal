@@ -35,30 +35,29 @@ import { version } from "../index";
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
 }[keyof TObject];
-
-// TODO: rename
-interface Database {
-  name: string;
-  schemas: string[];
-  /** The key on 'context' where the pgSettings for this DB will be sourced */
-  pgSettingsKey: KeysOfType<
-    GraphileBuild.GraphileResolverContext,
-    { [key: string]: string } | null
-  >;
-  /** The key on 'context' where the withPgClient function will be sourced */
-  withPgClientKey: KeysOfType<
-    GraphileBuild.GraphileResolverContext,
-    WithPgClient
-  >;
-  /** A function to allow us to run queries during the data gathering phase */
-  withPgClient: WithPgClient;
-  listen?(topic: string): AsyncIterable<string>;
-}
-
 declare global {
   namespace GraphileBuild {
+    // TODO: rename
+    interface PgDatabaseConfiguration {
+      name: string;
+      schemas: string[];
+      /** The key on 'context' where the pgSettings for this DB will be sourced */
+      pgSettingsKey: KeysOfType<
+        GraphileBuild.GraphileResolverContext,
+        { [key: string]: string } | null
+      >;
+      /** The key on 'context' where the withPgClient function will be sourced */
+      withPgClientKey: KeysOfType<
+        GraphileBuild.GraphileResolverContext,
+        WithPgClient
+      >;
+      /** A function to allow us to run queries during the data gathering phase */
+      withPgClient: WithPgClient;
+      listen?(topic: string): AsyncIterable<string>;
+    }
+
     interface GraphileBuildGatherOptions {
-      pgDatabases: ReadonlyArray<Database>;
+      pgDatabases: ReadonlyArray<PgDatabaseConfiguration>;
     }
   }
 }
@@ -81,7 +80,10 @@ declare global {
     interface GatherHelpers {
       pgIntrospection: {
         getIntrospection(): Promise<
-          Array<{ introspection: Introspection; database: Database }>
+          Array<{
+            introspection: Introspection;
+            database: GraphileBuild.PgDatabaseConfiguration;
+          }>
         >;
         getExecutorForDatabase(databaseName: string): PgExecutor;
 
@@ -265,7 +267,7 @@ declare global {
 interface Cache {
   introspectionResultsPromise: null | Promise<
     {
-      database: Database;
+      database: GraphileBuild.PgDatabaseConfiguration;
       introspection: Introspection;
     }[]
   >;
