@@ -6,7 +6,7 @@ import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isPageInfoStartCursorField?: boolean;
       isPageInfoEndCursorField?: boolean;
     }

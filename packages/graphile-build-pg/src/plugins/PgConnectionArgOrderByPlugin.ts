@@ -20,7 +20,7 @@ declare global {
     interface Inflection {
       orderByType(this: Inflection, typeName: string): string;
     }
-    interface ScopeGraphQLEnumType {
+    interface ScopeEnum {
       pgCodec?: PgTypeCodec<any, any, any, any>;
       isPgRowSortEnum?: boolean;
     }

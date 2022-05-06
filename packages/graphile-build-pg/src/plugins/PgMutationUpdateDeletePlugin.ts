@@ -24,17 +24,17 @@ import { version } from "../index";
 
 declare global {
   namespace GraphileBuild {
-    interface ScopeGraphQLObjectType {
+    interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
       pgSource?: PgSource<any, any, any, any>;
     }
 
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isPgMutationPayloadDeletedNodeIdField?: boolean;
     }
 
-    interface ScopeGraphQLInputObjectType {
+    interface ScopeInputObject {
       isPgUpdateInputType?: boolean;
       isPgUpdateByKeysInputType?: boolean;
       isPgUpdateNodeInputType?: boolean;

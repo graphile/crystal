@@ -13,7 +13,7 @@ import { version } from "../index";
 
 declare global {
   namespace GraphileBuild {
-    interface ScopeGraphQLInputObjectTypeFieldsField {
+    interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
       pgFieldSource?: PgSource<any, any, any, any>;
     }

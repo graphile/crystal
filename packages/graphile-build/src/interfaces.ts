@@ -237,35 +237,35 @@ declare global {
           GraphQLObjectType?: PluginHook<
             GraphileBuild.Hook<
               GraphileBuild.GraphileObjectTypeConfig<any, any>,
-              GraphileBuild.ContextGraphQLObjectType,
+              GraphileBuild.ContextObject,
               GraphileBuild.Build
             >
           >;
           GraphQLObjectType_interfaces?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInterfaceType[],
-              GraphileBuild.ContextGraphQLObjectTypeInterfaces,
+              GraphileBuild.ContextObjectInterfaces,
               GraphileBuild.Build
             >
           >;
           GraphQLObjectType_fields?: PluginHook<
             GraphileBuild.Hook<
               GraphileBuild.GraphileFieldConfigMap<any, any>,
-              GraphileBuild.ContextGraphQLObjectTypeFields,
+              GraphileBuild.ContextObjectFields,
               GraphileBuild.Build
             >
           >;
           GraphQLObjectType_fields_field?: PluginHook<
             GraphileBuild.Hook<
               GraphileFieldConfig<any, any, any, any, any>,
-              GraphileBuild.ContextGraphQLObjectTypeFieldsField,
+              GraphileBuild.ContextObjectFieldsField,
               GraphileBuild.Build
             >
           >;
           GraphQLObjectType_fields_field_args?: PluginHook<
             GraphileBuild.Hook<
               GraphileFieldConfigArgumentMap<any, any, any, any>,
-              GraphileBuild.ContextGraphQLObjectTypeFieldsFieldArgs,
+              GraphileBuild.ContextObjectFieldsFieldArgs,
               GraphileBuild.Build
             >
           >;
@@ -282,21 +282,21 @@ declare global {
           GraphQLInputObjectType?: PluginHook<
             GraphileBuild.Hook<
               GraphileBuild.GraphileInputObjectTypeConfig,
-              GraphileBuild.ContextGraphQLInputObjectType,
+              GraphileBuild.ContextInputObject,
               GraphileBuild.Build
             >
           >;
           GraphQLInputObjectType_fields?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInputFieldConfigMap,
-              GraphileBuild.ContextGraphQLInputObjectTypeFields,
+              GraphileBuild.ContextInputObjectFields,
               GraphileBuild.Build
             >
           >;
           GraphQLInputObjectType_fields_field?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInputFieldConfig,
-              GraphileBuild.ContextGraphQLInputObjectTypeFieldsField,
+              GraphileBuild.ContextInputObjectFieldsField,
               GraphileBuild.Build
             >
           >;
@@ -311,21 +311,21 @@ declare global {
           GraphQLEnumType?: PluginHook<
             GraphileBuild.Hook<
               GraphQLEnumTypeConfig,
-              GraphileBuild.ContextGraphQLEnumType,
+              GraphileBuild.ContextEnum,
               GraphileBuild.Build
             >
           >;
           GraphQLEnumType_values?: PluginHook<
             GraphileBuild.Hook<
               GraphQLEnumValueConfigMap,
-              GraphileBuild.ContextGraphQLEnumTypeValues,
+              GraphileBuild.ContextEnumValues,
               GraphileBuild.Build
             >
           >;
           GraphQLEnumType_values_value?: PluginHook<
             GraphileBuild.Hook<
               GraphQLEnumValueConfig,
-              GraphileBuild.ContextGraphQLEnumTypeValuesValue,
+              GraphileBuild.ContextEnumValuesValue,
               GraphileBuild.Build
             >
           >;
@@ -339,14 +339,14 @@ declare global {
           GraphQLUnionType?: PluginHook<
             GraphileBuild.Hook<
               GraphileBuild.GraphileUnionTypeConfig<any, any>,
-              GraphileBuild.ContextGraphQLUnionType,
+              GraphileBuild.ContextUnion,
               GraphileBuild.Build
             >
           >;
           GraphQLUnionType_types?: PluginHook<
             GraphileBuild.Hook<
               GraphQLObjectType[],
-              GraphileBuild.ContextGraphQLUnionTypeTypes,
+              GraphileBuild.ContextUnionTypes,
               GraphileBuild.Build
             >
           >;
@@ -364,28 +364,28 @@ declare global {
           GraphQLInterfaceType?: PluginHook<
             GraphileBuild.Hook<
               GraphileBuild.GraphileInterfaceTypeConfig<any, any>,
-              GraphileBuild.ContextGraphQLInterfaceType,
+              GraphileBuild.ContextInterface,
               GraphileBuild.Build
             >
           >;
           GraphQLInterfaceType_fields?: PluginHook<
             GraphileBuild.Hook<
               GraphQLFieldConfigMap<any, any>,
-              GraphileBuild.ContextGraphQLInterfaceTypeFields,
+              GraphileBuild.ContextInterfaceFields,
               GraphileBuild.Build
             >
           >;
           GraphQLInterfaceType_fields_field?: PluginHook<
             GraphileBuild.Hook<
               GraphQLFieldConfig<any, any>,
-              GraphileBuild.ContextGraphQLInterfaceTypeFieldsField,
+              GraphileBuild.ContextInterfaceFieldsField,
               GraphileBuild.Build
             >
           >;
           GraphQLInterfaceType_fields_field_args?: PluginHook<
             GraphileBuild.Hook<
               GraphQLFieldConfigArgumentMap,
-              GraphileBuild.ContextGraphQLInterfaceTypeFieldsFieldArgs,
+              GraphileBuild.ContextInterfaceFieldsFieldArgs,
               GraphileBuild.Build
             >
           >;
@@ -396,7 +396,7 @@ declare global {
           GraphQLScalarType?: PluginHook<
             GraphileBuild.Hook<
               GraphQLScalarTypeConfig<any, any>,
-              GraphileBuild.ContextGraphQLScalarType,
+              GraphileBuild.ContextScalar,
               GraphileBuild.Build
             >
           >;

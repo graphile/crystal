@@ -70,7 +70,7 @@ declare global {
       ): string;
     }
 
-    interface ScopeGraphQLInputObjectType {
+    interface ScopeInputObject {
       isInputType?: boolean;
       isPgPatch?: boolean;
       isPgBaseInput?: boolean;

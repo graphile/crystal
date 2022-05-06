@@ -11,15 +11,15 @@ import { version } from "../index";
 
 declare global {
   namespace GraphileBuild {
-    interface ScopeGraphQLObjectType {
+    interface ScopeObject {
       isPgIntervalType?: boolean;
       isPgPointType?: boolean;
     }
-    interface ScopeGraphQLInputObjectType {
+    interface ScopeInputObject {
       isPgIntervalInputType?: boolean;
       isPgPointInputType?: boolean;
     }
-    interface ScopeGraphQLScalarType {}
+    interface ScopeScalar {}
     interface GraphileBuildSchemaOptions {
       pgUseCustomNetworkScalars?: boolean;
     }

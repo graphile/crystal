@@ -90,13 +90,13 @@ declare global {
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
     }
 
-    interface ScopeGraphQLObjectType {
+    interface ScopeObject {
       pgCodec?: PgTypeCodec<any, any, any>;
       // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
       isPgConnectionRelated?: true;
     }
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       pgSource?: PgSource<any, any, any, any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;

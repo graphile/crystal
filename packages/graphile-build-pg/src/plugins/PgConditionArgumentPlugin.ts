@@ -19,10 +19,10 @@ declare global {
     interface Inflection {
       conditionType(this: Inflection, typeName: string): string;
     }
-    interface ScopeGraphQLInputObjectType {
+    interface ScopeInputObject {
       isPgCondition?: boolean;
     }
-    interface ScopeGraphQLInputObjectTypeFieldsField {
+    interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
     }
   }

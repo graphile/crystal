@@ -8,18 +8,18 @@ import { version } from "../index.js";
 
 interface RegisterCursorConnectionOptions {
   typeName: string;
-  scope?: GraphileBuild.ScopeGraphQLObjectType;
+  scope?: GraphileBuild.ScopeObject;
   nonNullNode?: boolean;
 }
 
 declare global {
   namespace GraphileBuild {
-    interface ScopeGraphQLObjectType {
+    interface ScopeObject {
       isConnectionType?: true;
       isConnectionEdgeType?: true;
       isPageInfo?: boolean;
     }
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isPageInfoHasNextPageField?: boolean;
       isPageInfoHasPreviousPageField?: boolean;
     }

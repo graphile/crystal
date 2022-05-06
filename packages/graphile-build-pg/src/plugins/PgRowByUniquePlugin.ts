@@ -14,7 +14,7 @@ declare global {
         details: { uniqueKeys: string[]; source: PgSource<any, any, any, any> },
       ): string;
     }
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isPgRowByUniqueConstraintField?: boolean;
     }
   }

@@ -19,7 +19,7 @@ declare global {
       jwtType?: [string, string];
     }
 
-    interface ScopeGraphQLScalarType {
+    interface ScopeScalar {
       isPgJwtType?: boolean;
       pgCodec?: PgTypeCodec<any, any, any, any>;
     }

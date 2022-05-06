@@ -20,7 +20,7 @@ declare global {
       getNodeTypeNames(): string[];
     }
 
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isRootNodeField?: boolean;
     }
   }

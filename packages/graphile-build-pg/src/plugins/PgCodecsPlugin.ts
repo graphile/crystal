@@ -59,12 +59,12 @@ declare global {
       }): string;
     }
 
-    interface ScopeGraphQLObjectType {
+    interface ScopeObject {
       isPgRangeType?: boolean;
       isPgRangeBoundType?: boolean;
     }
 
-    interface ScopeGraphQLInputObjectType {
+    interface ScopeInputObject {
       isPgRangeInputType?: boolean;
       isPgRangeBoundInputType?: boolean;
       pgCodec?: PgTypeCodec<any, any, any, any>;

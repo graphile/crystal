@@ -15,7 +15,7 @@ declare global {
     interface Inflection {
       nodeById(this: Inflection, typeName: string): string;
     }
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isPgNodeQuery?: boolean;
     }
   }

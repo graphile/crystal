@@ -22,7 +22,7 @@ declare global {
       edgeField(this: Inflection, typeName: string): string;
     }
 
-    interface ScopeGraphQLObjectTypeFieldsField {
+    interface ScopeObjectFieldsField {
       isPgMutationPayloadEdgeField?: boolean;
     }
   }

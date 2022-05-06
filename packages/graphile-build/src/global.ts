@@ -138,12 +138,12 @@ declare global {
       fields?:
         | GraphileFieldConfigMap<TParentPlan, TContext>
         | ((
-            context: ContextGraphQLObjectTypeFields,
+            context: ContextObjectFields,
           ) => GraphileFieldConfigMap<TParentPlan, TContext>);
       interfaces?:
         | GraphQLInterfaceType[]
         | ((
-            context: ContextGraphQLObjectTypeInterfaces,
+            context: ContextObjectInterfaces,
           ) => GraphQLInterfaceType[]);
     }
 
@@ -153,7 +153,7 @@ declare global {
       fields?:
         | GraphileInputFieldConfigMap<any, any>
         | ((
-            context: ContextGraphQLInputObjectTypeFields,
+            context: ContextInputObjectFields,
           ) => GraphileInputFieldConfigMap<any, any>);
     }
 
@@ -162,7 +162,7 @@ declare global {
       extends Omit<GraphQLUnionTypeConfig<TSource, TContext>, "types"> {
       types?:
         | GraphQLObjectType[]
-        | ((context: ContextGraphQLUnionTypeTypes) => GraphQLObjectType[]);
+        | ((context: ContextUnionTypes) => GraphQLObjectType[]);
     }
 
     /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
@@ -171,7 +171,7 @@ declare global {
       fields?:
         | GraphQLFieldConfigMap<TSource, TContext>
         | ((
-            context: ContextGraphQLInterfaceTypeFields,
+            context: ContextInterfaceFields,
           ) => GraphQLFieldConfigMap<TSource, TContext>);
     }
 
@@ -257,7 +257,7 @@ declare global {
        */
       registerObjectType<TPlan extends ExecutablePlan<any> | null>(
         typeName: string,
-        scope: ScopeGraphQLObjectType,
+        scope: ScopeObject,
         Plan: TPlan extends ExecutablePlan<any>
           ? { new (...args: any[]): TPlan }
           : null,
@@ -268,7 +268,7 @@ declare global {
       /** As registerObjectType, but for interfaces */
       registerInterfaceType: (
         typeName: string,
-        scope: ScopeGraphQLInterfaceType,
+        scope: ScopeInterface,
         specGenerator: () => Omit<
           GraphileInterfaceTypeConfig<any, any>,
           "name"
@@ -278,28 +278,28 @@ declare global {
       /** As registerObjectType, but for unions */
       registerUnionType: (
         typeName: string,
-        scope: ScopeGraphQLUnionType,
+        scope: ScopeUnion,
         specGenerator: () => Omit<GraphileUnionTypeConfig<any, any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for scalars */
       registerScalarType: (
         typeName: string,
-        scope: ScopeGraphQLScalarType,
+        scope: ScopeScalar,
         specGenerator: () => Omit<GraphQLScalarTypeConfig<any, any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for enums */
       registerEnumType: (
         typeName: string,
-        scope: ScopeGraphQLEnumType,
+        scope: ScopeEnum,
         specGenerator: () => Omit<GraphQLEnumTypeConfig, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for input objects */
       registerInputObjectType: (
         typeName: string,
-        scope: ScopeGraphQLInputObjectType,
+        scope: ScopeInputObject,
         specGenerator: () => Omit<GraphileInputObjectTypeConfig, "name">,
         origin: string | null | undefined,
       ) => void;
@@ -444,142 +444,142 @@ declare global {
       type: "GraphQLSchema";
     }
 
-    interface ScopeGraphQLScalarType extends Scope {}
-    interface ContextGraphQLScalarType extends Context {
-      scope: ScopeGraphQLScalarType;
+    interface ScopeScalar extends Scope {}
+    interface ContextScalar extends Context {
+      scope: ScopeScalar;
       type: "GraphQLScalarType";
     }
 
-    interface ScopeGraphQLObjectType extends Scope {
+    interface ScopeObject extends Scope {
       isRootQuery?: boolean;
       isRootMutation?: boolean;
       isRootSubscription?: boolean;
       isMutationPayload?: boolean;
       isPageInfo?: boolean;
     }
-    interface ContextGraphQLObjectType extends Context {
-      scope: ScopeGraphQLObjectType;
+    interface ContextObject extends Context {
+      scope: ScopeObject;
       type: "GraphQLObjectType";
     }
 
-    interface ScopeGraphQLObjectTypeInterfaces extends ScopeGraphQLObjectType {}
-    interface ContextGraphQLObjectTypeInterfaces
-      extends ContextGraphQLObjectType {
-      scope: ScopeGraphQLObjectTypeInterfaces;
+    interface ScopeObjectInterfaces extends ScopeObject {}
+    interface ContextObjectInterfaces
+      extends ContextObject {
+      scope: ScopeObjectInterfaces;
       Self: GraphQLObjectType;
     }
 
-    interface ScopeGraphQLObjectTypeFields extends ScopeGraphQLObjectType {}
-    interface ContextGraphQLObjectTypeFields extends ContextGraphQLObjectType {
-      scope: ScopeGraphQLObjectTypeFields;
+    interface ScopeObjectFields extends ScopeObject {}
+    interface ContextObjectFields extends ContextObject {
+      scope: ScopeObjectFields;
       Self: GraphQLObjectType;
       fieldWithHooks: FieldWithHooksFunction;
     }
 
-    interface ScopeGraphQLObjectTypeFieldsField
-      extends ScopeGraphQLObjectTypeFields {
+    interface ScopeObjectFieldsField
+      extends ScopeObjectFields {
       fieldName: string;
       fieldDirectives?: DirectiveDetails[];
       isCursorField?: boolean;
     }
-    interface ContextGraphQLObjectTypeFieldsField
-      extends ContextGraphQLObjectTypeFields {
-      scope: ScopeGraphQLObjectTypeFieldsField;
+    interface ContextObjectFieldsField
+      extends ContextObjectFields {
+      scope: ScopeObjectFieldsField;
     }
 
-    interface ScopeGraphQLObjectTypeFieldsFieldArgs
-      extends ScopeGraphQLObjectTypeFieldsField {}
-    interface ContextGraphQLObjectTypeFieldsFieldArgs
-      extends ContextGraphQLObjectTypeFieldsField {
-      scope: ScopeGraphQLObjectTypeFieldsFieldArgs;
+    interface ScopeObjectFieldsFieldArgs
+      extends ScopeObjectFieldsField {}
+    interface ContextObjectFieldsFieldArgs
+      extends ContextObjectFieldsField {
+      scope: ScopeObjectFieldsFieldArgs;
     }
 
-    interface ScopeGraphQLInterfaceType extends Scope {}
-    interface ContextGraphQLInterfaceType extends Context {
-      scope: ScopeGraphQLInterfaceType;
+    interface ScopeInterface extends Scope {}
+    interface ContextInterface extends Context {
+      scope: ScopeInterface;
       type: "GraphQLInterfaceType";
     }
 
-    interface ScopeGraphQLInterfaceTypeFields
-      extends ScopeGraphQLInterfaceType {}
-    interface ContextGraphQLInterfaceTypeFields
-      extends ContextGraphQLInterfaceType {
-      scope: ScopeGraphQLInterfaceTypeFields;
+    interface ScopeInterfaceFields
+      extends ScopeInterface {}
+    interface ContextInterfaceFields
+      extends ContextInterface {
+      scope: ScopeInterfaceFields;
       Self: GraphQLInterfaceType;
       fieldWithHooks: InterfaceFieldWithHooksFunction;
     }
 
-    interface ScopeGraphQLInterfaceTypeFieldsField
-      extends ScopeGraphQLInterfaceTypeFields {
+    interface ScopeInterfaceFieldsField
+      extends ScopeInterfaceFields {
       fieldName: string;
     }
-    interface ContextGraphQLInterfaceTypeFieldsField
-      extends ContextGraphQLInterfaceTypeFields {
-      scope: ScopeGraphQLInterfaceTypeFieldsField;
+    interface ContextInterfaceFieldsField
+      extends ContextInterfaceFields {
+      scope: ScopeInterfaceFieldsField;
     }
 
-    interface ScopeGraphQLInterfaceTypeFieldsFieldArgs
-      extends ScopeGraphQLInterfaceTypeFieldsField {}
-    interface ContextGraphQLInterfaceTypeFieldsFieldArgs
-      extends ContextGraphQLInterfaceTypeFieldsField {
-      scope: ScopeGraphQLInterfaceTypeFieldsFieldArgs;
+    interface ScopeInterfaceFieldsFieldArgs
+      extends ScopeInterfaceFieldsField {}
+    interface ContextInterfaceFieldsFieldArgs
+      extends ContextInterfaceFieldsField {
+      scope: ScopeInterfaceFieldsFieldArgs;
     }
 
-    interface ScopeGraphQLUnionType extends Scope {}
-    interface ContextGraphQLUnionType extends Context {
-      scope: ScopeGraphQLUnionType;
+    interface ScopeUnion extends Scope {}
+    interface ContextUnion extends Context {
+      scope: ScopeUnion;
       type: "GraphQLUnionType";
     }
 
-    interface ScopeGraphQLUnionTypeTypes extends ScopeGraphQLUnionType {}
-    interface ContextGraphQLUnionTypeTypes extends ContextGraphQLUnionType {
-      scope: ScopeGraphQLUnionTypeTypes;
+    interface ScopeUnionTypes extends ScopeUnion {}
+    interface ContextUnionTypes extends ContextUnion {
+      scope: ScopeUnionTypes;
       Self: GraphQLUnionType;
     }
 
-    interface ScopeGraphQLInputObjectType extends Scope {
+    interface ScopeInputObject extends Scope {
       isMutationInput?: boolean;
     }
-    interface ContextGraphQLInputObjectType extends Context {
-      scope: ScopeGraphQLInputObjectType;
+    interface ContextInputObject extends Context {
+      scope: ScopeInputObject;
       type: "GraphQLInputObjectType";
     }
 
-    interface ScopeGraphQLInputObjectTypeFields
-      extends ScopeGraphQLInputObjectType {}
-    interface ContextGraphQLInputObjectTypeFields
-      extends ContextGraphQLInputObjectType {
-      scope: ScopeGraphQLInputObjectTypeFields;
+    interface ScopeInputObjectFields
+      extends ScopeInputObject {}
+    interface ContextInputObjectFields
+      extends ContextInputObject {
+      scope: ScopeInputObjectFields;
       Self: GraphQLInputObjectType;
       fieldWithHooks: InputFieldWithHooksFunction;
     }
 
-    interface ScopeGraphQLInputObjectTypeFieldsField
-      extends ScopeGraphQLInputObjectType {
+    interface ScopeInputObjectFieldsField
+      extends ScopeInputObject {
       fieldName: string;
     }
-    interface ContextGraphQLInputObjectTypeFieldsField
-      extends ContextGraphQLInputObjectType {
-      scope: ScopeGraphQLInputObjectTypeFieldsField;
+    interface ContextInputObjectFieldsField
+      extends ContextInputObject {
+      scope: ScopeInputObjectFieldsField;
       Self: GraphQLInputObjectType;
     }
 
-    interface ScopeGraphQLEnumType extends Scope {}
-    interface ContextGraphQLEnumType extends Context {
-      scope: ScopeGraphQLEnumType;
+    interface ScopeEnum extends Scope {}
+    interface ContextEnum extends Context {
+      scope: ScopeEnum;
       type: "GraphQLEnumType";
     }
 
-    interface ScopeGraphQLEnumTypeValues extends ScopeGraphQLEnumType {}
-    interface ContextGraphQLEnumTypeValues extends ContextGraphQLEnumType {
-      scope: ScopeGraphQLEnumTypeValues;
+    interface ScopeEnumValues extends ScopeEnum {}
+    interface ContextEnumValues extends ContextEnum {
+      scope: ScopeEnumValues;
     }
 
-    interface ScopeGraphQLEnumTypeValuesValue
-      extends ScopeGraphQLEnumTypeValues {}
-    interface ContextGraphQLEnumTypeValuesValue
-      extends ContextGraphQLEnumTypeValues {
-      scope: ScopeGraphQLEnumTypeValuesValue;
+    interface ScopeEnumValuesValue
+      extends ScopeEnumValues {}
+    interface ContextEnumValuesValue
+      extends ContextEnumValues {
+      scope: ScopeEnumValuesValue;
     }
 
     interface ScopeFinalize extends Scope {}
@@ -596,21 +596,21 @@ declare global {
       | ScopeBuild
       | ScopeInit
       | ScopeGraphQLSchema
-      | ScopeGraphQLScalarType
-      | ScopeGraphQLObjectType
-      | ScopeGraphQLObjectTypeInterfaces
-      | ScopeGraphQLObjectTypeFields
-      | ScopeGraphQLObjectTypeFieldsField
-      | ScopeGraphQLObjectTypeFieldsFieldArgs
-      | ScopeGraphQLInterfaceType
-      | ScopeGraphQLUnionType
-      | ScopeGraphQLUnionTypeTypes
-      | ScopeGraphQLInputObjectType
-      | ScopeGraphQLInputObjectTypeFields
-      | ScopeGraphQLInputObjectTypeFieldsField
-      | ScopeGraphQLEnumType
-      | ScopeGraphQLEnumTypeValues
-      | ScopeGraphQLEnumTypeValuesValue
+      | ScopeScalar
+      | ScopeObject
+      | ScopeObjectInterfaces
+      | ScopeObjectFields
+      | ScopeObjectFieldsField
+      | ScopeObjectFieldsFieldArgs
+      | ScopeInterface
+      | ScopeUnion
+      | ScopeUnionTypes
+      | ScopeInputObject
+      | ScopeInputObjectFields
+      | ScopeInputObjectFieldsField
+      | ScopeEnum
+      | ScopeEnumValues
+      | ScopeEnumValuesValue
       | ScopeFinalize;
 
     /**
@@ -641,11 +641,11 @@ declare global {
       TFieldPlan extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,
     >(
-      fieldScope: ScopeGraphQLObjectTypeFieldsField,
+      fieldScope: ScopeObjectFieldsField,
       spec:
         | GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>
         | ((
-            context: ContextGraphQLObjectTypeFieldsField,
+            context: ContextObjectFieldsField,
           ) => GraphileFieldConfig<
             TType,
             TContext,
@@ -656,20 +656,20 @@ declare global {
     ) => GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>;
 
     type InterfaceFieldWithHooksFunction = (
-      fieldScope: ScopeGraphQLInterfaceTypeFieldsField,
+      fieldScope: ScopeInterfaceFieldsField,
       spec:
         | GraphQLFieldConfig<any, any>
         | ((
-            context: ContextGraphQLInterfaceTypeFieldsField,
+            context: ContextInterfaceFieldsField,
           ) => GraphQLFieldConfig<any, any>),
     ) => GraphQLFieldConfig<any, any>;
 
     type InputFieldWithHooksFunction = (
-      fieldScope: ScopeGraphQLInputObjectTypeFieldsField,
+      fieldScope: ScopeInputObjectFieldsField,
       spec:
         | GraphileInputFieldConfig<any, any, any, any, any>
         | ((
-            context: ContextGraphQLInputObjectTypeFieldsField,
+            context: ContextInputObjectFieldsField,
           ) => GraphileInputFieldConfig<any, any, any, any, any>),
     ) => GraphileInputFieldConfig<any, any, any, any, any>;
 
@@ -739,27 +739,27 @@ declare global {
        */
       GraphQLObjectType: GraphileBuild.Hook<
         GraphileObjectTypeConfig<any, any>,
-        GraphileBuild.ContextGraphQLObjectType,
+        GraphileBuild.ContextObject,
         TBuild
       >[];
       GraphQLObjectType_interfaces: GraphileBuild.Hook<
         GraphQLInterfaceType[],
-        GraphileBuild.ContextGraphQLObjectTypeInterfaces,
+        GraphileBuild.ContextObjectInterfaces,
         TBuild
       >[];
       GraphQLObjectType_fields: GraphileBuild.Hook<
         GraphileFieldConfigMap<any, any>,
-        GraphileBuild.ContextGraphQLObjectTypeFields,
+        GraphileBuild.ContextObjectFields,
         TBuild
       >[];
       GraphQLObjectType_fields_field: GraphileBuild.Hook<
         GraphileFieldConfig<any, any, any, any, any>,
-        GraphileBuild.ContextGraphQLObjectTypeFieldsField,
+        GraphileBuild.ContextObjectFieldsField,
         TBuild
       >[];
       GraphQLObjectType_fields_field_args: GraphileBuild.Hook<
         GraphileFieldConfigArgumentMap<any, any, any, any>,
-        GraphileBuild.ContextGraphQLObjectTypeFieldsFieldArgs,
+        GraphileBuild.ContextObjectFieldsFieldArgs,
         TBuild
       >[];
 
@@ -774,17 +774,17 @@ declare global {
        */
       GraphQLInputObjectType: GraphileBuild.Hook<
         GraphileBuild.GraphileInputObjectTypeConfig,
-        GraphileBuild.ContextGraphQLInputObjectType,
+        GraphileBuild.ContextInputObject,
         TBuild
       >[];
       GraphQLInputObjectType_fields: GraphileBuild.Hook<
         GraphQLInputFieldConfigMap,
-        GraphileBuild.ContextGraphQLInputObjectTypeFields,
+        GraphileBuild.ContextInputObjectFields,
         TBuild
       >[];
       GraphQLInputObjectType_fields_field: GraphileBuild.Hook<
         GraphileInputFieldConfig<any, any, any, any, any>,
-        GraphileBuild.ContextGraphQLInputObjectTypeFieldsField,
+        GraphileBuild.ContextInputObjectFieldsField,
         TBuild
       >[];
 
@@ -797,17 +797,17 @@ declare global {
        */
       GraphQLEnumType: GraphileBuild.Hook<
         GraphQLEnumTypeConfig,
-        GraphileBuild.ContextGraphQLEnumType,
+        GraphileBuild.ContextEnum,
         TBuild
       >[];
       GraphQLEnumType_values: GraphileBuild.Hook<
         GraphQLEnumValueConfigMap,
-        GraphileBuild.ContextGraphQLEnumTypeValues,
+        GraphileBuild.ContextEnumValues,
         TBuild
       >[];
       GraphQLEnumType_values_value: GraphileBuild.Hook<
         GraphQLEnumValueConfig,
-        GraphileBuild.ContextGraphQLEnumTypeValuesValue,
+        GraphileBuild.ContextEnumValuesValue,
         TBuild
       >[];
 
@@ -819,12 +819,12 @@ declare global {
        */
       GraphQLUnionType: GraphileBuild.Hook<
         GraphileBuild.GraphileUnionTypeConfig<any, any>,
-        GraphileBuild.ContextGraphQLUnionType,
+        GraphileBuild.ContextUnion,
         TBuild
       >[];
       GraphQLUnionType_types: GraphileBuild.Hook<
         GraphQLObjectType[],
-        GraphileBuild.ContextGraphQLUnionTypeTypes,
+        GraphileBuild.ContextUnionTypes,
         TBuild
       >[];
 
@@ -840,22 +840,22 @@ declare global {
        */
       GraphQLInterfaceType: GraphileBuild.Hook<
         GraphileBuild.GraphileInterfaceTypeConfig<any, any>,
-        GraphileBuild.ContextGraphQLInterfaceType,
+        GraphileBuild.ContextInterface,
         TBuild
       >[];
       GraphQLInterfaceType_fields: GraphileBuild.Hook<
         GraphQLFieldConfigMap<any, any>,
-        GraphileBuild.ContextGraphQLInterfaceTypeFields,
+        GraphileBuild.ContextInterfaceFields,
         TBuild
       >[];
       GraphQLInterfaceType_fields_field: GraphileBuild.Hook<
         GraphQLFieldConfig<any, any>,
-        GraphileBuild.ContextGraphQLInterfaceTypeFieldsField,
+        GraphileBuild.ContextInterfaceFieldsField,
         TBuild
       >[];
       GraphQLInterfaceType_fields_field_args: GraphileBuild.Hook<
         GraphQLFieldConfigArgumentMap,
-        GraphileBuild.ContextGraphQLInterfaceTypeFieldsFieldArgs,
+        GraphileBuild.ContextInterfaceFieldsFieldArgs,
         TBuild
       >[];
 
@@ -864,7 +864,7 @@ declare global {
        */
       GraphQLScalarType: GraphileBuild.Hook<
         GraphQLScalarTypeConfig<any, any>,
-        GraphileBuild.ContextGraphQLScalarType,
+        GraphileBuild.ContextScalar,
         TBuild
       >[];
     }
