@@ -40,9 +40,9 @@ const version: string = JSON.parse(
  */
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,
-  input: GraphileEngine.BuildInput,
-  inflection: GraphileEngine.Inflection,
-): GraphileEngine.BuildBase {
+  input: GraphileBuild.BuildInput,
+  inflection: GraphileBuild.Inflection,
+): GraphileBuild.BuildBase {
   const allTypes = {
     Int: GraphQLInt,
     Float: GraphQLFloat,
@@ -66,20 +66,20 @@ export default function makeNewBuild(
     [key: string]: {
       // The constructor - GraphQLScalarType, GraphQLObjectType, etc
       klass: { new (spec: any): GraphQLNamedType };
-      scope: GraphileEngine.SomeScope;
+      scope: GraphileBuild.SomeScope;
       specGenerator: any;
       origin: string | null | undefined;
       Plan?: { new (...args: any[]): ExecutablePlan<any> } | null;
     };
   } = {};
 
-  const scopeByType = new Map<GraphQLNamedType, GraphileEngine.SomeScope>();
+  const scopeByType = new Map<GraphQLNamedType, GraphileBuild.SomeScope>();
 
   // TODO: allow registering a previously constructed type.
   function register(
     klass: { new (spec: any): GraphQLNamedType },
     typeName: string,
-    scope: GraphileEngine.SomeScope,
+    scope: GraphileBuild.SomeScope,
     Plan: { new (...args: any[]): ExecutablePlan<any> } | null,
     specGenerator: () => any,
     origin: string | null | undefined,
@@ -117,7 +117,7 @@ export default function makeNewBuild(
     };
   }
 
-  const build: GraphileEngine.BuildBase = {
+  const build: GraphileBuild.BuildBase = {
     options: builder.options,
     versions: {
       graphql: graphql.version,

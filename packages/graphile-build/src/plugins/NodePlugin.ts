@@ -5,7 +5,7 @@ import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       nodeIdFieldName(this: Inflection): string;
     }

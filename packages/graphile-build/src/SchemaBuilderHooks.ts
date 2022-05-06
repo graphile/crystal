@@ -5,8 +5,8 @@ import "./global.js";
  * hook functions to be registered into it.
  */
 export function makeSchemaBuilderHooks<
-  TBuild extends GraphileEngine.Build = GraphileEngine.Build,
->(): GraphileEngine.SchemaBuilderHooks<TBuild> {
+  TBuild extends GraphileBuild.Build = GraphileBuild.Build,
+>(): GraphileBuild.SchemaBuilderHooks<TBuild> {
   return {
     build: [],
     init: [],

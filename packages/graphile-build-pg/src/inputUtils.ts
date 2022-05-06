@@ -50,7 +50,7 @@ export function makePgTypeCodecMeta(
  * Memoized for performance, using a WeakMap.
  */
 export function getCodecMetaLookupFromInput(
-  input: GraphileEngine.BuildInput,
+  input: GraphileBuild.BuildInput,
 ): PgTypeCodecMetaLookup {
   const metaLookup: PgTypeCodecMetaLookup = new Map();
   const seenSources = new Set<PgSource<any, any, any, any>>();

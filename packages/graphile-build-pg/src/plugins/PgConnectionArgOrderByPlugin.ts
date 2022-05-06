@@ -16,7 +16,7 @@ import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       orderByType(this: Inflection, typeName: string): string;
     }

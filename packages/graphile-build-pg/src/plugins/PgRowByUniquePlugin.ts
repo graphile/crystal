@@ -7,7 +7,7 @@ import type { GraphQLObjectType } from "graphql";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       rowByUniqueKeys(
         this: Inflection,

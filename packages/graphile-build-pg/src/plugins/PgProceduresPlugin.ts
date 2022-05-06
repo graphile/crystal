@@ -28,7 +28,7 @@ interface _ArgumentDetails {
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       functionSourceName(
         this: Inflection,

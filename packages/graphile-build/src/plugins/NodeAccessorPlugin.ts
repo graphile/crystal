@@ -11,7 +11,7 @@ import type { Plugin } from "graphile-plugin";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       nodeById(this: Inflection, typeName: string): string;
     }

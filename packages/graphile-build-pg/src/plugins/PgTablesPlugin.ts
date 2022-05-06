@@ -11,7 +11,7 @@ import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileBuildSchemaOptions {
       /**
        * If true, setof functions cannot return null, so our list and
@@ -83,11 +83,11 @@ declare global {
        * represented as a certain PgTypeCodec)
        */
       tableType(
-        this: GraphileEngine.Inflection,
+        this: GraphileBuild.Inflection,
         codec: PgTypeCodec<any, any, any>,
       ): string;
 
-      patchType(this: GraphileEngine.Inflection, typeName: string): string;
+      patchType(this: GraphileBuild.Inflection, typeName: string): string;
     }
 
     interface ScopeGraphQLObjectType {

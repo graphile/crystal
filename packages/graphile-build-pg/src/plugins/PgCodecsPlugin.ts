@@ -30,7 +30,7 @@ interface State {
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       classCodecName(details: {
         pgClass: PgClass;

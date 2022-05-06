@@ -10,7 +10,7 @@ import type { Plugin } from "graphile-plugin";
 import { version } from "../index.js";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLObjectTypeFieldsField {
       isPgConnectionTotalCountField?: true;
     }

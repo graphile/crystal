@@ -5,7 +5,7 @@ import type { GraphQLScalarLiteralParser } from "graphql";
 import { version } from "../index.js";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLScalarType {}
     interface GraphileBuildSchemaOptions {
       /**

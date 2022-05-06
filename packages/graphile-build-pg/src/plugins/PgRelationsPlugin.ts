@@ -25,7 +25,7 @@ interface RelationDetails {
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLObjectTypeFieldsField {
       isPgSingleRelationField?: boolean;
       isPgManyRelationConnectionField?: boolean;

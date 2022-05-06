@@ -40,12 +40,12 @@ import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
 /*
  * To make it easier for plugins to extend our builtin types we put them all in
- * the global `GraphileEngine` namespace. Anywhere you need to extend these
+ * the global `GraphileBuild` namespace. Anywhere you need to extend these
  * types you can do so via:
  *
  * ```
  * declare global {
- *   namespace GraphileEngine {
+ *   namespace GraphileBuild {
  *     // Your extensions here
  *   }
  * }
@@ -53,7 +53,7 @@ import type { stringTypeSpec, wrapDescription } from "./utils.js";
  */
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     /**
      * Input to the 'schema build' phase, this is typically the output of the
      * gather phase.
@@ -316,7 +316,7 @@ declare global {
        */
       getTypeMetaByName: (typeName: string) => {
         Constructor: { new (spec: any): GraphQLNamedType };
-        scope: GraphileEngine.SomeScope;
+        scope: GraphileBuild.SomeScope;
         origin: string | null | undefined;
         Plan?: { new (...args: any[]): ExecutablePlan<any> } | null;
       } | null;
@@ -682,17 +682,17 @@ declare global {
      * the various parameters to the hook function.
      */
     interface SchemaBuilderHooks<
-      TBuild extends GraphileEngine.Build = GraphileEngine.Build,
+      TBuild extends GraphileBuild.Build = GraphileBuild.Build,
     > {
       /**
        * The build object represents the current schema build and is passed to all
        * hooks, hook the 'build' event to extend this object. Note: you MUST NOT
        * generate GraphQL objects during this phase.
        */
-      build: GraphileEngine.Hook<
-        Partial<TBuild> & GraphileEngine.BuildBase,
-        GraphileEngine.ContextBuild,
-        Partial<TBuild> & GraphileEngine.BuildBase
+      build: GraphileBuild.Hook<
+        Partial<TBuild> & GraphileBuild.BuildBase,
+        GraphileBuild.ContextBuild,
+        Partial<TBuild> & GraphileBuild.BuildBase
       >[];
 
       /**
@@ -700,9 +700,9 @@ declare global {
        * or the schema are actually built. It is the only phase in which you
        * can register GraphQL types; do so using `build.registerType`.
        */
-      init: GraphileEngine.Hook<
+      init: GraphileBuild.Hook<
         Record<string, never>,
-        GraphileEngine.ContextInit,
+        GraphileBuild.ContextInit,
         TBuild
       >[];
 
@@ -711,18 +711,18 @@ declare global {
        * shouldn't use this, but it's useful for interfacing with external
        * libraries that mutate an already constructed schema.
        */
-      finalize: GraphileEngine.Hook<
+      finalize: GraphileBuild.Hook<
         GraphQLSchema,
-        GraphileEngine.ContextFinalize,
+        GraphileBuild.ContextFinalize,
         TBuild
       >[];
 
       /**
        * Add 'query', 'mutation' or 'subscription' types in this hook:
        */
-      GraphQLSchema: GraphileEngine.Hook<
+      GraphQLSchema: GraphileBuild.Hook<
         GraphQLSchemaConfig,
-        GraphileEngine.ContextGraphQLSchema,
+        GraphileBuild.ContextGraphQLSchema,
         TBuild
       >[];
 
@@ -737,29 +737,29 @@ declare global {
        * - 'GraphQLObjectType_fields_field' to customize an individual field from above
        * - 'GraphQLObjectType_fields_field_args' to customize the arguments to a field
        */
-      GraphQLObjectType: GraphileEngine.Hook<
+      GraphQLObjectType: GraphileBuild.Hook<
         GraphileObjectTypeConfig<any, any>,
-        GraphileEngine.ContextGraphQLObjectType,
+        GraphileBuild.ContextGraphQLObjectType,
         TBuild
       >[];
-      GraphQLObjectType_interfaces: GraphileEngine.Hook<
+      GraphQLObjectType_interfaces: GraphileBuild.Hook<
         GraphQLInterfaceType[],
-        GraphileEngine.ContextGraphQLObjectTypeInterfaces,
+        GraphileBuild.ContextGraphQLObjectTypeInterfaces,
         TBuild
       >[];
-      GraphQLObjectType_fields: GraphileEngine.Hook<
+      GraphQLObjectType_fields: GraphileBuild.Hook<
         GraphileFieldConfigMap<any, any>,
-        GraphileEngine.ContextGraphQLObjectTypeFields,
+        GraphileBuild.ContextGraphQLObjectTypeFields,
         TBuild
       >[];
-      GraphQLObjectType_fields_field: GraphileEngine.Hook<
+      GraphQLObjectType_fields_field: GraphileBuild.Hook<
         GraphileFieldConfig<any, any, any, any, any>,
-        GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+        GraphileBuild.ContextGraphQLObjectTypeFieldsField,
         TBuild
       >[];
-      GraphQLObjectType_fields_field_args: GraphileEngine.Hook<
+      GraphQLObjectType_fields_field_args: GraphileBuild.Hook<
         GraphileFieldConfigArgumentMap<any, any, any, any>,
-        GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs,
+        GraphileBuild.ContextGraphQLObjectTypeFieldsFieldArgs,
         TBuild
       >[];
 
@@ -772,19 +772,19 @@ declare global {
        *   `Self` in the context)
        * - 'GraphQLInputObjectType_fields_field' to customize an individual field from above
        */
-      GraphQLInputObjectType: GraphileEngine.Hook<
-        GraphileEngine.GraphileInputObjectTypeConfig,
-        GraphileEngine.ContextGraphQLInputObjectType,
+      GraphQLInputObjectType: GraphileBuild.Hook<
+        GraphileBuild.GraphileInputObjectTypeConfig,
+        GraphileBuild.ContextGraphQLInputObjectType,
         TBuild
       >[];
-      GraphQLInputObjectType_fields: GraphileEngine.Hook<
+      GraphQLInputObjectType_fields: GraphileBuild.Hook<
         GraphQLInputFieldConfigMap,
-        GraphileEngine.ContextGraphQLInputObjectTypeFields,
+        GraphileBuild.ContextGraphQLInputObjectTypeFields,
         TBuild
       >[];
-      GraphQLInputObjectType_fields_field: GraphileEngine.Hook<
+      GraphQLInputObjectType_fields_field: GraphileBuild.Hook<
         GraphileInputFieldConfig<any, any, any, any, any>,
-        GraphileEngine.ContextGraphQLInputObjectTypeFieldsField,
+        GraphileBuild.ContextGraphQLInputObjectTypeFieldsField,
         TBuild
       >[];
 
@@ -795,19 +795,19 @@ declare global {
        * - 'GraphQLEnumType_values' to add additional values
        * - 'GraphQLEnumType_values_value' to change an individual value
        */
-      GraphQLEnumType: GraphileEngine.Hook<
+      GraphQLEnumType: GraphileBuild.Hook<
         GraphQLEnumTypeConfig,
-        GraphileEngine.ContextGraphQLEnumType,
+        GraphileBuild.ContextGraphQLEnumType,
         TBuild
       >[];
-      GraphQLEnumType_values: GraphileEngine.Hook<
+      GraphQLEnumType_values: GraphileBuild.Hook<
         GraphQLEnumValueConfigMap,
-        GraphileEngine.ContextGraphQLEnumTypeValues,
+        GraphileBuild.ContextGraphQLEnumTypeValues,
         TBuild
       >[];
-      GraphQLEnumType_values_value: GraphileEngine.Hook<
+      GraphQLEnumType_values_value: GraphileBuild.Hook<
         GraphQLEnumValueConfig,
-        GraphileEngine.ContextGraphQLEnumTypeValuesValue,
+        GraphileBuild.ContextGraphQLEnumTypeValuesValue,
         TBuild
       >[];
 
@@ -817,14 +817,14 @@ declare global {
        * - 'GraphQLUnionType' to add any root-level attributes, e.g. add a description
        * - 'GraphQLUnionType_types' to add additional types to this union
        */
-      GraphQLUnionType: GraphileEngine.Hook<
-        GraphileEngine.GraphileUnionTypeConfig<any, any>,
-        GraphileEngine.ContextGraphQLUnionType,
+      GraphQLUnionType: GraphileBuild.Hook<
+        GraphileBuild.GraphileUnionTypeConfig<any, any>,
+        GraphileBuild.ContextGraphQLUnionType,
         TBuild
       >[];
-      GraphQLUnionType_types: GraphileEngine.Hook<
+      GraphQLUnionType_types: GraphileBuild.Hook<
         GraphQLObjectType[],
-        GraphileEngine.ContextGraphQLUnionTypeTypes,
+        GraphileBuild.ContextGraphQLUnionTypeTypes,
         TBuild
       >[];
 
@@ -838,33 +838,33 @@ declare global {
        *  - 'GraphQLInterfaceType_fields_field' to customise an individual field from above
        *  - 'GraphQLInterfaceType_fields_field_args' to customize the arguments to a field
        */
-      GraphQLInterfaceType: GraphileEngine.Hook<
-        GraphileEngine.GraphileInterfaceTypeConfig<any, any>,
-        GraphileEngine.ContextGraphQLInterfaceType,
+      GraphQLInterfaceType: GraphileBuild.Hook<
+        GraphileBuild.GraphileInterfaceTypeConfig<any, any>,
+        GraphileBuild.ContextGraphQLInterfaceType,
         TBuild
       >[];
-      GraphQLInterfaceType_fields: GraphileEngine.Hook<
+      GraphQLInterfaceType_fields: GraphileBuild.Hook<
         GraphQLFieldConfigMap<any, any>,
-        GraphileEngine.ContextGraphQLInterfaceTypeFields,
+        GraphileBuild.ContextGraphQLInterfaceTypeFields,
         TBuild
       >[];
-      GraphQLInterfaceType_fields_field: GraphileEngine.Hook<
+      GraphQLInterfaceType_fields_field: GraphileBuild.Hook<
         GraphQLFieldConfig<any, any>,
-        GraphileEngine.ContextGraphQLInterfaceTypeFieldsField,
+        GraphileBuild.ContextGraphQLInterfaceTypeFieldsField,
         TBuild
       >[];
-      GraphQLInterfaceType_fields_field_args: GraphileEngine.Hook<
+      GraphQLInterfaceType_fields_field_args: GraphileBuild.Hook<
         GraphQLFieldConfigArgumentMap,
-        GraphileEngine.ContextGraphQLInterfaceTypeFieldsFieldArgs,
+        GraphileBuild.ContextGraphQLInterfaceTypeFieldsFieldArgs,
         TBuild
       >[];
 
       /**
        * For scalars
        */
-      GraphQLScalarType: GraphileEngine.Hook<
+      GraphQLScalarType: GraphileBuild.Hook<
         GraphQLScalarTypeConfig<any, any>,
-        GraphileEngine.ContextGraphQLScalarType,
+        GraphileBuild.ContextGraphQLScalarType,
         TBuild
       >[];
     }
@@ -882,15 +882,15 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
   TType extends GraphQLSchema
     ? Partial<GraphQLSchemaConfig>
     : TType extends GraphQLObjectType
-    ? Partial<GraphileEngine.GraphileObjectTypeConfig<any, any>> & {
+    ? Partial<GraphileBuild.GraphileObjectTypeConfig<any, any>> & {
         name: string;
       }
     : TType extends GraphQLInterfaceType
-    ? Partial<GraphileEngine.GraphileInterfaceTypeConfig<any, any>> & {
+    ? Partial<GraphileBuild.GraphileInterfaceTypeConfig<any, any>> & {
         name: string;
       }
     : TType extends GraphQLUnionType
-    ? Partial<GraphileEngine.GraphileUnionTypeConfig<any, any>> & {
+    ? Partial<GraphileBuild.GraphileUnionTypeConfig<any, any>> & {
         name: string;
       }
     : TType extends GraphQLScalarType
@@ -898,10 +898,10 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
     : TType extends GraphQLEnumType
     ? Partial<GraphQLEnumTypeConfig> & { name: string }
     : TType extends GraphQLInputObjectType
-    ? Partial<GraphileEngine.GraphileInputObjectTypeConfig> & { name: string }
+    ? Partial<GraphileBuild.GraphileInputObjectTypeConfig> & { name: string }
     : never;
 
 // TODO: this returning `never` for non-GraphQLSchema seems wrong... why is it
 // not causing issues?
 export type ScopeForType<TType extends GraphQLNamedType | GraphQLSchema> =
-  TType extends GraphQLSchema ? GraphileEngine.ScopeGraphQLSchema : never;
+  TType extends GraphQLSchema ? GraphileBuild.ScopeGraphQLSchema : never;

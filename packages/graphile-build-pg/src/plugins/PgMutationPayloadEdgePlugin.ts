@@ -16,7 +16,7 @@ import { version } from "../index";
 import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       // TODO: move this somewhere more shared
       edgeField(this: Inflection, typeName: string): string;

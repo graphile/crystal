@@ -49,7 +49,7 @@ interface ArgumentDetails {
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       customMutation(this: Inflection, details: ProcedureDetails): string;
       customMutationPayload(
@@ -75,7 +75,7 @@ declare global {
 }
 
 function getArgDetailsFromParameters(
-  build: GraphileEngine.Build,
+  build: GraphileBuild.Build,
   source: PgSource<any, any, any, any>,
   parameters: PgSourceParameter[],
 ) {
@@ -687,7 +687,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
 };
 
 function getFunctionSourceReturnGraphQLType(
-  build: GraphileEngine.Build,
+  build: GraphileBuild.Build,
   source: PgSource<any, any, any, any>,
 ): GraphQLOutputType | null {
   const sourceInnerCodec: PgTypeCodec<any, any, any> =

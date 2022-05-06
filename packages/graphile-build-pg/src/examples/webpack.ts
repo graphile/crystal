@@ -24,7 +24,7 @@ const DEBUG_MODE = true;
 
 // Our server will supply pgSettings/withPgClient on the GraphQL context
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileResolverContext {
       pgSettings: {
         [key: string]: string;

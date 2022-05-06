@@ -12,7 +12,7 @@ import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLInputObjectTypeFieldsField {
       isPgConnectionConditionInputField?: boolean;
       pgFieldSource?: PgSource<any, any, any, any>;

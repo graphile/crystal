@@ -10,7 +10,7 @@ import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLObjectType {
       isPgIntervalType?: boolean;
       isPgPointType?: boolean;
@@ -363,7 +363,7 @@ export const PgTypesPlugin: Plugin = {
           function registerGeometry(
             typeName: string,
             description: string,
-            fieldGen: () => GraphileEngine.GraphileFieldConfigMap<any, any>,
+            fieldGen: () => GraphileBuild.GraphileFieldConfigMap<any, any>,
             inputFieldGen: () => GraphQLInputFieldConfigMap,
           ): void {
             build.registerObjectType(

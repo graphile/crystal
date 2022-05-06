@@ -16,7 +16,7 @@ import { buildSchema, defaultPreset } from "../index.js";
  */
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileBuildSchemaOptions {
       myDefaultMin?: number;
       myDefaultMax?: number;
@@ -97,7 +97,7 @@ const MyRandomFieldPlugin: Plugin = {
   ]);
 
   // This'd normally be the "gather" phase, but we don't need one
-  const input: GraphileEngine.BuildInput = {};
+  const input: GraphileBuild.BuildInput = {};
 
   // Build the schema:
   const schema = buildSchema(config, input);

@@ -34,18 +34,18 @@ export {
   upperFirst,
 } from "./utils.js";
 
-export { GraphileEngine, SchemaBuilder };
+export { GraphileBuild, SchemaBuilder };
 
 const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
 
 /**
  * Generate 'build.inflection' from the given preset.
  */
-export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
+export const buildInflection = (preset: Preset): GraphileBuild.Inflection => {
   const config = resolvePresets([preset]);
   const { plugins, inflection: _options = {} } = config;
 
-  const inflectors: Partial<GraphileEngine.Inflection> =
+  const inflectors: Partial<GraphileBuild.Inflection> =
     makeInitialInflection();
 
   // Add the base inflectors
@@ -54,11 +54,11 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
       const inflectorsToAdd = plugin.inflection.add;
       for (const inflectorName of Object.keys(
         inflectorsToAdd,
-      ) as (keyof GraphileEngine.Inflection)[]) {
+      ) as (keyof GraphileBuild.Inflection)[]) {
         const fn = inflectorsToAdd[inflectorName];
         if (fn) {
           const inflector = (fn as any).bind(
-            inflectors as GraphileEngine.Inflection,
+            inflectors as GraphileBuild.Inflection,
             preset,
           );
           extend(
@@ -83,7 +83,7 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
         );
       }
       const inflector = (replacementFunction as any).bind(
-        inflectors as GraphileEngine.Inflection,
+        inflectors as GraphileBuild.Inflection,
         previous,
         preset,
       );
@@ -91,7 +91,7 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
     },
   );
 
-  return inflectors as GraphileEngine.Inflection;
+  return inflectors as GraphileBuild.Inflection;
 };
 
 /**
@@ -102,9 +102,9 @@ export const gather = async (
   {
     inflection,
   }: {
-    inflection: GraphileEngine.Inflection;
+    inflection: GraphileBuild.Inflection;
   } = { inflection: buildInflection(preset) },
-): Promise<GraphileEngine.BuildInput> => {
+): Promise<GraphileBuild.BuildInput> => {
   const config = resolvePresets([preset]);
   const options = config.gather || {};
   const plugins = config.plugins;
@@ -117,7 +117,7 @@ export const gather = async (
   const pluginContext = new Map<
     Plugin,
     {
-      inflection: GraphileEngine.Inflection;
+      inflection: GraphileBuild.Inflection;
       helpers: GatherHelpers;
       options: typeof options;
       cache: any;
@@ -174,7 +174,7 @@ export const gather = async (
   );
 
   // Now call the main functions
-  const output: Partial<GraphileEngine.BuildInput> = {};
+  const output: Partial<GraphileBuild.BuildInput> = {};
   for (const plugin of plugins) {
     if (plugin.gather?.main) {
       const context = pluginContext.get(plugin);
@@ -185,7 +185,7 @@ export const gather = async (
     }
   }
 
-  return output as GraphileEngine.BuildInput;
+  return output as GraphileBuild.BuildInput;
 };
 
 /**
@@ -194,7 +194,7 @@ export const gather = async (
  */
 export const getBuilder = (
   preset: Preset,
-  inflection: GraphileEngine.Inflection = buildInflection(preset),
+  inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const config = resolvePresets([preset]);
   const { plugins, schema: options } = config;
@@ -212,9 +212,9 @@ export const getBuilder = (
  */
 export const buildSchema = (
   preset: Preset,
-  input: GraphileEngine.BuildInput,
+  input: GraphileBuild.BuildInput,
   options: {
-    inflection?: GraphileEngine.Inflection;
+    inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
   const builder = getBuilder(preset, options.inflection);

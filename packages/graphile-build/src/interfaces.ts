@@ -36,12 +36,12 @@ export interface GatherPluginContext<
    * The (completed) inflection object, to help you name things your data
    * gathering produces.
    */
-  inflection: GraphileEngine.Inflection;
+  inflection: GraphileBuild.Inflection;
 
   /**
    * The 'gather' phase options from the resolved preset.
    */
-  options: GraphileEngine.GraphileBuildGatherOptions;
+  options: GraphileBuild.GraphileBuildGatherOptions;
 
   /**
    * The `helpers` that all the gather plugins make available to you.
@@ -71,9 +71,9 @@ export interface GatherPluginContext<
 
 declare module "graphile-plugin" {
   interface Preset {
-    inflection?: GraphileEngine.GraphileBuildInflectionOptions;
-    gather?: GraphileEngine.GraphileBuildGatherOptions;
-    schema?: GraphileEngine.GraphileBuildSchemaOptions;
+    inflection?: GraphileBuild.GraphileBuildInflectionOptions;
+    gather?: GraphileBuild.GraphileBuildGatherOptions;
+    schema?: GraphileBuild.GraphileBuildSchemaOptions;
   }
 
   interface PluginInflectionConfig {
@@ -81,24 +81,24 @@ declare module "graphile-plugin" {
      * Define new inflectors here
      */
     add?: {
-      [key in keyof GraphileEngine.Inflection]?: (
-        this: GraphileEngine.Inflection,
+      [key in keyof GraphileBuild.Inflection]?: (
+        this: GraphileBuild.Inflection,
         // TODO: should we wrap this in an object to allow future expansion?
         options: Preset,
-        ...args: Parameters<GraphileEngine.Inflection[key]>
-      ) => ReturnType<GraphileEngine.Inflection[key]>;
+        ...args: Parameters<GraphileBuild.Inflection[key]>
+      ) => ReturnType<GraphileBuild.Inflection[key]>;
     };
 
     /**
      * Overwrite existing inflectors here.
      */
     replace?: {
-      [key in keyof GraphileEngine.Inflection]?: (
-        this: GraphileEngine.Inflection,
-        previous: GraphileEngine.Inflection[key] | undefined,
+      [key in keyof GraphileBuild.Inflection]?: (
+        this: GraphileBuild.Inflection,
+        previous: GraphileBuild.Inflection[key] | undefined,
         options: Preset,
-        ...args: Parameters<GraphileEngine.Inflection[key]>
-      ) => ReturnType<GraphileEngine.Inflection[key]>;
+        ...args: Parameters<GraphileBuild.Inflection[key]>
+      ) => ReturnType<GraphileBuild.Inflection[key]>;
     };
   }
 
@@ -163,7 +163,7 @@ declare module "graphile-plugin" {
      * phase to the 'output' object.
      */
     main?: (
-      output: Partial<GraphileEngine.BuildInput>,
+      output: Partial<GraphileBuild.BuildInput>,
       info: GatherPluginContext<TState, TCache>,
     ) => Promise<void>;
   }
@@ -181,10 +181,10 @@ declare module "graphile-plugin" {
          * generate GraphQL objects during this phase.
          */
         build?: PluginHook<
-          GraphileEngine.Hook<
-            Partial<GraphileEngine.Build> & GraphileEngine.BuildBase,
-            GraphileEngine.ContextBuild,
-            Partial<GraphileEngine.Build> & GraphileEngine.BuildBase
+          GraphileBuild.Hook<
+            Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
+            GraphileBuild.ContextBuild,
+            Partial<GraphileBuild.Build> & GraphileBuild.BuildBase
           >
         >;
 
@@ -194,10 +194,10 @@ declare module "graphile-plugin" {
          * can register GraphQL types; do so using `build.registerType`.
          */
         init?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             Record<string, never>,
-            GraphileEngine.ContextInit,
-            GraphileEngine.Build
+            GraphileBuild.ContextInit,
+            GraphileBuild.Build
           >
         >;
 
@@ -207,10 +207,10 @@ declare module "graphile-plugin" {
          * libraries that mutate an already constructed schema.
          */
         finalize?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLSchema,
-            GraphileEngine.ContextFinalize,
-            GraphileEngine.Build
+            GraphileBuild.ContextFinalize,
+            GraphileBuild.Build
           >
         >;
 
@@ -218,10 +218,10 @@ declare module "graphile-plugin" {
          * Add 'query', 'mutation' or 'subscription' types in this hook:
          */
         GraphQLSchema?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLSchemaConfig,
-            GraphileEngine.ContextGraphQLSchema,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLSchema,
+            GraphileBuild.Build
           >
         >;
 
@@ -237,38 +237,38 @@ declare module "graphile-plugin" {
          * - 'GraphQLObjectType_fields_field_args' to customize the arguments to a field
          */
         GraphQLObjectType?: PluginHook<
-          GraphileEngine.Hook<
-            GraphileEngine.GraphileObjectTypeConfig<any, any>,
-            GraphileEngine.ContextGraphQLObjectType,
-            GraphileEngine.Build
+          GraphileBuild.Hook<
+            GraphileBuild.GraphileObjectTypeConfig<any, any>,
+            GraphileBuild.ContextGraphQLObjectType,
+            GraphileBuild.Build
           >
         >;
         GraphQLObjectType_interfaces?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLInterfaceType[],
-            GraphileEngine.ContextGraphQLObjectTypeInterfaces,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLObjectTypeInterfaces,
+            GraphileBuild.Build
           >
         >;
         GraphQLObjectType_fields?: PluginHook<
-          GraphileEngine.Hook<
-            GraphileEngine.GraphileFieldConfigMap<any, any>,
-            GraphileEngine.ContextGraphQLObjectTypeFields,
-            GraphileEngine.Build
+          GraphileBuild.Hook<
+            GraphileBuild.GraphileFieldConfigMap<any, any>,
+            GraphileBuild.ContextGraphQLObjectTypeFields,
+            GraphileBuild.Build
           >
         >;
         GraphQLObjectType_fields_field?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphileFieldConfig<any, any, any, any, any>,
-            GraphileEngine.ContextGraphQLObjectTypeFieldsField,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLObjectTypeFieldsField,
+            GraphileBuild.Build
           >
         >;
         GraphQLObjectType_fields_field_args?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphileFieldConfigArgumentMap<any, any, any, any>,
-            GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLObjectTypeFieldsFieldArgs,
+            GraphileBuild.Build
           >
         >;
 
@@ -282,24 +282,24 @@ declare module "graphile-plugin" {
          * - 'GraphQLInputObjectType_fields_field' to customize an individual field from above
          */
         GraphQLInputObjectType?: PluginHook<
-          GraphileEngine.Hook<
-            GraphileEngine.GraphileInputObjectTypeConfig,
-            GraphileEngine.ContextGraphQLInputObjectType,
-            GraphileEngine.Build
+          GraphileBuild.Hook<
+            GraphileBuild.GraphileInputObjectTypeConfig,
+            GraphileBuild.ContextGraphQLInputObjectType,
+            GraphileBuild.Build
           >
         >;
         GraphQLInputObjectType_fields?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLInputFieldConfigMap,
-            GraphileEngine.ContextGraphQLInputObjectTypeFields,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLInputObjectTypeFields,
+            GraphileBuild.Build
           >
         >;
         GraphQLInputObjectType_fields_field?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLInputFieldConfig,
-            GraphileEngine.ContextGraphQLInputObjectTypeFieldsField,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLInputObjectTypeFieldsField,
+            GraphileBuild.Build
           >
         >;
 
@@ -311,24 +311,24 @@ declare module "graphile-plugin" {
          * - 'GraphQLEnumType_values_value' to change an individual value
          */
         GraphQLEnumType?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLEnumTypeConfig,
-            GraphileEngine.ContextGraphQLEnumType,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLEnumType,
+            GraphileBuild.Build
           >
         >;
         GraphQLEnumType_values?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLEnumValueConfigMap,
-            GraphileEngine.ContextGraphQLEnumTypeValues,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLEnumTypeValues,
+            GraphileBuild.Build
           >
         >;
         GraphQLEnumType_values_value?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLEnumValueConfig,
-            GraphileEngine.ContextGraphQLEnumTypeValuesValue,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLEnumTypeValuesValue,
+            GraphileBuild.Build
           >
         >;
 
@@ -339,17 +339,17 @@ declare module "graphile-plugin" {
          * - 'GraphQLUnionType_types' to add additional types to this union
          */
         GraphQLUnionType?: PluginHook<
-          GraphileEngine.Hook<
-            GraphileEngine.GraphileUnionTypeConfig<any, any>,
-            GraphileEngine.ContextGraphQLUnionType,
-            GraphileEngine.Build
+          GraphileBuild.Hook<
+            GraphileBuild.GraphileUnionTypeConfig<any, any>,
+            GraphileBuild.ContextGraphQLUnionType,
+            GraphileBuild.Build
           >
         >;
         GraphQLUnionType_types?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLObjectType[],
-            GraphileEngine.ContextGraphQLUnionTypeTypes,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLUnionTypeTypes,
+            GraphileBuild.Build
           >
         >;
 
@@ -364,31 +364,31 @@ declare module "graphile-plugin" {
          *  - 'GraphQLInterfaceType_fields_field_args' to customize the arguments to a field
          */
         GraphQLInterfaceType?: PluginHook<
-          GraphileEngine.Hook<
-            GraphileEngine.GraphileInterfaceTypeConfig<any, any>,
-            GraphileEngine.ContextGraphQLInterfaceType,
-            GraphileEngine.Build
+          GraphileBuild.Hook<
+            GraphileBuild.GraphileInterfaceTypeConfig<any, any>,
+            GraphileBuild.ContextGraphQLInterfaceType,
+            GraphileBuild.Build
           >
         >;
         GraphQLInterfaceType_fields?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLFieldConfigMap<any, any>,
-            GraphileEngine.ContextGraphQLInterfaceTypeFields,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLInterfaceTypeFields,
+            GraphileBuild.Build
           >
         >;
         GraphQLInterfaceType_fields_field?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLFieldConfig<any, any>,
-            GraphileEngine.ContextGraphQLInterfaceTypeFieldsField,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLInterfaceTypeFieldsField,
+            GraphileBuild.Build
           >
         >;
         GraphQLInterfaceType_fields_field_args?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLFieldConfigArgumentMap,
-            GraphileEngine.ContextGraphQLInterfaceTypeFieldsFieldArgs,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLInterfaceTypeFieldsFieldArgs,
+            GraphileBuild.Build
           >
         >;
 
@@ -396,10 +396,10 @@ declare module "graphile-plugin" {
          * For scalars
          */
         GraphQLScalarType?: PluginHook<
-          GraphileEngine.Hook<
+          GraphileBuild.Hook<
             GraphQLScalarTypeConfig<any, any>,
-            GraphileEngine.ContextGraphQLScalarType,
-            GraphileEngine.Build
+            GraphileBuild.ContextGraphQLScalarType,
+            GraphileBuild.Build
           >
         >;
       };

@@ -4,7 +4,7 @@ import { version } from "../index.js";
 import { stringScalarSpec } from "../utils.js";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLScalarType extends Scope {
       isCursorType?: boolean;
     }

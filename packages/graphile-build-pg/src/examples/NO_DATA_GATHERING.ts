@@ -33,7 +33,7 @@ import { inspect } from "util";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileResolverContext {
       pgSettings: {
         [key: string]: string;
@@ -57,11 +57,11 @@ async function main() {
         context: () =>
           object({
             pgSettings:
-              context<GraphileEngine.GraphileResolverContext>().get(
+              context<GraphileBuild.GraphileResolverContext>().get(
                 "pgSettings",
               ),
             withPgClient:
-              context<GraphileEngine.GraphileResolverContext>().get(
+              context<GraphileBuild.GraphileResolverContext>().get(
                 "withPgClient",
               ),
           } as PgExecutorContextPlans<any>),
@@ -419,7 +419,7 @@ async function main() {
   );
 
   // We're crafting our own input
-  const input: GraphileEngine.BuildInput = {
+  const input: GraphileBuild.BuildInput = {
     pgSources: [
       usersSource,
       forumsSource,

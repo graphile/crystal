@@ -33,7 +33,7 @@ type SetGraphQLTypeForPgCodec = (
 ) => void;
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Build {
       /**
        * A store of metadata for given codecs. Currently internal as this API

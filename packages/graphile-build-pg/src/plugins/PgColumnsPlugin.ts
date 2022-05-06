@@ -35,7 +35,7 @@ function nullableIf<T extends GraphQLType>(
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       /**
        * Given a columnName on a PgTypeCodec's columns, should return the field
@@ -46,7 +46,7 @@ declare global {
        * them common behavior.
        */
       _columnName(
-        this: GraphileEngine.Inflection,
+        this: GraphileBuild.Inflection,
         details: {
           columnName: string;
           column: PgTypeColumn;
@@ -61,7 +61,7 @@ declare global {
        * with the table).
        */
       column(
-        this: GraphileEngine.Inflection,
+        this: GraphileBuild.Inflection,
         details: {
           columnName: string;
           column: PgTypeColumn;

@@ -42,7 +42,7 @@ import * as ws from "ws";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileResolverContext {
       pgSettings: {
         [key: string]: string;

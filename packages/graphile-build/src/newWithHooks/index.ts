@@ -57,7 +57,7 @@ interface MakeNewWithHooksOptions {
 export type NewWithHooksFunction = <
   TType extends GraphQLNamedType | GraphQLSchema,
 >(
-  build: GraphileEngine.Build,
+  build: GraphileBuild.Build,
   klass: { new (spec: SpecForType<TType>): TType },
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
@@ -105,8 +105,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
       switch (Type) {
         case GraphQLSchema: {
           const rawSpec = inSpec as GraphQLSchemaConfig;
-          const scope = (inScope || {}) as GraphileEngine.ScopeGraphQLSchema;
-          const context: GraphileEngine.ContextGraphQLSchema = {
+          const scope = (inScope || {}) as GraphileBuild.ScopeGraphQLSchema;
+          const context: GraphileBuild.ContextGraphQLSchema = {
             type: "GraphQLSchema",
             scope,
           };
@@ -121,14 +121,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLObjectType: {
-          const rawSpec = inSpec as GraphileEngine.GraphileObjectTypeConfig<
+          const rawSpec = inSpec as GraphileBuild.GraphileObjectTypeConfig<
             any,
             any
           >;
           const scope = (inScope ||
-            {}) as GraphileEngine.ScopeGraphQLObjectType;
+            {}) as GraphileBuild.ScopeGraphQLObjectType;
 
-          const objectContext: GraphileEngine.ContextGraphQLObjectType = {
+          const objectContext: GraphileBuild.ContextGraphQLObjectType = {
             type: "GraphQLObjectType",
             scope,
           };
@@ -145,7 +145,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           const finalSpec = {
             ...baseSpec,
             interfaces: (): GraphQLInterfaceType[] => {
-              const interfacesContext: GraphileEngine.ContextGraphQLObjectTypeInterfaces =
+              const interfacesContext: GraphileBuild.ContextGraphQLObjectTypeInterfaces =
                 {
                   ...objectContext,
                   Self,
@@ -171,14 +171,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 any,
                 any
               >[] = [];
-              const fieldWithHooks: GraphileEngine.FieldWithHooksFunction = <
+              const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
                 TContext extends BaseGraphQLContext,
                 TParentPlan extends ExecutablePlan<any>,
                 TFieldPlan extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
               >(
-                fieldScope: GraphileEngine.ScopeGraphQLObjectTypeFieldsField,
+                fieldScope: GraphileBuild.ScopeGraphQLObjectTypeFieldsField,
                 fieldSpec:
                   | GraphileFieldConfig<
                       TType,
@@ -188,7 +188,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       TArgs
                     >
                   | ((
-                      context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+                      context: GraphileBuild.ContextGraphQLObjectTypeFieldsField,
                     ) => GraphileFieldConfig<
                       TType,
                       TContext,
@@ -226,7 +226,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   );
                 }
 
-                const fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField =
+                const fieldContext: GraphileBuild.ContextGraphQLObjectTypeFieldsField =
                   {
                     ...fieldsContext,
                     scope: fieldScope,
@@ -245,7 +245,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
-                const argsContext: GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs =
+                const argsContext: GraphileBuild.ContextGraphQLObjectTypeFieldsFieldArgs =
                   {
                     ...fieldContext,
                   };
@@ -277,7 +277,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 return finalFieldSpec;
               };
 
-              const fieldsContext: GraphileEngine.ContextGraphQLObjectTypeFields =
+              const fieldsContext: GraphileBuild.ContextGraphQLObjectTypeFields =
                 {
                   ...objectContext,
                   Self: Self as GraphQLObjectType,
@@ -344,14 +344,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLInterfaceType: {
-          const rawSpec = inSpec as GraphileEngine.GraphileInterfaceTypeConfig<
+          const rawSpec = inSpec as GraphileBuild.GraphileInterfaceTypeConfig<
             any,
             any
           >;
           const scope = (inScope ||
-            {}) as GraphileEngine.ScopeGraphQLInterfaceType;
+            {}) as GraphileBuild.ScopeGraphQLInterfaceType;
 
-          const interfaceContext: GraphileEngine.ContextGraphQLInterfaceType = {
+          const interfaceContext: GraphileBuild.ContextGraphQLInterfaceType = {
             type: "GraphQLInterfaceType",
             scope,
           };
@@ -367,7 +367,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             ...baseSpec,
             fields: () => {
               const processedFields: GraphQLFieldConfig<any, any>[] = [];
-              const fieldsContext: GraphileEngine.ContextGraphQLInterfaceTypeFields =
+              const fieldsContext: GraphileBuild.ContextGraphQLInterfaceTypeFields =
                 {
                   ...interfaceContext,
                   Self,
@@ -395,7 +395,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       );
                     }
 
-                    const fieldContext: GraphileEngine.ContextGraphQLInterfaceTypeFieldsField =
+                    const fieldContext: GraphileBuild.ContextGraphQLInterfaceTypeFieldsField =
                       {
                         ...fieldsContext,
                         scope: fieldScope,
@@ -475,13 +475,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLUnionType: {
-          const rawSpec = inSpec as GraphileEngine.GraphileUnionTypeConfig<
+          const rawSpec = inSpec as GraphileBuild.GraphileUnionTypeConfig<
             any,
             any
           >;
-          const scope = (inScope || {}) as GraphileEngine.ScopeGraphQLUnionType;
+          const scope = (inScope || {}) as GraphileBuild.ScopeGraphQLUnionType;
 
-          const commonContext: GraphileEngine.ContextGraphQLUnionType = {
+          const commonContext: GraphileBuild.ContextGraphQLUnionType = {
             type: "GraphQLUnionType",
             scope,
           };
@@ -497,7 +497,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           const finalSpec = {
             ...baseSpec,
             types: (): GraphQLObjectType[] => {
-              const typesContext: GraphileEngine.ContextGraphQLUnionTypeTypes =
+              const typesContext: GraphileBuild.ContextGraphQLUnionTypeTypes =
                 {
                   ...commonContext,
                   Self,
@@ -522,11 +522,11 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLInputObjectType: {
           const rawSpec =
-            inSpec as GraphileEngine.GraphileInputObjectTypeConfig;
+            inSpec as GraphileBuild.GraphileInputObjectTypeConfig;
           const scope = (inScope ||
-            {}) as GraphileEngine.ScopeGraphQLInputObjectType;
+            {}) as GraphileBuild.ScopeGraphQLInputObjectType;
 
-          const inputObjectContext: GraphileEngine.ContextGraphQLInputObjectType =
+          const inputObjectContext: GraphileBuild.ContextGraphQLInputObjectType =
             {
               type: "GraphQLInputObjectType",
               scope,
@@ -544,7 +544,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             ...baseSpec,
             fields: () => {
               const processedFields: GraphQLInputFieldConfig[] = [];
-              const fieldWithHooks: GraphileEngine.InputFieldWithHooksFunction =
+              const fieldWithHooks: GraphileBuild.InputFieldWithHooksFunction =
                 (fieldScope, spec) => {
                   const { fieldName } = fieldScope;
                   if (!isString(fieldName)) {
@@ -552,13 +552,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
                     );
                   }
-                  const finalFieldScope: GraphileEngine.ScopeGraphQLInputObjectTypeFieldsField =
+                  const finalFieldScope: GraphileBuild.ScopeGraphQLInputObjectTypeFieldsField =
                     build.extend(
                       fieldScope,
                       scope,
                       `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`,
                     );
-                  const fieldContext: GraphileEngine.ContextGraphQLInputObjectTypeFieldsField =
+                  const fieldContext: GraphileBuild.ContextGraphQLInputObjectTypeFieldsField =
                     {
                       ...fieldsContext,
                       scope: finalFieldScope,
@@ -578,7 +578,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   processedFields.push(finalSpec);
                   return finalSpec;
                 };
-              const fieldsContext: GraphileEngine.ContextGraphQLInputObjectTypeFields =
+              const fieldsContext: GraphileBuild.ContextGraphQLInputObjectTypeFields =
                 {
                   ...inputObjectContext,
                   Self,
@@ -635,9 +635,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         case GraphQLScalarType: {
           const rawSpec = inSpec as GraphQLScalarTypeConfig<any, any>;
           const scope = (inScope ||
-            {}) as GraphileEngine.ScopeGraphQLScalarType;
+            {}) as GraphileBuild.ScopeGraphQLScalarType;
 
-          const scalarContext: GraphileEngine.ContextGraphQLScalarType = {
+          const scalarContext: GraphileBuild.ContextGraphQLScalarType = {
             type: "GraphQLScalarType",
             scope,
           };
@@ -656,9 +656,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLEnumType: {
           const rawSpec = inSpec as GraphQLEnumTypeConfig;
-          const scope = (inScope || {}) as GraphileEngine.ScopeGraphQLEnumType;
+          const scope = (inScope || {}) as GraphileBuild.ScopeGraphQLEnumType;
 
-          const enumContext: GraphileEngine.ContextGraphQLEnumType = {
+          const enumContext: GraphileBuild.ContextGraphQLEnumType = {
             type: "GraphQLEnumType",
             scope,
           };

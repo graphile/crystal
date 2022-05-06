@@ -23,7 +23,7 @@ import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLObjectType {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;

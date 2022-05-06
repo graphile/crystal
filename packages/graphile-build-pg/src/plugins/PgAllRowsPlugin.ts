@@ -11,7 +11,7 @@ import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       /**
        * A PgSource represents a single way of getting a number of values of

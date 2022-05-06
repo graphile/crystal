@@ -8,7 +8,7 @@ import type { Plugin } from "graphile-plugin";
 import { version } from "../index";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface Inflection {
       conditionType(this: Inflection, typeName: string): string;
     }

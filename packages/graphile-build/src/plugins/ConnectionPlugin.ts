@@ -8,12 +8,12 @@ import { version } from "../index.js";
 
 interface RegisterCursorConnectionOptions {
   typeName: string;
-  scope?: GraphileEngine.ScopeGraphQLObjectType;
+  scope?: GraphileBuild.ScopeGraphQLObjectType;
   nonNullNode?: boolean;
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface ScopeGraphQLObjectType {
       isConnectionType?: true;
       isConnectionEdgeType?: true;

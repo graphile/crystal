@@ -13,10 +13,10 @@ import type {
  */
 function rmEmptyTypeDescription<
   T extends
-    | GraphileEngine.GraphileObjectTypeConfig<any, any>
-    | GraphileEngine.GraphileInputObjectTypeConfig
-    | GraphileEngine.GraphileUnionTypeConfig<any, any>
-    | GraphileEngine.GraphileInterfaceTypeConfig<any, any>
+    | GraphileBuild.GraphileObjectTypeConfig<any, any>
+    | GraphileBuild.GraphileInputObjectTypeConfig
+    | GraphileBuild.GraphileUnionTypeConfig<any, any>
+    | GraphileBuild.GraphileInterfaceTypeConfig<any, any>
     | GraphQLEnumTypeConfig,
 >(type: T): T {
   // TODO: should we trim before comparison?

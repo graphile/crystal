@@ -47,12 +47,12 @@ interface Database {
   schemas: string[];
   /** The key on 'context' where the pgSettings for this DB will be sourced */
   pgSettingsKey: KeysOfType<
-    GraphileEngine.GraphileResolverContext,
+    GraphileBuild.GraphileResolverContext,
     { [key: string]: string } | null
   >;
   /** The key on 'context' where the withPgClient function will be sourced */
   withPgClientKey: KeysOfType<
-    GraphileEngine.GraphileResolverContext,
+    GraphileBuild.GraphileResolverContext,
     WithPgClient
   >;
   /** A function to allow us to run queries during the data gathering phase */
@@ -61,7 +61,7 @@ interface Database {
 }
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileBuildGatherOptions {
       pgDatabases: ReadonlyArray<Database>;
     }
@@ -341,7 +341,7 @@ export const PgIntrospectionPlugin: Plugin = {
             new PgExecutor({
               name: databaseName,
               context: () => {
-                const ctx = context<GraphileEngine.GraphileResolverContext>();
+                const ctx = context<GraphileBuild.GraphileResolverContext>();
                 return object({
                   pgSettings: ctx.get(pgSettingsKey),
                   withPgClient: ctx.get(withPgClientKey),

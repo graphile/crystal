@@ -12,7 +12,7 @@ import type { ContextCallback, SchemaResult } from "./interfaces.js";
 import { defaultPreset as postgraphilePreset } from "./preset.js";
 
 declare global {
-  namespace GraphileEngine {
+  namespace GraphileBuild {
     interface GraphileResolverContext {
       pgSettings: {
         [key: string]: string;
@@ -25,7 +25,7 @@ declare global {
 export function makePgDatabasesAndContextFromConnectionString(
   connectionString?: string,
   schemas?: string | string[],
-): [GraphileEngine.GraphileBuildGatherOptions["pgDatabases"], ContextCallback] {
+): [GraphileBuild.GraphileBuildGatherOptions["pgDatabases"], ContextCallback] {
   const pool = new Pool({
     connectionString,
   });
