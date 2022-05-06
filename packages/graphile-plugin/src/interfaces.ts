@@ -9,20 +9,6 @@ declare global {
       before?: string[];
     }
 
-    type PluginHookObject<T extends (...args: any[]) => any> = {
-      provides?: string[];
-      before?: string[];
-      after?: string[];
-      callback: T;
-    };
-
-    type PluginHook<T extends (...args: any[]) => any> =
-      | T
-      | PluginHookObject<T>;
-
-    type PluginHookCallback<T extends PluginHook<(...args: any[]) => any>> =
-      T extends PluginHook<infer U> ? U : never;
-
     interface Preset {
       extends?: ReadonlyArray<Preset>;
       plugins?: Plugin[];
@@ -38,10 +24,20 @@ declare global {
   }
 }
 
-export type Plugin = GraphilePlugin.Plugin;
+export type PluginHookObject<T extends (...args: any[]) => any> = {
+  provides?: string[];
+  before?: string[];
+  after?: string[];
+  callback: T;
+};
+
 export type PluginHook<T extends (...args: any[]) => any> =
-  GraphilePlugin.PluginHook<T>;
-export type PluginHookObject<T extends (...args: any[]) => any> =
-  GraphilePlugin.PluginHookObject<T>;
+  | T
+  | PluginHookObject<T>;
+
+export type PluginHookCallback<T extends PluginHook<(...args: any[]) => any>> =
+  T extends PluginHook<infer U> ? U : never;
+
+export type Plugin = GraphilePlugin.Plugin;
 export type Preset = GraphilePlugin.Preset;
 export type ResolvedPreset = GraphilePlugin.ResolvedPreset;
