@@ -6,12 +6,7 @@ import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
-import type {
-  GatherHooks,
-  Plugin,
-  PluginGatherConfig,
-  PluginHook,
-} from "graphile-plugin";
+import type { Plugin, PluginHook } from "graphile-plugin";
 import type {
   Introspection,
   PgAttribute,
@@ -81,166 +76,189 @@ export type PgEntityWithId =
   | PgIndex
   | PgLanguage;
 
-declare module "graphile-plugin" {
-  interface GatherHelpers {
-    pgIntrospection: {
-      getIntrospection(): Promise<
-        Array<{ introspection: Introspection; database: Database }>
+declare global {
+  namespace GraphilePlugin {
+    interface GatherHelpers {
+      pgIntrospection: {
+        getIntrospection(): Promise<
+          Array<{ introspection: Introspection; database: Database }>
+        >;
+        getExecutorForDatabase(databaseName: string): PgExecutor;
+
+        getNamespace(
+          databaseName: string,
+          id: string,
+        ): Promise<PgNamespace | undefined>;
+        getClass(
+          databaseName: string,
+          id: string,
+        ): Promise<PgClass | undefined>;
+        getConstraint(
+          databaseName: string,
+          id: string,
+        ): Promise<PgConstraint | undefined>;
+        getProc(databaseName: string, id: string): Promise<PgProc | undefined>;
+        getRoles(
+          databaseName: string,
+          id: string,
+        ): Promise<PgRoles | undefined>;
+        getType(databaseName: string, id: string): Promise<PgType | undefined>;
+        getEnum(databaseName: string, id: string): Promise<PgEnum | undefined>;
+        getExtension(
+          databaseName: string,
+          id: string,
+        ): Promise<PgExtension | undefined>;
+        getIndex(
+          databaseName: string,
+          id: string,
+        ): Promise<PgIndex | undefined>;
+        getLanguage(
+          databaseName: string,
+          id: string,
+        ): Promise<PgLanguage | undefined>;
+
+        getAttribute(
+          databaseName: string,
+          classId: string,
+          attributeNumber: number,
+        ): Promise<PgAttribute | undefined>;
+        // getAuthMembers(
+        //   databaseName: string,
+        //   id: string,
+        // ): Promise<PgAuthMembers | undefined>;
+        // getRange(databaseName: string, id: string): Promise<PgRange | undefined>;
+        // getDepend(
+        //   databaseName: string,
+        //   id: string,
+        // ): Promise<PgDepend | undefined>;
+        // getDescription(
+        //   databaseName: string,
+        //   id: string,
+        // ): Promise<PgDescription | undefined>;
+
+        getAttributesForClass(
+          databaseName: string,
+          classId: string,
+        ): Promise<PgAttribute[]>;
+        getConstraintsForClass(
+          databaseName: string,
+          classId: string,
+        ): Promise<PgConstraint[]>;
+        getForeignConstraintsForClass(
+          databaseName: string,
+          classId: string,
+        ): Promise<PgConstraint[]>;
+        getNamespaceByName(
+          databaseName: string,
+          namespaceName: string,
+        ): Promise<PgNamespace | undefined>;
+        getTypeByArray(
+          databaseName: string,
+          arrayId: string,
+        ): Promise<PgType | undefined>;
+        getEnumsForType(
+          databaseName: string,
+          typeId: string,
+        ): Promise<PgEnum[]>;
+        getRangeByType(
+          databaseName: string,
+          typeId: string,
+        ): Promise<PgRange | null>;
+      };
+    }
+
+    interface GatherHooks {
+      pgIntrospection_namespace: PluginHook<
+        (event: {
+          entity: PgNamespace;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
       >;
-      getExecutorForDatabase(databaseName: string): PgExecutor;
-
-      getNamespace(
-        databaseName: string,
-        id: string,
-      ): Promise<PgNamespace | undefined>;
-      getClass(databaseName: string, id: string): Promise<PgClass | undefined>;
-      getConstraint(
-        databaseName: string,
-        id: string,
-      ): Promise<PgConstraint | undefined>;
-      getProc(databaseName: string, id: string): Promise<PgProc | undefined>;
-      getRoles(databaseName: string, id: string): Promise<PgRoles | undefined>;
-      getType(databaseName: string, id: string): Promise<PgType | undefined>;
-      getEnum(databaseName: string, id: string): Promise<PgEnum | undefined>;
-      getExtension(
-        databaseName: string,
-        id: string,
-      ): Promise<PgExtension | undefined>;
-      getIndex(databaseName: string, id: string): Promise<PgIndex | undefined>;
-      getLanguage(
-        databaseName: string,
-        id: string,
-      ): Promise<PgLanguage | undefined>;
-
-      getAttribute(
-        databaseName: string,
-        classId: string,
-        attributeNumber: number,
-      ): Promise<PgAttribute | undefined>;
-      // getAuthMembers(
-      //   databaseName: string,
-      //   id: string,
-      // ): Promise<PgAuthMembers | undefined>;
-      // getRange(databaseName: string, id: string): Promise<PgRange | undefined>;
-      // getDepend(
-      //   databaseName: string,
-      //   id: string,
-      // ): Promise<PgDepend | undefined>;
-      // getDescription(
-      //   databaseName: string,
-      //   id: string,
-      // ): Promise<PgDescription | undefined>;
-
-      getAttributesForClass(
-        databaseName: string,
-        classId: string,
-      ): Promise<PgAttribute[]>;
-      getConstraintsForClass(
-        databaseName: string,
-        classId: string,
-      ): Promise<PgConstraint[]>;
-      getForeignConstraintsForClass(
-        databaseName: string,
-        classId: string,
-      ): Promise<PgConstraint[]>;
-      getNamespaceByName(
-        databaseName: string,
-        namespaceName: string,
-      ): Promise<PgNamespace | undefined>;
-      getTypeByArray(
-        databaseName: string,
-        arrayId: string,
-      ): Promise<PgType | undefined>;
-      getEnumsForType(databaseName: string, typeId: string): Promise<PgEnum[]>;
-      getRangeByType(
-        databaseName: string,
-        typeId: string,
-      ): Promise<PgRange | null>;
-    };
-  }
-
-  interface GatherHooks {
-    pgIntrospection_namespace: PluginHook<
-      (event: {
-        entity: PgNamespace;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_class: PluginHook<
-      (event: {
-        entity: PgClass;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_attribute: PluginHook<
-      (event: {
-        entity: PgAttribute;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_constraint: PluginHook<
-      (event: {
-        entity: PgConstraint;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_proc: PluginHook<
-      (event: { entity: PgProc; databaseName: string }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_role: PluginHook<
-      (event: {
-        entity: PgRoles;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_auth_member: PluginHook<
-      (event: {
-        entity: PgAuthMembers;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_type: PluginHook<
-      (event: { entity: PgType; databaseName: string }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_enum: PluginHook<
-      (event: { entity: PgEnum; databaseName: string }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_extension: PluginHook<
-      (event: {
-        entity: PgExtension;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_index: PluginHook<
-      (event: {
-        entity: PgIndex;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_language: PluginHook<
-      (event: {
-        entity: PgLanguage;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_range: PluginHook<
-      (event: {
-        entity: PgRange;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_depend: PluginHook<
-      (event: {
-        entity: PgDepend;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
-    pgIntrospection_description: PluginHook<
-      (event: {
-        entity: PgDescription;
-        databaseName: string;
-      }) => PromiseOrDirect<void>
-    >;
+      pgIntrospection_class: PluginHook<
+        (event: {
+          entity: PgClass;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_attribute: PluginHook<
+        (event: {
+          entity: PgAttribute;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_constraint: PluginHook<
+        (event: {
+          entity: PgConstraint;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_proc: PluginHook<
+        (event: {
+          entity: PgProc;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_role: PluginHook<
+        (event: {
+          entity: PgRoles;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_auth_member: PluginHook<
+        (event: {
+          entity: PgAuthMembers;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_type: PluginHook<
+        (event: {
+          entity: PgType;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_enum: PluginHook<
+        (event: {
+          entity: PgEnum;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_extension: PluginHook<
+        (event: {
+          entity: PgExtension;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_index: PluginHook<
+        (event: {
+          entity: PgIndex;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_language: PluginHook<
+        (event: {
+          entity: PgLanguage;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_range: PluginHook<
+        (event: {
+          entity: PgRange;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_depend: PluginHook<
+        (event: {
+          entity: PgDepend;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+      pgIntrospection_description: PluginHook<
+        (event: {
+          entity: PgDescription;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
+    }
   }
 }
 
@@ -309,7 +327,7 @@ export const PgIntrospectionPlugin: Plugin = {
     "Introspects PostgreSQL databases and makes the results available to other plugins",
   version: version,
   // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <PluginGatherConfig<"pgIntrospection", State, Cache>>{
+  gather: <GraphilePlugin.PluginGatherConfig<"pgIntrospection", State, Cache>>{
     namespace: "pgIntrospection",
     initialCache: (): Cache => ({
       introspectionResultsPromise: null,
@@ -495,9 +513,11 @@ export const PgIntrospectionPlugin: Plugin = {
             descriptions,
           } = introspection;
 
-          function announce<TEvent extends keyof GatherHooks>(
+          function announce<TEvent extends keyof GraphilePlugin.GatherHooks>(
             eventName: TEvent,
-            entities: GatherHooks[TEvent] extends PluginHook<infer U>
+            entities: GraphilePlugin.GatherHooks[TEvent] extends PluginHook<
+              infer U
+            >
               ? Parameters<U>[0] extends {
                   entity: infer V;
                   databaseName: string;

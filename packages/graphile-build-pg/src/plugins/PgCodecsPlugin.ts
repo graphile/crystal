@@ -12,7 +12,7 @@ import {
   TYPES,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import type { Plugin, PluginHook } from "graphile-plugin";
 import type { PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -72,29 +72,31 @@ declare global {
   }
 }
 
-declare module "graphile-plugin" {
-  interface GatherHelpers {
-    pgCodecs: {
-      getCodecFromClass(
-        databaseName: string,
-        pgClassId: string,
-      ): Promise<PgTypeCodec<any, any, any> | null>;
-      getCodecFromType(
-        databaseName: string,
-        pgTypeId: string,
-        pgTypeModifier?: number | null,
-      ): Promise<PgTypeCodec<any, any, any, any> | null>;
-    };
-  }
-  interface GatherHooks {
-    pgCodecs_PgTypeCodec: PluginHook<
-      (event: {
-        pgCodec: PgTypeCodec<any, any, any, any>;
-        databaseName: string;
-        pgClass?: PgClass;
-        pgType: PgType;
-      }) => Promise<void>
-    >;
+declare global {
+  namespace GraphilePlugin {
+    interface GatherHelpers {
+      pgCodecs: {
+        getCodecFromClass(
+          databaseName: string,
+          pgClassId: string,
+        ): Promise<PgTypeCodec<any, any, any> | null>;
+        getCodecFromType(
+          databaseName: string,
+          pgTypeId: string,
+          pgTypeModifier?: number | null,
+        ): Promise<PgTypeCodec<any, any, any, any> | null>;
+      };
+    }
+    interface GatherHooks {
+      pgCodecs_PgTypeCodec: PluginHook<
+        (event: {
+          pgCodec: PgTypeCodec<any, any, any, any>;
+          databaseName: string;
+          pgClass?: PgClass;
+          pgType: PgType;
+        }) => Promise<void>
+      >;
+    }
   }
 }
 
@@ -212,7 +214,7 @@ export const PgCodecsPlugin: Plugin = {
   },
 
   // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <PluginGatherConfig<"pgCodecs", State>>{
+  gather: <GraphilePlugin.PluginGatherConfig<"pgCodecs", State>>{
     namespace: "pgCodecs",
     initialState: (): State => ({
       codecByTypeIdByDatabaseName: new Map(),

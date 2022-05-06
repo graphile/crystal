@@ -4,7 +4,7 @@ import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import type { Plugin, PluginHook } from "graphile-plugin";
 import type { PgClass, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior";
@@ -108,35 +108,37 @@ type PgSourceRelations = {
   [identifier: string]: PgSourceRelation<any, any>;
 };
 
-declare module "graphile-plugin" {
-  interface GatherHelpers {
-    pgTables: {
-      getSourceBuilder(
-        databaseName: string,
-        pgClass: PgClass,
-      ): Promise<PgSourceBuilder<any, any, any> | null>;
-      getSource(
-        sourceBuilder: PgSourceBuilder<any, any, any>,
-      ): Promise<PgSource<any, any, any, any> | null>;
-    };
-  }
+declare global {
+  namespace GraphilePlugin {
+    interface GatherHelpers {
+      pgTables: {
+        getSourceBuilder(
+          databaseName: string,
+          pgClass: PgClass,
+        ): Promise<PgSourceBuilder<any, any, any> | null>;
+        getSource(
+          sourceBuilder: PgSourceBuilder<any, any, any>,
+        ): Promise<PgSource<any, any, any, any> | null>;
+      };
+    }
 
-  interface GatherHooks {
-    pgTables_PgSourceBuilder_relations: PluginHook<
-      (event: {
-        sourceBuilder: PgSourceBuilder<any, any, any>;
-        pgClass: PgClass;
-        databaseName: string;
-        relations: PgSourceRelations;
-      }) => Promise<void>
-    >;
-    pgTables_PgSource: PluginHook<
-      (event: {
-        source: PgSource<any, any, any, any>;
-        pgClass: PgClass;
-        databaseName: string;
-      }) => Promise<void>
-    >;
+    interface GatherHooks {
+      pgTables_PgSourceBuilder_relations: PluginHook<
+        (event: {
+          sourceBuilder: PgSourceBuilder<any, any, any>;
+          pgClass: PgClass;
+          databaseName: string;
+          relations: PgSourceRelations;
+        }) => Promise<void>
+      >;
+      pgTables_PgSource: PluginHook<
+        (event: {
+          source: PgSource<any, any, any, any>;
+          pgClass: PgClass;
+          databaseName: string;
+        }) => Promise<void>
+      >;
+    }
   }
 }
 
@@ -387,7 +389,7 @@ export const PgTablesPlugin: Plugin = {
         }
       }
     },
-  } as PluginGatherConfig<"pgTables", State, Cache>,
+  } as GraphilePlugin.PluginGatherConfig<"pgTables", State, Cache>,
 
   schema: {
     hooks: {

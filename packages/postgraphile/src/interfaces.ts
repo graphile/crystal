@@ -32,8 +32,10 @@ export interface ServerOptions {
   planPath?: string;
 }
 
-declare module "graphile-plugin" {
-  interface Preset {
-    server?: ServerOptions;
+declare global {
+  namespace GraphilePlugin {
+    interface Preset {
+      server?: ServerOptions;
+    }
   }
 }

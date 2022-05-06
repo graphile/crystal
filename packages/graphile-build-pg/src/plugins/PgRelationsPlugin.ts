@@ -10,7 +10,7 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { Plugin, PluginGatherConfig } from "graphile-plugin";
+import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
@@ -60,9 +60,11 @@ declare global {
   }
 }
 
-declare module "graphile-plugin" {
-  interface GatherHelpers {
-    pgRelations: Record<string, never>;
+declare global {
+  namespace GraphilePlugin {
+    interface GatherHelpers {
+      pgRelations: Record<string, never>;
+    }
   }
 }
 
@@ -142,7 +144,7 @@ export const PgRelationsPlugin: Plugin = {
     },
   },
 
-  gather: <PluginGatherConfig<"pgRelations", State, Cache>>{
+  gather: <GraphilePlugin.PluginGatherConfig<"pgRelations", State, Cache>>{
     namespace: "pgRelations",
     helpers: {},
     initialState: (): State => ({}),

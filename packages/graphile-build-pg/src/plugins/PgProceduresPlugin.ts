@@ -10,7 +10,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import type { Plugin, PluginHook } from "graphile-plugin";
 import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -55,24 +55,26 @@ declare global {
   }
 }
 
-declare module "graphile-plugin" {
-  interface GatherHelpers {
-    pgProcedures: {
-      getSource(
-        databaseName: string,
-        pgProc: PgProc,
-      ): Promise<PgSource<any, any, any, any> | null>;
-    };
-  }
+declare global {
+  namespace GraphilePlugin {
+    interface GatherHelpers {
+      pgProcedures: {
+        getSource(
+          databaseName: string,
+          pgProc: PgProc,
+        ): Promise<PgSource<any, any, any, any> | null>;
+      };
+    }
 
-  interface GatherHooks {
-    pgProcedures_PgSource: PluginHook<
-      (event: {
-        source: PgSource<any, any, any, any>;
-        pgProc: PgProc;
-        databaseName: string;
-      }) => Promise<void>
-    >;
+    interface GatherHooks {
+      pgProcedures_PgSource: PluginHook<
+        (event: {
+          source: PgSource<any, any, any, any>;
+          pgProc: PgProc;
+          databaseName: string;
+        }) => Promise<void>
+      >;
+    }
   }
 }
 
@@ -497,5 +499,5 @@ export const PgProceduresPlugin: Plugin = {
         }
       }
     },
-  } as PluginGatherConfig<"pgProcedures", State, Cache>,
+  } as GraphilePlugin.PluginGatherConfig<"pgProcedures", State, Cache>,
 };

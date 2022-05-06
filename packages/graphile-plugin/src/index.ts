@@ -1,3 +1,7 @@
+import "./interfaces.js";
+
+export { GraphilePlugin };
+
 export { applyHooks, AsyncHooks, HookObject } from "./hooks.js";
 export type {
   Plugin,

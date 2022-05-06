@@ -1,12 +1,7 @@
 import "./global.js";
 import "./interfaces.js";
 
-import type {
-  GatherHelpers,
-  GatherHooks,
-  Plugin,
-  Preset,
-} from "graphile-plugin";
+import type { Plugin, Preset } from "graphile-plugin";
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
@@ -34,7 +29,10 @@ export {
   upperFirst,
 } from "./utils.js";
 
-export { GraphileBuild, SchemaBuilder };
+// export globals for TypeDoc
+export { GraphileBuild, GraphilePlugin };
+
+export { SchemaBuilder };
 
 const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
 
@@ -45,8 +43,7 @@ export const buildInflection = (preset: Preset): GraphileBuild.Inflection => {
   const config = resolvePresets([preset]);
   const { plugins, inflection: _options = {} } = config;
 
-  const inflectors: Partial<GraphileBuild.Inflection> =
-    makeInitialInflection();
+  const inflectors: Partial<GraphileBuild.Inflection> = makeInitialInflection();
 
   // Add the base inflectors
   for (const plugin of plugins) {
@@ -112,13 +109,13 @@ export const gather = async (
   const gatherState: { [key: string]: any } = {};
   const helpers: { [key: string]: any } = {}; // GatherHelpers
 
-  const hooks = new AsyncHooks<GatherHooks>();
+  const hooks = new AsyncHooks<GraphilePlugin.GatherHooks>();
 
   const pluginContext = new Map<
     Plugin,
     {
       inflection: GraphileBuild.Inflection;
-      helpers: GatherHelpers;
+      helpers: GraphilePlugin.GatherHelpers;
       options: typeof options;
       cache: any;
       state: any;
@@ -141,7 +138,7 @@ export const gather = async (
     const cache = (globalState[spec.namespace] = spec.initialCache?.() ?? {});
     const state = (gatherState[spec.namespace] = spec.initialState?.() ?? {});
     const context = {
-      helpers: helpers as GatherHelpers,
+      helpers: helpers as GraphilePlugin.GatherHelpers,
       options,
       state,
       cache,
