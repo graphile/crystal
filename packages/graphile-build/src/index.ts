@@ -34,7 +34,7 @@ export {
   upperFirst,
 } from "./utils.js";
 
-export { SchemaBuilder };
+export { GraphileEngine, SchemaBuilder };
 
 const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
 

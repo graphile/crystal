@@ -82,7 +82,6 @@ export type PgEntityWithId =
   | PgLanguage;
 
 declare module "graphile-plugin" {
-  /** @notExported */
   interface GatherHelpers {
     pgIntrospection: {
       getIntrospection(): Promise<
@@ -160,7 +159,6 @@ declare module "graphile-plugin" {
     };
   }
 
-  /** @notExported */
   interface GatherHooks {
     pgIntrospection_namespace: PluginHook<
       (event: {

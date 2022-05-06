@@ -61,7 +61,6 @@ declare global {
 }
 
 declare module "graphile-plugin" {
-  /** @notExported */
   interface GatherHelpers {
     pgRelations: Record<string, never>;
   }

@@ -34,3 +34,5 @@ export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin";
+
+export { GraphileEngine };
