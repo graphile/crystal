@@ -11403,6 +11403,7 @@ __metadata:
     prettier: "npm:^2.5.1"
     typedoc: "npm:^0.22.15"
     typedoc-monorepo-link-types: "npm:^0.0.2"
+    typedoc-plugin-not-exported: "npm:^0.1.6"
     typescript: "npm:next"
     webpack: "npm:^5.65.0"
   languageName: unknown
@@ -12649,6 +12650,15 @@ __metadata:
   peerDependencies:
     typedoc: 0.22.x
   checksum: f37f44a118dedcc52c162374c4f8865264db71b8cea8fed73fa1a3e9d208668a03f12497c5e0f16147ff85b5bbe112baf9010135850cbf4a32546ce32319d5f8
+  languageName: node
+  linkType: hard
+
+"typedoc-plugin-not-exported@npm:^0.1.6":
+  version: 0.1.6
+  resolution: "typedoc-plugin-not-exported@npm:0.1.6"
+  peerDependencies:
+    typedoc: ">=0.20.16"
+  checksum: 2bbd5c40228ec9428a2df1a60fc8d7117222ded3cf028e5746edeb4c3b1c2f678dc26a0dbbd9e7b3d8f9a3dafa3e60a564388bf4e2866c40e1cd6070c3b9003e
   languageName: node
   linkType: hard
 

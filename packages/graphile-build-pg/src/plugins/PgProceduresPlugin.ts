@@ -56,6 +56,7 @@ declare global {
 }
 
 declare module "graphile-plugin" {
+  /** @notExported */
   interface GatherHelpers {
     pgProcedures: {
       getSource(
@@ -65,6 +66,7 @@ declare module "graphile-plugin" {
     };
   }
 
+  /** @notExported */
   interface GatherHooks {
     pgProcedures_PgSource: PluginHook<
       (event: {

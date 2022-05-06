@@ -33,6 +33,7 @@ export interface ServerOptions {
 }
 
 declare module "graphile-plugin" {
+  /** @notExported */
   interface Preset {
     server?: ServerOptions;
   }

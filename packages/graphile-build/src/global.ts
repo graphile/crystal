@@ -53,6 +53,7 @@ import type { stringTypeSpec, wrapDescription } from "./utils.js";
  */
 
 declare global {
+  /** @notExported */
   namespace GraphileEngine {
     /**
      * Input to the 'schema build' phase, this is typically the output of the

@@ -70,12 +70,14 @@ export interface GatherPluginContext<
 }
 
 declare module "graphile-plugin" {
+  /** @notExported */
   interface Preset {
     inflection?: GraphileEngine.GraphileBuildInflectionOptions;
     gather?: GraphileEngine.GraphileBuildGatherOptions;
     schema?: GraphileEngine.GraphileBuildSchemaOptions;
   }
 
+  /** @notExported */
   interface PluginInflectionConfig {
     /**
      * Define new inflectors here
@@ -102,14 +104,17 @@ declare module "graphile-plugin" {
     };
   }
 
+  /** @notExported */
   interface GatherHelpers {
     // Extend this with declaration merging
   }
 
+  /** @notExported */
   interface GatherHooks {
     // Extend this with declaration merging
   }
 
+  /** @notExported */
   interface PluginGatherConfig<
     TNamespace extends keyof GatherHelpers,
     TState extends { [key: string]: any } = { [key: string]: any },
@@ -168,6 +173,7 @@ declare module "graphile-plugin" {
     ) => Promise<void>;
   }
 
+  /** @notExported */
   interface Plugin {
     inflection?: PluginInflectionConfig;
 

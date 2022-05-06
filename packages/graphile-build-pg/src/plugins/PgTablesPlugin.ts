@@ -109,6 +109,7 @@ type PgSourceRelations = {
 };
 
 declare module "graphile-plugin" {
+  /** @notExported */
   interface GatherHelpers {
     pgTables: {
       getSourceBuilder(
@@ -121,6 +122,7 @@ declare module "graphile-plugin" {
     };
   }
 
+  /** @notExported */
   interface GatherHooks {
     pgTables_PgSourceBuilder_relations: PluginHook<
       (event: {

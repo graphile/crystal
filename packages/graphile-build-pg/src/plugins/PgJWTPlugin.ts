@@ -27,6 +27,7 @@ declare global {
 }
 
 declare module "graphile-plugin" {
+  /** @notExported */
   interface GatherHelpers {
     pgJWT: Record<string, never>;
   }

@@ -30,6 +30,7 @@ interface State {
 }
 
 declare global {
+  /** @notExported */
   namespace GraphileEngine {
     interface Inflection {
       classCodecName(details: {
@@ -73,6 +74,7 @@ declare global {
 }
 
 declare module "graphile-plugin" {
+  /** @notExported */
   interface GatherHelpers {
     pgCodecs: {
       getCodecFromClass(
@@ -86,6 +88,7 @@ declare module "graphile-plugin" {
       ): Promise<PgTypeCodec<any, any, any, any> | null>;
     };
   }
+  /** @notExported */
   interface GatherHooks {
     pgCodecs_PgTypeCodec: PluginHook<
       (event: {
