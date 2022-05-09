@@ -6,14 +6,14 @@ import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
 
-interface RegisterCursorConnectionOptions {
-  typeName: string;
-  scope?: GraphileBuild.ScopeObject;
-  nonNullNode?: boolean;
-}
-
 declare global {
   namespace GraphileBuild {
+    interface RegisterCursorConnectionOptions {
+      typeName: string;
+      scope?: GraphileBuild.ScopeObject;
+      nonNullNode?: boolean;
+    }
+
     interface ScopeObject {
       isConnectionType?: true;
       isConnectionEdgeType?: true;
@@ -41,7 +41,9 @@ export const ConnectionPlugin: GraphilePlugin.Plugin = {
         return build.extend(
           build,
           {
-            registerCursorConnection(options: RegisterCursorConnectionOptions) {
+            registerCursorConnection(
+              options: GraphileBuild.RegisterCursorConnectionOptions,
+            ) {
               const { typeName, scope = {}, nonNullNode = false } = options;
               const edgeTypeName = build.inflection.edgeType(typeName);
               build.registerObjectType(

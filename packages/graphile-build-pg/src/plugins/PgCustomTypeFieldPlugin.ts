@@ -39,37 +39,58 @@ function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
 }
 
-interface ProcedureDetails {
-  source: PgSource<any, any, any, PgSourceParameter[]>;
-}
-interface ArgumentDetails {
-  source: PgSource<any, any, any, PgSourceParameter[]>;
-  param: PgSourceParameter;
-  index: number;
-}
-
 declare global {
   namespace GraphileBuild {
+    interface InflectionCustomFieldProcedureDetails {
+      source: PgSource<any, any, any, PgSourceParameter[]>;
+    }
+    interface InflectionCustomFieldArgumentDetails {
+      source: PgSource<any, any, any, PgSourceParameter[]>;
+      param: PgSourceParameter;
+      index: number;
+    }
+
     interface Inflection {
-      customMutation(this: Inflection, details: ProcedureDetails): string;
+      customMutation(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
       customMutationPayload(
         this: Inflection,
-        details: ProcedureDetails,
+        details: InflectionCustomFieldProcedureDetails,
       ): string;
-      customMutationInput(this: Inflection, details: ProcedureDetails): string;
-      customQuery(this: Inflection, details: ProcedureDetails): string;
+      customMutationInput(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      customQuery(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
       customQueryConnection(
         this: Inflection,
-        details: ProcedureDetails,
+        details: InflectionCustomFieldProcedureDetails,
       ): string;
-      customQueryList(this: Inflection, details: ProcedureDetails): string;
-      computedColumn(this: Inflection, details: ProcedureDetails): string;
+      customQueryList(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      computedColumn(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
       computedColumnConnection(
         this: Inflection,
-        details: ProcedureDetails,
+        details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumnList(this: Inflection, details: ProcedureDetails): string;
-      argument(this: Inflection, details: ArgumentDetails): string;
+      computedColumnList(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      argument(
+        this: Inflection,
+        details: InflectionCustomFieldArgumentDetails,
+      ): string;
     }
   }
 }

@@ -46,6 +46,8 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
   /**
    * A reference to the relevant
    * aether.variableValuesConstraints/contextConstraints/rootValueConstraints.
+   *
+   * @internal
    */
   private readonly constraints: Constraint[];
 
@@ -55,6 +57,9 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
    */
   private readonly path: Array<string | number>;
 
+  /**
+   * @internal
+   */
   constructor(
     value: TData | undefined,
     valuePlan: __ValuePlan<TData> | AccessPlan<TData>,

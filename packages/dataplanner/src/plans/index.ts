@@ -52,7 +52,7 @@ export {
 } from "./listTransform";
 export { makeMapper, map, MapPlan, ActualKeyByDesiredKey } from "./map";
 export { node, NodePlan } from "./node";
-export { object, ObjectPlan } from "./object";
+export { object, ObjectPlan, ObjectPlanMeta } from "./object";
 export { partitionByIndex } from "./partitionByIndex";
 export { reverse, reverseArray, ReversePlan } from "./reverse";
 

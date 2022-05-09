@@ -3,7 +3,17 @@ import debugFactory from "debug";
 
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import { exportAsMany } from "./exportAs";
-import { makeCrystalSchema } from "./makeCrystalSchema";
+import {
+  makeCrystalSchema,
+  CrystalPlans,
+  EnumPlans,
+  ScalarPlans,
+  InterfaceOrUnionPlans,
+  InputObjectPlans,
+  ObjectPlans,
+  FieldPlans,
+} from "./makeCrystalSchema";
+import { PrintPlanGraphOptions } from "./mermaid";
 
 // TODO: doing this here feels "naughty".
 debugFactory.formatters.c = crystalPrint;
@@ -124,6 +134,7 @@ import {
   reverse,
   reverseArray,
   ReversePlan,
+  ObjectPlanMeta,
 } from "./plans";
 import { __InputListPlan } from "./plans/__inputList";
 import { polymorphicWrap, resolveType } from "./polymorphic";
@@ -133,6 +144,7 @@ import {
   dataplannerResolver,
   dataplannerSubscriber,
   isCrystalWrapped,
+  CrystalWrapDetails,
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import { subscribe } from "./subscribe";
@@ -242,6 +254,7 @@ export {
   InputPlan,
   isCrystalError,
   isCrystalWrapped,
+  CrystalWrapDetails,
   isDev,
   isExecutablePlan,
   isListCapablePlan,
@@ -260,6 +273,14 @@ export {
   ListPlan,
   listTransform,
   makeCrystalSchema,
+  CrystalPlans,
+  EnumPlans,
+  ScalarPlans,
+  InterfaceOrUnionPlans,
+  InputObjectPlans,
+  ObjectPlans,
+  FieldPlans,
+  PrintPlanGraphOptions,
   makeMapper,
   map,
   MapPlan,
@@ -292,6 +313,7 @@ export {
   reverse,
   reverseArray,
   ReversePlan,
+  ObjectPlanMeta,
   ROOT_PATH,
   StreamablePlan,
   stripAnsi,

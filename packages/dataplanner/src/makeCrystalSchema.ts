@@ -33,7 +33,7 @@ import { crystalResolve, dataplannerResolver } from "./resolvers";
  * directly, or you can define a configuration object that accepts the plan and
  * more.
  */
-type FieldPlans =
+export type FieldPlans =
   | FieldPlanResolver<any, any, any>
   | {
       plan?: FieldPlanResolver<any, any, any>;
@@ -48,7 +48,7 @@ type FieldPlans =
 /**
  * The plans/config for each field of a GraphQL object type.
  */
-type ObjectPlans = {
+export type ObjectPlans = {
   __Plan?: { new (...args: any[]): ExecutablePlan<any> };
 } & {
   [fieldName: string]: FieldPlans;
@@ -57,21 +57,21 @@ type ObjectPlans = {
 /**
  * The plans for each field of a GraphQL input object type.
  */
-type InputObjectPlans = {
+export type InputObjectPlans = {
   [fieldName: string]: InputObjectFieldPlanResolver<any, any, any, any>;
 };
 
 /**
  * The plan config for an interface or union type.
  */
-type InterfaceOrUnionPlans = {
+export type InterfaceOrUnionPlans = {
   __resolveType?: (o: unknown) => string;
 };
 
 /**
  * The config for a GraphQL scalar type.
  */
-type ScalarPlans = {
+export type ScalarPlans = {
   serialize?: GraphQLScalarSerializer<any>;
   parseValue?: GraphQLScalarValueParser<any>;
   parseLiteral?: GraphQLScalarLiteralParser<any>;
@@ -81,7 +81,7 @@ type ScalarPlans = {
 /**
  * The values/configs for the entries in a GraphQL enum type.
  */
-type EnumPlans = {
+export type EnumPlans = {
   // The internal value for the enum
   [enumValueName: string]:
     | EnumPlanResolver
@@ -97,7 +97,7 @@ type EnumPlans = {
 /**
  * A map from GraphQL named type to the config for that type.
  */
-interface CrystalPlans {
+export interface CrystalPlans {
   [typeName: string]:
     | ObjectPlans
     | InputObjectPlans

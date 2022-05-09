@@ -104,12 +104,12 @@ declare global {
   }
 }
 
-type PgSourceRelations = {
-  [identifier: string]: PgSourceRelation<any, any>;
-};
-
 declare global {
   namespace GraphilePlugin {
+    type PgTablesPluginSourceRelations = {
+      [identifier: string]: PgSourceRelation<any, any>;
+    };
+
     interface GatherHelpers {
       pgTables: {
         getSourceBuilder(
@@ -128,7 +128,7 @@ declare global {
           sourceBuilder: PgSourceBuilder<any, any, any>;
           pgClass: PgClass;
           databaseName: string;
-          relations: PgSourceRelations;
+          relations: PgTablesPluginSourceRelations;
         }) => Promise<void>
       >;
       pgTables_PgSource: PluginHook<
@@ -216,7 +216,7 @@ export const PgTablesPlugin: GraphilePlugin.Plugin = {
           return source;
         }
         source = (async () => {
-          const relations: PgSourceRelations = {};
+          const relations: GraphilePlugin.PgTablesPluginSourceRelations = {};
           const { pgClass, databaseName } =
             info.state.detailsBySourceBuilder.get(sourceBuilder)!;
           await info.process("pgTables_PgSourceBuilder_relations", {

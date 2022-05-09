@@ -32,7 +32,7 @@ interface Node<KeyType, ValueType> {
   p: Node<KeyType, ValueType> | null;
 }
 
-interface LRUOptions<KeyType, ValueType> {
+export interface LRUOptions<KeyType, ValueType> {
   maxLength: number;
   dispose?: (key: KeyType, value: ValueType) => void;
 }

@@ -53,6 +53,7 @@ export {
   PgSourceRowAttribute,
   PgSourceUnique,
   PgSourceUniqueExtensions,
+  PgSourceOptions,
 } from "./datasource";
 export {
   PgClient,
@@ -62,6 +63,9 @@ export {
   PgExecutorContext,
   PgExecutorContextPlans,
   WithPgClient,
+  PgExecutorMutationOptions,
+  PgExecutorInput,
+  PgExecutorOptions,
 } from "./executor";
 export { BooleanFilterPlan } from "./filters/booleanFilter";
 export { ClassFilterPlan } from "./filters/classFilter";
@@ -75,6 +79,8 @@ export {
   PgDecode,
   PgEncode,
   PgOrderSpec,
+  PlanByUniques,
+  PgGroupSpec,
 } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
@@ -89,17 +95,25 @@ export { PgCursorPlan } from "./plans/pgCursor";
 export { pgDelete, PgDeletePlan } from "./plans/pgDelete";
 export { pgInsert, PgInsertPlan } from "./plans/pgInsert";
 export { pgPageInfo, PgPageInfoPlan } from "./plans/pgPageInfo";
-export { pgPolymorphic, PgPolymorphicPlan } from "./plans/pgPolymorphic";
+export {
+  pgPolymorphic,
+  PgPolymorphicPlan,
+  PgPolymorphicTypeMap,
+} from "./plans/pgPolymorphic";
 export {
   pgSelect,
   PgSelectArgumentSpec,
   pgSelectFromRecords,
   PgSelectPlan,
   PgSelectMode,
+  PgSelectLockCallback,
+  PgSelectOptions,
+  PgSelectLockableParameter,
 } from "./plans/pgSelect";
 export {
   pgSelectSingleFromRecord,
   PgSelectSinglePlan,
+  PgSelectSinglePlanOptions,
 } from "./plans/pgSelectSingle";
 export { PgSetCapableParentPlan, PgSetPlan } from "./plans/pgSet";
 export {

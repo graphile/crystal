@@ -1,3 +1,4 @@
+export type { ExportOptions } from "./interfaces.js";
 export {
   exportSchema,
   exportSchemaAsString,

@@ -17,20 +17,20 @@ import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 
-interface RelationDetails {
-  source: PgSource<any, any, any, any>;
-  codec: PgTypeCodec<any, any, any>;
-  identifier: string;
-  relation: PgSourceRelation<any, any>;
-}
-
 declare global {
   namespace GraphileBuild {
+    interface PgRelationsPluginRelationDetails {
+      source: PgSource<any, any, any, any>;
+      codec: PgTypeCodec<any, any, any>;
+      identifier: string;
+      relation: PgSourceRelation<any, any>;
+    }
+
     interface ScopeObjectFieldsField {
       isPgSingleRelationField?: boolean;
       isPgManyRelationConnectionField?: boolean;
       isPgManyRelationListField?: boolean;
-      pgRelationDetails?: RelationDetails;
+      pgRelationDetails?: PgRelationsPluginRelationDetails;
     }
     interface Inflection {
       sourceRelationName(
@@ -46,16 +46,22 @@ declare global {
           isBackwards: boolean;
         },
       ): string;
-      singleRelation(this: Inflection, details: RelationDetails): string;
+      singleRelation(
+        this: Inflection,
+        details: PgRelationsPluginRelationDetails,
+      ): string;
       singleRelationBackwards(
         this: Inflection,
-        details: RelationDetails,
+        details: PgRelationsPluginRelationDetails,
       ): string;
       manyRelationConnection(
         this: Inflection,
-        details: RelationDetails,
+        details: PgRelationsPluginRelationDetails,
       ): string;
-      manyRelationList(this: Inflection, details: RelationDetails): string;
+      manyRelationList(
+        this: Inflection,
+        details: PgRelationsPluginRelationDetails,
+      ): string;
     }
   }
 }
@@ -353,12 +359,13 @@ export const PgRelationsPlugin: GraphilePlugin.Plugin = {
                 ? ["list"]
                 : ["connection"]);
 
-            const relationDetails: RelationDetails = {
-              source,
-              codec,
-              identifier,
-              relation,
-            };
+            const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
+              {
+                source,
+                codec,
+                identifier,
+                relation,
+              };
             const clean =
               remoteColumns.every(
                 (remoteColumnName) =>

@@ -47,8 +47,6 @@ export interface ListTransformOptions<
  * A "special" plan that has custom handling in Crystal. Used for turning lists
  * into other things (or maybe more lists!).
  *
- * @internal
- *
  * It's recommended that you don't use this directly, please use one of the
  * functions that uses this under the hood such as `filter()`.
  */

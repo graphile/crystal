@@ -1136,6 +1136,8 @@ export class Aether<
   /**
    * Called by `graphqlCollectFields` when a new boundary is met -
    * mutations/mutation payloads/stream/defer.
+   *
+   * @internal
    */
   public addGroup(group: Group): number {
     if (!group.parent) {

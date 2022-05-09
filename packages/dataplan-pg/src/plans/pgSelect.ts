@@ -96,8 +96,13 @@ function isStaticInputPlan(
   );
 }
 
-type LockableParameter = "orderBy" | "first" | "last" | "offset" | "groupBy";
-type LockCallback<
+export type PgSelectLockableParameter =
+  | "orderBy"
+  | "first"
+  | "last"
+  | "offset"
+  | "groupBy";
+export type PgSelectLockCallback<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
@@ -193,7 +198,7 @@ function assertSensible(plan: ExecutablePlan): void {
 
 export type PgSelectMode = "normal" | "aggregate";
 
-interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
+export interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
@@ -447,8 +452,8 @@ export class PgSelectPlan<
   // --------------------
 
   private _beforeLock: {
-    [a in LockableParameter]: Array<
-      LockCallback<TColumns, TUniques, TRelations, TParameters>
+    [a in PgSelectLockableParameter]: Array<
+      PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>
     >;
   } = {
     orderBy: [],
@@ -459,8 +464,8 @@ export class PgSelectPlan<
   };
 
   private _afterLock: {
-    [a in LockableParameter]: Array<
-      LockCallback<TColumns, TUniques, TRelations, TParameters>
+    [a in PgSelectLockableParameter]: Array<
+      PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>
     >;
   } = {
     orderBy: [],
@@ -471,7 +476,7 @@ export class PgSelectPlan<
   };
 
   private _lockedParameter: {
-    [a in LockableParameter]: false | true | string | undefined;
+    [a in PgSelectLockableParameter]: false | true | string | undefined;
   } = {
     orderBy: false,
     groupBy: false,
@@ -2467,7 +2472,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   // --------------------
 
   /**
-   * Performs the given call back just before the given LockableParameter is
+   * Performs the given call back just before the given PgSelectLockableParameter is
    * locked.
    *
    * @remarks To make sure we do things in the right order (e.g. ensure all the
@@ -2479,20 +2484,20 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * add the primary key to the ordering.
    */
   public beforeLock(
-    type: LockableParameter,
-    callback: LockCallback<TColumns, TUniques, TRelations, TParameters>,
+    type: PgSelectLockableParameter,
+    callback: PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>,
   ): void {
     this._assertParameterUnlocked(type);
     this._beforeLock[type].push(callback);
   }
 
   /**
-   * Performs the given call back just after the given LockableParameter is
+   * Performs the given call back just after the given PgSelectLockableParameter is
    * locked.
    */
   public afterLock(
-    type: LockableParameter,
-    callback: LockCallback<TColumns, TUniques, TRelations, TParameters>,
+    type: PgSelectLockableParameter,
+    callback: PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>,
   ): void {
     this._assertParameterUnlocked(type);
     this._afterLock[type].push(callback);
@@ -2500,7 +2505,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
   private lockCallbacks(
     phase: "beforeLock" | "afterLock",
-    type: LockableParameter,
+    type: PgSelectLockableParameter,
   ) {
     const list = phase === "beforeLock" ? this._beforeLock : this._afterLock;
     const callbacks = list[type];
@@ -2522,7 +2527,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * Calls all the beforeLock actions for the given parameter and then locks
    * it.
    */
-  private _lockParameter(type: LockableParameter): void {
+  private _lockParameter(type: PgSelectLockableParameter): void {
     if (this._lockedParameter[type] !== false) {
       return;
     }
@@ -2537,7 +2542,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * Throw a helpful error if you're trying to modify something that's already
    * locked.
    */
-  private _assertParameterUnlocked(type: LockableParameter): void {
+  private _assertParameterUnlocked(type: PgSelectLockableParameter): void {
     const isLocked = this._lockedParameter[type];
     if (isLocked !== false) {
       if (typeof isLocked === "string") {

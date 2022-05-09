@@ -15,7 +15,10 @@ type DataFromPlans<TPlans extends { [key: string]: ExecutablePlan<any> }> = {
 type Results<TPlans extends { [key: string]: ExecutablePlan<any> }> = Array<
   [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]
 >;
-interface Meta<TPlans extends { [key: string]: ExecutablePlan<any> }> {
+
+export interface ObjectPlanMeta<
+  TPlans extends { [key: string]: ExecutablePlan<any> },
+> {
   results: Results<TPlans>;
 }
 
@@ -75,7 +78,7 @@ export class ObjectPlan<
   // TODO: JIT this function
   tupleToObject(
     tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>,
-    meta: Meta<TPlans>,
+    meta: ObjectPlanMeta<TPlans>,
   ): DataFromPlans<TPlans> {
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
@@ -127,7 +130,7 @@ export class ObjectPlan<
     if (!inMeta.results) {
       inMeta.results = [];
     }
-    const meta = inMeta as any as Meta<TPlans>;
+    const meta = inMeta as any as ObjectPlanMeta<TPlans>;
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
@@ -142,7 +145,7 @@ export class ObjectPlan<
   executeSingle:
     | ((
         values: Array<DataFromPlans<TPlans>[keyof TPlans]>,
-        meta: Meta<TPlans>,
+        meta: ObjectPlanMeta<TPlans>,
       ) => DataFromPlans<TPlans>)
     | null = null;
 
