@@ -1,5 +1,6 @@
 import type {
   Introspection,
+  PgDatabase,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -27,6 +28,7 @@ export {
   PgConstraint,
   PgDepend,
   PgDescription,
+  PgDatabase,
   PgEnum,
   PgExtension,
   PgIndex,

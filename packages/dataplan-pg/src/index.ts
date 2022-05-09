@@ -57,6 +57,7 @@ export {
 export {
   PgClient,
   PgClientQuery,
+  PgClientResult,
   PgExecutor,
   PgExecutorContext,
   PgExecutorContextPlans,
@@ -73,6 +74,7 @@ export {
   PgTypedExecutablePlan,
   PgDecode,
   PgEncode,
+  PgOrderSpec,
 } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
@@ -83,6 +85,7 @@ export {
   PgConditionCapableParentPlan,
   PgConditionPlan,
 } from "./plans/pgCondition";
+export { PgCursorPlan } from "./plans/pgCursor";
 export { pgDelete, PgDeletePlan } from "./plans/pgDelete";
 export { pgInsert, PgInsertPlan } from "./plans/pgInsert";
 export { pgPageInfo, PgPageInfoPlan } from "./plans/pgPageInfo";

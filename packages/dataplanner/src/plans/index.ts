@@ -36,15 +36,21 @@ export {
 } from "./connection";
 export { constant, ConstantPlan } from "./constant";
 export { each } from "./each";
-export { filter } from "./filter";
+export { filter, FilterPlanMemo } from "./filter";
 export { first, FirstPlan } from "./first";
-export { groupBy } from "./groupBy";
+export { groupBy, GroupByPlanMemo } from "./groupBy";
 export { lambda, LambdaPlan } from "./lambda";
 export { last, LastPlan } from "./last";
 export { list, ListPlan } from "./list";
 export { listen, ListenPlan } from "./listen";
-export { __ListTransformPlan, listTransform } from "./listTransform";
-export { makeMapper, map, MapPlan } from "./map";
+export {
+  __ListTransformPlan,
+  listTransform,
+  ListTransformItemPlanCallback,
+  ListTransformOptions,
+  ListTransformReduce,
+} from "./listTransform";
+export { makeMapper, map, MapPlan, ActualKeyByDesiredKey } from "./map";
 export { node, NodePlan } from "./node";
 export { object, ObjectPlan } from "./object";
 export { partitionByIndex } from "./partitionByIndex";

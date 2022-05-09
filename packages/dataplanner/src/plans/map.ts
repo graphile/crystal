@@ -10,7 +10,7 @@ import { ExecutablePlan } from "../plan";
 export const isSafeIdentifier = (key: string) =>
   /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
-type ActualKeyByDesiredKey = { [desiredKey: string]: string };
+export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
 export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   const entries = Object.entries(actualKeyByDesiredKey);

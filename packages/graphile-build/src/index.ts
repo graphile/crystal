@@ -28,11 +28,11 @@ export {
   upperCamelCase,
   upperFirst,
 } from "./utils.js";
-
+import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 // export globals for TypeDoc
 export { GraphileBuild, GraphilePlugin };
 
-export { SchemaBuilder };
+export { SchemaBuilder, NewWithHooksFunction };
 
 const getSchemaHooks = (plugin: GraphilePlugin.Plugin) => plugin.schema?.hooks;
 

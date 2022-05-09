@@ -13,9 +13,9 @@ import type {
 } from "./listTransform";
 import { listTransform } from "./listTransform";
 
-type Memo = Map<unknown, unknown[]>;
+export type GroupByPlanMemo = Map<unknown, unknown[]>;
 
-const reduceCallback: ListTransformReduce<Memo, any> = (
+const reduceCallback: ListTransformReduce<GroupByPlanMemo, any> = (
   memo,
   entireItemValue,
   idx,
@@ -29,7 +29,7 @@ const reduceCallback: ListTransformReduce<Memo, any> = (
   return memo;
 };
 
-const initialState = (): Memo => new Map();
+const initialState = (): GroupByPlanMemo => new Map();
 
 /**
  * Takes a single dimensional list plan and a mapper that returns a grouping
@@ -43,13 +43,13 @@ export function groupBy<
 >(
   listPlan: TListPlan,
   mapper: ListTransformItemPlanCallback<TListPlan, TItemPlan>,
-): __ListTransformPlan<TListPlan, TItemPlan, Memo, any> {
+): __ListTransformPlan<TListPlan, TItemPlan, GroupByPlanMemo, any> {
   const currentGraphQLType = getCurrentGraphQLType();
   if (!currentGraphQLType) {
     throw new Error("partitionByIndex cannot be used in this position");
   }
   const namedType = getNamedType(currentGraphQLType);
-  return listTransform<TListPlan, TItemPlan, Memo, any>({
+  return listTransform<TListPlan, TItemPlan, GroupByPlanMemo, any>({
     listPlan,
     itemPlanCallback: mapper,
     initialState,

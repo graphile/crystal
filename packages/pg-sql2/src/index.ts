@@ -198,8 +198,17 @@ function mangleName(str: string): string {
   );
 }
 
-// Objects with short fixed properties are more efficient than tuples in V8.
-type SymbolAndName = { s: symbol; n: string };
+/**
+ * A symbol and it's name {@see {@link getSymbolAndName}}.
+ *
+ * @privateRemarks
+ *
+ * Objects with short fixed properties are more efficient than
+ * tuples in V8.
+ *
+ * @internal
+ */
+export type SymbolAndName = { s: symbol; n: string };
 
 // Alas we cannot use WeakMap to cache this because symbols cannot be WeakMap
 // keys (and we wouldn't want to open the user to memory exhaustion via a map).

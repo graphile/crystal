@@ -12,9 +12,9 @@ import type {
 } from "./listTransform";
 import { listTransform } from "./listTransform";
 
-type Memo = unknown[];
+export type FilterPlanMemo = unknown[];
 
-const reduceCallback: ListTransformReduce<Memo, boolean> = (
+const reduceCallback: ListTransformReduce<FilterPlanMemo, boolean> = (
   memo,
   entireItemValue,
   include,
@@ -25,7 +25,7 @@ const reduceCallback: ListTransformReduce<Memo, boolean> = (
   return memo;
 };
 
-const initialState = (): Memo => [];
+const initialState = (): FilterPlanMemo => [];
 
 /**
  * Filters a list plan to only include entries for which the `filterCallback`
@@ -40,7 +40,7 @@ export function filter<
 ): __ListTransformPlan<
   TListPlan,
   TItemPlan,
-  Memo,
+  FilterPlanMemo,
   TListPlan extends ListCapablePlan<any, any>
     ? ReturnType<TListPlan["listItem"]>
     : __ItemPlan<any>
@@ -50,7 +50,7 @@ export function filter<
     throw new Error("partitionByIndex cannot be used in this position");
   }
   const namedType = getNamedType(currentGraphQLType);
-  return listTransform<TListPlan, TItemPlan, Memo, any>({
+  return listTransform<TListPlan, TItemPlan, FilterPlanMemo, any>({
     listPlan,
     itemPlanCallback: filterCallback,
     initialState,
