@@ -149,7 +149,7 @@ type PgSelectPlaceholder = {
   symbol: symbol;
 };
 
-type PgSelectIdentifierSpec =
+export type PgSelectIdentifierSpec =
   | {
       plan: ExecutablePlan<any>;
       codec: PgTypeCodec<any, any, any>;

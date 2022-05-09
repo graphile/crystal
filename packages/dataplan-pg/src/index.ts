@@ -109,6 +109,7 @@ export {
   PgSelectMode,
   PgSelectOptions,
   PgSelectPlan,
+  PgSelectIdentifierSpec,
 } from "./plans/pgSelect";
 export {
   pgSelectSingleFromRecord,
