@@ -105,12 +105,12 @@ export {
   pgSelect,
   PgSelectArgumentSpec,
   pgSelectFromRecords,
+  PgSelectIdentifierSpec,
   PgSelectLockableParameter,
   PgSelectLockCallback,
   PgSelectMode,
   PgSelectOptions,
   PgSelectPlan,
-  PgSelectIdentifierSpec,
 } from "./plans/pgSelect";
 export {
   pgSelectSingleFromRecord,

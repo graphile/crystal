@@ -47,6 +47,7 @@ import {
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
+  EnumPlanResolver,
   EventCallback,
   EventMapKey,
   ExecutionEventEmitter,
@@ -65,10 +66,9 @@ import {
   PlanStreamOptions,
   PolymorphicData,
   PromiseOrDirect,
+  ScalarPlanResolver,
   TrackedArguments,
   TypedEventEmitter,
-  ScalarPlanResolver,
-  EnumPlanResolver,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -225,6 +225,7 @@ export {
   each,
   EdgeCapablePlan,
   EdgePlan,
+  EnumPlanResolver,
   EnumPlans,
   EventCallback,
   EventMapKey,
@@ -316,14 +317,13 @@ export {
   reverseArray,
   ReversePlan,
   ROOT_PATH,
+  ScalarPlanResolver,
   ScalarPlans,
   StreamablePlan,
   stripAnsi,
   subscribe,
   TrackedArguments,
   TypedEventEmitter,
-  ScalarPlanResolver,
-  EnumPlanResolver,
 };
 
 exportAsMany({
