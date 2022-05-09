@@ -312,7 +312,7 @@ export function arraysMatch<T>(
   return true;
 }
 
-type ObjectTypeFields<
+export type ObjectTypeFields<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
 > = {

@@ -71,6 +71,8 @@ export {
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypedExecutablePlan,
+  PgDecode,
+  PgEncode,
 } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
@@ -90,6 +92,7 @@ export {
   PgSelectArgumentSpec,
   pgSelectFromRecords,
   PgSelectPlan,
+  PgSelectMode,
 } from "./plans/pgSelect";
 export {
   pgSelectSingleFromRecord,

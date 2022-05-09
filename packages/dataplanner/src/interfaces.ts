@@ -607,9 +607,10 @@ export type NodeIdHandler<
   ): TNodePlan;
 };
 
-type BaseEventMap = Record<string, any>;
-type EventMapKey<TEventMap extends BaseEventMap> = string & keyof TEventMap;
-type EventCallback<TPayload> = (params: TPayload) => void;
+export type BaseEventMap = Record<string, any>;
+export type EventMapKey<TEventMap extends BaseEventMap> = string &
+  keyof TEventMap;
+export type EventCallback<TPayload> = (params: TPayload) => void;
 
 export interface TypedEventEmitter<TEventMap extends BaseEventMap>
   extends EventEmitter {
