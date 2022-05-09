@@ -1,4 +1,4 @@
-import type { Preset } from "graphile-plugin";
+import "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
 import type { IncomingMessage, RequestListener } from "node:http";
@@ -61,7 +61,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   // Try and load the preset
   const userPreset = await loadConfig(configFileLocation);
-  const preset: Preset = {
+  const preset: GraphilePlugin.Preset = {
     extends: userPreset ? [userPreset] : [defaultPreset],
   };
   let contextCallback: ContextCallback | null = null;

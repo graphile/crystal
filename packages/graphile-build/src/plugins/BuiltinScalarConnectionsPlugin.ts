@@ -1,10 +1,10 @@
 import "./ConnectionPlugin";
 
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { version } from "../index.js";
 
-export const BuiltinScalarConnectionsPlugin: Plugin = {
+export const BuiltinScalarConnectionsPlugin: GraphilePlugin.Plugin = {
   name: "BuiltinScalarConnectionsPlugin",
   description: "Adds connection types for builtin scalars",
   version,

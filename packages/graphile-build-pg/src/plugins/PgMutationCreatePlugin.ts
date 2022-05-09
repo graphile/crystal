@@ -3,7 +3,7 @@ import { pgInsert } from "@dataplan/pg";
 import type { ObjectPlan } from "dataplanner";
 import { constant, ExecutablePlan, object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";
@@ -43,7 +43,7 @@ const isInsertable = (source: PgSource<any, any, any, any>) => {
   return true;
 };
 
-export const PgMutationCreatePlugin: Plugin = {
+export const PgMutationCreatePlugin: GraphilePlugin.Plugin = {
   name: "PgMutationCreatePlugin",
   description: "Adds 'create' mutation for supported table-like sources",
   version: version,

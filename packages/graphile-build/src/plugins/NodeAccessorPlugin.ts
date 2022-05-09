@@ -6,7 +6,7 @@ import type {
 } from "dataplanner";
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { version } from "../index";
 
@@ -36,7 +36,7 @@ const specForHandler =
     return null;
   };
 
-export const NodeAccessorPlugin: Plugin = {
+export const NodeAccessorPlugin: GraphilePlugin.Plugin = {
   name: "NodeAccessorPlugin",
   description:
     "Adds accessors for the various types registered with the Global Unique Object Identification ID (Node ID) system",

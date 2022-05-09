@@ -1,6 +1,6 @@
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
-export const NodeIdCodecBase64JSONPlugin: Plugin = {
+export const NodeIdCodecBase64JSONPlugin: GraphilePlugin.Plugin = {
   name: "NodeIdCodecBase64JSONPlugin",
   version: "1.0.0",
   description: `Adds the 'base64JSON' codec for NodeIDs`,

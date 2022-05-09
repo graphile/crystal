@@ -1,4 +1,4 @@
-import type { ResolvedPreset } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 import type { IncomingMessage } from "http";
 
@@ -7,7 +7,7 @@ export type ContextCallback = (req: IncomingMessage) => object;
 // TODO: rename this!
 export interface SchemaResult {
   schema: GraphQLSchema;
-  config: ResolvedPreset;
+  config: GraphilePlugin.ResolvedPreset;
   contextCallback: ContextCallback;
 }
 

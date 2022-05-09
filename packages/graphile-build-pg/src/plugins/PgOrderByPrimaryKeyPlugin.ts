@@ -2,11 +2,11 @@ import "./PgTablesPlugin";
 
 import type { PgSelectPlan, PgSourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { version } from "../index";
 
-export const PgOrderByPrimaryKeyPlugin: Plugin = {
+export const PgOrderByPrimaryKeyPlugin: GraphilePlugin.Plugin = {
   name: "PgOrderByPrimaryKeyPlugin",
   description: "Adds ordering by the table's primary key",
   version: version,

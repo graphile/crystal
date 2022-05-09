@@ -1,7 +1,7 @@
 import type { PgTypeCodec } from "@dataplan/pg";
 import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { getBehavior } from "../behavior";
@@ -37,7 +37,7 @@ declare global {
 interface State {}
 interface Cache {}
 
-export const PgJWTPlugin: Plugin = {
+export const PgJWTPlugin: GraphilePlugin.Plugin = {
   name: "PgJWTPlugin",
   description:
     "Converts a Postgres JWT object type into a GraphQL scalar type containing a signed JWT",

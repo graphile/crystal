@@ -6,7 +6,7 @@ import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-plugin";
 import type {
   Introspection,
   PgAttribute,
@@ -323,7 +323,7 @@ function makeGetEntity<
   };
 }
 
-export const PgIntrospectionPlugin: Plugin = {
+export const PgIntrospectionPlugin: GraphilePlugin.Plugin = {
   name: "PgIntrospectionPlugin",
   description:
     "Introspects PostgreSQL databases and makes the results available to other plugins",

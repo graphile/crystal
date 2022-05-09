@@ -5,7 +5,7 @@ import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { version } from "../index.js";
 
@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-export const PgConnectionTotalCountPlugin: Plugin = {
+export const PgConnectionTotalCountPlugin: GraphilePlugin.Plugin = {
   name: "PgConnectionTotalCountPlugin",
   description: "Add 'totalCount' field to connections",
   version,

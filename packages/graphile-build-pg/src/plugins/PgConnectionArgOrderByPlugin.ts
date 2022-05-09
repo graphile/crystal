@@ -8,7 +8,7 @@ import type {
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
@@ -28,7 +28,7 @@ declare global {
 }
 
 // TODO: rename this, it's not just for connections
-export const PgConnectionArgOrderByPlugin: Plugin = {
+export const PgConnectionArgOrderByPlugin: GraphilePlugin.Plugin = {
   name: "PgConnectionArgOrderByPlugin",
   description:
     "Adds the 'orderBy' argument to connections and simple collections",

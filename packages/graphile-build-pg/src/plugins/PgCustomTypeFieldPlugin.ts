@@ -29,7 +29,7 @@ import {
   ObjectPlan,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";
@@ -115,7 +115,7 @@ function getArgDetailsFromParameters(
   return argDetails;
 }
 
-export const PgCustomTypeFieldPlugin: Plugin = {
+export const PgCustomTypeFieldPlugin: GraphilePlugin.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
     "Adds GraphQL fields based on PostgreSQL functions (in PostGraphile v4 these were called 'custom query functions', 'custom mutation functions' and 'computed column functions'",

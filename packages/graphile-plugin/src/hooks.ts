@@ -1,6 +1,6 @@
 import * as assert from "assert";
 
-import type { Plugin, PluginHook, PluginHookObject } from "./interfaces.js";
+import type { PluginHook, PluginHookObject } from "./interfaces.js";
 
 export type HookObject<T> = Record<keyof T, (...args: any[]) => any>;
 
@@ -35,17 +35,19 @@ export function applyHooks<
     [key: string]: PluginHook<(...args: any[]) => any>;
   },
 >(
-  plugins: Plugin[],
-  hooksRetriever: (plugin: Plugin) => Partial<THooks> | undefined,
+  plugins: GraphilePlugin.Plugin[],
+  hooksRetriever: (
+    plugin: GraphilePlugin.Plugin,
+  ) => Partial<THooks> | undefined,
   applyHookCallback: <THookName extends keyof THooks>(
     hookName: THookName,
     hookFn: THooks[THookName] extends PluginHook<infer U> ? U : never,
-    plugin: Plugin,
+    plugin: GraphilePlugin.Plugin,
   ) => void,
 ): void {
   type FullHookSpec = {
     id: string;
-    plugin: Plugin;
+    plugin: GraphilePlugin.Plugin;
     provides: string[];
     before: string[];
     after: string[];

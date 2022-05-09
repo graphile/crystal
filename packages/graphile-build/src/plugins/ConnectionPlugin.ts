@@ -1,7 +1,7 @@
 import type { EdgeCapablePlan, PageInfoCapablePlan } from "dataplanner";
 import { ConnectionPlan, ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-export const ConnectionPlugin: Plugin = {
+export const ConnectionPlugin: GraphilePlugin.Plugin = {
   name: "ConnectionPlugin",
   description: "Plugin to make constructing cursor connections easier",
   version,

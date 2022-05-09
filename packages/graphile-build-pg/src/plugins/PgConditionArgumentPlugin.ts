@@ -8,7 +8,7 @@ import type {
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
 import { getBehavior } from "../behavior";
@@ -28,7 +28,7 @@ declare global {
   }
 }
 
-export const PgConditionArgumentPlugin: Plugin = {
+export const PgConditionArgumentPlugin: GraphilePlugin.Plugin = {
   name: "PgConditionArgumentPlugin",
   description: "Adds the 'condition' argument to connections and lists",
   version: version,

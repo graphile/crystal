@@ -1,5 +1,5 @@
 import { __ValuePlan } from "dataplanner";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { isValidObjectType } from "../utils.js";
 
@@ -16,7 +16,7 @@ import { isValidObjectType } from "../utils.js";
  *
  * Removing this plugin will result in an invalid GraphQL schema.
  */
-export const QueryPlugin: Plugin = {
+export const QueryPlugin: GraphilePlugin.Plugin = {
   name: "QueryPlugin",
   version: "1.0.0",
   description: `Registers the operation type for the 'query' operation.`,

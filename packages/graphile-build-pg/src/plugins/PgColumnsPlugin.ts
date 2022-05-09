@@ -16,7 +16,7 @@ import {
 } from "@dataplan/pg";
 import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
 
 import { getBehavior } from "../behavior";
@@ -107,7 +107,7 @@ const getSource = EXPORTABLE(
   [PgSource],
 );
 
-export const PgColumnsPlugin: Plugin = {
+export const PgColumnsPlugin: GraphilePlugin.Plugin = {
   name: "PgColumnsPlugin",
   description:
     "Adds PostgreSQL columns (attributes) to the relevant GraphQL object/input object types",

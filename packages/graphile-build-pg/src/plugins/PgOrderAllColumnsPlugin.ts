@@ -8,7 +8,7 @@ import type {
   PgTypeColumns,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -30,7 +30,7 @@ declare global {
 }
 
 // TODO: respect indexes - via behavior?
-export const PgOrderAllColumnsPlugin: Plugin = {
+export const PgOrderAllColumnsPlugin: GraphilePlugin.Plugin = {
   name: "PgOrderAllColumnsPlugin",
   description: "Allows ordering by table columns",
   version: version,

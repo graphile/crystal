@@ -4,7 +4,7 @@ import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-plugin";
 import type { PgClass, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior";
@@ -159,7 +159,7 @@ interface State {
 interface Cache {}
 
 // TODO: rename to "PgClassesPlugin"? This coverse more than just tables.
-export const PgTablesPlugin: Plugin = {
+export const PgTablesPlugin: GraphilePlugin.Plugin = {
   name: "PgTablesPlugin",
   description:
     "Spots pg_class entries that looks like tables/views/materialized views (but not partitions!) and registers them as sources",

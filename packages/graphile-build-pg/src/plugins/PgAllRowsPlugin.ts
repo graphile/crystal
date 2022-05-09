@@ -4,7 +4,7 @@ import "./PgTablesPlugin";
 import type { PgSource } from "@dataplan/pg";
 import { connection } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";
@@ -61,7 +61,7 @@ declare global {
   }
 }
 
-export const PgAllRowsPlugin: Plugin = {
+export const PgAllRowsPlugin: GraphilePlugin.Plugin = {
   name: "PgAllRowsPlugin",
   description: "Adds 'all rows' accessors for all table-like datasources.",
   version: version,

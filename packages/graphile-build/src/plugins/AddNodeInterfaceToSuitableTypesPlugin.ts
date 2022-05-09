@@ -1,12 +1,12 @@
 import type { ExecutablePlan } from "dataplanner";
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";
 
 import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";
 
-export const AddNodeInterfaceToSuitableTypesPlugin: Plugin = {
+export const AddNodeInterfaceToSuitableTypesPlugin: GraphilePlugin.Plugin = {
   name: "AddNodeInterfaceToSuitableTypesPlugin",
   version: "1.0.0",
   description: `Adds the 'Node' interface to all types that have registered a Node ID handler`,

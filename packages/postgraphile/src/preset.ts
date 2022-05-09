@@ -4,9 +4,9 @@ import {
   SwallowErrorsPlugin,
 } from "graphile-build";
 import { defaultPreset as graphileBuildPgPreset } from "graphile-build-pg";
-import type { Preset } from "graphile-plugin";
+import "graphile-plugin";
 
-export const defaultPreset: Preset = {
+export const defaultPreset: GraphilePlugin.Preset = {
   extends: [graphileBuildPreset, graphileBuildPgPreset],
   plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
 };

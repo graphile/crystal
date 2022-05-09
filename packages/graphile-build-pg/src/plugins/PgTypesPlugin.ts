@@ -4,7 +4,7 @@ import "../interfaces";
 
 import type { PgHStore } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../index";
@@ -26,7 +26,7 @@ declare global {
   }
 }
 
-export const PgTypesPlugin: Plugin = {
+export const PgTypesPlugin: GraphilePlugin.Plugin = {
   name: "PgTypesPlugin",
   description:
     "Registers the GraphQL types for a number of standard PostgreSQL types",

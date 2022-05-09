@@ -12,7 +12,7 @@ import {
   TYPES,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-plugin";
 import type { PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -100,7 +100,7 @@ declare global {
   }
 }
 
-export const PgCodecsPlugin: Plugin = {
+export const PgCodecsPlugin: GraphilePlugin.Plugin = {
   name: "PgCodecsPlugin",
   description: "Turns PostgreSQL types into @dataplan/pg codecs",
   version: version,

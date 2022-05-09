@@ -10,7 +10,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin, PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-plugin";
 import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -86,7 +86,7 @@ interface State {
 }
 interface Cache {}
 
-export const PgProceduresPlugin: Plugin = {
+export const PgProceduresPlugin: GraphilePlugin.Plugin = {
   name: "PgProceduresPlugin",
   description:
     "Generates @dataplan/pg sources for the PostgreSQL functions/procedures it finds",

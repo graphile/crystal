@@ -6,7 +6,7 @@ import type {
 } from "@dataplan/pg";
 import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -20,7 +20,7 @@ declare global {
   }
 }
 
-export const PgConditionCustomFieldsPlugin: Plugin = {
+export const PgConditionCustomFieldsPlugin: GraphilePlugin.Plugin = {
   name: "PgConditionCustomFieldsPlugin",
   description:
     "Add GraphQL conditions based on 'filterable' PostgreSQL functions",

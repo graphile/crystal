@@ -1,6 +1,6 @@
 import "./interfaces";
 
-import type { Preset } from "graphile-plugin";
+import "graphile-plugin";
 
 import {
   AddNodeInterfaceToSuitableTypesPlugin,
@@ -23,7 +23,7 @@ import {
 } from "./plugins/index.js";
 
 // TODO: version this
-export const defaultPreset: Preset = {
+export const defaultPreset: GraphilePlugin.Preset = {
   plugins: [
     QueryPlugin,
     MutationPlugin,

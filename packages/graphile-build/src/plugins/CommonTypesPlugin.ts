@@ -1,5 +1,5 @@
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLScalarLiteralParser } from "graphql";
 
 import { version } from "../index.js";
@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-export const CommonTypesPlugin: Plugin = {
+export const CommonTypesPlugin: GraphilePlugin.Plugin = {
   name: "CommonTypesPlugin",
   description:
     "Registers common GraphQL utility types like BigInt, Datetime, UUID",

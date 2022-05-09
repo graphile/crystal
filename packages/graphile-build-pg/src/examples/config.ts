@@ -11,7 +11,7 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import type { Plugin, Preset } from "graphile-plugin";
+import "graphile-plugin";
 import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
@@ -47,7 +47,7 @@ export function getPool() {
   return pool;
 }
 
-const EnumManglingPlugin: Plugin = {
+const EnumManglingPlugin: GraphilePlugin.Plugin = {
   name: "EnumManglingPlugin",
   description:
     "Mangles enum value names so that they're more likely to be compatible with GraphQL",
@@ -68,7 +68,7 @@ const EnumManglingPlugin: Plugin = {
 
 export function makeSharedPresetAndClient(pool: Pool) {
   const withPgClient = makeNodePostgresWithPgClient(pool);
-  const preset: Preset = {
+  const preset: GraphilePlugin.Preset = {
     extends: [graphileBuildPreset, graphileBuildPgPreset],
     plugins: [QueryQueryPlugin, SwallowErrorsPlugin, EnumManglingPlugin],
     gather: {

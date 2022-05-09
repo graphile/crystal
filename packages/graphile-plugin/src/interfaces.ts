@@ -37,7 +37,3 @@ export type PluginHook<T extends (...args: any[]) => any> =
 
 export type PluginHookCallback<T extends PluginHook<(...args: any[]) => any>> =
   T extends PluginHook<infer U> ? U : never;
-
-export type Plugin = GraphilePlugin.Plugin;
-export type Preset = GraphilePlugin.Preset;
-export type ResolvedPreset = GraphilePlugin.ResolvedPreset;

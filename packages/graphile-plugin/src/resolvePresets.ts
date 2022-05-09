@@ -1,8 +1,10 @@
 import * as assert from "assert";
 
-import type { Preset, ResolvedPreset } from "./interfaces.js";
+import "./interfaces.js";
 
-function isResolvedPreset(preset: Preset): preset is ResolvedPreset {
+function isResolvedPreset(
+  preset: GraphilePlugin.Preset,
+): preset is GraphilePlugin.ResolvedPreset {
   return (preset.plugins && preset.extends?.length === 0) || false;
 }
 
@@ -10,7 +12,9 @@ function isResolvedPreset(preset: Preset): preset is ResolvedPreset {
  * Given a list of presets, resolves the presets and returns the resulting
  * ResolvedPreset (which does not have any `extends`).
  */
-export function resolvePresets(presets: ReadonlyArray<Preset>): ResolvedPreset {
+export function resolvePresets(
+  presets: ReadonlyArray<GraphilePlugin.Preset>,
+): GraphilePlugin.ResolvedPreset {
   if (presets.length === 1) {
     // Maybe it's already resolved?
     const preset = presets[0];
@@ -31,7 +35,9 @@ export function resolvePresets(presets: ReadonlyArray<Preset>): ResolvedPreset {
  *
  * @internal
  */
-function resolvePreset(preset: Preset): ResolvedPreset {
+function resolvePreset(
+  preset: GraphilePlugin.Preset,
+): GraphilePlugin.ResolvedPreset {
   const { extends: presets = [] } = preset;
   const basePreset = resolvePresets(presets);
   mergePreset(basePreset, preset);
@@ -46,7 +52,10 @@ function resolvePreset(preset: Preset): ResolvedPreset {
  *
  * @internal
  */
-function mergePreset(targetPreset: ResolvedPreset, sourcePreset: Preset): void {
+function mergePreset(
+  targetPreset: GraphilePlugin.ResolvedPreset,
+  sourcePreset: GraphilePlugin.Preset,
+): void {
   assert.ok(
     targetPreset.extends == null || targetPreset.extends.length === 0,
     "First argument to mergePreset must be a resolved preset",
@@ -71,7 +80,7 @@ function mergePreset(targetPreset: ResolvedPreset, sourcePreset: Preset): void {
   }
 }
 
-function blankResolvedPreset(): ResolvedPreset {
+function blankResolvedPreset(): GraphilePlugin.ResolvedPreset {
   return {
     extends: [],
     plugins: [],

@@ -16,7 +16,7 @@ import type {
 } from "dataplanner";
 import { lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior";
@@ -155,7 +155,7 @@ const isDeletable = (source: PgSource<any, any, any, any>) => {
   return true;
 };
 
-export const PgMutationUpdateDeletePlugin: Plugin = {
+export const PgMutationUpdateDeletePlugin: GraphilePlugin.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
   version: version,

@@ -1,8 +1,8 @@
 import { aether, constant } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 
-export const RegisterQueryNodePlugin: Plugin = {
+export const RegisterQueryNodePlugin: GraphilePlugin.Plugin = {
   name: "RegisterQueryNodePlugin",
   version: "1.0.0",
   description: `Registers the 'Query' type as a 'Node' type. You probably don't want this.`,

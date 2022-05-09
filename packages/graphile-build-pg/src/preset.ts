@@ -1,4 +1,4 @@
-import type { Preset } from "graphile-plugin";
+import "graphile-plugin";
 
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin";
 import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin";
@@ -28,7 +28,7 @@ import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
 
 // TODO: version this.
-export const defaultPreset: Preset = {
+export const defaultPreset: GraphilePlugin.Preset = {
   plugins: [
     PgBasicsPlugin,
     PgCodecsPlugin,

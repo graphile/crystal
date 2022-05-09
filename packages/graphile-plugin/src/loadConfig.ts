@@ -3,7 +3,7 @@ import type { Extension } from "interpret";
 import { jsVariants } from "interpret";
 import { resolve } from "path";
 
-import type { Preset } from "./interfaces";
+import "./interfaces";
 
 const extensions = Object.keys(jsVariants);
 
@@ -45,7 +45,7 @@ async function registerLoader(loader: Extension | null): Promise<void> {
 
 export async function loadConfig(
   configPath?: string | null,
-): Promise<Preset | null> {
+): Promise<GraphilePlugin.Preset | null> {
   if (configPath != null) {
     // Explicitly load the file the user has indicated
 

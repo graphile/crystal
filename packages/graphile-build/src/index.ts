@@ -1,7 +1,7 @@
 import "./global.js";
 import "./interfaces.js";
 
-import type { Plugin, Preset } from "graphile-plugin";
+import "graphile-plugin";
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
@@ -34,12 +34,14 @@ export { GraphileBuild, GraphilePlugin };
 
 export { SchemaBuilder };
 
-const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
+const getSchemaHooks = (plugin: GraphilePlugin.Plugin) => plugin.schema?.hooks;
 
 /**
  * Generate 'build.inflection' from the given preset.
  */
-export const buildInflection = (preset: Preset): GraphileBuild.Inflection => {
+export const buildInflection = (
+  preset: GraphilePlugin.Preset,
+): GraphileBuild.Inflection => {
   const config = resolvePresets([preset]);
   const { plugins, inflection: _options = {} } = config;
 
@@ -95,7 +97,7 @@ export const buildInflection = (preset: Preset): GraphileBuild.Inflection => {
  * One-time gather; see `watchGather` for watch mode.
  */
 export const gather = async (
-  preset: Preset,
+  preset: GraphilePlugin.Preset,
   {
     inflection,
   }: {
@@ -112,7 +114,7 @@ export const gather = async (
   const hooks = new AsyncHooks<GraphilePlugin.GatherHooks>();
 
   const pluginContext = new Map<
-    Plugin,
+    GraphilePlugin.Plugin,
     {
       inflection: GraphileBuild.Inflection;
       helpers: GraphilePlugin.GatherHelpers;
@@ -190,7 +192,7 @@ export const gather = async (
  * you would need this, typically you'll want `buildSchema` instead.
  */
 export const getBuilder = (
-  preset: Preset,
+  preset: GraphilePlugin.Preset,
   inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const config = resolvePresets([preset]);
@@ -208,7 +210,7 @@ export const getBuilder = (
  * Builds a GraphQL schema according to the given preset and input data.
  */
 export const buildSchema = (
-  preset: Preset,
+  preset: GraphilePlugin.Preset,
   input: GraphileBuild.BuildInput,
   options: {
     inflection?: GraphileBuild.Inflection;

@@ -4,7 +4,7 @@ import type { PgClassSinglePlan, PgSourceUnique } from "@dataplan/pg";
 import type { ObjectPlan, TrackedArguments } from "dataplanner";
 import { connection, constant, EdgePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type {
   GraphQLEnumType,
   GraphQLObjectType,
@@ -28,7 +28,7 @@ declare global {
   }
 }
 
-export const PgMutationPayloadEdgePlugin: Plugin = {
+export const PgMutationPayloadEdgePlugin: GraphilePlugin.Plugin = {
   name: "PgMutationPayloadEdgePlugin",
   description:
     "Adds 'edge' field to mutation payloads to aid with Relay pagination",

@@ -10,7 +10,7 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
@@ -72,7 +72,7 @@ interface State {}
 interface Cache {}
 
 // TODO: split this into one plugin for gathering and another for schema
-export const PgRelationsPlugin: Plugin = {
+export const PgRelationsPlugin: GraphilePlugin.Plugin = {
   name: "PgRelationsPlugin",
   description:
     "Creates relationships between the @dataplan/pg data sources, and mirrors these relationships into the GraphQL schema",

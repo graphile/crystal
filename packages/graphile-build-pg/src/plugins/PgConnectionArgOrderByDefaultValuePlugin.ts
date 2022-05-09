@@ -1,11 +1,11 @@
 import "./PgTablesPlugin";
 
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLEnumType } from "graphql";
 
 import { version } from "../index";
 
-export const PgConnectionArgOrderByDefaultValuePlugin: Plugin = {
+export const PgConnectionArgOrderByDefaultValuePlugin: GraphilePlugin.Plugin = {
   name: "PgConnectionArgOrderByDefaultValuePlugin",
   description: "Sets the default 'orderBy' for a table",
   version: version,

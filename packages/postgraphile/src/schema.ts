@@ -2,7 +2,7 @@ import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import type {} from "graphile-build-pg";
-import type { Preset } from "graphile-plugin";
+import "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
 import * as pg from "pg";
 
@@ -51,7 +51,7 @@ export function makePgDatabasesAndContextFromConnectionString(
 function makeConfigFromConnectionString(
   connectionString: string,
   schemas?: string | string[],
-): [Preset, ContextCallback] {
+): [GraphilePlugin.Preset, ContextCallback] {
   const [pgDatabases, contextCallback] =
     makePgDatabasesAndContextFromConnectionString(connectionString, schemas);
 
@@ -72,7 +72,7 @@ function makeConfigFromConnectionString(
 }
 
 export async function makeSchema(
-  preset: Preset,
+  preset: GraphilePlugin.Preset,
   contextCallback: ContextCallback,
 ): Promise<SchemaResult>;
 export async function makeSchema(
@@ -80,7 +80,7 @@ export async function makeSchema(
   schemas?: string | string[],
 ): Promise<SchemaResult>;
 export async function makeSchema(
-  connectionStringOrPreset: string | Preset,
+  connectionStringOrPreset: string | GraphilePlugin.Preset,
   schemasOrContextCallback: string | string[] | ContextCallback | undefined,
 ): Promise<SchemaResult> {
   const [preset, contextCallback] =

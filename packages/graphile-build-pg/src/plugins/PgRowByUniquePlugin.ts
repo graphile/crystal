@@ -1,7 +1,7 @@
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { Plugin } from "graphile-plugin";
+import "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
 import { version } from "../index";
@@ -20,7 +20,7 @@ declare global {
   }
 }
 
-export const PgRowByUniquePlugin: Plugin = {
+export const PgRowByUniquePlugin: GraphilePlugin.Plugin = {
   name: "PgRowByUniquePlugin",
   description:
     "Adds accessors for rows by their unique constraints (technically the @dataplan/pg data sources' 'uniques' property)",
