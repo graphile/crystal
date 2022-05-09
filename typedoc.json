@@ -3,7 +3,11 @@
   "entryPointStrategy": "Packages",
   "name": "Graphile GraphQL Suite",
   "readme": "README.md",
-  "listInvalidSymbolLinks": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "validation": {
+    "invalidLink": true
+  },
   "noMissingExports": true,
   "pluginPages": {
     "source": "pages",

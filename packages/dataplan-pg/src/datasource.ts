@@ -908,7 +908,7 @@ export class PgSource<
    * Returns an SQL fragment that evaluates to `'true'` (string) if the row is
    * non-null and `'false'` or `null` otherwise.
    *
-   * @see {@link PgTypeCodec.nonNullExpression}
+   * @see {@link PgTypeCodec.notNullExpression}
    */
   public getNullCheckExpression(alias: SQL): SQL | null {
     if (this.codec.notNullExpression) {

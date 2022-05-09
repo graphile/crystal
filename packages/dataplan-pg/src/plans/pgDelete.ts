@@ -94,6 +94,8 @@ export class PgDeletePlan<
   /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
    * the relevant queryValues. This saves repeating this work at execution time.
+   *
+   * @internal
    */
   private finalizeResults: PgDeletePlanFinalizeResults | null = null;
 
