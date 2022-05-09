@@ -60,7 +60,6 @@
     "prettier": "^2.5.1",
     "typedoc": "^0.22.15",
     "typedoc-monorepo-link-types": "^0.0.2",
-    "typedoc-plugin-not-exported": "^0.1.6",
     "typescript": "next",
     "webpack": "^5.65.0"
   },
