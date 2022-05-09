@@ -49,6 +49,7 @@ export {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRelationExtensions,
+  PgSourceRow,
   PgSourceUnique,
   PgSourceUniqueExtensions,
 } from "./datasource";

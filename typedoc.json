@@ -2,7 +2,6 @@
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "Packages",
   "name": "Graphile GraphQL Suite",
-  "includeVersion": true,
   "readme": "README.md",
   "listInvalidSymbolLinks": true,
   "noMissingExports": true,

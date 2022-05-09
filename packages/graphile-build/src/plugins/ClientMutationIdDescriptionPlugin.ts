@@ -1,5 +1,3 @@
-import type { Plugin } from "graphile-plugin";
-
 import { version } from "..";
 
 /**
@@ -12,7 +10,7 @@ import { version } from "..";
  * Descriptions aren't required in these places, so you can safely disable this
  * plugin.
  */
-export const ClientMutationIdDescriptionPlugin: Plugin = {
+export const ClientMutationIdDescriptionPlugin: GraphilePlugin.Plugin = {
   name: "ClientMutationIdDescriptionPlugin",
   version,
   description:
