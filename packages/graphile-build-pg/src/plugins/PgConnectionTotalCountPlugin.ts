@@ -12,6 +12,10 @@ import { version } from "../index.js";
 declare global {
   namespace GraphileBuild {
     interface ScopeObjectFieldsField {
+      /**
+       * 'true' if this field is the 'totalCount' field on a connection as
+       * added by {@link PgConnectionTotalCountPlugin}.
+       */
       isPgConnectionTotalCountField?: true;
     }
   }
