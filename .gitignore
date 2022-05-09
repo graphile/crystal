@@ -21,6 +21,9 @@ packages/dataplan-pg/__tests__/**/*.mermaid.png
 !.yarn/plugins
 .pnp.*
 
+# Generated documentation
+docs/
+
 # Benjie's stuff
 Session.vim
 WHAT_ARE_YOU_DOING.md
