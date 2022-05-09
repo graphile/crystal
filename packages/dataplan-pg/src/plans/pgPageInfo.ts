@@ -28,6 +28,8 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  * Invoking PgPageInfoPlan should have no direct overhead (e.g.
  * `pageInfo { __typename }` is free); cost should not be incurred until one of
  * the submethods is called.
+ *
+ * {@page ~@dataplan/pg/plans/pgPageInfo.md}
  */
 export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
   extends ExecutablePlan<any>
@@ -155,6 +157,8 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 
 /**
  * Represents the PageInfo for a Relay-style GraphQL Connection.
+ *
+ * {@page ~@dataplan/pg/plans/pgPageInfo.md}
  */
 export function pgPageInfo<TPlan extends PgSelectPlan<any, any, any, any>>(
   connectionPlan: ConnectionPlan<any, TPlan, any>,

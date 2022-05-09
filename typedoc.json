@@ -1,0 +1,32 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "Packages",
+  "name": "Graphile GraphQL Suite",
+  "includeVersion": true,
+  "readme": "README.md",
+  "listInvalidSymbolLinks": true,
+  "pluginPages": {
+    "source": "pages",
+    "pages": [
+      {
+        "title": "dataplanner",
+        "children": [
+          {
+            "title": "Technical overview",
+            "source": "overview.md"
+          },
+          {
+            "title": "listTransform details",
+            "source": "plans/listTransform.md"
+          }
+        ]
+      },
+      {
+        "title": "@dataplan/pg",
+        "children": [
+          { "title": "pgPageInfo details", "source": "plans/pgPageInfo.md" }
+        ]
+      }
+    ]
+  }
+}

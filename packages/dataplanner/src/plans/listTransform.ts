@@ -205,7 +205,7 @@ export class __ListTransformPlan<
  * A "special" plan that has custom handling in Crystal. Used for turning lists
  * into other things (or maybe more lists!).
  *
- * @see ./listTransform.md
+ * {@page ~dataplanner/plans/listTransform.md}
  */
 export function listTransform<
   TListPlan extends ExecutablePlan<readonly any[]>,

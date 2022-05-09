@@ -2195,6 +2195,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@knodes/typedoc-plugin-pages@npm:^0.22.5":
+  version: 0.22.5
+  resolution: "@knodes/typedoc-plugin-pages@npm:0.22.5"
+  dependencies:
+    "@knodes/typedoc-pluginutils": "npm:~0.22.5"
+  peerDependencies:
+    lodash: ^4.17.0
+    lunr: ^2.3.0
+    typedoc: ^0.22.0
+  checksum: de78caef2b84eca33c00376b7ebb789c98ef9a2859bf03668d9541c9c07882d9672ba3a12ca89097890971433a1fe1bc71c37a8325dc6097fad022e58b2c162a
+  languageName: node
+  linkType: hard
+
 "@knodes/typedoc-pluginutils@npm:~0.22.5":
   version: 0.22.5
   resolution: "@knodes/typedoc-pluginutils@npm:0.22.5"
@@ -11439,6 +11452,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.16.5"
     "@babel/preset-typescript": "npm:^7.16.5"
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.22.5"
+    "@knodes/typedoc-plugin-pages": "npm:^0.22.5"
     "@tsconfig/node16": "npm:^1.0.2"
     "@types/jest": "npm:^27.0.3"
     "@types/mock-fs": "npm:4.13.1"
