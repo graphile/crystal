@@ -1,5 +1,6 @@
-import { __ValuePlan } from "dataplanner";
 import "graphile-plugin";
+
+import { __ValuePlan } from "dataplanner";
 
 import { version } from "../index.js";
 import { isValidObjectType } from "../utils.js";

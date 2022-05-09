@@ -1,9 +1,9 @@
-export { postgraphile } from "./middleware/index.js";
-export { makeSchema } from "./schema.js";
 export type {
+  ContextCallback,
   SchemaResult,
   ServerOptions,
-  ContextCallback,
 } from "./interfaces.js";
+export { postgraphile } from "./middleware/index.js";
+export { makeSchema } from "./schema.js";
 
 export { GraphileBuild, GraphilePlugin };

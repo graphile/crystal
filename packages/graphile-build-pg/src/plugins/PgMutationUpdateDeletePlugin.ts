@@ -1,3 +1,5 @@
+import "graphile-plugin";
+
 import type {
   PgClassSinglePlan,
   PgDeletePlan,
@@ -16,7 +18,6 @@ import type {
 } from "dataplanner";
 import { lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior";

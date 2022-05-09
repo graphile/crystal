@@ -1,9 +1,10 @@
+import "graphile-plugin";
+
 import type { PgInsertPlan, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
 import type { ObjectPlan } from "dataplanner";
 import { constant, ExecutablePlan, object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";

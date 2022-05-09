@@ -1,10 +1,10 @@
 import "graphile-build";
+import "graphile-plugin";
 
 import type { PgSelectSinglePlan } from "@dataplan/pg";
 import type { ListPlan } from "dataplanner";
 import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";

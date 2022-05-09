@@ -1,6 +1,6 @@
 import "./PgTablesPlugin";
-
 import "graphile-plugin";
+
 import type { GraphQLEnumType } from "graphql";
 
 import { version } from "../index";

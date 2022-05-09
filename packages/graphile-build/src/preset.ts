@@ -1,5 +1,4 @@
 import "./interfaces";
-
 import "graphile-plugin";
 
 import {

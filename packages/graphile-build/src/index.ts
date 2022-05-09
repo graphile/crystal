@@ -1,7 +1,6 @@
 import "./global.js";
 import "./interfaces.js";
 
-import "graphile-plugin";
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
@@ -32,7 +31,7 @@ import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 // export globals for TypeDoc
 export { GraphileBuild, GraphilePlugin };
 
-export { SchemaBuilder, NewWithHooksFunction };
+export { NewWithHooksFunction, SchemaBuilder };
 
 const getSchemaHooks = (plugin: GraphilePlugin.Plugin) => plugin.schema?.hooks;
 

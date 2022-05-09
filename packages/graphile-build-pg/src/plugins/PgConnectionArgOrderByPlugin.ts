@@ -1,4 +1,5 @@
 import "./PgTablesPlugin";
+import "graphile-plugin";
 
 import type {
   PgSelectPlan,
@@ -8,7 +9,6 @@ import type {
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 

@@ -1,9 +1,9 @@
+import "./interfaces";
+
 import { access } from "fs/promises";
 import type { Extension } from "interpret";
 import { jsVariants } from "interpret";
 import { resolve } from "path";
-
-import "./interfaces";
 
 const extensions = Object.keys(jsVariants);
 

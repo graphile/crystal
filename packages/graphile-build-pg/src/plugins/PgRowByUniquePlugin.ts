@@ -1,7 +1,8 @@
+import "graphile-plugin";
+
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
 import { version } from "../index";

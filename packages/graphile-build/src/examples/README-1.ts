@@ -2,7 +2,6 @@ import chalk from "chalk";
 import { lambda } from "dataplanner";
 import { readFile } from "fs/promises";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 

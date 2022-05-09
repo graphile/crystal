@@ -4,6 +4,8 @@
  * schema against.
  */
 
+import "graphile-plugin";
+
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import {
@@ -11,7 +13,6 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import "graphile-plugin";
 import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";

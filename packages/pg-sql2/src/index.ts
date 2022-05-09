@@ -199,7 +199,9 @@ function mangleName(str: string): string {
 }
 
 /**
- * A symbol and it's name {@see {@link getSymbolAndName}}.
+ * A symbol and it's name
+ *
+ * @see {@link getSymbolAndName}.
  *
  * @privateRemarks
  *

@@ -1,5 +1,6 @@
-import { EXPORTABLE } from "graphile-export";
 import "graphile-plugin";
+
+import { EXPORTABLE } from "graphile-export";
 import type { GraphQLScalarLiteralParser } from "graphql";
 
 import { version } from "../index.js";

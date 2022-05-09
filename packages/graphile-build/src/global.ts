@@ -142,9 +142,7 @@ declare global {
           ) => GraphileFieldConfigMap<TParentPlan, TContext>);
       interfaces?:
         | GraphQLInterfaceType[]
-        | ((
-            context: ContextObjectInterfaces,
-          ) => GraphQLInterfaceType[]);
+        | ((context: ContextObjectInterfaces) => GraphQLInterfaceType[]);
     }
 
     /** Our take on GraphQLInputObjectTypeConfig that allows for plans */
@@ -463,8 +461,7 @@ declare global {
     }
 
     interface ScopeObjectInterfaces extends ScopeObject {}
-    interface ContextObjectInterfaces
-      extends ContextObject {
+    interface ContextObjectInterfaces extends ContextObject {
       scope: ScopeObjectInterfaces;
       Self: GraphQLObjectType;
     }
@@ -476,21 +473,17 @@ declare global {
       fieldWithHooks: FieldWithHooksFunction;
     }
 
-    interface ScopeObjectFieldsField
-      extends ScopeObjectFields {
+    interface ScopeObjectFieldsField extends ScopeObjectFields {
       fieldName: string;
       fieldDirectives?: DirectiveDetails[];
       isCursorField?: boolean;
     }
-    interface ContextObjectFieldsField
-      extends ContextObjectFields {
+    interface ContextObjectFieldsField extends ContextObjectFields {
       scope: ScopeObjectFieldsField;
     }
 
-    interface ScopeObjectFieldsFieldArgs
-      extends ScopeObjectFieldsField {}
-    interface ContextObjectFieldsFieldArgs
-      extends ContextObjectFieldsField {
+    interface ScopeObjectFieldsFieldArgs extends ScopeObjectFieldsField {}
+    interface ContextObjectFieldsFieldArgs extends ContextObjectFieldsField {
       scope: ScopeObjectFieldsFieldArgs;
     }
 
@@ -500,26 +493,21 @@ declare global {
       type: "GraphQLInterfaceType";
     }
 
-    interface ScopeInterfaceFields
-      extends ScopeInterface {}
-    interface ContextInterfaceFields
-      extends ContextInterface {
+    interface ScopeInterfaceFields extends ScopeInterface {}
+    interface ContextInterfaceFields extends ContextInterface {
       scope: ScopeInterfaceFields;
       Self: GraphQLInterfaceType;
       fieldWithHooks: InterfaceFieldWithHooksFunction;
     }
 
-    interface ScopeInterfaceFieldsField
-      extends ScopeInterfaceFields {
+    interface ScopeInterfaceFieldsField extends ScopeInterfaceFields {
       fieldName: string;
     }
-    interface ContextInterfaceFieldsField
-      extends ContextInterfaceFields {
+    interface ContextInterfaceFieldsField extends ContextInterfaceFields {
       scope: ScopeInterfaceFieldsField;
     }
 
-    interface ScopeInterfaceFieldsFieldArgs
-      extends ScopeInterfaceFieldsField {}
+    interface ScopeInterfaceFieldsFieldArgs extends ScopeInterfaceFieldsField {}
     interface ContextInterfaceFieldsFieldArgs
       extends ContextInterfaceFieldsField {
       scope: ScopeInterfaceFieldsFieldArgs;
@@ -545,21 +533,17 @@ declare global {
       type: "GraphQLInputObjectType";
     }
 
-    interface ScopeInputObjectFields
-      extends ScopeInputObject {}
-    interface ContextInputObjectFields
-      extends ContextInputObject {
+    interface ScopeInputObjectFields extends ScopeInputObject {}
+    interface ContextInputObjectFields extends ContextInputObject {
       scope: ScopeInputObjectFields;
       Self: GraphQLInputObjectType;
       fieldWithHooks: InputFieldWithHooksFunction;
     }
 
-    interface ScopeInputObjectFieldsField
-      extends ScopeInputObject {
+    interface ScopeInputObjectFieldsField extends ScopeInputObject {
       fieldName: string;
     }
-    interface ContextInputObjectFieldsField
-      extends ContextInputObject {
+    interface ContextInputObjectFieldsField extends ContextInputObject {
       scope: ScopeInputObjectFieldsField;
       Self: GraphQLInputObjectType;
     }
@@ -575,10 +559,8 @@ declare global {
       scope: ScopeEnumValues;
     }
 
-    interface ScopeEnumValuesValue
-      extends ScopeEnumValues {}
-    interface ContextEnumValuesValue
-      extends ContextEnumValues {
+    interface ScopeEnumValuesValue extends ScopeEnumValues {}
+    interface ContextEnumValuesValue extends ContextEnumValues {
       scope: ScopeEnumValuesValue;
     }
 

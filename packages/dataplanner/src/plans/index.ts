@@ -50,7 +50,7 @@ export {
   ListTransformOptions,
   ListTransformReduce,
 } from "./listTransform";
-export { makeMapper, map, MapPlan, ActualKeyByDesiredKey } from "./map";
+export { ActualKeyByDesiredKey, makeMapper, map, MapPlan } from "./map";
 export { node, NodePlan } from "./node";
 export { object, ObjectPlan, ObjectPlanMeta } from "./object";
 export { partitionByIndex } from "./partitionByIndex";

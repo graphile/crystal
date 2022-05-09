@@ -1,7 +1,8 @@
+import "graphile-plugin";
+
 import type { NodeIdCodec, NodeIdHandler } from "dataplanner";
 import { node, resolveType } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
 declare global {

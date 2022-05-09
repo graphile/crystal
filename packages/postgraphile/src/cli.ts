@@ -1,4 +1,3 @@
-import "graphile-plugin";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
 import type { IncomingMessage, RequestListener } from "node:http";

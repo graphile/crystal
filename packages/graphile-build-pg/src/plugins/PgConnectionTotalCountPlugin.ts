@@ -1,11 +1,11 @@
 import "./PgTablesPlugin";
 import "./PgBasicsPlugin";
+import "graphile-plugin";
 
 import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 
 import { version } from "../index.js";
 

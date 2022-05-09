@@ -2,7 +2,6 @@ import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import type {} from "graphile-build-pg";
-import "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
 import * as pg from "pg";
 

@@ -1,5 +1,4 @@
 import "./ConnectionPlugin";
-
 import "graphile-plugin";
 
 import { version } from "../index.js";

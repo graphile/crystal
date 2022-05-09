@@ -1,7 +1,8 @@
+import "graphile-plugin";
+
 import type { ExecutablePlan } from "dataplanner";
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";
 
 import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";

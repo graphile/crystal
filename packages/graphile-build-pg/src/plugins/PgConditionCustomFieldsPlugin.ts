@@ -1,3 +1,5 @@
+import "graphile-plugin";
+
 import type {
   PgConditionPlan,
   PgSelectPlan,
@@ -6,7 +8,6 @@ import type {
 } from "@dataplan/pg";
 import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";

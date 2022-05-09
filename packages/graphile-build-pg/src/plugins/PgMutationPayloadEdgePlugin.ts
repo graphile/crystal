@@ -1,10 +1,10 @@
 import "graphile-build";
+import "graphile-plugin";
 
 import type { PgClassSinglePlan, PgSourceUnique } from "@dataplan/pg";
 import type { ObjectPlan, TrackedArguments } from "dataplanner";
 import { connection, constant, EdgePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type {
   GraphQLEnumType,
   GraphQLObjectType,

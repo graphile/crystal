@@ -1,8 +1,8 @@
 import "./PgTablesPlugin";
+import "graphile-plugin";
 
 import type { PgSelectPlan, PgSourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 
 import { version } from "../index";
 

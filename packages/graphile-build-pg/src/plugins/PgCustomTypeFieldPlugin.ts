@@ -3,6 +3,7 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import "./PgProceduresPlugin";
+import "graphile-plugin";
 
 import type {
   PgClassSinglePlan,
@@ -29,7 +30,6 @@ import {
   ObjectPlan,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";

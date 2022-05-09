@@ -1,3 +1,5 @@
+import "graphile-plugin";
+
 import type {
   ExecutablePlan,
   NodeIdCodec,
@@ -6,7 +8,6 @@ import type {
 } from "dataplanner";
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 
 import { version } from "../index";
 

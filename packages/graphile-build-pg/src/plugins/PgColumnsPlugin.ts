@@ -1,6 +1,7 @@
 import "graphile-build";
 import "./PgTablesPlugin";
 import "../interfaces";
+import "graphile-plugin";
 
 import type {
   PgSelectSinglePlan,
@@ -16,7 +17,6 @@ import {
 } from "@dataplan/pg";
 import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
 
 import { getBehavior } from "../behavior";

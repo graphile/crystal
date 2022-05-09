@@ -23,7 +23,6 @@ import {
   QueryQueryPlugin,
 } from "graphile-build";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import "graphile-plugin";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";

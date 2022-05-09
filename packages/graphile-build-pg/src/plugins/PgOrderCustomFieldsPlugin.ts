@@ -1,8 +1,8 @@
 import "./PgTablesPlugin";
+import "graphile-plugin";
 
 import type { PgSelectPlan, PgSource, PgSourceParameter } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";

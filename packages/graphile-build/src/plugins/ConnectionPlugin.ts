@@ -1,7 +1,8 @@
+import "graphile-plugin";
+
 import type { EdgeCapablePlan, PageInfoCapablePlan } from "dataplanner";
 import { ConnectionPlan, ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";

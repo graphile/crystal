@@ -1,4 +1,5 @@
 import "./PgTablesPlugin";
+import "graphile-plugin";
 
 import type {
   PgConditionPlan,
@@ -8,7 +9,6 @@ import type {
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
 import { getBehavior } from "../behavior";

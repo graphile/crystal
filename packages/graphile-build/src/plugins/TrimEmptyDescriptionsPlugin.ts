@@ -1,4 +1,5 @@
 import "graphile-plugin";
+
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,

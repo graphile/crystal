@@ -1,6 +1,6 @@
-import * as assert from "assert";
-
 import "./interfaces.js";
+
+import * as assert from "assert";
 
 function isResolvedPreset(
   preset: GraphilePlugin.Preset,

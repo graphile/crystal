@@ -1,5 +1,6 @@
 import "graphile-build";
 import "./PgTablesPlugin.js";
+import "graphile-plugin";
 
 import type {
   PgSelectSinglePlan,
@@ -10,7 +11,6 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 

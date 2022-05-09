@@ -1,10 +1,10 @@
 import "graphile-build";
 import "./PgBasicsPlugin";
 import "../interfaces";
+import "graphile-plugin";
 
 import type { PgHStore } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import "graphile-plugin";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../index";

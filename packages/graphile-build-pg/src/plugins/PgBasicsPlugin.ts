@@ -1,9 +1,9 @@
 import "graphile-build";
 import "./PgTablesPlugin";
 import "../interfaces";
+import "graphile-plugin";
 
 import type { PgTypeCodec } from "@dataplan/pg";
-import "graphile-plugin";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
