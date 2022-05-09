@@ -40,18 +40,18 @@ And please give some love to our featured sponsors 🤩:
 
 Add to your eslintrc:
 
-```json5
+```jsonc
 {
   //...
-  plugins: [
+  "plugins": [
     //...
-    "graphile-export",
+    "graphile-export"
     //...
   ],
-  extends: [
+  "extends": [
     // ...
-    "plugin:graphile-export/recommended",
-  ],
+    "plugin:graphile-export/recommended"
+  ]
   // ...
 }
 ```

@@ -51,24 +51,24 @@ const initialState = () => [];
  *
  * @example For this data:
  *
- * ```json5
+ * ```jsonc
  * [
- *   {array_idx: 1, id: 'b0b00000-0000-0000-0000-000000000b0b', username: 'Bob'},
- *   {array_idx: 2, id: 'a11ce000-0000-0000-0000-0000000a11ce', username: 'Alice'}],
- *   {array_idx: 2, id: 'cec111a0-0000-0000-0000-00000cec111a', username: 'Cecilia'}],
+ *   {"array_idx": 1, "id": "b0b00000-0000-0000-0000-000000000b0b", "username": "Bob"},
+ *   {"array_idx": 2, "id": "a11ce000-0000-0000-0000-0000000a11ce", "username": "Alice"}],
+ *   {"array_idx": 2, "id": "cec111a0-0000-0000-0000-00000cec111a", "username": "Cecilia"}],
  * ]
  * ```
  *
  * partitioning by the array_idx (which is 1-indexed), would result in:
  *
- * ```json5
+ * ```jsonc
  * [
  *   [
- *     {array_idx: 1, id: 'b0b00000-0000-0000-0000-000000000b0b', username: 'Bob'},
+ *     {"array_idx": 1, "id": "b0b00000-0000-0000-0000-000000000b0b", "username": "Bob"},
  *   ],
  *   [
- *     {array_idx: 2, id: 'a11ce000-0000-0000-0000-0000000a11ce', username: 'Alice'}],
- *     {array_idx: 2, id: 'cec111a0-0000-0000-0000-00000cec111a', username: 'Cecilia'}],
+ *     {"array_idx": 2, "id": "a11ce000-0000-0000-0000-0000000a11ce", "username": "Alice"}],
+ *     {"array_idx": 2, "id": "cec111a0-0000-0000-0000-00000cec111a", "username": "Cecilia"}],
  *   ],
  * ]
  * ```
