@@ -2182,6 +2182,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@knodes/typedoc-plugin-monorepo-readmes@npm:^0.22.5":
+  version: 0.22.5
+  resolution: "@knodes/typedoc-plugin-monorepo-readmes@npm:0.22.5"
+  dependencies:
+    "@knodes/typedoc-pluginutils": "npm:~0.22.5"
+    find-up: "npm:^4.1.0"
+  peerDependencies:
+    lodash: ^4.17.0
+    typedoc: ^0.22.0
+  checksum: 66a7ad030208d2bc325f669bfac95b99b80fc673f69fa153f4dda98b37ba3444e2373bebad203d9f3bf51e7dcf46328e694828259d4505f875f04e89fa75b426
+  languageName: node
+  linkType: hard
+
+"@knodes/typedoc-pluginutils@npm:~0.22.5":
+  version: 0.22.5
+  resolution: "@knodes/typedoc-pluginutils@npm:0.22.5"
+  dependencies:
+    pkg-up: "npm:^3.1.0"
+    semver: "npm:^7.3.5"
+  peerDependencies:
+    lodash: ^4.17.0
+    typedoc: ^0.22.0
+  checksum: 90662fb1f25b626727f214d14d78d2509b5432ebb50cbb8cd03b844c5bdc824f681ef35531acf8905dc24feeb926e76a6cceb2963da966400533dea9f0bdff20
+  languageName: node
+  linkType: hard
+
 "@lezer/common@npm:^0.15.0, @lezer/common@npm:^0.15.5":
   version: 0.15.12
   resolution: "@lezer/common@npm:0.15.12"
@@ -6898,6 +6924,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"find-up@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "find-up@npm:3.0.0"
+  dependencies:
+    locate-path: "npm:^3.0.0"
+  checksum: edbd2334fcfb1391af9f246bbf6aa2e7187bdc807150ba7e39dca2c0a7a07560ea49dd7a86e266465de0934958da6ad0f9526d46af1e952f1d2fb858d76bc598
+  languageName: node
+  linkType: hard
+
 "find-up@npm:^4.0.0, find-up@npm:^4.1.0":
   version: 4.1.0
   resolution: "find-up@npm:4.1.0"
@@ -9215,6 +9250,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"locate-path@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "locate-path@npm:3.0.0"
+  dependencies:
+    p-locate: "npm:^3.0.0"
+    path-exists: "npm:^3.0.0"
+  checksum: ca3f5b4f7f8f9dc8f650b7a9ced56babaeeb3da4b34eea236cc75a62ac69626aa13b784685d3a9d6e8ce383c8921912823c8a2d16cd8cd68a0484d8ca8d98e09
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^5.0.0":
   version: 5.0.0
   resolution: "locate-path@npm:5.0.0"
@@ -10212,7 +10257,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-limit@npm:^2.2.0":
+"p-limit@npm:^2.0.0, p-limit@npm:^2.2.0":
   version: 2.3.0
   resolution: "p-limit@npm:2.3.0"
   dependencies:
@@ -10227,6 +10272,15 @@ __metadata:
   dependencies:
     p-limit: "npm:^1.1.0"
   checksum: bec5584bafa1f21965eef193c7c0d37be9e71d24c4f749a08b3f68d1a10e1c020b4b20e840be4d0be4a9204efe4eaa2f51edc74fdc531d427e909261ad1c67b8
+  languageName: node
+  linkType: hard
+
+"p-locate@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "p-locate@npm:3.0.0"
+  dependencies:
+    p-limit: "npm:^2.0.0"
+  checksum: b54aaaebb15cc2d854752e424d73f9626aefdc5700821836a247f41039b668ebfa9e702e672adc79643ecdb7518fce92d0d721ea59754afcef32681aab4a732d
   languageName: node
   linkType: hard
 
@@ -10591,6 +10645,15 @@ __metadata:
   dependencies:
     find-up: "npm:^2.1.0"
   checksum: 74b2ca0abefdb6d5d41e623d8ae356807cebca11252a50f31fbe141834addffdc37fd64726ebbf4c49bd154c9fcc533e8140cd759b0c1de56ee5b08b48b38a9d
+  languageName: node
+  linkType: hard
+
+"pkg-up@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "pkg-up@npm:3.1.0"
+  dependencies:
+    find-up: "npm:^3.0.0"
+  checksum: 98db94ac40bd11694516ed7298bb971f38a064ec78e0d123a159d0056791834611289f9588313e573c65f07268d565c4550ec1463ddc24008bc453505afac996
   languageName: node
   linkType: hard
 
@@ -11375,6 +11438,7 @@ __metadata:
     "@babel/plugin-transform-runtime": "npm:^7.16.5"
     "@babel/preset-env": "npm:^7.16.5"
     "@babel/preset-typescript": "npm:^7.16.5"
+    "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.22.5"
     "@tsconfig/node16": "npm:^1.0.2"
     "@types/jest": "npm:^27.0.3"
     "@types/mock-fs": "npm:4.13.1"

@@ -30,6 +30,7 @@
     "@babel/plugin-transform-runtime": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
+    "@knodes/typedoc-plugin-monorepo-readmes": "^0.22.5",
     "@tsconfig/node16": "^1.0.2",
     "@types/jest": "^27.0.3",
     "@types/mock-fs": "4.13.1",
