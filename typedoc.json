@@ -5,6 +5,7 @@
   "includeVersion": true,
   "readme": "README.md",
   "listInvalidSymbolLinks": true,
+  "noMissingExports": true,
   "pluginPages": {
     "source": "pages",
     "pages": [
