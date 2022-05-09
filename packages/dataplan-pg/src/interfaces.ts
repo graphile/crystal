@@ -200,7 +200,7 @@ export interface PgGroupSpec {
   // TODO: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
-type TuplePlanMap<
+export type TuplePlanMap<
   TColumns extends { [column: string]: any },
   TTuple extends ReadonlyArray<keyof TColumns>,
 > = {

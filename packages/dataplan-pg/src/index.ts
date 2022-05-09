@@ -81,6 +81,7 @@ export {
   PgTypeCodecExtensions,
   PgTypedExecutablePlan,
   PlanByUniques,
+  TuplePlanMap,
 } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
