@@ -69,6 +69,14 @@ export interface PgClientResult<TData> {
  */
 export interface PgClient {
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
+  /**
+   * Listens to the given topic and calls the callback on matching events.
+   * Returns a function to call to stop listening.
+   */
+  listen?<TEvent>(
+    topic: string,
+    callback: (event: TEvent) => void,
+  ): Promise<() => void>;
 
   startTransaction(): Promise<void>;
   commitTransaction(): Promise<void>;

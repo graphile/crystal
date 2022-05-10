@@ -94,16 +94,16 @@ export const buildInflection = (
 };
 
 /**
- * One-time gather; see `watchGather` for watch mode.
+ * @internal
  */
-export const gather = async (
+const gatherBase = (
   preset: GraphileConfig.Preset,
   {
     inflection,
   }: {
     inflection: GraphileBuild.Inflection;
   } = { inflection: buildInflection(preset) },
-): Promise<GraphileBuild.BuildInput> => {
+) => {
   const resolvedPreset = resolvePresets([preset]);
   const options = resolvedPreset.gather || {};
   const plugins = resolvedPreset.plugins;
@@ -118,12 +118,11 @@ export const gather = async (
     GatherPluginContext<any, any>
   >();
 
+  const gatherPlugins = plugins.filter((p) => p.gather);
+
   // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
-  for (const plugin of plugins) {
-    const spec = plugin.gather;
-    if (!spec) {
-      continue;
-    }
+  for (const plugin of gatherPlugins) {
+    const spec = plugin.gather!;
     if (spec.namespace in globalState) {
       // TODO: track who registers which namespace, output more helpful error.
       throw new Error(
@@ -152,13 +151,12 @@ export const gather = async (
 
   // Register the hooks
   applyHooks(
-    plugins,
-    (p) => p.gather?.hooks,
+    gatherPlugins,
+    (p) => p.gather!.hooks,
     (name, fn, plugin) => {
-      const context = pluginContext.get(plugin);
-      if (!context) {
-        throw new Error("No context for this plugin?");
-      }
+      const context = pluginContext.get(plugin)!;
+
+      // hooks.hook(name, (...args) => fn(context, ...args));
       (hooks.hook as any)(
         name as any,
         ((...args: any[]) => (fn as any)(context, ...args)) as any,
@@ -166,19 +164,137 @@ export const gather = async (
     },
   );
 
-  // Now call the main functions
-  const output: Partial<GraphileBuild.BuildInput> = {};
-  for (const plugin of plugins) {
-    if (plugin.gather?.main) {
-      const context = pluginContext.get(plugin);
-      if (!context) {
-        throw new Error("No context for this plugin?");
-      }
-      await plugin.gather.main(output, context);
+  async function run() {
+    // Reset state
+    for (const plugin of gatherPlugins) {
+      const spec = plugin.gather!;
+      const context = pluginContext.get(plugin)!;
+      context.state = gatherState[spec.namespace] = spec.initialState?.() ?? {};
     }
+
+    // Now call the main functions
+    const output: Partial<GraphileBuild.BuildInput> = {};
+    for (const plugin of gatherPlugins) {
+      const spec = plugin.gather!;
+      if (spec.main) {
+        const context = pluginContext.get(plugin)!;
+        await spec.main(output, context);
+      }
+    }
+
+    return output as GraphileBuild.BuildInput;
   }
 
-  return output as GraphileBuild.BuildInput;
+  async function watch(
+    callback: (gather: GraphileBuild.BuildInput | null, error?: Error) => void,
+  ): Promise<() => void> {
+    let stopped = false;
+    const unlisten: Array<() => void> = [];
+    let runAgain = false;
+    let runInProgress = true;
+    const handleChange = () => {
+      if (stopped) return;
+      if (runInProgress) {
+        runAgain = true;
+        return;
+      }
+      runAgain = false;
+      runInProgress = true;
+      run().then(
+        (v) => {
+          if (stopped) return;
+          try {
+            callback(v);
+          } catch {
+            // TODO: this indicates a bug in user code; how to handle?
+            /*nom nom nom*/
+          }
+          runInProgress = false;
+          if (runAgain) handleChange();
+        },
+        (e) => {
+          if (stopped) return;
+          try {
+            callback(null, e);
+          } catch {
+            // TODO: this indicates a bug in user code; how to handle?
+            /*nom nom nom*/
+          }
+          runInProgress = false;
+          if (runAgain) handleChange();
+        },
+      );
+    };
+
+    // Put all the plugins into watch mode.
+    for (const plugin of gatherPlugins) {
+      const spec = plugin.gather!;
+      if (spec.watch) {
+        const context = pluginContext.get(plugin)!;
+        unlisten.push(await spec.watch(context, handleChange));
+      }
+    }
+
+    // Trigger the first build, being sure it completes before resolving
+    try {
+      // Clear 'runAgain' since we're starting now
+      runAgain = false;
+      const firstResult = await run();
+      callback(firstResult);
+    } catch (e) {
+      callback(null, e);
+    }
+    runInProgress = false;
+
+    if (runAgain) {
+      handleChange();
+    }
+
+    // Return the unlistener.
+    return () => {
+      stopped = true;
+      unlisten.forEach((cb) => cb());
+    };
+  }
+
+  return {
+    run,
+    watch,
+  };
+};
+
+/**
+ * One-time gather. See `watchGather` for watch mode.
+ */
+export const gather = (
+  preset: GraphileConfig.Preset,
+  helpers?: {
+    inflection: GraphileBuild.Inflection;
+  },
+): Promise<GraphileBuild.BuildInput> => {
+  const { run } = gatherBase(preset, helpers);
+  return run();
+};
+
+/**
+ * Tells your gather plugins to monitor their sources, and passes the resulting
+ * BuildInput to the callback each time a new one is generated. It is
+ * guaranteed that the `callback` will be called at least once before the
+ * promise resolves.
+ *
+ * @returns A callback to call to stop watching.
+ */
+export const watchGather = (
+  preset: GraphileConfig.Preset,
+  helpers:
+    | {
+        inflection: GraphileBuild.Inflection;
+      }
+    | undefined,
+  callback: (gather: GraphileBuild.BuildInput | null, error?: Error) => void,
+): Promise<() => void> => {
+  const { watch } = gatherBase(preset, helpers);
+  return watch(callback);
 };
 
 /**

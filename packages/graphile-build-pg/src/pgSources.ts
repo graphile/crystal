@@ -1,5 +1,5 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
-import type { PromiseOrDirect } from "dataplanner";
+import { defer, PromiseOrDirect } from "dataplanner";
 import { isPromiseLike } from "dataplanner";
 
 import type { KeysOfType } from "./interfaces.js";
@@ -124,4 +124,25 @@ export async function withPgClientFromPgSource<T>(
   } finally {
     withPgClient.release!();
   }
+}
+
+export async function listenWithPgClientFromPgSource(
+  source: GraphileConfig.PgDatabaseConfiguration,
+  topic: string,
+  callback: (event: any) => void,
+): Promise<() => void> {
+  const deferredUnlisten = defer<() => void>();
+  withPgClientFromPgSource(source, null, async (client) => {
+    if (!client.listen) {
+      throw new Error(`Client for '${source.name}' does not support listening`);
+    }
+    const keepalive = defer();
+    const unlisten = await client.listen!(topic, callback);
+    deferredUnlisten.resolve(() => {
+      unlisten();
+      keepalive.resolve();
+    });
+    return keepalive;
+  }).catch((e) => deferredUnlisten.reject(e));
+  return deferredUnlisten;
 }

@@ -2,7 +2,7 @@ import "graphile-build";
 
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
-import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
+import { defer, ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import type { PluginHook } from "graphile-config";
@@ -32,7 +32,11 @@ import {
 
 import { version } from "../index.js";
 import type { KeysOfType } from "../interfaces.js";
-import { withPgClientFromPgSource } from "../pgSources.js";
+import {
+  listenWithPgClientFromPgSource,
+  withPgClientFromPgSource,
+} from "../pgSources.js";
+import { watchFixtures } from "../watchFixtures.js";
 
 export type PgEntityWithId =
   | PgNamespace
@@ -48,6 +52,18 @@ export type PgEntityWithId =
   | PgLanguage;
 
 declare global {
+  namespace GraphileBuild {
+    // TODO: Should we move this interface (which is defined in many places) to GraphileConfig?
+    interface GraphileBuildGatherOptions {
+      /**
+       * Should we attempt to install the watch fixtures into the database?
+       *
+       * Default: true
+       */
+      installWatchFixtures?: boolean;
+    }
+  }
+
   namespace GraphileConfig {
     interface GatherHelpers {
       pgIntrospection: {
@@ -236,16 +252,17 @@ declare global {
   }
 }
 
+type IntrospectionResults = Array<{
+  database: GraphileConfig.PgDatabaseConfiguration;
+  introspection: Introspection;
+}>;
+
 interface Cache {
-  introspectionResultsPromise: null | Promise<
-    {
-      database: GraphileConfig.PgDatabaseConfiguration;
-      introspection: Introspection;
-    }[]
-  >;
+  introspectionResultsPromise: null | Promise<IntrospectionResults>;
 }
 
 interface State {
+  introspectionResultsPromise: null | Promise<IntrospectionResults>;
   executors: {
     [key: string]: PgExecutor;
   };
@@ -307,6 +324,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       introspectionResultsPromise: null,
     }),
     initialState: (): State => ({
+      introspectionResultsPromise: null,
       executors: {},
     }),
     helpers: {
@@ -436,35 +454,88 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       getIntrospection(info) {
-        if (info.cache.introspectionResultsPromise) {
-          return info.cache.introspectionResultsPromise;
-        }
-        if (!info.resolvedPreset.pgSources) {
-          return [];
-        }
-        // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
-        const introspectionPromise = Promise.all(
-          info.resolvedPreset.pgSources.map(async (database) => {
-            const introspectionQuery = makeIntrospectionQuery();
-            const {
-              rows: [row],
-            } = await withPgClientFromPgSource(database, null, (client) =>
-              client.query<{ introspection: string }>({
-                text: introspectionQuery,
-              }),
-            );
-            if (!row) {
-              throw new Error("Introspection failed");
-            }
-            const introspection = parseIntrospectionResults(row.introspection);
-            return { database, introspection };
-          }),
-        );
-        info.cache.introspectionResultsPromise = introspectionPromise;
+        // IMPORTANT: introspection shouldn't change within a single run (even
+        // if the cache does), thus we add it to state.
 
-        return introspectionPromise;
+        if (info.state.introspectionResultsPromise) {
+          return info.state.introspectionResultsPromise;
+        }
+
+        info.state.introspectionResultsPromise = (async () => {
+          if (info.cache.introspectionResultsPromise) {
+            return info.cache.introspectionResultsPromise;
+          }
+          if (!info.resolvedPreset.pgSources) {
+            return [];
+          }
+          // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
+          const introspectionPromise = Promise.all(
+            info.resolvedPreset.pgSources.map(async (database) => {
+              const introspectionQuery = makeIntrospectionQuery();
+              const {
+                rows: [row],
+              } = await withPgClientFromPgSource(database, null, (client) =>
+                client.query<{ introspection: string }>({
+                  text: introspectionQuery,
+                }),
+              );
+              if (!row) {
+                throw new Error("Introspection failed");
+              }
+              const introspection = parseIntrospectionResults(
+                row.introspection,
+              );
+              return { database, introspection };
+            }),
+          );
+          info.cache.introspectionResultsPromise = introspectionPromise;
+          return introspectionPromise;
+        })();
+
+        return info.state.introspectionResultsPromise;
       },
     },
+
+    async watch(info, callback) {
+      const unlistens: Array<() => void> = [];
+      for (const pgSource of info.resolvedPreset.pgSources ?? []) {
+        // install the watch fixtures
+        if (info.options.installWatchFixtures ?? true) {
+          try {
+            await withPgClientFromPgSource(pgSource, null, (client) =>
+              client.query({ text: watchFixtures }),
+            );
+          } catch (e) {
+            console.warn(
+              `Failed to install watch fixtures into '${pgSource.name}': ${e}`,
+            );
+          }
+        }
+        try {
+          unlistens.push(
+            await listenWithPgClientFromPgSource(
+              pgSource,
+              "postgraphile_watch",
+              (event) => {
+                callback();
+              },
+            ),
+          );
+        } catch (e) {
+          console.warn(`Failed to watch '${pgSource.name}': ${e}`);
+        }
+      }
+      return () => {
+        for (const cb of unlistens) {
+          try {
+            cb();
+          } catch {
+            /*nom nom nom*/
+          }
+        }
+      };
+    },
+
     async main(_output, info) {
       const introspections =
         await info.helpers.pgIntrospection.getIntrospection();

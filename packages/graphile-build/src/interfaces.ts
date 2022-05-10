@@ -169,6 +169,16 @@ declare global {
         output: Partial<GraphileBuild.BuildInput>,
         info: GatherPluginContext<TState, TCache>,
       ) => Promise<void>;
+
+      /**
+       * Called when the plugin is put into watch mode; the plugin should call
+       * the given callback whenever a change is detected, and should return a
+       * function that prevents this behaviour.
+       */
+      watch?: (
+        info: GatherPluginContext<TState, TCache>,
+        callback: () => void,
+      ) => Promise<() => void>;
     }
 
     interface Plugin {

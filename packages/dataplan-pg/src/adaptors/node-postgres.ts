@@ -12,6 +12,11 @@ import * as pg from "pg";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../executor";
 
+// TODO: security sensitive, review this.
+function escapeIdentifier(str: string): string {
+  return '"' + str.replace(/"/g, '""') + '"';
+}
+
 declare global {
   namespace DataPlanner {
     interface PgDatabaseAdaptorOptions {
@@ -79,6 +84,21 @@ export function makeNodePostgresWithPgClient(
       : [];
     /** If transactions become unpaired, prevent any further usage */
     let catastrophicFailure: Error | null = null;
+
+    const subscriptions = new Map<string, ((notification: any) => void)[]>();
+
+    pgClient.on("notification", (notification) => {
+      const subs = subscriptions.get(notification.channel);
+      if (subs) {
+        for (const cb of subs) {
+          try {
+            cb(notification);
+          } catch {
+            /*nom nom nom*/
+          }
+        }
+      }
+    });
 
     try {
       const client: PgClient = {
@@ -159,6 +179,35 @@ export function makeNodePostgresWithPgClient(
             throw e;
           }
         },
+
+        async listen(topic, callback) {
+          const subs = subscriptions.get(topic) ?? [];
+          if (subs.length === 0) {
+            subs.push(callback);
+            subscriptions.set(topic, subs);
+            pgClient
+              .query({ text: `listen ${escapeIdentifier(topic)}` })
+              .catch(() => {
+                /*nom nom nom*/
+              });
+          } else {
+            subs.push(callback);
+          }
+          return () => {
+            const i = subs.indexOf(callback);
+            if (i >= 0) {
+              subs.splice(i, 1);
+              if (subs.length === 0) {
+                pgClient
+                  .query({ text: `unlisten ${escapeIdentifier(topic)}` })
+                  .catch(() => {
+                    /*nom nom nom*/
+                  });
+              }
+            }
+          };
+        },
+
         async startTransaction() {
           if (catastrophicFailure !== null) {
             throw catastrophicFailure;
