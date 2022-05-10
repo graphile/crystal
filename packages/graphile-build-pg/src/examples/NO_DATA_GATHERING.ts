@@ -22,8 +22,8 @@ import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
 } from "graphile-build";
-import { EXPORTABLE, exportSchema } from "graphile-export";
 import { resolvePresets } from "graphile-config";
+import { EXPORTABLE, exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import sql from "pg-sql2";

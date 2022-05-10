@@ -5,8 +5,8 @@ import { PgExecutor } from "@dataplan/pg";
 import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
-import { EXPORTABLE } from "graphile-export";
 import type { PluginHook } from "graphile-config";
+import { EXPORTABLE } from "graphile-export";
 import type {
   Introspection,
   PgAttribute,

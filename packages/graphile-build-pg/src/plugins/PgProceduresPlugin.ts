@@ -9,8 +9,8 @@ import type {
   PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-export";
 import type { PluginHook } from "graphile-config";
+import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";

@@ -11,8 +11,8 @@ import {
   recordType,
   TYPES,
 } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-export";
 import type { PluginHook } from "graphile-config";
+import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 

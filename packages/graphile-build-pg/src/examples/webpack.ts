@@ -9,8 +9,8 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import { exportSchema } from "graphile-export";
 import { resolvePresets } from "graphile-config";
+import { exportSchema } from "graphile-export";
 import { Pool } from "pg";
 import webpack from "webpack";
 
