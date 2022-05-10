@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "dataplanner";
@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-export const PgRowByUniquePlugin: GraphilePlugin.Plugin = {
+export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
   name: "PgRowByUniquePlugin",
   description:
     "Adds accessors for rows by their unique constraints (technically the @dataplan/pg data sources' 'uniques' property)",

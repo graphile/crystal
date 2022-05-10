@@ -17,7 +17,7 @@ import chalk from "chalk";
 import { useDataPlanner, useMoreDetailedErrors } from "dataplanner/envelop";
 import fastify from "fastify";
 import { buildInflection, buildSchema, gather } from "graphile-build";
-import { resolvePresets } from "graphile-plugin";
+import { resolvePresets } from "graphile-config";
 import {
   getGraphQLParameters,
   processRequest,

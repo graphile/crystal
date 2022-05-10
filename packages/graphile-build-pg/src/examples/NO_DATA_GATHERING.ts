@@ -23,7 +23,7 @@ import {
   QueryQueryPlugin,
 } from "graphile-build";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { resolvePresets } from "graphile-plugin";
+import { resolvePresets } from "graphile-config";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import sql from "pg-sql2";
@@ -69,7 +69,7 @@ async function main() {
   );
   // TODO: extract this to be usable in general and not specific to this
   // example file.
-  const UseRelationNamesPlugin: GraphilePlugin.Plugin = {
+  const UseRelationNamesPlugin: GraphileConfig.Plugin = {
     name: "UseRelationNamesPlugin",
     version: "0.0.0",
     inflection: {

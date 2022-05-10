@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgTypeCodec } from "@dataplan/pg";
 import { object } from "dataplanner";
@@ -28,7 +28,7 @@ declare global {
 }
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface GatherHelpers {
       pgJWT: Record<string, never>;
     }
@@ -38,7 +38,7 @@ declare global {
 interface State {}
 interface Cache {}
 
-export const PgJWTPlugin: GraphilePlugin.Plugin = {
+export const PgJWTPlugin: GraphileConfig.Plugin = {
   name: "PgJWTPlugin",
   description:
     "Converts a Postgres JWT object type into a GraphQL scalar type containing a signed JWT",
@@ -62,7 +62,7 @@ export const PgJWTPlugin: GraphilePlugin.Plugin = {
         }
       },
     },
-  } as GraphilePlugin.PluginGatherConfig<"pgJWT", State, Cache>,
+  } as GraphileConfig.PluginGatherConfig<"pgJWT", State, Cache>,
 
   schema: {
     hooks: {

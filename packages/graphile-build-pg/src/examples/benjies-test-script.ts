@@ -25,7 +25,7 @@ import {
   SwallowErrorsPlugin,
 } from "graphile-build";
 import { exportSchema } from "graphile-export";
-import { resolvePresets } from "graphile-plugin";
+import { resolvePresets } from "graphile-config";
 import { graphql } from "graphql";
 import {
   getGraphQLParameters,

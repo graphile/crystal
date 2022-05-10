@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   ExecutablePlan,
@@ -37,7 +37,7 @@ const specForHandler =
     return null;
   };
 
-export const NodeAccessorPlugin: GraphilePlugin.Plugin = {
+export const NodeAccessorPlugin: GraphileConfig.Plugin = {
   name: "NodeAccessorPlugin",
   description:
     "Adds accessors for the various types registered with the Global Unique Object Identification ID (Node ID) system",

@@ -17,6 +17,6 @@
     { "path": "../lru" },
     { "path": "../dataplanner" },
     { "path": "../graphile-export" },
-    { "path": "../graphile-plugin" }
+    { "path": "../graphile-config" }
   ]
 }

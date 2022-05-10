@@ -44,8 +44,8 @@
     "dataplanner": "workspace:^",
     "debug": "^4.3.3",
     "graphile-build": "workspace:*",
+    "graphile-config": "workspace:^",
     "graphile-export": "workspace:^",
-    "graphile-plugin": "workspace:^",
     "jsonwebtoken": "^8.5.1",
     "pg-introspection": "workspace:^",
     "tslib": "^2.3.1"

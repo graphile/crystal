@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { aether } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -10,7 +10,7 @@ import { version } from "../index";
  * out to be quite helpful but if you don't want it in your schema then it's
  * safe to disable this plugin.
  */
-export const MutationPayloadQueryPlugin: GraphilePlugin.Plugin = {
+export const MutationPayloadQueryPlugin: GraphileConfig.Plugin = {
   name: "MutationPayloadQueryPlugin",
   description:
     "Adds the 'query' field to mutation payloads; useful for follow-up queries after a mutation",

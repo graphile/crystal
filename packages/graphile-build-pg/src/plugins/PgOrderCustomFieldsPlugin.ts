@@ -1,5 +1,5 @@
 import "./PgTablesPlugin";
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgSelectPlan, PgSource, PgSourceParameter } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-export const PgOrderCustomFieldsPlugin: GraphilePlugin.Plugin = {
+export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
   name: "PgOrderCustomFieldsPlugin",
   description: "Adds ordering by 'computed column' functions",
   version: version,

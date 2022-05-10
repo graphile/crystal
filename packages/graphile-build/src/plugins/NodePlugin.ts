@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type { NodeIdCodec, NodeIdHandler } from "dataplanner";
 import { node, resolveType } from "dataplanner";
@@ -36,7 +36,7 @@ export const NODE_ID_CODECS = Symbol("nodeIdCodecs");
  */
 export const NODE_ID_HANDLER_BY_TYPE_NAME = Symbol("nodeIdHandlerByTypeName");
 
-export const NodePlugin: GraphilePlugin.Plugin = {
+export const NodePlugin: GraphileConfig.Plugin = {
   name: "NodePlugin",
   version: "1.0.0",
   description: `Adds the interfaces required to support the GraphQL Global Object Identification Specification`,

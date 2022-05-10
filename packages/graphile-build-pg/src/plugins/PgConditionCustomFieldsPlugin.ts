@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgConditionPlan,
@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-export const PgConditionCustomFieldsPlugin: GraphilePlugin.Plugin = {
+export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   name: "PgConditionCustomFieldsPlugin",
   description:
     "Add GraphQL conditions based on 'filterable' PostgreSQL functions",

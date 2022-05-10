@@ -1,7 +1,7 @@
 import "graphile-build";
 import "./PgTablesPlugin";
 import "../interfaces";
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgTypeCodec } from "@dataplan/pg";
 import type { GraphQLType } from "graphql";
@@ -71,7 +71,7 @@ declare global {
   }
 }
 
-export const PgBasicsPlugin: GraphilePlugin.Plugin = {
+export const PgBasicsPlugin: GraphileConfig.Plugin = {
   name: "PgBasicsPlugin",
   description:
     "Basic utilities required by many other graphile-build-pg plugins.",

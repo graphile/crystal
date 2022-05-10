@@ -35,7 +35,7 @@ export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 
-export { GraphileBuild, GraphilePlugin };
+export { GraphileBuild, GraphileConfig };
 
 export {
   getWithPgClientFromPgSource,

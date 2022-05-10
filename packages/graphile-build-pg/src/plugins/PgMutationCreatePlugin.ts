@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgInsertPlan, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
@@ -44,7 +44,7 @@ const isInsertable = (source: PgSource<any, any, any, any>) => {
   return true;
 };
 
-export const PgMutationCreatePlugin: GraphilePlugin.Plugin = {
+export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   name: "PgMutationCreatePlugin",
   description: "Adds 'create' mutation for supported table-like sources",
   version: version,

@@ -1,5 +1,5 @@
 import "./PgTablesPlugin";
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgSelectPlan,
@@ -28,7 +28,7 @@ declare global {
 }
 
 // TODO: rename this, it's not just for connections
-export const PgConnectionArgOrderByPlugin: GraphilePlugin.Plugin = {
+export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   name: "PgConnectionArgOrderByPlugin",
   description:
     "Adds the 'orderBy' argument to connections and simple collections",

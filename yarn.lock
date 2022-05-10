@@ -7379,9 +7379,9 @@ __metadata:
     fastify: "npm:^3.27.2"
     fastify-static: "npm:^4.5.0"
     graphile-build: "workspace:*"
+    graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphile-inspect: "workspace:^"
-    graphile-plugin: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-helix: "npm:^1.11.0"
     jest: "npm:^27.4.5"
@@ -7406,8 +7406,8 @@ __metadata:
     chalk: "npm:^4.1.2"
     dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
+    graphile-config: "workspace:^"
     graphile-export: "workspace:^"
-    graphile-plugin: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
     pluralize: "npm:^7.0.0"
@@ -7417,6 +7417,26 @@ __metadata:
     typescript: "npm:next"
   peerDependencies:
     graphql: "*"
+  languageName: unknown
+  linkType: soft
+
+"graphile-config@workspace:^, graphile-config@workspace:packages/graphile-config":
+  version: 0.0.0-use.local
+  resolution: "graphile-config@workspace:packages/graphile-config"
+  dependencies:
+    "@types/debug": "npm:^4.1.7"
+    "@types/interpret": "npm:^1.1.1"
+    "@types/jest": "npm:^27.0.3"
+    "@types/node": "npm:^16.11.15"
+    "@types/semver": "npm:^7.3.9"
+    chalk: "npm:^4.1.2"
+    debug: "npm:^4.3.3"
+    interpret: "npm:^2.2.0"
+    jest: "npm:^27.4.5"
+    semver: "npm:^7.3.5"
+    ts-node: "npm:^10.4.0"
+    tslib: "npm:^2.3.1"
+    typescript: "npm:next"
   languageName: unknown
   linkType: soft
 
@@ -7458,7 +7478,7 @@ __metadata:
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18.0.0"
     "@types/yargs": "npm:^17.0.10"
-    graphile-plugin: "workspace:^"
+    graphile-config: "workspace:^"
     graphiql: "npm:^1.8.7"
     graphiql-explorer: "npm:^0.9.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -7479,26 +7499,6 @@ __metadata:
   bin:
     graphile-inspect: ./dist/cli-run.js
     grin: ./dist/cli-run.js
-  languageName: unknown
-  linkType: soft
-
-"graphile-plugin@workspace:^, graphile-plugin@workspace:packages/graphile-plugin":
-  version: 0.0.0-use.local
-  resolution: "graphile-plugin@workspace:packages/graphile-plugin"
-  dependencies:
-    "@types/debug": "npm:^4.1.7"
-    "@types/interpret": "npm:^1.1.1"
-    "@types/jest": "npm:^27.0.3"
-    "@types/node": "npm:^16.11.15"
-    "@types/semver": "npm:^7.3.9"
-    chalk: "npm:^4.1.2"
-    debug: "npm:^4.3.3"
-    interpret: "npm:^2.2.0"
-    jest: "npm:^27.4.5"
-    semver: "npm:^7.3.5"
-    ts-node: "npm:^10.4.0"
-    tslib: "npm:^2.3.1"
-    typescript: "npm:next"
   languageName: unknown
   linkType: soft
 
@@ -10693,9 +10693,9 @@ __metadata:
     debug: "npm:^4.3.3"
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
+    graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphile-inspect: "workspace:^"
-    graphile-plugin: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^27.4.5"
     jsonwebtoken: "npm:^8.5.1"

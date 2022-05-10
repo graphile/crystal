@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { version } from "../index.js";
 import { stringScalarSpec } from "../utils.js";
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const CursorTypePlugin: GraphilePlugin.Plugin = {
+export const CursorTypePlugin: GraphileConfig.Plugin = {
   name: "CursorTypePlugin",
   description: "Registers the 'Cursor' scalar type for cursor pagination",
   version,

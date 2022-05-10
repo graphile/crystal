@@ -1,5 +1,5 @@
 import "graphile-build";
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgSelectSinglePlan } from "@dataplan/pg";
 import type { ListPlan } from "dataplanner";
@@ -9,7 +9,7 @@ import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import { getBehavior } from "../behavior";
 import { version } from "../index";
 
-export const PgTableNodePlugin: GraphilePlugin.Plugin = {
+export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
   description: "Add the 'Node' interface to table types",
   version: version,

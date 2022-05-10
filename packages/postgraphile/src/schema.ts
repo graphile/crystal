@@ -3,7 +3,7 @@ import "@dataplan/pg/adaptors/node-postgres";
 import type { WithPgClient } from "@dataplan/pg";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import { withPgClientFromPgSource } from "graphile-build-pg";
-import { resolvePresets } from "graphile-plugin";
+import { resolvePresets } from "graphile-config";
 import * as pg from "pg";
 
 const Pool = pg.Pool || (pg as any).default?.Pool;
@@ -25,14 +25,14 @@ declare global {
 export function makePgDatabasesAndContextFromConnectionString(
   connectionString?: string,
   schemas?: string | string[],
-): [ReadonlyArray<GraphilePlugin.PgDatabaseConfiguration>, ContextCallback] {
+): [ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>, ContextCallback] {
   const pool = new Pool({
     connectionString,
   });
   pool.on("error", (e) => {
     console.log("Client error", e);
   });
-  const source: GraphilePlugin.PgDatabaseConfiguration = {
+  const source: GraphileConfig.PgDatabaseConfiguration = {
     name: "main",
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
     pgSettingsKey: "pgSettings",
@@ -51,7 +51,7 @@ export function makePgDatabasesAndContextFromConnectionString(
 function makeConfigFromConnectionString(
   connectionString: string,
   schemas?: string | string[],
-): [GraphilePlugin.Preset, ContextCallback] {
+): [GraphileConfig.Preset, ContextCallback] {
   const [pgSources, contextCallback] =
     makePgDatabasesAndContextFromConnectionString(connectionString, schemas);
 
@@ -72,7 +72,7 @@ function makeConfigFromConnectionString(
 }
 
 export async function makeSchema(
-  preset: GraphilePlugin.Preset,
+  preset: GraphileConfig.Preset,
   contextCallback: ContextCallback,
 ): Promise<SchemaResult>;
 export async function makeSchema(
@@ -80,7 +80,7 @@ export async function makeSchema(
   schemas?: string | string[],
 ): Promise<SchemaResult>;
 export async function makeSchema(
-  connectionStringOrPreset: string | GraphilePlugin.Preset,
+  connectionStringOrPreset: string | GraphileConfig.Preset,
   schemasOrContextCallback: string | string[] | ContextCallback | undefined,
 ): Promise<SchemaResult> {
   const [preset, contextCallback] =

@@ -1,5 +1,5 @@
 import "./PgTablesPlugin";
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgConditionPlan,
@@ -28,7 +28,7 @@ declare global {
   }
 }
 
-export const PgConditionArgumentPlugin: GraphilePlugin.Plugin = {
+export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   name: "PgConditionArgumentPlugin",
   description: "Adds the 'condition' argument to connections and lists",
   version: version,

@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { __ValuePlan } from "dataplanner";
 
@@ -16,7 +16,7 @@ import { isValidObjectType } from "../utils.js";
  * Removing this plugin will mean that your GraphQL schema will not allow
  * subscription operations.
  */
-export const SubscriptionPlugin: GraphilePlugin.Plugin = {
+export const SubscriptionPlugin: GraphileConfig.Plugin = {
   name: "SubscriptionPlugin",
   description:
     "Adds the 'Subscription' type to handle 'subscription' operations. Only use this if you want realtime features in your GraphQL API.",

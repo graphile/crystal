@@ -10,7 +10,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-config";
 import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -56,7 +56,7 @@ declare global {
 }
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface GatherHelpers {
       pgProcedures: {
         getSource(
@@ -86,7 +86,7 @@ interface State {
 }
 interface Cache {}
 
-export const PgProceduresPlugin: GraphilePlugin.Plugin = {
+export const PgProceduresPlugin: GraphileConfig.Plugin = {
   name: "PgProceduresPlugin",
   description:
     "Generates @dataplan/pg sources for the PostgreSQL functions/procedures it finds",
@@ -504,5 +504,5 @@ export const PgProceduresPlugin: GraphilePlugin.Plugin = {
         }
       }
     },
-  } as GraphilePlugin.PluginGatherConfig<"pgProcedures", State, Cache>,
+  } as GraphileConfig.PluginGatherConfig<"pgProcedures", State, Cache>,
 };

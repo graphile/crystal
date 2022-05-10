@@ -1,5 +1,5 @@
 import "./PgTablesPlugin";
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgSelectPlan,
@@ -30,7 +30,7 @@ declare global {
 }
 
 // TODO: respect indexes - via behavior?
-export const PgOrderAllColumnsPlugin: GraphilePlugin.Plugin = {
+export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
   name: "PgOrderAllColumnsPlugin",
   description: "Allows ordering by table columns",
   version: version,

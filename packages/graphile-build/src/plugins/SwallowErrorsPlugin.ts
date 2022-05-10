@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { version } from "../index.js";
 import swallowError from "../swallowError.js";
@@ -14,7 +14,7 @@ import swallowError from "../swallowError.js";
  * We've registered the `dontSwallowErrors` option in case you want to opt out
  * of this without changing your plugin list.
  */
-export const SwallowErrorsPlugin: GraphilePlugin.Plugin = {
+export const SwallowErrorsPlugin: GraphileConfig.Plugin = {
   name: "SwallowErrorsPlugin",
   description:
     "Adding this plugin will cause 'recoverable' errors to be 'swallowed' - i.e. schema build will continue despite certain errors. You should not use this in a production schema but it can be useful for development.",

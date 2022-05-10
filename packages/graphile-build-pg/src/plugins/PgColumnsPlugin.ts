@@ -1,7 +1,7 @@
 import "graphile-build";
 import "./PgTablesPlugin";
 import "../interfaces";
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgSelectSinglePlan,
@@ -107,7 +107,7 @@ const getSource = EXPORTABLE(
   [PgSource],
 );
 
-export const PgColumnsPlugin: GraphilePlugin.Plugin = {
+export const PgColumnsPlugin: GraphileConfig.Plugin = {
   name: "PgColumnsPlugin",
   description:
     "Adds PostgreSQL columns (attributes) to the relevant GraphQL object/input object types",

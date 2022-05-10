@@ -1,4 +1,4 @@
-import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
+import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import type { createProxyServer } from "http-proxy";
 import { createServer } from "node:http";
 

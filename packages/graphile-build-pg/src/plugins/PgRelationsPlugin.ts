@@ -1,6 +1,6 @@
 import "graphile-build";
 import "./PgTablesPlugin.js";
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgSelectSinglePlan,
@@ -67,7 +67,7 @@ declare global {
 }
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface GatherHelpers {
       pgRelations: Record<string, never>;
     }
@@ -78,7 +78,7 @@ interface State {}
 interface Cache {}
 
 // TODO: split this into one plugin for gathering and another for schema
-export const PgRelationsPlugin: GraphilePlugin.Plugin = {
+export const PgRelationsPlugin: GraphileConfig.Plugin = {
   name: "PgRelationsPlugin",
   description:
     "Creates relationships between the @dataplan/pg data sources, and mirrors these relationships into the GraphQL schema",
@@ -150,7 +150,7 @@ export const PgRelationsPlugin: GraphilePlugin.Plugin = {
     },
   },
 
-  gather: <GraphilePlugin.PluginGatherConfig<"pgRelations", State, Cache>>{
+  gather: <GraphileConfig.PluginGatherConfig<"pgRelations", State, Cache>>{
     namespace: "pgRelations",
     helpers: {},
     initialState: (): State => ({}),

@@ -1,6 +1,6 @@
-import "graphile-plugin";
+import "graphile-config";
 
-export const NodeIdCodecPipeStringPlugin: GraphilePlugin.Plugin = {
+export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
   name: "NodeIdCodecPipeStringPlugin",
   version: "1.0.0",
   description: `Adds the 'pipeString' codec for NodeIDs`,

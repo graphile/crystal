@@ -1,7 +1,7 @@
 import "./global.js";
 import "./interfaces.js";
 
-import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
+import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
 import extend from "./extend.js";
@@ -30,17 +30,17 @@ export {
 import type { GatherPluginContext } from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 // export globals for TypeDoc
-export { GraphileBuild, GraphilePlugin };
+export { GraphileBuild, GraphileConfig };
 
 export { NewWithHooksFunction, SchemaBuilder };
 
-const getSchemaHooks = (plugin: GraphilePlugin.Plugin) => plugin.schema?.hooks;
+const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
 
 /**
  * Generate 'build.inflection' from the given preset.
  */
 export const buildInflection = (
-  preset: GraphilePlugin.Preset,
+  preset: GraphileConfig.Preset,
 ): GraphileBuild.Inflection => {
   const resolvedPreset = resolvePresets([preset]);
   const { plugins, inflection: _options = {} } = resolvedPreset;
@@ -97,7 +97,7 @@ export const buildInflection = (
  * One-time gather; see `watchGather` for watch mode.
  */
 export const gather = async (
-  preset: GraphilePlugin.Preset,
+  preset: GraphileConfig.Preset,
   {
     inflection,
   }: {
@@ -111,10 +111,10 @@ export const gather = async (
   const gatherState: { [key: string]: any } = {};
   const helpers: { [key: string]: any } = {}; // GatherHelpers
 
-  const hooks = new AsyncHooks<GraphilePlugin.GatherHooks>();
+  const hooks = new AsyncHooks<GraphileConfig.GatherHooks>();
 
   const pluginContext = new Map<
-    GraphilePlugin.Plugin,
+    GraphileConfig.Plugin,
     GatherPluginContext<any, any>
   >();
 
@@ -133,7 +133,7 @@ export const gather = async (
     const cache = (globalState[spec.namespace] = spec.initialCache?.() ?? {});
     const state = (gatherState[spec.namespace] = spec.initialState?.() ?? {});
     const context: GatherPluginContext<any, any> = {
-      helpers: helpers as GraphilePlugin.GatherHelpers,
+      helpers: helpers as GraphileConfig.GatherHelpers,
       options,
       state,
       cache,
@@ -186,7 +186,7 @@ export const gather = async (
  * you would need this, typically you'll want `buildSchema` instead.
  */
 export const getBuilder = (
-  preset: GraphilePlugin.Preset,
+  preset: GraphileConfig.Preset,
   inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const resolvedPreset = resolvePresets([preset]);
@@ -204,7 +204,7 @@ export const getBuilder = (
  * Builds a GraphQL schema according to the given preset and input data.
  */
 export const buildSchema = (
-  preset: GraphilePlugin.Preset,
+  preset: GraphileConfig.Preset,
   input: GraphileBuild.BuildInput,
   options: {
     inflection?: GraphileBuild.Inflection;

@@ -43,8 +43,8 @@
     "chalk": "^4.1.2",
     "dataplanner": "workspace:^",
     "debug": "^4.3.3",
+    "graphile-config": "workspace:^",
     "graphile-export": "workspace:^",
-    "graphile-plugin": "workspace:^",
     "pluralize": "^7.0.0",
     "semver": "^7.3.5",
     "tslib": "^2.3.1"

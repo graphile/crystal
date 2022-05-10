@@ -12,7 +12,7 @@ import {
   TYPES,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
-import type { PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-config";
 import type { PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -73,7 +73,7 @@ declare global {
 }
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface GatherHelpers {
       pgCodecs: {
         getCodecFromClass(
@@ -100,7 +100,7 @@ declare global {
   }
 }
 
-export const PgCodecsPlugin: GraphilePlugin.Plugin = {
+export const PgCodecsPlugin: GraphileConfig.Plugin = {
   name: "PgCodecsPlugin",
   description: "Turns PostgreSQL types into @dataplan/pg codecs",
   version: version,
@@ -214,7 +214,7 @@ export const PgCodecsPlugin: GraphilePlugin.Plugin = {
   },
 
   // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <GraphilePlugin.PluginGatherConfig<"pgCodecs", State>>{
+  gather: <GraphileConfig.PluginGatherConfig<"pgCodecs", State>>{
     namespace: "pgCodecs",
     initialState: (): State => ({
       codecByTypeIdByDatabaseName: new Map(),

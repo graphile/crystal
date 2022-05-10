@@ -1,4 +1,4 @@
-# graphile-plugin
+# graphile-config
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
@@ -8,9 +8,9 @@
 **PRERELEASE**: this is pre-release software; use at your own risk. This will
 likely change a lot before it's ultimately released.
 
-`graphile-plugin` provides a standard plugin interface and helpers that can be
+`graphile-config` provides a standard plugin interface and helpers that can be
 used across the entire of the Graphile suite. Primarily users will only use this
-as `import type Plugin from 'graphile-plugin';` so that they can export plugins.
+as `import type Plugin from 'graphile-config';` so that they can export plugins.
 
 This package provides two interfaces: `Plugin` and `Preset` (alias `Config`).
 

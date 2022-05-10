@@ -45,7 +45,7 @@ async function registerLoader(loader: Extension | null): Promise<void> {
 
 export async function loadConfig(
   configPath?: string | null,
-): Promise<GraphilePlugin.Preset | null> {
+): Promise<GraphileConfig.Preset | null> {
   if (configPath != null) {
     // Explicitly load the file the user has indicated
 

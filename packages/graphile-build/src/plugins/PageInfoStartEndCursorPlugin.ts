@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PageInfoCapablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-export const PageInfoStartEndCursorPlugin: GraphilePlugin.Plugin = {
+export const PageInfoStartEndCursorPlugin: GraphileConfig.Plugin = {
   name: "PageInfoStartEndCursorPlugin",
   description: "Add startCursor/endCursor to the PageInfo type",
   version,

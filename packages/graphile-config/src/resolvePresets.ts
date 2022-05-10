@@ -3,8 +3,8 @@ import "./interfaces.js";
 import * as assert from "assert";
 
 function isResolvedPreset(
-  preset: GraphilePlugin.Preset,
-): preset is GraphilePlugin.ResolvedPreset {
+  preset: GraphileConfig.Preset,
+): preset is GraphileConfig.ResolvedPreset {
   return (preset.plugins && preset.extends?.length === 0) || false;
 }
 
@@ -13,8 +13,8 @@ function isResolvedPreset(
  * ResolvedPreset (which does not have any `extends`).
  */
 export function resolvePresets(
-  presets: ReadonlyArray<GraphilePlugin.Preset>,
-): GraphilePlugin.ResolvedPreset {
+  presets: ReadonlyArray<GraphileConfig.Preset>,
+): GraphileConfig.ResolvedPreset {
   if (presets.length === 1) {
     // Maybe it's already resolved?
     const preset = presets[0];
@@ -36,8 +36,8 @@ export function resolvePresets(
  * @internal
  */
 function resolvePreset(
-  preset: GraphilePlugin.Preset,
-): GraphilePlugin.ResolvedPreset {
+  preset: GraphileConfig.Preset,
+): GraphileConfig.ResolvedPreset {
   const { extends: presets = [] } = preset;
   const basePreset = resolvePresets(presets);
   mergePreset(basePreset, preset);
@@ -53,8 +53,8 @@ function resolvePreset(
  * @internal
  */
 function mergePreset(
-  targetPreset: GraphilePlugin.ResolvedPreset,
-  sourcePreset: GraphilePlugin.Preset,
+  targetPreset: GraphileConfig.ResolvedPreset,
+  sourcePreset: GraphileConfig.Preset,
 ): void {
   assert.ok(
     targetPreset.extends == null || targetPreset.extends.length === 0,
@@ -80,7 +80,7 @@ function mergePreset(
   }
 }
 
-function blankResolvedPreset(): GraphilePlugin.ResolvedPreset {
+function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
   return {
     extends: [],
     plugins: [],

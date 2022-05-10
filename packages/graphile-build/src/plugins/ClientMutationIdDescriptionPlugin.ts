@@ -10,7 +10,7 @@ import { version } from "..";
  * Descriptions aren't required in these places, so you can safely disable this
  * plugin.
  */
-export const ClientMutationIdDescriptionPlugin: GraphilePlugin.Plugin = {
+export const ClientMutationIdDescriptionPlugin: GraphileConfig.Plugin = {
   name: "ClientMutationIdDescriptionPlugin",
   version,
   description:

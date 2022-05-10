@@ -2,7 +2,7 @@ import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
 } from "dataplanner";
-import type { AsyncHooks, PluginHook } from "graphile-plugin";
+import type { AsyncHooks, PluginHook } from "graphile-config";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
@@ -41,12 +41,12 @@ export interface GatherPluginContext<
   /**
    * The full resolved preset (generally you'll want `options` instead).
    */
-  resolvedPreset: GraphilePlugin.ResolvedPreset;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
 
   /**
    * The `helpers` that all the gather plugins make available to you.
    */
-  helpers: GraphilePlugin.GatherHelpers;
+  helpers: GraphileConfig.GatherHelpers;
 
   /**
    * The state for this plugin specifically. State exists only for a single
@@ -66,11 +66,11 @@ export interface GatherPluginContext<
    * Triggers the given hook with the given event (used to broadcast to other
    * gather plugins so they can make their own changes/additions).
    */
-  process: AsyncHooks<GraphilePlugin.GatherHooks>["process"];
+  process: AsyncHooks<GraphileConfig.GatherHooks>["process"];
 }
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface Preset {
       inflection?: GraphileBuild.GraphileBuildInflectionOptions;
       gather?: GraphileBuild.GraphileBuildGatherOptions;

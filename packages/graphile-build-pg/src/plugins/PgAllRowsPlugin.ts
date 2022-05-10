@@ -1,6 +1,6 @@
 import "graphile-build";
 import "./PgTablesPlugin";
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgSource } from "@dataplan/pg";
 import { connection } from "dataplanner";
@@ -61,7 +61,7 @@ declare global {
   }
 }
 
-export const PgAllRowsPlugin: GraphilePlugin.Plugin = {
+export const PgAllRowsPlugin: GraphileConfig.Plugin = {
   name: "PgAllRowsPlugin",
   description: "Adds 'all rows' accessors for all table-like datasources.",
   version: version,

@@ -1,8 +1,8 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { version } from "../index";
 
-export const PgColumnDeprecationPlugin: GraphilePlugin.Plugin = {
+export const PgColumnDeprecationPlugin: GraphileConfig.Plugin = {
   name: "PgColumnDeprecationPlugin",
   description: "Marks a column as deprecated if it has the deprecated tag",
   version: version,

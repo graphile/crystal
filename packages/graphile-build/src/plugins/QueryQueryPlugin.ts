@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { aether } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -9,7 +9,7 @@ import { version } from "../index";
  * Adds the Query.query field to the Query type for Relay 1 compatibility. This
  * is a vestigial field, you probably don't want it.
  */
-export const QueryQueryPlugin: GraphilePlugin.Plugin = {
+export const QueryQueryPlugin: GraphileConfig.Plugin = {
   name: "QueryQueryPlugin",
   description:
     "Adds a 'query' field to the Query type giving access to the Query type again. You probably don't want this unless you need to support Relay Classic.",

@@ -4,7 +4,7 @@
  * schema against.
  */
 
-import "graphile-plugin";
+import "graphile-config";
 
 import type { WithPgClient } from "@dataplan/pg";
 import {
@@ -48,7 +48,7 @@ export function getPool() {
   return pool;
 }
 
-const EnumManglingPlugin: GraphilePlugin.Plugin = {
+const EnumManglingPlugin: GraphileConfig.Plugin = {
   name: "EnumManglingPlugin",
   description:
     "Mangles enum value names so that they're more likely to be compatible with GraphQL",
@@ -68,7 +68,7 @@ const EnumManglingPlugin: GraphilePlugin.Plugin = {
 };
 
 export async function makeSharedPresetAndClient(pool: Pool) {
-  const preset: GraphilePlugin.Preset = {
+  const preset: GraphileConfig.Preset = {
     extends: [graphileBuildPreset, graphileBuildPgPreset],
     plugins: [QueryQueryPlugin, SwallowErrorsPlugin, EnumManglingPlugin],
     pgSources: [

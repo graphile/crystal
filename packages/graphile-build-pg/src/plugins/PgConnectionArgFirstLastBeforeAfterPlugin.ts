@@ -1,5 +1,5 @@
 import "./PgTablesPlugin";
-import "graphile-plugin";
+import "graphile-config";
 
 import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
@@ -22,7 +22,7 @@ declare global {
 }
 
 // TODO: rename this, it's not just for connections
-export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphilePlugin.Plugin =
+export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
   {
     name: "PgConnectionArgFirstLastBeforeAfterPlugin",
     description:

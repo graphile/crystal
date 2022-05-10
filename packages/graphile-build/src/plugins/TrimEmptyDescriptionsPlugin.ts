@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   GraphQLEnumTypeConfig,
@@ -61,7 +61,7 @@ function rmEmptyArgDescriptions<T extends GraphQLFieldConfigArgumentMap>(
   return args;
 }
 
-export const TrimEmptyDescriptionsPlugin: GraphilePlugin.Plugin = {
+export const TrimEmptyDescriptionsPlugin: GraphileConfig.Plugin = {
   name: "TrimEmptyDescriptionsPlugin",
   description:
     "Trims the 'description' property from types, field and args that have an empty description",

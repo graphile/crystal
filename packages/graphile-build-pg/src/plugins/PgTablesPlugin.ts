@@ -4,7 +4,7 @@ import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-config";
 import type { PgClass, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior";
@@ -105,7 +105,7 @@ declare global {
 }
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     type PgTablesPluginSourceRelations = {
       [identifier: string]: PgSourceRelation<any, any>;
     };
@@ -159,7 +159,7 @@ interface State {
 interface Cache {}
 
 // TODO: rename to "PgClassesPlugin"? This coverse more than just tables.
-export const PgTablesPlugin: GraphilePlugin.Plugin = {
+export const PgTablesPlugin: GraphileConfig.Plugin = {
   name: "PgTablesPlugin",
   description:
     "Spots pg_class entries that looks like tables/views/materialized views (but not partitions!) and registers them as sources",
@@ -216,7 +216,7 @@ export const PgTablesPlugin: GraphilePlugin.Plugin = {
           return source;
         }
         source = (async () => {
-          const relations: GraphilePlugin.PgTablesPluginSourceRelations = {};
+          const relations: GraphileConfig.PgTablesPluginSourceRelations = {};
           const { pgClass, databaseName } =
             info.state.detailsBySourceBuilder.get(sourceBuilder)!;
           await info.process("pgTables_PgSourceBuilder_relations", {
@@ -392,7 +392,7 @@ export const PgTablesPlugin: GraphilePlugin.Plugin = {
         }
       }
     },
-  } as GraphilePlugin.PluginGatherConfig<"pgTables", State, Cache>,
+  } as GraphileConfig.PluginGatherConfig<"pgTables", State, Cache>,
 
   schema: {
     hooks: {

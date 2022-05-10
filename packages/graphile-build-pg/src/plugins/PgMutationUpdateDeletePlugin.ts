@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import type {
   PgClassSinglePlan,
@@ -156,7 +156,7 @@ const isDeletable = (source: PgSource<any, any, any, any>) => {
   return true;
 };
 
-export const PgMutationUpdateDeletePlugin: GraphilePlugin.Plugin = {
+export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
   version: version,

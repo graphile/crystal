@@ -1,6 +1,6 @@
 import { withPgClientFromPgSource } from "graphile-build-pg";
-import { loadConfig, resolvePresets } from "graphile-plugin";
-import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
+import { loadConfig, resolvePresets } from "graphile-config";
+import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import type { IncomingMessage, RequestListener } from "node:http";
 import { createServer } from "node:http";
 
@@ -61,7 +61,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   // Try and load the preset
   const userPreset = await loadConfig(configFileLocation);
-  const preset: GraphilePlugin.Preset = {
+  const preset: GraphileConfig.Preset = {
     extends: userPreset ? [userPreset] : [defaultPreset],
   };
   let contextCallback: ContextCallback | null = null;

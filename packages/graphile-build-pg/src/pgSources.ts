@@ -11,7 +11,7 @@ declare global {
     }
   }
 
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     // TODO: rename
     interface PgDatabaseConfiguration<
       TAdaptor extends keyof DataPlanner.PgDatabaseAdaptorOptions = keyof DataPlanner.PgDatabaseAdaptorOptions,
@@ -47,7 +47,7 @@ interface PgClientBySourceCacheValue {
 }
 
 const pgClientBySourceCache = new Map<
-  GraphilePlugin.PgDatabaseConfiguration,
+  GraphileConfig.PgDatabaseConfiguration,
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
 
@@ -56,7 +56,7 @@ const pgClientBySourceCache = new Map<
  * source, caching it to make future lookups faster.
  */
 export function getWithPgClientFromPgSource(
-  source: GraphilePlugin.PgDatabaseConfiguration,
+  source: GraphileConfig.PgDatabaseConfiguration,
 ): PromiseOrDirect<WithPgClient> {
   const existing = pgClientBySourceCache.get(source);
   if (existing) {
@@ -111,7 +111,7 @@ export function getWithPgClientFromPgSource(
 }
 
 export async function withPgClientFromPgSource<T>(
-  source: GraphilePlugin.PgDatabaseConfiguration,
+  source: GraphileConfig.PgDatabaseConfiguration,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {

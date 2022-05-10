@@ -1,5 +1,5 @@
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface Plugin {
       name: string;
       version: string;

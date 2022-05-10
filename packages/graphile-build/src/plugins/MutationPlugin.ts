@@ -1,4 +1,4 @@
-import "graphile-plugin";
+import "graphile-config";
 
 import { __ValuePlan } from "dataplanner";
 
@@ -16,7 +16,7 @@ import { isValidObjectType } from "../utils.js";
  * Removing this plugin will mean that your GraphQL schema will not allow
  * mutation operations.
  */
-export const MutationPlugin: GraphilePlugin.Plugin = {
+export const MutationPlugin: GraphileConfig.Plugin = {
   name: "MutationPlugin",
   description: "Adds the 'Mutation' type to the GraphQL schema",
   version: version,

@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { lambda } from "dataplanner";
 import { readFile } from "fs/promises";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { resolvePresets } from "graphile-plugin";
+import { resolvePresets } from "graphile-config";
 import { graphql, printSchema } from "graphql";
 
 import { buildSchema, defaultPreset } from "../index.js";
@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-const MyRandomFieldPlugin: GraphilePlugin.Plugin = {
+const MyRandomFieldPlugin: GraphileConfig.Plugin = {
   name: "MyRandomFieldPlugin",
   description: "Adds a random field to every GraphQLObject",
   version: "1.0.0",

@@ -103,7 +103,7 @@ Here's a rough breakdown of the main packages:
 - **[jest-serializer-graphql-schema][]** - a simple Jest serializer that
   understands GraphQL schemas and thus does not fill snapshots with `\"\"\"`
   etc.
-- **[graphile-plugin][]** - a module that handles the plugins, presets and
+- **[graphile-config][]** - a module that handles the plugins, presets and
   configuration files for Graphile software - a universal configuration layer.
 - **[graphile-build][]** - a system for building a GraphQL.js schema from
   "plugins", particularly useful for auto-generated GraphQL APIs (e.g.
@@ -208,7 +208,7 @@ If you want to work in a Docker environment you can follow
 [graphile-export]: packages/graphile-export/
 [eslint-plugin-graphile-export]: packages/eslint-plugin-graphile-export/
 [jest-serializer-graphql-schema]: packages/jest-serializer-graphql-schema/
-[graphile-plugin]: packages/graphile-plugin/
+[graphile-config]: packages/graphile-config/
 [postgraphile]: packages/postgraphile/
 [graphile-build]: packages/graphile-build/
 [graphile-build-pg]: packages/graphile-build-pg/

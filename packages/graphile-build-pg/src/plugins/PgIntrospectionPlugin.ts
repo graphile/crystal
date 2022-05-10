@@ -6,7 +6,7 @@ import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
-import type { PluginHook } from "graphile-plugin";
+import type { PluginHook } from "graphile-config";
 import type {
   Introspection,
   PgAttribute,
@@ -48,13 +48,13 @@ export type PgEntityWithId =
   | PgLanguage;
 
 declare global {
-  namespace GraphilePlugin {
+  namespace GraphileConfig {
     interface GatherHelpers {
       pgIntrospection: {
         getIntrospection(): Promise<
           Array<{
             introspection: Introspection;
-            database: GraphilePlugin.PgDatabaseConfiguration;
+            database: GraphileConfig.PgDatabaseConfiguration;
           }>
         >;
         getExecutorForDatabase(databaseName: string): PgExecutor;
@@ -239,7 +239,7 @@ declare global {
 interface Cache {
   introspectionResultsPromise: null | Promise<
     {
-      database: GraphilePlugin.PgDatabaseConfiguration;
+      database: GraphileConfig.PgDatabaseConfiguration;
       introspection: Introspection;
     }[]
   >;
@@ -295,13 +295,13 @@ function makeGetEntity<
   };
 }
 
-export const PgIntrospectionPlugin: GraphilePlugin.Plugin = {
+export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
   name: "PgIntrospectionPlugin",
   description:
     "Introspects PostgreSQL databases and makes the results available to other plugins",
   version: version,
   // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <GraphilePlugin.PluginGatherConfig<"pgIntrospection", State, Cache>>{
+  gather: <GraphileConfig.PluginGatherConfig<"pgIntrospection", State, Cache>>{
     namespace: "pgIntrospection",
     initialCache: (): Cache => ({
       introspectionResultsPromise: null,
@@ -490,9 +490,9 @@ export const PgIntrospectionPlugin: GraphilePlugin.Plugin = {
             descriptions,
           } = introspection;
 
-          function announce<TEvent extends keyof GraphilePlugin.GatherHooks>(
+          function announce<TEvent extends keyof GraphileConfig.GatherHooks>(
             eventName: TEvent,
-            entities: GraphilePlugin.GatherHooks[TEvent] extends PluginHook<
+            entities: GraphileConfig.GatherHooks[TEvent] extends PluginHook<
               infer U
             >
               ? Parameters<U>[0] extends {

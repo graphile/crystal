@@ -35,19 +35,19 @@ export function applyHooks<
     [key: string]: PluginHook<(...args: any[]) => any>;
   },
 >(
-  plugins: GraphilePlugin.Plugin[],
+  plugins: GraphileConfig.Plugin[],
   hooksRetriever: (
-    plugin: GraphilePlugin.Plugin,
+    plugin: GraphileConfig.Plugin,
   ) => Partial<THooks> | undefined,
   applyHookCallback: <THookName extends keyof THooks>(
     hookName: THookName,
     hookFn: THooks[THookName] extends PluginHook<infer U> ? U : never,
-    plugin: GraphilePlugin.Plugin,
+    plugin: GraphileConfig.Plugin,
   ) => void,
 ): void {
   type FullHookSpec = {
     id: string;
-    plugin: GraphilePlugin.Plugin;
+    plugin: GraphileConfig.Plugin;
     provides: string[];
     before: string[];
     after: string[];
