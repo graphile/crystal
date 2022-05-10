@@ -38,6 +38,6 @@ export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 export { GraphileBuild, GraphilePlugin };
 
 export {
-  withPgClientFromPgSource,
   getWithPgClientFromPgSource,
+  withPgClientFromPgSource,
 } from "./pgSources.js";

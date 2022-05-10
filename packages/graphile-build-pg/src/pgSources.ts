@@ -1,6 +1,8 @@
-import { PgClient, WithPgClient } from "@dataplan/pg";
-import { isPromiseLike, PromiseOrDirect } from "dataplanner";
-import { KeysOfType } from "./interfaces";
+import type { PgClient, WithPgClient } from "@dataplan/pg";
+import type { PromiseOrDirect } from "dataplanner";
+import { isPromiseLike } from "dataplanner";
+
+import type { KeysOfType } from "./interfaces.js";
 
 declare global {
   namespace DataPlanner {
