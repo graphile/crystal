@@ -168,7 +168,7 @@ export const PgTablesPlugin: GraphilePlugin.Plugin = {
   inflection: {
     add: {
       _schemaPrefix(options, { pgNamespace, databaseName }) {
-        const database = options.gather?.pgDatabases.find(
+        const database = options.pgSources?.find(
           (db) => db.name === databaseName,
         );
         const databasePrefix =
@@ -254,10 +254,13 @@ export const PgTablesPlugin: GraphilePlugin.Plugin = {
           return sourceBuilder;
         }
         sourceBuilder = (async () => {
-          const database = info.options.pgDatabases.find(
+          const database = info.resolvedPreset.pgSources?.find(
             (db) => db.name === databaseName,
-          )!;
-          const schemas = database.schemas;
+          );
+          if (!database) {
+            throw new Error(`Could not find '${databaseName}' in 'pgSources'`);
+          }
+          const schemas = database.schemas ?? ["public"];
 
           const namespace = pgClass.getNamespace();
           if (!namespace) {

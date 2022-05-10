@@ -39,6 +39,11 @@ export interface GatherPluginContext<
   options: GraphileBuild.GraphileBuildGatherOptions;
 
   /**
+   * The full resolved preset (generally you'll want `options` instead).
+   */
+  resolvedPreset: GraphilePlugin.ResolvedPreset;
+
+  /**
    * The `helpers` that all the gather plugins make available to you.
    */
   helpers: GraphilePlugin.GatherHelpers;

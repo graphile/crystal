@@ -122,10 +122,15 @@ export const PgProceduresPlugin: GraphilePlugin.Plugin = {
           return source;
         }
         source = (async () => {
-          const database = info.options.pgDatabases.find(
+          const database = info.resolvedPreset.pgSources?.find(
             (db) => db.name === databaseName,
-          )!;
-          const schemas = database.schemas;
+          );
+          if (!database) {
+            throw new Error(
+              `Could not find database '${databaseName}' in pgSources`,
+            );
+          }
+          const schemas = database.schemas ?? ["public"];
 
           const namespace = pgProc.getNamespace();
           if (!namespace) {

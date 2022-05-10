@@ -9,6 +9,7 @@ import type {
   ExecutablePlan,
   ExecutionEventEmitter,
   ObjectPlan,
+  PromiseOrDirect,
 } from "dataplanner";
 import { defer, isAsyncIterable, isDev } from "dataplanner";
 import debugFactory from "debug";
@@ -74,10 +75,14 @@ export interface PgClient {
   rollbackTransaction(): Promise<void>;
 }
 
-export type WithPgClient = <T>(
-  pgSettings: { [key: string]: string } | null,
-  callback: (client: PgClient) => T | Promise<T>,
-) => Promise<T>;
+export interface WithPgClient {
+  <T>(
+    pgSettings: { [key: string]: string } | null,
+    callback: (client: PgClient) => T | Promise<T>,
+  ): Promise<T>;
+
+  release?(): PromiseOrDirect<void>;
+}
 
 export type PgExecutorContext<TSettings = any> = {
   pgSettings: TSettings;

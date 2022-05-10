@@ -10,7 +10,6 @@
  */
 
 import type { WithPgClient } from "@dataplan/pg";
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
@@ -40,6 +39,7 @@ import { inspect } from "util";
 import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { getWithPgClientFromPgSource } from "../pgSources.js";
 
 declare global {
   namespace GraphileBuild {
@@ -58,7 +58,6 @@ const pool = new Pool({
 pool.on("error", (e) => {
   console.log("Client error", e);
 });
-const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
 
 (async function () {
   // Create our GraphQL schema by applying all the plugins
@@ -66,17 +65,20 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
+      pgSources: [
+        {
+          name: "main",
+          schemas: ["a", "b", "c"],
+          pgSettingsKey: "pgSettings",
+          withPgClientKey: "withPgClient",
+          adaptor: "@dataplan/pg/adaptors/node-postgres",
+          adaptorSettings: {
+            pool,
+          },
+        },
+      ],
       gather: {
         jwtType: ["b", "jwt_token"],
-        pgDatabases: [
-          {
-            name: "main",
-            schemas: ["a", "b", "c"],
-            pgSettingsKey: "pgSettings",
-            withPgClientKey: "withPgClient",
-            withPgClient: withPgClient,
-          },
-        ],
       },
       schema: {
         pgJwtSecret: "secret",
@@ -127,7 +129,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   const rootValue = null;
 
   const contextValue = {
-    withPgClient,
+    withPgClient: getWithPgClientFromPgSource(config.pgSources![0]!),
   };
 
   // Our operation requires no variables

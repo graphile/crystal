@@ -6,9 +6,19 @@
 // TODO: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
 import LRU from "@graphile/lru";
+import type { PromiseOrDirect } from "dataplanner";
 import type { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
+import * as pg from "pg";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../executor";
+
+declare global {
+  namespace DataPlanner {
+    interface PgDatabaseAdaptorOptions {
+      "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
+    }
+  }
+}
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
@@ -46,8 +56,11 @@ const DONT_DISABLE_JIT = process.env.DATAPLAN_PG_DONT_DISABLE_JIT === "1";
 /**
  * Returns a `withPgClient` for the given `pg.Pool` instance.
  */
-export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
-  return async (pgSettings, callback) => {
+export function makeNodePostgresWithPgClient(
+  pool: Pool,
+  release: () => PromiseOrDirect<void> = () => {},
+): WithPgClient {
+  const withPgClient: WithPgClient = async (pgSettings, callback) => {
     const pgClient = await pool.connect();
     if (!pgClient[$$isSetup]) {
       pgClient[$$isSetup] = true;
@@ -197,4 +210,23 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
       pgClient.release();
     }
   };
+
+  return Object.assign(withPgClient, { release });
+}
+
+export interface NodePostgresAdaptorOptions {
+  connectionString?: string;
+  pool?: Pool;
+}
+
+export function createWithPgClient(
+  options: NodePostgresAdaptorOptions,
+): WithPgClient {
+  if (options.pool) {
+    return makeNodePostgresWithPgClient(options.pool);
+  } else {
+    const pool = new pg.Pool(options);
+    const release = () => pool.end();
+    return makeNodePostgresWithPgClient(pool, release);
+  }
 }

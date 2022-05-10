@@ -7,7 +7,6 @@
 import "graphile-plugin";
 
 import type { WithPgClient } from "@dataplan/pg";
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
@@ -16,6 +15,7 @@ import {
 import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { getWithPgClientFromPgSource } from "../pgSources.js";
 
 // You should set these to be the values you want to use for demonstration
 const DATABASE_CONNECTION_STRING = "postgres:///pagila";
@@ -67,27 +67,31 @@ const EnumManglingPlugin: GraphilePlugin.Plugin = {
   },
 };
 
-export function makeSharedPresetAndClient(pool: Pool) {
-  const withPgClient = makeNodePostgresWithPgClient(pool);
+export async function makeSharedPresetAndClient(pool: Pool) {
   const preset: GraphilePlugin.Preset = {
     extends: [graphileBuildPreset, graphileBuildPgPreset],
     plugins: [QueryQueryPlugin, SwallowErrorsPlugin, EnumManglingPlugin],
-    gather: {
-      pgDatabases: [
-        {
-          name: "main",
-          schemas: DATABASE_SCHEMAS,
-          pgSettingsKey: "pgSettings",
-          withPgClientKey: "withPgClient",
-          withPgClient: withPgClient,
+    pgSources: [
+      {
+        name: "main",
+        schemas: DATABASE_SCHEMAS,
+        pgSettingsKey: "pgSettings",
+        withPgClientKey: "withPgClient",
+        adaptor: "@dataplan/pg/adaptors/node-postgres",
+        adaptorSettings: {
+          pool,
         },
-      ],
+      },
+    ],
+    gather: {
       // jwtType: ["public", "jwt_token"],
     },
     schema: {
       // pgJwtSecret: "secret",
     },
   };
+
+  const withPgClient = await getWithPgClientFromPgSource(preset.pgSources![0]!);
 
   return {
     preset,

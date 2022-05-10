@@ -31,7 +31,7 @@ const pool = getPool();
 
 async function main() {
   // Get our preset and withPgClient function (common across examples)
-  const { preset, withPgClient } = makeSharedPresetAndClient(pool);
+  const { preset, withPgClient } = await makeSharedPresetAndClient(pool);
 
   // ---------------------------------------------------------------------------
   // Resolve the preset(s)

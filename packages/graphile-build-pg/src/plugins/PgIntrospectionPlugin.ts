@@ -30,37 +30,9 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import { version } from "../index";
-
-type KeysOfType<TObject, TValueType> = {
-  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
-}[keyof TObject];
-declare global {
-  namespace GraphileBuild {
-    // TODO: rename
-    interface PgDatabaseConfiguration {
-      name: string;
-      schemas: string[];
-      /** The key on 'context' where the pgSettings for this DB will be sourced */
-      pgSettingsKey: KeysOfType<
-        GraphileBuild.GraphileResolverContext,
-        { [key: string]: string } | null
-      >;
-      /** The key on 'context' where the withPgClient function will be sourced */
-      withPgClientKey: KeysOfType<
-        GraphileBuild.GraphileResolverContext,
-        WithPgClient
-      >;
-      /** A function to allow us to run queries during the data gathering phase */
-      withPgClient: WithPgClient;
-      listen?(topic: string): AsyncIterable<string>;
-    }
-
-    interface GraphileBuildGatherOptions {
-      pgDatabases: ReadonlyArray<PgDatabaseConfiguration>;
-    }
-  }
-}
+import { version } from "../index.js";
+import { KeysOfType } from "../interfaces.js";
+import { withPgClientFromPgSource } from "../pgSources.js";
 
 export type PgEntityWithId =
   | PgNamespace
@@ -82,7 +54,7 @@ declare global {
         getIntrospection(): Promise<
           Array<{
             introspection: Introspection;
-            database: GraphileBuild.PgDatabaseConfiguration;
+            database: GraphilePlugin.PgDatabaseConfiguration;
           }>
         >;
         getExecutorForDatabase(databaseName: string): PgExecutor;
@@ -267,7 +239,7 @@ declare global {
 interface Cache {
   introspectionResultsPromise: null | Promise<
     {
-      database: GraphileBuild.PgDatabaseConfiguration;
+      database: GraphilePlugin.PgDatabaseConfiguration;
       introspection: Introspection;
     }[]
   >;
@@ -342,7 +314,7 @@ export const PgIntrospectionPlugin: GraphilePlugin.Plugin = {
         if (info.state.executors[databaseName]) {
           return info.state.executors[databaseName];
         }
-        const database = info.options.pgDatabases.find(
+        const database = info.resolvedPreset.pgSources?.find(
           (db) => db.name === databaseName,
         );
         if (!database) {
@@ -373,7 +345,7 @@ export const PgIntrospectionPlugin: GraphilePlugin.Plugin = {
             context,
             databaseName,
             object,
-            pgSettingsKey,
+            pgSettingsKey as keyof GraphileBuild.GraphileResolverContext,
             withPgClientKey,
           ],
         );
@@ -467,13 +439,16 @@ export const PgIntrospectionPlugin: GraphilePlugin.Plugin = {
         if (info.cache.introspectionResultsPromise) {
           return info.cache.introspectionResultsPromise;
         }
+        if (!info.resolvedPreset.pgSources) {
+          return [];
+        }
         // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
         const introspectionPromise = Promise.all(
-          info.options.pgDatabases.map(async (database) => {
+          info.resolvedPreset.pgSources.map(async (database) => {
             const introspectionQuery = makeIntrospectionQuery();
             const {
               rows: [row],
-            } = await database.withPgClient(null, (client) =>
+            } = await withPgClientFromPgSource(database, null, (client) =>
               client.query<{ introspection: string }>({
                 text: introspectionQuery,
               }),

@@ -21,6 +21,10 @@ export interface PgSmartTagsDict {
   [tagName: string]: null | true | string | string[];
 }
 
+export type KeysOfType<TObject, TValueType> = {
+  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
+}[keyof TObject];
+
 /*
  * Declaration merging to add graphile-build-pg 'tags' to @dataplan/pg
  * extensions so we can easily use them with TypeScript.

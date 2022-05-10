@@ -17,7 +17,7 @@ const pool = getPool();
 
 async function main() {
   // Get our preset (common across examples)
-  const { preset } = makeSharedPresetAndClient(pool);
+  const { preset } = await makeSharedPresetAndClient(pool);
 
   // ---------------------------------------------------------------------------
   // Resolve the preset(s)

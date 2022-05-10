@@ -1,7 +1,7 @@
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import { buildInflection, buildSchema, gather } from "graphile-build";
-import type {} from "graphile-build-pg";
+import { withPgClientFromPgSource } from "graphile-build-pg";
 import { resolvePresets } from "graphile-plugin";
 import * as pg from "pg";
 
@@ -24,43 +24,43 @@ declare global {
 export function makePgDatabasesAndContextFromConnectionString(
   connectionString?: string,
   schemas?: string | string[],
-): [GraphileBuild.GraphileBuildGatherOptions["pgDatabases"], ContextCallback] {
+): [ReadonlyArray<GraphilePlugin.PgDatabaseConfiguration>, ContextCallback] {
   const pool = new Pool({
     connectionString,
   });
   pool.on("error", (e) => {
     console.log("Client error", e);
   });
-  const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
-  const contextCallback: ContextCallback = () => ({ withPgClient });
-  return [
-    [
-      {
-        name: "main",
-        schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-        pgSettingsKey: "pgSettings",
-        withPgClientKey: "withPgClient",
-        withPgClient,
-      },
-    ],
-    contextCallback,
-  ];
+  const source: GraphilePlugin.PgDatabaseConfiguration = {
+    name: "main",
+    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+    pgSettingsKey: "pgSettings",
+    withPgClientKey: "withPgClient",
+    adaptor: "@dataplan/pg/adaptors/node-postgres",
+    adaptorSettings: {
+      pool,
+    },
+  };
+  const contextCallback: ContextCallback = () => ({
+    withPgClient: withPgClientFromPgSource.bind(null, source),
+  });
+  return [[source], contextCallback];
 }
 
 function makeConfigFromConnectionString(
   connectionString: string,
   schemas?: string | string[],
 ): [GraphilePlugin.Preset, ContextCallback] {
-  const [pgDatabases, contextCallback] =
+  const [pgSources, contextCallback] =
     makePgDatabasesAndContextFromConnectionString(connectionString, schemas);
 
   // Create our GraphQL schema by applying all the plugins
   return [
     {
       extends: [postgraphilePreset],
+      pgSources,
       gather: {
         // jwtType: ["b", "jwt_token"],
-        pgDatabases,
       },
       schema: {
         // pgJwtSecret: "secret",

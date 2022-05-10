@@ -1,3 +1,4 @@
+import { withPgClientFromPgSource } from "graphile-build-pg";
 import { loadConfig, resolvePresets } from "graphile-plugin";
 import type { ArgsFromOptions, Argv } from "graphile-plugin/cli";
 import type { IncomingMessage, RequestListener } from "node:http";
@@ -68,11 +69,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const [newPgDatabases, newContextCallback] =
+    const [newPgSources, newContextCallback] =
       makePgDatabasesAndContextFromConnectionString(connectionString, schemas);
     contextCallback = newContextCallback;
-    preset.gather = preset.gather || { pgDatabases: [] };
-    preset.gather!.pgDatabases = newPgDatabases;
+    preset.pgSources = newPgSources;
   }
   preset.server = preset.server || {};
   if (rawPort != null) {
@@ -85,13 +85,22 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const config = resolvePresets([preset]);
 
   if (contextCallback === null) {
-    const withPgClient = config.gather?.pgDatabases?.[0]?.withPgClient;
-    if (!withPgClient) {
+    if (!config.pgSources || config.pgSources.length === 0) {
       throw new Error(
         "Please specify `-c` so we know which database to connect to (or populate the configuration with the relevant options)",
       );
     }
-    const contextValue = { withPgClient };
+    const contextValue = {};
+    for (const pgSource of config.pgSources) {
+      if (pgSource.pgSettingsKey != null) {
+        // TODO! How do we determine the pgSettings to use from CLI? Presumably there's a callback function...
+        contextValue[pgSource.pgSettingsKey] = undefined;
+      }
+      contextValue[pgSource.withPgClientKey] = withPgClientFromPgSource.bind(
+        null,
+        pgSource,
+      );
+    }
     contextCallback = () => contextValue;
   }
 

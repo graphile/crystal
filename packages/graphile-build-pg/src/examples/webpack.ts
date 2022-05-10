@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 
 import type { WithPgClient } from "@dataplan/pg";
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import {
   buildInflection,
   buildSchema,
@@ -44,7 +43,6 @@ pool.on("error", (e) => {
 });
 
 // We're using the node-postgres adaptor
-const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
 
 async function main() {
   // The Graphile configuration
@@ -52,18 +50,20 @@ async function main() {
     {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
-      gather: {
-        pgDatabases: [
-          // Configuration of our main (and only) Postgres database
-          {
-            name: "main",
-            schemas: ["public"],
-            pgSettingsKey: "pgSettings",
-            withPgClientKey: "withPgClient",
-            withPgClient: withPgClient,
+      pgSources: [
+        // Configuration of our main (and only) Postgres database
+        {
+          name: "main",
+          schemas: ["public"],
+          pgSettingsKey: "pgSettings",
+          withPgClientKey: "withPgClient",
+          adaptor: "@dataplan/pg/adaptors/node-postgres",
+          adaptorSettings: {
+            pool,
           },
-        ],
-      },
+        },
+      ],
+      gather: {},
       schema: {
         simpleCollections: "only",
       },
