@@ -78,6 +78,9 @@ module.exports = {
 
     "import/no-deprecated": "warn",
 
+    // Apply has been more optimised than spread, use whatever feels right.
+    "prefer-spread": "off",
+
     // note you must disable the base rule as it can report incorrect errors
     "no-duplicate-imports": "off",
     "import/no-duplicates": "off",

@@ -103,7 +103,7 @@ export function getWithPgClientFromPgSource(
     if (!pgClientBySourceCache.has(source)) {
       pgClientBySourceCache.set(source, promise);
     }
-    promise.catch((e) => {
+    promise.catch(() => {
       pgClientBySourceCache.delete(source);
     });
     return promise.then((v) => v.withPgClient);

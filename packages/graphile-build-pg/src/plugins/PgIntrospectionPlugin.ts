@@ -31,7 +31,7 @@ import {
 } from "pg-introspection";
 
 import { version } from "../index.js";
-import { KeysOfType } from "../interfaces.js";
+import type { KeysOfType } from "../interfaces.js";
 import { withPgClientFromPgSource } from "../pgSources.js";
 
 export type PgEntityWithId =
