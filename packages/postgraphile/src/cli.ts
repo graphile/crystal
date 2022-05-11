@@ -84,10 +84,12 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   if (rawPort != null) {
     preset.server!.port = rawPort;
   }
-  if (rawAllowExplain === true) {
-    preset.server!.exposePlan = true;
+  if (rawAllowExplain != null) {
+    preset.server!.exposePlan = rawAllowExplain;
   }
-  preset.server!.watch = watch;
+  if (watch != null) {
+    preset.server!.watch = watch;
+  }
 
   const config = resolvePresets([preset]);
   if (!config.pgSources || config.pgSources.length === 0) {
@@ -99,7 +101,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const middleware = postgraphile(config);
 
-  const server = createServer(middleware as RequestListener);
+  const server = createServer(middleware);
   let started = false;
   server.on("error", (e) => {
     console.error("Server raised an error:", e);
