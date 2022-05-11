@@ -1,14 +1,16 @@
-import type { Deferred } from "dataplanner";
+import type { Deferred, TypedEventEmitter } from "dataplanner";
 import { defer, isPromiseLike, stripAnsi } from "dataplanner";
 import { resolvePresets } from "graphile-config";
+import type { GraphQLSchema } from "graphql";
 import { GraphQLError } from "graphql";
 import type { IncomingMessage, RequestListener, ServerResponse } from "http";
+import EventEmitter from "node:events";
 
 import type { SchemaResult } from "../interfaces.js";
 import { makeSchema, watchSchema } from "../schema.js";
 import { makeGraphiQLHandler } from "./graphiql.js";
 import { makeGraphQLHandler } from "./graphql.js";
-import type { HandlerResult } from "./interfaces.js";
+import type { EventStreamEvent, HandlerResult } from "./interfaces.js";
 
 function getBodyFromRequest(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -33,6 +35,8 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
     graphiql = true,
     graphiqlOnGraphQLGET = true,
     graphiqlPath = "/",
+    watch = false,
+    eventStreamRoute = "/graphql/stream",
   } = config.server ?? {};
 
   const sendResult = (res: ServerResponse, handlerResult: HandlerResult) => {
@@ -52,7 +56,14 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
             });
           });
         }
-        res.writeHead(statusCode, { "Content-Type": "application/json" });
+        res.writeHead(statusCode, {
+          "Content-Type": "application/json",
+          ...(watch
+            ? {
+                "X-GraphQL-Event-Stream": eventStreamRoute,
+              }
+            : null),
+        });
         res.end(JSON.stringify(payload));
         break;
       }
@@ -66,6 +77,119 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
               : "text/plain; charset=utf-8",
         });
         res.end(payload);
+        break;
+      }
+      case "event-stream": {
+        const { payload: stream, statusCode = 200 } = handlerResult;
+
+        // Making sure these options are set.
+        res.req.socket.setTimeout(0);
+        res.req.socket.setNoDelay(true);
+        res.req.socket.setKeepAlive(true);
+
+        // Set headers for Server-Sent Events.
+        // Don't buffer EventStream in nginx
+        res.setHeader("X-Accel-Buffering", "no");
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache, no-transform");
+        if (res.req.httpVersionMajor >= 2) {
+          // NOOP
+        } else {
+          res.setHeader("Connection", "keep-alive");
+        }
+        res.writeHead(statusCode);
+
+        // Creates a stream for the response
+
+        let stopped = false;
+        const send = (event: EventStreamEvent) => {
+          if (stopped) {
+            return;
+          }
+          let payload = "";
+          if (event.event) {
+            payload += `event: ${event.event}\n`;
+          }
+          if (event.id) {
+            payload += `id: ${event.id}\n`;
+          }
+          if (event.retry) {
+            payload += `retry: ${event.retry}\n`;
+          }
+          if (event.data != null) {
+            payload += `data: ${event.data.replace(/\n/g, "\ndata: ")}\n`;
+          }
+          payload += "\n";
+          res.write(payload);
+          // Technically we should see if `.write()` returned false, and if so we
+          // should pause the stream. However, since our stream is coming from
+          // watch mode, we find it unlikely that a significant amount of data
+          // will be buffered (and we don't recommend watch mode in production),
+          // so it doesn't feel like we need this currently. If it turns out you
+          // need this, a PR would be welcome.
+
+          if (typeof (res as any).flush === "function") {
+            // https://github.com/expressjs/compression#server-sent-events
+            (res as any).flush();
+          } else if (typeof (res as any).flushHeaders === "function") {
+            (res as any).flushHeaders();
+          }
+        };
+
+        // Notify client that connection is open.
+        send({ event: "open" });
+
+        // Process stream
+        const iterator = stream[Symbol.asyncIterator]();
+        const waitNext = () => {
+          const n = iterator.next();
+          n.then(
+            (r) => {
+              if (!r.done || r.value) {
+                send(r.value);
+              }
+              if (r.done) {
+                res.end();
+                cleanup();
+                return;
+              } else {
+                if (!stopped) {
+                  waitNext();
+                }
+              }
+            },
+            (error) => {
+              console.error("Error occurred processing event stream:", error);
+              send({
+                event: "error",
+                data: JSON.stringify({
+                  errors: [
+                    { message: "Error occurred processing event stream" },
+                  ],
+                }),
+              });
+              res.end();
+              cleanup();
+            },
+          );
+        };
+        waitNext();
+
+        // Clean up when connection closes.
+        const cleanup = () => {
+          stopped = true;
+          try {
+            iterator.return?.();
+          } catch {
+            /* nom nom nom */
+          }
+          res.req.removeListener("close", cleanup);
+          res.req.removeListener("finish", cleanup);
+          res.req.removeListener("error", cleanup);
+        };
+        res.req.on("close", cleanup);
+        res.req.on("finish", cleanup);
+        res.req.on("error", cleanup);
         break;
       }
       default: {
@@ -100,7 +224,72 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
     graphqlHandler: Awaited<ReturnType<typeof makeGraphQLHandler>>;
     graphiqlHandler: Awaited<ReturnType<typeof makeGraphiQLHandler>>;
   };
+  const eventEmitter: TypedEventEmitter<{
+    newSchema: GraphQLSchema;
+  }> = new EventEmitter();
+  type SchemaChangeEvent = {
+    event: "change";
+    data: "schema";
+  };
+  function makeStream(): AsyncIterableIterator<SchemaChangeEvent> {
+    const queue: Array<{
+      resolve: (value: IteratorResult<SchemaChangeEvent>) => void;
+      reject: (e: Error) => void;
+    }> = [];
+    let finished = false;
+    const bump = () => {
+      const next = queue.shift();
+      if (next) {
+        next.resolve({
+          done: false,
+          value: { event: "change", data: "schema" },
+        });
+      }
+    };
+    const flushQueue = (e?: Error) => {
+      const entries = queue.splice(0, queue.length);
+      for (const entry of entries) {
+        if (e) {
+          entry.reject(e);
+        } else {
+          entry.resolve({ done: true } as IteratorResult<SchemaChangeEvent>);
+        }
+      }
+    };
+    eventEmitter.on("newSchema", bump);
+    return {
+      [Symbol.asyncIterator]() {
+        return this;
+      },
+      next() {
+        if (finished) {
+          return Promise.resolve({
+            done: true,
+          } as IteratorResult<SchemaChangeEvent>);
+        }
+        return new Promise((resolve, reject) => {
+          queue.push({ resolve, reject });
+        });
+      },
+      return() {
+        finished = true;
+        if (queue.length) {
+          flushQueue();
+        }
+        return Promise.resolve({
+          done: true,
+        } as IteratorResult<SchemaChangeEvent>);
+      },
+      throw(e) {
+        if (queue.length) {
+          flushQueue(e);
+        }
+        return Promise.reject(e);
+      },
+    };
+  }
   function addHandlers(r: SchemaResult): SchemaResultAndHandlers {
+    eventEmitter.emit("newSchema", r.schema);
     return {
       ...r,
       graphqlHandler: makeGraphQLHandler(r),
@@ -183,6 +372,18 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
           : schemaResult;
         const result = await sR.graphiqlHandler();
         sendResult(res, result);
+      })().catch(handleError);
+      return;
+    }
+
+    if (watch && req.url === eventStreamRoute && req.method === "GET") {
+      (async () => {
+        const stream = makeStream();
+        sendResult(res, {
+          type: "event-stream",
+          payload: stream,
+          statusCode: 200,
+        });
       })().catch(handleError);
       return;
     }

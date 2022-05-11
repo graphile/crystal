@@ -19,6 +19,8 @@ export interface ServerOptions {
 
   /** The path at which GraphQL will be available; usually /graphql */
   graphqlPath?: string;
+  /** The path at which the GraphQL event stream would be made available; usually /graphql/stream */
+  eventStreamRoute?: string;
 
   graphiql?: boolean;
   /** If true, then we will render GraphiQL on GET requests to the /graphql endpoint */

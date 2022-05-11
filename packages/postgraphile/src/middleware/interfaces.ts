@@ -17,7 +17,21 @@ export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";
   payload: ExecutionResult;
 }
+export interface EventStreamEvent {
+  /** The name of the event. Use simple names. Don't put newlines in it! */
+  event: string;
+  /** The data for this event. We'll automatically split this on newlines for you */
+  data?: string;
+  id?: string;
+  /** integer number of milliseconds indicating how long to wait before reconnecting if connection is lost */
+  retry?: number;
+}
+export interface EventStreamHeandlerResult extends IHandlerResult {
+  type: "event-stream";
+  payload: AsyncIterable<EventStreamEvent>;
+}
 export type HandlerResult =
   | HTMLHandlerResult
   | GraphQLHandlerResult
-  | TextHandlerResult;
+  | TextHandlerResult
+  | EventStreamHeandlerResult;
