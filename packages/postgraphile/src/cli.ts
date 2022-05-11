@@ -1,12 +1,10 @@
-import { withPgClientFromPgSource } from "graphile-build-pg";
 import { loadConfig, resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
-import type { IncomingMessage, RequestListener } from "node:http";
 import { createServer } from "node:http";
 
 import { postgraphile } from "./middleware/index.js";
 import { defaultPreset } from "./preset.js";
-import { makePgDatabasesFromConnectionString, makeSchema } from "./schema.js";
+import { makePgDatabasesFromConnectionString } from "./schema.js";
 
 export function options(yargs: Argv) {
   return yargs

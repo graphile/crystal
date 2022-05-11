@@ -2,7 +2,7 @@ import "graphile-build";
 
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
-import { defer, ExecutablePlan, PromiseOrDirect } from "dataplanner";
+import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
 import { context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import type { PluginHook } from "graphile-config";
@@ -516,7 +516,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             await listenWithPgClientFromPgSource(
               pgSource,
               "postgraphile_watch",
-              (event) => {
+              (_event) => {
                 // Delete the introspection results
                 info.cache.introspectionResultsPromise = null;
                 // Trigger re-gather

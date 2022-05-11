@@ -1,9 +1,8 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "dataplanner";
-import { defer } from "dataplanner";
-import { isPromiseLike } from "dataplanner";
-import { IncomingMessage } from "node:http";
-import { Socket } from "node:net";
+import { defer, isPromiseLike } from "dataplanner";
+import type { IncomingMessage } from "node:http";
+import type { Socket } from "node:net";
 
 import type { KeysOfType } from "./interfaces.js";
 
