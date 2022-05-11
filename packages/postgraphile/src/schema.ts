@@ -14,7 +14,6 @@ import * as pg from "pg";
 const Pool = pg.Pool || (pg as any).default?.Pool;
 
 import type { SchemaResult } from "./interfaces.js";
-import { defaultPreset as postgraphilePreset } from "./preset.js";
 
 declare global {
   namespace GraphileBuild {
@@ -27,7 +26,7 @@ declare global {
   }
 }
 
-export function makePgDatabasesFromConnectionString(
+export function makePgSourcesFromConnectionString(
   connectionString?: string,
   schemas?: string | string[],
 ): ReadonlyArray<GraphileConfig.PgDatabaseConfiguration> {
@@ -48,28 +47,6 @@ export function makePgDatabasesFromConnectionString(
     },
   };
   return [source];
-}
-
-function makeConfigFromConnectionString(
-  connectionString: string,
-  schemas?: string | string[],
-): GraphileConfig.Preset {
-  const pgSources = makePgDatabasesFromConnectionString(
-    connectionString,
-    schemas,
-  );
-
-  // Create our GraphQL schema by applying all the plugins
-  return {
-    extends: [postgraphilePreset],
-    pgSources,
-    gather: {
-      // jwtType: ["b", "jwt_token"],
-    },
-    schema: {
-      // pgJwtSecret: "secret",
-    },
-  };
 }
 
 // TODO: should we move this to graphile-build-pg?

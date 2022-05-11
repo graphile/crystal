@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 
 import { postgraphile } from "./middleware/index.js";
 import { defaultPreset } from "./preset.js";
-import { makePgDatabasesFromConnectionString } from "./schema.js";
+import { makePgSourcesFromConnectionString } from "./schema.js";
 
 export function options(yargs: Argv) {
   return yargs
@@ -74,7 +74,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const newPgSources = makePgDatabasesFromConnectionString(
+    const newPgSources = makePgSourcesFromConnectionString(
       connectionString,
       schemas,
     );
