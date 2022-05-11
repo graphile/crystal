@@ -1,8 +1,11 @@
-import { stripAnsi } from "dataplanner";
+import type { Deferred } from "dataplanner";
+import { defer, isPromiseLike, stripAnsi } from "dataplanner";
+import { resolvePresets } from "graphile-config";
 import { GraphQLError } from "graphql";
-import type { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, RequestListener, ServerResponse } from "http";
 
 import type { SchemaResult } from "../interfaces.js";
+import { makeSchema, watchSchema } from "../schema.js";
 import { makeGraphiQLHandler } from "./graphiql.js";
 import { makeGraphQLHandler } from "./graphql.js";
 import type { HandlerResult } from "./interfaces.js";
@@ -21,17 +24,16 @@ function getBodyFromRequest(req: IncomingMessage): Promise<string> {
   });
 }
 
-export function postgraphile(schemaResult: SchemaResult) {
-  const { contextCallback } = schemaResult;
-  const graphqlHandler = makeGraphQLHandler(schemaResult);
-  const graphiqlHandler = makeGraphiQLHandler(schemaResult);
+export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
+  release(): Promise<void>;
+} {
+  const config = resolvePresets([preset]);
   const {
     graphqlPath = "/graphql",
-
     graphiql = true,
     graphiqlOnGraphQLGET = true,
     graphiqlPath = "/",
-  } = schemaResult.config.server ?? {};
+  } = config.server ?? {};
 
   const sendResult = (res: ServerResponse, handlerResult: HandlerResult) => {
     switch (handlerResult.type) {
@@ -94,7 +96,45 @@ export function postgraphile(schemaResult: SchemaResult) {
     };
   };
 
-  return (req: IncomingMessage, res: ServerResponse, next: any): void => {
+  type SchemaResultAndHandlers = SchemaResult & {
+    graphqlHandler: Awaited<ReturnType<typeof makeGraphQLHandler>>;
+    graphiqlHandler: Awaited<ReturnType<typeof makeGraphiQLHandler>>;
+  };
+  function addHandlers(r: SchemaResult): SchemaResultAndHandlers {
+    return {
+      ...r,
+      graphqlHandler: makeGraphQLHandler(r),
+      graphiqlHandler: makeGraphiQLHandler(r),
+    };
+  }
+
+  let schemaResult:
+    | Promise<SchemaResultAndHandlers>
+    | Deferred<SchemaResultAndHandlers>
+    | SchemaResultAndHandlers;
+  let stopWatchingPromise: Promise<() => void> | null = null;
+  if (config.server?.watch) {
+    schemaResult = defer<SchemaResultAndHandlers>();
+    stopWatchingPromise = watchSchema(preset, (error, result) => {
+      if (error) {
+        console.error("Watch error: ", error);
+        return;
+      }
+      const resultWithHandlers = addHandlers(result!);
+      if (
+        schemaResult !== null &&
+        "resolve" in schemaResult &&
+        typeof schemaResult.resolve === "function"
+      ) {
+        schemaResult.resolve(resultWithHandlers);
+      }
+      schemaResult = resultWithHandlers;
+    });
+  } else {
+    schemaResult = makeSchema(preset).then(addHandlers);
+  }
+
+  const middleware: RequestListener = (req, res, next?: any): void => {
     const handleError = makeErrorHandler(req, res, next);
 
     // TODO: consider allowing GraphQL queries over 'GET'
@@ -102,8 +142,11 @@ export function postgraphile(schemaResult: SchemaResult) {
       (async () => {
         const bodyRaw = await getBodyFromRequest(req);
         const body = JSON.parse(bodyRaw);
-        const contextValue = contextCallback(req);
-        const result = await graphqlHandler(contextValue, body);
+        const sR = isPromiseLike(schemaResult)
+          ? await schemaResult
+          : schemaResult;
+        const contextValue = sR.contextCallback(req);
+        const result = await sR.graphqlHandler(contextValue, body);
         sendResult(res, result);
       })().catch((e) => {
         // Special error handling for GraphQL route
@@ -135,7 +178,10 @@ export function postgraphile(schemaResult: SchemaResult) {
       req.method === "GET"
     ) {
       (async () => {
-        const result = await graphiqlHandler();
+        const sR = isPromiseLike(schemaResult)
+          ? await schemaResult
+          : schemaResult;
+        const result = await sR.graphiqlHandler();
         sendResult(res, result);
       })().catch(handleError);
       return;
@@ -154,4 +200,14 @@ export function postgraphile(schemaResult: SchemaResult) {
       return;
     }
   };
+
+  return Object.assign(middleware, {
+    async release() {
+      if (stopWatchingPromise) {
+        const cb = await stopWatchingPromise;
+        cb();
+      }
+      // TODO: there's almost certainly more things that need releasing?
+    },
+  });
 }

@@ -517,6 +517,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               pgSource,
               "postgraphile_watch",
               (event) => {
+                // Delete the introspection results
+                info.cache.introspectionResultsPromise = null;
+                // Trigger re-gather
                 callback();
               },
             ),

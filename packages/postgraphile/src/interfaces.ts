@@ -1,9 +1,10 @@
 import "graphile-config";
 
 import type { GraphQLSchema } from "graphql";
-import type { IncomingMessage } from "http";
 
-export type ContextCallback = (req: IncomingMessage) => object;
+export type ContextCallback = (
+  graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
+) => object;
 
 // TODO: rename this!
 export interface SchemaResult {
@@ -15,9 +16,6 @@ export interface SchemaResult {
 export interface ServerOptions {
   /** Port number to listen on */
   port?: number;
-
-  /** Return settings to set in the session */
-  pgSettings?: (req: IncomingMessage) => object;
 
   /** The path at which GraphQL will be available; usually /graphql */
   graphqlPath?: string;
@@ -31,6 +29,9 @@ export interface ServerOptions {
   exposePlan?: boolean;
   /** The path at which the latest plan will be visible; usually /plan */
   planPath?: string;
+
+  /** Set true to enable watch mode */
+  watch?: boolean;
 }
 
 declare global {

@@ -1,6 +1,9 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
-import { defer, PromiseOrDirect } from "dataplanner";
+import type { PromiseOrDirect } from "dataplanner";
+import { defer } from "dataplanner";
 import { isPromiseLike } from "dataplanner";
+import { IncomingMessage } from "node:http";
+import { Socket } from "node:net";
 
 import type { KeysOfType } from "./interfaces.js";
 
@@ -12,27 +15,46 @@ declare global {
   }
 
   namespace GraphileConfig {
+    /**
+     * Details about the incoming GraphQL request - e.g. if it was sent over an
+     * HTTP request, the request itself so headers can be interrogated.
+     *
+     * It's anticipated this will be expanded via declaration merging, e.g. if
+     * your server is Koa then a `koaCtx` might be added.
+     */
+    interface GraphQLRequestContext {
+      // TODO: add things like operationName, operation, etc?
+      httpRequest?: IncomingMessage;
+      socket?: Socket;
+    }
+
     // TODO: rename
     interface PgDatabaseConfiguration<
       TAdaptor extends keyof DataPlanner.PgDatabaseAdaptorOptions = keyof DataPlanner.PgDatabaseAdaptorOptions,
     > {
       name: string;
+      schemas?: string[];
+
       adaptor: TAdaptor;
       adaptorSettings?: DataPlanner.PgDatabaseAdaptorOptions[TAdaptor];
-      schemas?: string[];
+
+      /** The key on 'context' where the withPgClient function will be sourced */
+      withPgClientKey: KeysOfType<
+        GraphileBuild.GraphileResolverContext,
+        WithPgClient
+      >;
+      listen?(topic: string): AsyncIterable<string>;
+
+      /** Return settings to set in the session */
+      pgSettings?: (
+        graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
+      ) => object | null;
 
       /** The key on 'context' where the pgSettings for this DB will be sourced */
       pgSettingsKey?: KeysOfType<
         GraphileBuild.GraphileResolverContext,
         { [key: string]: string } | null
       >;
-      /** The key on 'context' where the withPgClient function will be sourced */
-      withPgClientKey: KeysOfType<
-        GraphileBuild.GraphileResolverContext,
-        WithPgClient
-      >;
-
-      listen?(topic: string): AsyncIterable<string>;
     }
 
     interface Preset {
