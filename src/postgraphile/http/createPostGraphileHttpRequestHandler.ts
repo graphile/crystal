@@ -13,6 +13,7 @@ import {
 } from 'graphql';
 import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
+import * as querystring from 'querystring';
 import { pluginHookFromOptions } from '../pluginHook';
 import {
   HttpRequestHandler,
@@ -115,32 +116,13 @@ const isPostGraphileDevelopmentMode = process.env.POSTGRAPHILE_ENV === 'developm
 const debugGraphql = Debugger('postgraphile:graphql');
 const debugRequest = Debugger('postgraphile:request');
 
-function parseExplainOptions(req: IncomingMessage): ExplainOptions {
-  const explainOptions = {};
-  const header = req.headers['x-postgraphile-explain-options'];
-  if (!header) {
-    return explainOptions;
+function parseExplainHeader(req: IncomingMessage): { on: boolean; options: ExplainOptions } {
+  const header = req.headers['x-postgraphile-explain'];
+  if (typeof header !== 'string') {
+    return { on: false, options: {} };
   }
-  const headerValues = typeof header === 'string' ? header.split(',') : header;
-  for (const headerValue of headerValues) {
-    const [option, value] = headerValue.split('=').map(s => s.toLowerCase().trim());
-    switch (option) {
-      case 'format':
-        if (['text', 'xml', 'json', 'yaml'].includes(value)) {
-          explainOptions[option] = value;
-        } else {
-          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`);
-        }
-        break;
-      default:
-        if (['true', 'false'].includes(value)) {
-          explainOptions[option] = value === 'true';
-        } else {
-          console.warn(`Ignoring invalid value '${value}' for explain option '${option}'.`);
-        }
-    }
-  }
-  return explainOptions;
+  const { on, ...options } = querystring.parse(header, ';', '=');
+  return { on: on !== undefined, options };
 }
 
 /**
@@ -177,13 +159,14 @@ function withPostGraphileContextFromReqResGenerator(
       typeof allowExplainGenerator === 'function'
         ? await allowExplainGenerator(req)
         : allowExplainGenerator;
+    const explainHeader = allowExplain ? parseExplainHeader(req) : null;
     return withPostGraphileContext(
       {
         ...options,
         jwtToken,
         pgSettings,
-        explain: allowExplain && req.headers['x-postgraphile-explain'] === 'on',
-        explainOptions: parseExplainOptions(req),
+        explain: explainHeader && explainHeader.on,
+        explainOptions: explainHeader?.options ?? {},
         ...moreOptions,
       },
       context => {
@@ -1209,7 +1192,6 @@ function addCORSHeaders(res: PostGraphileResponse): void {
       'Content-Length',
       // For our 'Explain' feature
       'X-PostGraphile-Explain',
-      'X-PostGraphile-Explain-Options',
     ].join(', '),
   );
   res.setHeader('Access-Control-Expose-Headers', ['X-GraphQL-Event-Stream'].join(', '));

@@ -1,5 +1,6 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
+import * as querystring from 'querystring';
 import {buildClientSchema, getIntrospectionQuery, getOperationAST, GraphQLObjectType, isType, parse} from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
@@ -89,9 +90,9 @@ function explainOptionRequiresAnalyze(option) {
 
 function buildExplainOptionsHeader(explainOptions) {
   const analyzeEnabled = explainOptions.analyze;
-  return Object.entries(explainOptions)
-    .filter(([option]) => !explainOptionRequiresAnalyze(option) || analyzeEnabled)
-    .map(([option, value]) => `${option}=${value}`).join(',')
+  const validOptions = Object.fromEntries(Object.entries(explainOptions)
+    .filter(([option]) => !explainOptionRequiresAnalyze(option) || analyzeEnabled));
+  return querystring.stringify(validOptions, ';', '=');
 }
 
 function writeToClipboard(content) {
@@ -129,7 +130,12 @@ class PostGraphiQL extends React.PureComponent {
 
   parseFromStorage(key) {
     const value = this._storage.get(key);
-    return value ? JSON.parse(value) : undefined;
+    try {
+      return value ? JSON.parse(value) : undefined;
+    } catch (e) {
+      console.warn(`Failed to parse key '${key}' from storage: ${value}`)
+      return undefined;
+    }
   }
 
   restartRequested = false;
@@ -398,9 +404,8 @@ class PostGraphiQL extends React.PureComponent {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           ...(this.state.explain && POSTGRAPHILE_CONFIG.allowExplain
-            ? { 'X-PostGraphile-Explain': 'on' }
+            ? { 'X-PostGraphile-Explain': `on;${buildExplainOptionsHeader(this.state.explainOptions)}` }
             : null),
-          'X-PostGraphile-Explain-Options': buildExplainOptionsHeader(this.state.explainOptions)
         },
         extraHeaders,
       ),
