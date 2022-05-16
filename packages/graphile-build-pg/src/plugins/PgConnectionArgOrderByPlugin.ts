@@ -49,7 +49,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         pgCodecMetaLookup.forEach((meta, codec) => {
           if (!codec.columns || codec.isAnonymous) return;
           const behavior = getBehavior(codec.extensions);
-          if (behavior && !behavior.includes("order")) {
+          // TODO: should this be `type:order` or similar?
+          if (!build.behavior.matches(behavior, "order", "order")) {
             return;
           }
 

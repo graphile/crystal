@@ -277,7 +277,7 @@ async function main() {
             remoteColumns: ["forum_id"],
             extensions: {
               tags: {
-                behavior: ["connection", "list"],
+                behavior: "connection list",
               },
             },
           },
@@ -323,7 +323,7 @@ async function main() {
         ],
         extensions: {
           tags: {
-            behavior: ["query_field"],
+            behavior: "query_field",
           },
         },
       }),
@@ -409,7 +409,7 @@ async function main() {
         ],
         extensions: {
           tags: {
-            behavior: ["type_field", "connection", "list"],
+            behavior: "type_field connection list",
             name: "featured_messages",
           },
         },

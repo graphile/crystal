@@ -11,41 +11,51 @@ import { inspect } from "util";
 // NOTE: 'behaviour' is the correct spelling in UK English; we try and stick to
 // US English but this function tries to be a bit forgiving.
 
+type ArrayOrDirect<T> = Array<T> | T;
+
 /**
  * Takes a smart tags object and extracts the 'behavior' (or 'behaviour')
  * property and coerces it to be a string array. Returns null if no behavior
  * was specified (in which case the default behavior should be used).
  */
-export function getBehavior<
-  TExtensions extends
-    | PgSourceExtensions
-    | PgSourceRelationExtensions
-    | PgTypeCodecExtensions,
->(
-  extensions: Partial<TExtensions> | undefined,
-): TExtensions["tags"]["behavior"] | null {
-  const behavior = extensions?.tags?.behavior || extensions?.tags?.behaviour;
-  if (behavior == null) {
-    return null;
+export function getBehavior(
+  extensions: ArrayOrDirect<
+    | Partial<
+        PgSourceExtensions | PgSourceRelationExtensions | PgTypeCodecExtensions
+      >
+    | undefined
+  >,
+): string | null {
+  const allExtensions = Array.isArray(extensions) ? extensions : [];
+  const behaviors: string[] = [];
+  for (const extensions of allExtensions) {
+    add(extensions?.tags?.behaviour);
+    add(extensions?.tags?.behavior);
   }
-  if (Array.isArray(behavior)) {
-    if (isDev && !behavior.every(isValidBehavior)) {
-      throw new Error(
-        `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
-          behavior,
-        )}`,
-      );
+  return behaviors.join(" ");
+
+  function add(behavior: string[] | string | true | null | undefined): void {
+    if (Array.isArray(behavior)) {
+      if (isDev && !behavior.every(isValidBehavior)) {
+        throw new Error(
+          `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
+            behavior,
+          )}`,
+        );
+      }
+      behaviors.push(behavior.join(" "));
+      return;
     }
-    return behavior;
+    if (isValidBehavior(behavior)) {
+      behaviors.push(behavior);
+      return;
+    }
+    throw new Error(
+      `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
+        behavior,
+      )}`,
+    );
   }
-  if (isValidBehavior(behavior)) {
-    return [behavior];
-  }
-  throw new Error(
-    `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
-      behavior,
-    )}`,
-  );
 }
 
 /**

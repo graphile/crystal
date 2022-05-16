@@ -21,6 +21,7 @@ import {
 import * as graphql from "graphql";
 import * as semver from "semver";
 
+import { Behavior } from "./behavior.js";
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { stringTypeSpec, wrapDescription } from "./utils.js";
@@ -168,6 +169,8 @@ export default function makeNewBuild(
     },
     wrapDescription,
     stringTypeSpec,
+
+    behavior: new Behavior(),
 
     registerObjectType(typeName, scope, Plan, specGenerator, origin) {
       register(GraphQLObjectType, typeName, scope, Plan, specGenerator, origin);

@@ -34,6 +34,7 @@ import type {
   GraphQLUnionType,
   GraphQLUnionTypeConfig,
 } from "graphql";
+import { Behavior } from "./behavior.js";
 
 import type { InflectionBase } from "./inflection.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
@@ -245,6 +246,13 @@ declare global {
        * given description/coercion.
        */
       stringTypeSpec: typeof stringTypeSpec;
+
+      /**
+       * Behavior logic that helps decide whether or not a certain thing
+       * (typically a field, argument, enum value, input field, or similar)
+       * goes into the schema.
+       */
+      behavior: Behavior;
 
       /**
        * Register a type by name with the system; names must be unique. It's

@@ -66,13 +66,34 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
         return extend(
           values,
           Object.entries(columns).reduce((memo, [columnName, column]) => {
-            const behavior = getBehavior(column.extensions);
-            if (behavior && !behavior.includes("order")) {
+            const behavior = getBehavior([
+              pgCodec.extensions,
+              column.extensions,
+            ]);
+            // Enable ordering, but don't order by array or range types
+            const defaultBehavior = "order order:* -order:array -order:range";
+            if (!build.behavior.matches(behavior, "order", defaultBehavior)) {
               return memo;
             }
-            if (!behavior) {
-              // Unless explicitly told to, do not allow ordering by arrays/ranges
-              if (column.codec.arrayOfCodec || column.codec.rangeOfCodec) {
+            if (column.codec.arrayOfCodec) {
+              if (
+                !build.behavior.matches(
+                  behavior,
+                  "order:array",
+                  defaultBehavior,
+                )
+              ) {
+                return memo;
+              }
+            }
+            if (column.codec.rangeOfCodec) {
+              if (
+                !build.behavior.matches(
+                  behavior,
+                  "order:range",
+                  defaultBehavior,
+                )
+              ) {
                 return memo;
               }
             }
