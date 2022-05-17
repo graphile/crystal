@@ -111,6 +111,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                           [fieldName]: fieldWithHooks(
                             {
                               fieldName,
+                              fieldBehaviorScope: "attribute:filterBy",
                               isPgConnectionConditionInputField: true,
                             },
                             {

@@ -8,6 +8,7 @@ import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
+import { getBehavior } from "../behavior.js";
 
 declare global {
   namespace GraphileBuild {
@@ -49,11 +50,20 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
+        const behavior = getBehavior(codec!.extensions);
+        if (!build.behavior.matches(behavior, "totalCount", "totalCount")) {
+          return fields;
+        }
+
         return extend(
           fields,
           {
             totalCount: fieldWithHooks(
-              { fieldName: "totalCount", isPgConnectionTotalCountField: true },
+              {
+                fieldName: "totalCount",
+                fieldBehaviorScope: `totalCount`,
+                isPgConnectionTotalCountField: true,
+              },
               () => {
                 return {
                   description: build.wrapDescription(

@@ -6,6 +6,7 @@ import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
 
 import { version } from "../index";
+import { getBehavior } from "../behavior";
 
 declare global {
   namespace GraphileBuild {
@@ -62,7 +63,6 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         return sources.reduce(
           (outerMemo, source) =>
             build.recoverable(outerMemo, () =>
-              // TODO: by having 'uniques' be a simple array, we can't add 'behaviour' extensions.
               (source.uniques as PgSourceUnique[]).reduce((memo, unique) => {
                 const uniqueKeys = unique.columns as string[];
                 const fieldName = build.inflection.rowByUniqueKeys({
@@ -138,12 +138,29 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                         },
                       [detailsByColumnName, source],
                     );
+
+                const behavior = getBehavior([
+                  source.extensions,
+                  unique.extensions,
+                ]);
+                const fieldBehaviorScope = "query:single";
+                if (
+                  !build.behavior.matches(
+                    behavior,
+                    fieldBehaviorScope,
+                    "single",
+                  )
+                ) {
+                  return memo;
+                }
+
                 return build.extend(
                   memo,
                   {
                     [fieldName]: fieldWithHooks(
                       {
                         fieldName,
+                        fieldBehaviorScope,
                       },
                       () => ({
                         description: `Get a single \`${type.name}\`.`,

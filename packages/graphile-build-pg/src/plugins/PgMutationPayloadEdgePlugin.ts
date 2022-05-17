@@ -137,6 +137,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
             [fieldName]: fieldWithHooks(
               {
                 fieldName,
+                // TODO: fieldBehaviorScope: `...`,
                 isPgMutationPayloadEdgeField: true,
                 pgCodec: pgCodec,
               },

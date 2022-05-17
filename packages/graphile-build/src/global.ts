@@ -551,6 +551,7 @@ declare global {
 
     interface ScopeInputObjectFieldsField extends ScopeInputObject {
       fieldName: string;
+      fieldBehaviorScope?: string;
     }
     interface ContextInputObjectFieldsField extends ContextInputObject {
       scope: ScopeInputObjectFieldsField;

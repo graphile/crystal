@@ -49,7 +49,20 @@ it. But for now, this list will have to suffice.
 - `manyRelation:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
 
-# FORBIDDEN:
+- `insert:input:record` - input to the 'insert' mutation
+- `insert:payload:record` - the record added to the insert mutation payload
+- `update:payload:record`
+
+- `totalCount` - on a codec, should we add the `totalCount` field?
+
+## TODO
+
+Would be good to add additional data, e.g. `query:single[pk]`,
+`query:single[node]`, `query:single[unique]` could all be be added, and would
+allow you to set a rule like `-query:single +query:single[node]` to only allow
+the node accessors.
+
+## FORBIDDEN:
 
 - `create` - use `insert` instead!
 - `root:` - use `query:`, `mutation:` or `subscription:` instead

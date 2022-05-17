@@ -327,8 +327,9 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                 ? "update"
                 : "create";
 
+              const fieldBehaviorScope = `attribute:${action}`;
               if (
-                build.behavior.matches(behavior, `attribute:${action}`, action)
+                build.behavior.matches(behavior, fieldBehaviorScope, action)
               ) {
                 return memo;
               }
@@ -354,7 +355,12 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                 memo,
                 {
                   [fieldName]: fieldWithHooks(
-                    { fieldName, pgCodec, pgColumn: column },
+                    {
+                      fieldName,
+                      fieldBehaviorScope,
+                      pgCodec,
+                      pgColumn: column,
+                    },
                     {
                       description: column.description,
                       type: nullableIf(

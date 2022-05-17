@@ -78,6 +78,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
+                    fieldBehaviorScope: "proc:filterBy",
                     isPgConnectionConditionInputField: true,
                     pgFieldSource,
                   },

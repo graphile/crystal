@@ -506,6 +506,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
+                      fieldBehaviorScope: `${relationTypeScope}:single`,
                       isPgSingleRelationField: true,
                       pgRelationDetails: relationDetails,
                     },
@@ -541,6 +542,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                     [fieldName]: fieldWithHooks(
                       {
                         fieldName,
+                        fieldBehaviorScope: `${relationTypeScope}:connection`,
                         pgSource: otherSource,
                         isPgFieldConnection: true,
                         isPgManyRelationConnectionField: true,
@@ -574,6 +576,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
+                      fieldBehaviorScope: `${relationTypeScope}:list`,
                       pgSource: otherSource,
                       isPgFieldSimpleCollection: true,
                       isPgManyRelationListField: true,

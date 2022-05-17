@@ -649,14 +649,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     : "connection"
                   : "list";
 
-                const behaviorScope = isRootQuery
-                  ? `query_field`
-                  : `type_field`;
+                const baseScope = isRootQuery ? `query_field` : `type_field`;
+                const connectionFieldBehaviorScope = `${baseScope}:connection`;
+                const listFieldBehaviorScope = `${baseScope}:list`;
                 if (
                   canUseConnection &&
                   build.behavior.matches(
                     behavior,
-                    `${behaviorScope}:connection`,
+                    connectionFieldBehaviorScope,
                     defaultBehavior,
                   )
                 ) {
@@ -675,7 +675,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         memo,
                         {
                           [fieldName]: fieldWithHooks(
-                            { fieldName },
+                            {
+                              fieldName,
+                              fieldBehaviorScope: connectionFieldBehaviorScope,
+                            },
                             {
                               description: source.description,
                               type: ConnectionType,
@@ -707,7 +710,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 if (
                   build.behavior.matches(
                     behavior,
-                    `${behaviorScope}:list`,
+                    listFieldBehaviorScope,
                     defaultBehavior,
                   )
                 ) {
@@ -719,7 +722,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       memo,
                       {
                         [fieldName]: fieldWithHooks(
-                          { fieldName },
+                          {
+                            fieldName,
+                            fieldBehaviorScope: listFieldBehaviorScope,
+                          },
                           {
                             description: source.description,
                             // TODO: nullability

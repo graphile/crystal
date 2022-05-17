@@ -273,6 +273,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 ),
                 fields: ({ fieldWithHooks }) => {
                   const tableName = inflection.tableFieldName(source);
+                  const behavior = getBehavior([
+                    source.codec.extensions,
+                    source.extensions,
+                  ]);
                   // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
                   const deletedNodeIdFieldName = inflection.deletedNodeId({
                     source,
@@ -300,6 +304,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                           [tableName]: fieldWithHooks(
                             {
                               fieldName: tableName,
+                              fieldBehaviorScope: `update:payload:record`,
                             },
                             () => ({
                               description: build.wrapDescription(
@@ -324,11 +329,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                           ),
                         }
                       : {}),
-                    ...(mode === "delete" && handler && nodeIdCodec
+                    ...(mode === "delete" &&
+                    handler &&
+                    nodeIdCodec &&
+                    build.behavior.matches(behavior, "node", "node")
                       ? {
                           [deletedNodeIdFieldName]: fieldWithHooks(
                             {
                               fieldName: deletedNodeIdFieldName,
+                              // TODO: fieldBehaviorScope: `...`,
                               isPgMutationPayloadDeletedNodeIdField: true,
                             },
                             () => {
@@ -680,7 +689,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   fields,
                   {
                     [fieldName]: fieldWithHooks(
-                      { fieldName },
+                      { fieldName, fieldBehaviorScope: mode },
                       {
                         args: {
                           input: {

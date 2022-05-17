@@ -107,6 +107,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                           [tableFieldName]: fieldWithHooks(
                             {
                               fieldName: tableFieldName,
+                              fieldBehaviorScope: `insert:input:record`,
                             },
                             () => ({
                               description: build.wrapDescription(
@@ -138,6 +139,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             );
 
             const payloadTypeName = inflection.createPayloadType(source);
+            const behavior = getBehavior(source.extensions);
             build.registerObjectType(
               payloadTypeName,
               {
@@ -167,11 +169,17 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                         [constant],
                       ),
                     },
-                    ...(TableType
+                    ...(TableType &&
+                    build.behavior.matches(
+                      behavior,
+                      "insert:payload:record",
+                      "insert:payload:record",
+                    )
                       ? {
                           [tableFieldName]: fieldWithHooks(
                             {
                               fieldName: tableFieldName,
+                              fieldBehaviorScope: `insert:payload:record`,
                             },
                             {
                               type: TableType,
@@ -230,7 +238,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
               memo,
               {
                 [createFieldName]: fieldWithHooks(
-                  { fieldName: createFieldName },
+                  { fieldName: createFieldName, fieldBehaviorScope: "insert" },
                   {
                     args: {
                       input: {

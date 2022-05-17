@@ -131,6 +131,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
+                    fieldBehaviorScope: `query:list`,
                     isPgFieldSimpleCollection: true,
                     pgSource: source,
                   },
@@ -172,6 +173,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
+                      fieldBehaviorScope: `query:connection`,
                       isPgFieldConnection: true,
                       pgSource: source,
                     },
