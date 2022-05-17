@@ -18,7 +18,7 @@ export interface PgTypeCodecTags extends PgSmartTagsDict {
 }
 
 export interface PgSmartTagsDict {
-  [tagName: string]: null | true | string | string[];
+  [tagName: string]: null | true | string | (string | true)[];
 }
 
 export type KeysOfType<TObject, TValueType> = {
@@ -32,17 +32,21 @@ export type KeysOfType<TObject, TValueType> = {
 declare module "@dataplan/pg" {
   interface PgSourceExtensions {
     tags: Partial<PgSourceTags>;
+    description?: string;
   }
 
   interface PgSourceRelationExtensions {
     tags: Partial<PgSourceTags>;
+    description?: string;
   }
 
   interface PgTypeColumnExtensions {
     tags: Partial<PgTypeColumnTags>;
+    description?: string;
   }
 
   interface PgTypeCodecExtensions {
     tags: Partial<PgTypeCodecTags>;
+    description?: string;
   }
 }

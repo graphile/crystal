@@ -9,6 +9,7 @@ import type { PgClass, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { parseSmartComment } from "../smartComments.js";
 
 declare global {
   namespace GraphileBuild {
@@ -329,8 +330,25 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
+          const useSmartComments = true;
+          const { description, tags } = useSmartComments
+            ? parseSmartComment(pgClass.getDescription())
+            : {
+                description: pgClass.getDescription(),
+                tags: Object.create(null),
+              };
+
           const sourceBuilder = EXPORTABLE(
-            (PgSourceBuilder, codec, executor, identifier, name, uniques) =>
+            (
+              PgSourceBuilder,
+              codec,
+              description,
+              executor,
+              identifier,
+              name,
+              tags,
+              uniques,
+            ) =>
               new PgSourceBuilder({
                 executor,
                 name,
@@ -339,12 +357,20 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 codec,
                 uniques,
                 extensions: {
-                  tags: {
-                    // TODO
-                  },
+                  description,
+                  tags,
                 },
               }),
-            [PgSourceBuilder, codec, executor, identifier, name, uniques],
+            [
+              PgSourceBuilder,
+              codec,
+              description,
+              executor,
+              identifier,
+              name,
+              tags,
+              uniques,
+            ],
           );
           info.state.detailsBySourceBuilder.set(sourceBuilder, {
             databaseName,

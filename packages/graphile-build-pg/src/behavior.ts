@@ -34,7 +34,9 @@ export function getBehavior(
   }
   return behaviors.join(" ");
 
-  function add(behavior: string[] | string | true | null | undefined): void {
+  function add(
+    behavior: (string | true)[] | string | true | null | undefined,
+  ): void {
     if (!behavior) {
       return;
     }
