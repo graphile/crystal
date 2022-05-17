@@ -1,4 +1,4 @@
-import "./interfaces";
+import "./interfaces.js";
 
 import { access } from "fs/promises";
 import type { Extension } from "interpret";

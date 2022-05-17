@@ -1,5 +1,5 @@
-import "./PgTablesPlugin";
-import "./PgBasicsPlugin";
+import "./PgTablesPlugin.js";
+import "./PgBasicsPlugin.js";
 import "graphile-config";
 
 import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";

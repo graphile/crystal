@@ -1,5 +1,5 @@
 import "graphile-build";
-import "./PgTablesPlugin";
+import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type { PgSource } from "@dataplan/pg";

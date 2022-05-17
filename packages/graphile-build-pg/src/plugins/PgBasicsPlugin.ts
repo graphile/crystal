@@ -1,6 +1,6 @@
 import "graphile-build";
-import "./PgTablesPlugin";
-import "../interfaces";
+import "./PgTablesPlugin.js";
+import "../interfaces.js";
 import "graphile-config";
 
 import type { PgTypeCodec } from "@dataplan/pg";

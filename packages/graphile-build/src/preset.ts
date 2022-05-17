@@ -1,4 +1,4 @@
-import "./interfaces";
+import "./interfaces.js";
 import "graphile-config";
 
 import {

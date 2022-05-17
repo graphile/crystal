@@ -1,4 +1,4 @@
-import "./PgTablesPlugin";
+import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type { PgSelectPlan, PgSource, PgSourceParameter } from "@dataplan/pg";

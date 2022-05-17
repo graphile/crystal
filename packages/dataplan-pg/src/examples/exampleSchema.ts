@@ -77,6 +77,8 @@ import type {
   PgTypeColumnVia,
   WithPgClient,
 } from "../";
+import type { PgTypeColumns } from "../codecs.js";
+import { listOfType } from "../codecs.js";
 import {
   BooleanFilterPlan,
   ClassFilterPlan,
@@ -100,9 +102,7 @@ import {
   PgUpdatePlan,
   recordType,
   TYPES,
-} from "../";
-import type { PgTypeColumns } from "../codecs.js";
-import { listOfType } from "../codecs.js";
+} from "../index.js";
 import { PgPageInfoPlan } from "../plans/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic.js";
 

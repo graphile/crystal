@@ -2,7 +2,7 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
-import "./PgProceduresPlugin";
+import "./PgProceduresPlugin.js";
 import "graphile-config";
 
 import type {

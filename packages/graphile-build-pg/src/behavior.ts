@@ -1,4 +1,4 @@
-import "./interfaces";
+import "./interfaces.js";
 
 import type {
   PgSourceExtensions,

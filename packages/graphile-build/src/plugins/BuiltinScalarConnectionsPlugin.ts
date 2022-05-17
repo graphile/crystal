@@ -1,4 +1,4 @@
-import "./ConnectionPlugin";
+import "./ConnectionPlugin.js";
 import "graphile-config";
 
 import { version } from "../index.js";

@@ -1,6 +1,6 @@
 import "graphile-build";
-import "./PgBasicsPlugin";
-import "../interfaces";
+import "./PgBasicsPlugin.js";
+import "../interfaces.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
