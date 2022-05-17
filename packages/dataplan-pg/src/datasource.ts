@@ -32,7 +32,11 @@ import type {
   PgExecutorOptions,
 } from "./executor.js";
 import { exportAs } from "./exportAs.js";
-import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces.js";
+import type {
+  PgEnumTypeCodec,
+  PgTypeCodec,
+  PlanByUniques,
+} from "./interfaces.js";
 import type { PgClassExpressionPlan } from "./plans/pgClassExpression.js";
 import type { PgSelectArgumentSpec, PgSelectPlan } from "./plans/pgSelect.js";
 import { pgSelect } from "./plans/pgSelect.js";

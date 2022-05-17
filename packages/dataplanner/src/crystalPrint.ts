@@ -7,7 +7,12 @@ import { ExecutablePlan } from "./plan.js";
 import { PlanResults } from "./planResults.js";
 import { isCrystalObject } from "./resolvers.js";
 import { stripAnsi } from "./stripAnsi.js";
-import { isDeferred, isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
+import {
+  isDeferred,
+  isPromise,
+  ROOT_VALUE_OBJECT,
+  sharedNull,
+} from "./utils.js";
 
 /*
  * This file contains utilities used with the `debug` module primarily (but
