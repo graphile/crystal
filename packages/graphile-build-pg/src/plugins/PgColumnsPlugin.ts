@@ -150,8 +150,8 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         for (const columnName in pgCodec.columns) {
           const column = pgCodec.columns[columnName];
 
-          const behavior = getBehavior(column.extensions) ?? ["select"];
-          if (!behavior.includes("select")) {
+          const behavior = getBehavior(column.extensions);
+          if (!build.behavior.matches(behavior, "attribute:select", "select")) {
             // Don't allow selecting this column.
             continue;
           }
@@ -320,16 +320,18 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           (memo, [columnName, column]) =>
             build.recoverable(memo, () => {
               const behavior = getBehavior(column.extensions);
-              if (behavior && !behavior.includes("insertable")) {
-                return memo;
-              }
 
-              // TODO: should this be used?
-              const _action = isPgBaseInput
+              const action = isPgBaseInput
                 ? "base"
                 : isPgPatch
                 ? "update"
                 : "create";
+
+              if (
+                build.behavior.matches(behavior, `attribute:${action}`, action)
+              ) {
+                return memo;
+              }
 
               const fieldName = inflection.column({
                 column,

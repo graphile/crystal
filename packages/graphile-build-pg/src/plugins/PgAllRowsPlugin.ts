@@ -117,13 +117,13 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const behavior = getBehavior(source.extensions);
-          // TODO: should this be `"all:list"`?
-          if (behavior && !behavior.includes("all")) {
-            continue;
-          }
+          const behavior = getBehavior([
+            source.codec.extensions,
+            source.extensions,
+          ]);
+          const defaultBehavior = "connection -list";
 
-          {
+          if (build.behavior.matches(behavior, "query:list", defaultBehavior)) {
             const fieldName = build.inflection.allRowsList(source);
             fields = build.extend(
               fields,
@@ -152,7 +152,13 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          {
+          if (
+            build.behavior.matches(
+              behavior,
+              "query:connection",
+              defaultBehavior,
+            )
+          ) {
             const fieldName = build.inflection.allRowsConnection(source);
             const connectionType = build.getTypeByName(
               build.inflection.connectionType(

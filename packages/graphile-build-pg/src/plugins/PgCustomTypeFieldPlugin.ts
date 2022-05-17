@@ -205,7 +205,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           (s) =>
             s.isMutation &&
             s.parameters &&
-            (getBehavior(s.extensions) ?? ["mutation"]).includes("mutation"),
+            build.behavior.matches(
+              getBehavior(s.extensions),
+              "mutation_field",
+              "mutation_field",
+            ),
         );
 
         for (const source of mutationProcSources) {
@@ -357,18 +361,23 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           return fields;
         }
         const procSources = (() => {
+          // TODO: should we use query:field, mutation:field, type:field rather than underscores for the behaviors?
           if (isRootQuery) {
             // "custom query"
             // Find non-mutation function sources that don't accept a row type
             // as the first argument
             return build.input.pgSources.filter(
               (s) =>
-                !s.isMutation &&
                 s.parameters &&
-                !(s as PgSource<any, any, any, PgSourceParameter[]>)
-                  .parameters[0]?.codec?.columns &&
-                (getBehavior(s.extensions) ?? ["query_field"]).includes(
+                build.behavior.matches(
+                  getBehavior(s.extensions),
                   "query_field",
+                  !s.isMutation &&
+                    // Don't default to this being a query_field if it looks like a computed column function
+                    !(s as PgSource<any, any, any, PgSourceParameter[]>)
+                      .parameters[0]?.codec?.columns
+                    ? "query_field"
+                    : "-query_field",
                 ),
             );
           } else if (isRootMutation) {
@@ -376,10 +385,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             // Find mutation function sources
             return build.input.pgSources.filter(
               (s) =>
-                s.isMutation &&
                 s.parameters &&
-                (getBehavior(s.extensions) ?? ["mutation"]).includes(
-                  "mutation",
+                build.behavior.matches(
+                  getBehavior(s.extensions),
+                  "mutation_field",
+                  s.isMutation ? "mutation_field" : "-mutation_field",
                 ),
             );
           } else {
@@ -388,11 +398,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             // matching codec as the first argument
             return build.input.pgSources.filter(
               (s) =>
-                !s.isMutation &&
                 s.parameters &&
+                // TODO: should we allow other forms of computed columns here,
+                // e.g. accepting the row id rather than the row itself.
                 s.parameters?.[0]?.codec === pgCodec &&
-                (getBehavior(s.extensions) ?? ["type_field"]).includes(
+                build.behavior.matches(
+                  getBehavior(s.extensions),
                   "type_field",
+                  !s.isMutation ? "type_field" : "-type_field",
                 ),
             );
           }
@@ -568,7 +581,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   return memo;
                 }
                 memo[fieldName] = fieldWithHooks(
-                  { fieldName },
+                  { fieldName, fieldBehaviorScope: "mutation_field" },
                   {
                     description: source.description,
                     type: payloadType,
@@ -597,7 +610,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   ? build.inflection.customQuery({ source })
                   : build.inflection.computedColumn({ source });
                 memo[fieldName] = fieldWithHooks(
-                  { fieldName },
+                  {
+                    fieldName,
+                    // TODO: just because it's unique doesn't mean it doesn't
+                    // return a list. But even if it does, we can't order it or
+                    // filter it... So maybe `single` is fine?
+                    fieldBehaviorScope: isRootQuery
+                      ? "query_field:single"
+                      : "type_field:single",
+                  },
                   {
                     description: source.description,
                     type: type!,
@@ -619,17 +640,26 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 const canUseConnection =
                   !source.sqlPartitionByIndex && !source.isList;
 
-                const behavior = getBehavior(source.extensions) ?? [
-                  ...(canUseConnection
-                    ? simpleCollections === "both"
-                      ? ["connection", "list"]
-                      : simpleCollections === "only"
-                      ? ["list"]
-                      : ["connection"]
-                    : ["list"]),
-                ];
+                const behavior = getBehavior(source.extensions);
+                const defaultBehavior = canUseConnection
+                  ? simpleCollections === "both"
+                    ? "connection list"
+                    : simpleCollections === "only"
+                    ? "list"
+                    : "connection"
+                  : "list";
 
-                if (behavior.includes("connection") && canUseConnection) {
+                const behaviorScope = isRootQuery
+                  ? `query_field`
+                  : `type_field`;
+                if (
+                  canUseConnection &&
+                  build.behavior.matches(
+                    behavior,
+                    `${behaviorScope}:connection`,
+                    defaultBehavior,
+                  )
+                ) {
                   const fieldName = isRootQuery
                     ? build.inflection.customQueryConnection({ source })
                     : build.inflection.computedColumnConnection({ source });
@@ -674,7 +704,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   }
                 }
 
-                if (behavior.includes("list")) {
+                if (
+                  build.behavior.matches(
+                    behavior,
+                    `${behaviorScope}:list`,
+                    defaultBehavior,
+                  )
+                ) {
                   const fieldName = isRootQuery
                     ? build.inflection.customQueryList({ source })
                     : build.inflection.computedColumnList({ source });

@@ -34,8 +34,8 @@ import type {
   GraphQLUnionType,
   GraphQLUnionTypeConfig,
 } from "graphql";
-import { Behavior } from "./behavior.js";
 
+import type { Behavior } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
@@ -483,6 +483,7 @@ declare global {
 
     interface ScopeObjectFieldsField extends ScopeObjectFields {
       fieldName: string;
+      fieldBehaviorScope?: string;
       fieldDirectives?: DirectiveDetails[];
       isCursorField?: boolean;
     }

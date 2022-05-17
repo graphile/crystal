@@ -53,11 +53,12 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (parameters.filter((p) => p.required).length !== 1) return false;
           if (parameters[0].codec !== pgCodec) return false;
           if (!source.isUnique) return false;
-          const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
-          ]);
-          return build.behavior.matches(behavior, "filterBy", "filterBy");
+          const behavior = getBehavior([source.extensions]);
+          return build.behavior.matches(
+            behavior,
+            "proc:filterBy",
+            "-proc:filterBy",
+          );
         });
 
         return build.extend(

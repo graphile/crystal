@@ -132,28 +132,28 @@ declare global {
   }
 }
 
-const isUpdatable = (source: PgSource<any, any, any, any>) => {
+const isUpdatable = (
+  build: GraphileBuild.Build,
+  source: PgSource<any, any, any, any>,
+) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
   const behavior = getBehavior(source.extensions);
-  if (behavior && !behavior.includes("update")) {
-    return false;
-  }
-  return true;
+  return !!build.behavior.matches(behavior, "update", "update");
 };
 
-const isDeletable = (source: PgSource<any, any, any, any>) => {
+const isDeletable = (
+  build: GraphileBuild.Build,
+  source: PgSource<any, any, any, any>,
+) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
   const behavior = getBehavior(source.extensions);
-  if (behavior && !behavior.includes("delete")) {
-    return false;
-  }
-  return true;
+  return !!build.behavior.matches(behavior, "delete", "delete");
 };
 
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
@@ -530,8 +530,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           }
         };
 
-        const updatableSources = build.input.pgSources.filter(isUpdatable);
-        const deletableSources = build.input.pgSources.filter(isDeletable);
+        const updatableSources = build.input.pgSources.filter((source) =>
+          isUpdatable(build, source),
+        );
+        const deletableSources = build.input.pgSources.filter((source) =>
+          isDeletable(build, source),
+        );
 
         updatableSources.forEach((source) => {
           process(source, "update");
@@ -557,8 +561,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const updatableSources = build.input.pgSources.filter(isUpdatable);
-        const deletableSources = build.input.pgSources.filter(isDeletable);
+        const updatableSources = build.input.pgSources.filter((source) =>
+          isUpdatable(build, source),
+        );
+        const deletableSources = build.input.pgSources.filter((source) =>
+          isDeletable(build, source),
+        );
 
         const process = (
           fields: GraphQLFieldConfigMap<any, any>,

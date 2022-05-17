@@ -15,8 +15,8 @@ type ArrayOrDirect<T> = Array<T> | T;
 
 /**
  * Takes a smart tags object and extracts the 'behavior' (or 'behaviour')
- * property and coerces it to be a string array. Returns null if no behavior
- * was specified (in which case the default behavior should be used).
+ * property and coerces it to be a string. Returns null if no behavior was
+ * specified (in which case the default behavior should be used).
  */
 export function getBehavior(
   extensions: ArrayOrDirect<
@@ -35,6 +35,9 @@ export function getBehavior(
   return behaviors.join(" ");
 
   function add(behavior: string[] | string | true | null | undefined): void {
+    if (!behavior) {
+      return;
+    }
     if (Array.isArray(behavior)) {
       if (isDev && !behavior.every(isValidBehavior)) {
         throw new Error(
@@ -60,7 +63,7 @@ export function getBehavior(
 
 /**
  * We're strict with this because we want to be able to expand this in future.
- * For example I want to allow `@behavior all,some` to operate the same as
+ * For example I want to allow `@behavior all some` to operate the same as
  * `@behavior all\n@behavior some`. I also want to be able to add
  * `@behavior -all` to remove a previously enabled behavior.
  *
@@ -69,6 +72,8 @@ export function getBehavior(
 function isValidBehavior(behavior: unknown): behavior is string {
   return (
     typeof behavior === "string" &&
-    /^[a-zA-Z]([-_]?[a-zA-Z0-9])+$/.test(behavior)
+    /^[+-]?[a-zA-Z](_?[a-zA-Z0-9])+(?:\s+[+-]?[a-zA-Z](_?[a-zA-Z0-9])+)*$/.test(
+      behavior,
+    )
   );
 }

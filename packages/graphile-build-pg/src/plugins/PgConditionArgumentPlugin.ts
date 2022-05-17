@@ -53,7 +53,8 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
             }
 
             const behavior = getBehavior(codec.extensions);
-            if (behavior && !behavior.includes("selectable")) {
+            // TODO: do we want this filter here? E.g. we might want to enable a bulk delete mutation without allowing any selects?
+            if (!build.behavior.matches(behavior, "select", "select")) {
               return;
             }
 
@@ -80,10 +81,17 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
                       const behavior = getBehavior(column.extensions);
-                      // TODO: should this be filterBy?
-                      if (behavior && !behavior.includes("filter")) {
+                      if (
+                        !build.behavior.matches(
+                          behavior,
+                          "attribute:filterBy",
+                          "filterBy",
+                        )
+                      ) {
                         return memo;
                       }
+
+                      // TODO: add `attribute:filterBy:array`/`:range` ?
 
                       const fieldName = inflection.column({
                         columnName,
@@ -166,6 +174,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         const {
           scope: {
             fieldName,
+            fieldBehaviorScope,
             isPgFieldConnection,
             isPgFieldSimpleCollection,
             pgSource,
@@ -183,8 +192,17 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         )
           return args;
 
-        const behavior = getBehavior(pgSource.extensions);
-        if (behavior && !behavior.includes("filterable")) {
+        const behavior = getBehavior([
+          pgSource.codec.extensions,
+          pgSource.extensions,
+        ]);
+        if (
+          build.behavior.matches(
+            behavior,
+            fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
+            "filter",
+          )
+        ) {
           return args;
         }
 

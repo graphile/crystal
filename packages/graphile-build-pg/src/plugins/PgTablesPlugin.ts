@@ -410,19 +410,26 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             const tableTypeName = inflection.tableType(codec);
-            const behavior = getBehavior(codec.extensions) ?? [
-              "selectable",
+            const behavior = getBehavior(codec.extensions);
+            const defaultBehavior = [
+              "select",
+              "insert",
+              "update",
+              "delete",
               ...(!codec.isAnonymous ? ["insert", "update"] : []),
               ...(simpleCollections === "both"
                 ? ["connection", "list"]
                 : simpleCollections === "only"
                 ? ["list"]
                 : ["connection"]),
-            ];
-            // TODO: is 'selectable' the right behavior? What if you can only see
-            // it in a subscription? What if only on a mutation payload? More
-            // like "viewable"?
-            const selectable = !behavior || behavior.includes("selectable");
+            ].join(" ");
+
+            const selectable = build.behavior.matches(
+              behavior,
+              "select",
+              defaultBehavior,
+            );
+
             if (selectable) {
               build.registerObjectType(
                 tableTypeName,
@@ -439,8 +446,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              (!behavior && !codec.isAnonymous) ||
-              behavior?.includes("insert")
+              !codec.isAnonymous &&
+              build.behavior.matches(behavior, "insert", defaultBehavior)
             ) {
               const inputTypeName = inflection.inputType(tableTypeName);
               build.registerInputObjectType(
@@ -458,8 +465,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              (!behavior && !codec.isAnonymous) ||
-              behavior?.includes("update")
+              !codec.isAnonymous &&
+              build.behavior.matches(behavior, "update", defaultBehavior)
             ) {
               const patchTypeName = inflection.patchType(tableTypeName);
               build.registerInputObjectType(
@@ -476,7 +483,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               setGraphQLTypeForPgCodec(codec, ["patch"], patchTypeName);
             }
 
-            if (!behavior || behavior.includes("connection")) {
+            if (
+              build.behavior.matches(behavior, "*:connection", defaultBehavior)
+            ) {
               // Register edges
               build.registerCursorConnection({
                 typeName: tableTypeName,

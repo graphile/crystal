@@ -67,14 +67,19 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const behavior =
-          getBehavior(pgCodec.extensions) ??
-          (simpleCollections === "both"
-            ? ["connection", "list"]
+        const behavior = getBehavior(pgCodec.extensions);
+        const defaultBehavior =
+          simpleCollections === "both"
+            ? "connection list"
             : simpleCollections === "only"
-            ? ["list"]
-            : ["connection"]);
-        if (!behavior.includes("connection")) {
+            ? "list"
+            : "connection";
+
+        // TODO: this is a rule on the codec; we must ensure that everywhere
+        // that uses 'list'/'connection' respects the codec behaviors
+        if (
+          !build.behavior.matches(behavior, "*:connection", defaultBehavior)
+        ) {
           return fields;
         }
 

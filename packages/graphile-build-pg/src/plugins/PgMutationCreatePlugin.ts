@@ -33,15 +33,15 @@ declare global {
   }
 }
 
-const isInsertable = (source: PgSource<any, any, any, any>) => {
+const isInsertable = (
+  build: GraphileBuild.Build,
+  source: PgSource<any, any, any, any>,
+) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
   if (source.codec.isAnonymous) return false;
   const behavior = getBehavior(source.extensions);
-  if (behavior && !behavior.includes("create")) {
-    return false;
-  }
-  return true;
+  return build.behavior.matches(behavior, "insert", "insert") === true;
 };
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -73,7 +73,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           inflection,
           graphql: { GraphQLString, GraphQLNonNull },
         } = build;
-        const insertableSources = build.input.pgSources.filter(isInsertable);
+        const insertableSources = build.input.pgSources.filter((source) =>
+          isInsertable(build, source),
+        );
 
         insertableSources.forEach((source) => {
           build.recoverable(null, () => {
@@ -212,7 +214,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const insertableSources = build.input.pgSources.filter(isInsertable);
+        const insertableSources = build.input.pgSources.filter((source) =>
+          isInsertable(build, source),
+        );
         return insertableSources.reduce((memo, source) => {
           return build.recoverable(memo, () => {
             const createFieldName = inflection.createField(source);

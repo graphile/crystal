@@ -5,7 +5,7 @@ interface BehaviorSpec {
 }
 
 export class Behavior {
-  defaultBehavior = "";
+  private globalBehaviorDefaults = "";
 
   /**
    * @param localBehaviorSpecsString - the behavior of the entity as determined by details on the entity itself and any applicable ancestors
@@ -15,17 +15,17 @@ export class Behavior {
   public matches(
     localBehaviorSpecsString: string | null | undefined,
     filter: string,
-    defaultBehavior: string = "",
+    defaultBehavior = "",
   ): boolean | undefined {
     const finalBehaviorSpecsString = `${defaultBehavior} ${
-      this.defaultBehavior
+      this.globalBehaviorDefaults
     } ${localBehaviorSpecsString ?? ""}`;
     const specs = parseSpecs(finalBehaviorSpecsString);
     const filterScope = parseScope(filter);
     // Loop backwards through the specs
     for (let i = specs.length - 1; i >= 0; i--) {
       const { positive, scope } = specs[i];
-      if (scopeMatches(scope, filterScope)) {
+      if (scopeMatches(scope, filterScope, positive)) {
         return positive;
       }
     }
@@ -66,6 +66,9 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
 /**
  * Returns true if `filterScope` can be matched by `specifiedScope`.
  *
+ * If `filterScope` contains an `*` then we return true if any possible
+ * `filterScope` can be matched by `specifiedScope` in a positive fashion.
+ *
  * @param specifiedScope - the scope the user entered, e.g. from `+root:*:filter`
  * @param filterScope - the scope the plugin says we're in, e.g. from `root:connection:filter`
  *
@@ -74,6 +77,7 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
 function scopeMatches(
   specifiedScope: BehaviorScope,
   filterScope: BehaviorScope,
+  positive: boolean,
 ): boolean {
   if (specifiedScope.length > filterScope.length) {
     return false;
@@ -90,10 +94,13 @@ function scopeMatches(
   // Loop through each entry, if it doesn't match then return false.
   for (let i = 0, l = filterScopeTrimmed.length; i < l; i++) {
     const rule = specifiedScope[i];
-    if (rule === "*") {
+    const filter = filterScopeTrimmed[i];
+    if (filter === "*" && !positive) {
+      return false;
+    }
+    if (rule === "*" || filter === "*") {
       continue;
     }
-    const filter = filterScopeTrimmed[i];
     if (rule !== filter) {
       return false;
     }

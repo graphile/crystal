@@ -338,6 +338,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               source: otherSourceOrBuilder,
               extensions,
             } = relation;
+            const relationTypeScope = isUnique
+              ? `singularRelation`
+              : `manyRelation`;
             const otherSource =
               otherSourceOrBuilder instanceof PgSourceBuilder
                 ? otherSourceOrBuilder.get()
@@ -349,15 +352,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               return memo;
             }
             let fields = memo;
-            const behavior =
-              getBehavior(extensions) ??
-              (isUnique
-                ? ["single"]
-                : simpleCollections === "both"
-                ? ["connection", "list"]
-                : simpleCollections === "only"
-                ? ["list"]
-                : ["connection"]);
+            const behavior = getBehavior(extensions);
+            const defaultBehavior = isUnique
+              ? "single -singleRelation:list -singleRelation:connection"
+              : simpleCollections === "both"
+              ? "connection list"
+              : simpleCollections === "only"
+              ? "list"
+              : "connection";
 
             const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
               {
@@ -487,7 +489,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   [connection, localColumns, otherSource, remoteColumns],
                 );
 
-            if (isUnique && behavior.includes("single")) {
+            if (
+              isUnique &&
+              build.behavior.matches(
+                behavior,
+                `${relationTypeScope}:single`,
+                defaultBehavior,
+              )
+            ) {
               const fieldName = relationDetails.relation.isBackwards
                 ? build.inflection.singleRelationBackwards(relationDetails)
                 : build.inflection.singleRelation(relationDetails);
@@ -512,7 +521,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               );
             }
 
-            if (behavior.includes("connection")) {
+            if (
+              build.behavior.matches(
+                behavior,
+                `${relationTypeScope}:connection`,
+                defaultBehavior,
+              )
+            ) {
               const connectionTypeName =
                 build.inflection.connectionType(typeName);
               const ConnectionType =
@@ -544,7 +559,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            if (behavior.includes("list")) {
+            if (
+              build.behavior.matches(
+                behavior,
+                `${relationTypeScope}:list`,
+                defaultBehavior,
+              )
+            ) {
               const fieldName =
                 build.inflection.manyRelationList(relationDetails);
               fields = extend(

@@ -71,15 +71,22 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               column.extensions,
             ]);
             // Enable ordering, but don't order by array or range types
-            const defaultBehavior = "order order:* -order:array -order:range";
-            if (!build.behavior.matches(behavior, "order", defaultBehavior)) {
+            const defaultBehavior =
+              "orderBy orderBy:* -orderBy:array -orderBy:range";
+            if (
+              !build.behavior.matches(
+                behavior,
+                "attribute:orderBy",
+                defaultBehavior,
+              )
+            ) {
               return memo;
             }
             if (column.codec.arrayOfCodec) {
               if (
                 !build.behavior.matches(
                   behavior,
-                  "order:array",
+                  "attribute:orderBy:array",
                   defaultBehavior,
                 )
               ) {
@@ -90,7 +97,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               if (
                 !build.behavior.matches(
                   behavior,
-                  "order:range",
+                  "attribute:orderBy:range",
                   defaultBehavior,
                 )
               ) {
