@@ -2,6 +2,6 @@
 
 import { exportSchema } from "graphile-export";
 
-import { makeExampleSchema } from "../src/examples/exampleSchema";
+import { makeExampleSchema } from "../src/examples/exampleSchema.js";
 
 exportSchema(makeExampleSchema(), `${__dirname}/exampleSchemaExport.mjs`);

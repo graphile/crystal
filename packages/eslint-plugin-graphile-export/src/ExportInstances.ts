@@ -1,8 +1,8 @@
 import type { Rule } from "eslint";
 import type { CallExpression, NewExpression, Node as ESTreeNode } from "estree";
 
-import { reportProblem } from "./common";
-import { hasExportableParent } from "./NoNested";
+import { reportProblem } from "./common.js";
+import { hasExportableParent } from "./NoNested.js";
 
 interface CommonOptions {
   disableAutofix: boolean;

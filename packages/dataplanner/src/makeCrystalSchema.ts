@@ -23,9 +23,9 @@ import type {
   FieldPlanResolver,
   InputObjectFieldPlanResolver,
   ScalarPlanResolver,
-} from "./interfaces";
-import type { ExecutablePlan } from "./plan";
-import { crystalResolve, dataplannerResolver } from "./resolvers";
+} from "./interfaces.js";
+import type { ExecutablePlan } from "./plan.js";
+import { crystalResolve, dataplannerResolver } from "./resolvers.js";
 
 // TODO:TS: improve the types here!
 /**

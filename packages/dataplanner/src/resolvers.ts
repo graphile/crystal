@@ -5,13 +5,13 @@ import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
-import { populateValuePlan } from "./aether";
-import { ROOT_PATH } from "./constants";
-import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
-import type { Deferred } from "./deferred";
-import { defer } from "./deferred";
-import { establishAether } from "./establishAether";
-import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import { populateValuePlan } from "./aether.js";
+import { ROOT_PATH } from "./constants.js";
+import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
+import type { Deferred } from "./deferred.js";
+import { defer } from "./deferred.js";
+import { establishAether } from "./establishAether.js";
+import type { Batch, CrystalContext, CrystalObject } from "./interfaces.js";
 import {
   $$concreteType,
   $$crystalContext,
@@ -20,10 +20,10 @@ import {
   $$pathIdentity,
   $$planResults,
   $$verbatim,
-} from "./interfaces";
-import type { PlanResults } from "./planResults";
-import { __ValuePlan } from "./plans";
-import { ROOT_VALUE_OBJECT, sharedNull } from "./utils";
+} from "./interfaces.js";
+import type { PlanResults } from "./planResults.js";
+import { __ValuePlan } from "./plans/index.js";
+import { ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
 
 const debug = debugFactory("dataplanner:resolvers");
 const debugVerbose = debug.extend("verbose");

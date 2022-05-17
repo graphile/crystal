@@ -14,14 +14,14 @@ import type {
   SelectionNode,
 } from "graphql";
 
-import type { Aether } from "./aether";
-import type { Deferred } from "./deferred";
-import type { CrystalError } from "./error";
-import type { InputPlan } from "./input";
-import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan";
-import type { PlanResults, PlanResultsBucket } from "./planResults";
-import type { __TrackedObjectPlan } from "./plans";
-import type { GraphileInputObjectType, GraphileObjectType } from "./utils";
+import type { Aether } from "./aether.js";
+import type { Deferred } from "./deferred.js";
+import type { CrystalError } from "./error.js";
+import type { InputPlan } from "./input.js";
+import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan.js";
+import type { PlanResults, PlanResultsBucket } from "./planResults.js";
+import type { __TrackedObjectPlan } from "./plans/index.js";
+import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
 
 /*
  * We register certain things (plans, etc) into the GraphQL "extensions"

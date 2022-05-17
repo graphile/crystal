@@ -4,16 +4,16 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
-import type { PgTypeColumn, PgTypeColumns } from "../codecs";
+import type { PgTypeColumn, PgTypeColumns } from "../codecs.js";
 import type {
   PgSource,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
-} from "../datasource";
-import type { PgTypeCodec, PlanByUniques } from "../interfaces";
-import type { PgClassExpressionPlan } from "./pgClassExpression";
-import { pgClassExpression } from "./pgClassExpression";
+} from "../datasource.js";
+import type { PgTypeCodec, PlanByUniques } from "../interfaces.js";
+import type { PgClassExpressionPlan } from "./pgClassExpression.js";
+import { pgClassExpression } from "./pgClassExpression.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,

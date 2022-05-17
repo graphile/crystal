@@ -6,7 +6,7 @@ import {
   dataplannerResolver,
   dataplannerSubscriber,
   isCrystalWrapped,
-} from "./resolvers";
+} from "./resolvers.js";
 
 const debug = debugFactory("dataplanner:enforce");
 

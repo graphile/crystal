@@ -9,11 +9,11 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces";
-import { $$bypassGraphQL, $$eventEmitter, $$extensions } from "./interfaces";
-import type { CrystalPrepareOptions } from "./prepare";
-import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare";
-import { isPromiseLike } from "./utils";
+import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
+import { $$bypassGraphQL, $$eventEmitter, $$extensions } from "./interfaces.js";
+import type { CrystalPrepareOptions } from "./prepare.js";
+import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare.js";
+import { isPromiseLike } from "./utils.js";
 
 export interface DataPlannerExecuteOptions {
   experimentalGraphQLBypass?: boolean;

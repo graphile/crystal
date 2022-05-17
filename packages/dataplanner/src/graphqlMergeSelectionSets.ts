@@ -6,8 +6,8 @@ import type {
 import { Kind } from "graphql";
 import { inspect } from "util";
 
-import type { Aether } from "./aether";
-import type { FieldAndGroup } from "./interfaces";
+import type { Aether } from "./aether.js";
+import type { FieldAndGroup } from "./interfaces.js";
 
 /**
  * Implements the `MergeSelectionSets` algorithm from the GraphQL spec.

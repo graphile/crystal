@@ -2,10 +2,10 @@ import assert from "assert";
 import type { GraphQLInputType, ValueNode } from "graphql";
 import { GraphQLList } from "graphql";
 
-import type { InputPlan } from "../input";
-import { assertInputPlan, inputPlan } from "../input";
-import { ExecutablePlan } from "../plan";
-import { constant } from "./constant";
+import type { InputPlan } from "../input.js";
+import { assertInputPlan, inputPlan } from "../input.js";
+import { ExecutablePlan } from "../plan.js";
+import { constant } from "./constant.js";
 
 /**
  * Implements `__InputListPlan`.

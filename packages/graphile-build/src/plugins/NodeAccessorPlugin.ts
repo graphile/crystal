@@ -9,7 +9,7 @@ import type {
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

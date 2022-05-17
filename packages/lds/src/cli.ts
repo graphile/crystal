@@ -2,8 +2,8 @@
 /* eslint-disable no-console,curly */
 import WebSocket from "ws";
 
-import type { AnnounceCallback } from "./index";
-import subscribeToLogicalDecoding from "./index";
+import type { AnnounceCallback } from "./index.js";
+import subscribeToLogicalDecoding from "./index.js";
 
 const CONNECTION_STRING = process.env.LD_DATABASE_URL;
 const TABLE_PATTERN = process.env.LD_TABLE_PATTERN || "*.*";

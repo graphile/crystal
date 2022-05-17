@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
 
-import type { CrystalError } from "../error";
-import { isCrystalError } from "../error";
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
+import type { CrystalError } from "../error.js";
+import { isCrystalError } from "../error.js";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
 
 // Do **NOT** allow variables that start with `__`!
 export const isSafeIdentifier = (key: string) =>

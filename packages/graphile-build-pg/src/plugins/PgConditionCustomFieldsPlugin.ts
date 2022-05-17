@@ -9,8 +9,8 @@ import type {
 import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

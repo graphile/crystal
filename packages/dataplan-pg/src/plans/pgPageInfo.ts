@@ -11,9 +11,9 @@ import {
   last,
 } from "dataplanner";
 
-import type { PgCursorPlan } from "./pgCursor";
-import type { PgSelectPlan } from "./pgSelect";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
+import type { PgCursorPlan } from "./pgCursor.js";
+import type { PgSelectPlan } from "./pgSelect.js";
+import { PgSelectSinglePlan } from "./pgSelectSingle.js";
 
 /*
  * **IMPORTANT**: see pgPageInfo.md for reasoning behind decisions made in this file

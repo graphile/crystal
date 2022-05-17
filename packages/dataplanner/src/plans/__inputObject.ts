@@ -1,10 +1,10 @@
 import type { GraphQLInputObjectType, ValueNode } from "graphql";
 
-import type { InputPlan } from "../input";
-import { inputPlan } from "../input";
-import { ExecutablePlan } from "../plan";
-import { defaultValueToValueNode } from "../utils";
-import { constant } from "./constant";
+import type { InputPlan } from "../input.js";
+import { inputPlan } from "../input.js";
+import { ExecutablePlan } from "../plan.js";
+import { defaultValueToValueNode } from "../utils.js";
+import { constant } from "./constant.js";
 
 /**
  * Implements `InputObjectPlan`

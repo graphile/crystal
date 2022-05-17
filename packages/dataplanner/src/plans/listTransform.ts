@@ -1,10 +1,10 @@
 import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
-import { getCurrentParentPathIdentity } from "../global";
-import type { CrystalResultsList } from "../interfaces";
-import type { ListCapablePlan } from "../plan";
-import { ExecutablePlan } from "../plan";
-import type { __ItemPlan } from "./__item";
+import { getCurrentParentPathIdentity } from "../global.js";
+import type { CrystalResultsList } from "../interfaces.js";
+import type { ListCapablePlan } from "../plan.js";
+import { ExecutablePlan } from "../plan.js";
+import type { __ItemPlan } from "./__item.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,

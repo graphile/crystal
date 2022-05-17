@@ -15,7 +15,7 @@ import type { PgProc } from "pg-introspection";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {

@@ -1,9 +1,9 @@
 import type { GraphQLLeafType, ValueNode } from "graphql";
 import { valueFromAST } from "graphql";
 
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
-import { arrayOfLength } from "../utils";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
+import { arrayOfLength } from "../utils.js";
 
 /**
  * Implements `InputStaticLeafPlan`

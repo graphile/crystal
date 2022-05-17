@@ -19,8 +19,8 @@ import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 function nullableIf<T extends GraphQLType>(
   GraphQLNonNull: { new <T extends GraphQLType>(t: T): GraphQLNonNull<T> },

@@ -5,8 +5,8 @@ import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

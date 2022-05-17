@@ -27,18 +27,18 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
-import * as assert from "./assert";
-import type { Deferred } from "./deferred";
-import { isDev } from "./dev";
-import type { InputPlan } from "./input";
+import * as assert from "./assert.js";
+import type { Deferred } from "./deferred.js";
+import { isDev } from "./dev.js";
+import type { InputPlan } from "./input.js";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
   GraphileFieldConfig,
   GraphileInputFieldConfig,
   OutputPlanForType,
-} from "./interfaces";
-import type { ExecutablePlan, ModifierPlan } from "./plan";
+} from "./interfaces.js";
+import type { ExecutablePlan, ModifierPlan } from "./plan.js";
 
 /**
  * The parent object is used as the key in `GetValuePlanId()`; for root level

@@ -8,8 +8,8 @@ import { ExecutablePlan, isDev, polymorphicWrap } from "dataplanner";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { PgClassExpressionPlan } from "./pgClassExpression";
-import type { PgSelectSinglePlan } from "./pgSelectSingle";
+import type { PgClassExpressionPlan } from "./pgClassExpression.js";
+import type { PgSelectSinglePlan } from "./pgSelectSingle.js";
 
 /**
  * A map from the potential concrete types a polymorphic item may be, how to

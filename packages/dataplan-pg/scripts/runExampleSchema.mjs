@@ -7,7 +7,7 @@ import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import pg from "pg";
 
-import { schema } from "./exampleSchemaExport.mjs";
+import { schema } from "./exampleSchemaExport.mjs.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",

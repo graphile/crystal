@@ -1,7 +1,7 @@
 import debugFactory from "debug";
 
-import type { ExecutionExtra } from "../interfaces";
-import { ExecutablePlan } from "../plan";
+import type { ExecutionExtra } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
 
 const debugObjectPlan = debugFactory("dataplanner:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");

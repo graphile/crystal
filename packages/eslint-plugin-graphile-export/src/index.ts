@@ -1,10 +1,10 @@
 // Inspired by babel-plugin-react-hooks
 
-import { ExhaustiveDeps } from "./ExhaustiveDeps";
-import { ExportInstances } from "./ExportInstances";
-import { ExportMethods } from "./ExportMethods";
-import { ExportSubclasses } from "./ExportSubclasses";
-import { NoNested } from "./NoNested";
+import { ExhaustiveDeps } from "./ExhaustiveDeps.js";
+import { ExportInstances } from "./ExportInstances.js";
+import { ExportMethods } from "./ExportMethods.js";
+import { ExportSubclasses } from "./ExportSubclasses.js";
+import { NoNested } from "./NoNested.js";
 
 export const configs = {
   recommended: {

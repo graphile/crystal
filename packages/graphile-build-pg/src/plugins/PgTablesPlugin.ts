@@ -7,8 +7,8 @@ import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgNamespace } from "pg-introspection";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

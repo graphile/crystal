@@ -1,9 +1,9 @@
 import { ModifierPlan } from "dataplanner";
 import sql from "pg-sql2";
 
-import type { PgSource } from "../datasource";
-import { TempTablePlan } from "../plans/tempTable";
-import { ClassFilterPlan } from "./classFilter";
+import type { PgSource } from "../datasource.js";
+import { TempTablePlan } from "../plans/tempTable.js";
+import { ClassFilterPlan } from "./classFilter.js";
 
 export class ManyFilterPlan<
   TChildDataSource extends PgSource<any, any, any, any>,

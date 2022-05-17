@@ -21,8 +21,8 @@ import type {
   PgTypeColumns,
   PgTypeColumnVia,
   PgTypeColumnViaExplicit,
-} from "./codecs";
-import { TYPES } from "./codecs";
+} from "./codecs.js";
+import { TYPES } from "./codecs.js";
 import type {
   PgClientResult,
   PgExecutor,
@@ -30,16 +30,16 @@ import type {
   PgExecutorInput,
   PgExecutorMutationOptions,
   PgExecutorOptions,
-} from "./executor";
-import { exportAs } from "./exportAs";
-import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces";
-import type { PgClassExpressionPlan } from "./plans/pgClassExpression";
-import type { PgSelectArgumentSpec, PgSelectPlan } from "./plans/pgSelect";
-import { pgSelect } from "./plans/pgSelect";
+} from "./executor.js";
+import { exportAs } from "./exportAs.js";
+import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces.js";
+import type { PgClassExpressionPlan } from "./plans/pgClassExpression.js";
+import type { PgSelectArgumentSpec, PgSelectPlan } from "./plans/pgSelect.js";
+import { pgSelect } from "./plans/pgSelect.js";
 import type {
   PgSelectSinglePlan,
   PgSelectSinglePlanOptions,
-} from "./plans/pgSelectSingle";
+} from "./plans/pgSelectSingle.js";
 
 // TODO: PgSourceRow and PgSourceRowAttribute are lies; we don't use them even
 // though we claim to. Everything that references them needs to be typed in a

@@ -9,10 +9,10 @@ import {
   isUnionType,
 } from "graphql";
 
-import type { Aether } from "./aether";
-import { isDev } from "./dev";
-import type { FieldAndGroup, GroupedSelections } from "./interfaces";
-import type { __TrackedObjectPlan } from "./plans";
+import type { Aether } from "./aether.js";
+import { isDev } from "./dev.js";
+import type { FieldAndGroup, GroupedSelections } from "./interfaces.js";
+import type { __TrackedObjectPlan } from "./plans/index.js";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.

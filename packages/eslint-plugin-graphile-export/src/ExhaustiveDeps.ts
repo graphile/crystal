@@ -22,7 +22,7 @@ import type {
   Super as ESTreeSuper,
 } from "estree";
 
-import { fastFindReferenceWithParent, reportProblem } from "./common";
+import { fastFindReferenceWithParent, reportProblem } from "./common.js";
 
 interface CommonOptions {
   disableAutofix: boolean;

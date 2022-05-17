@@ -2,11 +2,11 @@ import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
-import { $$contextPlanCache } from "./aether";
-import { establishAether } from "./establishAether";
-import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces";
-import { $$eventEmitter, $$extensions } from "./interfaces";
-import { isPromiseLike } from "./utils";
+import { $$contextPlanCache } from "./aether.js";
+import { establishAether } from "./establishAether.js";
+import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces.js";
+import { $$eventEmitter, $$extensions } from "./interfaces.js";
+import { isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";
 

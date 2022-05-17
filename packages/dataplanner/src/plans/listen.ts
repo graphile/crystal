@@ -2,11 +2,11 @@ import type {
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
-} from "../interfaces";
-import type { StreamablePlan } from "../plan";
-import { ExecutablePlan, isExecutablePlan } from "../plan";
-import type { __ItemPlan } from "./__item";
-import { constant } from "./constant";
+} from "../interfaces.js";
+import type { StreamablePlan } from "../plan.js";
+import { ExecutablePlan, isExecutablePlan } from "../plan.js";
+import type { __ItemPlan } from "./__item.js";
+import { constant } from "./constant.js";
 
 /**
  * Subscribes to the given `pubsubOrPlan` to get realtime updates on a given

@@ -11,9 +11,9 @@ import {
   messageLoader,
   userLoader,
   PgConnectionPlan,
-} from "./fetchers";
-import sql from "../../pg-sql2/dist";
-import {FutureDependencies} from "../src/interfaces";
+} from "./fetchers.js";
+import sql from "../../pg-sql2/dist.js";
+import {FutureDependencies} from "../src/interfaces.js";
 
 const { enforceCrystal } = require("../src");
 

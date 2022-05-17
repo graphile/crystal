@@ -1,7 +1,7 @@
 import { inspect } from "util";
 
-import type { PgPoint } from "./point";
-import { stringifyPoint } from "./point";
+import type { PgPoint } from "./point.js";
+import { stringifyPoint } from "./point.js";
 
 export interface PgPolygon {
   points: PgPoint[];

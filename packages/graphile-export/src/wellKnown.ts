@@ -5,7 +5,7 @@ import * as crystalStar from "dataplanner";
 import * as graphqlStar from "graphql";
 import util, * as utilStar from "util";
 
-import type { ExportOptions } from "./interfaces";
+import type { ExportOptions } from "./interfaces.js";
 
 interface $$Export {
   moduleName: string;

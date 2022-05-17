@@ -32,8 +32,8 @@ import {
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;

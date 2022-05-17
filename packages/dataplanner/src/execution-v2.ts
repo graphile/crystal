@@ -5,19 +5,19 @@ import type {
   Bucket,
   BucketDefinitionFieldOutputMap,
   RequestContext,
-} from "./bucket";
-import { BucketSetter, bucketValue } from "./bucket";
-import { isCrystalError, newCrystalError } from "./error";
+} from "./bucket.js";
+import { BucketSetter, bucketValue } from "./bucket.js";
+import { isCrystalError, newCrystalError } from "./error.js";
 import type {
   CrystalContext,
   CrystalValuesList,
   ExecutionExtra,
   PromiseOrDirect,
-} from "./interfaces";
-import { $$concreteType } from "./interfaces";
-import type { ExecutablePlan } from "./plan";
-import { __ListTransformPlan } from "./plans";
-import { arrayOfLength, isPromiseLike } from "./utils";
+} from "./interfaces.js";
+import { $$concreteType } from "./interfaces.js";
+import type { ExecutablePlan } from "./plan.js";
+import { __ListTransformPlan } from "./plans/index.js";
+import { arrayOfLength, isPromiseLike } from "./utils.js";
 
 // optimization
 export const $$keys = Symbol("keys");

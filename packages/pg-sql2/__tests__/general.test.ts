@@ -1,5 +1,5 @@
-import type { SQLQuery } from "../src";
-import sql from "../src";
+import type { SQLQuery } from "../src.js";
+import sql from "../src.js";
 
 function sansSymbols(obj: any) {
   if (obj && typeof obj === "object") {

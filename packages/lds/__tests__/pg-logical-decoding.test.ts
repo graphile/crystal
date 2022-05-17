@@ -1,5 +1,5 @@
-import PgLogicalDecoding from "../src/pg-logical-decoding";
-import { DATABASE_URL, query, tryDropSlot, withLdAndClient } from "./helpers";
+import PgLogicalDecoding from "../src/pg-logical-decoding.js";
+import { DATABASE_URL, query, tryDropSlot, withLdAndClient } from "./helpers.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

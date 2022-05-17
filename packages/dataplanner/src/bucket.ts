@@ -2,12 +2,12 @@ import type { GraphQLScalarType } from "graphql";
 import { inspect } from "util";
 
 import type { CrystalError } from ".";
-import { isCrystalError, newCrystalError } from "./error";
-import type { ExecutionEventEmitter } from "./interfaces";
-import { $$concreteType, $$idempotent } from "./interfaces";
-import type { ExecutablePlan } from "./plan";
-import { isPolymorphicData } from "./polymorphic";
-import { arrayOfLength } from "./utils";
+import { isCrystalError, newCrystalError } from "./error.js";
+import type { ExecutionEventEmitter } from "./interfaces.js";
+import { $$concreteType, $$idempotent } from "./interfaces.js";
+import type { ExecutablePlan } from "./plan.js";
+import { isPolymorphicData } from "./polymorphic.js";
+import { arrayOfLength } from "./utils.js";
 
 /**
  * This is an interface other interfaces inherit from, it should never be used

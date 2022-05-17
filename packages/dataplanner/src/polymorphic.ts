@@ -1,7 +1,7 @@
 import { inspect } from "util";
 
-import type { PolymorphicData } from "./interfaces";
-import { $$concreteType } from "./interfaces";
+import type { PolymorphicData } from "./interfaces.js";
+import { $$concreteType } from "./interfaces.js";
 
 export function isPolymorphicData(data: unknown): data is PolymorphicData {
   if (typeof data !== "object" || data == null) {

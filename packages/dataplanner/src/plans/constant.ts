@@ -1,6 +1,6 @@
-import type { CrystalResultsList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
-import { arrayOfLength } from "../utils";
+import type { CrystalResultsList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
+import { arrayOfLength } from "../utils.js";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan

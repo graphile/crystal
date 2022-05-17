@@ -5,7 +5,7 @@ import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

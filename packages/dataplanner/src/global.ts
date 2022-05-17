@@ -1,6 +1,6 @@
 import type { GraphQLOutputType } from "graphql";
 
-import type { Aether } from "./aether";
+import type { Aether } from "./aether.js";
 
 /**
  * @internal

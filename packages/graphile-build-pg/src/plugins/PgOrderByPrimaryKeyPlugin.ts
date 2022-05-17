@@ -4,7 +4,7 @@ import "graphile-config";
 import type { PgSelectPlan, PgSourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
   name: "PgOrderByPrimaryKeyPlugin",

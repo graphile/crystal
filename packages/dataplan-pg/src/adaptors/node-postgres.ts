@@ -10,7 +10,7 @@ import type { PromiseOrDirect } from "dataplanner";
 import type { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
 import * as pg from "pg";
 
-import type { PgClient, PgClientQuery, WithPgClient } from "../executor";
+import type { PgClient, PgClientQuery, WithPgClient } from "../executor.js";
 
 // TODO: security sensitive, review this.
 function escapeIdentifier(str: string): string {

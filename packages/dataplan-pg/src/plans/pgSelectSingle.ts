@@ -7,22 +7,22 @@ import { ExecutablePlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumn, PgTypeColumns } from "../codecs";
-import { TYPES } from "../codecs";
+import type { PgTypeColumn, PgTypeColumns } from "../codecs.js";
+import { TYPES } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
-} from "../datasource";
-import { PgSourceBuilder } from "../datasource";
-import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
-import type { PgClassExpressionPlan } from "./pgClassExpression";
-import { pgClassExpression } from "./pgClassExpression";
-import { PgCursorPlan } from "./pgCursor";
-import type { PgSelectMode } from "./pgSelect";
-import { PgSelectPlan } from "./pgSelect";
+} from "../datasource.js";
+import { PgSourceBuilder } from "../datasource.js";
+import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces.js";
+import type { PgClassExpressionPlan } from "./pgClassExpression.js";
+import { pgClassExpression } from "./pgClassExpression.js";
+import { PgCursorPlan } from "./pgCursor.js";
+import type { PgSelectMode } from "./pgSelect.js";
+import { PgSelectPlan } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("datasource:pg:PgSelectSinglePlan:plan");

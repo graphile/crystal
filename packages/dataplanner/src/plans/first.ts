@@ -1,6 +1,6 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
-import { ListPlan } from "./list";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
+import { ListPlan } from "./list.js";
 
 export class FirstPlan<TData> extends ExecutablePlan<TData> {
   static $$export = {

@@ -1,6 +1,6 @@
-import { ExecutablePlan } from "../plan";
-import type { AccessPlan } from "./access";
-import { access } from "./access";
+import { ExecutablePlan } from "../plan.js";
+import type { AccessPlan } from "./access.js";
+import { access } from "./access.js";
 
 /**
  * Implements `__ValuePlan(aether)` which is never executed; it's purely

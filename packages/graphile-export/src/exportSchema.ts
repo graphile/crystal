@@ -45,9 +45,9 @@ import { sql } from "pg-sql2";
 import type { URL } from "url";
 import { inspect } from "util";
 
-import type { ExportOptions } from "./interfaces";
-import { optimize } from "./optimize";
-import { wellKnown } from "./wellKnown";
+import type { ExportOptions } from "./interfaces.js";
+import { optimize } from "./optimize/index.js";
+import { wellKnown } from "./wellKnown.js";
 
 // Do **NOT** allow variables that start with `__`!
 export const isSafeIdentifier = (key: string) =>

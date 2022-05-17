@@ -11,8 +11,8 @@ import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

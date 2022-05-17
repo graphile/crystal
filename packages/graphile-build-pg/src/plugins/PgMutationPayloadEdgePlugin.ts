@@ -11,9 +11,9 @@ import type {
   GraphQLSchema,
 } from "graphql";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
-import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
+import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 
 declare global {
   namespace GraphileBuild {

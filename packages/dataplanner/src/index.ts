@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import debugFactory from "debug";
 
-import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
-import { exportAsMany } from "./exportAs";
+import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
+import { exportAsMany } from "./exportAs.js";
 import {
   CrystalPlans,
   EnumPlans,
@@ -12,24 +12,24 @@ import {
   makeCrystalSchema,
   ObjectPlans,
   ScalarPlans,
-} from "./makeCrystalSchema";
-import { PrintPlanGraphOptions } from "./mermaid";
+} from "./makeCrystalSchema.js";
+import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // TODO: doing this here feels "naughty".
 debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { Aether } from "./aether";
-import { ROOT_PATH } from "./constants";
-import { dataplannerEnforce } from "./dataplannerEnforce";
-import { defer, Deferred } from "./deferred";
+import { Aether } from "./aether.js";
+import { ROOT_PATH } from "./constants.js";
+import { dataplannerEnforce } from "./dataplannerEnforce.js";
+import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
-import { isDev, noop } from "./dev";
-import { CrystalError, isCrystalError } from "./error";
-import { DataPlannerExecuteOptions, execute } from "./execute";
-import { getCurrentParentPathIdentity } from "./global";
-import { InputPlan } from "./input";
+import { isDev, noop } from "./dev.js";
+import { CrystalError, isCrystalError } from "./error.js";
+import { DataPlannerExecuteOptions, execute } from "./execute.js";
+import { getCurrentParentPathIdentity } from "./global.js";
+import { InputPlan } from "./input.js";
 import {
   $$bypassGraphQL,
   $$data,
@@ -69,7 +69,7 @@ import {
   ScalarPlanResolver,
   TrackedArguments,
   TypedEventEmitter,
-} from "./interfaces";
+} from "./interfaces.js";
 import {
   assertListCapablePlan,
   BasePlan,
@@ -84,7 +84,8 @@ import {
   ObjectLikePlan,
   PolymorphicPlan,
   StreamablePlan,
-} from "./plan";
+} from "./plan.js";
+import { __InputListPlan } from "./plans/__inputList.js";
 import {
   __InputObjectPlan,
   __InputStaticLeafPlan,
@@ -137,9 +138,8 @@ import {
   reverse,
   reverseArray,
   ReversePlan,
-} from "./plans";
-import { __InputListPlan } from "./plans/__inputList";
-import { polymorphicWrap, resolveType } from "./polymorphic";
+} from "./plans/index.js";
+import { polymorphicWrap, resolveType } from "./polymorphic.js";
 import {
   $$crystalWrapped,
   crystalResolve,
@@ -147,9 +147,9 @@ import {
   dataplannerResolver,
   dataplannerSubscriber,
   isCrystalWrapped,
-} from "./resolvers";
-import { stripAnsi } from "./stripAnsi";
-import { subscribe } from "./subscribe";
+} from "./resolvers.js";
+import { stripAnsi } from "./stripAnsi.js";
+import { subscribe } from "./subscribe.js";
 import {
   arraysMatch,
   getEnumValueConfig,
@@ -167,7 +167,7 @@ import {
   ObjectTypeFields,
   ObjectTypeSpec,
   planGroupsOverlap,
-} from "./utils";
+} from "./utils.js";
 
 export { isAsyncIterable } from "iterall";
 export {

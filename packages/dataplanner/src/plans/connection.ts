@@ -1,9 +1,9 @@
-import type { InputPlan } from "../input";
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
-import { arrayOfLength } from "../utils";
-import { constant } from "./constant";
-import { each } from "./each";
+import type { InputPlan } from "../input.js";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
+import { arrayOfLength } from "../utils.js";
+import { constant } from "./constant.js";
+import { each } from "./each.js";
 
 /**
  * Describes what a plan needs to implement in order to be suitable for

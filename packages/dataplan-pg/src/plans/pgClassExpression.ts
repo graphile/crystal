@@ -3,22 +3,22 @@ import { ExecutablePlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs";
+import type { PgTypeColumns } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
-} from "../datasource";
+} from "../datasource.js";
 import type {
   PgClassSinglePlan,
   PgTypeCodec,
   PgTypedExecutablePlan,
-} from "../interfaces";
-import { PgDeletePlan } from "./pgDelete";
-import { PgInsertPlan } from "./pgInsert";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
-import { PgUpdatePlan } from "./pgUpdate";
+} from "../interfaces.js";
+import { PgDeletePlan } from "./pgDelete.js";
+import { PgInsertPlan } from "./pgInsert.js";
+import { PgSelectSinglePlan } from "./pgSelectSingle.js";
+import { PgUpdatePlan } from "./pgUpdate.js";
 
 // const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
 // const debugExecute = debugFactory( "datasource:pg:PgClassExpressionPlan:execute",);

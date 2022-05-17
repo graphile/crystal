@@ -16,7 +16,7 @@ import debugFactory from "debug";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 
-import { formatSQLForDebugging } from "./formatSQLForDebugging";
+import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);

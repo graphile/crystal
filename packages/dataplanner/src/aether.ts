@@ -43,33 +43,36 @@ import {
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import * as assert from "./assert";
+import * as assert from "./assert.js";
 import type {
   Bucket,
   BucketDefinition,
   BucketDefinitionFieldOutputMap,
   BucketDefinitionOutputMode,
   RequestContext,
-} from "./bucket";
-import { BucketSetter } from "./bucket";
-import { GLOBAL_PATH, ROOT_PATH } from "./constants";
-import type { Constraint } from "./constraints";
-import { ansiPad, crystalPrint } from "./crystalPrint";
-import type { Deferred } from "./deferred";
-import { defer } from "./deferred";
-import type { CrystalError } from "./error";
-import { isCrystalError, newCrystalError } from "./error";
-import { $$keys, executeBucket } from "./execution-v2";
-import { withGlobalState } from "./global";
-import type { Group } from "./graphqlCollectFields";
-import { getDirectiveArg, graphqlCollectFields } from "./graphqlCollectFields";
+} from "./bucket.js";
+import { BucketSetter } from "./bucket.js";
+import { GLOBAL_PATH, ROOT_PATH } from "./constants.js";
+import type { Constraint } from "./constraints.js";
+import { ansiPad, crystalPrint } from "./crystalPrint.js";
+import type { Deferred } from "./deferred.js";
+import { defer } from "./deferred.js";
+import type { CrystalError } from "./error.js";
+import { isCrystalError, newCrystalError } from "./error.js";
+import { $$keys, executeBucket } from "./execution-v2.js";
+import { withGlobalState } from "./global.js";
+import type { Group } from "./graphqlCollectFields.js";
+import {
+  getDirectiveArg,
+  graphqlCollectFields,
+} from "./graphqlCollectFields.js";
 import {
   graphqlMergeSelectionSets,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
   typesUsedInSelections,
-} from "./graphqlMergeSelectionSets";
-import type { InputPlan } from "./input";
-import { inputPlan } from "./input";
+} from "./graphqlMergeSelectionSets.js";
+import type { InputPlan } from "./input.js";
+import { inputPlan } from "./input.js";
 import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
@@ -83,7 +86,7 @@ import type {
   PlanOptions,
   PromiseOrDirect,
   TrackedArguments,
-} from "./interfaces";
+} from "./interfaces.js";
 import {
   $$bypassGraphQL,
   $$concreteType,
@@ -93,15 +96,15 @@ import {
   $$idempotent,
   $$planResults,
   $$verbatim,
-} from "./interfaces";
-import type { PrintPlanGraphOptions } from "./mermaid";
-import { printPlanGraph } from "./mermaid";
+} from "./interfaces.js";
+import type { PrintPlanGraphOptions } from "./mermaid.js";
+import { printPlanGraph } from "./mermaid.js";
 import type {
   ListCapablePlan,
   ModifierPlan,
   PolymorphicPlan,
   StreamablePlan,
-} from "./plan";
+} from "./plan.js";
 import {
   assertArgumentsFinalized,
   assertExecutablePlan,
@@ -109,24 +112,24 @@ import {
   ExecutablePlan,
   isListCapablePlan,
   isStreamablePlan,
-} from "./plan";
-import type { PlanResultsBucket } from "./planResults";
-import { PlanResults } from "./planResults";
+} from "./plan.js";
+import type { PlanResultsBucket } from "./planResults.js";
+import { PlanResults } from "./planResults.js";
 import {
   __InputObjectPlan,
   __ItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
-} from "./plans";
-import { __ListTransformPlan } from "./plans/listTransform";
-import { assertPolymorphicData } from "./polymorphic";
+} from "./plans/index.js";
+import { __ListTransformPlan } from "./plans/listTransform.js";
+import { assertPolymorphicData } from "./polymorphic.js";
 import {
   $$crystalWrapped,
   isCrystalObject,
   isCrystalWrapped,
   newCrystalObject,
-} from "./resolvers";
-import { stripAnsi } from "./stripAnsi";
+} from "./resolvers.js";
+import { stripAnsi } from "./stripAnsi.js";
 import {
   arrayOfLength,
   arraysMatch,
@@ -135,7 +138,7 @@ import {
   planGroupsOverlap,
   ROOT_VALUE_OBJECT,
   sharedNull,
-} from "./utils";
+} from "./utils.js";
 
 /**
  * Once the plan has been requested once from context, we can just return the

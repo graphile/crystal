@@ -2,15 +2,15 @@ import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { Aether } from "./aether";
-import { GLOBAL_PATH } from "./constants";
-import { crystalPrintPathIdentity } from "./crystalPrint";
-import { isDev, noop } from "./dev";
+import type { Aether } from "./aether.js";
+import { GLOBAL_PATH } from "./constants.js";
+import { crystalPrintPathIdentity } from "./crystalPrint.js";
+import { isDev, noop } from "./dev.js";
 import {
   getCurrentAether,
   getCurrentParentPathIdentity,
   getDebug,
-} from "./global";
+} from "./global.js";
 import type {
   CrystalResultsList,
   CrystalResultStreamList,
@@ -18,8 +18,8 @@ import type {
   ExecutionExtra,
   PlanOptimizeOptions,
   PromiseOrDirect,
-} from "./interfaces";
-import type { __ItemPlan } from "./plans";
+} from "./interfaces.js";
+import type { __ItemPlan } from "./plans/index.js";
 
 function reallyAssertFinalized(plan: BasePlan): void {
   if (!plan.isFinalized) {

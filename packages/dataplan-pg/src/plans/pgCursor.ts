@@ -2,8 +2,8 @@ import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
 import { ExecutablePlan, list } from "dataplanner";
 import sql from "pg-sql2";
 
-import { TYPES } from "../codecs";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
+import { TYPES } from "../codecs.js";
+import { PgSelectSinglePlan } from "./pgSelectSingle.js";
 
 /**
  * Given a PgSelectSinglePlan, this will build a cursor by looking at all the

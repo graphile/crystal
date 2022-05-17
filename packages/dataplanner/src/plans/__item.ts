@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
-import { getCurrentParentPathIdentity } from "../global";
-import { ExecutablePlan } from "../plan";
+import { getCurrentParentPathIdentity } from "../global.js";
+import { ExecutablePlan } from "../plan.js";
 
 /**
  * An __ItemPlan is an internal plan (users must never construct it

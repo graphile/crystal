@@ -30,8 +30,8 @@ import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
 
-import type { WithPgClient } from "../src";
-import { schema } from "../src/examples/exampleSchema";
+import type { WithPgClient } from "../src.js";
+import { schema } from "../src/examples/exampleSchema.js";
 
 // Convenience so we don't have to type these out each time. These used to be
 // separate plans, but required too much maintenance.

@@ -1,16 +1,16 @@
 import chalk from "chalk";
 import { getNamedType } from "graphql";
 
-import { getCurrentGraphQLType } from "../global";
-import type { ExecutablePlan, ListCapablePlan } from "../plan";
-import { isListCapablePlan } from "../plan";
-import type { __ItemPlan } from "./__item";
+import { getCurrentGraphQLType } from "../global.js";
+import type { ExecutablePlan, ListCapablePlan } from "../plan.js";
+import { isListCapablePlan } from "../plan.js";
+import type { __ItemPlan } from "./__item.js";
 import type {
   __ListTransformPlan,
   ListTransformItemPlanCallback,
   ListTransformReduce,
-} from "./listTransform";
-import { listTransform } from "./listTransform";
+} from "./listTransform.js";
+import { listTransform } from "./listTransform.js";
 
 export type FilterPlanMemo = unknown[];
 

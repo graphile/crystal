@@ -16,7 +16,7 @@ import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 interface State {
   codecByTypeIdByDatabaseName: Map<

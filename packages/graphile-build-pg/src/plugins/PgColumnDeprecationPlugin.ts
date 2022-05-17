@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 export const PgColumnDeprecationPlugin: GraphileConfig.Plugin = {
   name: "PgColumnDeprecationPlugin",

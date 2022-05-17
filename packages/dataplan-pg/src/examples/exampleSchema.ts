@@ -101,10 +101,10 @@ import {
   recordType,
   TYPES,
 } from "../";
-import type { PgTypeColumns } from "../codecs";
-import { listOfType } from "../codecs";
-import { PgPageInfoPlan } from "../plans/pgPageInfo";
-import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic";
+import type { PgTypeColumns } from "../codecs.js";
+import { listOfType } from "../codecs.js";
+import { PgPageInfoPlan } from "../plans/pgPageInfo.js";
+import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic.js";
 
 declare module ".." {
   interface PgEnumSourceExtensions {

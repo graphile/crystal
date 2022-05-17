@@ -2,8 +2,8 @@ import type { ExecutablePlan } from "dataplanner";
 import { ModifierPlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 
-import type { PgTypeCodec } from "../interfaces";
-import type { PgConditionPlan } from "../plans/pgCondition";
+import type { PgTypeCodec } from "../interfaces.js";
+import type { PgConditionPlan } from "../plans/pgCondition.js";
 
 export class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
   static $$export = {

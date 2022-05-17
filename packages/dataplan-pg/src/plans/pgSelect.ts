@@ -35,30 +35,30 @@ import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs";
-import { listOfType } from "../codecs";
+import type { PgTypeColumns } from "../codecs.js";
+import { listOfType } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
-} from "../datasource";
-import { PgSourceBuilder } from "../datasource";
+} from "../datasource.js";
+import { PgSourceBuilder } from "../datasource.js";
 import type {
   PgGroupSpec,
   PgOrderSpec,
   PgTypeCodec,
   PgTypedExecutablePlan,
-} from "../interfaces";
-import { PgClassExpressionPlan } from "./pgClassExpression";
-import { PgConditionPlan } from "./pgCondition";
-import type { PgPageInfoPlan } from "./pgPageInfo";
-import { pgPageInfo } from "./pgPageInfo";
-import type { PgSelectSinglePlanOptions } from "./pgSelectSingle";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
-import { pgValidateParsedCursor } from "./pgValidateParsedCursor";
-import { toPg } from "./toPg";
+} from "../interfaces.js";
+import { PgClassExpressionPlan } from "./pgClassExpression.js";
+import { PgConditionPlan } from "./pgCondition.js";
+import type { PgPageInfoPlan } from "./pgPageInfo.js";
+import { pgPageInfo } from "./pgPageInfo.js";
+import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
+import { PgSelectSinglePlan } from "./pgSelectSingle.js";
+import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
+import { toPg } from "./toPg.js";
 
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)

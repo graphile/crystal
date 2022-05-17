@@ -6,8 +6,8 @@ import type { ListPlan } from "dataplanner";
 import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",

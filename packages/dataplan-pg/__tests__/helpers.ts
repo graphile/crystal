@@ -23,10 +23,10 @@ import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
 //import prettier from "prettier";
-import type { PgClient, PgClientQuery, WithPgClient } from "../src";
-import { PgSubscriber } from "../src";
-import { makeExampleSchema } from "../src/examples/exampleSchema";
-import type { PgClientResult } from "../src/executor";
+import type { PgClient, PgClientQuery, WithPgClient } from "../src.js";
+import { PgSubscriber } from "../src.js";
+import { makeExampleSchema } from "../src/examples/exampleSchema.js";
+import type { PgClientResult } from "../src/executor.js";
 
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.

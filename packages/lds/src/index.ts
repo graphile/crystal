@@ -1,9 +1,9 @@
 /* eslint-disable no-console,curly,@typescript-eslint/ban-types */
-import FatalError from "./fatal-error";
+import FatalError from "./fatal-error.js";
 import PgLogicalDecoding, {
   changeToPk,
   changeToRecord,
-} from "./pg-logical-decoding";
+} from "./pg-logical-decoding.js";
 
 export interface Options {
   slotName?: string;

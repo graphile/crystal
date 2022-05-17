@@ -3,7 +3,7 @@ import type { BasePlan, ExecutablePlan } from "dataplanner";
 import { ModifierPlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 
-import type { PgTypeCodec } from "../interfaces";
+import type { PgTypeCodec } from "../interfaces.js";
 
 export interface PgConditionCapableParentPlan extends BasePlan {
   alias: SQL;

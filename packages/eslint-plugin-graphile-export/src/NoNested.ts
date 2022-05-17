@@ -2,7 +2,7 @@ import type { CallExpression } from "@babel/types";
 import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
-import { reportProblem } from "./common";
+import { reportProblem } from "./common.js";
 
 interface CommonOptions {
   disableAutofix: boolean;

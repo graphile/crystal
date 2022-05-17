@@ -1,8 +1,8 @@
-import type { Constraint } from "../constraints";
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
-import type { __ValuePlan } from "./__value";
-import type { AccessPlan } from "./access";
+import type { Constraint } from "../constraints.js";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
+import type { __ValuePlan } from "./__value.js";
+import type { AccessPlan } from "./access.js";
 
 // TODO: rename to __TrackedValuePlan? Seems to represent values as well as
 // objects.

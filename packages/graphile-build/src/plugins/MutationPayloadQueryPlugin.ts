@@ -3,7 +3,7 @@ import "graphile-config";
 import { aether } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 /**
  * Adds a 'query' field to each mutation payload object type; this often turns

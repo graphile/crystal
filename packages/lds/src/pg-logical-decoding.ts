@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import FatalError from "./fatal-error";
+import FatalError from "./fatal-error.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

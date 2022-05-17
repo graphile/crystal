@@ -16,9 +16,9 @@ import type {
   PgRange,
   PgRoles,
   PgType,
-} from "./introspection";
-export { makeIntrospectionQuery } from "./introspection";
-import { augmentIntrospection } from "./augmentIntrospection";
+} from "./introspection.js";
+export { makeIntrospectionQuery } from "./introspection.js";
+import { augmentIntrospection } from "./augmentIntrospection.js";
 
 export {
   Introspection,

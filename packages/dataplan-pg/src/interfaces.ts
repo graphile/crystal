@@ -1,16 +1,16 @@
 import type { ExecutablePlan } from "dataplanner";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
-import type { PgTypeColumns } from "./codecs";
+import type { PgTypeColumns } from "./codecs.js";
 import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
-} from "./datasource";
-import type { PgDeletePlan } from "./plans/pgDelete";
-import type { PgInsertPlan } from "./plans/pgInsert";
-import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
-import type { PgUpdatePlan } from "./plans/pgUpdate";
+} from "./datasource.js";
+import type { PgDeletePlan } from "./plans/pgDelete.js";
+import type { PgInsertPlan } from "./plans/pgInsert.js";
+import type { PgSelectSinglePlan } from "./plans/pgSelectSingle.js";
+import type { PgUpdatePlan } from "./plans/pgUpdate.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or

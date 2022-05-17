@@ -2,7 +2,7 @@ import debugFactory from "debug";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import { formatSQLForDebugging } from "./formatSQLForDebugging";
+import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
 
 function sqlPrint(fragment: SQL): string {
   const { text } = sql.compile(fragment);
@@ -27,7 +27,7 @@ export {
   rangeOfCodec,
   recordType,
   TYPES,
-} from "./codecs";
+} from "./codecs.js";
 export {
   PgBox,
   PgCircle,
@@ -38,7 +38,7 @@ export {
   PgPath,
   PgPoint,
   PgPolygon,
-} from "./codecUtils";
+} from "./codecUtils/index.js";
 export {
   PgEnumSource,
   PgEnumSourceExtensions,
@@ -54,7 +54,7 @@ export {
   PgSourceRowAttribute,
   PgSourceUnique,
   PgSourceUniqueExtensions,
-} from "./datasource";
+} from "./datasource.js";
 export {
   PgClient,
   PgClientQuery,
@@ -66,10 +66,10 @@ export {
   PgExecutorMutationOptions,
   PgExecutorOptions,
   WithPgClient,
-} from "./executor";
-export { BooleanFilterPlan } from "./filters/booleanFilter";
-export { ClassFilterPlan } from "./filters/classFilter";
-export { ManyFilterPlan } from "./filters/manyFilter";
+} from "./executor.js";
+export { BooleanFilterPlan } from "./filters/booleanFilter.js";
+export { ClassFilterPlan } from "./filters/classFilter.js";
+export { ManyFilterPlan } from "./filters/manyFilter.js";
 export {
   PgClassSinglePlan,
   PgDecode,
@@ -82,25 +82,25 @@ export {
   PgTypedExecutablePlan,
   PlanByUniques,
   TuplePlanMap,
-} from "./interfaces";
-export { PgSubscriber } from "./PgSubscriber";
+} from "./interfaces.js";
+export { PgSubscriber } from "./PgSubscriber.js";
 export {
   pgClassExpression,
   PgClassExpressionPlan,
-} from "./plans/pgClassExpression";
+} from "./plans/pgClassExpression.js";
 export {
   PgConditionCapableParentPlan,
   PgConditionPlan,
-} from "./plans/pgCondition";
-export { PgCursorPlan } from "./plans/pgCursor";
-export { pgDelete, PgDeletePlan } from "./plans/pgDelete";
-export { pgInsert, PgInsertPlan } from "./plans/pgInsert";
-export { pgPageInfo, PgPageInfoPlan } from "./plans/pgPageInfo";
+} from "./plans/pgCondition.js";
+export { PgCursorPlan } from "./plans/pgCursor.js";
+export { pgDelete, PgDeletePlan } from "./plans/pgDelete.js";
+export { pgInsert, PgInsertPlan } from "./plans/pgInsert.js";
+export { pgPageInfo, PgPageInfoPlan } from "./plans/pgPageInfo.js";
 export {
   pgPolymorphic,
   PgPolymorphicPlan,
   PgPolymorphicTypeMap,
-} from "./plans/pgPolymorphic";
+} from "./plans/pgPolymorphic.js";
 export {
   pgSelect,
   PgSelectArgumentSpec,
@@ -111,21 +111,21 @@ export {
   PgSelectMode,
   PgSelectOptions,
   PgSelectPlan,
-} from "./plans/pgSelect";
+} from "./plans/pgSelect.js";
 export {
   pgSelectSingleFromRecord,
   PgSelectSinglePlan,
   PgSelectSinglePlanOptions,
-} from "./plans/pgSelectSingle";
-export { PgSetCapableParentPlan, PgSetPlan } from "./plans/pgSet";
+} from "./plans/pgSelectSingle.js";
+export { PgSetCapableParentPlan, PgSetPlan } from "./plans/pgSet.js";
 export {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicPlan,
-} from "./plans/pgSingleTablePolymorphic";
-export { pgUpdate, PgUpdatePlan } from "./plans/pgUpdate";
+} from "./plans/pgSingleTablePolymorphic.js";
+export { pgUpdate, PgUpdatePlan } from "./plans/pgUpdate.js";
 export {
   pgValidateParsedCursor,
   PgValidateParsedCursorPlan,
-} from "./plans/pgValidateParsedCursor";
-export { TempTablePlan } from "./plans/tempTable";
-export { toPg, ToPgPlan } from "./plans/toPg";
+} from "./plans/pgValidateParsedCursor.js";
+export { TempTablePlan } from "./plans/tempTable.js";
+export { toPg, ToPgPlan } from "./plans/toPg.js";

@@ -2,8 +2,8 @@ import chalk from "chalk";
 import debugFactory from "debug";
 import { inspect } from "util";
 
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import { ExecutablePlan } from "../plan.js";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in

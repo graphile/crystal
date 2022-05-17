@@ -12,8 +12,8 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

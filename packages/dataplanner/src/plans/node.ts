@@ -1,20 +1,20 @@
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import { isDev } from "../dev";
+import { isDev } from "../dev.js";
 import type {
   CrystalResultsList,
   CrystalValuesList,
   NodeIdCodec,
   NodeIdHandler,
   PolymorphicData,
-} from "../interfaces";
-import type { PolymorphicPlan } from "../plan";
-import { ExecutablePlan } from "../plan";
-import { polymorphicWrap } from "../polymorphic";
-import { access } from "./access";
-import { constant } from "./constant";
-import { lambda } from "./lambda";
+} from "../interfaces.js";
+import type { PolymorphicPlan } from "../plan.js";
+import { ExecutablePlan } from "../plan.js";
+import { polymorphicWrap } from "../polymorphic.js";
+import { access } from "./access.js";
+import { constant } from "./constant.js";
+import { lambda } from "./lambda.js";
 
 /**
  * A plan to get a Node by it's global object identifier (string). Accepts an

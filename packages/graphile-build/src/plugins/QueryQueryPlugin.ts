@@ -3,7 +3,7 @@ import "graphile-config";
 import { aether } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index";
+import { version } from "../index.js";
 
 /**
  * Adds the Query.query field to the Query type for Relay 1 compatibility. This

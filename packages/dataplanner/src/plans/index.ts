@@ -1,7 +1,7 @@
-import type { Aether } from "../aether";
-import { getCurrentAether, getDebug, setDebug } from "../global";
-import type { BaseGraphQLContext } from "../interfaces";
-import type { __ValuePlan } from "./__value";
+import type { Aether } from "../aether.js";
+import { getCurrentAether, getDebug, setDebug } from "../global.js";
+import type { BaseGraphQLContext } from "../interfaces.js";
+import type { __ValuePlan } from "./__value.js";
 
 export function aether(): Aether {
   return getCurrentAether();
@@ -25,7 +25,7 @@ export function debugPlans<T>(callback: () => T): T {
   return result;
 }
 
-export { access, AccessPlan } from "./access";
+export { access, AccessPlan } from "./access.js";
 export {
   connection,
   ConnectionCapablePlan,
@@ -33,33 +33,33 @@ export {
   EdgeCapablePlan,
   EdgePlan,
   PageInfoCapablePlan,
-} from "./connection";
-export { constant, ConstantPlan } from "./constant";
-export { each } from "./each";
-export { filter, FilterPlanMemo } from "./filter";
-export { first, FirstPlan } from "./first";
-export { groupBy, GroupByPlanMemo } from "./groupBy";
-export { lambda, LambdaPlan } from "./lambda";
-export { last, LastPlan } from "./last";
-export { list, ListPlan } from "./list";
-export { listen, ListenPlan } from "./listen";
+} from "./connection.js";
+export { constant, ConstantPlan } from "./constant.js";
+export { each } from "./each.js";
+export { filter, FilterPlanMemo } from "./filter.js";
+export { first, FirstPlan } from "./first.js";
+export { groupBy, GroupByPlanMemo } from "./groupBy.js";
+export { lambda, LambdaPlan } from "./lambda.js";
+export { last, LastPlan } from "./last.js";
+export { list, ListPlan } from "./list.js";
+export { listen, ListenPlan } from "./listen.js";
 export {
   __ListTransformPlan,
   listTransform,
   ListTransformItemPlanCallback,
   ListTransformOptions,
   ListTransformReduce,
-} from "./listTransform";
-export { ActualKeyByDesiredKey, makeMapper, map, MapPlan } from "./map";
-export { node, NodePlan } from "./node";
-export { object, ObjectPlan, ObjectPlanMeta } from "./object";
-export { partitionByIndex } from "./partitionByIndex";
-export { reverse, reverseArray, ReversePlan } from "./reverse";
+} from "./listTransform.js";
+export { ActualKeyByDesiredKey, makeMapper, map, MapPlan } from "./map.js";
+export { node, NodePlan } from "./node.js";
+export { object, ObjectPlan, ObjectPlanMeta } from "./object.js";
+export { partitionByIndex } from "./partitionByIndex.js";
+export { reverse, reverseArray, ReversePlan } from "./reverse.js";
 
 // Internal plans
-export { __InputListPlan } from "./__inputList";
-export { __InputObjectPlan } from "./__inputObject";
-export { __InputStaticLeafPlan } from "./__inputStaticLeaf";
-export { __ItemPlan } from "./__item";
-export { __TrackedObjectPlan } from "./__trackedObject";
-export { __ValuePlan } from "./__value";
+export { __InputListPlan } from "./__inputList.js";
+export { __InputObjectPlan } from "./__inputObject.js";
+export { __InputStaticLeafPlan } from "./__inputStaticLeaf.js";
+export { __ItemPlan } from "./__item.js";
+export { __TrackedObjectPlan } from "./__trackedObject.js";
+export { __ValuePlan } from "./__value.js";

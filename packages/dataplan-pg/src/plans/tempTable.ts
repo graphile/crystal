@@ -3,11 +3,11 @@ import { BasePlan } from "dataplanner";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgSource } from "../datasource";
-import type { ClassFilterPlan } from "../filters/classFilter";
-import type { PgTypeCodec } from "../interfaces";
-import type { PgConditionCapableParentPlan } from "./pgCondition";
-import { PgConditionPlan } from "./pgCondition";
+import type { PgSource } from "../datasource.js";
+import type { ClassFilterPlan } from "../filters/classFilter.js";
+import type { PgTypeCodec } from "../interfaces.js";
+import type { PgConditionCapableParentPlan } from "./pgCondition.js";
+import { PgConditionPlan } from "./pgCondition.js";
 
 export class TempTablePlan<TDataSource extends PgSource<any, any, any, any>>
   extends BasePlan

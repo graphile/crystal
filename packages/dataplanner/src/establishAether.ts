@@ -6,14 +6,14 @@ import type {
   OperationDefinitionNode,
 } from "graphql";
 
-import { Aether } from "./aether";
-import { matchesConstraints } from "./constraints";
-import { isDev, noop } from "./dev";
+import { Aether } from "./aether.js";
+import { matchesConstraints } from "./constraints.js";
+import { isDev, noop } from "./dev.js";
 import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-} from "./interfaces";
+} from "./interfaces.js";
 
 const debug = debugFactory("dataplanner:establishAether");
 

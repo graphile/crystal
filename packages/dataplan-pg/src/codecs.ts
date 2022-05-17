@@ -14,7 +14,7 @@ import type {
   PgPath,
   PgPoint,
   PgPolygon,
-} from "./codecUtils";
+} from "./codecUtils/index.js";
 import {
   parseBox,
   parseCircle,
@@ -33,15 +33,15 @@ import {
   stringifyPath,
   stringifyPoint,
   stringifyPolygon,
-} from "./codecUtils";
-import { exportAs } from "./exportAs";
+} from "./codecUtils/index.js";
+import { exportAs } from "./exportAs.js";
 import type {
   PgDecode,
   PgEncode,
   PgEnumTypeCodec,
   PgTypeCodec,
   PgTypeCodecExtensions,
-} from "./interfaces";
+} from "./interfaces.js";
 
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;

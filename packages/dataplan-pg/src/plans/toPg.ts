@@ -1,7 +1,7 @@
 import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
 import { ExecutablePlan } from "dataplanner";
 
-import type { PgTypeCodec } from "../interfaces";
+import type { PgTypeCodec } from "../interfaces.js";
 
 /**
  * Converts the given value to the representation suitable for feeding into the

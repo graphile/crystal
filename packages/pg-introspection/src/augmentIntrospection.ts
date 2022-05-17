@@ -9,7 +9,7 @@ import type {
   PgRange,
   PgRoles,
   PgType,
-} from "./introspection";
+} from "./introspection.js";
 
 /**
  * Adds helpers to the introspection results.

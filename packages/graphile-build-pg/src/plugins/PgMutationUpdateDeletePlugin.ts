@@ -20,8 +20,8 @@ import { lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

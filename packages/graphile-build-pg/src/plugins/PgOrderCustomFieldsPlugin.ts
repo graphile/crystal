@@ -4,8 +4,8 @@ import "graphile-config";
 import type { PgSelectPlan, PgSource, PgSourceParameter } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
-import { getBehavior } from "../behavior";
-import { version } from "../index";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

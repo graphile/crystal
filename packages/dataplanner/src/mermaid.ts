@@ -3,11 +3,11 @@
  */
 
 import type { Aether } from ".";
-import type { BucketDefinitionFieldOutputMap } from "./bucket";
-import { crystalPrintPathIdentity } from "./crystalPrint";
-import type { ExecutablePlan } from "./plan";
-import { __ItemPlan, __ListTransformPlan } from "./plans";
-import { stripAnsi } from "./stripAnsi";
+import type { BucketDefinitionFieldOutputMap } from "./bucket.js";
+import { crystalPrintPathIdentity } from "./crystalPrint.js";
+import type { ExecutablePlan } from "./plan.js";
+import { __ItemPlan, __ListTransformPlan } from "./plans/index.js";
+import { stripAnsi } from "./stripAnsi.js";
 
 /**
  * An array of hex colour codes that we use for colouring the buckets/steps in

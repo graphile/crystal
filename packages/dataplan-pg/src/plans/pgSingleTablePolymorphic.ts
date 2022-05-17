@@ -7,14 +7,14 @@ import type {
 import { ExecutablePlan, polymorphicWrap } from "dataplanner";
 import type { GraphQLObjectType } from "graphql";
 
-import type { PgTypeColumns } from "../codecs";
+import type { PgTypeColumns } from "../codecs.js";
 import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
   PgSourceUnique,
-} from "../datasource";
-import type { PgSelectSinglePlan } from "./pgSelectSingle";
+} from "../datasource.js";
+import type { PgSelectSinglePlan } from "./pgSelectSingle.js";
 
 /**
  * This polymorphic plan is to support polymorphism from a single PostgreSQL

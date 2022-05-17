@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { inspect } from "util";
 
-import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint";
-import { sharedNull } from "./utils";
+import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint.js";
+import { sharedNull } from "./utils.js";
 
 const isDev = process.env.GRAPHILE_ENV === "development";
 let planResultsId = 0;

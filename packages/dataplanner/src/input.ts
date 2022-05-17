@@ -16,14 +16,14 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
-import type { Aether } from "./aether";
-import * as assert from "./assert";
+import type { Aether } from "./aether.js";
+import * as assert from "./assert.js";
+import { __InputObjectPlan } from "./plans/__inputObject.js";
 import {
   __InputListPlan,
   __InputStaticLeafPlan,
   __TrackedObjectPlan,
-} from "./plans";
-import { __InputObjectPlan } from "./plans/__inputObject";
+} from "./plans/index.js";
 
 // TODO: should this have `__` prefix?
 export type InputPlan =

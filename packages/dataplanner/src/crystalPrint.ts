@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import { inspect } from "util";
 
-import { isDev } from "./dev";
-import type { CrystalObject } from "./interfaces";
-import { ExecutablePlan } from "./plan";
-import { PlanResults } from "./planResults";
-import { isCrystalObject } from "./resolvers";
-import { stripAnsi } from "./stripAnsi";
-import { isDeferred, isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils";
+import { isDev } from "./dev.js";
+import type { CrystalObject } from "./interfaces.js";
+import { ExecutablePlan } from "./plan.js";
+import { PlanResults } from "./planResults.js";
+import { isCrystalObject } from "./resolvers.js";
+import { stripAnsi } from "./stripAnsi.js";
+import { isDeferred, isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
 
 /*
  * This file contains utilities used with the `debug` module primarily (but
