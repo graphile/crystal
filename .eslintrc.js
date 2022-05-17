@@ -76,6 +76,7 @@ module.exports = {
     "sort-imports": "off",
     "import/order": "off",
 
+    "import/extensions": ["error", "ignorePackages"],
     "import/no-deprecated": "warn",
 
     // Apply has been more optimised than spread, use whatever feels right.
