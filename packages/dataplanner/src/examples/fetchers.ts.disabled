@@ -1,5 +1,5 @@
 import sql, { SQL } from "pg-sql2";
-import { Plan } from "../src.js";
+import { Plan } from "../src/index.js";
 import { FutureValue } from "../src/future.js";
 
 export class ConnectionPlan extends Plan {
