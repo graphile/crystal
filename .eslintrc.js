@@ -128,6 +128,7 @@ module.exports = {
       files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
       rules: {
         "tsdoc/syntax": "off",
+        "import/extensions": "off",
       },
     },
 
