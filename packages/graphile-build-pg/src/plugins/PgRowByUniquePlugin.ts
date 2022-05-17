@@ -5,8 +5,8 @@ import type { TrackedArguments } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
 
-import { version } from "../index";
-import { getBehavior } from "../behavior";
+import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {

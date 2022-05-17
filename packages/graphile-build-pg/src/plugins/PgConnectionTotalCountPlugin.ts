@@ -7,8 +7,8 @@ import { TYPES } from "@dataplan/pg";
 import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index.js";
 import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {
