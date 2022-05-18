@@ -275,7 +275,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             isBackwards,
           });
           const existingRelation = relations[relationName];
-          const { description, tags } = pgConstraint.getTagsAndDescription();
+          const { tags } = pgConstraint.getTagsAndDescription();
           const newRelation: PgSourceRelation<any, any> = {
             localColumns: localColumns.map((c) => c!.attname),
             remoteColumns: foreignColumns.map((c) => c!.attname),
