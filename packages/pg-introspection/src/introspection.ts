@@ -1261,19 +1261,19 @@ export interface PgDepend {
  */
 export interface PgDescription {
   /** The OID of the object this description pertains to */
-  objoid: PgOid | null;
+  objoid: PgOid;
 
   /** The OID of the system catalog this object appears in */
-  classoid: PgOid | null;
+  classoid: PgOid;
 
   /**
    * For a comment on a table column, this is the column number (the objoid and classoid refer to the table itself). For
    * all other object types, this column is zero.
    */
-  objsubid: number | null;
+  objsubid: number;
 
   /** Arbitrary text that serves as the description of this object */
-  description: string | null;
+  description: string;
 }
 
 /**
