@@ -10,6 +10,8 @@ import type {
   PgRoles,
   PgType,
 } from "./introspection.js";
+import type { PgSmartTagsAndDescription } from "./smartComments.js";
+import { parseSmartComment } from "./smartComments.js";
 
 /**
  * Adds helpers to the introspection results.
@@ -87,10 +89,21 @@ export function augmentIntrospection(
             d.objsubid === objsubid,
         )?.description ?? undefined;
 
+  const getTagsAndDescription = (
+    classoid: string,
+    objoid: string,
+    objsubid?: number,
+  ): PgSmartTagsAndDescription => {
+    const description = getDescription(classoid, objoid, objsubid);
+    return parseSmartComment(description);
+  };
+
   introspection.database.getDba = () => getRole(introspection.database.datdba);
   introspection.namespaces.forEach((entity) => {
     entity.getOwner = () => getRole(entity.nspowner);
     entity.getDescription = () => getDescription(PG_NAMESPACE, entity._id);
+    entity.getTagsAndDescription = () =>
+      getTagsAndDescription(PG_NAMESPACE, entity._id);
   });
   introspection.classes.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.relnamespace);
@@ -102,12 +115,16 @@ export function augmentIntrospection(
     entity.getForeignConstraints = () => getForeignConstraints(entity._id);
     entity.getIndexes = () => getIndexes(entity._id);
     entity.getDescription = () => getDescription(PG_CLASS, entity._id, 0);
+    entity.getTagsAndDescription = () =>
+      getTagsAndDescription(PG_CLASS, entity._id, 0);
   });
   introspection.attributes.forEach((entity) => {
     entity.getClass = () => getClass(entity.attrelid);
     entity.getType = () => getType(entity.atttypid);
     entity.getDescription = () =>
       getDescription(PG_CLASS, entity.attrelid, entity.attnum);
+    entity.getTagsAndDescription = () =>
+      getTagsAndDescription(PG_CLASS, entity.attrelid, entity.attnum);
   });
   introspection.constraints.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.connamespace);
@@ -115,12 +132,16 @@ export function augmentIntrospection(
     entity.getType = () => getType(entity.contypid);
     entity.getForeignClass = () => getClass(entity.confrelid);
     entity.getDescription = () => getDescription(PG_CONSTRAINT, entity._id);
+    entity.getTagsAndDescription = () =>
+      getTagsAndDescription(PG_CONSTRAINT, entity._id);
   });
   introspection.procs.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.pronamespace);
     entity.getOwner = () => getRole(entity.proowner);
     entity.getReturnType = () => getType(entity.prorettype);
     entity.getDescription = () => getDescription(PG_PROC, entity._id);
+    entity.getTagsAndDescription = () =>
+      getTagsAndDescription(PG_PROC, entity._id);
   });
   introspection.types.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.typnamespace);
@@ -131,6 +152,8 @@ export function augmentIntrospection(
     entity.getEnumValues = () => getEnums(entity._id);
     entity.getRange = () => getRange(entity._id);
     entity.getDescription = () => getDescription(PG_TYPE, entity._id);
+    entity.getTagsAndDescription = () =>
+      getTagsAndDescription(PG_TYPE, entity._id);
   });
   introspection.enums.forEach((entity) => {
     entity.getType = () => getType(entity.enumtypid);

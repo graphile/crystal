@@ -1,14 +1,16 @@
-import type { PgSmartTagsDict } from "./interfaces.js";
+export interface PgSmartTagsDict {
+  [tagName: string]: null | true | string | (string | true)[];
+}
 
-export interface SmartTagsAndDescription {
+export interface PgSmartTagsAndDescription {
   tags: PgSmartTagsDict;
   description: string | undefined;
 }
 
 export const parseSmartComment = (
   str: string | undefined,
-): SmartTagsAndDescription => {
-  const result: SmartTagsAndDescription = {
+): PgSmartTagsAndDescription => {
+  const result: PgSmartTagsAndDescription = {
     tags: Object.create(null),
     description: "",
   };

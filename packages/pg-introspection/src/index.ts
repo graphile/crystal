@@ -19,6 +19,7 @@ import type {
 } from "./introspection.js";
 export { makeIntrospectionQuery } from "./introspection.js";
 import { augmentIntrospection } from "./augmentIntrospection.js";
+import type { PgSmartTagsAndDescription } from "./smartComments.js";
 
 export {
   Introspection,
@@ -46,6 +47,8 @@ export function parseIntrospectionResults(
   return augmentIntrospection(JSON.parse(introspectionResults));
 }
 
+export { PgSmartTagsAndDescription };
+
 declare module "./introspection" {
   interface PgDatabase {
     getDba(): PgRoles | undefined;
@@ -53,6 +56,7 @@ declare module "./introspection" {
   interface PgNamespace {
     getOwner(): PgRoles | undefined;
     getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgClass {
     getNamespace(): PgNamespace | undefined;
@@ -64,11 +68,13 @@ declare module "./introspection" {
     getForeignConstraints(): PgConstraint[];
     getIndexes(): PgIndex[];
     getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgAttribute {
     getClass(): PgClass | undefined;
     getType(): PgType | undefined;
     getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgConstraint {
     getNamespace(): PgNamespace | undefined;
@@ -76,12 +82,14 @@ declare module "./introspection" {
     getType(): PgType | undefined;
     getForeignClass(): PgClass | undefined;
     getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgProc {
     getNamespace(): PgNamespace | undefined;
     getOwner(): PgRoles | undefined;
     getReturnType(): PgType | undefined;
     getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgType {
     getNamespace(): PgNamespace | undefined;
@@ -92,6 +100,7 @@ declare module "./introspection" {
     getEnumValues(): PgEnum[] | undefined;
     getRange(): PgRange | undefined;
     getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgEnum {
     getType(): PgType | undefined;
