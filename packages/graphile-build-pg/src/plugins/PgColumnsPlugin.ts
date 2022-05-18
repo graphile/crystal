@@ -329,7 +329,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
 
               const fieldBehaviorScope = `attribute:${action}`;
               if (
-                build.behavior.matches(behavior, fieldBehaviorScope, action)
+                !build.behavior.matches(behavior, fieldBehaviorScope, action)
               ) {
                 return memo;
               }
