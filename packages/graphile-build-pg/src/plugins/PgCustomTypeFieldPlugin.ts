@@ -169,8 +169,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         return this.camelCase(this.customQuery(details) + "-list");
       },
       computedColumn(options, details) {
-        const explicitName = details.source.extensions?.tags?.name;
-        if (explicitName) {
+        const explicitName = details.source.extensions?.tags?.fieldName;
+        if (typeof explicitName === "string") {
           return this.camelCase(explicitName);
         }
         const name = details.source.name;

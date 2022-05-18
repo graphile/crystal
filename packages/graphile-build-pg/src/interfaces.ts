@@ -1,5 +1,7 @@
 export interface PgSourceTags extends PgSmartTagsDict {
   name: string;
+  /** For a computed column function/etc, what field name should we use? */
+  fieldName: string;
   behavior: string | string[];
 }
 
