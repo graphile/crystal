@@ -87,7 +87,7 @@ export function makeNodePostgresWithPgClient(
 
     const subscriptions = new Map<string, ((notification: any) => void)[]>();
 
-    pgClient.on("notification", (notification) => {
+    const notificationCallback = (notification: pg.Notification) => {
       const subs = subscriptions.get(notification.channel);
       if (subs) {
         for (const cb of subs) {
@@ -98,7 +98,8 @@ export function makeNodePostgresWithPgClient(
           }
         }
       }
-    });
+    };
+    pgClient.on("notification", notificationCallback);
 
     try {
       const client: PgClient = {
@@ -256,6 +257,7 @@ export function makeNodePostgresWithPgClient(
       };
       return await callback(client);
     } finally {
+      pgClient.removeListener("notification", notificationCallback);
       pgClient.release();
     }
   };
