@@ -448,7 +448,17 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               });
               const enumLabels = enumValues.map((e) => e.enumlabel);
               return EXPORTABLE(
-                (codecName, description, enumLabels, enumType, namespaceName, sql, tags, typeName) => enumType(
+                (
+                  codecName,
+                  description,
+                  enumLabels,
+                  enumType,
+                  namespaceName,
+                  sql,
+                  tags,
+                  typeName,
+                ) =>
+                  enumType(
                     codecName,
                     sql.identifier(namespaceName, typeName),
                     enumLabels,
@@ -457,7 +467,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       tags,
                     },
                   ),
-                [codecName, description, enumLabels, enumType, namespaceName, sql, tags, typeName],
+                [
+                  codecName,
+                  description,
+                  enumLabels,
+                  enumType,
+                  namespaceName,
+                  sql,
+                  tags,
+                  typeName,
+                ],
               );
             }
 
@@ -597,7 +616,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 if (innerCodec) {
                   const typeDelim = innerType.typdelim!;
                   return EXPORTABLE(
-                    (description, innerCodec, listOfType, tags, typeDelim) => listOfType(
+                    (description, innerCodec, listOfType, tags, typeDelim) =>
+                      listOfType(
                         innerCodec,
                         {
                           description,
