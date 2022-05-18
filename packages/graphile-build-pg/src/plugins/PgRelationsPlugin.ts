@@ -66,6 +66,19 @@ declare global {
   }
 }
 
+declare module "@dataplan/pg" {
+  interface PgSourceRelationExtensions {
+    /** The (singular) forward relation name */
+    fieldName?: string;
+    /** The (singular) backward relation name for a FK against a unique combo */
+    foreignSingleFieldName?: string;
+    /** The (plural) backward relation name for a FK when exposed as a list (rather than a connection) */
+    foreignSimpleFieldName?: string;
+    /** The (generally plural) backward relation name, also used as a fallback from foreignSimpleFieldName, foreignSingleFieldName */
+    foreignFieldName?: string;
+  }
+}
+
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
@@ -90,7 +103,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         options,
         {
           databaseName,
-          pgConstraint: _pgConstraint,
+          pgConstraint,
           localClass: _localClass,
           localColumns,
           foreignClass,
@@ -99,6 +112,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isBackwards,
         },
       ) {
+        const { tags } = pgConstraint.getTagsAndDescription();
+        if (!isBackwards && typeof tags.fieldName === "string") {
+          return tags.fieldName;
+        }
+        if (isBackwards && typeof tags.foreignFieldName === "string") {
+          return tags.foreignFieldName;
+        }
         const remoteName = this.tableSourceName({
           databaseName,
           pgClass: foreignClass,
@@ -117,12 +137,26 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
 
       singleRelation(options, details) {
+        if (typeof details.relation.extensions?.tags.fieldName === "string") {
+          return details.relation.extensions.tags.fieldName;
+        }
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(details.relation.source.codec);
         const localColumns = details.relation.localColumns;
         return this.camelCase(`${remoteType}-by-${localColumns.join("-and-")}`);
       },
       singleRelationBackwards(options, details) {
+        if (
+          typeof details.relation.extensions?.tags.foreignSingleFieldName ===
+          "string"
+        ) {
+          return details.relation.extensions.tags.foreignSingleFieldName;
+        }
+        if (
+          typeof details.relation.extensions?.tags.foreignFieldName === "string"
+        ) {
+          return details.relation.extensions.tags.foreignFieldName;
+        }
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(details.relation.source.codec);
         const remoteColumns = details.relation.remoteColumns;
@@ -131,6 +165,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         );
       },
       manyRelationConnection(options, details) {
+        if (
+          typeof details.relation.extensions?.tags.foreignFieldName === "string"
+        ) {
+          return this.camelCase(
+            details.relation.extensions.tags.foreignFieldName,
+          );
+        }
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(details.relation.source.codec);
         const remoteColumns = details.relation.remoteColumns;
@@ -139,6 +180,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         );
       },
       manyRelationList(options, details) {
+        if (
+          typeof details.relation.extensions?.tags.foreignSimpleFieldName ===
+          "string"
+        ) {
+          return details.relation.extensions.tags.foreignSimpleFieldName;
+        }
+        if (
+          typeof details.relation.extensions?.tags.foreignFieldName === "string"
+        ) {
+          return this.camelCase(
+            details.relation.extensions.tags.foreignFieldName + "-list",
+          );
+        }
         const remoteType = this.tableType(details.relation.source.codec);
         const remoteColumns = details.relation.remoteColumns;
         return this.camelCase(
@@ -221,13 +275,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             isBackwards,
           });
           const existingRelation = relations[relationName];
+          const { description, tags } = pgConstraint.getTagsAndDescription();
           const newRelation: PgSourceRelation<any, any> = {
             localColumns: localColumns.map((c) => c!.attname),
             remoteColumns: foreignColumns.map((c) => c!.attname),
             source: foreignSource,
             isUnique,
             isBackwards,
-            extensions: { tags: {} },
+            extensions: {
+              // Clone the tags because we use the same tags on both relations
+              // (in both directions) but don't want modifications made to one
+              // to affect the other.
+              tags: JSON.parse(JSON.stringify(tags)),
+            },
           };
           if (existingRelation) {
             const isEquivalent =

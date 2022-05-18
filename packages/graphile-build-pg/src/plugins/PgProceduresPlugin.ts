@@ -95,14 +95,16 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       functionSourceName(options, { databaseName, pgProc }) {
+        const { tags } = pgProc.getTagsAndDescription();
+        if (typeof tags.name === "string") {
+          return tags.name;
+        }
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
         return `${schemaPrefix}${pgProc.proname}`;
       },
-      functionRecordReturnCodecName(options, { databaseName, pgProc }) {
-        const pgNamespace = pgProc.getNamespace()!;
-        const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
-        return `${schemaPrefix}${pgProc.proname}`;
+      functionRecordReturnCodecName(options, details) {
+        return this.upperCamelCase(this.functionSourceName(details));
       },
     },
   },
@@ -226,6 +228,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 columns[argName] = {
                   notNull: false,
                   codec: columnCodec,
+                  // TODO: could use "param" smart tag in function to add extensions here?
                 };
               }
             }
@@ -274,10 +277,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const isMutation =
             pgProc.provolatile !== "i" && pgProc.provolatile !== "s";
 
+          const { description, tags } = pgProc.getTagsAndDescription();
           const extensions: PgSourceExtensions = {
-            tags: {
-              // TODO
-            },
+            description,
+            tags,
           };
 
           const numberOfArguments = allArgTypes.length ?? 0;

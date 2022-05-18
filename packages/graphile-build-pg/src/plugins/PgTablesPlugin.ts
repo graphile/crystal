@@ -329,13 +329,19 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          const uniques = uniqueColumnOnlyConstraints.map((c) => ({
-            isPrimary: c.contype === "p",
-            columns: c.conkey!.map(
-              (k) => attributes.find((att) => att.attnum === k)!.attname,
-            ),
-            extensions: {},
-          }));
+          const uniques = uniqueColumnOnlyConstraints.map((c) => {
+            const { tags, description } = c.getTagsAndDescription();
+            return {
+              isPrimary: c.contype === "p",
+              columns: c.conkey!.map(
+                (k) => attributes.find((att) => att.attnum === k)!.attname,
+              ),
+              extensions: {
+                description,
+                tags,
+              },
+            };
+          });
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);

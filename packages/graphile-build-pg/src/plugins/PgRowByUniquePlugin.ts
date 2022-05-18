@@ -11,9 +11,12 @@ import { version } from "../index.js";
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      rowByUniqueKeys(
+      rowByUnique(
         this: Inflection,
-        details: { uniqueKeys: string[]; source: PgSource<any, any, any, any> },
+        details: {
+          unique: PgSourceUnique;
+          source: PgSource<any, any, any, any>;
+        },
       ): string;
     }
     interface ScopeObjectFieldsField {
@@ -30,7 +33,11 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      rowByUniqueKeys(options, { uniqueKeys, source }) {
+      rowByUnique(options, { unique, source }) {
+        if (typeof unique.extensions?.tags?.fieldName === "string") {
+          return unique.extensions?.tags?.fieldName;
+        }
+        const uniqueKeys = unique.columns;
         return this.camelCase(
           // TODO: should this use the _source_ rather than the _codec_ in case the same codec is used across multiple sources?
           `${this.tableType(source.codec)}-by-${uniqueKeys.join("-and-")}`,
@@ -65,8 +72,8 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
             build.recoverable(outerMemo, () =>
               (source.uniques as PgSourceUnique[]).reduce((memo, unique) => {
                 const uniqueKeys = unique.columns as string[];
-                const fieldName = build.inflection.rowByUniqueKeys({
-                  uniqueKeys,
+                const fieldName = build.inflection.rowByUnique({
+                  unique,
                   source,
                 });
 

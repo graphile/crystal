@@ -3,6 +3,12 @@ export interface PgSourceTags extends PgSmartTagsDict {
   behavior: string | string[];
 }
 
+export interface PgSourceUniqueTags extends PgSmartTagsDict {
+  /** The field name for the root-level accessor for a row by this unique constraint */
+  fieldName: string;
+  behavior: string | string[];
+}
+
 export interface PgSourceRelationTags extends PgSmartTagsDict {
   behavior: string | string[];
 }
@@ -35,8 +41,13 @@ declare module "@dataplan/pg" {
     description?: string;
   }
 
+  interface PgSourceUniqueExtensions {
+    tags: Partial<PgSourceUniqueTags>;
+    description?: string;
+  }
+
   interface PgSourceRelationExtensions {
-    tags: Partial<PgSourceTags>;
+    tags: Partial<PgSourceRelationTags>;
     description?: string;
   }
 
