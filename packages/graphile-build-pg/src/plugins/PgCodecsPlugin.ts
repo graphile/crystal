@@ -108,6 +108,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       classCodecName(options, { pgClass, databaseName }) {
+        const typeTags = pgClass.getType()!.getTagsAndDescription().tags;
+        const classTags = pgClass.getTagsAndDescription().tags;
+        if (typeof typeTags?.name === "string") {
+          return typeTags.name;
+        }
+        if (typeof classTags?.name === "string") {
+          return classTags.name;
+        }
         const pgNamespace = pgClass.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
         return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
@@ -267,13 +275,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             );
             if (columnCodec) {
               hasAtLeastOneColumn = true;
+              const { description, tags } =
+                columnAttribute.getTagsAndDescription();
               columns[columnAttribute.attname] = {
                 codec: columnCodec,
                 notNull: columnAttribute.attnotnull === true,
                 hasDefault: columnAttribute.atthasdef ?? undefined,
                 // TODO: identicalVia,
                 extensions: {
-                  // TODO: tags
+                  description,
+                  tags,
                 },
               };
             }
@@ -291,14 +302,58 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             databaseName,
             pgClass,
           });
+          const useSmartComments = true;
+          const typeTagsAndDescription = useSmartComments
+            ? pgClass.getType()!.getTagsAndDescription()
+            : {
+                description: pgClass.getDescription(),
+                tags: Object.create(null),
+              };
+          const classTagsAndDescription = useSmartComments
+            ? pgClass.getTagsAndDescription()
+            : {
+                description: pgClass.getDescription(),
+                tags: Object.create(null),
+              };
+
+          const description =
+            typeTagsAndDescription.description ||
+            classTagsAndDescription.description;
+          const tags = {
+            ...typeTagsAndDescription.tags,
+            ...classTagsAndDescription.tags,
+          };
+
           const codec = EXPORTABLE(
-            (className, codecName, columns, nspName, recordType, sql) =>
+            (
+              className,
+              codecName,
+              columns,
+              description,
+              nspName,
+              recordType,
+              sql,
+              tags,
+            ) =>
               recordType(
                 codecName,
                 sql.identifier(nspName, className),
                 columns,
+                {
+                  description,
+                  tags,
+                },
               ),
-            [className, codecName, columns, nspName, recordType, sql],
+            [
+              className,
+              codecName,
+              columns,
+              description,
+              nspName,
+              recordType,
+              sql,
+              tags,
+            ],
           );
           info.process("pgCodecs_PgTypeCodec", {
             pgCodec: codec,
@@ -377,6 +432,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return TYPES.hstore;
             }
 
+            const { description, tags } = type.getTagsAndDescription();
+
             // Enum type
             if (type.typtype === "e") {
               const enumValues =
@@ -391,20 +448,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               });
               const enumLabels = enumValues.map((e) => e.enumlabel);
               return EXPORTABLE(
-                (
-                  codecName,
-                  enumLabels,
-                  enumType,
-                  namespaceName,
-                  sql,
-                  typeName,
-                ) =>
-                  enumType(
+                (codecName, description, enumLabels, enumType, namespaceName, sql, tags, typeName) => enumType(
                     codecName,
                     sql.identifier(namespaceName, typeName),
                     enumLabels,
+                    {
+                      description,
+                      tags,
+                    },
                   ),
-                [codecName, enumLabels, enumType, namespaceName, sql, typeName],
+                [codecName, description, enumLabels, enumType, namespaceName, sql, tags, typeName],
               );
             }
 
@@ -438,24 +491,28 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return EXPORTABLE(
                 (
                   codecName,
+                  description,
                   innerCodec,
                   namespaceName,
                   rangeOfCodec,
                   sql,
+                  tags,
                   typeName,
                 ) =>
                   rangeOfCodec(
                     innerCodec,
                     codecName,
                     sql.identifier(namespaceName, typeName),
-                    { extensions: {} },
+                    { extensions: { description, tags } },
                   ),
                 [
                   codecName,
+                  description,
                   innerCodec,
                   namespaceName,
                   rangeOfCodec,
                   sql,
+                  tags,
                   typeName,
                 ],
               );
@@ -480,7 +537,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 : null;
               const namespaceName = namespace.nspname;
               const typeName = type.typname;
-              const extensions = {};
+              const extensions = {
+                description,
+                tags,
+              };
               if (innerCodec) {
                 const codecName = info.inflection.typeCodecName({
                   pgType: type,
@@ -537,9 +597,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 if (innerCodec) {
                   const typeDelim = innerType.typdelim!;
                   return EXPORTABLE(
-                    (innerCodec, listOfType, typeDelim) =>
-                      listOfType(innerCodec, {}, typeDelim),
-                    [innerCodec, listOfType, typeDelim],
+                    (description, innerCodec, listOfType, tags, typeDelim) => listOfType(
+                        innerCodec,
+                        {
+                          description,
+                          tags,
+                        },
+                        typeDelim,
+                      ),
+                    [description, innerCodec, listOfType, tags, typeDelim],
                   );
                 }
               }

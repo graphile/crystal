@@ -181,6 +181,14 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       },
 
       tableSourceName(options, { pgClass, databaseName }) {
+        const typeTags = pgClass.getType()!.getTagsAndDescription().tags;
+        const classTags = pgClass.getTagsAndDescription().tags;
+        if (typeof typeTags?.name === "string") {
+          return typeTags.name;
+        }
+        if (typeof classTags?.name === "string") {
+          return classTags.name;
+        }
         const pgNamespace = pgClass.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
         return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
