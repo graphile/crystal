@@ -14,6 +14,21 @@ import type { PgSmartTagsAndDescription } from "./smartComments.js";
 import { parseSmartComment } from "./smartComments.js";
 
 /**
+ * Only suitable for functions that accept no arguments.
+ */
+function memo<T>(fn: () => T): () => T {
+  let cache: T;
+  let called = false;
+  return () => {
+    if (!called) {
+      cache = fn();
+      called = true;
+    }
+    return cache!;
+  };
+}
+
+/**
  * Adds helpers to the introspection results.
  */
 export function augmentIntrospection(
@@ -98,69 +113,84 @@ export function augmentIntrospection(
     return parseSmartComment(description);
   };
 
-  introspection.database.getDba = () => getRole(introspection.database.datdba);
+  introspection.database.getDba = memo(() =>
+    getRole(introspection.database.datdba),
+  );
   introspection.namespaces.forEach((entity) => {
-    entity.getOwner = () => getRole(entity.nspowner);
-    entity.getDescription = () => getDescription(PG_NAMESPACE, entity._id);
-    entity.getTagsAndDescription = () =>
-      getTagsAndDescription(PG_NAMESPACE, entity._id);
+    entity.getOwner = memo(() => getRole(entity.nspowner));
+    entity.getDescription = memo(() =>
+      getDescription(PG_NAMESPACE, entity._id),
+    );
+    entity.getTagsAndDescription = memo(() =>
+      getTagsAndDescription(PG_NAMESPACE, entity._id),
+    );
   });
   introspection.classes.forEach((entity) => {
-    entity.getNamespace = () => getNamespace(entity.relnamespace);
-    entity.getType = () => getType(entity.reltype);
-    entity.getOfType = () => getType(entity.reloftype);
-    entity.getOwner = () => getRole(entity.relowner);
-    entity.getAttributes = () => getAttributes(entity._id);
-    entity.getConstraints = () => getConstraints(entity._id);
-    entity.getForeignConstraints = () => getForeignConstraints(entity._id);
-    entity.getIndexes = () => getIndexes(entity._id);
-    entity.getDescription = () => getDescription(PG_CLASS, entity._id, 0);
-    entity.getTagsAndDescription = () =>
-      getTagsAndDescription(PG_CLASS, entity._id, 0);
+    entity.getNamespace = memo(() => getNamespace(entity.relnamespace));
+    entity.getType = memo(() => getType(entity.reltype));
+    entity.getOfType = memo(() => getType(entity.reloftype));
+    entity.getOwner = memo(() => getRole(entity.relowner));
+    entity.getAttributes = memo(() => getAttributes(entity._id));
+    entity.getConstraints = memo(() => getConstraints(entity._id));
+    entity.getForeignConstraints = memo(() =>
+      getForeignConstraints(entity._id),
+    );
+    entity.getIndexes = memo(() => getIndexes(entity._id));
+    entity.getDescription = memo(() => getDescription(PG_CLASS, entity._id, 0));
+    entity.getTagsAndDescription = memo(() =>
+      getTagsAndDescription(PG_CLASS, entity._id, 0),
+    );
   });
   introspection.attributes.forEach((entity) => {
-    entity.getClass = () => getClass(entity.attrelid);
-    entity.getType = () => getType(entity.atttypid);
-    entity.getDescription = () =>
-      getDescription(PG_CLASS, entity.attrelid, entity.attnum);
-    entity.getTagsAndDescription = () =>
-      getTagsAndDescription(PG_CLASS, entity.attrelid, entity.attnum);
+    entity.getClass = memo(() => getClass(entity.attrelid));
+    entity.getType = memo(() => getType(entity.atttypid));
+    entity.getDescription = memo(() =>
+      getDescription(PG_CLASS, entity.attrelid, entity.attnum),
+    );
+    entity.getTagsAndDescription = memo(() =>
+      getTagsAndDescription(PG_CLASS, entity.attrelid, entity.attnum),
+    );
   });
   introspection.constraints.forEach((entity) => {
-    entity.getNamespace = () => getNamespace(entity.connamespace);
-    entity.getClass = () => getClass(entity.conrelid);
-    entity.getType = () => getType(entity.contypid);
-    entity.getForeignClass = () => getClass(entity.confrelid);
-    entity.getDescription = () => getDescription(PG_CONSTRAINT, entity._id);
-    entity.getTagsAndDescription = () =>
-      getTagsAndDescription(PG_CONSTRAINT, entity._id);
+    entity.getNamespace = memo(() => getNamespace(entity.connamespace));
+    entity.getClass = memo(() => getClass(entity.conrelid));
+    entity.getType = memo(() => getType(entity.contypid));
+    entity.getForeignClass = memo(() => getClass(entity.confrelid));
+    entity.getDescription = memo(() =>
+      getDescription(PG_CONSTRAINT, entity._id),
+    );
+    entity.getTagsAndDescription = memo(() =>
+      getTagsAndDescription(PG_CONSTRAINT, entity._id),
+    );
   });
   introspection.procs.forEach((entity) => {
-    entity.getNamespace = () => getNamespace(entity.pronamespace);
-    entity.getOwner = () => getRole(entity.proowner);
-    entity.getReturnType = () => getType(entity.prorettype);
-    entity.getDescription = () => getDescription(PG_PROC, entity._id);
-    entity.getTagsAndDescription = () =>
-      getTagsAndDescription(PG_PROC, entity._id);
+    entity.getNamespace = memo(() => getNamespace(entity.pronamespace));
+    entity.getOwner = memo(() => getRole(entity.proowner));
+    entity.getReturnType = memo(() => getType(entity.prorettype));
+    entity.getDescription = memo(() => getDescription(PG_PROC, entity._id));
+    entity.getTagsAndDescription = memo(() =>
+      getTagsAndDescription(PG_PROC, entity._id),
+    );
   });
   introspection.types.forEach((entity) => {
-    entity.getNamespace = () => getNamespace(entity.typnamespace);
-    entity.getOwner = () => getRole(entity.typowner);
-    entity.getClass = () => getClass(entity.typrelid);
-    entity.getElemType = () => getType(entity.typelem);
-    entity.getArrayType = () => getType(entity.typarray);
-    entity.getEnumValues = () => getEnums(entity._id);
-    entity.getRange = () => getRange(entity._id);
-    entity.getDescription = () => getDescription(PG_TYPE, entity._id);
-    entity.getTagsAndDescription = () =>
-      getTagsAndDescription(PG_TYPE, entity._id);
+    entity.getNamespace = memo(() => getNamespace(entity.typnamespace));
+    entity.getOwner = memo(() => getRole(entity.typowner));
+    entity.getClass = memo(() => getClass(entity.typrelid));
+    entity.getElemType = memo(() => getType(entity.typelem));
+    entity.getArrayType = memo(() => getType(entity.typarray));
+    entity.getEnumValues = memo(() => getEnums(entity._id));
+    entity.getRange = memo(() => getRange(entity._id));
+    entity.getDescription = memo(() => getDescription(PG_TYPE, entity._id));
+    entity.getTagsAndDescription = memo(() =>
+      getTagsAndDescription(PG_TYPE, entity._id),
+    );
   });
   introspection.enums.forEach((entity) => {
-    entity.getType = () => getType(entity.enumtypid);
+    entity.getType = memo(() => getType(entity.enumtypid));
   });
   introspection.ranges.forEach((entity) => {
-    entity.getType = () => getType(entity.rngtypid);
-    entity.getSubType = () => getType(entity.rngsubtype);
+    entity.getType = memo(() => getType(entity.rngtypid));
+    entity.getSubType = memo(() => getType(entity.rngsubtype));
   });
 
   return introspection;
