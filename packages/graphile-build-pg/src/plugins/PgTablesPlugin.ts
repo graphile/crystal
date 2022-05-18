@@ -413,9 +413,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             const behavior = getBehavior(codec.extensions);
             const defaultBehavior = [
               "select",
-              "insert",
-              "update",
-              "delete",
               ...(!codec.isAnonymous ? ["insert", "update"] : []),
               ...(simpleCollections === "both"
                 ? ["connection", "list"]
