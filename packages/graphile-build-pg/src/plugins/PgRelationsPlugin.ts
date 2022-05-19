@@ -16,6 +16,7 @@ import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { PluginHook } from "graphile-config";
 
 declare global {
   namespace GraphileBuild {
@@ -83,6 +84,16 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgRelations: Record<string, never>;
+    }
+    interface GatherHooks {
+      pgRelations_relation: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          pgConstraint: PgConstraint;
+          relation: PgSourceRelation<any, any>;
+        }) => Promise<void> | void
+      >;
     }
   }
 }
@@ -275,20 +286,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             isBackwards,
           });
           const existingRelation = relations[relationName];
-          const { tags } = pgConstraint.getTagsAndDescription();
           const newRelation: PgSourceRelation<any, any> = {
             localColumns: localColumns.map((c) => c!.attname),
             remoteColumns: foreignColumns.map((c) => c!.attname),
             source: foreignSource,
             isUnique,
             isBackwards,
-            extensions: {
-              // Clone the tags because we use the same tags on both relations
-              // (in both directions) but don't want modifications made to one
-              // to affect the other.
-              tags: JSON.parse(JSON.stringify(tags)),
-            },
           };
+          await info.process("pgRelations_relation", {
+            databaseName,
+            pgClass,
+            pgConstraint,
+            relation: newRelation,
+          });
           if (existingRelation) {
             const isEquivalent =
               existingRelation.isUnique === newRelation.isUnique &&

@@ -4,11 +4,12 @@
 
 import type {
   PgSourceExtensions,
+  PgSourceOptions,
   PgSourceParameter,
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSource, recordType } from "@dataplan/pg";
+import { PgSource, recordType, PgFunctionSourceOptions } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
@@ -73,6 +74,23 @@ declare global {
           pgProc: PgProc;
           databaseName: string;
         }) => Promise<void>
+      >;
+
+      // TODO: should pgProcedures_functionSource_options and pgProcedures_PgSource_options be the same hook?
+      pgProcedures_functionSource_options: PluginHook<
+        (event: {
+          databaseName: string;
+          pgProc: PgProc;
+          options: PgFunctionSourceOptions<any, any, any>;
+        }) => void | Promise<void>
+      >;
+
+      pgProcedures_PgSource_options: PluginHook<
+        (event: {
+          databaseName: string;
+          pgProc: PgProc;
+          options: PgSourceOptions<any, any, any, any>;
+        }) => void | Promise<void>
       >;
     }
   }
@@ -277,12 +295,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const isMutation =
             pgProc.provolatile !== "i" && pgProc.provolatile !== "s";
 
-          const { description, tags } = pgProc.getTagsAndDescription();
-          const extensions: PgSourceExtensions = {
-            description,
-            tags,
-          };
-
           const numberOfArguments = allArgTypes.length ?? 0;
           const numberOfArgumentsWithDefaults = pgProc.pronargdefaults ?? 0;
           const numberOfRequiredArguments =
@@ -397,80 +409,50 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             if (!source) {
               return null;
             }
+
+            const options: PgFunctionSourceOptions<any, any, any> = {
+              name,
+              identifier,
+              source: sourceCallback,
+              parameters,
+              returnsArray,
+              returnsSetof,
+              isMutation,
+            };
+
+            await info.process("pgProcedures_functionSource_options", {
+              databaseName,
+              pgProc,
+              options,
+            });
+
             return EXPORTABLE(
-              (
-                extensions,
-                identifier,
-                isMutation,
-                name,
-                parameters,
-                returnsArray,
-                returnsSetof,
-                source,
-                sourceCallback,
-              ) =>
-                source.functionSource({
-                  name,
-                  identifier,
-                  source: sourceCallback,
-                  parameters,
-                  returnsArray,
-                  returnsSetof,
-                  extensions,
-                  isMutation,
-                }),
-              [
-                extensions,
-                identifier,
-                isMutation,
-                name,
-                parameters,
-                returnsArray,
-                returnsSetof,
-                source,
-                sourceCallback,
-              ],
+              (source, options) => source.functionSource(options),
+              [source, options],
+            );
+          } else {
+            const options: PgSourceOptions<any, any, any, any> = {
+              executor,
+              name,
+              identifier,
+              source: sourceCallback,
+              parameters,
+              isUnique: !returnsSetof,
+              codec: returnCodec,
+              uniques: [],
+              isMutation,
+            };
+            await info.process("pgProcedures_PgSource_options", {
+              databaseName,
+              pgProc,
+              options,
+            });
+
+            return EXPORTABLE(
+              (PgSource, options) => new PgSource(options),
+              [PgSource, options],
             );
           }
-
-          return EXPORTABLE(
-            (
-              PgSource,
-              executor,
-              extensions,
-              identifier,
-              isMutation,
-              name,
-              parameters,
-              returnCodec,
-              returnsSetof,
-              sourceCallback,
-            ) =>
-              new PgSource({
-                executor,
-                name,
-                identifier,
-                source: sourceCallback,
-                parameters,
-                isUnique: !returnsSetof,
-                codec: returnCodec,
-                uniques: [],
-                extensions,
-                isMutation,
-              }),
-            [
-              PgSource,
-              executor,
-              extensions,
-              identifier,
-              isMutation,
-              name,
-              parameters,
-              returnCodec,
-              returnsSetof,
-              sourceCallback,
-            ],
-          );
         })();
         sourceByPgProc.set(pgProc, source!);
         return source;

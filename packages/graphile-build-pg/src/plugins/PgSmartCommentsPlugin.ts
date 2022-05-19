@@ -1,5 +1,11 @@
 import "graphile-config";
-import { PgClass, PgConstraint } from "pg-introspection";
+import {
+  PgAttribute,
+  PgClass,
+  PgConstraint,
+  PgType,
+  PgProc,
+} from "pg-introspection";
 
 import { version } from "../index.js";
 import { PgSmartTagsDict } from "../interfaces.js";
@@ -30,21 +36,94 @@ export const PgSmartCommentsPlugin: GraphileConfig.Plugin = {
         const { pgClass, options } = event;
         applyTags(pgClass, options);
       },
+
+      pgRelations_relation(info, event) {
+        const { pgConstraint, relation } = event;
+        const { tags } = pgConstraint.getTagsAndDescription();
+        relation.extensions = relation.extensions || {
+          tags: Object.create(null),
+        };
+        relation.extensions.tags =
+          relation.extensions.tags || Object.create(null);
+        // Clone the tags because we use the same tags on both relations
+        // (in both directions) but don't want modifications made to one
+        // to affect the other.
+        mergeTags(relation.extensions.tags, JSON.parse(JSON.stringify(tags)));
+      },
+
+      pgCodecs_column(info, event) {
+        const { pgAttribute, column } = event;
+        applyTags(pgAttribute, column);
+      },
+
+      pgCodecs_recordType_extensions(info, event) {
+        const { pgClass, extensions } = event;
+        const typeTagsAndDescription = pgClass
+          .getType()!
+          .getTagsAndDescription();
+        const classTagsAndDescription = pgClass.getTagsAndDescription();
+
+        if (!extensions.description) {
+          extensions.description =
+            typeTagsAndDescription.description ||
+            classTagsAndDescription.description;
+        }
+        extensions.tags = extensions.tags || Object.create(null);
+        mergeTags(extensions.tags, typeTagsAndDescription.tags);
+        mergeTags(extensions.tags, classTagsAndDescription.tags);
+      },
+
+      pgCodecs_rangeOfCodec_extensions(info, event) {
+        const { pgType, extensions } = event;
+        const { tags, description } = pgType.getTagsAndDescription();
+        applyTagsToExtensions(pgType, extensions);
+      },
+
+      pgCodecs_domainOfCodec_extensions(info, event) {
+        const { pgType, extensions } = event;
+        applyTagsToExtensions(pgType, extensions);
+      },
+
+      pgCodecs_listOfCodec_extensions(info, event) {
+        const { pgType, extensions } = event;
+        applyTagsToExtensions(pgType, extensions);
+      },
+
+      pgProcedures_functionSource_options(info, event) {
+        const { pgProc, options } = event;
+        applyTags(pgProc, options);
+      },
+
+      pgProcedures_PgSource_options(info, event) {
+        const { pgProc, options } = event;
+        applyTags(pgProc, options);
+      },
     },
   },
 };
 
 function applyTags(
-  entity: PgClass | PgConstraint,
+  entity: PgClass | PgConstraint | PgAttribute | PgType | PgProc,
   config: {
     extensions?: { description?: string; tags?: Partial<PgSmartTagsDict> };
   },
 ): void {
-  const { tags, description } = entity.getTagsAndDescription();
   config.extensions = config.extensions || { tags: Object.create(null) };
-  config.extensions.tags = config.extensions.tags || Object.create(null);
-  if (!config.extensions.description) {
-    config.extensions.description = description;
+  applyTagsToExtensions(entity, config.extensions);
+}
+
+function applyTagsToExtensions(
+  entity: PgClass | PgConstraint | PgAttribute | PgType | PgProc,
+  extensions: {
+    description?: string;
+    tags?: Partial<PgSmartTagsDict>;
+  },
+): void {
+  const { tags, description } = entity.getTagsAndDescription();
+
+  extensions.tags = extensions.tags || Object.create(null);
+  if (!extensions.description) {
+    extensions.description = description;
   }
-  mergeTags(config.extensions.tags!, tags);
+  mergeTags(extensions.tags!, tags);
 }
