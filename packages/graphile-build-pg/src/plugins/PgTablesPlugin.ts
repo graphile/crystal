@@ -1,14 +1,25 @@
 import "graphile-build";
 
-import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
+import type {
+  PgSource,
+  PgSourceOptions,
+  PgSourceRelation,
+  PgSourceUnique,
+  PgTypeCodec,
+} from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
-import type { PgClass, PgNamespace } from "pg-introspection";
+import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+
+type PgSourceBuilderOptions = Omit<
+  PgSourceOptions<any, any, any, any>,
+  "relations"
+>;
 
 declare global {
   namespace GraphileBuild {
@@ -125,18 +136,33 @@ declare global {
     interface GatherHooks {
       pgTables_PgSourceBuilder_relations: PluginHook<
         (event: {
-          sourceBuilder: PgSourceBuilder<any, any, any>;
-          pgClass: PgClass;
           databaseName: string;
+          pgClass: PgClass;
+          sourceBuilder: PgSourceBuilder<any, any, any>;
           relations: PgTablesPluginSourceRelations;
         }) => Promise<void>
       >;
       pgTables_PgSource: PluginHook<
         (event: {
-          source: PgSource<any, any, any, any>;
-          pgClass: PgClass;
           databaseName: string;
+          pgClass: PgClass;
+          source: PgSource<any, any, any>;
         }) => Promise<void>
+      >;
+      pgTables_PgSourceBuilder_options: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          options: PgSourceBuilderOptions;
+        }) => void | Promise<void>
+      >;
+      pgTables_unique: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          pgConstraint: PgConstraint;
+          unique: PgSourceUnique;
+        }) => void | Promise<void>
       >;
     }
   }
@@ -292,14 +318,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               pgClass._id,
             );
 
-          const useSmartComments = true;
-          const { description, tags } = useSmartComments
-            ? pgClass.getTagsAndDescription()
-            : {
-                description: pgClass.getDescription(),
-                tags: Object.create(null),
-              };
-
           const codec = await info.helpers.pgCodecs.getCodecFromClass(
             databaseName,
             pgClass._id,
@@ -329,19 +347,23 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          const uniques = uniqueColumnOnlyConstraints.map((c) => {
-            const { tags, description } = c.getTagsAndDescription();
-            return {
-              isPrimary: c.contype === "p",
-              columns: c.conkey!.map(
-                (k) => attributes.find((att) => att.attnum === k)!.attname,
-              ),
-              extensions: {
-                description,
-                tags,
-              },
-            };
-          });
+          const uniques = await Promise.all(
+            uniqueColumnOnlyConstraints.map(async (pgConstraint) => {
+              const unique: PgSourceUnique = {
+                isPrimary: pgConstraint.contype === "p",
+                columns: pgConstraint.conkey!.map(
+                  (k) => attributes.find((att) => att.attnum === k)!.attname,
+                ),
+              };
+              await info.process("pgTables_unique", {
+                databaseName,
+                pgClass,
+                pgConstraint,
+                unique,
+              });
+              return unique;
+            }),
+          );
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
@@ -351,39 +373,24 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
+          const options: PgSourceBuilderOptions = {
+            executor,
+            name,
+            identifier,
+            source: codec.sqlType,
+            codec,
+            uniques,
+          };
+
+          await info.process("pgTables_PgSourceBuilder_options", {
+            databaseName,
+            pgClass,
+            options,
+          });
+
           const sourceBuilder = EXPORTABLE(
-            (
-              PgSourceBuilder,
-              codec,
-              description,
-              executor,
-              identifier,
-              name,
-              tags,
-              uniques,
-            ) =>
-              new PgSourceBuilder({
-                executor,
-                name,
-                identifier,
-                source: codec.sqlType,
-                codec,
-                uniques,
-                extensions: {
-                  description,
-                  tags,
-                },
-              }),
-            [
-              PgSourceBuilder,
-              codec,
-              description,
-              executor,
-              identifier,
-              name,
-              tags,
-              uniques,
-            ],
+            (PgSourceBuilder, options) => new PgSourceBuilder(options),
+            [PgSourceBuilder, options],
           );
           info.state.detailsBySourceBuilder.set(sourceBuilder, {
             databaseName,

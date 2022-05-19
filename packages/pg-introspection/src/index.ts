@@ -19,7 +19,10 @@ import type {
 } from "./introspection.js";
 export { makeIntrospectionQuery } from "./introspection.js";
 import { augmentIntrospection } from "./augmentIntrospection.js";
-import type { PgSmartTagsAndDescription } from "./smartComments.js";
+import type {
+  PgSmartTagsAndDescription,
+  PgSmartTagsDict,
+} from "./smartComments.js";
 
 export {
   Introspection,
@@ -47,7 +50,7 @@ export function parseIntrospectionResults(
   return augmentIntrospection(JSON.parse(introspectionResults));
 }
 
-export { PgSmartTagsAndDescription };
+export { PgSmartTagsAndDescription, PgSmartTagsDict };
 
 declare module "./introspection" {
   interface PgDatabase {
