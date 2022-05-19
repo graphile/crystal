@@ -10,13 +10,13 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
+import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { PluginHook } from "graphile-config";
 
 declare global {
   namespace GraphileBuild {

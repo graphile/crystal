@@ -1,25 +1,25 @@
 import "graphile-config";
-import "./PgCodecsPlugin";
-import "./PgProceduresPlugin";
-import "./PgRelationsPlugin";
-import "./PgTablesPlugin";
+import "./PgCodecsPlugin.js";
+import "./PgProceduresPlugin.js";
+import "./PgRelationsPlugin.js";
+import "./PgTablesPlugin.js";
 
-import {
+import type {
   PgAttribute,
   PgClass,
   PgConstraint,
-  PgType,
   PgProc,
+  PgType,
 } from "pg-introspection";
 
 import { version } from "../index.js";
-import { PgSmartTagsDict } from "../interfaces.js";
+import type { PgSmartTagsDict } from "../interfaces.js";
 import { mergeTags } from "../mergeTags.js";
 
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
-      pgSmartComments: {};
+      pgSmartComments: Record<string, never>;
     }
   }
 }
@@ -80,7 +80,6 @@ export const PgSmartCommentsPlugin: GraphileConfig.Plugin = {
 
       pgCodecs_rangeOfCodec_extensions(info, event) {
         const { pgType, extensions } = event;
-        const { tags, description } = pgType.getTagsAndDescription();
         applyTagsToExtensions(pgType, extensions);
       },
 

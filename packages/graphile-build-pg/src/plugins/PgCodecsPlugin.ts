@@ -372,10 +372,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               className,
               codecName,
               columns,
+              extensions,
               nspName,
               recordType,
               sql,
-              extensions,
             ) =>
               recordType(
                 codecName,
@@ -387,10 +387,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               className,
               codecName,
               columns,
+              extensions,
               nspName,
               recordType,
               sql,
-              extensions,
             ],
           );
           info.process("pgCodecs_PgTypeCodec", {
@@ -494,9 +494,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   codecName,
                   enumLabels,
                   enumType,
+                  extensions,
                   namespaceName,
                   sql,
-                  extensions,
                   typeName,
                 ) =>
                   enumType(
@@ -509,9 +509,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   codecName,
                   enumLabels,
                   enumType,
+                  extensions,
                   namespaceName,
                   sql,
-                  extensions,
                   typeName,
                 ],
               );
@@ -556,11 +556,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return EXPORTABLE(
                 (
                   codecName,
+                  extensions,
                   innerCodec,
                   namespaceName,
                   rangeOfCodec,
                   sql,
-                  extensions,
                   typeName,
                 ) =>
                   rangeOfCodec(
@@ -571,11 +571,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   ),
                 [
                   codecName,
+                  extensions,
                   innerCodec,
                   namespaceName,
                   rangeOfCodec,
                   sql,
-                  extensions,
                   typeName,
                 ],
               );

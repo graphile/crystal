@@ -23,10 +23,10 @@ import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.j
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
 import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
+import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
-import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 
 // TODO: version this.
 export const defaultPreset: GraphileConfig.Preset = {

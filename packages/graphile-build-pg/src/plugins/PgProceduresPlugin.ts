@@ -3,13 +3,13 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
-  PgSourceExtensions,
+  PgFunctionSourceOptions,
   PgSourceOptions,
   PgSourceParameter,
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSource, recordType, PgFunctionSourceOptions } from "@dataplan/pg";
+import { PgSource, recordType } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
@@ -427,8 +427,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             return EXPORTABLE(
-              (source, options) => source.functionSource(options),
-              [source, options],
+              (options, source) => source.functionSource(options),
+              [options, source],
             );
           } else {
             const options: PgSourceOptions<any, any, any, any> = {
