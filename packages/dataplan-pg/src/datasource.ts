@@ -213,6 +213,22 @@ export interface PgSourceOptions<
   isList?: boolean;
 }
 
+export interface PgFunctionSourceOptions<
+  TColumns extends PgTypeColumns | undefined,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
+  TNewParameters extends PgSourceParameter[],
+> {
+  name: string;
+  identifier?: string;
+  source: (...args: SQL[]) => SQL;
+  parameters: TNewParameters;
+  returnsSetof: boolean;
+  returnsArray: boolean;
+  uniques?: TUniques;
+  extensions?: PgSourceExtensions;
+  isMutation?: boolean;
+  selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
+}
 // TODO: is there a better way?
 /**
  * This class hacks around TypeScript inference issues by allowing us to define
@@ -519,18 +535,13 @@ export class PgSource<
       PgSourceUnique<Exclude<TColumns, undefined>>
     >,
     TNewParameters extends PgSourceParameter[],
-  >(overrideOptions: {
-    name: string;
-    identifier?: string;
-    source: (...args: SQL[]) => SQL;
-    parameters: TNewParameters;
-    returnsSetof: boolean;
-    returnsArray: boolean;
-    uniques?: TUniques;
-    extensions?: PgSourceExtensions;
-    isMutation?: boolean;
-    selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
-  }) {
+  >(
+    overrideOptions: PgFunctionSourceOptions<
+      TColumns,
+      TUniques,
+      TNewParameters
+    >,
+  ) {
     const {
       name,
       identifier,

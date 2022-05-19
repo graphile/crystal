@@ -43,6 +43,7 @@ export {
   PgEnumSource,
   PgEnumSourceExtensions,
   PgEnumSourceOptions,
+  PgFunctionSourceOptions,
   PgSource,
   PgSourceBuilder,
   PgSourceExtensions,
