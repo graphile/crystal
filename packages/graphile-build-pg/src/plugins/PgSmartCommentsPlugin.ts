@@ -1,4 +1,9 @@
 import "graphile-config";
+import "./PgCodecsPlugin";
+import "./PgProceduresPlugin";
+import "./PgRelationsPlugin";
+import "./PgTablesPlugin";
+
 import {
   PgAttribute,
   PgClass,
