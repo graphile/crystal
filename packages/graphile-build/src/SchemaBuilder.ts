@@ -11,7 +11,7 @@ import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
 
-const debug = debugFactory("graphile-builder");
+const debug = debugFactory("graphile-build:SchemaBuilder");
 
 const INIT_OBJECT: GraphileBuild.InitObject = Object.freeze(
   Object.create(null),
@@ -109,7 +109,7 @@ class SchemaBuilder<
     context: Parameters<
       GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
     >[2],
-    debugStr?: string,
+    debugStr = "",
   ): Parameters<
     GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
   >[0] {
