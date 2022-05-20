@@ -29,7 +29,12 @@ export function getBehavior(
   const allExtensions = Array.isArray(extensions) ? extensions : [extensions];
   const behaviors: string[] = [];
   for (const extensions of allExtensions) {
+    // TODO: all of these are just for user convenience, users should be guided not to use them.
+    add(extensions?.tags?.behaviours);
+    add(extensions?.tags?.behaviors);
     add(extensions?.tags?.behaviour);
+
+    // This is the real one
     add(extensions?.tags?.behavior);
   }
   return behaviors.join(" ");
