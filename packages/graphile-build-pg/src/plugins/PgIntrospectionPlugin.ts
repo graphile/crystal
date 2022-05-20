@@ -142,6 +142,11 @@ declare global {
           databaseName: string,
           namespaceName: string,
         ): Promise<PgNamespace | undefined>;
+        getClassByName(
+          databaseName: string,
+          namespaceName: string,
+          tableName: string,
+        ): Promise<PgClass | undefined>;
         getTypeByArray(
           databaseName: string,
           arrayId: string,
@@ -427,6 +432,16 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         const relevant = await getDb(info, databaseName);
         const list = relevant.introspection.namespaces;
         return list.find((nsp) => nsp.nspname === name);
+      },
+
+      async getClassByName(info, databaseName, schemaName, tableName) {
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.classes;
+        return list.find(
+          (rel) =>
+            rel.getNamespace()!.nspname === schemaName &&
+            rel.relname === tableName,
+        );
       },
 
       // TODO: we should maybe use pg_type.typelem and look up by ID directy

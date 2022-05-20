@@ -1,8 +1,13 @@
-import { PgSourceOptions, PgSourceUnique } from "@dataplan/pg";
+import { PgSourceBuilder, PgSourceOptions, PgSourceUnique } from "@dataplan/pg";
 import { GatherPluginContext } from "graphile-build";
 import "graphile-config";
 import { PluginHook } from "graphile-config";
-import { parseSmartComment, PgClass, PgConstraint } from "pg-introspection";
+import {
+  parseSmartComment,
+  PgAttribute,
+  PgClass,
+  PgConstraint,
+} from "pg-introspection";
 import { version } from "../index.js";
 
 declare global {
@@ -15,6 +20,10 @@ declare global {
 
 interface State {
   fakeId: number;
+  fakeFkConstraintsByDatabaseName: {
+    [databaseName: string]: PgConstraint[];
+  };
+  accessed: boolean;
 }
 interface Cache {}
 
@@ -23,15 +32,24 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   description:
     "Looks for the @primaryKey, @foreignKey, @unique and @nonNull smart comments and changes the Data Sources such that it's as if these were concrete constraints",
   version: version,
+  after: ["PgSmartCommentsPlugin"],
+  before: ["PgRelationsPlugin"],
 
   gather: {
     namespace: "pgFakeConstraints",
     helpers: {},
     initialState: () => ({
       fakeId: 0,
+      fakeFkConstraintsByDatabaseName: Object.create(null),
+      accessed: false,
     }),
     hooks: {
       async pgTables_PgSourceBuilder_options(info, event) {
+        if (info.state.accessed) {
+          throw new Error(
+            `GraphileInternalError<71c63b95-802d-4946-971c-e76d74db07a6>: options must not be built after relations is called, otherwise fake constraints don't have enough time to be established`,
+          );
+        }
         const { databaseName, pgClass, options } = event;
         const tags = options.extensions?.tags;
         const knownColumns = Object.keys(options.codec.columns);
@@ -51,6 +69,37 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
           }
 
           if (tags.foreignKey) {
+            if (Array.isArray(tags.foreignKey)) {
+              for (const fk of tags.foreignKey) {
+                await processFk(info, event, fk);
+              }
+            } else {
+              await processFk(info, event, tags.foreignKey);
+            }
+          }
+        }
+      },
+
+      async pgTables_PgSourceBuilder_relations(info, event) {
+        if (!info.state.accessed) {
+          info.state.accessed = true;
+        }
+        const fakeFkConstraints =
+          info.state.fakeFkConstraintsByDatabaseName[event.databaseName];
+        if (!fakeFkConstraints) {
+          return;
+        }
+        for (const pgConstraint of fakeFkConstraints) {
+          if (pgConstraint.conrelid === event.pgClass._id) {
+            // Forwards
+            await info.helpers.pgRelations.addRelation(event, pgConstraint);
+          } else if (pgConstraint.confrelid === event.pgClass._id) {
+            // Backwards
+            await info.helpers.pgRelations.addRelation(
+              event,
+              pgConstraint,
+              true,
+            );
           }
         }
       },
@@ -61,6 +110,31 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
 function parseConstraintSpec(rawSpec: string) {
   const [spec, ...tagComponents] = rawSpec.split(/\|/);
   return [spec, tagComponents.join("\n")];
+}
+
+function attributesByNames(
+  pgClass: PgClass,
+  names: string[],
+  identity: () => string,
+): PgAttribute[] {
+  const allAttrs = pgClass.getAttributes();
+  const attrs = names.map(
+    (col) => allAttrs.find((attr) => attr.attname === col)!,
+  );
+  for (let i = 0, l = attrs.length; i < l; i++) {
+    const attr = attrs[i];
+    const col = names[i];
+    if (!attr) {
+      throw new Error(
+        `${identity()} referenced non-existent column '${col}'; known columns: ${allAttrs
+          .filter((a) => a.attnum >= 0)
+          .map((attr) => attr.attname)
+          .join(", ")}`,
+      );
+    }
+  }
+
+  return attrs;
 }
 
 async function processUnique(
@@ -75,7 +149,6 @@ async function processUnique(
 ) {
   const identity = () =>
     `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
-  const id = `_fake_constraint_${info.state.fakeId++}`;
   const { databaseName, pgClass, options } = event;
   const tag = primaryKey ? "primaryKey" : "unique";
   if (typeof rawSpec !== "string") {
@@ -85,22 +158,11 @@ async function processUnique(
   }
   const [spec, extraDescription] = parseConstraintSpec(rawSpec);
   const columns = spec.split(",");
-  const allAttrs = pgClass.getAttributes();
-  const attrs = columns.map(
-    (col) => allAttrs.find((attr) => attr.attname === col)!,
+  const attrs = attributesByNames(
+    pgClass,
+    columns,
+    () => `'@${tag}' smart tag on ${identity()}`,
   );
-  for (let i = 0, l = attrs.length; i < l; i++) {
-    const attr = attrs[i];
-    const col = columns[i];
-    if (!attr) {
-      throw new Error(
-        `'@${tag}' smart tag on ${identity()} referenced non-existent column '${col}'; known columns: ${allAttrs
-          .filter((a) => a.attnum >= 0)
-          .map((attr) => attr.attname)
-          .join(", ")}`,
-      );
-    }
-  }
   const unique: PgSourceUnique = {
     columns,
     isPrimary: true,
@@ -109,6 +171,10 @@ async function processUnique(
     options.uniques = [];
   }
   const tagsAndDescription = parseSmartComment(extraDescription);
+
+  const id = `FAKE_${pgClass.getNamespace()!.nspname}_${
+    pgClass.relname
+  }_${tag}_${info.state.fakeId++}`;
 
   // Now we fake the constraint
   const pgConstraint: PgConstraint = {
@@ -153,4 +219,139 @@ async function processUnique(
   });
 
   options.uniques.push(unique);
+}
+
+const removeQuotes = (str: string) => {
+  const trimmed = str.trim();
+  if (trimmed[0] === '"') {
+    if (trimmed[trimmed.length - 1] !== '"') {
+      throw new Error(
+        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`,
+      );
+    }
+    return trimmed.slice(1, -1);
+  } else {
+    // PostgreSQL lower-cases unquoted columns, so we should too.
+    return trimmed.toLowerCase();
+  }
+};
+
+const parseSqlColumnArray = (str: string) => {
+  if (!str) {
+    throw new Error(`Cannot parse '${str}'`);
+  }
+  const parts = str.split(",");
+  return parts.map(removeQuotes);
+};
+
+const parseSqlColumnString = (str: string) => {
+  if (!str) {
+    throw new Error(`Cannot parse '${str}'`);
+  }
+  return removeQuotes(str);
+};
+
+async function processFk(
+  info: GatherPluginContext<State, Cache>,
+  event: {
+    databaseName: string;
+    pgClass: PgClass;
+  },
+  rawSpec: string | true | (string | true)[],
+) {
+  const identity = () =>
+    `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
+  const { databaseName, pgClass } = event;
+  if (typeof rawSpec !== "string") {
+    throw new Error(
+      `Invalid '@foreignKey' smart tag on ${identity()}; expected a string`,
+    );
+  }
+  const [spec, extraDescription] = parseConstraintSpec(rawSpec);
+  const matches = spec.match(
+    /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i,
+  );
+  if (!matches) {
+    throw new Error(
+      `Invalid @foreignKey syntax on '${identity()}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${spec}'`,
+    );
+  }
+  const [, rawColumns, rawSchemaOrTable, rawTableOnly, rawForeignColumns] =
+    matches;
+  const rawSchema = rawTableOnly
+    ? rawSchemaOrTable
+    : `"${pgClass.getNamespace()!.nspname}"`;
+  const rawTable = rawTableOnly || rawSchemaOrTable;
+  const columns: string[] = parseSqlColumnArray(rawColumns);
+  const foreignSchema: string = parseSqlColumnString(rawSchema);
+  const foreignTable: string = parseSqlColumnString(rawTable);
+  const foreignColumns: string[] | null = rawForeignColumns
+    ? parseSqlColumnArray(rawForeignColumns)
+    : null;
+
+  const foreignPgClass = await info.helpers.pgIntrospection.getClassByName(
+    databaseName,
+    foreignSchema,
+    foreignTable,
+  );
+  if (!foreignPgClass) {
+    throw new Error(
+      `Invalid @foreignKey on '${identity()}'; referenced non-existent table/view '${foreignSchema}.${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${rawSpec})`,
+    );
+  }
+  const keyAttibutes = attributesByNames(
+    pgClass,
+    columns,
+    () => `'@foreignKey' smart tag on ${identity()} local columns`,
+  );
+  const foreignKeyAttibutes = attributesByNames(
+    foreignPgClass,
+    columns,
+    () => `'@foreignKey' smart tag on ${identity()} remote columns`,
+  );
+
+  const tagsAndDescription = parseSmartComment(extraDescription);
+
+  const id = `FAKE_${pgClass.getNamespace()!.nspname}_${
+    pgClass.relname
+  }_foreignKey_${info.state.fakeId++}`;
+
+  // Now we fake the constraint
+  const pgConstraint: PgConstraint = {
+    _id: id,
+    conname: id,
+    connamespace: pgClass.relnamespace,
+    contype: "f",
+    condeferrable: false,
+    condeferred: false,
+    convalidated: true,
+    conrelid: pgClass._id,
+    contypid: "0",
+    conindid: "0",
+    confrelid: foreignPgClass._id,
+    confupdtype: "a",
+    confdeltype: "a",
+    confmatchtype: "s",
+    conislocal: true,
+    coninhcount: 0,
+    connoinherit: null,
+    conkey: keyAttibutes.map((c) => c.attnum),
+    confkey: foreignKeyAttibutes.map((c) => c.attnum),
+    conpfeqop: null,
+    conppeqop: null,
+    conffeqop: null,
+    conexclop: null,
+    conbin: null,
+    getClass: () => pgClass,
+    getDescription: () => extraDescription,
+    getTagsAndDescription: () => tagsAndDescription,
+    getForeignClass: () => foreignPgClass,
+    getNamespace: () => pgClass.getNamespace(),
+    getType: () => undefined,
+  };
+
+  // And register it into our cache
+  info.state.fakeFkConstraintsByDatabaseName[databaseName] =
+    info.state.fakeFkConstraintsByDatabaseName[databaseName] || [];
+  info.state.fakeFkConstraintsByDatabaseName[databaseName].push(pgConstraint);
 }
