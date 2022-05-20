@@ -79,6 +79,7 @@ declare global {
           databaseName: string,
           id: string,
         ): Promise<PgNamespace | undefined>;
+        getClasses(databaseName: string): Promise<PgClass[]>;
         getClass(
           databaseName: string,
           id: string,
@@ -317,6 +318,25 @@ function makeGetEntity<
   };
 }
 
+function makeGetEntities<
+  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
+>(loc: TKey) {
+  return async (
+    info: GatherPluginContext<State, Cache>,
+    databaseName: string,
+    id: string,
+  ): Promise<Introspection[TKey]> => {
+    const relevant = await getDb(info, databaseName);
+    const list = relevant.introspection[loc];
+    if (!list) {
+      throw new Error(
+        `Could not find database '${databaseName}''s introspection results for '${loc}'`,
+      );
+    }
+    return list as any[];
+  };
+}
+
 export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
   name: "PgIntrospectionPlugin",
   description:
@@ -377,6 +397,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       getNamespace: makeGetEntity("namespaces"),
+      getClasses: makeGetEntities("classes"),
       getClass: makeGetEntity("classes"),
       getConstraint: makeGetEntity("constraints"),
       getProc: makeGetEntity("procs"),

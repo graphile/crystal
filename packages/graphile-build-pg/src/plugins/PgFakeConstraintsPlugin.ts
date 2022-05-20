@@ -23,7 +23,7 @@ interface State {
   fakeFkConstraintsByDatabaseName: {
     [databaseName: string]: PgConstraint[];
   };
-  accessed: boolean;
+  promises: Promise<any>[];
 }
 interface Cache {}
 
@@ -40,7 +40,7 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
     initialState: () => ({
       fakeId: 0,
       fakeFkConstraintsByDatabaseName: Object.create(null),
-      accessed: false,
+      promises: [],
     }),
     hooks: {
       async pgCodecs_column(info, event) {
@@ -52,11 +52,6 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       },
 
       async pgTables_PgSourceBuilder_options(info, event) {
-        if (info.state.accessed) {
-          throw new Error(
-            `GraphileInternalError<71c63b95-802d-4946-971c-e76d74db07a6>: options must not be built after relations is called, otherwise fake constraints don't have enough time to be established`,
-          );
-        }
         const { databaseName, pgClass, options } = event;
         const tags = options.extensions?.tags;
         const knownColumns = Object.keys(options.codec.columns);
@@ -85,12 +80,27 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
             }
           }
         }
+
+        // To prevent race conditions (where smart comments sometimes have no
+        // effect because pgTables_PgSourceBuilder_relations is called earlier
+        // than all the _options), we're going to pro-actively call
+        // getSourceBuilder for every source now.
+        for (const otherPgClass of await info.helpers.pgIntrospection.getClasses(
+          databaseName,
+        )) {
+          // We cannot await this, otherwise we'll fail due to waiting on
+          // ourself. Instead, add it to list of promises to await in `main()`
+          const promise = info.helpers.pgTables.getSourceBuilder(
+            databaseName,
+            otherPgClass,
+          );
+          info.state.promises.push(promise);
+          // Don't exit the process if the promise rejects!
+          promise.then(null, () => {});
+        }
       },
 
       async pgTables_PgSourceBuilder_relations(info, event) {
-        if (!info.state.accessed) {
-          info.state.accessed = true;
-        }
         const fakeFkConstraints =
           info.state.fakeFkConstraintsByDatabaseName[event.databaseName];
         if (!fakeFkConstraints) {
@@ -110,6 +120,9 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
           }
         }
       },
+    },
+    async main(output, info) {
+      await Promise.all(info.state.promises);
     },
   } as GraphileConfig.PluginGatherConfig<"pgFakeConstraints", State, Cache>,
 };
