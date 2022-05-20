@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 
 import { postgraphile } from "./middleware/index.js";
 // TODO: there should be no default preset
-import defaultPreset from "./preset/amber.js";
+import defaultPreset from "./presets/amber.js";
 import { makePgSourcesFromConnectionString } from "./schema.js";
 
 export function options(yargs: Argv) {
