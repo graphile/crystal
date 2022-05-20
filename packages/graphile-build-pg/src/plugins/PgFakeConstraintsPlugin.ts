@@ -48,6 +48,25 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
 
       async pgTables_PgSourceBuilder_options(info, event) {
         const { databaseName, options } = event;
+
+        // To prevent race conditions (where smart comments sometimes have no
+        // effect because pgTables_PgSourceBuilder_relations is called earlier
+        // than all the _options), we're going to pro-actively call
+        // getSourceBuilder for every source now.
+        for (const otherPgClass of await info.helpers.pgIntrospection.getClasses(
+          databaseName,
+        )) {
+          // We cannot await this, otherwise we'll fail due to waiting on
+          // ourself. Instead, add it to list of promises to await in `main()`
+          const promise = info.helpers.pgTables.getSourceBuilder(
+            databaseName,
+            otherPgClass,
+          );
+          info.state.promises.push(promise);
+          // Don't exit the process if the promise rejects!
+          promise.then(null, () => {});
+        }
+
         const tags = options.extensions?.tags;
         if (tags) {
           if (tags.primaryKey) {
@@ -73,24 +92,6 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
               await processFk(info, event, tags.foreignKey);
             }
           }
-        }
-
-        // To prevent race conditions (where smart comments sometimes have no
-        // effect because pgTables_PgSourceBuilder_relations is called earlier
-        // than all the _options), we're going to pro-actively call
-        // getSourceBuilder for every source now.
-        for (const otherPgClass of await info.helpers.pgIntrospection.getClasses(
-          databaseName,
-        )) {
-          // We cannot await this, otherwise we'll fail due to waiting on
-          // ourself. Instead, add it to list of promises to await in `main()`
-          const promise = info.helpers.pgTables.getSourceBuilder(
-            databaseName,
-            otherPgClass,
-          );
-          info.state.promises.push(promise);
-          // Don't exit the process if the promise rejects!
-          promise.then(null, () => {});
         }
       },
 
