@@ -325,7 +325,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                 ? "base"
                 : isPgPatch
                 ? "update"
-                : "create";
+                : "insert";
 
               const fieldBehaviorScope = `attribute:${action}`;
               if (
