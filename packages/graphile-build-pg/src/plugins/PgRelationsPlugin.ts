@@ -373,7 +373,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         for (const constraint of foreignConstraints) {
           if (constraint.contype === "f") {
-            await info.helpers.pgRelations.addRelation(event, constraint);
+            await info.helpers.pgRelations.addRelation(event, constraint, true);
           }
         }
       },
