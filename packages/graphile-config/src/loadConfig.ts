@@ -73,7 +73,11 @@ export async function loadConfig(
       const resolvedPath = basePath + extension;
       if (await exists(resolvedPath)) {
         registerLoader(jsVariants[extension]);
-        return require(resolvedPath);
+        try {
+          return require(resolvedPath);
+        } catch (e) {
+          return import(resolvedPath);
+        }
       }
     }
   }

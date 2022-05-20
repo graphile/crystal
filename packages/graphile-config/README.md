@@ -135,3 +135,31 @@ And please give some love to our featured sponsors 🤩:
 <em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
+
+## Supporting TypeScript ESM
+
+You can specify a `graphile.config.ts` file; but if that uses `export default`
+and your TypeScript is configured to export ESM then you'll get an error telling
+you that you cannot `require` an ES Module:
+
+```
+Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: /path/to/graphile.config.ts
+require() of ES modules is not supported.
+require() of /path/to/graphile.config.ts from /path/to/node_modules/graphile-config/dist/loadConfig.js is an ES module file as it is a .ts file whose nearest parent package.json contains "type": "module" which defines all .ts files in that package scope as ES modules.
+Instead change the requiring code to use import(), or remove "type": "module" from /path/to/package.json.
+```
+
+Or, in newer versions, an error saying unknown file extension:
+
+```
+TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /path/to/graphile.config.ts
+```
+
+To solve this, use the experimental loaders API to add support for TS ESM via
+the `ts-node/esm` loader:
+
+```
+export NODE_OPTIONS="$NODE_OPTIONS --loader ts-node/esm"
+```
+
+Then run your command again.
