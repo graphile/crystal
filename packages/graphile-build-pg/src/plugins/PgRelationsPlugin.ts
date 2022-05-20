@@ -83,7 +83,21 @@ declare module "@dataplan/pg" {
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
-      pgRelations: Record<string, never>;
+      pgRelations: {
+        addRelation(
+          event: {
+            pgClass: PgClass;
+            databaseName: string;
+            relations: GraphileConfig.PgTablesPluginSourceRelations;
+          },
+          pgConstraint: PgConstraint,
+          localColumnNumbers: readonly number[],
+          foreignClassId: string,
+          foreignColumnNumbers: readonly number[],
+          isUnique: boolean,
+          isBackwards?: boolean,
+        ): Promise<void>;
+      };
     }
     interface GatherHooks {
       pgRelations_relation: PluginHook<
@@ -217,13 +231,108 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
   gather: <GraphileConfig.PluginGatherConfig<"pgRelations", State, Cache>>{
     namespace: "pgRelations",
-    helpers: {},
     initialState: (): State => ({}),
-    hooks: {
-      async pgTables_PgSourceBuilder_relations(
+    helpers: {
+      async addRelation(
         info,
-        { pgClass, databaseName, relations },
+        event,
+        pgConstraint,
+        localColumnNumbers,
+        foreignClassId,
+        foreignColumnNumbers,
+        isUnique,
+        isBackwards = false,
       ) {
+        const { databaseName, pgClass, relations } = event;
+        const localColumns = await Promise.all(
+          localColumnNumbers!.map((key) =>
+            info.helpers.pgIntrospection.getAttribute(
+              databaseName,
+              pgClass._id,
+              key,
+            ),
+          ),
+        );
+        const foreignClass = await info.helpers.pgIntrospection.getClass(
+          databaseName,
+          foreignClassId,
+        );
+        if (!foreignClass) {
+          throw new Error(`Could not find class with id '${foreignClassId}'`);
+        }
+        const foreignColumns = await Promise.all(
+          foreignColumnNumbers.map((key) =>
+            info.helpers.pgIntrospection.getAttribute(
+              databaseName,
+              foreignClass!._id,
+              key,
+            ),
+          ),
+        );
+        const foreignSource = await info.helpers.pgTables.getSourceBuilder(
+          databaseName,
+          foreignClass,
+        );
+        if (!foreignSource) {
+          return;
+        }
+        const relationName = info.inflection.sourceRelationName({
+          databaseName,
+          pgConstraint,
+          localClass: pgClass,
+          localColumns: localColumns as PgAttribute[],
+          foreignClass,
+          foreignColumns: foreignColumns as PgAttribute[],
+          isUnique,
+          isBackwards,
+        });
+        const existingRelation = relations[relationName];
+        const newRelation: PgSourceRelation<any, any> = {
+          localColumns: localColumns.map((c) => c!.attname),
+          remoteColumns: foreignColumns.map((c) => c!.attname),
+          source: foreignSource,
+          isUnique,
+          isBackwards,
+        };
+        await info.process("pgRelations_relation", {
+          databaseName,
+          pgClass,
+          pgConstraint,
+          relation: newRelation,
+        });
+        if (existingRelation) {
+          const isEquivalent =
+            existingRelation.isUnique === newRelation.isUnique &&
+            existingRelation.isBackwards === newRelation.isBackwards &&
+            arraysMatch(
+              existingRelation.localColumns,
+              newRelation.localColumns,
+            ) &&
+            arraysMatch(
+              existingRelation.remoteColumns,
+              newRelation.remoteColumns,
+            ) &&
+            existingRelation.source === newRelation.source;
+          const message = `Attempted to add a relation named '${relationName}' for ${
+            isEquivalent ? "equivalent " : ""
+          }constraint '${pgConstraint.conname}' on '${
+            pgClass.getNamespace()!.nspname
+          }.${
+            pgClass.relname
+          }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`;
+          if (isEquivalent) {
+            console.warn(message);
+            return;
+          } else {
+            throw new Error(message);
+          }
+        }
+        relations[relationName] = newRelation;
+      },
+    },
+    hooks: {
+      async pgTables_PgSourceBuilder_relations(info, event) {
+        const { pgClass, databaseName, relations } = event;
         const constraints =
           await info.helpers.pgIntrospection.getConstraintsForClass(
             databaseName,
@@ -235,103 +344,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             databaseName,
             pgClass._id,
           );
-        const addRelation = async (
-          pgConstraint: PgConstraint,
-          localColumnNumbers: readonly number[],
-          foreignClassId: string,
-          foreignColumnNumbers: readonly number[],
-          isUnique: boolean,
-          isBackwards = false,
-        ) => {
-          const localColumns = await Promise.all(
-            localColumnNumbers!.map((key) =>
-              info.helpers.pgIntrospection.getAttribute(
-                databaseName,
-                pgClass._id,
-                key,
-              ),
-            ),
-          );
-          const foreignClass = await info.helpers.pgIntrospection.getClass(
-            databaseName,
-            foreignClassId,
-          );
-          if (!foreignClass) {
-            throw new Error(`Could not find class with id '${foreignClassId}'`);
-          }
-          const foreignColumns = await Promise.all(
-            foreignColumnNumbers.map((key) =>
-              info.helpers.pgIntrospection.getAttribute(
-                databaseName,
-                foreignClass!._id,
-                key,
-              ),
-            ),
-          );
-          const foreignSource = await info.helpers.pgTables.getSourceBuilder(
-            databaseName,
-            foreignClass,
-          );
-          if (!foreignSource) {
-            return;
-          }
-          const relationName = info.inflection.sourceRelationName({
-            databaseName,
-            pgConstraint,
-            localClass: pgClass,
-            localColumns: localColumns as PgAttribute[],
-            foreignClass,
-            foreignColumns: foreignColumns as PgAttribute[],
-            isUnique,
-            isBackwards,
-          });
-          const existingRelation = relations[relationName];
-          const newRelation: PgSourceRelation<any, any> = {
-            localColumns: localColumns.map((c) => c!.attname),
-            remoteColumns: foreignColumns.map((c) => c!.attname),
-            source: foreignSource,
-            isUnique,
-            isBackwards,
-          };
-          await info.process("pgRelations_relation", {
-            databaseName,
-            pgClass,
-            pgConstraint,
-            relation: newRelation,
-          });
-          if (existingRelation) {
-            const isEquivalent =
-              existingRelation.isUnique === newRelation.isUnique &&
-              existingRelation.isBackwards === newRelation.isBackwards &&
-              arraysMatch(
-                existingRelation.localColumns,
-                newRelation.localColumns,
-              ) &&
-              arraysMatch(
-                existingRelation.remoteColumns,
-                newRelation.remoteColumns,
-              ) &&
-              existingRelation.source === newRelation.source;
-            const message = `Attempted to add a relation named '${relationName}' for ${
-              isEquivalent ? "equivalent " : ""
-            }constraint '${pgConstraint.conname}' on '${
-              pgClass.getNamespace()!.nspname
-            }.${
-              pgClass.relname
-            }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`;
-            if (isEquivalent) {
-              console.warn(message);
-              return;
-            } else {
-              throw new Error(message);
-            }
-          }
-          relations[relationName] = newRelation;
-        };
 
         for (const constraint of constraints) {
           if (constraint.contype === "f") {
-            await addRelation(
+            await info.helpers.pgRelations.addRelation(
+              event,
               constraint,
               constraint.conkey!,
               constraint.confrelid!,
@@ -362,7 +379,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                 );
               },
             );
-            await addRelation(
+            await info.helpers.pgRelations.addRelation(
+              event,
               constraint,
               constraint.confkey!,
               constraint.conrelid!,
