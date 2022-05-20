@@ -13,6 +13,14 @@
     "./cli": {
       "types": "./dist/cli.d.ts",
       "node": "./dist/cli.js"
+    },
+    "./preset/amber": {
+      "types": "./dist/preset/amber.d.ts",
+      "node": "./dist/preset/amber.js"
+    },
+    "./preset/v4": {
+      "types": "./dist/preset/v4.d.ts",
+      "node": "./dist/preset/v4.js"
     }
   },
   "bin": "./dist/cli-run.js",

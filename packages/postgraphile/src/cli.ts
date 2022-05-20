@@ -3,7 +3,8 @@ import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { createServer } from "node:http";
 
 import { postgraphile } from "./middleware/index.js";
-import { defaultPreset } from "./preset.js";
+// TODO: there should be no default preset
+import defaultPreset from "./preset/amber.js";
 import { makePgSourcesFromConnectionString } from "./schema.js";
 
 export function options(yargs: Argv) {

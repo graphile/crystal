@@ -7,7 +7,9 @@ import {
 } from "graphile-build";
 import { defaultPreset as graphileBuildPgPreset } from "graphile-build-pg";
 
-export const defaultPreset: GraphileConfig.Preset = {
+export const postgraphilePresetAmber: GraphileConfig.Preset = {
   extends: [graphileBuildPreset, graphileBuildPgPreset],
   plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
 };
+
+export default postgraphilePresetAmber;
