@@ -6,7 +6,9 @@
     "declarationMap": true,
     "allowJs": false,
 
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "ESNext",
 
     "sourceMap": true,
     "pretty": true,

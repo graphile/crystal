@@ -35,7 +35,7 @@
     "pretty-format": "^27.4.2",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
-    "typescript": "next"
+    "typescript": "rc"
   },
   "files": [
     "dist"

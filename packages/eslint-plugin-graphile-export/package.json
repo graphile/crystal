@@ -47,6 +47,6 @@
     "@typescript-eslint/parser-v5": "npm:@typescript-eslint/parser@^5.0.0-0",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
-    "typescript": "next"
+    "typescript": "rc"
   }
 }

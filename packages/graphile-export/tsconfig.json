@@ -6,7 +6,7 @@
     "outDir": "./dist",
 
     "noUncheckedIndexedAccess": false,
-    "moduleResolution": "Node12",
+    "moduleResolution": "nodenext",
     "module": "nodenext"
   },
   "include": ["src"],

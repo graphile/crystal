@@ -1492,7 +1492,7 @@ __metadata:
     jest: "npm:^27.4.5"
     jest-serializer-simple: "workspace:^"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     dataplanner: "workspace:^"
     graphql: "*"
@@ -1521,7 +1521,7 @@ __metadata:
     postgres-range: "npm:^1.1.1"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -1653,7 +1653,7 @@ __metadata:
     pg: "npm:^8.7.1"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
     ws: "npm:^8.4.0"
   bin:
     graphile-lds: ./dist/cli.js
@@ -1669,7 +1669,7 @@ __metadata:
     jest: "npm:^27.4.5"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   languageName: unknown
   linkType: soft
 
@@ -5647,7 +5647,7 @@ __metadata:
     spec-md: "npm:^3.0.2"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -6203,7 +6203,7 @@ __metadata:
     jest: "npm:^27.4.5"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
   languageName: unknown
@@ -7389,7 +7389,7 @@ __metadata:
     pg-introspection: "workspace:^"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   languageName: unknown
   linkType: soft
 
@@ -7414,7 +7414,7 @@ __metadata:
     semver: "npm:^7.3.5"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -7436,7 +7436,7 @@ __metadata:
     semver: "npm:^7.3.5"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   languageName: unknown
   linkType: soft
 
@@ -7458,7 +7458,7 @@ __metadata:
     prettier: "npm:^2.5.1"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     graphql: "*"
     pg-sql2: "*"
@@ -7490,7 +7490,7 @@ __metadata:
     ts-loader: "npm:^9.2.8"
     ts-node: "npm:^10.7.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
     webpack: "npm:^5.72.0"
     webpack-cli: "npm:^4.9.2"
     yargs: "npm:^17.4.1"
@@ -8759,7 +8759,7 @@ __metadata:
     pretty-format: "npm:^27.4.2"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -8777,7 +8777,7 @@ __metadata:
     pretty-format: "npm:^27.4.2"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   languageName: unknown
   linkType: soft
 
@@ -10492,7 +10492,7 @@ __metadata:
     jest: "npm:^27.4.5"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   languageName: unknown
   linkType: soft
 
@@ -10524,7 +10524,7 @@ __metadata:
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   languageName: unknown
   linkType: soft
 
@@ -10703,7 +10703,7 @@ __metadata:
     pg: "npm:^8.7.1"
     ts-node: "npm:^10.4.0"
     tslib: "npm:^2.3.1"
-    typescript: "npm:next"
+    typescript: "npm:rc"
   bin:
     postgraphile: ./dist/cli-run.js
   languageName: unknown
@@ -11481,7 +11481,7 @@ __metadata:
     prettier: "npm:^2.5.1"
     typedoc: "npm:^0.22.15"
     typedoc-monorepo-link-types: "npm:^0.0.2"
-    typescript: "npm:next"
+    typescript: "npm:rc"
     webpack: "npm:^5.65.0"
   languageName: unknown
   linkType: soft
@@ -12747,23 +12747,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:next":
-  version: 4.7.0-dev.20220422
-  resolution: "typescript@npm:4.7.0-dev.20220422"
+"typescript@npm:rc":
+  version: 4.7.1-rc
+  resolution: "typescript@npm:4.7.1-rc"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: b1f6539a437fcbcb57f871ab3ed0dccccfe3b77e2a07e303522094bb40048c257ee0c4290d9052ca9a2088cddf160609be38c696e778cb8919e618ae93e78f9f
+  checksum: 9758c7886a6ded9a37dfd14a9aa46a5ac1fc3fbc9eb3c1a61fa8b5c1a47163a9f894f6c19d2c7f58975c4a1495e8d9fcc8772a81be6b13bc50edd8a4256112d7
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3Anext#optional!builtin<compat/typescript>":
-  version: 4.7.0-dev.20220422
-  resolution: "typescript@patch:typescript@npm%3A4.7.0-dev.20220422#optional!builtin<compat/typescript>::version=4.7.0-dev.20220422&hash=7ad353"
+"typescript@patch:typescript@npm%3Arc#optional!builtin<compat/typescript>":
+  version: 4.7.1-rc
+  resolution: "typescript@patch:typescript@npm%3A4.7.1-rc#optional!builtin<compat/typescript>::version=4.7.1-rc&hash=7ad353"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 06958988b54991b26c9e58c63922077265a34cb7f69d95a6d74093fe49d56eb4661f3debf9f8e41e55380b305a655a2a5a813a3f38a4bc23e200cdd1c807585d
+  checksum: 1a2ae2613271b29a69e5fd2d785abe7383e0e25f0066798d01081e8ce601d270dc52112d44760a2dbb60a1547cd0657afcb68878081cd590263345faf1f142f2
   languageName: node
   linkType: hard
 

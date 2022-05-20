@@ -75,6 +75,6 @@
     "graphql-helix": "^1.11.0",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
-    "typescript": "next"
+    "typescript": "rc"
   }
 }

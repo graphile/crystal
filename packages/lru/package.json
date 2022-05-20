@@ -35,6 +35,6 @@
     "@types/node": "^16.11.15",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
-    "typescript": "next"
+    "typescript": "rc"
   }
 }

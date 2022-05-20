@@ -66,6 +66,6 @@
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
-    "typescript": "next"
+    "typescript": "rc"
   }
 }

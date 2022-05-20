@@ -69,6 +69,6 @@
     "pg-sql2": "workspace:^",
     "spec-md": "^3.0.2",
     "ts-node": "^10.4.0",
-    "typescript": "next"
+    "typescript": "rc"
   }
 }

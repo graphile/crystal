@@ -39,7 +39,7 @@
     "jest": "^27.4.5",
     "markdown-doctest": "^1.1.0",
     "ts-node": "^10.4.0",
-    "typescript": "next"
+    "typescript": "rc"
   },
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
