@@ -230,51 +230,48 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     initialState: (): State => ({}),
     helpers: {
       async addRelation(info, event, pgConstraint, isBackwards = false) {
-        const [
-          localColumnNumbers,
-          foreignClassId,
-          foreignColumnNumbers,
-          isUnique,
-        ] = (() => {
-          if (isBackwards) {
-            return [
-              pgConstraint.conkey!,
-              pgConstraint.confrelid!,
-              pgConstraint.confkey!,
-              true,
-            ];
-          } else {
-            const foreignClass = pgConstraint.getClass()!;
-            // This relationship is unique if the REFERENCED table (not us!)
-            // has a unique constraint on the remoteColumns the relationship
-            // specifies (or a subset thereof).
-            const foreignUniqueColumnOnlyConstraints = foreignClass
-              .getConstraints()!
-              .filter(
-                (c) =>
-                  ["u", "p"].includes(c.contype) &&
-                  c.conkey?.every((k) => k > 0),
-              );
-            const foreignUniqueColumnNumberCombinations =
-              foreignUniqueColumnOnlyConstraints.map((c) => c.conkey!);
-            const isUnique = foreignUniqueColumnNumberCombinations.some(
-              (foreignUniqueColumnNumbers) => {
-                return foreignUniqueColumnNumbers.every(
-                  (n) => n > 0 && pgConstraint.conkey!.includes(n),
+        const pgClass = isBackwards
+          ? pgConstraint.getForeignClass()
+          : pgConstraint.getClass();
+        const foreignClass = isBackwards
+          ? pgConstraint.getClass()
+          : pgConstraint.getForeignClass();
+        if (!pgClass || !foreignClass) {
+          throw new Error(`Invalid introspection`);
+        }
+        const localColumnNumbers = isBackwards
+          ? pgConstraint.confkey!
+          : pgConstraint.conkey!;
+        const foreignColumnNumbers = isBackwards
+          ? pgConstraint.conkey!
+          : pgConstraint.confkey!;
+        const isUnique = !isBackwards
+          ? true
+          : (() => {
+              // This relationship is unique if the REFERENCED table (not us!)
+              // has a unique constraint on the remoteColumns the relationship
+              // specifies (or a subset thereof).
+              const foreignUniqueColumnOnlyConstraints = foreignClass
+                .getConstraints()!
+                .filter(
+                  (c) =>
+                    ["u", "p"].includes(c.contype) &&
+                    c.conkey?.every((k) => k > 0),
                 );
-              },
-            );
-            return [
-              pgConstraint.confkey!,
-              pgConstraint.conrelid!,
-              pgConstraint.conkey!,
-              isUnique,
-            ];
-          }
-        })();
-        const { databaseName, pgClass, relations } = event;
+              const foreignUniqueColumnNumberCombinations =
+                foreignUniqueColumnOnlyConstraints.map((c) => c.conkey!);
+              const isUnique = foreignUniqueColumnNumberCombinations.some(
+                (foreignUniqueColumnNumbers) => {
+                  return foreignUniqueColumnNumbers.every(
+                    (n) => n > 0 && pgConstraint.conkey!.includes(n),
+                  );
+                },
+              );
+              return isUnique;
+            })();
+        const { databaseName, relations } = event;
         const localColumns = await Promise.all(
-          localColumnNumbers!.map((key) =>
+          localColumnNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
               databaseName,
               pgClass._id,
@@ -282,13 +279,6 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             ),
           ),
         );
-        const foreignClass = await info.helpers.pgIntrospection.getClass(
-          databaseName,
-          foreignClassId,
-        );
-        if (!foreignClass) {
-          throw new Error(`Could not find class with id '${foreignClassId}'`);
-        }
         const foreignColumns = await Promise.all(
           foreignColumnNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
@@ -342,7 +332,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               newRelation.remoteColumns,
             ) &&
             existingRelation.source === newRelation.source;
-          const message = `Attempted to add a relation named '${relationName}' for ${
+          const message = `Attempted to add a ${
+            isBackwards ? "backwards" : "forwards"
+          } relation named '${relationName}' to '${pgClass.relname}' for ${
             isEquivalent ? "equivalent " : ""
           }constraint '${pgConstraint.conname}' on '${
             pgClass.getNamespace()!.nspname
