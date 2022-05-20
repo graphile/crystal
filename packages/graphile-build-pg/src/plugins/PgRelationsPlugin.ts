@@ -91,10 +91,6 @@ declare global {
             relations: GraphileConfig.PgTablesPluginSourceRelations;
           },
           pgConstraint: PgConstraint,
-          localColumnNumbers: readonly number[],
-          foreignClassId: string,
-          foreignColumnNumbers: readonly number[],
-          isUnique: boolean,
           isBackwards?: boolean,
         ): Promise<void>;
       };
@@ -233,16 +229,49 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     namespace: "pgRelations",
     initialState: (): State => ({}),
     helpers: {
-      async addRelation(
-        info,
-        event,
-        pgConstraint,
-        localColumnNumbers,
-        foreignClassId,
-        foreignColumnNumbers,
-        isUnique,
-        isBackwards = false,
-      ) {
+      async addRelation(info, event, pgConstraint, isBackwards = false) {
+        const [
+          localColumnNumbers,
+          foreignClassId,
+          foreignColumnNumbers,
+          isUnique,
+        ] = (() => {
+          if (isBackwards) {
+            return [
+              pgConstraint.conkey!,
+              pgConstraint.confrelid!,
+              pgConstraint.confkey!,
+              true,
+            ];
+          } else {
+            const foreignClass = pgConstraint.getClass()!;
+            // This relationship is unique if the REFERENCED table (not us!)
+            // has a unique constraint on the remoteColumns the relationship
+            // specifies (or a subset thereof).
+            const foreignUniqueColumnOnlyConstraints = foreignClass
+              .getConstraints()!
+              .filter(
+                (c) =>
+                  ["u", "p"].includes(c.contype) &&
+                  c.conkey?.every((k) => k > 0),
+              );
+            const foreignUniqueColumnNumberCombinations =
+              foreignUniqueColumnOnlyConstraints.map((c) => c.conkey!);
+            const isUnique = foreignUniqueColumnNumberCombinations.some(
+              (foreignUniqueColumnNumbers) => {
+                return foreignUniqueColumnNumbers.every(
+                  (n) => n > 0 && pgConstraint.conkey!.includes(n),
+                );
+              },
+            );
+            return [
+              pgConstraint.confkey!,
+              pgConstraint.conrelid!,
+              pgConstraint.conkey!,
+              isUnique,
+            ];
+          }
+        })();
         const { databaseName, pgClass, relations } = event;
         const localColumns = await Promise.all(
           localColumnNumbers!.map((key) =>
@@ -347,47 +376,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
         for (const constraint of constraints) {
           if (constraint.contype === "f") {
-            await info.helpers.pgRelations.addRelation(
-              event,
-              constraint,
-              constraint.conkey!,
-              constraint.confrelid!,
-              constraint.confkey!,
-              true,
-            );
+            await info.helpers.pgRelations.addRelation(event, constraint);
           }
         }
         for (const constraint of foreignConstraints) {
           if (constraint.contype === "f") {
-            const foreignClass = constraint.getClass()!;
-            // This relationship is unique if the REFERENCED table (not us!)
-            // has a unique constraint on the remoteColumns the relationship
-            // specifies (or a subset thereof).
-            const foreignUniqueColumnOnlyConstraints = foreignClass
-              .getConstraints()!
-              .filter(
-                (c) =>
-                  ["u", "p"].includes(c.contype) &&
-                  c.conkey?.every((k) => k > 0),
-              );
-            const foreignUniqueColumnNumberCombinations =
-              foreignUniqueColumnOnlyConstraints.map((c) => c.conkey!);
-            const isUnique = foreignUniqueColumnNumberCombinations.some(
-              (foreignUniqueColumnNumbers) => {
-                return foreignUniqueColumnNumbers.every(
-                  (n) => n > 0 && constraint.conkey!.includes(n),
-                );
-              },
-            );
-            await info.helpers.pgRelations.addRelation(
-              event,
-              constraint,
-              constraint.confkey!,
-              constraint.conrelid!,
-              constraint.conkey!,
-              isUnique,
-              true,
-            );
+            await info.helpers.pgRelations.addRelation(event, constraint);
           }
         }
       },
