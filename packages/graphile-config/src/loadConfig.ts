@@ -76,7 +76,11 @@ export async function loadConfig(
         try {
           return require(resolvedPath);
         } catch (e) {
-          return (await import(resolvedPath)).default;
+          if (e.code === "ERR_REQUIRE_ESM") {
+            return (await import(resolvedPath)).default;
+          } else {
+            throw e;
+          }
         }
       }
     }
