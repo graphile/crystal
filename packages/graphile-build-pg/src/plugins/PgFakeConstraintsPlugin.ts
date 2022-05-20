@@ -134,27 +134,40 @@ function parseConstraintSpec(rawSpec: string) {
 
 function attributesByNames(
   pgClass: PgClass,
-  names: string[],
+  names: string[] | null,
   identity: () => string,
 ): PgAttribute[] {
   const allAttrs = pgClass.getAttributes();
-  const attrs = names.map(
-    (col) => allAttrs.find((attr) => attr.attname === col)!,
-  );
-  for (let i = 0, l = attrs.length; i < l; i++) {
-    const attr = attrs[i];
-    const col = names[i];
-    if (!attr) {
+  if (!names) {
+    const pk = pgClass.getConstraints().find((con) => con.contype === "p");
+    if (pk) {
+      return pk.conkey!.map((n) => allAttrs.find((a) => a.attnum === n)!);
+    } else {
       throw new Error(
-        `${identity()} referenced non-existent column '${col}'; known columns: ${allAttrs
-          .filter((a) => a.attnum >= 0)
-          .map((attr) => attr.attname)
-          .join(", ")}`,
+        `No columns specified for '${pgClass.getNamespace()!.nspname}.${
+          pgClass.relname
+        }' (oid: ${pgClass._id}) and no PK found.`,
       );
     }
-  }
+  } else {
+    const attrs = names.map(
+      (col) => allAttrs.find((attr) => attr.attname === col)!,
+    );
+    for (let i = 0, l = attrs.length; i < l; i++) {
+      const attr = attrs[i];
+      const col = names[i];
+      if (!attr) {
+        throw new Error(
+          `${identity()} referenced non-existent column '${col}'; known columns: ${allAttrs
+            .filter((a) => a.attnum >= 0)
+            .map((attr) => attr.attname)
+            .join(", ")}`,
+        );
+      }
+    }
 
-  return attrs;
+    return attrs;
+  }
 }
 
 async function processUnique(
@@ -326,7 +339,7 @@ async function processFk(
   );
   const foreignKeyAttibutes = attributesByNames(
     foreignPgClass,
-    columns,
+    foreignColumns,
     () => `'@foreignKey' smart tag on ${identity()} remote columns`,
   );
 
