@@ -26,7 +26,7 @@ export function getBehavior(
     | undefined
   >,
 ): string | null {
-  const allExtensions = Array.isArray(extensions) ? extensions : [];
+  const allExtensions = Array.isArray(extensions) ? extensions : [extensions];
   const behaviors: string[] = [];
   for (const extensions of allExtensions) {
     add(extensions?.tags?.behaviour);
