@@ -33,7 +33,6 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
     "Looks for the @primaryKey, @foreignKey, @unique and @nonNull smart comments and changes the Data Sources such that it's as if these were concrete constraints",
   version: version,
   after: ["PgSmartCommentsPlugin"],
-  before: ["PgRelationsPlugin"],
 
   gather: {
     namespace: "pgFakeConstraints",
@@ -44,6 +43,14 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       accessed: false,
     }),
     hooks: {
+      async pgCodecs_column(info, event) {
+        const { column } = event;
+        const tags = column.extensions?.tags;
+        if (tags?.notNull) {
+          column.notNull = true;
+        }
+      },
+
       async pgTables_PgSourceBuilder_options(info, event) {
         if (info.state.accessed) {
           throw new Error(
