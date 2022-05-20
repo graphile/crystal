@@ -20,6 +20,7 @@ export { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnection
 export { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 export { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
 export { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
+export { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 export { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 export { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 export { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";

@@ -547,14 +547,14 @@ export interface PgConstraint {
    *
    * @remarks Only in 14.x, 13.x, 12.x, 11.x
    */
-  conparentid: PgOid | null | undefined;
+  conparentid?: PgOid | null | undefined;
 
   /**
    * If a check constraint, a human-readable representation of the expression
    *
    * @remarks Only in 11.x, 10.x
    */
-  consrc: string | null | undefined;
+  consrc?: string | null | undefined;
 }
 
 /**

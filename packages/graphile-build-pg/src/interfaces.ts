@@ -3,6 +3,9 @@ export interface PgSourceTags extends PgSmartTagsDict {
   /** For a computed column function/etc, what field name should we use? */
   fieldName: string;
   behavior: string | string[];
+  primaryKey: string;
+  foreignKey: string | string[];
+  unique: string | string[];
 }
 
 export interface PgSourceUniqueTags extends PgSmartTagsDict {
@@ -18,6 +21,7 @@ export interface PgSourceRelationTags extends PgSmartTagsDict {
 export interface PgTypeColumnTags extends PgSmartTagsDict {
   name: string;
   behavior: string | string[];
+  nonNull: true;
 }
 
 export interface PgTypeCodecTags extends PgSmartTagsDict {

@@ -12,6 +12,7 @@ import { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnection
 import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
+import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
@@ -50,6 +51,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgConditionArgumentPlugin,
     PgConditionCustomFieldsPlugin,
     PgConnectionArgOrderByPlugin,
+    PgFakeConstraintsPlugin,
     PgOrderByPrimaryKeyPlugin,
     PgOrderAllColumnsPlugin,
     PgOrderCustomFieldsPlugin,

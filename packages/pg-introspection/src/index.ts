@@ -24,6 +24,8 @@ import type {
   PgSmartTagsDict,
 } from "./smartComments.js";
 
+export { parseSmartComment } from "./smartComments.js";
+
 export {
   Introspection,
   PgAttribute,
