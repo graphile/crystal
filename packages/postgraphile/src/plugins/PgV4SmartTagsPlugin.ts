@@ -7,59 +7,75 @@ import { inspect } from "util";
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
-      pgV4SmartTagsOmit: Record<string, never>;
+      pgV4SmartTags: Record<string, never>;
     }
   }
 }
 
-export const PgV4SmartTagsOmitPlugin: GraphileConfig.Plugin = {
-  name: "PgV4SmartTagsOmitPlugin",
+export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
+  name: "PgV4SmartTagsPlugin",
   description:
-    "For compatibility with PostGraphile v4 schemas, this plugin attempts to take the `@omit` smart tags on a resource and turn them into behaviours",
+    "For compatibility with PostGraphile v4 schemas, this plugin attempts to convert various V4 smart tags (`@omit`, etc) and convert them to V5 behaviors",
   version: "0.0.0",
   after: ["PgSmartCommentsPlugin"],
 
   gather: {
-    namespace: "pgV4SmartTagsOmit",
+    namespace: "pgV4SmartTags",
     helpers: {},
     hooks: {
       pgTables_unique(info, event) {
-        processOmit(event.unique.extensions?.tags);
+        processTags(event.unique.extensions?.tags);
       },
       pgTables_PgSourceBuilder_options(info, event) {
-        processOmit(event.options.extensions?.tags);
+        processTags(event.options.extensions?.tags);
       },
       pgRelations_relation(info, event) {
-        processOmit(event.relation.extensions?.tags);
+        processTags(event.relation.extensions?.tags);
       },
       pgCodecs_column(info, event) {
-        processOmit(event.column.extensions?.tags);
+        processTags(event.column.extensions?.tags);
       },
       pgCodecs_recordType_extensions(info, event) {
-        processOmit(event.extensions?.tags);
+        processTags(event.extensions?.tags);
       },
       pgCodecs_rangeOfCodec_extensions(info, event) {
-        processOmit(event.extensions?.tags);
+        processTags(event.extensions?.tags);
       },
       pgCodecs_domainOfCodec_extensions(info, event) {
-        processOmit(event.extensions?.tags);
+        processTags(event.extensions?.tags);
       },
       pgCodecs_listOfCodec_extensions(info, event) {
-        processOmit(event.extensions?.tags);
+        processTags(event.extensions?.tags);
       },
       pgProcedures_functionSource_options(info, event) {
-        processOmit(event.options.extensions?.tags);
+        processTags(event.options.extensions?.tags);
       },
       pgProcedures_PgSource_options(info, event) {
-        processOmit(event.options.extensions?.tags);
+        processTags(event.options.extensions?.tags);
       },
     },
   },
 };
 
-export default PgV4SmartTagsOmitPlugin;
+export default PgV4SmartTagsPlugin;
 
-function processOmit(tags: Partial<PgSmartTagsDict> | undefined) {
+function processTags(tags: Partial<PgSmartTagsDict> | undefined): void {
+  processOmit(tags);
+  convertBoolean(tags, "sortable", "orderBy order");
+  convertBoolean(tags, "filterable", "filter filterBy");
+}
+
+function convertBoolean(
+  tags: Partial<PgSmartTagsDict> | undefined,
+  key: string,
+  behavior: string,
+): void {
+  if (tags && tags[key]) {
+    addBehaviors(tags, [behavior]);
+  }
+}
+
+function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
   const omit = tags?.omit;
   if (!omit) {
     return;
@@ -175,7 +191,11 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined) {
     processOmit(omit);
   }
 
-  // Merge the omit behaviors into the existing ones.
+  addBehaviors(tags, behavior);
+}
+
+// Merge the behaviors into the existing ones.
+function addBehaviors(tags: Partial<PgSmartTagsDict>, behavior: string[]) {
   if (behavior.length > 0) {
     if (Array.isArray(tags.behavior)) {
       tags.behavior.push(...behavior);

@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import { PgV4SmartTagsOmitPlugin } from "../plugins/PgV4SmartTagsOmitPlugin.js";
+import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 const preset: GraphileConfig.Preset = {
-  plugins: [PgV4SmartTagsOmitPlugin],
+  plugins: [PgV4SmartTagsPlugin],
 };
 export default preset;
