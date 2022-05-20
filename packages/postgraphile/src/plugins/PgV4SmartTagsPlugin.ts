@@ -63,6 +63,31 @@ function processTags(tags: Partial<PgSmartTagsDict> | undefined): void {
   processOmit(tags);
   convertBoolean(tags, "sortable", "orderBy order");
   convertBoolean(tags, "filterable", "filter filterBy");
+  processSimpleCollections(tags);
+}
+
+function processSimpleCollections(tags: Partial<PgSmartTagsDict> | undefined) {
+  if (tags?.simpleCollections) {
+    switch (tags.simpleCollections) {
+      case "omit": {
+        addBehaviors(tags, ["-list +connection"]);
+        break;
+      }
+      case "both": {
+        addBehaviors(tags, ["+list +connection"]);
+        break;
+      }
+      case "only": {
+        addBehaviors(tags, ["+list -connection"]);
+        break;
+      }
+      default: {
+        console.warn(
+          `Did not understand @simpleCollections argument '${tags.simpleCollections}'`,
+        );
+      }
+    }
+  }
 }
 
 function convertBoolean(
