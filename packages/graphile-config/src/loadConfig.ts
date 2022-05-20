@@ -76,7 +76,7 @@ export async function loadConfig(
         try {
           return require(resolvedPath);
         } catch (e) {
-          return import(resolvedPath);
+          return (await import(resolvedPath)).default;
         }
       }
     }
