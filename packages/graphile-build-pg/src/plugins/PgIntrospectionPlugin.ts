@@ -324,7 +324,6 @@ function makeGetEntities<
   return async (
     info: GatherPluginContext<State, Cache>,
     databaseName: string,
-    id: string,
   ): Promise<Introspection[TKey]> => {
     const relevant = await getDb(info, databaseName);
     const list = relevant.introspection[loc];

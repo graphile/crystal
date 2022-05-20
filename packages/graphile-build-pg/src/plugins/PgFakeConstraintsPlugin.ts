@@ -1,13 +1,8 @@
-import { PgSourceBuilder, PgSourceOptions, PgSourceUnique } from "@dataplan/pg";
-import { GatherPluginContext } from "graphile-build";
-import "graphile-config";
-import { PluginHook } from "graphile-config";
-import {
-  parseSmartComment,
-  PgAttribute,
-  PgClass,
-  PgConstraint,
-} from "pg-introspection";
+import type { PgSourceOptions, PgSourceUnique } from "@dataplan/pg";
+import type { GatherPluginContext } from "graphile-build";
+import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
+import { parseSmartComment } from "pg-introspection";
+
 import { version } from "../index.js";
 
 declare global {
@@ -52,9 +47,8 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       },
 
       async pgTables_PgSourceBuilder_options(info, event) {
-        const { databaseName, pgClass, options } = event;
+        const { databaseName, options } = event;
         const tags = options.extensions?.tags;
-        const knownColumns = Object.keys(options.codec.columns);
         if (tags) {
           if (tags.primaryKey) {
             await processUnique(info, event, tags.primaryKey, true);

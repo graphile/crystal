@@ -353,7 +353,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       async pgTables_PgSourceBuilder_relations(info, event) {
-        const { pgClass, databaseName, relations } = event;
+        const { pgClass, databaseName } = event;
         const constraints =
           await info.helpers.pgIntrospection.getConstraintsForClass(
             databaseName,
