@@ -15,7 +15,7 @@ declare global {
 
 interface State {
   fakeId: number;
-  fakeFkConstraintsByDatabaseName: {
+  fakeConstraintsByDatabaseName: {
     [databaseName: string]: PgConstraint[];
   };
   promises: Promise<any>[];
@@ -34,10 +34,52 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
     helpers: {},
     initialState: () => ({
       fakeId: 0,
-      fakeFkConstraintsByDatabaseName: Object.create(null),
+      fakeConstraintsByDatabaseName: Object.create(null),
       promises: [],
     }),
     hooks: {
+      // We detect "fake" foreign key constraints during the "introspection"
+      // phase (which runs first) because we need it to already be established
+      // for _all_ classes by the time pgTables_PgSourceBuilder_relations is
+      // called (otherwise we may get race conditions and relations only being
+      // defined in one direction).
+      async pgIntrospection_introspection(info, event) {
+        const { databaseName, introspection } = event;
+
+        for (const pgClass of introspection.classes) {
+          const { tags } = pgClass.getTagsAndDescription();
+
+          if (tags.primaryKey) {
+            await processUnique(
+              info,
+              { databaseName, pgClass },
+              tags.primaryKey,
+              true,
+            );
+          }
+
+          if (tags.unique) {
+            if (Array.isArray(tags.unique)) {
+              for (const uniq of tags.unique) {
+                await processUnique(info, { databaseName, pgClass }, uniq);
+              }
+            } else {
+              await processUnique(info, { databaseName, pgClass }, tags.unique);
+            }
+          }
+
+          if (tags.foreignKey) {
+            if (Array.isArray(tags.foreignKey)) {
+              for (const fk of tags.foreignKey) {
+                await processFk(info, { databaseName, pgClass }, fk);
+              }
+            } else {
+              await processFk(info, { databaseName, pgClass }, tags.foreignKey);
+            }
+          }
+        }
+      },
+
       async pgCodecs_column(info, event) {
         const { column } = event;
         const tags = column.extensions?.tags;
@@ -47,65 +89,57 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
       },
 
       async pgTables_PgSourceBuilder_options(info, event) {
-        const { databaseName, options } = event;
+        const { databaseName, pgClass, options } = event;
 
-        // To prevent race conditions (where smart comments sometimes have no
-        // effect because pgTables_PgSourceBuilder_relations is called earlier
-        // than all the _options), we're going to pro-actively call
-        // getSourceBuilder for every source now.
-        for (const otherPgClass of await info.helpers.pgIntrospection.getClasses(
-          databaseName,
-        )) {
-          // We cannot await this, otherwise we'll fail due to waiting on
-          // ourself. Instead, add it to list of promises to await in `main()`
-          const promise = info.helpers.pgTables.getSourceBuilder(
-            databaseName,
-            otherPgClass,
-          );
-          info.state.promises.push(promise);
-          // Don't exit the process if the promise rejects!
-          promise.then(null, () => {});
+        const fakeConstraints =
+          info.state.fakeConstraintsByDatabaseName[event.databaseName];
+        if (!fakeConstraints) {
+          return;
         }
 
-        const tags = options.extensions?.tags;
-        if (tags) {
-          if (tags.primaryKey) {
-            await processUnique(info, event, tags.primaryKey, true);
-          }
-
-          if (tags.unique) {
-            if (Array.isArray(tags.unique)) {
-              for (const uniq of tags.unique) {
-                await processUnique(info, event, uniq);
-              }
-            } else {
-              await processUnique(info, event, tags.unique);
-            }
-          }
-
-          if (tags.foreignKey) {
-            if (Array.isArray(tags.foreignKey)) {
-              for (const fk of tags.foreignKey) {
-                await processFk(info, event, fk);
-              }
-            } else {
-              await processFk(info, event, tags.foreignKey);
-            }
+        for (const pgConstraint of fakeConstraints) {
+          if (pgConstraint.contype === "p") {
+            await addUnique(
+              info,
+              { databaseName, pgClass, pgConstraint, options },
+              true,
+            );
+          } else if (pgConstraint.contype === "u") {
+            await addUnique(
+              info,
+              { databaseName, pgClass, pgConstraint, options },
+              false,
+            );
           }
         }
       },
 
       async pgTables_PgSourceBuilder_relations(info, event) {
-        const fakeFkConstraints =
-          info.state.fakeFkConstraintsByDatabaseName[event.databaseName];
-        if (!fakeFkConstraints) {
+        const fakeConstraints =
+          info.state.fakeConstraintsByDatabaseName[event.databaseName];
+        console.log(event.pgClass.relname, fakeConstraints);
+        if (!fakeConstraints) {
           return;
         }
-        for (const pgConstraint of fakeFkConstraints) {
+        for (const pgConstraint of fakeConstraints) {
+          if (pgConstraint.contype !== "f") {
+            continue;
+          }
           if (pgConstraint.conrelid === event.pgClass._id) {
+            console.log(
+              `Adding fake forward relation from ${event.pgClass.relname} to ${
+                pgConstraint.getForeignClass()!.relname
+              }`,
+            );
             // Forwards
             await info.helpers.pgRelations.addRelation(event, pgConstraint);
           } else if (pgConstraint.confrelid === event.pgClass._id) {
+            console.log(
+              `Adding fake backward relation from ${event.pgClass.relname} to ${
+                pgConstraint.getClass()!.relname
+              }`,
+            );
+
             // Backwards
             await info.helpers.pgRelations.addRelation(
               event,
@@ -170,14 +204,13 @@ async function processUnique(
   event: {
     databaseName: string;
     pgClass: PgClass;
-    options: PgSourceOptions<any, any, any, any>;
   },
   rawSpec: string | true | (string | true)[],
   primaryKey = false,
 ) {
   const identity = () =>
     `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
-  const { databaseName, pgClass, options } = event;
+  const { databaseName, pgClass } = event;
   const tag = primaryKey ? "primaryKey" : "unique";
   if (typeof rawSpec !== "string") {
     throw new Error(
@@ -191,13 +224,6 @@ async function processUnique(
     columns,
     () => `'@${tag}' smart tag on ${identity()}`,
   );
-  const unique: PgSourceUnique = {
-    columns,
-    isPrimary: true,
-  };
-  if (!options.uniques) {
-    options.uniques = [];
-  }
   const tagsAndDescription = parseSmartComment(extraDescription);
 
   const id = `FAKE_${pgClass.getNamespace()!.nspname}_${
@@ -238,6 +264,35 @@ async function processUnique(
     getType: () => undefined,
   };
 
+  info.state.fakeConstraintsByDatabaseName[databaseName] =
+    info.state.fakeConstraintsByDatabaseName[databaseName] || [];
+  info.state.fakeConstraintsByDatabaseName[databaseName].push(pgConstraint);
+}
+
+async function addUnique(
+  info: GatherPluginContext<State, Cache>,
+  event: {
+    databaseName: string;
+    pgClass: PgClass;
+    pgConstraint: PgConstraint;
+    options: PgSourceOptions<any, any, any, any>;
+  },
+  isPrimary = false,
+) {
+  const { databaseName, pgClass, pgConstraint, options } = event;
+
+  const attrs = pgClass.getAttributes();
+  const columns = pgConstraint.conkey!.map(
+    (num) => attrs.find((att) => att.attnum === num)!.attname,
+  );
+
+  const unique: PgSourceUnique = {
+    columns,
+    isPrimary,
+  };
+  if (!options.uniques) {
+    options.uniques = [];
+  }
   // And pretend it's real:
   await info.process("pgTables_unique", {
     databaseName,
@@ -378,8 +433,9 @@ async function processFk(
     getType: () => undefined,
   };
 
+  console.log("Added fakeFkConstraints");
   // And register it into our cache
-  info.state.fakeFkConstraintsByDatabaseName[databaseName] =
-    info.state.fakeFkConstraintsByDatabaseName[databaseName] || [];
-  info.state.fakeFkConstraintsByDatabaseName[databaseName].push(pgConstraint);
+  info.state.fakeConstraintsByDatabaseName[databaseName] =
+    info.state.fakeConstraintsByDatabaseName[databaseName] || [];
+  info.state.fakeConstraintsByDatabaseName[databaseName].push(pgConstraint);
 }

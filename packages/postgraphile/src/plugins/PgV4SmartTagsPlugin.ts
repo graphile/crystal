@@ -18,40 +18,33 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
     "For compatibility with PostGraphile v4 schemas, this plugin attempts to convert various V4 smart tags (`@omit`, etc) and convert them to V5 behaviors",
   version: "0.0.0",
   after: ["PgSmartCommentsPlugin"],
+  before: ["PgFakeConstraintsPlugin"],
 
   gather: {
     namespace: "pgV4SmartTags",
     helpers: {},
     hooks: {
-      pgTables_unique(info, event) {
-        processTags(event.unique.extensions?.tags);
-      },
-      pgTables_PgSourceBuilder_options(info, event) {
-        processTags(event.options.extensions?.tags);
-      },
-      pgRelations_relation(info, event) {
-        processTags(event.relation.extensions?.tags);
-      },
-      pgCodecs_column(info, event) {
-        processTags(event.column.extensions?.tags);
-      },
-      pgCodecs_recordType_extensions(info, event) {
-        processTags(event.extensions?.tags);
-      },
-      pgCodecs_rangeOfCodec_extensions(info, event) {
-        processTags(event.extensions?.tags);
-      },
-      pgCodecs_domainOfCodec_extensions(info, event) {
-        processTags(event.extensions?.tags);
-      },
-      pgCodecs_listOfCodec_extensions(info, event) {
-        processTags(event.extensions?.tags);
-      },
-      pgProcedures_functionSource_options(info, event) {
-        processTags(event.options.extensions?.tags);
-      },
-      pgProcedures_PgSource_options(info, event) {
-        processTags(event.options.extensions?.tags);
+      // Run in the 'introspection' phase before anything uses the tags
+      pgIntrospection_introspection(info, event) {
+        const { introspection } = event;
+        // Note the code here relies on the fact that `getTagsAndDescription`
+        // memoizes because it mutates the return result; if this changes then
+        // the code will no longer achieve its goal.
+        for (const pgClass of introspection.classes) {
+          processTags(pgClass.getTagsAndDescription().tags);
+        }
+        for (const pgAttr of introspection.attributes) {
+          processTags(pgAttr.getTagsAndDescription().tags);
+        }
+        for (const pgConstraint of introspection.constraints) {
+          processTags(pgConstraint.getTagsAndDescription().tags);
+        }
+        for (const pgProc of introspection.procs) {
+          processTags(pgProc.getTagsAndDescription().tags);
+        }
+        for (const pgType of introspection.types) {
+          processTags(pgType.getTagsAndDescription().tags);
+        }
       },
     },
   },

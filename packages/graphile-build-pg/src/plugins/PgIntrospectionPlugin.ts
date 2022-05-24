@@ -164,6 +164,12 @@ declare global {
     }
 
     interface GatherHooks {
+      pgIntrospection_introspection: PluginHook<
+        (event: {
+          introspection: Introspection;
+          databaseName: string;
+        }) => PromiseOrDirect<void>
+      >;
       pgIntrospection_namespace: PluginHook<
         (event: {
           entity: PgNamespace;
@@ -623,7 +629,10 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             }
             return Promise.all(promises);
           }
-
+          await info.process("pgIntrospection_introspection", {
+            introspection,
+            databaseName: database.name,
+          });
           await announce("pgIntrospection_namespace", namespaces);
           await announce("pgIntrospection_class", classes);
           await announce("pgIntrospection_attribute", attributes);
