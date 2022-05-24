@@ -21,7 +21,7 @@ export interface PgSourceRelationTags extends PgSmartTagsDict {
 export interface PgTypeColumnTags extends PgSmartTagsDict {
   name: string;
   behavior: string | string[];
-  nonNull: true;
+  notNull: true;
 }
 
 export interface PgTypeCodecTags extends PgSmartTagsDict {
