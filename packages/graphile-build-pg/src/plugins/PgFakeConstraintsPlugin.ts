@@ -1,4 +1,3 @@
-import type { PgSourceOptions, PgSourceUnique } from "@dataplan/pg";
 import type { GatherPluginContext } from "graphile-build";
 import type {
   Introspection,
