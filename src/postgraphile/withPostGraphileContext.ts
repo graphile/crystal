@@ -45,6 +45,10 @@ type WithAuthenticatedPgClientFunction = <T>(
   cb: (pgClient: PoolClient) => Promise<T>,
 ) => Promise<T>;
 
+function swallowErrors() {
+  /* noop */
+}
+
 const simpleWithPgClientCache = new WeakMap<Pool, WithAuthenticatedPgClientFunction>();
 function simpleWithPgClient(pgPool: Pool) {
   const cached = simpleWithPgClientCache.get(pgPool);
@@ -53,9 +57,11 @@ function simpleWithPgClient(pgPool: Pool) {
   }
   const func: WithAuthenticatedPgClientFunction = async cb => {
     const pgClient = await pgPool.connect();
+    pgClient.on('error', swallowErrors);
     try {
       return await cb(pgClient);
     } finally {
+      pgClient.removeListener('error', swallowErrors);
       pgClient.release();
     }
   };
@@ -148,26 +154,27 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     : async cb => {
         // Connect a new Postgres client
         const pgClient = await pgPool.connect();
-
-        // Begin our transaction
-        await pgClient.query('begin');
-
+        pgClient.on('error', swallowErrors);
         try {
-          // If there is at least one local setting, load it into the database.
-          if (sqlSettingsQuery) {
-            await pgClient.query(sqlSettingsQuery);
-          }
+          // Begin our transaction
+          await pgClient.query('begin');
 
-          // Use the client, wait for it to be finished with, then go to 'finally'
-          return await cb(pgClient);
-        } finally {
-          // Cleanup our Postgres client by ending the transaction and releasing
-          // the client back to the pool. Always do this even if the query fails.
           try {
-            await pgClient.query('commit');
+            // If there is at least one local setting, load it into the database.
+            if (sqlSettingsQuery) {
+              await pgClient.query(sqlSettingsQuery);
+            }
+
+            // Use the client, wait for it to be finished with, then go to 'finally'
+            return await cb(pgClient);
           } finally {
-            pgClient.release();
+            // Cleanup our Postgres client by ending the transaction and releasing
+            // the client back to the pool. Always do this even if the query fails.
+            await pgClient.query('commit');
           }
+        } finally {
+          pgClient.removeListener('error', swallowErrors);
+          pgClient.release();
         }
       };
 
