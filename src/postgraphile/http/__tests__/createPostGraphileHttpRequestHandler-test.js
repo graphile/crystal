@@ -75,6 +75,8 @@ const gqlSchema = new GraphQLSchema({
 const pgClient = {
   query: jest.fn(() => Promise.resolve()),
   release: jest.fn(),
+  on: jest.fn(),
+  removeListener: jest.fn(),
 };
 
 const pgPool = {
