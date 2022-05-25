@@ -12,6 +12,7 @@ sponsor](https://graphile.org/sponsor/).
 - The Guild
 - Qwick
 - Fanatics
+- GraphCDN
 - Dovetail
 - Enzuzo
 - Politics Rewired

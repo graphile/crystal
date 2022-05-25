@@ -33,9 +33,10 @@ And please give some love to our featured sponsors 🤩:
 </tr><tr>
 <td align="center"><a href="https://qwick.com/"><img src="https://graphile.org/images/sponsors/qwick.png" width="90" height="90" alt="Qwick" /><br />Qwick</a> *</td>
 <td align="center"><a href="https://www.fanatics.com/"><img src="https://graphile.org/images/sponsors/fanatics.png" width="90" height="90" alt="Fanatics" /><br />Fanatics</a> *</td>
+<td align="center"><a href="https://graphcdn.io/"><img src="https://graphile.org/images/sponsors/GraphCDN.png" width="90" height="90" alt="GraphCDN" /><br />GraphCDN</a> *</td>
 <td align="center"><a href="https://dovetailapp.com/"><img src="https://graphile.org/images/sponsors/dovetail.png" width="90" height="90" alt="Dovetail" /><br />Dovetail</a> *</td>
-<td align="center"><a href="https://www.enzuzo.com/"><img src="https://graphile.org/images/sponsors/enzuzo.png" width="90" height="90" alt="Enzuzo" /><br />Enzuzo</a> *</td>
 </tr><tr>
+<td align="center"><a href="https://www.enzuzo.com/"><img src="https://graphile.org/images/sponsors/enzuzo.png" width="90" height="90" alt="Enzuzo" /><br />Enzuzo</a> *</td>
 <td align="center"><a href="https://politicsrewired.com/"><img src="https://graphile.org/images/sponsors/politics-rewired.png" width="90" height="90" alt="Politics Rewired" /><br />Politics Rewired</a></td>
 <td align="center"><a href="https://iasql.com/"><img src="https://graphile.org/images/sponsors/IaSQL.png" width="90" height="90" alt="IaSQL" /><br />IaSQL</a></td>
 </tr></table>
