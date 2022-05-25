@@ -8,6 +8,13 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.11](https://github.com/graphile/postgraphile/compare/v4.12.10...v4.12.11) (2022-05-25)
+
+### Bug Fixes
+
+- handle pgClient errors ([#1633](https://github.com/graphile/postgraphile/issues/1633)) ([263ba74](https://github.com/graphile/postgraphile/commit/263ba7477bc2133eebdf89d29acd0460e58501ec))
+- **deps:** upgrade Graphile Engine ([#1631](https://github.com/graphile/postgraphile/issues/1631)) ([1824352](https://github.com/graphile/postgraphile/commit/18243528021fdae0c2f62769485f120087a24ccd))
+
 ## [4.12.10](https://github.com/graphile/postgraphile/compare/v4.12.9...v4.12.10) (2022-04-13)
 
 ### Bug Fixes
