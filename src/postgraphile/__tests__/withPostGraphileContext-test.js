@@ -23,14 +23,24 @@ function expectHttpError(promise, statusCode, message) {
 }
 
 test('will be a noop for no token, secret, or default role', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext({ pgPool }, () => {});
   expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']]);
 });
 
 test('will pass in a context object with the client', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext({ pgPool }, client => {
     expect(client[$$pgClient]).toBe(pgClient);
@@ -40,7 +50,12 @@ test('will pass in a context object with the client', async () => {
 test('will record queries run inside the transaction', async () => {
   const query1 = Symbol();
   const query2 = Symbol();
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext({ pgPool }, client => {
     client[$$pgClient].query(query1);
@@ -51,20 +66,35 @@ test('will record queries run inside the transaction', async () => {
 
 test('will return the value from the callback', async () => {
   const value = Symbol();
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   expect(await withPostGraphileContext({ pgPool }, () => value)).toBe(value);
 });
 
 test('will return the asynchronous value from the callback', async () => {
   const value = Symbol();
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   expect(await withPostGraphileContext({ pgPool }, () => Promise.resolve(value))).toBe(value);
 });
 
 test('will throw an error if there was a `jwtToken`, but no `jwtSecret`', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: 'asd' }, () => {}),
@@ -76,7 +106,12 @@ test('will throw an error if there was a `jwtToken`, but no `jwtSecret`', async 
 });
 
 test('will throw an error if there was a `jwtToken`, but `jwtSecret` had unsupported format', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: 'asd', jwtSecret: true }, () => {}),
@@ -88,7 +123,12 @@ test('will throw an error if there was a `jwtToken`, but `jwtSecret` had unsuppo
 });
 
 test('will throw an error for a malformed `jwtToken`', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: 'asd', jwtSecret: 'secret' }, () => {}),
@@ -100,7 +140,12 @@ test('will throw an error for a malformed `jwtToken`', async () => {
 });
 
 test('will throw an error if the JWT token was signed with the wrong signature', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext(
@@ -121,7 +166,12 @@ test('will throw an error if the JWT token was signed with the wrong signature',
 });
 
 test('will throw an error if the JWT token does not have an audience', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext(
@@ -142,7 +192,12 @@ test('will throw an error if the JWT token does not have an audience', async () 
 });
 
 test('will throw an error if the JWT token does not have an appropriate audience', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext(
@@ -163,7 +218,12 @@ test('will throw an error if the JWT token does not have an appropriate audience
 });
 
 test('will succeed with all the correct things', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -188,7 +248,12 @@ test('will succeed with all the correct things', async () => {
 });
 
 test('will succeed with jwt and buffer as secret ', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   const bufferSecret = Buffer.from('secret', 'utf8');
   await withPostGraphileContext(
@@ -214,7 +279,12 @@ test('will succeed with jwt and buffer as secret ', async () => {
 });
 
 test('will add extra claims as available', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -249,7 +319,12 @@ test('will add extra claims as available', async () => {
 });
 
 test('will include JWT claims as jwtClaims in context callback', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   const { jwtClaims } = await withPostGraphileContext(
     {
@@ -265,7 +340,12 @@ test('will include JWT claims as jwtClaims in context callback', async () => {
 });
 
 test('jwtClaims should be null if there is no JWT token', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   const { jwtClaims } = await withPostGraphileContext(
     {
@@ -277,7 +357,12 @@ test('jwtClaims should be null if there is no JWT token', async () => {
 });
 
 test('will add extra settings as available', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -313,7 +398,12 @@ test('will add extra settings as available', async () => {
 });
 
 test('undefined and null extra settings are ignored while 0 is converted to a string', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -365,7 +455,12 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
 });
 
 test('extra pgSettings that are objects throw an error', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   let message;
   try {
@@ -391,7 +486,12 @@ test('extra pgSettings that are objects throw an error', async () => {
 });
 
 test('extra pgSettings that are symbols throw an error', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   let message;
   try {
@@ -417,7 +517,12 @@ test('extra pgSettings that are symbols throw an error', async () => {
 });
 
 test('will set the default role if available', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -440,7 +545,12 @@ test('will set the default role if available', async () => {
 });
 
 test('will set the default role if no other role was provided in the JWT', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -478,7 +588,12 @@ test('will set the default role if no other role was provided in the JWT', async
 });
 
 test('will set a role provided in the JWT', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -521,7 +636,12 @@ test('will set a role provided in the JWT', async () => {
 });
 
 test('will set a role provided in the JWT superceding the default role', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -565,7 +685,12 @@ test('will set a role provided in the JWT superceding the default role', async (
 });
 
 test('will set a role provided in the JWT (deep role)', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -613,7 +738,12 @@ test('will set a role provided in the JWT (deep role)', async () => {
 });
 
 test('if same settings are set by pgSettings and JWT, JWT will "win", except for the "role" because of legacy', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -666,7 +796,12 @@ test('if same settings are set by pgSettings and JWT, JWT will "win", except for
 });
 
 test('will set a role provided in the JWT superceding the default role (deep role)', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgClient = {
+    query: jest.fn(),
+    release: jest.fn(),
+    on: jest.fn(),
+    removeListener: jest.fn(),
+  };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
@@ -718,7 +853,7 @@ describe('jwtVerifyOptions', () => {
   let pgClient;
   let pgPool;
   beforeEach(() => {
-    pgClient = { query: jest.fn(), release: jest.fn() };
+    pgClient = { query: jest.fn(), release: jest.fn(), on: jest.fn(), removeListener: jest.fn() };
     pgPool = { connect: jest.fn(() => pgClient) };
   });
 
