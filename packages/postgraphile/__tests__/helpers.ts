@@ -326,6 +326,7 @@ export async function runTestQuery(
   config: {
     variableValues?: { [key: string]: any };
     directPg?: boolean;
+    schema?: string | string[];
   },
   options: {
     callback?: (
@@ -355,6 +356,11 @@ export async function runTestQuery(
   await releaseClients();
 
   const queries: PgClientQuery[] = [];
+  const schemas = Array.isArray(config.schema)
+    ? config.schema
+    : typeof config.schema === "string"
+    ? [config.schema]
+    : ["a", "b", "c"];
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset, V4Preset],
     pgSources: [
@@ -362,6 +368,7 @@ export async function runTestQuery(
         adaptor: "@dataplan/pg/adaptors/node-postgres",
         name: "main",
         withPgClientKey: "withPgClient",
+        schemas: schemas,
         adaptorSettings: {
           connectionString: process.env.TEST_DATABASE_URL || "pggql_test",
         },
