@@ -82,9 +82,11 @@ const pathCompare = (
 /** Postgres pool */
 let testPool: Pool | null = null;
 
+const connectionString = process.env.TEST_DATABASE_URL || "pggql_test";
+
 beforeAll(() => {
   testPool = new Pool({
-    connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
+    connectionString,
   });
   testPool.on("connect", (client) => {
     client.query(`set TimeZone to 'UTC'`);
@@ -370,7 +372,7 @@ export async function runTestQuery(
         withPgClientKey: "withPgClient",
         schemas: schemas,
         adaptorSettings: {
-          connectionString: process.env.TEST_DATABASE_URL || "pggql_test",
+          connectionString,
         },
       } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
     ],
@@ -392,11 +394,17 @@ export async function runTestQuery(
       };
   const pgSubscriber = new PgSubscriber(testPool);
   try {
+    /*
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},
       withPgClient,
       pgSubscriber,
     };
+    */
+
+    const contextValue: BaseGraphQLContext = _contextCallback({});
+    // TODO: evaluate this - shouldn't it be part of _contextCallback?
+    (contextValue as any).pgSubscriber = pgSubscriber;
 
     const schemaValidationErrors = validateSchema(schema);
     if (schemaValidationErrors.length > 0) {
