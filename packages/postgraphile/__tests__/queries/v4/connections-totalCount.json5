@@ -1,0 +1,42 @@
+{
+  a: {
+    totalCount: 6,
+  },
+  b: {
+    nodes: [
+      {
+        friends: {
+          totalCount: 2,
+        },
+      },
+      {
+        friends: {
+          totalCount: 2,
+        },
+      },
+      {
+        friends: {
+          totalCount: 2,
+        },
+      },
+      {
+        friends: {
+          totalCount: 2,
+        },
+      },
+      {
+        friends: {
+          totalCount: 1,
+        },
+      },
+      {
+        friends: {
+          totalCount: 0,
+        },
+      },
+    ],
+  },
+  c: {
+    totalCount: 6,
+  },
+}
