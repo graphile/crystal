@@ -6,7 +6,9 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
+import "@dataplan/pg/adaptors/node-postgres";
 import "graphile-config";
+import "graphile-build-pg";
 
 import type {
   PgClient,
@@ -32,6 +34,7 @@ import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
 import { makeSchema } from "..";
+import AmberPreset from "../src/presets/amber.js";
 import V4Preset from "../src/presets/v4.js";
 
 /**
@@ -353,7 +356,17 @@ export async function runTestQuery(
 
   const queries: PgClientQuery[] = [];
   const preset: GraphileConfig.Preset = {
-    extends: [V4Preset],
+    extends: [AmberPreset, V4Preset],
+    pgSources: [
+      {
+        adaptor: "@dataplan/pg/adaptors/node-postgres",
+        name: "main",
+        withPgClientKey: "withPgClient",
+        adaptorSettings: {
+          connectionString: process.env.TEST_DATABASE_URL || "pggql_test",
+        },
+      } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
+    ],
   };
   const {
     schema,

@@ -1534,7 +1534,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/template@npm:^7.16.7":
+"@babel/template@npm:^7.16.7, @babel/template@npm:^7.4.4":
   version: 7.16.7
   resolution: "@babel/template@npm:7.16.7"
   dependencies:
@@ -4111,6 +4111,18 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0-0
   checksum: b781e3732e4f6592d707b0736f1e137125ec8c5424b54b4f20314b52a38068ce36236cfde4810c75e6873ade1b85143288df9bdfa9311c90b5009fdf49972420
+  languageName: node
+  linkType: hard
+
+"babel-plugin-transform-import-meta@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "babel-plugin-transform-import-meta@npm:2.1.1"
+  dependencies:
+    "@babel/template": "npm:^7.4.4"
+    tslib: "npm:^2.2.0"
+  peerDependencies:
+    "@babel/core": ^7.10.0
+  checksum: 9b9d40b6d0e82c51ca09ad26771b537d796fd8847a320025e174d7455d5be5c5503d9aea02a907b50d2e9d0fa818e6eb54839d1acc500a0d1bf91e6ee902b019
   languageName: node
   linkType: hard
 
@@ -11554,6 +11566,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^5.8.0"
     "@typescript-eslint/typescript-estree": "npm:^5.8.0"
     babel-jest: "npm:^28.1.0"
+    babel-plugin-transform-import-meta: "npm:^2.1.1"
     concurrently: "npm:^6.5.1"
     conventional-changelog-cli: "npm:^2.1.1"
     eslint: "npm:^8.5.0"
@@ -12692,6 +12705,13 @@ __metadata:
   version: 2.3.1
   resolution: "tslib@npm:2.3.1"
   checksum: 78b00432027abb82405d5986a091fa593c6ef6589d0104d20ecdcaf24f2b02be428d9a38e7cd5304e5d64544cddb83210e326dac4fea9b2b83128a869c825d19
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.2.0":
+  version: 2.4.0
+  resolution: "tslib@npm:2.4.0"
+  checksum: 022a70708abbc3491734959effd9a87e6e0af5932b61d0c9f1d07b8b80cabbbfc9fc9e9c0fe86e5ab2d32d766ae30117edf00b02d170ff255ab7e60361a4b711
   languageName: node
   linkType: hard
 
