@@ -3,7 +3,7 @@ import "graphile-build";
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
 import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
-import { context, object } from "dataplanner";
+import { constant, context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
@@ -383,7 +383,10 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               context: () => {
                 const ctx = context<GraphileBuild.GraphileResolverContext>();
                 return object({
-                  pgSettings: ctx.get(pgSettingsKey),
+                  pgSettings:
+                    pgSettingsKey != null
+                      ? ctx.get(pgSettingsKey)
+                      : constant(null),
                   withPgClient: ctx.get(withPgClientKey),
                 } as PgExecutorContextPlans<any>);
               },
