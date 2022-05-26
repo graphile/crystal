@@ -79,7 +79,7 @@ export function getBehavior(
 function isValidBehavior(behavior: unknown): behavior is string {
   return (
     typeof behavior === "string" &&
-    /^[+-]?[a-zA-Z](_?[a-zA-Z0-9])+(?:\s+[+-]?[a-zA-Z](_?[a-zA-Z0-9])+)*$/.test(
+    /^[+-]?([a-zA-Z](?:_?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z](_?[a-zA-Z0-9])+|\*))*$/.test(
       behavior,
     )
   );

@@ -15,6 +15,7 @@ import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
+import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
@@ -60,5 +61,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgMutationPayloadEdgePlugin,
     PgMutationUpdateDeletePlugin,
     PgJWTPlugin,
+    PgRemoveExtensionResourcesPlugin,
   ],
 };
