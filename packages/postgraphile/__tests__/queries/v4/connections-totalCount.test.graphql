@@ -1,0 +1,17 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+query {
+  a: allPeople {
+    totalCount
+  }
+  b: allPeople {
+    nodes {
+      friends {
+        totalCount
+      }
+    }
+  }
+  c: tableSetQuery {
+    totalCount
+  }
+}

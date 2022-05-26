@@ -1499,7 +1499,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dataplan/pg@workspace:^, @dataplan/pg@workspace:packages/dataplan-pg":
+"@dataplan/pg@workspace:*, @dataplan/pg@workspace:^, @dataplan/pg@workspace:packages/dataplan-pg":
   version: 0.0.0-use.local
   resolution: "@dataplan/pg@workspace:packages/dataplan-pg"
   dependencies:
@@ -10681,6 +10681,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "postgraphile@workspace:packages/postgraphile"
   dependencies:
+    "@dataplan/pg": "workspace:*"
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/debug": "npm:^4.1.7"
     "@types/express": "npm:^4"
