@@ -41,10 +41,6 @@
     "@types/eslint": "^7.29.0",
     "@types/estree": "^0.0.50",
     "@types/jest": "^27.0.3",
-    "@typescript-eslint/parser-v2": "npm:@typescript-eslint/parser@^2.26.0",
-    "@typescript-eslint/parser-v3": "npm:@typescript-eslint/parser@^3.10.0",
-    "@typescript-eslint/parser-v4": "npm:@typescript-eslint/parser@^4.1.0",
-    "@typescript-eslint/parser-v5": "npm:@typescript-eslint/parser@^5.0.0-0",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
     "typescript": "rc"
