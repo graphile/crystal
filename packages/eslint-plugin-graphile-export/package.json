@@ -40,8 +40,8 @@
     "@babel/types": "^7.16.0",
     "@types/eslint": "^7.29.0",
     "@types/estree": "^0.0.50",
-    "@types/jest": "^27.0.3",
-    "jest": "^27.4.5",
+    "@types/jest": "^27.5.1",
+    "jest": "^28.1.0",
     "ts-node": "^10.4.0",
     "typescript": "rc"
   }

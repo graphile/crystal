@@ -62,7 +62,8 @@ exports.process = (src, path) => {
   // case all the data that we're converting to code is controlled by us, so
   // we'd only be attacking ourselves, therefore we'll allow it rather than
   // bringing in an extra dependency.
-  return `\
+  return {
+    code: `\
 const { assertSnapshotsMatch, assertResultsMatch, assertErrorsMatch, runTestQuery } = require("../_test");
 
 const document = ${JSON.stringify(document)};
@@ -86,12 +87,12 @@ const waitFor = async (conditionCallback, max = 1000) => {
 }
 
 const callback = ${
-    scripts.length
-      ? `async (pgClient, payloads) => {
+      scripts.length
+        ? `async (pgClient, payloads) => {
   ${scripts.join("\n  ")}
 }`
-      : `null`
-  };
+        : `null`
+    };
 
 beforeAll(() => {
   result1 =
@@ -172,5 +173,6 @@ it('matches plan (mermaid) snapshots with inlining disabled', () => assertSnapsh
   result: result2,
   ext: ".deopt",
 }));
-`;
+`,
+  };
 };

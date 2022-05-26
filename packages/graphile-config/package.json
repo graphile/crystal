@@ -51,8 +51,8 @@
   ],
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/jest": "^27.0.3",
-    "jest": "^27.4.5",
+    "@types/jest": "^27.5.1",
+    "jest": "^28.1.0",
     "ts-node": "^10.4.0",
     "typescript": "rc"
   }

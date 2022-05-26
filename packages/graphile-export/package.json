@@ -61,10 +61,10 @@
   "devDependencies": {
     "@types/babel__generator": "^7.6.3",
     "@types/babel__template": "^7.4.1",
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.5.1",
     "@types/prettier": "^2",
     "graphql": "16.1.0-experimental-stream-defer.6",
-    "jest": "^27.4.5",
+    "jest": "^28.1.0",
     "ts-node": "^10.4.0",
     "typescript": "rc"
   }

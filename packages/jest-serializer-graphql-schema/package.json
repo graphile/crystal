@@ -28,9 +28,9 @@
     "graphql": "*"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.5.1",
     "graphql": "16.1.0-experimental-stream-defer.6",
-    "jest": "^27.4.5",
+    "jest": "^28.1.0",
     "pretty-format": "^27.4.2",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
