@@ -110,7 +110,7 @@ afterAll(async () => {
 function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
   return async (pgSettings, callback) => {
     const poolClient = await testPool.connect();
-    const pgSettingsEntries = Object.entries(pgSettings);
+    const pgSettingsEntries = pgSettings ? Object.entries(pgSettings) : [];
 
     const q = async <TData>(
       opts: PgClientQuery,
@@ -222,11 +222,13 @@ function clientForSettings(
     // Set the claims
     const setCalls: string[] = [];
     const setValues: string[] = [];
-    Object.entries(pgSettings).map(([key, value]) => {
-      const i = setValues.push(key);
-      const j = setValues.push(value);
-      setCalls.push(`set_config($${i}, $${j}, true)`);
-    });
+    if (pgSettings) {
+      Object.entries(pgSettings).map(([key, value]) => {
+        const i = setValues.push(key);
+        const j = setValues.push(value);
+        setCalls.push(`set_config($${i}, $${j}, true)`);
+      });
+    }
     if (setCalls.length) {
       const query = `select ${setCalls.join(", ")}`;
       await poolClient.query(query, setValues);
