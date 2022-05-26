@@ -23,7 +23,7 @@ module.exports = (dir) => {
     },
 
     rootDir: dir,
-    name: packageJson.name,
+    // name: packageJson.name,
     displayName: packageJson.name,
     globals: {
       /*
