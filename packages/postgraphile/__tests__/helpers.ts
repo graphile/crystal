@@ -372,6 +372,7 @@ export async function runTestQuery(
         adaptor: "@dataplan/pg/adaptors/node-postgres",
         name: "main",
         withPgClientKey: "withPgClient",
+        pgSettingsKey: "pgSettings",
         schemas: schemas,
         adaptorSettings: {
           connectionString,
@@ -379,11 +380,7 @@ export async function runTestQuery(
       } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
     ],
   };
-  const {
-    schema,
-    config: _config,
-    contextCallback: _contextCallback,
-  } = await makeSchema(preset);
+  const { schema, config: _config, contextCallback } = await makeSchema(preset);
   const withPgClient: WithPgClient = config.directPg
     ? makeWithTestPgClient(queries)
     : async (pgSettings, callback) => {
@@ -396,17 +393,13 @@ export async function runTestQuery(
       };
   const pgSubscriber = new PgSubscriber(testPool);
   try {
-    /*
+    // We must override the context so that we can listen to the SQL queries.
+    const originalContext = contextCallback({}) as any;
     const contextValue: BaseGraphQLContext = {
-      pgSettings: {},
+      pgSettings: originalContext.pgSettings,
       withPgClient,
       pgSubscriber,
     };
-    */
-
-    const contextValue: BaseGraphQLContext = _contextCallback({});
-    // TODO: evaluate this - shouldn't it be part of _contextCallback?
-    (contextValue as any).pgSubscriber = pgSubscriber;
 
     const schemaValidationErrors = validateSchema(schema);
     if (schemaValidationErrors.length > 0) {
