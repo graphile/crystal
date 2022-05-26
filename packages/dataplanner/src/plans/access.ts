@@ -97,8 +97,14 @@ function constructDestructureFunction(
     } else if (Number.isFinite(pathItem)) {
       // ?.[42]
       jitParts.push(`?.[${JSON.stringify(pathItem)}]`);
+    } else if (pathItem == null) {
+      slowMode = true;
     } else {
-      throw new Error(`Invalid path item: ${inspect(pathItem)}`);
+      throw new Error(
+        `Invalid path item: ${inspect(pathItem)} in path '${JSON.stringify(
+          path,
+        )}'`,
+      );
     }
   }
 
