@@ -1,0 +1,85 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access42["Access[42∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access43["Access[43∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object44["Object[44∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect15[["PgSelect[15∈0]<br />ᐸpersonᐳ"]]:::plan
+    Constant60["Constant[60∈0]"]:::plan
+    PgSelect20[["PgSelect[20∈0]<br />ᐸpersonᐳ"]]:::plan
+    First21["First[21∈0]"]:::plan
+    PgSelectSingle22["PgSelectSingle[22∈0]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    Constant61["Constant[61∈0]"]:::plan
+    __Item38>"__Item[38∈1]<br />ᐸ15ᐳ"]:::itemplan
+    PgSelectSingle39["PgSelectSingle[39∈1]<br />ᐸpersonᐳ"]:::plan
+    Constant62["Constant[62∈0]"]:::plan
+    Access59["Access[59∈1]<br />ᐸ38.0ᐳ"]:::plan
+    First47["First[47∈1]"]:::plan
+    PgSelectSingle48["PgSelectSingle[48∈1]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression49["PgClassExpression[49∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    Constant63["Constant[63∈0]"]:::plan
+    PgSelect55[["PgSelect[55∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
+    First56["First[56∈0]"]:::plan
+    PgSelectSingle57["PgSelectSingle[57∈0]<br />ᐸtable_set_queryᐳ"]:::plan
+    PgClassExpression58["PgClassExpression[58∈0]<br />ᐸcount(*)ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access42
+    __Value3 --> Access43
+    Access42 & Access43 --> Object44
+    Object44 --> PgSelect15
+    Object44 --> PgSelect20
+    PgSelect20 --> First21
+    First21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression23
+    PgSelect15 ==> __Item38
+    __Item38 --> PgSelectSingle39
+    __Item38 --> Access59
+    Access59 --> First47
+    First47 --> PgSelectSingle48
+    PgSelectSingle48 --> PgClassExpression49
+    Object44 --> PgSelect55
+    PgSelect55 --> First56
+    First56 --> PgSelectSingle57
+    PgSelectSingle57 --> PgClassExpression58
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P15["ᐳbᐳnodes"]
+    PgSelect15 -.-> P15
+    P23["ᐳaᐳtotalCount"]
+    PgClassExpression23 -.-> P23
+    P39["ᐳbᐳnodes[]"]
+    PgSelectSingle39 -.-> P39
+    P49["ᐳbᐳn…]ᐳf…sᐳtotalCount"]
+    PgClassExpression49 -.-> P49
+    P58["ᐳcᐳtotalCount"]
+    PgClassExpression58 -.-> P58
+    P60["ᐳa"]
+    Constant60 -.-> P60
+    P61["ᐳb"]
+    Constant61 -.-> P61
+    P62["ᐳbᐳn…]ᐳfriends"]
+    Constant62 -.-> P62
+    P63["ᐳc"]
+    Constant63 -.-> P63
+
+    subgraph "Buckets for queries/v4/connections-totalCount"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-O- 60<br />⠀⠀⠀a.totalCount ᐸ-L- 23<br />⠀⠀b ᐸ-O- 61<br />⠀⠀⠀b.nodes ᐸ-A- 15<br />⠀⠀c ᐸ-O- 63<br />⠀⠀⠀c.totalCount ᐸ-L- 58"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,PgSelect15,PgSelect20,First21,PgSelectSingle22,PgClassExpression23,Access42,Access43,Object44,PgSelect55,First56,PgSelectSingle57,PgClassExpression58,Constant60,Constant61,Constant62,Constant63 bucket0
+    Bucket1("Bucket 1 (item38)<br />Deps: 15, 62<br />~ᐳQuery.bᐳPersonConnection.nodes[]<br />⠀ROOT ᐸ-O- 39<br />⠀⠀friends ᐸ-O- 62<br />⠀⠀⠀friends.totalCount ᐸ-L- 49"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item38,PgSelectSingle39,First47,PgSelectSingle48,PgClassExpression49,Access59 bucket1
+    Bucket0 --> Bucket1
+    end
