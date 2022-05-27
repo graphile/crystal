@@ -97,6 +97,7 @@ beforeAll(() => {
 });
 
 afterAll(async () => {
+  await releaseClients();
   await testPool.end();
   const p = testPool as any;
   if (p._clients.length > 0) {
@@ -116,7 +117,6 @@ afterAll(async () => {
  */
 function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
   return async (pgSettings, callback) => {
-    const poolClient = await testPool.connect();
     const pgSettingsEntries = pgSettings ? Object.entries(pgSettings) : [];
 
     const q = async <TData>(
@@ -140,6 +140,7 @@ function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
 
     /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
     let txLevel = 0;
+    const poolClient = await testPool.connect();
     try {
       const client: PgClient = {
         async query<TData>(opts: PgClientQuery) {
