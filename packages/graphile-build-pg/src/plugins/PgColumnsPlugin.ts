@@ -50,7 +50,6 @@ declare global {
         details: {
           columnName: string;
           column: PgTypeColumn;
-          codec: PgTypeCodec<any, any, any>;
           skipRowId?: boolean;
         },
       ): string;
