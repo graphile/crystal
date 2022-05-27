@@ -11,6 +11,7 @@ declare global {
   namespace GraphileBuild {
     interface RegisterCursorConnectionOptions {
       typeName: string;
+      connectionTypeName?: string;
       scope?: GraphileBuild.ScopeObject;
       nonNullNode?: boolean;
     }
@@ -110,6 +111,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
 
               // Register connection
               const connectionTypeName =
+                options.connectionTypeName ??
                 build.inflection.connectionType(typeName);
               build.registerObjectType<ConnectionPlan<any, any, any>>(
                 connectionTypeName,
