@@ -380,6 +380,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             source: codec.sqlType,
             codec,
             uniques,
+            extensions: {
+              tags: {
+                originalName: pgClass.relname,
+              },
+            },
           };
 
           await info.process("pgTables_PgSourceBuilder_options", {

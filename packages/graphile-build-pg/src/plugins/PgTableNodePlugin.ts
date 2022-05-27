@@ -1,13 +1,21 @@
 import "graphile-build";
 import "graphile-config";
 
-import type { PgSelectSinglePlan } from "@dataplan/pg";
+import type { PgSelectSinglePlan, PgSource, PgTypeCodec } from "@dataplan/pg";
 import type { ListPlan } from "dataplanner";
 import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+
+declare global {
+  namespace GraphileBuild {
+    interface GraphileBuildSchemaOptions {
+      pgV4UseTableNameForNodeIdentifier?: boolean;
+    }
+  }
+}
 
 export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
@@ -27,7 +35,10 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           return !!build.behavior.matches(behavior, "node", "node");
         });
 
-        const sourcesByCodec = new Map();
+        const sourcesByCodec = new Map<
+          PgTypeCodec<any, any, any, any>,
+          PgSource<any, any, any, any>[]
+        >();
         for (const source of tableSources) {
           let list = sourcesByCodec.get(source.codec);
           if (!list) {
@@ -48,8 +59,17 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           const pgSource = sources[0];
           const pk = pgSource.uniques[0].columns as string[];
 
+          const identifier =
+            // Yes, this behaviour in V4 was ridiculous. Alas.
+            build.options.pgV4UseTableNameForNodeIdentifier &&
+            pgSource.extensions?.tags?.originalName
+              ? build.inflection.pluralize(
+                  pgSource.extensions?.tags?.originalName,
+                )
+              : tableTypeName;
+
           const clean =
-            isSafeIdentifier(tableTypeName) &&
+            isSafeIdentifier(identifier) &&
             pk.every((columnName) => isSafeIdentifier(columnName));
 
           build.registerNodeIdHandler(tableTypeName, {
@@ -61,7 +81,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                     "list",
                     "constant",
                     `return $record => list([constant(${JSON.stringify(
-                      tableTypeName,
+                      identifier,
                     )}), ${pk
                       .map(
                         (columnName) =>
@@ -72,14 +92,14 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                   [list, constant],
                 )
               : EXPORTABLE(
-                  (constant, list, pk, tableTypeName) =>
+                  (constant, identifier, list, pk) =>
                     ($record: PgSelectSinglePlan<any, any, any, any>) => {
                       return list([
-                        constant(tableTypeName),
+                        constant(identifier),
                         ...pk.map((column) => $record.get(column)),
                       ]);
                     },
-                  [constant, list, pk, tableTypeName],
+                  [constant, identifier, list, pk],
                 ),
             get: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
@@ -105,10 +125,10 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                   [access, pgSource, pk],
                 ),
             match: EXPORTABLE(
-              (tableTypeName) => (obj) => {
-                return obj[0] === tableTypeName;
+              (identifier) => (obj) => {
+                return obj[0] === identifier;
               },
-              [tableTypeName],
+              [identifier],
             ),
           });
         }

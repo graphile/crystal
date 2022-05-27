@@ -1,5 +1,9 @@
 export interface PgSourceTags extends PgSmartTagsDict {
   name: string;
+
+  /** For v4 compatibility, what's the name of the actual table. */
+  originalName: string;
+
   /** For a computed column function/etc, what field name should we use? */
   fieldName: string;
   behavior: string | string[];

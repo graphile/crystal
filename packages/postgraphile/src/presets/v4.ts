@@ -74,6 +74,7 @@ export const makeV4Preset = (
       makeV4Plugin(options),
     ].filter(isNotNullish),
     schema: {
+      pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
         options.pgForbidSetofFunctionsToReturnNull ?? false,
     },
