@@ -1,0 +1,39 @@
+{
+  badlyBehavedFunction: {
+    nodes: [
+      {
+        nodeId: "WyJwZW9wbGUiLDFd",
+        id: 1,
+        firstName: "John",
+      },
+      null,
+      {
+        nodeId: "WyJwZW9wbGUiLDZd",
+        id: 6,
+        firstName: "Twenty",
+      },
+    ],
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          nodeId: "WyJwZW9wbGUiLDFd",
+          id: 1,
+          firstName: "John",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: null,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          nodeId: "WyJwZW9wbGUiLDZd",
+          id: 6,
+          firstName: "Twenty",
+        },
+      },
+    ],
+  },
+}

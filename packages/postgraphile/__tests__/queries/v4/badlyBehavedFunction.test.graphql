@@ -1,0 +1,24 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> viewUniqueKey: "testviewid"
+#> setofFunctionsContainNulls: true
+{
+  badlyBehavedFunction {
+    nodes {
+      ...PersonFragment
+    }
+    edges {
+      cursor
+      node {
+        ...PersonFragment
+      }
+    }
+  }
+}
+
+fragment PersonFragment on Person {
+  nodeId
+  id
+  firstName
+}
