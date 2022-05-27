@@ -1,5 +1,6 @@
 import assert from "assert";
 import type { GraphQLInputType, ValueNode } from "graphql";
+import { Kind } from "graphql";
 import { GraphQLList } from "graphql";
 
 import type { InputPlan } from "../input.js";
@@ -30,9 +31,15 @@ export class __InputListPlan extends ExecutablePlan {
       "Expected inputType to be a List",
     );
     const innerType = inputType.ofType;
-    // TODO: should we coerce to list here?
-    if (inputValues && inputValues.kind === "ListValue") {
-      const values = inputValues.values;
+    const values =
+      inputValues?.kind === Kind.LIST
+        ? inputValues.values
+        : inputValues?.kind === Kind.NULL
+        ? null
+        : inputValues
+        ? [inputValues]
+        : inputValues;
+    if (values) {
       for (
         let inputValueIndex = 0, inputValuesLength = values.length;
         inputValueIndex < inputValuesLength;
