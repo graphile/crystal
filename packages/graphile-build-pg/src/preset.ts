@@ -15,7 +15,6 @@ import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
-import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
@@ -24,6 +23,7 @@ import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.j
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
+import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.js";
 import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
