@@ -78,6 +78,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 fields: (context) => {
                   const { fieldWithHooks } = context;
                   const columns: PgTypeColumns = codec.columns;
+                  // TODO: move this to a separate plugin
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
                       const behavior = getBehavior(column.extensions);
