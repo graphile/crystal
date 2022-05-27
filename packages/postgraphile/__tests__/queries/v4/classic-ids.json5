@@ -1,0 +1,18 @@
+{
+  allPosts: {
+    nodes: [
+      {
+        id: "WyJwb3N0cyIsMV0=",
+        rowId: 1,
+        headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+      },
+    ],
+  },
+  allEdgeCases: {
+    nodes: [
+      {
+        rowId: 2,
+      },
+    ],
+  },
+}
