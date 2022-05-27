@@ -191,8 +191,9 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           !pgSource ||
           !pgSource.codec.columns ||
           pgSource.isUnique
-        )
+        ) {
           return args;
+        }
 
         const behavior = getBehavior([
           pgSource.codec.extensions,
