@@ -7,6 +7,15 @@ interface BehaviorSpec {
 export class Behavior {
   private globalBehaviorDefaults = "";
 
+  // Should only be called during 'build' phase.
+  public addDefaultBehavior(behavior: string) {
+    if (this.globalBehaviorDefaults) {
+      this.globalBehaviorDefaults += " " + behavior;
+    } else {
+      this.globalBehaviorDefaults = behavior;
+    }
+  }
+
   /**
    * @param localBehaviorSpecsString - the behavior of the entity as determined by details on the entity itself and any applicable ancestors
    * @param filter - the behavior the plugin specifies
