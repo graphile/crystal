@@ -1,0 +1,26 @@
+[
+  {
+    message: 'Invalid cursor, please enter a cursor from a previous request, or null.',
+    locations: [
+      {
+        line: 2,
+        column: 3,
+      },
+    ],
+    path: [
+      'blankCursor',
+    ],
+  },
+  {
+    message: 'Invalid cursor, please enter a cursor from a previous request, or null.',
+    locations: [
+      {
+        line: 3,
+        column: 3,
+      },
+    ],
+    path: [
+      'invalidCursor',
+    ],
+  },
+]
