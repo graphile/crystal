@@ -1,0 +1,30 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+
+query {
+  a: allPeopleList { ...personFragment }
+  b: allPeopleList(first: 2) { ...personFragment }
+	c: allPeopleList(orderBy: NAME_ASC) { ...personFragment }
+  d: allPeopleList(orderBy: NAME_DESC) { ...personFragment }
+  e: allPostsList(condition: { authorId: 2 }) { ...postFragment }
+	f: allPostsList(first: 2, condition: { authorId: 2 }) { ...postFragment }
+  g: allPeopleList(first: 3, offset: 1) { ...personFragment }
+  h: allPeopleList(first: 0) { ...personFragment }
+  i: allPeopleList(orderBy: PRIMARY_KEY_ASC) { ...personFragment }
+  j: allPeopleList(condition: { about: null }) { ...personFragment }
+  k: allPostsList(orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC], first: 3) { ...postFragment }
+
+}
+
+fragment personFragment on Person {
+  id
+  name
+  email
+}
+
+fragment postFragment on Post {
+  headline
+  authorId
+}

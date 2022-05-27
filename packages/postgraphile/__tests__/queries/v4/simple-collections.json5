@@ -1,0 +1,225 @@
+{
+  a: [
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john.smith@email.com",
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+    {
+      id: 3,
+      name: "Budd Deey",
+      email: "budd.deey@email.com",
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+    },
+    {
+      id: 5,
+      name: "Joe Tucker",
+      email: "joe.tucker@email.com",
+    },
+    {
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "graphile-build.issue.27.exists@example.com",
+    },
+  ],
+  b: [
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john.smith@email.com",
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+  ],
+  c: [
+    {
+      id: 3,
+      name: "Budd Deey",
+      email: "budd.deey@email.com",
+    },
+    {
+      id: 5,
+      name: "Joe Tucker",
+      email: "joe.tucker@email.com",
+    },
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john.smith@email.com",
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+    {
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "graphile-build.issue.27.exists@example.com",
+    },
+  ],
+  d: [
+    {
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "graphile-build.issue.27.exists@example.com",
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+    },
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john.smith@email.com",
+    },
+    {
+      id: 5,
+      name: "Joe Tucker",
+      email: "joe.tucker@email.com",
+    },
+    {
+      id: 3,
+      name: "Budd Deey",
+      email: "budd.deey@email.com",
+    },
+  ],
+  e: [
+    {
+      headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+      authorId: 2,
+    },
+    {
+      headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+      authorId: 2,
+    },
+    {
+      headline: "What’s with you kids? Every other day it’s food, food, food.",
+      authorId: 2,
+    },
+  ],
+  f: [
+    {
+      headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+      authorId: 2,
+    },
+    {
+      headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+      authorId: 2,
+    },
+  ],
+  g: [
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+    {
+      id: 3,
+      name: "Budd Deey",
+      email: "budd.deey@email.com",
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+    },
+  ],
+  h: [],
+  i: [
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john.smith@email.com",
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+    {
+      id: 3,
+      name: "Budd Deey",
+      email: "budd.deey@email.com",
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+    },
+    {
+      id: 5,
+      name: "Joe Tucker",
+      email: "joe.tucker@email.com",
+    },
+    {
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "graphile-build.issue.27.exists@example.com",
+    },
+  ],
+  j: [
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john.smith@email.com",
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      email: "sara.smith@email.com",
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+    },
+    {
+      id: 5,
+      name: "Joe Tucker",
+      email: "joe.tucker@email.com",
+    },
+    {
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "graphile-build.issue.27.exists@example.com",
+    },
+  ],
+  k: [
+    {
+      headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      authorId: 5,
+    },
+    {
+      headline: "You know how I sometimes have really brilliant ideas?",
+      authorId: 3,
+    },
+    {
+      headline: "They’re not aliens, they’re Earth…liens!",
+      authorId: 3,
+    },
+  ],
+}
