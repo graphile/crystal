@@ -7,15 +7,28 @@ if (process.env.DEBUG) {
 }
 
 import type { BaseGraphQLContext } from "dataplanner";
-import { $$bypassGraphQL, execute, subscribe } from "dataplanner";
+import {
+  $$bypassGraphQL,
+  execute as dataplannerExecute,
+  subscribe as dataplannerSubscribe,
+} from "dataplanner";
 import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
+  ExecutionArgs,
   ExecutionPatchResult,
   GraphQLError,
   GraphQLSchema,
+  SubscriptionArgs,
 } from "graphql";
-import { getOperationAST, parse, validate, validateSchema } from "graphql";
+import {
+  execute as graphqlExecute,
+  getOperationAST,
+  parse,
+  subscribe as graphqlSubscribe,
+  validate,
+  validateSchema,
+} from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";
@@ -402,6 +415,15 @@ export async function runTestQuery(
           .join(",")}`,
       );
     }
+
+    const execute =
+      options.prepare ?? true
+        ? dataplannerExecute
+        : (args: ExecutionArgs) => graphqlExecute(args);
+    const subscribe =
+      options.prepare ?? true
+        ? dataplannerSubscribe
+        : (args: SubscriptionArgs) => graphqlSubscribe(args);
 
     const result =
       operationType === "subscription"
