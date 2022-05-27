@@ -339,7 +339,6 @@ export async function runTestQuery(
       payloads: Omit<AsyncExecutionResult, "hasNext">[],
     ) => Promise<void>;
     path: string;
-    deoptimize?: boolean;
     prepare?: boolean;
   } = Object.create(null),
 ): Promise<{

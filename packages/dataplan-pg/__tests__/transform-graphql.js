@@ -21,49 +21,51 @@
 
 const JSON5 = require("json5");
 
-exports.process = (src, path) => {
-  const lines = src.split("\n");
-  const config = Object.create(null);
-  config.checkErrorSnapshots = true;
-  const assertions = [];
-  const documentLines = [];
-  const scripts = [];
-  for (const line of lines) {
-    if (line.startsWith("#>")) {
-      const colon = line.indexOf(":");
-      if (colon < 0) {
+exports.makeProcess =
+  (options = { includeDeoptimize: true }) =>
+  (src, path) => {
+    const lines = src.split("\n");
+    const config = Object.create(null);
+    config.checkErrorSnapshots = true;
+    const assertions = [];
+    const documentLines = [];
+    const scripts = [];
+    for (const line of lines) {
+      if (line.startsWith("#>")) {
+        const colon = line.indexOf(":");
+        if (colon < 0) {
+          throw new Error(
+            `Invalid query configuration '${line}' - expected colon.`,
+          );
+        }
+        const key = line.substr(2, colon - 2).trim();
+        const value = JSON5.parse(line.substr(colon + 1));
+        config[key] = value;
+      } else if (line.startsWith("##")) {
+        const assertion = line.substr(2);
+        assertions.push(assertion);
+        if (/expect\(errors\).toBeFalsy\(\)/.test(assertion)) {
+          config.checkErrorSnapshots = false;
+        }
+      } else if (line.startsWith("#!")) {
+        scripts.push(line.substr(2));
+      } else if (line.match(/^#\s*expect\(/)) {
         throw new Error(
-          `Invalid query configuration '${line}' - expected colon.`,
+          "Found line that looks like an assertion, but isn't in a '##' comment: '${line}'",
         );
+      } else {
+        documentLines.push(line);
       }
-      const key = line.substr(2, colon - 2).trim();
-      const value = JSON5.parse(line.substr(colon + 1));
-      config[key] = value;
-    } else if (line.startsWith("##")) {
-      const assertion = line.substr(2);
-      assertions.push(assertion);
-      if (/expect\(errors\).toBeFalsy\(\)/.test(assertion)) {
-        config.checkErrorSnapshots = false;
-      }
-    } else if (line.startsWith("#!")) {
-      scripts.push(line.substr(2));
-    } else if (line.match(/^#\s*expect\(/)) {
-      throw new Error(
-        "Found line that looks like an assertion, but isn't in a '##' comment: '${line}'",
-      );
-    } else {
-      documentLines.push(line);
     }
-  }
-  const document = documentLines.join("\n");
+    const document = documentLines.join("\n");
 
-  // NOTE: technically JSON.stringify is not safe for producing JavaScript
-  // code, this could be a security vulnerability in general. However, in this
-  // case all the data that we're converting to code is controlled by us, so
-  // we'd only be attacking ourselves, therefore we'll allow it rather than
-  // bringing in an extra dependency.
-  return {
-    code: `\
+    // NOTE: technically JSON.stringify is not safe for producing JavaScript
+    // code, this could be a security vulnerability in general. However, in this
+    // case all the data that we're converting to code is controlled by us, so
+    // we'd only be attacking ourselves, therefore we'll allow it rather than
+    // bringing in an extra dependency.
+    return {
+      code: `\
 const { assertSnapshotsMatch, assertResultsMatch, assertErrorsMatch, runTestQuery } = require("../_test");
 
 const document = ${JSON.stringify(document)};
@@ -87,23 +89,29 @@ const waitFor = async (conditionCallback, max = 1000) => {
 }
 
 const callback = ${
-      scripts.length
-        ? `async (pgClient, payloads) => {
+        scripts.length
+          ? `async (pgClient, payloads) => {
   ${scripts.join("\n  ")}
 }`
-        : `null`
-    };
+          : `null`
+      };
 
 beforeAll(() => {
   result1 =
     runTestQuery(document, config, { callback, path });
   // Always run result2 after result1 finishes
-  result2 = result1.then(() => {}, () => {}).then(() =>
+  result2 = ${
+    options.includeDeoptimize
+      ? `result1.then(() => {}, () => {}).then(() =>
     runTestQuery(document, config, { callback, path, deoptimize: true })
-  );
+  )`
+      : `result1.then(() => {}, () => {})`
+  }
   // Always run result3 after result2 finishes
   result3 = result2.then(() => {}, () => {}).then(() =>
-    runTestQuery(document, config, { callback, path, deoptimize: true, prepare: false })
+    runTestQuery(document, config, { callback, path, ${
+      options.includeDeoptimize ? `deoptimize: true, ` : ``
+    }prepare: false })
   );
   // Wait for these promises to resolve, even if it's with errors.
   return Promise.all([result1.catch(e => {}), result2.catch(e => {}), result3.catch(e => {})]);
@@ -153,11 +161,24 @@ if (config.checkErrorSnapshots) {
   }));
 }
 
+${
+  options.includeDeoptimize
+    ? `
 it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2));
 it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(result1, result2));
-it('returns same data for optimized vs unprepared deoptimized', () => assertResultsMatch(result1, result3));
-it('returns same errors for optimized vs unprepared deoptimized', () => assertErrorsMatch(result1, result3));
+`
+    : ``
+}
+it('returns same data for optimized vs unprepared${
+        options.includeDeoptimize ? ` deoptimized` : ``
+      }', () => assertResultsMatch(result1, result3));
+it('returns same errors for optimized vs unprepared${
+        options.includeDeoptimize ? ` deoptimized` : ``
+      }', () => assertErrorsMatch(result1, result3));
 
+${
+  options.includeDeoptimize
+    ? `
 it('matches SQL snapshots with inlining disabled', () => assertSnapshotsMatch('sql', {
   document,
   path,
@@ -173,6 +194,11 @@ it('matches plan (mermaid) snapshots with inlining disabled', () => assertSnapsh
   result: result2,
   ext: ".deopt",
 }));
+`
+    : ``
+}
 `,
+    };
   };
-};
+
+exports.process = exports.makeProcess();
