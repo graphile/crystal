@@ -48,7 +48,7 @@ import { Pool } from "pg";
 
 import { makeSchema } from "..";
 import AmberPreset from "../src/presets/amber.js";
-import V4Preset from "../src/presets/v4.js";
+import { makeV4Preset } from "../src/presets/v4.js";
 
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
@@ -379,7 +379,7 @@ export async function runTestQuery(
     ? [config.schema]
     : ["a", "b", "c"];
   const preset: GraphileConfig.Preset = {
-    extends: [AmberPreset, V4Preset],
+    extends: [AmberPreset],
     pgSources: [
       {
         adaptor: "@dataplan/pg/adaptors/node-postgres",
@@ -393,6 +393,11 @@ export async function runTestQuery(
       } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
     ],
   };
+
+  if (path.includes("/v4")) {
+    applyV4Stuff(preset, config);
+  }
+
   const { schema, config: _config, contextCallback } = await makeSchema(preset);
   const withPgClient: WithPgClient = config.directPg
     ? makeWithTestPgClient(queries)
@@ -798,3 +803,10 @@ export const assertErrorsMatch = async (
   const { errors: errors2 } = await result2;
   expect(errors2).toEqual(errors1);
 };
+
+function applyV4Stuff(
+  preset: GraphileConfig.Preset,
+  config: Record<string, any>,
+): void {
+  (preset.extends as Array<GraphileConfig.Preset>).push(makeV4Preset(config));
+}
