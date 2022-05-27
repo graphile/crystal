@@ -49,6 +49,26 @@ function deferred<T = void>(): Deferred<T> {
   });
 }
 
+const perMessageDeflate = {
+  zlibDeflateOptions: {
+    // See zlib defaults.
+    chunkSize: 1024,
+    memLevel: 7,
+    level: 3,
+  },
+  zlibInflateOptions: {
+    chunkSize: 10 * 1024,
+  },
+  // Other options settable:
+  clientNoContextTakeover: true, // Defaults to negotiated value.
+  serverNoContextTakeover: true, // Defaults to negotiated value.
+  serverMaxWindowBits: 10, // Defaults to negotiated value.
+  // Below options specified as default values.
+  concurrencyLimit: 10, // Limits zlib concurrency for perf.
+  threshold: 1024, // Size (in bytes) below which messages
+  // should not be compressed if context takeover is disabled.
+};
+
 export async function enhanceHttpServerWithWebSockets<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
@@ -201,7 +221,10 @@ export async function enhanceHttpServerWithWebSockets<
 
   let v0Wss: WebSocket.Server | null = null;
   if (websockets.includes('v0')) {
-    v0Wss = new WebSocket.Server({ noServer: true });
+    v0Wss = new WebSocket.Server({
+      noServer: true,
+      perMessageDeflate,
+    });
     SubscriptionServer.create(
       {
         schema,
@@ -355,7 +378,10 @@ export async function enhanceHttpServerWithWebSockets<
 
   let v1Wss: WebSocket.Server | null = null;
   if (websockets.includes('v1')) {
-    v1Wss = new WebSocket.Server({ noServer: true });
+    v1Wss = new WebSocket.Server({
+      noServer: true,
+      perMessageDeflate,
+    });
     useServer(
       {
         schema,
