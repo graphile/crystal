@@ -1,66 +1,36 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'rowId'::text,
-        (__local_1__."id"),
-        'headline'::text,
-        (__local_1__."headline")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (
-      __local_1__."id" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+  order by __post__."id" asc
+) as __post_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'rowId'::text,
-        (__local_1__."row_id")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."edge_case" as __local_1__
-    where (
-      __local_1__."row_id" = $1
-    ) and (TRUE) and (TRUE)
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __edge_case_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __edge_case_identifiers__,
+lateral (
+  select
+    __edge_case__."row_id"::text as "0",
+    __edge_case__."not_null_has_default"::text as "1",
+    __edge_case_identifiers__.idx as "2"
+  from "c"."edge_case" as __edge_case__
+  where (
+    __edge_case__."row_id" = __edge_case_identifiers__."id0"
+  )
+) as __edge_case_result__
