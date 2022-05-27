@@ -37,8 +37,9 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      orderByColumnEnum(options, { columnName, variant }) {
-        return this.constantCase(`${columnName}-${variant}`);
+      orderByColumnEnum(options, { column, columnName, variant }) {
+        const fieldName = this._columnName({ columnName, column });
+        return this.constantCase(`${fieldName}-${variant}`);
       },
     },
   },
