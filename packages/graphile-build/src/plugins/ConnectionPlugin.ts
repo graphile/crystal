@@ -168,7 +168,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           ),
                           type: new build.graphql.GraphQLNonNull(
                             new build.graphql.GraphQLList(
-                              new build.graphql.GraphQLNonNull(EdgeType),
+                              nullableIf(!nonNullNode, EdgeType),
                             ),
                           ),
                           plan: EXPORTABLE(

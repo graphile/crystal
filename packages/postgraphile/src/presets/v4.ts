@@ -6,13 +6,14 @@ import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 export interface V4Options {
   simpleCollections?: "both" | "only" | "omit";
   classicIds?: boolean;
+  pgForbidSetofFunctionsToReturnNull?: boolean;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
   return arg != null;
 }
 
-const makeV4Plugin = (options: V4Options = {}): GraphileConfig.Plugin => {
+const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
   const { classicIds = false } = options;
   return {
     name: "PostGraphileV4CompatibilityPlugin",
@@ -63,13 +64,19 @@ const makeV4Plugin = (options: V4Options = {}): GraphileConfig.Plugin => {
   };
 };
 
-export const makeV4Preset = (options?: V4Options): GraphileConfig.Preset => {
+export const makeV4Preset = (
+  options: V4Options = {},
+): GraphileConfig.Preset => {
   return {
     plugins: [
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       makeV4Plugin(options),
     ].filter(isNotNullish),
+    schema: {
+      pgForbidSetofFunctionsToReturnNull:
+        options.pgForbidSetofFunctionsToReturnNull ?? false,
+    },
   };
 };
 

@@ -536,7 +536,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgConnectionRelated: true,
                   pgCodec: codec,
                 },
-                nonNullNode: !pgForbidSetofFunctionsToReturnNull,
+                nonNullNode: pgForbidSetofFunctionsToReturnNull,
               });
             }
           });
