@@ -20,6 +20,9 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     version: "0.0.0",
     inflection: {
       replace: {
+        connectionType(previous, preset, typeName) {
+          return this.pluralize(typeName) + `Connection`;
+        },
         ...(classicIds
           ? null
           : {
