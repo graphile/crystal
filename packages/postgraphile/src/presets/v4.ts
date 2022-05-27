@@ -41,22 +41,23 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     schema: {
       hooks: {
         build: {
-          callback(input) {
+          callback(build) {
             switch (options.simpleCollections) {
               case "both": {
-                input.behavior.addDefaultBehavior("+collection +list");
+                build.behavior.addDefaultBehavior("+collection +list");
                 break;
               }
               case "only": {
-                input.behavior.addDefaultBehavior("-collection +list");
+                build.behavior.addDefaultBehavior("-collection +list");
                 break;
               }
               case "omit": {
-                input.behavior.addDefaultBehavior("+collection -list");
+                build.behavior.addDefaultBehavior("+collection -list");
                 break;
               }
             }
-            return input;
+
+            return build;
           },
         },
       },
