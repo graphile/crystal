@@ -1,35 +1,18 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'name'::text,
-        (__local_1__."person_full_name")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (
-      "c"."person_computed_out"(__local_1__) = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"text" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
+  where (
+    "c"."person_computed_out"(__person__) = __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+) as __person_result__
