@@ -7,6 +7,7 @@ import type {
   ValueNode,
 } from "graphql";
 import {
+  assertScalarType,
   GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
@@ -18,6 +19,7 @@ import { inspect } from "util";
 
 import type { Aether } from "./aether.js";
 import * as assert from "./assert.js";
+import { __InputDynamicScalarPlan } from "./plans/__inputDynamicScalar.js";
 import { __InputObjectPlan } from "./plans/__inputObject.js";
 import {
   __InputListPlan,
@@ -30,6 +32,7 @@ export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
   | __InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafPlan // .eval(), .evalIs()
+  | __InputDynamicScalarPlan // .eval(), .evalIs()
   | __InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
 
 export function assertInputPlan(
@@ -42,7 +45,7 @@ export function assertInputPlan(
   throw new Error(`Expected an InputPlan, but found ${itemPlan}`);
 }
 
-function graphqlGetTypeForNode(
+export function graphqlGetTypeForNode(
   aether: Aether,
   node: NamedTypeNode | ListTypeNode | NonNullTypeNode,
 ): GraphQLType {
@@ -115,7 +118,16 @@ export function inputPlan(
   } else if (inputType instanceof GraphQLList) {
     return new __InputListPlan(inputType, inputValue);
   } else if (isLeafType(inputType)) {
-    return new __InputStaticLeafPlan(inputType, inputValue);
+    if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
+      const scalarType = assertScalarType(inputType);
+      // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
+      // scalars that have variables in subfields.)
+      return new __InputDynamicScalarPlan(scalarType, inputValue);
+    } else {
+      // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
+      // none of which can contain a variable:
+      return new __InputStaticLeafPlan(inputType, inputValue);
+    }
   } else if (inputType instanceof GraphQLInputObjectType) {
     return new __InputObjectPlan(inputType, inputValue);
   } else {

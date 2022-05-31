@@ -7,6 +7,8 @@ import { arrayOfLength } from "../utils.js";
 
 /**
  * Implements `InputStaticLeafPlan`
+ *
+ * @see __InputDynamicScalarPlan
  */
 export class __InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
   static $$export = {
@@ -19,10 +21,10 @@ export class __InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
     super();
     // `coerceInputValue` throws on coercion failure. NOTE: it's only safe for
-    // us to call coerceInputValue because we already know this is a scalar and
-    // *not* a variable. Otherwise we'd need to process it via
+    // us to call coerceInputValue because we already know this is a scalar,
+    // *not* a variable, and not an object/list therefore cannot _contain_ a
+    // variable. Otherwise we'd need to process it via
     // aether.trackedVariableValuesPlan.
-    // TODO: validate this is safe.
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
