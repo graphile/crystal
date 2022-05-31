@@ -175,12 +175,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const allArgTypes = pgProc.proallargtypes ?? pgProc.proargtypes ?? [];
 
           /**
-           * If there's any OUT, INOUT or TABLE arguments then we'll need to
-           * generate a codec for the payload.
+           * If there's two or more OUT or inout arguments INOUT, or any TABLE
+           * arguments then we'll need to generate a codec for the payload.
            */
-          const needsPayloadCodecToBeGenerated = pgProc.proargmodes?.some(
-            (m) => m === "o" || m === "b" || m === "t",
-          );
+          const hasTableArg =
+            pgProc.proargmodes?.some((m) => m === "t") ?? false;
+          const outOrInoutArgs =
+            pgProc.proargmodes?.filter((m) => m === "o" || m === "b") ?? [];
+          const needsPayloadCodecToBeGenerated =
+            hasTableArg || outOrInoutArgs.length > 1;
 
           const isRecordReturnType =
             pgProc.prorettype === "2249"; /* OID of the 'record' type */
