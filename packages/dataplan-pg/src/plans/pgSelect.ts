@@ -78,14 +78,20 @@ const parseCursor = (cursor: string | null) => {
       "GraphileInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
     );
   }
-  if (typeof cursor !== "string") {
-    throw new Error("Invalid cursor");
+  try {
+    if (typeof cursor !== "string") {
+      throw new Error("Invalid cursor");
+    }
+    const decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
+    if (!Array.isArray(decoded)) {
+      throw new Error("Expected array");
+    }
+    return decoded;
+  } catch (e) {
+    throw new Error(
+      "Invalid cursor, please enter a cursor from a previous request, or null.",
+    );
   }
-  const decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-  if (!Array.isArray(decoded)) {
-    throw new Error("Expected array");
-  }
-  return decoded;
 };
 
 function isStaticInputPlan(
