@@ -486,6 +486,12 @@ const viaDateFormat = (format: string): Cast => {
 
 const parseAsInt = (n: string) => parseInt(n, 10);
 
+const stripSubnet32 = {
+  fromPg(value: string) {
+    return value.replace(/\/32$/, "");
+  },
+};
+
 /**
  * Built in PostgreSQL types that we support; note the keys are the "ergonomic"
  * names (like 'bigint'), but the values use the underlying PostgreSQL true
@@ -517,7 +523,7 @@ export const TYPES = {
   date: t<string>("date", viaDateFormat("YYYY-MM-DD")),
   time: t<string>("time", viaDateFormat("HH24:MI:SS.US")),
   timetz: t<string>("timetz", viaDateFormat("HH24:MI:SS.US")),
-  inet: t<string>("inet"),
+  inet: t<string>("inet", stripSubnet32),
   regproc: t<string>("regproc"),
   regprocedure: t<string>("regprocedure"),
   regoper: t<string>("regoper"),
