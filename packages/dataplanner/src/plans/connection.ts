@@ -271,9 +271,15 @@ export class ConnectionPlan<
     return plan.pageInfo(this);
   }
 
+  /*
+
+  **IMPORTANT**: we cannot optimize this by replacing ourself with a constant
+  because otherwise errors in cursors/etc will be pushed down a level.
+
   public optimize() {
     return constant(EMPTY_OBJECT);
   }
+  */
 
   public execute(
     values: Array<CrystalValuesList<any>>,
