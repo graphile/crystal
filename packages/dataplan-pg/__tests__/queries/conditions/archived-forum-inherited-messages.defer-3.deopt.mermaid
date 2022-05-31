@@ -16,10 +16,12 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    __InputStaticLeaf24["__InputStaticLeaf[24∈0]"]:::plan
+    __InputStaticLeaf25["__InputStaticLeaf[25∈0]"]:::plan
     PgClassExpression33["PgClassExpression[33∈1] {1,2}<br />ᐸ__forums__.”id”ᐳ"]:::plan
     PgClassExpression39["PgClassExpression[39∈1] {1,2}<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
     PgSelect34[["PgSelect[34∈1] {1,2}<br />ᐸmessagesᐳ"]]:::plan
-    Constant68["Constant[68∈0]"]:::plan
+    Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
     __Item41>"__Item[41∈2] {1,2}<br />ᐸ34ᐳ"]:::itemplan
     PgSelectSingle42["PgSelectSingle[42∈2] {1,2}<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈2] {1,2}<br />ᐸ__messages__.”body”ᐳ"]:::plan
@@ -44,6 +46,7 @@ graph TD
     PgSelectSingle22 --> PgClassExpression33
     PgSelectSingle22 --> PgClassExpression39
     Object63 & PgClassExpression33 & PgClassExpression39 --> PgSelect34
+    __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
     PgSelect34 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -68,6 +71,8 @@ graph TD
     PgClassExpression23 -.-> P23
     P34["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     PgSelect34 -.-> P34
+    P38["ᐳf…]ᐳmessagesConnection"]
+    Connection38 -.-> P38
     P42["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
     PgSelectSingle42 -.-> P42
     P43["ᐳf…]ᐳm…nᐳn…]ᐳbody<br />ᐳf…]ᐳm…nᐳe…]ᐳnodeᐳbody"]
@@ -80,13 +85,11 @@ graph TD
     PgClassExpression52 -.-> P52
     P55["ᐳf…]ᐳm…nᐳe…]ᐳcursor"]
     PgCursor55 -.-> P55
-    P68["ᐳf…]ᐳmessagesConnection"]
-    Constant68 -.-> P68
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-3"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,Access61,Access62,Object63,Constant68 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf24,__InputStaticLeaf25,Connection38,Access61,Access62,Object63 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 63<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression33,PgSelect34,PgClassExpression39 bucket1

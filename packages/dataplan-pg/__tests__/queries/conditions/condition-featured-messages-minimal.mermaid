@@ -16,7 +16,9 @@ graph TD
     PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    Constant49["Constant[49∈0]"]:::plan
+    __InputStaticLeaf23["__InputStaticLeaf[23∈0]"]:::plan
+    __InputStaticLeaf24["__InputStaticLeaf[24∈0]"]:::plan
+    Connection37["Connection[37∈0]<br />ᐸ33ᐳ"]:::plan
     PgPageInfo39["PgPageInfo[39∈0]"]:::plan
     Access46["Access[46∈1]<br />ᐸ21.0ᐳ"]:::plan
     Lambda47["Lambda[47∈1]"]:::plan
@@ -33,6 +35,7 @@ graph TD
     Object36 & __InputStaticLeaf26 --> PgSelect17
     PgSelect17 ==> __Item21
     __Item21 --> PgSelectSingle22
+    __InputStaticLeaf23 & __InputStaticLeaf24 --> Connection37
     __Item21 --> Access46
     Access46 --> Lambda47
     Lambda47 --> Lambda41
@@ -48,20 +51,20 @@ graph TD
     PgSelect17 -.-> P17
     P22["ᐳforums[]"]
     PgSelectSingle22 -.-> P22
+    P37["ᐳf…]ᐳmessagesConnection"]
+    Connection37 -.-> P37
     P39["ᐳf…]ᐳm…nᐳpageInfo"]
     PgPageInfo39 -.-> P39
     P41["ᐳf…]ᐳm…nᐳp…oᐳhasNextPage"]
     Lambda41 -.-> P41
     P45["ᐳf…]ᐳm…nᐳtotalCount"]
     PgClassExpression45 -.-> P45
-    P49["ᐳf…]ᐳmessagesConnection"]
-    Constant49 -.-> P49
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf26,Access34,Access35,Object36,PgPageInfo39,Constant49 bucket0
-    Bucket1("Bucket 1 (item21)<br />Deps: 17, 49, 39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀messagesConnection ᐸ-O- 49<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 45"):::bucket
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf23,__InputStaticLeaf24,__InputStaticLeaf26,Access34,Access35,Object36,Connection37,PgPageInfo39 bucket0
+    Bucket1("Bucket 1 (item21)<br />Deps: 17, 37, 39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀messagesConnection ᐸ-O- 37<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 45"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,Lambda41,First43,PgSelectSingle44,PgClassExpression45,Access46,Lambda47,Access48 bucket1
     Bucket0 --> Bucket1

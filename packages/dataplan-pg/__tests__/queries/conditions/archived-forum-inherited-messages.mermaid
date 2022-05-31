@@ -16,8 +16,10 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    __InputStaticLeaf24["__InputStaticLeaf[24∈0]"]:::plan
+    __InputStaticLeaf25["__InputStaticLeaf[25∈0]"]:::plan
     Access89["Access[89∈1]<br />ᐸ21.1ᐳ"]:::plan
-    Constant91["Constant[91∈0]"]:::plan
+    Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
     __Item41>"__Item[41∈2]<br />ᐸ89ᐳ"]:::itemplan
     PgSelectSingle42["PgSelectSingle[42∈2]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
@@ -55,6 +57,7 @@ graph TD
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
     __Item21 --> Access89
+    __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
     Access89 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -89,6 +92,8 @@ graph TD
     PgSelectSingle22 -.-> P22
     P23["ᐳf…]ᐳname"]
     PgClassExpression23 -.-> P23
+    P38["ᐳf…]ᐳmessagesConnection"]
+    Connection38 -.-> P38
     P42["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
     PgSelectSingle42 -.-> P42
     P43["ᐳf…]ᐳm…nᐳn…]ᐳbody<br />ᐳf…]ᐳm…nᐳe…]ᐳnodeᐳbody"]
@@ -115,14 +120,12 @@ graph TD
     PgClassExpression86 -.-> P86
     P89["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     Access89 -.-> P89
-    P91["ᐳf…]ᐳmessagesConnection"]
-    Constant91 -.-> P91
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,Access61,Access62,Object63,PgPageInfo68,Constant69,Constant70,Constant91 bucket0
-    Bucket1("Bucket 1 (item21)<br />Deps: 17, 91, 68, 69, 70<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀name ᐸ-L- 23<br />⠀⠀messagesConnection ᐸ-O- 91<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 69<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- 70<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- 74<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- 80<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 86<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- 89<br />⠀⠀⠀messagesConnection.edges ᐸ-A- 89"):::bucket
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf24,__InputStaticLeaf25,Connection38,Access61,Access62,Object63,PgPageInfo68,Constant69,Constant70 bucket0
+    Bucket1("Bucket 1 (item21)<br />Deps: 17, 38, 68, 69, 70<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀name ᐸ-L- 23<br />⠀⠀messagesConnection ᐸ-O- 38<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 69<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- 70<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- 74<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- 80<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 86<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- 89<br />⠀⠀⠀messagesConnection.edges ᐸ-A- 89"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,First72,PgSelectSingle73,PgCursor74,PgClassExpression75,List76,Last78,PgSelectSingle79,PgCursor80,PgClassExpression81,List82,First84,PgSelectSingle85,PgClassExpression86,Access89,Access90 bucket1
     Bucket2("Bucket 2 (item41)<br />Deps: 89<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- 42<br />⠀⠀node ᐸ-O- 42<br />⠀⠀⠀node.body ᐸ-L- 43<br />⠀⠀⠀node.author ᐸ-O- 50<br />⠀⠀⠀⠀node.author.username ᐸ-L- 51<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- 52<br />⠀⠀body ᐸ-L- 43<br />⠀⠀author ᐸ-O- 50<br />⠀⠀⠀author.username ᐸ-L- 51<br />⠀⠀⠀author.gravatarUrl ᐸ-L- 52<br />⠀⠀cursor ᐸ-L- 55"):::bucket

@@ -16,8 +16,10 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    __InputStaticLeaf24["__InputStaticLeaf[24∈0]"]:::plan
+    __InputStaticLeaf25["__InputStaticLeaf[25∈0]"]:::plan
     Access68["Access[68∈1]<br />ᐸ21.1ᐳ"]:::plan
-    Constant69["Constant[69∈0]"]:::plan
+    Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
     __Item41>"__Item[41∈2]<br />ᐸ68ᐳ"]:::itemplan
     PgSelectSingle42["PgSelectSingle[42∈2]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
@@ -40,6 +42,7 @@ graph TD
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
     __Item21 --> Access68
+    __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
     Access68 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -62,6 +65,8 @@ graph TD
     PgSelectSingle22 -.-> P22
     P23["ᐳf…]ᐳname"]
     PgClassExpression23 -.-> P23
+    P38["ᐳf…]ᐳmessagesConnection"]
+    Connection38 -.-> P38
     P42["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
     PgSelectSingle42 -.-> P42
     P43["ᐳf…]ᐳm…nᐳn…]ᐳbody<br />ᐳf…]ᐳm…nᐳe…]ᐳnodeᐳbody"]
@@ -76,13 +81,11 @@ graph TD
     PgCursor55 -.-> P55
     P68["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     Access68 -.-> P68
-    P69["ᐳf…]ᐳmessagesConnection"]
-    Constant69 -.-> P69
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-6"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,Access61,Access62,Object63,Constant69 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf24,__InputStaticLeaf25,Connection38,Access61,Access62,Object63 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 63<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,Access68 bucket1

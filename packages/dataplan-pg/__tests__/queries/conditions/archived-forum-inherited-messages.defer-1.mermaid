@@ -16,10 +16,12 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    __InputStaticLeaf24["__InputStaticLeaf[24∈2@1]"]:::plan
+    __InputStaticLeaf25["__InputStaticLeaf[25∈2@1]"]:::plan
     PgClassExpression33["PgClassExpression[33∈2@1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
     PgClassExpression39["PgClassExpression[39∈2@1]<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
     PgSelect34[["PgSelect[34∈2@1]<br />ᐸmessagesᐳ"]]:::plan
-    Constant70["Constant[70∈2@1]"]:::plan
+    Connection38["Connection[38∈2@1]<br />ᐸ34ᐳ"]:::plan
     __Item41>"__Item[41∈3@1]<br />ᐸ34ᐳ"]:::itemplan
     PgSelectSingle42["PgSelectSingle[42∈3@1]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈3@1]<br />ᐸ__messages__.”body”ᐳ"]:::plan
@@ -42,6 +44,7 @@ graph TD
     PgSelectSingle22 --> PgClassExpression33
     PgSelectSingle22 --> PgClassExpression39
     Object63 & PgClassExpression33 & PgClassExpression39 --> PgSelect34
+    __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
     PgSelect34 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -64,6 +67,8 @@ graph TD
     PgClassExpression23 -.-> P23
     P34["ᐳf…]ᐳm…nᐳnodes<br />ᐳf…]ᐳm…nᐳedges"]
     PgSelect34 -.-> P34
+    P38["ᐳf…]ᐳmessagesConnection"]
+    Connection38 -.-> P38
     P42["ᐳf…]ᐳm…nᐳnodes[]<br />ᐳf…]ᐳm…nᐳedges[]<br />ᐳf…]ᐳm…nᐳe…]ᐳnode"]
     PgSelectSingle42 -.-> P42
     P43["ᐳf…]ᐳm…nᐳn…]ᐳbody<br />ᐳf…]ᐳm…nᐳe…]ᐳnodeᐳbody"]
@@ -76,8 +81,6 @@ graph TD
     PgClassExpression52 -.-> P52
     P55["ᐳf…]ᐳm…nᐳe…]ᐳcursor"]
     PgCursor55 -.-> P55
-    P70["ᐳf…]ᐳmessagesConnection"]
-    Constant70 -.-> P70
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-1"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
@@ -88,7 +91,7 @@ graph TD
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23 bucket1
     Bucket2("Bucket 2 (group1[defer])<br />Deps: 22, 63<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression33,PgSelect34,PgClassExpression39,Constant70 bucket2
+    class Bucket2,__InputStaticLeaf24,__InputStaticLeaf25,PgClassExpression33,PgSelect34,Connection38,PgClassExpression39 bucket2
     Bucket3("Bucket 3 (item41)<br />Deps: 34<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item41,PgSelectSingle42,PgClassExpression43,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgCursor55,PgClassExpression56,List57,Map68 bucket3
