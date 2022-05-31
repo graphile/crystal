@@ -11,6 +11,7 @@ import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { noop } from "./dev.js";
+import { isCrystalError } from "./error.js";
 import { establishAether } from "./establishAether.js";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces.js";
 import {
@@ -204,7 +205,12 @@ function dataplannerResolverOrSubscriber<
       if (source?.[$$verbatim]) {
         const fieldAlias = info.path.key;
         if (fieldAlias in source) {
-          return source[fieldAlias];
+          const data = source[fieldAlias];
+          if (isCrystalError(data)) {
+            throw data.originalError;
+          } else {
+            return data;
+          }
         }
       }
       let possiblyParentCrystalObject: CrystalObject | null = null;
