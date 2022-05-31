@@ -68,8 +68,8 @@ export class ConnectionPlan<
   private _firstDepId: number | null = null;
   private _lastDepId: number | null = null;
   private _offsetDepId: number | null = null;
-  private _beforeDepId: number | null = null;
-  private _afterDepId: number | null = null;
+  private _beforeDepId: number | null | undefined = undefined;
+  private _afterDepId: number | null | undefined = undefined;
 
   // TODO:TS: if subplan is `ConnectionCapablePlan<EdgeCapablePlan<any>>` then `itemPlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
@@ -132,7 +132,7 @@ export class ConnectionPlan<
       : null;
   }
   public setBefore($beforePlan: InputPlan) {
-    if (this._beforeDepId != null) {
+    if (this._beforeDepId !== undefined) {
       throw new Error(`${this}->setBefore already called`);
     }
     const $parsedBeforePlan = this.getSubplan().parseCursor($beforePlan);
@@ -146,7 +146,7 @@ export class ConnectionPlan<
       : null;
   }
   public setAfter($afterPlan: InputPlan) {
-    if (this._afterDepId != null) {
+    if (this._afterDepId !== undefined) {
       throw new Error(`${this}->setAfter already called`);
     }
     const $parsedAfterPlan = this.getSubplan().parseCursor($afterPlan);
