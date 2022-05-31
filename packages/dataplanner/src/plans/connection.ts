@@ -2,8 +2,11 @@ import type { InputPlan } from "../input.js";
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
 import { ExecutablePlan } from "../plan.js";
 import { arrayOfLength } from "../utils.js";
-import { constant } from "./constant.js";
 import { each } from "./each.js";
+
+type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
+  ? R
+  : never[];
 
 /**
  * Describes what a plan needs to implement in order to be suitable for
@@ -26,9 +29,17 @@ export interface ConnectionCapablePlan<
 > extends ExecutablePlan<
     ReadonlyArray<TItemPlan extends ExecutablePlan<infer U> ? U : any>
   > {
-  clone(...args: any[]): ConnectionCapablePlan<TItemPlan, TCursorPlan>; // TODO: `this`
+  /**
+   * Clone the plan; it's recommended that you add `$connection` as a
+   * dependency so that you can abort execution early in the case of errors
+   * (e.g. if the cursors cannot be parsed).
+   */
+  connectionClone(
+    $connection: ConnectionPlan<TItemPlan, TCursorPlan, any, any>,
+    ...args: any[]
+  ): ConnectionCapablePlan<TItemPlan, TCursorPlan>; // TODO: `this`
   pageInfo(
-    $connectionPlan: ConnectionPlan<
+    $connection: ConnectionPlan<
       TItemPlan,
       TCursorPlan,
       ConnectionCapablePlan<TItemPlan, TCursorPlan>,
@@ -179,7 +190,7 @@ export class ConnectionPlan<
    * This cannot be called before 'finalizeArguments' has been called.
    */
   public cloneSubplanWithoutPagination(
-    ...args: Parameters<TPlan["clone"]>
+    ...args: ParametersExceptFirst<TPlan["connectionClone"]>
   ): TPlan {
     if (!this.isArgumentsFinalized) {
       throw new Error(
@@ -187,7 +198,7 @@ export class ConnectionPlan<
       );
     }
     const plan = this.getPlan(this.subplanId) as TPlan;
-    const clonedPlan = plan.clone(...args) as TPlan;
+    const clonedPlan = plan.connectionClone(this, ...args) as TPlan;
     return clonedPlan;
   }
 
@@ -201,7 +212,7 @@ export class ConnectionPlan<
    */
   public cloneSubplanWithPagination(
     // TODO:TS: ugh. The `|[]` shouldn't be needed.
-    ...args: Parameters<TPlan["clone"]> | []
+    ...args: ParametersExceptFirst<TPlan["connectionClone"]> | []
   ): TPlan {
     const clonedPlan = this.cloneSubplanWithoutPagination(...(args as any));
 

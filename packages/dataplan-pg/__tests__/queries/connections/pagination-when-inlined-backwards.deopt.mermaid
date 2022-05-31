@@ -61,7 +61,7 @@ graph TD
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression33
     __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
-    Object62 & PgClassExpression33 --> PgSelect39
+    Object62 & PgClassExpression33 & Connection38 --> PgSelect39
     PgSelect39 ==> __Item40
     __Item40 --> PgSelectSingle41
     PgSelectSingle41 --> PgClassExpression42
@@ -85,7 +85,7 @@ graph TD
     PgSelectSingle79 --> PgClassExpression81
     PgClassExpression81 --> List82
     List82 --> PgCursor80
-    Object62 & PgClassExpression33 --> PgSelect83
+    Object62 & PgClassExpression33 & Connection38 --> PgSelect83
     PgSelect83 --> First84
     First84 --> PgSelectSingle85
     PgSelectSingle85 --> PgClassExpression86

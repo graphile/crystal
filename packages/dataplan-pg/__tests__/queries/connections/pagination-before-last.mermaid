@@ -58,7 +58,7 @@ graph TD
     Lambda25 --> PgValidateParsedCursor27
     Lambda25 --> Access28
     Access28 --> ToPg29
-    Object40 & Lambda25 & PgValidateParsedCursor27 & ToPg29 --> PgSelect26
+    Object40 & Connection24 & Lambda25 & PgValidateParsedCursor27 & ToPg29 --> PgSelect26
     PgSelect26 ==> __Item30
     __Item30 --> PgSelectSingle31
     PgSelectSingle31 --> PgClassExpression33
@@ -80,7 +80,7 @@ graph TD
     PgSelectSingle63 --> PgClassExpression68
     PgClassExpression68 --> List69
     List69 --> PgCursor64
-    Object40 --> PgSelect70
+    Object40 & Connection24 --> PgSelect70
     PgSelect70 --> First71
     First71 --> PgSelectSingle72
     PgSelectSingle72 --> PgClassExpression73

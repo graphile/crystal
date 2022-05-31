@@ -2,8 +2,6 @@ import assert from "assert";
 import { createHash } from "crypto";
 import type {
   ConnectionCapablePlan,
-  ConnectionPlan,
-  ConstantPlan,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
@@ -14,6 +12,7 @@ import type {
   PlanStreamOptions,
   StreamablePlan,
 } from "dataplanner";
+import { ConnectionPlan } from "dataplanner";
 import {
   __InputListPlan,
   __InputObjectPlan,
@@ -21,7 +20,6 @@ import {
   __ItemPlan,
   __TrackedObjectPlan,
   access,
-  constant,
   ExecutablePlan,
   first,
   isAsyncIterable,
@@ -950,6 +948,16 @@ export class PgSelectPlan<
     mode?: PgSelectMode,
   ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
     return new PgSelectPlan(this, mode);
+  }
+
+  connectionClone(
+    $connection: ConnectionPlan<any, any, any, any>,
+    mode?: PgSelectMode,
+  ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
+    const $plan = this.clone(mode);
+    // In case any errors are raised
+    $plan.addDependency($connection);
+    return $plan;
   }
 
   where(condition: SQL): void {
@@ -2141,6 +2149,8 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         } else if (isStaticInputPlan(dep)) {
           // This has come from a hard-coded input in the document, therefore
           // it's shared and thus safe.
+        } else if (dep instanceof ConnectionPlan) {
+          // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionPlan) {
           const p2 = this.getPlan(dep.dependencies[dep.tableId]);
           const t2Parent = dep.getParentPlan();

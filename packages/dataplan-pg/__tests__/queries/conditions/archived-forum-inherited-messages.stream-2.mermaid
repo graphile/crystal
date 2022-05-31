@@ -59,7 +59,7 @@ graph TD
     PgSelectSingle22 --> PgClassExpression33
     __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
     PgSelectSingle22 --> PgClassExpression39
-    Object64 & PgClassExpression33 & PgClassExpression39 --> PgSelect40
+    Object64 & PgClassExpression33 & PgClassExpression39 & Connection38 --> PgSelect40
     PgSelect40 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -67,7 +67,7 @@ graph TD
     Map76 --> PgSelectSingle50
     PgSelectSingle50 --> PgClassExpression51
     PgSelectSingle50 --> PgClassExpression52
-    Object64 & PgClassExpression33 & PgClassExpression39 --> PgSelect53
+    Object64 & PgClassExpression33 & PgClassExpression39 & Connection38 --> PgSelect53
     PgSelect53 ==> __Item54
     __Item54 --> PgSelectSingle55
     PgSelectSingle55 --> PgClassExpression57
@@ -133,16 +133,16 @@ graph TD
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf24,__InputStaticLeaf25,Connection38,Access62,Access63,Object64,PgPageInfo69,Constant70,Constant71 bucket0
-    Bucket1("Bucket 1 (item21)<br />Deps: 17, 64<br />~ᐳQuery.forums[]"):::bucket
+    Bucket1("Bucket 1 (item21)<br />Deps: 17, 64, 38<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression33,PgClassExpression39,First73,PgSelectSingle74,PgClassExpression75,Access80 bucket1
-    Bucket2("Bucket 2 (group1[stream])<br />Deps: 64, 33, 39<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
+    Bucket2("Bucket 2 (group1[stream])<br />Deps: 64, 33, 39, 38<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect40 bucket2
     Bucket3("Bucket 3 (item41)<br />Deps: 40<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item41,PgSelectSingle42,PgClassExpression43,PgSelectSingle50,PgClassExpression51,PgClassExpression52,Map76 bucket3
-    Bucket4("Bucket 4 (group2[stream])<br />Deps: 64, 33, 39<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
+    Bucket4("Bucket 4 (group2[stream])<br />Deps: 64, 33, 39, 38<br />~ᐳQuery.forums[]ᐳForum.messagesConnection"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect53 bucket4
     Bucket5("Bucket 5 (item54)<br />Deps: 53<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket

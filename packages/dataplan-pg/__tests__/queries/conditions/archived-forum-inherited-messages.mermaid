@@ -18,8 +18,8 @@ graph TD
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
     __InputStaticLeaf24["__InputStaticLeaf[24∈0]"]:::plan
     __InputStaticLeaf25["__InputStaticLeaf[25∈0]"]:::plan
-    Access89["Access[89∈1]<br />ᐸ21.1ᐳ"]:::plan
     Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
+    Access89["Access[89∈1]<br />ᐸ21.1ᐳ"]:::plan
     __Item41>"__Item[41∈2]<br />ᐸ89ᐳ"]:::itemplan
     PgSelectSingle42["PgSelectSingle[42∈2]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
@@ -56,8 +56,8 @@ graph TD
     PgSelect17 ==> __Item21
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
-    __Item21 --> Access89
     __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
+    __Item21 --> Access89
     Access89 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43

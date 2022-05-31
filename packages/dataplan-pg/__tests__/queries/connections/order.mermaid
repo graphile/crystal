@@ -55,7 +55,7 @@ graph TD
     __Value3 --> Access39
     Access38 & Access39 --> Object40
     __InputStaticLeaf14 & __InputStaticLeaf15 --> Connection26
-    Object40 --> PgSelect27
+    Object40 & Connection26 --> PgSelect27
     PgSelect27 ==> __Item28
     __Item28 --> PgSelectSingle29
     PgSelectSingle29 --> PgClassExpression31
@@ -83,7 +83,7 @@ graph TD
     PgSelectSingle59 --> PgClassExpression63
     PgClassExpression61 & PgClassExpression62 & PgClassExpression63 --> List64
     List64 --> PgCursor60
-    Object40 --> PgSelect65
+    Object40 & Connection26 --> PgSelect65
     PgSelect65 --> First66
     First66 --> PgSelectSingle67
     PgSelectSingle67 --> PgClassExpression68
