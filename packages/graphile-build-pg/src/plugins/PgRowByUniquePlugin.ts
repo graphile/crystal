@@ -3,7 +3,7 @@ import "graphile-config";
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { GraphQLObjectType } from "graphql";
+import { GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -77,10 +77,10 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                   source,
                 });
 
-                const type = build.getOutputTypeByName(
+                const type = build.getTypeByName(
                   build.inflection.tableType(source.codec),
-                ) as GraphQLObjectType;
-                if (!type) {
+                );
+                if (!type || !(type instanceof GraphQLObjectType)) {
                   return memo;
                 }
 

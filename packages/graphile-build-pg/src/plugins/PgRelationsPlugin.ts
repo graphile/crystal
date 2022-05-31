@@ -12,7 +12,7 @@ import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { GraphQLObjectType } from "graphql";
+import { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
@@ -421,8 +421,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                 : otherSourceOrBuilder;
             const otherCodec = otherSource.codec;
             const typeName = build.inflection.tableType(otherCodec);
-            const OtherType = build.getOutputTypeByName(typeName);
-            if (!OtherType) {
+            const OtherType = build.getTypeByName(typeName);
+            if (!OtherType || !(OtherType instanceof GraphQLObjectType)) {
               return memo;
             }
             let fields = memo;
