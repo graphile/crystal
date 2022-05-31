@@ -1,0 +1,190 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    Access9["Access[9∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access10["Access[10∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object11["Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First12["First[12∈0]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
+    PgSelect16[["PgSelect[16∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First20["First[20∈0]"]:::plan
+    PgSelectSingle21["PgSelectSingle[21∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputStaticLeaf23["__InputStaticLeaf[23∈0]"]:::plan
+    PgSelect24[["PgSelect[24∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First28["First[28∈0]"]:::plan
+    PgSelectSingle29["PgSelectSingle[29∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression30["PgClassExpression[30∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputStaticLeaf31["__InputStaticLeaf[31∈0]"]:::plan
+    PgSelect32[["PgSelect[32∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First36["First[36∈0]"]:::plan
+    PgSelectSingle37["PgSelectSingle[37∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputStaticLeaf39["__InputStaticLeaf[39∈0]"]:::plan
+    PgSelect40[["PgSelect[40∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First44["First[44∈0]"]:::plan
+    PgSelectSingle45["PgSelectSingle[45∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression46["PgClassExpression[46∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputDynamicScalar47["__InputDynamicScalar[47∈0]"]:::plan
+    PgSelect48[["PgSelect[48∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First52["First[52∈0]"]:::plan
+    PgSelectSingle53["PgSelectSingle[53∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression54["PgClassExpression[54∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputDynamicScalar55["__InputDynamicScalar[55∈0]"]:::plan
+    PgSelect56[["PgSelect[56∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First60["First[60∈0]"]:::plan
+    PgSelectSingle61["PgSelectSingle[61∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression62["PgClassExpression[62∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputDynamicScalar63["__InputDynamicScalar[63∈0]"]:::plan
+    PgSelect64[["PgSelect[64∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First68["First[68∈0]"]:::plan
+    PgSelectSingle69["PgSelectSingle[69∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression70["PgClassExpression[70∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputDynamicScalar71["__InputDynamicScalar[71∈0]"]:::plan
+    PgSelect72[["PgSelect[72∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First76["First[76∈0]"]:::plan
+    PgSelectSingle77["PgSelectSingle[77∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression78["PgClassExpression[78∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputDynamicScalar79["__InputDynamicScalar[79∈0]"]:::plan
+    PgSelect80[["PgSelect[80∈0]<br />ᐸjson_identityᐳ"]]:::plan
+    First84["First[84∈0]"]:::plan
+    PgSelectSingle85["PgSelectSingle[85∈0]<br />ᐸjson_identityᐳ"]:::plan
+    PgClassExpression86["PgClassExpression[86∈0]<br />ᐸ__json_ide...identity__ᐳ"]:::plan
+    __InputDynamicScalar87["__InputDynamicScalar[87∈0]"]:::plan
+    PgSelect88[["PgSelect[88∈0]<br />ᐸjsonb_identityᐳ"]]:::plan
+    First92["First[92∈0]"]:::plan
+    PgSelectSingle93["PgSelectSingle[93∈0]<br />ᐸjsonb_identityᐳ"]:::plan
+    PgClassExpression94["PgClassExpression[94∈0]<br />ᐸ__jsonb_id...identity__ᐳ"]:::plan
+    __InputDynamicScalar95["__InputDynamicScalar[95∈0]"]:::plan
+    PgSelect96[["PgSelect[96∈0]<br />ᐸjsonb_identityᐳ"]]:::plan
+    First100["First[100∈0]"]:::plan
+    PgSelectSingle101["PgSelectSingle[101∈0]<br />ᐸjsonb_identityᐳ"]:::plan
+    PgClassExpression102["PgClassExpression[102∈0]<br />ᐸ__jsonb_id...identity__ᐳ"]:::plan
+    __InputStaticLeaf103["__InputStaticLeaf[103∈0]"]:::plan
+    __InputStaticLeaf104["__InputStaticLeaf[104∈0]"]:::plan
+    __InputStaticLeaf105["__InputStaticLeaf[105∈0]"]:::plan
+    Connection280["Connection[280∈0]<br />ᐸ276ᐳ"]:::plan
+    PgSelect281[["PgSelect[281∈0]<br />ᐸtypesᐳ"]]:::plan
+    __Item282>"__Item[282∈1]<br />ᐸ281ᐳ"]:::itemplan
+    PgSelectSingle283["PgSelectSingle[283∈1]<br />ᐸtypesᐳ"]:::plan
+    PgClassExpression284["PgClassExpression[284∈1]<br />ᐸ__types__.”json”ᐳ"]:::plan
+    PgClassExpression285["PgClassExpression[285∈1]<br />ᐸ__types__.”jsonb”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access9
+    __Value3 --> Access10
+    Access9 & Access10 --> Object11
+    Object11 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    Object11 & __InputStaticLeaf15 --> PgSelect16
+    PgSelect16 --> First20
+    First20 --> PgSelectSingle21
+    PgSelectSingle21 --> PgClassExpression22
+    Object11 & __InputStaticLeaf23 --> PgSelect24
+    PgSelect24 --> First28
+    First28 --> PgSelectSingle29
+    PgSelectSingle29 --> PgClassExpression30
+    Object11 & __InputStaticLeaf31 --> PgSelect32
+    PgSelect32 --> First36
+    First36 --> PgSelectSingle37
+    PgSelectSingle37 --> PgClassExpression38
+    Object11 & __InputStaticLeaf39 --> PgSelect40
+    PgSelect40 --> First44
+    First44 --> PgSelectSingle45
+    PgSelectSingle45 --> PgClassExpression46
+    Object11 & __InputDynamicScalar47 --> PgSelect48
+    PgSelect48 --> First52
+    First52 --> PgSelectSingle53
+    PgSelectSingle53 --> PgClassExpression54
+    Object11 & __InputDynamicScalar55 --> PgSelect56
+    PgSelect56 --> First60
+    First60 --> PgSelectSingle61
+    PgSelectSingle61 --> PgClassExpression62
+    Object11 & __InputDynamicScalar63 --> PgSelect64
+    PgSelect64 --> First68
+    First68 --> PgSelectSingle69
+    PgSelectSingle69 --> PgClassExpression70
+    Object11 & __InputDynamicScalar71 --> PgSelect72
+    PgSelect72 --> First76
+    First76 --> PgSelectSingle77
+    PgSelectSingle77 --> PgClassExpression78
+    Object11 & __InputDynamicScalar79 --> PgSelect80
+    PgSelect80 --> First84
+    First84 --> PgSelectSingle85
+    PgSelectSingle85 --> PgClassExpression86
+    Object11 & __InputDynamicScalar87 --> PgSelect88
+    PgSelect88 --> First92
+    First92 --> PgSelectSingle93
+    PgSelectSingle93 --> PgClassExpression94
+    Object11 & __InputDynamicScalar95 --> PgSelect96
+    PgSelect96 --> First100
+    First100 --> PgSelectSingle101
+    PgSelectSingle101 --> PgClassExpression102
+    __InputStaticLeaf103 & __InputStaticLeaf104 & __InputStaticLeaf105 --> Connection280
+    Object11 & Connection280 --> PgSelect281
+    PgSelect281 ==> __Item282
+    __Item282 --> PgSelectSingle283
+    PgSelectSingle283 --> PgClassExpression284
+    PgSelectSingle283 --> PgClassExpression285
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P14["ᐳa"]
+    PgClassExpression14 -.-> P14
+    P22["ᐳb"]
+    PgClassExpression22 -.-> P22
+    P30["ᐳc"]
+    PgClassExpression30 -.-> P30
+    P38["ᐳd"]
+    PgClassExpression38 -.-> P38
+    P46["ᐳe"]
+    PgClassExpression46 -.-> P46
+    P54["ᐳf"]
+    PgClassExpression54 -.-> P54
+    P62["ᐳg"]
+    PgClassExpression62 -.-> P62
+    P70["ᐳh"]
+    PgClassExpression70 -.-> P70
+    P78["ᐳi"]
+    PgClassExpression78 -.-> P78
+    P86["ᐳj"]
+    PgClassExpression86 -.-> P86
+    P94["ᐳk"]
+    PgClassExpression94 -.-> P94
+    P102["ᐳl"]
+    PgClassExpression102 -.-> P102
+    P280["ᐳallTypes"]
+    Connection280 -.-> P280
+    P281["ᐳa…sᐳnodes"]
+    PgSelect281 -.-> P281
+    P283["ᐳa…sᐳnodes[]"]
+    PgSelectSingle283 -.-> P283
+    P284["ᐳa…sᐳn…]ᐳjson"]
+    PgClassExpression284 -.-> P284
+    P285["ᐳa…sᐳn…]ᐳjsonb"]
+    PgClassExpression285 -.-> P285
+
+    subgraph "Buckets for queries/v4/dynamic-json"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-L- 14<br />⠀⠀b ᐸ-L- 22<br />⠀⠀c ᐸ-L- 30<br />⠀⠀d ᐸ-L- 38<br />⠀⠀e ᐸ-L- 46<br />⠀⠀f ᐸ-L- 54<br />⠀⠀g ᐸ-L- 62<br />⠀⠀h ᐸ-L- 70<br />⠀⠀i ᐸ-L- 78<br />⠀⠀j ᐸ-L- 86<br />⠀⠀k ᐸ-L- 94<br />⠀⠀l ᐸ-L- 102<br />⠀⠀allTypes ᐸ-O- 280<br />⠀⠀⠀allTypes.nodes ᐸ-A- 281"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,__InputStaticLeaf15,PgSelect16,First20,PgSelectSingle21,PgClassExpression22,__InputStaticLeaf23,PgSelect24,First28,PgSelectSingle29,PgClassExpression30,__InputStaticLeaf31,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,__InputStaticLeaf39,PgSelect40,First44,PgSelectSingle45,PgClassExpression46,__InputDynamicScalar47,PgSelect48,First52,PgSelectSingle53,PgClassExpression54,__InputDynamicScalar55,PgSelect56,First60,PgSelectSingle61,PgClassExpression62,__InputDynamicScalar63,PgSelect64,First68,PgSelectSingle69,PgClassExpression70,__InputDynamicScalar71,PgSelect72,First76,PgSelectSingle77,PgClassExpression78,__InputDynamicScalar79,PgSelect80,First84,PgSelectSingle85,PgClassExpression86,__InputDynamicScalar87,PgSelect88,First92,PgSelectSingle93,PgClassExpression94,__InputDynamicScalar95,PgSelect96,First100,PgSelectSingle101,PgClassExpression102,__InputStaticLeaf103,__InputStaticLeaf104,__InputStaticLeaf105,Connection280,PgSelect281 bucket0
+    Bucket1("Bucket 1 (item282)<br />Deps: 281<br />~ᐳQuery.allTypesᐳTypesConnection.nodes[]<br />⠀ROOT ᐸ-O- 283<br />⠀⠀json ᐸ-L- 284<br />⠀⠀jsonb ᐸ-L- 285"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item282,PgSelectSingle283,PgClassExpression284,PgClassExpression285 bucket1
+    Bucket0 --> Bucket1
+    end
