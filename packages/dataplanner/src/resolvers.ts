@@ -10,6 +10,7 @@ import { ROOT_PATH } from "./constants.js";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
+import { noop } from "./dev.js";
 import { establishAether } from "./establishAether.js";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces.js";
 import {
@@ -283,7 +284,7 @@ function dataplannerResolverOrSubscriber<
             parentCrystalObject,
             result,
           );
-        });
+        }, noop);
       }
       if (userSpecifiedResolver != null) {
         // At this point, Aether will already have performed the relevant
