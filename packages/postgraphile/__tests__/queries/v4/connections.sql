@@ -228,18 +228,6 @@ order by __person__."id" asc
 limit 4
 offset 1
 
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."config"::text as "3",
-  __person__."last_login_from_ip"::text as "4",
-  __person__."last_login_from_subnet"::text as "5",
-  __person__."user_mac"::text as "6"
-from "c"."person" as __person__
-order by __person__."id" asc
-limit 0
-
 select __edge_case_result__.*
 from (
   select

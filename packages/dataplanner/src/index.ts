@@ -151,6 +151,7 @@ import {
 import { stripAnsi } from "./stripAnsi.js";
 import { subscribe } from "./subscribe.js";
 import {
+  arrayOfLength,
   arraysMatch,
   getEnumValueConfig,
   GraphileInputFieldConfigMap,
@@ -191,6 +192,7 @@ export {
   Aether,
   aether,
   ArgumentPlanResolver,
+  arrayOfLength,
   arraysMatch,
   assertListCapablePlan,
   BaseEventMap,
@@ -399,6 +401,7 @@ exportAsMany({
   newObjectTypeBuilder,
   objectFieldSpec,
   objectSpec,
+  arrayOfLength,
   planGroupsOverlap,
   isPromiseLike,
   isDev,

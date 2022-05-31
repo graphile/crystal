@@ -19,6 +19,7 @@ import {
   __ItemPlan,
   __TrackedObjectPlan,
   access,
+  arrayOfLength,
   ConnectionPlan,
   ExecutablePlan,
   first,
@@ -1144,6 +1145,12 @@ export class PgSelectPlan<
     return pgPageInfo($connectionPlan);
   }
 
+  isNullFetch() {
+    return (
+      (this.first === 0 || this.last === 0) && this.fetchOneExtra === false
+    );
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -1162,6 +1169,9 @@ export class PgSelectPlan<
   ): Promise<CrystalResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
+    }
+    if (this.isNullFetch()) {
+      return arrayOfLength(values[0].length, []);
     }
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults;
@@ -2133,7 +2143,12 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
-    if (!this.isInliningForbidden && !this.hasSideEffects && !stream) {
+    if (
+      !this.isInliningForbidden &&
+      !this.hasSideEffects &&
+      !stream &&
+      !this.isNullFetch()
+    ) {
       // Inline ourself into our parent if we can.
       let t: PgSelectPlan<any, any, any, any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
