@@ -112,11 +112,15 @@ export class __InputListPlan extends ExecutablePlan {
     return list;
   }
 
-  evalIs(value: null | undefined): boolean {
+  evalIs(value: null | undefined | 0): boolean {
     if (value === undefined) {
       return this.inputValues === value;
     } else if (value === null) {
       return this.inputValues?.kind === "NullValue";
+    } else if (value === 0) {
+      return (
+        this.inputValues?.kind === "IntValue" && this.inputValues.value === "0"
+      );
     } else {
       throw new Error(
         "__InputListPlan cannot evalIs values other than null and undefined currently",

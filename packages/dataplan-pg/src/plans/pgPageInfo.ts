@@ -86,6 +86,9 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     const $connection = this.getConnectionPlan();
     const first = $connection.getFirst();
     const last = $connection.getLast();
+    if ((first && first.evalIs(0)) || (last && last.evalIs(0))) {
+      return constant(false);
+    }
     const firstExists =
       first && !first.evalIs(null) && !first.evalIs(undefined);
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
@@ -119,6 +122,10 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     const $connection = this.getConnectionPlan();
     const first = $connection.getFirst();
     const last = $connection.getLast();
+    if ((first && first.evalIs(0)) || (last && last.evalIs(0))) {
+      return constant(false);
+    }
+    const offset = $connection.getOffset();
     const firstExists =
       first && !first.evalIs(null) && !first.evalIs(undefined);
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
@@ -132,6 +139,8 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
         >
       ).cloneSubplanWithPagination();
       return nodePlan.hasMore();
+    } else if (offset && !offset.evalIs(null) && !offset.evalIs(undefined)) {
+      return constant(true);
     } else {
       return constant(false);
     }

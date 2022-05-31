@@ -98,11 +98,15 @@ export class __InputObjectPlan extends ExecutablePlan {
     return resultValues;
   }
 
-  evalIs(value: null | undefined): boolean {
+  evalIs(value: null | undefined | 0): boolean {
     if (value === undefined) {
       return this.inputValues === value;
     } else if (value === null) {
       return this.inputValues?.kind === "NullValue";
+    } else if (value === 0) {
+      return (
+        this.inputValues?.kind === "IntValue" && this.inputValues.value === "0"
+      );
     } else {
       throw new Error(
         "__InputObjectPlan cannot evalIs values other than null and undefined currently",

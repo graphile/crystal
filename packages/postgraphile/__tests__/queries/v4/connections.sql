@@ -1,1970 +1,502 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."id" asc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 2
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where (TRUE)
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  )
-) as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  (count(*))::text as "0"
+from "c"."person" as __person__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    with __local_2__ as (
-      select __local_1__.*
-      from "c"."person" as __local_1__
-      where (TRUE) and (TRUE)
-      order by __local_1__."id" DESC
-      limit 2
-    )
-    select *
-    from __local_2__
-    order by (
-      row_number( ) over (partition by 1)
-    ) desc
-  ) __local_1__
-),
-__local_3__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_3__.data
-    from __local_3__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where (TRUE)
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  )
-) as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."id" asc
+limit 3
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'name_asc',
-      json_build_array(
-        __local_1__."person_full_name",
-        __local_1__."id"
-      )
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."person_full_name" ASC,
-    __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."id" desc
+limit 3
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'name_desc',
-      json_build_array(
-        __local_1__."person_full_name",
-        __local_1__."id"
-      )
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."person_full_name" DESC,
-    __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."person_full_name" as "0",
+  __person__."id"::text as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."person_full_name" asc, __person__."id" asc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE)
-    and (
-      (
-        (
-          (
-            ('primary_key_asc') = (
-              $1
-            )
-          ) AND (
-            (
-              (
-                __local_1__."id" < $2
-              ) OR (
-                __local_1__."id" = $2 AND false
-              )
-            )
-          )
-        )
-      )
-    )
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where 1 = 1
-  and not (
-    (
-      (
-        (
-          ('primary_key_asc') = (
-            $1
-          )
-        ) AND (
-          (
-            (
-              __local_1__."id" < $2
-            ) OR (
-              __local_1__."id" = $2 AND false
-            )
-          )
-        )
-      )
-    )
-  )
-) as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."person_full_name" as "0",
+  __person__."id"::text as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."person_full_name" desc, __person__."id" asc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (
-      (
-        (
-          (
-            ('primary_key_asc') = (
-              $1
-            )
-          ) AND (
-            (
-              (
-                __local_1__."id" > $2
-              ) OR (
-                __local_1__."id" = $2 AND false
-              )
-            )
-          )
-        )
-      )
-    ) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where 1 = 1
-  and not (
-    (
-      (
-        (
-          ('primary_key_asc') = (
-            $1
-          )
-        ) AND (
-          (
-            (
-              __local_1__."id" > $2
-            ) OR (
-              __local_1__."id" = $2 AND false
-            )
-          )
-        )
-      )
-    )
-  )
-) as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (__person__."id" < __person_identifiers__."id0")
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '@node'::text,
-        (
-          json_build_object(
-            'x'::text,
-            (__local_1__."x"),
-            'name'::text,
-            (__local_1__."name"),
-            'constant'::text,
-            (__local_1__."constant")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'view_unique_key_asc',
-      json_build_array(__local_1__."x")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "b"."updatable_view" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."x" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (__person__."id" > __person_identifiers__."id0")
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '@node'::text,
-        (
-          json_build_object(
-            'x'::text,
-            (__local_1__."x"),
-            'name'::text,
-            (__local_1__."name"),
-            'constant'::text,
-            (__local_1__."constant")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'constant_asc',
-      json_build_array(
-        __local_1__."constant",
-        __local_1__."x"
-      )
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "b"."updatable_view" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."constant" ASC,
-    __local_1__."x" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select
+  (row_number() over (partition by 1))::text as "0",
+  __updatable_view__."x"::text as "1",
+  __updatable_view__."name" as "2",
+  __updatable_view__."constant"::text as "3",
+  (not (__updatable_view__ is null))::text as "4"
+from "b"."updatable_view" as __updatable_view__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'headline'::text,
-            (__local_1__."headline"),
-            'authorId'::text,
-            (__local_1__."author_id")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (
-      __local_1__."author_id" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "a"."post" as __local_1__
+select
+  __updatable_view__."constant"::text as "0",
+  __updatable_view__."x"::text as "1",
+  __updatable_view__."name" as "2",
+  (not (__updatable_view__ is null))::text as "3"
+from "b"."updatable_view" as __updatable_view__
+order by __updatable_view__."constant" asc
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post__."author_id"::text as "2",
+    __post_identifiers__.idx as "3"
+  from "a"."post" as __post__
   where (
-    __local_1__."author_id" = $1
+    __post__."author_id" = __post_identifiers__."id0"
   )
-) as "aggregates"
+  order by __post__."id" asc
+) as __post_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'headline'::text,
-            (__local_1__."headline"),
-            'authorId'::text,
-            (__local_1__."author_id")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (
-      __local_1__."author_id" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 2
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "a"."post" as __local_1__
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __post_identifiers__.idx as "1"
+  from "a"."post" as __post__
   where (
-    __local_1__."author_id" = $1
-  ) and (TRUE)
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
+    __post__."author_id" = __post_identifiers__."id0"
   )
-) as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "a"."post" as __local_1__
+) as __post_result__
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post__."author_id"::text as "2",
+    __post_identifiers__.idx as "3"
+  from "a"."post" as __post__
   where (
-    __local_1__."author_id" = $1
+    __post__."author_id" = __post_identifiers__."id0"
   )
-) as "aggregates"
+  order by __post__."id" asc
+  limit 3
+) as __post_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'headline'::text,
-            (__local_1__."headline"),
-            'authorId'::text,
-            (__local_1__."author_id")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'headline_asc',
-      json_build_array(
-        __local_1__."headline",
-        __local_1__."id"
-      )
-    )
-  ) as "__cursor"
-  from (
-    with __local_2__ as (
-      select __local_1__.*
-      from "a"."post" as __local_1__
-      where (
-        __local_1__."author_id" = $1
-      ) and (TRUE) and (TRUE)
-      order by __local_1__."headline" DESC,
-      __local_1__."id" DESC
-      limit 1
-    )
-    select *
-    from __local_2__
-    order by (
-      row_number( ) over (partition by 1)
-    ) desc
-  ) __local_1__
-),
-__local_3__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_3__.data
-    from __local_3__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-exists(
-  select 1
-  from "a"."post" as __local_1__
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."headline" as "0",
+    __post__."id"::text as "1",
+    __post__."author_id"::text as "2",
+    __post_identifiers__.idx as "3"
+  from "a"."post" as __post__
   where (
-    __local_1__."author_id" = $1
-  ) and (TRUE)
-  and (
-    json_build_array(
-      'headline_asc',
-      json_build_array(
-        __local_1__."headline",
-        __local_1__."id"
-      )
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
+    __post__."author_id" = __post_identifiers__."id0"
   )
-) as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "a"."post" as __local_1__
+  order by __post__."headline" desc, __post__."id" desc
+  limit 2
+) as __post_result__
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __post_identifiers__.idx as "1"
+  from "a"."post" as __post__
   where (
-    __local_1__."author_id" = $1
+    __post__."author_id" = __post_identifiers__."id0"
   )
-) as "aggregates"
+) as __post_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 3 offset 1
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where (TRUE)
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  ) offset $1
-) as "hasNextPage",
-TRUE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."id" asc
+limit 4
+offset 1
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 0
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+order by __person__."id" asc
+limit 0
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'rowId'::text,
-        (__local_1__."row_id")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."edge_case" as __local_1__
-    where (
-      __local_1__."row_id" = $1
-    ) and (TRUE) and (TRUE)
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    with __local_2__ as (
-      select __local_1__.*
-      from "c"."person" as __local_1__
-      where (TRUE)
-      and (
-        (
-          (
-            (
-              ('primary_key_asc') = (
-                $1
-              )
-            ) AND (
-              (
-                (
-                  __local_1__."id" < $2
-                ) OR (
-                  __local_1__."id" = $2 AND false
-                )
-              )
-            )
-          )
-        )
-      )
-      order by __local_1__."id" DESC
-      limit 2
-    )
-    select *
-    from __local_2__
-    order by (
-      row_number( ) over (partition by 1)
-    ) desc
-  ) __local_1__
-),
-__local_3__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_3__.data
-    from __local_3__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where 1 = 1
-  and not (
-    (
-      (
-        (
-          ('primary_key_asc') = (
-            $1
-          )
-        ) AND (
-          (
-            (
-              __local_1__."id" < $2
-            ) OR (
-              __local_1__."id" = $2 AND false
-            )
-          )
-        )
-      )
-    )
-  )
-) as "hasNextPage",
-exists(
-  select 1
-  from "c"."person" as __local_1__
+select __edge_case_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __edge_case_identifiers__,
+lateral (
+  select
+    __edge_case__."row_id"::text as "0",
+    __edge_case__."not_null_has_default"::text as "1",
+    __edge_case_identifiers__.idx as "2"
+  from "c"."edge_case" as __edge_case__
   where (
-    (
-      (
-        (
-          ('primary_key_asc') = (
-            $1
-          )
-        ) AND (
-          (
-            (
-              __local_1__."id" < $2
-            ) OR (
-              __local_1__."id" = $2 AND false
-            )
-          )
-        )
-      )
-    )
+    __edge_case__."row_id" = __edge_case_identifiers__."id0"
   )
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  )
-) as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+) as __edge_case_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (
-      (
-        (
-          (
-            ('primary_key_asc') = (
-              $1
-            )
-          ) AND (
-            (
-              (
-                __local_1__."id" > $2
-              ) OR (
-                __local_1__."id" = $2 AND false
-              )
-            )
-          )
-        )
-      )
-    ) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 1
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (__person__."id" < __person_identifiers__."id0")
+  order by __person__."id" desc
+  limit 3
+) as __person_result__
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (__person__."id" > __person_identifiers__."id0")
+  order by __person__."id" asc
+  limit 2
+) as __person_result__
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (__person__."id" > __person_identifiers__."id0")
+  order by __person__."id" desc
+  limit 2
+) as __person_result__
+
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
+from "c"."person" as __person__
+where (
+  __person__."about" is null
 )
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."person" as __local_1__
+order by __person__."id" asc
+
+select
+  (count(*))::text as "0"
+from "c"."person" as __person__
+where (
+  __person__."about" is null
+)
+
+select
+  __post__."author_id"::text as "0",
+  __post__."headline" as "1",
+  __post__."id"::text as "2"
+from "a"."post" as __post__
+order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
+limit 4
+
+select
+  (count(*))::text as "0"
+from "a"."post" as __post__
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"inet" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
   where (
-    (
-      (
-        (
-          ('primary_key_asc') = (
-            $1
-          )
-        ) AND (
-          (
-            (
-              __local_1__."id" > $2
-            ) OR (
-              __local_1__."id" = $2 AND false
-            )
-          )
-        )
-      )
-    )
+    __person__."last_login_from_ip" = __person_identifiers__."id0"
   )
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  )
-) as "hasNextPage",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where 1 = 1
-  and not (
-    (
-      (
-        (
-          ('primary_key_asc') = (
-            $1
-          )
-        ) AND (
-          (
-            (
-              __local_1__."id" > $2
-            ) OR (
-              __local_1__."id" = $2 AND false
-            )
-          )
-        )
-      )
-    )
-  )
-) as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    with __local_2__ as (
-      select __local_1__.*
-      from "c"."person" as __local_1__
-      where (
-        (
-          (
-            (
-              ('primary_key_asc') = (
-                $1
-              )
-            ) AND (
-              (
-                (
-                  __local_1__."id" > $2
-                ) OR (
-                  __local_1__."id" = $2 AND false
-                )
-              )
-            )
-          )
-        )
-      ) and (TRUE)
-      order by __local_1__."id" DESC
-      limit 1
-    )
-    select *
-    from __local_2__
-    order by (
-      row_number( ) over (partition by 1)
-    ) desc
-  ) __local_1__
-),
-__local_3__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_3__.data
-    from __local_3__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-exists(
-  select 1
-  from "c"."person" as __local_1__
-  where (TRUE)
-  and (
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  )
-) as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where 1 = 1
-) as "aggregates"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (__local_1__."about" IS NULL) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
-  where (__local_1__."about" IS NULL)
-) as "aggregates"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'headline'::text,
-            (__local_1__."headline"),
-            'authorId'::text,
-            (__local_1__."author_id")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'author_id_desc',
-      'headline_desc',
-      json_build_array(
-        __local_1__."author_id",
-        __local_1__."headline",
-        __local_1__."id"
-      )
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."author_id" DESC,
-    __local_1__."headline" DESC,
-    __local_1__."id" ASC
-    limit 3
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "a"."post" as __local_1__
-  where (TRUE)
-  and (
-    json_build_array(
-      'author_id_desc',
-      'headline_desc',
-      json_build_array(
-        __local_1__."author_id",
-        __local_1__."headline",
-        __local_1__."id"
-      )
-    )
-  )::text not in (
-    select __cursor::text
-    from __local_0__
-  )
-) as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "a"."post" as __local_1__
-  where 1 = 1
-) as "aggregates"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (
-      __local_1__."last_login_from_ip" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"inet" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    __local_1__."last_login_from_ip" = $1
+    __person__."last_login_from_ip" = __person_identifiers__."id0"
   )
-) as "aggregates"
+) as __person_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '@n1'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            '@personByAuthorId'::text,
-            (
-              select json_build_object(
-                '__identifiers'::text,
-                json_build_array(__local_2__."id"),
-                'name'::text,
-                (__local_2__."person_full_name")
-              ) as object
-              from "c"."person" as __local_2__
-              where (__local_1__."author_id" = __local_2__."id") and (TRUE) and (TRUE)
-            )
-          )
-        ),
-        '@n2'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'headline'::text,
-            (__local_1__."headline"),
-            '@personByAuthorId'::text,
-            (
-              select json_build_object(
-                '__identifiers'::text,
-                json_build_array(__local_3__."id"),
-                'id'::text,
-                (__local_3__."id")
-              ) as object
-              from "c"."person" as __local_3__
-              where (__local_1__."author_id" = __local_3__."id") and (TRUE) and (TRUE)
-            )
-          )
-        )
-      )
-    )
-  ) as "@e1",
-  to_json(
-    (
-      json_build_object(
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id")
-          )
-        )
-      )
-    )
-  ) as "@e2"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 2
-  ) __local_1__
-),
-__local_4__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_4__.data
-    from __local_4__
-  ),
-  '[]'::json
-) as "data"
+select
+  __post__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."id"::text as "2",
+  __post__."headline" as "3"
+from "a"."post" as __post__
+left outer join "c"."person" as __person__
+on (__post__."author_id"::"int4" = __person__."id")
+order by __post__."id" asc
+limit 2
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (
-      __local_1__."last_login_from_subnet" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"cidr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
   where (
-    __local_1__."last_login_from_subnet" = $1
+    __person__."last_login_from_subnet" = __person_identifiers__."id0"
   )
-) as "aggregates"
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'id'::text,
-            (__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name"),
-            'email'::text,
-            (__local_1__."email"),
-            'config'::text,
-            (__local_1__."config"),
-            'lastLoginFromIp'::text,
-            (__local_1__."last_login_from_ip"),
-            'lastLoginFromSubnet'::text,
-            (__local_1__."last_login_from_subnet"),
-            'userMac'::text,
-            (__local_1__."user_mac")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (
-      __local_1__."user_mac" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "c"."person" as __local_1__
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"cidr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    __local_1__."user_mac" = $1
+    __person__."last_login_from_subnet" = __person_identifiers__."id0"
   )
-) as "aggregates"
+) as __person_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'nullableText'::text,
-        (__local_1__."nullable_text"),
-        'nullableInt'::text,
-        (__local_1__."nullable_int")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."null_test_record" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"macaddr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (
+    __person__."user_mac" = __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+) as __person_result__
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"macaddr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
+  where (
+    __person__."user_mac" = __person_identifiers__."id0"
+  )
+) as __person_result__
+
+select
+  __null_test_record__."nullable_text" as "0",
+  __null_test_record__."nullable_int"::text as "1",
+  __null_test_record__."id"::text as "2"
+from "c"."null_test_record" as __null_test_record__
+order by __null_test_record__."id" asc
