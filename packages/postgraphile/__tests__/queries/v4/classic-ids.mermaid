@@ -9,12 +9,15 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
     __InputStaticLeaf13["__InputStaticLeaf[13∈0]"]:::plan
     Access22["Access[22∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access23["Access[23∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object24["Object[24∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgSelect21[["PgSelect[21∈0]<br />ᐸpostᐳ"]]:::plan
-    Constant56["Constant[56∈0]"]:::plan
+    Connection25["Connection[25∈0]<br />ᐸ21ᐳ"]:::plan
     __Item27>"__Item[27∈1]<br />ᐸ21ᐳ"]:::itemplan
     PgSelectSingle28["PgSelectSingle[28∈1]<br />ᐸpostᐳ"]:::plan
     Constant29["Constant[29∈0]"]:::plan
@@ -22,9 +25,12 @@ graph TD
     List31["List[31∈1]<br />ᐸ29,30ᐳ"]:::plan
     Lambda32["Lambda[32∈1]<br />ᐸencodeᐳ"]:::plan
     PgClassExpression34["PgClassExpression[34∈1]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    __InputStaticLeaf35["__InputStaticLeaf[35∈0]"]:::plan
+    __InputStaticLeaf36["__InputStaticLeaf[36∈0]"]:::plan
+    __InputStaticLeaf37["__InputStaticLeaf[37∈0]"]:::plan
     __InputStaticLeaf43["__InputStaticLeaf[43∈0]"]:::plan
     PgSelect47[["PgSelect[47∈0]<br />ᐸedgeCaseᐳ"]]:::plan
-    Constant57["Constant[57∈0]"]:::plan
+    Connection51["Connection[51∈0]<br />ᐸ47ᐳ"]:::plan
     __Item53>"__Item[53∈2]<br />ᐸ47ᐳ"]:::itemplan
     PgSelectSingle54["PgSelectSingle[54∈2]<br />ᐸedgeCaseᐳ"]:::plan
     PgClassExpression55["PgClassExpression[55∈2]<br />ᐸ__edge_case__.”row_id”ᐳ"]:::plan
@@ -34,6 +40,7 @@ graph TD
     __Value3 --> Access23
     Access22 & Access23 --> Object24
     Object24 & __InputStaticLeaf13 --> PgSelect21
+    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection25
     PgSelect21 ==> __Item27
     __Item27 --> PgSelectSingle28
     PgSelectSingle28 --> PgClassExpression30
@@ -41,6 +48,7 @@ graph TD
     List31 --> Lambda32
     PgSelectSingle28 --> PgClassExpression34
     Object24 & __InputStaticLeaf43 --> PgSelect47
+    __InputStaticLeaf35 & __InputStaticLeaf36 & __InputStaticLeaf37 --> Connection51
     PgSelect47 ==> __Item53
     __Item53 --> PgSelectSingle54
     PgSelectSingle54 --> PgClassExpression55
@@ -50,6 +58,8 @@ graph TD
     __Value0 -.-> P0
     P21["ᐳa…sᐳnodes"]
     PgSelect21 -.-> P21
+    P25["ᐳallPosts"]
+    Connection25 -.-> P25
     P28["ᐳa…sᐳnodes[]"]
     PgSelectSingle28 -.-> P28
     P30["ᐳa…sᐳn…]ᐳrowId"]
@@ -60,19 +70,17 @@ graph TD
     PgClassExpression34 -.-> P34
     P47["ᐳa…sᐳnodes"]
     PgSelect47 -.-> P47
+    P51["ᐳallEdgeCases"]
+    Connection51 -.-> P51
     P54["ᐳa…sᐳnodes[]"]
     PgSelectSingle54 -.-> P54
     P55["ᐳa…sᐳn…]ᐳrowId"]
     PgClassExpression55 -.-> P55
-    P56["ᐳallPosts"]
-    Constant56 -.-> P56
-    P57["ᐳallEdgeCases"]
-    Constant57 -.-> P57
 
     subgraph "Buckets for queries/v4/classic-ids"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPosts ᐸ-O- 56<br />⠀⠀⠀allPosts.nodes ᐸ-A- 21<br />⠀⠀allEdgeCases ᐸ-O- 57<br />⠀⠀⠀allEdgeCases.nodes ᐸ-A- 47"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPosts ᐸ-O- 25<br />⠀⠀⠀allPosts.nodes ᐸ-A- 21<br />⠀⠀allEdgeCases ᐸ-O- 51<br />⠀⠀⠀allEdgeCases.nodes ᐸ-A- 47"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf13,PgSelect21,Access22,Access23,Object24,Constant29,__InputStaticLeaf43,PgSelect47,Constant56,Constant57 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf13,PgSelect21,Access22,Access23,Object24,Connection25,Constant29,__InputStaticLeaf35,__InputStaticLeaf36,__InputStaticLeaf37,__InputStaticLeaf43,PgSelect47,Connection51 bucket0
     Bucket1("Bucket 1 (item27)<br />Deps: 21, 29<br />~ᐳQuery.allPostsᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 28<br />⠀⠀rowId ᐸ-L- 30<br />⠀⠀id ᐸ-L- 32<br />⠀⠀headline ᐸ-L- 34"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item27,PgSelectSingle28,PgClassExpression30,List31,Lambda32,PgClassExpression34 bucket1

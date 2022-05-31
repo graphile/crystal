@@ -9,24 +9,30 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
     Access66["Access[66∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access67["Access[67∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object68["Object[68∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgSelect27[["PgSelect[27∈0]<br />ᐸpersonᐳ"]]:::plan
-    Constant84["Constant[84∈0]"]:::plan
+    Connection31["Connection[31∈0]<br />ᐸ27ᐳ"]:::plan
     PgSelect32[["PgSelect[32∈0]<br />ᐸpersonᐳ"]]:::plan
     First33["First[33∈0]"]:::plan
     PgSelectSingle34["PgSelectSingle[34∈0]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression35["PgClassExpression[35∈0]<br />ᐸcount(*)ᐳ"]:::plan
-    Constant85["Constant[85∈0]"]:::plan
+    __InputStaticLeaf36["__InputStaticLeaf[36∈0]"]:::plan
+    __InputStaticLeaf37["__InputStaticLeaf[37∈0]"]:::plan
+    __InputStaticLeaf38["__InputStaticLeaf[38∈0]"]:::plan
+    Connection60["Connection[60∈0]<br />ᐸ56ᐳ"]:::plan
     __Item62>"__Item[62∈1]<br />ᐸ27ᐳ"]:::itemplan
     PgSelectSingle63["PgSelectSingle[63∈1]<br />ᐸpersonᐳ"]:::plan
-    Constant86["Constant[86∈0]"]:::plan
+    Connection69["Connection[69∈0]<br />ᐸ65ᐳ"]:::plan
     Access83["Access[83∈1]<br />ᐸ62.0ᐳ"]:::plan
     First71["First[71∈1]"]:::plan
     PgSelectSingle72["PgSelectSingle[72∈1]<br />ᐸperson_friendsᐳ"]:::plan
     PgClassExpression73["PgClassExpression[73∈1]<br />ᐸcount(*)ᐳ"]:::plan
-    Constant87["Constant[87∈0]"]:::plan
+    Connection78["Connection[78∈0]<br />ᐸ74ᐳ"]:::plan
     PgSelect79[["PgSelect[79∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
     First80["First[80∈0]"]:::plan
     PgSelectSingle81["PgSelectSingle[81∈0]<br />ᐸtable_set_queryᐳ"]:::plan
@@ -37,10 +43,12 @@ graph TD
     __Value3 --> Access67
     Access66 & Access67 --> Object68
     Object68 --> PgSelect27
+    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection31
     Object68 --> PgSelect32
     PgSelect32 --> First33
     First33 --> PgSelectSingle34
     PgSelectSingle34 --> PgClassExpression35
+    __InputStaticLeaf36 & __InputStaticLeaf37 & __InputStaticLeaf38 --> Connection60
     PgSelect27 ==> __Item62
     __Item62 --> PgSelectSingle63
     __Item62 --> Access83
@@ -57,28 +65,28 @@ graph TD
     __Value0 -.-> P0
     P27["ᐳbᐳnodes"]
     PgSelect27 -.-> P27
+    P31["ᐳa"]
+    Connection31 -.-> P31
     P35["ᐳaᐳtotalCount"]
     PgClassExpression35 -.-> P35
+    P60["ᐳb"]
+    Connection60 -.-> P60
     P63["ᐳbᐳnodes[]"]
     PgSelectSingle63 -.-> P63
+    P69["ᐳbᐳn…]ᐳfriends"]
+    Connection69 -.-> P69
     P73["ᐳbᐳn…]ᐳf…sᐳtotalCount"]
     PgClassExpression73 -.-> P73
+    P78["ᐳc"]
+    Connection78 -.-> P78
     P82["ᐳcᐳtotalCount"]
     PgClassExpression82 -.-> P82
-    P84["ᐳa"]
-    Constant84 -.-> P84
-    P85["ᐳb"]
-    Constant85 -.-> P85
-    P86["ᐳbᐳn…]ᐳfriends"]
-    Constant86 -.-> P86
-    P87["ᐳc"]
-    Constant87 -.-> P87
 
     subgraph "Buckets for queries/v4/connections-totalCount"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-O- 84<br />⠀⠀⠀a.totalCount ᐸ-L- 35<br />⠀⠀b ᐸ-O- 85<br />⠀⠀⠀b.nodes ᐸ-A- 27<br />⠀⠀c ᐸ-O- 87<br />⠀⠀⠀c.totalCount ᐸ-L- 82"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-O- 31<br />⠀⠀⠀a.totalCount ᐸ-L- 35<br />⠀⠀b ᐸ-O- 60<br />⠀⠀⠀b.nodes ᐸ-A- 27<br />⠀⠀c ᐸ-O- 78<br />⠀⠀⠀c.totalCount ᐸ-L- 82"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect27,PgSelect32,First33,PgSelectSingle34,PgClassExpression35,Access66,Access67,Object68,PgSelect79,First80,PgSelectSingle81,PgClassExpression82,Constant84,Constant85,Constant86,Constant87 bucket0
-    Bucket1("Bucket 1 (item62)<br />Deps: 27, 86<br />~ᐳQuery.bᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 63<br />⠀⠀friends ᐸ-O- 86<br />⠀⠀⠀friends.totalCount ᐸ-L- 73"):::bucket
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,PgSelect27,Connection31,PgSelect32,First33,PgSelectSingle34,PgClassExpression35,__InputStaticLeaf36,__InputStaticLeaf37,__InputStaticLeaf38,Connection60,Access66,Access67,Object68,Connection69,Connection78,PgSelect79,First80,PgSelectSingle81,PgClassExpression82 bucket0
+    Bucket1("Bucket 1 (item62)<br />Deps: 27, 69<br />~ᐳQuery.bᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 63<br />⠀⠀friends ᐸ-O- 69<br />⠀⠀⠀friends.totalCount ᐸ-L- 73"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item62,PgSelectSingle63,First71,PgSelectSingle72,PgClassExpression73,Access83 bucket1
     Bucket0 --> Bucket1
