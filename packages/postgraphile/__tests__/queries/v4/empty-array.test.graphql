@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  allPeople(first: 1) {
+    nodes {
+      id
+      name
+      aliases
+    }
+  }
+}

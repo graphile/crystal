@@ -1,0 +1,11 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        id: 1,
+        name: "John Smith",
+        aliases: [],
+      },
+    ],
+  },
+}
