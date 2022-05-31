@@ -1,9 +1,9 @@
 import assert from "assert";
 import { createHash } from "crypto";
 import type {
-  __ItemPlan,
   ConnectionCapablePlan,
   ConnectionPlan,
+  ConstantPlan,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
@@ -18,8 +18,10 @@ import {
   __InputListPlan,
   __InputObjectPlan,
   __InputStaticLeafPlan,
+  __ItemPlan,
   __TrackedObjectPlan,
   access,
+  constant,
   ExecutablePlan,
   first,
   isAsyncIterable,
@@ -59,6 +61,8 @@ import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSinglePlan } from "./pgSelectSingle.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
+
+export type PgSelectParsedCursorPlan = LambdaPlan<string, any[]>;
 
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)
@@ -265,7 +269,10 @@ export class PgSelectPlan<
   extends ExecutablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
   implements
     StreamablePlan<PgSourceRow<TColumns>>,
-    ConnectionCapablePlan<PgSelectSinglePlan<TColumns, any, any, any>>
+    ConnectionCapablePlan<
+      PgSelectSinglePlan<TColumns, any, any, any>,
+      PgSelectParsedCursorPlan
+    >
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -1019,25 +1026,6 @@ export class PgSelectPlan<
     }
   }
 
-  private addCursorPlan(
-    beforeOrAfter: "before" | "after",
-    $cursorPlan: __InputStaticLeafPlan<string | null>,
-  ): void {
-    this.assertCursorPaginationAllowed();
-
-    if ($cursorPlan.evalIs(null) || $cursorPlan.evalIs(undefined)) {
-      return;
-    }
-
-    const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
-
-    if (beforeOrAfter === "before") {
-      this.beforePlanId = this.addDependency($parsedCursorPlan);
-    } else {
-      this.afterPlanId = this.addDependency($parsedCursorPlan);
-    }
-  }
-
   private conditionFromCursor(
     beforeOrAfter: "before" | "after",
     $parsedCursorPlan: LambdaPlan<any, any[] | null>,
@@ -1110,18 +1098,32 @@ export class PgSelectPlan<
     return finalCondition;
   }
 
-  setAfter($cursorPlan: __InputStaticLeafPlan<string>): void {
+  // TODO: rename?
+  // TODO: should this be a static method?
+  parseCursor(
+    $cursorPlan: __InputStaticLeafPlan<string>,
+  ): PgSelectParsedCursorPlan | null {
     this.assertCursorPaginationAllowed();
-    this.addCursorPlan("after", $cursorPlan);
+    if ($cursorPlan.evalIs(null)) {
+      return null;
+    } else if ($cursorPlan.evalIs(undefined)) {
+      return null;
+    }
+
+    const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
+    return $parsedCursorPlan;
   }
 
-  setBefore($cursorPlan: __InputStaticLeafPlan<string>): void {
-    this.assertCursorPaginationAllowed();
-    this.addCursorPlan("before", $cursorPlan);
+  setAfter($parsedCursorPlan: PgSelectParsedCursorPlan): void {
+    this.afterPlanId = this.addDependency($parsedCursorPlan);
+  }
+
+  setBefore($parsedCursorPlan: PgSelectParsedCursorPlan): void {
+    this.beforePlanId = this.addDependency($parsedCursorPlan);
   }
 
   public pageInfo(
-    $connectionPlan: ConnectionPlan<any, this, any>,
+    $connectionPlan: ConnectionPlan<any, PgSelectParsedCursorPlan, this, any>,
   ): PgPageInfoPlan<this> {
     this.assertCursorPaginationAllowed();
     this.lock();

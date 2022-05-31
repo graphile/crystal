@@ -111,6 +111,7 @@ export {
   PgSelectLockCallback,
   PgSelectMode,
   PgSelectOptions,
+  PgSelectParsedCursorPlan,
   PgSelectPlan,
 } from "./plans/pgSelect.js";
 export {

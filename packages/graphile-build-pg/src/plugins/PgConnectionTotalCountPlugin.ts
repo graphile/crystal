@@ -2,7 +2,11 @@ import "./PgTablesPlugin.js";
 import "./PgBasicsPlugin.js";
 import "graphile-config";
 
-import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
+import type {
+  PgSelectParsedCursorPlan,
+  PgSelectPlan,
+  PgSelectSinglePlan,
+} from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -76,6 +80,7 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                       (
                         $connection: ConnectionPlan<
                           PgSelectSinglePlan<any, any, any, any>,
+                          PgSelectParsedCursorPlan,
                           PgSelectPlan<any, any, any, any>,
                           PgSelectSinglePlan<any, any, any, any>
                         >,

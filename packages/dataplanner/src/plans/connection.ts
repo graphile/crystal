@@ -20,23 +20,28 @@ export interface PageInfoCapablePlan extends ExecutablePlan<any> {
  * Describes what a plan needs to implement in order to be suitable for
  * supplying what a ConnectionPlan requires.
  */
-export interface ConnectionCapablePlan<TItemPlan extends ExecutablePlan<any>>
-  extends ExecutablePlan<
+export interface ConnectionCapablePlan<
+  TItemPlan extends ExecutablePlan<any>,
+  TCursorPlan extends ExecutablePlan<any>,
+> extends ExecutablePlan<
     ReadonlyArray<TItemPlan extends ExecutablePlan<infer U> ? U : any>
   > {
-  clone(...args: any[]): ConnectionCapablePlan<TItemPlan>; // TODO: `this`
+  clone(...args: any[]): ConnectionCapablePlan<TItemPlan, TCursorPlan>; // TODO: `this`
   pageInfo(
     $connectionPlan: ConnectionPlan<
       TItemPlan,
-      ConnectionCapablePlan<TItemPlan>,
+      TCursorPlan,
+      ConnectionCapablePlan<TItemPlan, TCursorPlan>,
       any
     >,
   ): PageInfoCapablePlan;
   setFirst($plan: InputPlan): void;
   setLast($plan: InputPlan): void;
   setOffset($plan: InputPlan): void;
-  setBefore($plan: InputPlan): void;
-  setAfter($plan: InputPlan): void;
+
+  parseCursor($plan: InputPlan): TCursorPlan | null | undefined;
+  setBefore($plan: TCursorPlan): void;
+  setAfter($plan: TCursorPlan): void;
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -47,14 +52,15 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  */
 export class ConnectionPlan<
   TItemPlan extends ExecutablePlan<any>,
-  TPlan extends ConnectionCapablePlan<TItemPlan>,
+  TCursorPlan extends ExecutablePlan<any>,
+  TPlan extends ConnectionCapablePlan<TItemPlan, TCursorPlan>,
   TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > extends ExecutablePlan<unknown> {
   static $$export = {
     moduleName: "dataplanner",
     exportName: "ConnectionPlan",
   };
-  isSyncAndSafe = true;
+  isSyncAndSafe = false;
 
   private subplanId: string;
 
@@ -120,27 +126,33 @@ export class ConnectionPlan<
     }
     this._offsetDepId = this.addDependency($offsetPlan);
   }
-  public getBefore(): InputPlan | null {
+  public getBefore(): TCursorPlan | null {
     return this._beforeDepId != null
-      ? (this.getDep(this._beforeDepId) as InputPlan)
+      ? (this.getDep(this._beforeDepId) as TCursorPlan)
       : null;
   }
   public setBefore($beforePlan: InputPlan) {
     if (this._beforeDepId != null) {
       throw new Error(`${this}->setBefore already called`);
     }
-    this._beforeDepId = this.addDependency($beforePlan);
+    const $parsedBeforePlan = this.getSubplan().parseCursor($beforePlan);
+    this._beforeDepId = $parsedBeforePlan
+      ? this.addDependency($parsedBeforePlan)
+      : null;
   }
-  public getAfter(): InputPlan | null {
+  public getAfter(): TCursorPlan | null {
     return this._afterDepId != null
-      ? (this.getDep(this._afterDepId) as InputPlan)
+      ? (this.getDep(this._afterDepId) as TCursorPlan)
       : null;
   }
   public setAfter($afterPlan: InputPlan) {
     if (this._afterDepId != null) {
       throw new Error(`${this}->setAfter already called`);
     }
-    this._afterDepId = this.addDependency($afterPlan);
+    const $parsedAfterPlan = this.getSubplan().parseCursor($afterPlan);
+    this._afterDepId = $parsedAfterPlan
+      ? this.addDependency($parsedAfterPlan)
+      : null;
   }
 
   /**
@@ -248,7 +260,9 @@ export class ConnectionPlan<
     }
   }
 
-  public wrapEdge($edge: TItemPlan): EdgePlan<TItemPlan, TPlan, TNodePlan> {
+  public wrapEdge(
+    $edge: TItemPlan,
+  ): EdgePlan<TItemPlan, TCursorPlan, TPlan, TNodePlan> {
     return new EdgePlan(this, $edge);
   }
 
@@ -277,7 +291,8 @@ export interface EdgeCapablePlan<TNodePlan extends ExecutablePlan<any>>
 
 export class EdgePlan<
     TItemPlan extends ExecutablePlan<any>,
-    TPlan extends ConnectionCapablePlan<TItemPlan>,
+    TCursorPlan extends ExecutablePlan<any>,
+    TPlan extends ConnectionCapablePlan<TItemPlan, TCursorPlan>,
     TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
   >
   extends ExecutablePlan
@@ -292,7 +307,7 @@ export class EdgePlan<
   private connectionPlanId: string;
 
   constructor(
-    $connection: ConnectionPlan<TItemPlan, TPlan, TNodePlan>,
+    $connection: ConnectionPlan<TItemPlan, TCursorPlan, TPlan, TNodePlan>,
     $item: TItemPlan,
   ) {
     super();
@@ -300,7 +315,12 @@ export class EdgePlan<
     this.addDependency($item);
   }
 
-  private getConnectionPlan(): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
+  private getConnectionPlan(): ConnectionPlan<
+    TItemPlan,
+    TCursorPlan,
+    TPlan,
+    TNodePlan
+  > {
     return this.getPlan(this.connectionPlanId) as any;
   }
 
@@ -337,12 +357,13 @@ export class EdgePlan<
  */
 export function connection<
   TItemPlan extends ExecutablePlan<any>,
-  TPlan extends ConnectionCapablePlan<TItemPlan>,
+  TCursorPlan extends ExecutablePlan<any>,
+  TPlan extends ConnectionCapablePlan<TItemPlan, TCursorPlan>,
   TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 >(
   plan: TPlan,
   itemPlan?: ($item: TItemPlan) => TNodePlan,
   cursorPlan?: ($item: TItemPlan) => ExecutablePlan<string | null>,
-): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
+): ConnectionPlan<TItemPlan, TCursorPlan, TPlan, TNodePlan> {
   return new ConnectionPlan(plan, itemPlan, cursorPlan);
 }

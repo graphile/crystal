@@ -105,6 +105,7 @@ import {
 } from "../index.js";
 import { PgPageInfoPlan } from "../plans/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic.js";
+import type { PgSelectParsedCursorPlan } from "../plans/pgSelect.js";
 
 declare module ".." {
   interface PgEnumSourceExtensions {
@@ -203,6 +204,7 @@ export function makeExampleSchema(
       TSource["TRelations"],
       TSource["TParameters"]
     >,
+    PgSelectParsedCursorPlan,
     PgSelectPlan<
       TSource["TColumns"],
       TSource["TUniques"],

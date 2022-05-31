@@ -2,11 +2,12 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgSelectParsedCursorPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
   PgTypeCodec,
 } from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan } from "dataplanner";
+import type { ConnectionPlan, InputPlan, LambdaPlan } from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
@@ -146,6 +147,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                         _: any,
                         $connection: ConnectionPlan<
                           PgSelectSinglePlan<any, any, any, any>,
+                          PgSelectParsedCursorPlan,
                           PgSelectPlan<any, any, any, any>
                         >,
                         $value: InputPlan,

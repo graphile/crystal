@@ -1,7 +1,11 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
+import type {
+  PgSelectParsedCursorPlan,
+  PgSelectPlan,
+  PgSelectSinglePlan,
+} from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
@@ -71,6 +75,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                       _: any,
                       $connection: ConnectionPlan<
                         PgSelectSinglePlan<any, any, any, any>,
+                        PgSelectParsedCursorPlan,
                         PgSelectPlan<any, any, any, any>
                       >,
                       $value: InputPlan,
@@ -94,6 +99,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                             _: any,
                             $connection: ConnectionPlan<
                               PgSelectSinglePlan<any, any, any, any>,
+                              PgSelectParsedCursorPlan,
                               PgSelectPlan<any, any, any, any>
                             >,
                             $value: InputPlan,
@@ -119,6 +125,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                       _: any,
                       $connection: ConnectionPlan<
                         PgSelectSinglePlan<any, any, any, any>,
+                        PgSelectParsedCursorPlan,
                         PgSelectPlan<any, any, any, any>
                       >,
                       $value: InputPlan,
@@ -142,6 +149,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                             _: any,
                             $connection: ConnectionPlan<
                               PgSelectSinglePlan<any, any, any, any>,
+                              PgSelectParsedCursorPlan,
                               PgSelectPlan<any, any, any, any>
                             >,
                             $value: InputPlan,
@@ -163,6 +171,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                             _: any,
                             $connection: ConnectionPlan<
                               PgSelectSinglePlan<any, any, any, any>,
+                              PgSelectParsedCursorPlan,
                               PgSelectPlan<any, any, any, any>
                             >,
                             $value: InputPlan,

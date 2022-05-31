@@ -3,6 +3,7 @@ import "graphile-config";
 
 import type {
   PgConditionPlan,
+  PgSelectParsedCursorPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
   PgTypeColumns,
@@ -233,6 +234,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                     _condition,
                     $connection: ConnectionPlan<
                       PgSelectSinglePlan<any, any, any, any>,
+                      PgSelectParsedCursorPlan,
                       PgSelectPlan<any, any, any, any>
                     >,
                   ) => {

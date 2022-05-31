@@ -12,7 +12,7 @@ import {
 } from "dataplanner";
 
 import type { PgCursorPlan } from "./pgCursor.js";
-import type { PgSelectPlan } from "./pgSelect.js";
+import type { PgSelectParsedCursorPlan, PgSelectPlan } from "./pgSelect.js";
 import { PgSelectSinglePlan } from "./pgSelectSingle.js";
 
 /*
@@ -44,7 +44,9 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 
   private connectionPlanId: string;
 
-  constructor(connectionPlan: ConnectionPlan<any, TPlan, any>) {
+  constructor(
+    connectionPlan: ConnectionPlan<any, PgSelectParsedCursorPlan, TPlan, any>,
+  ) {
     super();
     this.connectionPlanId = connectionPlan.id;
   }
@@ -54,14 +56,19 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
    *
    * @internal
    */
-  public getConnectionPlan(): ConnectionPlan<any, TPlan, any> {
+  public getConnectionPlan(): ConnectionPlan<
+    any,
+    PgSelectParsedCursorPlan,
+    TPlan,
+    any
+  > {
     const plan = this.getPlan(this.connectionPlanId);
     if (!(plan instanceof ConnectionPlan)) {
       throw new Error(
         `Expected ${this.connectionPlanId} (${plan}) to be a ConnectionPlan`,
       );
     }
-    return plan as ConnectionPlan<any, TPlan, any>;
+    return plan as ConnectionPlan<any, PgSelectParsedCursorPlan, TPlan, any>;
   }
 
   /**
@@ -86,6 +93,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
       const nodePlan = (
         $connection as ConnectionPlan<
           any,
+          PgSelectParsedCursorPlan,
           PgSelectPlan<any, any, any, any>,
           any
         >
@@ -118,6 +126,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
       const nodePlan = (
         $connection as ConnectionPlan<
           PgSelectSinglePlan<any, any, any, any>,
+          PgSelectParsedCursorPlan,
           PgSelectPlan<any, any, any, any>,
           PgSelectSinglePlan<any, any, any, any>
         >
@@ -131,6 +140,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
   startCursor(): PgCursorPlan<PgSelectSinglePlan<any, any, any, any>> {
     const $connection = this.getConnectionPlan() as ConnectionPlan<
       PgSelectSinglePlan<any, any, any, any>,
+      PgSelectParsedCursorPlan,
       PgSelectPlan<any, any, any, any>,
       PgSelectSinglePlan<any, any, any, any>
     >;
@@ -141,6 +151,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
   endCursor(): PgCursorPlan<PgSelectSinglePlan<any, any, any, any>> {
     const $connection = this.getConnectionPlan() as ConnectionPlan<
       PgSelectSinglePlan<any, any, any, any>,
+      PgSelectParsedCursorPlan,
       PgSelectPlan<any, any, any, any>,
       PgSelectSinglePlan<any, any, any, any>
     >;
@@ -161,7 +172,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
  * {@page ~@dataplan/pg/plans/pgPageInfo.md}
  */
 export function pgPageInfo<TPlan extends PgSelectPlan<any, any, any, any>>(
-  connectionPlan: ConnectionPlan<any, TPlan, any>,
+  connectionPlan: ConnectionPlan<any, PgSelectParsedCursorPlan, TPlan, any>,
 ): PgPageInfoPlan<TPlan> {
   return new PgPageInfoPlan(connectionPlan);
 }
