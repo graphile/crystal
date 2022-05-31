@@ -1,0 +1,9 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query TestDirectives($true: Boolean = true, $false: Boolean = false) {
+  a: nodeId @include(if: $true)
+  b: nodeId @include(if: $false)
+  c: nodeId @skip(if: $true)
+  d: nodeId @skip(if: $false)
+}
