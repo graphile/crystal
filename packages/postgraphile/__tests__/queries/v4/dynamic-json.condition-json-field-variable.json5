@@ -1,0 +1,32 @@
+{
+  a: {
+    nodes: [
+      {
+        id: 1,
+        jsonData: {
+          stringField: "test",
+        },
+      },
+    ],
+  },
+  b: {
+    nodes: [
+      {
+        id: 1,
+        jsonData: {
+          stringField: "test",
+        },
+      },
+    ],
+  },
+  c: {
+    nodes: [
+      {
+        id: 1,
+        jsonData: {
+          stringField: "test",
+        },
+      },
+    ],
+  },
+}
