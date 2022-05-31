@@ -22,6 +22,11 @@ class _CrystalError extends Error implements CrystalError {
   public readonly originalError: Error;
   extensions: Record<string, any>;
   constructor(originalError: Error, planId: string | null) {
+    if (originalError instanceof _CrystalError) {
+      throw new Error(
+        "GraphileInternalError<62505509-8b21-4ef7-80f5-d0f99873174b>: attempted to wrap a CrystalError with a CrystalError.",
+      );
+    }
     const message = originalError?.message;
     // TODO: remove `CrystalError:` prefix
     super(message ? `CrystalError: ${message}` : `CrystalError`);
