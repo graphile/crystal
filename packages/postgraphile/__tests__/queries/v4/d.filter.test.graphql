@@ -1,0 +1,17 @@
+## expect(errors).toBeFalsy();
+#> schema: ["d"]
+{
+  allPeople(condition:{colNoCreate:"col_no_create1"}) {
+    nodes {
+      id
+      firstName
+      lastName
+      colNoCreate
+      colNoUpdate
+      colNoOrder
+      colNoFilter
+      colNoCreateUpdate
+      colNoCreateUpdateOrderFilter
+    }
+  }
+}

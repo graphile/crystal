@@ -1,0 +1,17 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        id: 1,
+        firstName: "John",
+        lastName: "Smith",
+        colNoCreate: "col_no_create1",
+        colNoUpdate: "col_no_update1",
+        colNoOrder: "col_no_order1",
+        colNoFilter: "col_no_filter1",
+        colNoCreateUpdate: "col_no_create_update1",
+        colNoCreateUpdateOrderFilter: "col_no_create_update_order_filter1",
+      },
+    ],
+  },
+}
