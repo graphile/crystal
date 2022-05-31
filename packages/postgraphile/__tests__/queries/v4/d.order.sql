@@ -1,46 +1,12 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'id'::text,
-        (__local_1__."id"),
-        'firstName'::text,
-        (__local_1__."first_name"),
-        'lastName'::text,
-        (__local_1__."last_name"),
-        'colNoCreate'::text,
-        (__local_1__."col_no_create"),
-        'colNoUpdate'::text,
-        (__local_1__."col_no_update"),
-        'colNoOrder'::text,
-        (__local_1__."col_no_order"),
-        'colNoFilter'::text,
-        (__local_1__."col_no_filter"),
-        'colNoCreateUpdate'::text,
-        (__local_1__."col_no_create_update"),
-        'colNoCreateUpdateOrderFilter'::text,
-        (__local_1__."col_no_create_update_order_filter")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "d"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."col_no_create_update" DESC,
-    __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select
+  __person__."id"::text as "0",
+  __person__."first_name" as "1",
+  __person__."last_name" as "2",
+  __person__."col_no_create" as "3",
+  __person__."col_no_update" as "4",
+  __person__."col_no_order" as "5",
+  __person__."col_no_filter" as "6",
+  __person__."col_no_create_update" as "7",
+  __person__."col_no_create_update_order_filter" as "8"
+from "d"."person" as __person__
+order by __person__."col_no_create_update" desc, __person__."id" asc
