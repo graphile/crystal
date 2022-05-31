@@ -197,7 +197,7 @@ export function executeBucket(
           } else {
             requestContext.hasIssue();
             bucket.hasErrors = true;
-            return newCrystalError(t.reason);
+            return newCrystalError(t.reason, finishedPlan.id);
           }
         });
         store[finishedPlan.id] = result;
@@ -411,7 +411,7 @@ export function executeBucket(
             requestContext.hasIssue();
             return completedPlan(
               plan,
-              arrayOfLength(size, newCrystalError(error)),
+              arrayOfLength(size, newCrystalError(error, plan.id)),
             );
           },
         );
@@ -423,7 +423,7 @@ export function executeBucket(
       bucket.hasErrors = true;
       return completedPlan(
         plan,
-        arrayOfLength(size, newCrystalError(error)),
+        arrayOfLength(size, newCrystalError(error, plan.id)),
         true,
       );
     }

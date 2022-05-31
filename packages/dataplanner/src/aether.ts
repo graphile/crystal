@@ -4262,7 +4262,10 @@ export class Aether<
           dependencyValuesList[dependencyIndex] = await promise;
         } catch (e) {
           // An error has occurred; we can short-circuit execution.
-          const crystalError = newCrystalError(e);
+          const crystalError = newCrystalError(
+            e,
+            plan.dependencies[dependencyIndex],
+          );
           for (const list of pendingPlanResultsAndIndexListList) {
             for (const item of list) {
               result[item.planResultsesIndex] = crystalError;
@@ -4429,7 +4432,7 @@ export class Aether<
             );
           }
         } catch (e) {
-          crystalError = newCrystalError(e);
+          crystalError = newCrystalError(e, plan.id);
         }
         if (debugExecuteEnabled)
           console.timeLog(`plan\t${plan}`, "pre executable loop");
@@ -4661,7 +4664,7 @@ export class Aether<
         }
       },
       (error) => {
-        const crystalError = newCrystalError(error);
+        const crystalError = newCrystalError(error, plan.id);
         for (let i = 0; i < pendingPlanResultsesLength; i++) {
           // Execution complete; delete from cache
           const planResults = pendingPlanResultses[i];
@@ -4883,7 +4886,7 @@ export class Aether<
           try {
             result[underlyingIndex] = await rawPendingResult;
           } catch (e: any) {
-            result[underlyingIndex] = newCrystalError(e);
+            result[underlyingIndex] = newCrystalError(e, plan.id);
           }
         }
         // TODO: do we need 'else if (isAsyncIterable(rawPendingResult)) { ... }'

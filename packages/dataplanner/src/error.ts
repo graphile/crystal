@@ -20,10 +20,13 @@ export interface CrystalError extends Error {
  */
 class _CrystalError extends Error implements CrystalError {
   public readonly originalError: Error;
-  constructor(originalError: Error) {
+  extensions: Record<string, any>;
+  constructor(originalError: Error, planId: string | null) {
     const message = originalError?.message;
+    // TODO: remove `CrystalError:` prefix
     super(message ? `CrystalError: ${message}` : `CrystalError`);
     this.originalError = originalError;
+    this.extensions = { dataplanner: { planId } };
   }
 }
 
@@ -32,8 +35,8 @@ class _CrystalError extends Error implements CrystalError {
  *
  * @internal
  */
-export function newCrystalError(error: Error) {
-  return new _CrystalError(error);
+export function newCrystalError(error: Error, planId: string | null) {
+  return new _CrystalError(error, planId);
 }
 
 /**

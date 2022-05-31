@@ -314,7 +314,7 @@ export function bucketValue(
           try {
             return mode.serialize(value);
           } catch (e) {
-            return handleNull(newCrystalError(e));
+            return handleNull(newCrystalError(e, null));
           }
         } else {
           // Queue serialization to take place when we know no errors can occur
