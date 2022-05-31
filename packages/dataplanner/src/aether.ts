@@ -141,6 +141,16 @@ import {
 } from "./utils.js";
 
 /**
+ * Return a rejected promise, but make sure that Node doesn't exit due to
+ * unhandled promise rejection (we'll handle the rejection later).
+ */
+function reject(e: Error) {
+  const promise = Promise.reject(e);
+  promise.then(null, () => {});
+  return promise;
+}
+
+/**
  * Once the plan has been requested once from context, we can just return the
  * same plan over and over without rebuilding it each time.
  *
@@ -3983,46 +3993,58 @@ export class Aether<
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
   ): PromiseOrDirect<any[]> {
-    if (String(plan.id) in planCacheForPlanResultses) {
-      if (isDev) {
-        Promise.resolve(planCacheForPlanResultses[plan.id]).then(
-          (planCache) => {
-            assert.strictEqual(
-              planCache.length,
-              planResultses.length,
-              "Expected the planCache length to match the planResultses length",
-            );
-          },
-        );
+    try {
+      if (String(plan.id) in planCacheForPlanResultses) {
+        if (isDev) {
+          return Promise.resolve(planCacheForPlanResultses[plan.id]).then(
+            (planCache) => {
+              assert.strictEqual(
+                planCache.length,
+                planResultses.length,
+                `(1) When executing '${plan}', expected the planCache length (${planCache.length}) to match the planResultses length (${planResultses.length})`,
+              );
+              return planCache;
+            },
+          );
+        } else {
+          return planCacheForPlanResultses[plan.id];
+        }
       }
-      return planCacheForPlanResultses[plan.id];
-    }
-    let timeString: string | null = null;
-    if (debugExecuteEnabled && Math.random() > 2) {
-      timeString = `plan\t${plan}`;
-      console.time(timeString);
-      console.timeLog(timeString, "START");
-    }
-    const result = this.executePlanAlt(
-      plan,
-      crystalContext,
-      planResultses,
-      visitedPlans,
-      depth,
-      planCacheForPlanResultses,
-    );
-    if (timeString) {
-      if (isPromiseLike(result)) {
-        Promise.resolve(result).then(() => {
+      let timeString: string | null = null;
+      if (debugExecuteEnabled && Math.random() > 2) {
+        timeString = `plan\t${plan}`;
+        console.time(timeString);
+        console.timeLog(timeString, "START");
+      }
+      const result = this.executePlanAlt(
+        plan,
+        crystalContext,
+        planResultses,
+        visitedPlans,
+        depth,
+        planCacheForPlanResultses,
+      );
+      if (timeString) {
+        if (isPromiseLike(result)) {
+          Promise.resolve(result).then(
+            () => {
+              console.timeEnd(timeString!);
+            },
+            () => {},
+          );
+        } else {
           console.timeEnd(timeString!);
-        });
-      } else {
-        console.timeEnd(timeString!);
+        }
       }
-    }
-    planCacheForPlanResultses[plan.id] = result;
+      planCacheForPlanResultses[plan.id] = result;
 
-    return result;
+      return result;
+    } catch (e) {
+      const error = newCrystalError(e, plan.id);
+      const promise = reject(error);
+      planCacheForPlanResultses[plan.id] = promise;
+      return promise;
+    }
   }
 
   /**
