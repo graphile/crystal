@@ -12,7 +12,6 @@ import type {
   PlanStreamOptions,
   StreamablePlan,
 } from "dataplanner";
-import { ConnectionPlan } from "dataplanner";
 import {
   __InputListPlan,
   __InputObjectPlan,
@@ -20,6 +19,7 @@ import {
   __ItemPlan,
   __TrackedObjectPlan,
   access,
+  ConnectionPlan,
   ExecutablePlan,
   first,
   isAsyncIterable,
