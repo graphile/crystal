@@ -141,16 +141,6 @@ import {
 } from "./utils.js";
 
 /**
- * Return a rejected promise, but make sure that Node doesn't exit due to
- * unhandled promise rejection (we'll handle the rejection later).
- */
-function reject(e: Error) {
-  const promise = Promise.reject(e);
-  promise.then(null, () => {});
-  return promise;
-}
-
-/**
  * Once the plan has been requested once from context, we can just return the
  * same plan over and over without rebuilding it each time.
  *
@@ -4041,7 +4031,7 @@ export class Aether<
       return result;
     } catch (e) {
       const error = newCrystalError(e, plan.id);
-      const promise = reject(error);
+      const promise = Promise.reject(error);
       planCacheForPlanResultses[plan.id] = promise;
       return promise;
     }
