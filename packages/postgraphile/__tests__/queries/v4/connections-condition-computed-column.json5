@@ -1,0 +1,10 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        id: 3,
+        name: "Budd Deey",
+      },
+    ],
+  },
+}
