@@ -34,6 +34,7 @@ export function parseHstore(hstoreString: string): PgHStore {
           continue;
         } else if (char === '"') {
           mode = "KEY_QUOTES";
+          key = "";
         } else if (char === "\\") {
           mode = "KEY_RAW";
           key = hstoreString[++i];
@@ -84,6 +85,7 @@ export function parseHstore(hstoreString: string): PgHStore {
           continue;
         } else if (char === '"') {
           mode = "VALUE_QUOTES";
+          value = "";
         } else if (char === "\\") {
           mode = "VALUE_RAW";
           value = hstoreString[++i];
