@@ -4030,8 +4030,7 @@ export class Aether<
 
       return result;
     } catch (e) {
-      const error = newCrystalError(e, plan.id);
-      const promise = Promise.reject(error);
+      const promise = Promise.reject(e);
       planCacheForPlanResultses[plan.id] = promise;
       return promise;
     }
