@@ -1,0 +1,118 @@
+{
+  all: {
+    nodes: [
+      {
+        id: 101,
+        letter: "A",
+        letterViaView: "A",
+        description: "The first letter in the alphabet",
+      },
+      {
+        id: 102,
+        letter: "B",
+        letterViaView: "B",
+        description: "Following closely behind the first letter, this is a popular choice",
+      },
+      {
+        id: 103,
+        letter: "C",
+        letterViaView: "C",
+        description: "Pronounced like 'sea'",
+      },
+      {
+        id: 104,
+        letter: "D",
+        letterViaView: "D",
+        description: "The first letter omitted from the 'ABC' phrase",
+      },
+    ],
+  },
+  reverse: {
+    nodes: [
+      {
+        id: 104,
+        letter: "D",
+        letterViaView: "D",
+        description: "The first letter omitted from the 'ABC' phrase",
+      },
+      {
+        id: 103,
+        letter: "C",
+        letterViaView: "C",
+        description: "Pronounced like 'sea'",
+      },
+      {
+        id: 102,
+        letter: "B",
+        letterViaView: "B",
+        description: "Following closely behind the first letter, this is a popular choice",
+      },
+      {
+        id: 101,
+        letter: "A",
+        letterViaView: "A",
+        description: "The first letter in the alphabet",
+      },
+    ],
+  },
+  reverseView: {
+    nodes: [
+      {
+        id: 104,
+        letter: "D",
+        letterViaView: "D",
+        description: "The first letter omitted from the 'ABC' phrase",
+      },
+      {
+        id: 103,
+        letter: "C",
+        letterViaView: "C",
+        description: "Pronounced like 'sea'",
+      },
+      {
+        id: 102,
+        letter: "B",
+        letterViaView: "B",
+        description: "Following closely behind the first letter, this is a popular choice",
+      },
+      {
+        id: 101,
+        letter: "A",
+        letterViaView: "A",
+        description: "The first letter in the alphabet",
+      },
+    ],
+  },
+  b: {
+    id: 102,
+    letter: "B",
+    letterViaView: "B",
+    description: "Following closely behind the first letter, this is a popular choice",
+  },
+  bView: {
+    id: 102,
+    letter: "B",
+    letterViaView: "B",
+    description: "Following closely behind the first letter, this is a popular choice",
+  },
+  letterC: {
+    nodes: [
+      {
+        id: 103,
+        letter: "C",
+        letterViaView: "C",
+        description: "Pronounced like 'sea'",
+      },
+    ],
+  },
+  letterCView: {
+    nodes: [
+      {
+        id: 103,
+        letter: "C",
+        letterViaView: "C",
+        description: "Pronounced like 'sea'",
+      },
+    ],
+  },
+}
