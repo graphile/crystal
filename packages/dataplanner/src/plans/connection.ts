@@ -60,7 +60,7 @@ export class ConnectionPlan<
     moduleName: "dataplanner",
     exportName: "ConnectionPlan",
   };
-  isSyncAndSafe = false;
+  isSyncAndSafe = true;
 
   private subplanId: string;
 
