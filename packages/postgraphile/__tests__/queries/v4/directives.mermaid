@@ -1,0 +1,32 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0]"]:::plan
+    Constant15["Constant[15]"]:::plan
+    Lambda16["Lambda[16]<br />ᐸencodeᐳ"]:::plan
+    Constant17["Constant[17]"]:::plan
+    Lambda18["Lambda[18]<br />ᐸencodeᐳ"]:::plan
+
+    %% plan dependencies
+    Constant15 --> Lambda16
+    Constant17 --> Lambda18
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P16["ᐳa"]
+    Lambda16 -.-> P16
+    P18["ᐳd"]
+    Lambda18 -.-> P18
+
+    subgraph "Buckets for queries/v4/directives"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-L- 16<br />⠀⠀d ᐸ-L- 18"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,Constant15,Lambda16,Constant17,Lambda18 bucket0
+    end
