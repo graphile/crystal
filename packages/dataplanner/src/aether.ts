@@ -1407,16 +1407,17 @@ export class Aether<
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const groupedFieldSet = graphqlCollectFields(
-      this,
-      this.trackedRootValuePlan.id,
-      rootType,
-      [
+    const wgs = withGlobalState.bind(null, {
+      aether: this,
+      parentPathIdentity: ROOT_PATH,
+    }) as <T>(cb: () => T) => T;
+    const groupedFieldSet = wgs(() =>
+      graphqlCollectFields(this, this.trackedRootValuePlan.id, rootType, [
         {
           groupId: 0,
           selections: selectionSet.selections,
         },
-      ],
+      ]),
     );
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.keys()) {
@@ -1437,10 +1438,6 @@ export class Aether<
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
-    const wgs = withGlobalState.bind(null, {
-      aether: this,
-      parentPathIdentity: ROOT_PATH,
-    }) as <T>(cb: () => T) => T;
     if (subscriptionPlanResolver) {
       const trackedArguments = wgs(() =>
         this.getTrackedArguments(rootType, field),
@@ -1535,12 +1532,19 @@ export class Aether<
     isMutation = false,
   ): { fieldDigests: FieldDigest[] } {
     assertObjectType(objectType);
-    const groupedFieldSet = graphqlCollectFields(
-      this,
-      parentPlan.id,
-      objectType,
-      groupedSelectionsList,
-      isMutation,
+    const groupedFieldSet = withGlobalState(
+      {
+        aether: this,
+        parentPathIdentity: parentFieldPathIdentity,
+      },
+      () =>
+        graphqlCollectFields(
+          this,
+          parentPlan.id,
+          objectType,
+          groupedSelectionsList,
+          isMutation,
+        ),
     );
     const objectTypeFields = objectType.getFields();
     const fieldDigests: FieldDigest[] = [];
