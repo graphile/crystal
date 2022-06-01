@@ -1,4 +1,5 @@
 import {
+  Introspection,
   PgAttribute,
   PgClass,
   PgConstraint,
@@ -8,6 +9,7 @@ import {
 import { version } from "../index.js";
 import { sql } from "pg-sql2";
 import { withPgClientFromPgSource } from "../pgSources.js";
+import { PgTypeCodec } from "@dataplan/pg";
 
 declare global {
   namespace GraphileConfig {
@@ -18,12 +20,25 @@ declare global {
           pgClass: PgClass,
           columns: PgAttribute[],
         ): Promise<readonly Record<string, string>[]>;
+        processIntrospection(event: {
+          databaseName: string;
+          introspection: Introspection;
+        }): Promise<void>;
       };
+    }
+  }
+
+  namespace GraphileBuild {
+    interface Inflection {
+      enumTableCodec(this: Inflection, pgConstraint: PgConstraint): string;
     }
   }
 }
 
-interface State {}
+interface State {
+  codecByPgConstraint: Map<PgConstraint, PgTypeCodec<any, any, any, any>>;
+  codecByPgAttribute: Map<PgAttribute, PgTypeCodec<any, any, any, any>>;
+}
 interface Cache {}
 
 // Assert the columns are text
@@ -40,8 +55,28 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
   version,
   after: ["PgFakeConstraintsPlugin"],
 
+  inflection: {
+    add: {
+      enumTableCodec(pgConstraint) {
+        const pgClass = pgConstraint.getClass()!;
+        if (pgConstraint.contype === "p") {
+          return this._tableName(pgClass);
+        } else {
+          const tableName = this._tableName(pgClass);
+          const pgAttribute = pgClass
+            .getAttributes()!
+            .find((att) => att.attnum === pgConstraint.conkey![0])!;
+          return this.upperCamelCase(`${tableName}-${pgAttribute.attname}`);
+        }
+      },
+    },
+  },
+
   gather: <GraphileConfig.PluginGatherConfig<"pgEnumTables", State, Cache>>{
     namespace: "pgEnumTables",
+    initialState: (): State => ({
+      codecByPgConstraint: new Map(),
+    }),
     helpers: {
       async getIntrospectionData(info, databaseName, pgClass, columns) {
         // Load data from the table/view.
@@ -96,11 +131,7 @@ Original error: ${e.message}
 `);
         }
       },
-    },
-    hooks: {
-      /*
-      // Run in the 'introspection' phase before anything uses the tags
-      async pgIntrospection_introspection(info, event) {
+      async processIntrospection(info, event) {
         const { introspection, databaseName } = event;
         for (const pgClass of introspection.classes) {
           const pgNamespace = pgClass.getNamespace();
@@ -182,169 +213,27 @@ Original error: ${e.message}
                 );
               }
 
-              // Create fake enum type
-              const constraintIdent =
-                pgConstraint.contype === "p" ? "" : `_${pgConstraint.conname}`;
-              const fakeId = `FAKE_ENUM_${pgNamespace.nspname}_${pgClass.relname}${constraintIdent}`;
-              const listTagsAndDescription = {
-                tags: {},
-                description: "",
-              };
-              const enumTypeArray: PgType = {
-                _id: `${fakeId}_list`,
-                typname: `_${pgClass.relname}${constraintIdent}`,
-                typnamespace: pgNamespace._id,
-                typtype: "b",
-                typcategory: "A",
-                typnotnull: null,
-                typarray: null,
-                typlen: -1,
-                typelem: fakeId,
-                typrelid: null,
-                typbasetype: null,
-                typtypmod: null,
-                typdefault: null,
-                typdefaultbin: null,
-                typinput: null,
-                typoutput: null,
-                typreceive: null,
-                typsend: null,
-                typmodin: null,
-                typmodout: null,
-                typanalyze: null,
-                typalign: null,
-                typstorage: null,
-                typndims: null,
-                typcollation: null,
-                typacl: null,
-                typsubscript: null,
-                typowner: pgClass.getOwner()?._id || null,
-                typbyval: null,
-                typispreferred: null,
-                typisdefined: true,
-                typdelim: null,
-                getArrayType() {
-                  return undefined;
-                },
-                getEnumValues() {
-                  return undefined;
-                },
-                getRange() {
-                  return undefined;
-                },
-                getDescription() {
-                  return listTagsAndDescription.description;
-                },
-                getOwner() {
-                  return pgClass.getOwner();
-                },
-                getClass() {
-                  return undefined;
-                },
-                getElemType() {
-                  return enumType;
-                },
-                getTagsAndDescription() {
-                  return listTagsAndDescription;
-                },
-                getNamespace() {
-                  return pgNamespace;
-                },
-              };
-              const enumValues: PgEnum[] = data.map((r, i) => {
-                const value = r[pgAttribute.attname];
-                const description = descriptionColumn
-                  ? r[descriptionColumn.attname]
-                  : "";
-                const tagsAndDescription = {
-                  tags: Object.create(null),
-                  description,
-                };
-                return {
-                  _id: `${fakeId}_value_${value}`,
-                  enumlabel: value,
-                  enumsortorder: i,
-                  enumtypid: fakeId,
-                  getType() {
-                    return enumType;
-                  },
-                  getDescription() {
-                    return description;
-                  },
-                  getTagsAndDescription() {
-                    return tagsAndDescription;
-                  },
-                };
-              });
+              const originalCodec =
+                await info.helpers.pgCodecs.getCodecFromType(
+                  databaseName,
+                  pgAttribute.atttypeid,
+                  pgAttribute.atttypmod,
+                );
 
-              introspection.enums.push(...enumValues);
+              const values: string[] = data.map(
+                (r, i) => r[pgAttribute.attname],
+              );
 
-              const elemTagsAndDescription = {
-                tags: { ...tags, ...pgConstraint.getTagsAndDescription().tags },
-                description,
-              };
-              const enumType: PgType = {
-                _id: fakeId,
-                typname: `${pgClass.relname}${constraintIdent}`,
-                typnamespace: pgNamespace._id,
-                typtype: "e",
-                typcategory: "E",
-                typnotnull: null,
-                typarray: enumTypeArray._id,
-                typlen: 4, // ???
-                typelem: fakeId,
-                typrelid: null,
-                typbasetype: null,
-                typtypmod: null,
-                typdefault: null,
-                typdefaultbin: null,
-                typinput: null,
-                typoutput: null,
-                typreceive: null,
-                typsend: null,
-                typmodin: null,
-                typmodout: null,
-                typanalyze: null,
-                typalign: null,
-                typstorage: null,
-                typndims: null,
-                typcollation: null,
-                typacl: null,
-                typsubscript: null,
-                typowner: pgClass.getOwner()?._id || null,
-                typbyval: null,
-                typispreferred: null,
-                typisdefined: true,
-                typdelim: null,
-                getArrayType() {
-                  return enumTypeArray;
-                },
-                getEnumValues() {
-                  return enumValues;
-                },
-                getRange() {
-                  return undefined;
-                },
-                getDescription() {
-                  return elemTagsAndDescription.description;
-                },
-                getOwner() {
-                  return pgClass.getOwner();
-                },
-                getClass() {
-                  return undefined;
-                },
-                getElemType() {
-                  return undefined;
-                },
-                getTagsAndDescription() {
-                  return elemTagsAndDescription;
-                },
-                getNamespace() {
-                  return pgNamespace;
-                },
-              };
-              introspection.types.push(enumType, enumTypeArray);
+              // Build the codec
+              const codec = enumType(
+                build.inflection.enumTableCodec(pgConstraint),
+                originalCodec.identifier,
+                values,
+                {}, //extensions
+              );
+
+              // Associate this constraint with our new codec
+              info.state.codecByPgConstraint.set(pgConstraint, codec);
 
               // Change type of all attributes that reference this table to
               // reference this enum type
@@ -362,8 +251,8 @@ Original error: ${e.message}
                       attr.attnum === c.conkey![0],
                   );
                   if (fkattr) {
-                    // Override the detected type to pretend to be our enum
-                    fkattr.atttypid = enumType._id;
+                    // Associate this attribute with our new codec
+                    info.state.codecByPgAttribute.set(fkattr, codec);
                   }
                 }
               });
@@ -371,7 +260,12 @@ Original error: ${e.message}
           }
         }
       },
-      */
+    },
+    hooks: {
+      // Run in the 'introspection' phase before anything uses the tags
+      async pgIntrospection_introspection(info, event) {
+        info.helpers.pgEnumTables.processIntrospection(event);
+      },
     },
   },
 };
