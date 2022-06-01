@@ -187,6 +187,7 @@ export function recordType<TColumns extends PgTypeColumns>(
 exportAs(recordType, "recordType");
 
 // TODO: rename to enumCodec
+// TODO: enum values should not be strings but objects so that they can have descriptions, tags, etc.
 /**
  * Returns a PgTypeCodec that represents a Postgres enum type.
  *

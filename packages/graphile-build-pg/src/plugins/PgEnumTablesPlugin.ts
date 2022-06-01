@@ -9,7 +9,7 @@ import {
 import { version } from "../index.js";
 import { sql } from "pg-sql2";
 import { withPgClientFromPgSource } from "../pgSources.js";
-import { PgTypeCodec } from "@dataplan/pg";
+import { enumType, PgTypeCodec } from "@dataplan/pg";
 
 declare global {
   namespace GraphileConfig {
@@ -30,7 +30,10 @@ declare global {
 
   namespace GraphileBuild {
     interface Inflection {
-      enumTableCodec(this: Inflection, pgConstraint: PgConstraint): string;
+      enumTableCodec(
+        this: Inflection,
+        details: { databaseName: string; pgConstraint: PgConstraint },
+      ): string;
     }
   }
 }
@@ -57,12 +60,12 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      enumTableCodec(pgConstraint) {
+      enumTableCodec(preset, { databaseName, pgConstraint }) {
         const pgClass = pgConstraint.getClass()!;
         if (pgConstraint.contype === "p") {
-          return this._tableName(pgClass);
+          return this.tableSourceName({ databaseName, pgClass });
         } else {
-          const tableName = this._tableName(pgClass);
+          const tableName = this.tableSourceName({ databaseName, pgClass });
           const pgAttribute = pgClass
             .getAttributes()!
             .find((att) => att.attnum === pgConstraint.conkey![0])!;
@@ -76,6 +79,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     namespace: "pgEnumTables",
     initialState: (): State => ({
       codecByPgConstraint: new Map(),
+      codecByPgAttribute: new Map(),
     }),
     helpers: {
       async getIntrospectionData(info, databaseName, pgClass, columns) {
@@ -194,7 +198,7 @@ Original error: ${e.message}
                 columns,
               );
 
-            enumConstraints.forEach((pgConstraint) => {
+            for (const pgConstraint of enumConstraints) {
               const pgAttribute = enumTableColumns.find(
                 (pgAttribute) => pgAttribute.attnum === pgConstraint.conkey![0],
               );
@@ -216,20 +220,25 @@ Original error: ${e.message}
               const originalCodec =
                 await info.helpers.pgCodecs.getCodecFromType(
                   databaseName,
-                  pgAttribute.atttypeid,
+                  pgAttribute.atttypid,
                   pgAttribute.atttypmod,
                 );
+              if (!originalCodec) {
+                // TODO: throw an error?
+                continue;
+              }
 
+              // TODO: values should be an object array to leave space for description, etc?
               const values: string[] = data.map(
                 (r, i) => r[pgAttribute.attname],
               );
 
               // Build the codec
               const codec = enumType(
-                build.inflection.enumTableCodec(pgConstraint),
-                originalCodec.identifier,
+                info.inflection.enumTableCodec({ databaseName, pgConstraint }),
+                originalCodec.sqlType,
                 values,
-                {}, //extensions
+                // TODO: extensions?
               );
 
               // Associate this constraint with our new codec
@@ -256,7 +265,7 @@ Original error: ${e.message}
                   }
                 }
               });
-            });
+            }
           }
         }
       },
@@ -265,6 +274,13 @@ Original error: ${e.message}
       // Run in the 'introspection' phase before anything uses the tags
       async pgIntrospection_introspection(info, event) {
         info.helpers.pgEnumTables.processIntrospection(event);
+      },
+      pgCodecs_column(info, event) {
+        const { column, pgAttribute } = event;
+        const replacementCodec = info.state.codecByPgAttribute.get(pgAttribute);
+        if (replacementCodec) {
+          column.codec = replacementCodec;
+        }
       },
     },
   },
