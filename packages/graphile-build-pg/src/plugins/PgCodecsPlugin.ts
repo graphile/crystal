@@ -22,7 +22,6 @@ import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
 import { version } from "../index.js";
-import { GraphQLOutputType } from "graphql";
 
 interface State {
   codecByTypeIdByDatabaseName: Map<

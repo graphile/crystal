@@ -4,7 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type { PgTypeCodec } from "@dataplan/pg";
-import type { GraphQLType, GraphQLOutputType } from "graphql";
+import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
 import { version } from "../index.js";
@@ -64,19 +64,6 @@ declare global {
       setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec;
 
       /**
-       * Given a plan `plan` that resolves data for a given `pgCodec`, and a
-       * type `type` that we would like to return from our field, return a
-       * higher-order plan that converts the data to be suitable for use with
-       * `type`.
-       */
-      castFromPgCodec<T extends (...args: any[]) => any>(props: {
-        pgCodec: PgTypeCodec<any, any, any, any>;
-        type: GraphQLOutputType;
-        plan: T;
-      }): // TODO: should be (...args: Parameters<T>) => any;
-      (...args: any[]) => any;
-
-      /**
        * pg-sql2 access on Build to avoid duplicate module issues.
        */
       sql: typeof sql;
@@ -93,9 +80,6 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const {
-          graphql: { isNonNullType, isListType },
-        } = build;
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
         const getGraphQLTypeNameByPgCodec: GraphileBuild.GetGraphQLTypeNameByPgCodec =
@@ -152,41 +136,6 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             }
           };
 
-        const castFromPgCodec: GraphileBuild.Build["castFromPgCodec"] =
-          function ({ pgCodec, type, plan }) {
-            const expectedType = getGraphQLTypeByPgCodec(pgCodec, "output");
-            // First: see if casting is unnecessary
-            if (expectedType === type) {
-              return plan;
-            }
-            if (pgCodec.arrayOfCodec) {
-              const innerCodec = pgCodec.arrayOfCodec;
-              const nullableType = isNonNullType(type) ? type.ofType : type;
-              if (isListType(nullableType)) {
-                const innerType = nullableType.ofType;
-                const expectedInnerType = getGraphQLTypeByPgCodec(
-                  innerCodec,
-                  "output",
-                );
-                if (expectedInnerType === innerType) {
-                  return plan;
-                }
-                // TODO: list of list needs handling
-              }
-            }
-
-            // Okay, casting is necessary... let's do it!
-            // IMPORTANT: make sure any casting is EXPORTABLE
-
-            // TODO: do it (or at least make it easy for the user to do it)
-
-            // TODO: we should throw an error here.
-            console.warn(
-              `No explicit cast from '${pgCodec}' to '${type}'; not performing any conversion`,
-            );
-            return plan;
-          };
-
         return build.extend(
           build,
           {
@@ -195,7 +144,6 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             getGraphQLTypeByPgCodec,
             hasGraphQLTypeForPgCodec,
             setGraphQLTypeForPgCodec,
-            castFromPgCodec,
             sql,
             // For slightly better backwards compatibility with v4.
             pgSql: sql,

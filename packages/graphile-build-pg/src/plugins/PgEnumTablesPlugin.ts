@@ -37,7 +37,7 @@ const VALID_TYPE_IDS = [VARCHAR_ID, TEXT_ID, CHAR_ID, BPCHAR_ID];
 export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
   name: "PgEnumTablesPlugin",
   description: "Converts columns that reference `@enum` tables into enums",
-  version: version,
+  version,
   after: ["PgFakeConstraintsPlugin"],
 
   gather: <GraphileConfig.PluginGatherConfig<"pgEnumTables", State, Cache>>{
@@ -98,6 +98,7 @@ Original error: ${e.message}
       },
     },
     hooks: {
+      /*
       // Run in the 'introspection' phase before anything uses the tags
       async pgIntrospection_introspection(info, event) {
         const { introspection, databaseName } = event;
@@ -112,7 +113,7 @@ Original error: ${e.message}
 
           if (isEnumTable) {
             if (Array.isArray(tags.behavior)) {
-              /* no action */
+              // no action
             } else if (typeof tags.behavior === "string") {
               tags.behavior = [tags.behavior];
             } else {
@@ -250,12 +251,6 @@ Original error: ${e.message}
                   return pgNamespace;
                 },
               };
-              /*
-                enumVariants: data.map((r) => r[pgAttribute.attname]),
-                enumDescriptions: descriptionColumn
-                  ? data.map((r) => r[descriptionColumn.attname])
-                  : null,
-                  */
               const enumValues: PgEnum[] = data.map((r, i) => {
                 const value = r[pgAttribute.attname];
                 const description = descriptionColumn
@@ -376,6 +371,7 @@ Original error: ${e.message}
           }
         }
       },
+      */
     },
   },
 };
