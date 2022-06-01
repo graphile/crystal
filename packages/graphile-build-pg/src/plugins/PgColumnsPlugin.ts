@@ -17,7 +17,7 @@ import {
 } from "@dataplan/pg";
 import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLNonNull, GraphQLType } from "graphql";
+import type { GraphQLNonNull, GraphQLOutputType, GraphQLType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -77,6 +77,17 @@ declare global {
       isPgCompoundType?: boolean;
       pgColumn?: PgTypeColumn;
     }
+
+    interface Build {
+      getGraphQLOutputTypeByPgColumn(props: {
+        pgCodec: PgTypeCodec<any, any, any>;
+        columnName: string;
+        column: PgTypeColumn;
+      }): {
+        type: GraphQLOutputType;
+        baseCodec: PgTypeCodec<undefined, any, any, any>;
+      } | null;
+    }
   }
 }
 
@@ -130,12 +141,65 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
+      build(build) {
+        const {
+          graphql: {
+            GraphQLList,
+            GraphQLNonNull,
+            getNullableType,
+            isOutputType,
+          },
+        } = build;
+        return build.extend(
+          build,
+          {
+            getGraphQLOutputTypeByPgColumn({ columnName, column, pgCodec }) {
+              const baseCodec = unwrapCodec(column.codec);
+              const baseType = (
+                build as GraphileBuild.Build
+              ).getGraphQLTypeByPgCodec(baseCodec, "output")!;
+              const arrayOrNotType = column.codec.arrayOfCodec
+                ? new GraphQLList(
+                    baseType, // TODO: nullability
+                  )
+                : baseType;
+              if (!arrayOrNotType) {
+                console.warn(
+                  `Couldn't find a 'output' variant for PgTypeCodec ${
+                    pgCodec.name
+                  }'s '${columnName}' column (${
+                    column.codec.name
+                  }; array=${!!column.codec.arrayOfCodec}, domain=${!!column
+                    .codec.domainOfCodec}, enum=${!!(column.codec as any)
+                    .values})`,
+                );
+                return null;
+              }
+              const type = column.notNull
+                ? new GraphQLNonNull(getNullableType(arrayOrNotType))
+                : arrayOrNotType;
+
+              if (!type || !isOutputType(type)) {
+                // Could not determine the type, skip this field
+                console.warn(
+                  `Could not determine the type for column '${columnName}' of ${pgCodec.name}`,
+                );
+                return null;
+              }
+              return { type, baseCodec };
+            },
+          },
+          "Adding PgColumnsPlugin helpers to Build",
+        );
+      },
+
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,
           graphql: { getNullableType, GraphQLNonNull, GraphQLList },
           inflection,
-          getGraphQLTypeByPgCodec,
+          getGraphQLOutputTypeByPgColumn,
+          castFromPgCodec,
         } = build;
 
         const {
@@ -160,36 +224,18 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
             column,
             codec: pgCodec,
           });
-          const baseCodec = unwrapCodec(column.codec);
-          const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
-          const arrayOrNotType = column.codec.arrayOfCodec
-            ? new GraphQLList(
-                baseType, // TODO: nullability
-              )
-            : baseType;
-          if (!arrayOrNotType) {
-            console.warn(
-              `Couldn't find a 'output' variant for PgTypeCodec ${
-                pgCodec.name
-              }'s '${columnName}' column (${column.codec.name}; array=${!!column
-                .codec.arrayOfCodec}, domain=${!!column.codec
-                .domainOfCodec}, enum=${!!(column.codec as any).values})`,
-            );
+
+          const columnDetails = getGraphQLOutputTypeByPgColumn({
+            pgCodec,
+            columnName,
+            column,
+          });
+          if (!columnDetails) {
             continue;
           }
-          const type = column.notNull
-            ? new GraphQLNonNull(getNullableType(arrayOrNotType))
-            : arrayOrNotType;
+          const { type, baseCodec } = columnDetails;
 
-          if (!type) {
-            // Could not determine the type, skip this field
-            console.warn(
-              `Could not determine the type for column '${columnName}' of ${pgCodec.name}`,
-            );
-            continue;
-          }
-
-          const makePlan = () => {
+          const makeBasePlan = () => {
             // See if there's a source to pull record types from (e.g. for relations/etc)
             if (!baseCodec.columns) {
               // Simply get the value
@@ -275,6 +321,15 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                 );
               }
             }
+          };
+
+          const makePlan = () => {
+            const plan = makeBasePlan();
+            return castFromPgCodec({
+              pgCodec: column.codec,
+              type,
+              plan,
+            });
           };
 
           fields = extend(
