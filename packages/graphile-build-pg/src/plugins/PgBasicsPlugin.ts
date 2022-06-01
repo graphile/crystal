@@ -155,6 +155,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         const castFromPgCodec: GraphileBuild.Build["castFromPgCodec"] =
           function ({ pgCodec, type, plan }) {
             const expectedType = getGraphQLTypeByPgCodec(pgCodec, "output");
+            // First: see if casting is unnecessary
             if (expectedType === type) {
               return plan;
             }
@@ -174,8 +175,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            // TODO: we should throw an error here. Also make it easy for users
-            // to handle this...
+            // Okay, casting is necessary... let's do it!
+            // IMPORTANT: make sure any casting is EXPORTABLE
+
+            // TODO: do it (or at least make it easy for the user to do it)
+
+            // TODO: we should throw an error here.
             console.warn(
               `No explicit cast from '${pgCodec}' to '${type}'; not performing any conversion`,
             );
