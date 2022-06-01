@@ -109,6 +109,7 @@ declare module "./introspection" {
   }
   interface PgEnum {
     getType(): PgType | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
   }
   interface PgRange {
     getType(): PgType | undefined;

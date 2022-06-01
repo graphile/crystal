@@ -187,6 +187,12 @@ export function augmentIntrospection(
   });
   introspection.enums.forEach((entity) => {
     entity.getType = memo(() => getType(entity.enumtypid));
+    // Postgres doesn't support comments on enum values right now, but we still
+    // want to be able to add tags/description so we fake it.
+    entity.getTagsAndDescription = memo(() => ({
+      tags: Object.create(null),
+      description: "",
+    }));
   });
   introspection.ranges.forEach((entity) => {
     entity.getType = memo(() => getType(entity.rngtypid));

@@ -17,7 +17,7 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
   description:
     "For compatibility with PostGraphile v4 schemas, this plugin attempts to convert various V4 smart tags (`@omit`, etc) and convert them to V5 behaviors",
   version: "0.0.0",
-  after: ["PgSmartCommentsPlugin"],
+  after: ["PgSmartCommentsPlugin", "PgEnumTablesPlugin"],
   before: ["PgFakeConstraintsPlugin"],
 
   gather: {
@@ -56,6 +56,7 @@ function processTags(tags: Partial<PgSmartTagsDict> | undefined): void {
   processOmit(tags);
   convertBoolean(tags, "sortable", "orderBy order");
   convertBoolean(tags, "filterable", "filter filterBy");
+  convertBoolean(tags, "enum", "enum");
   processSimpleCollections(tags);
 }
 

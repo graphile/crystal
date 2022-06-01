@@ -12,6 +12,7 @@ import { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnection
 import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
+import { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
@@ -62,5 +63,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgMutationUpdateDeletePlugin,
     PgJWTPlugin,
     PgRemoveExtensionResourcesPlugin,
+    PgEnumTablesPlugin,
   ],
 };
