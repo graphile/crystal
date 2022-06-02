@@ -20,8 +20,12 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     replace: {
-      _schemaPrefix(options) {
+      _schemaPrefix() {
         return ``;
+      },
+      enumValue(previous, options, value, codec) {
+        const oldValue = previous!.call(this, value, codec);
+        return this.upperCamelCase(oldValue);
       },
     },
   },
