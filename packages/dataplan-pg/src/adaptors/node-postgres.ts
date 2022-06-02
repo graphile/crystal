@@ -262,7 +262,17 @@ export function makeNodePostgresWithPgClient(
     }
   };
 
-  return Object.assign(withPgClient, { release });
+  let released = false;
+  const releaseOnce = () => {
+    if (released) {
+      throw new Error("Release called twice on the same withPgClient");
+    } else {
+      released = true;
+      release();
+    }
+  };
+
+  return Object.assign(withPgClient, { release: releaseOnce });
 }
 
 export interface NodePostgresAdaptorOptions {

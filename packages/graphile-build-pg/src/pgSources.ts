@@ -107,12 +107,14 @@ export function getWithPgClientFromPgSource(
         withPgClient,
         retainers: 1,
       };
+      let released = false;
       withPgClient.release = () => {
         cachedValue.retainers--;
 
         // To allow for other promises to resolve and add/remove from the retaininers, check after a tick
         setTimeout(() => {
-          if (cachedValue.retainers === 0) {
+          if (cachedValue.retainers === 0 && !released) {
+            released = true;
             pgClientBySourceCache.delete(source);
             return originalWithPgClient.release();
           }
