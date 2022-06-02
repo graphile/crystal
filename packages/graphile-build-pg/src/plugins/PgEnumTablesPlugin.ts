@@ -273,7 +273,7 @@ Original error: ${e.message}
     hooks: {
       // Run in the 'introspection' phase before anything uses the tags
       async pgIntrospection_introspection(info, event) {
-        info.helpers.pgEnumTables.processIntrospection(event);
+        await info.helpers.pgEnumTables.processIntrospection(event);
       },
       pgCodecs_column(info, event) {
         const { column, pgAttribute } = event;
