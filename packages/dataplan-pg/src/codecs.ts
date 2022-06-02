@@ -509,6 +509,7 @@ export const TYPES = {
   money: t<string>("money", viaNumeric),
   numeric: t<string>("numeric"),
   char: t<string>("char", verbatim),
+  bpchar: t<string>("bpchar", verbatim),
   varchar: t<string>("varchar", verbatim),
   text: t<string>("text", verbatim),
   json: t<string>("json"),
@@ -583,6 +584,8 @@ export function getCodecByPgCatalogTypeName(
 
     case "char":
       return TYPES.char;
+    case "bpchar":
+      return TYPES.bpchar;
     case "varchar":
       return TYPES.varchar;
     case "text":
