@@ -903,6 +903,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               build.registerCursorConnection?.({
                 typeName,
                 nonNullNode: !build.options.pgForbidSetofFunctionsToReturnNull,
+                scope: {
+                  isPgConnectionRelated: true,
+                },
               });
               build.setGraphQLTypeForPgCodec(
                 codec,
@@ -1049,6 +1052,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   typeName: rangeTypeName,
                   nonNullNode:
                     !build.options.pgForbidSetofFunctionsToReturnNull,
+                  scope: {
+                    isPgConnectionRelated: true,
+                  },
                 });
                 build.registerInputObjectType(
                   rangeInputTypeName,
@@ -1111,6 +1117,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         typeName,
                         nonNullNode:
                           !build.options.pgForbidSetofFunctionsToReturnNull,
+                        scope: {
+                          isPgConnectionRelated: true,
+                        },
                       });
                       break;
                     }
@@ -1125,6 +1134,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         typeName,
                         nonNullNode:
                           !build.options.pgForbidSetofFunctionsToReturnNull,
+                        scope: {
+                          isPgConnectionRelated: true,
+                        },
                       });
                       break;
                     }
@@ -1139,6 +1151,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         typeName,
                         nonNullNode:
                           !build.options.pgForbidSetofFunctionsToReturnNull,
+                        scope: {
+                          isPgConnectionRelated: true,
+                        },
                       });
                       break;
                     }

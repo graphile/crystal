@@ -59,6 +59,9 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
             build.registerCursorConnection?.({
               typeName: inflection.builtin(name),
               nonNullNode: !build.options.pgForbidSetofFunctionsToReturnNull,
+              scope: {
+                isPgConnectionRelated: true,
+              },
             });
           };
 
