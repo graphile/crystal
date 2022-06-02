@@ -1,217 +1,107 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'letter'::text,
-        (__local_1__."letter"),
-        'letterViaView'::text,
-        (__local_1__."letter_via_view"),
-        'description'::text,
-        (__local_1__."description")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "enum_tables"."letter_descriptions" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select
+  __letter_descriptions__."id"::text as "0",
+  __letter_descriptions__."letter"::text as "1",
+  __letter_descriptions__."letter_via_view"::text as "2",
+  __letter_descriptions__."description" as "3"
+from "enum_tables"."letter_descriptions" as __letter_descriptions__
+order by __letter_descriptions__."id" asc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'letter'::text,
-        (__local_1__."letter"),
-        'letterViaView'::text,
-        (__local_1__."letter_via_view"),
-        'description'::text,
-        (__local_1__."description")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "enum_tables"."letter_descriptions" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."letter" DESC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select
+  __letter_descriptions__."id"::text as "0",
+  __letter_descriptions__."letter"::text as "1",
+  __letter_descriptions__."letter_via_view"::text as "2",
+  __letter_descriptions__."description" as "3"
+from "enum_tables"."letter_descriptions" as __letter_descriptions__
+order by __letter_descriptions__."letter" desc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'letter'::text,
-        (__local_1__."letter"),
-        'letterViaView'::text,
-        (__local_1__."letter_via_view"),
-        'description'::text,
-        (__local_1__."description")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "enum_tables"."letter_descriptions" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."letter_via_view" DESC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select
+  __letter_descriptions__."id"::text as "0",
+  __letter_descriptions__."letter"::text as "1",
+  __letter_descriptions__."letter_via_view"::text as "2",
+  __letter_descriptions__."description" as "3"
+from "enum_tables"."letter_descriptions" as __letter_descriptions__
+order by __letter_descriptions__."letter_via_view" desc
 
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json((__local_0__."id")) as "id",
-to_json((__local_0__."letter")) as "letter",
-to_json((__local_0__."letter_via_view")) as "letterViaView",
-to_json((__local_0__."description")) as "description"
-from "enum_tables"."letter_descriptions" as __local_0__
-where (
-  __local_0__."letter" = $1
-) and (TRUE) and (TRUE)
+select __letter_descriptions_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"text" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __letter_descriptions_identifiers__,
+lateral (
+  select
+    __letter_descriptions__."id"::text as "0",
+    __letter_descriptions__."letter"::text as "1",
+    __letter_descriptions__."letter_via_view"::text as "2",
+    __letter_descriptions__."description" as "3",
+    __letter_descriptions_identifiers__.idx as "4"
+  from "enum_tables"."letter_descriptions" as __letter_descriptions__
+  where (
+    __letter_descriptions__."letter" = __letter_descriptions_identifiers__."id0"
+  )
+  order by __letter_descriptions__."id" asc
+) as __letter_descriptions_result__
 
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json((__local_0__."id")) as "id",
-to_json((__local_0__."letter")) as "letter",
-to_json((__local_0__."letter_via_view")) as "letterViaView",
-to_json((__local_0__."description")) as "description"
-from "enum_tables"."letter_descriptions" as __local_0__
-where (
-  __local_0__."letter_via_view" = $1
-) and (TRUE) and (TRUE)
+select __letter_descriptions_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"text" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __letter_descriptions_identifiers__,
+lateral (
+  select
+    __letter_descriptions__."id"::text as "0",
+    __letter_descriptions__."letter"::text as "1",
+    __letter_descriptions__."letter_via_view"::text as "2",
+    __letter_descriptions__."description" as "3",
+    __letter_descriptions_identifiers__.idx as "4"
+  from "enum_tables"."letter_descriptions" as __letter_descriptions__
+  where (
+    __letter_descriptions__."letter_via_view" = __letter_descriptions_identifiers__."id0"
+  )
+  order by __letter_descriptions__."id" asc
+) as __letter_descriptions_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'letter'::text,
-        (__local_1__."letter"),
-        'letterViaView'::text,
-        (__local_1__."letter_via_view"),
-        'description'::text,
-        (__local_1__."description")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "enum_tables"."letter_descriptions" as __local_1__
-    where (
-      __local_1__."letter" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __letter_descriptions_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"text" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __letter_descriptions_identifiers__,
+lateral (
+  select
+    __letter_descriptions__."id"::text as "0",
+    __letter_descriptions__."letter"::text as "1",
+    __letter_descriptions__."letter_via_view"::text as "2",
+    __letter_descriptions__."description" as "3",
+    __letter_descriptions_identifiers__.idx as "4"
+  from "enum_tables"."letter_descriptions" as __letter_descriptions__
+  where (
+    __letter_descriptions__."letter" = __letter_descriptions_identifiers__."id0"
+  )
+  order by __letter_descriptions__."id" asc
+) as __letter_descriptions_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'letter'::text,
-        (__local_1__."letter"),
-        'letterViaView'::text,
-        (__local_1__."letter_via_view"),
-        'description'::text,
-        (__local_1__."description")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "enum_tables"."letter_descriptions" as __local_1__
-    where (
-      __local_1__."letter_via_view" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
+select __letter_descriptions_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"text" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __letter_descriptions_identifiers__,
+lateral (
+  select
+    __letter_descriptions__."id"::text as "0",
+    __letter_descriptions__."letter"::text as "1",
+    __letter_descriptions__."letter_via_view"::text as "2",
+    __letter_descriptions__."description" as "3",
+    __letter_descriptions_identifiers__.idx as "4"
+  from "enum_tables"."letter_descriptions" as __letter_descriptions__
+  where (
+    __letter_descriptions__."letter_via_view" = __letter_descriptions_identifiers__."id0"
+  )
+  order by __letter_descriptions__."id" asc
+) as __letter_descriptions_result__
