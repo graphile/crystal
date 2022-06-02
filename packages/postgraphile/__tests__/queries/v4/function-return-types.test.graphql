@@ -1,0 +1,199 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+{
+  funcInInout(i: 10, ino: 5)
+  funcInOut(i: 10)
+  funcOut
+  funcOutComplex(a: 1, b: "test") {
+    x
+    y {
+      a
+      b
+      c
+    }
+    z {
+      nodeId
+      id
+      name
+      postsByAuthorId {
+        nodes {
+          nodeId
+          id
+        }
+      }
+    }
+  }
+  funcOutComplexSetof(a: 1, b: "test") {
+    nodes {
+      x
+      y {
+        a
+        b
+        c
+      }
+      z {
+        nodeId
+        id
+        name
+        postsByAuthorId {
+          nodes {
+            nodeId
+            id
+          }
+        }
+      }
+    }
+    totalCount
+  }
+  funcOutOut {
+    firstOut
+    secondOut
+  }
+  funcOutOutCompoundType(i1: 10) {
+    o1
+    o2 {
+      a
+      b
+      c
+    }
+  }
+  funcOutOutSetof {
+    nodes {
+      o1
+      o2
+    }
+    totalCount
+  }
+  funcOutOutUnnamed {
+    arg1
+    arg2
+  }
+  funcOutSetof {
+    nodes
+    totalCount
+  }
+  funcOutTable {
+    nodeId
+    id
+  }
+  funcOutTableSetof {
+    nodes {
+      nodeId
+      id
+    }
+    totalCount
+  }
+  funcOutUnnamed
+  funcOutUnnamedOutOutUnnamed {
+    arg1
+    arg3
+    o2
+  }
+  funcReturnsTableMultiCol(i: 20) {
+    nodes {
+      col1
+      col2
+    }
+    totalCount
+  }
+  funcReturnsTableOneCol(i: 20) {
+    nodes
+    totalCount
+  }
+  personById(id: 1) {
+    nodeId
+    id
+    name
+    computedComplex(a: 1, b: "test") {
+      x
+      y {
+        a
+        b
+        c
+      }
+      z {
+        nodeId
+        id
+        name
+        postsByAuthorId {
+          nodes {
+            nodeId
+            id
+          }
+        }
+      }
+    }
+    computedFirstArgInout {
+      id
+      name
+    }
+    computedFirstArgInoutOut {
+      person {
+        id
+        name
+      }
+      o
+    }
+    computedInout(ino: "test")
+    computedInoutOut(ino: "test") {
+      ino
+      o
+    }
+    computedOut
+    computedOutOut {
+      o1
+      o2
+    }
+  }
+  queryOutputTwoRowsBothExist: queryOutputTwoRows(
+    leftArmId: 42
+    postId: 1
+    txt: "Hi"
+  ) {
+    ...OutputTwoRowsFragment
+  }
+  queryOutputTwoRowsNeitherExist: queryOutputTwoRows(
+    leftArmId: 999999999
+    postId: 999999999
+    txt: "Don't fail me now..."
+  ) {
+    ...OutputTwoRowsFragment
+  }
+  searchTestSummariesList {
+    id
+    totalDuration {
+      hours
+      minutes
+    }
+  }
+}
+
+fragment OutputTwoRowsFragment on QueryOutputTwoRowsRecord {
+  leftArm {
+    id
+    lengthInMetres
+    mood
+    personByPersonId {
+      name
+      personSecretByPersonId {
+        secret
+      }
+    }
+  }
+  l2: leftArm {
+    personId
+  }
+  post {
+    id
+    headline
+    authorId
+    personByAuthorId {
+      name
+      personSecretByPersonId {
+        secret
+      }
+    }
+  }
+  txt
+}

@@ -1,0 +1,278 @@
+{
+  funcInInout: 15,
+  funcInOut: 52,
+  funcOut: 42,
+  funcOutComplex: {
+    x: 2,
+    y: {
+      a: 1,
+      b: "2",
+      c: "BLUE",
+    },
+    z: {
+      nodeId: "WyJwZW9wbGUiLDFd",
+      id: 1,
+      name: "John Smith",
+      postsByAuthorId: {
+        nodes: [
+          {
+            nodeId: "WyJwb3N0cyIsMl0=",
+            id: 2,
+          },
+          {
+            nodeId: "WyJwb3N0cyIsM10=",
+            id: 3,
+          },
+          {
+            nodeId: "WyJwb3N0cyIsNF0=",
+            id: 4,
+          },
+          {
+            nodeId: "WyJwb3N0cyIsN10=",
+            id: 7,
+          },
+        ],
+      },
+    },
+  },
+  funcOutComplexSetof: {
+    nodes: [
+      {
+        x: 2,
+        y: {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+        },
+        z: {
+          nodeId: "WyJwZW9wbGUiLDFd",
+          id: 1,
+          name: "John Smith",
+          postsByAuthorId: {
+            nodes: [
+              {
+                nodeId: "WyJwb3N0cyIsMl0=",
+                id: 2,
+              },
+              {
+                nodeId: "WyJwb3N0cyIsM10=",
+                id: 3,
+              },
+              {
+                nodeId: "WyJwb3N0cyIsNF0=",
+                id: 4,
+              },
+              {
+                nodeId: "WyJwb3N0cyIsN10=",
+                id: 7,
+              },
+            ],
+          },
+        },
+      },
+    ],
+    totalCount: 1,
+  },
+  funcOutOut: {
+    firstOut: 42,
+    secondOut: "out",
+  },
+  funcOutOutCompoundType: {
+    o1: 20,
+    o2: {
+      a: 1,
+      b: "2",
+      c: "BLUE",
+    },
+  },
+  funcOutOutSetof: {
+    nodes: [
+      {
+        o1: 42,
+        o2: "out",
+      },
+      {
+        o1: 43,
+        o2: "out2",
+      },
+    ],
+    totalCount: 2,
+  },
+  funcOutOutUnnamed: {
+    arg1: 42,
+    arg2: "out",
+  },
+  funcOutSetof: {
+    nodes: [
+      42,
+      43,
+    ],
+    totalCount: 2,
+  },
+  funcOutTable: {
+    nodeId: "WyJwZW9wbGUiLDFd",
+    id: 1,
+  },
+  funcOutTableSetof: {
+    nodes: [
+      {
+        nodeId: "WyJwZW9wbGUiLDFd",
+        id: 1,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDJd",
+        id: 2,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDNd",
+        id: 3,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDRd",
+        id: 4,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDVd",
+        id: 5,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDZd",
+        id: 6,
+      },
+    ],
+    totalCount: 6,
+  },
+  funcOutUnnamed: 42,
+  funcOutUnnamedOutOutUnnamed: {
+    arg1: 42,
+    arg3: 3,
+    o2: "out2",
+  },
+  funcReturnsTableMultiCol: {
+    nodes: [
+      {
+        col1: 62,
+        col2: "out",
+      },
+      {
+        col1: 63,
+        col2: "out2",
+      },
+    ],
+    totalCount: 2,
+  },
+  funcReturnsTableOneCol: {
+    nodes: [
+      62,
+      63,
+    ],
+    totalCount: 2,
+  },
+  personById: {
+    nodeId: "WyJwZW9wbGUiLDFd",
+    id: 1,
+    name: "John Smith",
+    computedComplex: {
+      x: 2,
+      y: {
+        a: 1,
+        b: "2",
+        c: "BLUE",
+      },
+      z: {
+        nodeId: "WyJwZW9wbGUiLDFd",
+        id: 1,
+        name: "John Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              nodeId: "WyJwb3N0cyIsMl0=",
+              id: 2,
+            },
+            {
+              nodeId: "WyJwb3N0cyIsM10=",
+              id: 3,
+            },
+            {
+              nodeId: "WyJwb3N0cyIsNF0=",
+              id: 4,
+            },
+            {
+              nodeId: "WyJwb3N0cyIsN10=",
+              id: 7,
+            },
+          ],
+        },
+      },
+    },
+    computedFirstArgInout: {
+      id: 1,
+      name: "John Smith",
+    },
+    computedFirstArgInoutOut: {
+      person: {
+        id: 1,
+        name: "John Smith",
+      },
+      o: 42,
+    },
+    computedInout: "test John Smith",
+    computedInoutOut: {
+      ino: "test John Smith",
+      o: "o John Smith",
+    },
+    computedOut: "o1 John Smith",
+    computedOutOut: {
+      o1: "o1 John Smith",
+      o2: "o2 John Smith",
+    },
+  },
+  queryOutputTwoRowsBothExist: {
+    leftArm: {
+      id: 42,
+      lengthInMetres: 0.6,
+      mood: "neutral",
+      personByPersonId: {
+        name: "Kathryn Ramirez",
+        personSecretByPersonId: null,
+      },
+    },
+    l2: {
+      personId: 4,
+    },
+    post: {
+      id: 1,
+      headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+      authorId: 2,
+      personByAuthorId: {
+        name: "Sara Smith",
+        personSecretByPersonId: {
+          secret: "Sara Smith is not really my name!",
+        },
+      },
+    },
+    txt: "Hi421",
+  },
+  queryOutputTwoRowsNeitherExist: {
+    leftArm: null,
+    l2: null,
+    post: null,
+    txt: "Don't fail me now...999999999999999999",
+  },
+  searchTestSummariesList: [
+    {
+      id: 1,
+      totalDuration: {
+        hours: 2,
+        minutes: 1,
+      },
+    },
+    {
+      id: 2,
+      totalDuration: {
+        hours: 3,
+        minutes: 1,
+      },
+    },
+  ],
+}
