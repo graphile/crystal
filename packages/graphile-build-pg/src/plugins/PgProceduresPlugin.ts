@@ -56,6 +56,13 @@ declare global {
   }
 }
 
+declare module "@dataplan/pg" {
+  interface PgTypeColumnExtensions {
+    argIndex?: number;
+    argName?: string;
+  }
+}
+
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
@@ -211,7 +218,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const columns: PgTypeColumns = {};
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
-              const argName = pgProc.proargnames?.[i] || `column${i + 1}`;
+              const trueArgName = pgProc.proargnames?.[i];
+              const argName = trueArgName || `column${i + 1}`;
 
               // TODO: smart tag should allow changing the modifier
               const typeModifier = undefined;
@@ -249,6 +257,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 columns[argName] = {
                   notNull: false,
                   codec: columnCodec,
+                  extensions: {
+                    argIndex: i,
+                    argName: trueArgName,
+                  },
                   // TODO: could use "param" smart tag in function to add extensions here?
                 };
               }
