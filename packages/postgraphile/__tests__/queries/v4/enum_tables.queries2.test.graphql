@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy();
+#> schema: ["enum_tables"]
+#> subscriptions: true
+{
+  all: allReferencingTables {
+    nodes {
+      id
+      enum1
+      enum2
+      enum3
+    }
+  }
+}
