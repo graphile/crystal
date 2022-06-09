@@ -129,7 +129,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         return `${schemaPrefix}${pgProc.proname}`;
       },
       functionRecordReturnCodecName(options, details) {
-        return this.upperCamelCase(this.functionSourceName(details));
+        return this.upperCamelCase(
+          this.functionSourceName(details) + "-record",
+        );
       },
     },
   },
