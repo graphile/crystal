@@ -1412,7 +1412,11 @@ export class PgSelectPlan<
   }
 
   private buildFrom() {
-    return { sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}` };
+    return {
+      sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
+        this.source.codec.columns ? sql.blank : sql`(v)`
+      }`,
+    };
   }
 
   private buildJoin() {

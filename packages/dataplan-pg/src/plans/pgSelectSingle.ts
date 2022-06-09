@@ -250,7 +250,7 @@ export class PgSelectSinglePlan<
       ? dataSourceColumn.expression
         ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
-      : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
+      : sqlExpr`${classPlan.alias}.v`; /* single column */
 
     if (
       this.nonNullColumn == null &&
