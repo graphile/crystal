@@ -189,11 +189,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             pgProc.proargmodes?.some((m) => m === "t") ?? false;
           const outOrInoutArgs =
             pgProc.proargmodes?.filter((m) => m === "o" || m === "b") ?? [];
-          const needsPayloadCodecToBeGenerated =
-            hasTableArg || outOrInoutArgs.length > 1;
-
           const isRecordReturnType =
             pgProc.prorettype === "2249"; /* OID of the 'record' type */
+          const needsPayloadCodecToBeGenerated =
+            (hasTableArg && isRecordReturnType) || outOrInoutArgs.length > 1;
+
           const debugProcName = `${namespace.nspname}.${pgProc.proname}`;
 
           if (isRecordReturnType && !needsPayloadCodecToBeGenerated) {
