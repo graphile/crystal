@@ -47,7 +47,13 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
 /**
  * Custom metadata for a codec
  */
-export interface PgTypeCodecExtensions {}
+export interface PgTypeCodecExtensions {
+  /**
+   * If true, this represents an 'anonymous' type, e.g. the unnamed return type
+   * of a function.
+   */
+  isAnonymous?: boolean;
+}
 
 /**
  * A codec for a Postgres type, tells us how to convert to-and-from Postgres
