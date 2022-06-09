@@ -25,7 +25,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
       },
       enumValue(previous, options, value, codec) {
         const oldValue = previous!.call(this, value, codec);
-        return this.upperCamelCase(oldValue);
+        return this.coerceToGraphQLName(this.constantCase(oldValue));
       },
       _columnName(previous, options, details) {
         const { column, columnName } = details;
