@@ -136,6 +136,51 @@ function getArgDetailsFromParameters(
   return argDetails;
 }
 
+function defaultProcSourceBehavior(
+  s: PgSource<any, any, any, any>,
+  options: GraphileBuild.GraphileBuildSchemaOptions,
+): string {
+  const { simpleCollections } = options;
+  const behavior = [];
+  if (
+    !s.isMutation &&
+    s.parameters &&
+    // Don't default to this being a query_field if it looks like a computed column function
+    !(s as PgSource<any, any, any, PgSourceParameter[]>).parameters[0]?.codec
+      ?.columns
+  ) {
+    behavior.push("query_field");
+  } else {
+    behavior.push("-query_field");
+  }
+
+  if (s.isMutation && s.parameters) {
+    behavior.push("mutation_field");
+  } else {
+    behavior.push("-mutation_field");
+  }
+
+  if (s.parameters && s.parameters?.[0]?.codec?.columns && !s.isMutation) {
+    behavior.push("type_field");
+  } else {
+    behavior.push("-type_field");
+  }
+
+  if (s.parameters && !s.isUnique) {
+    const canUseConnection = !s.sqlPartitionByIndex && !s.isList;
+    const defaultBehavior = canUseConnection
+      ? simpleCollections === "both"
+        ? "connection list"
+        : simpleCollections === "only"
+        ? "list"
+        : "connection"
+      : "list";
+    behavior.push(defaultBehavior);
+  }
+
+  return behavior.join(" ");
+}
+
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
@@ -350,7 +395,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             GraphQLObjectType,
             GraphQLInputObjectType,
           },
-          options: { simpleCollections },
+          options,
         } = build;
         const {
           Self,
@@ -372,12 +417,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 build.behavior.matches(
                   getBehavior(s.extensions),
                   "query_field",
-                  !s.isMutation &&
-                    // Don't default to this being a query_field if it looks like a computed column function
-                    !(s as PgSource<any, any, any, PgSourceParameter[]>)
-                      .parameters[0]?.codec?.columns
-                    ? "query_field"
-                    : "-query_field",
+                  defaultProcSourceBehavior(s, options),
                 ),
             );
           } else if (isRootMutation) {
@@ -389,7 +429,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 build.behavior.matches(
                   getBehavior(s.extensions),
                   "mutation_field",
-                  s.isMutation ? "mutation_field" : "-mutation_field",
+                  defaultProcSourceBehavior(s, options),
                 ),
             );
           } else {
@@ -405,7 +445,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 build.behavior.matches(
                   getBehavior(s.extensions),
                   "type_field",
-                  !s.isMutation ? "type_field" : "-type_field",
+                  defaultProcSourceBehavior(s, options),
                 ),
             );
           }
@@ -641,13 +681,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   !source.sqlPartitionByIndex && !source.isList;
 
                 const behavior = getBehavior(source.extensions);
-                const defaultBehavior = canUseConnection
-                  ? simpleCollections === "both"
-                    ? "connection list"
-                    : simpleCollections === "only"
-                    ? "list"
-                    : "connection"
-                  : "list";
 
                 const baseScope = isRootQuery ? `query_field` : `type_field`;
                 const connectionFieldBehaviorScope = `${baseScope}:connection`;
@@ -657,7 +690,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   build.behavior.matches(
                     behavior,
                     connectionFieldBehaviorScope,
-                    defaultBehavior,
+                    defaultProcSourceBehavior(source, options),
                   )
                 ) {
                   const fieldName = isRootQuery
@@ -711,7 +744,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   build.behavior.matches(
                     behavior,
                     listFieldBehaviorScope,
-                    defaultBehavior,
+                    defaultProcSourceBehavior(source, options),
                   )
                 ) {
                   const fieldName = isRootQuery
