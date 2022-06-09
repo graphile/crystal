@@ -12,6 +12,7 @@ declare global {
     interface RegisterCursorConnectionOptions {
       typeName: string;
       connectionTypeName?: string;
+      edgeTypeName?: string;
       scope?: GraphileBuild.ScopeObject;
       nonNullNode?: boolean;
     }
@@ -47,7 +48,40 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
               options: GraphileBuild.RegisterCursorConnectionOptions,
             ) {
               const { typeName, scope = {}, nonNullNode = false } = options;
-              const edgeTypeName = build.inflection.edgeType(typeName);
+              if (
+                (options.connectionTypeName || options.edgeTypeName) &&
+                !(options.connectionTypeName && options.edgeTypeName)
+              ) {
+                throw new Error(
+                  `You should either specify both connectionTypeName and edgeTypeName or neither (${JSON.stringify(
+                    {
+                      connectionTypeName: options.connectionTypeName,
+                      edgeTypeName: options.edgeTypeName,
+                    },
+                  )}).`,
+                );
+              }
+
+              if (!build.getTypeMetaByName(typeName)) {
+                throw new Error(
+                  `There's no type registered called '${typeName}'; please register this type before attempting to create a connection for it - you might need to change your plugin's before/after`,
+                );
+              }
+
+              const connectionTypeName =
+                options.connectionTypeName ??
+                build.inflection.connectionType(typeName);
+              if (build.getTypeMetaByName(connectionTypeName)) {
+                throw new Error(
+                  `A type named ${connectionTypeName} already exists`,
+                );
+              }
+              const edgeTypeName =
+                options.edgeTypeName ?? build.inflection.edgeType(typeName);
+              if (build.getTypeMetaByName(edgeTypeName)) {
+                throw new Error(`A type named ${edgeTypeName} already exists.`);
+              }
+
               build.registerObjectType(
                 edgeTypeName,
                 {
@@ -110,9 +144,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
               );
 
               // Register connection
-              const connectionTypeName =
-                options.connectionTypeName ??
-                build.inflection.connectionType(typeName);
               build.registerObjectType<ConnectionPlan<any, any, any>>(
                 connectionTypeName,
                 {
@@ -122,9 +153,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                 ConnectionPlan,
                 () => {
                   const NodeType = build.getOutputTypeByName(typeName);
-                  const EdgeType = build.getOutputTypeByName(
-                    build.inflection.edgeType(typeName),
-                  );
+                  const EdgeType = build.getOutputTypeByName(edgeTypeName);
                   const PageInfo = build.getOutputTypeByName(
                     build.inflection.builtin("PageInfo"),
                   );

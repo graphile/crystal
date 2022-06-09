@@ -13,7 +13,7 @@ export default function swallowError(e: Error): void {
   // BE VERY CAREFUL NOT TO THROW!
   // XXX: Improve this
   if (debugWarn.enabled) {
-    debugWarn("Recoverable error occurred: %o", e);
+    debugWarn("Recoverable error occurred: %s", e);
   } else {
     const errorSnippet =
       e && typeof e.toString === "function"

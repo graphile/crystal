@@ -276,9 +276,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
-                  {
-                    isAnonymous: true,
-                  },
+                  {},
                   true,
                 ),
               [columns, recordCodecName, recordType, sql],

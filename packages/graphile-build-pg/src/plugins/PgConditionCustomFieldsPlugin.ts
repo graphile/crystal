@@ -64,7 +64,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         return build.extend(
           fields,
           functionSources.reduce((memo, pgFieldSource) => {
-            const fieldName = inflection.computedColumn({
+            const fieldName = inflection.computedColumnField({
               source: pgFieldSource,
             });
             const type = build.getGraphQLTypeByPgCodec(

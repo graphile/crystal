@@ -31,7 +31,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       computedColumnOrder(options, { source, variant }) {
-        const computedColumnName = this.computedColumn({ source });
+        const computedColumnName = this.computedColumnField({ source });
         return this.constantCase(`${computedColumnName}-${variant}`);
       },
     },

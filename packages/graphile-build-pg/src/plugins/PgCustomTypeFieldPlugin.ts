@@ -51,7 +51,11 @@ declare global {
     }
 
     interface Inflection {
-      customMutation(
+      _functionName(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      customMutationField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
@@ -63,33 +67,49 @@ declare global {
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      customQuery(
+      customQueryField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      customQueryConnection(
+      customQueryConnectionField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      customQueryList(
+      customQueryListField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumn(
+      computedColumnField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumnConnection(
+      computedColumnConnectionField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumnList(
+      computedColumnListField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
       argument(
         this: Inflection,
         details: InflectionCustomFieldArgumentDetails,
+      ): string;
+      recordFunctionConnectionType(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      scalarFunctionConnectionType(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      recordFunctionEdgeType(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      scalarFunctionEdgeType(
+        this: Inflection,
+        details: InflectionCustomFieldProcedureDetails,
       ): string;
     }
   }
@@ -134,6 +154,13 @@ function getArgDetailsFromParameters(
     };
   });
   return argDetails;
+}
+
+function shouldUseCustomConnection(
+  pgSource: PgSource<any, any, any, any>,
+): boolean {
+  // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
+  return !pgSource.codec.columns || pgSource.codec.isAnonymous || false;
 }
 
 function defaultProcSourceBehavior(
@@ -189,31 +216,28 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      customMutation(options, details) {
-        return this.camelCase(
-          details.source.extensions?.tags?.name ?? details.source.name,
-        );
+      _functionName(options, details) {
+        return details.source.extensions?.tags?.name ?? details.source.name;
+      },
+      customMutationField(options, details) {
+        return this.camelCase(this._functionName(details));
       },
       customMutationPayload(options, details) {
-        return this.upperCamelCase(this.customMutation(details) + "-payload");
+        return this.upperCamelCase(this._functionName(details) + "-payload");
       },
       customMutationInput(options, details) {
-        return this.inputType(
-          this.upperCamelCase(this.customMutation(details)),
-        );
+        return this.inputType(this.upperCamelCase(this._functionName(details)));
       },
-      customQuery(options, details) {
-        return this.camelCase(
-          details.source.extensions?.tags?.name ?? details.source.name,
-        );
+      customQueryField(options, details) {
+        return this.camelCase(this._functionName(details));
       },
-      customQueryConnection(options, details) {
-        return this.customQuery(details);
+      customQueryConnectionField(options, details) {
+        return this.customQueryField(details);
       },
-      customQueryList(options, details) {
-        return this.camelCase(this.customQuery(details) + "-list");
+      customQueryListField(options, details) {
+        return this.camelCase(this.customQueryField(details) + "-list");
       },
-      computedColumn(options, details) {
+      computedColumnField(options, details) {
         const explicitName = details.source.extensions?.tags?.fieldName;
         if (typeof explicitName === "string") {
           return this.camelCase(explicitName);
@@ -227,93 +251,113 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           return this.camelCase(name);
         }
       },
-      computedColumnConnection(options, details) {
-        return this.computedColumn(details);
+      computedColumnConnectionField(options, details) {
+        return this.computedColumnField(details);
       },
-      computedColumnList(options, details) {
-        return this.camelCase(this.computedColumn(details) + "-list");
+      computedColumnListField(options, details) {
+        return this.camelCase(this.computedColumnField(details) + "-list");
       },
       argument(options, details) {
         return this.camelCase(details.param.name || `arg${details.index}`);
+      },
+      recordFunctionConnectionType(options, details) {
+        return this.connectionType(
+          this.upperCamelCase(this._functionName(details)),
+        );
+      },
+      scalarFunctionConnectionType(options, details) {
+        return this.connectionType(
+          this.upperCamelCase(this._functionName(details)),
+        );
+      },
+      recordFunctionEdgeType(options, details) {
+        return this.edgeType(this.upperCamelCase(this._functionName(details)));
+      },
+      scalarFunctionEdgeType(options, details) {
+        return this.edgeType(this.upperCamelCase(this._functionName(details)));
       },
     },
   },
 
   schema: {
     hooks: {
-      init(_, build) {
-        const {
-          graphql: { GraphQLList, GraphQLString },
-        } = build;
-        // Add payload type for mutation functions
-        const mutationProcSources = build.input.pgSources.filter(
-          (s) =>
-            s.isMutation &&
-            s.parameters &&
-            build.behavior.matches(
-              getBehavior(s.extensions),
-              "mutation_field",
-              "mutation_field",
-            ),
-        );
-
-        for (const source of mutationProcSources) {
-          const inputTypeName = build.inflection.customMutationInput({
-            source,
-          });
-
-          build.registerInputObjectType(
-            inputTypeName,
-            {},
-            () => {
-              const argDetails = getArgDetailsFromParameters(
-                build,
-                source,
-                source.parameters,
-              );
-
-              // Not used for isMutation; that's handled elsewhere
-              const fields = argDetails.reduce(
-                (memo, { inputType, argName }) => {
-                  memo[argName] = {
-                    type: inputType,
-                  };
-                  return memo;
-                },
-                {
-                  clientMutationId: {
-                    type: GraphQLString,
-                    plan: EXPORTABLE(
-                      () =>
-                        function plan(
-                          $input: ObjectPlan<any>,
-                          value: InputPlan,
-                        ) {
-                          $input.set("clientMutationId", value);
-                        },
-                      [],
-                    ),
-                  },
-                },
-              );
-
-              return {
-                fields,
-              };
-            },
-            "PgCustomTypeFieldPlugin mutation function input type",
+      init: {
+        after: ["PgCodecs"],
+        callback(_, build) {
+          const {
+            graphql: { GraphQLList, GraphQLString },
+            inflection,
+            options,
+          } = build;
+          // Add payload type for mutation functions
+          const mutationProcSources = build.input.pgSources.filter(
+            (s) =>
+              s.isMutation &&
+              s.parameters &&
+              build.behavior.matches(
+                getBehavior(s.extensions),
+                "mutation_field",
+                "mutation_field",
+              ),
           );
 
-          ////////////////////////////////////////
+          for (const source of mutationProcSources) {
+            const inputTypeName = inflection.customMutationInput({
+              source,
+            });
 
-          const payloadTypeName = build.inflection.customMutationPayload({
-            source,
-          });
+            build.registerInputObjectType(
+              inputTypeName,
+              {},
+              () => {
+                const argDetails = getArgDetailsFromParameters(
+                  build,
+                  source,
+                  source.parameters,
+                );
 
-          const isVoid = source.codec === TYPES.void;
+                // Not used for isMutation; that's handled elsewhere
+                const fields = argDetails.reduce(
+                  (memo, { inputType, argName }) => {
+                    memo[argName] = {
+                      type: inputType,
+                    };
+                    return memo;
+                  },
+                  {
+                    clientMutationId: {
+                      type: GraphQLString,
+                      plan: EXPORTABLE(
+                        () =>
+                          function plan(
+                            $input: ObjectPlan<any>,
+                            value: InputPlan,
+                          ) {
+                            $input.set("clientMutationId", value);
+                          },
+                        [],
+                      ),
+                    },
+                  },
+                );
 
-          // TODO:
-          /*
+                return {
+                  fields,
+                };
+              },
+              "PgCustomTypeFieldPlugin mutation function input type",
+            );
+
+            ////////////////////////////////////////
+
+            const payloadTypeName = inflection.customMutationPayload({
+              source,
+            });
+
+            const isVoid = source.codec === TYPES.void;
+
+            // TODO:
+            /*
           const resultFieldName = inflection.functionMutationResultFieldName(
             proc,
             getNamedType(type),
@@ -321,70 +365,107 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             outputArgNames
           );
           */
-          const resultFieldName = `result`;
+            const resultFieldName = `result`;
 
-          build.registerObjectType(
-            payloadTypeName,
-            {
-              isMutationPayload: true,
-              pgCodec: source.codec,
-            },
-            ObjectPlan,
-            () => ({
-              fields: () => {
-                const fields = {
-                  clientMutationId: {
-                    type: GraphQLString,
-                    plan: EXPORTABLE(
-                      (constant) =>
-                        function plan($object: ObjectPlan<any>) {
-                          return (
-                            $object.getPlanForKey("clientMutationId", true) ??
-                            constant(undefined)
-                          );
-                        },
-                      [constant],
-                    ),
-                  },
-                };
-                if (isVoid) {
-                  return fields;
-                }
-                const baseType = getFunctionSourceReturnGraphQLType(
-                  build,
-                  source,
-                );
-                if (!baseType) {
-                  console.warn(
-                    `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
-                  );
-                  return {};
-                }
-                const type = source.isUnique
-                  ? baseType
-                  : new GraphQLList(baseType);
-                fields[resultFieldName] = {
-                  type,
-                  plan: EXPORTABLE(
-                    () =>
-                      (
-                        $object: ObjectPlan<{
-                          result: PgClassSinglePlan<any, any, any, any>;
-                        }>,
-                      ) => {
-                        return $object.get("result");
-                      },
-                    [],
-                  ),
-                };
-                return fields;
+            build.registerObjectType(
+              payloadTypeName,
+              {
+                isMutationPayload: true,
+                pgCodec: source.codec,
               },
-            }),
-            "PgCustomTypeFieldPlugin mutation function payload type",
-          );
-        }
+              ObjectPlan,
+              () => ({
+                fields: () => {
+                  const fields = {
+                    clientMutationId: {
+                      type: GraphQLString,
+                      plan: EXPORTABLE(
+                        (constant) =>
+                          function plan($object: ObjectPlan<any>) {
+                            return (
+                              $object.getPlanForKey("clientMutationId", true) ??
+                              constant(undefined)
+                            );
+                          },
+                        [constant],
+                      ),
+                    },
+                  };
+                  if (isVoid) {
+                    return fields;
+                  }
+                  const baseType = getFunctionSourceReturnGraphQLType(
+                    build,
+                    source,
+                  );
+                  if (!baseType) {
+                    console.warn(
+                      `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
+                    );
+                    return {};
+                  }
+                  const type = source.isUnique
+                    ? baseType
+                    : new GraphQLList(baseType);
+                  fields[resultFieldName] = {
+                    type,
+                    plan: EXPORTABLE(
+                      () =>
+                        (
+                          $object: ObjectPlan<{
+                            result: PgClassSinglePlan<any, any, any, any>;
+                          }>,
+                        ) => {
+                          return $object.get("result");
+                        },
+                      [],
+                    ),
+                  };
+                  return fields;
+                },
+              }),
+              "PgCustomTypeFieldPlugin mutation function payload type",
+            );
+          }
 
-        return _;
+          // Add connection type for functions that need it
+          const functionSourcesRequiringConnections =
+            build.input.pgSources.filter(
+              (s) => s.parameters && shouldUseCustomConnection(s),
+            );
+
+          for (const pgSource of functionSourcesRequiringConnections) {
+            build.recoverable(null, () => {
+              const connectionTypeName = pgSource.codec.columns
+                ? inflection.recordFunctionConnectionType({ source: pgSource })
+                : inflection.scalarFunctionConnectionType({ source: pgSource });
+              const edgeTypeName = pgSource.codec.columns
+                ? inflection.recordFunctionEdgeType({ source: pgSource })
+                : inflection.scalarFunctionEdgeType({ source: pgSource });
+              const typeName = pgSource.codec.columns
+                ? inflection.tableType(pgSource.codec)
+                : build.getGraphQLTypeNameByPgCodec(pgSource.codec, "output");
+              if (typeName) {
+                build.registerCursorConnection({
+                  connectionTypeName,
+                  edgeTypeName,
+                  typeName,
+                  scope: {
+                    isPgConnectionRelated: true,
+                    pgCodec: pgSource.codec,
+                  },
+                  nonNullNode: options.pgForbidSetofFunctionsToReturnNull,
+                });
+              } else {
+                console.warn(
+                  `Could not find a type for codec ${pgSource}'s codec`,
+                );
+              }
+            });
+          }
+
+          return _;
+        },
       },
 
       GraphQLObjectType_fields(fields, build, context) {
@@ -395,6 +476,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             GraphQLObjectType,
             GraphQLInputObjectType,
           },
+          inflection,
           options,
         } = build;
         const {
@@ -605,12 +687,12 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
               if (isRootMutation) {
                 // mutation type
-                const fieldName = build.inflection.customMutation({ source });
-                const payloadTypeName = build.inflection.customMutationPayload({
+                const fieldName = inflection.customMutationField({ source });
+                const payloadTypeName = inflection.customMutationPayload({
                   source,
                 });
                 const payloadType = build.getTypeByName(payloadTypeName);
-                const inputTypeName = build.inflection.customMutationInput({
+                const inputTypeName = inflection.customMutationInput({
                   source,
                 });
                 const inputType = build.getTypeByName(inputTypeName);
@@ -647,8 +729,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 }
 
                 const fieldName = isRootQuery
-                  ? build.inflection.customQuery({ source })
-                  : build.inflection.computedColumn({ source });
+                  ? inflection.customQueryField({ source })
+                  : inflection.computedColumnField({ source });
                 memo[fieldName] = fieldWithHooks(
                   {
                     fieldName,
@@ -694,14 +776,22 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   )
                 ) {
                   const fieldName = isRootQuery
-                    ? build.inflection.customQueryConnection({ source })
-                    : build.inflection.computedColumnConnection({ source });
+                    ? inflection.customQueryConnectionField({ source })
+                    : inflection.computedColumnConnectionField({ source });
+
                   const namedType = build.graphql.getNamedType(type!);
-                  const ConnectionType = namedType
-                    ? build.getOutputTypeByName(
-                        build.inflection.connectionType(namedType.name),
-                      )
+                  const connectionTypeName = shouldUseCustomConnection(source)
+                    ? source.codec.columns
+                      ? inflection.recordFunctionConnectionType({ source })
+                      : inflection.scalarFunctionConnectionType({ source })
+                    : namedType
+                    ? inflection.connectionType(namedType.name)
                     : null;
+
+                  const ConnectionType = connectionTypeName
+                    ? build.getOutputTypeByName(connectionTypeName)
+                    : null;
+
                   if (ConnectionType) {
                     memo = build.recoverable(memo, () =>
                       build.extend(
@@ -748,8 +838,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   )
                 ) {
                   const fieldName = isRootQuery
-                    ? build.inflection.customQueryList({ source })
-                    : build.inflection.computedColumnList({ source });
+                    ? inflection.customQueryListField({ source })
+                    : inflection.computedColumnListField({ source });
                   memo = build.recoverable(memo, () =>
                     build.extend(
                       memo,

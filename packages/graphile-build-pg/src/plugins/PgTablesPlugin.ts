@@ -532,6 +532,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
+              !codec.isAnonymous &&
               build.behavior.matches(behavior, "*:connection", defaultBehavior)
             ) {
               // Register edges

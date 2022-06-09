@@ -711,6 +711,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     hooks: {
       init: {
         after: ["pg-standard-types"],
+        provides: ["PgCodecs"],
         callback: (_, build) => {
           const {
             inflection,
@@ -900,13 +901,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 }),
                 "PgCodecsPlugin",
               );
-              build.registerCursorConnection?.({
-                typeName,
-                nonNullNode: !build.options.pgForbidSetofFunctionsToReturnNull,
-                scope: {
-                  isPgConnectionRelated: true,
-                },
-              });
               build.setGraphQLTypeForPgCodec(
                 codec,
                 ["input", "output"],
@@ -1047,15 +1041,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   }),
                   "PgCodecsPlugin enum range output",
                 );
-                // TODO: should we remove this?
-                build.registerCursorConnection?.({
-                  typeName: rangeTypeName,
-                  nonNullNode:
-                    !build.options.pgForbidSetofFunctionsToReturnNull,
-                  scope: {
-                    isPgConnectionRelated: true,
-                  },
-                });
                 build.registerInputObjectType(
                   rangeInputTypeName,
                   {
@@ -1113,14 +1098,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );
-                      build.registerCursorConnection?.({
-                        typeName,
-                        nonNullNode:
-                          !build.options.pgForbidSetofFunctionsToReturnNull,
-                        scope: {
-                          isPgConnectionRelated: true,
-                        },
-                      });
                       break;
                     }
                     case GraphQLEnumType: {
@@ -1130,14 +1107,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );
-                      build.registerCursorConnection?.({
-                        typeName,
-                        nonNullNode:
-                          !build.options.pgForbidSetofFunctionsToReturnNull,
-                        scope: {
-                          isPgConnectionRelated: true,
-                        },
-                      });
                       break;
                     }
                     case GraphQLObjectType: {
