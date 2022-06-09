@@ -8,6 +8,7 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../index.js";
+import { access, ExecutablePlan } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -296,6 +297,13 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLFloat,
+                plan: EXPORTABLE(
+                  () =>
+                    function plan($r: ExecutablePlan<any>) {
+                      return access($r, ["seconds"]);
+                    },
+                  [],
+                ),
               },
               minutes: {
                 description: build.wrapDescription(
@@ -303,6 +311,13 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
+                plan: EXPORTABLE(
+                  () =>
+                    function plan($r: ExecutablePlan<any>) {
+                      return access($r, ["minutes"]);
+                    },
+                  [],
+                ),
               },
               hours: {
                 description: build.wrapDescription(
@@ -310,6 +325,13 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
+                plan: EXPORTABLE(
+                  () =>
+                    function plan($r: ExecutablePlan<any>) {
+                      return access($r, ["hours"]);
+                    },
+                  [],
+                ),
               },
               days: {
                 description: build.wrapDescription(
@@ -317,6 +339,13 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
+                plan: EXPORTABLE(
+                  () =>
+                    function plan($r: ExecutablePlan<any>) {
+                      return access($r, ["days"]);
+                    },
+                  [],
+                ),
               },
               months: {
                 description: build.wrapDescription(
@@ -324,6 +353,13 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
+                plan: EXPORTABLE(
+                  () =>
+                    function plan($r: ExecutablePlan<any>) {
+                      return access($r, ["months"]);
+                    },
+                  [],
+                ),
               },
               years: {
                 description: build.wrapDescription(
@@ -331,6 +367,13 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
+                plan: EXPORTABLE(
+                  () =>
+                    function plan($r: ExecutablePlan<any>) {
+                      return access($r, ["years"]);
+                    },
+                  [],
+                ),
               },
             };
           };
@@ -338,7 +381,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           build.registerObjectType(
             inflection.builtin("Interval"),
             { isPgIntervalType: true },
-            null, // TODO: does this want a plan?
+            ExecutablePlan,
             () => ({
               description: build.wrapDescription(
                 "An interval of time that has passed where the smallest distinct unit is a second.",
