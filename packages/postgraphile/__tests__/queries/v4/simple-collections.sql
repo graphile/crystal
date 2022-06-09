@@ -41,14 +41,6 @@ select
   __person__."person_full_name" as "1",
   __person__."email" as "2"
 from "c"."person" as __person__
-order by __person__."id" asc
-limit 0
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2"
-from "c"."person" as __person__
 where (
   __person__."about" is null
 )

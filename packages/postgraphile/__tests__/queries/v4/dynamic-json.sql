@@ -7,9 +7,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -21,9 +21,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -35,9 +35,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -49,9 +49,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -63,9 +63,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -77,9 +77,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -91,9 +91,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -105,9 +105,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -119,9 +119,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __json_identity_result__.*
@@ -133,9 +133,9 @@ from (
 ) as __json_identity_identifiers__,
 lateral (
   select
-    __json_identity__.__json_identity__::text as "0",
+    __json_identity__.v::text as "0",
     __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
 ) as __json_identity_result__
 
 select __jsonb_identity_result__.*
@@ -147,9 +147,9 @@ from (
 ) as __jsonb_identity_identifiers__,
 lateral (
   select
-    __jsonb_identity__.__jsonb_identity__::text as "0",
+    __jsonb_identity__.v::text as "0",
     __jsonb_identity_identifiers__.idx as "1"
-  from "c"."jsonb_identity"(__jsonb_identity_identifiers__."id0") as __jsonb_identity__
+  from "c"."jsonb_identity"(__jsonb_identity_identifiers__."id0") as __jsonb_identity__(v)
 ) as __jsonb_identity_result__
 
 select __jsonb_identity_result__.*
@@ -161,9 +161,9 @@ from (
 ) as __jsonb_identity_identifiers__,
 lateral (
   select
-    __jsonb_identity__.__jsonb_identity__::text as "0",
+    __jsonb_identity__.v::text as "0",
     __jsonb_identity_identifiers__.idx as "1"
-  from "c"."jsonb_identity"(__jsonb_identity_identifiers__."id0") as __jsonb_identity__
+  from "c"."jsonb_identity"(__jsonb_identity_identifiers__."id0") as __jsonb_identity__(v)
 ) as __jsonb_identity_result__
 
 select
