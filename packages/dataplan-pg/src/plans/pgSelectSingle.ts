@@ -602,6 +602,7 @@ export function pgSelectSingleFromRecord<
     identifiers: [],
     from: (record) => sql`(select (${record}).*)`,
     args: [{ plan: record, pgCodec: source.codec }],
+    joinAsLateral: true,
   }).single() as PgSelectSinglePlan<
     TColumns,
     TUniques,

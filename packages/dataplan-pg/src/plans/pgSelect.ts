@@ -134,12 +134,14 @@ type PgSelectPlanJoin =
       type: "cross";
       source: SQL;
       alias: SQL;
+      lateral?: boolean;
     }
   | {
       type: "inner" | "left" | "right" | "full";
       source: SQL;
       alias: SQL;
       conditions: SQL[];
+      lateral?: boolean;
     };
 
 /**
@@ -248,6 +250,11 @@ export interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
   name?: string;
 
   mode?: PgSelectMode;
+
+  /**
+   * If true and this turns into a join it should be a lateral join.
+   */
+  joinAsLateral?: boolean;
 }
 
 /**
@@ -408,6 +415,22 @@ export class PgSelectPlan<
   private isInliningForbidden: boolean;
 
   /**
+   * If true and this becomes a join during optimisation then it should become
+   * a lateral join; e.g. in the following query, the left join must be
+   * lateral.
+   *
+   * ```sql
+   * select *
+   * from foo
+   * left join lateral (
+   *   select (foo.col).*
+   * ) t
+   * on true
+   * ```
+   */
+  private joinAsLateral: boolean;
+
+  /**
    * The list of things we're selecting.
    */
   private selects: Array<SQL>;
@@ -520,6 +543,7 @@ export class PgSelectPlan<
         from: inFrom = null,
         name: customName,
         mode: inMode,
+        joinAsLateral: inJoinAsLateral = false,
       },
     ] =
       optionsOrCloneFrom instanceof PgSelectPlan
@@ -585,6 +609,9 @@ export class PgSelectPlan<
     this.placeholderValues = cloneFrom
       ? new Map(cloneFrom.placeholderValues)
       : new Map();
+    this.joinAsLateral =
+      (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
+      !!this.source.parameters;
     if (cloneFrom) {
       this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
@@ -1451,7 +1478,9 @@ export class PgSelectPlan<
           ? sql`cross join`
           : (sql.blank as never);
 
-      return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
+      return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${
+        j.source
+      } as ${j.alias}${joinCondition}`;
     });
 
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
@@ -2326,6 +2355,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
                 source: this.fromExpression(),
                 alias: this.alias,
                 conditions,
+                lateral: this.joinAsLateral,
               },
               ...this.joins,
             );
