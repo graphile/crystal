@@ -12,6 +12,7 @@ Graphile ecosystem. Find out
 - The Guild
 - Qwick
 - Fanatics
+- Stellate
 - Dovetail
 - Enzuzo
 - Politics Rewired
@@ -22,9 +23,9 @@ Graphile ecosystem. Find out
 - Robert Claypool
 - Joe Dennis
 - domonda
+- nigelrmtaylor
 - Jack Dinker
 - DocIQ
-- nigelrmtaylor
 - Principia Mentis
 - Ian Stewart
 - HR-ON
@@ -33,9 +34,9 @@ Graphile ecosystem. Find out
 - Axinom
 - Taiste
 - Notably
-- William Baxter
 - Nathanael Beisiegel
 - SuperRare Labs
+- William Baxter
 - latch.bio
 
 ## Supporters
@@ -48,8 +49,8 @@ Graphile ecosystem. Find out
 - Matt Bretl
 - svarmony
 - James Rascoe
-- Mark
 - Simon Elliott
+- Mark
 - CJ Lazell
 - Mansoor Razzaq
 - Keith Layne
@@ -68,3 +69,5 @@ Graphile ecosystem. Find out
 - IFCHOR GROUP
 - CartoLab
 - Zentered
+- Nicolas Penot
+- Gamma Peak
