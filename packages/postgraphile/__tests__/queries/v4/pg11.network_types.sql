@@ -1,259 +1,155 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            'id'::text,
-            (__local_1__."id"),
-            'inet'::text,
-            (__local_1__."inet"),
-            'cidr'::text,
-            (__local_1__."cidr"),
-            'macaddr'::text,
-            (__local_1__."macaddr"),
-            'macaddr8'::text,
-            (__local_1__."macaddr8")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "pg11"."network" as __local_1__
-    where (
-      __local_1__."inet" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "pg11"."network" as __local_1__
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"inet" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    __network__."id"::text as "0",
+    __network__."inet"::text as "1",
+    __network__."cidr"::text as "2",
+    __network__."macaddr"::text as "3",
+    __network__."macaddr8"::text as "4",
+    __network_identifiers__.idx as "5"
+  from "pg11"."network" as __network__
   where (
-    __local_1__."inet" = $1
+    __network__."inet" = __network_identifiers__."id0"
   )
-) as "aggregates"
+  order by __network__."id" asc
+) as __network_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            'id'::text,
-            (__local_1__."id"),
-            'inet'::text,
-            (__local_1__."inet"),
-            'cidr'::text,
-            (__local_1__."cidr"),
-            'macaddr'::text,
-            (__local_1__."macaddr"),
-            'macaddr8'::text,
-            (__local_1__."macaddr8")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "pg11"."network" as __local_1__
-    where (
-      __local_1__."cidr" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "pg11"."network" as __local_1__
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"inet" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __network_identifiers__.idx as "1"
+  from "pg11"."network" as __network__
   where (
-    __local_1__."cidr" = $1
+    __network__."inet" = __network_identifiers__."id0"
   )
-) as "aggregates"
+) as __network_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            'id'::text,
-            (__local_1__."id"),
-            'inet'::text,
-            (__local_1__."inet"),
-            'cidr'::text,
-            (__local_1__."cidr"),
-            'macaddr'::text,
-            (__local_1__."macaddr"),
-            'macaddr8'::text,
-            (__local_1__."macaddr8")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "pg11"."network" as __local_1__
-    where (
-      __local_1__."macaddr" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "pg11"."network" as __local_1__
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"cidr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    __network__."id"::text as "0",
+    __network__."inet"::text as "1",
+    __network__."cidr"::text as "2",
+    __network__."macaddr"::text as "3",
+    __network__."macaddr8"::text as "4",
+    __network_identifiers__.idx as "5"
+  from "pg11"."network" as __network__
   where (
-    __local_1__."macaddr" = $1
+    __network__."cidr" = __network_identifiers__."id0"
   )
-) as "aggregates"
+  order by __network__."id" asc
+) as __network_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            'id'::text,
-            (__local_1__."id"),
-            'inet'::text,
-            (__local_1__."inet"),
-            'cidr'::text,
-            (__local_1__."cidr"),
-            'macaddr'::text,
-            (__local_1__."macaddr"),
-            'macaddr8'::text,
-            (__local_1__."macaddr8")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'primary_key_asc',
-      json_build_array(__local_1__."id")
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "pg11"."network" as __local_1__
-    where (
-      __local_1__."macaddr8" = $1
-    ) and (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "pg11"."network" as __local_1__
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"cidr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __network_identifiers__.idx as "1"
+  from "pg11"."network" as __network__
   where (
-    __local_1__."macaddr8" = $1
+    __network__."cidr" = __network_identifiers__."id0"
   )
-) as "aggregates"
+) as __network_result__
+
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"macaddr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    __network__."id"::text as "0",
+    __network__."inet"::text as "1",
+    __network__."cidr"::text as "2",
+    __network__."macaddr"::text as "3",
+    __network__."macaddr8"::text as "4",
+    __network_identifiers__.idx as "5"
+  from "pg11"."network" as __network__
+  where (
+    __network__."macaddr" = __network_identifiers__."id0"
+  )
+  order by __network__."id" asc
+) as __network_result__
+
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"macaddr" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __network_identifiers__.idx as "1"
+  from "pg11"."network" as __network__
+  where (
+    __network__."macaddr" = __network_identifiers__."id0"
+  )
+) as __network_result__
+
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"macaddr8" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    __network__."id"::text as "0",
+    __network__."inet"::text as "1",
+    __network__."cidr"::text as "2",
+    __network__."macaddr"::text as "3",
+    __network__."macaddr8"::text as "4",
+    __network_identifiers__.idx as "5"
+  from "pg11"."network" as __network__
+  where (
+    __network__."macaddr8" = __network_identifiers__."id0"
+  )
+  order by __network__."id" asc
+) as __network_result__
+
+select __network_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"macaddr8" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __network_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __network_identifiers__.idx as "1"
+  from "pg11"."network" as __network__
+  where (
+    __network__."macaddr8" = __network_identifiers__."id0"
+  )
+) as __network_result__

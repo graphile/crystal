@@ -1,0 +1,390 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
+    __InputStaticLeaf14["__InputStaticLeaf[14∈0]"]:::plan
+    Access22["Access[22∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access23["Access[23∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object24["Object[24∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection25["Connection[25∈0]<br />ᐸ21ᐳ"]:::plan
+    PgPageInfo26["PgPageInfo[26∈0]"]:::plan
+    PgSelect27[["PgSelect[27∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First28["First[28∈0]"]:::plan
+    PgSelectSingle29["PgSelectSingle[29∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List32["List[32∈0]<br />ᐸ31ᐳ"]:::plan
+    PgCursor30["PgCursor[30∈0]"]:::plan
+    Last34["Last[34∈0]"]:::plan
+    PgSelectSingle35["PgSelectSingle[35∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression37["PgClassExpression[37∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List38["List[38∈0]<br />ᐸ37ᐳ"]:::plan
+    PgCursor36["PgCursor[36∈0]"]:::plan
+    Constant39["Constant[39∈0]"]:::plan
+    Constant40["Constant[40∈0]"]:::plan
+    PgSelect41[["PgSelect[41∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First42["First[42∈0]"]:::plan
+    PgSelectSingle43["PgSelectSingle[43∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression44["PgClassExpression[44∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    __Item46>"__Item[46∈1]<br />ᐸ27ᐳ"]:::itemplan
+    PgSelectSingle47["PgSelectSingle[47∈1]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression49["PgClassExpression[49∈1]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List50["List[50∈1]<br />ᐸ49ᐳ"]:::plan
+    PgCursor48["PgCursor[48∈1]"]:::plan
+    PgClassExpression52["PgClassExpression[52∈1]<br />ᐸ__network__.”inet”ᐳ"]:::plan
+    PgClassExpression53["PgClassExpression[53∈1]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
+    PgClassExpression54["PgClassExpression[54∈1]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
+    PgClassExpression55["PgClassExpression[55∈1]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
+    __InputStaticLeaf56["__InputStaticLeaf[56∈0]"]:::plan
+    __InputStaticLeaf57["__InputStaticLeaf[57∈0]"]:::plan
+    __InputStaticLeaf58["__InputStaticLeaf[58∈0]"]:::plan
+    __InputStaticLeaf64["__InputStaticLeaf[64∈0]"]:::plan
+    Connection74["Connection[74∈0]<br />ᐸ70ᐳ"]:::plan
+    PgPageInfo75["PgPageInfo[75∈0]"]:::plan
+    PgSelect76[["PgSelect[76∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First77["First[77∈0]"]:::plan
+    PgSelectSingle78["PgSelectSingle[78∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression80["PgClassExpression[80∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List81["List[81∈0]<br />ᐸ80ᐳ"]:::plan
+    PgCursor79["PgCursor[79∈0]"]:::plan
+    Last83["Last[83∈0]"]:::plan
+    PgSelectSingle84["PgSelectSingle[84∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression86["PgClassExpression[86∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List87["List[87∈0]<br />ᐸ86ᐳ"]:::plan
+    PgCursor85["PgCursor[85∈0]"]:::plan
+    Constant88["Constant[88∈0]"]:::plan
+    Constant89["Constant[89∈0]"]:::plan
+    PgSelect90[["PgSelect[90∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First91["First[91∈0]"]:::plan
+    PgSelectSingle92["PgSelectSingle[92∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression93["PgClassExpression[93∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    __Item95>"__Item[95∈2]<br />ᐸ76ᐳ"]:::itemplan
+    PgSelectSingle96["PgSelectSingle[96∈2]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression98["PgClassExpression[98∈2]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List99["List[99∈2]<br />ᐸ98ᐳ"]:::plan
+    PgCursor97["PgCursor[97∈2]"]:::plan
+    PgClassExpression101["PgClassExpression[101∈2]<br />ᐸ__network__.”inet”ᐳ"]:::plan
+    PgClassExpression102["PgClassExpression[102∈2]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
+    PgClassExpression103["PgClassExpression[103∈2]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
+    PgClassExpression104["PgClassExpression[104∈2]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
+    __InputStaticLeaf105["__InputStaticLeaf[105∈0]"]:::plan
+    __InputStaticLeaf106["__InputStaticLeaf[106∈0]"]:::plan
+    __InputStaticLeaf107["__InputStaticLeaf[107∈0]"]:::plan
+    __InputStaticLeaf114["__InputStaticLeaf[114∈0]"]:::plan
+    Connection123["Connection[123∈0]<br />ᐸ119ᐳ"]:::plan
+    PgPageInfo124["PgPageInfo[124∈0]"]:::plan
+    PgSelect125[["PgSelect[125∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First126["First[126∈0]"]:::plan
+    PgSelectSingle127["PgSelectSingle[127∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression129["PgClassExpression[129∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List130["List[130∈0]<br />ᐸ129ᐳ"]:::plan
+    PgCursor128["PgCursor[128∈0]"]:::plan
+    Last132["Last[132∈0]"]:::plan
+    PgSelectSingle133["PgSelectSingle[133∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression135["PgClassExpression[135∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List136["List[136∈0]<br />ᐸ135ᐳ"]:::plan
+    PgCursor134["PgCursor[134∈0]"]:::plan
+    Constant137["Constant[137∈0]"]:::plan
+    Constant138["Constant[138∈0]"]:::plan
+    PgSelect139[["PgSelect[139∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First140["First[140∈0]"]:::plan
+    PgSelectSingle141["PgSelectSingle[141∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression142["PgClassExpression[142∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    __Item144>"__Item[144∈3]<br />ᐸ125ᐳ"]:::itemplan
+    PgSelectSingle145["PgSelectSingle[145∈3]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression147["PgClassExpression[147∈3]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List148["List[148∈3]<br />ᐸ147ᐳ"]:::plan
+    PgCursor146["PgCursor[146∈3]"]:::plan
+    PgClassExpression150["PgClassExpression[150∈3]<br />ᐸ__network__.”inet”ᐳ"]:::plan
+    PgClassExpression151["PgClassExpression[151∈3]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
+    PgClassExpression152["PgClassExpression[152∈3]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
+    PgClassExpression153["PgClassExpression[153∈3]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
+    __InputStaticLeaf154["__InputStaticLeaf[154∈0]"]:::plan
+    __InputStaticLeaf155["__InputStaticLeaf[155∈0]"]:::plan
+    __InputStaticLeaf156["__InputStaticLeaf[156∈0]"]:::plan
+    __InputStaticLeaf164["__InputStaticLeaf[164∈0]"]:::plan
+    Connection172["Connection[172∈0]<br />ᐸ168ᐳ"]:::plan
+    PgPageInfo173["PgPageInfo[173∈0]"]:::plan
+    PgSelect174[["PgSelect[174∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First175["First[175∈0]"]:::plan
+    PgSelectSingle176["PgSelectSingle[176∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression178["PgClassExpression[178∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List179["List[179∈0]<br />ᐸ178ᐳ"]:::plan
+    PgCursor177["PgCursor[177∈0]"]:::plan
+    Last181["Last[181∈0]"]:::plan
+    PgSelectSingle182["PgSelectSingle[182∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression184["PgClassExpression[184∈0]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List185["List[185∈0]<br />ᐸ184ᐳ"]:::plan
+    PgCursor183["PgCursor[183∈0]"]:::plan
+    Constant186["Constant[186∈0]"]:::plan
+    Constant187["Constant[187∈0]"]:::plan
+    PgSelect188[["PgSelect[188∈0]<br />ᐸnetworkᐳ"]]:::plan
+    First189["First[189∈0]"]:::plan
+    PgSelectSingle190["PgSelectSingle[190∈0]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression191["PgClassExpression[191∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    __Item193>"__Item[193∈4]<br />ᐸ174ᐳ"]:::itemplan
+    PgSelectSingle194["PgSelectSingle[194∈4]<br />ᐸnetworkᐳ"]:::plan
+    PgClassExpression196["PgClassExpression[196∈4]<br />ᐸ__network__.”id”ᐳ"]:::plan
+    List197["List[197∈4]<br />ᐸ196ᐳ"]:::plan
+    PgCursor195["PgCursor[195∈4]"]:::plan
+    PgClassExpression199["PgClassExpression[199∈4]<br />ᐸ__network__.”inet”ᐳ"]:::plan
+    PgClassExpression200["PgClassExpression[200∈4]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
+    PgClassExpression201["PgClassExpression[201∈4]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
+    PgClassExpression202["PgClassExpression[202∈4]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access22
+    __Value3 --> Access23
+    Access22 & Access23 --> Object24
+    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection25
+    Object24 & __InputStaticLeaf14 & Connection25 --> PgSelect27
+    PgSelect27 --> First28
+    First28 --> PgSelectSingle29
+    PgSelectSingle29 --> PgClassExpression31
+    PgClassExpression31 --> List32
+    List32 --> PgCursor30
+    PgSelect27 --> Last34
+    Last34 --> PgSelectSingle35
+    PgSelectSingle35 --> PgClassExpression37
+    PgClassExpression37 --> List38
+    List38 --> PgCursor36
+    Object24 & __InputStaticLeaf14 & Connection25 --> PgSelect41
+    PgSelect41 --> First42
+    First42 --> PgSelectSingle43
+    PgSelectSingle43 --> PgClassExpression44
+    PgSelect27 ==> __Item46
+    __Item46 --> PgSelectSingle47
+    PgSelectSingle47 --> PgClassExpression49
+    PgClassExpression49 --> List50
+    List50 --> PgCursor48
+    PgSelectSingle47 --> PgClassExpression52
+    PgSelectSingle47 --> PgClassExpression53
+    PgSelectSingle47 --> PgClassExpression54
+    PgSelectSingle47 --> PgClassExpression55
+    __InputStaticLeaf56 & __InputStaticLeaf57 & __InputStaticLeaf58 --> Connection74
+    Object24 & __InputStaticLeaf64 & Connection74 --> PgSelect76
+    PgSelect76 --> First77
+    First77 --> PgSelectSingle78
+    PgSelectSingle78 --> PgClassExpression80
+    PgClassExpression80 --> List81
+    List81 --> PgCursor79
+    PgSelect76 --> Last83
+    Last83 --> PgSelectSingle84
+    PgSelectSingle84 --> PgClassExpression86
+    PgClassExpression86 --> List87
+    List87 --> PgCursor85
+    Object24 & __InputStaticLeaf64 & Connection74 --> PgSelect90
+    PgSelect90 --> First91
+    First91 --> PgSelectSingle92
+    PgSelectSingle92 --> PgClassExpression93
+    PgSelect76 ==> __Item95
+    __Item95 --> PgSelectSingle96
+    PgSelectSingle96 --> PgClassExpression98
+    PgClassExpression98 --> List99
+    List99 --> PgCursor97
+    PgSelectSingle96 --> PgClassExpression101
+    PgSelectSingle96 --> PgClassExpression102
+    PgSelectSingle96 --> PgClassExpression103
+    PgSelectSingle96 --> PgClassExpression104
+    __InputStaticLeaf105 & __InputStaticLeaf106 & __InputStaticLeaf107 --> Connection123
+    Object24 & __InputStaticLeaf114 & Connection123 --> PgSelect125
+    PgSelect125 --> First126
+    First126 --> PgSelectSingle127
+    PgSelectSingle127 --> PgClassExpression129
+    PgClassExpression129 --> List130
+    List130 --> PgCursor128
+    PgSelect125 --> Last132
+    Last132 --> PgSelectSingle133
+    PgSelectSingle133 --> PgClassExpression135
+    PgClassExpression135 --> List136
+    List136 --> PgCursor134
+    Object24 & __InputStaticLeaf114 & Connection123 --> PgSelect139
+    PgSelect139 --> First140
+    First140 --> PgSelectSingle141
+    PgSelectSingle141 --> PgClassExpression142
+    PgSelect125 ==> __Item144
+    __Item144 --> PgSelectSingle145
+    PgSelectSingle145 --> PgClassExpression147
+    PgClassExpression147 --> List148
+    List148 --> PgCursor146
+    PgSelectSingle145 --> PgClassExpression150
+    PgSelectSingle145 --> PgClassExpression151
+    PgSelectSingle145 --> PgClassExpression152
+    PgSelectSingle145 --> PgClassExpression153
+    __InputStaticLeaf154 & __InputStaticLeaf155 & __InputStaticLeaf156 --> Connection172
+    Object24 & __InputStaticLeaf164 & Connection172 --> PgSelect174
+    PgSelect174 --> First175
+    First175 --> PgSelectSingle176
+    PgSelectSingle176 --> PgClassExpression178
+    PgClassExpression178 --> List179
+    List179 --> PgCursor177
+    PgSelect174 --> Last181
+    Last181 --> PgSelectSingle182
+    PgSelectSingle182 --> PgClassExpression184
+    PgClassExpression184 --> List185
+    List185 --> PgCursor183
+    Object24 & __InputStaticLeaf164 & Connection172 --> PgSelect188
+    PgSelect188 --> First189
+    First189 --> PgSelectSingle190
+    PgSelectSingle190 --> PgClassExpression191
+    PgSelect174 ==> __Item193
+    __Item193 --> PgSelectSingle194
+    PgSelectSingle194 --> PgClassExpression196
+    PgClassExpression196 --> List197
+    List197 --> PgCursor195
+    PgSelectSingle194 --> PgClassExpression199
+    PgSelectSingle194 --> PgClassExpression200
+    PgSelectSingle194 --> PgClassExpression201
+    PgSelectSingle194 --> PgClassExpression202
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P25["ᐳinetTest"]
+    Connection25 -.-> P25
+    P26["ᐳi…tᐳpageInfo"]
+    PgPageInfo26 -.-> P26
+    P27["ᐳi…tᐳedges"]
+    PgSelect27 -.-> P27
+    P30["ᐳi…tᐳp…oᐳstartCursor"]
+    PgCursor30 -.-> P30
+    P36["ᐳi…tᐳp…oᐳendCursor"]
+    PgCursor36 -.-> P36
+    P39["ᐳi…tᐳp…oᐳhasNextPage"]
+    Constant39 -.-> P39
+    P40["ᐳi…tᐳp…oᐳhasPreviousPage"]
+    Constant40 -.-> P40
+    P44["ᐳi…tᐳtotalCount"]
+    PgClassExpression44 -.-> P44
+    P47["ᐳi…tᐳedges[]<br />ᐳi…tᐳe…]ᐳnode"]
+    PgSelectSingle47 -.-> P47
+    P48["ᐳi…tᐳe…]ᐳcursor"]
+    PgCursor48 -.-> P48
+    P49["ᐳi…tᐳe…]ᐳnodeᐳid"]
+    PgClassExpression49 -.-> P49
+    P52["ᐳi…tᐳe…]ᐳnodeᐳinet"]
+    PgClassExpression52 -.-> P52
+    P53["ᐳi…tᐳe…]ᐳnodeᐳcidr"]
+    PgClassExpression53 -.-> P53
+    P54["ᐳi…tᐳe…]ᐳnodeᐳmacaddr"]
+    PgClassExpression54 -.-> P54
+    P55["ᐳi…tᐳe…]ᐳnodeᐳmacaddr8"]
+    PgClassExpression55 -.-> P55
+    P74["ᐳcidrTest"]
+    Connection74 -.-> P74
+    P75["ᐳc…tᐳpageInfo"]
+    PgPageInfo75 -.-> P75
+    P76["ᐳc…tᐳedges"]
+    PgSelect76 -.-> P76
+    P79["ᐳc…tᐳp…oᐳstartCursor"]
+    PgCursor79 -.-> P79
+    P85["ᐳc…tᐳp…oᐳendCursor"]
+    PgCursor85 -.-> P85
+    P88["ᐳc…tᐳp…oᐳhasNextPage"]
+    Constant88 -.-> P88
+    P89["ᐳc…tᐳp…oᐳhasPreviousPage"]
+    Constant89 -.-> P89
+    P93["ᐳc…tᐳtotalCount"]
+    PgClassExpression93 -.-> P93
+    P96["ᐳc…tᐳedges[]<br />ᐳc…tᐳe…]ᐳnode"]
+    PgSelectSingle96 -.-> P96
+    P97["ᐳc…tᐳe…]ᐳcursor"]
+    PgCursor97 -.-> P97
+    P98["ᐳc…tᐳe…]ᐳnodeᐳid"]
+    PgClassExpression98 -.-> P98
+    P101["ᐳc…tᐳe…]ᐳnodeᐳinet"]
+    PgClassExpression101 -.-> P101
+    P102["ᐳc…tᐳe…]ᐳnodeᐳcidr"]
+    PgClassExpression102 -.-> P102
+    P103["ᐳc…tᐳe…]ᐳnodeᐳmacaddr"]
+    PgClassExpression103 -.-> P103
+    P104["ᐳc…tᐳe…]ᐳnodeᐳmacaddr8"]
+    PgClassExpression104 -.-> P104
+    P123["ᐳmacaddrTest"]
+    Connection123 -.-> P123
+    P124["ᐳm…tᐳpageInfo"]
+    PgPageInfo124 -.-> P124
+    P125["ᐳm…tᐳedges"]
+    PgSelect125 -.-> P125
+    P128["ᐳm…tᐳp…oᐳstartCursor"]
+    PgCursor128 -.-> P128
+    P134["ᐳm…tᐳp…oᐳendCursor"]
+    PgCursor134 -.-> P134
+    P137["ᐳm…tᐳp…oᐳhasNextPage"]
+    Constant137 -.-> P137
+    P138["ᐳm…tᐳp…oᐳhasPreviousPage"]
+    Constant138 -.-> P138
+    P142["ᐳm…tᐳtotalCount"]
+    PgClassExpression142 -.-> P142
+    P145["ᐳm…tᐳedges[]<br />ᐳm…tᐳe…]ᐳnode"]
+    PgSelectSingle145 -.-> P145
+    P146["ᐳm…tᐳe…]ᐳcursor"]
+    PgCursor146 -.-> P146
+    P147["ᐳm…tᐳe…]ᐳnodeᐳid"]
+    PgClassExpression147 -.-> P147
+    P150["ᐳm…tᐳe…]ᐳnodeᐳinet"]
+    PgClassExpression150 -.-> P150
+    P151["ᐳm…tᐳe…]ᐳnodeᐳcidr"]
+    PgClassExpression151 -.-> P151
+    P152["ᐳm…tᐳe…]ᐳnodeᐳmacaddr"]
+    PgClassExpression152 -.-> P152
+    P153["ᐳm…tᐳe…]ᐳnodeᐳmacaddr8"]
+    PgClassExpression153 -.-> P153
+    P172["ᐳmacaddr8Test"]
+    Connection172 -.-> P172
+    P173["ᐳm…tᐳpageInfo"]
+    PgPageInfo173 -.-> P173
+    P174["ᐳm…tᐳedges"]
+    PgSelect174 -.-> P174
+    P177["ᐳm…tᐳp…oᐳstartCursor"]
+    PgCursor177 -.-> P177
+    P183["ᐳm…tᐳp…oᐳendCursor"]
+    PgCursor183 -.-> P183
+    P186["ᐳm…tᐳp…oᐳhasNextPage"]
+    Constant186 -.-> P186
+    P187["ᐳm…tᐳp…oᐳhasPreviousPage"]
+    Constant187 -.-> P187
+    P191["ᐳm…tᐳtotalCount"]
+    PgClassExpression191 -.-> P191
+    P194["ᐳm…tᐳedges[]<br />ᐳm…tᐳe…]ᐳnode"]
+    PgSelectSingle194 -.-> P194
+    P195["ᐳm…tᐳe…]ᐳcursor"]
+    PgCursor195 -.-> P195
+    P196["ᐳm…tᐳe…]ᐳnodeᐳid"]
+    PgClassExpression196 -.-> P196
+    P199["ᐳm…tᐳe…]ᐳnodeᐳinet"]
+    PgClassExpression199 -.-> P199
+    P200["ᐳm…tᐳe…]ᐳnodeᐳcidr"]
+    PgClassExpression200 -.-> P200
+    P201["ᐳm…tᐳe…]ᐳnodeᐳmacaddr"]
+    PgClassExpression201 -.-> P201
+    P202["ᐳm…tᐳe…]ᐳnodeᐳmacaddr8"]
+    PgClassExpression202 -.-> P202
+
+    subgraph "Buckets for queries/v4/pg11.network_types"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀inetTest ᐸ-O- 25<br />⠀⠀⠀inetTest.pageInfo ᐸ-O- 26<br />⠀⠀⠀⠀inetTest.pageInfo.startCursor ᐸ-L- 30<br />⠀⠀⠀⠀inetTest.pageInfo.endCursor ᐸ-L- 36<br />⠀⠀⠀⠀inetTest.pageInfo.hasNextPage ᐸ-L- 39<br />⠀⠀⠀⠀inetTest.pageInfo.hasPreviousPage ᐸ-L- 40<br />⠀⠀⠀inetTest.edges ᐸ-A- 27<br />⠀⠀⠀inetTest.totalCount ᐸ-L- 44<br />⠀⠀cidrTest ᐸ-O- 74<br />⠀⠀⠀cidrTest.pageInfo ᐸ-O- 75<br />⠀⠀⠀⠀cidrTest.pageInfo.startCursor ᐸ-L- 79<br />⠀⠀⠀⠀cidrTest.pageInfo.endCursor ᐸ-L- 85<br />⠀⠀⠀⠀cidrTest.pageInfo.hasNextPage ᐸ-L- 88<br />⠀⠀⠀⠀cidrTest.pageInfo.hasPreviousPage ᐸ-L- 89<br />⠀⠀⠀cidrTest.edges ᐸ-A- 76<br />⠀⠀⠀cidrTest.totalCount ᐸ-L- 93<br />⠀⠀macaddrTest ᐸ-O- 123<br />⠀⠀⠀macaddrTest.pageInfo ᐸ-O- 124<br />⠀⠀⠀⠀macaddrTest.pageInfo.startCursor ᐸ-L- 128<br />⠀⠀⠀⠀macaddrTest.pageInfo.endCursor ᐸ-L- 134<br />⠀⠀⠀⠀macaddrTest.pageInfo.hasNextPage ᐸ-L- 137<br />⠀⠀⠀⠀macaddrTest.pageInfo.hasPreviousPage ᐸ-L- 138<br />⠀⠀⠀macaddrTest.edges ᐸ-A- 125<br />⠀⠀⠀macaddrTest.totalCount ᐸ-L- 142<br />⠀⠀macaddr8Test ᐸ-O- 172<br />⠀⠀⠀macaddr8Test.pageInfo ᐸ-O- 173<br />⠀⠀⠀⠀macaddr8Test.pageInfo.startCursor ᐸ-L- 177<br />⠀⠀⠀⠀macaddr8Test.pageInfo.endCursor ᐸ-L- 183<br />⠀⠀⠀⠀macaddr8Test.pageInfo.hasNextPage ᐸ-L- 186<br />⠀⠀⠀⠀macaddr8Test.pageInfo.hasPreviousPage ᐸ-L- 187<br />⠀⠀⠀macaddr8Test.edges ᐸ-A- 174<br />⠀⠀⠀macaddr8Test.totalCount ᐸ-L- 191"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf14,Access22,Access23,Object24,Connection25,PgPageInfo26,PgSelect27,First28,PgSelectSingle29,PgCursor30,PgClassExpression31,List32,Last34,PgSelectSingle35,PgCursor36,PgClassExpression37,List38,Constant39,Constant40,PgSelect41,First42,PgSelectSingle43,PgClassExpression44,__InputStaticLeaf56,__InputStaticLeaf57,__InputStaticLeaf58,__InputStaticLeaf64,Connection74,PgPageInfo75,PgSelect76,First77,PgSelectSingle78,PgCursor79,PgClassExpression80,List81,Last83,PgSelectSingle84,PgCursor85,PgClassExpression86,List87,Constant88,Constant89,PgSelect90,First91,PgSelectSingle92,PgClassExpression93,__InputStaticLeaf105,__InputStaticLeaf106,__InputStaticLeaf107,__InputStaticLeaf114,Connection123,PgPageInfo124,PgSelect125,First126,PgSelectSingle127,PgCursor128,PgClassExpression129,List130,Last132,PgSelectSingle133,PgCursor134,PgClassExpression135,List136,Constant137,Constant138,PgSelect139,First140,PgSelectSingle141,PgClassExpression142,__InputStaticLeaf154,__InputStaticLeaf155,__InputStaticLeaf156,__InputStaticLeaf164,Connection172,PgPageInfo173,PgSelect174,First175,PgSelectSingle176,PgCursor177,PgClassExpression178,List179,Last181,PgSelectSingle182,PgCursor183,PgClassExpression184,List185,Constant186,Constant187,PgSelect188,First189,PgSelectSingle190,PgClassExpression191 bucket0
+    Bucket1("Bucket 1 (item46)<br />Deps: 27<br />~ᐳQuery.inetTestᐳNetworksConnection.edges[]<br />⠀ROOT ᐸ-O- 47<br />⠀⠀node ᐸ-O- 47<br />⠀⠀⠀node.id ᐸ-L- 49<br />⠀⠀⠀node.inet ᐸ-L- 52<br />⠀⠀⠀node.cidr ᐸ-L- 53<br />⠀⠀⠀node.macaddr ᐸ-L- 54<br />⠀⠀⠀node.macaddr8 ᐸ-L- 55<br />⠀⠀cursor ᐸ-L- 48"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item46,PgSelectSingle47,PgCursor48,PgClassExpression49,List50,PgClassExpression52,PgClassExpression53,PgClassExpression54,PgClassExpression55 bucket1
+    Bucket2("Bucket 2 (item95)<br />Deps: 76<br />~ᐳQuery.cidrTestᐳNetworksConnection.edges[]<br />⠀ROOT ᐸ-O- 96<br />⠀⠀node ᐸ-O- 96<br />⠀⠀⠀node.id ᐸ-L- 98<br />⠀⠀⠀node.inet ᐸ-L- 101<br />⠀⠀⠀node.cidr ᐸ-L- 102<br />⠀⠀⠀node.macaddr ᐸ-L- 103<br />⠀⠀⠀node.macaddr8 ᐸ-L- 104<br />⠀⠀cursor ᐸ-L- 97"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item95,PgSelectSingle96,PgCursor97,PgClassExpression98,List99,PgClassExpression101,PgClassExpression102,PgClassExpression103,PgClassExpression104 bucket2
+    Bucket3("Bucket 3 (item144)<br />Deps: 125<br />~ᐳQuery.macaddrTestᐳNetworksConnection.edges[]<br />⠀ROOT ᐸ-O- 145<br />⠀⠀node ᐸ-O- 145<br />⠀⠀⠀node.id ᐸ-L- 147<br />⠀⠀⠀node.inet ᐸ-L- 150<br />⠀⠀⠀node.cidr ᐸ-L- 151<br />⠀⠀⠀node.macaddr ᐸ-L- 152<br />⠀⠀⠀node.macaddr8 ᐸ-L- 153<br />⠀⠀cursor ᐸ-L- 146"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item144,PgSelectSingle145,PgCursor146,PgClassExpression147,List148,PgClassExpression150,PgClassExpression151,PgClassExpression152,PgClassExpression153 bucket3
+    Bucket4("Bucket 4 (item193)<br />Deps: 174<br />~ᐳQuery.macaddr8TestᐳNetworksConnection.edges[]<br />⠀ROOT ᐸ-O- 194<br />⠀⠀node ᐸ-O- 194<br />⠀⠀⠀node.id ᐸ-L- 196<br />⠀⠀⠀node.inet ᐸ-L- 199<br />⠀⠀⠀node.cidr ᐸ-L- 200<br />⠀⠀⠀node.macaddr ᐸ-L- 201<br />⠀⠀⠀node.macaddr8 ᐸ-L- 202<br />⠀⠀cursor ᐸ-L- 195"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item193,PgSelectSingle194,PgCursor195,PgClassExpression196,List197,PgClassExpression199,PgClassExpression200,PgClassExpression201,PgClassExpression202 bucket4
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
+    end
