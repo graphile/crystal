@@ -1,0 +1,48 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  a: allPeople { nodes { ...node } }
+  b: allCompoundKeys { nodes { ...node } }
+  c: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
+  d: node(nodeId: "WyJwZW9wbGUiLDJd") { ...node }
+  e: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
+  f: node(nodeId: "WyJwZW9wbGUiLDVd") { ...node }
+  g: node(nodeId: "WyJwZW9wbGUiLDUwMF0=") { ...node }
+  h: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
+  i: person(nodeId: "WyJwZW9wbGUiLDJd") { ...node }
+  j: person(nodeId: "WyJwZW9wbGUiLDVd") { ...node }
+  k: person(nodeId: "WyJwZW9wbGUiLDUwMF0=") { ...node }
+  l: compoundKey(nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
+  m: compoundKey(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
+  n: compoundKey(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
+  o: node(nodeId: "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==") { ...node }
+  p: node(nodeId: "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==") { ...node }
+  q: similarTable1(nodeId: "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==") { ...node }
+  r: similarTable2(nodeId: "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==") { ...node }
+}
+
+fragment node on Node {
+  __typename
+  nodeId
+  ... on Person {
+    id
+    name
+  }
+  ... on CompoundKey {
+    personId1
+    personId2
+  }
+  ... on SimilarTable1 {
+    id
+    col1
+    col2
+    col3
+  }
+  ... on SimilarTable2 {
+    id
+    col3
+    col4
+    col5
+  }
+}
