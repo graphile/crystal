@@ -1,963 +1,529 @@
-with __local_0__ as (
-  select to_json(
-    (
-      (
-        jsonb_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_1__."id"),
-          'headline'::text,
-          (__local_1__."headline"),
-          '@a1'::text,
-          (
-            select to_json(__local_2__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $1
-            ) as __local_2__
-            where (TRUE) and (TRUE)
-          ),
-          '@a2'::text,
-          (
-            select to_json(__local_3__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $2
-            ) as __local_3__
-            where (TRUE) and (TRUE)
-          ),
-          '@a3'::text,
-          (
-            select to_json(__local_4__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $3
-            ) as __local_4__
-            where (TRUE) and (TRUE)
-          ),
-          '@a4'::text,
-          (
-            select to_json(__local_5__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $4
-            ) as __local_5__
-            where (TRUE) and (TRUE)
-          ),
-          '@a5'::text,
-          (
-            select to_json(__local_6__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $5
-            ) as __local_6__
-            where (TRUE) and (TRUE)
-          ),
-          '@a6'::text,
-          (
-            select to_json(__local_7__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $6
-            ) as __local_7__
-            where (TRUE) and (TRUE)
-          ),
-          '@a7'::text,
-          (
-            select to_json(__local_8__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $7
-            ) as __local_8__
-            where (TRUE) and (TRUE)
-          ),
-          '@a8'::text,
-          (
-            select to_json(__local_9__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $8
-            ) as __local_9__
-            where (TRUE) and (TRUE)
-          ),
-          '@a9'::text,
-          (
-            select to_json(__local_10__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $9
-            ) as __local_10__
-            where (TRUE) and (TRUE)
-          ),
-          '@a10'::text,
-          (
-            select to_json(__local_11__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $10
-            ) as __local_11__
-            where (TRUE) and (TRUE)
-          ),
-          '@a11'::text,
-          (
-            select to_json(__local_12__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $11
-            ) as __local_12__
-            where (TRUE) and (TRUE)
-          ),
-          '@a12'::text,
-          (
-            select to_json(__local_13__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $12
-            ) as __local_13__
-            where (TRUE) and (TRUE)
-          ),
-          '@a13'::text,
-          (
-            select to_json(__local_14__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $13
-            ) as __local_14__
-            where (TRUE) and (TRUE)
-          ),
-          '@a14'::text,
-          (
-            select to_json(__local_15__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $14
-            ) as __local_15__
-            where (TRUE) and (TRUE)
-          ),
-          '@a15'::text,
-          (
-            select to_json(__local_16__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $15
-            ) as __local_16__
-            where (TRUE) and (TRUE)
-          ),
-          '@a16'::text,
-          (
-            select to_json(__local_17__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $16
-            ) as __local_17__
-            where (TRUE) and (TRUE)
-          ),
-          '@a17'::text,
-          (
-            select to_json(__local_18__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $17
-            ) as __local_18__
-            where (TRUE) and (TRUE)
-          ),
-          '@a18'::text,
-          (
-            select to_json(__local_19__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $18
-            ) as __local_19__
-            where (TRUE) and (TRUE)
-          ),
-          '@a19'::text,
-          (
-            select to_json(__local_20__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $19
-            ) as __local_20__
-            where (TRUE) and (TRUE)
-          ),
-          '@a20'::text,
-          (
-            select to_json(__local_21__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $20
-            ) as __local_21__
-            where (TRUE) and (TRUE)
-          ),
-          '@a21'::text,
-          (
-            select to_json(__local_22__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $21
-            ) as __local_22__
-            where (TRUE) and (TRUE)
-          ),
-          '@a22'::text,
-          (
-            select to_json(__local_23__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $22
-            ) as __local_23__
-            where (TRUE) and (TRUE)
-          ),
-          '@a23'::text,
-          (
-            select to_json(__local_24__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $23
-            ) as __local_24__
-            where (TRUE) and (TRUE)
-          ),
-          '@a24'::text,
-          (
-            select to_json(__local_25__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $24
-            ) as __local_25__
-            where (TRUE) and (TRUE)
-          ),
-          '@a25'::text,
-          (
-            select to_json(__local_26__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $25
-            ) as __local_26__
-            where (TRUE) and (TRUE)
-          ),
-          '@a26'::text,
-          (
-            select to_json(__local_27__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $26
-            ) as __local_27__
-            where (TRUE) and (TRUE)
-          ),
-          '@a27'::text,
-          (
-            select to_json(__local_28__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $27
-            ) as __local_28__
-            where (TRUE) and (TRUE)
-          ),
-          '@a28'::text,
-          (
-            select to_json(__local_29__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $28
-            ) as __local_29__
-            where (TRUE) and (TRUE)
-          ),
-          '@a29'::text,
-          (
-            select to_json(__local_30__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $29
-            ) as __local_30__
-            where (TRUE) and (TRUE)
-          ),
-          '@a30'::text,
-          (
-            select to_json(__local_31__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $30
-            ) as __local_31__
-            where (TRUE) and (TRUE)
-          ),
-          '@a31'::text,
-          (
-            select to_json(__local_32__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $31
-            ) as __local_32__
-            where (TRUE) and (TRUE)
-          ),
-          '@a32'::text,
-          (
-            select to_json(__local_33__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $32
-            ) as __local_33__
-            where (TRUE) and (TRUE)
-          ),
-          '@a33'::text,
-          (
-            select to_json(__local_34__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $33
-            ) as __local_34__
-            where (TRUE) and (TRUE)
-          ),
-          '@a34'::text,
-          (
-            select to_json(__local_35__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $34
-            ) as __local_35__
-            where (TRUE) and (TRUE)
-          ),
-          '@a35'::text,
-          (
-            select to_json(__local_36__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $35
-            ) as __local_36__
-            where (TRUE) and (TRUE)
-          ),
-          '@a36'::text,
-          (
-            select to_json(__local_37__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $36
-            ) as __local_37__
-            where (TRUE) and (TRUE)
-          ),
-          '@a37'::text,
-          (
-            select to_json(__local_38__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $37
-            ) as __local_38__
-            where (TRUE) and (TRUE)
-          ),
-          '@a38'::text,
-          (
-            select to_json(__local_39__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $38
-            ) as __local_39__
-            where (TRUE) and (TRUE)
-          ),
-          '@a39'::text,
-          (
-            select to_json(__local_40__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $39
-            ) as __local_40__
-            where (TRUE) and (TRUE)
-          ),
-          '@a40'::text,
-          (
-            select to_json(__local_41__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $40
-            ) as __local_41__
-            where (TRUE) and (TRUE)
-          ),
-          '@a41'::text,
-          (
-            select to_json(__local_42__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $41
-            ) as __local_42__
-            where (TRUE) and (TRUE)
-          ),
-          '@a42'::text,
-          (
-            select to_json(__local_43__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $42
-            ) as __local_43__
-            where (TRUE) and (TRUE)
-          ),
-          '@a43'::text,
-          (
-            select to_json(__local_44__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $43
-            ) as __local_44__
-            where (TRUE) and (TRUE)
-          ),
-          '@a44'::text,
-          (
-            select to_json(__local_45__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $44
-            ) as __local_45__
-            where (TRUE) and (TRUE)
-          ),
-          '@a45'::text,
-          (
-            select to_json(__local_46__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $45
-            ) as __local_46__
-            where (TRUE) and (TRUE)
-          ),
-          '@a46'::text,
-          (
-            select to_json(__local_47__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $46
-            ) as __local_47__
-            where (TRUE) and (TRUE)
-          ),
-          '@a47'::text,
-          (
-            select to_json(__local_48__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $47
-            ) as __local_48__
-            where (TRUE) and (TRUE)
-          ),
-          '@a48'::text,
-          (
-            select to_json(__local_49__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $48
-            ) as __local_49__
-            where (TRUE) and (TRUE)
-          )
-        ) || jsonb_build_object(
-          '@a49'::text,
-          (
-            select to_json(__local_50__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $49
-            ) as __local_50__
-            where (TRUE) and (TRUE)
-          ),
-          '@a50'::text,
-          (
-            select to_json(__local_51__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $50
-            ) as __local_51__
-            where (TRUE) and (TRUE)
-          ),
-          '@a51'::text,
-          (
-            select to_json(__local_52__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $51
-            ) as __local_52__
-            where (TRUE) and (TRUE)
-          ),
-          '@a52'::text,
-          (
-            select to_json(__local_53__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $52
-            ) as __local_53__
-            where (TRUE) and (TRUE)
-          ),
-          '@a53'::text,
-          (
-            select to_json(__local_54__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $53
-            ) as __local_54__
-            where (TRUE) and (TRUE)
-          ),
-          '@a54'::text,
-          (
-            select to_json(__local_55__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $54
-            ) as __local_55__
-            where (TRUE) and (TRUE)
-          ),
-          '@a55'::text,
-          (
-            select to_json(__local_56__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $55
-            ) as __local_56__
-            where (TRUE) and (TRUE)
-          ),
-          '@a56'::text,
-          (
-            select to_json(__local_57__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $56
-            ) as __local_57__
-            where (TRUE) and (TRUE)
-          ),
-          '@a57'::text,
-          (
-            select to_json(__local_58__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $57
-            ) as __local_58__
-            where (TRUE) and (TRUE)
-          ),
-          '@a58'::text,
-          (
-            select to_json(__local_59__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $58
-            ) as __local_59__
-            where (TRUE) and (TRUE)
-          ),
-          '@a59'::text,
-          (
-            select to_json(__local_60__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $59
-            ) as __local_60__
-            where (TRUE) and (TRUE)
-          ),
-          '@a60'::text,
-          (
-            select to_json(__local_61__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $60
-            ) as __local_61__
-            where (TRUE) and (TRUE)
-          ),
-          '@a61'::text,
-          (
-            select to_json(__local_62__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $61
-            ) as __local_62__
-            where (TRUE) and (TRUE)
-          ),
-          '@a62'::text,
-          (
-            select to_json(__local_63__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $62
-            ) as __local_63__
-            where (TRUE) and (TRUE)
-          ),
-          '@a63'::text,
-          (
-            select to_json(__local_64__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $63
-            ) as __local_64__
-            where (TRUE) and (TRUE)
-          ),
-          '@a64'::text,
-          (
-            select to_json(__local_65__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $64
-            ) as __local_65__
-            where (TRUE) and (TRUE)
-          ),
-          '@a65'::text,
-          (
-            select to_json(__local_66__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $65
-            ) as __local_66__
-            where (TRUE) and (TRUE)
-          ),
-          '@a66'::text,
-          (
-            select to_json(__local_67__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $66
-            ) as __local_67__
-            where (TRUE) and (TRUE)
-          ),
-          '@a67'::text,
-          (
-            select to_json(__local_68__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $67
-            ) as __local_68__
-            where (TRUE) and (TRUE)
-          ),
-          '@a68'::text,
-          (
-            select to_json(__local_69__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $68
-            ) as __local_69__
-            where (TRUE) and (TRUE)
-          ),
-          '@a69'::text,
-          (
-            select to_json(__local_70__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $69
-            ) as __local_70__
-            where (TRUE) and (TRUE)
-          ),
-          '@a70'::text,
-          (
-            select to_json(__local_71__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $70
-            ) as __local_71__
-            where (TRUE) and (TRUE)
-          ),
-          '@a71'::text,
-          (
-            select to_json(__local_72__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $71
-            ) as __local_72__
-            where (TRUE) and (TRUE)
-          ),
-          '@a72'::text,
-          (
-            select to_json(__local_73__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $72
-            ) as __local_73__
-            where (TRUE) and (TRUE)
-          ),
-          '@a73'::text,
-          (
-            select to_json(__local_74__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $73
-            ) as __local_74__
-            where (TRUE) and (TRUE)
-          ),
-          '@a74'::text,
-          (
-            select to_json(__local_75__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $74
-            ) as __local_75__
-            where (TRUE) and (TRUE)
-          ),
-          '@a75'::text,
-          (
-            select to_json(__local_76__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $75
-            ) as __local_76__
-            where (TRUE) and (TRUE)
-          ),
-          '@a76'::text,
-          (
-            select to_json(__local_77__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $76
-            ) as __local_77__
-            where (TRUE) and (TRUE)
-          ),
-          '@a77'::text,
-          (
-            select to_json(__local_78__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $77
-            ) as __local_78__
-            where (TRUE) and (TRUE)
-          ),
-          '@a78'::text,
-          (
-            select to_json(__local_79__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $78
-            ) as __local_79__
-            where (TRUE) and (TRUE)
-          ),
-          '@a79'::text,
-          (
-            select to_json(__local_80__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $79
-            ) as __local_80__
-            where (TRUE) and (TRUE)
-          ),
-          '@a80'::text,
-          (
-            select to_json(__local_81__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $80
-            ) as __local_81__
-            where (TRUE) and (TRUE)
-          ),
-          '@a81'::text,
-          (
-            select to_json(__local_82__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $81
-            ) as __local_82__
-            where (TRUE) and (TRUE)
-          ),
-          '@a82'::text,
-          (
-            select to_json(__local_83__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $82
-            ) as __local_83__
-            where (TRUE) and (TRUE)
-          ),
-          '@a83'::text,
-          (
-            select to_json(__local_84__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $83
-            ) as __local_84__
-            where (TRUE) and (TRUE)
-          ),
-          '@a84'::text,
-          (
-            select to_json(__local_85__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $84
-            ) as __local_85__
-            where (TRUE) and (TRUE)
-          ),
-          '@a85'::text,
-          (
-            select to_json(__local_86__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $85
-            ) as __local_86__
-            where (TRUE) and (TRUE)
-          ),
-          '@a86'::text,
-          (
-            select to_json(__local_87__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $86
-            ) as __local_87__
-            where (TRUE) and (TRUE)
-          ),
-          '@a87'::text,
-          (
-            select to_json(__local_88__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $87
-            ) as __local_88__
-            where (TRUE) and (TRUE)
-          ),
-          '@a88'::text,
-          (
-            select to_json(__local_89__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $88
-            ) as __local_89__
-            where (TRUE) and (TRUE)
-          ),
-          '@a89'::text,
-          (
-            select to_json(__local_90__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $89
-            ) as __local_90__
-            where (TRUE) and (TRUE)
-          ),
-          '@a90'::text,
-          (
-            select to_json(__local_91__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $90
-            ) as __local_91__
-            where (TRUE) and (TRUE)
-          ),
-          '@a91'::text,
-          (
-            select to_json(__local_92__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $91
-            ) as __local_92__
-            where (TRUE) and (TRUE)
-          ),
-          '@a92'::text,
-          (
-            select to_json(__local_93__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $92
-            ) as __local_93__
-            where (TRUE) and (TRUE)
-          ),
-          '@a93'::text,
-          (
-            select to_json(__local_94__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $93
-            ) as __local_94__
-            where (TRUE) and (TRUE)
-          ),
-          '@a94'::text,
-          (
-            select to_json(__local_95__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $94
-            ) as __local_95__
-            where (TRUE) and (TRUE)
-          ),
-          '@a95'::text,
-          (
-            select to_json(__local_96__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $95
-            ) as __local_96__
-            where (TRUE) and (TRUE)
-          ),
-          '@a96'::text,
-          (
-            select to_json(__local_97__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $96
-            ) as __local_97__
-            where (TRUE) and (TRUE)
-          ),
-          '@a97'::text,
-          (
-            select to_json(__local_98__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $97
-            ) as __local_98__
-            where (TRUE) and (TRUE)
-          ),
-          '@a98'::text,
-          (
-            select to_json(__local_99__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $98
-            ) as __local_99__
-            where (TRUE) and (TRUE)
-          )
-        ) || jsonb_build_object(
-          '@a99'::text,
-          (
-            select to_json(__local_100__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $99
-            ) as __local_100__
-            where (TRUE) and (TRUE)
-          ),
-          '@a100'::text,
-          (
-            select to_json(__local_101__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $100
-            ) as __local_101__
-            where (TRUE) and (TRUE)
-          ),
-          '@a101'::text,
-          (
-            select to_json(__local_102__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $101
-            ) as __local_102__
-            where (TRUE) and (TRUE)
-          ),
-          '@a102'::text,
-          (
-            select to_json(__local_103__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $102
-            ) as __local_103__
-            where (TRUE) and (TRUE)
-          ),
-          '@a103'::text,
-          (
-            select to_json(__local_104__) as "value"
-            from "a"."post_headline_trimmed"(
-              __local_1__,
-              "length" := $103
-            ) as __local_104__
-            where (TRUE) and (TRUE)
-          )
-        )
-      )::json
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-    limit 1
-  ) __local_1__
-),
-__local_105__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_105__.data
-    from __local_105__
-  ),
-  '[]'::json
-) as "data"
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"int4" as "id2",
+    (ids.value->>3)::"int4" as "id3",
+    (ids.value->>4)::"int4" as "id4",
+    (ids.value->>5)::"int4" as "id5",
+    (ids.value->>6)::"int4" as "id6",
+    (ids.value->>7)::"int4" as "id7",
+    (ids.value->>8)::"int4" as "id8",
+    (ids.value->>9)::"int4" as "id9",
+    (ids.value->>10)::"int4" as "id10",
+    (ids.value->>11)::"int4" as "id11",
+    (ids.value->>12)::"int4" as "id12",
+    (ids.value->>13)::"int4" as "id13",
+    (ids.value->>14)::"int4" as "id14",
+    (ids.value->>15)::"int4" as "id15",
+    (ids.value->>16)::"int4" as "id16",
+    (ids.value->>17)::"int4" as "id17",
+    (ids.value->>18)::"int4" as "id18",
+    (ids.value->>19)::"int4" as "id19",
+    (ids.value->>20)::"int4" as "id20",
+    (ids.value->>21)::"int4" as "id21",
+    (ids.value->>22)::"int4" as "id22",
+    (ids.value->>23)::"int4" as "id23",
+    (ids.value->>24)::"int4" as "id24",
+    (ids.value->>25)::"int4" as "id25",
+    (ids.value->>26)::"int4" as "id26",
+    (ids.value->>27)::"int4" as "id27",
+    (ids.value->>28)::"int4" as "id28",
+    (ids.value->>29)::"int4" as "id29",
+    (ids.value->>30)::"int4" as "id30",
+    (ids.value->>31)::"int4" as "id31",
+    (ids.value->>32)::"int4" as "id32",
+    (ids.value->>33)::"int4" as "id33",
+    (ids.value->>34)::"int4" as "id34",
+    (ids.value->>35)::"int4" as "id35",
+    (ids.value->>36)::"int4" as "id36",
+    (ids.value->>37)::"int4" as "id37",
+    (ids.value->>38)::"int4" as "id38",
+    (ids.value->>39)::"int4" as "id39",
+    (ids.value->>40)::"int4" as "id40",
+    (ids.value->>41)::"int4" as "id41",
+    (ids.value->>42)::"int4" as "id42",
+    (ids.value->>43)::"int4" as "id43",
+    (ids.value->>44)::"int4" as "id44",
+    (ids.value->>45)::"int4" as "id45",
+    (ids.value->>46)::"int4" as "id46",
+    (ids.value->>47)::"int4" as "id47",
+    (ids.value->>48)::"int4" as "id48",
+    (ids.value->>49)::"int4" as "id49",
+    (ids.value->>50)::"int4" as "id50",
+    (ids.value->>51)::"int4" as "id51",
+    (ids.value->>52)::"int4" as "id52",
+    (ids.value->>53)::"int4" as "id53",
+    (ids.value->>54)::"int4" as "id54",
+    (ids.value->>55)::"int4" as "id55",
+    (ids.value->>56)::"int4" as "id56",
+    (ids.value->>57)::"int4" as "id57",
+    (ids.value->>58)::"int4" as "id58",
+    (ids.value->>59)::"int4" as "id59",
+    (ids.value->>60)::"int4" as "id60",
+    (ids.value->>61)::"int4" as "id61",
+    (ids.value->>62)::"int4" as "id62",
+    (ids.value->>63)::"int4" as "id63",
+    (ids.value->>64)::"int4" as "id64",
+    (ids.value->>65)::"int4" as "id65",
+    (ids.value->>66)::"int4" as "id66",
+    (ids.value->>67)::"int4" as "id67",
+    (ids.value->>68)::"int4" as "id68",
+    (ids.value->>69)::"int4" as "id69",
+    (ids.value->>70)::"int4" as "id70",
+    (ids.value->>71)::"int4" as "id71",
+    (ids.value->>72)::"int4" as "id72",
+    (ids.value->>73)::"int4" as "id73",
+    (ids.value->>74)::"int4" as "id74",
+    (ids.value->>75)::"int4" as "id75",
+    (ids.value->>76)::"int4" as "id76",
+    (ids.value->>77)::"int4" as "id77",
+    (ids.value->>78)::"int4" as "id78",
+    (ids.value->>79)::"int4" as "id79",
+    (ids.value->>80)::"int4" as "id80",
+    (ids.value->>81)::"int4" as "id81",
+    (ids.value->>82)::"int4" as "id82",
+    (ids.value->>83)::"int4" as "id83",
+    (ids.value->>84)::"int4" as "id84",
+    (ids.value->>85)::"int4" as "id85",
+    (ids.value->>86)::"int4" as "id86",
+    (ids.value->>87)::"int4" as "id87",
+    (ids.value->>88)::"int4" as "id88",
+    (ids.value->>89)::"int4" as "id89",
+    (ids.value->>90)::"int4" as "id90",
+    (ids.value->>91)::"int4" as "id91",
+    (ids.value->>92)::"int4" as "id92",
+    (ids.value->>93)::"int4" as "id93",
+    (ids.value->>94)::"int4" as "id94",
+    (ids.value->>95)::"int4" as "id95",
+    (ids.value->>96)::"int4" as "id96",
+    (ids.value->>97)::"int4" as "id97",
+    (ids.value->>98)::"int4" as "id98",
+    (ids.value->>99)::"int4" as "id99",
+    (ids.value->>100)::"int4" as "id100",
+    (ids.value->>101)::"int4" as "id101",
+    (ids.value->>102)::"int4" as "id102"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."headline" as "0",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id0"
+    ) as "1",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id1"
+    ) as "2",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id2"
+    ) as "3",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id3"
+    ) as "4",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id4"
+    ) as "5",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id5"
+    ) as "6",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id6"
+    ) as "7",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id7"
+    ) as "8",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id8"
+    ) as "9",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id9"
+    ) as "10",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id10"
+    ) as "11",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id11"
+    ) as "12",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id12"
+    ) as "13",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id13"
+    ) as "14",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id14"
+    ) as "15",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id15"
+    ) as "16",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id16"
+    ) as "17",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id17"
+    ) as "18",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id18"
+    ) as "19",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id19"
+    ) as "20",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id20"
+    ) as "21",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id21"
+    ) as "22",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id22"
+    ) as "23",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id23"
+    ) as "24",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id24"
+    ) as "25",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id25"
+    ) as "26",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id26"
+    ) as "27",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id27"
+    ) as "28",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id28"
+    ) as "29",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id29"
+    ) as "30",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id30"
+    ) as "31",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id31"
+    ) as "32",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id32"
+    ) as "33",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id33"
+    ) as "34",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id34"
+    ) as "35",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id35"
+    ) as "36",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id36"
+    ) as "37",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id37"
+    ) as "38",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id38"
+    ) as "39",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id39"
+    ) as "40",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id40"
+    ) as "41",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id41"
+    ) as "42",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id42"
+    ) as "43",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id43"
+    ) as "44",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id44"
+    ) as "45",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id45"
+    ) as "46",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id46"
+    ) as "47",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id47"
+    ) as "48",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id48"
+    ) as "49",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id49"
+    ) as "50",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id50"
+    ) as "51",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id51"
+    ) as "52",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id52"
+    ) as "53",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id53"
+    ) as "54",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id54"
+    ) as "55",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id55"
+    ) as "56",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id56"
+    ) as "57",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id57"
+    ) as "58",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id58"
+    ) as "59",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id59"
+    ) as "60",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id60"
+    ) as "61",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id61"
+    ) as "62",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id62"
+    ) as "63",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id63"
+    ) as "64",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id64"
+    ) as "65",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id65"
+    ) as "66",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id66"
+    ) as "67",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id67"
+    ) as "68",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id68"
+    ) as "69",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id69"
+    ) as "70",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id70"
+    ) as "71",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id71"
+    ) as "72",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id72"
+    ) as "73",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id73"
+    ) as "74",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id74"
+    ) as "75",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id75"
+    ) as "76",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id76"
+    ) as "77",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id77"
+    ) as "78",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id78"
+    ) as "79",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id79"
+    ) as "80",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id80"
+    ) as "81",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id81"
+    ) as "82",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id82"
+    ) as "83",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id83"
+    ) as "84",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id84"
+    ) as "85",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id85"
+    ) as "86",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id86"
+    ) as "87",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id87"
+    ) as "88",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id88"
+    ) as "89",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id89"
+    ) as "90",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id90"
+    ) as "91",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id91"
+    ) as "92",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id92"
+    ) as "93",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id93"
+    ) as "94",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id94"
+    ) as "95",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id95"
+    ) as "96",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id96"
+    ) as "97",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id97"
+    ) as "98",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id98"
+    ) as "99",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id99"
+    ) as "100",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id100"
+    ) as "101",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id101"
+    ) as "102",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id102"
+    ) as "103",
+    __post_identifiers__.idx as "104"
+  from "a"."post" as __post__
+  order by __post__."id" asc
+  limit 1
+) as __post_result__
