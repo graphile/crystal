@@ -1,0 +1,248 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
+    Access64["Access[64∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access65["Access[65∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object66["Object[66∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection67["Connection[67∈0]<br />ᐸ63ᐳ"]:::plan
+    PgSelect68[["PgSelect[68∈0]<br />ᐸgeomᐳ"]]:::plan
+    __Item69>"__Item[69∈1]<br />ᐸ68ᐳ"]:::itemplan
+    PgSelectSingle70["PgSelectSingle[70∈1]<br />ᐸgeomᐳ"]:::plan
+    PgClassExpression71["PgClassExpression[71∈1]<br />ᐸ__geom__.”id”ᐳ"]:::plan
+    PgClassExpression72["PgClassExpression[72∈1]<br />ᐸ__geom__.”point”ᐳ"]:::plan
+    Access73["Access[73∈1]<br />ᐸ72.xᐳ"]:::plan
+    Access74["Access[74∈1]<br />ᐸ72.yᐳ"]:::plan
+    PgClassExpression75["PgClassExpression[75∈1]<br />ᐸ__geom__.”line”ᐳ"]:::plan
+    Access76["Access[76∈1]<br />ᐸ75.aᐳ"]:::plan
+    Access77["Access[77∈1]<br />ᐸ76.xᐳ"]:::plan
+    Access78["Access[78∈1]<br />ᐸ76.yᐳ"]:::plan
+    Access79["Access[79∈1]<br />ᐸ75.bᐳ"]:::plan
+    Access80["Access[80∈1]<br />ᐸ79.xᐳ"]:::plan
+    Access81["Access[81∈1]<br />ᐸ79.yᐳ"]:::plan
+    PgClassExpression82["PgClassExpression[82∈1]<br />ᐸ__geom__.”lseg”ᐳ"]:::plan
+    Access83["Access[83∈1]<br />ᐸ82.aᐳ"]:::plan
+    Access84["Access[84∈1]<br />ᐸ83.xᐳ"]:::plan
+    Access85["Access[85∈1]<br />ᐸ83.yᐳ"]:::plan
+    Access86["Access[86∈1]<br />ᐸ82.bᐳ"]:::plan
+    Access87["Access[87∈1]<br />ᐸ86.xᐳ"]:::plan
+    Access88["Access[88∈1]<br />ᐸ86.yᐳ"]:::plan
+    PgClassExpression89["PgClassExpression[89∈1]<br />ᐸ__geom__.”box”ᐳ"]:::plan
+    Access90["Access[90∈1]<br />ᐸ89.aᐳ"]:::plan
+    Access91["Access[91∈1]<br />ᐸ90.xᐳ"]:::plan
+    Access92["Access[92∈1]<br />ᐸ90.yᐳ"]:::plan
+    Access93["Access[93∈1]<br />ᐸ89.bᐳ"]:::plan
+    Access94["Access[94∈1]<br />ᐸ93.xᐳ"]:::plan
+    Access95["Access[95∈1]<br />ᐸ93.yᐳ"]:::plan
+    PgClassExpression96["PgClassExpression[96∈1]<br />ᐸ__geom__.”open_path”ᐳ"]:::plan
+    Access97["Access[97∈1]<br />ᐸ96.isOpenᐳ"]:::plan
+    Access98["Access[98∈1]<br />ᐸ96.pointsᐳ"]:::plan
+    __Item99>"__Item[99∈2]<br />ᐸ98ᐳ"]:::itemplan
+    Access100["Access[100∈2]<br />ᐸ99.xᐳ"]:::plan
+    Access101["Access[101∈2]<br />ᐸ99.yᐳ"]:::plan
+    PgClassExpression102["PgClassExpression[102∈1]<br />ᐸ__geom__.”closed_path”ᐳ"]:::plan
+    Access103["Access[103∈1]<br />ᐸ102.isOpenᐳ"]:::plan
+    Access104["Access[104∈1]<br />ᐸ102.pointsᐳ"]:::plan
+    __Item105>"__Item[105∈3]<br />ᐸ104ᐳ"]:::itemplan
+    Access106["Access[106∈3]<br />ᐸ105.xᐳ"]:::plan
+    Access107["Access[107∈3]<br />ᐸ105.yᐳ"]:::plan
+    PgClassExpression108["PgClassExpression[108∈1]<br />ᐸ__geom__.”polygon”ᐳ"]:::plan
+    Access109["Access[109∈1]<br />ᐸ108.pointsᐳ"]:::plan
+    __Item110>"__Item[110∈4]<br />ᐸ109ᐳ"]:::itemplan
+    Access111["Access[111∈4]<br />ᐸ110.xᐳ"]:::plan
+    Access112["Access[112∈4]<br />ᐸ110.yᐳ"]:::plan
+    PgClassExpression113["PgClassExpression[113∈1]<br />ᐸ__geom__.”circle”ᐳ"]:::plan
+    Access114["Access[114∈1]<br />ᐸ113.centerᐳ"]:::plan
+    Access115["Access[115∈1]<br />ᐸ114.xᐳ"]:::plan
+    Access116["Access[116∈1]<br />ᐸ114.yᐳ"]:::plan
+    Access117["Access[117∈1]<br />ᐸ113.radiusᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access64
+    __Value3 --> Access65
+    Access64 & Access65 --> Object66
+    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection67
+    Object66 & Connection67 --> PgSelect68
+    PgSelect68 ==> __Item69
+    __Item69 --> PgSelectSingle70
+    PgSelectSingle70 --> PgClassExpression71
+    PgSelectSingle70 --> PgClassExpression72
+    PgClassExpression72 --> Access73
+    PgClassExpression72 --> Access74
+    PgSelectSingle70 --> PgClassExpression75
+    PgClassExpression75 --> Access76
+    Access76 --> Access77
+    Access76 --> Access78
+    PgClassExpression75 --> Access79
+    Access79 --> Access80
+    Access79 --> Access81
+    PgSelectSingle70 --> PgClassExpression82
+    PgClassExpression82 --> Access83
+    Access83 --> Access84
+    Access83 --> Access85
+    PgClassExpression82 --> Access86
+    Access86 --> Access87
+    Access86 --> Access88
+    PgSelectSingle70 --> PgClassExpression89
+    PgClassExpression89 --> Access90
+    Access90 --> Access91
+    Access90 --> Access92
+    PgClassExpression89 --> Access93
+    Access93 --> Access94
+    Access93 --> Access95
+    PgSelectSingle70 --> PgClassExpression96
+    PgClassExpression96 --> Access97
+    PgClassExpression96 --> Access98
+    Access98 ==> __Item99
+    __Item99 --> Access100
+    __Item99 --> Access101
+    PgSelectSingle70 --> PgClassExpression102
+    PgClassExpression102 --> Access103
+    PgClassExpression102 --> Access104
+    Access104 ==> __Item105
+    __Item105 --> Access106
+    __Item105 --> Access107
+    PgSelectSingle70 --> PgClassExpression108
+    PgClassExpression108 --> Access109
+    Access109 ==> __Item110
+    __Item110 --> Access111
+    __Item110 --> Access112
+    PgSelectSingle70 --> PgClassExpression113
+    PgClassExpression113 --> Access114
+    Access114 --> Access115
+    Access114 --> Access116
+    PgClassExpression113 --> Access117
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P67["ᐳallGeoms"]
+    Connection67 -.-> P67
+    P68["ᐳa…sᐳnodes"]
+    PgSelect68 -.-> P68
+    P70["ᐳa…sᐳnodes[]"]
+    PgSelectSingle70 -.-> P70
+    P71["ᐳa…sᐳn…]ᐳid"]
+    PgClassExpression71 -.-> P71
+    P72["ᐳa…sᐳn…]ᐳpoint"]
+    PgClassExpression72 -.-> P72
+    P73["ᐳa…sᐳn…]ᐳp…tᐳx"]
+    Access73 -.-> P73
+    P74["ᐳa…sᐳn…]ᐳp…tᐳy"]
+    Access74 -.-> P74
+    P75["ᐳa…sᐳn…]ᐳline"]
+    PgClassExpression75 -.-> P75
+    P76["ᐳa…sᐳn…]ᐳlineᐳa"]
+    Access76 -.-> P76
+    P77["ᐳa…sᐳn…]ᐳlineᐳaᐳx"]
+    Access77 -.-> P77
+    P78["ᐳa…sᐳn…]ᐳlineᐳaᐳy"]
+    Access78 -.-> P78
+    P79["ᐳa…sᐳn…]ᐳlineᐳb"]
+    Access79 -.-> P79
+    P80["ᐳa…sᐳn…]ᐳlineᐳbᐳx"]
+    Access80 -.-> P80
+    P81["ᐳa…sᐳn…]ᐳlineᐳbᐳy"]
+    Access81 -.-> P81
+    P82["ᐳa…sᐳn…]ᐳlseg"]
+    PgClassExpression82 -.-> P82
+    P83["ᐳa…sᐳn…]ᐳlsegᐳa"]
+    Access83 -.-> P83
+    P84["ᐳa…sᐳn…]ᐳlsegᐳaᐳx"]
+    Access84 -.-> P84
+    P85["ᐳa…sᐳn…]ᐳlsegᐳaᐳy"]
+    Access85 -.-> P85
+    P86["ᐳa…sᐳn…]ᐳlsegᐳb"]
+    Access86 -.-> P86
+    P87["ᐳa…sᐳn…]ᐳlsegᐳbᐳx"]
+    Access87 -.-> P87
+    P88["ᐳa…sᐳn…]ᐳlsegᐳbᐳy"]
+    Access88 -.-> P88
+    P89["ᐳa…sᐳn…]ᐳbox"]
+    PgClassExpression89 -.-> P89
+    P90["ᐳa…sᐳn…]ᐳboxᐳa"]
+    Access90 -.-> P90
+    P91["ᐳa…sᐳn…]ᐳboxᐳaᐳx"]
+    Access91 -.-> P91
+    P92["ᐳa…sᐳn…]ᐳboxᐳaᐳy"]
+    Access92 -.-> P92
+    P93["ᐳa…sᐳn…]ᐳboxᐳb"]
+    Access93 -.-> P93
+    P94["ᐳa…sᐳn…]ᐳboxᐳbᐳx"]
+    Access94 -.-> P94
+    P95["ᐳa…sᐳn…]ᐳboxᐳbᐳy"]
+    Access95 -.-> P95
+    P96["ᐳa…sᐳn…]ᐳopenPath"]
+    PgClassExpression96 -.-> P96
+    P97["ᐳa…sᐳn…]ᐳo…hᐳisOpen"]
+    Access97 -.-> P97
+    P98["ᐳa…sᐳn…]ᐳo…hᐳpoints"]
+    Access98 -.-> P98
+    P99["ᐳa…sᐳn…]ᐳo…hᐳpoints[]"]
+    __Item99 -.-> P99
+    P100["ᐳa…sᐳn…]ᐳo…hᐳp…]ᐳx"]
+    Access100 -.-> P100
+    P101["ᐳa…sᐳn…]ᐳo…hᐳp…]ᐳy"]
+    Access101 -.-> P101
+    P102["ᐳa…sᐳn…]ᐳclosedPath"]
+    PgClassExpression102 -.-> P102
+    P103["ᐳa…sᐳn…]ᐳc…hᐳisOpen"]
+    Access103 -.-> P103
+    P104["ᐳa…sᐳn…]ᐳc…hᐳpoints"]
+    Access104 -.-> P104
+    P105["ᐳa…sᐳn…]ᐳc…hᐳpoints[]"]
+    __Item105 -.-> P105
+    P106["ᐳa…sᐳn…]ᐳc…hᐳp…]ᐳx"]
+    Access106 -.-> P106
+    P107["ᐳa…sᐳn…]ᐳc…hᐳp…]ᐳy"]
+    Access107 -.-> P107
+    P108["ᐳa…sᐳn…]ᐳpolygon"]
+    PgClassExpression108 -.-> P108
+    P109["ᐳa…sᐳn…]ᐳp…nᐳpoints"]
+    Access109 -.-> P109
+    P110["ᐳa…sᐳn…]ᐳp…nᐳpoints[]"]
+    __Item110 -.-> P110
+    P111["ᐳa…sᐳn…]ᐳp…nᐳp…]ᐳx"]
+    Access111 -.-> P111
+    P112["ᐳa…sᐳn…]ᐳp…nᐳp…]ᐳy"]
+    Access112 -.-> P112
+    P113["ᐳa…sᐳn…]ᐳcircle"]
+    PgClassExpression113 -.-> P113
+    P114["ᐳa…sᐳn…]ᐳc…eᐳcenter"]
+    Access114 -.-> P114
+    P115["ᐳa…sᐳn…]ᐳc…eᐳc…rᐳx"]
+    Access115 -.-> P115
+    P116["ᐳa…sᐳn…]ᐳc…eᐳc…rᐳy"]
+    Access116 -.-> P116
+    P117["ᐳa…sᐳn…]ᐳc…eᐳradius"]
+    Access117 -.-> P117
+
+    subgraph "Buckets for queries/v4/geometry.queries"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allGeoms ᐸ-O- 67<br />⠀⠀⠀allGeoms.nodes ᐸ-A- 68"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,Access64,Access65,Object66,Connection67,PgSelect68 bucket0
+    Bucket1("Bucket 1 (item69)<br />Deps: 68<br />~ᐳQuery.allGeomsᐳGeomsConnection.nodes[]<br />⠀ROOT ᐸ-O- 70<br />⠀⠀id ᐸ-L- 71<br />⠀⠀point ᐸ-O- 72<br />⠀⠀⠀point.x ᐸ-L- 73<br />⠀⠀⠀point.y ᐸ-L- 74<br />⠀⠀line ᐸ-O- 75<br />⠀⠀⠀line.a ᐸ-O- 76<br />⠀⠀⠀⠀line.a.x ᐸ-L- 77<br />⠀⠀⠀⠀line.a.y ᐸ-L- 78<br />⠀⠀⠀line.b ᐸ-O- 79<br />⠀⠀⠀⠀line.b.x ᐸ-L- 80<br />⠀⠀⠀⠀line.b.y ᐸ-L- 81<br />⠀⠀lseg ᐸ-O- 82<br />⠀⠀⠀lseg.a ᐸ-O- 83<br />⠀⠀⠀⠀lseg.a.x ᐸ-L- 84<br />⠀⠀⠀⠀lseg.a.y ᐸ-L- 85<br />⠀⠀⠀lseg.b ᐸ-O- 86<br />⠀⠀⠀⠀lseg.b.x ᐸ-L- 87<br />⠀⠀⠀⠀lseg.b.y ᐸ-L- 88<br />⠀⠀box ᐸ-O- 89<br />⠀⠀⠀box.a ᐸ-O- 90<br />⠀⠀⠀⠀box.a.x ᐸ-L- 91<br />⠀⠀⠀⠀box.a.y ᐸ-L- 92<br />⠀⠀⠀box.b ᐸ-O- 93<br />⠀⠀⠀⠀box.b.x ᐸ-L- 94<br />⠀⠀⠀⠀box.b.y ᐸ-L- 95<br />⠀⠀openPath ᐸ-O- 96<br />⠀⠀⠀openPath.isOpen ᐸ-L- 97<br />⠀⠀⠀openPath.points ᐸ-A- 98<br />⠀⠀closedPath ᐸ-O- 102<br />⠀⠀⠀closedPath.isOpen ᐸ-L- 103<br />⠀⠀⠀closedPath.points ᐸ-A- 104<br />⠀⠀polygon ᐸ-O- 108<br />⠀⠀⠀polygon.points ᐸ-A- 109<br />⠀⠀circle ᐸ-O- 113<br />⠀⠀⠀circle.center ᐸ-O- 114<br />⠀⠀⠀⠀circle.center.x ᐸ-L- 115<br />⠀⠀⠀⠀circle.center.y ᐸ-L- 116<br />⠀⠀⠀circle.radius ᐸ-L- 117"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item69,PgSelectSingle70,PgClassExpression71,PgClassExpression72,Access73,Access74,PgClassExpression75,Access76,Access77,Access78,Access79,Access80,Access81,PgClassExpression82,Access83,Access84,Access85,Access86,Access87,Access88,PgClassExpression89,Access90,Access91,Access92,Access93,Access94,Access95,PgClassExpression96,Access97,Access98,PgClassExpression102,Access103,Access104,PgClassExpression108,Access109,PgClassExpression113,Access114,Access115,Access116,Access117 bucket1
+    Bucket2("Bucket 2 (item99)<br />Deps: 98<br />~ᐳQuery.allGeomsᐳGeomsConnection.nodes[]ᐳGeom.openPathᐳPath.points[]<br />⠀ROOT ᐸ-O- 99<br />⠀⠀x ᐸ-L- 100<br />⠀⠀y ᐸ-L- 101"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item99,Access100,Access101 bucket2
+    Bucket3("Bucket 3 (item105)<br />Deps: 104<br />~ᐳQuery.allGeomsᐳGeomsConnection.nodes[]ᐳGeom.closedPathᐳPath.points[]<br />⠀ROOT ᐸ-O- 105<br />⠀⠀x ᐸ-L- 106<br />⠀⠀y ᐸ-L- 107"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item105,Access106,Access107 bucket3
+    Bucket4("Bucket 4 (item110)<br />Deps: 109<br />~ᐳQuery.allGeomsᐳGeomsConnection.nodes[]ᐳGeom.polygonᐳPolygon.points[]<br />⠀ROOT ᐸ-O- 110<br />⠀⠀x ᐸ-L- 111<br />⠀⠀y ᐸ-L- 112"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item110,Access111,Access112 bucket4
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4
+    end
