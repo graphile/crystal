@@ -624,6 +624,8 @@ export function getCodecByPgCatalogTypeName(
       return TYPES.box;
     case "point":
       return TYPES.point;
+    case "path":
+      return TYPES.path;
     case "line":
       return TYPES.line;
     case "lseg":
