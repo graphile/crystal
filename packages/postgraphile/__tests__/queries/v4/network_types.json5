@@ -1,15 +1,15 @@
 {
   inetTest: {
     pageInfo: {
-      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      startCursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
+      endCursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
       hasNextPage: false,
       hasPreviousPage: false,
     },
     totalCount: 1,
     edges: [
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        cursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
         node: {
           id: 1,
           inet: "192.168.0.0",
@@ -21,15 +21,15 @@
   },
   cidrTest: {
     pageInfo: {
-      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      startCursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
+      endCursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
       hasNextPage: false,
       hasPreviousPage: false,
     },
     totalCount: 1,
     edges: [
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        cursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
         node: {
           id: 1,
           inet: "192.168.0.0",
@@ -41,15 +41,15 @@
   },
   macaddrTest: {
     pageInfo: {
-      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+      startCursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
+      endCursor: "WyJhMGQ1NmQyYWE4Iiw2XQ==",
       hasNextPage: false,
       hasPreviousPage: false,
     },
     totalCount: 6,
     edges: [
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        cursor: "WyJhMGQ1NmQyYWE4IiwxXQ==",
         node: {
           id: 1,
           inet: "192.168.0.0",
@@ -58,7 +58,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        cursor: "WyJhMGQ1NmQyYWE4IiwyXQ==",
         node: {
           id: 2,
           inet: "192.168.0.1",
@@ -67,7 +67,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        cursor: "WyJhMGQ1NmQyYWE4IiwzXQ==",
         node: {
           id: 3,
           inet: "172.16.0.0/12",
@@ -76,7 +76,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        cursor: "WyJhMGQ1NmQyYWE4Iiw0XQ==",
         node: {
           id: 4,
           inet: "172.16.0.1/12",
@@ -85,7 +85,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        cursor: "WyJhMGQ1NmQyYWE4Iiw1XQ==",
         node: {
           id: 5,
           inet: "2001:4f8:3:ba::",
@@ -94,7 +94,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        cursor: "WyJhMGQ1NmQyYWE4Iiw2XQ==",
         node: {
           id: 6,
           inet: "2001:4f8:3:ba:2e0:81ff:fe22:d1f1",
