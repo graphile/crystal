@@ -939,7 +939,7 @@ export class PgSource<
       return sql`(not((${sql.join(columns, ", ")}) is null))::text`;
     } else {
       // Fallback
-      return sql`(not (${alias} is null))::text`;
+      return sql`(${alias} is distinct from null)::text`;
     }
   }
 }
