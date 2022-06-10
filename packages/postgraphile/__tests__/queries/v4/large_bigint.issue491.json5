@@ -1,0 +1,26 @@
+{
+  allLargeNodeIds: {
+    nodes: [
+      {
+        nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=",
+        id: "9007199254740990",
+        text: "Should be fine",
+      },
+      {
+        nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ==",
+        id: "2098288669218571760",
+        text: "Graphile Engine issue #491",
+      },
+    ],
+  },
+  safeInt: {
+    nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=",
+    id: "9007199254740990",
+    text: "Should be fine",
+  },
+  largeInt: {
+    nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ==",
+    id: "2098288669218571760",
+    text: "Graphile Engine issue #491",
+  },
+}

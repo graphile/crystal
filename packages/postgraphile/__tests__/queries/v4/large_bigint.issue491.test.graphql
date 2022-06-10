@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy();
+#> schema: ["large_bigint"]
+{
+  allLargeNodeIds {
+    nodes {
+      nodeId
+      id
+      text
+    }
+  }
+  safeInt: largeNodeId(nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=") {
+    nodeId
+    id
+    text
+  }
+  largeInt: largeNodeId(nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ==") {
+    nodeId
+    id
+    text
+  }
+}
