@@ -1,0 +1,71 @@
+{
+  allTypes: {
+    nodes: [
+      {
+        id: 11,
+        regrole: null,
+        regnamespace: null,
+        bigintDomainArrayDomain: null,
+        domainConstrainedCompoundType: null,
+      },
+      {
+        id: 12,
+        regrole: "postgraphile_test_authenticator",
+        regnamespace: "b",
+        bigintDomainArrayDomain: [
+          "1",
+          "2",
+          "2098288669218571760",
+        ],
+        domainConstrainedCompoundType: {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+          d: "<UUID 1>",
+          e: "FOO_BAR",
+          f: "_EMPTY_",
+          fooBar: null,
+        },
+      },
+    ],
+    edges: [
+      {
+        node: {
+          id: 11,
+          regrole: null,
+          regnamespace: null,
+          bigintDomainArrayDomain: null,
+          domainConstrainedCompoundType: null,
+        },
+      },
+      {
+        node: {
+          id: 12,
+          regrole: "postgraphile_test_authenticator",
+          regnamespace: "b",
+          bigintDomainArrayDomain: [
+            "1",
+            "2",
+            "2098288669218571760",
+          ],
+          domainConstrainedCompoundType: {
+            a: 1,
+            b: "2",
+            c: "BLUE",
+            d: "<UUID 1>",
+            e: "FOO_BAR",
+            f: "_EMPTY_",
+            fooBar: null,
+          },
+        },
+      },
+    ],
+    totalCount: 2,
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxMV1d",
+      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxMl1d",
+    },
+  },
+}
