@@ -1,0 +1,66 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  allTypes {
+    nodes {
+      compoundType { a fooBar computedField }
+      nestedCompoundType {
+        a { a fooBar computedField }
+        b { a fooBar computedField }
+      }
+      nullableCompoundType { a fooBar computedField }
+      nullableNestedCompoundType {
+        a { a fooBar computedField }
+        b { a fooBar computedField }
+      }
+    }
+  }
+  allPosts {
+    nodes {
+      headline
+      a: headlineTrimmed
+      b: headlineTrimmed(length: 15)
+      c: headlineTrimmed(length: 20, omission: "[...]")
+      d: headlineTrimmedStrict
+      e: headlineTrimmedStrict(length: 15)
+      f: headlineTrimmedStrict(length: 20, omission: "[...]")
+      g: headlineTrimmedNoDefaults(length: 15) # Expect null
+      h: headlineTrimmedNoDefaults(length: 20, omission: "[...]")
+
+      computedCompoundTypeArray(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 }) { a b c d e f g { seconds minutes hours } fooBar }
+      computedTextArray
+      computedIntervalArray { seconds minutes hours days months years }
+      computedIntervalSet { nodes { seconds minutes hours days months years } edges { node { seconds minutes hours } cursor } }
+    }
+  }
+  allPeople {
+    nodes {
+      name
+      firstName
+      friends {
+        nodes {
+          name
+          firstName
+          friends(first: 1) {
+            nodes {
+              name
+              firstName
+            }
+          }
+        }
+      }
+      firstPost {
+        id
+        headline
+      }
+    }
+  }
+  allEdgeCases {
+    nodes {
+      notNullHasDefault
+      wontCastEasy
+      computed
+    }
+  }
+}
