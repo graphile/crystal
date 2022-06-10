@@ -2,7 +2,7 @@
   allLargeNodeIds: {
     nodes: [
       {
-        nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=",
+        nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsIjkwMDcxOTkyNTQ3NDA5OTAiXQ==",
         id: "9007199254740990",
         text: "Should be fine",
       },
@@ -14,7 +14,7 @@
     ],
   },
   safeInt: {
-    nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=",
+    nodeId: "WyJsYXJnZV9ub2RlX2lkcyIsIjkwMDcxOTkyNTQ3NDA5OTAiXQ==",
     id: "9007199254740990",
     text: "Should be fine",
   },
