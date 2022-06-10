@@ -1357,7 +1357,7 @@ with
   classes as (
     select pg_class.oid as _id, *
     from pg_catalog.pg_class
-    where relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg_%')
+    where relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
   ),
 
   attributes as (
@@ -1369,13 +1369,13 @@ with
   constraints as (
     select pg_constraint.oid as _id, *
     from pg_catalog.pg_constraint
-    where connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg_%')
+    where connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
   ),
 
   procs as (
     select pg_proc.oid as _id, *
     from pg_catalog.pg_proc
-    where pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg_%')
+    where pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
     and prorettype operator(pg_catalog.<>) 2279
   ),
 
@@ -1393,7 +1393,7 @@ with
   types as (
     select pg_type.oid as _id, *
     from pg_catalog.pg_type
-    where (typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg_%'))
+    where (typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%'))
     or (typnamespace = 'pg_catalog'::regnamespace)
   ),
 
