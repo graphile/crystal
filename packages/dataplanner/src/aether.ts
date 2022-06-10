@@ -13,6 +13,7 @@ import type {
   GraphQLSchema,
   OperationDefinitionNode,
 } from "graphql";
+import { defaultFieldResolver } from "graphql";
 import {
   assertObjectType,
   executeSync,
@@ -115,6 +116,8 @@ import {
 } from "./plan.js";
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
+import type { AccessPlan } from "./plans/index.js";
+import { access } from "./plans/index.js";
 import {
   __InputObjectPlan,
   __ItemPlan,
@@ -366,6 +369,10 @@ function assertPolymorphicPlan(
     "function",
     `Expected property 'planForType' for interface field plan ${plan} to be a function at ${pathIdentity}.`,
   );
+}
+
+function makeDefaultPlan(fieldName: string) {
+  return ($plan: ExecutablePlan<any>) => access($plan, [fieldName]);
 }
 
 /**
@@ -1619,9 +1626,32 @@ export class Aether<
         this.hasNonIntrospectionFields = true;
       }
       const fieldType = objectTypeFields[fieldName].type;
-      const planResolver = objectField.extensions?.graphile?.plan;
+      const rawPlanResolver = objectField.extensions?.graphile?.plan;
       const namedReturnType = getNamedType(fieldType);
       const namedResultTypeIsLeaf = isLeafType(namedReturnType);
+
+      /**
+       * This could be the crystal resolver or a user-supplied resolver or
+       * nothing.
+       */
+      const rawResolver = objectField.resolve;
+
+      /**
+       * This will never be the crystal resolver - only ever the user-supplied
+       * resolver or nothing
+       */
+      const graphqlResolver =
+        rawResolver && isCrystalWrapped(rawResolver)
+          ? rawResolver[$$crystalWrapped].original
+          : rawResolver;
+
+      const usesDefaultResolver =
+        !graphqlResolver || graphqlResolver === defaultFieldResolver;
+
+      // Apply a default plan to fields that do not have a plan nor a resolver.
+      const planResolver =
+        rawPlanResolver ??
+        (usesDefaultResolver ? makeDefaultPlan(fieldName) : undefined);
 
       /*
        *  When considering resolvers on fields, there's three booleans to
@@ -1677,22 +1707,7 @@ export class Aether<
        *        directly.)
        */
 
-      /**
-       * This could be the crystal resolver or a user-supplied resolver or
-       * nothing.
-       */
-      const rawResolver = objectField.resolve;
-
       const typePlan = objectType.extensions?.graphile?.Plan;
-
-      /**
-       * This will never be the crystal resolver - only ever the user-supplied
-       * resolver or nothing
-       */
-      const graphqlResolver =
-        rawResolver && isCrystalWrapped(rawResolver)
-          ? rawResolver[$$crystalWrapped].original
-          : rawResolver;
 
       if (graphqlResolver) {
         this.pure = false;
