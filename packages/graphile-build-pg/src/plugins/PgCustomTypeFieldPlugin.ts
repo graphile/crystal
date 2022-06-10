@@ -243,7 +243,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           return this.camelCase(explicitName);
         }
         const name = details.source.name;
-        const codecName = details.source.parameters[0].codec.name;
+        const codecName =
+          details.source.parameters[0].codec.extensions?.tags?.originalName;
         const legacyPrefix = codecName + "_";
         if (name.startsWith(legacyPrefix)) {
           return this.camelCase(name.slice(legacyPrefix.length));

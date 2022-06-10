@@ -75,9 +75,7 @@ declare global {
       pgCodec?: PgTypeCodec<any, any, any, any>;
     }
   }
-}
 
-declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgCodecs: {
@@ -154,6 +152,12 @@ declare global {
         }) => Promise<void> | void
       >;
     }
+  }
+}
+
+declare module "@dataplan/pg" {
+  interface PgSourceRelationExtensions {
+    originalName?: string;
   }
 }
 
@@ -360,7 +364,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             pgClass,
           });
 
-          const extensions = { tags: Object.create(null) };
+          const extensions = {
+            tags: Object.assign(Object.create(null), {
+              originalName: pgClass.relname,
+            }),
+          };
           await info.process("pgCodecs_recordType_extensions", {
             databaseName,
             pgClass,
