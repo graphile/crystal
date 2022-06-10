@@ -1,0 +1,452 @@
+{
+  allPosts: {
+    edges: [
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        node: {
+          id: 1,
+          headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+          headlineTrimmed: "No… It’s …",
+          author: {
+            id: 2,
+            name: "Sara Smith",
+            firstName: "Sara",
+            firstPost: {
+              id: 1,
+              headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+              headlineTrimmed: "No… It’s …",
+              author: {
+                id: 2,
+                name: "Sara Smith",
+                firstName: "Sara",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+                {
+                  id: 4,
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        node: {
+          id: 2,
+          headline: "I hate yogurt. It’s just stuff with bits in.",
+          headlineTrimmed: "I hate yo…",
+          author: {
+            id: 1,
+            name: "John Smith",
+            firstName: "John",
+            firstPost: {
+              id: 2,
+              headline: "I hate yogurt. It’s just stuff with bits in.",
+              headlineTrimmed: "I hate yo…",
+              author: {
+                id: 1,
+                name: "John Smith",
+                firstName: "John",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 2,
+                  name: "Sara Smith",
+                  firstName: "Sara",
+                },
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        node: {
+          id: 3,
+          headline: "Is that a cooking show?",
+          headlineTrimmed: "Is that a…",
+          author: {
+            id: 1,
+            name: "John Smith",
+            firstName: "John",
+            firstPost: {
+              id: 2,
+              headline: "I hate yogurt. It’s just stuff with bits in.",
+              headlineTrimmed: "I hate yo…",
+              author: {
+                id: 1,
+                name: "John Smith",
+                firstName: "John",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 2,
+                  name: "Sara Smith",
+                  firstName: "Sara",
+                },
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        node: {
+          id: 4,
+          headline: "You hit me with a cricket bat.",
+          headlineTrimmed: "You hit m…",
+          author: {
+            id: 1,
+            name: "John Smith",
+            firstName: "John",
+            firstPost: {
+              id: 2,
+              headline: "I hate yogurt. It’s just stuff with bits in.",
+              headlineTrimmed: "I hate yo…",
+              author: {
+                id: 1,
+                name: "John Smith",
+                firstName: "John",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 2,
+                  name: "Sara Smith",
+                  firstName: "Sara",
+                },
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        node: {
+          id: 5,
+          headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          headlineTrimmed: "Please, D…",
+          author: {
+            id: 5,
+            name: "Joe Tucker",
+            firstName: "Joe",
+            firstPost: {
+              id: 5,
+              headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              headlineTrimmed: "Please, D…",
+              author: {
+                id: 5,
+                name: "Joe Tucker",
+                firstName: "Joe",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 6,
+                  name: "Twenty Seventwo",
+                  firstName: "Twenty",
+                },
+              ],
+              totalCount: 1,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        node: {
+          id: 6,
+          headline: "Stop talking, brain thinking. Hush.",
+          headlineTrimmed: "Stop talk…",
+          author: {
+            id: 3,
+            name: "Budd Deey",
+            firstName: "Budd",
+            firstPost: {
+              id: 6,
+              headline: "Stop talking, brain thinking. Hush.",
+              headlineTrimmed: "Stop talk…",
+              author: {
+                id: 3,
+                name: "Budd Deey",
+                firstName: "Budd",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 4,
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+                {
+                  id: 5,
+                  name: "Joe Tucker",
+                  firstName: "Joe",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs3XV0=",
+        node: {
+          id: 7,
+          headline: "Large bet on myself in round one.",
+          headlineTrimmed: "Large bet…",
+          author: {
+            id: 1,
+            name: "John Smith",
+            firstName: "John",
+            firstPost: {
+              id: 2,
+              headline: "I hate yogurt. It’s just stuff with bits in.",
+              headlineTrimmed: "I hate yo…",
+              author: {
+                id: 1,
+                name: "John Smith",
+                firstName: "John",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 2,
+                  name: "Sara Smith",
+                  firstName: "Sara",
+                },
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+        node: {
+          id: 8,
+          headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+          headlineTrimmed: "It’s a fe…",
+          author: {
+            id: 2,
+            name: "Sara Smith",
+            firstName: "Sara",
+            firstPost: {
+              id: 1,
+              headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+              headlineTrimmed: "No… It’s …",
+              author: {
+                id: 2,
+                name: "Sara Smith",
+                firstName: "Sara",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+                {
+                  id: 4,
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs5XV0=",
+        node: {
+          id: 9,
+          headline: "You know how I sometimes have really brilliant ideas?",
+          headlineTrimmed: "You know …",
+          author: {
+            id: 3,
+            name: "Budd Deey",
+            firstName: "Budd",
+            firstPost: {
+              id: 6,
+              headline: "Stop talking, brain thinking. Hush.",
+              headlineTrimmed: "Stop talk…",
+              author: {
+                id: 3,
+                name: "Budd Deey",
+                firstName: "Budd",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 4,
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+                {
+                  id: 5,
+                  name: "Joe Tucker",
+                  firstName: "Joe",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+        node: {
+          id: 10,
+          headline: "What’s with you kids? Every other day it’s food, food, food.",
+          headlineTrimmed: "What’s wi…",
+          author: {
+            id: 2,
+            name: "Sara Smith",
+            firstName: "Sara",
+            firstPost: {
+              id: 1,
+              headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+              headlineTrimmed: "No… It’s …",
+              author: {
+                id: 2,
+                name: "Sara Smith",
+                firstName: "Sara",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 3,
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+                {
+                  id: 4,
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxMV1d",
+        node: {
+          id: 11,
+          headline: "They’re not aliens, they’re Earth…liens!",
+          headlineTrimmed: "They’re n…",
+          author: {
+            id: 3,
+            name: "Budd Deey",
+            firstName: "Budd",
+            firstPost: {
+              id: 6,
+              headline: "Stop talking, brain thinking. Hush.",
+              headlineTrimmed: "Stop talk…",
+              author: {
+                id: 3,
+                name: "Budd Deey",
+                firstName: "Budd",
+              },
+            },
+            friends: {
+              nodes: [
+                {
+                  id: 4,
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+                {
+                  id: 5,
+                  name: "Joe Tucker",
+                  firstName: "Joe",
+                },
+              ],
+              totalCount: 2,
+              pageInfo: {
+                startCursor: "WyJuYXR1cmFsIiwxXQ==",
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+}
