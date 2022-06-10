@@ -1,0 +1,30 @@
+## expect(errors).toBeFalsy();
+#> schema: ["pg11"]
+#> requiresPg: 110000
+#> graphileBuildOptions: { pgUseCustomNetworkScalars: true }
+query {
+  inetTest: allNetworks(condition: { inet: "192.168.0.0" }) { ...networkConnection }
+  cidrTest: allNetworks(condition: { cidr: "192.168.0.0/16" }) { ...networkConnection }
+  macaddrTest: allNetworks(condition: { macaddr: "08:00:2b:01:02:03" }) { ...networkConnection }
+  macaddr8Test: allNetworks(condition: { macaddr8: "08:00:2b:01:02:03:04:05" }) { ...networkConnection }
+}
+
+fragment networkConnection on NetworksConnection {
+  pageInfo {
+    startCursor
+    endCursor
+    hasNextPage
+    hasPreviousPage
+  }
+  totalCount
+  edges {
+    cursor
+    node {
+      id
+      inet
+      cidr
+      macaddr
+      macaddr8
+    }
+  }
+}
