@@ -5421,9 +5421,8 @@ export class Aether<
                 )}`,
               );
             }
-            // TODO: should this be null in some cases?
             // Stops here
-            return [];
+            return null;
           }
         },
       );
