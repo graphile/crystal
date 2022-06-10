@@ -10,9 +10,9 @@ graph TD
     __Value0["__Value[0]"]:::plan
     __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
-    Access31["Access[31]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access32["Access[32]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object33["Object[33]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access71["Access[71]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access72["Access[72]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object73["Object[73]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgSelect8[["PgSelect[8]<br />ᐸpersonᐳ"]]:::plan
     First12["First[12]"]:::plan
     PgSelectSingle13["PgSelectSingle[13]<br />ᐸpersonᐳ"]:::plan
@@ -21,36 +21,44 @@ graph TD
     List16["List[16]<br />ᐸ14,15ᐳ"]:::plan
     Lambda17["Lambda[17]<br />ᐸencodeᐳ"]:::plan
     PgClassExpression18["PgClassExpression[18]<br />ᐸ__person__.”email”ᐳ"]:::plan
-    Connection24["Connection[24]<br />ᐸ20ᐳ"]:::plan
-    Access39["Access[39]<br />ᐸ12.2ᐳ"]:::plan
-    First26["First[26]"]:::plan
-    PgSelectSingle27["PgSelectSingle[27]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28]<br />ᐸcount(*)ᐳ"]:::plan
-    Connection34["Connection[34]<br />ᐸ30ᐳ"]:::plan
-    Access40["Access[40]<br />ᐸ12.3ᐳ"]:::plan
-    First36["First[36]"]:::plan
-    PgSelectSingle37["PgSelectSingle[37]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38]<br />ᐸcount(*)ᐳ"]:::plan
+    __InputStaticLeaf19["__InputStaticLeaf[19]"]:::plan
+    __InputStaticLeaf20["__InputStaticLeaf[20]"]:::plan
+    __InputStaticLeaf21["__InputStaticLeaf[21]"]:::plan
+    Connection44["Connection[44]<br />ᐸ40ᐳ"]:::plan
+    Access79["Access[79]<br />ᐸ12.2ᐳ"]:::plan
+    First46["First[46]"]:::plan
+    PgSelectSingle47["PgSelectSingle[47]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression48["PgClassExpression[48]<br />ᐸcount(*)ᐳ"]:::plan
+    __InputStaticLeaf49["__InputStaticLeaf[49]"]:::plan
+    __InputStaticLeaf50["__InputStaticLeaf[50]"]:::plan
+    __InputStaticLeaf51["__InputStaticLeaf[51]"]:::plan
+    Connection74["Connection[74]<br />ᐸ70ᐳ"]:::plan
+    Access80["Access[80]<br />ᐸ12.3ᐳ"]:::plan
+    First76["First[76]"]:::plan
+    PgSelectSingle77["PgSelectSingle[77]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression78["PgClassExpression[78]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access31
-    __Value3 --> Access32
-    Access31 & Access32 --> Object33
-    Object33 & __InputStaticLeaf7 --> PgSelect8
+    __Value3 --> Access71
+    __Value3 --> Access72
+    Access71 & Access72 --> Object73
+    Object73 & __InputStaticLeaf7 --> PgSelect8
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression15
     Constant14 & PgClassExpression15 --> List16
     List16 --> Lambda17
     PgSelectSingle13 --> PgClassExpression18
-    First12 --> Access39
-    Access39 --> First26
-    First26 --> PgSelectSingle27
-    PgSelectSingle27 --> PgClassExpression28
-    First12 --> Access40
-    Access40 --> First36
-    First36 --> PgSelectSingle37
-    PgSelectSingle37 --> PgClassExpression38
+    __InputStaticLeaf19 & __InputStaticLeaf20 & __InputStaticLeaf21 --> Connection44
+    First12 --> Access79
+    Access79 --> First46
+    First46 --> PgSelectSingle47
+    PgSelectSingle47 --> PgClassExpression48
+    __InputStaticLeaf49 & __InputStaticLeaf50 & __InputStaticLeaf51 --> Connection74
+    First12 --> Access80
+    Access80 --> First76
+    First76 --> PgSelectSingle77
+    PgSelectSingle77 --> PgClassExpression78
 
     %% plan-to-path relationships
     P0["~"]
@@ -61,17 +69,17 @@ graph TD
     Lambda17 -.-> P17
     P18["ᐳp…nᐳemail"]
     PgClassExpression18 -.-> P18
-    P24["ᐳp…nᐳaVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength"]
-    Connection24 -.-> P24
-    P28["ᐳp…nᐳa…hᐳtotalCount"]
-    PgClassExpression28 -.-> P28
-    P34["ᐳp…nᐳanotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength"]
-    Connection34 -.-> P34
-    P38["ᐳp…nᐳa…hᐳtotalCount"]
-    PgClassExpression38 -.-> P38
+    P44["ᐳp…nᐳaVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength"]
+    Connection44 -.-> P44
+    P48["ᐳp…nᐳa…hᐳtotalCount"]
+    PgClassExpression48 -.-> P48
+    P74["ᐳp…nᐳanotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength"]
+    Connection74 -.-> P74
+    P78["ᐳp…nᐳa…hᐳtotalCount"]
+    PgClassExpression78 -.-> P78
 
     subgraph "Buckets for queries/v4/longAliases"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀person ᐸ-O- 13<br />⠀⠀⠀person.nodeId ᐸ-L- 17<br />⠀⠀⠀person.email ᐸ-L- 18<br />⠀⠀⠀person.aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength ᐸ-O- 24<br />⠀⠀⠀⠀person.aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength.totalCount ᐸ-L- 28<br />⠀⠀⠀person.anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength ᐸ-O- 34<br />⠀⠀⠀⠀person.anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength.totalCount ᐸ-L- 38"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀person ᐸ-O- 13<br />⠀⠀⠀person.nodeId ᐸ-L- 17<br />⠀⠀⠀person.email ᐸ-L- 18<br />⠀⠀⠀person.aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength ᐸ-O- 44<br />⠀⠀⠀⠀person.aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength.totalCount ᐸ-L- 48<br />⠀⠀⠀person.anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength ᐸ-O- 74<br />⠀⠀⠀⠀person.anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength.totalCount ᐸ-L- 78"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,Connection24,First26,PgSelectSingle27,PgClassExpression28,Access31,Access32,Object33,Connection34,First36,PgSelectSingle37,PgClassExpression38,Access39,Access40 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,__InputStaticLeaf19,__InputStaticLeaf20,__InputStaticLeaf21,Connection44,First46,PgSelectSingle47,PgClassExpression48,__InputStaticLeaf49,__InputStaticLeaf50,__InputStaticLeaf51,Access71,Access72,Object73,Connection74,First76,PgSelectSingle77,PgClassExpression78,Access79,Access80 bucket0
     end

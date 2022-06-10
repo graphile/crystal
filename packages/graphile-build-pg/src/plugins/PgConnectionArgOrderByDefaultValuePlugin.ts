@@ -23,7 +23,12 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
           return args;
         }
 
-        if (!isPgFieldConnection || !pgSource || !pgSource.codec.columns) {
+        if (
+          !isPgFieldConnection ||
+          !pgSource ||
+          !pgSource.codec.columns ||
+          pgSource.parameters
+        ) {
           return args;
         }
 

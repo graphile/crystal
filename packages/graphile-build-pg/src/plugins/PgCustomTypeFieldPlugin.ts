@@ -802,6 +802,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             {
                               fieldName,
                               fieldBehaviorScope: connectionFieldBehaviorScope,
+                              isPgFieldConnection: true,
+                              pgSource: source,
                             },
                             {
                               description: source.description,
