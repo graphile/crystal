@@ -28,7 +28,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         return this.coerceToGraphQLName(this.constantCase(oldValue));
       },
       _columnName(previous, options, details) {
-        const { column, columnName } = details;
+        const { column, columnName: _columnName } = details;
         if (column.extensions?.argIndex != null && !column.extensions.argName) {
           return `arg${column.extensions.argIndex + 1}`;
         }
