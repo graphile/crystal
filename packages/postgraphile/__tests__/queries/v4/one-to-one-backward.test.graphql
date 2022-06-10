@@ -1,0 +1,36 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+{
+  allPeople {
+    edges {
+      cursor
+      node {
+        ...PersonDetails
+        leftArm: leftArmByPersonId {
+          nodeId
+          id
+          personId
+          personByPersonId {
+            ...PersonDetails
+          }
+          lengthInMetres
+        }
+        secret: personSecretByPersonId {
+          nodeId
+          personId
+          personByPersonId {
+            ...PersonDetails
+          }
+          secret
+        }
+      }
+    }
+  }
+}
+
+fragment PersonDetails on Person {
+  id
+  name
+  firstName
+}

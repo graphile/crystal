@@ -1,0 +1,142 @@
+{
+  allPeople: {
+    edges: [
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        node: {
+          id: 1,
+          name: "John Smith",
+          firstName: "John",
+          leftArm: {
+            nodeId: "WyJsZWZ0X2FybXMiLDUwXQ==",
+            id: 50,
+            personId: 1,
+            personByPersonId: {
+              id: 1,
+              name: "John Smith",
+              firstName: "John",
+            },
+            lengthInMetres: 0.65,
+          },
+          secret: null,
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          firstName: "Sara",
+          leftArm: {
+            nodeId: "WyJsZWZ0X2FybXMiLDQ1XQ==",
+            id: 45,
+            personId: 2,
+            personByPersonId: {
+              id: 2,
+              name: "Sara Smith",
+              firstName: "Sara",
+            },
+            lengthInMetres: 0.7,
+          },
+          secret: {
+            nodeId: "WyJwZXJzb25fc2VjcmV0cyIsMl0=",
+            personId: 2,
+            personByPersonId: {
+              id: 2,
+              name: "Sara Smith",
+              firstName: "Sara",
+            },
+            secret: "Sara Smith is not really my name!",
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          firstName: "Budd",
+          leftArm: null,
+          secret: {
+            nodeId: "WyJwZXJzb25fc2VjcmV0cyIsM10=",
+            personId: 3,
+            personByPersonId: {
+              id: 3,
+              name: "Budd Deey",
+              firstName: "Budd",
+            },
+            secret: "I once got stuck trying to retrieve something embarassing from between two panes of glass",
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          firstName: "Kathryn",
+          leftArm: {
+            nodeId: "WyJsZWZ0X2FybXMiLDQyXQ==",
+            id: 42,
+            personId: 4,
+            personByPersonId: {
+              id: 4,
+              name: "Kathryn Ramirez",
+              firstName: "Kathryn",
+            },
+            lengthInMetres: 0.6,
+          },
+          secret: null,
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          firstName: "Joe",
+          leftArm: {
+            nodeId: "WyJsZWZ0X2FybXMiLDQ3XQ==",
+            id: 47,
+            personId: 5,
+            personByPersonId: {
+              id: 5,
+              name: "Joe Tucker",
+              firstName: "Joe",
+            },
+            lengthInMetres: 0.65,
+          },
+          secret: {
+            nodeId: "WyJwZXJzb25fc2VjcmV0cyIsNV0=",
+            personId: 5,
+            personByPersonId: {
+              id: 5,
+              name: "Joe Tucker",
+              firstName: "Joe",
+            },
+            secret: "My only secret is that I have no secrets!",
+          },
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          firstName: "Twenty",
+          leftArm: null,
+          secret: {
+            nodeId: "WyJwZXJzb25fc2VjcmV0cyIsNl0=",
+            personId: 6,
+            personByPersonId: {
+              id: 6,
+              name: "Twenty Seventwo",
+              firstName: "Twenty",
+            },
+            secret: "I don't think the bug I test for will ever return!",
+          },
+        },
+      },
+    ],
+  },
+}
