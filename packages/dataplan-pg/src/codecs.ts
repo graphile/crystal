@@ -489,7 +489,7 @@ const parseAsInt = (n: string) => parseInt(n, 10);
 
 const stripSubnet32 = {
   fromPg(value: string) {
-    return value.replace(/\/32$/, "");
+    return value.replace(/\/(32|128)$/, "");
   },
 };
 
