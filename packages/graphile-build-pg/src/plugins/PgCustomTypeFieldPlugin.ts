@@ -840,6 +840,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ) {
                   const fieldName = isRootQuery
                     ? inflection.customQueryListField({ source })
+                    : source.isList
+                    ? inflection.computedColumnField({ source })
                     : inflection.computedColumnListField({ source });
                   memo = build.recoverable(memo, () =>
                     build.extend(
