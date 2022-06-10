@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a"]
+#> subscriptions: true
+#> graphileBuildOptions: { orderByNullsLast: true }
+{
+  asc: allSimilarTable1S(orderBy: COL2_ASC) {
+    nodes {
+      nodeId
+      col2
+    }
+  }
+  desc: allSimilarTable1S(orderBy: COL2_DESC) {
+    nodes {
+      nodeId
+      col2
+    }
+  }
+}
