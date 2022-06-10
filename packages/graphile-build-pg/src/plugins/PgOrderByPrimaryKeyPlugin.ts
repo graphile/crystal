@@ -6,6 +6,14 @@ import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
 
+declare global {
+  namespace GraphileBuild {
+    interface GraphileBuildSchemaOptions {
+      orderByNullsLast?: boolean;
+    }
+  }
+}
+
 export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
   name: "PgOrderByPrimaryKeyPlugin",
   description: "Adds ordering by the table's primary key",
@@ -14,10 +22,11 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, sql } = build;
+        const { extend, inflection, sql, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;
+        const { orderByNullsLast } = options;
 
         if (
           !isPgRowSortEnum ||
@@ -60,6 +69,11 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                               columnName,
                             )}`,
                             direction: "ASC",
+                            ...(orderByNullsLast != null
+                              ? {
+                                  nulls: orderByNullsLast ? "LAST" : "FIRST",
+                                }
+                              : null),
                           });
                         });
                         plan.setOrderIsUnique();
@@ -83,6 +97,11 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                               columnName,
                             )}`,
                             direction: "DESC",
+                            ...(orderByNullsLast != null
+                              ? {
+                                  nulls: orderByNullsLast ? "LAST" : "FIRST",
+                                }
+                              : null),
                           });
                         });
                         plan.setOrderIsUnique();

@@ -345,6 +345,7 @@ export async function runTestQuery(
     variableValues?: { [key: string]: any };
     directPg?: boolean;
     schema?: string | string[];
+    graphileBuildOptions?: any;
   },
   options: {
     callback?: (
@@ -365,7 +366,7 @@ export async function runTestQuery(
   queries: PgClientQuery[];
   extensions?: any;
 }> {
-  const { variableValues } = config;
+  const { variableValues, graphileBuildOptions } = config;
   const { path } = options;
   // Do not allow queries to run in parallel during these tests, we need
   // reproducibility (and we don't want to mess with the transactons, see
@@ -392,6 +393,9 @@ export async function runTestQuery(
         },
       } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
     ],
+    schema: {
+      ...graphileBuildOptions,
+    },
   };
 
   if (path.includes("/v4")) {

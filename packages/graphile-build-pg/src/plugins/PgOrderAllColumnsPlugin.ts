@@ -47,10 +47,11 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, sql } = build;
+        const { extend, inflection, sql, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;
+        const { orderByNullsLast } = options;
         if (
           !isPgRowSortEnum ||
           !pgCodec ||
@@ -136,6 +137,11 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                                 columnName,
                               )}`,
                               direction: "ASC",
+                              ...(orderByNullsLast != null
+                                ? {
+                                    nulls: orderByNullsLast ? "LAST" : "FIRST",
+                                  }
+                                : null),
                             });
                             if (isUnique) {
                               plan.setOrderIsUnique();
@@ -171,6 +177,11 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                                 columnName,
                               )}`,
                               direction: "DESC",
+                              ...(orderByNullsLast != null
+                                ? {
+                                    nulls: orderByNullsLast ? "LAST" : "FIRST",
+                                  }
+                                : null),
                             });
                             if (isUnique) {
                               plan.setOrderIsUnique();
