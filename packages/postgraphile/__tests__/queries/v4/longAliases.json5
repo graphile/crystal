@@ -1,0 +1,12 @@
+{
+  person: {
+    nodeId: "WyJwZW9wbGUiLDJd",
+    email: "sara.smith@email.com",
+    aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength: {
+      totalCount: 2,
+    },
+    anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength: {
+      totalCount: 2,
+    },
+  },
+}
