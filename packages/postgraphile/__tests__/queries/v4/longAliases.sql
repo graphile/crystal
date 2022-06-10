@@ -1,38 +1,28 @@
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json((__local_0__."email")) as "email",
-to_json(
-  (
-    select json_build_object(
-      'aggregates'::text,
-      (
-        select json_build_object(
-          'totalCount'::text,
-          count(1)
-        )
-        from "c"."person_friends"(__local_0__) as __local_1__
-        where 1 = 1
-      )
-    )
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"b"."email" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."email" as "1",
+    (select json_agg(_) from (
+      select
+        (count(*))::text as "0"
+      from "c"."person_friends"(__person__) as __person_friends__
+    ) _) as "2",
+    (select json_agg(_) from (
+      select
+        (count(*))::text as "0"
+      from "c"."person_friends"(__person__) as __person_friends__
+    ) _) as "3",
+    __person_identifiers__.idx as "4"
+  from "c"."person" as __person__
+  where (
+    __person__."email" = __person_identifiers__."id0"
   )
-) as "@@25fa9871b4d4d16ffd41359c88e7e851739819c6",
-to_json(
-  (
-    select json_build_object(
-      'aggregates'::text,
-      (
-        select json_build_object(
-          'totalCount'::text,
-          count(1)
-        )
-        from "c"."person_friends"(__local_0__) as __local_2__
-        where 1 = 1
-      )
-    )
-  )
-) as "@@e82261e340b3c5fc784bd0d54ec53541f5a4e2fe"
-from "c"."person" as __local_0__
-where (
-  __local_0__."email" = $1
-) and (TRUE) and (TRUE)
+  order by __person__."id" asc
+) as __person_result__
