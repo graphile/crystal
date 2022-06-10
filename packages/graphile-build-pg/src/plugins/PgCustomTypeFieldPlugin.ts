@@ -820,7 +820,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                         $parent,
                                         args,
                                       ) as PgSelectPlan<any, any, any, any>;
-                                    return connection($select);
+                                    return connection(
+                                      $select,
+                                      ($item) => $item,
+                                      ($item: any) =>
+                                        $item.getParentPlan
+                                          ? $item.getParentPlan().cursor()
+                                          : $item.cursor(),
+                                    );
                                   },
                                 [connection, getSelectPlanFromParentAndArgs],
                               ),
