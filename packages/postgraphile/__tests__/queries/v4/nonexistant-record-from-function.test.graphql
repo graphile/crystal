@@ -1,0 +1,9 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+{
+  tableQuery(id: 13373475) {
+    id
+    headline
+  }
+}
