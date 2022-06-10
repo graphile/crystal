@@ -1108,6 +1108,7 @@ export class PgSelectPlan<
         toPg(access($parsedCursorPlan, [i + 1]), order.codec),
         order.codec,
       );
+      // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
       const gt =
         (order.direction === "ASC" && beforeOrAfter === "after") ||
         (order.direction === "DESC" && beforeOrAfter === "before");
