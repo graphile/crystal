@@ -1,0 +1,100 @@
+{
+  allGeoms: {
+    nodes: [
+      {
+        id: 101,
+        point: {
+          x: 4,
+          y: 2,
+        },
+        line: {
+          a: {
+            x: -4,
+            y: 0,
+          },
+          b: {
+            x: 0,
+            y: 4,
+          },
+        },
+        lseg: {
+          a: {
+            x: 7,
+            y: 11,
+          },
+          b: {
+            x: 13,
+            y: 17,
+          },
+        },
+        box: {
+          a: {
+            x: 13,
+            y: 17,
+          },
+          b: {
+            x: 7,
+            y: 11,
+          },
+        },
+        openPath: {
+          isOpen: true,
+          points: [
+            {
+              x: 1,
+              y: 3,
+            },
+            {
+              x: 3,
+              y: 4,
+            },
+            {
+              x: 4,
+              y: 1,
+            },
+          ],
+        },
+        closedPath: {
+          isOpen: false,
+          points: [
+            {
+              x: 1,
+              y: 3,
+            },
+            {
+              x: 3,
+              y: 4,
+            },
+            {
+              x: 4,
+              y: 1,
+            },
+          ],
+        },
+        polygon: {
+          points: [
+            {
+              x: 1,
+              y: 3,
+            },
+            {
+              x: 3,
+              y: 4,
+            },
+            {
+              x: 4,
+              y: 1,
+            },
+          ],
+        },
+        circle: {
+          center: {
+            x: 10,
+            y: 10,
+          },
+          radius: 7,
+        },
+      },
+    ],
+  },
+}
