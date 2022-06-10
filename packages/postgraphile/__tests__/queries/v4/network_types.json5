@@ -1,0 +1,107 @@
+{
+  inetTest: {
+    pageInfo: {
+      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 1,
+    edges: [
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        node: {
+          id: 1,
+          inet: "192.168.0.0",
+          cidr: "192.168.0.0/16",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+    ],
+  },
+  cidrTest: {
+    pageInfo: {
+      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 1,
+    edges: [
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        node: {
+          id: 1,
+          inet: "192.168.0.0",
+          cidr: "192.168.0.0/16",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+    ],
+  },
+  macaddrTest: {
+    pageInfo: {
+      startCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      endCursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        node: {
+          id: 1,
+          inet: "192.168.0.0",
+          cidr: "192.168.0.0/16",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        node: {
+          id: 2,
+          inet: "192.168.0.1",
+          cidr: "192.168.0.0/24",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        node: {
+          id: 3,
+          inet: "172.16.0.0/12",
+          cidr: "172.16.0.0/12",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        node: {
+          id: 4,
+          inet: "172.16.0.1/12",
+          cidr: "172.16.0.0/24",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        node: {
+          id: 5,
+          inet: "2001:4f8:3:ba::",
+          cidr: "2001:4f8:3:ba::/64",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+      {
+        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        node: {
+          id: 6,
+          inet: "2001:4f8:3:ba:2e0:81ff:fe22:d1f1",
+          cidr: "2001:4f8:3:ba:2e0:81ff:fe22:d1f1/128",
+          macaddr: "08:00:2b:01:02:03",
+        },
+      },
+    ],
+  },
+}
