@@ -2,7 +2,7 @@
   allPeople: {
     edges: [
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
         node: {
           id: 1,
           name: "John Smith",
@@ -22,7 +22,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        cursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
         node: {
           id: 2,
           name: "Sara Smith",
@@ -51,7 +51,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        cursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
         node: {
           id: 3,
           name: "Budd Deey",
@@ -70,7 +70,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        cursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
         node: {
           id: 4,
           name: "Kathryn Ramirez",
@@ -90,7 +90,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        cursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
         node: {
           id: 5,
           name: "Joe Tucker",
@@ -119,7 +119,7 @@
         },
       },
       {
-        cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        cursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
         node: {
           id: 6,
           name: "Twenty Seventwo",
