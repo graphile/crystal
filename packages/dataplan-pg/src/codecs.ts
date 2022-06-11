@@ -1,4 +1,4 @@
-import type { SQL } from "pg-sql2";
+import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
@@ -156,6 +156,68 @@ function t<TFromJavaScript = any, TFromPostgres = string>(
   };
 }
 
+function pgWrapQuotesInCompositeValue(str: string): string {
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
+function toRecordString(val: SQLRawValue): string {
+  if (val == null) {
+    return "";
+  } else if (typeof val === "boolean") {
+    return val ? "t" : "f";
+  } else if (typeof val === "number") {
+    return String(val);
+  } else if (Array.isArray(val)) {
+    const parts = val.map((v) => toListString(v));
+    return `{${parts.join(",")}}`;
+  } else if (/[(),]/.test(val) || val.length === 0) {
+    // > You can put double quotes around any field value, and must do so if
+    // > it contains commas or parentheses.
+    return pgWrapQuotesInCompositeValue(val);
+  } else {
+    return String(val);
+  }
+}
+
+function pgWrapQuotesInArray(str: string): string {
+  return `"${str.replace(/["\\]/g, "\\$&")}"`;
+}
+
+function toListString(val: SQLRawValue): string {
+  if (val == null) {
+    return "NULL";
+  } else if (typeof val === "boolean") {
+    return val ? "t" : "f";
+  } else if (typeof val === "number") {
+    return String(val);
+  } else if (Array.isArray(val)) {
+    const parts = val.map((v) => toListString(v));
+    return `{${parts.join(",")}}`;
+  } else {
+    return pgWrapQuotesInArray(val);
+  }
+}
+
+/**
+ * Takes a list of columns and returns a mapping function that takes a
+ * composite value and turns it into a string that PostgreSQL could process as
+ * the composite value.
+ *
+ * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
+ */
+function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
+  columns: TColumns,
+): (value: any) => SQLRawValue {
+  const columnDefs = Object.entries(columns);
+  return (value) => {
+    const values = columnDefs.map(([columnName, spec]) => {
+      const val = spec.codec.toPg(value[columnName]);
+      return toRecordString(val);
+    });
+    return `(${values.join(",")})`;
+  };
+}
+
 // TODO: Move extensions,isAnonymous into a config object for consistency with other functions in this file.
 /**
  * Returns a PgTypeCodec that represents a composite type (a type with
@@ -179,7 +241,7 @@ export function recordType<TColumns extends PgTypeColumns>(
     sqlType: identifier,
     isAnonymous,
     fromPg: identity,
-    toPg: identity,
+    toPg: makeRecordToSQLRawValue(columns),
     columns,
     extensions,
   };
