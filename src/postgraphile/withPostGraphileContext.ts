@@ -430,7 +430,8 @@ async function getSettingsForPgClientTransaction({
   // If we have some JWT claims, we want to set those claims as local
   // settings with the namespace `jwt.claims`.
   for (const key in jwtClaims) {
-    if (Object.prototype.hasOwnProperty.call(jwtClaims, key)) {
+    // Exclude claims beginning with "_" as they are not supported by postgresql
+    if (Object.prototype.hasOwnProperty.call(jwtClaims, key) && key.indexOf('_') !== 0) {
       const rawValue = jwtClaims[key];
       // Unsafe to pass raw object/array to pg.query -> set_config; instead JSONify
       const value: mixed =
