@@ -943,7 +943,13 @@ export class PgSource<
         return sql`(not (${firstColumn} is null))::text`;
       } else {
         // Fallback
-        return sql`(${alias} is distinct from null)::text`;
+
+        // NOTE: we cannot use `is distinct from null` here because it's
+        // commonly used for `select * from ((select my_table.composite).*)`
+        // and the rows there _are_ distinct from null even if the underlying
+        // data is not.
+
+        return sql`(not (${alias} is null))::text`;
       }
     }
   }
