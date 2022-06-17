@@ -7,9 +7,9 @@ from (
 ) as __unique_author_count_identifiers__,
 lateral (
   select
-    __unique_author_count__.__unique_author_count__::text as "0",
+    __unique_author_count__.v::text as "0",
     __unique_author_count_identifiers__.idx as "1"
-  from app_public.unique_author_count(__unique_author_count_identifiers__."id0") as __unique_author_count__
+  from app_public.unique_author_count(__unique_author_count_identifiers__."id0") as __unique_author_count__(v)
   where (
     true /* authorization checks */
   )
@@ -24,9 +24,9 @@ from (
 ) as __unique_author_count_identifiers__,
 lateral (
   select
-    __unique_author_count__.__unique_author_count__::text as "0",
+    __unique_author_count__.v::text as "0",
     __unique_author_count_identifiers__.idx as "1"
-  from app_public.unique_author_count(__unique_author_count_identifiers__."id0") as __unique_author_count__
+  from app_public.unique_author_count(__unique_author_count_identifiers__."id0") as __unique_author_count__(v)
   where (
     true /* authorization checks */
   )
@@ -41,9 +41,9 @@ from (
 ) as __unique_author_count_identifiers__,
 lateral (
   select
-    __unique_author_count__.__unique_author_count__::text as "0",
+    __unique_author_count__.v::text as "0",
     __unique_author_count_identifiers__.idx as "1"
-  from app_public.unique_author_count(__unique_author_count_identifiers__."id0") as __unique_author_count__
+  from app_public.unique_author_count(__unique_author_count_identifiers__."id0") as __unique_author_count__(v)
   where (
     true /* authorization checks */
   )

@@ -10,7 +10,7 @@ lateral (
   select
     __forums_random_user__."username" as "0",
     __forums_random_user__."gravatar_url" as "1",
-    __forums_unique_author_count__.__forums_unique_author_count__::text as "2",
+    __forums_unique_author_count__.v::text as "2",
     (select json_agg(_) from (
       select
         __forums_featured_messages__."body" as "0"
@@ -27,7 +27,7 @@ lateral (
   on TRUE
   left outer join app_public.users_most_recent_forum(__forums_random_user__) as __users_most_recent_forum__
   on TRUE
-  left outer join app_public.forums_unique_author_count(__users_most_recent_forum__, __forums_identifiers__."id1") as __forums_unique_author_count__
+  left outer join app_public.forums_unique_author_count(__users_most_recent_forum__, __forums_identifiers__."id1") as __forums_unique_author_count__(v)
   on TRUE
   where
     (

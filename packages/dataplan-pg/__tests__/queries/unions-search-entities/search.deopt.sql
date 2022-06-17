@@ -19,7 +19,7 @@ lateral (
     __comments__."post_id"::text as "9",
     __comments__."body" as "10",
     __entity_search__."comment_id"::text as "11",
-    (not (__entity_search__ is null))::text as "12",
+    (__entity_search__ is distinct from null)::text as "12",
     __entity_search_identifiers__.idx as "13"
   from interfaces_and_unions.search(__entity_search_identifiers__."id0") as __entity_search__
   left outer join interfaces_and_unions.people as __people__

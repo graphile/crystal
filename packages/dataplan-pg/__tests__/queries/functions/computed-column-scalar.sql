@@ -10,17 +10,17 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_unique_author_count__.__forums_unique_author_count__::text as "0",
-    __forums_unique_author_count_2.__forums_unique_author_count_2::text as "1",
-    __forums_unique_author_count_3.__forums_unique_author_count_3::text as "2",
+    __forums_unique_author_count__.v::text as "0",
+    __forums_unique_author_count_2.v::text as "1",
+    __forums_unique_author_count_3.v::text as "2",
     __forums__."id" as "3",
     __forums_identifiers__.idx as "4"
   from app_public.forums as __forums__
-  left outer join app_public.forums_unique_author_count(__forums__, __forums_identifiers__."id1") as __forums_unique_author_count__
+  left outer join app_public.forums_unique_author_count(__forums__, __forums_identifiers__."id1") as __forums_unique_author_count__(v)
   on TRUE
-  left outer join app_public.forums_unique_author_count(__forums__, __forums_identifiers__."id2") as __forums_unique_author_count_2
+  left outer join app_public.forums_unique_author_count(__forums__, __forums_identifiers__."id2") as __forums_unique_author_count_2(v)
   on TRUE
-  left outer join app_public.forums_unique_author_count(__forums__, __forums_identifiers__."id3") as __forums_unique_author_count_3
+  left outer join app_public.forums_unique_author_count(__forums__, __forums_identifiers__."id3") as __forums_unique_author_count_3(v)
   on TRUE
   where
     (

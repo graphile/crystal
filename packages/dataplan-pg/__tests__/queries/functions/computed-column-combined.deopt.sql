@@ -50,12 +50,12 @@ from (
 ) as __users_most_recent_forum_identifiers__,
 lateral (
   select
-    __forums_unique_author_count__.__forums_unique_author_count__::text as "0",
+    __forums_unique_author_count__.v::text as "0",
     __users_most_recent_forum__::text as "1",
     __users_most_recent_forum__."id" as "2",
     __users_most_recent_forum_identifiers__.idx as "3"
   from app_public.users_most_recent_forum(__users_most_recent_forum_identifiers__."id0") as __users_most_recent_forum__
-  left outer join app_public.forums_unique_author_count(__users_most_recent_forum__, __users_most_recent_forum_identifiers__."id1") as __forums_unique_author_count__
+  left outer join app_public.forums_unique_author_count(__users_most_recent_forum__, __users_most_recent_forum_identifiers__."id1") as __forums_unique_author_count__(v)
   on TRUE
   where (
     true /* authorization checks */
