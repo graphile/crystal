@@ -87,6 +87,7 @@ export class PgSelectSinglePlan<
   private classPlanId: string;
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
+  private _coalesceToEmptyObject = false;
 
   constructor(
     classPlan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
@@ -99,6 +100,10 @@ export class PgSelectSinglePlan<
     this.mode = classPlan.mode;
     this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
+  }
+
+  public coalesceToEmptyObject(): void {
+    this._coalesceToEmptyObject = true;
   }
 
   public toStringMeta(): string {
@@ -552,11 +557,11 @@ export class PgSelectSinglePlan<
   ): CrystalResultsList<PgSourceRow<TColumns> | null> {
     return values[this.itemPlanId].map((result) => {
       if (result == null) {
-        return null;
+        return this._coalesceToEmptyObject ? Object.create(null) : null;
       } else if (this.nullCheckAttributeIndex != null) {
         const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
         if (nullIfAttributeNull == null) {
-          return null;
+          return this._coalesceToEmptyObject ? Object.create(null) : null;
         }
       } else if (this.nullCheckId != null) {
         const nullIfExpressionNotTrue = result[this.nullCheckId];
@@ -564,7 +569,7 @@ export class PgSelectSinglePlan<
           nullIfExpressionNotTrue == null ||
           TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
         ) {
-          return null;
+          return this._coalesceToEmptyObject ? Object.create(null) : null;
         }
       }
       return result;

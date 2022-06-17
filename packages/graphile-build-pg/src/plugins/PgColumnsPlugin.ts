@@ -147,7 +147,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         }
 
         for (const columnName in pgCodec.columns) {
-          const column = pgCodec.columns[columnName];
+          const column = pgCodec.columns[columnName] as PgTypeColumn<any, any>;
 
           const behavior = getBehavior(column.extensions);
           if (!build.behavior.matches(behavior, "attribute:select", "select")) {
@@ -208,6 +208,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               );
               // TODO: this is pretty horrible in the export; we should fix that.
               if (!column.codec.arrayOfCodec) {
+                const notNull = column.notNull || column.codec.notNull;
                 // Single record from source
                 /*
                  * TODO: if we refactor `PgSelectSinglePlan` we can probably
@@ -216,29 +217,19 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                  * joined_thing.column`
                  */
                 return EXPORTABLE(
-                  (
-                      baseCodec,
-                      columnName,
-                      getSource,
-                      pgSelectSingleFromRecord,
-                      pgSources,
-                    ) =>
-                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                  (baseCodec, columnName, getSource, notNull, pgSelectSingleFromRecord, pgSources) => ($record: PgSelectSinglePlan<any, any, any, any>) => {
                       const $plan = $record.get(columnName);
                       const $select = pgSelectSingleFromRecord(
                         getSource(baseCodec, pgSources, $record),
                         $plan,
                       );
+                      if (notNull) {
+                        $select.coalesceToEmptyObject();
+                      }
                       $select.getClassPlan().setTrusted();
                       return $select;
                     },
-                  [
-                    baseCodec,
-                    columnName,
-                    getSource,
-                    pgSelectSingleFromRecord,
-                    pgSources,
-                  ],
+                  [baseCodec, columnName, getSource, notNull, pgSelectSingleFromRecord, pgSources],
                 );
               } else {
                 // Many records from source
