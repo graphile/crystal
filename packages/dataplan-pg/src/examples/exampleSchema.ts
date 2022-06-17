@@ -1264,9 +1264,8 @@ export function makeExampleSchema(
 
   const relationalTopicsColumns = EXPORTABLE(
     (TYPES, col, itemColumns) => ({
-      title: col({ codec: TYPES.text, notNull: false }),
-
       ...itemColumns,
+      title: col({ codec: TYPES.text, notNull: false }),
     }),
     [TYPES, col, itemColumns],
   );
@@ -1303,11 +1302,10 @@ export function makeExampleSchema(
 
   const relationalPostsColumns = EXPORTABLE(
     (TYPES, col, itemColumns) => ({
+      ...itemColumns,
       title: col({ codec: TYPES.text, notNull: false }),
       description: col({ codec: TYPES.text, notNull: false }),
       note: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
     }),
     [TYPES, col, itemColumns],
   );
@@ -1344,10 +1342,9 @@ export function makeExampleSchema(
 
   const relationalDividersColumns = EXPORTABLE(
     (TYPES, col, itemColumns) => ({
+      ...itemColumns,
       title: col({ codec: TYPES.text, notNull: false }),
       color: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
     }),
     [TYPES, col, itemColumns],
   );
@@ -1384,9 +1381,8 @@ export function makeExampleSchema(
 
   const relationalChecklistsColumns = EXPORTABLE(
     (TYPES, col, itemColumns) => ({
-      title: col({ codec: TYPES.text, notNull: false }),
-
       ...itemColumns,
+      title: col({ codec: TYPES.text, notNull: false }),
     }),
     [TYPES, col, itemColumns],
   );
@@ -1423,10 +1419,9 @@ export function makeExampleSchema(
 
   const relationalChecklistItemsColumns = EXPORTABLE(
     (TYPES, col, itemColumns) => ({
+      ...itemColumns,
       description: col({ codec: TYPES.text, notNull: true }),
       note: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
     }),
     [TYPES, col, itemColumns],
   );
