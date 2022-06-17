@@ -134,12 +134,14 @@ type PgSelectPlanJoin =
       type: "cross";
       source: SQL;
       alias: SQL;
+      columnNames?: SQL;
       lateral?: boolean;
     }
   | {
       type: "inner" | "left" | "right" | "full";
       source: SQL;
       alias: SQL;
+      columnNames?: SQL;
       conditions: SQL[];
       lateral?: boolean;
     };
@@ -1481,7 +1483,7 @@ export class PgSelectPlan<
 
       return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${
         j.source
-      } as ${j.alias}${joinCondition}`;
+      } as ${j.alias}${j.columnNames ?? sql.blank}${joinCondition}`;
     });
 
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
@@ -2355,6 +2357,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
                 type: "left",
                 source: this.fromExpression(),
                 alias: this.alias,
+                columnNames: this.source.codec.columns ? sql.blank : sql`(v)`,
                 conditions,
                 lateral: this.joinAsLateral,
               },
