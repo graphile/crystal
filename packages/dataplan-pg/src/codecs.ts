@@ -198,6 +198,84 @@ function toListString(val: SQLRawValue): string {
   }
 }
 
+// TODO: this needs unit tests!
+/**
+ * Parses a PostgreSQL record string (e.g. `(1,2,   hi)`) into a tuple (e.g.
+ * `["1", "2", "   hi"]`).
+ *
+ * Postgres says:
+ *
+ * | The composite output routine will put double quotes around field values if
+ * | they are empty strings or contain parentheses, commas, double quotes,
+ * | backslashes, or white space. (Doing so for white space is not essential,
+ * | but aids legibility.) Double quotes and backslashes embedded in field
+ * | values will be doubled.
+ *
+ * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
+ */
+function recordStringToTuple(value: string): Array<string | null> {
+  if (!value.startsWith("(") || !value.endsWith(")")) {
+    throw new Error(`Unsupported record string '${value}'`);
+  }
+  let inQuotes = false;
+  let current: string | null = null;
+  const tuple: Array<string | null> = [];
+  // We only need to loop inside the parenthesis. Whitespace is significant in here.
+  for (let i = 1, l = value.length - 1; i < l; i++) {
+    const char = value[i];
+    if (inQuotes) {
+      if (current === null) {
+        throw new Error("Impossible?");
+      }
+      if (char === '"') {
+        // '""' is an escape for '"'
+        if (value[i + 1] === '"') {
+          current += value[++i];
+        } else {
+          inQuotes = false;
+          // Expect comma or end
+        }
+      } else if (char === "\\") {
+        // Backslash is literal escape
+        current += value[++i];
+      } else {
+        current += char;
+      }
+    } else if (char === '"') {
+      if (current !== null) {
+        throw new Error(
+          `Invalid record string attempts to open quotes when value already exists '${value}'`,
+        );
+      }
+      inQuotes = true;
+      current = "";
+    } else if (char === ",") {
+      tuple.push(current);
+      current = null;
+    } else if (current !== null) {
+      current += char;
+    } else {
+      current = char;
+    }
+  }
+  if (inQuotes) {
+    throw new Error(
+      `Invalid record string; exits whilst still in quote marks '${value}'`,
+    );
+  }
+  tuple.push(current);
+  return tuple;
+}
+
+function realColumnDefs(
+  columns: PgTypeColumns,
+): Array<[string, PgTypeColumn<any, any>]> {
+  const columnDefs = Object.entries(columns);
+  return columnDefs.filter(
+    ([_columnName, spec]) => !spec.expression && !spec.via,
+  );
+}
+
 /**
  * Takes a list of columns and returns a mapping function that takes a
  * composite value and turns it into a string that PostgreSQL could process as
@@ -208,13 +286,37 @@ function toListString(val: SQLRawValue): string {
 function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   columns: TColumns,
 ): (value: any) => SQLRawValue {
-  const columnDefs = Object.entries(columns);
+  const columnDefs = realColumnDefs(columns);
   return (value) => {
     const values = columnDefs.map(([columnName, spec]) => {
       const val = spec.codec.toPg(value[columnName]);
       return toRecordString(val);
     });
     return `(${values.join(",")})`;
+  };
+}
+
+/**
+ * Takes a list of columns and returns a mapping function that takes a
+ * PostgreSQL record string value (e.g. `(1,2,"hi")`) and turns it into a
+ * JavaScript object.
+ *
+ * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
+ */
+function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
+  columns: TColumns,
+): (value: string) => object {
+  const columnDefs = realColumnDefs(columns);
+  const columnCount = columnDefs.length;
+  return (value) => {
+    const tuple = recordStringToTuple(value);
+    const record = Object.create(null);
+    for (let i = 0; i < columnCount; i++) {
+      const [columnName, spec] = columnDefs[i];
+      const entry = tuple[i];
+      record[columnName] = spec.codec.fromPg(entry);
+    }
+    return record;
   };
 }
 
@@ -235,12 +337,12 @@ export function recordType<TColumns extends PgTypeColumns>(
   columns: TColumns,
   extensions?: Partial<PgTypeCodecExtensions>,
   isAnonymous = false,
-): PgTypeCodec<TColumns, string, string> {
+): PgTypeCodec<TColumns, string, object> {
   return {
     name,
     sqlType: identifier,
     isAnonymous,
-    fromPg: identity,
+    fromPg: makeSQLValueToRecord(columns),
     toPg: makeRecordToSQLRawValue(columns),
     columns,
     extensions,
