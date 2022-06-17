@@ -929,17 +929,22 @@ export class PgSource<
     if (this.codec.notNullExpression) {
       // Use the user-provided check
       return this.codec.notNullExpression(alias);
-    } else if (this.uniques.length > 0) {
-      // We're just going to assume the first unique is the primary key, and that
-      // if that's not null then we're not null
-      const pk = this.uniques[0];
-      const columns = (pk.columns as readonly string[]).map(
-        (col) => sql`${alias}.${sql.identifier(col)}`,
-      );
-      return sql`(not((${sql.join(columns, ", ")}) is null))::text`;
     } else {
-      // Fallback
-      return sql`(${alias} is distinct from null)::text`;
+      // Every column in a primary key is non-nullable; so just see if one is null
+      const pk = this.uniques.find((u) => u.isPrimary);
+      const nonNullableColumn = this.codec.columns
+        ? Object.entries(this.codec.columns).find(
+            ([_columnName, spec]) =>
+              !spec.via && !spec.expression && spec.notNull,
+          )?.[0]
+        : null ?? pk?.columns[0];
+      if (nonNullableColumn) {
+        const firstColumn = sql`${alias}.${sql.identifier(nonNullableColumn)}`;
+        return sql`(not (${firstColumn} is null))::text`;
+      } else {
+        // Fallback
+        return sql`(${alias} is distinct from null)::text`;
+      }
     }
   }
 }
