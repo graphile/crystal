@@ -23,6 +23,42 @@ import type { PlanResults, PlanResultsBucket } from "./planResults.js";
 import type { __TrackedObjectPlan } from "./plans/index.js";
 import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
 
+export interface DataPlannerFieldExtensions {
+  plan?: FieldPlanResolver<any, any, any>;
+  subscribePlan?: FieldPlanResolver<any, any, any>;
+}
+
+export interface DataPlannerArgumentExtensions {
+  // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
+  plan?: ArgumentPlanResolver<any, any, any, any, any>;
+}
+
+export interface DataPlannerInputFieldExtensions {
+  // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
+  plan?: InputObjectFieldPlanResolver<any, any, any, any>;
+}
+
+export interface DataPlannerObjectTypeExtensions {
+  Plan?: { new (...args: any[]): ExecutablePlan };
+}
+
+export interface DataPlannerEnumValueExtensions {
+  /**
+   * EXPERIMENTAL!
+   *
+   * @internal
+   */
+  plan?: EnumPlanResolver;
+}
+
+export interface DataPlannerScalarTypeExtensions {
+  plan?: ScalarPlanResolver<any, any>;
+  /**
+   * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
+   */
+  idempotent?: boolean;
+}
+
 /*
  * We register certain things (plans, etc) into the GraphQL "extensions"
  * property on the various GraphQL configs (type, field, argument, etc); this
@@ -30,49 +66,27 @@ import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
  */
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
-    graphile?: {
-      plan?: FieldPlanResolver<any, any, any>;
-      subscribePlan?: FieldPlanResolver<any, any, any>;
-    };
+    graphile?: DataPlannerFieldExtensions;
   }
 
   interface GraphQLArgumentExtensions {
-    graphile?: {
-      plan?: ArgumentPlanResolver<any, any, any, any, any>;
-    };
+    graphile?: DataPlannerArgumentExtensions;
   }
 
   interface GraphQLInputFieldExtensions {
-    graphile?: {
-      plan?: InputObjectFieldPlanResolver<any, any, any, any>;
-    };
+    graphile?: DataPlannerInputFieldExtensions;
   }
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
-    graphile?: {
-      Plan?: { new (...args: any[]): ExecutablePlan };
-    };
+    graphile?: DataPlannerObjectTypeExtensions;
   }
 
   interface GraphQLEnumValueExtensions {
-    graphile?: {
-      /**
-       * EXPERIMENTAL!
-       *
-       * @internal
-       */
-      plan?: EnumPlanResolver;
-    };
+    graphile?: DataPlannerEnumValueExtensions;
   }
 
   interface GraphQLScalarTypeExtensions {
-    graphile?: {
-      plan?: ScalarPlanResolver<any, any>;
-      /**
-       * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
-       */
-      idempotent?: boolean;
-    };
+    graphile?: DataPlannerScalarTypeExtensions;
   }
 }
 
