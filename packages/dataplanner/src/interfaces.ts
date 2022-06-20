@@ -59,6 +59,8 @@ export interface DataPlannerScalarTypeExtensions {
   idempotent?: boolean;
 }
 
+// TODO: change 'graphile' to 'dataplanner'
+
 /*
  * We register certain things (plans, etc) into the GraphQL "extensions"
  * property on the various GraphQL configs (type, field, argument, etc); this
