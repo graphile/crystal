@@ -13,9 +13,9 @@ import type {
   GraphQLSchema,
   OperationDefinitionNode,
 } from "graphql";
-import { defaultFieldResolver } from "graphql";
 import {
   assertObjectType,
+  defaultFieldResolver,
   executeSync,
   getNamedType,
   GraphQLBoolean,
@@ -117,12 +117,12 @@ import {
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
 import type { AccessPlan } from "./plans/index.js";
-import { access } from "./plans/index.js";
 import {
   __InputObjectPlan,
   __ItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
+  access,
 } from "./plans/index.js";
 import { __ListTransformPlan } from "./plans/listTransform.js";
 import { assertPolymorphicData } from "./polymorphic.js";
