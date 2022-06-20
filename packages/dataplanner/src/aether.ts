@@ -1451,6 +1451,7 @@ export class Aether<
       );
       const subscribePlan = wgs(() =>
         subscriptionPlanResolver(this.trackedRootValuePlan, trackedArguments, {
+          field: fieldSpec,
           schema: this.schema,
         }),
       );
@@ -1761,6 +1762,7 @@ export class Aether<
         );
         plan = wgs(() =>
           planResolver(parentPlan, trackedArguments, {
+            field: objectField,
             schema: this.schema,
           }),
         );

@@ -2,6 +2,7 @@ import type EventEmitter from "events";
 import type {
   FieldNode,
   GraphQLArgumentConfig,
+  GraphQLField,
   GraphQLFieldConfig,
   GraphQLInputFieldConfig,
   GraphQLInputType,
@@ -253,6 +254,7 @@ export type FieldPlanResolver<
   $parentPlan: TParentPlan,
   args: TrackedArguments<TArgs>,
   info: {
+    field: GraphQLField<any, any, any>;
     schema: GraphQLSchema;
   },
 ) => TResultPlan;
