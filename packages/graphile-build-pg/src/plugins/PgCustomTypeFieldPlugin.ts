@@ -21,6 +21,7 @@ import type {
   ExecutablePlan,
   InputPlan,
   TrackedArguments,
+  FieldPlanResolver,
 } from "dataplanner";
 import {
   __ListTransformPlan,
@@ -485,6 +486,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           scope: { isPgTableType, pgCodec, isRootQuery, isRootMutation },
           fieldWithHooks,
         } = context;
+        const SelfName = Self.name;
         if (!(isPgTableType && pgCodec) && !isRootQuery && !isRootMutation) {
           return fields;
         }
@@ -569,11 +571,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 }),
               );
 
-              const getSelectPlanFromParentAndArgs = isRootQuery
+              const getSelectPlanFromParentAndArgs: FieldPlanResolver<
+                any,
+                ExecutablePlan,
+                any
+              > = isRootQuery
                 ? // Not computed
                   EXPORTABLE(
-                    (argDetailsSimple, isNotNullish, source) =>
-                      ($root: ExecutablePlan, args: TrackedArguments<any>) => {
+                    (aether, argDetailsSimple, isNotNullish, source) =>
+                      ($root, args) => {
                         const selectArgs: PgSelectArgumentSpec[] = [
                           ...argDetailsSimple
                             .map(({ argName, pgCodec, required }) => {
@@ -599,7 +605,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         object,
                         source,
                       ) =>
-                      ($root: ExecutablePlan, args: TrackedArguments<any>) => {
+                      ($root, args) => {
                         const selectArgs: PgSelectArgumentSpec[] = [
                           ...argDetailsSimple
                             .map(({ argName, pgCodec, required }) => {
@@ -634,7 +640,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         pgClassExpression,
                         source,
                       ) =>
-                      ($row: ExecutablePlan, args: TrackedArguments<any>) => {
+                      ($row, args) => {
                         if (!($row instanceof PgSelectSinglePlan)) {
                           throw new Error(
                             `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,
@@ -834,7 +840,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             },
                           ),
                         },
-                        `Adding field '${fieldName}' to '${Self.name}' from function source '${source.name}'`,
+                        `Adding field '${fieldName}' to '${SelfName}' from function source '${source.name}'`,
                       ),
                     );
                   }
@@ -870,7 +876,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           },
                         ),
                       },
-                      `Adding list field '${fieldName}' to ${Self.name} from function source '${source.name}'`,
+                      `Adding list field '${fieldName}' to ${SelfName} from function source '${source.name}'`,
                     ),
                   );
                 }
