@@ -1,5 +1,10 @@
-import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
-import { ExecutablePlan, isDev } from "dataplanner";
+import type {
+  CrystalResultsList,
+  CrystalValuesList,
+  SetterCapablePlan,
+  SetterPlan,
+} from "dataplanner";
+import { ExecutablePlan, isDev, setter } from "dataplanner";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
@@ -14,8 +19,6 @@ import type {
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces.js";
 import type { PgClassExpressionPlan } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import type { PgSetCapableParentPlan } from "./pgSet.js";
-import { PgSetPlan } from "./pgSet.js";
 
 const EMPTY_MAP = new Map<never, never>();
 
@@ -50,7 +53,8 @@ export class PgInsertPlan<
     },
   >
   extends ExecutablePlan<PgSourceRow<TColumns>>
-  implements PgSetCapableParentPlan<keyof TColumns & string>
+  implements
+    SetterCapablePlan<{ [key in keyof TColumns & string]: ExecutablePlan }>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -157,13 +161,16 @@ export class PgInsertPlan<
     this.columns.push({ name, depId, pgCodec });
   }
 
-  setPlan(): PgSetPlan<keyof TColumns & string, this> {
+  setPlan(): SetterPlan<
+    { [key in keyof TColumns & string]: ExecutablePlan<any> },
+    this
+  > {
     if (this.locked) {
       throw new Error(
         `${this}: cannot set values once plan is locked ('setPlan')`,
       );
     }
-    return new PgSetPlan(this);
+    return setter(this);
   }
 
   /**

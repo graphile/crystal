@@ -5,7 +5,6 @@ import "graphile-config";
 
 import type {
   PgSelectSinglePlan,
-  PgSetPlan,
   PgTypeCodec,
   PgTypeColumn,
   PgTypeColumns,
@@ -15,7 +14,7 @@ import {
   pgSelectSingleFromRecord,
   PgSource,
 } from "@dataplan/pg";
-import type { InputPlan } from "dataplanner";
+import type { InputPlan, SetterPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
 
@@ -217,7 +216,15 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                  * joined_thing.column`
                  */
                 return EXPORTABLE(
-                  (baseCodec, columnName, getSource, notNull, pgSelectSingleFromRecord, pgSources) => ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                  (
+                      baseCodec,
+                      columnName,
+                      getSource,
+                      notNull,
+                      pgSelectSingleFromRecord,
+                      pgSources,
+                    ) =>
+                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
                       const $plan = $record.get(columnName);
                       const $select = pgSelectSingleFromRecord(
                         getSource(baseCodec, pgSources, $record),
@@ -229,7 +236,14 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       $select.getClassPlan().setTrusted();
                       return $select;
                     },
-                  [baseCodec, columnName, getSource, notNull, pgSelectSingleFromRecord, pgSources],
+                  [
+                    baseCodec,
+                    columnName,
+                    getSource,
+                    notNull,
+                    pgSelectSingleFromRecord,
+                    pgSources,
+                  ],
                 );
               } else {
                 // Many records from source
@@ -366,7 +380,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       plan: EXPORTABLE(
                         (columnName) =>
                           function plan(
-                            $insert: PgSetPlan<any, any>,
+                            $insert: SetterPlan<any, any>,
                             $value: InputPlan,
                           ) {
                             $insert.set(columnName, $value);

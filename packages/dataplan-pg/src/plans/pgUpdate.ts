@@ -1,5 +1,9 @@
-import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
-import { ExecutablePlan, isDev } from "dataplanner";
+import type {
+  CrystalResultsList,
+  CrystalValuesList,
+  SetterPlan,
+} from "dataplanner";
+import { ExecutablePlan, isDev, setter } from "dataplanner";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
@@ -14,7 +18,6 @@ import type {
 import type { PgTypeCodec, PlanByUniques } from "../interfaces.js";
 import type { PgClassExpressionPlan } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import { PgSetPlan } from "./pgSet.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -189,13 +192,16 @@ export class PgUpdatePlan<
     this.columns.push({ name, depId, pgCodec });
   }
 
-  setPlan(): PgSetPlan<keyof TColumns & string, this> {
+  setPlan(): SetterPlan<
+    { [key in keyof TColumns & string]: ExecutablePlan },
+    this
+  > {
     if (this.locked) {
       throw new Error(
         `${this}: cannot set values once plan is locked ('setPlan')`,
       );
     }
-    return new PgSetPlan(this);
+    return setter(this);
   }
 
   /**

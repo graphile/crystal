@@ -55,6 +55,7 @@ export { node, NodePlan } from "./node.js";
 export { object, ObjectPlan, ObjectPlanMeta } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
 export { reverse, reverseArray, ReversePlan } from "./reverse.js";
+export { setter, SetterCapablePlan, SetterPlan } from "./setter.js";
 
 // Internal plans
 export { __InputListPlan } from "./__inputList.js";

@@ -119,7 +119,6 @@ export {
   PgSelectSinglePlan,
   PgSelectSinglePlanOptions,
 } from "./plans/pgSelectSingle.js";
-export { PgSetCapableParentPlan, PgSetPlan } from "./plans/pgSet.js";
 export {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicPlan,

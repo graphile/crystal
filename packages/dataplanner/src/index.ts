@@ -138,6 +138,9 @@ import {
   reverse,
   reverseArray,
   ReversePlan,
+  setter,
+  SetterCapablePlan,
+  SetterPlan,
 } from "./plans/index.js";
 import { polymorphicWrap, resolveType } from "./polymorphic.js";
 import {
@@ -321,6 +324,9 @@ export {
   ROOT_PATH,
   ScalarPlanResolver,
   ScalarPlans,
+  setter,
+  SetterCapablePlan,
+  SetterPlan,
   StreamablePlan,
   stripAnsi,
   subscribe,
@@ -384,6 +390,8 @@ exportAsMany({
   reverse,
   reverseArray,
   ReversePlan,
+  setter,
+  SetterPlan,
   listen,
   ListenPlan,
   polymorphicWrap,
