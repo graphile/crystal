@@ -83,6 +83,7 @@ import type {
   CrystalObject,
   CrystalResultsList,
   FieldAndGroup,
+  FieldPlanResolver,
   GroupedSelections,
   PlanOptions,
   PromiseOrDirect,
@@ -1446,29 +1447,16 @@ export class Aether<
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
-      const trackedArguments = wgs(() =>
-        this.getTrackedArguments(rootType, field),
-      );
-      const subscribePlan = wgs(() =>
-        subscriptionPlanResolver(this.trackedRootValuePlan, trackedArguments, {
-          field: fieldSpec,
-          schema: this.schema,
-        }),
+      const subscribePlan = this.planField(
+        ROOT_PATH,
+        ROOT_PATH,
+        rootType,
+        field,
+        subscriptionPlanResolver,
+        this.trackedRootValuePlan,
+        fieldSpec,
       );
       this.subscriptionPlanId = subscribePlan.id;
-
-      // NOTE: don't need to worry about tracking groupId when planning
-      // arguments as they're guaranteed to be identical across all selections.
-      wgs(() =>
-        this.planFieldArguments(
-          rootType,
-          fieldSpec,
-          field,
-          trackedArguments,
-          this.trackedRootValuePlan,
-          subscribePlan,
-        ),
-      );
 
       // TODO: this is a LIE! This should be `ROOT_PATH + "[]"` but that breaks
       // everything... We've worked around it elsewhere, but maybe all path
@@ -1752,30 +1740,14 @@ export class Aether<
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
         const oldPlansLength = this.planCount;
-        const wgs = withGlobalState.bind(null, {
-          aether: this,
-          parentPathIdentity: path,
-          currentGraphQLType: fieldType,
-        }) as <T>(cb: () => T) => T;
-        const trackedArguments = wgs(() =>
-          this.getTrackedArguments(objectType, field),
-        );
-        plan = wgs(() =>
-          planResolver(parentPlan, trackedArguments, {
-            field: objectField,
-            schema: this.schema,
-          }),
-        );
-        assertExecutablePlan(plan, pathIdentity);
-        wgs(() =>
-          this.planFieldArguments(
-            objectType,
-            objectField,
-            field,
-            trackedArguments,
-            parentPlan,
-            plan,
-          ),
+        plan = this.planField(
+          path,
+          pathIdentity,
+          objectType,
+          field,
+          planResolver,
+          parentPlan,
+          objectField,
         );
 
         // TODO: Check SameStreamDirective still exists in @stream spec at release.
@@ -2476,6 +2448,55 @@ export class Aether<
       }
     }
     return trackedArgumentValues;
+  }
+
+  planField(
+    parentPathIdentity: string,
+    pathIdentity: string,
+    objectType: GraphQLObjectType,
+    fieldNode: FieldNode,
+    planResolver: FieldPlanResolver<any, any, any>,
+    parentPlan: ExecutablePlan,
+    field: GraphQLField<any, any>,
+  ) {
+    const fieldType = field.type;
+    const wgs = withGlobalState.bind(null, {
+      aether: this,
+      parentPathIdentity,
+      currentGraphQLType: fieldType,
+    }) as <T>(cb: () => T) => T;
+    const trackedArguments = wgs(() =>
+      this.getTrackedArguments(objectType, fieldNode),
+    );
+    const plan = wgs(() =>
+      planResolver(parentPlan, trackedArguments, {
+        field,
+        schema: this.schema,
+        applyArgPlan() {
+          // TODO: do more!
+        },
+        evaluateArgPlan(argName) {
+          // TODO: do more!
+          const $arg = trackedArguments[argName];
+          return $arg;
+        },
+      }),
+    );
+    assertExecutablePlan(plan, pathIdentity);
+
+    // NOTE: don't need to worry about tracking groupId when planning
+    // arguments as they're guaranteed to be identical across all selections.
+    wgs(() =>
+      this.planFieldArguments(
+        objectType,
+        field,
+        fieldNode,
+        trackedArguments,
+        parentPlan,
+        plan,
+      ),
+    );
+    return plan;
   }
 
   private getPlanIds(offset = 0) {

@@ -256,6 +256,8 @@ export type FieldPlanResolver<
   info: {
     field: GraphQLField<any, any, any>;
     schema: GraphQLSchema;
+    applyArgPlan(argName: string, $toPlan: ExecutablePlan): void;
+    evaluateArgPlan(argName: string): ExecutablePlan<any>;
   },
 ) => TResultPlan;
 
