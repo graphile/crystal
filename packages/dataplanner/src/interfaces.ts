@@ -31,7 +31,9 @@ export interface DataPlannerFieldExtensions {
 
 export interface DataPlannerArgumentExtensions {
   // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-  plan?: ArgumentPlanResolver<any, any, any, any, any>;
+  plan?:
+    | ArgumentPlanResolver<any, any, any, any, any>
+    | ArgumentValuePlanResolver;
 }
 
 export interface DataPlannerInputFieldExtensions {
@@ -256,8 +258,10 @@ export type FieldPlanResolver<
   info: {
     field: GraphQLField<any, any, any>;
     schema: GraphQLSchema;
-    applyArgPlan(argName: string, $toPlan: ExecutablePlan): void;
-    evaluateArgPlan(argName: string): ExecutablePlan<any>;
+    applyArgPlan(argName: string | string[], $toPlan: ExecutablePlan): void;
+    evaluateArgPlan(
+      argName: string | string[],
+    ): ExecutablePlan<any> | undefined;
   },
 ) => TResultPlan;
 
@@ -307,6 +311,12 @@ export type ArgumentPlanResolver<
     schema: GraphQLSchema;
   },
 ) => TResultPlan;
+
+export type ArgumentValuePlanResolver<
+  TParentPlan extends ExecutablePlan<any> | null = ExecutablePlan<any> | null,
+  TInput extends InputPlan = InputPlan,
+  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+> = ($parentPlan: TParentPlan, $input: TInput) => TResultPlan;
 
 /**
  * GraphQLScalarTypes can have plans, these are passed the field plan and must

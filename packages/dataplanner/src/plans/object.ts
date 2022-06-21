@@ -2,6 +2,7 @@ import debugFactory from "debug";
 
 import type { ExecutionExtra } from "../interfaces.js";
 import { ExecutablePlan } from "../plan.js";
+import type { SetterCapablePlan } from "./setter.js";
 
 const debugObjectPlan = debugFactory("dataplanner:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
@@ -27,8 +28,13 @@ export interface ObjectPlanMeta<
  * the results of the associated plans.
  */
 export class ObjectPlan<
-  TPlans extends { [key: string]: ExecutablePlan<any> },
-> extends ExecutablePlan<DataFromPlans<TPlans>> {
+    TPlans extends { [key: string]: ExecutablePlan<any> } = {
+      [key: string]: ExecutablePlan<any>;
+    },
+  >
+  extends ExecutablePlan<DataFromPlans<TPlans>>
+  implements SetterCapablePlan<TPlans>
+{
   static $$export = {
     moduleName: "dataplanner",
     exportName: "ObjectPlan",
@@ -48,7 +54,7 @@ export class ObjectPlan<
    * This key doesn't get typed, but it can be added later which can be quite
    * handy.
    */
-  public set(key: string, plan: ExecutablePlan<any>): void {
+  public set<TKey extends keyof TPlans>(key: TKey, plan: TPlans[TKey]): void {
     this.keys.push(key);
     this.addDependency(plan);
   }

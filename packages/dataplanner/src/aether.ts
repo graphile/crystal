@@ -3,6 +3,7 @@ import debugFactory from "debug";
 import type {
   FieldNode,
   FragmentDefinitionNode,
+  GraphQLArgument,
   GraphQLEnumType,
   GraphQLField,
   GraphQLInputField,
@@ -13,6 +14,7 @@ import type {
   GraphQLSchema,
   OperationDefinitionNode,
 } from "graphql";
+import { getNullableType } from "graphql";
 import {
   assertObjectType,
   defaultFieldResolver,
@@ -111,6 +113,7 @@ import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
+  assertModifierPlan,
   ExecutablePlan,
   isListCapablePlan,
   isStreamablePlan,
@@ -2182,53 +2185,14 @@ export class Aether<
     };
   }
 
-  /**
-   * Implements the `PlanFieldArguments` and `PlanFieldArgument` algorithms.
-   */
-  private planFieldArguments(
-    _objectType: GraphQLObjectType,
-    fieldSpec: GraphQLField<unknown, unknown>,
-    _field: FieldNode,
-    trackedArguments: TrackedArguments,
-    parentPlan: ExecutablePlan,
-    fieldPlan: ExecutablePlan,
-  ): void {
+  private withModifiers<T>(cb: () => T): T {
     assert.strictEqual(
       this.modifierPlans.length,
       0,
       "Expected Aether.modifierPlans to be empty",
     );
 
-    // Arguments are applied in the order that they are specified in the
-    // schema, NOT the order that they are specified in the request.
-    for (let i = 0, l = fieldSpec.args.length; i < l; i++) {
-      const argSpec = fieldSpec.args[i];
-      const argName = argSpec.name;
-      const trackedArgumentValuePlan = trackedArguments[argName];
-      if (trackedArgumentValuePlan !== undefined) {
-        const planResolver = argSpec.extensions?.graphile?.plan;
-        if (typeof planResolver === "function") {
-          const argPlan = planResolver(
-            parentPlan,
-            fieldPlan,
-            trackedArgumentValuePlan,
-            { schema: this.schema },
-          );
-          if (argPlan != null) {
-            // TODO: why did I add this? Is it required? Seems important, but
-            // also makes writing the schema a bit more painful.
-            /*
-            assertModifierPlan(
-              argPlan,
-              `${_objectType.name}.${fieldSpec.name}(${argName}:)`,
-            );
-            */
-
-            this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
-          }
-        }
-      }
-    }
+    const result = cb();
 
     // Remove the modifier plans from aether and sort them ready for application.
     const plansToApply = this.modifierPlans
@@ -2240,6 +2204,8 @@ export class Aether<
     for (let i = 0, l = plansToApply.length; i < l; i++) {
       plansToApply[i].apply();
     }
+
+    return result;
   }
 
   /**
@@ -2411,34 +2377,151 @@ export class Aether<
     const trackedArguments = wgs(() =>
       this.getTrackedArguments(objectType, fieldNode),
     );
+    const plannedArgs: string[] = [];
+
+    const getArgOnceOnly = (
+      inPath: string | string[],
+      $toPlan: ExecutablePlan | null,
+    ) => {
+      const id = Array.isArray(inPath) ? inPath.join(".") : inPath;
+      if (plannedArgs.includes(id)) {
+        throw new Error(`Argument '${id}' has already been evaluated`);
+      }
+      plannedArgs.push(id);
+
+      const path = Array.isArray(inPath) ? inPath : [inPath];
+      const argName = path.shift()!;
+      let $value: InputPlan = trackedArguments[argName];
+      let argOrField = field.args.find((arg) => arg.name === argName)!;
+      if ($value.evalIs(undefined)) {
+        return undefined;
+      }
+
+      let type = getNullableType(argOrField.type);
+
+      while (path.length > 0) {
+        const name = path.shift()!;
+        if (!isInputObjectType(type)) {
+          throw new Error(
+            `Cannot process '${type}' through args; expected input object`,
+          );
+        }
+        $value = ($value as __TrackedObjectPlan | __InputObjectPlan).get(name);
+        if ($value.evalIs(undefined)) {
+          return undefined;
+        }
+        argOrField = type.getFields()[name];
+        type = getNullableType(argOrField.type);
+      }
+
+      const plan = this.withModifiers(() => {
+        const planResolver = argOrField.extensions?.graphile?.plan;
+
+        if (typeof planResolver === "function") {
+          const argPlan = planResolver(parentPlan, $toPlan, $value, {
+            schema: this.schema,
+          });
+          if (argPlan != null) {
+            this.planInput(argOrField.type, $value, argPlan);
+          }
+          return argPlan;
+        } else {
+          return $value;
+        }
+      });
+      return plan;
+    };
+
+    const applyArgPlan = (
+      argName: string | string[],
+      $toPlan: ExecutablePlan,
+      // TODO: remove this when we remove 'args' from resolvers.
+      ignoreErrors = false,
+    ): void => {
+      const plan = getArgOnceOnly(argName, $toPlan);
+
+      if (!ignoreErrors) {
+        if (plan && plan !== $toPlan) {
+          assertModifierPlan(
+            plan,
+            `${objectType.name}.${field.name}(${argName}:)`,
+          );
+        }
+      }
+    };
+
+    const evaluateArgPlan = (
+      argName: string | string[],
+    ): ExecutablePlan | undefined => {
+      const plan = getArgOnceOnly(argName, null);
+
+      if (plan && !(plan instanceof ExecutablePlan)) {
+        throw new Error(
+          `Bad argument resolver for '${objectType.name}.${field.name}(${argName}:)'`,
+        );
+      }
+      return plan;
+    };
+
     let plan = wgs(() =>
       planResolver(parentPlan, trackedArguments, {
         field,
         schema: this.schema,
-        applyArgPlan() {
-          // TODO: do more!
-        },
-        evaluateArgPlan(argName) {
-          // TODO: do more!
-          const $arg = trackedArguments[argName];
-          return $arg;
-        },
+        applyArgPlan,
+        evaluateArgPlan,
       }),
     );
     assertExecutablePlan(plan, pathIdentity);
 
     // NOTE: don't need to worry about tracking groupId when planning
     // arguments as they're guaranteed to be identical across all selections.
-    wgs(() =>
-      this.planFieldArguments(
-        objectType,
-        field,
-        fieldNode,
-        trackedArguments,
-        parentPlan,
-        plan,
-      ),
-    );
+    wgs(() => {
+      // Arguments are applied in the order that they are specified in the
+      // schema, NOT the order that they are specified in the request.
+      for (let i = 0, l = field.args.length; i < l; i++) {
+        const argSpec = field.args[i];
+        const argName = argSpec.name;
+        if (plannedArgs.includes(argName)) {
+          // Already handled
+          continue;
+        }
+
+        const prefix = `${argName}.`;
+        if (plannedArgs.some((a) => a.startsWith(prefix))) {
+          // Need to scan through for unhandled stuff
+          const process = (
+            spec: GraphQLArgument | GraphQLInputField,
+            path: readonly string[],
+          ) => {
+            const type = getNullableType(spec.type);
+            if (!isInputObjectType(type)) {
+              throw new Error(
+                "GraphileInternalError<81cae96e-4924-4dc5-a6ae-7946d9843427>: This should be impossible.",
+              );
+            }
+            const fields = type.getFields();
+            for (const fieldName of Object.keys(fields)) {
+              const newPath = [...path, fieldName];
+              if (plannedArgs.includes(newPath.join("."))) {
+                // handled
+                continue;
+              }
+              const newPrefix = `${newPath.join(".")}.`;
+              if (plannedArgs.some((a) => a.startsWith(newPrefix))) {
+                // go deeper
+                process(fields[fieldName], newPath);
+              } else {
+                applyArgPlan(newPath, plan, true);
+              }
+            }
+          };
+          process(argSpec, [argName]);
+        } else {
+          // User didn't explicitly call, so auto-handle
+          applyArgPlan(argName, plan, true);
+        }
+      }
+    });
 
     // TODO: Check SameStreamDirective still exists in @stream spec at release.
     /*

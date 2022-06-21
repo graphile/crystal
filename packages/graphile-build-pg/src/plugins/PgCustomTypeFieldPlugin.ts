@@ -23,6 +23,7 @@ import type {
   TrackedArguments,
   FieldPlanResolver,
 } from "dataplanner";
+import { aether } from "dataplanner";
 import {
   __ListTransformPlan,
   connection,
@@ -31,7 +32,7 @@ import {
   ObjectPlan,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLOutputType } from "graphql";
+import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -148,7 +149,8 @@ function getArgDetailsFromParameters(
     const inputType =
       param.notNull && param.required ? new GraphQLNonNull(listType) : listType;
     return {
-      argName,
+      graphqlArgName: argName,
+      postgresArgName: param.name,
       pgCodec: param.codec,
       inputType,
       required: param.required,
@@ -320,8 +322,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                 // Not used for isMutation; that's handled elsewhere
                 const fields = argDetails.reduce(
-                  (memo, { inputType, argName }) => {
-                    memo[argName] = {
+                  (memo, { inputType, graphqlArgName }) => {
+                    memo[graphqlArgName] = {
                       type: inputType,
                     };
                     return memo;
@@ -556,19 +558,80 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               );
 
               // Not used for isMutation; that's handled elsewhere
-              const args = argDetails.reduce((memo, { inputType, argName }) => {
-                memo[argName] = {
-                  type: inputType,
-                };
-                return memo;
-              }, {});
+              const args = argDetails.reduce(
+                (memo, { inputType, graphqlArgName }) => {
+                  memo[graphqlArgName] = {
+                    type: inputType,
+                  };
+                  return memo;
+                },
+                {},
+              );
 
               const argDetailsSimple = argDetails.map(
-                ({ argName, pgCodec, required }) => ({
-                  argName,
+                ({ graphqlArgName, pgCodec, required, postgresArgName }) => ({
+                  graphqlArgName,
+                  postgresArgName,
                   pgCodec,
                   required,
                 }),
+              );
+
+              const makeArgs = EXPORTABLE(
+                (argDetailsSimple) =>
+                  (
+                    info: {
+                      evaluateArgPlan: (
+                        path: string | string[],
+                      ) => ExecutablePlan | undefined;
+                    },
+                    path: string[] = [],
+                  ) => {
+                    const { evaluateArgPlan } = info;
+                    const selectArgs: PgSelectArgumentSpec[] = [];
+
+                    let skipped = false;
+                    for (const {
+                      graphqlArgName,
+                      postgresArgName,
+                      pgCodec,
+                      required,
+                    } of argDetailsSimple) {
+                      let plan = evaluateArgPlan([...path, graphqlArgName]);
+                      if (plan === undefined) {
+                        if (!required) {
+                          skipped = true;
+                          continue;
+                        } else {
+                          plan = constant(null);
+                        }
+                      }
+
+                      if (skipped) {
+                        const name = postgresArgName;
+                        if (!name) {
+                          // TODO: we should handle this above and not skip arguments
+                          // if there are additional parameters that are unnamed.
+                          throw new Error(
+                            "Cannot skip arguments when parameters are unnamed",
+                          );
+                        }
+                        selectArgs.push({
+                          plan,
+                          pgCodec,
+                          name,
+                        });
+                      } else {
+                        selectArgs.push({
+                          plan,
+                          pgCodec,
+                        });
+                      }
+                    }
+
+                    return selectArgs;
+                  },
+                [argDetailsSimple],
               );
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<
@@ -578,85 +641,36 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               > = isRootQuery
                 ? // Not computed
                   EXPORTABLE(
-                    (aether, argDetailsSimple, isNotNullish, source) =>
-                      ($root, args) => {
-                        const selectArgs: PgSelectArgumentSpec[] = [
-                          ...argDetailsSimple
-                            .map(({ argName, pgCodec, required }) => {
-                              const plan = args[argName];
-                              if (!required && plan.evalIs(undefined)) {
-                                return null;
-                              }
-                              return { plan, pgCodec };
-                            })
-                            .filter(isNotNullish),
-                        ];
-                        return source.execute(selectArgs);
-                      },
-                    [argDetailsSimple, isNotNullish, source],
+                    (source) => ($root, args, info) => {
+                      const selectArgs = makeArgs(info);
+                      return source.execute(selectArgs);
+                    },
+                    [source],
                   )
                 : isRootMutation
                 ? // Mutation uses 'args.input' rather than 'args'
                   EXPORTABLE(
-                    (
-                        argDetailsSimple,
-                        constant,
-                        isNotNullish,
-                        object,
-                        source,
-                      ) =>
-                      ($root, args) => {
-                        const selectArgs: PgSelectArgumentSpec[] = [
-                          ...argDetailsSimple
-                            .map(({ argName, pgCodec, required }) => {
-                              const plan = (
-                                args.input as
-                                  | __TrackedObjectPlan
-                                  | __InputObjectPlan
-                              ).get(argName);
-                              if (!required && plan.evalIs(undefined)) {
-                                return null;
-                              }
-                              return {
-                                plan: plan ?? constant(undefined),
-                                pgCodec,
-                              };
-                            })
-                            .filter(isNotNullish),
-                        ];
-                        const $result = source.execute(selectArgs);
-                        return object({
-                          result: $result,
-                        });
-                      },
-                    [argDetailsSimple, constant, isNotNullish, object, source],
+                    (object, source) => ($root, args, info) => {
+                      const selectArgs = makeArgs(info, ["input"]);
+                      const $result = source.execute(selectArgs);
+                      return object({
+                        result: $result,
+                      });
+                    },
+                    [object, source],
                   )
                 : // Otherwise computed:
                   EXPORTABLE(
-                    (
-                        PgSelectSinglePlan,
-                        argDetailsSimple,
-                        isNotNullish,
-                        pgClassExpression,
-                        source,
-                      ) =>
-                      ($row, args) => {
+                    (PgSelectSinglePlan, pgClassExpression, source) =>
+                      ($row, args, info) => {
                         if (!($row instanceof PgSelectSinglePlan)) {
                           throw new Error(
                             `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,
                           );
                         }
-                        const selectArgs: PgSelectArgumentSpec[] = [
+                        const selectArgs = [
                           { plan: $row.record() },
-                          ...argDetailsSimple
-                            .map(({ argName, pgCodec, required }) => {
-                              const plan = args[argName];
-                              if (!required && plan.evalIs(undefined)) {
-                                return null;
-                              }
-                              return { plan, pgCodec };
-                            })
-                            .filter(isNotNullish),
+                          ...makeArgs(info),
                         ];
                         if (
                           source.isUnique &&
@@ -683,13 +697,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         // TODO: or here, if scalar add select to `$row`?
                         return source.execute(selectArgs);
                       },
-                    [
-                      PgSelectSinglePlan,
-                      argDetailsSimple,
-                      isNotNullish,
-                      pgClassExpression,
-                      source,
-                    ],
+                    [PgSelectSinglePlan, pgClassExpression, source],
                   );
 
               if (isRootMutation) {
@@ -820,11 +828,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                   function plan(
                                     $parent: ExecutablePlan,
                                     args: TrackedArguments<any>,
+                                    info,
                                   ) {
                                     const $select =
                                       getSelectPlanFromParentAndArgs(
                                         $parent,
                                         args,
+                                        info,
                                       ) as PgSelectPlan<any, any, any, any>;
                                     return connection(
                                       $select,
