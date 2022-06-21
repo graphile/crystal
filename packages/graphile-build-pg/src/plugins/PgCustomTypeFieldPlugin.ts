@@ -22,6 +22,7 @@ import type {
   InputPlan,
   TrackedArguments,
   FieldPlanResolver,
+  GraphileFieldConfigArgumentMap,
 } from "dataplanner";
 import { aether } from "dataplanner";
 import {
@@ -565,7 +566,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   };
                   return memo;
                 },
-                {},
+                {} as GraphileFieldConfigArgumentMap<any, any, any, any>,
               );
 
               const argDetailsSimple = argDetails.map(
