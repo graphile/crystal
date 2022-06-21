@@ -10,8 +10,6 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
-    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
-    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
     __InputStaticLeaf11["__InputStaticLeaf[11∈0]"]:::plan
     Access29["Access[29∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access30["Access[30∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
@@ -49,8 +47,6 @@ graph TD
     PgClassExpression75["PgClassExpression[75∈1]<br />ᐸ__person__.”config”ᐳ"]:::plan
     PgClassExpression76["PgClassExpression[76∈1]<br />ᐸ__person__...n_from_ip”ᐳ"]:::plan
     __InputStaticLeaf77["__InputStaticLeaf[77∈0]"]:::plan
-    __InputStaticLeaf78["__InputStaticLeaf[78∈0]"]:::plan
-    __InputStaticLeaf79["__InputStaticLeaf[79∈0]"]:::plan
     __InputStaticLeaf81["__InputStaticLeaf[81∈0]"]:::plan
     Lambda103["Lambda[103∈0]<br />ᐸparseCursorᐳ"]:::plan
     Connection102["Connection[102∈0]<br />ᐸ98ᐳ"]:::plan
@@ -90,7 +86,7 @@ graph TD
     __Value3 --> Access30
     Access29 & Access30 --> Object31
     __InputStaticLeaf11 --> Lambda33
-    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 & Lambda33 --> Connection32
+    __InputStaticLeaf7 & Lambda33 --> Connection32
     Lambda33 --> PgValidateParsedCursor39
     Lambda33 --> Access40
     Access40 --> ToPg41
@@ -120,7 +116,7 @@ graph TD
     PgSelectSingle68 --> PgClassExpression75
     PgSelectSingle68 --> PgClassExpression76
     __InputStaticLeaf81 --> Lambda103
-    __InputStaticLeaf77 & __InputStaticLeaf78 & __InputStaticLeaf79 & Lambda103 --> Connection102
+    __InputStaticLeaf77 & Lambda103 --> Connection102
     Lambda103 --> PgValidateParsedCursor109
     Lambda103 --> Access110
     Access110 --> ToPg111
@@ -217,7 +213,7 @@ graph TD
     subgraph "Buckets for queries/v4/connections-blankcursor"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀blankCursor ᐸ-O- 32<br />⠀⠀⠀blankCursor.pageInfo ᐸ-O- 34<br />⠀⠀⠀⠀blankCursor.pageInfo.startCursor ᐸ-L- 38<br />⠀⠀⠀⠀blankCursor.pageInfo.endCursor ᐸ-L- 47<br />⠀⠀⠀⠀blankCursor.pageInfo.hasNextPage ᐸ-L- 54<br />⠀⠀⠀⠀blankCursor.pageInfo.hasPreviousPage ᐸ-L- 58<br />⠀⠀⠀blankCursor.edges ᐸ-A- 35<br />⠀⠀⠀blankCursor.totalCount ᐸ-L- 62<br />⠀⠀invalidCursor ᐸ-O- 102<br />⠀⠀⠀invalidCursor.pageInfo ᐸ-O- 104<br />⠀⠀⠀⠀invalidCursor.pageInfo.startCursor ᐸ-L- 108<br />⠀⠀⠀⠀invalidCursor.pageInfo.endCursor ᐸ-L- 117<br />⠀⠀⠀⠀invalidCursor.pageInfo.hasNextPage ᐸ-L- 124<br />⠀⠀⠀⠀invalidCursor.pageInfo.hasPreviousPage ᐸ-L- 128<br />⠀⠀⠀invalidCursor.edges ᐸ-A- 105<br />⠀⠀⠀invalidCursor.totalCount ᐸ-L- 132"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf11,Access29,Access30,Object31,Connection32,Lambda33,PgPageInfo34,PgSelect35,First36,PgSelectSingle37,PgCursor38,PgValidateParsedCursor39,Access40,ToPg41,PgClassExpression42,List43,Last45,PgSelectSingle46,PgCursor47,PgClassExpression51,List52,Lambda54,Constant58,PgSelect59,First60,PgSelectSingle61,PgClassExpression62,__InputStaticLeaf77,__InputStaticLeaf78,__InputStaticLeaf79,__InputStaticLeaf81,Connection102,Lambda103,PgPageInfo104,PgSelect105,First106,PgSelectSingle107,PgCursor108,PgValidateParsedCursor109,Access110,ToPg111,PgClassExpression112,List113,Last115,PgSelectSingle116,PgCursor117,PgClassExpression121,List122,Lambda124,Constant128,PgSelect129,First130,PgSelectSingle131,PgClassExpression132 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf11,Access29,Access30,Object31,Connection32,Lambda33,PgPageInfo34,PgSelect35,First36,PgSelectSingle37,PgCursor38,PgValidateParsedCursor39,Access40,ToPg41,PgClassExpression42,List43,Last45,PgSelectSingle46,PgCursor47,PgClassExpression51,List52,Lambda54,Constant58,PgSelect59,First60,PgSelectSingle61,PgClassExpression62,__InputStaticLeaf77,__InputStaticLeaf81,Connection102,Lambda103,PgPageInfo104,PgSelect105,First106,PgSelectSingle107,PgCursor108,PgValidateParsedCursor109,Access110,ToPg111,PgClassExpression112,List113,Last115,PgSelectSingle116,PgCursor117,PgClassExpression121,List122,Lambda124,Constant128,PgSelect129,First130,PgSelectSingle131,PgClassExpression132 bucket0
     Bucket1("Bucket 1 (item67)<br />Deps: 35<br />~ᐳQuery.blankCursorᐳPeopleConnection.edges[]<br />⠀ROOT ᐸ-O- 68<br />⠀⠀node ᐸ-O- 68<br />⠀⠀⠀node.id ᐸ-L- 70<br />⠀⠀⠀node.name ᐸ-L- 73<br />⠀⠀⠀node.email ᐸ-L- 74<br />⠀⠀⠀node.config ᐸ-L- 75<br />⠀⠀⠀node.lastLoginFromIp ᐸ-L- 76<br />⠀⠀cursor ᐸ-L- 69"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item67,PgSelectSingle68,PgCursor69,PgClassExpression70,List71,PgClassExpression73,PgClassExpression74,PgClassExpression75,PgClassExpression76 bucket1

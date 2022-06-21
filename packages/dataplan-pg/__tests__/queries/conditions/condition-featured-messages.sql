@@ -19,9 +19,9 @@ lateral (
       on (__messages__."author_id"::"uuid" = __users__."id")
       where
         (
-          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-        ) and (
           __messages__.featured = __forums_identifiers__."id0"
+        ) and (
+          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
@@ -34,9 +34,9 @@ lateral (
       from app_public.messages as __messages__
       where
         (
-          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-        ) and (
           __messages__.featured = __forums_identifiers__."id0"
+        ) and (
+          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )

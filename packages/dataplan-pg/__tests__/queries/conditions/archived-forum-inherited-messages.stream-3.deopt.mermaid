@@ -16,8 +16,6 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    __InputStaticLeaf24["__InputStaticLeaf[24∈0]"]:::plan
-    __InputStaticLeaf25["__InputStaticLeaf[25∈0]"]:::plan
     PgClassExpression33["PgClassExpression[33∈2@1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
     Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
     PgClassExpression39["PgClassExpression[39∈2@1]<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
@@ -41,7 +39,6 @@ graph TD
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression33
-    __InputStaticLeaf24 & __InputStaticLeaf25 --> Connection38
     PgSelectSingle22 --> PgClassExpression39
     Object48 & PgClassExpression33 & PgClassExpression39 & Connection38 --> PgSelect40
     PgSelect40 ==> __Item41
@@ -81,7 +78,7 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.stream-3"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf24,__InputStaticLeaf25,Connection38,Access46,Access47,Object48 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,Connection38,Access46,Access47,Object48 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 48, 38<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23 bucket1

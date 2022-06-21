@@ -9,9 +9,6 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
-    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
-    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
     Access21["Access[21∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access22["Access[22∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object23["Object[23∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
@@ -23,9 +20,6 @@ graph TD
     PgClassExpression29["PgClassExpression[29∈1]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
     PgClassExpression30["PgClassExpression[30∈1]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
     PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf32["__InputStaticLeaf[32∈0]"]:::plan
-    __InputStaticLeaf33["__InputStaticLeaf[33∈0]"]:::plan
-    __InputStaticLeaf34["__InputStaticLeaf[34∈0]"]:::plan
     Connection49["Connection[49∈0]<br />ᐸ45ᐳ"]:::plan
     PgSelect50[["PgSelect[50∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
     __Item51>"__Item[51∈2]<br />ᐸ50ᐳ"]:::itemplan
@@ -34,9 +28,6 @@ graph TD
     PgClassExpression54["PgClassExpression[54∈2]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
     PgClassExpression55["PgClassExpression[55∈2]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
     PgClassExpression56["PgClassExpression[56∈2]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf57["__InputStaticLeaf[57∈0]"]:::plan
-    __InputStaticLeaf58["__InputStaticLeaf[58∈0]"]:::plan
-    __InputStaticLeaf59["__InputStaticLeaf[59∈0]"]:::plan
     Connection74["Connection[74∈0]<br />ᐸ70ᐳ"]:::plan
     PgSelect75[["PgSelect[75∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
     __Item76>"__Item[76∈3]<br />ᐸ75ᐳ"]:::itemplan
@@ -61,9 +52,6 @@ graph TD
     PgClassExpression101["PgClassExpression[101∈0]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
     PgClassExpression102["PgClassExpression[102∈0]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
     PgClassExpression103["PgClassExpression[103∈0]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf104["__InputStaticLeaf[104∈0]"]:::plan
-    __InputStaticLeaf105["__InputStaticLeaf[105∈0]"]:::plan
-    __InputStaticLeaf106["__InputStaticLeaf[106∈0]"]:::plan
     __InputStaticLeaf111["__InputStaticLeaf[111∈0]"]:::plan
     Connection121["Connection[121∈0]<br />ᐸ117ᐳ"]:::plan
     PgSelect122[["PgSelect[122∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
@@ -73,9 +61,6 @@ graph TD
     PgClassExpression126["PgClassExpression[126∈4]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
     PgClassExpression127["PgClassExpression[127∈4]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
     PgClassExpression128["PgClassExpression[128∈4]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf129["__InputStaticLeaf[129∈0]"]:::plan
-    __InputStaticLeaf130["__InputStaticLeaf[130∈0]"]:::plan
-    __InputStaticLeaf131["__InputStaticLeaf[131∈0]"]:::plan
     __InputStaticLeaf137["__InputStaticLeaf[137∈0]"]:::plan
     Connection146["Connection[146∈0]<br />ᐸ142ᐳ"]:::plan
     PgSelect147[["PgSelect[147∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
@@ -90,7 +75,6 @@ graph TD
     __Value3 --> Access21
     __Value3 --> Access22
     Access21 & Access22 --> Object23
-    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection24
     Object23 & Connection24 --> PgSelect25
     PgSelect25 ==> __Item26
     __Item26 --> PgSelectSingle27
@@ -98,7 +82,6 @@ graph TD
     PgSelectSingle27 --> PgClassExpression29
     PgSelectSingle27 --> PgClassExpression30
     PgSelectSingle27 --> PgClassExpression31
-    __InputStaticLeaf32 & __InputStaticLeaf33 & __InputStaticLeaf34 --> Connection49
     Object23 & Connection49 --> PgSelect50
     PgSelect50 ==> __Item51
     __Item51 --> PgSelectSingle52
@@ -106,7 +89,6 @@ graph TD
     PgSelectSingle52 --> PgClassExpression54
     PgSelectSingle52 --> PgClassExpression55
     PgSelectSingle52 --> PgClassExpression56
-    __InputStaticLeaf57 & __InputStaticLeaf58 & __InputStaticLeaf59 --> Connection74
     Object23 & Connection74 --> PgSelect75
     PgSelect75 ==> __Item76
     __Item76 --> PgSelectSingle77
@@ -128,7 +110,6 @@ graph TD
     PgSelectSingle99 --> PgClassExpression101
     PgSelectSingle99 --> PgClassExpression102
     PgSelectSingle99 --> PgClassExpression103
-    __InputStaticLeaf104 & __InputStaticLeaf105 & __InputStaticLeaf106 --> Connection121
     Object23 & __InputStaticLeaf111 & Connection121 --> PgSelect122
     PgSelect122 ==> __Item123
     __Item123 --> PgSelectSingle124
@@ -136,7 +117,6 @@ graph TD
     PgSelectSingle124 --> PgClassExpression126
     PgSelectSingle124 --> PgClassExpression127
     PgSelectSingle124 --> PgClassExpression128
-    __InputStaticLeaf129 & __InputStaticLeaf130 & __InputStaticLeaf131 --> Connection146
     Object23 & __InputStaticLeaf137 & Connection146 --> PgSelect147
     PgSelect147 ==> __Item148
     __Item148 --> PgSelectSingle149
@@ -242,7 +222,7 @@ graph TD
     subgraph "Buckets for queries/v4/enum_tables.queries"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀all ᐸ-O- 24<br />⠀⠀⠀all.nodes ᐸ-A- 25<br />⠀⠀reverse ᐸ-O- 49<br />⠀⠀⠀reverse.nodes ᐸ-A- 50<br />⠀⠀reverseView ᐸ-O- 74<br />⠀⠀⠀reverseView.nodes ᐸ-A- 75<br />⠀⠀b ᐸ-O- 88<br />⠀⠀⠀b.id ᐸ-L- 89<br />⠀⠀⠀b.letter ᐸ-L- 90<br />⠀⠀⠀b.letterViaView ᐸ-L- 91<br />⠀⠀⠀b.description ᐸ-L- 92<br />⠀⠀bView ᐸ-O- 99<br />⠀⠀⠀bView.id ᐸ-L- 100<br />⠀⠀⠀bView.letter ᐸ-L- 101<br />⠀⠀⠀bView.letterViaView ᐸ-L- 102<br />⠀⠀⠀bView.description ᐸ-L- 103<br />⠀⠀letterC ᐸ-O- 121<br />⠀⠀⠀letterC.nodes ᐸ-A- 122<br />⠀⠀letterCView ᐸ-O- 146<br />⠀⠀⠀letterCView.nodes ᐸ-A- 147"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,Access21,Access22,Object23,Connection24,PgSelect25,__InputStaticLeaf32,__InputStaticLeaf33,__InputStaticLeaf34,Connection49,PgSelect50,__InputStaticLeaf57,__InputStaticLeaf58,__InputStaticLeaf59,Connection74,PgSelect75,__InputStaticLeaf82,PgSelect83,First87,PgSelectSingle88,PgClassExpression89,PgClassExpression90,PgClassExpression91,PgClassExpression92,__InputStaticLeaf93,PgSelect94,First98,PgSelectSingle99,PgClassExpression100,PgClassExpression101,PgClassExpression102,PgClassExpression103,__InputStaticLeaf104,__InputStaticLeaf105,__InputStaticLeaf106,__InputStaticLeaf111,Connection121,PgSelect122,__InputStaticLeaf129,__InputStaticLeaf130,__InputStaticLeaf131,__InputStaticLeaf137,Connection146,PgSelect147 bucket0
+    class Bucket0,__Value0,__Value3,Access21,Access22,Object23,Connection24,PgSelect25,Connection49,PgSelect50,Connection74,PgSelect75,__InputStaticLeaf82,PgSelect83,First87,PgSelectSingle88,PgClassExpression89,PgClassExpression90,PgClassExpression91,PgClassExpression92,__InputStaticLeaf93,PgSelect94,First98,PgSelectSingle99,PgClassExpression100,PgClassExpression101,PgClassExpression102,PgClassExpression103,__InputStaticLeaf111,Connection121,PgSelect122,__InputStaticLeaf137,Connection146,PgSelect147 bucket0
     Bucket1("Bucket 1 (item26)<br />Deps: 25<br />~ᐳQuery.allᐳLetterDescriptionsConnection.nodes[]<br />⠀ROOT ᐸ-O- 27<br />⠀⠀id ᐸ-L- 28<br />⠀⠀letter ᐸ-L- 29<br />⠀⠀letterViaView ᐸ-L- 30<br />⠀⠀description ᐸ-L- 31"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression31 bucket1

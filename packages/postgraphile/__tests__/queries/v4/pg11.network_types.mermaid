@@ -9,9 +9,6 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
-    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
-    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
     __InputStaticLeaf14["__InputStaticLeaf[14∈0]"]:::plan
     Access22["Access[22∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access23["Access[23∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
@@ -44,9 +41,6 @@ graph TD
     PgClassExpression53["PgClassExpression[53∈1]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
     PgClassExpression54["PgClassExpression[54∈1]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
     PgClassExpression55["PgClassExpression[55∈1]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
-    __InputStaticLeaf56["__InputStaticLeaf[56∈0]"]:::plan
-    __InputStaticLeaf57["__InputStaticLeaf[57∈0]"]:::plan
-    __InputStaticLeaf58["__InputStaticLeaf[58∈0]"]:::plan
     __InputStaticLeaf64["__InputStaticLeaf[64∈0]"]:::plan
     Connection74["Connection[74∈0]<br />ᐸ70ᐳ"]:::plan
     PgPageInfo75["PgPageInfo[75∈0]"]:::plan
@@ -76,9 +70,6 @@ graph TD
     PgClassExpression102["PgClassExpression[102∈2]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
     PgClassExpression103["PgClassExpression[103∈2]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
     PgClassExpression104["PgClassExpression[104∈2]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
-    __InputStaticLeaf105["__InputStaticLeaf[105∈0]"]:::plan
-    __InputStaticLeaf106["__InputStaticLeaf[106∈0]"]:::plan
-    __InputStaticLeaf107["__InputStaticLeaf[107∈0]"]:::plan
     __InputStaticLeaf114["__InputStaticLeaf[114∈0]"]:::plan
     Connection123["Connection[123∈0]<br />ᐸ119ᐳ"]:::plan
     PgPageInfo124["PgPageInfo[124∈0]"]:::plan
@@ -108,9 +99,6 @@ graph TD
     PgClassExpression151["PgClassExpression[151∈3]<br />ᐸ__network__.”cidr”ᐳ"]:::plan
     PgClassExpression152["PgClassExpression[152∈3]<br />ᐸ__network__.”macaddr”ᐳ"]:::plan
     PgClassExpression153["PgClassExpression[153∈3]<br />ᐸ__network__.”macaddr8”ᐳ"]:::plan
-    __InputStaticLeaf154["__InputStaticLeaf[154∈0]"]:::plan
-    __InputStaticLeaf155["__InputStaticLeaf[155∈0]"]:::plan
-    __InputStaticLeaf156["__InputStaticLeaf[156∈0]"]:::plan
     __InputStaticLeaf164["__InputStaticLeaf[164∈0]"]:::plan
     Connection172["Connection[172∈0]<br />ᐸ168ᐳ"]:::plan
     PgPageInfo173["PgPageInfo[173∈0]"]:::plan
@@ -145,7 +133,6 @@ graph TD
     __Value3 --> Access22
     __Value3 --> Access23
     Access22 & Access23 --> Object24
-    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection25
     Object24 & __InputStaticLeaf14 & Connection25 --> PgSelect27
     PgSelect27 --> First28
     First28 --> PgSelectSingle29
@@ -170,7 +157,6 @@ graph TD
     PgSelectSingle47 --> PgClassExpression53
     PgSelectSingle47 --> PgClassExpression54
     PgSelectSingle47 --> PgClassExpression55
-    __InputStaticLeaf56 & __InputStaticLeaf57 & __InputStaticLeaf58 --> Connection74
     Object24 & __InputStaticLeaf64 & Connection74 --> PgSelect76
     PgSelect76 --> First77
     First77 --> PgSelectSingle78
@@ -195,7 +181,6 @@ graph TD
     PgSelectSingle96 --> PgClassExpression102
     PgSelectSingle96 --> PgClassExpression103
     PgSelectSingle96 --> PgClassExpression104
-    __InputStaticLeaf105 & __InputStaticLeaf106 & __InputStaticLeaf107 --> Connection123
     Object24 & __InputStaticLeaf114 & Connection123 --> PgSelect125
     PgSelect125 --> First126
     First126 --> PgSelectSingle127
@@ -220,7 +205,6 @@ graph TD
     PgSelectSingle145 --> PgClassExpression151
     PgSelectSingle145 --> PgClassExpression152
     PgSelectSingle145 --> PgClassExpression153
-    __InputStaticLeaf154 & __InputStaticLeaf155 & __InputStaticLeaf156 --> Connection172
     Object24 & __InputStaticLeaf164 & Connection172 --> PgSelect174
     PgSelect174 --> First175
     First175 --> PgSelectSingle176
@@ -373,7 +357,7 @@ graph TD
     subgraph "Buckets for queries/v4/pg11.network_types"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀inetTest ᐸ-O- 25<br />⠀⠀⠀inetTest.pageInfo ᐸ-O- 26<br />⠀⠀⠀⠀inetTest.pageInfo.startCursor ᐸ-L- 30<br />⠀⠀⠀⠀inetTest.pageInfo.endCursor ᐸ-L- 36<br />⠀⠀⠀⠀inetTest.pageInfo.hasNextPage ᐸ-L- 39<br />⠀⠀⠀⠀inetTest.pageInfo.hasPreviousPage ᐸ-L- 40<br />⠀⠀⠀inetTest.edges ᐸ-A- 27<br />⠀⠀⠀inetTest.totalCount ᐸ-L- 44<br />⠀⠀cidrTest ᐸ-O- 74<br />⠀⠀⠀cidrTest.pageInfo ᐸ-O- 75<br />⠀⠀⠀⠀cidrTest.pageInfo.startCursor ᐸ-L- 79<br />⠀⠀⠀⠀cidrTest.pageInfo.endCursor ᐸ-L- 85<br />⠀⠀⠀⠀cidrTest.pageInfo.hasNextPage ᐸ-L- 88<br />⠀⠀⠀⠀cidrTest.pageInfo.hasPreviousPage ᐸ-L- 89<br />⠀⠀⠀cidrTest.edges ᐸ-A- 76<br />⠀⠀⠀cidrTest.totalCount ᐸ-L- 93<br />⠀⠀macaddrTest ᐸ-O- 123<br />⠀⠀⠀macaddrTest.pageInfo ᐸ-O- 124<br />⠀⠀⠀⠀macaddrTest.pageInfo.startCursor ᐸ-L- 128<br />⠀⠀⠀⠀macaddrTest.pageInfo.endCursor ᐸ-L- 134<br />⠀⠀⠀⠀macaddrTest.pageInfo.hasNextPage ᐸ-L- 137<br />⠀⠀⠀⠀macaddrTest.pageInfo.hasPreviousPage ᐸ-L- 138<br />⠀⠀⠀macaddrTest.edges ᐸ-A- 125<br />⠀⠀⠀macaddrTest.totalCount ᐸ-L- 142<br />⠀⠀macaddr8Test ᐸ-O- 172<br />⠀⠀⠀macaddr8Test.pageInfo ᐸ-O- 173<br />⠀⠀⠀⠀macaddr8Test.pageInfo.startCursor ᐸ-L- 177<br />⠀⠀⠀⠀macaddr8Test.pageInfo.endCursor ᐸ-L- 183<br />⠀⠀⠀⠀macaddr8Test.pageInfo.hasNextPage ᐸ-L- 186<br />⠀⠀⠀⠀macaddr8Test.pageInfo.hasPreviousPage ᐸ-L- 187<br />⠀⠀⠀macaddr8Test.edges ᐸ-A- 174<br />⠀⠀⠀macaddr8Test.totalCount ᐸ-L- 191"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf14,Access22,Access23,Object24,Connection25,PgPageInfo26,PgSelect27,First28,PgSelectSingle29,PgCursor30,PgClassExpression31,List32,Last34,PgSelectSingle35,PgCursor36,PgClassExpression37,List38,Constant39,Constant40,PgSelect41,First42,PgSelectSingle43,PgClassExpression44,__InputStaticLeaf56,__InputStaticLeaf57,__InputStaticLeaf58,__InputStaticLeaf64,Connection74,PgPageInfo75,PgSelect76,First77,PgSelectSingle78,PgCursor79,PgClassExpression80,List81,Last83,PgSelectSingle84,PgCursor85,PgClassExpression86,List87,Constant88,Constant89,PgSelect90,First91,PgSelectSingle92,PgClassExpression93,__InputStaticLeaf105,__InputStaticLeaf106,__InputStaticLeaf107,__InputStaticLeaf114,Connection123,PgPageInfo124,PgSelect125,First126,PgSelectSingle127,PgCursor128,PgClassExpression129,List130,Last132,PgSelectSingle133,PgCursor134,PgClassExpression135,List136,Constant137,Constant138,PgSelect139,First140,PgSelectSingle141,PgClassExpression142,__InputStaticLeaf154,__InputStaticLeaf155,__InputStaticLeaf156,__InputStaticLeaf164,Connection172,PgPageInfo173,PgSelect174,First175,PgSelectSingle176,PgCursor177,PgClassExpression178,List179,Last181,PgSelectSingle182,PgCursor183,PgClassExpression184,List185,Constant186,Constant187,PgSelect188,First189,PgSelectSingle190,PgClassExpression191 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf14,Access22,Access23,Object24,Connection25,PgPageInfo26,PgSelect27,First28,PgSelectSingle29,PgCursor30,PgClassExpression31,List32,Last34,PgSelectSingle35,PgCursor36,PgClassExpression37,List38,Constant39,Constant40,PgSelect41,First42,PgSelectSingle43,PgClassExpression44,__InputStaticLeaf64,Connection74,PgPageInfo75,PgSelect76,First77,PgSelectSingle78,PgCursor79,PgClassExpression80,List81,Last83,PgSelectSingle84,PgCursor85,PgClassExpression86,List87,Constant88,Constant89,PgSelect90,First91,PgSelectSingle92,PgClassExpression93,__InputStaticLeaf114,Connection123,PgPageInfo124,PgSelect125,First126,PgSelectSingle127,PgCursor128,PgClassExpression129,List130,Last132,PgSelectSingle133,PgCursor134,PgClassExpression135,List136,Constant137,Constant138,PgSelect139,First140,PgSelectSingle141,PgClassExpression142,__InputStaticLeaf164,Connection172,PgPageInfo173,PgSelect174,First175,PgSelectSingle176,PgCursor177,PgClassExpression178,List179,Last181,PgSelectSingle182,PgCursor183,PgClassExpression184,List185,Constant186,Constant187,PgSelect188,First189,PgSelectSingle190,PgClassExpression191 bucket0
     Bucket1("Bucket 1 (item46)<br />Deps: 27<br />~ᐳQuery.inetTestᐳNetworksConnection.edges[]<br />⠀ROOT ᐸ-O- 47<br />⠀⠀node ᐸ-O- 47<br />⠀⠀⠀node.id ᐸ-L- 49<br />⠀⠀⠀node.inet ᐸ-L- 52<br />⠀⠀⠀node.cidr ᐸ-L- 53<br />⠀⠀⠀node.macaddr ᐸ-L- 54<br />⠀⠀⠀node.macaddr8 ᐸ-L- 55<br />⠀⠀cursor ᐸ-L- 48"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item46,PgSelectSingle47,PgCursor48,PgClassExpression49,List50,PgClassExpression52,PgClassExpression53,PgClassExpression54,PgClassExpression55 bucket1

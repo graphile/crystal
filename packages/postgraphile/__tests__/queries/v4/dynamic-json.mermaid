@@ -72,9 +72,6 @@ graph TD
     First100["First[100∈0]"]:::plan
     PgSelectSingle101["PgSelectSingle[101∈0]<br />ᐸjsonb_identityᐳ"]:::plan
     PgClassExpression102["PgClassExpression[102∈0]<br />ᐸ__jsonb_identity__.vᐳ"]:::plan
-    __InputStaticLeaf103["__InputStaticLeaf[103∈0]"]:::plan
-    __InputStaticLeaf104["__InputStaticLeaf[104∈0]"]:::plan
-    __InputStaticLeaf105["__InputStaticLeaf[105∈0]"]:::plan
     Connection280["Connection[280∈0]<br />ᐸ276ᐳ"]:::plan
     PgSelect281[["PgSelect[281∈0]<br />ᐸtypesᐳ"]]:::plan
     __Item282>"__Item[282∈1]<br />ᐸ281ᐳ"]:::itemplan
@@ -134,7 +131,6 @@ graph TD
     PgSelect96 --> First100
     First100 --> PgSelectSingle101
     PgSelectSingle101 --> PgClassExpression102
-    __InputStaticLeaf103 & __InputStaticLeaf104 & __InputStaticLeaf105 --> Connection280
     Object11 & Connection280 --> PgSelect281
     PgSelect281 ==> __Item282
     __Item282 --> PgSelectSingle283
@@ -182,7 +178,7 @@ graph TD
     subgraph "Buckets for queries/v4/dynamic-json"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-L- 14<br />⠀⠀b ᐸ-L- 22<br />⠀⠀c ᐸ-L- 30<br />⠀⠀d ᐸ-L- 38<br />⠀⠀e ᐸ-L- 46<br />⠀⠀f ᐸ-L- 54<br />⠀⠀g ᐸ-L- 62<br />⠀⠀h ᐸ-L- 70<br />⠀⠀i ᐸ-L- 78<br />⠀⠀j ᐸ-L- 86<br />⠀⠀k ᐸ-L- 94<br />⠀⠀l ᐸ-L- 102<br />⠀⠀allTypes ᐸ-O- 280<br />⠀⠀⠀allTypes.nodes ᐸ-A- 281"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,__InputStaticLeaf15,PgSelect16,First20,PgSelectSingle21,PgClassExpression22,__InputStaticLeaf23,PgSelect24,First28,PgSelectSingle29,PgClassExpression30,__InputStaticLeaf31,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,__InputStaticLeaf39,PgSelect40,First44,PgSelectSingle45,PgClassExpression46,__InputDynamicScalar47,PgSelect48,First52,PgSelectSingle53,PgClassExpression54,__InputDynamicScalar55,PgSelect56,First60,PgSelectSingle61,PgClassExpression62,__InputDynamicScalar63,PgSelect64,First68,PgSelectSingle69,PgClassExpression70,__InputDynamicScalar71,PgSelect72,First76,PgSelectSingle77,PgClassExpression78,__InputDynamicScalar79,PgSelect80,First84,PgSelectSingle85,PgClassExpression86,__InputDynamicScalar87,PgSelect88,First92,PgSelectSingle93,PgClassExpression94,__InputDynamicScalar95,PgSelect96,First100,PgSelectSingle101,PgClassExpression102,__InputStaticLeaf103,__InputStaticLeaf104,__InputStaticLeaf105,Connection280,PgSelect281 bucket0
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,__InputStaticLeaf15,PgSelect16,First20,PgSelectSingle21,PgClassExpression22,__InputStaticLeaf23,PgSelect24,First28,PgSelectSingle29,PgClassExpression30,__InputStaticLeaf31,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,__InputStaticLeaf39,PgSelect40,First44,PgSelectSingle45,PgClassExpression46,__InputDynamicScalar47,PgSelect48,First52,PgSelectSingle53,PgClassExpression54,__InputDynamicScalar55,PgSelect56,First60,PgSelectSingle61,PgClassExpression62,__InputDynamicScalar63,PgSelect64,First68,PgSelectSingle69,PgClassExpression70,__InputDynamicScalar71,PgSelect72,First76,PgSelectSingle77,PgClassExpression78,__InputDynamicScalar79,PgSelect80,First84,PgSelectSingle85,PgClassExpression86,__InputDynamicScalar87,PgSelect88,First92,PgSelectSingle93,PgClassExpression94,__InputDynamicScalar95,PgSelect96,First100,PgSelectSingle101,PgClassExpression102,Connection280,PgSelect281 bucket0
     Bucket1("Bucket 1 (item282)<br />Deps: 281<br />~ᐳQuery.allTypesᐳTypesConnection.nodes[]<br />⠀ROOT ᐸ-O- 283<br />⠀⠀json ᐸ-L- 284<br />⠀⠀jsonb ᐸ-L- 285"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item282,PgSelectSingle283,PgClassExpression284,PgClassExpression285 bucket1

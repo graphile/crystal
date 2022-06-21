@@ -9,9 +9,6 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
-    __InputStaticLeaf8["__InputStaticLeaf[8∈0]"]:::plan
-    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
     Access95["Access[95∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access96["Access[96∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object97["Object[97∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
@@ -39,9 +36,6 @@ graph TD
     PgClassExpression69["PgClassExpression[69∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression70["PgClassExpression[70∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression72["PgClassExpression[72∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    __InputStaticLeaf73["__InputStaticLeaf[73∈0]"]:::plan
-    __InputStaticLeaf74["__InputStaticLeaf[74∈0]"]:::plan
-    __InputStaticLeaf75["__InputStaticLeaf[75∈0]"]:::plan
     Connection98["Connection[98∈0]<br />ᐸ94ᐳ"]:::plan
     Access124["Access[124∈1]<br />ᐸ126.8ᐳ"]:::plan
     __ListTransform100["__ListTransform[100∈1]<br />ᐸeach:99ᐳ"]:::plan
@@ -67,7 +61,6 @@ graph TD
     __Value3 --> Access95
     __Value3 --> Access96
     Access95 & Access96 --> Object97
-    __InputStaticLeaf7 & __InputStaticLeaf8 & __InputStaticLeaf9 --> Connection25
     Object97 & Connection25 --> PgSelect26
     PgSelect26 ==> __Item27
     __Item27 --> PgSelectSingle28
@@ -91,7 +84,6 @@ graph TD
     PgSelectSingle68 --> PgClassExpression69
     PgSelectSingle68 --> PgClassExpression70
     PgSelectSingle68 --> PgClassExpression72
-    __InputStaticLeaf73 & __InputStaticLeaf74 & __InputStaticLeaf75 --> Connection98
     Map126 --> Access124
     Access124 --> __ListTransform100
     PgSelectSingle102 -.-> __ListTransform100
@@ -177,7 +169,7 @@ graph TD
     subgraph "Buckets for queries/v4/posts"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPosts ᐸ-O- 25<br />⠀⠀⠀allPosts.edges ᐸ-A- 26"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,__InputStaticLeaf8,__InputStaticLeaf9,Connection25,PgSelect26,__InputStaticLeaf73,__InputStaticLeaf74,__InputStaticLeaf75,Access95,Access96,Object97,Connection98,PgPageInfo113 bucket0
+    class Bucket0,__Value0,__Value3,Connection25,PgSelect26,Access95,Access96,Object97,Connection98,PgPageInfo113 bucket0
     Bucket1("Bucket 1 (item27)<br />Deps: 26, 98, 113<br />~ᐳQuery.allPostsᐳPostsConnection.edges[]<br />⠀ROOT ᐸ-O- 28<br />⠀⠀node ᐸ-O- 28<br />⠀⠀⠀node.id ᐸ-L- 30<br />⠀⠀⠀node.headline ᐸ-L- 33<br />⠀⠀⠀node.headlineTrimmed ᐸ-L- 37<br />⠀⠀⠀node.author ᐸ-O- 44<br />⠀⠀⠀⠀node.author.id ᐸ-L- 45<br />⠀⠀⠀⠀node.author.name ᐸ-L- 46<br />⠀⠀⠀⠀node.author.firstName ᐸ-L- 48<br />⠀⠀⠀⠀node.author.firstPost ᐸ-O- 55<br />⠀⠀⠀⠀⠀node.author.firstPost.id ᐸ-L- 56<br />⠀⠀⠀⠀⠀node.author.firstPost.headline ᐸ-L- 57<br />⠀⠀⠀⠀⠀node.author.firstPost.headlineTrimmed ᐸ-L- 61<br />⠀⠀⠀⠀⠀node.author.firstPost.author ᐸ-O- 68<br />⠀⠀⠀⠀⠀⠀node.author.firstPost.author.id ᐸ-L- 69<br />⠀⠀⠀⠀⠀⠀node.author.firstPost.author.name ᐸ-L- 70<br />⠀⠀⠀⠀⠀⠀node.author.firstPost.author.firstName ᐸ-L- 72<br />⠀⠀⠀⠀node.author.friends ᐸ-O- 98<br />⠀⠀⠀⠀⠀node.author.friends.nodes ᐸ-A- 100<br />⠀⠀⠀⠀⠀node.author.friends.totalCount ᐸ-L- 112<br />⠀⠀⠀⠀⠀node.author.friends.pageInfo ᐸ-O- 113<br />⠀⠀⠀⠀⠀⠀node.author.friends.pageInfo.startCursor ᐸ-L- 117<br />⠀⠀cursor ᐸ-L- 29"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item27,PgSelectSingle28,PgCursor29,PgClassExpression30,List31,PgClassExpression33,PgClassExpression37,PgSelectSingle44,PgClassExpression45,PgClassExpression46,PgClassExpression48,PgSelectSingle55,PgClassExpression56,PgClassExpression57,PgClassExpression61,PgSelectSingle68,PgClassExpression69,PgClassExpression70,PgClassExpression72,__ListTransform100,First110,PgSelectSingle111,PgClassExpression112,First115,PgSelectSingle116,PgCursor117,PgClassExpression118,List119,Map120,Map122,Access124,Access125,Map126 bucket1
