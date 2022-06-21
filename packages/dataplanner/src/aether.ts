@@ -1457,6 +1457,7 @@ export class Aether<
         fieldSpec,
       );
       this.subscriptionPlanId = subscribePlan.id;
+      const oldPlansLength = this.planCount;
 
       // TODO: this is a LIE! This should be `ROOT_PATH + "[]"` but that breaks
       // everything... We've worked around it elsewhere, but maybe all path
@@ -1468,7 +1469,7 @@ export class Aether<
         () => subscribePlan.itemPlan(this.itemPlanFor(subscribePlan)),
       );
       this.subscriptionItemPlanId = streamItemPlan.id;
-      this.finalizeArgumentsSince(0, ROOT_PATH);
+      this.finalizeArgumentsSince(oldPlansLength, ROOT_PATH);
       const { fieldDigests } = this.planSelectionSet(
         nestedParentPathIdentity,
         nestedParentPathIdentity,
@@ -1739,7 +1740,6 @@ export class Aether<
       let plan: ExecutablePlan | PolymorphicPlan;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
-        const oldPlansLength = this.planCount;
         plan = this.planField(
           path,
           pathIdentity,
@@ -1749,64 +1749,6 @@ export class Aether<
           parentPlan,
           objectField,
         );
-
-        // TODO: Check SameStreamDirective still exists in @stream spec at release.
-        /*
-         * `SameStreamDirective`
-         * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
-         * ensures that every field that has `@stream` must have the same
-         * `@stream` arguments; so we can just check the first node in the
-         * merged set to see our stream options. NOTE: if this changes before
-         * release then we may need to find the stream with the largest
-         * `initialCount` to figure what to do; something like:
-         *
-         *      const streamDirective = firstField.directives?.filter(
-         *        (d) => d.name.value === "stream",
-         *      ).sort(
-         *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
-         *      )[0]
-         */
-        const streamDirective = firstField.directives?.find(
-          (d) => d.name.value === "stream",
-        );
-
-        const planOptions: PlanOptions = {
-          stream:
-            streamDirective && isStreamablePlan(plan)
-              ? {
-                  initialCount:
-                    Number(
-                      getDirectiveArg(
-                        field,
-                        "stream",
-                        "initialCount",
-                        this.trackedVariableValuesPlan,
-                      ),
-                    ) || 0,
-                }
-              : null,
-        };
-        this.planOptionsByPlan.set(plan, planOptions);
-
-        const newPlansLength = this.planCount;
-        if (debugPlanVerboseEnabled) {
-          debugPlanVerbose(
-            "Created %o new plans whilst processing %p",
-            newPlansLength - oldPlansLength,
-            pathIdentity,
-          );
-        }
-
-        this.finalizeArgumentsSince(oldPlansLength, pathIdentity, true);
-
-        // Now that the field has been planned (including arguments, but NOT
-        // including selection set) we can deduplicate it to see if any of its
-        // peers are identical.
-        this.deduplicatePlans(oldPlansLength);
-
-        // After deduplication, this plan may have been substituted; get the
-        // updated reference.
-        plan = this.plans[plan.id]!;
       } else {
         // There's no plan resolver; use the parent plan
         plan = parentPlan;
@@ -2459,6 +2401,7 @@ export class Aether<
     parentPlan: ExecutablePlan,
     field: GraphQLField<any, any>,
   ) {
+    const oldPlansLength = this.planCount;
     const fieldType = field.type;
     const wgs = withGlobalState.bind(null, {
       aether: this,
@@ -2468,7 +2411,7 @@ export class Aether<
     const trackedArguments = wgs(() =>
       this.getTrackedArguments(objectType, fieldNode),
     );
-    const plan = wgs(() =>
+    let plan = wgs(() =>
       planResolver(parentPlan, trackedArguments, {
         field,
         schema: this.schema,
@@ -2496,6 +2439,64 @@ export class Aether<
         plan,
       ),
     );
+
+    // TODO: Check SameStreamDirective still exists in @stream spec at release.
+    /*
+     * `SameStreamDirective`
+     * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+     * ensures that every field that has `@stream` must have the same
+     * `@stream` arguments; so we can just check the first node in the
+     * merged set to see our stream options. NOTE: if this changes before
+     * release then we may need to find the stream with the largest
+     * `initialCount` to figure what to do; something like:
+     *
+     *      const streamDirective = firstField.directives?.filter(
+     *        (d) => d.name.value === "stream",
+     *      ).sort(
+     *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+     *      )[0]
+     */
+    const streamDirective = fieldNode.directives?.find(
+      (d) => d.name.value === "stream",
+    );
+
+    const planOptions: PlanOptions = {
+      stream:
+        streamDirective && isStreamablePlan(plan as ExecutablePlan<any>)
+          ? {
+              initialCount:
+                Number(
+                  getDirectiveArg(
+                    fieldNode,
+                    "stream",
+                    "initialCount",
+                    this.trackedVariableValuesPlan,
+                  ),
+                ) || 0,
+            }
+          : null,
+    };
+    this.planOptionsByPlan.set(plan, planOptions);
+
+    const newPlansLength = this.planCount;
+    if (debugPlanVerboseEnabled) {
+      debugPlanVerbose(
+        "Created %o new plans whilst processing %p",
+        newPlansLength - oldPlansLength,
+        pathIdentity,
+      );
+    }
+
+    this.finalizeArgumentsSince(oldPlansLength, pathIdentity, true);
+
+    // Now that the field has been planned (including arguments, but NOT
+    // including selection set) we can deduplicate it to see if any of its
+    // peers are identical.
+    this.deduplicatePlans(oldPlansLength);
+
+    // After deduplication, this plan may have been substituted; get the
+    // updated reference.
+    plan = this.plans[plan.id]!;
     return plan;
   }
 
