@@ -385,12 +385,14 @@ function withFieldArgsForArgumentsOrInputObject<
       }
       const details = getArgOnceOnly(path);
       const plan = planArgumentOrInputField(details, $target);
+      /*
       if (plan && plan !== $target) {
         assertModifierPlan(
           plan,
-          `UNKNOWN` /* TODO : `${objectType.name}.${field.name}(${argName}:)` */,
+          `UNKNOWN` /* TODO : `${objectType.name}.${field.name}(${argName}:)` * /,
         );
       }
+    */
       return plan;
     },
   };
