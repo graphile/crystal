@@ -94,10 +94,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   return {
                     clientMutationId: {
                       type: GraphQLString,
-                      plan: EXPORTABLE(
+                      applyPlan: EXPORTABLE(
                         () =>
-                          function plan($input: ObjectPlan<any>, value) {
-                            $input.set("clientMutationId", value);
+                          function plan($input: ObjectPlan<any>, val) {
+                            $input.set("clientMutationId", val.get());
                           },
                         [],
                       ),
@@ -243,7 +243,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     args: {
                       input: {
                         type: new GraphQLNonNull(mutationInputType),
-                        plan: EXPORTABLE(
+                        applyPlan: EXPORTABLE(
                           () =>
                             function plan(
                               _: any,

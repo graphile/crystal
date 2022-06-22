@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
+import {
   PgSelectPlan,
   PgSourceUnique,
   PgTypeCodec,
@@ -12,6 +12,8 @@ import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { GraphQLEnumValueConfigMap } from "graphql";
+import { ExecutablePlan, ModifierPlan } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -128,9 +130,14 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                 [ascFieldName]: {
                   extensions: {
                     graphile: {
-                      plan: EXPORTABLE(
-                        (column, columnName, isUnique, sql) =>
-                          (plan: PgSelectPlan<any, any, any, any>) => {
+                      applyPlan: EXPORTABLE(
+                        (column, columnName, isUnique, orderByNullsLast, sql) =>
+                          (plan: ExecutablePlan | ModifierPlan): void => {
+                            if (!(plan instanceof PgSelectPlan)) {
+                              throw new Error(
+                                "Expected a PgSelectPlan when applying ordering value",
+                              );
+                            }
                             plan.orderBy({
                               codec: column.codec,
                               fragment: sql`${plan.alias}.${sql.identifier(
@@ -147,7 +154,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               plan.setOrderIsUnique();
                             }
                           },
-                        [column, columnName, isUnique, sql],
+                        [column, columnName, isUnique, orderByNullsLast, sql],
                       ),
                     },
                   },
@@ -168,9 +175,14 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                 [descFieldName]: {
                   extensions: {
                     graphile: {
-                      plan: EXPORTABLE(
-                        (column, columnName, isUnique, sql) =>
-                          (plan: PgSelectPlan<any, any, any, any>) => {
+                      applyPlan: EXPORTABLE(
+                        (column, columnName, isUnique, orderByNullsLast, sql) =>
+                          (plan: ExecutablePlan | ModifierPlan): void => {
+                            if (!(plan instanceof PgSelectPlan)) {
+                              throw new Error(
+                                "Expected a PgSelectPlan when applying ordering value",
+                              );
+                            }
                             plan.orderBy({
                               codec: column.codec,
                               fragment: sql`${plan.alias}.${sql.identifier(
@@ -187,7 +199,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               plan.setOrderIsUnique();
                             }
                           },
-                        [column, columnName, isUnique, sql],
+                        [column, columnName, isUnique, orderByNullsLast, sql],
                       ),
                     },
                   },
@@ -203,7 +215,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               )}`,*/
             );
             return memo;
-          }, {}),
+          }, {} as GraphQLEnumValueConfigMap),
           `Adding order values from table '${pgCodec.name}'`,
         );
       },

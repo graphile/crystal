@@ -137,6 +137,8 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
             ),
             extensions: {
               graphile: {
+                // TODO!
+                /*
                 plan: EXPORTABLE(
                   (columnNames, object) =>
                     function plan($record) {
@@ -148,6 +150,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                     },
                   [columnNames, object],
                 ),
+                */
               },
             },
           }),

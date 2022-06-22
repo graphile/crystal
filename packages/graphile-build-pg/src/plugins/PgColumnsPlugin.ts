@@ -377,13 +377,10 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                           Boolean(column.extensions?.tags?.hasDefault),
                         columnType,
                       ),
-                      plan: EXPORTABLE(
+                      applyPlan: EXPORTABLE(
                         (columnName) =>
-                          function plan(
-                            $insert: SetterPlan<any, any>,
-                            $value: InputPlan,
-                          ) {
-                            $insert.set(columnName, $value);
+                          function plan($insert: SetterPlan<any, any>, val) {
+                            $insert.set(columnName, val.get());
                           },
                         [columnName],
                       ),

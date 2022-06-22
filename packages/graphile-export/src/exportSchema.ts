@@ -1438,17 +1438,27 @@ function exportSchemaTypeDefs({
         const args = field.args
           ? Object.entries(field.args)
               .map(([argName, arg]) => {
-                if (arg.extensions?.graphile?.plan) {
-                  return t.objectProperty(
-                    identifierOrLiteral(argName),
-                    convertToIdentifierViaAST(
-                      file,
-                      arg.extensions.graphile.plan,
-                      `${type.name}.${fieldName}.${argName}Plan`,
-                      `${type.name}.fields[${fieldName}].args[${argName}].extensions.graphile.plan`,
-                    ),
-                  );
-                }
+                return t.objectProperty(
+                  identifierOrLiteral(argName),
+                  configToAST({
+                    input: arg.extensions?.graphile?.inputPlan
+                      ? convertToIdentifierViaAST(
+                          file,
+                          arg.extensions.graphile.inputPlan,
+                          `${type.name}.${fieldName}.${argName}InputPlan`,
+                          `${type.name}.fields[${fieldName}].args[${argName}].extensions.graphile.inputPlan`,
+                        )
+                      : null,
+                    apply: arg.extensions?.graphile?.applyPlan
+                      ? convertToIdentifierViaAST(
+                          file,
+                          arg.extensions.graphile.applyPlan,
+                          `${type.name}.${fieldName}.${argName}ApplyPlan`,
+                          `${type.name}.fields[${fieldName}].args[${argName}].extensions.graphile.applyPlan`,
+                        )
+                      : null,
+                  }),
+                );
               })
               .filter(isNotNullish)
           : null;
@@ -1496,20 +1506,35 @@ function exportSchemaTypeDefs({
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
         // Use shorthand if there's only a `plan` and nothing else
-        const planAST = field.extensions?.graphile?.plan
+        const inputPlanAST = field.extensions?.graphile?.inputPlan
           ? convertToIdentifierViaAST(
               file,
-              field.extensions?.graphile?.plan,
-              `${type.name}.${fieldName}Plan`,
-              `${type.name}.fields[${fieldName}].extensions.graphile.plan`,
+              field.extensions?.graphile?.inputPlan,
+              `${type.name}.${fieldName}InputPlan`,
+              `${type.name}.fields[${fieldName}].extensions.graphile.inputPlan`,
             )
           : null;
-        if (!planAST) {
-          continue;
+
+        const applyPlanAST = field.extensions?.graphile?.applyPlan
+          ? convertToIdentifierViaAST(
+              file,
+              field.extensions?.graphile?.applyPlan,
+              `${type.name}.${fieldName}ApplyPlan`,
+              `${type.name}.fields[${fieldName}].extensions.graphile.applyPlan`,
+            )
+          : null;
+
+        if (inputPlanAST || applyPlanAST) {
+          typeProperties.push(
+            t.objectProperty(
+              identifierOrLiteral(fieldName),
+              configToAST({
+                input: inputPlanAST,
+                apply: applyPlanAST,
+              }),
+            ),
+          );
         }
-        typeProperties.push(
-          t.objectProperty(identifierOrLiteral(fieldName), planAST),
-        );
       }
 
       plansProperties.push(
@@ -1596,23 +1621,23 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
-        const planAST = enumValueConfig.extensions?.graphile?.plan
+        const applyPlanAST = enumValueConfig.extensions?.graphile?.applyPlan
           ? convertToIdentifierViaAST(
               file,
-              enumValueConfig.extensions.graphile.plan,
-              `${type.name}_${enumValueName}Plan`,
-              `${type.name}.values[${enumValueName}].extensions.graphile.plan`,
+              enumValueConfig.extensions.graphile.applyPlan,
+              `${type.name}_${enumValueName}ApplyPlan`,
+              `${type.name}.values[${enumValueName}].extensions.graphile.applyPlan`,
             )
           : null;
 
-        if (valueAST || planAST) {
+        if (valueAST || applyPlanAST) {
           enumValues.push(
             t.objectProperty(
               identifierOrLiteral(enumValueName),
               t.objectExpression(
                 objectToObjectProperties({
                   value: valueAST,
-                  plan: planAST,
+                  apply: applyPlanAST,
                 }),
               ),
             ),

@@ -88,13 +88,13 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                       "field",
                     ),
                     type,
-                    plan: EXPORTABLE(
+                    applyPlan: EXPORTABLE(
                       (pgFieldSource, sql) =>
                         function plan(
                           $condition: PgConditionPlan<
                             PgSelectPlan<any, any, any, any>
                           >,
-                          $value: InputPlan,
+                          val,
                         ) {
                           if (typeof pgFieldSource.source !== "function") {
                             throw new Error("Invalid computed column source");
@@ -102,12 +102,12 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           const expression = sql`${pgFieldSource.source(
                             $condition.alias,
                           )}`;
-                          if ($value.evalIs(null)) {
+                          if (val.getRaw().evalIs(null)) {
                             $condition.where(sql`${expression} is null`);
                           } else {
                             $condition.where(
                               sql`${expression} = ${$condition.placeholder(
-                                $value,
+                                val.get(),
                                 pgFieldSource.codec,
                               )}`,
                             );

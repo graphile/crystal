@@ -74,7 +74,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     graphile: {
                       // NATURAL means to not change the sort order
-                      plan: EXPORTABLE(() => () => {}, []),
+                      applyPlan: EXPORTABLE(() => () => {}, []),
                     },
                   },
                 },
@@ -206,7 +206,7 @@ export const applyOrderToPlan = EXPORTABLE(
       }
       val.forEach((order) => {
         const config = getEnumValueConfig(TableOrderByType, order);
-        const plan = config?.extensions?.graphile?.plan;
+        const plan = config?.extensions?.graphile?.applyPlan;
         if (typeof plan !== "function") {
           console.error(
             `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(

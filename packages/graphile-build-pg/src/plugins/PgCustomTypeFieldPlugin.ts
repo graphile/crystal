@@ -20,9 +20,10 @@ import type {
   __TrackedObjectPlan,
   ExecutablePlan,
   InputPlan,
-  TrackedArguments,
   FieldPlanResolver,
+  GraphileArgumentConfig,
   GraphileFieldConfigArgumentMap,
+  FieldArgs,
 } from "dataplanner";
 import { aether } from "dataplanner";
 import {
@@ -563,6 +564,16 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 (memo, { inputType, graphqlArgName }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
+                    extensions: {
+                      graphile: {
+                        /*
+                        plan($parent: ExecutablePlan, $value: InputPlan) {
+                          if (inputType.extensions
+                          return $value;
+                        },
+                        */
+                      },
+                    },
                   };
                   return memo;
                 },
@@ -580,15 +591,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
               const makeArgs = EXPORTABLE(
                 (argDetailsSimple) =>
-                  (
-                    info: {
-                      evaluateArgPlan: (
-                        path: string | string[],
-                      ) => ExecutablePlan | undefined;
-                    },
-                    path: string[] = [],
-                  ) => {
-                    const { evaluateArgPlan } = info;
+                  (args: FieldArgs, path: string[] = []) => {
                     const selectArgs: PgSelectArgumentSpec[] = [];
 
                     let skipped = false;
@@ -598,7 +601,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       pgCodec,
                       required,
                     } of argDetailsSimple) {
-                      let plan = evaluateArgPlan([...path, graphqlArgName]);
+                      let plan = args.get([...path, graphqlArgName]);
                       if (plan === undefined) {
                         if (!required) {
                           skipped = true;
@@ -643,7 +646,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ? // Not computed
                   EXPORTABLE(
                     (source) => ($root, args, info) => {
-                      const selectArgs = makeArgs(info);
+                      const selectArgs = makeArgs(args);
                       return source.execute(selectArgs);
                     },
                     [source],
@@ -652,7 +655,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ? // Mutation uses 'args.input' rather than 'args'
                   EXPORTABLE(
                     (object, source) => ($root, args, info) => {
-                      const selectArgs = makeArgs(info, ["input"]);
+                      const selectArgs = makeArgs(args, ["input"]);
                       const $result = source.execute(selectArgs);
                       return object({
                         result: $result,
@@ -671,7 +674,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         }
                         const selectArgs = [
                           { plan: $row.record() },
-                          ...makeArgs(info),
+                          ...makeArgs(args),
                         ];
                         if (
                           source.isUnique &&
@@ -726,7 +729,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     args: {
                       input: {
                         type: new GraphQLNonNull(inputType),
-                        plan: EXPORTABLE(
+                        applyPlan: EXPORTABLE(
                           () =>
                             function plan(_: any, $object: ObjectPlan<any>) {
                               return $object;
@@ -828,7 +831,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                 (connection, getSelectPlanFromParentAndArgs) =>
                                   function plan(
                                     $parent: ExecutablePlan,
-                                    args: TrackedArguments<any>,
+                                    args,
                                     info,
                                   ) {
                                     const $select =

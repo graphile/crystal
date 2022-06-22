@@ -416,7 +416,7 @@ export function isExecutablePlan<TData = any>(
 }
 
 export function assertExecutablePlan<TData>(
-  plan: BasePlan,
+  plan: BasePlan | null | undefined | void,
   pathIdentity: string,
 ): asserts plan is ExecutablePlan<TData> {
   if (!isExecutablePlan(plan)) {
@@ -478,7 +478,7 @@ export type PolymorphicPlan = ExecutablePlan & {
  * Modifier plans do not use dependencies.
  */
 export abstract class ModifierPlan<
-  TParentPlan extends BasePlan,
+  TParentPlan extends BasePlan = BasePlan,
 > extends BasePlan {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;

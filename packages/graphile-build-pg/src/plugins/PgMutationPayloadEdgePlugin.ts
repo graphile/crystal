@@ -2,7 +2,7 @@ import "graphile-build";
 import "graphile-config";
 
 import type { PgClassSinglePlan, PgSourceUnique } from "@dataplan/pg";
-import type { ObjectPlan, TrackedArguments } from "dataplanner";
+import type { ObjectPlan } from "dataplanner";
 import { connection, constant, EdgePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type {
@@ -176,7 +176,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       $mutation: ObjectPlan<{
                         record: PgClassSinglePlan<any, any, any, any>;
                       }>,
-                      args: TrackedArguments,
+                      args,
                       info: { schema: GraphQLSchema },
                     ) {
                       const $record = $mutation.getPlanForKey("record", true);
@@ -189,7 +189,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       const $select = source.find(spec);
 
                       // Perform ordering
-                      const $value = args.orderBy;
+                      const $value = args.getRaw("orderBy");
                       applyOrderToPlan(
                         $select,
                         $value,

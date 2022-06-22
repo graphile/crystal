@@ -2,9 +2,9 @@ import "graphile-config";
 
 import type {
   ExecutablePlan,
+  FieldArgs,
   NodeIdCodec,
   NodeIdHandler,
-  TrackedArguments,
 } from "dataplanner";
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -88,10 +88,10 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                   (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
                     function plan(
                       _$parent: ExecutablePlan<any>,
-                      args: TrackedArguments,
+                      args: FieldArgs,
                     ) {
                       const $spec = lambda(
-                        args[nodeIdFieldName],
+                        args.get(nodeIdFieldName),
                         specForHandler(handler, codec),
                       );
                       return handler.get($spec);

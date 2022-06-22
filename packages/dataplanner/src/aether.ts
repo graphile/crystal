@@ -14,12 +14,12 @@ import type {
   GraphQLSchema,
   OperationDefinitionNode,
 } from "graphql";
-import { getNullableType } from "graphql";
 import {
   assertObjectType,
   defaultFieldResolver,
   executeSync,
   getNamedType,
+  getNullableType,
   GraphQLBoolean,
   GraphQLFloat,
   GraphQLID,
@@ -46,6 +46,7 @@ import {
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
+import { withFieldArgsForArguments } from "./aether-input.js";
 import * as assert from "./assert.js";
 import type {
   Bucket,
@@ -120,9 +121,8 @@ import {
 } from "./plan.js";
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
-import type { AccessPlan } from "./plans/index.js";
+import type { __InputObjectPlan, AccessPlan } from "./plans/index.js";
 import {
-  __InputObjectPlan,
   __ItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
@@ -2185,7 +2185,7 @@ export class Aether<
     };
   }
 
-  private withModifiers<T>(cb: () => T): T {
+  public withModifiers<T>(cb: () => T): T {
     assert.strictEqual(
       this.modifierPlans.length,
       0,
@@ -2206,110 +2206,6 @@ export class Aether<
     }
 
     return result;
-  }
-
-  /**
-   * Implements the `PlanInput` algorithm.
-   *
-   * Note: we are only expecting to `PlanInput()` for objects or lists thereof, not scalars.
-   */
-  private planInput(
-    inputType: GraphQLInputType,
-    trackedValuePlan: InputPlan,
-    parentPlan: ExecutablePlan | ModifierPlan<any>,
-  ): void {
-    if (isNonNullType(inputType)) {
-      this.planInput(inputType.ofType, trackedValuePlan, parentPlan);
-    } else if (isListType(inputType)) {
-      if (trackedValuePlan.evalIs(null)) {
-        // parentPlan.null();
-        return;
-      }
-      const innerInputType = inputType.ofType;
-      // TODO: assert trackedValuePlan represents a list
-      const length = (trackedValuePlan as any).evalLength?.();
-      for (let i = 0; i < length; i++) {
-        const listItemParentPlan = (parentPlan as any).itemPlan();
-        const trackedListValue = (trackedValuePlan as any).at(i);
-        this.planInput(innerInputType, trackedListValue, listItemParentPlan);
-      }
-    } else if (isInputObjectType(inputType)) {
-      if (trackedValuePlan.evalIs(null)) {
-        // TODO: should we indicate to the parent that this is null as opposed to an empty object?
-        return;
-      }
-      this.planInputFields(inputType, trackedValuePlan, parentPlan);
-      return;
-    } else {
-      throw new Error(
-        `Invalid plan; planInput called for unsupported type '${inspect(
-          inputType,
-        )}'.`,
-      );
-    }
-  }
-
-  /**
-   * Implements `PlanInputFields` algorithm.
-   */
-  private planInputFields(
-    inputObjectType: GraphQLInputObjectType,
-    trackedValuePlan: InputPlan,
-    parentPlan: ExecutablePlan | ModifierPlan<any>,
-  ): void {
-    assert.ok(
-      trackedValuePlan instanceof __InputObjectPlan,
-      "Expected trackedValuePlan to be an __InputObjectPlan",
-    );
-    const inputFieldSpecs = inputObjectType.getFields();
-    // Input fields are applied in the order that they are specified in the
-    // schema, NOT the order that they are specified in the request.
-    for (const fieldName in inputFieldSpecs) {
-      const inputFieldSpec = inputFieldSpecs[fieldName];
-      if (trackedValuePlan.evalHas(fieldName)) {
-        const trackedFieldValue = trackedValuePlan.get(fieldName);
-        this.planInputField(
-          inputObjectType,
-          inputFieldSpec,
-          trackedFieldValue,
-          parentPlan,
-        );
-      }
-    }
-  }
-
-  /**
-   * Implements `PlanInputField` algorithm.
-   */
-  private planInputField(
-    inputObjectType: GraphQLInputObjectType,
-    inputField: GraphQLInputField,
-    trackedValuePlan: InputPlan,
-    parentPlan: ExecutablePlan | ModifierPlan<any>,
-  ): void {
-    const planResolver = inputField.extensions?.graphile?.plan;
-    if (planResolver != null) {
-      assert.strictEqual(
-        typeof planResolver,
-        "function",
-        `Expected ${inputObjectType.name}.${inputField.name}'s 'extensions.graphile.plan' property to be a plan resolver function.`,
-      );
-      const inputFieldPlan = planResolver(parentPlan, trackedValuePlan, {
-        schema: this.schema,
-      });
-      if (inputFieldPlan != null) {
-        const inputFieldType = inputField.type;
-        // Note: the unwrapped type of inputFieldType must be an input object.
-        // TODO: assert this?
-        this.planInput(inputFieldType, trackedValuePlan, inputFieldPlan);
-      }
-    } else {
-      if (isDev) {
-        console.warn(
-          `Expected ${inputObjectType.name}.${inputField.name} to have an 'extensions.graphile.plan' function, but it does not.`,
-        );
-      }
-    }
   }
 
   /**
@@ -2355,7 +2251,11 @@ export class Aether<
         trackedArgumentValues[argumentName] = argumentPlan;
       }
     }
-    return trackedArgumentValues;
+    return {
+      get(name) {
+        return trackedArgumentValues[name];
+      },
+    };
   }
 
   planField(
@@ -2377,151 +2277,21 @@ export class Aether<
     const trackedArguments = wgs(() =>
       this.getTrackedArguments(objectType, fieldNode),
     );
-    const plannedArgs: string[] = [];
-
-    const getArgOnceOnly = (
-      inPath: string | string[],
-      $toPlan: ExecutablePlan | null,
-    ) => {
-      const id = Array.isArray(inPath) ? inPath.join(".") : inPath;
-      if (plannedArgs.includes(id)) {
-        throw new Error(`Argument '${id}' has already been evaluated`);
-      }
-      plannedArgs.push(id);
-
-      const path = Array.isArray(inPath) ? inPath : [inPath];
-      const argName = path.shift()!;
-      let $value: InputPlan = trackedArguments[argName];
-      let argOrField = field.args.find((arg) => arg.name === argName)!;
-      if ($value.evalIs(undefined)) {
-        return undefined;
-      }
-
-      let type = getNullableType(argOrField.type);
-
-      while (path.length > 0) {
-        const name = path.shift()!;
-        if (!isInputObjectType(type)) {
-          throw new Error(
-            `Cannot process '${type}' through args; expected input object`,
-          );
-        }
-        $value = ($value as __TrackedObjectPlan | __InputObjectPlan).get(name);
-        if ($value.evalIs(undefined)) {
-          return undefined;
-        }
-        argOrField = type.getFields()[name];
-        type = getNullableType(argOrField.type);
-      }
-
-      const plan = this.withModifiers(() => {
-        const planResolver = argOrField.extensions?.graphile?.plan;
-
-        if (typeof planResolver === "function") {
-          const argPlan = planResolver(parentPlan, $toPlan, $value, {
-            schema: this.schema,
-          });
-          if (argPlan != null) {
-            this.planInput(argOrField.type, $value, argPlan);
-          }
-          return argPlan;
-        } else {
-          return $value;
-        }
-      });
-      return plan;
-    };
-
-    const applyArgPlan = (
-      argName: string | string[],
-      $toPlan: ExecutablePlan,
-      // TODO: remove this when we remove 'args' from resolvers.
-      ignoreErrors = false,
-    ): void => {
-      const plan = getArgOnceOnly(argName, $toPlan);
-
-      if (!ignoreErrors) {
-        if (plan && plan !== $toPlan) {
-          assertModifierPlan(
-            plan,
-            `${objectType.name}.${field.name}(${argName}:)`,
-          );
-        }
-      }
-    };
-
-    const evaluateArgPlan = (
-      argName: string | string[],
-    ): ExecutablePlan | undefined => {
-      const plan = getArgOnceOnly(argName, null);
-
-      if (plan && !(plan instanceof ExecutablePlan)) {
-        throw new Error(
-          `Bad argument resolver for '${objectType.name}.${field.name}(${argName}:)'`,
-        );
-      }
-      return plan;
-    };
 
     let plan = wgs(() =>
-      planResolver(parentPlan, trackedArguments, {
+      withFieldArgsForArguments(
+        this,
+        parentPlan,
+        trackedArguments,
         field,
-        schema: this.schema,
-        applyArgPlan,
-        evaluateArgPlan,
-      }),
+        (fieldArgs) =>
+          planResolver(parentPlan, fieldArgs, {
+            field,
+            schema: this.schema,
+          }),
+      ),
     );
     assertExecutablePlan(plan, pathIdentity);
-
-    // NOTE: don't need to worry about tracking groupId when planning
-    // arguments as they're guaranteed to be identical across all selections.
-    wgs(() => {
-      // Arguments are applied in the order that they are specified in the
-      // schema, NOT the order that they are specified in the request.
-      for (let i = 0, l = field.args.length; i < l; i++) {
-        const argSpec = field.args[i];
-        const argName = argSpec.name;
-        if (plannedArgs.includes(argName)) {
-          // Already handled
-          continue;
-        }
-
-        const prefix = `${argName}.`;
-        if (plannedArgs.some((a) => a.startsWith(prefix))) {
-          // Need to scan through for unhandled stuff
-          const process = (
-            spec: GraphQLArgument | GraphQLInputField,
-            path: readonly string[],
-          ) => {
-            const type = getNullableType(spec.type);
-            if (!isInputObjectType(type)) {
-              throw new Error(
-                "GraphileInternalError<81cae96e-4924-4dc5-a6ae-7946d9843427>: This should be impossible.",
-              );
-            }
-            const fields = type.getFields();
-            for (const fieldName of Object.keys(fields)) {
-              const newPath = [...path, fieldName];
-              if (plannedArgs.includes(newPath.join("."))) {
-                // handled
-                continue;
-              }
-              const newPrefix = `${newPath.join(".")}.`;
-              if (plannedArgs.some((a) => a.startsWith(newPrefix))) {
-                // go deeper
-                process(fields[fieldName], newPath);
-              } else {
-                applyArgPlan(newPath, plan, true);
-              }
-            }
-          };
-          process(argSpec, [argName]);
-        } else {
-          // User didn't explicitly call, so auto-handle
-          applyArgPlan(argName, plan, true);
-        }
-      }
-    });
 
     // TODO: Check SameStreamDirective still exists in @stream spec at release.
     /*

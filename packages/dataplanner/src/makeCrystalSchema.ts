@@ -18,10 +18,12 @@ import {
 } from "graphql";
 
 import type {
-  ArgumentPlanResolver,
-  EnumPlanResolver,
+  ArgumentApplyPlanResolver,
+  ArgumentInputPlanResolver,
+  EnumValueApplyPlanResolver,
   FieldPlanResolver,
-  InputObjectFieldPlanResolver,
+  InputObjectFieldApplyPlanResolver,
+  InputObjectFieldInputPlanResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { ExecutablePlan } from "./plan.js";
@@ -41,7 +43,10 @@ export type FieldPlans =
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
-        [argName: string]: ArgumentPlanResolver<any, any, any, any, any>;
+        [argName: string]: {
+          input?: ArgumentInputPlanResolver;
+          apply?: ArgumentApplyPlanResolver;
+        };
       };
     };
 
@@ -58,7 +63,10 @@ export type ObjectPlans = {
  * The plans for each field of a GraphQL input object type.
  */
 export type InputObjectPlans = {
-  [fieldName: string]: InputObjectFieldPlanResolver<any, any, any, any>;
+  [fieldName: string]: {
+    input: InputObjectFieldInputPlanResolver;
+    apply: InputObjectFieldApplyPlanResolver;
+  };
 };
 
 /**
@@ -84,13 +92,13 @@ export type ScalarPlans = {
 export type EnumPlans = {
   // The internal value for the enum
   [enumValueName: string]:
-    | EnumPlanResolver
+    | EnumValueApplyPlanResolver
     | string
     | number
     | boolean
     | {
         value?: unknown;
-        plan?: EnumPlanResolver;
+        apply?: EnumValueApplyPlanResolver;
       };
 };
 

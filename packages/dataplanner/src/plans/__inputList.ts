@@ -117,14 +117,23 @@ export class __InputListPlan extends ExecutablePlan {
       return this.inputValues === value;
     } else if (value === null) {
       return this.inputValues?.kind === "NullValue";
-    } else if (value === 0) {
-      return (
-        this.inputValues?.kind === "IntValue" && this.inputValues.value === "0"
-      );
     } else {
       throw new Error(
         "__InputListPlan cannot evalIs values other than null and undefined currently",
       );
+    }
+  }
+
+  evalLength(): number | null {
+    if (this.inputValues === undefined) {
+      return null;
+    } else if (this.inputValues.kind === Kind.NULL) {
+      return null;
+    } else if (this.inputValues.kind === Kind.LIST) {
+      return this.inputValues.values.length;
+    } else {
+      // Coercion to list
+      return 1;
     }
   }
 }

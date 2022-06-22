@@ -419,14 +419,14 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const { plan, ...argSpec } = args[argName];
+        const { inputPlan, ...argSpec } = args[argName];
         memo[argName] = {
           ...argSpec,
-          ...(plan
+          ...(inputPlan
             ? {
                 extensions: {
                   graphile: {
-                    plan,
+                    inputPlan,
                   },
                 },
               }
@@ -554,13 +554,13 @@ export function inputObjectFieldSpec<
     TInput
   >,
 ): GraphQLInputFieldConfig {
-  const { plan, ...spec } = graphileSpec;
-  return plan
+  const { inputPlan, ...spec } = graphileSpec;
+  return inputPlan
     ? {
         ...spec,
         extensions: {
           graphile: {
-            plan,
+            inputPlan,
           },
         },
       }

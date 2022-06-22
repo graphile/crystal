@@ -8,7 +8,7 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { ExecutablePlan } from "dataplanner";
+import { ExecutablePlan, object } from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
@@ -506,7 +506,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgRowType: selectable,
                   isPgCompoundType: !selectable,
                 },
-                () => ({}),
+                () => ({
+                  extensions: {
+                    graphile: {
+                      inputPlan() {
+                        return object({});
+                      },
+                    },
+                  },
+                }),
                 `PgTablesPlugin input table type for ${codec.name}`,
               );
               setGraphQLTypeForPgCodec(codec, ["input"], inputTypeName);
@@ -525,7 +533,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgRowType: selectable,
                   isPgCompoundType: !selectable,
                 },
-                () => ({}),
+                () => ({
+                  extensions: {
+                    graphile: {
+                      inputPlan() {
+                        return object({});
+                      },
+                    },
+                  },
+                }),
                 `PgTablesPlugin patch table type for ${codec.name}`,
               );
               setGraphQLTypeForPgCodec(codec, ["patch"], patchTypeName);

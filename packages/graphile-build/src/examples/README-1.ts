@@ -50,7 +50,7 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (lambda, myDefaultMax, myDefaultMin) => (_$parent, args) => {
                     return lambda(
-                      args.sides,
+                      args.get("sides"),
                       (sides = myDefaultMax) =>
                         Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
                         myDefaultMin,

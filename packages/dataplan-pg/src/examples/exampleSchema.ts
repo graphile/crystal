@@ -22,6 +22,7 @@ import type {
   CrystalSubscriber,
   ExecutablePlan,
   ListPlan,
+  ObjectPlan,
 } from "dataplanner";
 import {
   __ListTransformPlan,
@@ -2078,7 +2079,7 @@ export function makeExampleSchema(
       BODY_ASC: {
         extensions: {
           graphile: {
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (TYPES, sql) =>
                 (plan: PgSelectPlanFromSource<typeof messageSource>) => {
                   plan.orderBy({
@@ -2095,7 +2096,7 @@ export function makeExampleSchema(
       BODY_DESC: {
         extensions: {
           graphile: {
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (TYPES, sql) =>
                 (plan: PgSelectPlanFromSource<typeof messageSource>) => {
                   plan.orderBy({
@@ -2112,7 +2113,7 @@ export function makeExampleSchema(
       AUTHOR_USERNAME_ASC: {
         extensions: {
           graphile: {
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (TYPES, sql) =>
                 (plan: PgSelectPlanFromSource<typeof messageSource>) => {
                   const authorAlias = plan.singleRelation("author");
@@ -2130,7 +2131,7 @@ export function makeExampleSchema(
       AUTHOR_USERNAME_DESC: {
         extensions: {
           graphile: {
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (TYPES, sql) =>
                 (plan: PgSelectPlanFromSource<typeof messageSource>) => {
                   const authorAlias = plan.singleRelation("author");
@@ -2349,9 +2350,10 @@ export function makeExampleSchema(
     fields: {
       featured: {
         type: GraphQLBoolean,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($condition, $value) {
+            function plan($condition: PgConditionPlan<any>, val) {
+              const $value = val.getRaw();
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.featured is null`);
               } else {
@@ -2377,9 +2379,10 @@ export function makeExampleSchema(
     fields: {
       equalTo: {
         type: GraphQLBoolean,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($parent, $value) {
+            function plan($parent, val) {
+              const $value = val.getRaw();
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
@@ -2396,9 +2399,10 @@ export function makeExampleSchema(
       },
       notEqualTo: {
         type: GraphQLBoolean,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($parent: BooleanFilterPlan, $value) {
+            function plan($parent: BooleanFilterPlan, val) {
+              const $value = val.getRaw();
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
@@ -2424,9 +2428,10 @@ export function makeExampleSchema(
     fields: {
       featured: {
         type: BooleanFilter,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           (BooleanFilterPlan, sql) =>
-            function plan($messageFilter, $value) {
+            function plan($messageFilter, arg) {
+              const $value = arg.getRaw();
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
@@ -2450,9 +2455,10 @@ export function makeExampleSchema(
     fields: {
       name: {
         type: GraphQLString,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($condition, $value) {
+            function plan($condition: PgConditionPlan<any>, arg) {
+              const $value = arg.getRaw();
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.name is null`);
               } else {
@@ -2478,9 +2484,13 @@ export function makeExampleSchema(
     fields: {
       some: {
         type: MessageFilter,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           () =>
-            function plan($manyFilter, $value) {
+            function plan(
+              $manyFilter: ManyFilterPlan<typeof messageSource>,
+              arg,
+            ) {
+              const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
                 return $manyFilter.some();
               }
@@ -2499,9 +2509,10 @@ export function makeExampleSchema(
     fields: {
       messages: {
         type: ForumToManyMessageFilter,
-        plan: EXPORTABLE(
+        applyPlan: EXPORTABLE(
           (ManyFilterPlan, messageSource) =>
-            function plan($condition, $value) {
+            function plan($condition, arg) {
+              const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
                 return new ManyFilterPlan(
                   $condition,
@@ -2564,14 +2575,14 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$forum,
+                  _$forum: ForumPlan,
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
-                  $messages.setFirst($value);
+                  $messages.setFirst(arg.getRaw());
                   return null;
                 },
               [],
@@ -2579,10 +2590,10 @@ export function makeExampleSchema(
           },
           condition: {
             type: MessageCondition,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$forum,
+                  _$forum: ForumPlan,
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
                 ) {
                   return $messages.wherePlan();
@@ -2592,10 +2603,10 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (ClassFilterPlan) =>
                 function plan(
-                  _$forum,
+                  _$forum: ForumPlan,
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
                 ) {
                   return new ClassFilterPlan(
@@ -2632,14 +2643,14 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$forum,
+                  _$forum: ForumPlan,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
-                  $connection.setFirst($value);
+                  $connection.setFirst(arg.getRaw());
                   return null;
                 },
               [],
@@ -2647,14 +2658,14 @@ export function makeExampleSchema(
           },
           last: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
-                  $connection.setLast($value);
+                  $connection.setLast(arg.getRaw());
                   return null;
                 },
               [],
@@ -2662,7 +2673,7 @@ export function makeExampleSchema(
           },
           condition: {
             type: MessageCondition,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
                   _$forum,
@@ -2676,7 +2687,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (ClassFilterPlan) =>
                 function plan(
                   _$forum,
@@ -2726,7 +2737,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (TYPES, forumsUniqueAuthorCountSource) =>
             function plan($forum, args) {
-              const $featured = args.featured;
+              const $featured = args.get("featured");
               return forumsUniqueAuthorCountSource.execute([
                 {
                   plan: $forum.record(),
@@ -3573,14 +3584,14 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$root,
+                  _$root: __ValuePlan<BaseGraphQLRootValue>,
                   $forums: PgSelectPlanFromSource<typeof forumSource>,
-                  $value,
+                  arg,
                 ) {
-                  $forums.setFirst($value);
+                  $forums.setFirst(arg.getRaw());
                   return null;
                 },
               [],
@@ -3591,7 +3602,7 @@ export function makeExampleSchema(
           >(($forums) => $forums),
           condition: {
             type: ForumCondition,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
                   _$root,
@@ -3604,7 +3615,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: ForumFilter,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (ClassFilterPlan) =>
                 function plan(
                   _$root,
@@ -3625,7 +3636,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, forumSource) =>
             function plan(_$root, args) {
-              const $forum = forumSource.get({ id: args.id });
+              const $forum = forumSource.get({ id: args.get("id") });
               deoptimizeIfAppropriate($forum);
               return $forum;
             },
@@ -3642,7 +3653,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, messageSource) =>
             function plan(_$root, args) {
-              const $message = messageSource.get({ id: args.id });
+              const $message = messageSource.get({ id: args.get("id") });
               deoptimizeIfAppropriate($message);
               return $message;
             },
@@ -3659,10 +3670,10 @@ export function makeExampleSchema(
         args: {
           condition: {
             type: MessageCondition,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$root,
+                  _$root: any,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3673,10 +3684,10 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (ClassFilterPlan) =>
                 function plan(
-                  _$root,
+                  _$root: any,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3693,14 +3704,14 @@ export function makeExampleSchema(
           >(($connection) => $connection.getSubplan()),
           first: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$root,
+                  _$root: any,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  val,
                 ) {
-                  $connection.setFirst($value);
+                  $connection.setFirst(val.getRaw());
                   return null;
                 },
               [],
@@ -3708,14 +3719,14 @@ export function makeExampleSchema(
           },
           last: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
-                  $connection.setLast($value);
+                  $connection.setLast(arg.getRaw());
                   return null;
                 },
               [],
@@ -3723,14 +3734,14 @@ export function makeExampleSchema(
           },
           after: {
             type: GraphQLString,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
-                  $connection.setAfter($value);
+                  $connection.setAfter(arg.getRaw());
                   return null;
                 },
               [],
@@ -3738,14 +3749,14 @@ export function makeExampleSchema(
           },
           before: {
             type: GraphQLString,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
-                  $connection.setBefore($value);
+                  $connection.setBefore(arg.getRaw());
                   return null;
                 },
               [],
@@ -3753,21 +3764,21 @@ export function makeExampleSchema(
           },
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               (MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                  $value,
+                  arg,
                 ) {
                   const $messages = $connection.getSubplan();
-                  const val = $value.eval();
+                  const val = arg.getRaw().eval();
                   if (!Array.isArray(val)) {
                     throw new Error("Invalid!");
                   }
                   val.forEach((order) => {
                     const config = getEnumValueConfig(MessagesOrderBy, order);
-                    const plan = config?.extensions?.graphile?.plan;
+                    const plan = config?.extensions?.graphile?.applyPlan;
                     if (typeof plan !== "function") {
                       console.error(
                         `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
@@ -3815,7 +3826,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (TYPES, deoptimizeIfAppropriate, uniqueAuthorCountSource) =>
             function plan(_$root, args) {
-              const $featured = args.featured;
+              const $featured = args.get("featured");
               const $plan = uniqueAuthorCountSource.execute([
                 {
                   plan: $featured,
@@ -3989,7 +4000,7 @@ export function makeExampleSchema(
           (singleTableItemInterface, singleTableItemsSource) =>
             function plan(_$root, args) {
               const $item: SingleTableItemPlan = singleTableItemsSource.get({
-                id: args.id,
+                id: args.get("id"),
               });
               return singleTableItemInterface($item);
             },
@@ -4008,7 +4019,7 @@ export function makeExampleSchema(
           (constant, singleTableItemsSource) =>
             function plan(_$root, args) {
               const $item: SingleTableItemPlan = singleTableItemsSource.get({
-                id: args.id,
+                id: args.get("id"),
                 type: constant("TOPIC"),
               });
               return $item;
@@ -4028,7 +4039,7 @@ export function makeExampleSchema(
           (relationalItemInterface, relationalItemsSource) =>
             function plan(_$root, args) {
               const $item: RelationalItemPlan = relationalItemsSource.get({
-                id: args.id,
+                id: args.get("id"),
               });
               return relationalItemInterface($item);
             },
@@ -4047,7 +4058,7 @@ export function makeExampleSchema(
           (relationalTopicsSource) =>
             function plan(_$root, args) {
               return relationalTopicsSource.get({
-                id: args.id,
+                id: args.get("id"),
               });
             },
           [relationalTopicsSource],
@@ -4059,16 +4070,16 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
-            plan: EXPORTABLE(
+            applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$root,
+                  _$root: any,
                   $each: __ListTransformPlan<any, any, any, any>,
-                  $value,
+                  val,
                 ) {
                   const $commentables =
                     $each.getListPlan() as RelationalCommentablesPlan;
-                  $commentables.setFirst($value);
+                  $commentables.setFirst(val.getRaw());
                   return null;
                 },
               [],
@@ -4116,7 +4127,7 @@ export function makeExampleSchema(
           (unionItemUnion, unionItemsSource) =>
             function plan(_$root, args) {
               const $item: UnionItemPlan = unionItemsSource.get({
-                id: args.id,
+                id: args.get("id"),
               });
               return unionItemUnion($item);
             },
@@ -4135,7 +4146,7 @@ export function makeExampleSchema(
           (unionTopicsSource) =>
             function plan(_$root, args) {
               return unionTopicsSource.get({
-                id: args.id,
+                id: args.get("id"),
               });
             },
           [unionTopicsSource],
@@ -4177,7 +4188,7 @@ export function makeExampleSchema(
             function plan(_$root, args) {
               const $plan = entitySearchSource.execute([
                 {
-                  plan: args.query,
+                  plan: args.get("query"),
                   pgCodec: TYPES.text,
                   name: "query",
                 },
@@ -4205,7 +4216,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (personSource) =>
             function plan(_$root, args) {
-              return personSource.get({ person_id: args.personId });
+              return personSource.get({ person_id: args.get("personId") });
             },
           [personSource],
         ),
@@ -4420,15 +4431,15 @@ export function makeExampleSchema(
               });
               const $itemId = $item.get("id");
               // TODO: make this TypeScript stuff automatic
-              const $input = args.input as __InputObjectPlan;
               const $post = pgInsert(relationalPostsSource, {
                 id: $itemId,
               });
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsSource.codec.columns
               >) {
-                const $value = $input.get(key);
+                const $value = args.getRaw(["input", key]);
                 if (!$value.evalIs(undefined)) {
+                  const $value = args.get(["input", key]);
                   $post.set(key, $value);
                 }
               }
@@ -4530,18 +4541,17 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (pgUpdate, relationalPostsSource) =>
             function plan(_$root, args) {
-              const $input = args.input as __InputObjectPlan;
-              const $patch = $input.get("patch") as __InputObjectPlan;
               const $post = pgUpdate(relationalPostsSource, {
-                id: $input.get("id"),
+                id: args.get(["input", "id"]),
               });
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsSource.codec.columns
               >) {
-                const $value = $patch.get(key);
+                const $rawValue = args.getRaw(["input", "patch", key]);
+                const $value = args.get(["input", "patch", key]);
                 // TODO: test that we differentiate between value set to null and
                 // value not being present
-                if (!$value.evalIs(undefined)) {
+                if (!$rawValue.evalIs(undefined)) {
                   $post.set(key, $value);
                 }
               }
@@ -4561,9 +4571,8 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (pgDelete, relationalPostsSource) =>
             function plan(_$root, args) {
-              const $input = args.input as __InputObjectPlan;
               const $post = pgDelete(relationalPostsSource, {
-                id: $input.get("id"),
+                id: args.get(["input", "id"]),
               });
               return $post;
             },
@@ -4620,11 +4629,11 @@ export function makeExampleSchema(
         subscribePlan: EXPORTABLE(
           (context, jsonParse, lambda, listen) =>
             function subscribePlan(_$root, args) {
-              const $forumId = args.forumId as __InputStaticLeafPlan<number>;
+              const $forumId = args.get("forumId");
               const $topic = lambda($forumId, (id) => `forum:${id}:message`);
               const $pgSubscriber = context<OurGraphQLContext>().get(
                 "pgSubscriber",
-              ) as AccessPlan<CrystalSubscriber>;
+              ) as unknown as AccessPlan<CrystalSubscriber>;
 
               return listen($pgSubscriber, $topic, jsonParse);
             },

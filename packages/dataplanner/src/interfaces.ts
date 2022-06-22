@@ -1,10 +1,13 @@
 import type EventEmitter from "events";
 import type {
   FieldNode,
+  GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLField,
   GraphQLFieldConfig,
+  GraphQLInputField,
   GraphQLInputFieldConfig,
+  GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
@@ -21,7 +24,13 @@ import type { CrystalError } from "./error.js";
 import type { InputPlan } from "./input.js";
 import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan.js";
 import type { PlanResults, PlanResultsBucket } from "./planResults.js";
-import type { __TrackedObjectPlan } from "./plans/index.js";
+import type { __InputDynamicScalarPlan } from "./plans/__inputDynamicScalar.js";
+import type {
+  __InputListPlan,
+  __InputObjectPlan,
+  __InputStaticLeafPlan,
+  __TrackedObjectPlan,
+} from "./plans/index.js";
 import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
 
 export interface DataPlannerFieldExtensions {
@@ -31,19 +40,25 @@ export interface DataPlannerFieldExtensions {
 
 export interface DataPlannerArgumentExtensions {
   // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-  plan?:
-    | ArgumentPlanResolver<any, any, any, any, any>
-    | ArgumentValuePlanResolver;
+  inputPlan?: ArgumentInputPlanResolver;
+  applyPlan?: ArgumentApplyPlanResolver;
+}
+
+export interface DataPlannerInputObjectTypeExtensions {
+  inputPlan?: InputObjectTypeInputPlanResolver;
 }
 
 export interface DataPlannerInputFieldExtensions {
   // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
-  plan?: InputObjectFieldPlanResolver<any, any, any, any>;
+  inputPlan?: InputObjectFieldInputPlanResolver;
+  applyPlan?: InputObjectFieldApplyPlanResolver;
 }
 
 export interface DataPlannerObjectTypeExtensions {
   Plan?: { new (...args: any[]): ExecutablePlan };
 }
+
+export interface DataPlannerEnumTypeExtensions {}
 
 export interface DataPlannerEnumValueExtensions {
   /**
@@ -51,11 +66,12 @@ export interface DataPlannerEnumValueExtensions {
    *
    * @internal
    */
-  plan?: EnumPlanResolver;
+  applyPlan?: EnumValueApplyPlanResolver<any>;
 }
 
 export interface DataPlannerScalarTypeExtensions {
-  plan?: ScalarPlanResolver<any, any>;
+  plan?: ScalarPlanResolver;
+  inputPlan?: ScalarInputPlanResolver;
   /**
    * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
    */
@@ -78,12 +94,20 @@ declare module "graphql" {
     graphile?: DataPlannerArgumentExtensions;
   }
 
+  interface GraphQLInputObjectTypeExtensions {
+    graphile?: DataPlannerInputObjectTypeExtensions;
+  }
+
   interface GraphQLInputFieldExtensions {
     graphile?: DataPlannerInputFieldExtensions;
   }
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
     graphile?: DataPlannerObjectTypeExtensions;
+  }
+
+  interface GraphQLEnumTypeExtensions {
+    graphile?: DataPlannerEnumTypeExtensions;
   }
 
   interface GraphQLEnumValueExtensions {
@@ -231,6 +255,13 @@ export interface BaseGraphQLArguments {
 }
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
+// TODO: rename
+export interface FieldArgs {
+  get(path?: string | string[]): ExecutablePlan;
+  getRaw(path?: string | string[]): InputPlan;
+  apply($target: ExecutablePlan | ModifierPlan, path?: string | string[]): void;
+}
+
 /**
  * Plan resolvers are like regular resolvers except they're called beforehand,
  * they return plans rather than values, and they only run once for lists
@@ -254,14 +285,10 @@ export type FieldPlanResolver<
   TResultPlan extends ExecutablePlan<any>,
 > = (
   $parentPlan: TParentPlan,
-  args: TrackedArguments<TArgs>,
+  args: FieldArgs,
   info: {
     field: GraphQLField<any, any, any>;
     schema: GraphQLSchema;
-    applyArgPlan(argName: string | string[], $toPlan: ExecutablePlan): void;
-    evaluateArgPlan(
-      argName: string | string[],
-    ): ExecutablePlan<any> | undefined;
   },
 ) => TResultPlan;
 
@@ -272,20 +299,41 @@ export type FieldPlanResolver<
  * input plan that represents the value the user will pass to this field. The
  * resolver must return either a ModifierPlan or null.
  */
-export type InputObjectFieldPlanResolver<
-  _TContext extends BaseGraphQLContext,
-  TInput extends InputPlan,
-  TParentPlan extends ModifierPlan<any> | null,
-  TResultPlan extends ModifierPlan<
-    ExecutablePlan<any> | ModifierPlan<any>
-  > | null,
+export type InputObjectFieldInputPlanResolver<
+  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > = (
-  $parentPlan: TParentPlan,
-  $input: TInput,
+  input: FieldArgs,
   info: {
     schema: GraphQLSchema;
+    entity: GraphQLInputField;
   },
 ) => TResultPlan;
+
+export type InputObjectFieldApplyPlanResolver<
+  TFieldPlan extends ExecutablePlan<any> | ModifierPlan<any> =
+    | ExecutablePlan<any>
+    | ModifierPlan<any>,
+  TResultPlan extends ModifierPlan<
+    ExecutablePlan<any> | ModifierPlan<any>
+  > | null | void = ModifierPlan<
+    ExecutablePlan<any> | ModifierPlan<any>
+  > | null | void,
+> = (
+  $fieldPlan: TFieldPlan,
+  input: FieldArgs,
+  info: {
+    schema: GraphQLSchema;
+    entity: GraphQLInputField;
+  },
+) => TResultPlan;
+
+export type InputObjectTypeInputPlanResolver = (
+  input: FieldArgs,
+  info: {
+    schema: GraphQLSchema;
+    type: GraphQLInputObjectType;
+  },
+) => ExecutablePlan;
 
 // TODO: review _TContext
 /**
@@ -295,37 +343,64 @@ export type InputObjectFieldPlanResolver<
  * and an input plan that represents the value the user will pass to this
  * argument. The resolver must return either a ModifierPlan or null.
  */
-export type ArgumentPlanResolver<
-  _TContext extends BaseGraphQLContext,
-  TInput extends InputPlan,
-  TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends ExecutablePlan<any> | null,
-  TResultPlan extends ModifierPlan<
-    ExecutablePlan<any> | ModifierPlan<any>
-  > | null,
+export type ArgumentInputPlanResolver<
+  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > = (
   $parentPlan: TParentPlan,
-  $fieldPlan: TFieldPlan,
-  $input: TInput,
+  input: FieldArgs,
   info: {
     schema: GraphQLSchema;
+    entity: GraphQLArgument;
   },
 ) => TResultPlan;
 
-export type ArgumentValuePlanResolver<
-  TParentPlan extends ExecutablePlan<any> | null = ExecutablePlan<any> | null,
-  TInput extends InputPlan = InputPlan,
-  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
-> = ($parentPlan: TParentPlan, $input: TInput) => TResultPlan;
+export type ArgumentApplyPlanResolver<
+  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TFieldPlan extends ExecutablePlan<any> | ModifierPlan<any> =
+    | ExecutablePlan<any>
+    | ModifierPlan<any>,
+  TResultPlan extends
+    | ExecutablePlan
+    | ModifierPlan<ExecutablePlan | ModifierPlan>
+    | null =
+    | ExecutablePlan
+    | ModifierPlan<ExecutablePlan | ModifierPlan>
+    | null,
+> = (
+  $parentPlan: TParentPlan,
+  $fieldPlan: TFieldPlan,
+  input: FieldArgs,
+  info: {
+    schema: GraphQLSchema;
+    entity: GraphQLArgument;
+  },
+) => TResultPlan;
 
 /**
  * GraphQLScalarTypes can have plans, these are passed the field plan and must
  * return an executable plan.
  */
 export type ScalarPlanResolver<
-  TParentPlan extends ExecutablePlan<any>,
-  TResultPlan extends ExecutablePlan<any>,
+  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > = ($parentPlan: TParentPlan, info: { schema: GraphQLSchema }) => TResultPlan;
+
+/**
+ * GraphQLScalarTypes can have plans, these are passed the field plan and must
+ * return an executable plan.
+ */
+export type ScalarInputPlanResolver<
+  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+> = (
+  $inputValue: InputPlan,
+  /*
+    | __InputListPlan
+    | __InputStaticLeafPlan
+    | __InputDynamicScalarPlan,
+  */
+  info: { schema: GraphQLSchema; type: GraphQLScalarType },
+) => TResultPlan;
 
 /**
  * EXPERIMENTAL!
@@ -336,7 +411,11 @@ export type ScalarPlanResolver<
  *
  * @internal
  */
-export type EnumPlanResolver = (plan: any) => void;
+export type EnumValueApplyPlanResolver<
+  TParentPlan extends ExecutablePlan | ModifierPlan =
+    | ExecutablePlan
+    | ModifierPlan,
+> = ($parent: TParentPlan) => ModifierPlan | void;
 
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
@@ -484,24 +563,17 @@ export type GraphileFieldConfigArgumentMap<
  */
 export type GraphileArgumentConfig<
   TInputType extends GraphQLInputType,
-  TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any> | null,
+  _TContext extends BaseGraphQLContext,
+  _TParentPlan extends ExecutablePlan<any> | null,
   TFieldPlan extends ExecutablePlan<any>,
-  TArgumentPlan extends TFieldPlan extends ExecutablePlan<any>
+  _TArgumentPlan extends TFieldPlan extends ExecutablePlan<any>
     ? ModifierPlan<TFieldPlan> | null
     : null,
-  TInput extends InputTypeFor<TInputType>,
+  _TInput extends InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
-  plan?: TParentPlan extends ExecutablePlan<any>
-    ? ArgumentPlanResolver<
-        TContext,
-        TInput,
-        TParentPlan,
-        TFieldPlan,
-        TArgumentPlan
-      >
-    : never;
+  inputPlan?: ArgumentInputPlanResolver<any>;
+  applyPlan?: ArgumentApplyPlanResolver<any, any>;
 };
 
 /**
@@ -509,18 +581,14 @@ export type GraphileArgumentConfig<
  */
 export type GraphileInputFieldConfig<
   TInputType extends GraphQLInputType,
-  TContext extends BaseGraphQLContext,
-  TParentPlan extends ModifierPlan<any>,
-  TResultPlan extends InputPlanForType<TInputType>,
-  TInput extends InputTypeFor<TInputType>,
+  _TContext extends BaseGraphQLContext,
+  _TParentPlan extends ModifierPlan<any>,
+  _TResultPlan extends InputPlanForType<TInputType>,
+  _TInput extends InputTypeFor<TInputType>,
 > = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
-  plan?: InputObjectFieldPlanResolver<
-    TContext,
-    TInput,
-    TParentPlan,
-    TResultPlan
-  >;
+  inputPlan?: InputObjectFieldInputPlanResolver;
+  applyPlan?: InputObjectFieldApplyPlanResolver<any>;
 };
 
 /**
@@ -529,7 +597,7 @@ export type GraphileInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  [key in keyof TArgs]: InputPlan;
+  get<TKey extends keyof TArgs>(key: TKey): InputPlan;
 };
 
 /**

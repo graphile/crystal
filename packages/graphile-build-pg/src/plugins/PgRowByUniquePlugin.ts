@@ -1,12 +1,12 @@
 import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
-import type { TrackedArguments } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import { GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { FieldArgs } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -132,14 +132,12 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                     )
                   : EXPORTABLE(
                       (detailsByColumnName, source) =>
-                        function plan(
-                          _$root: any,
-                          args: TrackedArguments<any>,
-                        ) {
+                        function plan(_$root: any, args: FieldArgs) {
                           const spec = {};
                           for (const columnName in detailsByColumnName) {
-                            spec[columnName] =
-                              args[detailsByColumnName[columnName].graphqlName];
+                            spec[columnName] = args.get(
+                              detailsByColumnName[columnName].graphqlName,
+                            );
                           }
                           return source.get(spec);
                         },

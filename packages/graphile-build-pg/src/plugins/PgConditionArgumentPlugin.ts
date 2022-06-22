@@ -122,25 +122,25 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: type as GraphQLInputType,
-                              plan: EXPORTABLE(
+                              applyPlan: EXPORTABLE(
                                 (column, columnName, sql) =>
                                   function plan(
                                     $condition: PgConditionPlan<
                                       PgSelectPlan<any, any, any, any>
                                     >,
-                                    $value: InputPlan,
+                                    val,
                                   ) {
                                     const expression = sql`${
                                       $condition.alias
                                     }.${sql.identifier(columnName)}`;
-                                    if ($value.evalIs(null)) {
+                                    if (val.getRaw().evalIs(null)) {
                                       $condition.where(
                                         sql`${expression} is null`,
                                       );
                                     } else {
                                       $condition.where(
                                         sql`${expression} = ${$condition.placeholder(
-                                          $value,
+                                          val.get(),
                                           column.codec,
                                         )}`,
                                       );
@@ -229,7 +229,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 "arg",
               ),
               type: tableConditionType,
-              plan: isPgFieldConnection
+              applyPlan: isPgFieldConnection
                 ? (
                     _condition,
                     $connection: ConnectionPlan<

@@ -14,7 +14,7 @@ import type {
   __TrackedObjectPlan,
   ExecutablePlan,
   InputPlan,
-  TrackedArguments,
+  FieldArgs,
 } from "dataplanner";
 import { lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
@@ -671,12 +671,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                  * pgUpdate/pgDelete spec describing the row to update/delete.
                  */
                 const specFromArgs = EXPORTABLE(
-                  (uniqueColumns) => (args: TrackedArguments) => {
+                  (uniqueColumns) => (args: FieldArgs) => {
                     return uniqueColumns.reduce(
                       (memo, [columnName, fieldName]) => {
-                        memo[columnName] = (
-                          args.input as __TrackedObjectPlan | __InputObjectPlan
-                        ).get(fieldName);
+                        memo[columnName] = args.get(["input", "fieldName"]);
                         return memo;
                       },
                       {},
@@ -694,7 +692,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         args: {
                           input: {
                             type: new GraphQLNonNull(mutationInputType),
-                            plan: EXPORTABLE(
+                            applyPlan: EXPORTABLE(
                               () =>
                                 function plan(
                                   _: any,
@@ -728,7 +726,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   (object, pgUpdate, source, specFromArgs) =>
                                     function plan(
                                       _$root: ExecutablePlan,
-                                      args: TrackedArguments,
+                                      args: FieldArgs,
                                     ) {
                                       return object({
                                         result: pgUpdate(
@@ -754,7 +752,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 (object, pgDelete, source, specFromArgs) =>
                                   function plan(
                                     _$root: ExecutablePlan,
-                                    args: TrackedArguments,
+                                    args: FieldArgs,
                                   ) {
                                     return object({
                                       result: pgDelete(
