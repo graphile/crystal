@@ -89,10 +89,9 @@ function withFieldArgsForArgumentsOrInputObject<
     }
 
     const id = path.join(".");
-    if (analyzedCoordinates.includes(id)) {
-      throw new Error(`Argument '${id}' has already been evaluated`);
+    if (!analyzedCoordinates.includes(id)) {
+      analyzedCoordinates.push(id);
     }
-    analyzedCoordinates.push(id);
 
     const argName = path.shift()!;
     let $value = ($current.get as (argName: string) => InputPlan)(argName);
