@@ -2186,11 +2186,13 @@ export class Aether<
   }
 
   public withModifiers<T>(cb: () => T): T {
-    assert.strictEqual(
-      this.modifierPlans.length,
+    // Stash previous modifiers
+    const previousStack = this.modifierPlans.splice(
       0,
-      "Expected Aether.modifierPlans to be empty",
+      this.modifierPlans.length,
     );
+    const previousCount = this.modifierPlanCount;
+    this.modifierPlanCount = 0;
 
     const result = cb();
 
@@ -2198,7 +2200,12 @@ export class Aether<
     const plansToApply = this.modifierPlans
       .splice(0, this.modifierPlans.length)
       .reverse();
-    this.modifierPlanCount = 0;
+
+    // Restore previous modifiers
+    this.modifierPlanCount = previousCount;
+    for (const mod of previousStack) {
+      this.modifierPlans.push(mod);
+    }
 
     // Apply the plans.
     for (let i = 0, l = plansToApply.length; i < l; i++) {
