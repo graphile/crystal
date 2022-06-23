@@ -431,9 +431,11 @@ export function listOfType<
     sqlType: identifier,
     // TODO: this does __NOT__ handle nulls safely!
     fromPg: (value) =>
-      arrayParse(value)
-        .flat(100)
-        .map((v) => innerCodec.fromPg(v)) as any,
+      value == null
+        ? null
+        : (arrayParse(value)
+            .flat(100)
+            .map((v) => innerCodec.fromPg(v)) as any),
     // TODO: this does __NOT__ handle nulls safely!
     toPg: (value) => {
       if (!value) {
