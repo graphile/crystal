@@ -564,16 +564,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 (memo, { inputType, graphqlArgName }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
-                    /*
-                    extensions: {
-                      graphile: {
-                        plan($parent: ExecutablePlan, $value: InputPlan) {
-                          if (inputType.extensions
-                          return $value;
-                        },
-                      },
-                    },
-                    */
                   };
                   return memo;
                 },
