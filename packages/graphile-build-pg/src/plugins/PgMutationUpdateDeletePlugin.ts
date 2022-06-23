@@ -659,9 +659,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   ? `{ ${uniqueColumns
                       .map(
                         ([columnName, fieldName]) =>
-                          `${columnName}: args.input.get(${JSON.stringify(
+                          `${columnName}: args.get(['input', ${JSON.stringify(
                             fieldName,
-                          )})`,
+                          )}])`,
                       )
                       .join(", ")} }`
                   : null;
@@ -674,7 +674,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   (uniqueColumns) => (args: FieldArgs) => {
                     return uniqueColumns.reduce(
                       (memo, [columnName, fieldName]) => {
-                        memo[columnName] = args.get(["input", "fieldName"]);
+                        memo[columnName] = args.get(["input", fieldName]);
                         return memo;
                       },
                       {},
