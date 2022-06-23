@@ -7,7 +7,12 @@ import type {
   PgSelectSinglePlan,
   PgTypeCodec,
 } from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan, LambdaPlan } from "dataplanner";
+import type {
+  ConnectionPlan,
+  GraphileFieldConfigArgumentMap,
+  InputPlan,
+  LambdaPlan,
+} from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
@@ -140,7 +145,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                 "arg",
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
-              plan: isPgFieldConnection
+              applyPlan: isPgFieldConnection
                 ? EXPORTABLE(
                     (applyOrderToPlan, tableOrderByTypeName) =>
                       function plan(
@@ -150,9 +155,10 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                           PgSelectParsedCursorPlan,
                           PgSelectPlan<any, any, any, any>
                         >,
-                        $value: InputPlan,
+                        val,
                         info: { schema: GraphQLSchema },
                       ) {
+                        const $value = val.getRaw();
                         const $select = $connection.getSubplan();
                         applyOrderToPlan(
                           $select,
@@ -170,9 +176,10 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                       function plan(
                         _: any,
                         $select: PgSelectPlan<any, any, any, any>,
-                        $value: InputPlan,
+                        val,
                         info: { schema: GraphQLSchema },
                       ) {
+                        const $value = val.getRaw();
                         applyOrderToPlan(
                           $select,
                           $value,
@@ -185,7 +192,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                     [applyOrderToPlan, tableOrderByTypeName],
                   ),
             },
-          },
+          } as GraphileFieldConfigArgumentMap<any, any, any, any>,
           `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`,
         );
       },
