@@ -1,15 +1,15 @@
-import {
+import type {
   Introspection,
   PgAttribute,
   PgClass,
   PgConstraint,
-  PgEnum,
-  PgType,
 } from "pg-introspection";
+import { PgEnum, PgType } from "pg-introspection";
 import { version } from "../index.js";
 import { sql } from "pg-sql2";
 import { withPgClientFromPgSource } from "../pgSources.js";
-import { enumType, PgTypeCodec } from "@dataplan/pg";
+import type { PgTypeCodec } from "@dataplan/pg";
+import { enumType } from "@dataplan/pg";
 
 declare global {
   namespace GraphileConfig {

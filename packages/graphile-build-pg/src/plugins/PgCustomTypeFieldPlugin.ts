@@ -19,11 +19,11 @@ import type {
   __InputObjectPlan,
   __TrackedObjectPlan,
   ExecutablePlan,
-  InputPlan,
+  FieldArgs,
   FieldPlanResolver,
   GraphileArgumentConfig,
   GraphileFieldConfigArgumentMap,
-  FieldArgs,
+  InputPlan,
 } from "dataplanner";
 import { aether } from "dataplanner";
 import {
@@ -580,7 +580,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               );
 
               const makeArgs = EXPORTABLE(
-                (argDetailsSimple) =>
+                (argDetailsSimple, constant) =>
                   (args: FieldArgs, path: string[] = []) => {
                     const selectArgs: PgSelectArgumentSpec[] = [];
 
@@ -591,7 +591,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       pgCodec,
                       required,
                     } of argDetailsSimple) {
-                      let $raw = args.getRaw([...path, graphqlArgName]);
+                      const $raw = args.getRaw([...path, graphqlArgName]);
                       let plan: ExecutablePlan;
                       if ($raw.evalIs(undefined)) {
                         if (!required) {
@@ -628,7 +628,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                     return selectArgs;
                   },
-                [argDetailsSimple],
+                [argDetailsSimple, constant],
               );
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<
@@ -638,27 +638,27 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               > = isRootQuery
                 ? // Not computed
                   EXPORTABLE(
-                    (source) => ($root, args, info) => {
+                    (makeArgs, source) => ($root, args, info) => {
                       const selectArgs = makeArgs(args);
                       return source.execute(selectArgs);
                     },
-                    [source],
+                    [makeArgs, source],
                   )
                 : isRootMutation
                 ? // Mutation uses 'args.input' rather than 'args'
                   EXPORTABLE(
-                    (object, source) => ($root, args, info) => {
+                    (makeArgs, object, source) => ($root, args, info) => {
                       const selectArgs = makeArgs(args, ["input"]);
                       const $result = source.execute(selectArgs);
                       return object({
                         result: $result,
                       });
                     },
-                    [object, source],
+                    [makeArgs, object, source],
                   )
                 : // Otherwise computed:
                   EXPORTABLE(
-                    (PgSelectSinglePlan, pgClassExpression, source) =>
+                    (PgSelectSinglePlan, makeArgs, pgClassExpression, source) =>
                       ($row, args, info) => {
                         if (!($row instanceof PgSelectSinglePlan)) {
                           throw new Error(
@@ -694,7 +694,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         // TODO: or here, if scalar add select to `$row`?
                         return source.execute(selectArgs);
                       },
-                    [PgSelectSinglePlan, pgClassExpression, source],
+                    [PgSelectSinglePlan, makeArgs, pgClassExpression, source],
                   );
 
               if (isRootMutation) {
