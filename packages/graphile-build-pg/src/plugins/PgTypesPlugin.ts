@@ -4,11 +4,11 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
+import { access, ExecutablePlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../index.js";
-import { access, ExecutablePlan } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -298,11 +298,11 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 type: GraphQLFloat,
                 plan: EXPORTABLE(
-                  () =>
+                  (access) =>
                     function plan($r: ExecutablePlan<any>) {
                       return access($r, ["seconds"]);
                     },
-                  [],
+                  [access],
                 ),
               },
               minutes: {
@@ -312,11 +312,11 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 type: GraphQLInt,
                 plan: EXPORTABLE(
-                  () =>
+                  (access) =>
                     function plan($r: ExecutablePlan<any>) {
                       return access($r, ["minutes"]);
                     },
-                  [],
+                  [access],
                 ),
               },
               hours: {
@@ -326,11 +326,11 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 type: GraphQLInt,
                 plan: EXPORTABLE(
-                  () =>
+                  (access) =>
                     function plan($r: ExecutablePlan<any>) {
                       return access($r, ["hours"]);
                     },
-                  [],
+                  [access],
                 ),
               },
               days: {
@@ -340,11 +340,11 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 type: GraphQLInt,
                 plan: EXPORTABLE(
-                  () =>
+                  (access) =>
                     function plan($r: ExecutablePlan<any>) {
                       return access($r, ["days"]);
                     },
-                  [],
+                  [access],
                 ),
               },
               months: {
@@ -354,11 +354,11 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 type: GraphQLInt,
                 plan: EXPORTABLE(
-                  () =>
+                  (access) =>
                     function plan($r: ExecutablePlan<any>) {
                       return access($r, ["months"]);
                     },
-                  [],
+                  [access],
                 ),
               },
               years: {
@@ -368,11 +368,11 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 type: GraphQLInt,
                 plan: EXPORTABLE(
-                  () =>
+                  (access) =>
                     function plan($r: ExecutablePlan<any>) {
                       return access($r, ["years"]);
                     },
-                  [],
+                  [access],
                 ),
               },
             };

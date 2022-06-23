@@ -4,10 +4,10 @@ import type { PgTypeCodec } from "@dataplan/pg";
 import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
+import type { PgSmartTagsDict } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { PgSmartTagsDict } from "pg-introspection";
 
 declare global {
   namespace GraphileConfig {

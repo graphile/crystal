@@ -1,12 +1,12 @@
 import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
+import type { FieldArgs } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import { GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { FieldArgs } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {

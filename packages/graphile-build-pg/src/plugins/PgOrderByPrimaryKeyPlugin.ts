@@ -59,7 +59,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
               extensions: {
                 graphile: {
                   applyPlan: EXPORTABLE(
-                    (pgCodec, primaryKeyColumns, sql) =>
+                    (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
                       (plan: PgSelectPlan<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
@@ -78,7 +78,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                         });
                         plan.setOrderIsUnique();
                       },
-                    [pgCodec, primaryKeyColumns, sql],
+                    [orderByNullsLast, pgCodec, primaryKeyColumns, sql],
                   ),
                 },
               },
@@ -87,7 +87,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
               extensions: {
                 graphile: {
                   applyPlan: EXPORTABLE(
-                    (pgCodec, primaryKeyColumns, sql) =>
+                    (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
                       (plan: PgSelectPlan<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
@@ -106,7 +106,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                         });
                         plan.setOrderIsUnique();
                       },
-                    [pgCodec, primaryKeyColumns, sql],
+                    [orderByNullsLast, pgCodec, primaryKeyColumns, sql],
                   ),
                 },
               },
