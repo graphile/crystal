@@ -67,7 +67,7 @@ function withFieldArgsForArgumentsOrInputObject<
   TParentPlan extends ExecutablePlan,
 >(
   aether: Aether,
-  type: GraphQLInputType | null,
+  typeContainingFields: GraphQLInputType | null,
   parentPlan: TParentPlan,
   $current: TrackedArguments | InputPlan, //__TrackedObjectPlan | __InputObjectPlan,
   fields: {
@@ -141,16 +141,7 @@ function withFieldArgsForArgumentsOrInputObject<
     $toPlan: ExecutablePlan | ModifierPlan | null,
   ) {
     const plan = aether.withModifiers(() => {
-      const { argOrField, $value, type } = details;
-
-      const defaultApplyPlan = () => {};
-      const defaultInputPlan = (args: FieldArgs) => {
-        return args.get();
-      };
-
-      const planResolver = $toPlan
-        ? argOrField.extensions?.graphile?.applyPlan ?? defaultApplyPlan
-        : argOrField.extensions?.graphile?.inputPlan ?? defaultInputPlan;
+      const { argOrField, $value } = details;
 
       return withFieldArgsForArgOrField(
         aether,
@@ -158,35 +149,51 @@ function withFieldArgsForArgumentsOrInputObject<
         argOrField,
         $value,
         (fieldArgs) => {
-          if (!type) {
+          if (!typeContainingFields) {
+            const arg = argOrField as GraphQLArgument;
             if ($toPlan) {
-              const argResolver = planResolver as ArgumentApplyPlanResolver;
-              return argResolver(parentPlan, $toPlan, fieldArgs, {
-                schema,
-                entity: argOrField as GraphQLArgument,
-              });
+              const argResolver = arg.extensions.graphile?.applyPlan;
+              if (argResolver) {
+                return argResolver(parentPlan, $toPlan, fieldArgs, {
+                  schema,
+                  entity: argOrField as GraphQLArgument,
+                });
+              } else {
+                return $toPlan;
+              }
             } else {
-              const argResolver = planResolver as ArgumentInputPlanResolver;
-              return argResolver(parentPlan, fieldArgs, {
-                schema,
-                entity: argOrField as GraphQLArgument,
-              });
+              const argResolver = arg.extensions.graphile?.inputPlan;
+              if (argResolver) {
+                return argResolver(parentPlan, fieldArgs, {
+                  schema,
+                  entity: argOrField as GraphQLArgument,
+                });
+              } else {
+                return fieldArgs.get();
+              }
             }
           } else {
+            const field = argOrField as GraphQLInputField;
             if ($toPlan) {
-              const fieldResolver =
-                planResolver as InputObjectFieldApplyPlanResolver;
-              return fieldResolver($toPlan, fieldArgs, {
-                schema,
-                entity: argOrField as GraphQLInputField,
-              });
+              const fieldResolver = field.extensions.graphile?.applyPlan;
+              if (fieldResolver) {
+                return fieldResolver($toPlan, fieldArgs, {
+                  schema,
+                  entity: argOrField as GraphQLInputField,
+                });
+              } else {
+                return $toPlan;
+              }
             } else {
-              const fieldResolver =
-                planResolver as InputObjectFieldInputPlanResolver;
-              return fieldResolver(fieldArgs, {
-                schema,
-                entity: argOrField as GraphQLInputField,
-              });
+              const fieldResolver = field.extensions.graphile?.inputPlan;
+              if (fieldResolver) {
+                return fieldResolver(fieldArgs, {
+                  schema,
+                  entity: argOrField as GraphQLInputField,
+                });
+              } else {
+                return fieldArgs.get();
+              }
             }
           }
         },
@@ -223,7 +230,7 @@ function withFieldArgsForArgumentsOrInputObject<
         defaultInputObjectTypeInputPlanResolver;
       return withFieldArgsForArgumentsOrInputObject(
         aether,
-        null,
+        currentType,
         parentPlan,
         $value as any,
         currentType.getFields(),
@@ -286,7 +293,7 @@ function withFieldArgsForArgumentsOrInputObject<
         if (resolver) {
           withFieldArgsForArgumentsOrInputObject(
             aether,
-            null,
+            currentType,
             parentPlan,
             $value as any,
             currentType.getFields(),
@@ -320,12 +327,12 @@ function withFieldArgsForArgumentsOrInputObject<
     get(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
-        if (!type) {
+        if (!typeContainingFields) {
           throw new Error(
             "You cannot call `get()` without a path in this situation",
           );
         } else {
-          return getPlannedValue($current as InputPlan, type);
+          return getPlannedValue($current as InputPlan, typeContainingFields);
         }
       }
       const details = getArgOnceOnly(path);
@@ -349,7 +356,7 @@ function withFieldArgsForArgumentsOrInputObject<
     apply($target, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
-        if (type && ($current as InputPlan).evalIs(undefined)) {
+        if (typeContainingFields && ($current as InputPlan).evalIs(undefined)) {
           return;
         }
         if (fields) {
@@ -358,12 +365,16 @@ function withFieldArgsForArgumentsOrInputObject<
           }
           return;
         } else {
-          if (!type) {
+          if (!typeContainingFields) {
             throw new Error(
               "You cannot call `apply()` without a path in this situation",
             );
           } else {
-            return applyPlannedValue($current as InputPlan, type, $target);
+            return applyPlannedValue(
+              $current as InputPlan,
+              typeContainingFields,
+              $target,
+            );
           }
         }
       }
