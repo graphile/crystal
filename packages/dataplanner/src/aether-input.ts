@@ -407,8 +407,8 @@ function withFieldArgsForArgumentsOrInputObject<
         layerFields: typeof fields,
         parentPath: readonly string[] = [],
       ) => {
-        for (const fieldName in fields) {
-          const field = fields[fieldName];
+        for (const fieldName in layerFields) {
+          const field = layerFields[fieldName];
           const newPath = [...parentPath, fieldName];
           const pathStr = newPath.join(".");
           const prefix = `${pathStr}.`;
