@@ -8,9 +8,7 @@ import type {
 } from "@dataplan/pg";
 import type {
   ConnectionPlan,
-  FieldArgs,
   GraphileFieldConfigArgumentMap,
-  InputPlan,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 

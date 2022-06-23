@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type { PgTypeCodec } from "@dataplan/pg";
-import { object } from "dataplanner";
+// import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 

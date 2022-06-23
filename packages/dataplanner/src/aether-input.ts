@@ -20,11 +20,7 @@ import type {
 } from "./index.js";
 import type { InputPlan } from "./input.js";
 import type {
-  ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   FieldArgs,
-  InputObjectFieldApplyPlanResolver,
-  InputObjectFieldInputPlanResolver,
   InputObjectTypeInputPlanResolver,
   TrackedArguments,
 } from "./interfaces.js";

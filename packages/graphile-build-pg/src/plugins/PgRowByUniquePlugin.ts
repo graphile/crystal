@@ -3,7 +3,6 @@ import "graphile-config";
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { FieldArgs } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import { GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -50,7 +49,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
-          graphql: { GraphQLNonNull },
+          graphql: { GraphQLNonNull, GraphQLObjectType },
         } = build;
         const {
           scope: { isRootQuery },

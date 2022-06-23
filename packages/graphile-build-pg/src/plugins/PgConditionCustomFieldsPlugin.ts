@@ -6,7 +6,6 @@ import type {
   PgSource,
   PgSourceParameter,
 } from "@dataplan/pg";
-import type { InputPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";

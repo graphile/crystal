@@ -3,12 +3,8 @@ import debugFactory from "debug";
 import type {
   FieldNode,
   FragmentDefinitionNode,
-  GraphQLArgument,
   GraphQLEnumType,
   GraphQLField,
-  GraphQLInputField,
-  GraphQLInputObjectType,
-  GraphQLInputType,
   GraphQLNamedType,
   GraphQLOutputType,
   GraphQLSchema,
@@ -19,7 +15,6 @@ import {
   defaultFieldResolver,
   executeSync,
   getNamedType,
-  getNullableType,
   GraphQLBoolean,
   GraphQLFloat,
   GraphQLID,
@@ -32,7 +27,6 @@ import {
   GraphQLString,
   GraphQLUnionType,
   isEnumType,
-  isInputObjectType,
   isInterfaceType,
   isLeafType,
   isListType,
@@ -75,7 +69,6 @@ import {
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
   typesUsedInSelections,
 } from "./graphqlMergeSelectionSets.js";
-import type { InputPlan } from "./input.js";
 import { inputPlan } from "./input.js";
 import type {
   BaseGraphQLContext,
@@ -114,14 +107,13 @@ import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
-  assertModifierPlan,
   ExecutablePlan,
   isListCapablePlan,
   isStreamablePlan,
 } from "./plan.js";
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
-import type { __InputObjectPlan, AccessPlan } from "./plans/index.js";
+import type { __InputObjectPlan } from "./plans/index.js";
 import {
   __ItemPlan,
   __TrackedObjectPlan,

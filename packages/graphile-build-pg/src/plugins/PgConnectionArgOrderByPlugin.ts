@@ -11,7 +11,6 @@ import type {
   ConnectionPlan,
   GraphileFieldConfigArgumentMap,
   InputPlan,
-  LambdaPlan,
 } from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";

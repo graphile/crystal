@@ -21,11 +21,9 @@ import type {
   ExecutablePlan,
   FieldArgs,
   FieldPlanResolver,
-  GraphileArgumentConfig,
   GraphileFieldConfigArgumentMap,
   InputPlan,
 } from "dataplanner";
-import { aether } from "dataplanner";
 import {
   __ListTransformPlan,
   connection,
@@ -34,14 +32,10 @@ import {
   ObjectPlan,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-
-function isNotNullish<T>(a: T | null | undefined): a is T {
-  return a != null;
-}
 
 declare global {
   namespace GraphileBuild {
@@ -638,7 +632,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               > = isRootQuery
                 ? // Not computed
                   EXPORTABLE(
-                    (makeArgs, source) => ($root, args, info) => {
+                    (makeArgs, source) => ($root, args, _info) => {
                       const selectArgs = makeArgs(args);
                       return source.execute(selectArgs);
                     },
@@ -647,7 +641,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 : isRootMutation
                 ? // Mutation uses 'args.input' rather than 'args'
                   EXPORTABLE(
-                    (makeArgs, object, source) => ($root, args, info) => {
+                    (makeArgs, object, source) => ($root, args, _info) => {
                       const selectArgs = makeArgs(args, ["input"]);
                       const $result = source.execute(selectArgs);
                       return object({
@@ -659,7 +653,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 : // Otherwise computed:
                   EXPORTABLE(
                     (PgSelectSinglePlan, makeArgs, pgClassExpression, source) =>
-                      ($row, args, info) => {
+                      ($row, args, _info) => {
                         if (!($row instanceof PgSelectSinglePlan)) {
                           throw new Error(
                             `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,

@@ -8,7 +8,7 @@ import type {
   PgSelectSinglePlan,
   PgTypeColumns,
 } from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan } from "dataplanner";
+import type { ConnectionPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 

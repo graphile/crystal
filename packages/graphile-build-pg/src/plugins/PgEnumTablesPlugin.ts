@@ -6,7 +6,6 @@ import type {
   PgClass,
   PgConstraint,
 } from "pg-introspection";
-import { PgEnum, PgType } from "pg-introspection";
 import { sql } from "pg-sql2";
 
 import { version } from "../index.js";
@@ -45,13 +44,15 @@ interface State {
 }
 interface Cache {}
 
-// Assert the columns are text
+// TODO: Assert the columns are text
+/*
 const VARCHAR_ID = "1043";
 const TEXT_ID = "25";
 const CHAR_ID = "18";
 const BPCHAR_ID = "1042";
 
 const VALID_TYPE_IDS = [VARCHAR_ID, TEXT_ID, CHAR_ID, BPCHAR_ID];
+*/
 
 export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
   name: "PgEnumTablesPlugin",
@@ -143,7 +144,8 @@ Original error: ${e.message}
           if (!pgNamespace) {
             continue;
           }
-          const { tags, description } = pgClass.getTagsAndDescription();
+          const { tags, description: _description } =
+            pgClass.getTagsAndDescription();
           const isEnumTable =
             tags.enum === true || typeof tags.enum === "string";
 
@@ -230,9 +232,7 @@ Original error: ${e.message}
               }
 
               // TODO: values should be an object array to leave space for description, etc?
-              const values: string[] = data.map(
-                (r, i) => r[pgAttribute.attname],
-              );
+              const values: string[] = data.map((r) => r[pgAttribute.attname]);
 
               // Build the codec
               const codec = enumType(

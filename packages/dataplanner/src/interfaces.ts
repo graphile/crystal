@@ -280,7 +280,7 @@ export interface FieldArgs {
  * executions.
  */
 export type FieldPlanResolver<
-  TArgs extends BaseGraphQLArguments,
+  _TArgs extends BaseGraphQLArguments,
   TParentPlan extends ExecutablePlan<any> | null,
   TResultPlan extends ExecutablePlan<any>,
 > = (

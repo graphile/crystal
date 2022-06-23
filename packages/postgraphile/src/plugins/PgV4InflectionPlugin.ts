@@ -1,9 +1,6 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type { PgSmartTagsDict } from "graphile-build-pg";
-import { inspect } from "util";
-
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {

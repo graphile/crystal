@@ -12,11 +12,11 @@ import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch, connection } from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { GraphQLObjectType } from "graphql";
 
 declare global {
   namespace GraphileBuild {
@@ -385,7 +385,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,
-          graphql: { GraphQLList },
+          graphql: { GraphQLList, GraphQLObjectType },
           options: { simpleCollections },
         } = build;
         const {
