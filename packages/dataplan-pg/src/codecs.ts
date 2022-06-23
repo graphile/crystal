@@ -289,7 +289,8 @@ function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   const columnDefs = realColumnDefs(columns);
   return (value) => {
     const values = columnDefs.map(([columnName, spec]) => {
-      const val = spec.codec.toPg(value[columnName]);
+      const v = value[columnName];
+      const val = v == null ? null : spec.codec.toPg(v);
       return toRecordString(val);
     });
     return `(${values.join(",")})`;
