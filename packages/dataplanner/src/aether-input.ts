@@ -320,20 +320,12 @@ function withFieldArgsForArgumentsOrInputObject<
     get(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
-        if (fields) {
-          const result = Object.create(null);
-          for (const fieldName of Object.keys(fields)) {
-            result[fieldName] = fieldArgs.get(fieldName);
-          }
-          return object(result);
+        if (!type) {
+          throw new Error(
+            "You cannot call `get()` without a path in this situation",
+          );
         } else {
-          if (!type) {
-            throw new Error(
-              "You cannot call `get()` without a path in this situation",
-            );
-          } else {
-            return getPlannedValue($current as InputPlan, type);
-          }
+          return getPlannedValue($current as InputPlan, type);
         }
       }
       const details = getArgOnceOnly(path);
