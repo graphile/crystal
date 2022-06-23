@@ -1,19 +1,19 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import {
-  PgSelectPlan,
+import type {
   PgSourceUnique,
   PgTypeCodec,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
+import { PgSelectPlan } from "@dataplan/pg";
+import type { ExecutablePlan, ModifierPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
+import type { GraphQLEnumValueConfigMap } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { GraphQLEnumValueConfigMap } from "graphql";
-import { ExecutablePlan, ModifierPlan } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -131,7 +131,14 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     graphile: {
                       applyPlan: EXPORTABLE(
-                        (column, columnName, isUnique, orderByNullsLast, sql) =>
+                        (
+                            PgSelectPlan,
+                            column,
+                            columnName,
+                            isUnique,
+                            orderByNullsLast,
+                            sql,
+                          ) =>
                           (plan: ExecutablePlan | ModifierPlan): void => {
                             if (!(plan instanceof PgSelectPlan)) {
                               throw new Error(
@@ -154,7 +161,14 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               plan.setOrderIsUnique();
                             }
                           },
-                        [column, columnName, isUnique, orderByNullsLast, sql],
+                        [
+                          PgSelectPlan,
+                          column,
+                          columnName,
+                          isUnique,
+                          orderByNullsLast,
+                          sql,
+                        ],
                       ),
                     },
                   },
@@ -176,7 +190,14 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     graphile: {
                       applyPlan: EXPORTABLE(
-                        (column, columnName, isUnique, orderByNullsLast, sql) =>
+                        (
+                            PgSelectPlan,
+                            column,
+                            columnName,
+                            isUnique,
+                            orderByNullsLast,
+                            sql,
+                          ) =>
                           (plan: ExecutablePlan | ModifierPlan): void => {
                             if (!(plan instanceof PgSelectPlan)) {
                               throw new Error(
@@ -199,7 +220,14 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               plan.setOrderIsUnique();
                             }
                           },
-                        [column, columnName, isUnique, orderByNullsLast, sql],
+                        [
+                          PgSelectPlan,
+                          column,
+                          columnName,
+                          isUnique,
+                          orderByNullsLast,
+                          sql,
+                        ],
                       ),
                     },
                   },

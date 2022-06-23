@@ -372,6 +372,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         const executor = EXPORTABLE(
           (
             PgExecutor,
+            constant,
             context,
             databaseName,
             object,
@@ -393,10 +394,11 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             }),
           [
             PgExecutor,
+            constant,
             context,
             databaseName,
             object,
-            pgSettingsKey as keyof GraphileBuild.GraphileResolverContext,
+            pgSettingsKey,
             withPgClientKey,
           ],
         );

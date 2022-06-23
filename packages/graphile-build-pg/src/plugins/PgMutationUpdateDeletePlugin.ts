@@ -13,8 +13,8 @@ import type {
   __InputObjectPlan,
   __TrackedObjectPlan,
   ExecutablePlan,
-  InputPlan,
   FieldArgs,
+  InputPlan,
 } from "dataplanner";
 import { lambda, object, ObjectPlan } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
