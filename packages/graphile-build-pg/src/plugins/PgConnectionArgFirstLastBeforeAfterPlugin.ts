@@ -6,7 +6,12 @@ import type {
   PgSelectPlan,
   PgSelectSinglePlan,
 } from "@dataplan/pg";
-import type { ConnectionPlan, InputPlan } from "dataplanner";
+import type {
+  ConnectionPlan,
+  InputPlan,
+  GraphileFieldConfigArgumentMap,
+  FieldArgs,
+} from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
@@ -69,7 +74,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                   "arg",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
+                applyPlan: EXPORTABLE(
                   () =>
                     function plan(
                       _: any,
@@ -78,9 +83,9 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         PgSelectParsedCursorPlan,
                         PgSelectPlan<any, any, any, any>
                       >,
-                      $value: InputPlan,
+                      arg,
                     ) {
-                      $connection.setFirst($value);
+                      $connection.setFirst(arg.getRaw());
                     },
                   [],
                 ),
@@ -93,7 +98,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         "arg",
                       ),
                       type: GraphQLInt,
-                      plan: EXPORTABLE(
+                      applyPlan: EXPORTABLE(
                         () =>
                           function plan(
                             _: any,
@@ -102,9 +107,9 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                               PgSelectParsedCursorPlan,
                               PgSelectPlan<any, any, any, any>
                             >,
-                            $value: InputPlan,
+                            val,
                           ) {
-                            $connection.setLast($value);
+                            $connection.setLast(val.getRaw());
                           },
                         [],
                       ),
@@ -119,7 +124,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                   "arg",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
+                applyPlan: EXPORTABLE(
                   () =>
                     function plan(
                       _: any,
@@ -128,9 +133,9 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         PgSelectParsedCursorPlan,
                         PgSelectPlan<any, any, any, any>
                       >,
-                      $value: InputPlan,
+                      val,
                     ) {
-                      $connection.setOffset($value);
+                      $connection.setOffset(val.getRaw());
                     },
                   [],
                 ),
@@ -143,7 +148,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         "arg",
                       ),
                       type: Cursor,
-                      plan: EXPORTABLE(
+                      applyPlan: EXPORTABLE(
                         () =>
                           function plan(
                             _: any,
@@ -152,9 +157,9 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                               PgSelectParsedCursorPlan,
                               PgSelectPlan<any, any, any, any>
                             >,
-                            $value: InputPlan,
+                            val,
                           ) {
-                            $connection.setBefore($value);
+                            $connection.setBefore(val.getRaw());
                           },
                         [],
                       ),
@@ -165,7 +170,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         "arg",
                       ),
                       type: Cursor,
-                      plan: EXPORTABLE(
+                      applyPlan: EXPORTABLE(
                         () =>
                           function plan(
                             _: any,
@@ -174,16 +179,16 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                               PgSelectParsedCursorPlan,
                               PgSelectPlan<any, any, any, any>
                             >,
-                            $value: InputPlan,
+                            val,
                           ) {
-                            $connection.setAfter($value);
+                            $connection.setAfter(val.getRaw());
                           },
                         [],
                       ),
                     },
                   }
                 : null),
-            },
+            } as GraphileFieldConfigArgumentMap<any, any, any, any>,
             isPgFieldConnection
               ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
               : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`,
