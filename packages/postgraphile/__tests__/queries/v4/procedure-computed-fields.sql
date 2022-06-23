@@ -1,617 +1,169 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'compoundType'::text,
-        (
-          case when (
-            (__local_1__."compound_type") is not distinct
-            from null
-          ) then null else json_build_object(
-            'a'::text,
-            (
-              (__local_1__."compound_type")."a"
-            ),
-            'fooBar'::text,
-            (
-              (__local_1__."compound_type")."foo_bar"
-            ),
-            '@computedField'::text,
-            (
-              select to_json(__local_2__) as "value"
-              from "c"."compound_type_computed_field"((__local_1__."compound_type")) as __local_2__
-              where (TRUE) and (TRUE)
-            )
-          ) end
-        ),
-        'nestedCompoundType'::text,
-        (
-          case when (
-            (__local_1__."nested_compound_type") is not distinct
-            from null
-          ) then null else json_build_object(
-            'a'::text,
-            (
-              case when (
-                (
-                  (__local_1__."nested_compound_type")."a"
-                ) is not distinct
-                from null
-              ) then null else json_build_object(
-                'a'::text,
-                (
-                  (
-                    (__local_1__."nested_compound_type")."a"
-                  )."a"
-                ),
-                'fooBar'::text,
-                (
-                  (
-                    (__local_1__."nested_compound_type")."a"
-                  )."foo_bar"
-                ),
-                '@computedField'::text,
-                (
-                  select to_json(__local_3__) as "value"
-                  from "c"."compound_type_computed_field"(
-                    (
-                      (__local_1__."nested_compound_type")."a"
-                    )
-                  ) as __local_3__
-                  where (TRUE) and (TRUE)
-                )
-              ) end
-            ),
-            'b'::text,
-            (
-              case when (
-                (
-                  (__local_1__."nested_compound_type")."b"
-                ) is not distinct
-                from null
-              ) then null else json_build_object(
-                'a'::text,
-                (
-                  (
-                    (__local_1__."nested_compound_type")."b"
-                  )."a"
-                ),
-                'fooBar'::text,
-                (
-                  (
-                    (__local_1__."nested_compound_type")."b"
-                  )."foo_bar"
-                ),
-                '@computedField'::text,
-                (
-                  select to_json(__local_4__) as "value"
-                  from "c"."compound_type_computed_field"(
-                    (
-                      (__local_1__."nested_compound_type")."b"
-                    )
-                  ) as __local_4__
-                  where (TRUE) and (TRUE)
-                )
-              ) end
-            )
-          ) end
-        ),
-        'nullableCompoundType'::text,
-        (
-          case when (
-            (__local_1__."nullable_compound_type") is not distinct
-            from null
-          ) then null else json_build_object(
-            'a'::text,
-            (
-              (__local_1__."nullable_compound_type")."a"
-            ),
-            'fooBar'::text,
-            (
-              (__local_1__."nullable_compound_type")."foo_bar"
-            ),
-            '@computedField'::text,
-            (
-              select to_json(__local_5__) as "value"
-              from "c"."compound_type_computed_field"((__local_1__."nullable_compound_type")) as __local_5__
-              where (TRUE) and (TRUE)
-            )
-          ) end
-        ),
-        'nullableNestedCompoundType'::text,
-        (
-          case when (
-            (__local_1__."nullable_nested_compound_type") is not distinct
-            from null
-          ) then null else json_build_object(
-            'a'::text,
-            (
-              case when (
-                (
-                  (__local_1__."nullable_nested_compound_type")."a"
-                ) is not distinct
-                from null
-              ) then null else json_build_object(
-                'a'::text,
-                (
-                  (
-                    (__local_1__."nullable_nested_compound_type")."a"
-                  )."a"
-                ),
-                'fooBar'::text,
-                (
-                  (
-                    (__local_1__."nullable_nested_compound_type")."a"
-                  )."foo_bar"
-                ),
-                '@computedField'::text,
-                (
-                  select to_json(__local_6__) as "value"
-                  from "c"."compound_type_computed_field"(
-                    (
-                      (__local_1__."nullable_nested_compound_type")."a"
-                    )
-                  ) as __local_6__
-                  where (TRUE) and (TRUE)
-                )
-              ) end
-            ),
-            'b'::text,
-            (
-              case when (
-                (
-                  (__local_1__."nullable_nested_compound_type")."b"
-                ) is not distinct
-                from null
-              ) then null else json_build_object(
-                'a'::text,
-                (
-                  (
-                    (__local_1__."nullable_nested_compound_type")."b"
-                  )."a"
-                ),
-                'fooBar'::text,
-                (
-                  (
-                    (__local_1__."nullable_nested_compound_type")."b"
-                  )."foo_bar"
-                ),
-                '@computedField'::text,
-                (
-                  select to_json(__local_7__) as "value"
-                  from "c"."compound_type_computed_field"(
-                    (
-                      (__local_1__."nullable_nested_compound_type")."b"
-                    )
-                  ) as __local_7__
-                  where (TRUE) and (TRUE)
-                )
-              ) end
-            )
-          ) end
-        )
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "b"."types" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_8__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_8__.data
-    from __local_8__
-  ),
-  '[]'::json
-) as "data"
+select
+  __compound_type__."a"::text as "0",
+  __compound_type__."foo_bar"::text as "1",
+  ("c"."compound_type_computed_field"(__compound_type__))::text as "2",
+  (not (__compound_type__ is null))::text as "3",
+  __compound_type_2."a"::text as "4",
+  __compound_type_2."foo_bar"::text as "5",
+  ("c"."compound_type_computed_field"(__compound_type_2))::text as "6",
+  (not (__compound_type_2 is null))::text as "7",
+  __compound_type_3."a"::text as "8",
+  __compound_type_3."foo_bar"::text as "9",
+  ("c"."compound_type_computed_field"(__compound_type_3))::text as "10",
+  (not (__compound_type_3 is null))::text as "11",
+  (not (__nested_compound_type__ is null))::text as "12",
+  __compound_type_4."a"::text as "13",
+  __compound_type_4."foo_bar"::text as "14",
+  ("c"."compound_type_computed_field"(__compound_type_4))::text as "15",
+  (not (__compound_type_4 is null))::text as "16",
+  __compound_type_5."a"::text as "17",
+  __compound_type_5."foo_bar"::text as "18",
+  ("c"."compound_type_computed_field"(__compound_type_5))::text as "19",
+  (not (__compound_type_5 is null))::text as "20",
+  __compound_type_6."a"::text as "21",
+  __compound_type_6."foo_bar"::text as "22",
+  ("c"."compound_type_computed_field"(__compound_type_6))::text as "23",
+  (not (__compound_type_6 is null))::text as "24",
+  (not (__nested_compound_type_2 is null))::text as "25",
+  __types__."compound_type"::text as "26"
+from "b"."types" as __types__
+left outer join lateral (select (__types__."compound_type").*) as __compound_type__
+on TRUE
+left outer join lateral (select (__types__."nested_compound_type").*) as __nested_compound_type__
+on TRUE
+left outer join lateral (select (__nested_compound_type__."a").*) as __compound_type_2
+on TRUE
+left outer join lateral (select (__nested_compound_type__."b").*) as __compound_type_3
+on TRUE
+left outer join lateral (select (__types__."nullable_compound_type").*) as __compound_type_4
+on TRUE
+left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __nested_compound_type_2
+on TRUE
+left outer join lateral (select (__nested_compound_type_2."a").*) as __compound_type_5
+on TRUE
+left outer join lateral (select (__nested_compound_type_2."b").*) as __compound_type_6
+on TRUE
+order by __types__."id" asc
 
-with __local_0__ as (
-  select to_json(
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"text" as "id2",
+    (ids.value->>3)::"int4" as "id3",
+    (ids.value->>4)::"int4" as "id4",
+    (ids.value->>5)::"text" as "id5",
+    (ids.value->>6)::"int4" as "id6",
+    (ids.value->>7)::"text" as "id7",
+    (ids.value->>8)::"int4" as "id8",
+    (ids.value->>9)::"text" as "id9"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."headline" as "0",
+    (select json_agg(_) from (
+      select
+        to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0",
+        (row_number() over (partition by 1))::text as "1"
+      from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
+    ) _) as "1",
+    __post__::text as "2",
+    "a"."post_headline_trimmed"(__post__) as "3",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id0"
+    ) as "4",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id1",
+      __post_identifiers__."id2"
+    ) as "5",
+    "a"."post_headline_trimmed_strict"(__post__) as "6",
+    "a"."post_headline_trimmed_strict"(
+      __post__,
+      __post_identifiers__."id3"
+    ) as "7",
+    "a"."post_headline_trimmed_strict"(
+      __post__,
+      __post_identifiers__."id4",
+      __post_identifiers__."id5"
+    ) as "8",
+    "a"."post_headline_trimmed_no_defaults"(
+      __post__,
+      __post_identifiers__."id6",
+      __post_identifiers__."id7"
+    ) as "9",
+    "a"."post_headline_trimmed_no_defaults"(
+      __post__,
+      __post_identifiers__."id8",
+      __post_identifiers__."id9"
+    ) as "10",
+    ("a"."post_computed_text_array"(__post__))::text as "11",
     (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'headline'::text,
-        (__local_1__."headline"),
-        '@a'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "a"."post_headline_trimmed"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        ),
-        '@b'::text,
-        (
-          select to_json(__local_3__) as "value"
-          from "a"."post_headline_trimmed"(
-            __local_1__,
-            "length" := $1
-          ) as __local_3__
-          where (TRUE) and (TRUE)
-        ),
-        '@c'::text,
-        (
-          select to_json(__local_4__) as "value"
-          from "a"."post_headline_trimmed"(
-            __local_1__,
-            "length" := $2,
-            "omission" := $3
-          ) as __local_4__
-          where (TRUE) and (TRUE)
-        ),
-        '@d'::text,
-        (
-          select to_json(__local_5__) as "value"
-          from "a"."post_headline_trimmed_strict"(__local_1__) as __local_5__
-          where (TRUE) and (TRUE)
-        ),
-        '@e'::text,
-        (
-          select to_json(__local_6__) as "value"
-          from "a"."post_headline_trimmed_strict"(
-            __local_1__,
-            "length" := $4
-          ) as __local_6__
-          where (TRUE) and (TRUE)
-        ),
-        '@f'::text,
-        (
-          select to_json(__local_7__) as "value"
-          from "a"."post_headline_trimmed_strict"(
-            __local_1__,
-            "length" := $5,
-            "omission" := $6
-          ) as __local_7__
-          where (TRUE) and (TRUE)
-        ),
-        '@g'::text,
-        (
-          select to_json(__local_8__) as "value"
-          from "a"."post_headline_trimmed_no_defaults"(
-            __local_1__,
-            $7,
-            NULL
-          ) as __local_8__
-          where (TRUE) and (TRUE)
-        ),
-        '@h'::text,
-        (
-          select to_json(__local_9__) as "value"
-          from "a"."post_headline_trimmed_no_defaults"(
-            __local_1__,
-            $8,
-            $9
-          ) as __local_9__
-          where (TRUE) and (TRUE)
-        ),
-        '@computedCompoundTypeArray'::text,
-        (
-          select coalesce(
-            (
-              select json_agg(__local_10__."object")
-              from (
-                select json_build_object(
-                  'a'::text,
-                  (__local_11__."a"),
-                  'b'::text,
-                  (__local_11__."b"),
-                  'c'::text,
-                  (__local_11__."c"),
-                  'd'::text,
-                  (__local_11__."d"),
-                  'e'::text,
-                  (__local_11__."e"),
-                  'f'::text,
-                  (__local_11__."f"),
-                  'g'::text,
-                  ((__local_11__."g"))::text,
-                  'fooBar'::text,
-                  (__local_11__."foo_bar")
-                ) as object
-                from unnest(
-                  "a"."post_computed_compound_type_array"(
-                    __local_1__,
-                    row(
-                      $10::"pg_catalog"."int4",
-                      $11::"pg_catalog"."text",
-                      $12::"b"."color",
-                      NULL,
-                      $13::"b"."enum_caps",
-                      $14::"b"."enum_with_empty_string",
-                      $15::"pg_catalog"."interval",
-                      $16::"pg_catalog"."int4"
-                    )::"c"."compound_type"
-                  )
-                ) as __local_11__
-                where (TRUE) and (TRUE)
-              ) as __local_10__
-            ),
-            '[]'::json
-          )
-        ),
-        '@computedTextArray'::text,
-        (
-          select coalesce(
-            (
-              select json_agg(__local_12__."object")
-              from (
-                select json_build_object(
-                  'value'::text,
-                  __local_13__
-                ) as object
-                from unnest(
-                  "a"."post_computed_text_array"(__local_1__)
-                ) as __local_13__
-                where (TRUE) and (TRUE)
-              ) as __local_12__
-            ),
-            '[]'::json
-          )
-        ),
-        '@computedIntervalArray'::text,
-        (
-          select coalesce(
-            (
-              select json_agg(__local_14__."object")
-              from (
-                select json_build_object(
-                  'value'::text,
-                  (__local_15__)::text
-                ) as object
-                from unnest(
-                  "a"."post_computed_interval_array"(__local_1__)
-                ) as __local_15__
-                where (TRUE) and (TRUE)
-              ) as __local_14__
-            ),
-            '[]'::json
-          )
-        ),
-        '@computedIntervalSet'::text,
-        (
-          with __local_16__ as (
-            select to_json(
-              (__local_17__)::text
-            ) as "value",
-            to_json(
-              (
-                to_json(__local_17__)
-              )
-            ) as "@nodes",
-            to_json(
-              (
-                to_json(__local_17__)
-              )
-            ) as "@edges",
-            to_json(
-              json_build_array(
-                'natural',
-                (
-                  row_number( ) over (partition by 1)
-                )
-              )
-            ) as "__cursor"
-            from "a"."post_computed_interval_set"(__local_1__) as __local_17__
-            where (TRUE) and (TRUE)
-          ),
-          __local_18__ as (
-            select json_agg(
-              to_json(__local_16__)
-            ) as data
-            from __local_16__
-          )
-          select json_build_object(
-            'data'::text,
-            coalesce(
-              (
-                select __local_18__.data
-                from __local_18__
-              ),
-              '[]'::json
-            )
-          )
-        )
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "a"."post" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_19__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_19__.data
-    from __local_19__
-  ),
-  '[]'::json
-) as "data"
+      select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'))
+      from unnest("a"."post_computed_interval_array"(__post__)) t
+    )::text as "12",
+    __post_identifiers__.idx as "13"
+  from "a"."post" as __post__
+  order by __post__."id" asc
+) as __post_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'name'::text,
-        (__local_1__."person_full_name"),
-        '@firstName'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "c"."person_first_name"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        ),
-        '@friends'::text,
-        (
-          with __local_3__ as (
-            select to_json(
-              (
-                json_build_object(
-                  '__identifiers'::text,
-                  json_build_array(__local_4__."id"),
-                  'name'::text,
-                  (__local_4__."person_full_name"),
-                  '@firstName'::text,
-                  (
-                    select to_json(__local_5__) as "value"
-                    from "c"."person_first_name"(__local_4__) as __local_5__
-                    where (TRUE) and (TRUE)
-                  ),
-                  '@friends'::text,
-                  (
-                    with __local_6__ as (
-                      select to_json(
-                        (
-                          json_build_object(
-                            '__identifiers'::text,
-                            json_build_array(__local_7__."id"),
-                            'name'::text,
-                            (__local_7__."person_full_name"),
-                            '@firstName'::text,
-                            (
-                              select to_json(__local_8__) as "value"
-                              from "c"."person_first_name"(__local_7__) as __local_8__
-                              where (TRUE) and (TRUE)
-                            )
-                          )
-                        )
-                      ) as "@nodes"
-                      from "c"."person_friends"(__local_4__) as __local_7__
-                      where (TRUE) and (TRUE)
-                      limit 1
-                    ),
-                    __local_9__ as (
-                      select json_agg(
-                        to_json(__local_6__)
-                      ) as data
-                      from __local_6__
-                    )
-                    select json_build_object(
-                      'data'::text,
-                      coalesce(
-                        (
-                          select __local_9__.data
-                          from __local_9__
-                        ),
-                        '[]'::json
-                      )
-                    )
-                  )
-                )
-              )
-            ) as "@nodes"
-            from "c"."person_friends"(__local_1__) as __local_4__
-            where (TRUE) and (TRUE)
-          ),
-          __local_10__ as (
-            select json_agg(
-              to_json(__local_3__)
-            ) as data
-            from __local_3__
-          )
-          select json_build_object(
-            'data'::text,
-            coalesce(
-              (
-                select __local_10__.data
-                from __local_10__
-              ),
-              '[]'::json
-            )
-          )
-        ),
-        '@firstPost'::text,
-        (
-          select (
-            case when (__local_11__ is null) then null else json_build_object(
-              '__identifiers'::text,
-              json_build_array(__local_11__."id"),
-              'id'::text,
-              (__local_11__."id"),
-              'headline'::text,
-              (__local_11__."headline")
-            ) end
-          ) as object
-          from "c"."person_first_post"(__local_1__) as __local_11__
-          where (
-            not (__local_11__ is null)
-          ) and (TRUE) and (TRUE)
-        )
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."person" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_12__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_12__.data
-    from __local_12__
-  ),
-  '[]'::json
-) as "data"
+select
+  __person__."person_full_name" as "0",
+  (select json_agg(_) from (
+    select
+      __person_friends__."person_full_name" as "0",
+      (select json_agg(_) from (
+        select
+          __person_friends_2."person_full_name" as "0",
+          "c"."person_first_name"(__person_friends_2) as "1",
+          __person_friends_2."id"::text as "2"
+        from "c"."person_friends"(__person_friends__) as __person_friends_2
+        limit 1
+      ) _) as "1",
+      "c"."person_first_name"(__person_friends__) as "2",
+      __person_friends__."id"::text as "3"
+    from "c"."person_friends"(__person__) as __person_friends__
+  ) _) as "1",
+  __person_first_post__."id"::text as "2",
+  __person_first_post__."headline" as "3",
+  "c"."person_first_name"(__person__) as "4"
+from "c"."person" as __person__
+left outer join "c"."person_first_post"(__person__) as __person_first_post__
+on TRUE
+order by __person__."id" asc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'notNullHasDefault'::text,
-        (__local_1__."not_null_has_default"),
-        'wontCastEasy'::text,
-        (__local_1__."wont_cast_easy"),
-        '@computed'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "c"."edge_case_computed"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        )
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."edge_case" as __local_1__
-    where (TRUE) and (TRUE)
-  ) __local_1__
-),
-__local_3__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_3__.data
-    from __local_3__
-  ),
-  '[]'::json
-) as "data"
+select
+  __edge_case__."not_null_has_default"::text as "0",
+  __edge_case__."wont_cast_easy"::text as "1",
+  "c"."edge_case_computed"(__edge_case__) as "2"
+from "c"."edge_case" as __edge_case__
+
+select __post_computed_compound_type_array_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"a"."post" as "id0",
+    (ids.value->>1)::"c"."compound_type" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_computed_compound_type_array_identifiers__,
+lateral (
+  select
+    __post_computed_compound_type_array__."a"::text as "0",
+    __post_computed_compound_type_array__."b" as "1",
+    __post_computed_compound_type_array__."c"::text as "2",
+    __post_computed_compound_type_array__."d" as "3",
+    __post_computed_compound_type_array__."e"::text as "4",
+    __post_computed_compound_type_array__."f"::text as "5",
+    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    __post_computed_compound_type_array__."foo_bar"::text as "7",
+    (not (__post_computed_compound_type_array__ is null))::text as "8",
+    __post_computed_compound_type_array_identifiers__.idx as "9"
+  from unnest("a"."post_computed_compound_type_array"(
+    __post_computed_compound_type_array_identifiers__."id0",
+    __post_computed_compound_type_array_identifiers__."id1"
+  )) as __post_computed_compound_type_array__
+) as __post_computed_compound_type_array_result__
