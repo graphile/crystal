@@ -720,19 +720,15 @@ export class PgSelectPlan<
 
     this.afterLock("orderBy", () => {
       if (this.beforePlanId != null) {
-        this.where(
-          this.conditionFromCursor(
-            "before",
-            this.getDep(this.beforePlanId) as any,
-          ),
+        this.applyConditionFromCursor(
+          "before",
+          this.getDep(this.beforePlanId) as any,
         );
       }
       if (this.afterPlanId != null) {
-        this.where(
-          this.conditionFromCursor(
-            "after",
-            this.getDep(this.afterPlanId) as any,
-          ),
+        this.applyConditionFromCursor(
+          "after",
+          this.getDep(this.afterPlanId) as any,
         );
       }
     });
@@ -1070,10 +1066,10 @@ export class PgSelectPlan<
     }
   }
 
-  private conditionFromCursor(
+  private applyConditionFromCursor(
     beforeOrAfter: "before" | "after",
     $parsedCursorPlan: LambdaPlan<any, any[] | null>,
-  ) {
+  ): void {
     const digest = this.getOrderByDigest();
     const orders = this.getOrderBy();
     const orderCount = orders.length;
@@ -1140,7 +1136,7 @@ export class PgSelectPlan<
     */
     const finalCondition = condition();
 
-    return finalCondition;
+    this.where(finalCondition);
   }
 
   // TODO: rename?
