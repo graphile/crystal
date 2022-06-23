@@ -35,13 +35,16 @@ import { constant } from "./plans/constant.js";
 import { list } from "./plans/list.js";
 import { object } from "./plans/object.js";
 
-export function withFieldArgsForArguments<T extends ExecutablePlan>(
+export function withFieldArgsForArguments<
+  T extends ExecutablePlan,
+  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+>(
   aether: Aether,
-  parentPlan: ExecutablePlan,
+  parentPlan: TParentPlan,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
   callback: (fieldArgs: FieldArgs) => T,
-): T {
+): Exclude<T, undefined | null | void> | TParentPlan {
   const fields: {
     [key: string]: GraphQLArgument;
   } = {};
@@ -61,16 +64,17 @@ export function withFieldArgsForArguments<T extends ExecutablePlan>(
 
 function withFieldArgsForArgumentsOrInputObject<
   T extends ExecutablePlan | ModifierPlan | null | void,
+  TParentPlan extends ExecutablePlan,
 >(
   aether: Aether,
   type: GraphQLInputType | null,
-  parentPlan: ExecutablePlan,
+  parentPlan: TParentPlan,
   $current: TrackedArguments | InputPlan, //__TrackedObjectPlan | __InputObjectPlan,
   fields: {
     [key: string]: GraphQLArgument | GraphQLInputField;
   } | null,
   callback: (fieldArgs: FieldArgs) => T,
-): T {
+): Exclude<T, undefined | null | void> | TParentPlan {
   const schema = aether.schema;
   const analyzedCoordinates: string[] = [];
 
@@ -371,6 +375,9 @@ function withFieldArgsForArgumentsOrInputObject<
     apply($target, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
+        if (type && ($current as InputPlan).evalIs(undefined)) {
+          return;
+        }
         if (fields) {
           for (const fieldName of Object.keys(fields)) {
             fieldArgs.apply($target, fieldName);
@@ -387,6 +394,9 @@ function withFieldArgsForArgumentsOrInputObject<
         }
       }
       const details = getArgOnceOnly(path);
+      if (details.$value.evalIs(undefined)) {
+        return;
+      }
       const plan = planArgumentOrInputField(details, $target);
       /*
       if (plan && plan !== $target) {
@@ -399,10 +409,12 @@ function withFieldArgsForArgumentsOrInputObject<
       return plan;
     },
   };
-  const plan = callback(fieldArgs);
+  const plan = (callback(fieldArgs) ?? parentPlan) as
+    | ExecutablePlan
+    | ModifierPlan;
 
   // Now handled all the remaining coordinates
-  if (plan && !analyzedCoordinates.includes("")) {
+  if (!analyzedCoordinates.includes("")) {
     if (!fields) {
       fieldArgs.apply(plan);
     } else {
@@ -435,18 +447,19 @@ function withFieldArgsForArgumentsOrInputObject<
     }
   }
 
-  return plan;
+  return plan as any;
 }
 
 function withFieldArgsForArgOrField<
   T extends ExecutablePlan | ModifierPlan | null | void,
+  TParentPlan extends ExecutablePlan,
 >(
   aether: Aether,
-  parentPlan: ExecutablePlan,
+  parentPlan: TParentPlan,
   argOrField: GraphQLArgument | GraphQLInputField,
   $value: InputPlan,
   callback: (fieldArgs: FieldArgs) => T,
-): T {
+): Exclude<T, undefined | null | void> | TParentPlan {
   const type = argOrField.type;
   const nullableType = getNullableType(type);
   const fields = isInputObjectType(nullableType)
