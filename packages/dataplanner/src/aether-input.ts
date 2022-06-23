@@ -75,7 +75,7 @@ function withFieldArgsForArgumentsOrInputObject<
   const analyzedCoordinates: string[] = [];
 
   const getArgOnceOnly = (inPath: string | string[]) => {
-    const path = Array.isArray(inPath) ? inPath : [inPath];
+    const path = Array.isArray(inPath) ? [...inPath] : [inPath];
     if (path.length < 1) {
       throw new Error("Invalid");
     }
