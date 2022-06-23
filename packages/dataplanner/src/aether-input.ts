@@ -29,11 +29,7 @@ import type {
   TrackedArguments,
 } from "./interfaces.js";
 import type { ModifierPlan } from "./plan.js";
-import {
-  assertExecutablePlan,
-  assertModifierPlan,
-  ExecutablePlan,
-} from "./plan.js";
+import { assertExecutablePlan, ExecutablePlan } from "./plan.js";
 import type { __ItemPlan } from "./plans/__item.js";
 import { constant } from "./plans/constant.js";
 import { list } from "./plans/list.js";

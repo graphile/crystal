@@ -22,9 +22,7 @@ import type {
   CrystalSubscriber,
   ExecutablePlan,
   GraphileArgumentConfig,
-  GraphileFieldConfig,
   ListPlan,
-  ObjectPlan,
 } from "dataplanner";
 import {
   __ListTransformPlan,
