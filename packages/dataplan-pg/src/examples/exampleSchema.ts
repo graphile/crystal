@@ -2434,10 +2434,11 @@ export function makeExampleSchema(
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
-                return new BooleanFilterPlan(
+                const plan = new BooleanFilterPlan(
                   $messageFilter,
                   sql`${$messageFilter.alias}.featured`,
                 );
+                arg.apply(plan);
               }
             },
           [BooleanFilterPlan, sql],
@@ -2491,7 +2492,8 @@ export function makeExampleSchema(
             ) {
               const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
-                return $manyFilter.some();
+                const plan = $manyFilter.some();
+                arg.apply(plan);
               }
             },
           [],
@@ -2513,12 +2515,13 @@ export function makeExampleSchema(
             function plan($condition, arg) {
               const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
-                return new ManyFilterPlan(
+                const plan = new ManyFilterPlan(
                   $condition,
                   messageSource,
                   ["id"],
                   ["forum_id"],
                 );
+                arg.apply(plan);
               }
             },
           [ManyFilterPlan, messageSource],
