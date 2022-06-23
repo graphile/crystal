@@ -21,6 +21,8 @@ import type {
   BaseGraphQLRootValue,
   CrystalSubscriber,
   ExecutablePlan,
+  GraphileArgumentConfig,
+  GraphileFieldConfig,
   ListPlan,
   ObjectPlan,
 } from "dataplanner";
@@ -2301,19 +2303,18 @@ export function makeExampleSchema(
     },
   });
 
-  function makeIncludeArchivedField<TFieldPlan>(
+  function makeIncludeArchivedArg<TFieldPlan>(
     getClassPlan: ($fieldPlan: TFieldPlan) => PgSelectPlanFromSource<any>,
-  ) {
+  ): GraphileArgumentConfig<any, any, any, any, any, any> {
     return {
       type: IncludeArchived,
-      plan: EXPORTABLE(
+      applyPlan: EXPORTABLE(
         (PgSelectSinglePlan, TYPES, getClassPlan, sql) =>
-          function plan(
-            $parent: ExecutablePlan<any>,
-            $field: TFieldPlan,
-            $value: __InputStaticLeafPlan | __TrackedObjectPlan,
-          ) {
+          function plan($parent: ExecutablePlan<any>, $field: TFieldPlan, val) {
             const $messages = getClassPlan($field);
+            const $value = val.getRaw() as
+              | __InputStaticLeafPlan
+              | __TrackedObjectPlan;
             if ($value.evalIs("YES")) {
               // No restriction
             } else if ($value.evalIs("EXCLUSIVELY")) {
@@ -2617,7 +2618,7 @@ export function makeExampleSchema(
               [ClassFilterPlan],
             ),
           },
-          includeArchived: makeIncludeArchivedField<
+          includeArchived: makeIncludeArchivedArg<
             PgSelectPlanFromSource<typeof messageSource>
           >(($messages) => $messages),
         },
@@ -2702,7 +2703,7 @@ export function makeExampleSchema(
               [ClassFilterPlan],
             ),
           },
-          includeArchived: makeIncludeArchivedField<
+          includeArchived: makeIncludeArchivedArg<
             PgConnectionPlanFromSource<typeof messageSource>
           >(($connection) => $connection.getSubplan()),
         },
@@ -3597,7 +3598,7 @@ export function makeExampleSchema(
               [],
             ),
           },
-          includeArchived: makeIncludeArchivedField<
+          includeArchived: makeIncludeArchivedArg<
             PgSelectPlanFromSource<typeof forumSource>
           >(($forums) => $forums),
           condition: {
@@ -3699,7 +3700,7 @@ export function makeExampleSchema(
               [ClassFilterPlan],
             ),
           },
-          includeArchived: makeIncludeArchivedField<
+          includeArchived: makeIncludeArchivedArg<
             PgConnectionPlanFromSource<typeof messageSource>
           >(($connection) => $connection.getSubplan()),
           first: {
