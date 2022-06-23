@@ -415,7 +415,7 @@ function withFieldArgsForArgumentsOrInputObject<
           const newPath = [...parentPath, fieldName];
           const pathStr = newPath.join(".");
           const prefix = `${pathStr}.`;
-          if (pathStr in analyzedCoordinates) {
+          if (analyzedCoordinates.includes(pathStr)) {
             continue;
           } else if (analyzedCoordinates.some((c) => c.startsWith(prefix))) {
             const inputObjectType = getNullableType(field.type);
