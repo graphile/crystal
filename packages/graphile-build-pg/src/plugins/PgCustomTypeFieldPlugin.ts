@@ -564,16 +564,16 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 (memo, { inputType, graphqlArgName }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
+                    /*
                     extensions: {
                       graphile: {
-                        /*
                         plan($parent: ExecutablePlan, $value: InputPlan) {
                           if (inputType.extensions
                           return $value;
                         },
-                        */
                       },
                     },
+                    */
                   };
                   return memo;
                 },
@@ -601,14 +601,17 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       pgCodec,
                       required,
                     } of argDetailsSimple) {
-                      let plan = args.get([...path, graphqlArgName]);
-                      if (plan === undefined) {
+                      let $raw = args.getRaw([...path, graphqlArgName]);
+                      let plan: ExecutablePlan;
+                      if ($raw.evalIs(undefined)) {
                         if (!required) {
                           skipped = true;
                           continue;
                         } else {
                           plan = constant(null);
                         }
+                      } else {
+                        plan = args.get([...path, graphqlArgName]);
                       }
 
                       if (skipped) {
