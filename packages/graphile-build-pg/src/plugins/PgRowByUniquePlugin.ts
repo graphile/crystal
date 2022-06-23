@@ -124,7 +124,9 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                         `return (_$root, args) => source.get({ ${columnNames
                           .map(
                             (columnName) =>
-                              `${columnName}: args.${detailsByColumnName[columnName].graphqlName}`,
+                              `${columnName}: args.get(${JSON.stringify(
+                                detailsByColumnName[columnName].graphqlName,
+                              )})`,
                           )
                           .join(", ")} })`,
                       ) as any,
