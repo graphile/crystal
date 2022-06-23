@@ -325,7 +325,7 @@ function withFieldArgsForArgumentsOrInputObject<
           for (const fieldName of Object.keys(fields)) {
             result[fieldName] = fieldArgs.get(fieldName);
           }
-          return result;
+          return object(result);
         } else {
           if (!type) {
             throw new Error(
