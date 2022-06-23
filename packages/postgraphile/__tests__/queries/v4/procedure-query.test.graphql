@@ -1,0 +1,54 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  jsonIdentity(json: "{\"a\":1,\"b\":2,\"c\":3}")
+  jsonbIdentity(json: "{\"a\":1,\"b\":2,\"c\":3}")
+  jsonIdentityIssue85: jsonIdentity(json:  "[{\"amount\":\"44\"},{\"amount\":null}]")
+  jsonbIdentityIssue85: jsonbIdentity(json: "[{\"amount\":\"44\"},{\"amount\":null}]")
+  add1Query(arg0: 1, arg1: 2)
+  add2Query(a: 2, b: 2)
+  add3Query(arg1: 5)
+  add4Query(arg0: 1, b: 3)
+  optionalMissingMiddle1(arg0: 1, c: 7) # expect 10 (b defaults to 2)
+  optionalMissingMiddle1_2: optionalMissingMiddle1(arg0: 1, b: 8, c: 7) # expect 16
+  optionalMissingMiddle2(a: 1, c: 7) # expect 10 (b defaults to 2)
+  optionalMissingMiddle3(a: 1, c: 7) # expect 10 because we can specify $1 positionally and $3 via name, and b defaults to 2
+  optionalMissingMiddle4(arg0: 1, arg2: 7) # expect null because we can't specify $3 without specifying $2 (= null)
+  optionalMissingMiddle5(a: 1, arg2: 7) # expect null because we can't specify $3 without specifying $2 (= null)
+  typesQuery(a: "50", b: false, c: "xyz", d: [1, 2, 3], e: "{\"a\":1,\"b\":2,\"c\":3}", f: { start: { value: 1, inclusive: false }, end: { value: 5, inclusive: false } })
+  empty: typesQuery(a: "50", b: false, c: "", d: [], e: "{}", f: {})
+  compoundTypeQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {seconds: 12, minutes: 3, hours: 2}, fooBar: 8 }) { a b c d e f g { hours minutes seconds } fooBar }
+  compoundTypeSetQuery(first: 5) { edges { cursor node { a b c d e f f g { hours minutes seconds } fooBar } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  compoundTypeArrayQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {seconds: 12, minutes: 3, hours: 2}, fooBar: 8 }) { a b c d e f f g { hours minutes seconds } fooBar }
+  tableQuery(id: 5) { nodeId id headline authorId }
+  tableSetQuery { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQuery_sorted: tableSetQuery(orderBy: NAME_ASC) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQuery_condition: tableSetQuery(condition: {name: "Budd Deey"}) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryWithOffset: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", after: "WyJuYXR1cmFsIiwzXQ==") { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryWithOffset2: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", before: "WyJuYXR1cmFsIiw1XQ==") { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryWithOffset3: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", last: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryWithOffset4: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", first: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryWithOffset5: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", first: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryWithOffset6: tableSetQuery(first: 2, offset: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  # There's only 6 people, so there should be no next page
+  tableSetQueryWithOffset7: tableSetQuery(first: 2, offset: 4) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  # There should be no previous page
+  tableSetQueryWithOffset8: tableSetQuery(first: 2, offset: 0) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  # There should be no previous or next page
+  tableSetQueryWithOffset9: tableSetQuery(first: 6, offset: 0) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  # Requesting before the first record returns no results, and thus has hasNextPage = false and hasPreviousPage = false as there's no cursors to use for pagination
+  tableSetQueryWithOffset10: tableSetQuery(before: "WyJuYXR1cmFsIiwxXQ==", last: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  # Using after and offset together should not throw
+  tableSetQueryWithOffset11: tableSetQuery(after: "WyJuYXR1cmFsIiwxXQ==", offset: 1, first: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryPlpgsql(first:2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryPlpgsqlOffset2: tableSetQueryPlpgsql(first:2, after: "WyJuYXR1cmFsIiwyXQ==") { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  intSetQuery(x: 5, z: 6) { edges { cursor node } totalCount }
+  noArgsQuery
+  staticBigInteger { edges { node } totalCount }
+
+  queryCompoundTypeArray(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 }) { a b c d e f g { seconds minutes hours } fooBar }
+  queryTextArray
+  queryIntervalArray { seconds minutes hours days months years }
+  queryIntervalSet { nodes { seconds minutes hours days months years } edges { node { seconds minutes hours } cursor } totalCount }
+}

@@ -1,0 +1,696 @@
+{
+  jsonIdentity: "{\"a\":1,\"b\":2,\"c\":3}",
+  jsonbIdentity: "{\"a\":1,\"b\":2,\"c\":3}",
+  jsonIdentityIssue85: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  jsonbIdentityIssue85: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  add1Query: 3,
+  add2Query: 4,
+  add3Query: null,
+  add4Query: 4,
+  optionalMissingMiddle1: 10,
+  optionalMissingMiddle1_2: 16,
+  optionalMissingMiddle2: 10,
+  optionalMissingMiddle3: 10,
+  optionalMissingMiddle4: null,
+  optionalMissingMiddle5: null,
+  typesQuery: false,
+  empty: false,
+  compoundTypeQuery: {
+    a: 420,
+    b: "easy cheesy baked potatoes",
+    c: "RED",
+    d: null,
+    e: "BAR_FOO",
+    f: "_EMPTY_",
+    g: {
+      hours: 2,
+      minutes: 3,
+      seconds: 12,
+    },
+    fooBar: 8,
+  },
+  compoundTypeSetQuery: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+          d: null,
+          e: "_0_BAR",
+          f: "_EMPTY_",
+          g: {
+            hours: 0,
+            minutes: 0,
+            seconds: 18,
+          },
+          fooBar: 7,
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  compoundTypeArrayQuery: [
+    {
+      a: 419,
+      b: "easy cheesy baked potatoes",
+      c: "RED",
+      d: null,
+      e: "BAR_FOO",
+      f: "_EMPTY_",
+      g: {
+        hours: 2,
+        minutes: 3,
+        seconds: 12,
+      },
+      fooBar: 8,
+    },
+    {
+      a: null,
+      b: null,
+      c: null,
+      d: null,
+      e: null,
+      f: null,
+      g: null,
+      fooBar: null,
+    },
+    {
+      a: 420,
+      b: "easy cheesy baked potatoes",
+      c: "RED",
+      d: null,
+      e: "BAR_FOO",
+      f: "_EMPTY_",
+      g: {
+        hours: 2,
+        minutes: 3,
+        seconds: 12,
+      },
+      fooBar: 8,
+    },
+  ],
+  tableQuery: {
+    nodeId: "WyJwb3N0cyIsNV0=",
+    id: 5,
+    headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+    authorId: 5,
+  },
+  tableSetQuery: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "John Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: {
+          name: "Sara Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw1XQ==",
+        node: {
+          name: "Joe Tucker",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw2XQ==",
+        node: {
+          name: "Twenty Seventwo",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQuery_sorted: {
+    edges: [
+      {
+        cursor: "WyJuYW1lX2FzYyIsM10=",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYW1lX2FzYyIsNV0=",
+        node: {
+          name: "Joe Tucker",
+        },
+      },
+      {
+        cursor: "WyJuYW1lX2FzYyIsMV0=",
+        node: {
+          name: "John Smith",
+        },
+      },
+      {
+        cursor: "WyJuYW1lX2FzYyIsNF0=",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+      {
+        cursor: "WyJuYW1lX2FzYyIsMl0=",
+        node: {
+          name: "Sara Smith",
+        },
+      },
+      {
+        cursor: "WyJuYW1lX2FzYyIsNl0=",
+        node: {
+          name: "Twenty Seventwo",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYW1lX2FzYyIsM10=",
+      endCursor: "WyJuYW1lX2FzYyIsNl0=",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQuery_condition: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryWithOffset: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiw0XQ==",
+      endCursor: "WyJuYXR1cmFsIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryWithOffset2: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiw0XQ==",
+      endCursor: "WyJuYXR1cmFsIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryWithOffset3: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwzXQ==",
+      endCursor: "WyJuYXR1cmFsIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryWithOffset4: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "John Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: {
+          name: "Sara Smith",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiwyXQ==",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryWithOffset5: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw1XQ==",
+        node: {
+          name: "Joe Tucker",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiw0XQ==",
+      endCursor: "WyJuYXR1cmFsIiw1XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryWithOffset6: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwzXQ==",
+      endCursor: "WyJuYXR1cmFsIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryWithOffset7: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiw1XQ==",
+        node: {
+          name: "Joe Tucker",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw2XQ==",
+        node: {
+          name: "Twenty Seventwo",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiw1XQ==",
+      endCursor: "WyJuYXR1cmFsIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryWithOffset8: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "John Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: {
+          name: "Sara Smith",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiwyXQ==",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryWithOffset9: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "John Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: {
+          name: "Sara Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw1XQ==",
+        node: {
+          name: "Joe Tucker",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw2XQ==",
+        node: {
+          name: "Twenty Seventwo",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryWithOffset10: {
+    edges: [],
+    pageInfo: {
+      startCursor: null,
+      endCursor: null,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryWithOffset11: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwzXQ==",
+      endCursor: "WyJuYXR1cmFsIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  tableSetQueryPlpgsql: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "John Smith",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: {
+          name: "Sara Smith",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiwyXQ==",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryPlpgsqlOffset2: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: {
+          name: "Kathryn Ramirez",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwzXQ==",
+      endCursor: "WyJuYXR1cmFsIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+  },
+  intSetQuery: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: 1,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+        node: 2,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+        node: 3,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw0XQ==",
+        node: 4,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw1XQ==",
+        node: 5,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw2XQ==",
+        node: null,
+      },
+      {
+        cursor: "WyJuYXR1cmFsIiw3XQ==",
+        node: 6,
+      },
+    ],
+    totalCount: 7,
+  },
+  noArgsQuery: 2,
+  staticBigInteger: {
+    edges: [
+      {
+        node: "30894622507013190",
+      },
+      {
+        node: "30894622507013191",
+      },
+      {
+        node: "30894622507013192",
+      },
+      {
+        node: "30894622507013193",
+      },
+      {
+        node: "30894622507013194",
+      },
+      {
+        node: "30894622507013195",
+      },
+      {
+        node: "30894622507013196",
+      },
+      {
+        node: "30894622507013197",
+      },
+      {
+        node: "30894622507013198",
+      },
+      {
+        node: "30894622507013199",
+      },
+      {
+        node: "30894622507013200",
+      },
+    ],
+    totalCount: 11,
+  },
+  queryCompoundTypeArray: [
+    {
+      a: 419,
+      b: "easy cheesy baked potatoes",
+      c: "RED",
+      d: null,
+      e: "BAR_FOO",
+      f: "_EMPTY_",
+      g: {
+        seconds: 0,
+        minutes: 0,
+        hours: 5,
+      },
+      fooBar: 8,
+    },
+    {
+      a: null,
+      b: null,
+      c: null,
+      d: null,
+      e: null,
+      f: null,
+      g: null,
+      fooBar: null,
+    },
+    {
+      a: 420,
+      b: "easy cheesy baked potatoes",
+      c: "RED",
+      d: null,
+      e: "BAR_FOO",
+      f: "_EMPTY_",
+      g: {
+        seconds: 0,
+        minutes: 0,
+        hours: 5,
+      },
+      fooBar: 8,
+    },
+  ],
+  queryTextArray: [
+    "str1",
+    "str2",
+    "str3",
+  ],
+  queryIntervalArray: [
+    {
+      seconds: 12,
+      minutes: 0,
+      hours: 0,
+      days: 0,
+      months: 0,
+      years: 0,
+    },
+    {
+      seconds: 0,
+      minutes: 0,
+      hours: 3,
+      days: 0,
+      months: 0,
+      years: 0,
+    },
+    {
+      seconds: 7,
+      minutes: 36,
+      hours: 9,
+      days: 0,
+      months: 0,
+      years: 0,
+    },
+  ],
+  queryIntervalSet: {
+    nodes: [
+      {
+        seconds: 12,
+        minutes: 0,
+        hours: 0,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+      {
+        seconds: 0,
+        minutes: 0,
+        hours: 3,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+      {
+        seconds: 7,
+        minutes: 36,
+        hours: 9,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+    ],
+    edges: [
+      {
+        node: {
+          seconds: 12,
+          minutes: 0,
+          hours: 0,
+        },
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+      },
+      {
+        node: {
+          seconds: 0,
+          minutes: 0,
+          hours: 3,
+        },
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
+      },
+      {
+        node: {
+          seconds: 7,
+          minutes: 36,
+          hours: 9,
+        },
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
+      },
+    ],
+    totalCount: 3,
+  },
+}
