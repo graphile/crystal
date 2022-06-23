@@ -86,7 +86,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
             [inflection.builtin("PRIMARY_KEY_DESC")]: {
               extensions: {
                 graphile: {
-                  plan: EXPORTABLE(
+                  applyPlan: EXPORTABLE(
                     (pgCodec, primaryKeyColumns, sql) =>
                       (plan: PgSelectPlan<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {

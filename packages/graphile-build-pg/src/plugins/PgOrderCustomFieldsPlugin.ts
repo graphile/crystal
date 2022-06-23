@@ -82,7 +82,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                   [valueName]: {
                     extensions: {
                       graphile: {
-                        plan: EXPORTABLE(
+                        applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
                             (plan: PgSelectPlan<any, any, any, any>) => {
                               if (typeof pgFieldSource.source !== "function") {
