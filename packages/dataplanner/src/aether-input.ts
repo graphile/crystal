@@ -141,74 +141,56 @@ function withFieldArgsForArgumentsOrInputObject<
     $toPlan: ExecutablePlan | ModifierPlan | null,
   ) {
     const plan = aether.withModifiers(() => {
-      const { argOrField, $value } = details;
-      const planResolver = $toPlan
-        ? argOrField.extensions?.graphile?.applyPlan
-        : argOrField.extensions?.graphile?.inputPlan;
+      const { argOrField, $value, type } = details;
 
-      if (typeof planResolver === "function") {
-        if (!type) {
-          if ($toPlan) {
-            const argResolver = planResolver as ArgumentApplyPlanResolver;
-            return withFieldArgsForArgOrField(
-              aether,
-              parentPlan,
-              argOrField,
-              $value,
-              (fieldArgs) =>
-                argResolver(parentPlan, $toPlan, fieldArgs, {
-                  schema,
-                  entity: argOrField as GraphQLArgument,
-                }),
-            );
+      const defaultApplyPlan = () => {};
+      const defaultInputPlan = (args: FieldArgs) => {
+        return args.get();
+      };
+
+      const planResolver = $toPlan
+        ? argOrField.extensions?.graphile?.applyPlan ?? defaultApplyPlan
+        : argOrField.extensions?.graphile?.inputPlan ?? defaultInputPlan;
+
+      return withFieldArgsForArgOrField(
+        aether,
+        parentPlan,
+        argOrField,
+        $value,
+        (fieldArgs) => {
+          if (!type) {
+            if ($toPlan) {
+              const argResolver = planResolver as ArgumentApplyPlanResolver;
+              return argResolver(parentPlan, $toPlan, fieldArgs, {
+                schema,
+                entity: argOrField as GraphQLArgument,
+              });
+            } else {
+              const argResolver = planResolver as ArgumentInputPlanResolver;
+              return argResolver(parentPlan, fieldArgs, {
+                schema,
+                entity: argOrField as GraphQLArgument,
+              });
+            }
           } else {
-            const argResolver = planResolver as ArgumentInputPlanResolver;
-            return withFieldArgsForArgOrField(
-              aether,
-              parentPlan,
-              argOrField,
-              $value,
-              (fieldArgs) =>
-                argResolver(parentPlan, fieldArgs, {
-                  schema,
-                  entity: argOrField as GraphQLArgument,
-                }),
-            );
+            if ($toPlan) {
+              const fieldResolver =
+                planResolver as InputObjectFieldApplyPlanResolver;
+              return fieldResolver($toPlan, fieldArgs, {
+                schema,
+                entity: argOrField as GraphQLInputField,
+              });
+            } else {
+              const fieldResolver =
+                planResolver as InputObjectFieldInputPlanResolver;
+              return fieldResolver(fieldArgs, {
+                schema,
+                entity: argOrField as GraphQLInputField,
+              });
+            }
           }
-        } else {
-          if ($toPlan) {
-            const fieldResolver =
-              planResolver as InputObjectFieldApplyPlanResolver;
-            return withFieldArgsForArgOrField(
-              aether,
-              parentPlan,
-              argOrField,
-              $value,
-              (fieldArgs) =>
-                fieldResolver($toPlan, fieldArgs, {
-                  schema,
-                  entity: argOrField as GraphQLInputField,
-                }),
-            );
-          } else {
-            const fieldResolver =
-              planResolver as InputObjectFieldInputPlanResolver;
-            return withFieldArgsForArgOrField(
-              aether,
-              parentPlan,
-              argOrField,
-              $value,
-              (fieldArgs) =>
-                fieldResolver(fieldArgs, {
-                  schema,
-                  entity: argOrField as GraphQLInputField,
-                }),
-            );
-          }
-        }
-      } else {
-        return $value;
-      }
+        },
+      );
     });
     return plan;
   }
