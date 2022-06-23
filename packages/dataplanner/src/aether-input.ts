@@ -69,7 +69,7 @@ function withFieldArgsForArgumentsOrInputObject<
   aether: Aether,
   type: GraphQLInputType | null,
   parentPlan: ExecutablePlan,
-  $current: TrackedArguments | __TrackedObjectPlan | __InputObjectPlan,
+  $current: TrackedArguments | InputPlan, //__TrackedObjectPlan | __InputObjectPlan,
   fields: {
     [key: string]: GraphQLArgument | GraphQLInputField;
   } | null,
@@ -93,8 +93,15 @@ function withFieldArgsForArgumentsOrInputObject<
       analyzedCoordinates.push(id);
     }
 
+    const $currentObject = $current as
+      | TrackedArguments
+      | __TrackedObjectPlan
+      | __InputObjectPlan;
+
     const argName = path.shift()!;
-    let $value = ($current.get as (argName: string) => InputPlan)(argName);
+    let $value = ($currentObject.get as (argName: string) => InputPlan)(
+      argName,
+    );
     let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
 
     /*
@@ -435,14 +442,28 @@ function withFieldArgsForArgumentsOrInputObject<
   return plan;
 }
 
-function withFieldArgsForArgOrField<T>(
+function withFieldArgsForArgOrField<
+  T extends ExecutablePlan | ModifierPlan | null | void,
+>(
   aether: Aether,
   parentPlan: ExecutablePlan,
   argOrField: GraphQLArgument | GraphQLInputField,
-  $value: ExecutablePlan,
+  $value: InputPlan,
   callback: (fieldArgs: FieldArgs) => T,
 ): T {
-  return callback(null as any);
+  const type = argOrField.type;
+  const nullableType = getNullableType(type);
+  const fields = isInputObjectType(nullableType)
+    ? nullableType.getFields()
+    : null;
+  return withFieldArgsForArgumentsOrInputObject(
+    aether,
+    type,
+    parentPlan,
+    $value,
+    fields,
+    callback,
+  );
 }
 
 const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver =
