@@ -363,10 +363,12 @@ export type ArgumentApplyPlanResolver<
   TResultPlan extends
     | ExecutablePlan
     | ModifierPlan<ExecutablePlan | ModifierPlan>
-    | null =
+    | null
+    | void =
     | ExecutablePlan
     | ModifierPlan<ExecutablePlan | ModifierPlan>
-    | null,
+    | null
+    | void,
 > = (
   $parentPlan: TParentPlan,
   $fieldPlan: TFieldPlan,
