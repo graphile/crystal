@@ -555,13 +555,14 @@ export function inputObjectFieldSpec<
     TInput
   >,
 ): GraphQLInputFieldConfig {
-  const { inputPlan, ...spec } = graphileSpec;
-  return inputPlan
+  const { inputPlan, applyPlan, ...spec } = graphileSpec;
+  return inputPlan || applyPlan
     ? {
         ...spec,
         extensions: {
           graphile: {
-            inputPlan,
+            ...(inputPlan ? { inputPlan } : null),
+            ...(applyPlan ? { applyPlan } : null),
           },
         },
       }
