@@ -419,14 +419,15 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const { inputPlan, ...argSpec } = args[argName];
+        const { inputPlan, applyPlan, ...argSpec } = args[argName];
         memo[argName] = {
           ...argSpec,
-          ...(inputPlan
+          ...(inputPlan || applyPlan
             ? {
                 extensions: {
                   graphile: {
-                    inputPlan,
+                    ...(inputPlan ? { inputPlan } : null),
+                    ...(applyPlan ? { applyPlan } : null),
                   },
                 },
               }
