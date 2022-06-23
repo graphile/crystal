@@ -572,6 +572,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   required,
                 }),
               );
+              const allArgsAreNamed = argDetails.every(
+                (a) => !!a.postgresArgName,
+              );
 
               const makeArgs = EXPORTABLE(
                 (argDetailsSimple, constant) =>
@@ -588,7 +591,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       const $raw = args.getRaw([...path, graphqlArgName]);
                       let plan: ExecutablePlan;
                       if ($raw.evalIs(undefined)) {
-                        if (!required) {
+                        if (!required && allArgsAreNamed) {
                           skipped = true;
                           continue;
                         } else {
@@ -601,10 +604,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       if (skipped) {
                         const name = postgresArgName;
                         if (!name) {
-                          // TODO: we should handle this above and not skip arguments
-                          // if there are additional parameters that are unnamed.
                           throw new Error(
-                            "Cannot skip arguments when parameters are unnamed",
+                            "GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed",
                           );
                         }
                         selectArgs.push({
