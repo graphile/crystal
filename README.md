@@ -92,6 +92,8 @@ yarn add postgraphile
 npx postgraphile --help
 ```
 
+**macOS users**: PostGraphile has used port 5000 by default for 5+ years; recently Apple decided to bind the AirPlay service to port 5000 causing a conflict. Please use the `--port` option to bind to a different port.
+
 ### Middleware
 
 You can also use PostGraphile as [native HTTP, Connect, Express, or Koa (experimental) middleware](https://www.graphile.org/postgraphile/usage-library/), e.g.:
@@ -123,6 +125,8 @@ E.g. you might run this command (substituting the relevant variables):
 ```bash
 docker run --init -p 5000:5000 graphile/postgraphile --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_DATABASE --schema app_public --watch
 ```
+
+**macOS users**: Please use a different port to avoid conflict with AirPlay.
 
 ## Read More
 
