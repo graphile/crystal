@@ -1592,32 +1592,24 @@ export class PgSelectPlan<
     };
   }
 
-  private buildLimit() {
+  private buildLimitAndOffset() {
     // NOTE: according to the EdgesToReturn algorithm in the GraphQL Cursor
     // Connections Specification first is applied first, then last is applied.
     // For us this means that if first is present we set the limit to this and
     // then we do the last artificially later.
     // https://relay.dev/graphql/connections.htm#EdgesToReturn()
+    const limit =
+      this.first != null
+        ? sql`\nlimit ${sql.literal(this.first + (this.fetchOneExtra ? 1 : 0))}`
+        : this.last != null
+        ? sql`\nlimit ${sql.literal(this.last + (this.fetchOneExtra ? 1 : 0))}`
+        : sql.blank;
+    const offset =
+      this.offset != null
+        ? sql`\noffset ${sql.literal(this.offset)}`
+        : sql.blank;
     return {
-      sql:
-        this.first != null
-          ? sql`\nlimit ${sql.literal(
-              this.first + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : this.last != null
-          ? sql`\nlimit ${sql.literal(
-              this.last + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank,
-    };
-  }
-
-  private buildOffset() {
-    return {
-      sql:
-        this.offset != null
-          ? sql`\noffset ${sql.literal(this.offset)}`
-          : sql.blank,
+      sql: sql`${limit}${offset}`,
     };
   }
 
@@ -1653,10 +1645,9 @@ export class PgSelectPlan<
       this.havingConditions,
     );
     const { sql: orderBy } = this.buildOrderBy({ reverse });
-    const { sql: limit } = this.buildLimit();
-    const { sql: offset } = this.buildOffset();
+    const { sql: limitAndOffset } = this.buildLimitAndOffset();
 
-    const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limit}${offset}`;
+    const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
     const query = options.asJsonAgg
       ? sql`select json_agg(_) from (${sql.indent(baseQuery)}) _`
       : baseQuery;
