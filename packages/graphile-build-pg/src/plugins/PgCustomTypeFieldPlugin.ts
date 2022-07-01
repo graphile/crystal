@@ -858,7 +858,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   )
                 ) {
                   const fieldName = isRootQuery
-                    ? inflection.customQueryListField({ source })
+                    ? source.isList
+                      ? inflection.customQueryField({ source })
+                      : inflection.customQueryListField({ source })
                     : source.isList
                     ? inflection.computedColumnField({ source })
                     : inflection.computedColumnListField({ source });
