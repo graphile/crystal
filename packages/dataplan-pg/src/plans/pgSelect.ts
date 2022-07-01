@@ -1280,7 +1280,13 @@ export class PgSelectPlan<
         this.first != null && this.last != null && this.last < this.first;
       const hasMore =
         this.fetchOneExtra && limit != null && allVals.length > limit;
-      const limitedRows = hasMore ? allVals.slice(0, limit!) : allVals;
+      const trimFromStart =
+        !shouldReverseOrder && this.last != null && this.first == null;
+      const limitedRows = hasMore
+        ? trimFromStart
+          ? allVals.slice(Math.max(0, allVals.length - limit!))
+          : allVals.slice(0, limit!)
+        : allVals;
       const slicedRows =
         firstAndLast && this.last != null
           ? limitedRows.slice(-this.last)
