@@ -12,6 +12,7 @@ import {
   PgSourceBuilder,
   recordType,
   TYPES,
+  sqlFromArgDigests,
 } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
@@ -312,7 +313,7 @@ async function main() {
         executor,
         codec: TYPES.int,
         source: (...args) =>
-          sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
+          sql`app_public.unique_author_count(${sqlFromArgDigests(args)})`,
         name: "unique_author_count",
         parameters: [
           {
@@ -337,7 +338,9 @@ async function main() {
         codec: TYPES.int,
         isUnique: true,
         source: (...args) =>
-          sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
+          sql`app_public.forums_unique_author_count(${sqlFromArgDigests(
+            args,
+          )})`,
         name: "forums_unique_author_count",
         parameters: [
           {
@@ -370,7 +373,7 @@ async function main() {
         codec: usersCodec,
         isUnique: true,
         source: (...args) =>
-          sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
+          sql`app_public.forums_random_user(${sqlFromArgDigests(args)})`,
         name: "forums_random_user",
         parameters: [
           {
@@ -397,7 +400,7 @@ async function main() {
         codec: messagesCodec,
         isUnique: false,
         source: (...args) =>
-          sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+          sql`app_public.forums_featured_messages(${sqlFromArgDigests(args)})`,
         name: "forums_featured_messages",
         parameters: [
           {

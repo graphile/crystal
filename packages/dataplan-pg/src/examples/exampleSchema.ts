@@ -107,6 +107,7 @@ import {
 import { PgPageInfoPlan } from "../plans/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic.js";
 import type { PgSelectParsedCursorPlan } from "../plans/pgSelect.js";
+import { sqlFromArgDigests } from "../plans/pgSelect.js";
 
 declare module ".." {
   interface PgEnumSourceExtensions {
@@ -404,13 +405,13 @@ export function makeExampleSchema(
   );
 
   const uniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, selectAuth, sql) =>
+    (PgSource, TYPES, executor, selectAuth, sql, sqlFromArgDigests) =>
       new PgSource({
         executor,
         selectAuth,
         codec: TYPES.int,
         source: (...args) =>
-          sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
+          sql`app_public.unique_author_count(${sqlFromArgDigests(args)})`,
         name: "unique_author_count",
         parameters: [
           {
@@ -421,46 +422,72 @@ export function makeExampleSchema(
         ],
         isUnique: true,
       }),
-    [PgSource, TYPES, executor, selectAuth, sql],
+    [PgSource, TYPES, executor, selectAuth, sql, sqlFromArgDigests],
   );
 
   const forumNamesArraySource = EXPORTABLE(
-    (PgSource, TYPES, executor, listOfType, selectAuth, sql) =>
+    (
+      PgSource,
+      TYPES,
+      executor,
+      listOfType,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ) =>
       new PgSource({
         executor,
         selectAuth,
         codec: listOfType(TYPES.text),
         source: (...args) =>
-          sql`app_public.forum_names_array(${sql.join(args, ", ")})`,
+          sql`app_public.forum_names_array(${sqlFromArgDigests(args)})`,
         name: "forum_names_array",
         parameters: [],
         isUnique: true, // No setof
       }),
-    [PgSource, TYPES, executor, listOfType, selectAuth, sql],
+    [PgSource, TYPES, executor, listOfType, selectAuth, sql, sqlFromArgDigests],
   );
 
   const forumNamesCasesSource = EXPORTABLE(
-    (PgSource, TYPES, executor, listOfType, selectAuth, sql) =>
+    (
+      PgSource,
+      TYPES,
+      executor,
+      listOfType,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ) =>
       new PgSource({
         executor,
         selectAuth,
         codec: listOfType(TYPES.text),
         source: (...args) =>
-          sql`app_public.forum_names_cases(${sql.join(args, ", ")})`,
+          sql`app_public.forum_names_cases(${sqlFromArgDigests(args)})`,
         name: "forum_names_cases",
         parameters: [],
       }),
-    [PgSource, TYPES, executor, listOfType, selectAuth, sql],
+    [PgSource, TYPES, executor, listOfType, selectAuth, sql, sqlFromArgDigests],
   );
 
   const forumsUniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, forumCodec, selectAuth, sql) =>
+    (
+      PgSource,
+      TYPES,
+      executor,
+      forumCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ) =>
       new PgSource({
         executor,
         selectAuth,
         codec: TYPES.int,
         source: (...args) =>
-          sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
+          sql`app_public.forums_unique_author_count(${sqlFromArgDigests(
+            args,
+          )})`,
         name: "forums_unique_author_count",
         parameters: [
           {
@@ -476,7 +503,7 @@ export function makeExampleSchema(
         ],
         isUnique: true,
       }),
-    [PgSource, TYPES, executor, forumCodec, selectAuth, sql],
+    [PgSource, TYPES, executor, forumCodec, selectAuth, sql, sqlFromArgDigests],
   );
 
   const scalarTextSource = EXPORTABLE(
@@ -534,11 +561,11 @@ export function makeExampleSchema(
   );
 
   const usersMostRecentForumSource = EXPORTABLE(
-    (forumSource, sql, userSource) =>
+    (forumSource, sql, sqlFromArgDigests, userSource) =>
       forumSource.functionSource({
         name: "users_most_recent_forum",
         source: (...args) =>
-          sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
+          sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
         returnsArray: false,
         returnsSetof: false,
         parameters: [
@@ -550,7 +577,7 @@ export function makeExampleSchema(
           },
         ],
       }),
-    [forumSource, sql, userSource],
+    [forumSource, sql, sqlFromArgDigests, userSource],
   );
 
   const messageSource = EXPORTABLE(
@@ -575,24 +602,24 @@ export function makeExampleSchema(
   );
 
   const featuredMessages = EXPORTABLE(
-    (messageSource, sql) =>
+    (messageSource, sql, sqlFromArgDigests) =>
       messageSource.functionSource({
         name: "featured_messages",
         source: (...args) =>
-          sql`app_public.featured_messages(${sql.join(args, ", ")})`,
+          sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
         returnsSetof: true,
         returnsArray: false,
         parameters: [],
       }),
-    [messageSource, sql],
+    [messageSource, sql, sqlFromArgDigests],
   );
 
   const forumsFeaturedMessages = EXPORTABLE(
-    (forumCodec, messageSource, sql) =>
+    (forumCodec, messageSource, sql, sqlFromArgDigests) =>
       messageSource.functionSource({
         name: "forums_featured_messages",
         source: (...args) =>
-          sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+          sql`app_public.forums_featured_messages(${sqlFromArgDigests(args)})`,
         returnsSetof: true,
         returnsArray: false,
         parameters: [
@@ -603,41 +630,41 @@ export function makeExampleSchema(
           },
         ],
       }),
-    [forumCodec, messageSource, sql],
+    [forumCodec, messageSource, sql, sqlFromArgDigests],
   );
 
   const randomUserArraySource = EXPORTABLE(
-    (sql, userSource) =>
+    (sql, sqlFromArgDigests, userSource) =>
       userSource.functionSource({
         name: "random_user_array",
         source: (...args) =>
-          sql`app_public.random_user_array(${sql.join(args, ", ")})`,
+          sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
         returnsArray: true,
         returnsSetof: false,
         parameters: [],
       }),
-    [sql, userSource],
+    [sql, sqlFromArgDigests, userSource],
   );
 
   const randomUserArraySetSource = EXPORTABLE(
-    (sql, userSource) =>
+    (sql, sqlFromArgDigests, userSource) =>
       userSource.functionSource({
         name: "random_user_array_set",
         source: (...args) =>
-          sql`app_public.random_user_array_set(${sql.join(args, ", ")})`,
+          sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
         returnsSetof: true,
         returnsArray: true,
         parameters: [],
       }),
-    [sql, userSource],
+    [sql, sqlFromArgDigests, userSource],
   );
 
   const forumsMessagesListSetSource = EXPORTABLE(
-    (messageSource, sql) =>
+    (messageSource, sql, sqlFromArgDigests) =>
       messageSource.functionSource({
         name: "forums_messages_list_set",
         source: (...args) =>
-          sql`app_public.forums_messages_list_set(${sql.join(args, ", ")})`,
+          sql`app_public.forums_messages_list_set(${sqlFromArgDigests(args)})`,
         parameters: [],
         returnsArray: true,
         returnsSetof: true,
@@ -647,7 +674,7 @@ export function makeExampleSchema(
           },
         },
       }),
-    [messageSource, sql],
+    [messageSource, sql, sqlFromArgDigests],
   );
 
   const unionEntityColumns = EXPORTABLE(
@@ -1819,10 +1846,10 @@ export function makeExampleSchema(
   );
 
   const entitySearchSource = EXPORTABLE(
-    (TYPES, sql, unionEntitySource) =>
+    (TYPES, sql, sqlFromArgDigests, unionEntitySource) =>
       unionEntitySource.functionSource({
-        source: (...args: SQL[]) =>
-          sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
+        source: (...args) =>
+          sql`interfaces_and_unions.search(${sqlFromArgDigests(args)})`,
         returnsSetof: true,
         returnsArray: false,
         name: "entity_search",
@@ -1834,7 +1861,7 @@ export function makeExampleSchema(
           },
         ],
       }),
-    [TYPES, sql, unionEntitySource],
+    [TYPES, sql, sqlFromArgDigests, unionEntitySource],
   );
 
   const unionItemsSource = EXPORTABLE(
@@ -2757,8 +2784,7 @@ export function makeExampleSchema(
       randomUser: {
         type: User,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, pgSelect, sql, userSource) =>
-            function plan($forum) {
+          (deoptimizeIfAppropriate, pgSelect, sql, sqlFromArgDigests, userSource) => function plan($forum) {
               const $user = pgSelect({
                 source: userSource,
                 identifiers: [],
@@ -2767,14 +2793,16 @@ export function makeExampleSchema(
                     plan: $forum.record(),
                   },
                 ],
-                from: (...args: SQL[]) =>
-                  sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
+                from: (...args) =>
+                  sql`app_public.forums_random_user(${sqlFromArgDigests(
+                    args,
+                  )})`,
                 name: "forums_random_user",
               }).single();
               deoptimizeIfAppropriate($user);
               return $user;
             },
-          [deoptimizeIfAppropriate, pgSelect, sql, userSource],
+          [deoptimizeIfAppropriate, pgSelect, sql, sqlFromArgDigests, userSource],
         ),
       },
 
@@ -3423,8 +3451,7 @@ export function makeExampleSchema(
       titleLower: {
         type: GraphQLString,
         plan: EXPORTABLE(
-          (pgSelect, scalarTextSource, sql) =>
-            function plan($entity) {
+          (pgSelect, scalarTextSource, sql, sqlFromArgDigests) => function plan($entity) {
               return pgSelect({
                 source: scalarTextSource,
                 identifiers: [],
@@ -3433,15 +3460,14 @@ export function makeExampleSchema(
                     plan: $entity.record(),
                   },
                 ],
-                from: (...args: SQL[]) =>
-                  sql`interfaces_and_unions.relational_posts_title_lower(${sql.join(
+                from: (...args) =>
+                  sql`interfaces_and_unions.relational_posts_title_lower(${sqlFromArgDigests(
                     args,
-                    ", ",
                   )})`,
                 name: "relational_posts_title_lower",
               }).single();
             },
-          [pgSelect, scalarTextSource, sql],
+          [pgSelect, scalarTextSource, sql, sqlFromArgDigests],
         ),
       },
     }),
@@ -4511,7 +4537,7 @@ export function makeExampleSchema(
                   source: relationalPostsSource,
                   identifiers: [],
                   from: (authorId, title) =>
-                    sql`interfaces_and_unions.insert_post(${authorId}, ${title})`,
+                    sql`interfaces_and_unions.insert_post(${authorId.placeholder}, ${title.placeholder})`,
                   args: [
                     {
                       plan: constant(2),

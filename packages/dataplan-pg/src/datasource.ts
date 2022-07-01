@@ -38,7 +38,11 @@ import type {
   PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionPlan } from "./plans/pgClassExpression.js";
-import type { PgSelectArgumentSpec, PgSelectPlan } from "./plans/pgSelect.js";
+import type {
+  PgSelectArgumentDigest,
+  PgSelectArgumentSpec,
+  PgSelectPlan,
+} from "./plans/pgSelect.js";
 import { pgSelect } from "./plans/pgSelect.js";
 import type {
   PgSelectSinglePlan,
@@ -189,7 +193,7 @@ export interface PgSourceOptions<
   name: string;
   identifier?: string;
   source: TParameters extends PgSourceParameter[]
-    ? (...args: SQL[]) => SQL
+    ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
@@ -220,7 +224,7 @@ export interface PgFunctionSourceOptions<
 > {
   name: string;
   identifier?: string;
-  source: (...args: SQL[]) => SQL;
+  source: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
   returnsSetof: boolean;
   returnsArray: boolean;
@@ -351,7 +355,7 @@ export class PgSource<
   public readonly executor: PgExecutor;
   public readonly name: string;
   public readonly identifier: string;
-  public readonly source: SQL | ((...args: SQL[]) => SQL);
+  public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private readonly _options: PgSourceOptions<
     TColumns,
@@ -575,7 +579,7 @@ export class PgSource<
       // This is a `composite[]` function; convert it to a `setof composite` function:
       const source = EXPORTABLE(
         (fnSource, sql) =>
-          (...args: SQL[]) =>
+          (...args: PgSelectArgumentDigest[]) =>
             sql`unnest(${fnSource(...args)})`,
         [fnSource, sql],
       );
@@ -600,7 +604,7 @@ export class PgSource<
       const sqlPartitionByIndex = sql.identifier(Symbol(`${name}_idx`));
       const source = EXPORTABLE(
         (fnSource, sql, sqlPartitionByIndex, sqlTmp) =>
-          (...args: SQL[]) =>
+          (...args: PgSelectArgumentDigest[]) =>
             sql`${fnSource(
               ...args,
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,

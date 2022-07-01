@@ -186,7 +186,7 @@ export type PgSelectArgumentSpec =
       name?: string;
     };
 
-interface PgSelectArgumentDigest {
+export interface PgSelectArgumentDigest {
   position?: number;
   name?: string;
   placeholder: SQL;
@@ -243,7 +243,7 @@ export interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
    * override the `source.source` here with your own from code. Defaults to
    * `source.source`.
    */
-  from?: SQL | ((...args: SQL[]) => SQL);
+  from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
 
   /**
    * If you pass a custom `from` (or otherwise want to aid in debugging),
@@ -297,7 +297,9 @@ export class PgSelectPlan<
   isSyncAndSafe = false;
 
   // FROM
-  private readonly from: SQL | ((...args: SQL[]) => SQL);
+  private readonly from:
+    | SQL
+    | ((...args: Array<PgSelectArgumentDigest>) => SQL);
 
   /**
    * This defaults to the name of the source but you can override it. Aids
@@ -1479,7 +1481,7 @@ export class PgSelectPlan<
   private fromExpression(): SQL {
     const source =
       typeof this.from === "function"
-        ? this.from(...this.arguments.map((arg) => arg.placeholder))
+        ? this.from(...this.arguments)
         : this.from;
     return source;
   }
@@ -2938,7 +2940,7 @@ export function pgSelectFromRecords<
   return new PgSelectPlan<TColumns, TUniques, TRelations, TParameters>({
     source,
     identifiers: [],
-    from: (records) => sql`unnest(${records})`,
+    from: (records) => sql`unnest(${records.placeholder})`,
     args: [{ plan: records, pgCodec: listOfType(source.codec) }],
   }) as PgSelectPlan<TColumns, TUniques, TRelations, TParameters>;
 }
@@ -2949,3 +2951,18 @@ Object.defineProperty(pgSelectFromRecords, "$$export", {
     exportName: "pgSelectFromRecords",
   },
 });
+
+export function sqlFromArgDigests(
+  digests: readonly PgSelectArgumentDigest[],
+): SQL {
+  const args = digests.map((digest) => {
+    if (digest.name) {
+      return sql`${sql.identifier(digest.name)} := ${digest.placeholder}`;
+    } else {
+      return digest.placeholder;
+    }
+  });
+  return digests.length > 1
+    ? sql.indent(sql.join(args, ",\n"))
+    : sql.join(args, ", ");
+}

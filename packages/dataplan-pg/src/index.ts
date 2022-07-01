@@ -104,6 +104,7 @@ export {
 } from "./plans/pgPolymorphic.js";
 export {
   pgSelect,
+  PgSelectArgumentDigest,
   PgSelectArgumentSpec,
   pgSelectFromRecords,
   PgSelectIdentifierSpec,
@@ -113,6 +114,7 @@ export {
   PgSelectOptions,
   PgSelectParsedCursorPlan,
   PgSelectPlan,
+  sqlFromArgDigests,
 } from "./plans/pgSelect.js";
 export {
   pgSelectSingleFromRecord,

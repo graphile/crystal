@@ -90,9 +90,9 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                                   "Invalid computed column source",
                                 );
                               }
-                              const expression = sql`${pgFieldSource.source(
-                                plan.alias,
-                              )}`;
+                              const expression = sql`${pgFieldSource.source({
+                                placeholder: plan.alias,
+                              })}`;
                               plan.orderBy({
                                 codec: pgFieldSource.codec,
                                 fragment: expression,

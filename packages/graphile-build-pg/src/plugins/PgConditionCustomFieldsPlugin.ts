@@ -98,9 +98,9 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           if (typeof pgFieldSource.source !== "function") {
                             throw new Error("Invalid computed column source");
                           }
-                          const expression = sql`${pgFieldSource.source(
-                            $condition.alias,
-                          )}`;
+                          const expression = sql`${pgFieldSource.source({
+                            placeholder: $condition.alias,
+                          })}`;
                           if (val.getRaw().evalIs(null)) {
                             $condition.where(sql`${expression} is null`);
                           } else {

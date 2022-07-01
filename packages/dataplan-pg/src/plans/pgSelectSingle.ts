@@ -605,7 +605,7 @@ export function pgSelectSingleFromRecord<
   return new PgSelectPlan<TColumns, TUniques, TRelations, TParameters>({
     source,
     identifiers: [],
-    from: (record) => sql`(select (${record}).*)`,
+    from: (record) => sql`(select (${record.placeholder}).*)`,
     args: [{ plan: record, pgCodec: source.codec }],
     joinAsLateral: true,
   }).single() as PgSelectSinglePlan<

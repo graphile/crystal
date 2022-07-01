@@ -574,26 +574,39 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   required,
                 }),
               );
-              const allArgsAreNamed = argDetails.every(
-                (a) => !!a.postgresArgName,
-              );
+              let indexAfterWhichAllArgsAreNamed = 0;
+              const argDetailsLength = argDetails.length;
+              for (let i = 0; i < argDetailsLength; i++) {
+                if (!argDetails[i].postgresArgName) {
+                  indexAfterWhichAllArgsAreNamed = i + 1;
+                }
+              }
 
               const makeArgs = EXPORTABLE(
-                (allArgsAreNamed, argDetailsSimple, constant) =>
+                (
+                    argDetailsLength,
+                    argDetailsSimple,
+                    constant,
+                    indexAfterWhichAllArgsAreNamed,
+                  ) =>
                   (args: FieldArgs, path: string[] = []) => {
                     const selectArgs: PgSelectArgumentSpec[] = [];
 
                     let skipped = false;
-                    for (const {
-                      graphqlArgName,
-                      postgresArgName,
-                      pgCodec,
-                      required,
-                    } of argDetailsSimple) {
+                    for (let i = 0; i < argDetailsLength; i++) {
+                      const {
+                        graphqlArgName,
+                        postgresArgName,
+                        pgCodec,
+                        required,
+                      } = argDetailsSimple[i];
                       const $raw = args.getRaw([...path, graphqlArgName]);
                       let plan: ExecutablePlan;
                       if ($raw.evalIs(undefined)) {
-                        if (!required && allArgsAreNamed) {
+                        if (
+                          !required &&
+                          i >= indexAfterWhichAllArgsAreNamed - 1
+                        ) {
                           skipped = true;
                           continue;
                         } else {
@@ -625,7 +638,12 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                     return selectArgs;
                   },
-                [allArgsAreNamed, argDetailsSimple, constant],
+                [
+                  argDetailsLength,
+                  argDetailsSimple,
+                  constant,
+                  indexAfterWhichAllArgsAreNamed,
+                ],
               );
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<
@@ -686,7 +704,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           return pgClassExpression(
                             $row,
                             source.codec,
-                          )`${source.source(...placeholders)}`;
+                          )`${source.source(
+                            ...placeholders.map((placeholder) => ({
+                              placeholder,
+                            })),
+                          )}`;
                         }
                         // TODO: or here, if scalar add select to `$row`?
                         return source.execute(selectArgs);

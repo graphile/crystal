@@ -4,11 +4,13 @@
 
 import type {
   PgFunctionSourceOptions,
+  PgSelectArgumentDigest,
   PgSourceOptions,
   PgSourceParameter,
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
+import { sqlFromArgDigests } from "@dataplan/pg";
 import { PgSource, recordType } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
@@ -382,14 +384,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const procName = pgProc.proname;
 
           const sourceCallback = EXPORTABLE(
-            (namespaceName, procName, sql) =>
-              (...args: SQL[]) =>
-                sql`${sql.identifier(namespaceName, procName)}(${
-                  args.length > 1
-                    ? sql.indent(sql.join(args, ",\n"))
-                    : sql.join(args, ", ")
-                })`,
-            [namespaceName, procName, sql],
+            (namespaceName, procName, sql, sqlFromArgDigests) =>
+              (...args: PgSelectArgumentDigest[]) =>
+                sql`${sql.identifier(
+                  namespaceName,
+                  procName,
+                )}(${sqlFromArgDigests(args)})`,
+            [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
           if (
