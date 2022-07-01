@@ -1271,19 +1271,15 @@ export class PgSelectPlan<
     );
     // debugExecute("%s; result: %c", this, executionResult);
 
-    return executionResult.values.map((allVals, i) => {
+    return executionResult.values.map((allVals) => {
       if (allVals == null || isPromiseLike(allVals)) {
         return allVals;
       }
       const limit = this.first ?? this.last;
       const firstAndLast =
         this.first != null && this.last != null && this.last < this.first;
-      const limitAndOffsetPlanResult =
-        this.limitAndOffsetId != null ? values[this.limitAndOffsetId][i] : null;
       const hasMore =
-        limitAndOffsetPlanResult?.[2] === true
-          ? false
-          : this.fetchOneExtra && limit != null && allVals.length > limit;
+        this.fetchOneExtra && limit != null && allVals.length > limit;
       const limitedRows = hasMore ? allVals.slice(0, limit!) : allVals;
       const slicedRows =
         firstAndLast && this.last != null
@@ -1712,9 +1708,9 @@ export class PgSelectPlan<
       const limitAndOffsetLambda = lambda(
         list([$lower, $upper]),
         ([cursorLower, cursorUpper]: Array<number | null>) => {
-          /** lower bound - inclusive */
+          /** lower bound - exclusive (1-indexed) */
           let lower = 0;
-          /** upper bound - exclusive */
+          /** upper bound - exclusive (1-indexed) */
           let upper = Infinity;
 
           // Apply 'after', if present
@@ -1728,7 +1724,6 @@ export class PgSelectPlan<
           }
 
           // Cannot go beyond these bounds
-          const minLower = lower;
           const maxUpper = upper;
 
           // Apply 'first', if present
@@ -1748,26 +1743,27 @@ export class PgSelectPlan<
           }
 
           // If 'fetch one extra', adjust:
-          let hasNoNextPage = null;
           if (this.fetchOneExtra) {
             if (this.first != null) {
-              upper = Math.min(upper + 1, maxUpper);
-              if (upper === maxUpper) {
-                hasNoNextPage = true;
-              }
+              upper = upper + 1;
             } else if (this.last != null) {
-              lower = Math.max(0, lower - 1, minLower);
-              if (lower === minLower) {
-                hasNoNextPage = true;
-              }
+              lower = Math.max(0, lower - 1);
             }
           }
 
-          // Calculate the final limit/offset
-          const limit = isFinite(upper) ? Math.max(0, upper - lower - 1) : null;
-          const offset = lower;
+          /** lower, but 0-indexed and inclusive */
+          const lower0 = lower - 1 + 1;
+          /** upper, but 0-indexed and inclusive */
+          const upper0 = upper - 1 - 1;
 
-          return [limit, offset, hasNoNextPage];
+          // Calculate the final limit/offset
+          const limit = isFinite(upper0)
+            ? Math.max(0, upper0 - lower0 + 1)
+            : null;
+          const offset = lower0;
+
+
+          return [limit, offset];
         },
       );
       this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
