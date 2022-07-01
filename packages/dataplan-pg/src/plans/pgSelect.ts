@@ -1739,6 +1739,12 @@ export class PgSelectPlan<
             lower = Math.max(0, lower, upper - this.last);
           }
 
+          // Apply 'offset', if present
+          if (this.offset != null && this.offset > 0) {
+            lower = Math.min(lower + this.offset, maxUpper);
+            upper = Math.min(upper + this.offset, maxUpper);
+          }
+
           // If 'fetch one extra', adjust:
           let hasNoNextPage = null;
           if (this.fetchOneExtra) {
