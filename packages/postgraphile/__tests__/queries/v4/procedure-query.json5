@@ -71,16 +71,7 @@
       },
       fooBar: 8,
     },
-    {
-      a: null,
-      b: null,
-      c: null,
-      d: null,
-      e: null,
-      f: null,
-      g: null,
-      fooBar: null,
-    },
+    null,
     {
       a: 420,
       b: "easy cheesy baked potatoes",
@@ -151,45 +142,45 @@
   tableSetQuery_sorted: {
     edges: [
       {
-        cursor: "WyJuYW1lX2FzYyIsM10=",
+        cursor: "WyI4MzE1YjI2OTJlIiwiQnVkZCBEZWV5Il0=",
         node: {
           name: "Budd Deey",
         },
       },
       {
-        cursor: "WyJuYW1lX2FzYyIsNV0=",
+        cursor: "WyI4MzE1YjI2OTJlIiwiSm9lIFR1Y2tlciJd",
         node: {
           name: "Joe Tucker",
         },
       },
       {
-        cursor: "WyJuYW1lX2FzYyIsMV0=",
+        cursor: "WyI4MzE1YjI2OTJlIiwiSm9obiBTbWl0aCJd",
         node: {
           name: "John Smith",
         },
       },
       {
-        cursor: "WyJuYW1lX2FzYyIsNF0=",
+        cursor: "WyI4MzE1YjI2OTJlIiwiS2F0aHJ5biBSYW1pcmV6Il0=",
         node: {
           name: "Kathryn Ramirez",
         },
       },
       {
-        cursor: "WyJuYW1lX2FzYyIsMl0=",
+        cursor: "WyI4MzE1YjI2OTJlIiwiU2FyYSBTbWl0aCJd",
         node: {
           name: "Sara Smith",
         },
       },
       {
-        cursor: "WyJuYW1lX2FzYyIsNl0=",
+        cursor: "WyI4MzE1YjI2OTJlIiwiVHdlbnR5IFNldmVudHdvIl0=",
         node: {
           name: "Twenty Seventwo",
         },
       },
     ],
     pageInfo: {
-      startCursor: "WyJuYW1lX2FzYyIsM10=",
-      endCursor: "WyJuYW1lX2FzYyIsNl0=",
+      startCursor: "WyI4MzE1YjI2OTJlIiwiQnVkZCBEZWV5Il0=",
+      endCursor: "WyI4MzE1YjI2OTJlIiwiVHdlbnR5IFNldmVudHdvIl0=",
       hasNextPage: false,
       hasPreviousPage: false,
     },
@@ -222,8 +213,8 @@
     pageInfo: {
       startCursor: "WyJuYXR1cmFsIiw0XQ==",
       endCursor: "WyJuYXR1cmFsIiw0XQ==",
-      hasNextPage: true,
-      hasPreviousPage: true,
+      hasNextPage: false,
+      hasPreviousPage: false,
     },
   },
   tableSetQueryWithOffset2: {
@@ -238,8 +229,8 @@
     pageInfo: {
       startCursor: "WyJuYXR1cmFsIiw0XQ==",
       endCursor: "WyJuYXR1cmFsIiw0XQ==",
-      hasNextPage: true,
-      hasPreviousPage: true,
+      hasNextPage: false,
+      hasPreviousPage: false,
     },
   },
   tableSetQueryWithOffset3: {
@@ -260,7 +251,7 @@
     pageInfo: {
       startCursor: "WyJuYXR1cmFsIiwzXQ==",
       endCursor: "WyJuYXR1cmFsIiw0XQ==",
-      hasNextPage: true,
+      hasNextPage: false,
       hasPreviousPage: true,
     },
   },
@@ -305,7 +296,7 @@
       startCursor: "WyJuYXR1cmFsIiw0XQ==",
       endCursor: "WyJuYXR1cmFsIiw1XQ==",
       hasNextPage: true,
-      hasPreviousPage: true,
+      hasPreviousPage: false,
     },
   },
   tableSetQueryWithOffset6: {
@@ -371,7 +362,7 @@
       startCursor: "WyJuYXR1cmFsIiwxXQ==",
       endCursor: "WyJuYXR1cmFsIiwyXQ==",
       hasNextPage: true,
-      hasPreviousPage: false,
+      hasPreviousPage: true,
     },
   },
   tableSetQueryWithOffset9: {
@@ -492,7 +483,7 @@
       startCursor: "WyJuYXR1cmFsIiwzXQ==",
       endCursor: "WyJuYXR1cmFsIiw0XQ==",
       hasNextPage: true,
-      hasPreviousPage: true,
+      hasPreviousPage: false,
     },
   },
   intSetQuery: {
@@ -582,16 +573,7 @@
       },
       fooBar: 8,
     },
-    {
-      a: null,
-      b: null,
-      c: null,
-      d: null,
-      e: null,
-      f: null,
-      g: null,
-      fooBar: null,
-    },
+    null,
     {
       a: 420,
       b: "easy cheesy baked potatoes",

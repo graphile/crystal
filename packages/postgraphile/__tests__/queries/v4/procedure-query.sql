@@ -1,1216 +1,665 @@
-select to_json(__local_0__) as "value"
-from "c"."json_identity"(
-  $1
-) as __local_0__
-where (TRUE) and (TRUE)
+select __json_identity_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"json" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __json_identity_identifiers__,
+lateral (
+  select
+    __json_identity__.v::text as "0",
+    __json_identity_identifiers__.idx as "1"
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
+) as __json_identity_result__
 
-select to_json(__local_0__) as "value"
-from "c"."jsonb_identity"(
-  $1
-) as __local_0__
-where (TRUE) and (TRUE)
+select
+  __no_args_query__.v::text as "0"
+from "c"."no_args_query"() as __no_args_query__(v)
 
-select to_json(__local_0__) as "value"
-from "c"."json_identity"(
-  $1
-) as __local_0__
-where (TRUE) and (TRUE)
+select
+  __query_text_array__.v::text as "0"
+from "a"."query_text_array"() as __query_text_array__(v)
 
-select to_json(__local_0__) as "value"
-from "c"."jsonb_identity"(
-  $1
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."add_1_query"(
-  $1,
-  $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."add_2_query"(
-  $1,
-  "b" := $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."add_3_query"(
-  NULL,
-  $1
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."add_4_query"(
-  $1,
-  "b" := $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."optional_missing_middle_1"(
-  $1,
-  "c" := $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."optional_missing_middle_1"(
-  $1,
-  "b" := $2,
-  "c" := $3
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."optional_missing_middle_2"(
-  $1,
-  "c" := $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."optional_missing_middle_3"(
-  $1,
-  "c" := $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."optional_missing_middle_4"(
-  $1,
-  NULL,
-  $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "a"."optional_missing_middle_5"(
-  $1,
-  NULL,
-  $2
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "c"."types_query"(
-  $1,
-  $2,
-  $3,
-  array[$4,
-  $5,
-  $6]::"pg_catalog"."_int4",
-  $7,
-  "c"."floatrange"(
-    $8,
-    $9,
-    $10
-  )
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json(__local_0__) as "value"
-from "c"."types_query"(
-  $1,
-  $2,
-  $3,
-  array[]::"pg_catalog"."_int4",
-  $4,
-  "c"."floatrange"(
-    NULL,
-    NULL,
-    $5
-  )
-) as __local_0__
-where (TRUE) and (TRUE)
-
-select to_json((__local_0__."a")) as "a",
-to_json((__local_0__."b")) as "b",
-to_json((__local_0__."c")) as "c",
-to_json((__local_0__."d")) as "d",
-to_json((__local_0__."e")) as "e",
-to_json((__local_0__."f")) as "f",
-to_json(
-  ((__local_0__."g"))::text
-) as "g",
-to_json((__local_0__."foo_bar")) as "fooBar"
-from "b"."compound_type_query"(
-  row(
-    $1::"pg_catalog"."int4",
-    $2::"pg_catalog"."text",
-    $3::"b"."color",
-    NULL,
-    $4::"b"."enum_caps",
-    $5::"b"."enum_with_empty_string",
-    $6::"pg_catalog"."interval",
-    $7::"pg_catalog"."int4"
-  )::"c"."compound_type"
-) as __local_0__
-where (
-  not (__local_0__ is null)
-) and (TRUE) and (TRUE)
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '@node'::text,
-        (
-          json_build_object(
-            'a'::text,
-            (__local_1__."a"),
-            'b'::text,
-            (__local_1__."b"),
-            'c'::text,
-            (__local_1__."c"),
-            'd'::text,
-            (__local_1__."d"),
-            'e'::text,
-            (__local_1__."e"),
-            'f'::text,
-            (__local_1__."f"),
-            'g'::text,
-            ((__local_1__."g"))::text,
-            'fooBar'::text,
-            (__local_1__."foo_bar")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."compound_type_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 5
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
+select
   (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."compound_type_set_query"( ) as __local_1__
-  where (TRUE) offset 5
-) as "hasNextPage",
-false as "hasPreviousPage"
+    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'))
+    from unnest(__query_interval_array__.v) t
+  )::text as "0"
+from "a"."query_interval_array"() as __query_interval_array__(v)
 
-select to_json((__local_0__."a")) as "a",
-to_json((__local_0__."b")) as "b",
-to_json((__local_0__."c")) as "c",
-to_json((__local_0__."d")) as "d",
-to_json((__local_0__."e")) as "e",
-to_json((__local_0__."f")) as "f",
-to_json(
-  ((__local_0__."g"))::text
-) as "g",
-to_json((__local_0__."foo_bar")) as "fooBar"
-from unnest(
-  "b"."compound_type_array_query"(
-    row(
-      $1::"pg_catalog"."int4",
-      $2::"pg_catalog"."text",
-      $3::"b"."color",
-      NULL,
-      $4::"b"."enum_caps",
-      $5::"b"."enum_with_empty_string",
-      $6::"pg_catalog"."interval",
-      $7::"pg_catalog"."int4"
-    )::"c"."compound_type"
-  )
-) as __local_0__
-where (TRUE) and (TRUE)
+select __jsonb_identity_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"jsonb" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __jsonb_identity_identifiers__,
+lateral (
+  select
+    __jsonb_identity__.v::text as "0",
+    __jsonb_identity_identifiers__.idx as "1"
+  from "c"."jsonb_identity"(__jsonb_identity_identifiers__."id0") as __jsonb_identity__(v)
+) as __jsonb_identity_result__
 
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json((__local_0__."id")) as "id",
-to_json((__local_0__."headline")) as "headline",
-to_json((__local_0__."author_id")) as "authorId"
-from "c"."table_query"(
-  $1
-) as __local_0__
-where (
-  not (__local_0__ is null)
-) and (TRUE) and (TRUE)
+select __json_identity_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"json" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __json_identity_identifiers__,
+lateral (
+  select
+    __json_identity__.v::text as "0",
+    __json_identity_identifiers__.idx as "1"
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
+) as __json_identity_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-false as "hasNextPage",
-false as "hasPreviousPage"
+select __jsonb_identity_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"jsonb" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __jsonb_identity_identifiers__,
+lateral (
+  select
+    __jsonb_identity__.v::text as "0",
+    __jsonb_identity_identifiers__.idx as "1"
+  from "c"."jsonb_identity"(__jsonb_identity_identifiers__."id0") as __jsonb_identity__(v)
+) as __jsonb_identity_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'name_asc',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  order by __local_1__."person_full_name" ASC
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-false as "hasNextPage",
-false as "hasPreviousPage"
+select __add_1_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __add_1_query_identifiers__,
+lateral (
+  select
+    __add_1_query__.v::text as "0",
+    __add_1_query_identifiers__.idx as "1"
+  from "a"."add_1_query"(
+    __add_1_query_identifiers__."id0",
+    __add_1_query_identifiers__."id1"
+  ) as __add_1_query__(v)
+) as __add_1_query_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
+select __add_2_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __add_2_query_identifiers__,
+lateral (
+  select
+    __add_2_query__.v::text as "0",
+    __add_2_query_identifiers__.idx as "1"
+  from "a"."add_2_query"(
+    __add_2_query_identifiers__."id0",
+    __add_2_query_identifiers__."id1"
+  ) as __add_2_query__(v)
+) as __add_2_query_result__
+
+select __add_3_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __add_3_query_identifiers__,
+lateral (
+  select
+    __add_3_query__.v::text as "0",
+    __add_3_query_identifiers__.idx as "1"
+  from "a"."add_3_query"(
+    __add_3_query_identifiers__."id0",
+    __add_3_query_identifiers__."id1"
+  ) as __add_3_query__(v)
+) as __add_3_query_result__
+
+select __add_4_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __add_4_query_identifiers__,
+lateral (
+  select
+    __add_4_query__.v::text as "0",
+    __add_4_query_identifiers__.idx as "1"
+  from "a"."add_4_query"(
+    __add_4_query_identifiers__."id0",
+    __add_4_query_identifiers__."id1"
+  ) as __add_4_query__(v)
+) as __add_4_query_result__
+
+select __optional_missing_middle_1_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __optional_missing_middle_1_identifiers__,
+lateral (
+  select
+    __optional_missing_middle_1__.v::text as "0",
+    __optional_missing_middle_1_identifiers__.idx as "1"
+  from "a"."optional_missing_middle_1"(
+    __optional_missing_middle_1_identifiers__."id0",
+    "c" := __optional_missing_middle_1_identifiers__."id1"
+  ) as __optional_missing_middle_1__(v)
+) as __optional_missing_middle_1_result__
+
+select __optional_missing_middle_1_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"int4" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __optional_missing_middle_1_identifiers__,
+lateral (
+  select
+    __optional_missing_middle_1__.v::text as "0",
+    __optional_missing_middle_1_identifiers__.idx as "1"
+  from "a"."optional_missing_middle_1"(
+    __optional_missing_middle_1_identifiers__."id0",
+    __optional_missing_middle_1_identifiers__."id1",
+    __optional_missing_middle_1_identifiers__."id2"
+  ) as __optional_missing_middle_1__(v)
+) as __optional_missing_middle_1_result__
+
+select __optional_missing_middle_2_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __optional_missing_middle_2_identifiers__,
+lateral (
+  select
+    __optional_missing_middle_2__.v::text as "0",
+    __optional_missing_middle_2_identifiers__.idx as "1"
+  from "a"."optional_missing_middle_2"(
+    __optional_missing_middle_2_identifiers__."id0",
+    "c" := __optional_missing_middle_2_identifiers__."id1"
+  ) as __optional_missing_middle_2__(v)
+) as __optional_missing_middle_2_result__
+
+select __optional_missing_middle_3_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __optional_missing_middle_3_identifiers__,
+lateral (
+  select
+    __optional_missing_middle_3__.v::text as "0",
+    __optional_missing_middle_3_identifiers__.idx as "1"
+  from "a"."optional_missing_middle_3"(
+    __optional_missing_middle_3_identifiers__."id0",
+    "c" := __optional_missing_middle_3_identifiers__."id1"
+  ) as __optional_missing_middle_3__(v)
+) as __optional_missing_middle_3_result__
+
+select __optional_missing_middle_4_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"int4" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __optional_missing_middle_4_identifiers__,
+lateral (
+  select
+    __optional_missing_middle_4__.v::text as "0",
+    __optional_missing_middle_4_identifiers__.idx as "1"
+  from "a"."optional_missing_middle_4"(
+    __optional_missing_middle_4_identifiers__."id0",
+    __optional_missing_middle_4_identifiers__."id1",
+    __optional_missing_middle_4_identifiers__."id2"
+  ) as __optional_missing_middle_4__(v)
+) as __optional_missing_middle_4_result__
+
+select __optional_missing_middle_5_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"int4" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __optional_missing_middle_5_identifiers__,
+lateral (
+  select
+    __optional_missing_middle_5__.v::text as "0",
+    __optional_missing_middle_5_identifiers__.idx as "1"
+  from "a"."optional_missing_middle_5"(
+    __optional_missing_middle_5_identifiers__."id0",
+    __optional_missing_middle_5_identifiers__."id1",
+    __optional_missing_middle_5_identifiers__."id2"
+  ) as __optional_missing_middle_5__(v)
+) as __optional_missing_middle_5_result__
+
+select __types_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int8" as "id0",
+    (ids.value->>1)::"bool" as "id1",
+    (ids.value->>2)::"varchar" as "id2",
+    (ids.value->>3)::"int4"[] as "id3",
+    (ids.value->>4)::"json" as "id4",
+    (ids.value->>5)::"c"."floatrange" as "id5"
+  from json_array_elements($1::json) with ordinality as ids
+) as __types_query_identifiers__,
+lateral (
+  select
+    __types_query__.v::text as "0",
+    __types_query_identifiers__.idx as "1"
+  from "c"."types_query"(
+    __types_query_identifiers__."id0",
+    __types_query_identifiers__."id1",
+    __types_query_identifiers__."id2",
+    __types_query_identifiers__."id3",
+    __types_query_identifiers__."id4",
+    __types_query_identifiers__."id5"
+  ) as __types_query__(v)
+) as __types_query_result__
+
+select __types_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int8" as "id0",
+    (ids.value->>1)::"bool" as "id1",
+    (ids.value->>2)::"varchar" as "id2",
+    (ids.value->>3)::"int4"[] as "id3",
+    (ids.value->>4)::"json" as "id4",
+    (ids.value->>5)::"c"."floatrange" as "id5"
+  from json_array_elements($1::json) with ordinality as ids
+) as __types_query_identifiers__,
+lateral (
+  select
+    __types_query__.v::text as "0",
+    __types_query_identifiers__.idx as "1"
+  from "c"."types_query"(
+    __types_query_identifiers__."id0",
+    __types_query_identifiers__."id1",
+    __types_query_identifiers__."id2",
+    __types_query_identifiers__."id3",
+    __types_query_identifiers__."id4",
+    __types_query_identifiers__."id5"
+  ) as __types_query__(v)
+) as __types_query_result__
+
+select __compound_type_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __compound_type_query_identifiers__,
+lateral (
+  select
+    __compound_type_query__."a"::text as "0",
+    __compound_type_query__."b" as "1",
+    __compound_type_query__."c"::text as "2",
+    __compound_type_query__."d" as "3",
+    __compound_type_query__."e"::text as "4",
+    __compound_type_query__."f"::text as "5",
+    to_char(__compound_type_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    __compound_type_query__."foo_bar"::text as "7",
+    (not (__compound_type_query__ is null))::text as "8",
+    __compound_type_query_identifiers__.idx as "9"
+  from "b"."compound_type_query"(__compound_type_query_identifiers__."id0") as __compound_type_query__
+) as __compound_type_query_result__
+
+select
+  (row_number() over (partition by 1))::text as "0",
+  __compound_type_set_query__."a"::text as "1",
+  __compound_type_set_query__."b" as "2",
+  __compound_type_set_query__."c"::text as "3",
+  __compound_type_set_query__."d" as "4",
+  __compound_type_set_query__."e"::text as "5",
+  __compound_type_set_query__."f"::text as "6",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "7",
+  __compound_type_set_query__."foo_bar"::text as "8",
+  (not (__compound_type_set_query__ is null))::text as "9"
+from "c"."compound_type_set_query"() as __compound_type_set_query__
+limit 6
+
+select __compound_type_array_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __compound_type_array_query_identifiers__,
+lateral (
+  select
+    __compound_type_array_query__."a"::text as "0",
+    __compound_type_array_query__."b" as "1",
+    __compound_type_array_query__."c"::text as "2",
+    __compound_type_array_query__."d" as "3",
+    __compound_type_array_query__."e"::text as "4",
+    __compound_type_array_query__."f"::text as "5",
+    to_char(__compound_type_array_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    __compound_type_array_query__."foo_bar"::text as "7",
+    (not (__compound_type_array_query__ is null))::text as "8",
+    __compound_type_array_query_identifiers__.idx as "9"
+  from unnest("b"."compound_type_array_query"(__compound_type_array_query_identifiers__."id0")) as __compound_type_array_query__
+) as __compound_type_array_query_result__
+
+select __table_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_query_identifiers__,
+lateral (
+  select
+    __table_query__."id"::text as "0",
+    __table_query__."headline" as "1",
+    __table_query__."author_id"::text as "2",
+    __table_query_identifiers__.idx as "3"
+  from "c"."table_query"(__table_query_identifiers__."id0") as __table_query__
+) as __table_query_result__
+
+select
+  (row_number() over (partition by 1))::text as "0",
+  __table_set_query__."person_full_name" as "1",
+  __table_set_query__."id"::text as "2"
+from "c"."table_set_query"() as __table_set_query__
+
+select
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1"
+from "c"."table_set_query"() as __table_set_query__
+order by __table_set_query__."person_full_name" asc
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"varchar" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
   where (
-    __local_1__."person_full_name" = $1
-  ) and (TRUE) and (TRUE)
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-false as "hasNextPage",
-false as "hasPreviousPage"
+    __table_set_query__."person_full_name" = __table_set_query_identifiers__."id0"
+  )
+) as __table_set_query_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 1 offset 3
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 4
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 1 offset 3
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 4
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
+select
+  (row_number() over (partition by 1))::text as "0",
+  __table_set_query__."person_full_name" as "1",
+  __table_set_query__."id"::text as "2"
+from "c"."table_set_query"() as __table_set_query__
+limit 3
+offset 2
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2 offset 2
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 4
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
+select
+  (row_number() over (partition by 1))::text as "0",
+  __table_set_query__."person_full_name" as "1",
+  __table_set_query__."id"::text as "2"
+from "c"."table_set_query"() as __table_set_query__
+limit 3
+offset 4
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 2
-) as "hasNextPage",
-false as "hasPreviousPage"
+select
+  (row_number() over (partition by 1))::text as "0",
+  __table_set_query__."person_full_name" as "1",
+  __table_set_query__."id"::text as "2"
+from "c"."table_set_query"() as __table_set_query__
+limit 3
+offset 0
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2 offset 3
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 5
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
+select
+  (row_number() over (partition by 1))::text as "0",
+  __table_set_query__."person_full_name" as "1",
+  __table_set_query__."id"::text as "2"
+from "c"."table_set_query"() as __table_set_query__
+limit 7
+offset 0
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2 offset 2
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 4
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
+select
+  (row_number() over (partition by 1))::text as "0",
+  __table_set_query_plpgsql__."person_full_name" as "1",
+  __table_set_query_plpgsql__."id"::text as "2"
+from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
+limit 3
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2 offset 4
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 6
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 2
-) as "hasNextPage",
-false as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 6
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 6
-) as "hasNextPage",
-false as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 0
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-FALSE as "hasNextPage",
-FALSE as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) and (TRUE)
-  limit 2 offset 2
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query"( ) as __local_1__
-  where (TRUE) offset 4
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      0 + (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."table_set_query_plpgsql"( ) as __local_1__
-    where (TRUE) and (TRUE)
-    limit 2
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query_plpgsql"( ) as __local_1__
-  where (TRUE) offset 2
-) as "hasNextPage",
-false as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        '@node'::text,
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_1__."id"),
-            'name'::text,
-            (__local_1__."person_full_name")
-          )
-        )
-      )
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      2 + (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from (
-    select __local_1__.*
-    from "c"."table_set_query_plpgsql"( ) as __local_1__
-    where (TRUE) and (TRUE)
-    limit 2 offset 2
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-exists(
-  select 1
-  from "c"."table_set_query_plpgsql"( ) as __local_1__
-  where (TRUE) offset 4
-) as "hasNextPage",
-TRUE as "hasPreviousPage"
-
-with __local_0__ as (
-  select to_json(__local_1__) as "value",
-  to_json(
-    (
-      to_json(__local_1__)
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
+select __int_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"int4" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __int_set_query_identifiers__,
+lateral (
+  select
+    __int_set_query__.v::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __int_set_query_identifiers__.idx as "2"
   from "c"."int_set_query"(
-    $1,
-    NULL,
-    $2
-  ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
+    __int_set_query_identifiers__."id0",
+    __int_set_query_identifiers__."id1",
+    __int_set_query_identifiers__."id2"
+  ) as __int_set_query__(v)
+) as __int_set_query_result__
+
+select __int_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1",
+    (ids.value->>2)::"int4" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __int_set_query_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __int_set_query_identifiers__.idx as "1"
   from "c"."int_set_query"(
-    $1,
-    NULL,
-    $2
-  ) as __local_1__
-  where 1 = 1
-) as "aggregates"
+    __int_set_query_identifiers__."id0",
+    __int_set_query_identifiers__."id1",
+    __int_set_query_identifiers__."id2"
+  ) as __int_set_query__(v)
+) as __int_set_query_result__
 
-select to_json(__local_0__) as "value"
-from "c"."no_args_query"( ) as __local_0__
-where (TRUE) and (TRUE)
+select
+  __static_big_integer__.v::text as "0"
+from "a"."static_big_integer"() as __static_big_integer__(v)
 
-with __local_0__ as (
-  select to_json(
-    (__local_1__)::text
-  ) as "value",
-  to_json(
-    (
-      to_json(__local_1__)
-    )
-  ) as "@edges"
-  from "a"."static_big_integer"( ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "a"."static_big_integer"( ) as __local_1__
-  where 1 = 1
-) as "aggregates"
+select
+  (count(*))::text as "0"
+from "a"."static_big_integer"() as __static_big_integer__(v)
 
-select to_json((__local_0__."a")) as "a",
-to_json((__local_0__."b")) as "b",
-to_json((__local_0__."c")) as "c",
-to_json((__local_0__."d")) as "d",
-to_json((__local_0__."e")) as "e",
-to_json((__local_0__."f")) as "f",
-to_json(
-  ((__local_0__."g"))::text
-) as "g",
-to_json((__local_0__."foo_bar")) as "fooBar"
-from unnest(
-  "a"."query_compound_type_array"(
-    row(
-      $1::"pg_catalog"."int4",
-      $2::"pg_catalog"."text",
-      $3::"b"."color",
-      NULL,
-      $4::"b"."enum_caps",
-      $5::"b"."enum_with_empty_string",
-      $6::"pg_catalog"."interval",
-      $7::"pg_catalog"."int4"
-    )::"c"."compound_type"
-  )
-) as __local_0__
-where (TRUE) and (TRUE)
+select __query_compound_type_array_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __query_compound_type_array_identifiers__,
+lateral (
+  select
+    __query_compound_type_array__."a"::text as "0",
+    __query_compound_type_array__."b" as "1",
+    __query_compound_type_array__."c"::text as "2",
+    __query_compound_type_array__."d" as "3",
+    __query_compound_type_array__."e"::text as "4",
+    __query_compound_type_array__."f"::text as "5",
+    to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    __query_compound_type_array__."foo_bar"::text as "7",
+    (not (__query_compound_type_array__ is null))::text as "8",
+    __query_compound_type_array_identifiers__.idx as "9"
+  from unnest("a"."query_compound_type_array"(__query_compound_type_array_identifiers__."id0")) as __query_compound_type_array__
+) as __query_compound_type_array_result__
 
-select to_json(__local_0__) as "value"
-from unnest(
-  "a"."query_text_array"( )
-) as __local_0__
-where (TRUE) and (TRUE)
+select
+  to_char(__query_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0",
+  (row_number() over (partition by 1))::text as "1"
+from "a"."query_interval_set"() as __query_interval_set__(v)
 
-select to_json(
-  (__local_0__)::text
-) as "value"
-from unnest(
-  "a"."query_interval_array"( )
-) as __local_0__
-where (TRUE) and (TRUE)
+select
+  (count(*))::text as "0"
+from "a"."query_interval_set"() as __query_interval_set__(v)
 
-with __local_0__ as (
-  select to_json(
-    (__local_1__)::text
-  ) as "value",
-  to_json(
-    (
-      to_json(__local_1__)
-    )
-  ) as "@nodes",
-  to_json(
-    (
-      to_json(__local_1__)
-    )
-  ) as "@edges",
-  to_json(
-    json_build_array(
-      'natural',
-      (
-        row_number( ) over (partition by 1)
-      )
-    )
-  ) as "__cursor"
-  from "a"."query_interval_set"( ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data",
-(
-  select json_build_object(
-    'totalCount'::text,
-    count(1)
-  )
-  from "a"."query_interval_set"( ) as __local_1__
-  where 1 = 1
-) as "aggregates"
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."person_full_name" as "1",
+    __table_set_query__."id"::text as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__
+
+select __table_set_query_plpgsql_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_plpgsql_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query_plpgsql__."person_full_name" as "1",
+    __table_set_query_plpgsql__."id"::text as "2",
+    __table_set_query_plpgsql_identifiers__.idx as "3"
+  from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
+  limit __table_set_query_plpgsql_identifiers__."id0"
+  offset __table_set_query_plpgsql_identifiers__."id1"
+) as __table_set_query_plpgsql_result__
