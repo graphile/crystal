@@ -362,7 +362,7 @@
       startCursor: "WyJuYXR1cmFsIiwxXQ==",
       endCursor: "WyJuYXR1cmFsIiwyXQ==",
       hasNextPage: true,
-      hasPreviousPage: true,
+      hasPreviousPage: false,
     },
   },
   tableSetQueryWithOffset9: {

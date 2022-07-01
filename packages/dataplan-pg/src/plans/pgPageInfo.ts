@@ -139,7 +139,12 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
         >
       ).cloneSubplanWithPagination();
       return nodePlan.hasMore();
-    } else if (offset && !offset.evalIs(null) && !offset.evalIs(undefined)) {
+    } else if (
+      offset &&
+      !offset.evalIs(null) &&
+      !offset.evalIs(undefined) &&
+      !offset.evalIs(0)
+    ) {
       return constant(true);
     } else {
       return constant(false);
