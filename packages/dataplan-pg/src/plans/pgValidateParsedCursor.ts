@@ -53,7 +53,11 @@ export class PgValidateParsedCursorPlan extends ExecutablePlan<undefined> {
             `Invalid cursor digest - '${cursorDigest}' !== '${this.digest}'`,
           );
         }
-        if (cursorParts.length !== this.orderCount) {
+        if (cursorDigest === "natural") {
+          if (cursorParts.length !== 1 || typeof cursorParts[0] !== "number") {
+            throw new Error(`Invalid 'natural' cursor value - ${cursorParts}`);
+          }
+        } else if (cursorParts.length !== this.orderCount) {
           throw new Error(
             `Invalid cursor length - ${cursorParts.length} !== ${this.orderCount}`,
           );

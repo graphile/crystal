@@ -21,6 +21,7 @@ import {
   access,
   arrayOfLength,
   ConnectionPlan,
+  constant,
   ExecutablePlan,
   first,
   isAsyncIterable,
@@ -37,7 +38,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
-import { listOfType } from "../codecs.js";
+import { listOfType, TYPES } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
@@ -351,6 +352,12 @@ export class PgSelectPlan<
   private first: number | null;
   private last: number | null;
   private fetchOneExtra: boolean;
+  /** When using natural pagination, this index is the lower bound (and should be excluded) */
+  private lowerIndexPlanId: number | null;
+  /** When using natural pagination, this index is the upper bound (and should be excluded) */
+  private upperIndexPlanId: number | null;
+  /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
+  private limitAndOffsetId: number | null;
 
   // OFFSET
 
@@ -717,6 +724,30 @@ export class PgSelectPlan<
             cloneFromMatchingMode.getDep(cloneFromMatchingMode.afterPlanId),
           )
         : null;
+    this.lowerIndexPlanId =
+      cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexPlanId != null
+        ? this.addDependency(
+            cloneFromMatchingMode.getDep(
+              cloneFromMatchingMode.lowerIndexPlanId,
+            ),
+          )
+        : null;
+    this.upperIndexPlanId =
+      cloneFromMatchingMode && cloneFromMatchingMode.upperIndexPlanId != null
+        ? this.addDependency(
+            cloneFromMatchingMode.getDep(
+              cloneFromMatchingMode.upperIndexPlanId,
+            ),
+          )
+        : null;
+    this.limitAndOffsetId =
+      cloneFromMatchingMode && cloneFromMatchingMode.limitAndOffsetId != null
+        ? this.addDependency(
+            cloneFromMatchingMode.getDep(
+              cloneFromMatchingMode.limitAndOffsetId,
+            ),
+          )
+        : null;
 
     this.afterLock("orderBy", () => {
       if (this.beforePlanId != null) {
@@ -1073,11 +1104,6 @@ export class PgSelectPlan<
     const digest = this.getOrderByDigest();
     const orders = this.getOrderBy();
     const orderCount = orders.length;
-    if (orderCount === 0 || !this.isOrderUnique) {
-      throw new Error(
-        `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
-      );
-    }
 
     // Cursor validity check; if we get inlined then this will be passed up
     // to the parent so we can trust it.
@@ -1089,6 +1115,23 @@ export class PgSelectPlan<
         beforeOrAfter,
       ),
     );
+
+    if (orderCount === 0) {
+      // Natural pagination `['natural', N]`
+      const $n = access($parsedCursorPlan, [1]);
+      if (beforeOrAfter === "before") {
+        this.upperIndexPlanId = this.addDependency($n);
+      } else {
+        this.lowerIndexPlanId = this.addDependency($n);
+      }
+      return;
+    }
+    if (!this.isOrderUnique) {
+      // TODO: make this smarter
+      throw new Error(
+        `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
+      );
+    }
 
     const condition = (i = 0): SQL => {
       const order = orders[i];
@@ -1226,16 +1269,20 @@ export class PgSelectPlan<
     );
     // debugExecute("%s; result: %c", this, executionResult);
 
-    return executionResult.values.map((allVals) => {
+    return executionResult.values.map((allVals, i) => {
       if (allVals == null || isPromiseLike(allVals)) {
         return allVals;
       }
       const limit = this.first ?? this.last;
       const firstAndLast =
         this.first != null && this.last != null && this.last < this.first;
+      const limitAndOffsetPlanResult =
+        this.limitAndOffsetId != null ? values[this.limitAndOffsetId][i] : null;
       const hasMore =
-        this.fetchOneExtra && limit != null && allVals.length > limit;
-      const limitedRows = hasMore ? allVals.slice(0, limit) : allVals;
+        limitAndOffsetPlanResult?.[2] === true
+          ? false
+          : this.fetchOneExtra && limit != null && allVals.length > limit;
+      const limitedRows = hasMore ? allVals.slice(0, limit!) : allVals;
       const slicedRows =
         firstAndLast && this.last != null
           ? limitedRows.slice(-this.last)
@@ -1592,24 +1639,151 @@ export class PgSelectPlan<
     };
   }
 
+  private limitAndOffsetSQL: SQL | null = null;
+  private planLimitAndOffset() {
+    if (this.lowerIndexPlanId != null || this.upperIndexPlanId != null) {
+      /*
+       * When using cursor-base pagination with 'natural' cursors, we are actually
+       * applying limit/offset under the hood (presumably because we're paginating
+       * something that has no explicit order, like a function).
+       *
+       * If you have:
+       * - first: 3
+       * - after: ['natural', 4]
+       *
+       * Then we want `limit 3 offset 4`.
+       * With `fetchOneExtra` it'd be `limit 4 offset 4`.
+       *
+       * For:
+       * - last: 2
+       * - before: ['natural', 6]
+       *
+       * We want `limit 2 offset 4`
+       * With `fetchOneExtra` it'd be `limit 3 offset 3`.
+       *
+       * For:
+       * - last: 2
+       * - before: ['natural', 3]
+       *
+       * We want `limit 2`
+       * With `fetchOneExtra` it'd still be `limit 2`.
+       *
+       * For:
+       * - last: 2
+       * - before: ['natural', 4]
+       *
+       * We want `limit 2 offset 1`
+       * With `fetchOneExtra` it'd be `limit 3`.
+       *
+       * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
+       *
+       * For:
+       * - after: ['natural', 2]
+       * - before: ['natural', 6]
+       *
+       * We want `limit 4 offset 2`
+       * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
+       *
+       * For:
+       * - first: 2
+       * - after: ['natural', 2]
+       * - before: ['natural', 6]
+       *
+       * We want `limit 2 offset 2`
+       * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
+       */
+
+      const $lower =
+        this.lowerIndexPlanId != null
+          ? this.getDep(this.lowerIndexPlanId)
+          : constant(null);
+      const $upper =
+        this.upperIndexPlanId != null
+          ? this.getDep(this.upperIndexPlanId)
+          : constant(null);
+
+      const limitAndOffsetLambda = lambda(
+        list([$lower, $upper]),
+        ([cursorLower, cursorUpper]: Array<number | null>) => {
+          let lower = 0;
+          let upper = Infinity;
+          // Apply 'after', if present
+          if (cursorLower != null) {
+            lower = cursorLower;
+          }
+          // Apply 'before', if present
+          if (cursorUpper != null) {
+            upper = cursorUpper;
+          }
+          const minLower = lower;
+          const maxUpper = upper;
+          // Apply 'first', if present
+          if (this.first != null) {
+            upper = Math.min(upper, lower + this.first);
+          }
+          // Apply 'last', if present
+          if (this.last != null) {
+            lower = Math.max(lower, upper - this.last);
+          }
+          // If 'fetch one extra', adjust:
+          let hasNoNextPage = null;
+          if (this.fetchOneExtra) {
+            if (this.first != null) {
+              upper = Math.min(upper + 1, maxUpper);
+              if (upper === maxUpper) {
+                hasNoNextPage = true;
+              }
+            } else if (this.last != null) {
+              lower = Math.min(lower - 1, minLower);
+              if (lower === minLower) {
+                hasNoNextPage = true;
+              }
+            }
+          }
+
+          return [0, 1, hasNoNextPage];
+        },
+      );
+      this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
+      const limitLambda = access(limitAndOffsetLambda, [0]);
+      const offsetLambda = access(limitAndOffsetLambda, [1]);
+      return sql`\nlimit ${this.placeholder(
+        limitLambda,
+        TYPES.int,
+      )}\noffset ${this.placeholder(offsetLambda, TYPES.int)}`;
+    } else {
+      const limit =
+        this.first != null
+          ? sql`\nlimit ${sql.literal(
+              this.first + (this.fetchOneExtra ? 1 : 0),
+            )}`
+          : this.last != null
+          ? sql`\nlimit ${sql.literal(
+              this.last + (this.fetchOneExtra ? 1 : 0),
+            )}`
+          : sql.blank;
+      const offset =
+        this.offset != null
+          ? sql`\noffset ${sql.literal(this.offset)}`
+          : sql.blank;
+      return sql`${limit}${offset}`;
+    }
+  }
+
   private buildLimitAndOffset() {
     // NOTE: according to the EdgesToReturn algorithm in the GraphQL Cursor
     // Connections Specification first is applied first, then last is applied.
     // For us this means that if first is present we set the limit to this and
     // then we do the last artificially later.
     // https://relay.dev/graphql/connections.htm#EdgesToReturn()
-    const limit =
-      this.first != null
-        ? sql`\nlimit ${sql.literal(this.first + (this.fetchOneExtra ? 1 : 0))}`
-        : this.last != null
-        ? sql`\nlimit ${sql.literal(this.last + (this.fetchOneExtra ? 1 : 0))}`
-        : sql.blank;
-    const offset =
-      this.offset != null
-        ? sql`\noffset ${sql.literal(this.offset)}`
-        : sql.blank;
+
+    if (!this.limitAndOffsetSQL) {
+      throw new Error(
+        "limitAndOffsetSQL was not built - did we not get optimized?",
+      );
+    }
     return {
-      sql: sql`${limit}${offset}`,
+      sql: this.limitAndOffsetSQL,
     };
   }
 
@@ -2154,6 +2328,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   }
 
   optimize({ stream }: PlanOptimizeOptions): ExecutablePlan {
+    // TODO: should this be in 'beforeLock'?
+    this.limitAndOffsetSQL = this.planLimitAndOffset();
+
     // In case we have any lock actions in future:
     this.lock();
 
