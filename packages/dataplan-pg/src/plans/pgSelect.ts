@@ -1728,12 +1728,12 @@ export class PgSelectPlan<
 
           // Apply 'first', if present
           if (this.first != null) {
-            upper = Math.min(upper, lower + this.first);
+            upper = Math.min(upper, lower + this.first + 1);
           }
 
           // Apply 'last', if present
           if (this.last != null) {
-            lower = Math.max(0, lower, upper - this.last);
+            lower = Math.max(0, lower, upper - this.last - 1);
           }
 
           // Apply 'offset', if present
