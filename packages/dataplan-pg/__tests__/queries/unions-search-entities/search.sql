@@ -22,7 +22,7 @@ lateral (
     __entity_search__."comment_id"::text as "12",
     (not (__entity_search__ is null))::text as "13",
     __entity_search_identifiers__.idx as "14"
-  from interfaces_and_unions.search(__entity_search_identifiers__."id0") as __entity_search__
+  from interfaces_and_unions.search("query" := __entity_search_identifiers__."id0") as __entity_search__
   left outer join interfaces_and_unions.people as __people__
   on (__entity_search__."person_id"::"int4" = __people__."person_id")
   left outer join interfaces_and_unions.posts as __posts__

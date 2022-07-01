@@ -27,7 +27,10 @@ lateral (
   on TRUE
   left outer join app_public.users_most_recent_forum(__forums_random_user__) as __users_most_recent_forum__
   on TRUE
-  left outer join app_public.forums_unique_author_count(__users_most_recent_forum__, __forums_identifiers__."id1") as __forums_unique_author_count__(v)
+  left outer join app_public.forums_unique_author_count(
+    __users_most_recent_forum__,
+    __forums_identifiers__."id1"
+  ) as __forums_unique_author_count__(v)
   on TRUE
   where
     (
