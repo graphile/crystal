@@ -101,7 +101,7 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
   }
   const behavior: string[] = [];
   const processOmit = (omit: true | string): void => {
-    if (omit === true) {
+    if (omit === true || omit === "*") {
       behavior.push("-*");
       return;
     }
