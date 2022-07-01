@@ -696,7 +696,7 @@ export class Aether<
   // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
   private readonly polymorphicDetailsByPlanId: Record<
     string,
-    { polymorphicPlanIds: string[]; typeNames: string[]; local: boolean }
+    { polymorphicPlanIds: string[]; typeNames: string[] }
   > = Object.create(null);
 
   /**
@@ -2063,13 +2063,10 @@ export class Aether<
             const possibleObjectType = possibleObjectTypes[i];
 
             const oldPlansLength = this.planCount;
-            const knownPlans = Object.keys(this.plans);
             // This line implements `GetPolymorphicObjectPlanForType`.
             const subPlan = wgs(() =>
               polymorphicPlan.planForType(possibleObjectType),
             );
-            // Was defined specifically by the subplan
-            const local = !knownPlans.includes(plan.id);
 
             // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
             {
@@ -2078,7 +2075,6 @@ export class Aether<
                 this.polymorphicDetailsByPlanId[subPlan.id] = details = {
                   polymorphicPlanIds: [],
                   typeNames: [],
-                  local,
                 };
               }
               if (!details.polymorphicPlanIds.includes(polymorphicPlan.id)) {
@@ -3098,7 +3094,6 @@ export class Aether<
                   (id) => this.plans[id].id,
                 ),
               typeNames: [...polymorphicDetailsListEntry.typeNames],
-              local: polymorphicDetailsListEntry.local,
             };
           } else {
             const ids = polymorphicDetailsListEntry.polymorphicPlanIds.map(
@@ -3114,19 +3109,12 @@ export class Aether<
                 memo.typeNames.push(typeName);
               }
             }
-            if (polymorphicDetailsListEntry.local) {
-              memo.local = true;
-            }
             return memo;
           }
         },
         undefined as
           | undefined
-          | {
-              polymorphicPlanIds: string[];
-              typeNames: string[];
-              local: boolean;
-            },
+          | { polymorphicPlanIds: string[]; typeNames: string[] },
       );
 
       const itemPlanId = plan instanceof __ItemPlan ? plan.id : undefined;
@@ -3139,10 +3127,9 @@ export class Aether<
           ))
           ? plan.primaryGroupId
           : undefined;
-      const polymorphicPlanIds =
-        polymorphicDetails && polymorphicDetails.local
-          ? polymorphicDetails.polymorphicPlanIds
-          : undefined;
+      const polymorphicPlanIds = polymorphicDetails
+        ? polymorphicDetails.polymorphicPlanIds
+        : undefined;
       const polymorphicTypeNames = polymorphicDetails
         ? polymorphicDetails.typeNames
         : undefined;
@@ -3621,7 +3608,7 @@ export class Aether<
               throw new Error(
                 `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec>: Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
                   "', '",
-                )}' when processing ${plan}`,
+                )}'`,
               );
             }
             const rootPathIdentity = matchingParentPathIdentities[0];
