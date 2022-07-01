@@ -1592,7 +1592,12 @@ export class PgSelectPlan<
    * re-reverse it in JS-land.
    */
   private shouldReverseOrder() {
-    return this.first == null && this.last != null;
+    return (
+      this.first == null &&
+      this.last != null &&
+      this.lowerIndexPlanId == null &&
+      this.upperIndexPlanId == null
+    );
   }
 
   private buildGroupBy() {
@@ -1705,26 +1710,35 @@ export class PgSelectPlan<
       const limitAndOffsetLambda = lambda(
         list([$lower, $upper]),
         ([cursorLower, cursorUpper]: Array<number | null>) => {
+          /** lower bound - inclusive */
           let lower = 0;
+          /** upper bound - exclusive */
           let upper = Infinity;
+
           // Apply 'after', if present
           if (cursorLower != null) {
             lower = Math.max(0, cursorLower);
           }
+
           // Apply 'before', if present
           if (cursorUpper != null) {
             upper = cursorUpper;
           }
+
+          // Cannot go beyond these bounds
           const minLower = lower;
           const maxUpper = upper;
+
           // Apply 'first', if present
           if (this.first != null) {
             upper = Math.min(upper, lower + this.first);
           }
+
           // Apply 'last', if present
           if (this.last != null) {
             lower = Math.max(0, lower, upper - this.last);
           }
+
           // If 'fetch one extra', adjust:
           let hasNoNextPage = null;
           if (this.fetchOneExtra) {
@@ -1734,14 +1748,15 @@ export class PgSelectPlan<
                 hasNoNextPage = true;
               }
             } else if (this.last != null) {
-              lower = Math.max(0, Math.min(lower - 1, minLower));
+              lower = Math.max(0, lower - 1, minLower);
               if (lower === minLower) {
                 hasNoNextPage = true;
               }
             }
           }
 
-          const limit = isFinite(upper) ? Math.max(0, upper - lower) : null;
+          // Calculate the final limit/offset
+          const limit = isFinite(upper) ? Math.max(0, upper - lower - 1) : null;
           const offset = lower;
 
           return [limit, offset, hasNoNextPage];
