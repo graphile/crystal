@@ -1709,7 +1709,7 @@ export class PgSelectPlan<
           let upper = Infinity;
           // Apply 'after', if present
           if (cursorLower != null) {
-            lower = cursorLower;
+            lower = Math.max(0, cursorLower);
           }
           // Apply 'before', if present
           if (cursorUpper != null) {
@@ -1723,7 +1723,7 @@ export class PgSelectPlan<
           }
           // Apply 'last', if present
           if (this.last != null) {
-            lower = Math.max(lower, upper - this.last);
+            lower = Math.max(0, lower, upper - this.last);
           }
           // If 'fetch one extra', adjust:
           let hasNoNextPage = null;
@@ -1734,14 +1734,17 @@ export class PgSelectPlan<
                 hasNoNextPage = true;
               }
             } else if (this.last != null) {
-              lower = Math.min(lower - 1, minLower);
+              lower = Math.max(0, Math.min(lower - 1, minLower));
               if (lower === minLower) {
                 hasNoNextPage = true;
               }
             }
           }
 
-          return [0, 1, hasNoNextPage];
+          const limit = isFinite(upper) ? Math.max(0, upper - lower) : null;
+          const offset = lower;
+
+          return [limit, offset, hasNoNextPage];
         },
       );
       this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
