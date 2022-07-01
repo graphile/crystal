@@ -67,6 +67,8 @@ declare module "@dataplan/pg" {
   }
 
   interface PgTypeCodecExtensions {
+    /** If false but the codec has columns then it's probably a composite type */
+    isTableLike?: boolean;
     tags: Partial<PgTypeCodecTags>;
     description?: string;
   }

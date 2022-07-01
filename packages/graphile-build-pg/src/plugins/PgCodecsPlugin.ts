@@ -3,6 +3,7 @@ import "graphile-build";
 import type {
   PgEnumTypeCodec,
   PgTypeCodec,
+  PgTypeCodecExtensions,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
@@ -364,7 +365,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             pgClass,
           });
 
-          const extensions = {
+          const extensions: Partial<PgTypeCodecExtensions> = {
+            isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             tags: Object.assign(Object.create(null), {
               originalName: pgClass.relname,
             }),

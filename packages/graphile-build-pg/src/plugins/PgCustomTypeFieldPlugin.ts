@@ -168,12 +168,14 @@ function defaultProcSourceBehavior(
 ): string {
   const { simpleCollections } = options;
   const behavior = [];
+  const firstParameter = (s as PgSource<any, any, any, PgSourceParameter[]>)
+    .parameters[0];
   if (
     !s.isMutation &&
     s.parameters &&
     // Don't default to this being a query_field if it looks like a computed column function
-    !(s as PgSource<any, any, any, PgSourceParameter[]>).parameters[0]?.codec
-      ?.columns
+    (!firstParameter?.codec?.columns ||
+      firstParameter?.codec?.extensions?.isTableLike === false)
   ) {
     behavior.push("query_field");
   } else {
@@ -577,7 +579,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               );
 
               const makeArgs = EXPORTABLE(
-                (argDetailsSimple, constant) =>
+                (allArgsAreNamed, argDetailsSimple, constant) =>
                   (args: FieldArgs, path: string[] = []) => {
                     const selectArgs: PgSelectArgumentSpec[] = [];
 
@@ -623,7 +625,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                     return selectArgs;
                   },
-                [argDetailsSimple, constant],
+                [allArgsAreNamed, argDetailsSimple, constant],
               );
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<

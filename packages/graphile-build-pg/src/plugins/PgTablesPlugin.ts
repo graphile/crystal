@@ -305,8 +305,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
+          // TODO: better support for partitioned tables
+          // TODO: check compatibility with 'foreign' tables
           if (
-            !["r", "v", "m", "p", "c"].includes(pgClass.relkind) ||
+            !["r", "v", "m", "f", "p", "c"].includes(pgClass.relkind) ||
             pgClass.relispartition
           ) {
             return null;
