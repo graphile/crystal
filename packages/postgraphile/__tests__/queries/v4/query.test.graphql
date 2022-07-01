@@ -1,0 +1,35 @@
+## expect(errors).toBeFalsy();
+query {
+  ...query
+  query {
+    ...query
+    query {
+      ...query
+      query {
+        ...query
+      }
+    }
+  }
+  a: node(nodeId: "hello") {
+    __typename
+    nodeId
+    ...query
+  }
+  b: node(nodeId: "query") {
+    __typename
+    nodeId
+    ...query
+  }
+}
+
+fragment query on Query {
+  nodeId
+  a: node(nodeId: "hello") {
+    __typename
+    nodeId
+  }
+  b: node(nodeId: "query") {
+    __typename
+    nodeId
+  }
+}

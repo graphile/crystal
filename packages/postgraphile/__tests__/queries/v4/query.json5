@@ -1,0 +1,37 @@
+{
+  nodeId: "query",
+  a: null,
+  b: {
+    __typename: "Query",
+    nodeId: "query",
+    a: null,
+    b: {
+      __typename: "Query",
+      nodeId: "query",
+    },
+  },
+  query: {
+    nodeId: "query",
+    a: null,
+    b: {
+      __typename: "Query",
+      nodeId: "query",
+    },
+    query: {
+      nodeId: "query",
+      a: null,
+      b: {
+        __typename: "Query",
+        nodeId: "query",
+      },
+      query: {
+        nodeId: "query",
+        a: null,
+        b: {
+          __typename: "Query",
+          nodeId: "query",
+        },
+      },
+    },
+  },
+}
