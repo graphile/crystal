@@ -1,260 +1,163 @@
-select to_json(
-  json_build_array(__local_0__."person_id")
-) as "__identifiers",
-to_json((__local_0__."person_id")) as "personId",
-to_json((__local_0__."sekrit")) as "secret"
-from "c"."person_secret" as __local_0__
-where (
-  __local_0__."person_id" = $1
-) and (TRUE) and (TRUE)
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."person_id"),
-        'personId'::text,
-        (__local_1__."person_id"),
-        'secret'::text,
-        (__local_1__."sekrit")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."person_secret" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."person_id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
-
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json(
-  (
-    select (
-      case when (__local_1__ is null) then null else json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."person_id"),
-        'personId'::text,
-        (__local_1__."person_id"),
-        'secret'::text,
-        (__local_1__."sekrit")
-      ) end
-    ) as object
-    from "c"."person_secret" as __local_1__
-    where (
-      not (__local_1__ is null)
-    )
-    and (__local_1__."person_id" = __local_0__."id") and (TRUE) and (TRUE)
+select __person_secret_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_secret_identifiers__,
+lateral (
+  select
+    __person_secret__."person_id"::text as "0",
+    __person_secret__."sekrit" as "1",
+    __person_secret_identifiers__.idx as "2"
+  from "c"."person_secret" as __person_secret__
+  where (
+    __person_secret__."person_id" = __person_secret_identifiers__."id0"
   )
-) as "@personSecretByPersonId"
-from "c"."person" as __local_0__
-where (
-  __local_0__."id" = $1
-) and (TRUE) and (TRUE)
+  order by __person_secret__."person_id" asc
+) as __person_secret_result__
 
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json((__local_0__."id")) as "id",
-to_json((__local_0__."person_id")) as "personId",
-to_json((__local_0__."length_in_metres")) as "lengthInMetres",
-to_json((__local_0__."mood")) as "mood"
-from "c"."left_arm" as __local_0__
-where (
-  __local_0__."id" = $1
-) and (TRUE) and (TRUE)
+select
+  __person_secret__."person_id"::text as "0",
+  __person_secret__."sekrit" as "1"
+from "c"."person_secret" as __person_secret__
+order by __person_secret__."person_id" asc
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'personId'::text,
-        (__local_1__."person_id"),
-        'lengthInMetres'::text,
-        (__local_1__."length_in_metres"),
-        'mood'::text,
-        (__local_1__."mood")
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "c"."left_arm" as __local_1__
-    where (TRUE) and (TRUE)
-    order by __local_1__."id" ASC
-  ) __local_1__
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
-
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json(
-  (
-    select (
-      case when (__local_1__ is null) then null else json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'personId'::text,
-        (__local_1__."person_id"),
-        'lengthInMetres'::text,
-        (__local_1__."length_in_metres"),
-        'mood'::text,
-        (__local_1__."mood")
-      ) end
-    ) as object
-    from "c"."left_arm" as __local_1__
-    where (
-      not (__local_1__ is null)
-    )
-    and (__local_1__."person_id" = __local_0__."id") and (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person_secret__."person_id"::text as "0",
+    __person_secret__."sekrit" as "1",
+    __person__."id"::text as "2",
+    __person_identifiers__.idx as "3"
+  from "c"."person" as __person__
+  left outer join "c"."person_secret" as __person_secret__
+  on (__person__."id"::"int4" = __person_secret__."person_id")
+  where (
+    __person__."id" = __person_identifiers__."id0"
   )
-) as "@leftArmByPersonId"
-from "c"."person" as __local_0__
-where (
-  __local_0__."id" = $1
-) and (TRUE) and (TRUE)
+  order by __person__."id" asc
+) as __person_result__
 
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json((__local_0__."id")) as "id",
-to_json((__local_0__."headline")) as "headline",
-to_json((__local_0__."body")) as "body",
-to_json((__local_0__."author_id")) as "authorId"
-from "a"."post" as __local_0__
-where (
-  __local_0__."id" = $1
-) and (TRUE) and (TRUE)
-
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        '__identifiers'::text,
-        json_build_array(__local_1__."id"),
-        'id'::text,
-        (__local_1__."id"),
-        'headline'::text,
-        (__local_1__."headline"),
-        'body'::text,
-        (__local_1__."body"),
-        'authorId'::text,
-        (__local_1__."author_id")
-      )
-    )
-  ) as "@nodes"
-  from "a"."post" as __local_1__
-  where (TRUE) and (TRUE)
-  order by __local_1__."id" ASC
-),
-__local_2__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_2__.data
-    from __local_2__
-  ),
-  '[]'::json
-) as "data"
-
-select to_json(
-  json_build_array(__local_0__."id")
-) as "__identifiers",
-to_json(
-  (
-    with __local_1__ as (
-      select to_json(
-        (
-          json_build_object(
-            '__identifiers'::text,
-            json_build_array(__local_2__."id"),
-            'id'::text,
-            (__local_2__."id"),
-            'headline'::text,
-            (__local_2__."headline"),
-            'body'::text,
-            (__local_2__."body"),
-            'authorId'::text,
-            (__local_2__."author_id")
-          )
-        )
-      ) as "@nodes"
-      from "a"."post" as __local_2__
-      where (__local_2__."author_id" = __local_0__."id") and (TRUE) and (TRUE)
-      order by __local_2__."id" ASC
-    ),
-    __local_3__ as (
-      select json_agg(
-        to_json(__local_1__)
-      ) as data
-      from __local_1__
-    )
-    select json_build_object(
-      'data'::text,
-      coalesce(
-        (
-          select __local_3__.data
-          from __local_3__
-        ),
-        '[]'::json
-      )
-    )
+select __left_arm_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __left_arm_identifiers__,
+lateral (
+  select
+    __left_arm__."id"::text as "0",
+    __left_arm__."person_id"::text as "1",
+    __left_arm__."length_in_metres"::text as "2",
+    __left_arm__."mood" as "3",
+    __left_arm_identifiers__.idx as "4"
+  from "c"."left_arm" as __left_arm__
+  where (
+    __left_arm__."id" = __left_arm_identifiers__."id0"
   )
-) as "@postsByAuthorId"
-from "c"."person" as __local_0__
-where (
-  __local_0__."id" = $1
-) and (TRUE) and (TRUE)
+  order by __left_arm__."id" asc
+) as __left_arm_result__
 
-select to_json(
-  json_build_array(
-    __local_0__."person_id_1",
-    __local_0__."person_id_2"
+select
+  __left_arm__."id"::text as "0",
+  __left_arm__."person_id"::text as "1",
+  __left_arm__."length_in_metres"::text as "2",
+  __left_arm__."mood" as "3"
+from "c"."left_arm" as __left_arm__
+order by __left_arm__."id" asc
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __left_arm__."id"::text as "0",
+    __left_arm__."person_id"::text as "1",
+    __left_arm__."length_in_metres"::text as "2",
+    __left_arm__."mood" as "3",
+    __person__."id"::text as "4",
+    __person_identifiers__.idx as "5"
+  from "c"."person" as __person__
+  left outer join "c"."left_arm" as __left_arm__
+  on (__person__."id"::"int4" = __left_arm__."person_id")
+  where (
+    __person__."id" = __person_identifiers__."id0"
   )
-) as "__identifiers",
-to_json((__local_0__."person_id_1")) as "personId1",
-to_json((__local_0__."person_id_2")) as "personId2"
-from "c"."return_table_without_grants"( ) as __local_0__
-where (
-  not (__local_0__ is null)
-) and (TRUE) and (TRUE)
+  order by __person__."id" asc
+) as __person_result__
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post__."body" as "2",
+    __post__."author_id"::text as "3",
+    __post_identifiers__.idx as "4"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+  order by __post__."id" asc
+) as __post_result__
+
+select
+  __post__."id"::text as "0",
+  __post__."headline" as "1",
+  __post__."body" as "2",
+  __post__."author_id"::text as "3"
+from "a"."post" as __post__
+order by __post__."id" asc
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    (select json_agg(_) from (
+      select
+        __post__."id"::text as "0",
+        __post__."headline" as "1",
+        __post__."body" as "2",
+        __post__."author_id"::text as "3"
+      from "a"."post" as __post__
+      where (
+        __person__."id"::"int4" = __post__."author_id"
+      )
+      order by __post__."id" asc
+    ) _) as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
+  where (
+    __person__."id" = __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+) as __person_result__
+
+select
+  __return_table_without_grants__."person_id_1"::text as "0",
+  __return_table_without_grants__."person_id_2"::text as "1"
+from "c"."return_table_without_grants"() as __return_table_without_grants__

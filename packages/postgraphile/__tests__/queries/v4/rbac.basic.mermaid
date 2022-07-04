@@ -1,0 +1,393 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
+    Access211["Access[211∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access212["Access[212∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object213["Object[213∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸpersonSecretᐳ"]]:::plan
+    First12["First[12∈0]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸpersonSecretᐳ"]:::plan
+    Constant14["Constant[14∈0]"]:::plan
+    PgClassExpression15["PgClassExpression[15∈0]<br />ᐸ__person_s...person_id”ᐳ"]:::plan
+    List16["List[16∈0]<br />ᐸ14,15ᐳ"]:::plan
+    Lambda17["Lambda[17∈0]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression19["PgClassExpression[19∈0]<br />ᐸ__person_s..._.”sekrit”ᐳ"]:::plan
+    Connection35["Connection[35∈0]<br />ᐸ31ᐳ"]:::plan
+    PgSelect36[["PgSelect[36∈0]<br />ᐸpersonSecretᐳ"]]:::plan
+    __Item37>"__Item[37∈1]<br />ᐸ36ᐳ"]:::itemplan
+    PgSelectSingle38["PgSelectSingle[38∈1]<br />ᐸpersonSecretᐳ"]:::plan
+    Constant39["Constant[39∈0]"]:::plan
+    PgClassExpression40["PgClassExpression[40∈1]<br />ᐸ__person_s...person_id”ᐳ"]:::plan
+    List41["List[41∈1]<br />ᐸ39,40ᐳ"]:::plan
+    Lambda42["Lambda[42∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression44["PgClassExpression[44∈1]<br />ᐸ__person_s..._.”sekrit”ᐳ"]:::plan
+    __InputStaticLeaf45["__InputStaticLeaf[45∈0]"]:::plan
+    PgSelect46[["PgSelect[46∈0]<br />ᐸpersonᐳ"]]:::plan
+    First50["First[50∈0]"]:::plan
+    PgSelectSingle51["PgSelectSingle[51∈0]<br />ᐸpersonᐳ"]:::plan
+    Constant52["Constant[52∈0]"]:::plan
+    PgClassExpression53["PgClassExpression[53∈0]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    List54["List[54∈0]<br />ᐸ52,53ᐳ"]:::plan
+    Lambda55["Lambda[55∈0]<br />ᐸencodeᐳ"]:::plan
+    Map239["Map[239∈0]<br />ᐸ51:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle62["PgSelectSingle[62∈0]<br />ᐸpersonSecretᐳ"]:::plan
+    Constant63["Constant[63∈0]"]:::plan
+    PgClassExpression64["PgClassExpression[64∈0]<br />ᐸ__person_s...person_id”ᐳ"]:::plan
+    List65["List[65∈0]<br />ᐸ63,64ᐳ"]:::plan
+    Lambda66["Lambda[66∈0]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression68["PgClassExpression[68∈0]<br />ᐸ__person_s..._.”sekrit”ᐳ"]:::plan
+    __InputStaticLeaf69["__InputStaticLeaf[69∈0]"]:::plan
+    PgSelect70[["PgSelect[70∈0]<br />ᐸleftArmᐳ"]]:::plan
+    First74["First[74∈0]"]:::plan
+    PgSelectSingle75["PgSelectSingle[75∈0]<br />ᐸleftArmᐳ"]:::plan
+    Constant76["Constant[76∈0]"]:::plan
+    PgClassExpression77["PgClassExpression[77∈0]<br />ᐸ__left_arm__.”id”ᐳ"]:::plan
+    List78["List[78∈0]<br />ᐸ76,77ᐳ"]:::plan
+    Lambda79["Lambda[79∈0]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression81["PgClassExpression[81∈0]<br />ᐸ__left_arm...person_id”ᐳ"]:::plan
+    PgClassExpression82["PgClassExpression[82∈0]<br />ᐸ__left_arm...in_metres”ᐳ"]:::plan
+    PgClassExpression83["PgClassExpression[83∈0]<br />ᐸ__left_arm__.”mood”ᐳ"]:::plan
+    Connection101["Connection[101∈0]<br />ᐸ97ᐳ"]:::plan
+    PgSelect102[["PgSelect[102∈0]<br />ᐸleftArmᐳ"]]:::plan
+    __Item103>"__Item[103∈2]<br />ᐸ102ᐳ"]:::itemplan
+    PgSelectSingle104["PgSelectSingle[104∈2]<br />ᐸleftArmᐳ"]:::plan
+    Constant105["Constant[105∈0]"]:::plan
+    PgClassExpression106["PgClassExpression[106∈2]<br />ᐸ__left_arm__.”id”ᐳ"]:::plan
+    List107["List[107∈2]<br />ᐸ105,106ᐳ"]:::plan
+    Lambda108["Lambda[108∈2]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression110["PgClassExpression[110∈2]<br />ᐸ__left_arm...person_id”ᐳ"]:::plan
+    PgClassExpression111["PgClassExpression[111∈2]<br />ᐸ__left_arm...in_metres”ᐳ"]:::plan
+    PgClassExpression112["PgClassExpression[112∈2]<br />ᐸ__left_arm__.”mood”ᐳ"]:::plan
+    __InputStaticLeaf113["__InputStaticLeaf[113∈0]"]:::plan
+    PgSelect114[["PgSelect[114∈0]<br />ᐸpersonᐳ"]]:::plan
+    First118["First[118∈0]"]:::plan
+    PgSelectSingle119["PgSelectSingle[119∈0]<br />ᐸpersonᐳ"]:::plan
+    Constant120["Constant[120∈0]"]:::plan
+    PgClassExpression121["PgClassExpression[121∈0]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    List122["List[122∈0]<br />ᐸ120,121ᐳ"]:::plan
+    Lambda123["Lambda[123∈0]<br />ᐸencodeᐳ"]:::plan
+    Map241["Map[241∈0]<br />ᐸ119:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"]:::plan
+    PgSelectSingle130["PgSelectSingle[130∈0]<br />ᐸleftArmᐳ"]:::plan
+    Constant131["Constant[131∈0]"]:::plan
+    PgClassExpression132["PgClassExpression[132∈0]<br />ᐸ__left_arm__.”id”ᐳ"]:::plan
+    List133["List[133∈0]<br />ᐸ131,132ᐳ"]:::plan
+    Lambda134["Lambda[134∈0]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression136["PgClassExpression[136∈0]<br />ᐸ__left_arm...person_id”ᐳ"]:::plan
+    PgClassExpression137["PgClassExpression[137∈0]<br />ᐸ__left_arm...in_metres”ᐳ"]:::plan
+    PgClassExpression138["PgClassExpression[138∈0]<br />ᐸ__left_arm__.”mood”ᐳ"]:::plan
+    __InputStaticLeaf139["__InputStaticLeaf[139∈0]"]:::plan
+    PgSelect140[["PgSelect[140∈0]<br />ᐸpostᐳ"]]:::plan
+    First144["First[144∈0]"]:::plan
+    PgSelectSingle145["PgSelectSingle[145∈0]<br />ᐸpostᐳ"]:::plan
+    Constant146["Constant[146∈0]"]:::plan
+    PgClassExpression147["PgClassExpression[147∈0]<br />ᐸ__post__.”id”ᐳ"]:::plan
+    List148["List[148∈0]<br />ᐸ146,147ᐳ"]:::plan
+    Lambda149["Lambda[149∈0]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression151["PgClassExpression[151∈0]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    PgClassExpression152["PgClassExpression[152∈0]<br />ᐸ__post__.”body”ᐳ"]:::plan
+    PgClassExpression153["PgClassExpression[153∈0]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
+    Connection172["Connection[172∈0]<br />ᐸ168ᐳ"]:::plan
+    PgSelect173[["PgSelect[173∈0]<br />ᐸpostᐳ"]]:::plan
+    __Item174>"__Item[174∈3]<br />ᐸ173ᐳ"]:::itemplan
+    PgSelectSingle175["PgSelectSingle[175∈3]<br />ᐸpostᐳ"]:::plan
+    Constant176["Constant[176∈0]"]:::plan
+    PgClassExpression177["PgClassExpression[177∈3]<br />ᐸ__post__.”id”ᐳ"]:::plan
+    List178["List[178∈3]<br />ᐸ176,177ᐳ"]:::plan
+    Lambda179["Lambda[179∈3]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression181["PgClassExpression[181∈3]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    PgClassExpression182["PgClassExpression[182∈3]<br />ᐸ__post__.”body”ᐳ"]:::plan
+    PgClassExpression183["PgClassExpression[183∈3]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
+    __InputStaticLeaf184["__InputStaticLeaf[184∈0]"]:::plan
+    PgSelect185[["PgSelect[185∈0]<br />ᐸpersonᐳ"]]:::plan
+    First189["First[189∈0]"]:::plan
+    PgSelectSingle190["PgSelectSingle[190∈0]<br />ᐸpersonᐳ"]:::plan
+    Constant191["Constant[191∈0]"]:::plan
+    PgClassExpression192["PgClassExpression[192∈0]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    List193["List[193∈0]<br />ᐸ191,192ᐳ"]:::plan
+    Lambda194["Lambda[194∈0]<br />ᐸencodeᐳ"]:::plan
+    Connection214["Connection[214∈0]<br />ᐸ210ᐳ"]:::plan
+    Access243["Access[243∈0]<br />ᐸ189.0ᐳ"]:::plan
+    __Item216>"__Item[216∈4]<br />ᐸ243ᐳ"]:::itemplan
+    PgSelectSingle217["PgSelectSingle[217∈4]<br />ᐸpostᐳ"]:::plan
+    Constant218["Constant[218∈0]"]:::plan
+    PgClassExpression219["PgClassExpression[219∈4]<br />ᐸ__post__.”id”ᐳ"]:::plan
+    List220["List[220∈4]<br />ᐸ218,219ᐳ"]:::plan
+    Lambda221["Lambda[221∈4]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression223["PgClassExpression[223∈4]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    PgClassExpression224["PgClassExpression[224∈4]<br />ᐸ__post__.”body”ᐳ"]:::plan
+    PgClassExpression225["PgClassExpression[225∈4]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
+    PgSelect226[["PgSelect[226∈0]<br />ᐸreturn_table_without_grantsᐳ"]]:::plan
+    First230["First[230∈0]"]:::plan
+    PgSelectSingle231["PgSelectSingle[231∈0]<br />ᐸreturn_table_without_grantsᐳ"]:::plan
+    Constant232["Constant[232∈0]"]:::plan
+    PgClassExpression233["PgClassExpression[233∈0]<br />ᐸ__return_t...rson_id_1”ᐳ"]:::plan
+    PgClassExpression234["PgClassExpression[234∈0]<br />ᐸ__return_t...rson_id_2”ᐳ"]:::plan
+    List235["List[235∈0]<br />ᐸ232,233,234ᐳ"]:::plan
+    Lambda236["Lambda[236∈0]<br />ᐸencodeᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access211
+    __Value3 --> Access212
+    Access211 & Access212 --> Object213
+    Object213 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression15
+    Constant14 & PgClassExpression15 --> List16
+    List16 --> Lambda17
+    PgSelectSingle13 --> PgClassExpression19
+    Object213 & Connection35 --> PgSelect36
+    PgSelect36 ==> __Item37
+    __Item37 --> PgSelectSingle38
+    PgSelectSingle38 --> PgClassExpression40
+    Constant39 & PgClassExpression40 --> List41
+    List41 --> Lambda42
+    PgSelectSingle38 --> PgClassExpression44
+    Object213 & __InputStaticLeaf45 --> PgSelect46
+    PgSelect46 --> First50
+    First50 --> PgSelectSingle51
+    PgSelectSingle51 --> PgClassExpression53
+    Constant52 & PgClassExpression53 --> List54
+    List54 --> Lambda55
+    PgSelectSingle51 --> Map239
+    Map239 --> PgSelectSingle62
+    PgSelectSingle62 --> PgClassExpression64
+    Constant63 & PgClassExpression64 --> List65
+    List65 --> Lambda66
+    PgSelectSingle62 --> PgClassExpression68
+    Object213 & __InputStaticLeaf69 --> PgSelect70
+    PgSelect70 --> First74
+    First74 --> PgSelectSingle75
+    PgSelectSingle75 --> PgClassExpression77
+    Constant76 & PgClassExpression77 --> List78
+    List78 --> Lambda79
+    PgSelectSingle75 --> PgClassExpression81
+    PgSelectSingle75 --> PgClassExpression82
+    PgSelectSingle75 --> PgClassExpression83
+    Object213 & Connection101 --> PgSelect102
+    PgSelect102 ==> __Item103
+    __Item103 --> PgSelectSingle104
+    PgSelectSingle104 --> PgClassExpression106
+    Constant105 & PgClassExpression106 --> List107
+    List107 --> Lambda108
+    PgSelectSingle104 --> PgClassExpression110
+    PgSelectSingle104 --> PgClassExpression111
+    PgSelectSingle104 --> PgClassExpression112
+    Object213 & __InputStaticLeaf113 --> PgSelect114
+    PgSelect114 --> First118
+    First118 --> PgSelectSingle119
+    PgSelectSingle119 --> PgClassExpression121
+    Constant120 & PgClassExpression121 --> List122
+    List122 --> Lambda123
+    PgSelectSingle119 --> Map241
+    Map241 --> PgSelectSingle130
+    PgSelectSingle130 --> PgClassExpression132
+    Constant131 & PgClassExpression132 --> List133
+    List133 --> Lambda134
+    PgSelectSingle130 --> PgClassExpression136
+    PgSelectSingle130 --> PgClassExpression137
+    PgSelectSingle130 --> PgClassExpression138
+    Object213 & __InputStaticLeaf139 --> PgSelect140
+    PgSelect140 --> First144
+    First144 --> PgSelectSingle145
+    PgSelectSingle145 --> PgClassExpression147
+    Constant146 & PgClassExpression147 --> List148
+    List148 --> Lambda149
+    PgSelectSingle145 --> PgClassExpression151
+    PgSelectSingle145 --> PgClassExpression152
+    PgSelectSingle145 --> PgClassExpression153
+    Object213 & Connection172 --> PgSelect173
+    PgSelect173 ==> __Item174
+    __Item174 --> PgSelectSingle175
+    PgSelectSingle175 --> PgClassExpression177
+    Constant176 & PgClassExpression177 --> List178
+    List178 --> Lambda179
+    PgSelectSingle175 --> PgClassExpression181
+    PgSelectSingle175 --> PgClassExpression182
+    PgSelectSingle175 --> PgClassExpression183
+    Object213 & __InputStaticLeaf184 --> PgSelect185
+    PgSelect185 --> First189
+    First189 --> PgSelectSingle190
+    PgSelectSingle190 --> PgClassExpression192
+    Constant191 & PgClassExpression192 --> List193
+    List193 --> Lambda194
+    First189 --> Access243
+    Access243 ==> __Item216
+    __Item216 --> PgSelectSingle217
+    PgSelectSingle217 --> PgClassExpression219
+    Constant218 & PgClassExpression219 --> List220
+    List220 --> Lambda221
+    PgSelectSingle217 --> PgClassExpression223
+    PgSelectSingle217 --> PgClassExpression224
+    PgSelectSingle217 --> PgClassExpression225
+    Object213 --> PgSelect226
+    PgSelect226 --> First230
+    First230 --> PgSelectSingle231
+    PgSelectSingle231 --> PgClassExpression233
+    PgSelectSingle231 --> PgClassExpression234
+    Constant232 & PgClassExpression233 & PgClassExpression234 --> List235
+    List235 --> Lambda236
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳpersonSecretByPersonId"]
+    PgSelectSingle13 -.-> P13
+    P15["ᐳp…dᐳpersonId"]
+    PgClassExpression15 -.-> P15
+    P17["ᐳp…dᐳnodeId"]
+    Lambda17 -.-> P17
+    P19["ᐳp…dᐳsecret"]
+    PgClassExpression19 -.-> P19
+    P35["ᐳallPersonSecrets"]
+    Connection35 -.-> P35
+    P36["ᐳa…sᐳnodes"]
+    PgSelect36 -.-> P36
+    P38["ᐳa…sᐳnodes[]"]
+    PgSelectSingle38 -.-> P38
+    P40["ᐳa…sᐳn…]ᐳpersonId"]
+    PgClassExpression40 -.-> P40
+    P42["ᐳa…sᐳn…]ᐳnodeId"]
+    Lambda42 -.-> P42
+    P44["ᐳa…sᐳn…]ᐳsecret"]
+    PgClassExpression44 -.-> P44
+    P51["ᐳpersonForSecret"]
+    PgSelectSingle51 -.-> P51
+    P55["ᐳp…tᐳnodeId"]
+    Lambda55 -.-> P55
+    P62["ᐳp…tᐳpersonSecretByPersonId"]
+    PgSelectSingle62 -.-> P62
+    P64["ᐳp…tᐳp…dᐳpersonId"]
+    PgClassExpression64 -.-> P64
+    P66["ᐳp…tᐳp…dᐳnodeId"]
+    Lambda66 -.-> P66
+    P68["ᐳp…tᐳp…dᐳsecret"]
+    PgClassExpression68 -.-> P68
+    P75["ᐳleftArmById"]
+    PgSelectSingle75 -.-> P75
+    P77["ᐳl…dᐳid"]
+    PgClassExpression77 -.-> P77
+    P79["ᐳl…dᐳnodeId"]
+    Lambda79 -.-> P79
+    P81["ᐳl…dᐳpersonId"]
+    PgClassExpression81 -.-> P81
+    P82["ᐳl…dᐳlengthInMetres"]
+    PgClassExpression82 -.-> P82
+    P83["ᐳl…dᐳmood"]
+    PgClassExpression83 -.-> P83
+    P101["ᐳallLeftArms"]
+    Connection101 -.-> P101
+    P102["ᐳa…sᐳnodes"]
+    PgSelect102 -.-> P102
+    P104["ᐳa…sᐳnodes[]"]
+    PgSelectSingle104 -.-> P104
+    P106["ᐳa…sᐳn…]ᐳid"]
+    PgClassExpression106 -.-> P106
+    P108["ᐳa…sᐳn…]ᐳnodeId"]
+    Lambda108 -.-> P108
+    P110["ᐳa…sᐳn…]ᐳpersonId"]
+    PgClassExpression110 -.-> P110
+    P111["ᐳa…sᐳn…]ᐳlengthInMetres"]
+    PgClassExpression111 -.-> P111
+    P112["ᐳa…sᐳn…]ᐳmood"]
+    PgClassExpression112 -.-> P112
+    P119["ᐳpersonForLeftArm"]
+    PgSelectSingle119 -.-> P119
+    P123["ᐳp…mᐳnodeId"]
+    Lambda123 -.-> P123
+    P130["ᐳp…mᐳleftArmByPersonId"]
+    PgSelectSingle130 -.-> P130
+    P132["ᐳp…mᐳl…dᐳid"]
+    PgClassExpression132 -.-> P132
+    P134["ᐳp…mᐳl…dᐳnodeId"]
+    Lambda134 -.-> P134
+    P136["ᐳp…mᐳl…dᐳpersonId"]
+    PgClassExpression136 -.-> P136
+    P137["ᐳp…mᐳl…dᐳlengthInMetres"]
+    PgClassExpression137 -.-> P137
+    P138["ᐳp…mᐳl…dᐳmood"]
+    PgClassExpression138 -.-> P138
+    P145["ᐳpostById"]
+    PgSelectSingle145 -.-> P145
+    P147["ᐳp…dᐳid"]
+    PgClassExpression147 -.-> P147
+    P149["ᐳp…dᐳnodeId"]
+    Lambda149 -.-> P149
+    P151["ᐳp…dᐳheadline"]
+    PgClassExpression151 -.-> P151
+    P152["ᐳp…dᐳbody"]
+    PgClassExpression152 -.-> P152
+    P153["ᐳp…dᐳauthorId"]
+    PgClassExpression153 -.-> P153
+    P172["ᐳallPosts"]
+    Connection172 -.-> P172
+    P173["ᐳa…sᐳnodes"]
+    PgSelect173 -.-> P173
+    P175["ᐳa…sᐳnodes[]"]
+    PgSelectSingle175 -.-> P175
+    P177["ᐳa…sᐳn…]ᐳid"]
+    PgClassExpression177 -.-> P177
+    P179["ᐳa…sᐳn…]ᐳnodeId"]
+    Lambda179 -.-> P179
+    P181["ᐳa…sᐳn…]ᐳheadline"]
+    PgClassExpression181 -.-> P181
+    P182["ᐳa…sᐳn…]ᐳbody"]
+    PgClassExpression182 -.-> P182
+    P183["ᐳa…sᐳn…]ᐳauthorId"]
+    PgClassExpression183 -.-> P183
+    P190["ᐳpersonForPosts"]
+    PgSelectSingle190 -.-> P190
+    P194["ᐳp…sᐳnodeId"]
+    Lambda194 -.-> P194
+    P214["ᐳp…sᐳpostsByAuthorId"]
+    Connection214 -.-> P214
+    P217["ᐳp…sᐳp…dᐳnodes[]"]
+    PgSelectSingle217 -.-> P217
+    P219["ᐳp…sᐳp…dᐳn…]ᐳid"]
+    PgClassExpression219 -.-> P219
+    P221["ᐳp…sᐳp…dᐳn…]ᐳnodeId"]
+    Lambda221 -.-> P221
+    P223["ᐳp…sᐳp…dᐳn…]ᐳheadline"]
+    PgClassExpression223 -.-> P223
+    P224["ᐳp…sᐳp…dᐳn…]ᐳbody"]
+    PgClassExpression224 -.-> P224
+    P225["ᐳp…sᐳp…dᐳn…]ᐳauthorId"]
+    PgClassExpression225 -.-> P225
+    P231["ᐳreturnTableWithoutGrants"]
+    PgSelectSingle231 -.-> P231
+    P233["ᐳr…sᐳpersonId1"]
+    PgClassExpression233 -.-> P233
+    P234["ᐳr…sᐳpersonId2"]
+    PgClassExpression234 -.-> P234
+    P236["ᐳr…sᐳnodeId"]
+    Lambda236 -.-> P236
+    P243["ᐳp…sᐳp…dᐳnodes"]
+    Access243 -.-> P243
+
+    subgraph "Buckets for queries/v4/rbac.basic"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀personSecretByPersonId ᐸ-O- 13<br />⠀⠀⠀personSecretByPersonId.personId ᐸ-L- 15<br />⠀⠀⠀personSecretByPersonId.nodeId ᐸ-L- 17<br />⠀⠀⠀personSecretByPersonId.secret ᐸ-L- 19<br />⠀⠀allPersonSecrets ᐸ-O- 35<br />⠀⠀⠀allPersonSecrets.nodes ᐸ-A- 36<br />⠀⠀personForSecret ᐸ-O- 51<br />⠀⠀⠀personForSecret.nodeId ᐸ-L- 55<br />⠀⠀⠀personForSecret.personSecretByPersonId ᐸ-O- 62<br />⠀⠀⠀⠀personForSecret.personSecretByPersonId.personId ᐸ-L- 64<br />⠀⠀⠀⠀personForSecret.personSecretByPersonId.nodeId ᐸ-L- 66<br />⠀⠀⠀⠀personForSecret.personSecretByPersonId.secret ᐸ-L- 68<br />⠀⠀leftArmById ᐸ-O- 75<br />⠀⠀⠀leftArmById.id ᐸ-L- 77<br />⠀⠀⠀leftArmById.nodeId ᐸ-L- 79<br />⠀⠀⠀leftArmById.personId ᐸ-L- 81<br />⠀⠀⠀leftArmById.lengthInMetres ᐸ-L- 82<br />⠀⠀⠀leftArmById.mood ᐸ-L- 83<br />⠀⠀allLeftArms ᐸ-O- 101<br />⠀⠀⠀allLeftArms.nodes ᐸ-A- 102<br />⠀⠀personForLeftArm ᐸ-O- 119<br />⠀⠀⠀personForLeftArm.nodeId ᐸ-L- 123<br />⠀⠀⠀personForLeftArm.leftArmByPersonId ᐸ-O- 130<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.id ᐸ-L- 132<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.nodeId ᐸ-L- 134<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.personId ᐸ-L- 136<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.lengthInMetres ᐸ-L- 137<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.mood ᐸ-L- 138<br />⠀⠀postById ᐸ-O- 145<br />⠀⠀⠀postById.id ᐸ-L- 147<br />⠀⠀⠀postById.nodeId ᐸ-L- 149<br />⠀⠀⠀postById.headline ᐸ-L- 151<br />⠀⠀⠀postById.body ᐸ-L- 152<br />⠀⠀⠀postById.authorId ᐸ-L- 153<br />⠀⠀allPosts ᐸ-O- 172<br />⠀⠀⠀allPosts.nodes ᐸ-A- 173<br />⠀⠀personForPosts ᐸ-O- 190<br />⠀⠀⠀personForPosts.nodeId ᐸ-L- 194<br />⠀⠀⠀personForPosts.postsByAuthorId ᐸ-O- 214<br />⠀⠀⠀⠀personForPosts.postsByAuthorId.nodes ᐸ-A- 243<br />⠀⠀returnTableWithoutGrants ᐸ-O- 231<br />⠀⠀⠀returnTableWithoutGrants.personId1 ᐸ-L- 233<br />⠀⠀⠀returnTableWithoutGrants.personId2 ᐸ-L- 234<br />⠀⠀⠀returnTableWithoutGrants.nodeId ᐸ-L- 236"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,First12,PgSelectSingle13,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression19,Connection35,PgSelect36,Constant39,__InputStaticLeaf45,PgSelect46,First50,PgSelectSingle51,Constant52,PgClassExpression53,List54,Lambda55,PgSelectSingle62,Constant63,PgClassExpression64,List65,Lambda66,PgClassExpression68,__InputStaticLeaf69,PgSelect70,First74,PgSelectSingle75,Constant76,PgClassExpression77,List78,Lambda79,PgClassExpression81,PgClassExpression82,PgClassExpression83,Connection101,PgSelect102,Constant105,__InputStaticLeaf113,PgSelect114,First118,PgSelectSingle119,Constant120,PgClassExpression121,List122,Lambda123,PgSelectSingle130,Constant131,PgClassExpression132,List133,Lambda134,PgClassExpression136,PgClassExpression137,PgClassExpression138,__InputStaticLeaf139,PgSelect140,First144,PgSelectSingle145,Constant146,PgClassExpression147,List148,Lambda149,PgClassExpression151,PgClassExpression152,PgClassExpression153,Connection172,PgSelect173,Constant176,__InputStaticLeaf184,PgSelect185,First189,PgSelectSingle190,Constant191,PgClassExpression192,List193,Lambda194,Access211,Access212,Object213,Connection214,Constant218,PgSelect226,First230,PgSelectSingle231,Constant232,PgClassExpression233,PgClassExpression234,List235,Lambda236,Map239,Map241,Access243 bucket0
+    Bucket1("Bucket 1 (item37)<br />Deps: 36, 39<br />~ᐳQuery.allPersonSecretsᐳPersonSecretsConnection.nodes[]<br />⠀ROOT ᐸ-O- 38<br />⠀⠀personId ᐸ-L- 40<br />⠀⠀nodeId ᐸ-L- 42<br />⠀⠀secret ᐸ-L- 44"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item37,PgSelectSingle38,PgClassExpression40,List41,Lambda42,PgClassExpression44 bucket1
+    Bucket2("Bucket 2 (item103)<br />Deps: 102, 105<br />~ᐳQuery.allLeftArmsᐳLeftArmsConnection.nodes[]<br />⠀ROOT ᐸ-O- 104<br />⠀⠀id ᐸ-L- 106<br />⠀⠀nodeId ᐸ-L- 108<br />⠀⠀personId ᐸ-L- 110<br />⠀⠀lengthInMetres ᐸ-L- 111<br />⠀⠀mood ᐸ-L- 112"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item103,PgSelectSingle104,PgClassExpression106,List107,Lambda108,PgClassExpression110,PgClassExpression111,PgClassExpression112 bucket2
+    Bucket3("Bucket 3 (item174)<br />Deps: 173, 176<br />~ᐳQuery.allPostsᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 175<br />⠀⠀id ᐸ-L- 177<br />⠀⠀nodeId ᐸ-L- 179<br />⠀⠀headline ᐸ-L- 181<br />⠀⠀body ᐸ-L- 182<br />⠀⠀authorId ᐸ-L- 183"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item174,PgSelectSingle175,PgClassExpression177,List178,Lambda179,PgClassExpression181,PgClassExpression182,PgClassExpression183 bucket3
+    Bucket4("Bucket 4 (item216)<br />Deps: 243, 218<br />~ᐳQuery.personForPostsᐳPerson.postsByAuthorIdᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 217<br />⠀⠀id ᐸ-L- 219<br />⠀⠀nodeId ᐸ-L- 221<br />⠀⠀headline ᐸ-L- 223<br />⠀⠀body ᐸ-L- 224<br />⠀⠀authorId ᐸ-L- 225"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item216,PgSelectSingle217,PgClassExpression219,List220,Lambda221,PgClassExpression223,PgClassExpression224,PgClassExpression225 bucket4
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
+    end
