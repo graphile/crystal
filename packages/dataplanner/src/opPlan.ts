@@ -696,7 +696,7 @@ export class OpPlan<
   // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
   private readonly polymorphicDetailsByStepId: Record<
     string,
-    { polymorphicPlanIds: string[]; typeNames: string[] }
+    { polymorphicPlanIds: string[]; typeNames: string[]; local: boolean }
   > = Object.create(null);
 
   /**
@@ -2059,6 +2059,7 @@ export class OpPlan<
         const planPossibleObjectTypes = (
           possibleObjectTypes: readonly GraphQLObjectType[],
         ): void => {
+          const knownPlanIds = Object.keys(this.plans);
           for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
             const possibleObjectType = possibleObjectTypes[i];
 
@@ -2075,6 +2076,7 @@ export class OpPlan<
                 this.polymorphicDetailsByStepId[subPlan.id] = details = {
                   polymorphicPlanIds: [],
                   typeNames: [],
+                  local: !knownPlanIds.includes(subPlan.id),
                 };
               }
               if (!details.polymorphicPlanIds.includes(polymorphicPlan.id)) {
@@ -3012,6 +3014,8 @@ export class OpPlan<
       ) {
         (plan.groupIds as any) = [0];
         plan.primaryGroupId = 0;
+        plan.bucketId = 0;
+        return;
       } else if (plan.groupIds.length === 0 || plan.groupIds.includes(0)) {
         (plan.groupIds as any) = [0];
         plan.primaryGroupId = 0;
@@ -3094,6 +3098,7 @@ export class OpPlan<
                   (id) => this.plans[id].id,
                 ),
               typeNames: [...polymorphicDetailsListEntry.typeNames],
+              local: polymorphicDetailsListEntry.local,
             };
           } else {
             const ids = polymorphicDetailsListEntry.polymorphicPlanIds.map(
@@ -3109,12 +3114,21 @@ export class OpPlan<
                 memo.typeNames.push(typeName);
               }
             }
+            if (polymorphicDetailsListEntry.local !== memo.local) {
+              throw new Error(
+                `Invalid polymorphic plan; expected plan ${plan} to either always be local or never, but mixed state found.`,
+              );
+            }
             return memo;
           }
         },
         undefined as
           | undefined
-          | { polymorphicPlanIds: string[]; typeNames: string[] },
+          | {
+              polymorphicPlanIds: string[];
+              typeNames: string[];
+              local: boolean;
+            },
       );
 
       const itemStepId = plan instanceof __ItemStep ? plan.id : undefined;
@@ -3314,7 +3328,11 @@ export class OpPlan<
       };
 
       const bucket = getBucket();
-      plan.bucketId = bucket.id;
+      if (polymorphicDetails && !polymorphicDetails.local) {
+        addPlanIdsToBucket(bucket, [plan]);
+      } else {
+        plan.bucketId = bucket.id;
+      }
       return plan;
     };
 
@@ -6239,7 +6257,7 @@ function addPlanIdsToBucket(
   if (next.length) {
     if (!bucket.parent) {
       throw new Error(
-        `Attempted to add ${next} to bucket ${attemptedBuckets[0].id}, but did not find their parent buckets in the chain. (i.e. the plan heirarchy is malformed.)`,
+        `Attempted to add ${next} to bucket ${attemptedBuckets?.[0]?.id}, but did not find their parent buckets in the chain. (i.e. the plan heirarchy is malformed.)`,
         //`${plan} (bucket ${plan.bucketId}) depends on ${dep} (bucket ${dep.bucketId}), but bucket ${dep.bucketId} does not appear in bucket ${plan.bucketId}'s ancestors.`,
       );
     }
