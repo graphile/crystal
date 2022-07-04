@@ -33,7 +33,7 @@ export class LastStep<TData> extends ExecutableStep<TData> {
     const parent = this.getDep(0);
     // The last of a list plan is just the last dependency of the list plan.
     if (parent instanceof ListStep) {
-      return this.getPlan(parent.dependencies[parent.dependencies.length - 1]);
+      return this.getStep(parent.dependencies[parent.dependencies.length - 1]);
     }
     return this;
   }

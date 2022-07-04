@@ -175,7 +175,7 @@ export class ObjectStep<
         )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
-    return this.getPlan(this.dependencies[index]) as TPlans[TKey];
+    return this.getStep(this.dependencies[index]) as TPlans[TKey];
   }
 }
 

@@ -266,12 +266,12 @@ export class ExecutableStep<TData = any> extends BaseStep {
     this.id = this.aether._addStep(this);
   }
 
-  protected getPlan(id: string): ExecutableStep {
-    return this.aether.getPlan(id, this);
+  protected getStep(id: string): ExecutableStep {
+    return this.aether.getStep(id, this);
   }
 
   protected getDep(depId: number): ExecutableStep {
-    return this.getPlan(this.dependencies[depId]);
+    return this.getStep(this.dependencies[depId]);
   }
 
   public toString(): string {

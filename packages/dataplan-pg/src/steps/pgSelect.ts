@@ -585,7 +585,7 @@ export class PgSelectStep<
         throw new Error("Should not have any dependencies yet");
       }
       cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency(this.getPlan(planId));
+        const myIdx = this.addDependency(this.getStep(planId));
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
@@ -2314,7 +2314,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   >(otherPlan: TOtherStep): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec } = placeholder;
-      const dep = this.getPlan(this.dependencies[dependencyIndex]);
+      const dep = this.getStep(this.dependencies[dependencyIndex]);
       if (
         // I am uncertain on this code.
         isStaticInputPlan(dep) ||
@@ -2391,7 +2391,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           continue;
         }
         const planId = this.dependencies[dependencyIndex];
-        const dep = this.getPlan(planId);
+        const dep = this.getStep(planId);
         if (dep instanceof __TrackedObjectStep) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
@@ -2401,7 +2401,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         } else if (dep instanceof ConnectionStep) {
           // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionStep) {
-          const p2 = this.getPlan(dep.dependencies[dep.tableId]);
+          const p2 = this.getStep(dep.dependencies[dep.tableId]);
           const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
@@ -2458,8 +2458,8 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         }
       }
       if (t != null && p != null) {
-        const myContext = this.getPlan(this.dependencies[this.contextId]);
-        const tsContext = this.getPlan(t.dependencies[t.contextId]);
+        const myContext = this.getStep(this.dependencies[this.contextId]);
+        const tsContext = this.getStep(t.dependencies[t.contextId]);
         if (myContext != tsContext) {
           debugPlanVerbose(
             "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
@@ -2510,7 +2510,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, codec } = this.queryValues[i];
-                const plan = this.getPlan(this.dependencies[dependencyIndex]);
+                const plan = this.getStep(this.dependencies[dependencyIndex]);
                 if (plan instanceof PgClassExpressionStep) {
                   return sql`${plan.toSQL()}::${
                     codec.sqlType
@@ -2576,10 +2576,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           parent instanceof PgSelectSingleStep &&
           parent.getClassStep().mode !== "aggregate"
         ) {
-          const parent2 = this.getPlan(parent.dependencies[parent.itemStepId]);
+          const parent2 = this.getStep(parent.dependencies[parent.itemStepId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, codec } = this.queryValues[i];
-            const plan = this.getPlan(this.dependencies[dependencyIndex]);
+            const plan = this.getStep(this.dependencies[dependencyIndex]);
             if (plan instanceof PgClassExpressionStep) {
               return this.where(
                 sql`${plan.toSQL()}::${codec.sqlType} = ${identifierMatch}`,

@@ -57,7 +57,7 @@ export class PgSingleTablePolymorphicStep<
   }
 
   private rowPlan() {
-    return this.getPlan(this.dependencies[this.rowStepId]);
+    return this.getStep(this.dependencies[this.rowStepId]);
   }
 
   deduplicate(

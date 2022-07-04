@@ -62,7 +62,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
     TStep,
     any
   > {
-    const plan = this.getPlan(this.connectionStepId);
+    const plan = this.getStep(this.connectionStepId);
     if (!(plan instanceof ConnectionStep)) {
       throw new Error(
         `Expected ${this.connectionStepId} (${plan}) to be a ConnectionStep`,

@@ -199,7 +199,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     if (typeof attrName !== "string") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getPlan(this.parentStepId), [
+    return new AccessStep(this.getStep(this.parentStepId), [
       ...this.path,
       attrName,
     ]);
@@ -212,7 +212,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     if (typeof index !== "number") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getPlan(this.parentStepId), [
+    return new AccessStep(this.getStep(this.parentStepId), [
       ...this.path,
       index,
     ]);

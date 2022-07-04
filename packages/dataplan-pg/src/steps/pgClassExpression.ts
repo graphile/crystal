@@ -202,7 +202,7 @@ export class PgClassExpressionStep<
     TRelations,
     TParameters
   > {
-    const plan = this.getPlan(this.dependencies[this.tableId]);
+    const plan = this.getStep(this.dependencies[this.tableId]);
     if (
       !(plan instanceof PgSelectSingleStep) &&
       !(plan instanceof PgInsertStep) &&

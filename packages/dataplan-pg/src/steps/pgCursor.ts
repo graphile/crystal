@@ -44,7 +44,7 @@ export class PgCursorStep<
   }
 
   public getClassSingleStep(): TStep {
-    const plan = this.getPlan(this.classSingleStepId);
+    const plan = this.getStep(this.classSingleStepId);
     if (!(plan instanceof PgSelectSingleStep)) {
       throw new Error(
         `Expected ${this.classSingleStepId} (${plan}) to be a PgSelectSingleStep`,

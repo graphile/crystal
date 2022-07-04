@@ -6036,7 +6036,7 @@ export class Aether<
 
   //----------------------------------------
 
-  public getPlan: (
+  public getStep: (
     id: string,
     requestingPlan: ExecutableStep,
   ) => ExecutableStep = isDev

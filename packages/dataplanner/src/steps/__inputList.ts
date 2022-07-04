@@ -85,8 +85,8 @@ export class __InputListStep extends ExecutableStep {
 
   at(index: number): InputStep {
     const itemStepId = this.itemPlanIds[index];
-    const outOfBoundsPlan = this.getPlan(this.outOfBoundsStepId);
-    const itemPlan = itemStepId ? this.getPlan(itemStepId) : outOfBoundsPlan;
+    const outOfBoundsPlan = this.getStep(this.outOfBoundsStepId);
+    const itemPlan = itemStepId ? this.getStep(itemStepId) : outOfBoundsPlan;
     assertInputPlan(itemPlan);
     return itemPlan;
   }
@@ -103,7 +103,7 @@ export class __InputListStep extends ExecutableStep {
       itemPlanIndex++
     ) {
       const itemStepId = this.itemPlanIds[itemPlanIndex];
-      const itemPlan = this.getPlan(itemStepId);
+      const itemPlan = this.getStep(itemStepId);
       assertInputPlan(itemPlan);
       const value = itemPlan.eval();
       list[itemPlanIndex] = value;

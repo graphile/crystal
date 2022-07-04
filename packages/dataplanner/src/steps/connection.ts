@@ -175,7 +175,7 @@ export class ConnectionStep<
         "Forbidden to call ConnectionStep.getSubplan after arguments finalize",
       );
     }
-    const plan = this.getPlan(this.subplanId) as TStep;
+    const plan = this.getStep(this.subplanId) as TStep;
     return plan;
   }
 
@@ -197,7 +197,7 @@ export class ConnectionStep<
         "Forbidden to call ConnectionStep.nodes before arguments finalize",
       );
     }
-    const plan = this.getPlan(this.subplanId) as TStep;
+    const plan = this.getStep(this.subplanId) as TStep;
     const clonedPlan = plan.connectionClone(this, ...args) as TStep;
     return clonedPlan;
   }
@@ -278,7 +278,7 @@ export class ConnectionStep<
   }
 
   public pageInfo(): PageInfoCapableStep {
-    const plan = this.getPlan(this.subplanId) as TStep;
+    const plan = this.getStep(this.subplanId) as TStep;
     return plan.pageInfo(this);
   }
 
@@ -338,7 +338,7 @@ export class EdgeStep<
     TStep,
     TNodeStep
   > {
-    return this.getPlan(this.connectionStepId) as any;
+    return this.getStep(this.connectionStepId) as any;
   }
 
   private getItemStep(): TItemStep {

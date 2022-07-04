@@ -29,7 +29,7 @@ export class FirstStep<TData> extends ExecutableStep<TData> {
     const parent = this.getDep(0);
     // The first of a list plan is just the first dependency of the list plan.
     if (parent instanceof ListStep) {
-      return this.getPlan(parent.dependencies[0]);
+      return this.getStep(parent.dependencies[0]);
     }
     return this;
   }

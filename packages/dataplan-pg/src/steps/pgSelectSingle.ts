@@ -119,7 +119,7 @@ export class PgSelectSingleStep<
     if (this.aether.isOptimized(this)) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
-    const plan = this.getPlan(this.classStepId);
+    const plan = this.getStep(this.classStepId);
     if (!(plan instanceof PgSelectStep)) {
       throw new Error(
         `Expected ${this.classStepId} (${plan}) to be a PgSelectStep`,
@@ -129,7 +129,7 @@ export class PgSelectSingleStep<
   }
 
   private getItemStep(): ExecutableStep<PgSourceRow<TColumns>> {
-    const plan = this.getPlan(this.dependencies[this.itemStepId]);
+    const plan = this.getStep(this.dependencies[this.itemStepId]);
     return plan;
   }
 
