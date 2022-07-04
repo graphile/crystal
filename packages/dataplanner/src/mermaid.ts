@@ -5,7 +5,7 @@
 import type { Aether } from ".";
 import type { BucketDefinitionFieldOutputMap } from "./bucket.js";
 import { crystalPrintPathIdentity } from "./crystalPrint.js";
-import type { ExecutableStep } from "./plan.js";
+import type { ExecutableStep } from "./step.js";
 import { __ItemStep, __ListTransformStep } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
 

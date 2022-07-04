@@ -2,8 +2,8 @@ import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
 import { getCurrentParentPathIdentity } from "../global.js";
 import type { CrystalResultsList } from "../interfaces.js";
-import type { ListCapableStep } from "../plan.js";
-import { ExecutableStep } from "../plan.js";
+import type { ListCapableStep } from "../step.js";
+import { ExecutableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (

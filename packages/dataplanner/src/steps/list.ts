@@ -1,4 +1,4 @@
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 
 type UnwrapPlanTuple<TPlanTuple extends readonly ExecutableStep<any>[]> = [
   ...(TPlanTuple extends readonly ExecutableStep<infer U>[]

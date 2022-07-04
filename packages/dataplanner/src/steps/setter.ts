@@ -1,5 +1,5 @@
-import type { BaseStep, ExecutableStep } from "../plan.js";
-import { ModifierStep } from "../plan.js";
+import type { BaseStep, ExecutableStep } from "../step.js";
+import { ModifierStep } from "../step.js";
 
 export interface SetterCapableStep<
   TPlans extends {

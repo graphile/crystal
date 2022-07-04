@@ -1,4 +1,4 @@
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
 

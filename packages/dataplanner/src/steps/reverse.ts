@@ -1,5 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 
 /**
  * Returns a reversed copy of the list.

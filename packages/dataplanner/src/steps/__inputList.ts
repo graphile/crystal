@@ -4,7 +4,7 @@ import { GraphQLList, Kind } from "graphql";
 
 import type { InputStep } from "../input.js";
 import { assertInputStep, inputPlan } from "../input.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import { constant } from "./constant.js";
 
 /**

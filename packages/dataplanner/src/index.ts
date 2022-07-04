@@ -92,7 +92,7 @@ import {
   ObjectLikeStep,
   PolymorphicStep,
   StreamableStep,
-} from "./plan.js";
+} from "./step.js";
 import { __InputListStep } from "./steps/__inputList.js";
 import {
   __InputObjectStep,

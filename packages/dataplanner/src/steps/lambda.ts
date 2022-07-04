@@ -1,5 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 
 /**
  * Calls the given lambda function for each tuple

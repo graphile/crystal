@@ -5,7 +5,7 @@ import type { CrystalError } from ".";
 import { isCrystalError, newCrystalError } from "./error.js";
 import type { ExecutionEventEmitter } from "./interfaces.js";
 import { $$concreteType, $$idempotent } from "./interfaces.js";
-import type { ExecutableStep } from "./plan.js";
+import type { ExecutableStep } from "./step.js";
 import { isPolymorphicData } from "./polymorphic.js";
 import { arrayOfLength } from "./utils.js";
 

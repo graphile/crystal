@@ -1,7 +1,7 @@
 import debugFactory from "debug";
 
 import type { ExecutionExtra } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import type { SetterCapableStep } from "./setter.js";
 
 const debugObjectPlan = debugFactory("dataplanner:ObjectStep");

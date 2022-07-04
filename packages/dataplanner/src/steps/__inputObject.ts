@@ -2,7 +2,7 @@ import type { GraphQLInputObjectType, ValueNode } from "graphql";
 
 import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";
 

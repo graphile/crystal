@@ -2,8 +2,8 @@ import chalk from "chalk";
 import { getNamedType } from "graphql";
 
 import { getCurrentGraphQLType } from "../global.js";
-import type { ExecutableStep } from "../plan.js";
-import { isListCapableStep } from "../plan.js";
+import type { ExecutableStep } from "../step.js";
+import { isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { each } from "./each.js";
 import type {

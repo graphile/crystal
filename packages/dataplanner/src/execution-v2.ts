@@ -15,7 +15,7 @@ import type {
   PromiseOrDirect,
 } from "./interfaces.js";
 import { $$concreteType } from "./interfaces.js";
-import type { ExecutableStep } from "./plan.js";
+import type { ExecutableStep } from "./step.js";
 import { __ListTransformStep } from "./steps/index.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 

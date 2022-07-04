@@ -1,5 +1,5 @@
 import type { CrystalResultsList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 /**

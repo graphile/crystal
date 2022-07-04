@@ -7,7 +7,7 @@ import type {
 import { Kind } from "graphql";
 
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
 
 /**

@@ -3,7 +3,7 @@ import { inspect } from "util";
 
 import { isDev } from "./dev.js";
 import type { CrystalObject } from "./interfaces.js";
-import { ExecutableStep } from "./plan.js";
+import { ExecutableStep } from "./step.js";
 import { PlanResults } from "./planResults.js";
 import { isCrystalObject } from "./resolvers.js";
 import { stripAnsi } from "./stripAnsi.js";

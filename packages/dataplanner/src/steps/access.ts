@@ -3,7 +3,7 @@ import debugFactory from "debug";
 import { inspect } from "util";
 
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in

@@ -38,7 +38,7 @@ import type {
   GraphileInputFieldConfig,
   OutputPlanForType,
 } from "./interfaces.js";
-import type { ExecutableStep, ModifierStep } from "./plan.js";
+import type { ExecutableStep, ModifierStep } from "./step.js";
 
 /**
  * The parent object is used as the key in `GetValueStepId()`; for root level

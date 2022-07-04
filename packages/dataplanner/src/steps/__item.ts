@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import { getCurrentParentPathIdentity } from "../global.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it

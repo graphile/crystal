@@ -24,8 +24,8 @@ import type {
   InputObjectTypeInputPlanResolver,
   TrackedArguments,
 } from "./interfaces.js";
-import type { ModifierStep } from "./plan.js";
-import { assertExecutableStep, ExecutableStep } from "./plan.js";
+import type { ModifierStep } from "./step.js";
+import { assertExecutableStep, ExecutableStep } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
 import { constant } from "./steps/constant.js";
 import { list } from "./steps/list.js";

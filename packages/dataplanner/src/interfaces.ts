@@ -22,7 +22,7 @@ import type { Aether } from "./aether.js";
 import type { Deferred } from "./deferred.js";
 import type { CrystalError } from "./error.js";
 import type { InputStep } from "./input.js";
-import type { ExecutableStep, ListCapableStep, ModifierStep } from "./plan.js";
+import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { PlanResults, PlanResultsBucket } from "./planResults.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {

@@ -2,7 +2,7 @@ import type { GraphQLLeafType, ValueNode } from "graphql";
 import { valueFromAST } from "graphql";
 
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 /**

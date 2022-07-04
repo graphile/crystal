@@ -3,8 +3,8 @@ import type {
   CrystalSubscriber,
   CrystalValuesList,
 } from "../interfaces.js";
-import type { StreamableStep } from "../plan.js";
-import { ExecutableStep, isExecutableStep } from "../plan.js";
+import type { StreamableStep } from "../step.js";
+import { ExecutableStep, isExecutableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
 

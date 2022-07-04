@@ -1,6 +1,6 @@
 import type { Constraint } from "../constraints.js";
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
 

@@ -1,6 +1,6 @@
 import type { InputStep } from "../input.js";
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 import { each } from "./each.js";
 

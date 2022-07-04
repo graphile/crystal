@@ -1,5 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
 
 export class LastStep<TData> extends ExecutableStep<TData> {

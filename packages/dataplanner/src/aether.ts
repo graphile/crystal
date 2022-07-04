@@ -102,7 +102,7 @@ import type {
   ModifierStep,
   PolymorphicStep,
   StreamableStep,
-} from "./plan.js";
+} from "./step.js";
 import {
   assertArgumentsFinalized,
   assertExecutableStep,
@@ -110,7 +110,7 @@ import {
   ExecutableStep,
   isListCapableStep,
   isStreamableStep,
-} from "./plan.js";
+} from "./step.js";
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
 import type { __InputObjectStep } from "./steps/index.js";

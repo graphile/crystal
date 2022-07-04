@@ -26,7 +26,7 @@ import type {
   InputObjectFieldInputPlanResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
-import type { ExecutableStep } from "./plan.js";
+import type { ExecutableStep } from "./step.js";
 import { crystalResolve, dataplannerResolver } from "./resolvers.js";
 
 // TODO:TS: improve the types here!

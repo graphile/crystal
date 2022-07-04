@@ -4,7 +4,7 @@ import chalk from "chalk";
 import type { CrystalError } from "../error.js";
 import { isCrystalError } from "../error.js";
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../plan.js";
+import { ExecutableStep } from "../step.js";
 
 // Do **NOT** allow variables that start with `__`!
 export const isSafeIdentifier = (key: string) =>
