@@ -134,6 +134,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
       }
       return { type: "graphql", statusCode: 200, payload: result };
     } catch (e) {
+      console.error(e);
       return {
         type: "graphql",
         statusCode: 500,
