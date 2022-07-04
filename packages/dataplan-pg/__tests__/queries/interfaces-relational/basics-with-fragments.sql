@@ -19,10 +19,10 @@ select
       __relational_items__."id"::text as "14",
       __relational_items__."type2"::text as "15",
       __relational_items__."position"::text as "16",
-      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "17",
-      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "18",
+      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "17",
+      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "18",
       __relational_items__."is_explicitly_archived"::text as "19",
-      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "20"
+      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "20"
     from interfaces_and_unions.relational_items as __relational_items__
     left outer join interfaces_and_unions.relational_topics as __relational_topics__
     on (__relational_items__."id"::"int4" = __relational_topics__."id")

@@ -13,9 +13,9 @@ graph TD
     __TrackedObject6["__TrackedObject[6∈0]"]:::plan
     Constant7["Constant[7∈1@1]"]:::plan
     Constant8["Constant[8∈1@1]"]:::plan
-    Access200["Access[200∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access201["Access[201∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object202["Object[202∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access10["Access[10∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access11["Access[11∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object12["Object[12∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgInsert9[["PgInsert[9∈1@1]"]]:::sideeffectplan
     PgClassExpression13["PgClassExpression[13∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     Constant14["Constant[14∈1@1]"]:::plan
@@ -45,7 +45,7 @@ graph TD
     PgSelectSingle56["PgSelectSingle[56∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression57["PgClassExpression[57∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic58["PgPolymorphic[58∈1@1]"]:::plan
-    PgClassExpression94["PgClassExpression[94∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression59["PgClassExpression[59∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     Map206["Map[206∈1@1]<br />ᐸ56:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
     PgSelectSingle73["PgSelectSingle[73∈2@1]<br />ᐸrelational_postsᐳ"]:::plan
     PgClassExpression75["PgClassExpression[75∈2@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
@@ -57,7 +57,7 @@ graph TD
     PgSelectSingle108["PgSelectSingle[108∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression109["PgClassExpression[109∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic110["PgPolymorphic[110∈1@1]"]:::plan
-    PgClassExpression146["PgClassExpression[146∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression111["PgClassExpression[111∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     Map208["Map[208∈1@1]<br />ᐸ108:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
     PgSelectSingle125["PgSelectSingle[125∈3@1]<br />ᐸrelational_postsᐳ"]:::plan
     PgClassExpression127["PgClassExpression[127∈3@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
@@ -69,7 +69,7 @@ graph TD
     PgSelectSingle160["PgSelectSingle[160∈1@1]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression161["PgClassExpression[161∈1@1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic162["PgPolymorphic[162∈1@1]"]:::plan
-    PgClassExpression198["PgClassExpression[198∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression163["PgClassExpression[163∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     Map210["Map[210∈1@1]<br />ᐸ160:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"]:::plan
     PgSelectSingle177["PgSelectSingle[177∈4@1]<br />ᐸrelational_postsᐳ"]:::plan
     PgClassExpression179["PgClassExpression[179∈4@1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
@@ -78,47 +78,47 @@ graph TD
 
     %% plan dependencies
     __Value5 --> __TrackedObject6
-    __Value3 --> Access200
-    __Value3 --> Access201
-    Access200 & Access201 --> Object202
-    Object202 & Constant7 & Constant8 --> PgInsert9
+    __Value3 --> Access10
+    __Value3 --> Access11
+    Access10 & Access11 --> Object12
+    Object12 & Constant7 & Constant8 --> PgInsert9
     PgInsert9 --> PgClassExpression13
-    Object202 & PgClassExpression13 & Constant14 & Constant15 & Constant16 --> PgInsert17
-    Object202 & Constant21 & Constant22 --> PgInsert23
+    Object12 & PgClassExpression13 & Constant14 & Constant15 & Constant16 --> PgInsert17
+    Object12 & Constant21 & Constant22 --> PgInsert23
     PgInsert23 --> PgClassExpression27
-    Object202 & PgClassExpression27 & Constant28 & Constant29 & Constant30 --> PgInsert31
-    Object202 & Constant35 & Constant36 --> PgInsert37
+    Object12 & PgClassExpression27 & Constant28 & Constant29 & Constant30 --> PgInsert31
+    Object12 & Constant35 & Constant36 --> PgInsert37
     PgInsert37 --> PgClassExpression41
-    Object202 & PgClassExpression41 & Constant42 & Constant43 & Constant44 --> PgInsert45
+    Object12 & PgClassExpression41 & Constant42 & Constant43 & Constant44 --> PgInsert45
     PgInsert45 --> PgClassExpression49
-    Object202 & __InputStaticLeaf50 --> PgSelect51
+    Object12 & __InputStaticLeaf50 --> PgSelect51
     PgSelect51 --> First55
     First55 --> PgSelectSingle56
     PgSelectSingle56 --> PgClassExpression57
     PgSelectSingle56 & PgClassExpression57 --> PgPolymorphic58
-    PgSelectSingle56 --> PgClassExpression94
+    PgSelectSingle56 --> PgClassExpression59
     PgSelectSingle56 --> Map206
     Map206 --> PgSelectSingle73
     PgSelectSingle73 --> PgClassExpression75
     PgSelectSingle73 --> PgClassExpression76
     PgSelectSingle73 --> PgClassExpression77
-    Object202 & __InputStaticLeaf102 --> PgSelect103
+    Object12 & __InputStaticLeaf102 --> PgSelect103
     PgSelect103 --> First107
     First107 --> PgSelectSingle108
     PgSelectSingle108 --> PgClassExpression109
     PgSelectSingle108 & PgClassExpression109 --> PgPolymorphic110
-    PgSelectSingle108 --> PgClassExpression146
+    PgSelectSingle108 --> PgClassExpression111
     PgSelectSingle108 --> Map208
     Map208 --> PgSelectSingle125
     PgSelectSingle125 --> PgClassExpression127
     PgSelectSingle125 --> PgClassExpression128
     PgSelectSingle125 --> PgClassExpression129
-    Object202 & __InputStaticLeaf154 --> PgSelect155
+    Object12 & __InputStaticLeaf154 --> PgSelect155
     PgSelect155 --> First159
     First159 --> PgSelectSingle160
     PgSelectSingle160 --> PgClassExpression161
     PgSelectSingle160 & PgClassExpression161 --> PgPolymorphic162
-    PgSelectSingle160 --> PgClassExpression198
+    PgSelectSingle160 --> PgClassExpression163
     PgSelectSingle160 --> Map210
     Map210 --> PgSelectSingle177
     PgSelectSingle177 --> PgClassExpression179
@@ -134,42 +134,42 @@ graph TD
     PgClassExpression49 -.-> P49
     P58["ᐳc…sᐳq…yᐳi1"]
     PgPolymorphic58 -.-> P58
+    P59["ᐳc…sᐳq…yᐳi1ᐳid x5"]
+    PgClassExpression59 -.-> P59
     P75["ᐳc…sᐳq…yᐳi1ᐳtitle"]
     PgClassExpression75 -.-> P75
     P76["ᐳc…sᐳq…yᐳi1ᐳdescription"]
     PgClassExpression76 -.-> P76
     P77["ᐳc…sᐳq…yᐳi1ᐳnote"]
     PgClassExpression77 -.-> P77
-    P94["ᐳc…sᐳq…yᐳi1ᐳid x5"]
-    PgClassExpression94 -.-> P94
     P110["ᐳc…sᐳq…yᐳi2"]
     PgPolymorphic110 -.-> P110
+    P111["ᐳc…sᐳq…yᐳi2ᐳid x5"]
+    PgClassExpression111 -.-> P111
     P127["ᐳc…sᐳq…yᐳi2ᐳtitle"]
     PgClassExpression127 -.-> P127
     P128["ᐳc…sᐳq…yᐳi2ᐳdescription"]
     PgClassExpression128 -.-> P128
     P129["ᐳc…sᐳq…yᐳi2ᐳnote"]
     PgClassExpression129 -.-> P129
-    P146["ᐳc…sᐳq…yᐳi2ᐳid x5"]
-    PgClassExpression146 -.-> P146
     P162["ᐳc…sᐳq…yᐳi3"]
     PgPolymorphic162 -.-> P162
+    P163["ᐳc…sᐳq…yᐳi3ᐳid x5"]
+    PgClassExpression163 -.-> P163
     P179["ᐳc…sᐳq…yᐳi3ᐳtitle"]
     PgClassExpression179 -.-> P179
     P180["ᐳc…sᐳq…yᐳi3ᐳdescription"]
     PgClassExpression180 -.-> P180
     P181["ᐳc…sᐳq…yᐳi3ᐳnote"]
     PgClassExpression181 -.-> P181
-    P198["ᐳc…sᐳq…yᐳi3ᐳid x5"]
-    PgClassExpression198 -.-> P198
 
     subgraph "Buckets for mutations/basics/create-three-relational-posts"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
-    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3, 5<br />~ᐳMutation.createThreeRelationalPosts<br />⠀ROOT ᐸ-O- 49<br />⠀⠀query ᐸ-O- 5<br />⠀⠀⠀query.i1 ᐸ-O- 58<br />⠀⠀⠀⠀query.i1.id ᐸ-L- 94<br />⠀⠀⠀query.i2 ᐸ-O- 110<br />⠀⠀⠀⠀query.i2.id ᐸ-L- 146<br />⠀⠀⠀query.i3 ᐸ-O- 162<br />⠀⠀⠀⠀query.i3.id ᐸ-L- 198"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3, 5<br />~ᐳMutation.createThreeRelationalPosts<br />⠀ROOT ᐸ-O- 49<br />⠀⠀query ᐸ-O- 5<br />⠀⠀⠀query.i1 ᐸ-O- 58<br />⠀⠀⠀⠀query.i1.id ᐸ-L- 59<br />⠀⠀⠀query.i2 ᐸ-O- 110<br />⠀⠀⠀⠀query.i2.id ᐸ-L- 111<br />⠀⠀⠀query.i3 ᐸ-O- 162<br />⠀⠀⠀⠀query.i3.id ᐸ-L- 163"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Constant7,Constant8,PgInsert9,PgClassExpression13,Constant14,Constant15,Constant16,PgInsert17,Constant21,Constant22,PgInsert23,PgClassExpression27,Constant28,Constant29,Constant30,PgInsert31,Constant35,Constant36,PgInsert37,PgClassExpression41,Constant42,Constant43,Constant44,PgInsert45,PgClassExpression49,__InputStaticLeaf50,PgSelect51,First55,PgSelectSingle56,PgClassExpression57,PgPolymorphic58,PgClassExpression94,__InputStaticLeaf102,PgSelect103,First107,PgSelectSingle108,PgClassExpression109,PgPolymorphic110,PgClassExpression146,__InputStaticLeaf154,PgSelect155,First159,PgSelectSingle160,PgClassExpression161,PgPolymorphic162,PgClassExpression198,Access200,Access201,Object202,Map206,Map208,Map210 bucket1
+    class Bucket1,Constant7,Constant8,PgInsert9,Access10,Access11,Object12,PgClassExpression13,Constant14,Constant15,Constant16,PgInsert17,Constant21,Constant22,PgInsert23,PgClassExpression27,Constant28,Constant29,Constant30,PgInsert31,Constant35,Constant36,PgInsert37,PgClassExpression41,Constant42,Constant43,Constant44,PgInsert45,PgClassExpression49,__InputStaticLeaf50,PgSelect51,First55,PgSelectSingle56,PgClassExpression57,PgPolymorphic58,PgClassExpression59,__InputStaticLeaf102,PgSelect103,First107,PgSelectSingle108,PgClassExpression109,PgPolymorphic110,PgClassExpression111,__InputStaticLeaf154,PgSelect155,First159,PgSelectSingle160,PgClassExpression161,PgPolymorphic162,PgClassExpression163,Map206,Map208,Map210 bucket1
     Bucket2("Bucket 2 (polymorphic58[RelationalPost])<br />Deps: 206<br />~ᐳMutation.createThreeRelationalPostsᐳCreateRelationalPostPayload.queryᐳQuery.i1<br />⠀⠀title ᐸ-L- 75<br />⠀⠀description ᐸ-L- 76<br />⠀⠀note ᐸ-L- 77"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelectSingle73,PgClassExpression75,PgClassExpression76,PgClassExpression77 bucket2

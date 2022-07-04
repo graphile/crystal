@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access61["Access[61∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access62["Access[62∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object63["Object[63∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access18["Access[18∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access19["Access[19∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object20["Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     __InputStaticLeaf27["__InputStaticLeaf[27∈0]"]:::plan
     PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
@@ -50,10 +50,10 @@ graph TD
     PgClassExpression87["PgClassExpression[87∈1]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access61
-    __Value3 --> Access62
-    Access61 & Access62 --> Object63
-    Object63 & __InputStaticLeaf27 --> PgSelect17
+    __Value3 --> Access18
+    __Value3 --> Access19
+    Access18 & Access19 --> Object20
+    Object20 & __InputStaticLeaf27 --> PgSelect17
     PgSelect17 ==> __Item21
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
@@ -127,7 +127,7 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,__InputStaticLeaf24,__InputStaticLeaf27,Connection38,Access61,Access62,Object63,PgPageInfo68,Constant71 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect17,Access18,Access19,Object20,__InputStaticLeaf24,__InputStaticLeaf27,Connection38,PgPageInfo68,Constant71 bucket0
     Bucket1("Bucket 1 (item21)<br />Deps: 17, 38, 68, 71<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀name ᐸ-L- 23<br />⠀⠀messagesConnection ᐸ-O- 38<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 70<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage ᐸ-L- 71<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor ᐸ-L- 75<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor ᐸ-L- 81<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 87<br />⠀⠀⠀messagesConnection.nodes ᐸ-A- 91<br />⠀⠀⠀messagesConnection.edges ᐸ-A- 91"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,Lambda70,First73,PgSelectSingle74,PgCursor75,PgClassExpression76,List77,Last79,PgSelectSingle80,PgCursor81,PgClassExpression82,List83,First85,PgSelectSingle86,PgClassExpression87,Access90,Lambda91,Access92 bucket1

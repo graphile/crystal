@@ -16,9 +16,9 @@ graph TD
     __InputStaticLeaf10["__InputStaticLeaf[10∈1@1]"]:::plan
     Constant11["Constant[11∈1@1]"]:::plan
     Constant12["Constant[12∈1@1]"]:::plan
-    Access26["Access[26∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access27["Access[27∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object28["Object[28∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access14["Access[14∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access15["Access[15∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object16["Object[16∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgInsert13[["PgInsert[13∈1@1]"]]:::sideeffectplan
     PgClassExpression17["PgClassExpression[17∈1@1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgInsert18[["PgInsert[18∈1@1]"]]:::sideeffectplan
@@ -34,15 +34,15 @@ graph TD
 
     %% plan dependencies
     __Value5 --> __TrackedObject6
-    __Value3 --> Access26
-    __Value3 --> Access27
-    Access26 & Access27 --> Object28
-    Object28 & Constant11 & Constant12 --> PgInsert13
+    __Value3 --> Access14
+    __Value3 --> Access15
+    Access14 & Access15 --> Object16
+    Object16 & Constant11 & Constant12 --> PgInsert13
     PgInsert13 --> PgClassExpression17
-    Object28 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf9 & __InputStaticLeaf10 --> PgInsert18
+    Object16 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf9 & __InputStaticLeaf10 --> PgInsert18
     PgInsert18 --> PgClassExpression22
     PgInsert18 --> PgClassExpression23
-    Object28 & PgClassExpression23 --> PgSelect25
+    Object16 & PgClassExpression23 --> PgSelect25
     PgSelect25 --> First29
     First29 --> PgSelectSingle30
     PgSelectSingle30 --> PgClassExpression31
@@ -74,6 +74,6 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.createRelationalPost<br />⠀ROOT ᐸ-O- 22<br />⠀⠀id ᐸ-L- 23<br />⠀⠀post ᐸ-O- 30<br />⠀⠀⠀post.id ᐸ-L- 31<br />⠀⠀⠀post.title ᐸ-L- 32<br />⠀⠀⠀post.description ᐸ-L- 33<br />⠀⠀⠀post.note ᐸ-L- 34"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,Access26,Access27,Object28,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket1
+    class Bucket1,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,PgInsert13,Access14,Access15,Object16,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket1
     Bucket0 --> Bucket1
     end

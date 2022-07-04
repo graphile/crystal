@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access802["Access[802∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access803["Access[803∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object804["Object[804∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access8["Access[8∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access9["Access[9∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object10["Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
     __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
     PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
@@ -24,14 +24,14 @@ graph TD
     PgSelectSingle23["PgSelectSingle[23∈3]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic25["PgPolymorphic[25∈3]"]:::plan
-    PgClassExpression657["PgClassExpression[657∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression26["PgClassExpression[26∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     Map815["Map[815∈3]<br />ᐸ23:{”0”:1,”1”:2}ᐳ"]:::plan
     PgSelectSingle32["PgSelectSingle[32∈4]<br />ᐸrelational_topicsᐳ"]:::plan
     Map837["Map[837∈3]<br />ᐸ23:{”0”:15,”1”:16,”2”:17,”3”:18,”4”:19,”5”:20,”6”:21,”7”:22,”8”:23,”9”:24,”10”:25,”11”:26,”12”:27,”13”:28,”14”:29,”15”:30,”16”:31,”17”:32,”18”:33,”19”:34,”20”:35,”21”:36}ᐳ"]:::plan
     PgSelectSingle39["PgSelectSingle[39∈3]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression40["PgClassExpression[40∈3]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgPolymorphic41["PgPolymorphic[41∈3]"]:::plan
-    PgClassExpression772["PgClassExpression[772∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
+    PgClassExpression42["PgClassExpression[42∈3]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     Map825["Map[825∈3]<br />ᐸ39:{”0”:1,”1”:2}ᐳ"]:::plan
     PgSelectSingle48["PgSelectSingle[48∈5]<br />ᐸrelational_topicsᐳ"]:::plan
     PgClassExpression51["PgClassExpression[51∈3]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
@@ -88,10 +88,10 @@ graph TD
     PgClassExpression814["PgClassExpression[814∈13]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access802
-    __Value3 --> Access803
-    Access802 & Access803 --> Object804
-    Object804 --> PgSelect7
+    __Value3 --> Access8
+    __Value3 --> Access9
+    Access8 & Access9 --> Object10
+    Object10 --> PgSelect7
     PgSelect7 ==> __Item11
     __Item11 --> PgSelectSingle12
     PgSelectSingle12 --> PgClassExpression13
@@ -104,14 +104,14 @@ graph TD
     __Item22 --> PgSelectSingle23
     PgSelectSingle23 --> PgClassExpression24
     PgSelectSingle23 & PgClassExpression24 --> PgPolymorphic25
-    PgSelectSingle23 --> PgClassExpression657
+    PgSelectSingle23 --> PgClassExpression26
     PgSelectSingle23 --> Map815
     Map815 --> PgSelectSingle32
     PgSelectSingle23 --> Map837
     Map837 --> PgSelectSingle39
     PgSelectSingle39 --> PgClassExpression40
     PgSelectSingle39 & PgClassExpression40 --> PgPolymorphic41
-    PgSelectSingle39 --> PgClassExpression772
+    PgSelectSingle39 --> PgClassExpression42
     PgSelectSingle39 --> Map825
     Map825 --> PgSelectSingle48
     PgSelectSingle39 --> PgClassExpression51
@@ -184,10 +184,14 @@ graph TD
     PgClassExpression24 -.-> P24
     P25["ᐳp…]ᐳitems[]"]
     PgPolymorphic25 -.-> P25
+    P26["ᐳp…]ᐳi…]ᐳid x5"]
+    PgClassExpression26 -.-> P26
     P40["ᐳp…]ᐳi…]ᐳp…tᐳtype x25"]
     PgClassExpression40 -.-> P40
     P41["ᐳp…]ᐳi…]ᐳparent x5"]
     PgPolymorphic41 -.-> P41
+    P42["ᐳp…]ᐳi…]ᐳp…tᐳid x25"]
+    PgClassExpression42 -.-> P42
     P51["ᐳp…]ᐳi…]ᐳp…tᐳtype2 x25"]
     PgClassExpression51 -.-> P51
     P58["ᐳp…]ᐳi…]ᐳp…tᐳauthor x25"]
@@ -252,10 +256,6 @@ graph TD
     PgClassExpression499 -.-> P499
     P656["ᐳp…]ᐳi…]ᐳtitle"]
     PgClassExpression656 -.-> P656
-    P657["ᐳp…]ᐳi…]ᐳid x5"]
-    PgClassExpression657 -.-> P657
-    P772["ᐳp…]ᐳi…]ᐳp…tᐳid x25"]
-    PgClassExpression772 -.-> P772
     P813["ᐳp…]ᐳi…]ᐳdescription"]
     PgClassExpression813 -.-> P813
     P814["ᐳp…]ᐳi…]ᐳnote"]
@@ -264,16 +264,16 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/nested-more-fragments"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀people ᐸ-A- 7"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect7,Access802,Access803,Object804 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect7,Access8,Access9,Object10 bucket0
     Bucket1("Bucket 1 (item11)<br />Deps: 7<br />~ᐳQuery.people[]<br />⠀ROOT ᐸ-O- 12<br />⠀⠀username ᐸ-L- 13<br />⠀⠀items ᐸ-A- 19"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13,__ListTransform19,Access841 bucket1
     Bucket2("Bucket 2 (item20)<br />Deps: 841"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item20,PgSelectSingle21 bucket2
-    Bucket3("Bucket 3 (item22)<br />Deps: 19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- 25<br />⠀⠀type ᐸ-L- 24<br />⠀⠀parent ᐸ-O- 41<br />⠀⠀⠀parent.type ᐸ-L- 40<br />⠀⠀⠀parent.type2 ᐸ-L- 51<br />⠀⠀⠀parent.author ᐸ-O- 58<br />⠀⠀⠀⠀parent.author.username ᐸ-L- 59<br />⠀⠀⠀parent.position ᐸ-L- 60<br />⠀⠀⠀parent.createdAt ᐸ-L- 61<br />⠀⠀⠀parent.updatedAt ᐸ-L- 62<br />⠀⠀⠀parent.isExplicitlyArchived ᐸ-L- 63<br />⠀⠀⠀parent.archivedAt ᐸ-L- 64<br />⠀⠀⠀parent.id ᐸ-L- 772<br />⠀⠀type2 ᐸ-L- 168<br />⠀⠀author ᐸ-O- 175<br />⠀⠀⠀author.username ᐸ-L- 176<br />⠀⠀position ᐸ-L- 177<br />⠀⠀createdAt ᐸ-L- 178<br />⠀⠀updatedAt ᐸ-L- 179<br />⠀⠀isExplicitlyArchived ᐸ-L- 180<br />⠀⠀archivedAt ᐸ-L- 181<br />⠀⠀id ᐸ-L- 657"):::bucket
+    Bucket3("Bucket 3 (item22)<br />Deps: 19<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀ROOT ᐸ-O- 25<br />⠀⠀type ᐸ-L- 24<br />⠀⠀id ᐸ-L- 26<br />⠀⠀parent ᐸ-O- 41<br />⠀⠀⠀parent.type ᐸ-L- 40<br />⠀⠀⠀parent.id ᐸ-L- 42<br />⠀⠀⠀parent.type2 ᐸ-L- 51<br />⠀⠀⠀parent.author ᐸ-O- 58<br />⠀⠀⠀⠀parent.author.username ᐸ-L- 59<br />⠀⠀⠀parent.position ᐸ-L- 60<br />⠀⠀⠀parent.createdAt ᐸ-L- 61<br />⠀⠀⠀parent.updatedAt ᐸ-L- 62<br />⠀⠀⠀parent.isExplicitlyArchived ᐸ-L- 63<br />⠀⠀⠀parent.archivedAt ᐸ-L- 64<br />⠀⠀type2 ᐸ-L- 168<br />⠀⠀author ᐸ-O- 175<br />⠀⠀⠀author.username ᐸ-L- 176<br />⠀⠀position ᐸ-L- 177<br />⠀⠀createdAt ᐸ-L- 178<br />⠀⠀updatedAt ᐸ-L- 179<br />⠀⠀isExplicitlyArchived ᐸ-L- 180<br />⠀⠀archivedAt ᐸ-L- 181"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item22,PgSelectSingle23,PgClassExpression24,PgPolymorphic25,PgSelectSingle39,PgClassExpression40,PgPolymorphic41,PgClassExpression51,PgSelectSingle58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgClassExpression62,PgClassExpression63,PgClassExpression64,PgClassExpression168,PgSelectSingle175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgClassExpression180,PgClassExpression181,PgClassExpression657,PgClassExpression772,Map815,Map817,Map819,Map821,Map823,Map825,Map827,Map829,Map831,Map833,Map835,Map837,Map839 bucket3
+    class Bucket3,__Item22,PgSelectSingle23,PgClassExpression24,PgPolymorphic25,PgClassExpression26,PgSelectSingle39,PgClassExpression40,PgPolymorphic41,PgClassExpression42,PgClassExpression51,PgSelectSingle58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgClassExpression62,PgClassExpression63,PgClassExpression64,PgClassExpression168,PgSelectSingle175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgClassExpression180,PgClassExpression181,Map815,Map817,Map819,Map821,Map823,Map825,Map827,Map829,Map831,Map833,Map835,Map837,Map839 bucket3
     Bucket4("Bucket 4 (polymorphic25[RelationalTopic])<br />Deps: 815<br />~ᐳQuery.people[]ᐳPerson.items[]<br />⠀⠀title ᐸ-L- 182"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelectSingle32,PgClassExpression182 bucket4

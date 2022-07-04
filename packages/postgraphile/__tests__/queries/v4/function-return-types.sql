@@ -434,6 +434,6 @@ lateral (
 
 select
   __search_test_summaries__."id"::text as "0",
-  to_char(__search_test_summaries__."total_duration", 'YYYY_MM_DD_HH24_MI_SS.US') as "1",
+  to_char(__search_test_summaries__."total_duration", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
   (not (__search_test_summaries__ is null))::text as "2"
 from "c"."search_test_summaries"() as __search_test_summaries__

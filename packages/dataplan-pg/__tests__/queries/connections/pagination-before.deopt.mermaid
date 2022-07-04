@@ -11,9 +11,9 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __InputStaticLeaf14["__InputStaticLeaf[14∈0]"]:::plan
     __InputStaticLeaf17["__InputStaticLeaf[17∈0]"]:::plan
-    Access38["Access[38∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access39["Access[39∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object40["Object[40∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access21["Access[21∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access22["Access[22∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object23["Object[23∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Lambda25["Lambda[25∈0]<br />ᐸparseCursorᐳ"]:::plan
     Connection24["Connection[24∈0]<br />ᐸ20ᐳ"]:::plan
     PgValidateParsedCursor27["PgValidateParsedCursor[27∈0]"]:::plan
@@ -51,15 +51,15 @@ graph TD
     PgClassExpression73["PgClassExpression[73∈0]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access38
-    __Value3 --> Access39
-    Access38 & Access39 --> Object40
+    __Value3 --> Access21
+    __Value3 --> Access22
+    Access21 & Access22 --> Object23
     __InputStaticLeaf17 --> Lambda25
     __InputStaticLeaf14 & Lambda25 --> Connection24
     Lambda25 --> PgValidateParsedCursor27
     Lambda25 --> Access28
     Access28 --> ToPg29
-    Object40 & Connection24 & Lambda25 & PgValidateParsedCursor27 & ToPg29 --> PgSelect26
+    Object23 & Connection24 & Lambda25 & PgValidateParsedCursor27 & ToPg29 --> PgSelect26
     PgSelect26 ==> __Item30
     __Item30 --> PgSelectSingle31
     PgSelectSingle31 --> PgClassExpression33
@@ -67,7 +67,7 @@ graph TD
     List34 --> PgCursor32
     PgSelectSingle31 --> PgClassExpression35
     PgSelectSingle31 --> PgClassExpression36
-    Object40 & PgClassExpression36 --> PgSelect37
+    Object23 & PgClassExpression36 --> PgSelect37
     PgSelect37 --> First41
     First41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -83,7 +83,7 @@ graph TD
     PgSelectSingle63 --> PgClassExpression68
     PgClassExpression68 --> List69
     List69 --> PgCursor64
-    Object40 & Connection24 --> PgSelect70
+    Object23 & Connection24 --> PgSelect70
     PgSelect70 --> First71
     First71 --> PgSelectSingle72
     PgSelectSingle72 --> PgClassExpression73
@@ -123,8 +123,8 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-before"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allMessagesConnection ᐸ-O- 24<br />⠀⠀⠀allMessagesConnection.edges ᐸ-A- 26<br />⠀⠀⠀allMessagesConnection.pageInfo ᐸ-O- 45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage ᐸ-L- 47<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage ᐸ-L- 51<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor ᐸ-L- 55<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor ᐸ-L- 64<br />⠀⠀⠀allMessagesConnection.totalCount ᐸ-L- 73"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf14,__InputStaticLeaf17,Connection24,Lambda25,PgSelect26,PgValidateParsedCursor27,Access28,ToPg29,Access38,Access39,Object40,PgPageInfo45,Lambda47,Constant51,First53,PgSelectSingle54,PgCursor55,PgClassExpression59,List60,Last62,PgSelectSingle63,PgCursor64,PgClassExpression68,List69,PgSelect70,First71,PgSelectSingle72,PgClassExpression73 bucket0
-    Bucket1("Bucket 1 (item30)<br />Deps: 26, 40<br />~ᐳQuery.allMessagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- 31<br />⠀⠀node ᐸ-O- 31<br />⠀⠀⠀node.body ᐸ-L- 35<br />⠀⠀⠀node.author ᐸ-O- 42<br />⠀⠀⠀⠀node.author.username ᐸ-L- 43<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- 44<br />⠀⠀cursor ᐸ-L- 32"):::bucket
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf14,__InputStaticLeaf17,Access21,Access22,Object23,Connection24,Lambda25,PgSelect26,PgValidateParsedCursor27,Access28,ToPg29,PgPageInfo45,Lambda47,Constant51,First53,PgSelectSingle54,PgCursor55,PgClassExpression59,List60,Last62,PgSelectSingle63,PgCursor64,PgClassExpression68,List69,PgSelect70,First71,PgSelectSingle72,PgClassExpression73 bucket0
+    Bucket1("Bucket 1 (item30)<br />Deps: 26, 23<br />~ᐳQuery.allMessagesConnectionᐳMessagesConnection.edges[]<br />⠀ROOT ᐸ-O- 31<br />⠀⠀node ᐸ-O- 31<br />⠀⠀⠀node.body ᐸ-L- 35<br />⠀⠀⠀node.author ᐸ-O- 42<br />⠀⠀⠀⠀node.author.username ᐸ-L- 43<br />⠀⠀⠀⠀node.author.gravatarUrl ᐸ-L- 44<br />⠀⠀cursor ᐸ-L- 32"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item30,PgSelectSingle31,PgCursor32,PgClassExpression33,List34,PgClassExpression35,PgClassExpression36,PgSelect37,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44 bucket1
     Bucket0 --> Bucket1

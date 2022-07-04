@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access61["Access[61∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access62["Access[62∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object63["Object[63∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access18["Access[18∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access19["Access[19∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object20["Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
@@ -32,16 +32,16 @@ graph TD
     PgCursor55["PgCursor[55∈3@1]"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access61
-    __Value3 --> Access62
-    Access61 & Access62 --> Object63
-    Object63 --> PgSelect17
+    __Value3 --> Access18
+    __Value3 --> Access19
+    Access18 & Access19 --> Object20
+    Object20 --> PgSelect17
     PgSelect17 ==> __Item21
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression33
     PgSelectSingle22 --> PgClassExpression39
-    Object63 & PgClassExpression33 & PgClassExpression39 & Connection38 --> PgSelect40
+    Object20 & PgClassExpression33 & PgClassExpression39 & Connection38 --> PgSelect40
     PgSelect40 ==> __Item41
     __Item41 --> PgSelectSingle42
     PgSelectSingle42 --> PgClassExpression43
@@ -82,11 +82,11 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-1"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,Access61,Access62,Object63 bucket0
-    Bucket1("Bucket 1 (item21)<br />Deps: 17, 63<br />~ᐳQuery.forums[]"):::bucket
+    class Bucket0,__Value0,__Value3,PgSelect17,Access18,Access19,Object20 bucket0
+    Bucket1("Bucket 1 (item21)<br />Deps: 17, 20<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23 bucket1
-    Bucket2("Bucket 2 (group1[defer])<br />Deps: 22, 63<br />~ᐳQuery.forums[]"):::bucket
+    Bucket2("Bucket 2 (group1[defer])<br />Deps: 22, 20<br />~ᐳQuery.forums[]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression33,Connection38,PgClassExpression39,PgSelect40 bucket2
     Bucket3("Bucket 3 (item41)<br />Deps: 40<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.nodes[]<br />~ᐳQuery.forums[]ᐳForum.messagesConnectionᐳMessagesConnection.edges[]"):::bucket

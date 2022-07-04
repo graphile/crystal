@@ -35,17 +35,17 @@ select
       __relational_items__."type2"::text as "30",
       __people_2."username" as "31",
       __relational_items__."position"::text as "32",
-      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "33",
-      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "34",
+      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "33",
+      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "34",
       __relational_items__."is_explicitly_archived"::text as "35",
-      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "36",
+      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "36",
       __relational_items_2."type2"::text as "37",
       __people_3."username" as "38",
       __relational_items_2."position"::text as "39",
-      to_char(__relational_items_2."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "40",
-      to_char(__relational_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "41",
+      to_char(__relational_items_2."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "40",
+      to_char(__relational_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "41",
       __relational_items_2."is_explicitly_archived"::text as "42",
-      to_char(__relational_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM') as "43"
+      to_char(__relational_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "43"
     from interfaces_and_unions.relational_items as __relational_items_2
     left outer join interfaces_and_unions.relational_topics as __relational_topics_2
     on (__relational_items_2."id"::"int4" = __relational_topics_2."id")
