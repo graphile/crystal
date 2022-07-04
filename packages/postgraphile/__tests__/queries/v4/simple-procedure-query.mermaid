@@ -1,0 +1,230 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access169["Access[169∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access170["Access[170∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object171["Object[171∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect29[["PgSelect[29∈0]<br />ᐸcompound_type_set_queryᐳ"]]:::plan
+    __Item33>"__Item[33∈1]<br />ᐸ29ᐳ"]:::itemplan
+    PgSelectSingle34["PgSelectSingle[34∈1]<br />ᐸcompound_type_set_queryᐳ"]:::plan
+    PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ__compound...uery__.”a”ᐳ"]:::plan
+    PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ__compound...uery__.”b”ᐳ"]:::plan
+    PgClassExpression37["PgClassExpression[37∈1]<br />ᐸ__compound...uery__.”c”ᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸ__compound...uery__.”d”ᐳ"]:::plan
+    PgClassExpression39["PgClassExpression[39∈1]<br />ᐸ__compound...uery__.”e”ᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈1]<br />ᐸ__compound...uery__.”f”ᐳ"]:::plan
+    PgClassExpression41["PgClassExpression[41∈1]<br />ᐸ__compound...uery__.”g”ᐳ"]:::plan
+    Access42["Access[42∈1]<br />ᐸ41.hoursᐳ"]:::plan
+    Access43["Access[43∈1]<br />ᐸ41.minutesᐳ"]:::plan
+    Access44["Access[44∈1]<br />ᐸ41.secondsᐳ"]:::plan
+    PgSelect65[["PgSelect[65∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
+    __Item69>"__Item[69∈2]<br />ᐸ65ᐳ"]:::itemplan
+    PgSelectSingle70["PgSelectSingle[70∈2]<br />ᐸtable_set_queryᐳ"]:::plan
+    PgClassExpression71["PgClassExpression[71∈2]<br />ᐸ__table_se...full_name”ᐳ"]:::plan
+    PgSelect92[["PgSelect[92∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
+    __Item96>"__Item[96∈3]<br />ᐸ92ᐳ"]:::itemplan
+    PgSelectSingle97["PgSelectSingle[97∈3]<br />ᐸtable_set_queryᐳ"]:::plan
+    PgClassExpression98["PgClassExpression[98∈3]<br />ᐸ__table_se...full_name”ᐳ"]:::plan
+    __InputStaticLeaf99["__InputStaticLeaf[99∈0]"]:::plan
+    __InputStaticLeaf101["__InputStaticLeaf[101∈0]"]:::plan
+    Constant107["Constant[107∈0]"]:::plan
+    PgSelect108[["PgSelect[108∈0]<br />ᐸint_set_queryᐳ"]]:::plan
+    __Item112>"__Item[112∈4]<br />ᐸ108ᐳ"]:::itemplan
+    PgSelectSingle113["PgSelectSingle[113∈4]<br />ᐸint_set_queryᐳ"]:::plan
+    PgClassExpression114["PgClassExpression[114∈4]<br />ᐸ__int_set_query__.vᐳ"]:::plan
+    PgSelect120[["PgSelect[120∈0]<br />ᐸstatic_big_integerᐳ"]]:::plan
+    __Item124>"__Item[124∈5]<br />ᐸ120ᐳ"]:::itemplan
+    PgSelectSingle125["PgSelectSingle[125∈5]<br />ᐸstatic_big_integerᐳ"]:::plan
+    PgClassExpression126["PgClassExpression[126∈5]<br />ᐸ__static_b...nteger__.vᐳ"]:::plan
+    PgSelect132[["PgSelect[132∈0]<br />ᐸquery_interval_setᐳ"]]:::plan
+    __Item136>"__Item[136∈6]<br />ᐸ132ᐳ"]:::itemplan
+    PgSelectSingle137["PgSelectSingle[137∈6]<br />ᐸquery_interval_setᐳ"]:::plan
+    PgClassExpression138["PgClassExpression[138∈6]<br />ᐸ__query_in...al_set__.vᐳ"]:::plan
+    Access139["Access[139∈6]<br />ᐸ138.secondsᐳ"]:::plan
+    Access140["Access[140∈6]<br />ᐸ138.minutesᐳ"]:::plan
+    Access141["Access[141∈6]<br />ᐸ138.hoursᐳ"]:::plan
+    Access142["Access[142∈6]<br />ᐸ138.daysᐳ"]:::plan
+    Access143["Access[143∈6]<br />ᐸ138.monthsᐳ"]:::plan
+    Access144["Access[144∈6]<br />ᐸ138.yearsᐳ"]:::plan
+    PgSelect155[["PgSelect[155∈0]<br />ᐸpostᐳ"]]:::plan
+    __Item159>"__Item[159∈7]<br />ᐸ155ᐳ"]:::itemplan
+    PgSelectSingle160["PgSelectSingle[160∈7]<br />ᐸpostᐳ"]:::plan
+    PgClassExpression161["PgClassExpression[161∈7]<br />ᐸ__post__.”id”ᐳ"]:::plan
+    Access177["Access[177∈7]<br />ᐸ159.1ᐳ"]:::plan
+    __Item172>"__Item[172∈8]<br />ᐸ177ᐳ"]:::itemplan
+    PgSelectSingle173["PgSelectSingle[173∈8]<br />ᐸpost_computed_interval_setᐳ"]:::plan
+    PgClassExpression174["PgClassExpression[174∈8]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
+    Access175["Access[175∈8]<br />ᐸ174.secondsᐳ"]:::plan
+    Access176["Access[176∈8]<br />ᐸ174.minutesᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access169
+    __Value3 --> Access170
+    Access169 & Access170 --> Object171
+    Object171 --> PgSelect29
+    PgSelect29 ==> __Item33
+    __Item33 --> PgSelectSingle34
+    PgSelectSingle34 --> PgClassExpression35
+    PgSelectSingle34 --> PgClassExpression36
+    PgSelectSingle34 --> PgClassExpression37
+    PgSelectSingle34 --> PgClassExpression38
+    PgSelectSingle34 --> PgClassExpression39
+    PgSelectSingle34 --> PgClassExpression40
+    PgSelectSingle34 --> PgClassExpression41
+    PgClassExpression41 --> Access42
+    PgClassExpression41 --> Access43
+    PgClassExpression41 --> Access44
+    Object171 --> PgSelect65
+    PgSelect65 ==> __Item69
+    __Item69 --> PgSelectSingle70
+    PgSelectSingle70 --> PgClassExpression71
+    Object171 --> PgSelect92
+    PgSelect92 ==> __Item96
+    __Item96 --> PgSelectSingle97
+    PgSelectSingle97 --> PgClassExpression98
+    Object171 & __InputStaticLeaf99 & Constant107 & __InputStaticLeaf101 --> PgSelect108
+    PgSelect108 ==> __Item112
+    __Item112 --> PgSelectSingle113
+    PgSelectSingle113 --> PgClassExpression114
+    Object171 --> PgSelect120
+    PgSelect120 ==> __Item124
+    __Item124 --> PgSelectSingle125
+    PgSelectSingle125 --> PgClassExpression126
+    Object171 --> PgSelect132
+    PgSelect132 ==> __Item136
+    __Item136 --> PgSelectSingle137
+    PgSelectSingle137 --> PgClassExpression138
+    PgClassExpression138 --> Access139
+    PgClassExpression138 --> Access140
+    PgClassExpression138 --> Access141
+    PgClassExpression138 --> Access142
+    PgClassExpression138 --> Access143
+    PgClassExpression138 --> Access144
+    Object171 --> PgSelect155
+    PgSelect155 ==> __Item159
+    __Item159 --> PgSelectSingle160
+    PgSelectSingle160 --> PgClassExpression161
+    __Item159 --> Access177
+    Access177 ==> __Item172
+    __Item172 --> PgSelectSingle173
+    PgSelectSingle173 --> PgClassExpression174
+    PgClassExpression174 --> Access175
+    PgClassExpression174 --> Access176
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P29["ᐳcompoundTypeSetQueryList"]
+    PgSelect29 -.-> P29
+    P34["ᐳcompoundTypeSetQueryList[]"]
+    PgSelectSingle34 -.-> P34
+    P35["ᐳc…]ᐳa"]
+    PgClassExpression35 -.-> P35
+    P36["ᐳc…]ᐳb"]
+    PgClassExpression36 -.-> P36
+    P37["ᐳc…]ᐳc"]
+    PgClassExpression37 -.-> P37
+    P38["ᐳc…]ᐳd"]
+    PgClassExpression38 -.-> P38
+    P39["ᐳc…]ᐳe"]
+    PgClassExpression39 -.-> P39
+    P40["ᐳc…]ᐳf"]
+    PgClassExpression40 -.-> P40
+    P41["ᐳc…]ᐳg"]
+    PgClassExpression41 -.-> P41
+    P42["ᐳc…]ᐳgᐳhours"]
+    Access42 -.-> P42
+    P43["ᐳc…]ᐳgᐳminutes"]
+    Access43 -.-> P43
+    P44["ᐳc…]ᐳgᐳseconds"]
+    Access44 -.-> P44
+    P65["ᐳtableSetQueryList"]
+    PgSelect65 -.-> P65
+    P70["ᐳtableSetQueryList[]"]
+    PgSelectSingle70 -.-> P70
+    P71["ᐳt…]ᐳname"]
+    PgClassExpression71 -.-> P71
+    P92["ᐳtableSetQueryWithOffset6"]
+    PgSelect92 -.-> P92
+    P97["ᐳtableSetQueryWithOffset6[]"]
+    PgSelectSingle97 -.-> P97
+    P98["ᐳt…]ᐳname"]
+    PgClassExpression98 -.-> P98
+    P108["ᐳintSetQueryList"]
+    PgSelect108 -.-> P108
+    P114["ᐳintSetQueryList[]"]
+    PgClassExpression114 -.-> P114
+    P120["ᐳstaticBigIntegerList"]
+    PgSelect120 -.-> P120
+    P126["ᐳstaticBigIntegerList[]"]
+    PgClassExpression126 -.-> P126
+    P132["ᐳqueryIntervalSetList"]
+    PgSelect132 -.-> P132
+    P138["ᐳqueryIntervalSetList[]"]
+    PgClassExpression138 -.-> P138
+    P139["ᐳq…]ᐳseconds"]
+    Access139 -.-> P139
+    P140["ᐳq…]ᐳminutes"]
+    Access140 -.-> P140
+    P141["ᐳq…]ᐳhours"]
+    Access141 -.-> P141
+    P142["ᐳq…]ᐳdays"]
+    Access142 -.-> P142
+    P143["ᐳq…]ᐳmonths"]
+    Access143 -.-> P143
+    P144["ᐳq…]ᐳyears"]
+    Access144 -.-> P144
+    P155["ᐳallPostsList"]
+    PgSelect155 -.-> P155
+    P160["ᐳallPostsList[]"]
+    PgSelectSingle160 -.-> P160
+    P161["ᐳa…]ᐳid"]
+    PgClassExpression161 -.-> P161
+    P174["ᐳa…]ᐳcomputedIntervalSetList[]"]
+    PgClassExpression174 -.-> P174
+    P175["ᐳa…]ᐳc…]ᐳseconds"]
+    Access175 -.-> P175
+    P176["ᐳa…]ᐳc…]ᐳminutes"]
+    Access176 -.-> P176
+    P177["ᐳa…]ᐳcomputedIntervalSetList"]
+    Access177 -.-> P177
+
+    subgraph "Buckets for queries/v4/simple-procedure-query"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀compoundTypeSetQueryList ᐸ-A- 29<br />⠀⠀tableSetQueryList ᐸ-A- 65<br />⠀⠀tableSetQueryWithOffset6 ᐸ-A- 92<br />⠀⠀intSetQueryList ᐸ-A- 108<br />⠀⠀staticBigIntegerList ᐸ-A- 120<br />⠀⠀queryIntervalSetList ᐸ-A- 132<br />⠀⠀allPostsList ᐸ-A- 155"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,PgSelect29,PgSelect65,PgSelect92,__InputStaticLeaf99,__InputStaticLeaf101,Constant107,PgSelect108,PgSelect120,PgSelect132,PgSelect155,Access169,Access170,Object171 bucket0
+    Bucket1("Bucket 1 (item33)<br />Deps: 29<br />~ᐳQuery.compoundTypeSetQueryList[]<br />⠀ROOT ᐸ-O- 34<br />⠀⠀a ᐸ-L- 35<br />⠀⠀b ᐸ-L- 36<br />⠀⠀c ᐸ-L- 37<br />⠀⠀d ᐸ-L- 38<br />⠀⠀e ᐸ-L- 39<br />⠀⠀f ᐸ-L- 40<br />⠀⠀g ᐸ-O- 41<br />⠀⠀⠀g.hours ᐸ-L- 42<br />⠀⠀⠀g.minutes ᐸ-L- 43<br />⠀⠀⠀g.seconds ᐸ-L- 44"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item33,PgSelectSingle34,PgClassExpression35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40,PgClassExpression41,Access42,Access43,Access44 bucket1
+    Bucket2("Bucket 2 (item69)<br />Deps: 65<br />~ᐳQuery.tableSetQueryList[]<br />⠀ROOT ᐸ-O- 70<br />⠀⠀name ᐸ-L- 71"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item69,PgSelectSingle70,PgClassExpression71 bucket2
+    Bucket3("Bucket 3 (item96)<br />Deps: 92<br />~ᐳQuery.tableSetQueryWithOffset6[]<br />⠀ROOT ᐸ-O- 97<br />⠀⠀name ᐸ-L- 98"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item96,PgSelectSingle97,PgClassExpression98 bucket3
+    Bucket4("Bucket 4 (item112)<br />Deps: 108<br />~ᐳQuery.intSetQueryList[]<br />⠀ROOT ᐸ-L- 114"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item112,PgSelectSingle113,PgClassExpression114 bucket4
+    Bucket5("Bucket 5 (item124)<br />Deps: 120<br />~ᐳQuery.staticBigIntegerList[]<br />⠀ROOT ᐸ-L- 126"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item124,PgSelectSingle125,PgClassExpression126 bucket5
+    Bucket6("Bucket 6 (item136)<br />Deps: 132<br />~ᐳQuery.queryIntervalSetList[]<br />⠀ROOT ᐸ-O- 138<br />⠀⠀seconds ᐸ-L- 139<br />⠀⠀minutes ᐸ-L- 140<br />⠀⠀hours ᐸ-L- 141<br />⠀⠀days ᐸ-L- 142<br />⠀⠀months ᐸ-L- 143<br />⠀⠀years ᐸ-L- 144"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item136,PgSelectSingle137,PgClassExpression138,Access139,Access140,Access141,Access142,Access143,Access144 bucket6
+    Bucket7("Bucket 7 (item159)<br />Deps: 155<br />~ᐳQuery.allPostsList[]<br />⠀ROOT ᐸ-O- 160<br />⠀⠀id ᐸ-L- 161<br />⠀⠀computedIntervalSetList ᐸ-A- 177"):::bucket
+    classDef bucket7 stroke:#808000
+    class Bucket7,__Item159,PgSelectSingle160,PgClassExpression161,Access177 bucket7
+    Bucket8("Bucket 8 (item172)<br />Deps: 177<br />~ᐳQuery.allPostsList[]ᐳPost.computedIntervalSetList[]<br />⠀ROOT ᐸ-O- 174<br />⠀⠀seconds ᐸ-L- 175<br />⠀⠀minutes ᐸ-L- 176"):::bucket
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8,__Item172,PgSelectSingle173,PgClassExpression174,Access175,Access176 bucket8
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7
+    Bucket7 --> Bucket8
+    end
