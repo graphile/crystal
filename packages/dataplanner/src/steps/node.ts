@@ -83,29 +83,28 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
         )}'`,
       );
     }
-    throw new Error("Could not determine the type to use");
+    return null;
   }
 
   execute(
     values: Array<CrystalValuesList<any>>,
   ): CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
-    return values[this.specPlanDep].map((specifier) =>
-      specifier
-        ? polymorphicWrap(this.getTypeNameFromSpecifier(specifier))
-        : null,
-    );
+    return values[this.specPlanDep].map((specifier) => {
+      const typeName = specifier
+        ? this.getTypeNameFromSpecifier(specifier)
+        : null;
+      return typeName ? polymorphicWrap(typeName) : null;
+    });
   }
 
   executeSingle = (
     v: any[],
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
     const specifier = v[this.specPlanDep];
-    if (specifier) {
-      const typeName = this.getTypeNameFromSpecifier(specifier);
-      return polymorphicWrap(typeName);
-    } else {
-      return null;
-    }
+    const typeName = specifier
+      ? this.getTypeNameFromSpecifier(specifier)
+      : null;
+    return typeName ? polymorphicWrap(typeName) : null;
   };
 }
 
