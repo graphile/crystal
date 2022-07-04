@@ -415,7 +415,7 @@ export function isExecutableStep<TData = any>(
   );
 }
 
-export function assertExecutablePlan<TData>(
+export function assertExecutableStep<TData>(
   plan: BaseStep | null | undefined | void,
   pathIdentity: string,
 ): asserts plan is ExecutableStep<TData> {
@@ -501,7 +501,7 @@ export function isModifierStep<
   return "apply" in plan && typeof (plan as any).apply === "function";
 }
 
-export function assertModifierPlan<
+export function assertModifierStep<
   TParentStep extends ExecutableStep | ModifierStep<any>,
 >(
   plan: BaseStep,
@@ -530,7 +530,7 @@ export function isListCapableStep<
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
-export function assertListCapablePlan<
+export function assertListCapableStep<
   TData,
   TItemStep extends ExecutableStep<TData>,
 >(

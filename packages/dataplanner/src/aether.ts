@@ -105,7 +105,7 @@ import type {
 } from "./plan.js";
 import {
   assertArgumentsFinalized,
-  assertExecutablePlan,
+  assertExecutableStep,
   assertFinalized,
   ExecutableStep,
   isListCapableStep,
@@ -352,7 +352,7 @@ const debugPlanVerboseEnabled = isDev && debugPlanVerbose.enabled;
 const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
 const debugExecuteVerboseEnabled = isDev && debugExecuteVerbose.enabled;
 
-function assertPolymorphicPlan(
+function assertPolymorphicStep(
   plan: ExecutableStep | PolymorphicStep,
   pathIdentity: string,
 ): asserts plan is PolymorphicStep {
@@ -2053,7 +2053,7 @@ export class Aether<
         );
         childFieldDigests = fieldDigests;
       } else {
-        assertPolymorphicPlan(plan, pathIdentity);
+        assertPolymorphicStep(plan, pathIdentity);
         const polymorphicPlan = plan;
         const fieldDigestsSet = new Set<FieldDigest>();
         const planPossibleObjectTypes = (
@@ -2290,7 +2290,7 @@ export class Aether<
           }),
       ),
     );
-    assertExecutablePlan(plan, pathIdentity);
+    assertExecutableStep(plan, pathIdentity);
 
     // TODO: Check SameStreamDirective still exists in @stream spec at release.
     /*

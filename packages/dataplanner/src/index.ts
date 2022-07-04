@@ -79,7 +79,7 @@ import {
   TypedEventEmitter,
 } from "./interfaces.js";
 import {
-  assertListCapablePlan,
+  assertListCapableStep,
   BaseStep,
   ExecutableStep,
   isExecutableStep,
@@ -206,7 +206,7 @@ export {
   ArgumentInputPlanResolver,
   arrayOfLength,
   arraysMatch,
-  assertListCapablePlan,
+  assertListCapableStep,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLContext,
@@ -363,7 +363,7 @@ exportAsMany({
   __InputListStep,
   __InputObjectStep,
   __InputStaticLeafStep,
-  assertListCapablePlan,
+  assertListCapableStep,
   isExecutableStep,
   isListCapableStep,
   isModifierStep,

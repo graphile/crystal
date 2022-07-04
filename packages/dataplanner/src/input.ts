@@ -35,7 +35,7 @@ export type InputStep =
   | __InputDynamicScalarStep // .eval(), .evalIs()
   | __InputObjectStep; // .get(), .eval(), .evalHas(), .evalIs(null)
 
-export function assertInputPlan(
+export function assertInputStep(
   itemPlan: unknown,
 ): asserts itemPlan is InputStep {
   if (itemPlan instanceof __TrackedObjectStep) return;

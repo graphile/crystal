@@ -3,7 +3,7 @@ import type { GraphQLInputType, ValueNode } from "graphql";
 import { GraphQLList, Kind } from "graphql";
 
 import type { InputStep } from "../input.js";
-import { assertInputPlan, inputPlan } from "../input.js";
+import { assertInputStep, inputPlan } from "../input.js";
 import { ExecutableStep } from "../plan.js";
 import { constant } from "./constant.js";
 
@@ -69,7 +69,7 @@ export class __InputListStep extends ExecutableStep {
       ) {
         const itemStepId = this.itemPlanIds[itemPlanIndex];
         const itemPlan = this.aether.dangerouslyGetPlan(itemStepId);
-        assertInputPlan(itemPlan);
+        assertInputStep(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;
       }
@@ -87,7 +87,7 @@ export class __InputListStep extends ExecutableStep {
     const itemStepId = this.itemPlanIds[index];
     const outOfBoundsPlan = this.getStep(this.outOfBoundsStepId);
     const itemPlan = itemStepId ? this.getStep(itemStepId) : outOfBoundsPlan;
-    assertInputPlan(itemPlan);
+    assertInputStep(itemPlan);
     return itemPlan;
   }
 
@@ -104,7 +104,7 @@ export class __InputListStep extends ExecutableStep {
     ) {
       const itemStepId = this.itemPlanIds[itemPlanIndex];
       const itemPlan = this.getStep(itemStepId);
-      assertInputPlan(itemPlan);
+      assertInputStep(itemPlan);
       const value = itemPlan.eval();
       list[itemPlanIndex] = value;
     }

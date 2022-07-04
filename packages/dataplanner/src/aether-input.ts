@@ -25,7 +25,7 @@ import type {
   TrackedArguments,
 } from "./interfaces.js";
 import type { ModifierStep } from "./plan.js";
-import { assertExecutablePlan, ExecutableStep } from "./plan.js";
+import { assertExecutableStep, ExecutableStep } from "./plan.js";
 import type { __ItemStep } from "./steps/__item.js";
 import { constant } from "./steps/constant.js";
 import { list } from "./steps/list.js";
@@ -334,7 +334,7 @@ function withFieldArgsForArgumentsOrInputObject<
       const details = getArgOnceOnly(path);
       const plan = planArgumentOrInputField(details, null);
 
-      assertExecutablePlan(plan, `UNKNOWN` /* TODO: pathIdentity */);
+      assertExecutableStep(plan, `UNKNOWN` /* TODO: pathIdentity */);
       return plan;
     },
     getRaw(path) {
@@ -381,7 +381,7 @@ function withFieldArgsForArgumentsOrInputObject<
       const plan = planArgumentOrInputField(details, $target);
       /*
       if (plan && plan !== $target) {
-        assertModifierPlan(
+        assertModifierStep(
           plan,
           `UNKNOWN` /* TODO : `${objectType.name}.${field.name}(${argName}:)` * /,
         );
