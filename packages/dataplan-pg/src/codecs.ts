@@ -638,15 +638,15 @@ const viaNumeric = castVia(sql`numeric`);
 /**
  * Casts using to_char to format dates; also handles arrays via unnest.
  */
-const viaDateFormat = (format: string): Cast => {
+const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   const sqlFormat = sql.literal(format);
   return {
     castFromPg(frag) {
-      return sql`to_char(${frag}, ${sqlFormat})`;
+      return sql`to_char(${prefix}${frag}, ${sqlFormat}::text)`;
     },
     listCastFromPg(frag) {
       return sql`(${sql.indent(
-        sql`select array_agg(to_char(t, ${sqlFormat}))\nfrom unnest(${frag}) t`,
+        sql`select array_agg(to_char(${prefix}t, ${sqlFormat}::text))\nfrom unnest(${frag}) t`,
       )})::text`;
     },
   };
@@ -690,8 +690,14 @@ export const TYPES = {
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
   ),
   date: t<string>("date", viaDateFormat("YYYY-MM-DD")),
-  time: t<string>("time", viaDateFormat("HH24:MI:SS.US")),
-  timetz: t<string>("timetz", viaDateFormat("HH24:MI:SS.US")),
+  time: t<string>(
+    "time",
+    viaDateFormat("HH24:MI:SS.US", sql`date '1970-01-01' + `),
+  ),
+  timetz: t<string>(
+    "timetz",
+    viaDateFormat("HH24:MI:SS.US", sql`date '1970-01-01' + `),
+  ),
   inet: t<string>("inet", stripSubnet32),
   regproc: t<string>("regproc"),
   regprocedure: t<string>("regprocedure"),
