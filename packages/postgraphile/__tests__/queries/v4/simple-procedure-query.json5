@@ -1,0 +1,112 @@
+{
+  compoundTypeSetQueryList: [
+    {
+      a: 1,
+      b: "2",
+      c: "BLUE",
+      d: null,
+      e: "_0_BAR",
+      f: "_EMPTY_",
+      g: {
+        hours: 0,
+        minutes: 0,
+        seconds: 18,
+      },
+    },
+  ],
+  tableSetQueryList: [
+    {
+      name: "John Smith",
+    },
+    {
+      name: "Sara Smith",
+    },
+    {
+      name: "Budd Deey",
+    },
+    {
+      name: "Kathryn Ramirez",
+    },
+    {
+      name: "Joe Tucker",
+    },
+    {
+      name: "Twenty Seventwo",
+    },
+  ],
+  tableSetQueryWithOffset6: [
+    {
+      name: "Budd Deey",
+    },
+    {
+      name: "Kathryn Ramirez",
+    },
+  ],
+  intSetQueryList: [
+    1,
+    2,
+    3,
+    4,
+    5,
+    null,
+    6,
+  ],
+  staticBigIntegerList: [
+    "30894622507013190",
+    "30894622507013191",
+    "30894622507013192",
+    "30894622507013193",
+    "30894622507013194",
+    "30894622507013195",
+    "30894622507013196",
+    "30894622507013197",
+    "30894622507013198",
+    "30894622507013199",
+    "30894622507013200",
+  ],
+  queryIntervalSetList: [
+    {
+      seconds: 12,
+      minutes: 0,
+      hours: 0,
+      days: 0,
+      months: 0,
+      years: 0,
+    },
+    {
+      seconds: 0,
+      minutes: 0,
+      hours: 3,
+      days: 0,
+      months: 0,
+      years: 0,
+    },
+    {
+      seconds: 7,
+      minutes: 36,
+      hours: 9,
+      days: 0,
+      months: 0,
+      years: 0,
+    },
+  ],
+  allPostsList: [
+    {
+      id: 1,
+      computedIntervalSetList: [
+        {
+          seconds: 12,
+          minutes: 0,
+        },
+        {
+          seconds: 0,
+          minutes: 0,
+        },
+        {
+          seconds: 7,
+          minutes: 36,
+        },
+      ],
+    },
+  ],
+}
