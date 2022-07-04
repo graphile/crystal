@@ -1,0 +1,140 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access71["Access[71∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access72["Access[72∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object73["Object[73∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect15[["PgSelect[15∈0]<br />ᐸcompoundKeyᐳ"]]:::plan
+    __Item19>"__Item[19∈1]<br />ᐸ15ᐳ"]:::itemplan
+    PgSelectSingle20["PgSelectSingle[20∈1]<br />ᐸcompoundKeyᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22∈1]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__compound...__.”extra”ᐳ"]:::plan
+    Map79["Map[79∈1]<br />ᐸ20:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle30["PgSelectSingle[30∈1]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    Map81["Map[81∈1]<br />ᐸ20:{”0”:3,”1”:4}ᐳ"]:::plan
+    PgSelectSingle39["PgSelectSingle[39∈1]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression41["PgClassExpression[41∈1]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    PgSelect50[["PgSelect[50∈0]<br />ᐸforeignKeyᐳ"]]:::plan
+    __Item54>"__Item[54∈2]<br />ᐸ50ᐳ"]:::itemplan
+    PgSelectSingle55["PgSelectSingle[55∈2]<br />ᐸforeignKeyᐳ"]:::plan
+    PgClassExpression56["PgClassExpression[56∈2]<br />ᐸ__foreign_...person_id”ᐳ"]:::plan
+    PgClassExpression57["PgClassExpression[57∈2]<br />ᐸ__foreign_...und_key_1”ᐳ"]:::plan
+    PgClassExpression58["PgClassExpression[58∈2]<br />ᐸ__foreign_...und_key_2”ᐳ"]:::plan
+    Map83["Map[83∈2]<br />ᐸ55:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle65["PgSelectSingle[65∈2]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression66["PgClassExpression[66∈2]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression67["PgClassExpression[67∈2]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    Map85["Map[85∈2]<br />ᐸ55:{”0”:3,”1”:4,”2”:5}ᐳ"]:::plan
+    PgSelectSingle75["PgSelectSingle[75∈2]<br />ᐸcompoundKeyᐳ"]:::plan
+    PgClassExpression76["PgClassExpression[76∈2]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression77["PgClassExpression[77∈2]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    PgClassExpression78["PgClassExpression[78∈2]<br />ᐸ__compound...__.”extra”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access71
+    __Value3 --> Access72
+    Access71 & Access72 --> Object73
+    Object73 --> PgSelect15
+    PgSelect15 ==> __Item19
+    __Item19 --> PgSelectSingle20
+    PgSelectSingle20 --> PgClassExpression21
+    PgSelectSingle20 --> PgClassExpression22
+    PgSelectSingle20 --> PgClassExpression23
+    PgSelectSingle20 --> Map79
+    Map79 --> PgSelectSingle30
+    PgSelectSingle30 --> PgClassExpression31
+    PgSelectSingle30 --> PgClassExpression32
+    PgSelectSingle20 --> Map81
+    Map81 --> PgSelectSingle39
+    PgSelectSingle39 --> PgClassExpression40
+    PgSelectSingle39 --> PgClassExpression41
+    Object73 --> PgSelect50
+    PgSelect50 ==> __Item54
+    __Item54 --> PgSelectSingle55
+    PgSelectSingle55 --> PgClassExpression56
+    PgSelectSingle55 --> PgClassExpression57
+    PgSelectSingle55 --> PgClassExpression58
+    PgSelectSingle55 --> Map83
+    Map83 --> PgSelectSingle65
+    PgSelectSingle65 --> PgClassExpression66
+    PgSelectSingle65 --> PgClassExpression67
+    PgSelectSingle55 --> Map85
+    Map85 --> PgSelectSingle75
+    PgSelectSingle75 --> PgClassExpression76
+    PgSelectSingle75 --> PgClassExpression77
+    PgSelectSingle75 --> PgClassExpression78
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P15["ᐳallCompoundKeysList"]
+    PgSelect15 -.-> P15
+    P20["ᐳallCompoundKeysList[]"]
+    PgSelectSingle20 -.-> P20
+    P21["ᐳa…]ᐳpersonId1"]
+    PgClassExpression21 -.-> P21
+    P22["ᐳa…]ᐳpersonId2"]
+    PgClassExpression22 -.-> P22
+    P23["ᐳa…]ᐳextra"]
+    PgClassExpression23 -.-> P23
+    P30["ᐳa…]ᐳpersonByPersonId1"]
+    PgSelectSingle30 -.-> P30
+    P31["ᐳa…]ᐳp…1ᐳname"]
+    PgClassExpression31 -.-> P31
+    P32["ᐳa…]ᐳp…1ᐳemail"]
+    PgClassExpression32 -.-> P32
+    P39["ᐳa…]ᐳpersonByPersonId2"]
+    PgSelectSingle39 -.-> P39
+    P40["ᐳa…]ᐳp…2ᐳname"]
+    PgClassExpression40 -.-> P40
+    P41["ᐳa…]ᐳp…2ᐳemail"]
+    PgClassExpression41 -.-> P41
+    P50["ᐳallForeignKeysList"]
+    PgSelect50 -.-> P50
+    P55["ᐳallForeignKeysList[]"]
+    PgSelectSingle55 -.-> P55
+    P56["ᐳa…]ᐳpersonId"]
+    PgClassExpression56 -.-> P56
+    P57["ᐳa…]ᐳcompoundKey1"]
+    PgClassExpression57 -.-> P57
+    P58["ᐳa…]ᐳcompoundKey2"]
+    PgClassExpression58 -.-> P58
+    P65["ᐳa…]ᐳpersonByPersonId"]
+    PgSelectSingle65 -.-> P65
+    P66["ᐳa…]ᐳp…dᐳname"]
+    PgClassExpression66 -.-> P66
+    P67["ᐳa…]ᐳp…dᐳemail"]
+    PgClassExpression67 -.-> P67
+    P75["ᐳa…]ᐳcompoundKeyByCompoundKey1AndCompoundKey2"]
+    PgSelectSingle75 -.-> P75
+    P76["ᐳa…]ᐳc…2ᐳpersonId1"]
+    PgClassExpression76 -.-> P76
+    P77["ᐳa…]ᐳc…2ᐳpersonId2"]
+    PgClassExpression77 -.-> P77
+    P78["ᐳa…]ᐳc…2ᐳextra"]
+    PgClassExpression78 -.-> P78
+
+    subgraph "Buckets for queries/v4/simple-relations-tail-head"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allCompoundKeysList ᐸ-A- 15<br />⠀⠀allForeignKeysList ᐸ-A- 50"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,PgSelect15,PgSelect50,Access71,Access72,Object73 bucket0
+    Bucket1("Bucket 1 (item19)<br />Deps: 15<br />~ᐳQuery.allCompoundKeysList[]<br />⠀ROOT ᐸ-O- 20<br />⠀⠀personId1 ᐸ-L- 21<br />⠀⠀personId2 ᐸ-L- 22<br />⠀⠀extra ᐸ-L- 23<br />⠀⠀personByPersonId1 ᐸ-O- 30<br />⠀⠀⠀personByPersonId1.name ᐸ-L- 31<br />⠀⠀⠀personByPersonId1.email ᐸ-L- 32<br />⠀⠀personByPersonId2 ᐸ-O- 39<br />⠀⠀⠀personByPersonId2.name ᐸ-L- 40<br />⠀⠀⠀personByPersonId2.email ᐸ-L- 41"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgSelectSingle39,PgClassExpression40,PgClassExpression41,Map79,Map81 bucket1
+    Bucket2("Bucket 2 (item54)<br />Deps: 50<br />~ᐳQuery.allForeignKeysList[]<br />⠀ROOT ᐸ-O- 55<br />⠀⠀personId ᐸ-L- 56<br />⠀⠀compoundKey1 ᐸ-L- 57<br />⠀⠀compoundKey2 ᐸ-L- 58<br />⠀⠀personByPersonId ᐸ-O- 65<br />⠀⠀⠀personByPersonId.name ᐸ-L- 66<br />⠀⠀⠀personByPersonId.email ᐸ-L- 67<br />⠀⠀compoundKeyByCompoundKey1AndCompoundKey2 ᐸ-O- 75<br />⠀⠀⠀compoundKeyByCompoundKey1AndCompoundKey2.personId1 ᐸ-L- 76<br />⠀⠀⠀compoundKeyByCompoundKey1AndCompoundKey2.personId2 ᐸ-L- 77<br />⠀⠀⠀compoundKeyByCompoundKey1AndCompoundKey2.extra ᐸ-L- 78"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item54,PgSelectSingle55,PgClassExpression56,PgClassExpression57,PgClassExpression58,PgSelectSingle65,PgClassExpression66,PgClassExpression67,PgSelectSingle75,PgClassExpression76,PgClassExpression77,PgClassExpression78,Map83,Map85 bucket2
+    Bucket0 --> Bucket1 & Bucket2
+    end
