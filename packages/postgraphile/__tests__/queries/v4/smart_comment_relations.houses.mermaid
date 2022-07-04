@@ -1,0 +1,583 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access349["Access[349∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access350["Access[350∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object351["Object[351∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection27["Connection[27∈0]<br />ᐸ23ᐳ"]:::plan
+    PgSelect28[["PgSelect[28∈0]<br />ᐸhousesᐳ"]]:::plan
+    __Item29>"__Item[29∈1]<br />ᐸ28ᐳ"]:::itemplan
+    PgSelectSingle30["PgSelectSingle[30∈1]<br />ᐸhousesᐳ"]:::plan
+    Constant31["Constant[31∈0]"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__houses__.”street_id”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ__houses__...operty_id”ᐳ"]:::plan
+    List34["List[34∈1]<br />ᐸ31,32,33ᐳ"]:::plan
+    Lambda35["Lambda[35∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ__houses__...ding_name”ᐳ"]:::plan
+    PgClassExpression37["PgClassExpression[37∈1]<br />ᐸ__houses__...or_number”ᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸ__houses__...reet_name”ᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈1]<br />ᐸ__houses__...ilding_id”ᐳ"]:::plan
+    Map397["Map[397∈1]<br />ᐸ30:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
+    PgSelectSingle48["PgSelectSingle[48∈1]<br />ᐸstreetsᐳ"]:::plan
+    Constant49["Constant[49∈0]"]:::plan
+    PgClassExpression50["PgClassExpression[50∈1]<br />ᐸ__streets__.”id”ᐳ"]:::plan
+    List51["List[51∈1]<br />ᐸ49,50ᐳ"]:::plan
+    Lambda52["Lambda[52∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression54["PgClassExpression[54∈1]<br />ᐸ__streets__.”name”ᐳ"]:::plan
+    Connection74["Connection[74∈0]<br />ᐸ70ᐳ"]:::plan
+    Access396["Access[396∈1]<br />ᐸ397.1ᐳ"]:::plan
+    __Item76>"__Item[76∈2]<br />ᐸ396ᐳ"]:::itemplan
+    PgSelectSingle77["PgSelectSingle[77∈2]<br />ᐸbuildingsᐳ"]:::plan
+    Constant78["Constant[78∈0]"]:::plan
+    PgClassExpression79["PgClassExpression[79∈2]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List80["List[80∈2]<br />ᐸ78,79ᐳ"]:::plan
+    Lambda81["Lambda[81∈2]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression83["PgClassExpression[83∈2]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    Map422["Map[422∈1]<br />ᐸ30:{”0”:26,”1”:27,”2”:28,”3”:29,”4”:30,”5”:31,”6”:32,”7”:33,”8”:34,”9”:35,”10”:36,”11”:37,”12”:38}ᐳ"]:::plan
+    PgSelectSingle90["PgSelectSingle[90∈1]<br />ᐸbuildingsᐳ"]:::plan
+    Constant91["Constant[91∈0]"]:::plan
+    PgClassExpression92["PgClassExpression[92∈1]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List93["List[93∈1]<br />ᐸ91,92ᐳ"]:::plan
+    Lambda94["Lambda[94∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression96["PgClassExpression[96∈1]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    PgClassExpression97["PgClassExpression[97∈1]<br />ᐸ__buildings__.”floors”ᐳ"]:::plan
+    PgClassExpression98["PgClassExpression[98∈1]<br />ᐸ__building...s_primary”ᐳ"]:::plan
+    Map415["Map[415∈1]<br />ᐸ90:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
+    PgSelectSingle105["PgSelectSingle[105∈1]<br />ᐸstreetsᐳ"]:::plan
+    Constant106["Constant[106∈0]"]:::plan
+    PgClassExpression107["PgClassExpression[107∈1]<br />ᐸ__streets__.”id”ᐳ"]:::plan
+    List108["List[108∈1]<br />ᐸ106,107ᐳ"]:::plan
+    Lambda109["Lambda[109∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression111["PgClassExpression[111∈1]<br />ᐸ__streets__.”name”ᐳ"]:::plan
+    Connection131["Connection[131∈0]<br />ᐸ127ᐳ"]:::plan
+    Access414["Access[414∈1]<br />ᐸ415.1ᐳ"]:::plan
+    __Item133>"__Item[133∈3]<br />ᐸ414ᐳ"]:::itemplan
+    PgSelectSingle134["PgSelectSingle[134∈3]<br />ᐸbuildingsᐳ"]:::plan
+    Constant135["Constant[135∈0]"]:::plan
+    PgClassExpression136["PgClassExpression[136∈3]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List137["List[137∈3]<br />ᐸ135,136ᐳ"]:::plan
+    Lambda138["Lambda[138∈3]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression140["PgClassExpression[140∈3]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    Map420["Map[420∈1]<br />ᐸ90:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"]:::plan
+    PgSelectSingle147["PgSelectSingle[147∈1]<br />ᐸpropertiesᐳ"]:::plan
+    Constant148["Constant[148∈0]"]:::plan
+    PgClassExpression149["PgClassExpression[149∈1]<br />ᐸ__properties__.”id”ᐳ"]:::plan
+    List150["List[150∈1]<br />ᐸ148,149ᐳ"]:::plan
+    Lambda151["Lambda[151∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression153["PgClassExpression[153∈1]<br />ᐸ__properti...street_id”ᐳ"]:::plan
+    PgClassExpression154["PgClassExpression[154∈1]<br />ᐸ__properti...or_number”ᐳ"]:::plan
+    Map418["Map[418∈1]<br />ᐸ147:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
+    PgSelectSingle161["PgSelectSingle[161∈1]<br />ᐸstreetsᐳ"]:::plan
+    Constant162["Constant[162∈0]"]:::plan
+    PgClassExpression163["PgClassExpression[163∈1]<br />ᐸ__streets__.”id”ᐳ"]:::plan
+    List164["List[164∈1]<br />ᐸ162,163ᐳ"]:::plan
+    Lambda165["Lambda[165∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression167["PgClassExpression[167∈1]<br />ᐸ__streets__.”name”ᐳ"]:::plan
+    Connection187["Connection[187∈0]<br />ᐸ183ᐳ"]:::plan
+    Access417["Access[417∈1]<br />ᐸ418.1ᐳ"]:::plan
+    __Item189>"__Item[189∈4]<br />ᐸ417ᐳ"]:::itemplan
+    PgSelectSingle190["PgSelectSingle[190∈4]<br />ᐸbuildingsᐳ"]:::plan
+    Constant191["Constant[191∈0]"]:::plan
+    PgClassExpression192["PgClassExpression[192∈4]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List193["List[193∈4]<br />ᐸ191,192ᐳ"]:::plan
+    Lambda194["Lambda[194∈4]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression196["PgClassExpression[196∈4]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    Map412["Map[412∈1]<br />ᐸ30:{”0”:16,”1”:17,”2”:18,”3”:19,”4”:20,”5”:21}ᐳ"]:::plan
+    PgSelectSingle203["PgSelectSingle[203∈1]<br />ᐸpropertiesᐳ"]:::plan
+    Constant204["Constant[204∈0]"]:::plan
+    PgClassExpression205["PgClassExpression[205∈1]<br />ᐸ__properties__.”id”ᐳ"]:::plan
+    List206["List[206∈1]<br />ᐸ204,205ᐳ"]:::plan
+    Lambda207["Lambda[207∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression209["PgClassExpression[209∈1]<br />ᐸ__properti...street_id”ᐳ"]:::plan
+    PgClassExpression210["PgClassExpression[210∈1]<br />ᐸ__properti...or_number”ᐳ"]:::plan
+    Map410["Map[410∈1]<br />ᐸ203:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
+    PgSelectSingle217["PgSelectSingle[217∈1]<br />ᐸstreetsᐳ"]:::plan
+    Constant218["Constant[218∈0]"]:::plan
+    PgClassExpression219["PgClassExpression[219∈1]<br />ᐸ__streets__.”id”ᐳ"]:::plan
+    List220["List[220∈1]<br />ᐸ218,219ᐳ"]:::plan
+    Lambda221["Lambda[221∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression223["PgClassExpression[223∈1]<br />ᐸ__streets__.”name”ᐳ"]:::plan
+    Connection243["Connection[243∈0]<br />ᐸ239ᐳ"]:::plan
+    Access409["Access[409∈1]<br />ᐸ410.1ᐳ"]:::plan
+    __Item245>"__Item[245∈5]<br />ᐸ409ᐳ"]:::itemplan
+    PgSelectSingle246["PgSelectSingle[246∈5]<br />ᐸbuildingsᐳ"]:::plan
+    Constant247["Constant[247∈0]"]:::plan
+    PgClassExpression248["PgClassExpression[248∈5]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List249["List[249∈5]<br />ᐸ247,248ᐳ"]:::plan
+    Lambda250["Lambda[250∈5]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression252["PgClassExpression[252∈5]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    Map407["Map[407∈1]<br />ᐸ30:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13,”11”:14}ᐳ"]:::plan
+    PgSelectSingle260["PgSelectSingle[260∈1]<br />ᐸstreetPropertyᐳ"]:::plan
+    PgClassExpression261["PgClassExpression[261∈1]<br />ᐸ__street_p..._.”str_id”ᐳ"]:::plan
+    PgClassExpression262["PgClassExpression[262∈1]<br />ᐸ__street_p....”prop_id”ᐳ"]:::plan
+    PgClassExpression263["PgClassExpression[263∈1]<br />ᐸ__street_p...ent_owner”ᐳ"]:::plan
+    Map400["Map[400∈1]<br />ᐸ260:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
+    PgSelectSingle270["PgSelectSingle[270∈1]<br />ᐸstreetsᐳ"]:::plan
+    Constant271["Constant[271∈0]"]:::plan
+    PgClassExpression272["PgClassExpression[272∈1]<br />ᐸ__streets__.”id”ᐳ"]:::plan
+    List273["List[273∈1]<br />ᐸ271,272ᐳ"]:::plan
+    Lambda274["Lambda[274∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression276["PgClassExpression[276∈1]<br />ᐸ__streets__.”name”ᐳ"]:::plan
+    Connection296["Connection[296∈0]<br />ᐸ292ᐳ"]:::plan
+    Access399["Access[399∈1]<br />ᐸ400.1ᐳ"]:::plan
+    __Item298>"__Item[298∈6]<br />ᐸ399ᐳ"]:::itemplan
+    PgSelectSingle299["PgSelectSingle[299∈6]<br />ᐸbuildingsᐳ"]:::plan
+    Constant300["Constant[300∈0]"]:::plan
+    PgClassExpression301["PgClassExpression[301∈6]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List302["List[302∈6]<br />ᐸ300,301ᐳ"]:::plan
+    Lambda303["Lambda[303∈6]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression305["PgClassExpression[305∈6]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    Map405["Map[405∈1]<br />ᐸ260:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9}ᐳ"]:::plan
+    PgSelectSingle312["PgSelectSingle[312∈1]<br />ᐸpropertiesᐳ"]:::plan
+    Constant313["Constant[313∈0]"]:::plan
+    PgClassExpression314["PgClassExpression[314∈1]<br />ᐸ__properties__.”id”ᐳ"]:::plan
+    List315["List[315∈1]<br />ᐸ313,314ᐳ"]:::plan
+    Lambda316["Lambda[316∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression318["PgClassExpression[318∈1]<br />ᐸ__properti...street_id”ᐳ"]:::plan
+    PgClassExpression319["PgClassExpression[319∈1]<br />ᐸ__properti...or_number”ᐳ"]:::plan
+    Map403["Map[403∈1]<br />ᐸ312:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
+    PgSelectSingle326["PgSelectSingle[326∈1]<br />ᐸstreetsᐳ"]:::plan
+    Constant327["Constant[327∈0]"]:::plan
+    PgClassExpression328["PgClassExpression[328∈1]<br />ᐸ__streets__.”id”ᐳ"]:::plan
+    List329["List[329∈1]<br />ᐸ327,328ᐳ"]:::plan
+    Lambda330["Lambda[330∈1]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression332["PgClassExpression[332∈1]<br />ᐸ__streets__.”name”ᐳ"]:::plan
+    Connection352["Connection[352∈0]<br />ᐸ348ᐳ"]:::plan
+    Access402["Access[402∈1]<br />ᐸ403.1ᐳ"]:::plan
+    __Item354>"__Item[354∈7]<br />ᐸ402ᐳ"]:::itemplan
+    PgSelectSingle355["PgSelectSingle[355∈7]<br />ᐸbuildingsᐳ"]:::plan
+    Constant356["Constant[356∈0]"]:::plan
+    PgClassExpression357["PgClassExpression[357∈7]<br />ᐸ__buildings__.”id”ᐳ"]:::plan
+    List358["List[358∈7]<br />ᐸ356,357ᐳ"]:::plan
+    Lambda359["Lambda[359∈7]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression361["PgClassExpression[361∈7]<br />ᐸ__buildings__.”name”ᐳ"]:::plan
+    __InputStaticLeaf362["__InputStaticLeaf[362∈0]"]:::plan
+    __InputStaticLeaf363["__InputStaticLeaf[363∈0]"]:::plan
+    PgSelect364[["PgSelect[364∈0]<br />ᐸhousesᐳ"]]:::plan
+    First368["First[368∈0]"]:::plan
+    PgSelectSingle369["PgSelectSingle[369∈0]<br />ᐸhousesᐳ"]:::plan
+    PgClassExpression370["PgClassExpression[370∈0]<br />ᐸ__houses__...ding_name”ᐳ"]:::plan
+    PgClassExpression371["PgClassExpression[371∈0]<br />ᐸ__houses__...or_number”ᐳ"]:::plan
+    PgClassExpression372["PgClassExpression[372∈0]<br />ᐸ__houses__...reet_name”ᐳ"]:::plan
+    Constant373["Constant[373∈0]"]:::plan
+    PgClassExpression374["PgClassExpression[374∈0]<br />ᐸ__houses__.”street_id”ᐳ"]:::plan
+    PgClassExpression375["PgClassExpression[375∈0]<br />ᐸ__houses__...operty_id”ᐳ"]:::plan
+    List376["List[376∈0]<br />ᐸ373,374,375ᐳ"]:::plan
+    Lambda377["Lambda[377∈0]<br />ᐸencodeᐳ"]:::plan
+    __InputStaticLeaf378["__InputStaticLeaf[378∈0]"]:::plan
+    Lambda379["Lambda[379∈0]"]:::plan
+    Access380["Access[380∈0]<br />ᐸ379.1ᐳ"]:::plan
+    Access381["Access[381∈0]<br />ᐸ379.2ᐳ"]:::plan
+    PgSelect382[["PgSelect[382∈0]<br />ᐸhousesᐳ"]]:::plan
+    First386["First[386∈0]"]:::plan
+    PgSelectSingle387["PgSelectSingle[387∈0]<br />ᐸhousesᐳ"]:::plan
+    PgClassExpression388["PgClassExpression[388∈0]<br />ᐸ__houses__...ding_name”ᐳ"]:::plan
+    PgClassExpression389["PgClassExpression[389∈0]<br />ᐸ__houses__...or_number”ᐳ"]:::plan
+    PgClassExpression390["PgClassExpression[390∈0]<br />ᐸ__houses__...reet_name”ᐳ"]:::plan
+    Constant391["Constant[391∈0]"]:::plan
+    PgClassExpression392["PgClassExpression[392∈0]<br />ᐸ__houses__.”street_id”ᐳ"]:::plan
+    PgClassExpression393["PgClassExpression[393∈0]<br />ᐸ__houses__...operty_id”ᐳ"]:::plan
+    List394["List[394∈0]<br />ᐸ391,392,393ᐳ"]:::plan
+    Lambda395["Lambda[395∈0]<br />ᐸencodeᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access349
+    __Value3 --> Access350
+    Access349 & Access350 --> Object351
+    Object351 & Connection27 --> PgSelect28
+    PgSelect28 ==> __Item29
+    __Item29 --> PgSelectSingle30
+    PgSelectSingle30 --> PgClassExpression32
+    PgSelectSingle30 --> PgClassExpression33
+    Constant31 & PgClassExpression32 & PgClassExpression33 --> List34
+    List34 --> Lambda35
+    PgSelectSingle30 --> PgClassExpression36
+    PgSelectSingle30 --> PgClassExpression37
+    PgSelectSingle30 --> PgClassExpression38
+    PgSelectSingle30 --> PgClassExpression40
+    PgSelectSingle30 --> Map397
+    Map397 --> PgSelectSingle48
+    PgSelectSingle48 --> PgClassExpression50
+    Constant49 & PgClassExpression50 --> List51
+    List51 --> Lambda52
+    PgSelectSingle48 --> PgClassExpression54
+    Map397 --> Access396
+    Access396 ==> __Item76
+    __Item76 --> PgSelectSingle77
+    PgSelectSingle77 --> PgClassExpression79
+    Constant78 & PgClassExpression79 --> List80
+    List80 --> Lambda81
+    PgSelectSingle77 --> PgClassExpression83
+    PgSelectSingle30 --> Map422
+    Map422 --> PgSelectSingle90
+    PgSelectSingle90 --> PgClassExpression92
+    Constant91 & PgClassExpression92 --> List93
+    List93 --> Lambda94
+    PgSelectSingle90 --> PgClassExpression96
+    PgSelectSingle90 --> PgClassExpression97
+    PgSelectSingle90 --> PgClassExpression98
+    PgSelectSingle90 --> Map415
+    Map415 --> PgSelectSingle105
+    PgSelectSingle105 --> PgClassExpression107
+    Constant106 & PgClassExpression107 --> List108
+    List108 --> Lambda109
+    PgSelectSingle105 --> PgClassExpression111
+    Map415 --> Access414
+    Access414 ==> __Item133
+    __Item133 --> PgSelectSingle134
+    PgSelectSingle134 --> PgClassExpression136
+    Constant135 & PgClassExpression136 --> List137
+    List137 --> Lambda138
+    PgSelectSingle134 --> PgClassExpression140
+    PgSelectSingle90 --> Map420
+    Map420 --> PgSelectSingle147
+    PgSelectSingle147 --> PgClassExpression149
+    Constant148 & PgClassExpression149 --> List150
+    List150 --> Lambda151
+    PgSelectSingle147 --> PgClassExpression153
+    PgSelectSingle147 --> PgClassExpression154
+    PgSelectSingle147 --> Map418
+    Map418 --> PgSelectSingle161
+    PgSelectSingle161 --> PgClassExpression163
+    Constant162 & PgClassExpression163 --> List164
+    List164 --> Lambda165
+    PgSelectSingle161 --> PgClassExpression167
+    Map418 --> Access417
+    Access417 ==> __Item189
+    __Item189 --> PgSelectSingle190
+    PgSelectSingle190 --> PgClassExpression192
+    Constant191 & PgClassExpression192 --> List193
+    List193 --> Lambda194
+    PgSelectSingle190 --> PgClassExpression196
+    PgSelectSingle30 --> Map412
+    Map412 --> PgSelectSingle203
+    PgSelectSingle203 --> PgClassExpression205
+    Constant204 & PgClassExpression205 --> List206
+    List206 --> Lambda207
+    PgSelectSingle203 --> PgClassExpression209
+    PgSelectSingle203 --> PgClassExpression210
+    PgSelectSingle203 --> Map410
+    Map410 --> PgSelectSingle217
+    PgSelectSingle217 --> PgClassExpression219
+    Constant218 & PgClassExpression219 --> List220
+    List220 --> Lambda221
+    PgSelectSingle217 --> PgClassExpression223
+    Map410 --> Access409
+    Access409 ==> __Item245
+    __Item245 --> PgSelectSingle246
+    PgSelectSingle246 --> PgClassExpression248
+    Constant247 & PgClassExpression248 --> List249
+    List249 --> Lambda250
+    PgSelectSingle246 --> PgClassExpression252
+    PgSelectSingle30 --> Map407
+    Map407 --> PgSelectSingle260
+    PgSelectSingle260 --> PgClassExpression261
+    PgSelectSingle260 --> PgClassExpression262
+    PgSelectSingle260 --> PgClassExpression263
+    PgSelectSingle260 --> Map400
+    Map400 --> PgSelectSingle270
+    PgSelectSingle270 --> PgClassExpression272
+    Constant271 & PgClassExpression272 --> List273
+    List273 --> Lambda274
+    PgSelectSingle270 --> PgClassExpression276
+    Map400 --> Access399
+    Access399 ==> __Item298
+    __Item298 --> PgSelectSingle299
+    PgSelectSingle299 --> PgClassExpression301
+    Constant300 & PgClassExpression301 --> List302
+    List302 --> Lambda303
+    PgSelectSingle299 --> PgClassExpression305
+    PgSelectSingle260 --> Map405
+    Map405 --> PgSelectSingle312
+    PgSelectSingle312 --> PgClassExpression314
+    Constant313 & PgClassExpression314 --> List315
+    List315 --> Lambda316
+    PgSelectSingle312 --> PgClassExpression318
+    PgSelectSingle312 --> PgClassExpression319
+    PgSelectSingle312 --> Map403
+    Map403 --> PgSelectSingle326
+    PgSelectSingle326 --> PgClassExpression328
+    Constant327 & PgClassExpression328 --> List329
+    List329 --> Lambda330
+    PgSelectSingle326 --> PgClassExpression332
+    Map403 --> Access402
+    Access402 ==> __Item354
+    __Item354 --> PgSelectSingle355
+    PgSelectSingle355 --> PgClassExpression357
+    Constant356 & PgClassExpression357 --> List358
+    List358 --> Lambda359
+    PgSelectSingle355 --> PgClassExpression361
+    Object351 & __InputStaticLeaf362 & __InputStaticLeaf363 --> PgSelect364
+    PgSelect364 --> First368
+    First368 --> PgSelectSingle369
+    PgSelectSingle369 --> PgClassExpression370
+    PgSelectSingle369 --> PgClassExpression371
+    PgSelectSingle369 --> PgClassExpression372
+    PgSelectSingle369 --> PgClassExpression374
+    PgSelectSingle369 --> PgClassExpression375
+    Constant373 & PgClassExpression374 & PgClassExpression375 --> List376
+    List376 --> Lambda377
+    __InputStaticLeaf378 --> Lambda379
+    Lambda379 --> Access380
+    Lambda379 --> Access381
+    Object351 & Access380 & Access381 --> PgSelect382
+    PgSelect382 --> First386
+    First386 --> PgSelectSingle387
+    PgSelectSingle387 --> PgClassExpression388
+    PgSelectSingle387 --> PgClassExpression389
+    PgSelectSingle387 --> PgClassExpression390
+    PgSelectSingle387 --> PgClassExpression392
+    PgSelectSingle387 --> PgClassExpression393
+    Constant391 & PgClassExpression392 & PgClassExpression393 --> List394
+    List394 --> Lambda395
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P27["ᐳallHouses"]
+    Connection27 -.-> P27
+    P28["ᐳa…sᐳnodes"]
+    PgSelect28 -.-> P28
+    P30["ᐳa…sᐳnodes[]"]
+    PgSelectSingle30 -.-> P30
+    P32["ᐳa…sᐳn…]ᐳstreetId"]
+    PgClassExpression32 -.-> P32
+    P33["ᐳa…sᐳn…]ᐳpropertyId"]
+    PgClassExpression33 -.-> P33
+    P35["ᐳa…sᐳn…]ᐳnodeId"]
+    Lambda35 -.-> P35
+    P36["ᐳa…sᐳn…]ᐳbuildingName"]
+    PgClassExpression36 -.-> P36
+    P37["ᐳa…sᐳn…]ᐳpropertyNameOrNumber"]
+    PgClassExpression37 -.-> P37
+    P38["ᐳa…sᐳn…]ᐳstreetName"]
+    PgClassExpression38 -.-> P38
+    P40["ᐳa…sᐳn…]ᐳbuildingId"]
+    PgClassExpression40 -.-> P40
+    P48["ᐳa…sᐳn…]ᐳstreetByStreetId"]
+    PgSelectSingle48 -.-> P48
+    P50["ᐳa…sᐳn…]ᐳs…dᐳid"]
+    PgClassExpression50 -.-> P50
+    P52["ᐳa…sᐳn…]ᐳs…dᐳnodeId"]
+    Lambda52 -.-> P52
+    P54["ᐳa…sᐳn…]ᐳs…dᐳname"]
+    PgClassExpression54 -.-> P54
+    P74["ᐳa…sᐳn…]ᐳs…dᐳbuildingsNamedAfterStreet"]
+    Connection74 -.-> P74
+    P77["ᐳa…sᐳn…]ᐳs…dᐳb…tᐳnodes[]"]
+    PgSelectSingle77 -.-> P77
+    P79["ᐳa…sᐳn…]ᐳs…dᐳb…tᐳn…]ᐳid"]
+    PgClassExpression79 -.-> P79
+    P81["ᐳa…sᐳn…]ᐳs…dᐳb…tᐳn…]ᐳnodeId"]
+    Lambda81 -.-> P81
+    P83["ᐳa…sᐳn…]ᐳs…dᐳb…tᐳn…]ᐳname"]
+    PgClassExpression83 -.-> P83
+    P90["ᐳa…sᐳn…]ᐳbuildingByBuildingId"]
+    PgSelectSingle90 -.-> P90
+    P92["ᐳa…sᐳn…]ᐳb…dᐳid"]
+    PgClassExpression92 -.-> P92
+    P94["ᐳa…sᐳn…]ᐳb…dᐳnodeId"]
+    Lambda94 -.-> P94
+    P96["ᐳa…sᐳn…]ᐳb…dᐳname"]
+    PgClassExpression96 -.-> P96
+    P97["ᐳa…sᐳn…]ᐳb…dᐳfloors"]
+    PgClassExpression97 -.-> P97
+    P98["ᐳa…sᐳn…]ᐳb…dᐳisPrimary"]
+    PgClassExpression98 -.-> P98
+    P105["ᐳa…sᐳn…]ᐳb…dᐳnamedAfterStreet"]
+    PgSelectSingle105 -.-> P105
+    P107["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳid"]
+    PgClassExpression107 -.-> P107
+    P109["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳnodeId"]
+    Lambda109 -.-> P109
+    P111["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳname"]
+    PgClassExpression111 -.-> P111
+    P131["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳbuildingsNamedAfterStreet"]
+    Connection131 -.-> P131
+    P134["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳb…tᐳnodes[]"]
+    PgSelectSingle134 -.-> P134
+    P136["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳb…tᐳn…]ᐳid"]
+    PgClassExpression136 -.-> P136
+    P138["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳb…tᐳn…]ᐳnodeId"]
+    Lambda138 -.-> P138
+    P140["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳb…tᐳn…]ᐳname"]
+    PgClassExpression140 -.-> P140
+    P147["ᐳa…sᐳn…]ᐳb…dᐳpropertyByPropertyId"]
+    PgSelectSingle147 -.-> P147
+    P149["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳid"]
+    PgClassExpression149 -.-> P149
+    P151["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳnodeId"]
+    Lambda151 -.-> P151
+    P153["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳstreetId"]
+    PgClassExpression153 -.-> P153
+    P154["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳnameOrNumber"]
+    PgClassExpression154 -.-> P154
+    P161["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳstreetByStreetId"]
+    PgSelectSingle161 -.-> P161
+    P163["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳid"]
+    PgClassExpression163 -.-> P163
+    P165["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳnodeId"]
+    Lambda165 -.-> P165
+    P167["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳname"]
+    PgClassExpression167 -.-> P167
+    P187["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳbuildingsNamedAfterStreet"]
+    Connection187 -.-> P187
+    P190["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳb…tᐳnodes[]"]
+    PgSelectSingle190 -.-> P190
+    P192["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳb…tᐳn…]ᐳid"]
+    PgClassExpression192 -.-> P192
+    P194["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳb…tᐳn…]ᐳnodeId"]
+    Lambda194 -.-> P194
+    P196["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳb…tᐳn…]ᐳname"]
+    PgClassExpression196 -.-> P196
+    P203["ᐳa…sᐳn…]ᐳpropertyByPropertyId"]
+    PgSelectSingle203 -.-> P203
+    P205["ᐳa…sᐳn…]ᐳp…dᐳid"]
+    PgClassExpression205 -.-> P205
+    P207["ᐳa…sᐳn…]ᐳp…dᐳnodeId"]
+    Lambda207 -.-> P207
+    P209["ᐳa…sᐳn…]ᐳp…dᐳstreetId"]
+    PgClassExpression209 -.-> P209
+    P210["ᐳa…sᐳn…]ᐳp…dᐳnameOrNumber"]
+    PgClassExpression210 -.-> P210
+    P217["ᐳa…sᐳn…]ᐳp…dᐳstreetByStreetId"]
+    PgSelectSingle217 -.-> P217
+    P219["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳid"]
+    PgClassExpression219 -.-> P219
+    P221["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳnodeId"]
+    Lambda221 -.-> P221
+    P223["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳname"]
+    PgClassExpression223 -.-> P223
+    P243["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳbuildingsNamedAfterStreet"]
+    Connection243 -.-> P243
+    P246["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳb…tᐳnodes[]"]
+    PgSelectSingle246 -.-> P246
+    P248["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳb…tᐳn…]ᐳid"]
+    PgClassExpression248 -.-> P248
+    P250["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳb…tᐳn…]ᐳnodeId"]
+    Lambda250 -.-> P250
+    P252["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳb…tᐳn…]ᐳname"]
+    PgClassExpression252 -.-> P252
+    P260["ᐳa…sᐳn…]ᐳstreetPropertyByStreetIdAndPropertyId"]
+    PgSelectSingle260 -.-> P260
+    P261["ᐳa…sᐳn…]ᐳs…dᐳstrId"]
+    PgClassExpression261 -.-> P261
+    P262["ᐳa…sᐳn…]ᐳs…dᐳpropId"]
+    PgClassExpression262 -.-> P262
+    P263["ᐳa…sᐳn…]ᐳs…dᐳcurrentOwner"]
+    PgClassExpression263 -.-> P263
+    P270["ᐳa…sᐳn…]ᐳs…dᐳstreetByStrId"]
+    PgSelectSingle270 -.-> P270
+    P272["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳid"]
+    PgClassExpression272 -.-> P272
+    P274["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳnodeId"]
+    Lambda274 -.-> P274
+    P276["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳname"]
+    PgClassExpression276 -.-> P276
+    P296["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳbuildingsNamedAfterStreet"]
+    Connection296 -.-> P296
+    P299["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳb…tᐳnodes[]"]
+    PgSelectSingle299 -.-> P299
+    P301["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳb…tᐳn…]ᐳid"]
+    PgClassExpression301 -.-> P301
+    P303["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳb…tᐳn…]ᐳnodeId"]
+    Lambda303 -.-> P303
+    P305["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳb…tᐳn…]ᐳname"]
+    PgClassExpression305 -.-> P305
+    P312["ᐳa…sᐳn…]ᐳs…dᐳpropertyByPropId"]
+    PgSelectSingle312 -.-> P312
+    P314["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳid"]
+    PgClassExpression314 -.-> P314
+    P316["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳnodeId"]
+    Lambda316 -.-> P316
+    P318["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳstreetId"]
+    PgClassExpression318 -.-> P318
+    P319["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳnameOrNumber"]
+    PgClassExpression319 -.-> P319
+    P326["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳstreetByStreetId"]
+    PgSelectSingle326 -.-> P326
+    P328["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳid"]
+    PgClassExpression328 -.-> P328
+    P330["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳnodeId"]
+    Lambda330 -.-> P330
+    P332["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳname"]
+    PgClassExpression332 -.-> P332
+    P352["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳbuildingsNamedAfterStreet"]
+    Connection352 -.-> P352
+    P355["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳb…tᐳnodes[]"]
+    PgSelectSingle355 -.-> P355
+    P357["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳb…tᐳn…]ᐳid"]
+    PgClassExpression357 -.-> P357
+    P359["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳb…tᐳn…]ᐳnodeId"]
+    Lambda359 -.-> P359
+    P361["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳb…tᐳn…]ᐳname"]
+    PgClassExpression361 -.-> P361
+    P369["ᐳbrothersGotADateToKeep"]
+    PgSelectSingle369 -.-> P369
+    P370["ᐳb…pᐳcantHangAround"]
+    PgClassExpression370 -.-> P370
+    P371["ᐳb…pᐳin"]
+    PgClassExpression371 -.-> P371
+    P372["ᐳb…pᐳof"]
+    PgClassExpression372 -.-> P372
+    P377["ᐳb…pᐳz"]
+    Lambda377 -.-> P377
+    P387["ᐳnothingEverSlowsHerDown"]
+    PgSelectSingle387 -.-> P387
+    P388["ᐳn…nᐳandAMessIsNotAllowed"]
+    PgClassExpression388 -.-> P388
+    P389["ᐳn…nᐳin"]
+    PgClassExpression389 -.-> P389
+    P390["ᐳn…nᐳof"]
+    PgClassExpression390 -.-> P390
+    P395["ᐳn…nᐳz"]
+    Lambda395 -.-> P395
+    P396["ᐳa…sᐳn…]ᐳs…dᐳb…tᐳnodes"]
+    Access396 -.-> P396
+    P399["ᐳa…sᐳn…]ᐳs…dᐳs…dᐳb…tᐳnodes"]
+    Access399 -.-> P399
+    P402["ᐳa…sᐳn…]ᐳs…dᐳp…dᐳs…dᐳb…tᐳnodes"]
+    Access402 -.-> P402
+    P409["ᐳa…sᐳn…]ᐳp…dᐳs…dᐳb…tᐳnodes"]
+    Access409 -.-> P409
+    P414["ᐳa…sᐳn…]ᐳb…dᐳn…tᐳb…tᐳnodes"]
+    Access414 -.-> P414
+    P417["ᐳa…sᐳn…]ᐳb…dᐳp…dᐳs…dᐳb…tᐳnodes"]
+    Access417 -.-> P417
+
+    subgraph "Buckets for queries/v4/smart_comment_relations.houses"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allHouses ᐸ-O- 27<br />⠀⠀⠀allHouses.nodes ᐸ-A- 28<br />⠀⠀brothersGotADateToKeep ᐸ-O- 369<br />⠀⠀⠀brothersGotADateToKeep.cantHangAround ᐸ-L- 370<br />⠀⠀⠀brothersGotADateToKeep.in ᐸ-L- 371<br />⠀⠀⠀brothersGotADateToKeep.of ᐸ-L- 372<br />⠀⠀⠀brothersGotADateToKeep.z ᐸ-L- 377<br />⠀⠀nothingEverSlowsHerDown ᐸ-O- 387<br />⠀⠀⠀nothingEverSlowsHerDown.andAMessIsNotAllowed ᐸ-L- 388<br />⠀⠀⠀nothingEverSlowsHerDown.in ᐸ-L- 389<br />⠀⠀⠀nothingEverSlowsHerDown.of ᐸ-L- 390<br />⠀⠀⠀nothingEverSlowsHerDown.z ᐸ-L- 395"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,Connection27,PgSelect28,Constant31,Constant49,Connection74,Constant78,Constant91,Constant106,Connection131,Constant135,Constant148,Constant162,Connection187,Constant191,Constant204,Constant218,Connection243,Constant247,Constant271,Connection296,Constant300,Constant313,Constant327,Access349,Access350,Object351,Connection352,Constant356,__InputStaticLeaf362,__InputStaticLeaf363,PgSelect364,First368,PgSelectSingle369,PgClassExpression370,PgClassExpression371,PgClassExpression372,Constant373,PgClassExpression374,PgClassExpression375,List376,Lambda377,__InputStaticLeaf378,Lambda379,Access380,Access381,PgSelect382,First386,PgSelectSingle387,PgClassExpression388,PgClassExpression389,PgClassExpression390,Constant391,PgClassExpression392,PgClassExpression393,List394,Lambda395 bucket0
+    Bucket1("Bucket 1 (item29)<br />Deps: 28, 31, 49, 78, 91, 106, 135, 148, 162, 191, 204, 218, 247, 271, 300, 313, 327, 356, 74, 131, 243, 296, 187, 352<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]<br />⠀ROOT ᐸ-O- 30<br />⠀⠀streetId ᐸ-L- 32<br />⠀⠀propertyId ᐸ-L- 33<br />⠀⠀nodeId ᐸ-L- 35<br />⠀⠀buildingName ᐸ-L- 36<br />⠀⠀propertyNameOrNumber ᐸ-L- 37<br />⠀⠀streetName ᐸ-L- 38<br />⠀⠀buildingId ᐸ-L- 40<br />⠀⠀streetByStreetId ᐸ-O- 48<br />⠀⠀⠀streetByStreetId.id ᐸ-L- 50<br />⠀⠀⠀streetByStreetId.nodeId ᐸ-L- 52<br />⠀⠀⠀streetByStreetId.name ᐸ-L- 54<br />⠀⠀⠀streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 74<br />⠀⠀⠀⠀streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 396<br />⠀⠀buildingByBuildingId ᐸ-O- 90<br />⠀⠀⠀buildingByBuildingId.id ᐸ-L- 92<br />⠀⠀⠀buildingByBuildingId.nodeId ᐸ-L- 94<br />⠀⠀⠀buildingByBuildingId.name ᐸ-L- 96<br />⠀⠀⠀buildingByBuildingId.floors ᐸ-L- 97<br />⠀⠀⠀buildingByBuildingId.isPrimary ᐸ-L- 98<br />⠀⠀⠀buildingByBuildingId.namedAfterStreet ᐸ-O- 105<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.id ᐸ-L- 107<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.nodeId ᐸ-L- 109<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.name ᐸ-L- 111<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.buildingsNamedAfterStreet ᐸ-O- 131<br />⠀⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.buildingsNamedAfterStreet.nodes ᐸ-A- 414<br />⠀⠀⠀buildingByBuildingId.propertyByPropertyId ᐸ-O- 147<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.id ᐸ-L- 149<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.nodeId ᐸ-L- 151<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetId ᐸ-L- 153<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.nameOrNumber ᐸ-L- 154<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId ᐸ-O- 161<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.id ᐸ-L- 163<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.nodeId ᐸ-L- 165<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.name ᐸ-L- 167<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 187<br />⠀⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 417<br />⠀⠀propertyByPropertyId ᐸ-O- 203<br />⠀⠀⠀propertyByPropertyId.id ᐸ-L- 205<br />⠀⠀⠀propertyByPropertyId.nodeId ᐸ-L- 207<br />⠀⠀⠀propertyByPropertyId.streetId ᐸ-L- 209<br />⠀⠀⠀propertyByPropertyId.nameOrNumber ᐸ-L- 210<br />⠀⠀⠀propertyByPropertyId.streetByStreetId ᐸ-O- 217<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.id ᐸ-L- 219<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.nodeId ᐸ-L- 221<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.name ᐸ-L- 223<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 243<br />⠀⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 409<br />⠀⠀streetPropertyByStreetIdAndPropertyId ᐸ-O- 260<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.strId ᐸ-L- 261<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propId ᐸ-L- 262<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.currentOwner ᐸ-L- 263<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId ᐸ-O- 270<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.id ᐸ-L- 272<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.nodeId ᐸ-L- 274<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.name ᐸ-L- 276<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.buildingsNamedAfterStreet ᐸ-O- 296<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.buildingsNamedAfterStreet.nodes ᐸ-A- 399<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId ᐸ-O- 312<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.id ᐸ-L- 314<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.nodeId ᐸ-L- 316<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetId ᐸ-L- 318<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.nameOrNumber ᐸ-L- 319<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId ᐸ-O- 326<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.id ᐸ-L- 328<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.nodeId ᐸ-L- 330<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.name ᐸ-L- 332<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 352<br />⠀⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 402"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item29,PgSelectSingle30,PgClassExpression32,PgClassExpression33,List34,Lambda35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression40,PgSelectSingle48,PgClassExpression50,List51,Lambda52,PgClassExpression54,PgSelectSingle90,PgClassExpression92,List93,Lambda94,PgClassExpression96,PgClassExpression97,PgClassExpression98,PgSelectSingle105,PgClassExpression107,List108,Lambda109,PgClassExpression111,PgSelectSingle147,PgClassExpression149,List150,Lambda151,PgClassExpression153,PgClassExpression154,PgSelectSingle161,PgClassExpression163,List164,Lambda165,PgClassExpression167,PgSelectSingle203,PgClassExpression205,List206,Lambda207,PgClassExpression209,PgClassExpression210,PgSelectSingle217,PgClassExpression219,List220,Lambda221,PgClassExpression223,PgSelectSingle260,PgClassExpression261,PgClassExpression262,PgClassExpression263,PgSelectSingle270,PgClassExpression272,List273,Lambda274,PgClassExpression276,PgSelectSingle312,PgClassExpression314,List315,Lambda316,PgClassExpression318,PgClassExpression319,PgSelectSingle326,PgClassExpression328,List329,Lambda330,PgClassExpression332,Access396,Map397,Access399,Map400,Access402,Map403,Map405,Map407,Access409,Map410,Map412,Access414,Map415,Access417,Map418,Map420,Map422 bucket1
+    Bucket2("Bucket 2 (item76)<br />Deps: 396, 78<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]ᐳHouse.streetByStreetIdᐳStreet.buildingsNamedAfterStreetᐳBuildingsConnection.nodes[]<br />⠀ROOT ᐸ-O- 77<br />⠀⠀id ᐸ-L- 79<br />⠀⠀nodeId ᐸ-L- 81<br />⠀⠀name ᐸ-L- 83"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item76,PgSelectSingle77,PgClassExpression79,List80,Lambda81,PgClassExpression83 bucket2
+    Bucket3("Bucket 3 (item133)<br />Deps: 414, 135<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]ᐳHouse.buildingByBuildingIdᐳBuilding.namedAfterStreetᐳStreet.buildingsNamedAfterStreetᐳBuildingsConnection.nodes[]<br />⠀ROOT ᐸ-O- 134<br />⠀⠀id ᐸ-L- 136<br />⠀⠀nodeId ᐸ-L- 138<br />⠀⠀name ᐸ-L- 140"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item133,PgSelectSingle134,PgClassExpression136,List137,Lambda138,PgClassExpression140 bucket3
+    Bucket4("Bucket 4 (item189)<br />Deps: 417, 191<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]ᐳHouse.buildingByBuildingIdᐳBuilding.propertyByPropertyIdᐳProperty.streetByStreetIdᐳStreet.buildingsNamedAfterStreetᐳBuildingsConnection.nodes[]<br />⠀ROOT ᐸ-O- 190<br />⠀⠀id ᐸ-L- 192<br />⠀⠀nodeId ᐸ-L- 194<br />⠀⠀name ᐸ-L- 196"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item189,PgSelectSingle190,PgClassExpression192,List193,Lambda194,PgClassExpression196 bucket4
+    Bucket5("Bucket 5 (item245)<br />Deps: 409, 247<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]ᐳHouse.propertyByPropertyIdᐳProperty.streetByStreetIdᐳStreet.buildingsNamedAfterStreetᐳBuildingsConnection.nodes[]<br />⠀ROOT ᐸ-O- 246<br />⠀⠀id ᐸ-L- 248<br />⠀⠀nodeId ᐸ-L- 250<br />⠀⠀name ᐸ-L- 252"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item245,PgSelectSingle246,PgClassExpression248,List249,Lambda250,PgClassExpression252 bucket5
+    Bucket6("Bucket 6 (item298)<br />Deps: 399, 300<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]ᐳHouse.streetPropertyByStreetIdAndPropertyIdᐳStreetProperty.streetByStrIdᐳStreet.buildingsNamedAfterStreetᐳBuildingsConnection.nodes[]<br />⠀ROOT ᐸ-O- 299<br />⠀⠀id ᐸ-L- 301<br />⠀⠀nodeId ᐸ-L- 303<br />⠀⠀name ᐸ-L- 305"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item298,PgSelectSingle299,PgClassExpression301,List302,Lambda303,PgClassExpression305 bucket6
+    Bucket7("Bucket 7 (item354)<br />Deps: 402, 356<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]ᐳHouse.streetPropertyByStreetIdAndPropertyIdᐳStreetProperty.propertyByPropIdᐳProperty.streetByStreetIdᐳStreet.buildingsNamedAfterStreetᐳBuildingsConnection.nodes[]<br />⠀ROOT ᐸ-O- 355<br />⠀⠀id ᐸ-L- 357<br />⠀⠀nodeId ᐸ-L- 359<br />⠀⠀name ᐸ-L- 361"):::bucket
+    classDef bucket7 stroke:#808000
+    class Bucket7,__Item354,PgSelectSingle355,PgClassExpression357,List358,Lambda359,PgClassExpression361 bucket7
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7
+    end
