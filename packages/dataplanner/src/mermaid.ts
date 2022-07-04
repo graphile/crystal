@@ -162,10 +162,10 @@ export function printPlanGraph(
   /*
   const pathIdMap = Object.create(null);
   const pathCounter = 0;
-  const pathId = (pathIdentity: string, isItemPlan = false): string => {
+  const pathId = (pathIdentity: string, isItemStep = false): string => {
     if (!pathIdMap[pathIdentity]) {
       pathIdMap[pathIdentity] = `P${++pathCounter}`;
-      const [lBrace, rBrace] = isItemPlan
+      const [lBrace, rBrace] = isItemStep
         ? [">", "]"]
         : aether.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
         ? ["[/", "\\]"]

@@ -405,7 +405,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
   }
 }
 
-export function isExecutablePlan<TData = any>(
+export function isExecutableStep<TData = any>(
   plan: unknown,
 ): plan is ExecutableStep<TData> {
   return (
@@ -419,7 +419,7 @@ export function assertExecutablePlan<TData>(
   plan: BaseStep | null | undefined | void,
   pathIdentity: string,
 ): asserts plan is ExecutableStep<TData> {
-  if (!isExecutablePlan(plan)) {
+  if (!isExecutableStep(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be an executable plan, but it does not implement the 'execute' method.`,
     );
@@ -436,7 +436,7 @@ export type ObjectLikeStep<
   get<TKey extends keyof TData>(key: TKey): ExecutableStep<TData[TKey]>;
 };
 
-export function isObjectLikePlan<
+export function isObjectLikeStep<
   TData extends { [key: string]: ExecutableStep<any> } = {
     [key: string]: ExecutableStep<any>;
   },
@@ -459,7 +459,7 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
   ): PromiseOrDirect<CrystalResultStreamList<TData>>;
 };
 
-export function isStreamablePlan<TData>(
+export function isStreamableStep<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): plan is StreamableStep<TData> {
   return typeof (plan as StreamableStep<TData>).stream === "function";
@@ -495,7 +495,7 @@ export abstract class ModifierStep<
   abstract apply(): void;
 }
 
-export function isModifierPlan<
+export function isModifierStep<
   TParentStep extends ExecutableStep | ModifierStep<any>,
 >(plan: BaseStep): plan is ModifierStep<TParentStep> {
   return "apply" in plan && typeof (plan as any).apply === "function";
@@ -507,7 +507,7 @@ export function assertModifierPlan<
   plan: BaseStep,
   pathIdentity: string,
 ): asserts plan is ModifierStep<TParentStep> {
-  if (!isModifierPlan(plan)) {
+  if (!isModifierStep(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be a modifier plan, but it does not implement the 'apply' method.`,
     );
@@ -521,7 +521,7 @@ export interface ListCapableStep<
   listItem(itemPlan: __ItemStep<this>): TItemStep;
 }
 
-export function isListCapablePlan<
+export function isListCapableStep<
   TData,
   TItemStep extends ExecutableStep<TData>,
 >(
@@ -537,7 +537,7 @@ export function assertListCapablePlan<
   plan: ExecutableStep<ReadonlyArray<TData>>,
   pathIdentity: string,
 ): asserts plan is ListCapableStep<TData, TItemStep> {
-  if (!isListCapablePlan(plan)) {
+  if (!isListCapableStep(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
     );

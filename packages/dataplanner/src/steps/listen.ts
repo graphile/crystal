@@ -4,7 +4,7 @@ import type {
   CrystalValuesList,
 } from "../interfaces.js";
 import type { StreamableStep } from "../plan.js";
-import { ExecutableStep, isExecutablePlan } from "../plan.js";
+import { ExecutableStep, isExecutableStep } from "../plan.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
 
@@ -47,7 +47,7 @@ export class ListenStep<
     super();
     const $topic =
       typeof topicOrPlan === "string" ? constant(topicOrPlan) : topicOrPlan;
-    const $pubsub = isExecutablePlan(pubsubOrPlan)
+    const $pubsub = isExecutableStep(pubsubOrPlan)
       ? pubsubOrPlan
       : constant(pubsubOrPlan);
     this.pubsubDep = this.addDependency($pubsub);

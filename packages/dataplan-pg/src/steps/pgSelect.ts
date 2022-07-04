@@ -96,7 +96,7 @@ const parseCursor = (cursor: string | null) => {
   }
 };
 
-function isStaticInputPlan(
+function isStaticInputStep(
   dep: ExecutableStep,
 ): dep is __InputListStep | __InputStaticLeafStep | __InputObjectStep {
   return (
@@ -2317,7 +2317,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
       const dep = this.getStep(this.dependencies[dependencyIndex]);
       if (
         // I am uncertain on this code.
-        isStaticInputPlan(dep) ||
+        isStaticInputStep(dep) ||
         (otherPlan.parentPathIdentity.length > dep.parentPathIdentity.length &&
           otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity))
       ) {
@@ -2395,7 +2395,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         if (dep instanceof __TrackedObjectStep) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
-        } else if (isStaticInputPlan(dep)) {
+        } else if (isStaticInputStep(dep)) {
           // This has come from a hard-coded input in the document, therefore
           // it's shared and thus safe.
         } else if (dep instanceof ConnectionStep) {
@@ -2515,7 +2515,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
                   return sql`${plan.toSQL()}::${
                     codec.sqlType
                   } = ${identifierMatch}`;
-                } else if (isStaticInputPlan(plan)) {
+                } else if (isStaticInputStep(plan)) {
                   return sql`${this.placeholder(
                     plan,
                     codec,
@@ -2584,7 +2584,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
               return this.where(
                 sql`${plan.toSQL()}::${codec.sqlType} = ${identifierMatch}`,
               );
-            } else if (isStaticInputPlan(plan)) {
+            } else if (isStaticInputStep(plan)) {
               return this.where(
                 sql`${this.placeholder(plan, codec)} = ${identifierMatch}`,
               );

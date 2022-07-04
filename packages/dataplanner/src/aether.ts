@@ -108,8 +108,8 @@ import {
   assertExecutablePlan,
   assertFinalized,
   ExecutableStep,
-  isListCapablePlan,
-  isStreamablePlan,
+  isListCapableStep,
+  isStreamableStep,
 } from "./plan.js";
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
@@ -279,7 +279,7 @@ function serializerForScalarType(
  * Returns true if this "executable plan" isn't actually executable because
  * it's a special internal plan type whose values get auto-populated
  */
-const isInternalPlan = (plan: ExecutableStep) =>
+const isInternalStep = (plan: ExecutableStep) =>
   plan instanceof __ValueStep || plan instanceof __ItemStep;
 
 interface PlanCacheForPlanResultses {
@@ -1950,7 +1950,7 @@ export class Aether<
           parentPathIdentity: nestedParentPathIdentity,
           currentGraphQLType: fieldType,
         },
-        isListCapablePlan(plan)
+        isListCapableStep(plan)
           ? () =>
               (plan as ListCapableStep<any>).listItem(
                 this.itemPlanFor(plan, listDepth),
@@ -2314,7 +2314,7 @@ export class Aether<
 
     const planOptions: PlanOptions = {
       stream:
-        streamDirective && isStreamablePlan(plan as ExecutableStep<any>)
+        streamDirective && isStreamableStep(plan as ExecutableStep<any>)
           ? {
               initialCount:
                 Number(
@@ -3789,7 +3789,7 @@ export class Aether<
             plan &&
             plan.id === planId &&
             plan.bucketId === bucket.id &&
-            !isInternalPlan(plan),
+            !isInternalStep(plan),
         )
         .map((t) => t[1]);
       bucket.plans = plans;
@@ -3801,7 +3801,7 @@ export class Aether<
           if (dep.bucketId !== bucket.id) {
             return true;
           }
-          if (isInternalPlan(dep)) {
+          if (isInternalStep(dep)) {
             return true;
           }
           return false;

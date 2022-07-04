@@ -3,7 +3,7 @@ import { getNamedType } from "graphql";
 
 import { getCurrentGraphQLType } from "../global.js";
 import type { ExecutableStep } from "../plan.js";
-import { isListCapablePlan } from "../plan.js";
+import { isListCapableStep } from "../plan.js";
 import type { __ItemStep } from "./__item.js";
 import { each } from "./each.js";
 import type {
@@ -98,7 +98,7 @@ export function partitionByIndex<
     itemPlanCallback: mapper,
     initialState,
     reduceCallback: startIndex === 1 ? reduceCallback1 : reduceCallback0,
-    listItem: isListCapablePlan(listPlan)
+    listItem: isListCapableStep(listPlan)
       ? (itemPlan) => {
           return each(itemPlan as any, ($item) =>
             listPlan.listItem($item as any),

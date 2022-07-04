@@ -3,7 +3,7 @@ import { getNamedType } from "graphql";
 
 import { getCurrentGraphQLType } from "../global.js";
 import type { ExecutableStep, ListCapableStep } from "../plan.js";
-import { isListCapablePlan } from "../plan.js";
+import { isListCapableStep } from "../plan.js";
 import type { __ItemStep } from "./__item.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
@@ -58,7 +58,7 @@ export function each<
     itemPlanCallback: eachItemPlanCallback,
     initialState: eachInitialState,
     reduceCallback: eachReduceCallback,
-    listItem: isListCapablePlan(listPlan)
+    listItem: isListCapableStep(listPlan)
       ? eachCallbackForListPlan(listPlan, mapper)
       : mapper,
     namedType,
