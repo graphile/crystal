@@ -1,0 +1,258 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        id: 1,
+        name: "John Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "You hit me with a cricket bat.",
+              authorId: 1,
+            },
+            {
+              headline: "Large bet on myself in round one.",
+              authorId: 1,
+            },
+          ],
+        },
+        roundOnePost: {
+          nodes: [
+            {
+              headline: "Large bet on myself in round one.",
+              authorId: 1,
+            },
+          ],
+        },
+        compoundKeysByPersonId1: {
+          nodes: [
+            {
+              personId1: 1,
+              personId2: 2,
+            },
+          ],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 1,
+            },
+          ],
+        },
+      },
+      {
+        id: 2,
+        name: "Sara Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+              authorId: 2,
+            },
+            {
+              headline: "What’s with you kids? Every other day it’s food, food, food.",
+              authorId: 2,
+            },
+          ],
+        },
+        roundOnePost: {
+          nodes: [],
+        },
+        compoundKeysByPersonId1: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 1,
+            },
+            {
+              personId1: 2,
+              personId2: 3,
+            },
+            {
+              personId1: 2,
+              personId2: 5,
+            },
+          ],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 1,
+              personId2: 2,
+            },
+          ],
+        },
+      },
+      {
+        id: 3,
+        name: "Budd Deey",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "You know how I sometimes have really brilliant ideas?",
+              authorId: 3,
+            },
+            {
+              headline: "They’re not aliens, they’re Earth…liens!",
+              authorId: 3,
+            },
+          ],
+        },
+        roundOnePost: {
+          nodes: [],
+        },
+        compoundKeysByPersonId1: {
+          nodes: [],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 3,
+            },
+            {
+              personId1: 4,
+              personId2: 3,
+            },
+          ],
+        },
+      },
+      {
+        id: 4,
+        name: "Kathryn Ramirez",
+        postsByAuthorId: {
+          nodes: [],
+        },
+        roundOnePost: {
+          nodes: [],
+        },
+        compoundKeysByPersonId1: {
+          nodes: [
+            {
+              personId1: 4,
+              personId2: 3,
+            },
+            {
+              personId1: 4,
+              personId2: 4,
+            },
+          ],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 4,
+              personId2: 4,
+            },
+          ],
+        },
+      },
+      {
+        id: 5,
+        name: "Joe Tucker",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              authorId: 5,
+            },
+          ],
+        },
+        roundOnePost: {
+          nodes: [],
+        },
+        compoundKeysByPersonId1: {
+          nodes: [],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 5,
+            },
+          ],
+        },
+      },
+      {
+        id: 6,
+        name: "Twenty Seventwo",
+        postsByAuthorId: {
+          nodes: [],
+        },
+        roundOnePost: {
+          nodes: [],
+        },
+        compoundKeysByPersonId1: {
+          nodes: [],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [],
+        },
+      },
+    ],
+  },
+  allCompoundKeys: {
+    nodes: [
+      {
+        personId1: 1,
+        personId2: 2,
+        foreignKeysByCompoundKey1AndCompoundKey2: {
+          nodes: [],
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 1,
+        foreignKeysByCompoundKey1AndCompoundKey2: {
+          nodes: [
+            {
+              personId: 5,
+              compoundKey1: 2,
+              compoundKey2: 1,
+            },
+            {
+              personId: null,
+              compoundKey1: 2,
+              compoundKey2: 1,
+            },
+          ],
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 3,
+        foreignKeysByCompoundKey1AndCompoundKey2: {
+          nodes: [],
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 5,
+        foreignKeysByCompoundKey1AndCompoundKey2: {
+          nodes: [],
+        },
+      },
+      {
+        personId1: 4,
+        personId2: 3,
+        foreignKeysByCompoundKey1AndCompoundKey2: {
+          nodes: [],
+        },
+      },
+      {
+        personId1: 4,
+        personId2: 4,
+        foreignKeysByCompoundKey1AndCompoundKey2: {
+          nodes: [
+            {
+              personId: null,
+              compoundKey1: 4,
+              compoundKey2: 4,
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
