@@ -117,7 +117,7 @@ export class PgClassExpressionStep<
         return plan;
       } else if (
         plan instanceof PgClassExpressionStep &&
-        plan.getParentPlan() === table
+        plan.getParentStep() === table
       ) {
         // TODO: when we defer placeholders until finalize we'll need to copy
         // deps/etc
@@ -190,13 +190,13 @@ export class PgClassExpressionStep<
         )}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
-    const sqlExpr = pgClassExpression(this.getParentPlan(), column.codec);
+    const sqlExpr = pgClassExpression(this.getParentStep(), column.codec);
     return sqlExpr`${sql.parens(this.expression, true)}.${sql.identifier(
       attributeName as string,
     )}` as any;
   }
 
-  public getParentPlan(): PgClassSingleStep<
+  public getParentStep(): PgClassSingleStep<
     TSourceColumns,
     TUniques,
     TRelations,
@@ -217,7 +217,7 @@ export class PgClassExpressionStep<
   }
 
   public optimize(): this {
-    this.attrIndex = this.getParentPlan().selectAndReturnIndex(
+    this.attrIndex = this.getParentStep().selectAndReturnIndex(
       this.pgCodec.castFromPg
         ? this.pgCodec.castFromPg(this.expression)
         : sql`${sql.parens(this.expression)}::text`,
@@ -260,10 +260,10 @@ export class PgClassExpressionStep<
     TRelations,
     TParameters
   > {
-    const parentPlan = this.getParentPlan();
+    const parentPlan = this.getParentStep();
     const classPlan =
       parentPlan instanceof PgSelectSingleStep
-        ? parentPlan.getClassPlan()
+        ? parentPlan.getClassStep()
         : null;
     const equivalentPeer = peers.find(
       (p) =>

@@ -110,14 +110,14 @@ export class PgSelectSingleStep<
     return this.source.name;
   }
 
-  public getClassPlan(): PgSelectStep<
+  public getClassStep(): PgSelectStep<
     TColumns,
     TUniques,
     TRelations,
     TParameters
   > {
     if (this.aether.isOptimized(this)) {
-      throw new Error(`Cannot ${this}.getClassPlan() after we're optimized.`);
+      throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
     const plan = this.getPlan(this.classPlanId);
     if (!(plan instanceof PgSelectStep)) {
@@ -128,7 +128,7 @@ export class PgSelectSingleStep<
     return plan;
   }
 
-  private getItemPlan(): ExecutableStep<PgSourceRow<TColumns>> {
+  private getItemStep(): ExecutableStep<PgSourceRow<TColumns>> {
     const plan = this.getPlan(this.dependencies[this.itemPlanId]);
     return plan;
   }
@@ -175,7 +175,7 @@ export class PgSelectSingleStep<
         `Cannot call ${this}.get() when the source codec (${this.source.codec.name}) has no columns to get.`,
       );
     }
-    const classPlan = this.getClassPlan();
+    const classPlan = this.getClassStep();
     // TODO: where do we do the SQL conversion, e.g. to_json for dates to
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
@@ -297,7 +297,7 @@ export class PgSelectSingleStep<
    * @internal
    */
   public selectAndReturnIndex(fragment: SQL): number {
-    return this.getClassPlan().selectAndReturnIndex(fragment);
+    return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public placeholder($plan: PgTypedExecutableStep<any>): SQL;
@@ -310,8 +310,8 @@ export class PgSelectSingleStep<
     overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
     return overrideCodec
-      ? this.getClassPlan().placeholder($plan, overrideCodec)
-      : this.getClassPlan().placeholder($plan as PgTypedExecutableStep<any>);
+      ? this.getClassStep().placeholder($plan, overrideCodec)
+      : this.getClassStep().placeholder($plan as PgTypedExecutableStep<any>);
   }
 
   private existingSingleRelation<TRelationName extends keyof TRelations>(
@@ -438,7 +438,7 @@ export class PgSelectSingleStep<
     TParameters
   > {
     return pgClassExpression(this, this.source.codec)`${
-      this.getClassPlan().alias
+      this.getClassStep().alias
     }`;
   }
 
@@ -486,10 +486,10 @@ export class PgSelectSingleStep<
       if (peer.source !== this.source) {
         return false;
       }
-      if (peer.getClassPlan() !== this.getClassPlan()) {
+      if (peer.getClassStep() !== this.getClassStep()) {
         return false;
       }
-      if (peer.getItemPlan() !== this.getItemPlan()) {
+      if (peer.getItemStep() !== this.getItemStep()) {
         return false;
       }
       return true;
@@ -507,7 +507,7 @@ export class PgSelectSingleStep<
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const columns = this.source.codec.columns;
-    if (columns && this.getClassPlan().mode === "normal") {
+    if (columns && this.getClassStep().mode === "normal") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
       // nonNullExpression (indirectly).
@@ -537,16 +537,16 @@ export class PgSelectSingleStep<
           column: { codec },
           attr,
         } = nonNullColumn;
-        const expression = sql`${this.getClassPlan().alias}.${sql.identifier(
+        const expression = sql`${this.getClassStep().alias}.${sql.identifier(
           attr,
         )}`;
-        this.nullCheckAttributeIndex = this.getClassPlan().selectAndReturnIndex(
+        this.nullCheckAttributeIndex = this.getClassStep().selectAndReturnIndex(
           codec.castFromPg
             ? codec.castFromPg(expression)
             : sql`${sql.parens(expression)}::text`,
         );
       } else {
-        this.nullCheckId = this.getClassPlan().getNullCheckIndex();
+        this.nullCheckId = this.getClassStep().getNullCheckIndex();
       }
     }
     return this;

@@ -332,7 +332,7 @@ export class EdgeStep<
     this.addDependency($item);
   }
 
-  private getConnectionPlan(): ConnectionStep<
+  private getConnectionStep(): ConnectionStep<
     TItemStep,
     TCursorStep,
     TStep,
@@ -341,19 +341,19 @@ export class EdgeStep<
     return this.getPlan(this.connectionPlanId) as any;
   }
 
-  private getItemPlan(): TItemStep {
+  private getItemStep(): TItemStep {
     return this.getDep(0) as any;
   }
 
   node(): TNodeStep {
-    const $item = this.getItemPlan();
-    return this.getConnectionPlan().itemPlan?.($item) ?? ($item as any);
+    const $item = this.getItemStep();
+    return this.getConnectionStep().itemPlan?.($item) ?? ($item as any);
   }
 
   cursor(): ExecutableStep<string | null> {
-    const $item = this.getItemPlan();
+    const $item = this.getItemStep();
     const $cursor =
-      this.getConnectionPlan().cursorPlan?.($item) ??
+      this.getConnectionStep().cursorPlan?.($item) ??
       ($item as ExecutableStep & { cursor?: () => ExecutableStep }).cursor?.();
     if ($cursor) {
       return $cursor;

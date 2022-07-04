@@ -25,7 +25,7 @@ export class PgCursorStep<
 
   constructor(itemPlan: TStep) {
     super();
-    const classPlan = itemPlan.getClassPlan();
+    const classPlan = itemPlan.getClassStep();
     this.classSinglePlanId = itemPlan.id;
     this.digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderBy();
@@ -43,7 +43,7 @@ export class PgCursorStep<
     this.cursorValuesDepId = this.addDependency(plan);
   }
 
-  public getClassSinglePlan(): TStep {
+  public getClassSingleStep(): TStep {
     const plan = this.getPlan(this.classSinglePlanId);
     if (!(plan instanceof PgSelectSingleStep)) {
       throw new Error(

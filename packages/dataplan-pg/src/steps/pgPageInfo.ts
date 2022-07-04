@@ -56,7 +56,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
    *
    * @internal
    */
-  public getConnectionPlan(): ConnectionStep<
+  public getConnectionStep(): ConnectionStep<
     any,
     PgSelectParsedCursorStep,
     TStep,
@@ -83,7 +83,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
    * @see {@link https://relay.dev/graphql/connections.htm#HasNextPage()}
    */
   public hasNextPage(): ExecutableStep<boolean> {
-    const $connection = this.getConnectionPlan();
+    const $connection = this.getConnectionStep();
     const first = $connection.getFirst();
     const last = $connection.getLast();
     if ((first && first.evalIs(0)) || (last && last.evalIs(0))) {
@@ -119,7 +119,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
    * @see {@link https://relay.dev/graphql/connections.htm#HasPreviousPage()}
    */
   public hasPreviousPage(): ExecutableStep<boolean> {
-    const $connection = this.getConnectionPlan();
+    const $connection = this.getConnectionStep();
     const first = $connection.getFirst();
     const last = $connection.getLast();
     if ((first && first.evalIs(0)) || (last && last.evalIs(0))) {
@@ -152,7 +152,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
   }
 
   startCursor(): PgCursorStep<PgSelectSingleStep<any, any, any, any>> {
-    const $connection = this.getConnectionPlan() as ConnectionStep<
+    const $connection = this.getConnectionStep() as ConnectionStep<
       PgSelectSingleStep<any, any, any, any>,
       PgSelectParsedCursorStep,
       PgSelectStep<any, any, any, any>,
@@ -163,7 +163,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
   }
 
   endCursor(): PgCursorStep<PgSelectSingleStep<any, any, any, any>> {
-    const $connection = this.getConnectionPlan() as ConnectionStep<
+    const $connection = this.getConnectionStep() as ConnectionStep<
       PgSelectSingleStep<any, any, any, any>,
       PgSelectParsedCursorStep,
       PgSelectStep<any, any, any, any>,

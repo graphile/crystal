@@ -692,7 +692,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           // This is a scalar computed column, let's inline the expression
                           const placeholders = selectArgs.map((arg, i) => {
                             if (i === 0) {
-                              return $row.getClassPlan().alias;
+                              return $row.getClassStep().alias;
                             } else if ("pgCodec" in arg && arg.pgCodec) {
                               return $row.placeholder(arg.plan, arg.pgCodec);
                             } else {
@@ -856,8 +856,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                       $select,
                                       ($item) => $item,
                                       ($item: any) =>
-                                        $item.getParentPlan
-                                          ? $item.getParentPlan().cursor()
+                                        $item.getParentStep
+                                          ? $item.getParentStep().cursor()
                                           : $item.cursor(),
                                     );
                                   },

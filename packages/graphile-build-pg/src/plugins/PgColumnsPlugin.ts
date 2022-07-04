@@ -233,7 +233,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       if (notNull) {
                         $select.coalesceToEmptyObject();
                       }
-                      $select.getClassPlan().setTrusted();
+                      $select.getClassStep().setTrusted();
                       return $select;
                     },
                   [

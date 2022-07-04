@@ -2402,11 +2402,11 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionStep) {
           const p2 = this.getPlan(dep.dependencies[dep.tableId]);
-          const t2Parent = dep.getParentPlan();
+          const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
           }
-          const t2 = t2Parent.getClassPlan();
+          const t2 = t2Parent.getClassStep();
           if (t2 === this) {
             throw new Error(
               `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,
@@ -2574,7 +2574,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           }
         } else if (
           parent instanceof PgSelectSingleStep &&
-          parent.getClassPlan().mode !== "aggregate"
+          parent.getClassStep().mode !== "aggregate"
         ) {
           const parent2 = this.getPlan(parent.dependencies[parent.itemPlanId]);
           this.identifierMatches.forEach((identifierMatch, i) => {

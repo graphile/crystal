@@ -168,12 +168,12 @@ export function makeExampleSchema(
         if (options.deoptimize) {
           const innerPlan =
             plan instanceof __ListTransformStep
-              ? plan.getListPlan()
+              ? plan.getListStep()
               : (plan as
                   | PgSelectStep<any, any, any, any>
                   | PgSelectSingleStep<any, any, any, any>);
-          if ("getClassPlan" in innerPlan) {
-            innerPlan.getClassPlan().setInliningForbidden();
+          if ("getClassStep" in innerPlan) {
+            innerPlan.getClassStep().setInliningForbidden();
           } else if ("setInliningForbidden" in innerPlan) {
             innerPlan.setInliningForbidden();
           }
@@ -2329,14 +2329,14 @@ export function makeExampleSchema(
   });
 
   function makeIncludeArchivedArg<TFieldStep>(
-    getClassPlan: ($fieldPlan: TFieldStep) => PgSelectPlanFromSource<any>,
+    getClassStep: ($fieldPlan: TFieldStep) => PgSelectPlanFromSource<any>,
   ): GraphileArgumentConfig<any, any, any, any, any, any> {
     return {
       type: IncludeArchived,
       applyPlan: EXPORTABLE(
-        (PgSelectSingleStep, TYPES, getClassPlan, sql) =>
+        (PgSelectSingleStep, TYPES, getClassStep, sql) =>
           function plan($parent: ExecutableStep<any>, $field: TFieldStep, val) {
-            const $messages = getClassPlan($field);
+            const $messages = getClassStep($field);
             const $value = val.getRaw() as
               | __InputStaticLeafStep
               | __TrackedObjectStep;
@@ -2362,7 +2362,7 @@ export function makeExampleSchema(
               $messages.where(sql`${$messages.alias}.archived_at is null`);
             }
           },
-        [PgSelectSingleStep, TYPES, getClassPlan, sql],
+        [PgSelectSingleStep, TYPES, getClassStep, sql],
       ),
       defaultValue: "INHERIT",
     };
@@ -4106,7 +4106,7 @@ export function makeExampleSchema(
                   val,
                 ) {
                   const $commentables =
-                    $each.getListPlan() as RelationalCommentablesStep;
+                    $each.getListStep() as RelationalCommentablesStep;
                   $commentables.setFirst(val.getRaw());
                   return null;
                 },

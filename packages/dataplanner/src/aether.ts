@@ -1837,7 +1837,7 @@ export class Aether<
         }
 
         if (newPlan instanceof __ListTransformStep) {
-          const listPlan = newPlan.getListPlan();
+          const listPlan = newPlan.getListStep();
           const nestedParentPathIdentity = pathIdentity + `@${newPlan.id}[]`;
           const wgs = withGlobalState.bind(null, {
             aether: this,

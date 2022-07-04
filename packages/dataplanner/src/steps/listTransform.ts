@@ -106,7 +106,7 @@ export class __ListTransformStep<
     return this.meta;
   }
 
-  getListPlan(): TListStep {
+  getListStep(): TListStep {
     return this.getDep(this.listPlanDepId) as TListStep;
   }
 
