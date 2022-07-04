@@ -3215,104 +3215,107 @@ export class OpPlan<
         parent = parent ? deeper(parent, potentialParent) : potentialParent;
       }
 
-      // Is it not special?
-      if (bucketKeyParts.length === 0) {
-        // Plans with no dependencies go in the root bucket
-        if (parents.length === 0) {
-          plan.bucketId = this.rootBucket.id;
-          return plan;
+      const getBucket = () => {
+        // Is it not special?
+        if (bucketKeyParts.length === 0) {
+          // Plans with no dependencies go in the root bucket
+          if (parents.length === 0) {
+            return this.rootBucket;
+          }
+
+          // If there's only one parent bucket, we just reuse that
+          if (parents.length === 1) {
+            return parents[0];
+          }
+
+          throw new Error(
+            `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
+              parents.length
+            } incompatible buckets: ${parents.map(
+              (bucket) =>
+                `${bucket.id}(i=${bucket.itemStepId ?? "-"}, g=${
+                  bucket.groupId ?? "-"
+                }, t=${bucket.polymorphicTypeNames?.join(",") ?? "-"}, p=${
+                  bucket.parent
+                })`,
+            )}`,
+          );
         }
 
-        // If there's only one parent bucket, we just reuse that
-        if (parents.length === 1) {
-          plan.bucketId = parents[0].id;
-          return plan;
-        }
-
-        throw new Error(
-          `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
-            parents.length
-          } incompatible buckets: ${parents.map(
-            (bucket) =>
-              `${bucket.id}(i=${bucket.itemStepId ?? "-"}, g=${
-                bucket.groupId ?? "-"
-              }, t=${bucket.polymorphicTypeNames?.join(",") ?? "-"}, p=${
-                bucket.parent
-              })`,
-          )}`,
-        );
-      }
-
-      // Okay it's special; let's build a bucket for it... unless we already have one
-      const bucketKey = bucketKeyParts.join("|");
-      if (bucketByBucketKey[bucketKey]) {
-        plan.bucketId = bucketByBucketKey[bucketKey].id;
-        return plan;
-      } else {
-        const rootPathIdentities: string[] = (() => {
-          if (group?.reason === "mutation") {
-            return [
-              `${ROOT_PATH}>${this.mutationTypeName}.${group.responseKey}`,
-            ];
-          }
-          if (transformPlan) {
-            return [];
-          }
-          if (itemPlan) {
-            const listPlan = this.plans[plan.dependencies[0]]!;
-            const listPlanPathIdentities = pathIdentitiesByStepId[listPlan.id];
-            if (
-              !listPlanPathIdentities ||
-              listPlanPathIdentities.length === 0
-            ) {
-              throw new Error(
-                `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by ${listPlan}`,
+        // Okay it's special; let's build a bucket for it... unless we already have one
+        const bucketKey = bucketKeyParts.join("|");
+        if (bucketByBucketKey[bucketKey]) {
+          return bucketByBucketKey[bucketKey];
+        } else {
+          const rootPathIdentities: string[] = (() => {
+            if (group?.reason === "mutation") {
+              return [
+                `${ROOT_PATH}>${this.mutationTypeName}.${group.responseKey}`,
+              ];
+            }
+            if (transformPlan) {
+              return [];
+            }
+            if (itemPlan) {
+              const listPlan = this.plans[plan.dependencies[0]]!;
+              const listPlanPathIdentities =
+                pathIdentitiesByStepId[listPlan.id];
+              if (
+                !listPlanPathIdentities ||
+                listPlanPathIdentities.length === 0
+              ) {
+                throw new Error(
+                  `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by ${listPlan}`,
+                );
+              }
+              return listPlanPathIdentities.map((pi) =>
+                // This ternary is a hack for subscriptions support; see TODO in planSubscription
+                pi === `~` ? pi : `${pi}[]`,
               );
             }
-            return listPlanPathIdentities.map((pi) =>
-              // This ternary is a hack for subscriptions support; see TODO in planSubscription
-              pi === `~` ? pi : `${pi}[]`,
-            );
-          }
-          if (polymorphicPlanIds !== undefined) {
-            const polymorphicPlans = polymorphicPlanIds.map(
-              (id) => this.plans[id],
-            );
-            return [
-              ...new Set(
-                polymorphicPlans.flatMap(
-                  (polymorphicPlan) =>
-                    pathIdentitiesByStepId[polymorphicPlan.id],
+            if (polymorphicPlanIds !== undefined) {
+              const polymorphicPlans = polymorphicPlanIds.map(
+                (id) => this.plans[id],
+              );
+              return [
+                ...new Set(
+                  polymorphicPlans.flatMap(
+                    (polymorphicPlan) =>
+                      pathIdentitiesByStepId[polymorphicPlan.id],
+                  ),
                 ),
-              ),
-            ];
+              ];
+            }
+            if (group) {
+              const groupParentPlan = this.plans[group.parentStepId];
+              return pathIdentitiesByStepId[groupParentPlan.id];
+            }
+            throw new Error(
+              `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the rootPathIdentities to use`,
+            );
+          })();
+          if (!parent) {
+            throw new Error(
+              `GraphileInternalError<af6208af-193d-4dbd-96d7-1cfe63ce1c4c>: could not determine the parent for this bucket`,
+            );
           }
-          if (group) {
-            const groupParentPlan = this.plans[group.parentStepId];
-            return pathIdentitiesByStepId[groupParentPlan.id];
-          }
-          throw new Error(
-            `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the rootPathIdentities to use`,
-          );
-        })();
-        if (!parent) {
-          throw new Error(
-            `GraphileInternalError<af6208af-193d-4dbd-96d7-1cfe63ce1c4c>: could not determine the parent for this bucket`,
-          );
+          const newBucket: BucketDefinition = this.newBucket({
+            parent,
+            rootPathIdentities,
+            itemStepId,
+            groupId,
+            polymorphicPlanIds,
+            polymorphicTypeNames,
+          });
+          addPlanIdsToBucket(newBucket, dependencyPlans);
+          bucketByBucketKey[bucketKey] = newBucket;
+          return newBucket;
         }
-        const newBucket: BucketDefinition = this.newBucket({
-          parent,
-          rootPathIdentities,
-          itemStepId,
-          groupId,
-          polymorphicPlanIds,
-          polymorphicTypeNames,
-        });
-        addPlanIdsToBucket(newBucket, dependencyPlans);
-        bucketByBucketKey[bucketKey] = newBucket;
-        plan.bucketId = newBucket.id;
-        return plan;
-      }
+      };
+
+      const bucket = getBucket();
+      plan.bucketId = bucket.id;
+      return plan;
     };
 
     // Assign bucketIds
