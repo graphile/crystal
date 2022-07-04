@@ -1,0 +1,209 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access171["Access[171∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access172["Access[172∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object173["Object[173∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection32["Connection[32∈0]<br />ᐸ28ᐳ"]:::plan
+    __InputStaticLeaf70["__InputStaticLeaf[70∈0]"]:::plan
+    PgSelect33[["PgSelect[33∈0]<br />ᐸpersonᐳ"]]:::plan
+    __Item34>"__Item[34∈1]<br />ᐸ33ᐳ"]:::itemplan
+    PgSelectSingle35["PgSelectSingle[35∈1]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression37["PgClassExpression[37∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    __InputStaticLeaf39["__InputStaticLeaf[39∈0]"]:::plan
+    Connection57["Connection[57∈0]<br />ᐸ53ᐳ"]:::plan
+    Access181["Access[181∈1]<br />ᐸ34.0ᐳ"]:::plan
+    Reverse182["Reverse[182∈1]"]:::plan
+    __Item59>"__Item[59∈2]<br />ᐸ182ᐳ"]:::itemplan
+    PgSelectSingle60["PgSelectSingle[60∈2]<br />ᐸpostᐳ"]:::plan
+    PgClassExpression61["PgClassExpression[61∈2]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    PgClassExpression62["PgClassExpression[62∈2]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
+    Connection82["Connection[82∈0]<br />ᐸ78ᐳ"]:::plan
+    Access183["Access[183∈1]<br />ᐸ34.1ᐳ"]:::plan
+    __Item84>"__Item[84∈3]<br />ᐸ183ᐳ"]:::itemplan
+    PgSelectSingle85["PgSelectSingle[85∈3]<br />ᐸpostᐳ"]:::plan
+    PgClassExpression86["PgClassExpression[86∈3]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    PgClassExpression87["PgClassExpression[87∈3]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
+    Connection105["Connection[105∈0]<br />ᐸ101ᐳ"]:::plan
+    Access184["Access[184∈1]<br />ᐸ34.2ᐳ"]:::plan
+    __Item107>"__Item[107∈4]<br />ᐸ184ᐳ"]:::itemplan
+    PgSelectSingle108["PgSelectSingle[108∈4]<br />ᐸcompoundKeyᐳ"]:::plan
+    PgClassExpression109["PgClassExpression[109∈4]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression110["PgClassExpression[110∈4]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    Connection128["Connection[128∈0]<br />ᐸ124ᐳ"]:::plan
+    Access185["Access[185∈1]<br />ᐸ34.3ᐳ"]:::plan
+    __Item130>"__Item[130∈5]<br />ᐸ185ᐳ"]:::itemplan
+    PgSelectSingle131["PgSelectSingle[131∈5]<br />ᐸcompoundKeyᐳ"]:::plan
+    PgClassExpression132["PgClassExpression[132∈5]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression133["PgClassExpression[133∈5]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    Connection150["Connection[150∈0]<br />ᐸ146ᐳ"]:::plan
+    PgSelect151[["PgSelect[151∈0]<br />ᐸcompoundKeyᐳ"]]:::plan
+    __Item152>"__Item[152∈6]<br />ᐸ151ᐳ"]:::itemplan
+    PgSelectSingle153["PgSelectSingle[153∈6]<br />ᐸcompoundKeyᐳ"]:::plan
+    PgClassExpression154["PgClassExpression[154∈6]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression155["PgClassExpression[155∈6]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    Connection174["Connection[174∈0]<br />ᐸ170ᐳ"]:::plan
+    Access186["Access[186∈6]<br />ᐸ152.0ᐳ"]:::plan
+    __Item176>"__Item[176∈7]<br />ᐸ186ᐳ"]:::itemplan
+    PgSelectSingle177["PgSelectSingle[177∈7]<br />ᐸforeignKeyᐳ"]:::plan
+    PgClassExpression178["PgClassExpression[178∈7]<br />ᐸ__foreign_...person_id”ᐳ"]:::plan
+    PgClassExpression179["PgClassExpression[179∈7]<br />ᐸ__foreign_...und_key_1”ᐳ"]:::plan
+    PgClassExpression180["PgClassExpression[180∈7]<br />ᐸ__foreign_...und_key_2”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access171
+    __Value3 --> Access172
+    Access171 & Access172 --> Object173
+    Object173 & Connection32 & __InputStaticLeaf70 --> PgSelect33
+    PgSelect33 ==> __Item34
+    __Item34 --> PgSelectSingle35
+    PgSelectSingle35 --> PgClassExpression36
+    PgSelectSingle35 --> PgClassExpression37
+    __InputStaticLeaf39 --> Connection57
+    __Item34 --> Access181
+    Access181 --> Reverse182
+    Reverse182 ==> __Item59
+    __Item59 --> PgSelectSingle60
+    PgSelectSingle60 --> PgClassExpression61
+    PgSelectSingle60 --> PgClassExpression62
+    __Item34 --> Access183
+    Access183 ==> __Item84
+    __Item84 --> PgSelectSingle85
+    PgSelectSingle85 --> PgClassExpression86
+    PgSelectSingle85 --> PgClassExpression87
+    __Item34 --> Access184
+    Access184 ==> __Item107
+    __Item107 --> PgSelectSingle108
+    PgSelectSingle108 --> PgClassExpression109
+    PgSelectSingle108 --> PgClassExpression110
+    __Item34 --> Access185
+    Access185 ==> __Item130
+    __Item130 --> PgSelectSingle131
+    PgSelectSingle131 --> PgClassExpression132
+    PgSelectSingle131 --> PgClassExpression133
+    Object173 & Connection150 --> PgSelect151
+    PgSelect151 ==> __Item152
+    __Item152 --> PgSelectSingle153
+    PgSelectSingle153 --> PgClassExpression154
+    PgSelectSingle153 --> PgClassExpression155
+    __Item152 --> Access186
+    Access186 ==> __Item176
+    __Item176 --> PgSelectSingle177
+    PgSelectSingle177 --> PgClassExpression178
+    PgSelectSingle177 --> PgClassExpression179
+    PgSelectSingle177 --> PgClassExpression180
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P32["ᐳallPeople"]
+    Connection32 -.-> P32
+    P33["ᐳa…eᐳnodes"]
+    PgSelect33 -.-> P33
+    P35["ᐳa…eᐳnodes[]"]
+    PgSelectSingle35 -.-> P35
+    P36["ᐳa…eᐳn…]ᐳid"]
+    PgClassExpression36 -.-> P36
+    P37["ᐳa…eᐳn…]ᐳname"]
+    PgClassExpression37 -.-> P37
+    P57["ᐳa…eᐳn…]ᐳpostsByAuthorId"]
+    Connection57 -.-> P57
+    P60["ᐳa…eᐳn…]ᐳp…dᐳnodes[]"]
+    PgSelectSingle60 -.-> P60
+    P61["ᐳa…eᐳn…]ᐳp…dᐳn…]ᐳheadline"]
+    PgClassExpression61 -.-> P61
+    P62["ᐳa…eᐳn…]ᐳp…dᐳn…]ᐳauthorId"]
+    PgClassExpression62 -.-> P62
+    P82["ᐳa…eᐳn…]ᐳroundOnePost"]
+    Connection82 -.-> P82
+    P85["ᐳa…eᐳn…]ᐳr…tᐳnodes[]"]
+    PgSelectSingle85 -.-> P85
+    P86["ᐳa…eᐳn…]ᐳr…tᐳn…]ᐳheadline"]
+    PgClassExpression86 -.-> P86
+    P87["ᐳa…eᐳn…]ᐳr…tᐳn…]ᐳauthorId"]
+    PgClassExpression87 -.-> P87
+    P105["ᐳa…eᐳn…]ᐳcompoundKeysByPersonId1"]
+    Connection105 -.-> P105
+    P108["ᐳa…eᐳn…]ᐳc…1ᐳnodes[]"]
+    PgSelectSingle108 -.-> P108
+    P109["ᐳa…eᐳn…]ᐳc…1ᐳn…]ᐳpersonId1"]
+    PgClassExpression109 -.-> P109
+    P110["ᐳa…eᐳn…]ᐳc…1ᐳn…]ᐳpersonId2"]
+    PgClassExpression110 -.-> P110
+    P128["ᐳa…eᐳn…]ᐳcompoundKeysByPersonId2"]
+    Connection128 -.-> P128
+    P131["ᐳa…eᐳn…]ᐳc…2ᐳnodes[]"]
+    PgSelectSingle131 -.-> P131
+    P132["ᐳa…eᐳn…]ᐳc…2ᐳn…]ᐳpersonId1"]
+    PgClassExpression132 -.-> P132
+    P133["ᐳa…eᐳn…]ᐳc…2ᐳn…]ᐳpersonId2"]
+    PgClassExpression133 -.-> P133
+    P150["ᐳallCompoundKeys"]
+    Connection150 -.-> P150
+    P151["ᐳa…sᐳnodes"]
+    PgSelect151 -.-> P151
+    P153["ᐳa…sᐳnodes[]"]
+    PgSelectSingle153 -.-> P153
+    P154["ᐳa…sᐳn…]ᐳpersonId1"]
+    PgClassExpression154 -.-> P154
+    P155["ᐳa…sᐳn…]ᐳpersonId2"]
+    PgClassExpression155 -.-> P155
+    P174["ᐳa…sᐳn…]ᐳforeignKeysByCompoundKey1AndCompoundKey2"]
+    Connection174 -.-> P174
+    P177["ᐳa…sᐳn…]ᐳf…2ᐳnodes[]"]
+    PgSelectSingle177 -.-> P177
+    P178["ᐳa…sᐳn…]ᐳf…2ᐳn…]ᐳpersonId"]
+    PgClassExpression178 -.-> P178
+    P179["ᐳa…sᐳn…]ᐳf…2ᐳn…]ᐳcompoundKey1"]
+    PgClassExpression179 -.-> P179
+    P180["ᐳa…sᐳn…]ᐳf…2ᐳn…]ᐳcompoundKey2"]
+    PgClassExpression180 -.-> P180
+    P182["ᐳa…eᐳn…]ᐳp…dᐳnodes"]
+    Reverse182 -.-> P182
+    P183["ᐳa…eᐳn…]ᐳr…tᐳnodes"]
+    Access183 -.-> P183
+    P184["ᐳa…eᐳn…]ᐳc…1ᐳnodes"]
+    Access184 -.-> P184
+    P185["ᐳa…eᐳn…]ᐳc…2ᐳnodes"]
+    Access185 -.-> P185
+    P186["ᐳa…sᐳn…]ᐳf…2ᐳnodes"]
+    Access186 -.-> P186
+
+    subgraph "Buckets for queries/v4/relation-head-tail"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPeople ᐸ-O- 32<br />⠀⠀⠀allPeople.nodes ᐸ-A- 33<br />⠀⠀allCompoundKeys ᐸ-O- 150<br />⠀⠀⠀allCompoundKeys.nodes ᐸ-A- 151"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,Connection32,PgSelect33,__InputStaticLeaf39,Connection57,__InputStaticLeaf70,Connection82,Connection105,Connection128,Connection150,PgSelect151,Access171,Access172,Object173,Connection174 bucket0
+    Bucket1("Bucket 1 (item34)<br />Deps: 33, 57, 82, 105, 128<br />~ᐳQuery.allPeopleᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 35<br />⠀⠀id ᐸ-L- 36<br />⠀⠀name ᐸ-L- 37<br />⠀⠀postsByAuthorId ᐸ-O- 57<br />⠀⠀⠀postsByAuthorId.nodes ᐸ-A- 182<br />⠀⠀roundOnePost ᐸ-O- 82<br />⠀⠀⠀roundOnePost.nodes ᐸ-A- 183<br />⠀⠀compoundKeysByPersonId1 ᐸ-O- 105<br />⠀⠀⠀compoundKeysByPersonId1.nodes ᐸ-A- 184<br />⠀⠀compoundKeysByPersonId2 ᐸ-O- 128<br />⠀⠀⠀compoundKeysByPersonId2.nodes ᐸ-A- 185"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item34,PgSelectSingle35,PgClassExpression36,PgClassExpression37,Access181,Reverse182,Access183,Access184,Access185 bucket1
+    Bucket2("Bucket 2 (item59)<br />Deps: 182<br />~ᐳQuery.allPeopleᐳPeopleConnection.nodes[]ᐳPerson.postsByAuthorIdᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 60<br />⠀⠀headline ᐸ-L- 61<br />⠀⠀authorId ᐸ-L- 62"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item59,PgSelectSingle60,PgClassExpression61,PgClassExpression62 bucket2
+    Bucket3("Bucket 3 (item84)<br />Deps: 183<br />~ᐳQuery.allPeopleᐳPeopleConnection.nodes[]ᐳPerson.roundOnePostᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 85<br />⠀⠀headline ᐸ-L- 86<br />⠀⠀authorId ᐸ-L- 87"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item84,PgSelectSingle85,PgClassExpression86,PgClassExpression87 bucket3
+    Bucket4("Bucket 4 (item107)<br />Deps: 184<br />~ᐳQuery.allPeopleᐳPeopleConnection.nodes[]ᐳPerson.compoundKeysByPersonId1ᐳCompoundKeysConnection.nodes[]<br />⠀ROOT ᐸ-O- 108<br />⠀⠀personId1 ᐸ-L- 109<br />⠀⠀personId2 ᐸ-L- 110"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item107,PgSelectSingle108,PgClassExpression109,PgClassExpression110 bucket4
+    Bucket5("Bucket 5 (item130)<br />Deps: 185<br />~ᐳQuery.allPeopleᐳPeopleConnection.nodes[]ᐳPerson.compoundKeysByPersonId2ᐳCompoundKeysConnection.nodes[]<br />⠀ROOT ᐸ-O- 131<br />⠀⠀personId1 ᐸ-L- 132<br />⠀⠀personId2 ᐸ-L- 133"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item130,PgSelectSingle131,PgClassExpression132,PgClassExpression133 bucket5
+    Bucket6("Bucket 6 (item152)<br />Deps: 151, 174<br />~ᐳQuery.allCompoundKeysᐳCompoundKeysConnection.nodes[]<br />⠀ROOT ᐸ-O- 153<br />⠀⠀personId1 ᐸ-L- 154<br />⠀⠀personId2 ᐸ-L- 155<br />⠀⠀foreignKeysByCompoundKey1AndCompoundKey2 ᐸ-O- 174<br />⠀⠀⠀foreignKeysByCompoundKey1AndCompoundKey2.nodes ᐸ-A- 186"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item152,PgSelectSingle153,PgClassExpression154,PgClassExpression155,Access186 bucket6
+    Bucket7("Bucket 7 (item176)<br />Deps: 186<br />~ᐳQuery.allCompoundKeysᐳCompoundKeysConnection.nodes[]ᐳCompoundKey.foreignKeysByCompoundKey1AndCompoundKey2ᐳForeignKeysConnection.nodes[]<br />⠀ROOT ᐸ-O- 177<br />⠀⠀personId ᐸ-L- 178<br />⠀⠀compoundKey1 ᐸ-L- 179<br />⠀⠀compoundKey2 ᐸ-L- 180"):::bucket
+    classDef bucket7 stroke:#808000
+    class Bucket7,__Item176,PgSelectSingle177,PgClassExpression178,PgClassExpression179,PgClassExpression180 bucket7
+    Bucket0 --> Bucket1 & Bucket6
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5
+    Bucket6 --> Bucket7
+    end
