@@ -7,6 +7,7 @@ export interface V4Options {
   simpleCollections?: "both" | "only" | "omit";
   classicIds?: boolean;
   pgForbidSetofFunctionsToReturnNull?: boolean;
+  dynamicJson?: boolean;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -81,6 +82,7 @@ export const makeV4Preset = (
       pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
         options.pgForbidSetofFunctionsToReturnNull ?? false,
+      jsonScalarAsString: options.dynamicJson !== true,
     },
   };
 };
