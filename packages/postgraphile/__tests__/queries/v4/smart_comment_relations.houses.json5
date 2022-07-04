@@ -1,0 +1,321 @@
+{
+  allHouses: {
+    nodes: [
+      {
+        nodeId: "WyJob3VzZXMiLDEsMV0=",
+        buildingName: "Home sweet home",
+        propertyNameOrNumber: "My House",
+        streetName: "My Street",
+        streetId: 1,
+        buildingId: 4,
+        propertyId: 1,
+        streetByStreetId: {
+          nodeId: "WyJzdHJlZXRzIiwxXQ==",
+          id: 1,
+          name: "My Street",
+          buildingsNamedAfterStreet: {
+            nodes: [],
+          },
+        },
+        buildingByBuildingId: {
+          nodeId: "WyJidWlsZGluZ3MiLDRd",
+          id: 4,
+          name: "Home sweet home",
+          floors: 2,
+          isPrimary: true,
+          namedAfterStreet: null,
+          propertyByPropertyId: {
+            nodeId: "WyJwcm9wZXJ0aWVzIiwxXQ==",
+            id: 1,
+            streetId: 1,
+            nameOrNumber: "My House",
+            streetByStreetId: {
+              nodeId: "WyJzdHJlZXRzIiwxXQ==",
+              id: 1,
+              name: "My Street",
+              buildingsNamedAfterStreet: {
+                nodes: [],
+              },
+            },
+          },
+        },
+        propertyByPropertyId: {
+          nodeId: "WyJwcm9wZXJ0aWVzIiwxXQ==",
+          id: 1,
+          streetId: 1,
+          nameOrNumber: "My House",
+          streetByStreetId: {
+            nodeId: "WyJzdHJlZXRzIiwxXQ==",
+            id: 1,
+            name: "My Street",
+            buildingsNamedAfterStreet: {
+              nodes: [],
+            },
+          },
+        },
+        streetPropertyByStreetIdAndPropertyId: {
+          strId: 1,
+          propId: 1,
+          currentOwner: "Me",
+          streetByStrId: {
+            nodeId: "WyJzdHJlZXRzIiwxXQ==",
+            id: 1,
+            name: "My Street",
+            buildingsNamedAfterStreet: {
+              nodes: [],
+            },
+          },
+          propertyByPropId: {
+            nodeId: "WyJwcm9wZXJ0aWVzIiwxXQ==",
+            id: 1,
+            streetId: 1,
+            nameOrNumber: "My House",
+            streetByStreetId: {
+              nodeId: "WyJzdHJlZXRzIiwxXQ==",
+              id: 1,
+              name: "My Street",
+              buildingsNamedAfterStreet: {
+                nodes: [],
+              },
+            },
+          },
+        },
+      },
+      {
+        nodeId: "WyJob3VzZXMiLDEsMl0=",
+        buildingName: null,
+        propertyNameOrNumber: "10",
+        streetName: "My Street",
+        streetId: 1,
+        buildingId: null,
+        propertyId: 2,
+        streetByStreetId: {
+          nodeId: "WyJzdHJlZXRzIiwxXQ==",
+          id: 1,
+          name: "My Street",
+          buildingsNamedAfterStreet: {
+            nodes: [],
+          },
+        },
+        buildingByBuildingId: null,
+        propertyByPropertyId: {
+          nodeId: "WyJwcm9wZXJ0aWVzIiwyXQ==",
+          id: 2,
+          streetId: 1,
+          nameOrNumber: "10",
+          streetByStreetId: {
+            nodeId: "WyJzdHJlZXRzIiwxXQ==",
+            id: 1,
+            name: "My Street",
+            buildingsNamedAfterStreet: {
+              nodes: [],
+            },
+          },
+        },
+        streetPropertyByStreetIdAndPropertyId: null,
+      },
+      {
+        nodeId: "WyJob3VzZXMiLDIsM10=",
+        buildingName: "Our House",
+        propertyNameOrNumber: "The middle",
+        streetName: "Our Street",
+        streetId: 2,
+        buildingId: 1,
+        propertyId: 3,
+        streetByStreetId: {
+          nodeId: "WyJzdHJlZXRzIiwyXQ==",
+          id: 2,
+          name: "Our Street",
+          buildingsNamedAfterStreet: {
+            nodes: [],
+          },
+        },
+        buildingByBuildingId: {
+          nodeId: "WyJidWlsZGluZ3MiLDFd",
+          id: 1,
+          name: "Our House",
+          floors: 3,
+          isPrimary: true,
+          namedAfterStreet: null,
+          propertyByPropertyId: {
+            nodeId: "WyJwcm9wZXJ0aWVzIiwzXQ==",
+            id: 3,
+            streetId: 2,
+            nameOrNumber: "The middle",
+            streetByStreetId: {
+              nodeId: "WyJzdHJlZXRzIiwyXQ==",
+              id: 2,
+              name: "Our Street",
+              buildingsNamedAfterStreet: {
+                nodes: [],
+              },
+            },
+          },
+        },
+        propertyByPropertyId: {
+          nodeId: "WyJwcm9wZXJ0aWVzIiwzXQ==",
+          id: 3,
+          streetId: 2,
+          nameOrNumber: "The middle",
+          streetByStreetId: {
+            nodeId: "WyJzdHJlZXRzIiwyXQ==",
+            id: 2,
+            name: "Our Street",
+            buildingsNamedAfterStreet: {
+              nodes: [],
+            },
+          },
+        },
+        streetPropertyByStreetIdAndPropertyId: {
+          strId: 2,
+          propId: 3,
+          currentOwner: "Us",
+          streetByStrId: {
+            nodeId: "WyJzdHJlZXRzIiwyXQ==",
+            id: 2,
+            name: "Our Street",
+            buildingsNamedAfterStreet: {
+              nodes: [],
+            },
+          },
+          propertyByPropId: {
+            nodeId: "WyJwcm9wZXJ0aWVzIiwzXQ==",
+            id: 3,
+            streetId: 2,
+            nameOrNumber: "The middle",
+            streetByStreetId: {
+              nodeId: "WyJzdHJlZXRzIiwyXQ==",
+              id: 2,
+              name: "Our Street",
+              buildingsNamedAfterStreet: {
+                nodes: [],
+              },
+            },
+          },
+        },
+      },
+      {
+        nodeId: "WyJob3VzZXMiLDMsNF0=",
+        buildingName: "The Tower",
+        propertyNameOrNumber: "Your house",
+        streetName: "Dunroamin",
+        streetId: 3,
+        buildingId: 5,
+        propertyId: 4,
+        streetByStreetId: {
+          nodeId: "WyJzdHJlZXRzIiwzXQ==",
+          id: 3,
+          name: "Dunroamin",
+          buildingsNamedAfterStreet: {
+            nodes: [
+              {
+                nodeId: "WyJidWlsZGluZ3MiLDJd",
+                id: 2,
+                name: "Dunroamin",
+              },
+            ],
+          },
+        },
+        buildingByBuildingId: {
+          nodeId: "WyJidWlsZGluZ3MiLDVd",
+          id: 5,
+          name: "The Tower",
+          floors: 200,
+          isPrimary: true,
+          namedAfterStreet: null,
+          propertyByPropertyId: {
+            nodeId: "WyJwcm9wZXJ0aWVzIiw0XQ==",
+            id: 4,
+            streetId: 3,
+            nameOrNumber: "Your house",
+            streetByStreetId: {
+              nodeId: "WyJzdHJlZXRzIiwzXQ==",
+              id: 3,
+              name: "Dunroamin",
+              buildingsNamedAfterStreet: {
+                nodes: [
+                  {
+                    nodeId: "WyJidWlsZGluZ3MiLDJd",
+                    id: 2,
+                    name: "Dunroamin",
+                  },
+                ],
+              },
+            },
+          },
+        },
+        propertyByPropertyId: {
+          nodeId: "WyJwcm9wZXJ0aWVzIiw0XQ==",
+          id: 4,
+          streetId: 3,
+          nameOrNumber: "Your house",
+          streetByStreetId: {
+            nodeId: "WyJzdHJlZXRzIiwzXQ==",
+            id: 3,
+            name: "Dunroamin",
+            buildingsNamedAfterStreet: {
+              nodes: [
+                {
+                  nodeId: "WyJidWlsZGluZ3MiLDJd",
+                  id: 2,
+                  name: "Dunroamin",
+                },
+              ],
+            },
+          },
+        },
+        streetPropertyByStreetIdAndPropertyId: {
+          strId: 3,
+          propId: 4,
+          currentOwner: "You",
+          streetByStrId: {
+            nodeId: "WyJzdHJlZXRzIiwzXQ==",
+            id: 3,
+            name: "Dunroamin",
+            buildingsNamedAfterStreet: {
+              nodes: [
+                {
+                  nodeId: "WyJidWlsZGluZ3MiLDJd",
+                  id: 2,
+                  name: "Dunroamin",
+                },
+              ],
+            },
+          },
+          propertyByPropId: {
+            nodeId: "WyJwcm9wZXJ0aWVzIiw0XQ==",
+            id: 4,
+            streetId: 3,
+            nameOrNumber: "Your house",
+            streetByStreetId: {
+              nodeId: "WyJzdHJlZXRzIiwzXQ==",
+              id: 3,
+              name: "Dunroamin",
+              buildingsNamedAfterStreet: {
+                nodes: [
+                  {
+                    nodeId: "WyJidWlsZGluZ3MiLDJd",
+                    id: 2,
+                    name: "Dunroamin",
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+  brothersGotADateToKeep: {
+    cantHangAround: "Our House",
+    in: "The middle",
+    of: "Our Street",
+    z: "WyJob3VzZXMiLDIsM10=",
+  },
+  nothingEverSlowsHerDown: {
+    andAMessIsNotAllowed: "Our House",
+    in: "The middle",
+    of: "Our Street",
+    z: "WyJob3VzZXMiLDIsM10=",
+  },
+}

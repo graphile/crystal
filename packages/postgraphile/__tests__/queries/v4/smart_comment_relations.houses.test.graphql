@@ -1,0 +1,85 @@
+## expect(errors).toBeFalsy();
+#> schema: ["smart_comment_relations"]
+{
+  allHouses {
+    nodes {
+      nodeId
+      buildingName
+      propertyNameOrNumber
+      streetName
+      streetId
+      buildingId
+      propertyId
+      streetByStreetId {
+        ...StreetFrag
+      }
+      buildingByBuildingId {
+        ...BuildingFrag
+      }
+      propertyByPropertyId {
+        ...PropertyFrag
+      }
+      streetPropertyByStreetIdAndPropertyId {
+        strId
+        propId
+        currentOwner
+        streetByStrId {
+          ...StreetFrag
+        }
+        propertyByPropId {
+          ...PropertyFrag
+        }
+      }
+    }
+  }
+  brothersGotADateToKeep: houseByStreetIdAndPropertyId(
+    streetId: 2
+    propertyId: 3
+  ) {
+    cantHangAround: buildingName
+    in: propertyNameOrNumber
+    of: streetName
+    z: nodeId
+  }
+  nothingEverSlowsHerDown: house(nodeId: "WyJob3VzZXMiLDIsM10=") {
+    andAMessIsNotAllowed: buildingName
+    in: propertyNameOrNumber
+    of: streetName
+    z: nodeId
+  }
+}
+
+fragment BuildingFrag on Building {
+  nodeId
+  id
+  name
+  floors
+  isPrimary
+  namedAfterStreet {
+    ...StreetFrag
+  }
+  propertyByPropertyId {
+    ...PropertyFrag
+  }
+}
+fragment PropertyFrag on Property {
+  nodeId
+  id
+  streetId
+  nameOrNumber
+  streetByStreetId {
+    ...StreetFrag
+  }
+}
+fragment StreetFrag on Street {
+  nodeId
+  id
+  name
+  buildingsNamedAfterStreet {
+    nodes {
+      nodeId
+      id
+      name
+    }
+  }
+}
