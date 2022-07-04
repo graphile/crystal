@@ -3672,7 +3672,11 @@ export class OpPlan<
                 bucket.rootOutputStepId !== plan.id
               ) {
                 throw new Error(
-                  `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputStepId is already set to '${bucket.rootOutputStepId}', cannot set it to '${plan.id}'`,
+                  `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${
+                    bucket.id
+                  }'s rootOutputStepId is already set to '${
+                    this.plans[bucket.rootOutputStepId]
+                  }', cannot set it to '${plan}'`,
                 );
               }
               if (bucket.polymorphicPlanIds) {
