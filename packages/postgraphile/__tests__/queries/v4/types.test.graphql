@@ -1,0 +1,212 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+query {
+  allTypes {
+    ...typesConnection
+  }
+  allTypesList {
+    ...type
+  }
+  typeById(id: 11) {
+    ...type
+  }
+  type(nodeId: "WyJ0eXBlcyIsMTFd") {
+    ...type
+  }
+  node(nodeId: "WyJ0eXBlcyIsMTFd") {
+    ...type
+  }
+  typeFunction(id: 11) {
+    ...type
+  }
+  typeFunctionList {
+    ...type
+  }
+  typeFunctionConnection {
+    ...typesConnection
+  }
+  personById(id: 1) {
+    typeFunction(id: 11) {
+      ...type
+    }
+    typeFunctionList {
+      ...type
+    }
+    typeFunctionConnection {
+      ...typesConnection
+    }
+  }
+  postById(id: 11) {
+    id
+    headline
+    typeById {
+      ...type
+    }
+    typesBySmallint {
+      ...typesConnection
+    }
+  }
+}
+
+fragment compoundType on CompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
+}
+
+# This should be the same fragment as in mutations/types.graphql
+fragment type on Type {
+  id
+  smallint
+  bigint
+  numeric
+  decimal
+  boolean
+  varchar
+  enum
+  enumArray
+  domain
+  domain2
+  textArray
+  json
+  jsonb
+  nullableRange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  numrange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  daterange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  anIntRange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  timestamp
+  timestamptz
+  date
+  time
+  timetz
+  interval {
+    years
+    months
+    days
+    hours
+    minutes
+    seconds
+  }
+  intervalArray {
+    years
+    months
+    days
+    hours
+    minutes
+    seconds
+  }
+  money
+  compoundType {
+    ...compoundType
+  }
+  nestedCompoundType {
+    a {
+      ...compoundType
+    }
+    b {
+      ...compoundType
+    }
+    bazBuz
+  }
+  nullableCompoundType {
+    ...compoundType
+  }
+  nullableNestedCompoundType {
+    a {
+      ...compoundType
+    }
+    b {
+      ...compoundType
+    }
+    bazBuz
+  }
+  point {
+    x
+    y
+  }
+  nullablePoint {
+    x
+    y
+  }
+  inet
+  cidr
+  macaddr
+  regproc
+  regprocedure
+  regoper
+  regoperator
+  regclass
+  regtype
+  regconfig
+  regdictionary
+  textArrayDomain
+  int8ArrayDomain
+  postBySmallint {
+    id
+    headline
+  }
+  postById {
+    id
+    headline
+  }
+}
+
+fragment typesConnection on TypesConnection {
+  nodes {
+    ...type
+  }
+  edges {
+    node {
+      ...type
+    }
+  }
+  totalCount
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+}
