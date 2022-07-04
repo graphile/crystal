@@ -1822,7 +1822,7 @@ export class Aether<
     pathIdentity: string,
     allowSideEffects = false,
   ): void {
-    const ids = this.getPlanIds(oldPlansLength);
+    const ids = this.getStepIds(oldPlansLength);
     for (const i of ids) {
       const newPlan = this.plans[i];
       // If the newPlan still exists, finalize it with respect to arguments (once only).
@@ -2352,13 +2352,13 @@ export class Aether<
     return plan;
   }
 
-  private getPlanIds(offset = 0) {
+  private getStepIds(offset = 0) {
     return Object.keys(this.plans).slice(offset);
   }
 
   private validatePlans(offset = 0): void {
     const errors: Error[] = [];
-    const ids = this.getPlanIds(offset);
+    const ids = this.getStepIds(offset);
     for (const id of ids) {
       const plan = this.plans[id];
       const referencingPlanIsAllowed =
@@ -2495,7 +2495,7 @@ export class Aether<
 
       if (replacementPlan != plan) {
         // Replace all references to `plan` with `replacementPlan`
-        const ids = this.getPlanIds();
+        const ids = this.getStepIds();
         for (const j of ids) {
           if (this.plans[j] && this.plans[j].id === plan.id) {
             this.plans[j] = replacementPlan;
@@ -2510,7 +2510,7 @@ export class Aether<
     let plansAdded = 0;
     const oldPlanCount = this.planCount;
     let l = oldPlanCount;
-    const ids = this.getPlanIds(offset);
+    const ids = this.getStepIds(offset);
     for (const i of ids) {
       processPlan(this.plans[i]);
 
@@ -2829,7 +2829,7 @@ export class Aether<
       this.markPlanActive(plan, activePlans);
     }
 
-    const ids = this.getPlanIds();
+    const ids = this.getStepIds();
     for (const i of ids) {
       const plan = this.plans[i];
       if (plan && !activePlans.has(plan)) {
@@ -3818,7 +3818,7 @@ export class Aether<
    */
   private finalizePlans(): void {
     const distinctActivePlansInReverseOrder = new Set<ExecutableStep>();
-    const ids = this.getPlanIds();
+    const ids = this.getStepIds();
     for (const i of ids.reverse()) {
       const plan = this.plans[i];
       if (plan !== null) {

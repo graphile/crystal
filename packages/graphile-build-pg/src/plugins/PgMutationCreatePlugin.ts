@@ -123,7 +123,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                     }>,
                                   ) {
                                     const $record =
-                                      $object.getPlanForKey("result");
+                                      $object.getStepForKey("result");
                                     return $record.setPlan();
                                   },
                                 [],
@@ -160,7 +160,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                         (constant) =>
                           function plan($mutation: ObjectStep<any>) {
                             return (
-                              $mutation.getPlanForKey(
+                              $mutation.getStepForKey(
                                 "clientMutationId",
                                 true,
                               ) ?? constant(null)

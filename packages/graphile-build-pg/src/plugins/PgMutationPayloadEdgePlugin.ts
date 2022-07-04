@@ -179,7 +179,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       args,
                       info: { schema: GraphQLSchema },
                     ) {
-                      const $record = $mutation.getPlanForKey("record", true);
+                      const $record = $mutation.getStepForKey("record", true);
                       if (!$record) return constant(null);
 
                       const spec = pkColumns.reduce((memo, columnName) => {

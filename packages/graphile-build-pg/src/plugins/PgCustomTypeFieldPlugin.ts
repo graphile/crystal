@@ -385,7 +385,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         (constant) =>
                           function plan($object: ObjectStep<any>) {
                             return (
-                              $object.getPlanForKey("clientMutationId", true) ??
+                              $object.getStepForKey("clientMutationId", true) ??
                               constant(undefined)
                             );
                           },

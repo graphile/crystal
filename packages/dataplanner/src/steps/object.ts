@@ -59,7 +59,7 @@ export class ObjectStep<
     this.addDependency(plan);
   }
 
-  getPlanForKey<TKey extends keyof TPlans>(
+  getStepForKey<TKey extends keyof TPlans>(
     key: TKey,
     allowMissing = false,
   ): TKey extends keyof TPlans ? TPlans[TKey] : null {

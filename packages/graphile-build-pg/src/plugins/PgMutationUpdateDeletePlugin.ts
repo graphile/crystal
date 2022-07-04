@@ -356,7 +356,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                       }>,
                                     ) {
                                       const $record =
-                                        $object.getPlanForKey("result");
+                                        $object.getStepForKey("result");
                                       const specifier = handler.plan($record);
                                       return lambda(
                                         specifier,
@@ -520,7 +520,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                     }>,
                                   ) {
                                     const $record =
-                                      $object.getPlanForKey("result");
+                                      $object.getStepForKey("result");
                                     return $record.setPlan();
                                   },
                                 [],
