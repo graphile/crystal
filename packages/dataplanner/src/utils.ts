@@ -41,7 +41,7 @@ import type {
 import type { ExecutableStep, ModifierStep } from "./plan.js";
 
 /**
- * The parent object is used as the key in `GetValuePlanId()`; for root level
+ * The parent object is used as the key in `GetValueStepId()`; for root level
  * fields it's possible that the parent will be null/undefined (in all other
  * cases it will be an object), so we need a value that can be the key in a
  * WeakMap to represent the root.

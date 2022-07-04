@@ -145,7 +145,7 @@ export interface BucketDefinition {
    * If this bucket has a plan for setting it's own root object, let this be
    * that.
    */
-  rootOutputPlanId?: string;
+  rootOutputStepId?: string;
   /**
    * If this bucket has a plan for setting it's own root object, what type of
    * processing should it get?.
@@ -194,7 +194,7 @@ export interface BucketDefinition {
    * If this bucket was caused by an `__ItemStep` (list, stream, subscription)
    * then what's the id of that `__ItemStep`.
    */
-  itemPlanId?: string;
+  itemStepId?: string;
   /**
    * If this is a 'group' bucket, which group is it?
    */

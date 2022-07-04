@@ -164,8 +164,8 @@ export interface PolymorphicData<TType extends string = string, _TData = any> {
   [$$concreteType]: TType;
 }
 
-export interface IndexByListItemPlanId {
-  [listItemPlanId: string]: number;
+export interface IndexByListItemStepId {
+  [listItemStepId: string]: number;
 }
 
 /**
@@ -224,7 +224,7 @@ export interface Batch {
 export interface CrystalContext {
   aether: Aether;
 
-  metaByPlanId: {
+  metaByStepId: {
     [planId: string]: Record<string, unknown> | undefined;
   };
 

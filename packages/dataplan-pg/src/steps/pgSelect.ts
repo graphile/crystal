@@ -355,9 +355,9 @@ export class PgSelectStep<
   private last: number | null;
   private fetchOneExtra: boolean;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  private lowerIndexPlanId: number | null;
+  private lowerIndexStepId: number | null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  private upperIndexPlanId: number | null;
+  private upperIndexStepId: number | null;
   /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
   private limitAndOffsetId: number | null;
 
@@ -367,8 +367,8 @@ export class PgSelectStep<
 
   // CURSORS
 
-  private beforePlanId: number | null;
-  private afterPlanId: number | null;
+  private beforeStepId: number | null;
+  private afterStepId: number | null;
 
   // --------------------
 
@@ -714,31 +714,31 @@ export class PgSelectStep<
       ? cloneFromMatchingMode.fetchOneExtra
       : false;
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
-    this.beforePlanId =
-      cloneFromMatchingMode && cloneFromMatchingMode.beforePlanId != null
+    this.beforeStepId =
+      cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
         ? this.addDependency(
-            cloneFromMatchingMode.getDep(cloneFromMatchingMode.beforePlanId),
+            cloneFromMatchingMode.getDep(cloneFromMatchingMode.beforeStepId),
           )
         : null;
-    this.afterPlanId =
-      cloneFromMatchingMode && cloneFromMatchingMode.afterPlanId != null
+    this.afterStepId =
+      cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
         ? this.addDependency(
-            cloneFromMatchingMode.getDep(cloneFromMatchingMode.afterPlanId),
+            cloneFromMatchingMode.getDep(cloneFromMatchingMode.afterStepId),
           )
         : null;
-    this.lowerIndexPlanId =
-      cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexPlanId != null
+    this.lowerIndexStepId =
+      cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
         ? this.addDependency(
             cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.lowerIndexPlanId,
+              cloneFromMatchingMode.lowerIndexStepId,
             ),
           )
         : null;
-    this.upperIndexPlanId =
-      cloneFromMatchingMode && cloneFromMatchingMode.upperIndexPlanId != null
+    this.upperIndexStepId =
+      cloneFromMatchingMode && cloneFromMatchingMode.upperIndexStepId != null
         ? this.addDependency(
             cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.upperIndexPlanId,
+              cloneFromMatchingMode.upperIndexStepId,
             ),
           )
         : null;
@@ -752,16 +752,16 @@ export class PgSelectStep<
         : null;
 
     this.afterLock("orderBy", () => {
-      if (this.beforePlanId != null) {
+      if (this.beforeStepId != null) {
         this.applyConditionFromCursor(
           "before",
-          this.getDep(this.beforePlanId) as any,
+          this.getDep(this.beforeStepId) as any,
         );
       }
-      if (this.afterPlanId != null) {
+      if (this.afterStepId != null) {
         this.applyConditionFromCursor(
           "after",
-          this.getDep(this.afterPlanId) as any,
+          this.getDep(this.afterStepId) as any,
         );
       }
     });
@@ -1122,9 +1122,9 @@ export class PgSelectStep<
       // Natural pagination `['natural', N]`
       const $n = access($parsedCursorPlan, [1]);
       if (beforeOrAfter === "before") {
-        this.upperIndexPlanId = this.addDependency($n);
+        this.upperIndexStepId = this.addDependency($n);
       } else {
-        this.lowerIndexPlanId = this.addDependency($n);
+        this.lowerIndexStepId = this.addDependency($n);
       }
       return;
     }
@@ -1201,11 +1201,11 @@ export class PgSelectStep<
   }
 
   setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.afterPlanId = this.addDependency($parsedCursorPlan);
+    this.afterStepId = this.addDependency($parsedCursorPlan);
   }
 
   setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.beforePlanId = this.addDependency($parsedCursorPlan);
+    this.beforeStepId = this.addDependency($parsedCursorPlan);
   }
 
   public pageInfo(
@@ -1599,8 +1599,8 @@ export class PgSelectStep<
     return (
       this.first == null &&
       this.last != null &&
-      this.lowerIndexPlanId == null &&
-      this.upperIndexPlanId == null
+      this.lowerIndexStepId == null &&
+      this.upperIndexStepId == null
     );
   }
 
@@ -1650,7 +1650,7 @@ export class PgSelectStep<
 
   private limitAndOffsetSQL: SQL | null = null;
   private planLimitAndOffset() {
-    if (this.lowerIndexPlanId != null || this.upperIndexPlanId != null) {
+    if (this.lowerIndexStepId != null || this.upperIndexStepId != null) {
       /*
        * When using cursor-base pagination with 'natural' cursors, we are actually
        * applying limit/offset under the hood (presumably because we're paginating
@@ -1703,12 +1703,12 @@ export class PgSelectStep<
        */
 
       const $lower =
-        this.lowerIndexPlanId != null
-          ? this.getDep(this.lowerIndexPlanId)
+        this.lowerIndexStepId != null
+          ? this.getDep(this.lowerIndexStepId)
           : constant(null);
       const $upper =
-        this.upperIndexPlanId != null
-          ? this.getDep(this.upperIndexPlanId)
+        this.upperIndexStepId != null
+          ? this.getDep(this.upperIndexStepId)
           : constant(null);
 
       const limitAndOffsetLambda = lambda(
@@ -2576,7 +2576,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           parent instanceof PgSelectSingleStep &&
           parent.getClassStep().mode !== "aggregate"
         ) {
-          const parent2 = this.getPlan(parent.dependencies[parent.itemPlanId]);
+          const parent2 = this.getPlan(parent.dependencies[parent.itemStepId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, codec } = this.queryValues[i];
             const plan = this.getPlan(this.dependencies[dependencyIndex]);

@@ -42,13 +42,13 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
 
   isSyncAndSafe = true;
 
-  private connectionPlanId: string;
+  private connectionStepId: string;
 
   constructor(
     connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>,
   ) {
     super();
-    this.connectionPlanId = connectionPlan.id;
+    this.connectionStepId = connectionPlan.id;
   }
 
   /**
@@ -62,10 +62,10 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
     TStep,
     any
   > {
-    const plan = this.getPlan(this.connectionPlanId);
+    const plan = this.getPlan(this.connectionStepId);
     if (!(plan instanceof ConnectionStep)) {
       throw new Error(
-        `Expected ${this.connectionPlanId} (${plan}) to be a ConnectionStep`,
+        `Expected ${this.connectionStepId} (${plan}) to be a ConnectionStep`,
       );
     }
     return plan as ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>;

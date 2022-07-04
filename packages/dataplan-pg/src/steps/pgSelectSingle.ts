@@ -82,9 +82,9 @@ export class PgSelectSingleStep<
   isSyncAndSafe = true;
 
   public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
-  public readonly itemPlanId: number;
+  public readonly itemStepId: number;
   public readonly mode: PgSelectMode;
-  private classPlanId: string;
+  private classStepId: string;
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
   private _coalesceToEmptyObject = false;
@@ -98,8 +98,8 @@ export class PgSelectSingleStep<
     this.source = classPlan.source;
     this.pgCodec = this.source.codec;
     this.mode = classPlan.mode;
-    this.classPlanId = classPlan.id;
-    this.itemPlanId = this.addDependency(itemPlan);
+    this.classStepId = classPlan.id;
+    this.itemStepId = this.addDependency(itemPlan);
   }
 
   public coalesceToEmptyObject(): void {
@@ -119,17 +119,17 @@ export class PgSelectSingleStep<
     if (this.aether.isOptimized(this)) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
-    const plan = this.getPlan(this.classPlanId);
+    const plan = this.getPlan(this.classStepId);
     if (!(plan instanceof PgSelectStep)) {
       throw new Error(
-        `Expected ${this.classPlanId} (${plan}) to be a PgSelectStep`,
+        `Expected ${this.classStepId} (${plan}) to be a PgSelectStep`,
       );
     }
     return plan;
   }
 
   private getItemStep(): ExecutableStep<PgSourceRow<TColumns>> {
-    const plan = this.getPlan(this.dependencies[this.itemPlanId]);
+    const plan = this.getPlan(this.dependencies[this.itemStepId]);
     return plan;
   }
 
@@ -555,7 +555,7 @@ export class PgSelectSingleStep<
   execute(
     values: CrystalValuesList<[PgSourceRow<TColumns>]>,
   ): CrystalResultsList<PgSourceRow<TColumns> | null> {
-    return values[this.itemPlanId].map((result) => {
+    return values[this.itemStepId].map((result) => {
       if (result == null) {
         return this._coalesceToEmptyObject ? Object.create(null) : null;
       } else if (this.nullCheckAttributeIndex != null) {

@@ -172,7 +172,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   isSyncAndSafe = true;
 
   private destructure: (value: TData) => any;
-  private parentPlanId: string;
+  private parentStepId: string;
   allowMultipleOptimizations = true;
 
   constructor(
@@ -182,7 +182,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   ) {
     super();
     this.addDependency(parentPlan);
-    this.parentPlanId = parentPlan.id;
+    this.parentStepId = parentPlan.id;
     this.destructure = constructDestructureFunction(path, fallback);
   }
 
@@ -199,7 +199,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     if (typeof attrName !== "string") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getPlan(this.parentPlanId), [
+    return new AccessStep(this.getPlan(this.parentStepId), [
       ...this.path,
       attrName,
     ]);
@@ -212,7 +212,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     if (typeof index !== "number") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getPlan(this.parentPlanId), [
+    return new AccessStep(this.getPlan(this.parentStepId), [
       ...this.path,
       index,
     ]);

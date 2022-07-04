@@ -50,8 +50,8 @@ export class PgPolymorphicStep<
   };
   isSyncAndSafe = true;
 
-  private typeSpecifierPlanId: number;
-  private itemPlanId: number;
+  private typeSpecifierStepId: number;
+  private itemStepId: number;
   private types: string[];
 
   constructor(
@@ -64,8 +64,8 @@ export class PgPolymorphicStep<
     >,
   ) {
     super();
-    this.itemPlanId = this.addDependency($itemPlan);
-    this.typeSpecifierPlanId = this.addDependency($typeSpecifierPlan);
+    this.itemStepId = this.addDependency($itemPlan);
+    this.typeSpecifierStepId = this.addDependency($typeSpecifierPlan);
     this.types = Object.keys(possibleTypes);
   }
 
@@ -79,13 +79,13 @@ export class PgPolymorphicStep<
   }
 
   itemPlan(): TItemStep {
-    const plan = this.getPlan(this.dependencies[this.itemPlanId]);
+    const plan = this.getPlan(this.dependencies[this.itemStepId]);
     return plan as any;
   }
 
   typeSpecifierPlan(): TTypeSpecifierStep {
     const plan = this.getPlan(
-      this.dependencies[this.typeSpecifierPlanId],
+      this.dependencies[this.typeSpecifierStepId],
     ) as TTypeSpecifierStep;
     return plan;
   }
@@ -127,7 +127,7 @@ export class PgPolymorphicStep<
     string,
     ReadonlyArray<any> // TODO: something to do with TCodec
   > | null> {
-    return values[this.typeSpecifierPlanId].map((specifier) => {
+    return values[this.typeSpecifierStepId].map((specifier) => {
       if (specifier) {
         const typeName = this.getTypeNameFromSpecifier(specifier);
         return polymorphicWrap(typeName);

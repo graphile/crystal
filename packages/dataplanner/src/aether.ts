@@ -409,7 +409,7 @@ interface FieldDigest {
    */
   returnRaw: boolean;
   planId: string;
-  itemPlanId: string;
+  itemStepId: string;
   /**
    * The field digests that are related to the selection set for this field.
    *
@@ -555,14 +555,14 @@ export class Aether<
    *
    * @internal
    */
-  public subscriptionPlanId: string | undefined;
+  public subscriptionStepId: string | undefined;
 
   /**
    * The plan id for the plan that represents a single payload in the subscription stream (if any)
    *
    * @internal
    */
-  public subscriptionItemPlanId: string | undefined;
+  public subscriptionItemStepId: string | undefined;
 
   /**
    * The plan by path identity is the plan that will return the results that
@@ -620,15 +620,15 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly itemPlanIdByListPlanId: {
-    [listPlanId: string]: string | undefined;
+  public readonly itemPlanIdByListStepId: {
+    [listStepId: string]: string | undefined;
   } = Object.create(null);
 
   /**
    * @internal
    */
-  public readonly itemPlanIdByListTransformPlanId: {
-    [listPlanId: string]: string | undefined;
+  public readonly itemPlanIdByListTransformStepId: {
+    [listStepId: string]: string | undefined;
   } = Object.create(null);
 
   /**
@@ -641,8 +641,8 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly transformDependencyPlanIdByTransformPlanId: {
-    [transformPlanId: string]: string;
+  public readonly transformDependencyPlanIdByTransformStepId: {
+    [transformStepId: string]: string;
   };
 
   /**
@@ -694,7 +694,7 @@ export class Aether<
   private readonly planOptionsByPlan = new Map<ExecutableStep, PlanOptions>();
 
   // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
-  private readonly polymorphicDetailsByPlanId: Record<
+  private readonly polymorphicDetailsByStepId: Record<
     string,
     { polymorphicPlanIds: string[]; typeNames: string[] }
   > = Object.create(null);
@@ -778,9 +778,9 @@ export class Aether<
    */
   private canPreempt = false;
   /**
-   * Factory for metaByPlanId variables.
+   * Factory for metaByStepId variables.
    */
-  private makeMetaByPlanId: () => CrystalContext["metaByPlanId"];
+  private makeMetaByStepId: () => CrystalContext["metaByStepId"];
 
   private [$$contextPlanCache]: any = null;
   private [$$introspectionResponseCache]: any = null;
@@ -904,7 +904,7 @@ export class Aether<
       [ROOT_PATH]: this.planIdByPathIdentity[ROOT_PATH],
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
-    this.transformDependencyPlanIdByTransformPlanId = Object.create(null);
+    this.transformDependencyPlanIdByTransformStepId = Object.create(null);
     this.returnRawValueByPathIdentity = Object.create(null);
     this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: [0],
@@ -913,7 +913,7 @@ export class Aether<
     this.groups.push({
       id: 0,
       parent: null,
-      parentPlanId: this.rootSelectionSetPlan.id,
+      parentStepId: this.rootSelectionSetPlan.id,
       reason: "root",
       children: [],
     });
@@ -1059,16 +1059,16 @@ export class Aether<
     /*
      * A JIT'd object constructor, roughly equivalent to:
 
-       const makeMetaByPlanId = () => {
-         const metaByPlanId = Object.create(null);
+       const makeMetaByStepId = () => {
+         const metaByStepId = Object.create(null);
          for (const [planId, plan] of Object.entries(this.plans)) {
            if (plan && plan.id === planId) {
-             metaByPlanId[plan.id] = Object.create(null);
+             metaByStepId[plan.id] = Object.create(null);
            }
          }
        }
     */
-    this.makeMetaByPlanId = new Function(
+    this.makeMetaByStepId = new Function(
       `return { ${Object.entries(this.plans)
         .map(([planId, plan]) =>
           plan && plan.id === planId ? `${plan.id}: Object.create(null)` : null,
@@ -1082,7 +1082,7 @@ export class Aether<
     spec: Pick<
       BucketDefinition,
       | "parent"
-      | "itemPlanId"
+      | "itemStepId"
       | "groupId"
       | "polymorphicPlanIds"
       | "polymorphicTypeNames"
@@ -1170,12 +1170,12 @@ export class Aether<
     listPlan: ExecutableStep<TData> | ExecutableStep<TData[]>,
     depth = 0,
   ): __ItemStep<TData> {
-    const itemPlanId = this.itemPlanIdByListPlanId[listPlan.id];
-    if (itemPlanId !== undefined) {
-      return this.plans[itemPlanId] as __ItemStep<TData>;
+    const itemStepId = this.itemPlanIdByListStepId[listPlan.id];
+    if (itemStepId !== undefined) {
+      return this.plans[itemStepId] as __ItemStep<TData>;
     }
     const itemPlan = new __ItemStep(listPlan, depth);
-    this.itemPlanIdByListPlanId[listPlan.id] = itemPlan.id;
+    this.itemPlanIdByListStepId[listPlan.id] = itemPlan.id;
     return itemPlan;
   }
 
@@ -1227,14 +1227,14 @@ export class Aether<
         continue;
       }
 
-      const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemPlanId);
+      const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemStepId);
 
       // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
       const executedPlanIds = new Set<string>();
-      const itemPlanId =
+      const itemStepId =
         this.itemPlanIdByFieldPathIdentity[fieldDigest.pathIdentity];
-      if (itemPlanId != null) {
-        executedPlanIds.add(itemPlanId);
+      if (itemStepId != null) {
+        executedPlanIds.add(itemStepId);
       }
       let ancestorFieldDigest: FieldDigest | null = fieldDigest;
       while (ancestorFieldDigest) {
@@ -1242,7 +1242,7 @@ export class Aether<
           break;
         }
         const ancestorItemPlan = this.dangerouslyGetPlan(
-          ancestorFieldDigest.itemPlanId,
+          ancestorFieldDigest.itemStepId,
         );
         for (const id of ancestorItemPlan._recursiveDependencyIds) {
           executedPlanIds.add(id);
@@ -1288,7 +1288,7 @@ export class Aether<
           }
           const childPlan = this.dangerouslyGetPlan(childFieldDigest.planId);
           const childItemPlan = this.dangerouslyGetPlan(
-            childFieldDigest.itemPlanId,
+            childFieldDigest.itemStepId,
           );
 
           // Only prefetch plans in the same group
@@ -1340,7 +1340,7 @@ export class Aether<
       isTypeName: false,
       isLeaf: false,
       planId: this.rootSelectionSetPlan.id,
-      itemPlanId: this.rootSelectionSetPlan.id,
+      itemStepId: this.rootSelectionSetPlan.id,
       listDepth: 0,
       childFieldDigests,
     };
@@ -1451,7 +1451,7 @@ export class Aether<
         this.trackedRootValuePlan,
         fieldSpec,
       );
-      this.subscriptionPlanId = subscribePlan.id;
+      this.subscriptionStepId = subscribePlan.id;
       const oldPlansLength = this.planCount;
 
       // TODO: this is a LIE! This should be `ROOT_PATH + "[]"` but that breaks
@@ -1463,7 +1463,7 @@ export class Aether<
         { aether: this, parentPathIdentity: ROOT_PATH },
         () => subscribePlan.itemPlan(this.itemPlanFor(subscribePlan)),
       );
-      this.subscriptionItemPlanId = streamItemPlan.id;
+      this.subscriptionItemStepId = streamItemPlan.id;
       this.finalizeArgumentsSince(oldPlansLength, ROOT_PATH);
       const { fieldDigests } = this.planSelectionSet(
         nestedParentPathIdentity,
@@ -1486,7 +1486,7 @@ export class Aether<
       this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     } else {
       const subscribePlan = this.trackedRootValuePlan;
-      this.subscriptionPlanId = subscribePlan.id;
+      this.subscriptionStepId = subscribePlan.id;
       this.finalizeArgumentsSince(0, ROOT_PATH);
       const { fieldDigests } = this.planSelectionSet(
         ROOT_PATH,
@@ -1596,7 +1596,7 @@ export class Aether<
             isLeaf: true,
             isTypeName: true,
             planId: "__typename",
-            itemPlanId: "__typename",
+            itemStepId: "__typename",
             listDepth: 0,
             childFieldDigests: null,
           };
@@ -1800,7 +1800,7 @@ export class Aether<
         isLeaf,
         isTypeName: false,
         planId: plan.id,
-        itemPlanId: itemPlan.id,
+        itemStepId: itemPlan.id,
         listDepth,
         childFieldDigests,
       };
@@ -1846,8 +1846,8 @@ export class Aether<
           const itemPlan = wgs(() => {
             // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
             const $__listItem = new __ItemStep(listPlan);
-            $__listItem.transformPlanId = newPlan.id;
-            this.itemPlanIdByListTransformPlanId[newPlan.id] = $__listItem.id;
+            $__listItem.transformStepId = newPlan.id;
+            this.itemPlanIdByListTransformStepId[newPlan.id] = $__listItem.id;
             const $listItem = listPlan.listItem?.($__listItem) ?? $__listItem;
             const $newListItem = newPlan.itemPlanCallback($listItem);
 
@@ -1867,7 +1867,7 @@ export class Aether<
           this.planIdByPathIdentity[nestedParentPathIdentity] = itemPlan.id;
 
           // TODO: if newPlan gets deduplicated, will this lookup be broken?
-          this.transformDependencyPlanIdByTransformPlanId[newPlan.id] =
+          this.transformDependencyPlanIdByTransformStepId[newPlan.id] =
             itemPlan.id;
         }
 
@@ -2070,9 +2070,9 @@ export class Aether<
 
             // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
             {
-              let details = this.polymorphicDetailsByPlanId[subPlan.id];
+              let details = this.polymorphicDetailsByStepId[subPlan.id];
               if (!details) {
-                this.polymorphicDetailsByPlanId[subPlan.id] = details = {
+                this.polymorphicDetailsByStepId[subPlan.id] = details = {
                   polymorphicPlanIds: [],
                   typeNames: [],
                 };
@@ -2698,16 +2698,16 @@ export class Aether<
           `deduplicatePlan error: Expected to replace plan ${plan} with one of its (identical) peers; instead found ${replacementPlan}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
         );
       }
-      if (this.itemPlanIdByListPlanId[plan.id] !== undefined) {
+      if (this.itemPlanIdByListStepId[plan.id] !== undefined) {
         const itemPlan = this.plans[
-          this.itemPlanIdByListPlanId[plan.id]!
+          this.itemPlanIdByListStepId[plan.id]!
         ] as __ItemStep<any>;
         const replacementItemPlan = this.itemPlanFor(
           replacementPlan,
           itemPlan.depth,
         );
         // Replace the __ItemStep for this entry
-        this.itemPlanIdByListPlanId[plan.id] = replacementItemPlan.id;
+        this.itemPlanIdByListStepId[plan.id] = replacementItemPlan.id;
       }
       if (debugPlanVerboseEnabled) {
         debugPlanVerbose(
@@ -2773,8 +2773,8 @@ export class Aether<
     const activePlans = new Set<ExecutableStep>();
 
     // The root subscription plan, if any, should be marked as active
-    if (this.subscriptionItemPlanId) {
-      const plan = this.plans[this.subscriptionItemPlanId];
+    if (this.subscriptionItemStepId) {
+      const plan = this.plans[this.subscriptionItemStepId];
       this.markPlanActive(plan, activePlans);
     }
 
@@ -2807,11 +2807,11 @@ export class Aether<
 
     // Mark all group-root plans as active.
     for (const group of this.groups) {
-      const plan = this.plans[group.parentPlanId];
+      const plan = this.plans[group.parentStepId];
       if (isDev) {
         assert.ok(
           plan,
-          `Could not find group ${group.id} parent plan for identifier '${group.parentPlanId}'`,
+          `Could not find group ${group.id} parent plan for identifier '${group.parentStepId}'`,
         );
       }
       this.markPlanActive(plan, activePlans);
@@ -2819,7 +2819,7 @@ export class Aether<
 
     // Mark all plans used in transforms as active.
     const planIds = Object.values(
-      this.transformDependencyPlanIdByTransformPlanId,
+      this.transformDependencyPlanIdByTransformStepId,
     );
     for (const planId of planIds) {
       const plan = this.plans[planId];
@@ -2874,7 +2874,7 @@ export class Aether<
               };
               treeNode.children.push(transformTreeNode);
               const depId =
-                this.transformDependencyPlanIdByTransformPlanId[plan.id];
+                this.transformDependencyPlanIdByTransformStepId[plan.id];
               this.planIdByPathIdentity[transformTreeNode.pathIdentity] = depId;
             }
           }
@@ -2889,8 +2889,8 @@ export class Aether<
       };
 
       if (!treeNode.parent) {
-        if (this.subscriptionPlanId) {
-          const subscriptionPlan = this.plans[this.subscriptionPlanId];
+        if (this.subscriptionStepId) {
+          const subscriptionPlan = this.plans[this.subscriptionStepId];
           assert.ok(
             subscriptionPlan != null,
             `Could not find the plan for the subscription`,
@@ -2902,17 +2902,17 @@ export class Aether<
       const sideEffectPlanIds =
         this.sideEffectPlanIdsByPathIdentity[treeNode.pathIdentity];
       if (sideEffectPlanIds) {
-        sideEffectPlanIds.forEach((sideEffectPlanId) =>
-          processPlan(this.plans[sideEffectPlanId]),
+        sideEffectPlanIds.forEach((sideEffectStepId) =>
+          processPlan(this.plans[sideEffectStepId]),
         );
       }
 
-      const treeNodePlanId = this.planIdByPathIdentity[treeNode.pathIdentity];
+      const treeNodeStepId = this.planIdByPathIdentity[treeNode.pathIdentity];
       assert.ok(
-        treeNodePlanId != null,
+        treeNodeStepId != null,
         `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
       );
-      const treeNodePlan = this.plans[treeNodePlanId];
+      const treeNodePlan = this.plans[treeNodeStepId];
       assert.ok(
         treeNodePlan != null,
         `Could not find the plan for path identity '${treeNode.pathIdentity}'`,
@@ -2950,41 +2950,41 @@ export class Aether<
     });
   }
 
-  private getPathIdentitiesByPlanId() {
-    const pathIdentitiesByPlanId: {
+  private getPathIdentitiesByStepId() {
+    const pathIdentitiesByStepId: {
       [planId: string]: string[];
     } = Object.create(null);
 
-    for (const [pathIdentity, rawPlanId] of Object.entries(
+    for (const [pathIdentity, rawStepId] of Object.entries(
       this.planIdByPathIdentity,
     )) {
-      if (rawPlanId != null) {
-        const planId = this.plans[rawPlanId].id;
-        if (!pathIdentitiesByPlanId[planId]) {
-          pathIdentitiesByPlanId[planId] = [];
+      if (rawStepId != null) {
+        const planId = this.plans[rawStepId].id;
+        if (!pathIdentitiesByStepId[planId]) {
+          pathIdentitiesByStepId[planId] = [];
         }
-        pathIdentitiesByPlanId[planId].push(pathIdentity);
+        pathIdentitiesByStepId[planId].push(pathIdentity);
       }
     }
-    if (this.subscriptionPlanId != null) {
-      const subscriptionPlan = this.plans[this.subscriptionPlanId];
-      pathIdentitiesByPlanId[subscriptionPlan.id] = [ROOT_PATH];
+    if (this.subscriptionStepId != null) {
+      const subscriptionPlan = this.plans[this.subscriptionStepId];
+      pathIdentitiesByStepId[subscriptionPlan.id] = [ROOT_PATH];
     }
-    for (const list of Object.values(pathIdentitiesByPlanId)) {
+    for (const list of Object.values(pathIdentitiesByStepId)) {
       list.sort((a, z) => a.length - z.length);
     }
-    const keys = Object.keys(pathIdentitiesByPlanId).sort(
+    const keys = Object.keys(pathIdentitiesByStepId).sort(
       (a, z) => parseInt(a.slice(1), 10) - parseInt(z.slice(1), 10),
     );
-    // Return pathIdentitiesByPlanId but with sorted keys
+    // Return pathIdentitiesByStepId but with sorted keys
     return keys.reduce((memo, key) => {
-      memo[key] = pathIdentitiesByPlanId[key];
+      memo[key] = pathIdentitiesByStepId[key];
       return memo;
-    }, Object.create(null) as typeof pathIdentitiesByPlanId);
+    }, Object.create(null) as typeof pathIdentitiesByStepId);
   }
 
   private assignBucketIds() {
-    const pathIdentitiesByPlanId = this.getPathIdentitiesByPlanId();
+    const pathIdentitiesByStepId = this.getPathIdentitiesByStepId();
 
     // See description of BucketDefinition for fuller explanation of this algorithm
     const bucketByBucketKey: {
@@ -3082,7 +3082,7 @@ export class Aether<
       const parents = [...nonOverlappingParents.values()];
 
       const polymorphicDetailsList = equivalentPlanIds
-        .map((planId) => this.polymorphicDetailsByPlanId[planId])
+        .map((planId) => this.polymorphicDetailsByStepId[planId])
         .filter(isNotNullish);
 
       const polymorphicDetails = polymorphicDetailsList.reduce(
@@ -3117,7 +3117,7 @@ export class Aether<
           | { polymorphicPlanIds: string[]; typeNames: string[] },
       );
 
-      const itemPlanId = plan instanceof __ItemStep ? plan.id : undefined;
+      const itemStepId = plan instanceof __ItemStep ? plan.id : undefined;
       // Plans that are in a new group get their own bucket
       const groupId =
         plan.primaryGroupId !== 0 &&
@@ -3134,7 +3134,7 @@ export class Aether<
         ? polymorphicDetails.typeNames
         : undefined;
       /*
-      const fieldDigests = pathIdentitiesByPlanId[plan.id]
+      const fieldDigests = pathIdentitiesByStepId[plan.id]
         ?.map((pathIdentity) => this.fieldDigestByPathIdentity[pathIdentity])
         .filter(isNotNullish);
       */
@@ -3144,8 +3144,8 @@ export class Aether<
       let parent: BucketDefinition | null | undefined = undefined;
 
       const itemPlan = plan instanceof __ItemStep ? plan : null;
-      const transformPlan = itemPlan?.transformPlanId
-        ? (this.plans[itemPlan.transformPlanId]! as __ListTransformStep<
+      const transformPlan = itemPlan?.transformStepId
+        ? (this.plans[itemPlan.transformStepId]! as __ListTransformStep<
             any,
             any,
             any
@@ -3158,7 +3158,7 @@ export class Aether<
         bucketKeyParts.push(`item=${itemPlan.id}`);
         if (transformPlan) {
           processPlan(transformPlan);
-          transformPlan.itemPlanId = itemPlan.id;
+          transformPlan.itemStepId = itemPlan.id;
           const potentialParent = this.buckets[transformPlan.bucketId];
           parent = parent ? deeper(parent, potentialParent) : potentialParent;
         } else {
@@ -3178,10 +3178,10 @@ export class Aether<
       if (groupId !== undefined) {
         bucketKeyParts.push(`group=${groupId}`);
         const group = this.groups[plan.primaryGroupId];
-        const groupParentPlan = this.plans[group.parentPlanId];
+        const groupParentPlan = this.plans[group.parentStepId];
         if (!groupParentPlan) {
           throw new Error(
-            `Group ${plan.primaryGroupId} had parentPlanId ${group.parentPlanId} but we couldn't find a plan with that id.`,
+            `Group ${plan.primaryGroupId} had parentStepId ${group.parentStepId} but we couldn't find a plan with that id.`,
           );
         }
         processPlan(groupParentPlan);
@@ -3234,7 +3234,7 @@ export class Aether<
             parents.length
           } incompatible buckets: ${parents.map(
             (bucket) =>
-              `${bucket.id}(i=${bucket.itemPlanId ?? "-"}, g=${
+              `${bucket.id}(i=${bucket.itemStepId ?? "-"}, g=${
                 bucket.groupId ?? "-"
               }, t=${bucket.polymorphicTypeNames?.join(",") ?? "-"}, p=${
                 bucket.parent
@@ -3260,7 +3260,7 @@ export class Aether<
           }
           if (itemPlan) {
             const listPlan = this.plans[plan.dependencies[0]]!;
-            const listPlanPathIdentities = pathIdentitiesByPlanId[listPlan.id];
+            const listPlanPathIdentities = pathIdentitiesByStepId[listPlan.id];
             if (
               !listPlanPathIdentities ||
               listPlanPathIdentities.length === 0
@@ -3282,14 +3282,14 @@ export class Aether<
               ...new Set(
                 polymorphicPlans.flatMap(
                   (polymorphicPlan) =>
-                    pathIdentitiesByPlanId[polymorphicPlan.id],
+                    pathIdentitiesByStepId[polymorphicPlan.id],
                 ),
               ),
             ];
           }
           if (group) {
-            const groupParentPlan = this.plans[group.parentPlanId];
-            return pathIdentitiesByPlanId[groupParentPlan.id];
+            const groupParentPlan = this.plans[group.parentStepId];
+            return pathIdentitiesByStepId[groupParentPlan.id];
           }
           throw new Error(
             `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the rootPathIdentities to use`,
@@ -3303,7 +3303,7 @@ export class Aether<
         const newBucket: BucketDefinition = this.newBucket({
           parent,
           rootPathIdentities,
-          itemPlanId,
+          itemStepId,
           groupId,
           polymorphicPlanIds,
           polymorphicTypeNames,
@@ -3386,7 +3386,7 @@ export class Aether<
       }
     }
 
-    // Set the bucket's outputMap / rootOutputPlanId
+    // Set the bucket's outputMap / rootOutputStepId
     /*
      * Buckets are responsible for where the data gets written out in the final
      * response.  Given each plan lives in exactly one bucket, and each path
@@ -3456,7 +3456,7 @@ export class Aether<
      * streamed/deferred payloads we'll use path identities such as
      * `~defer1>User.topPosts`.  The root path identity for these (e.g.
      * `~defer1`) will have the plan id at the root of the selection set
-     * (`Group.parentPlanId`) supplied.
+     * (`Group.parentStepId`) supplied.
      *
      * Temporarily I've disabled this for subscriptions too, since they want to
      * write to the root twice.
@@ -3492,7 +3492,7 @@ export class Aether<
             .flatMap((planId) => {
               const plan = this.plans[planId];
               if (plan && plan.id === planId) {
-                const pathIdentities = pathIdentitiesByPlanId[plan.id];
+                const pathIdentities = pathIdentitiesByStepId[plan.id];
                 if (pathIdentities && pathIdentities.length > 0) {
                   return pathIdentities.map((pathIdentity) => {
                     if (pathIdentity.includes("@")) {
@@ -3640,11 +3640,11 @@ export class Aether<
 
             if (path.length === 0) {
               if (
-                bucket.rootOutputPlanId != null &&
-                bucket.rootOutputPlanId !== plan.id
+                bucket.rootOutputStepId != null &&
+                bucket.rootOutputStepId !== plan.id
               ) {
                 throw new Error(
-                  `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputPlanId is already set to '${bucket.rootOutputPlanId}', cannot set it to '${plan.id}'`,
+                  `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputStepId is already set to '${bucket.rootOutputStepId}', cannot set it to '${plan.id}'`,
                 );
               }
               if (bucket.polymorphicPlanIds) {
@@ -3652,7 +3652,7 @@ export class Aether<
                   `GraphileInternalError<d09677c6-f5ff-4d8b-af0f-a82e2efadd30>: A polymorphic plan cannot set the root object path, this must be set outside.`,
                 );
               }
-              bucket.rootOutputPlanId = plan.id;
+              bucket.rootOutputStepId = plan.id;
               if (!bucket.rootOutputModeByRootPathIdentity) {
                 bucket.rootOutputModeByRootPathIdentity = Object.create(null);
                 bucket.rootOutputModeType = mode.type;
@@ -4116,8 +4116,8 @@ export class Aether<
         dependencyIndex < dependenciesCount;
         dependencyIndex++
       ) {
-        const dependencyPlanId = plan.dependencies[dependencyIndex];
-        const dependencyPlan = this.plans[dependencyPlanId];
+        const dependencyStepId = plan.dependencies[dependencyIndex];
+        const dependencyPlan = this.plans[dependencyStepId];
         if (isDev) {
           if (!dependencyPlan) {
             throw new Error(
@@ -4300,10 +4300,10 @@ export class Aether<
       if (debugExecuteEnabled)
         console.timeLog(`plan\t${plan}`, "toExecute reversed");
 
-      let meta = crystalContext.metaByPlanId[plan.id];
+      let meta = crystalContext.metaByStepId[plan.id];
       if (!meta) {
         meta = Object.create(null) as Record<string, unknown>;
-        crystalContext.metaByPlanId[plan.id] = meta;
+        crystalContext.metaByStepId[plan.id] = meta;
       }
       const extra = {
         meta,
@@ -4317,7 +4317,7 @@ export class Aether<
         );
       }
       const planOptions = this.planOptionsByPlan.get(plan);
-      const isSubscribe = plan.id === this.subscriptionPlanId;
+      const isSubscribe = plan.id === this.subscriptionStepId;
 
       // If plan is sync and safe then execute, store and return results (there's no risk of a race condition)
       if (
@@ -4645,8 +4645,8 @@ export class Aether<
 
     if (hasDependencies) {
       for (let i = 0; i < dependenciesCount; i++) {
-        const dependencyPlanId = plan.dependencies[i];
-        const dependencyPlan = this.plans[dependencyPlanId];
+        const dependencyStepId = plan.dependencies[i];
+        const dependencyPlan = this.plans[dependencyStepId];
         if (isDev) {
           if (!dependencyPlan) {
             throw new Error(
@@ -4716,10 +4716,10 @@ export class Aether<
 
     // If all the plans failed we can skip this
     if (realPendingPlanResultsesLength > 0) {
-      let meta = crystalContext.metaByPlanId[plan.id];
+      let meta = crystalContext.metaByStepId[plan.id];
       if (!meta) {
         meta = Object.create(null) as Record<string, unknown>;
-        crystalContext.metaByPlanId[plan.id] = meta;
+        crystalContext.metaByStepId[plan.id] = meta;
       }
       // Note: the `execute` method on plans is responsible for memoizing
       // results into `meta`.
@@ -4729,7 +4729,7 @@ export class Aether<
         );
       }
       const planOptions = this.planOptionsByPlan.get(plan);
-      const isSubscribe = plan.id === this.subscriptionPlanId;
+      const isSubscribe = plan.id === this.subscriptionStepId;
       const extra = {
         meta,
         eventEmitter: crystalContext.eventEmitter,
@@ -4824,8 +4824,8 @@ export class Aether<
     visitedPlans: Set<ExecutableStep>,
     planCacheForPlanResultses: PlanCacheForPlanResultses,
   ) {
-    const itemPlanId = this.transformDependencyPlanIdByTransformPlanId[plan.id];
-    const itemPlan = this.dangerouslyGetPlan(itemPlanId);
+    const itemStepId = this.transformDependencyPlanIdByTransformStepId[plan.id];
+    const itemPlan = this.dangerouslyGetPlan(itemStepId);
     const listPlan = plan.dangerouslyGetListPlan();
     // TODO: can this be made more efficient?
     const depResults = await this.executeBatchInner(
@@ -4917,9 +4917,9 @@ export class Aether<
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
       );
     }
-    const modifierPlanId = `${this.modifierPlanCount++}`;
+    const modifierStepId = `${this.modifierPlanCount++}`;
     this.modifierPlans.push(plan);
-    return modifierPlanId;
+    return modifierStepId;
   }
 
   /**
@@ -4934,10 +4934,10 @@ export class Aether<
       this.sideEffectPlanIdsByPathIdentity[fieldPathIdentity];
     const isSubscribe = fieldPathIdentity === ROOT_PATH;
     const planId = isSubscribe
-      ? this.subscriptionPlanId
+      ? this.subscriptionStepId
       : this.planIdByPathIdentity[fieldPathIdentity];
-    const itemPlanId = isSubscribe
-      ? this.subscriptionItemPlanId
+    const itemStepId = isSubscribe
+      ? this.subscriptionItemStepId
       : this.itemPlanIdByFieldPathIdentity[fieldPathIdentity];
     /*
     const returnRaw = isSubscribe
@@ -4964,23 +4964,23 @@ export class Aether<
       `Could not find the planId for path identity '${fieldPathIdentity}'`,
     );
     assert.ok(
-      itemPlanId != null,
-      `Could not find the itemPlanId for path identity '${fieldPathIdentity}'`,
+      itemStepId != null,
+      `Could not find the itemStepId for path identity '${fieldPathIdentity}'`,
     );
     // TODO: precompute this (and various other things in here)
     const sideEffectPlans =
       sideEffectPlanIds?.map(
-        (sideEffectPlanId) => this.plans[sideEffectPlanId],
+        (sideEffectStepId) => this.plans[sideEffectStepId],
       ) ?? [];
     const plan = this.plans[planId];
-    const itemPlan = this.plans[itemPlanId];
+    const itemPlan = this.plans[itemStepId];
     assert.ok(
       plan,
       `Could not find the plan with id '${planId}' at '${fieldPathIdentity}'`,
     );
     assert.ok(
       itemPlan,
-      `Could not find the itemPlan with id '${itemPlanId}' at '${fieldPathIdentity}'`,
+      `Could not find the itemPlan with id '${itemStepId}' at '${fieldPathIdentity}'`,
     );
     const batch: Batch = {
       // TODO: rename Batch.pathIdentity to fieldPathIdentity
@@ -5009,7 +5009,7 @@ export class Aether<
   ): CrystalContext {
     const crystalContext: CrystalContext = {
       aether: this,
-      metaByPlanId: Object.create(null),
+      metaByStepId: Object.create(null),
       inProgressPlanResolutions: Object.entries(this.plans).reduce(
         (memo, [idx, plan]) => {
           if (plan && plan.id === idx) {
@@ -5804,7 +5804,7 @@ export class Aether<
       }),
       hasErrors: false,
     };
-    const metaByPlanId = this.makeMetaByPlanId();
+    const metaByStepId = this.makeMetaByStepId();
     let requiresGraphQLJS =
       this.hasIntrospectionFields || !shouldTryToBypassGraphQL;
     const requestContext: RequestContext = {
@@ -5815,7 +5815,7 @@ export class Aether<
       toSerialize: [],
       eventEmitter: rootValue?.[$$eventEmitter],
     };
-    const p = executeBucket(this, metaByPlanId, rootBucket, requestContext);
+    const p = executeBucket(this, metaByStepId, rootBucket, requestContext);
     const finalize = (list: any[]) => {
       const result = list[0];
       if (!requiresGraphQLJS && typeof result == "object" && result != null) {
@@ -6017,7 +6017,7 @@ export class Aether<
    */
   printPlanGraph(options: PrintPlanGraphOptions = {}): string {
     return printPlanGraph(this, options, {
-      pathIdentitiesByPlanId: this.getPathIdentitiesByPlanId(),
+      pathIdentitiesByStepId: this.getPathIdentitiesByStepId(),
       plans: this.plans,
     });
   }

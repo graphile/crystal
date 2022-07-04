@@ -18,7 +18,7 @@ export class __InputListStep extends ExecutableStep {
   isSyncAndSafe = true;
 
   private itemPlanIds: string[] = [];
-  private outOfBoundsPlanId: string;
+  private outOfBoundsStepId: string;
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
@@ -52,7 +52,7 @@ export class __InputListStep extends ExecutableStep {
     }
     // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
     // `InputNonNullStep`, but maybe it's not safe any more?
-    this.outOfBoundsPlanId = inputPlan(this.aether, innerType, undefined).id;
+    this.outOfBoundsStepId = inputPlan(this.aether, innerType, undefined).id;
   }
 
   optimize() {
@@ -67,8 +67,8 @@ export class __InputListStep extends ExecutableStep {
         itemPlanIndex < itemPlansLength;
         itemPlanIndex++
       ) {
-        const itemPlanId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.aether.dangerouslyGetPlan(itemPlanId);
+        const itemStepId = this.itemPlanIds[itemPlanIndex];
+        const itemPlan = this.aether.dangerouslyGetPlan(itemStepId);
         assertInputPlan(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;
@@ -84,9 +84,9 @@ export class __InputListStep extends ExecutableStep {
   }
 
   at(index: number): InputStep {
-    const itemPlanId = this.itemPlanIds[index];
-    const outOfBoundsPlan = this.getPlan(this.outOfBoundsPlanId);
-    const itemPlan = itemPlanId ? this.getPlan(itemPlanId) : outOfBoundsPlan;
+    const itemStepId = this.itemPlanIds[index];
+    const outOfBoundsPlan = this.getPlan(this.outOfBoundsStepId);
+    const itemPlan = itemStepId ? this.getPlan(itemStepId) : outOfBoundsPlan;
     assertInputPlan(itemPlan);
     return itemPlan;
   }
@@ -102,8 +102,8 @@ export class __InputListStep extends ExecutableStep {
       itemPlanIndex < itemPlansLength;
       itemPlanIndex++
     ) {
-      const itemPlanId = this.itemPlanIds[itemPlanIndex];
-      const itemPlan = this.getPlan(itemPlanId);
+      const itemStepId = this.itemPlanIds[itemPlanIndex];
+      const itemPlan = this.getPlan(itemStepId);
       assertInputPlan(itemPlan);
       const value = itemPlan.eval();
       list[itemPlanIndex] = value;

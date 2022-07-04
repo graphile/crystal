@@ -5,7 +5,7 @@ import { access } from "./access.js";
 /**
  * Implements `__ValueStep(aether)` which is never executed; it's purely
  * internal - we populate the value as part of the algorithm - see
- * `GetValuePlanId` and `PopulateValueStep`.
+ * `GetValueStepId` and `PopulateValueStep`.
  */
 export class __ValueStep<TData> extends ExecutableStep<TData> {
   static $$export = {

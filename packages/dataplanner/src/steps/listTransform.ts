@@ -75,7 +75,7 @@ export class __ListTransformStep<
   private meta: string | null;
 
   /** Set during query planning.  */
-  public itemPlanId: string | null = null;
+  public itemStepId: string | null = null;
 
   constructor(
     options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,
@@ -129,7 +129,7 @@ export class __ListTransformStep<
       ) {
         // TODO: We shouldn't return `peer` until we alias the replacement id in
         // aether.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
-        // Also `itemPlanIdByListTransformPlanId`.
+        // Also `itemPlanIdByListTransformStepId`.
         //
         // return peer;
       }
@@ -146,10 +146,10 @@ export class __ListTransformStep<
     // __ListTransformStep must list all their child chain's external
     // dependencies as their own so that pluarility is correct for the
     // buckets.
-    const transformDependencyPlanId =
-      this.aether.transformDependencyPlanIdByTransformPlanId[this.id];
+    const transformDependencyStepId =
+      this.aether.transformDependencyPlanIdByTransformStepId[this.id];
     const transformDependencyPlan = this.aether.dangerouslyGetPlan(
-      transformDependencyPlanId,
+      transformDependencyStepId,
     );
 
     const externalDependencies = new Set<ExecutableStep>();
@@ -180,8 +180,8 @@ export class __ListTransformStep<
 
     recurse(transformDependencyPlan);
     if (externalDependencies.size > 0) {
-      const itemPlanId = this.aether.itemPlanIdByListTransformPlanId[this.id]!;
-      const itemPlan = this.aether.dangerouslyGetPlan(itemPlanId);
+      const itemStepId = this.aether.itemPlanIdByListTransformStepId[this.id]!;
+      const itemPlan = this.aether.dangerouslyGetPlan(itemStepId);
       for (const dep of externalDependencies) {
         this.addDependency(dep);
         (itemPlan.dependencies as Array<string>).push(dep.id);

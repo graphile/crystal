@@ -18,7 +18,7 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
   /**
    * @internal
    */
-  public transformPlanId?: string;
+  public transformStepId?: string;
 
   constructor(
     parentPlan: ExecutableStep<TData> | ExecutableStep<TData[]>,

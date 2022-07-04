@@ -92,7 +92,7 @@ function mergeErrorsBackIn(
  */
 export function executeBucket(
   aether: Aether,
-  metaByPlanId: CrystalContext["metaByPlanId"],
+  metaByStepId: CrystalContext["metaByStepId"],
   bucket: Bucket,
   requestContext: RequestContext,
 ): PromiseOrDirect<Array<any>> {
@@ -110,7 +110,7 @@ export function executeBucket(
       id: bucketId,
       startPlans,
       children: childBucketDefinitions,
-      rootOutputPlanId,
+      rootOutputStepId,
       singleTypeNameByRootPathIdentity,
       rootOutputModeByRootPathIdentity,
       outputMap,
@@ -212,8 +212,8 @@ export function executeBucket(
     _dependencies: (readonly any[])[],
     _extra: ExecutionExtra,
   ): PromiseOrDirect<any[]> {
-    const itemPlan = aether.dangerouslyGetPlan(plan.itemPlanId!);
-    const itemPlanId = itemPlan.id;
+    const itemPlan = aether.dangerouslyGetPlan(plan.itemStepId!);
+    const itemStepId = itemPlan.id;
     const itemBucketDefinition = aether.buckets[itemPlan.bucketId];
     if (!itemBucketDefinition) {
       throw new Error(
@@ -227,7 +227,7 @@ export function executeBucket(
     const itemStore: {
       [planId: string]: any[];
     } = Object.create(null);
-    itemStore[itemPlanId] = [];
+    itemStore[itemStepId] = [];
 
     for (const planId of itemBucketDefinition.copyPlanIds) {
       itemStore[planId] = [];
@@ -257,7 +257,7 @@ export function executeBucket(
               j,
             ),
           );
-          itemStore[itemPlanId].push(list[j]);
+          itemStore[itemStepId].push(list[j]);
           for (const planId of copyPlanIds) {
             const val = store[planId][i];
             itemStore[planId].push(val);
@@ -270,7 +270,7 @@ export function executeBucket(
 
     const result = executeBucket(
       aether,
-      metaByPlanId,
+      metaByStepId,
       itemBucket,
       requestContext,
     );
@@ -285,9 +285,9 @@ export function executeBucket(
 
     function performTransform(): any[] {
       const result: any[] = [];
-      const transformDepPlanId =
-        aether.transformDependencyPlanIdByTransformPlanId[plan.id];
-      const depResults = itemStore[transformDepPlanId];
+      const transformDepStepId =
+        aether.transformDependencyPlanIdByTransformStepId[plan.id];
+      const depResults = itemStore[transformDepStepId];
       let offset = 0;
       for (let i = 0, l = listsLength; i < l; i++) {
         const list = lists[i];
@@ -383,7 +383,7 @@ export function executeBucket(
     }
     inProgressPlans.add(plan);
     try {
-      const meta = metaByPlanId[plan.id]!;
+      const meta = metaByStepId[plan.id]!;
       const extra = {
         meta,
         eventEmitter: requestContext.eventEmitter,
@@ -455,8 +455,8 @@ export function executeBucket(
       for (const planId of childBucketDefinition.copyPlanIds) {
         entry.store[planId] = [];
       }
-      if (childBucketDefinition.itemPlanId) {
-        entry.store[childBucketDefinition.itemPlanId] = [];
+      if (childBucketDefinition.itemStepId) {
+        entry.store[childBucketDefinition.itemStepId] = [];
       }
       for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
         if (!childrenByPathIdentity[childRootPathIdentity]) {
@@ -475,7 +475,7 @@ export function executeBucket(
     const pathIdentitiesWithChildren = Object.keys(childrenByPathIdentity);
 
     const rootOutputStore =
-      rootOutputPlanId != null ? store[rootOutputPlanId] : null;
+      rootOutputStepId != null ? store[rootOutputStepId] : null;
 
     const result: any[] = [];
     for (let index = 0, l = input.length; index < l; index++) {
@@ -546,7 +546,7 @@ export function executeBucket(
           hasErrors: bucket.hasErrors,
         };
         const r = rejectOnThrow(() =>
-          executeBucket(aether, metaByPlanId, childBucket, requestContext),
+          executeBucket(aether, metaByStepId, childBucket, requestContext),
         );
         if (isPromiseLike(r)) {
           childPromises.push(r);
@@ -574,13 +574,13 @@ export function executeBucket(
             input: childInputs,
             store: childStore,
             definition: {
-              itemPlanId,
+              itemStepId,
               polymorphicPlanIds,
               groupId,
               copyPlanIds,
             },
           } = child;
-          if (itemPlanId == null) {
+          if (itemStepId == null) {
             throw new Error(
               `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
             );
@@ -594,7 +594,7 @@ export function executeBucket(
           }
           for (let i = 0, l = value.length; i < l; i++) {
             childInputs.push(new BucketSetter(nestedPathIdentity, value, i));
-            childStore[itemPlanId].push(rawValue[i]);
+            childStore[itemStepId].push(rawValue[i]);
             for (const planId of copyPlanIds) {
               const val = store[planId][index];
               childStore[planId].push(val);
@@ -656,7 +656,7 @@ export function executeBucket(
             if (pathIdentitiesWithChildren.includes(keyPathIdentity)) {
               const valueConcreteType = value[$$concreteType];
               for (const child of childrenByPathIdentity[keyPathIdentity]!) {
-                if (child.definition.itemPlanId != null) {
+                if (child.definition.itemStepId != null) {
                   throw new Error("INCONSISTENT!");
                 }
                 if (child.definition.groupId != null) {

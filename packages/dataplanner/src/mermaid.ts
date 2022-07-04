@@ -88,10 +88,10 @@ export function printPlanGraph(
     concise = false,
   }: PrintPlanGraphOptions,
   {
-    pathIdentitiesByPlanId,
+    pathIdentitiesByStepId,
     plans,
   }: {
-    pathIdentitiesByPlanId: ReturnType<Aether["getPathIdentitiesByPlanId"]>;
+    pathIdentitiesByStepId: ReturnType<Aether["getPathIdentitiesByStepId"]>;
     plans: Aether["plans"];
   },
 ): string {
@@ -226,13 +226,13 @@ export function printPlanGraph(
     const transformItemPlanNode =
       plan instanceof __ListTransformStep
         ? planId(
-            plans[aether.transformDependencyPlanIdByTransformPlanId[plan.id]],
+            plans[aether.transformDependencyPlanIdByTransformStepId[plan.id]],
           )
         : null;
     if (depNodes.length > 0) {
       if (plan instanceof __ItemStep) {
         const [firstDep, ...rest] = depNodes;
-        const arrow = plan.transformPlanId == null ? "==>" : "-.->";
+        const arrow = plan.transformStepId == null ? "==>" : "-.->";
         graph.push(`    ${firstDep} ${arrow} ${planNode}`);
         if (rest.length > 0) {
           graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
@@ -266,8 +266,8 @@ export function printPlanGraph(
     graph.push("");
     graph.push("    %% plan-to-path relationships");
     {
-      for (const [pathPlanId, pathIdentities] of Object.entries(
-        pathIdentitiesByPlanId,
+      for (const [pathStepId, pathIdentities] of Object.entries(
+        pathIdentitiesByStepId,
       )) {
         const crystalPathIdentities = pathIdentities.reduce(
           (memo, pathIdentity) => {
@@ -286,9 +286,9 @@ export function printPlanGraph(
           .sort((a, z) => z[1] - a[1])
           .map(([id, count]) => `${id}${count > 1 ? ` x${count}` : ""}`)
           .join("\n");
-        const pathNode = `P${pathPlanId}`;
+        const pathNode = `P${pathStepId}`;
         graph.push(`    ${pathNode}[${mermaidEscape(text)}]`);
-        graph.push(`    ${planId(plans[pathPlanId])} -.-> ${pathNode}`);
+        graph.push(`    ${planId(plans[pathStepId])} -.-> ${pathNode}`);
       }
     }
   }
@@ -300,7 +300,7 @@ export function printPlanGraph(
         if (parent.pathIdentity !== parent.itemPathIdentity) {
           const itemId = pathId(parent.itemPathIdentity);
           graph.push(
-            `    ${planId(plans[parent.itemPlanId])} -.-> ${itemId}`,
+            `    ${planId(plans[parent.itemStepId])} -.-> ${itemId}`,
           );
         }
         if (parent.childFieldDigests) {
@@ -322,7 +322,7 @@ export function printPlanGraph(
     const raisonDEtre = (() => {
       if (
         bucket.groupId === 0 &&
-        bucket.itemPlanId == null &&
+        bucket.itemStepId == null &&
         bucket.polymorphicPlanIds == null
       ) {
         return "root";
@@ -333,8 +333,8 @@ export function printPlanGraph(
           `group${bucket.groupId}[${aether.groups[bucket.groupId].reason}]`,
         );
       }
-      if (bucket.itemPlanId != null) {
-        reasons.push(`item${bucket.itemPlanId}`);
+      if (bucket.itemStepId != null) {
+        reasons.push(`item${bucket.itemStepId}`);
       }
       if (bucket.polymorphicPlanIds != null) {
         reasons.push(
@@ -383,10 +383,10 @@ export function printPlanGraph(
             )
           : bucket.rootPathIdentities
         ).join("\n")}\n${
-          bucket.rootOutputPlanId != null
+          bucket.rootOutputStepId != null
             ? `⠀ROOT <-${
                 bucket.rootOutputModeType ?? "?"
-              }- ${bucket.rootOutputPlanId.replace(/^_/, "")}\n`
+              }- ${bucket.rootOutputStepId.replace(/^_/, "")}\n`
             : ""
         }${outputMapStuff.join("\n")}`,
       )}):::bucket`,

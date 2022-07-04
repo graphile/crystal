@@ -44,20 +44,20 @@ export class PgSingleTablePolymorphicStep<
   };
   isSyncAndSafe = true;
 
-  private typePlanId: number;
-  private rowPlanId: number;
+  private typeStepId: number;
+  private rowStepId: number;
 
   constructor(
     $typePlan: ExecutableStep<string>,
     $rowPlan: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
   ) {
     super();
-    this.typePlanId = this.addDependency($typePlan);
-    this.rowPlanId = this.addDependency($rowPlan);
+    this.typeStepId = this.addDependency($typePlan);
+    this.rowStepId = this.addDependency($rowPlan);
   }
 
   private rowPlan() {
-    return this.getPlan(this.dependencies[this.rowPlanId]);
+    return this.getPlan(this.dependencies[this.rowStepId]);
   }
 
   deduplicate(
@@ -78,7 +78,7 @@ export class PgSingleTablePolymorphicStep<
     string,
     ReadonlyArray<PgSourceRow<TColumns>>
   > | null> {
-    return values[this.typePlanId].map((v) => (v ? polymorphicWrap(v) : null));
+    return values[this.typeStepId].map((v) => (v ? polymorphicWrap(v) : null));
   }
 }
 

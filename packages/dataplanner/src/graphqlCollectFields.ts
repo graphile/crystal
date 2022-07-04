@@ -104,7 +104,7 @@ function graphqlDoesFragmentTypeApply(
  */
 export interface Group {
   parent: Group | null;
-  parentPlanId: string;
+  parentStepId: string;
   reason: "root" | "defer" | "stream" | "mutation" | "mutationPayload";
   /**
    * Only set for 'mutation'
@@ -122,7 +122,7 @@ export interface Group {
  */
 export function graphqlCollectFields(
   aether: Aether,
-  parentPlanId: string,
+  parentStepId: string,
   objectType: GraphQLObjectType,
   groupedSelectionsList: GroupedSelections[],
   isMutation = false,
@@ -173,11 +173,11 @@ export function graphqlCollectFields(
             assertListType(fieldType);
           }
           const selectionGroupId = stream
-            ? aether.addGroup({ reason: "stream", parentPlanId, parent })
+            ? aether.addGroup({ reason: "stream", parentStepId, parent })
             : isMutation
             ? aether.addGroup({
                 reason: "mutation",
-                parentPlanId,
+                parentStepId,
                 parent,
                 responseKey,
               })
@@ -216,18 +216,18 @@ export function graphqlCollectFields(
 
           const defer = getDirective(selection, "defer");
           const fragmentGroupId = defer
-            ? aether.addGroup({ reason: "defer", parentPlanId, parent })
+            ? aether.addGroup({ reason: "defer", parentStepId, parent })
             : isMutation
             ? aether.addGroup({
                 reason: "mutationPayload",
-                parentPlanId,
+                parentStepId,
                 parent,
               })
             : groupId;
 
           graphqlCollectFields(
             aether,
-            parentPlanId,
+            parentStepId,
             objectType,
             [
               {
@@ -272,12 +272,12 @@ export function graphqlCollectFields(
           // I've thus removed this, but we need to be sure it's correct to do
           // so.
           const fragmentGroupId = defer
-            ? aether.addGroup({ reason: "defer", parentPlanId, parent })
+            ? aether.addGroup({ reason: "defer", parentStepId, parent })
             : groupId;
 
           graphqlCollectFields(
             aether,
-            parentPlanId,
+            parentStepId,
             objectType,
             [
               {

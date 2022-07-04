@@ -321,14 +321,14 @@ export class EdgeStep<
   };
   isSyncAndSafe = true;
 
-  private connectionPlanId: string;
+  private connectionStepId: string;
 
   constructor(
     $connection: ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>,
     $item: TItemStep,
   ) {
     super();
-    this.connectionPlanId = $connection.id;
+    this.connectionStepId = $connection.id;
     this.addDependency($item);
   }
 
@@ -338,7 +338,7 @@ export class EdgeStep<
     TStep,
     TNodeStep
   > {
-    return this.getPlan(this.connectionPlanId) as any;
+    return this.getPlan(this.connectionStepId) as any;
   }
 
   private getItemStep(): TItemStep {

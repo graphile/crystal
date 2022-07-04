@@ -20,13 +20,13 @@ export class PgCursorStep<
   isSyncAndSafe = true;
 
   private cursorValuesDepId: number;
-  private classSinglePlanId: string;
+  private classSingleStepId: string;
   private digest: string;
 
   constructor(itemPlan: TStep) {
     super();
     const classPlan = itemPlan.getClassStep();
-    this.classSinglePlanId = itemPlan.id;
+    this.classSingleStepId = itemPlan.id;
     this.digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderBy();
     const plan = list(
@@ -44,10 +44,10 @@ export class PgCursorStep<
   }
 
   public getClassSingleStep(): TStep {
-    const plan = this.getPlan(this.classSinglePlanId);
+    const plan = this.getPlan(this.classSingleStepId);
     if (!(plan instanceof PgSelectSingleStep)) {
       throw new Error(
-        `Expected ${this.classSinglePlanId} (${plan}) to be a PgSelectSingleStep`,
+        `Expected ${this.classSingleStepId} (${plan}) to be a PgSelectSingleStep`,
       );
     }
     return plan as TStep;
