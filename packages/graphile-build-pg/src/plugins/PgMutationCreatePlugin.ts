@@ -1,9 +1,9 @@
 import "graphile-config";
 
-import type { PgInsertPlan, PgSource } from "@dataplan/pg";
+import type { PgInsertStep, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
-import type { ObjectPlan } from "dataplanner";
-import { constant, ExecutablePlan, object } from "dataplanner";
+import type { ObjectStep } from "dataplanner";
+import { constant, ExecutableStep, object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 
@@ -96,7 +96,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       type: GraphQLString,
                       applyPlan: EXPORTABLE(
                         () =>
-                          function plan($input: ObjectPlan<any>, val) {
+                          function plan($input: ObjectStep<any>, val) {
                             $input.set("clientMutationId", val.get());
                           },
                         [],
@@ -118,8 +118,8 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                               plan: EXPORTABLE(
                                 () =>
                                   function plan(
-                                    $object: ObjectPlan<{
-                                      result: PgInsertPlan<any, any, any>;
+                                    $object: ObjectStep<{
+                                      result: PgInsertStep<any, any, any>;
                                     }>,
                                   ) {
                                     const $record =
@@ -146,7 +146,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                 isMutationPayload: true,
                 pgCodec: source.codec,
               },
-              ExecutablePlan as any,
+              ExecutableStep as any,
               () => ({
                 fields: ({ fieldWithHooks }) => {
                   const TableType = build.getGraphQLTypeByPgCodec(
@@ -158,7 +158,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       type: GraphQLString,
                       plan: EXPORTABLE(
                         (constant) =>
-                          function plan($mutation: ObjectPlan<any>) {
+                          function plan($mutation: ObjectStep<any>) {
                             return (
                               $mutation.getPlanForKey(
                                 "clientMutationId",
@@ -186,8 +186,8 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                               plan: EXPORTABLE(
                                 () =>
                                   function plan(
-                                    $object: ObjectPlan<{
-                                      result: PgInsertPlan<any, any, any>;
+                                    $object: ObjectStep<{
+                                      result: PgInsertStep<any, any, any>;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -247,8 +247,8 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                           () =>
                             function plan(
                               _: any,
-                              $object: ObjectPlan<{
-                                result: PgInsertPlan<any, any, any>;
+                              $object: ObjectStep<{
+                                result: PgInsertStep<any, any, any>;
                               }>,
                             ) {
                               return $object;

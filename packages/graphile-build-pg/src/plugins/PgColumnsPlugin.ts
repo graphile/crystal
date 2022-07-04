@@ -4,7 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
-  PgSelectSinglePlan,
+  PgSelectSingleStep,
   PgTypeCodec,
   PgTypeColumn,
   PgTypeColumns,
@@ -14,7 +14,7 @@ import {
   pgSelectSingleFromRecord,
   PgSource,
 } from "@dataplan/pg";
-import type { SetterPlan } from "dataplanner";
+import type { SetterStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNonNull, GraphQLType } from "graphql";
 
@@ -93,7 +93,7 @@ const getSource = EXPORTABLE(
     (
       baseCodec: PgTypeCodec<any, any, any, any>,
       pgSources: PgSource<any, any, any, any>[],
-      $record: PgSelectSinglePlan<any, any, any, any>,
+      $record: PgSelectSingleStep<any, any, any, any>,
     ) => {
       const executor = $record.source.executor;
       const source =
@@ -194,7 +194,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               // Simply get the value
               return EXPORTABLE(
                 (columnName) =>
-                  ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                  ($record: PgSelectSingleStep<any, any, any, any>) => {
                     return $record.get(columnName);
                   },
                 [columnName],
@@ -210,7 +210,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                 const notNull = column.notNull || column.codec.notNull;
                 // Single record from source
                 /*
-                 * TODO: if we refactor `PgSelectSinglePlan` we can probably
+                 * TODO: if we refactor `PgSelectSingleStep` we can probably
                  * optimise this to do inline selection and still join against
                  * the base table using e.g. `(table.column).attribute =
                  * joined_thing.column`
@@ -224,7 +224,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       pgSelectSingleFromRecord,
                       pgSources,
                     ) =>
-                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                    ($record: PgSelectSingleStep<any, any, any, any>) => {
                       const $plan = $record.get(columnName);
                       const $select = pgSelectSingleFromRecord(
                         getSource(baseCodec, pgSources, $record),
@@ -248,7 +248,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               } else {
                 // Many records from source
                 /*
-                 * TODO: if we refactor `PgSelectSinglePlan` we can probably
+                 * TODO: if we refactor `PgSelectSingleStep` we can probably
                  * optimise this to do inline selection and still join against
                  * the base table using e.g. `(table.column).attribute =
                  * joined_thing.column`
@@ -261,7 +261,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       pgSelectFromRecords,
                       pgSources,
                     ) =>
-                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                    ($record: PgSelectSingleStep<any, any, any, any>) => {
                       const $plan = $record.get(columnName);
                       const $select = pgSelectFromRecords(
                         getSource(baseCodec, pgSources, $record),
@@ -379,7 +379,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       ),
                       applyPlan: EXPORTABLE(
                         (columnName) =>
-                          function plan($insert: SetterPlan<any, any>, val) {
+                          function plan($insert: SetterStep<any, any>, val) {
                             $insert.set(columnName, val.get());
                           },
                         [columnName],

@@ -2,7 +2,7 @@ import "graphile-build";
 
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
-import type { ExecutablePlan, PromiseOrDirect } from "dataplanner";
+import type { ExecutableStep, PromiseOrDirect } from "dataplanner";
 import { constant, context, object } from "dataplanner";
 import type { GatherPluginContext } from "graphile-build";
 import type { PluginHook } from "graphile-config";
@@ -281,8 +281,8 @@ interface State {
 }
 
 type PgExecutorContextPlans<TSettings = any> = {
-  pgSettings: ExecutablePlan<TSettings>;
-  withPgClient: ExecutablePlan<WithPgClient>;
+  pgSettings: ExecutableStep<TSettings>;
+  withPgClient: ExecutableStep<WithPgClient>;
 };
 
 async function getDb(

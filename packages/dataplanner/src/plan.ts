@@ -19,20 +19,20 @@ import type {
   PlanOptimizeOptions,
   PromiseOrDirect,
 } from "./interfaces.js";
-import type { __ItemPlan } from "./plans/index.js";
+import type { __ItemStep } from "./steps/index.js";
 
-function reallyAssertFinalized(plan: BasePlan): void {
+function reallyAssertFinalized(plan: BaseStep): void {
   if (!plan.isFinalized) {
     throw new Error(
-      `Plan ${plan} is not finalized; did you forget to call \`super.finalize()\` from its \`finalize()\` method?`,
+      `Step ${plan} is not finalized; did you forget to call \`super.finalize()\` from its \`finalize()\` method?`,
     );
   }
 }
 
-function reallyAssertArgumentsFinalized(plan: BasePlan): void {
+function reallyAssertArgumentsFinalized(plan: BaseStep): void {
   if (!plan.isArgumentsFinalized) {
     throw new Error(
-      `Plan ${plan} is not finalized with respect to arguments; did you forget to call \`super.finalizeArguments()\` from its \`finalizeArguments()\` method?`,
+      `Step ${plan} is not finalized with respect to arguments; did you forget to call \`super.finalizeArguments()\` from its \`finalizeArguments()\` method?`,
     );
   }
 }
@@ -45,20 +45,20 @@ export const assertArgumentsFinalized = !isDev
 
 /**
  * The base abstract plan type; you should not extend this directly - instead
- * use an ExecutablePlan (for use when planning output fields) or a
- * ModifierPlan (for use when planning arguments/input fields).
+ * use an ExecutableStep (for use when planning output fields) or a
+ * ModifierStep (for use when planning arguments/input fields).
  *
  * @remarks
  *
- * Though it might seem that ModifierPlan should be used for all inputs
+ * Though it might seem that ModifierStep should be used for all inputs
  * (arguments, input objects), this is not the case. When planning an output
  * field, all inputs to it (including arguments, parent plan, context, etc)
- * should be other executable plans. The only time that ModifierPlan is used is
+ * should be other executable plans. The only time that ModifierStep is used is
  * when writing specific plans as part of the argument or input field
  * definitions themself; even in these cases the inputs to these plan resolvers
  * will be ExecutablePlans.
  */
-export abstract class BasePlan {
+export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
   public readonly aether: Aether;
@@ -86,7 +86,7 @@ export abstract class BasePlan {
   public toString(): string {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
-      `${this.constructor.name.replace(/Plan$/, "")}${
+      `${this.constructor.name.replace(/Step$/, "")}${
         meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
       }@${chalk.bold.yellow(
         crystalPrintPathIdentity(this.parentPathIdentity),
@@ -106,7 +106,7 @@ export abstract class BasePlan {
       this.isArgumentsFinalized = true;
     } else {
       throw new Error(
-        `Plan ${this} has already been finalized with respect to arguments - do not call \`finalizeArguments()\` from user code!`,
+        `Step ${this} has already been finalized with respect to arguments - do not call \`finalizeArguments()\` from user code!`,
       );
     }
   }
@@ -116,7 +116,7 @@ export abstract class BasePlan {
       this.isFinalized = true;
     } else {
       throw new Error(
-        `Plan ${this} has already been finalized - do not call \`finalize()\` from user code!`,
+        `Step ${this} has already been finalized - do not call \`finalize()\` from user code!`,
       );
     }
   }
@@ -126,14 +126,14 @@ export abstract class BasePlan {
  * Executable plans are the plans associated with leaves on the GraphQL tree,
  * they must be able to execute to return values.
  */
-export class ExecutablePlan<TData = any> extends BasePlan {
+export class ExecutableStep<TData = any> extends BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
   /**
    * @internal
    */
-  public _pathByDescendent: Map<ExecutablePlan, ExecutablePlan[] | null> =
+  public _pathByDescendent: Map<ExecutableStep, ExecutableStep[] | null> =
     new Map();
 
   /**
@@ -181,7 +181,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   /**
    * @internal
    */
-  public dependentPlans: Array<ExecutablePlan> = [];
+  public dependentPlans: Array<ExecutableStep> = [];
 
   public readonly id: string;
   /**
@@ -221,7 +221,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * This identifies the "bucket" into which this plan's results will be stored;
    * the this is determined as:
    *
-   * - If this is an __ItemPlan then a new bucket is assigned (this covers
+   * - If this is an __ItemStep then a new bucket is assigned (this covers
    *   lists (whether streamed or not) and subscriptions)
    * - Otherwise, if this plan is deferred, then the deferred bucket id
    * - Otherwise, if no dependencies then the root bucket
@@ -238,7 +238,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * 3. where the result of executing the plan is stored
    * 4. when the plan execution cache is allowed to be GC'd
    *
-   * NOTE: `__ListTransformPlan`'s effectively have a temporary bucket inside
+   * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
    * them (built on the `__Item`) that's thrown away once the transform is
    * complete.
    *
@@ -256,28 +256,28 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   /**
    * Set this true if your plan's optimize method can be called a second time;
    * note that in this situation it's likely that your dependencies will not be
-   * what you expect them to be (e.g. a PgSelectSinglePlan might become an
-   * AccessPlan).
+   * what you expect them to be (e.g. a PgSelectSingleStep might become an
+   * AccessStep).
    */
   public allowMultipleOptimizations = false;
 
   constructor() {
     super();
-    this.id = this.aether._addPlan(this);
+    this.id = this.aether._addStep(this);
   }
 
-  protected getPlan(id: string): ExecutablePlan {
+  protected getPlan(id: string): ExecutableStep {
     return this.aether.getPlan(id, this);
   }
 
-  protected getDep(depId: number): ExecutablePlan {
+  protected getDep(depId: number): ExecutableStep {
     return this.getPlan(this.dependencies[depId]);
   }
 
   public toString(): string {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
-      `${this.constructor.name.replace(/Plan$/, "")}${
+      `${this.constructor.name.replace(/Step$/, "")}${
         this.groupIds.length === 0
           ? chalk.grey(`{?}`)
           : this.groupIds.length === 1 && this.groupIds[0] === 0
@@ -294,14 +294,14 @@ export class ExecutablePlan<TData = any> extends BasePlan {
     );
   }
 
-  protected addDependency(plan: ExecutablePlan): number {
+  protected addDependency(plan: ExecutableStep): number {
     if (this.isFinalized) {
       throw new Error(
         "You cannot add a dependency after the plan is finalized.",
       );
     }
     if (isDev) {
-      if (!(plan instanceof ExecutablePlan)) {
+      if (!(plan instanceof ExecutableStep)) {
         throw new Error(
           `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
             plan,
@@ -315,7 +315,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
     / *
      * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all
      * of our dependencies; this effectively means that we only care about list
-     * boundaries (since `__ItemPlan` opts out of this) which allows us to
+     * boundaries (since `__ItemStep` opts out of this) which allows us to
      * optimise more plans.
      * /
     if (plan.parentPathIdentity.length > this.parentPathIdentity.length) {
@@ -340,7 +340,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   /**
    * Our chance to replace ourself with one of our peers.
    */
-  public deduplicate(_peers: ExecutablePlan[]): ExecutablePlan {
+  public deduplicate(_peers: ExecutableStep[]): ExecutableStep {
     return this;
   }
 
@@ -348,7 +348,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize(_options: PlanOptimizeOptions): ExecutablePlan {
+  public optimize(_options: PlanOptimizeOptions): ExecutableStep {
     return this;
   }
 
@@ -407,18 +407,18 @@ export class ExecutablePlan<TData = any> extends BasePlan {
 
 export function isExecutablePlan<TData = any>(
   plan: unknown,
-): plan is ExecutablePlan<TData> {
+): plan is ExecutableStep<TData> {
   return (
-    plan instanceof BasePlan &&
+    plan instanceof BaseStep &&
     "execute" in plan &&
     typeof (plan as any).execute === "function"
   );
 }
 
 export function assertExecutablePlan<TData>(
-  plan: BasePlan | null | undefined | void,
+  plan: BaseStep | null | undefined | void,
   pathIdentity: string,
-): asserts plan is ExecutablePlan<TData> {
+): asserts plan is ExecutableStep<TData> {
   if (!isExecutablePlan(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be an executable plan, but it does not implement the 'execute' method.`,
@@ -426,25 +426,25 @@ export function assertExecutablePlan<TData>(
   }
 }
 
-export type ObjectLikePlan<
-  TData extends { [key: string]: ExecutablePlan<any> } = {
-    [key: string]: ExecutablePlan<any>;
+export type ObjectLikeStep<
+  TData extends { [key: string]: ExecutableStep<any> } = {
+    [key: string]: ExecutableStep<any>;
   },
-> = ExecutablePlan<{
-  [key in keyof TData]: TData[key] extends ExecutablePlan<infer U> ? U : never;
+> = ExecutableStep<{
+  [key in keyof TData]: TData[key] extends ExecutableStep<infer U> ? U : never;
 }> & {
-  get<TKey extends keyof TData>(key: TKey): ExecutablePlan<TData[TKey]>;
+  get<TKey extends keyof TData>(key: TKey): ExecutableStep<TData[TKey]>;
 };
 
 export function isObjectLikePlan<
-  TData extends { [key: string]: ExecutablePlan<any> } = {
-    [key: string]: ExecutablePlan<any>;
+  TData extends { [key: string]: ExecutableStep<any> } = {
+    [key: string]: ExecutableStep<any>;
   },
->(plan: ExecutablePlan): plan is ObjectLikePlan<TData> {
+>(plan: ExecutableStep): plan is ObjectLikeStep<TData> {
   return "get" in plan && typeof (plan as any).get === "function";
 }
 
-export type StreamablePlan<TData> = ExecutablePlan<ReadonlyArray<TData>> & {
+export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
   /**
    * If this plan supports streaming then it should implement this method. It's
    * basically the same as `execute` except it returns a list of result streams
@@ -460,33 +460,33 @@ export type StreamablePlan<TData> = ExecutablePlan<ReadonlyArray<TData>> & {
 };
 
 export function isStreamablePlan<TData>(
-  plan: ExecutablePlan<ReadonlyArray<TData>>,
-): plan is StreamablePlan<TData> {
-  return typeof (plan as StreamablePlan<TData>).stream === "function";
+  plan: ExecutableStep<ReadonlyArray<TData>>,
+): plan is StreamableStep<TData> {
+  return typeof (plan as StreamableStep<TData>).stream === "function";
 }
 
-export type PolymorphicPlan = ExecutablePlan & {
-  planForType(objectType: GraphQLObjectType): ExecutablePlan;
+export type PolymorphicStep = ExecutableStep & {
+  planForType(objectType: GraphQLObjectType): ExecutableStep;
 };
 
 /**
- * Modifier plans modify their parent plan (which may be another ModifierPlan
- * or an ExecutablePlan). First they gather all the requirements from their
+ * Modifier plans modify their parent plan (which may be another ModifierStep
+ * or an ExecutableStep). First they gather all the requirements from their
  * children (if any) being applied to them, then they apply themselves to their
  * parent plan. This application is done through the `apply()` method.
  *
  * Modifier plans do not use dependencies.
  */
-export abstract class ModifierPlan<
-  TParentPlan extends BasePlan = BasePlan,
-> extends BasePlan {
+export abstract class ModifierStep<
+  TParentStep extends BaseStep = BaseStep,
+> extends BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
   public readonly id: string;
-  constructor(protected readonly $parent: TParentPlan) {
+  constructor(protected readonly $parent: TParentStep) {
     super();
-    this.id = this.aether._addModifierPlan(this);
+    this.id = this.aether._addModifierStep(this);
   }
 
   /**
@@ -496,17 +496,17 @@ export abstract class ModifierPlan<
 }
 
 export function isModifierPlan<
-  TParentPlan extends ExecutablePlan | ModifierPlan<any>,
->(plan: BasePlan): plan is ModifierPlan<TParentPlan> {
+  TParentStep extends ExecutableStep | ModifierStep<any>,
+>(plan: BaseStep): plan is ModifierStep<TParentStep> {
   return "apply" in plan && typeof (plan as any).apply === "function";
 }
 
 export function assertModifierPlan<
-  TParentPlan extends ExecutablePlan | ModifierPlan<any>,
+  TParentStep extends ExecutableStep | ModifierStep<any>,
 >(
-  plan: BasePlan,
+  plan: BaseStep,
   pathIdentity: string,
-): asserts plan is ModifierPlan<TParentPlan> {
+): asserts plan is ModifierStep<TParentStep> {
   if (!isModifierPlan(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be a modifier plan, but it does not implement the 'apply' method.`,
@@ -514,29 +514,29 @@ export function assertModifierPlan<
   }
 }
 
-export interface ListCapablePlan<
+export interface ListCapableStep<
   TOutputData,
-  TItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
-> extends ExecutablePlan<ReadonlyArray<any>> {
-  listItem(itemPlan: __ItemPlan<this>): TItemPlan;
+  TItemStep extends ExecutableStep<TOutputData> = ExecutableStep<TOutputData>,
+> extends ExecutableStep<ReadonlyArray<any>> {
+  listItem(itemPlan: __ItemStep<this>): TItemStep;
 }
 
 export function isListCapablePlan<
   TData,
-  TItemPlan extends ExecutablePlan<TData>,
+  TItemStep extends ExecutableStep<TData>,
 >(
-  plan: ExecutablePlan<ReadonlyArray<TData>>,
-): plan is ListCapablePlan<TData, TItemPlan> {
+  plan: ExecutableStep<ReadonlyArray<TData>>,
+): plan is ListCapableStep<TData, TItemStep> {
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
 export function assertListCapablePlan<
   TData,
-  TItemPlan extends ExecutablePlan<TData>,
+  TItemStep extends ExecutableStep<TData>,
 >(
-  plan: ExecutablePlan<ReadonlyArray<TData>>,
+  plan: ExecutableStep<ReadonlyArray<TData>>,
   pathIdentity: string,
-): asserts plan is ListCapablePlan<TData, TItemPlan> {
+): asserts plan is ListCapableStep<TData, TItemStep> {
   if (!isListCapablePlan(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,

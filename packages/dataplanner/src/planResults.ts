@@ -32,11 +32,11 @@ export interface PlanResultsBucket {
  * path identity for everything that doesn't come under a list, but it's
  * preferable to push the commonAncestorPathIdentity to be the deepest
  * pathIdentity that's still a common ancestor (and doesn't cross a
- * `__ItemPlan` boundary) because it enables garbage collection to discard
+ * `__ItemStep` boundary) because it enables garbage collection to discard
  * values when they're no longer needed.
  *
  * "Branch" refers to the fact that PlanResults branch for each list item
- * returned from a list (or, more specifically, a `__ItemPlan`) - plans
+ * returned from a list (or, more specifically, a `__ItemStep`) - plans
  * dependent on sibling items will store results to separate (per-item) caches.
  *
  * "Bucket" is a cache object (currently a Map) for a given "level" and

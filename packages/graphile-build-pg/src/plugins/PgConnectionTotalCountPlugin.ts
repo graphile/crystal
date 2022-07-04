@@ -3,12 +3,12 @@ import "./PgBasicsPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSelectParsedCursorPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
+  PgSelectParsedCursorStep,
+  PgSelectStep,
+  PgSelectSingleStep,
 } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
-import type { ConnectionPlan } from "dataplanner";
+import type { ConnectionStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
@@ -78,11 +78,11 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                   plan: EXPORTABLE(
                     (TYPES, sql) =>
                       (
-                        $connection: ConnectionPlan<
-                          PgSelectSinglePlan<any, any, any, any>,
-                          PgSelectParsedCursorPlan,
-                          PgSelectPlan<any, any, any, any>,
-                          PgSelectSinglePlan<any, any, any, any>
+                        $connection: ConnectionStep<
+                          PgSelectSingleStep<any, any, any, any>,
+                          PgSelectParsedCursorStep,
+                          PgSelectStep<any, any, any, any>,
+                          PgSelectSingleStep<any, any, any, any>
                         >,
                       ) =>
                         $connection

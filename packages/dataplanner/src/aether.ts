@@ -98,29 +98,29 @@ import {
 import type { PrintPlanGraphOptions } from "./mermaid.js";
 import { printPlanGraph } from "./mermaid.js";
 import type {
-  ListCapablePlan,
-  ModifierPlan,
-  PolymorphicPlan,
-  StreamablePlan,
+  ListCapableStep,
+  ModifierStep,
+  PolymorphicStep,
+  StreamableStep,
 } from "./plan.js";
 import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
-  ExecutablePlan,
+  ExecutableStep,
   isListCapablePlan,
   isStreamablePlan,
 } from "./plan.js";
 import type { PlanResultsBucket } from "./planResults.js";
 import { PlanResults } from "./planResults.js";
-import type { __InputObjectPlan } from "./plans/index.js";
+import type { __InputObjectStep } from "./steps/index.js";
 import {
-  __ItemPlan,
-  __TrackedObjectPlan,
-  __ValuePlan,
+  __ItemStep,
+  __TrackedObjectStep,
+  __ValueStep,
   access,
-} from "./plans/index.js";
-import { __ListTransformPlan } from "./plans/listTransform.js";
+} from "./steps/index.js";
+import { __ListTransformStep } from "./steps/listTransform.js";
 import { assertPolymorphicData } from "./polymorphic.js";
 import {
   $$crystalWrapped,
@@ -279,8 +279,8 @@ function serializerForScalarType(
  * Returns true if this "executable plan" isn't actually executable because
  * it's a special internal plan type whose values get auto-populated
  */
-const isInternalPlan = (plan: ExecutablePlan) =>
-  plan instanceof __ValuePlan || plan instanceof __ItemPlan;
+const isInternalPlan = (plan: ExecutableStep) =>
+  plan instanceof __ValueStep || plan instanceof __ItemStep;
 
 interface PlanCacheForPlanResultses {
   [planId: string]: PromiseOrDirect<any[]>;
@@ -353,9 +353,9 @@ const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
 const debugExecuteVerboseEnabled = isDev && debugExecuteVerbose.enabled;
 
 function assertPolymorphicPlan(
-  plan: ExecutablePlan | PolymorphicPlan,
+  plan: ExecutableStep | PolymorphicStep,
   pathIdentity: string,
-): asserts plan is PolymorphicPlan {
+): asserts plan is PolymorphicStep {
   assert.ok(
     "planForType" in plan,
     `Expected plan for interface field to be polymorphic at ${pathIdentity}, found ${plan}.`,
@@ -368,7 +368,7 @@ function assertPolymorphicPlan(
 }
 
 function makeDefaultPlan(fieldName: string) {
-  return ($plan: ExecutablePlan<any>) => access($plan, [fieldName]);
+  return ($plan: ExecutableStep<any>) => access($plan, [fieldName]);
 }
 
 /**
@@ -430,8 +430,8 @@ interface FieldDigest {
  */
 interface PrefetchConfig {
   fieldDigest: FieldDigest;
-  plan: ExecutablePlan;
-  itemPlan: ExecutablePlan;
+  plan: ExecutableStep;
+  itemPlan: ExecutableStep;
 }
 
 /**
@@ -528,7 +528,7 @@ export class Aether<
    * can reference the deleted plan and thus no error will occur.
    */
   private readonly plans: {
-    [key: string]: ExecutablePlan;
+    [key: string]: ExecutableStep;
   } = Object.create(sharedNull);
 
   /**
@@ -537,7 +537,7 @@ export class Aether<
    *
    * @internal
    */
-  public readonly modifierPlans: ModifierPlan<any>[] = [];
+  public readonly modifierPlans: ModifierStep<any>[] = [];
 
   /**
    * This is a execution-time (rather than planning time) property - it's for
@@ -668,7 +668,7 @@ export class Aether<
    */
   public readonly prefetchesForPathIdentity: {
     [pathIdentity: string]: {
-      local: ExecutablePlan[];
+      local: ExecutableStep[];
       children: PrefetchConfig[];
     };
   } = Object.create(null);
@@ -691,7 +691,7 @@ export class Aether<
    * Details of any plan options for the given plan; currently only used for
    * the `@stream` directive.
    */
-  private readonly planOptionsByPlan = new Map<ExecutablePlan, PlanOptions>();
+  private readonly planOptionsByPlan = new Map<ExecutableStep, PlanOptions>();
 
   // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
   private readonly polymorphicDetailsByPlanId: Record<
@@ -705,7 +705,7 @@ export class Aether<
    *
    * @internal
    */
-  public readonly rootSelectionSetPlan: __ValuePlan<object>;
+  public readonly rootSelectionSetPlan: __ValueStep<object>;
   /**
    * @internal
    */
@@ -713,11 +713,11 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly variableValuesPlan: __ValuePlan<TVariables>;
+  public readonly variableValuesPlan: __ValueStep<TVariables>;
   /**
    * @internal
    */
-  public readonly trackedVariableValuesPlan: __TrackedObjectPlan<TVariables>;
+  public readonly trackedVariableValuesPlan: __TrackedObjectStep<TVariables>;
   /**
    * @internal
    */
@@ -725,11 +725,11 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly contextPlan: __ValuePlan<TContext>;
+  public readonly contextPlan: __ValueStep<TContext>;
   /**
    * @internal
    */
-  public readonly trackedContextPlan: __TrackedObjectPlan<TContext>;
+  public readonly trackedContextPlan: __TrackedObjectStep<TContext>;
   /**
    * @internal
    */
@@ -737,11 +737,11 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly rootValuePlan: __ValuePlan<TRootValue>;
+  public readonly rootValuePlan: __ValueStep<TRootValue>;
   /**
    * @internal
    */
-  public readonly trackedRootValuePlan: __TrackedObjectPlan<TRootValue>;
+  public readonly trackedRootValuePlan: __TrackedObjectStep<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
   public readonly queryTypeName: string;
   public readonly mutationTypeName: string | undefined;
@@ -843,8 +843,8 @@ export class Aether<
       aether: this,
       parentPathIdentity: GLOBAL_PATH,
     }) as <T>(cb: () => T) => T;
-    this.rootSelectionSetPlan = wgs(() => new __ValuePlan());
-    this.variableValuesPlan = wgs(() => new __ValuePlan());
+    this.rootSelectionSetPlan = wgs(() => new __ValueStep());
+    this.variableValuesPlan = wgs(() => new __ValueStep());
     debugPlanVerbose(
       "Constructed variableValuesPlan %s",
       this.variableValuesPlan,
@@ -852,7 +852,7 @@ export class Aether<
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
     this.trackedVariableValuesPlan = wgs(
       () =>
-        new __TrackedObjectPlan(
+        new __TrackedObjectStep(
           variableValues,
           this.variableValuesPlan,
           this.variableValuesConstraints,
@@ -864,11 +864,11 @@ export class Aether<
         this.trackedVariableValuesPlan,
       );
     }
-    this.contextPlan = wgs(() => new __ValuePlan());
+    this.contextPlan = wgs(() => new __ValueStep());
     debugPlanVerbose("Constructed contextPlan %s", this.contextPlan);
     this.trackedContextPlan = wgs(
       () =>
-        new __TrackedObjectPlan(
+        new __TrackedObjectStep(
           context,
           this.contextPlan,
           this.contextConstraints,
@@ -880,11 +880,11 @@ export class Aether<
         this.trackedContextPlan,
       );
     }
-    this.rootValuePlan = wgs(() => new __ValuePlan());
+    this.rootValuePlan = wgs(() => new __ValueStep());
     debugPlanVerbose("Constructed rootValuePlan %s", this.rootValuePlan);
     this.trackedRootValuePlan = wgs(
       () =>
-        new __TrackedObjectPlan(
+        new __TrackedObjectStep(
           rootValue,
           this.rootValuePlan,
           this.rootValueConstraints,
@@ -1010,7 +1010,7 @@ export class Aether<
     }
 
     // Assign bucket IDs; this MUST come after finalization otherwise
-    // `__ListTransformPlan`s will be broken
+    // `__ListTransformStep`s will be broken
     this.assignBucketIds();
 
     // Log the plan now we're all done
@@ -1022,7 +1022,7 @@ export class Aether<
         why ? ` ${why}` : "",
         "\n" + this.printPlansByPath(),
       );
-      debugPlan(`Plan graph: %s`, "\n" + this.printPlanGraph());
+      debugPlan(`Step graph: %s`, "\n" + this.printPlanGraph());
     }
 
     this.phase = "ready";
@@ -1167,14 +1167,14 @@ export class Aether<
    * create one item plan per parent plan.
    */
   private itemPlanFor<TData>(
-    listPlan: ExecutablePlan<TData> | ExecutablePlan<TData[]>,
+    listPlan: ExecutableStep<TData> | ExecutableStep<TData[]>,
     depth = 0,
-  ): __ItemPlan<TData> {
+  ): __ItemStep<TData> {
     const itemPlanId = this.itemPlanIdByListPlanId[listPlan.id];
     if (itemPlanId !== undefined) {
-      return this.plans[itemPlanId] as __ItemPlan<TData>;
+      return this.plans[itemPlanId] as __ItemStep<TData>;
     }
-    const itemPlan = new __ItemPlan(listPlan, depth);
+    const itemPlan = new __ItemStep(listPlan, depth);
     this.itemPlanIdByListPlanId[listPlan.id] = itemPlan.id;
     return itemPlan;
   }
@@ -1517,7 +1517,7 @@ export class Aether<
   private planSelectionSet(
     path: string,
     parentFieldPathIdentity: string,
-    parentPlan: ExecutablePlan,
+    parentPlan: ExecutableStep,
     objectType: GraphQLObjectType,
     groupedSelectionsList: GroupedSelections[],
     parentTreeNode: TreeNode,
@@ -1666,9 +1666,9 @@ export class Aether<
        *      - Pass through the parent plan
        *    - Else, if resultIsPlanned:
        *      - Assert: `fieldHasPlan` must be true
-       *      - Pass through a `__ValuePlan` representing the parent value.
+       *      - Pass through a `__ValueStep` representing the parent value.
        *    - Else, if fieldHasPlan:
-       *      - Pass through a `__ValuePlan` representing the parent value.
+       *      - Pass through a `__ValueStep` representing the parent value.
        *    - Else
        *      - No action necessary.
        *  - If the field may define `resolve()` and what the "parent" argument
@@ -1683,16 +1683,16 @@ export class Aether<
        *      - Otherwise:
        *        - Crystal will wrap this resolver and will call `resolve()` (or
        *          default resolver) with the plan result.  IMPORTANT: you may
-       *          want to use an `ObjectPlan` so that the parent object is of
+       *          want to use an `ObjectStep` so that the parent object is of
        *          the expected shape; e.g. your plan might return
        *          `object({username: $username})` for a `User.username` field.
        *    - Else
        *      - Leave `resolve()` untouched - do not even wrap it.
-       *      - (Failing that, use a __ValuePlan and return the result
+       *      - (Failing that, use a __ValueStep and return the result
        *        directly.)
        */
 
-      const typePlan = objectType.extensions?.graphile?.Plan;
+      const typePlan = objectType.extensions?.graphile?.Step;
 
       if (graphqlResolver) {
         this.pure = false;
@@ -1712,7 +1712,7 @@ export class Aether<
         throw new Error(
           `Every field within a planned type must have a plan; object type ${
             objectType.name
-          } expects a ${typePlan.name || "ExecutablePlan"} however field ${
+          } expects a ${typePlan.name || "ExecutableStep"} however field ${
             objectType.name
           }.${fieldName} has no plan. Please add an 'extensions.graphile.plan' callback to this field.`,
         );
@@ -1732,7 +1732,7 @@ export class Aether<
 
       this.returnRawValueByPathIdentity[pathIdentity] = returnRaw;
 
-      let plan: ExecutablePlan | PolymorphicPlan;
+      let plan: ExecutableStep | PolymorphicStep;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
         plan = this.planField(
@@ -1836,7 +1836,7 @@ export class Aether<
           this.sideEffectPlanIdsByPathIdentity[pathIdentity].push(newPlan.id);
         }
 
-        if (newPlan instanceof __ListTransformPlan) {
+        if (newPlan instanceof __ListTransformStep) {
           const listPlan = newPlan.getListPlan();
           const nestedParentPathIdentity = pathIdentity + `@${newPlan.id}[]`;
           const wgs = withGlobalState.bind(null, {
@@ -1845,7 +1845,7 @@ export class Aether<
           }) as <T>(cb: () => T) => T;
           const itemPlan = wgs(() => {
             // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
-            const $__listItem = new __ItemPlan(listPlan);
+            const $__listItem = new __ItemStep(listPlan);
             $__listItem.transformPlanId = newPlan.id;
             this.itemPlanIdByListTransformPlanId[newPlan.id] = $__listItem.id;
             const $listItem = listPlan.listItem?.($__listItem) ?? $__listItem;
@@ -1889,7 +1889,7 @@ export class Aether<
   /**
    * This algorithm wasn't originally planned, but we should not have jumped
    * straight to getNamedType in the plan. This method lets us walk the type
-   * tree and add in `__ItemPlan`s in the relevant places so that we can refer
+   * tree and add in `__ItemStep`s in the relevant places so that we can refer
    * to individual values within lists.
    *
    * Note this handles both leaf types and branch types.
@@ -1899,14 +1899,14 @@ export class Aether<
     fieldAndGroups: FieldAndGroup[],
     fieldPathIdentity: string,
     pathIdentity: string,
-    plan: ExecutablePlan<any>,
+    plan: ExecutableStep<any>,
     treeNode: TreeNode,
     useValuePlan: boolean,
     isLeaf: boolean,
     listDepth = 0,
   ): {
     listDepth: number;
-    itemPlan: ExecutablePlan<any>;
+    itemPlan: ExecutableStep<any>;
     childFieldDigests: FieldDigest[] | null;
     itemPathIdentity: string;
   } {
@@ -1918,7 +1918,7 @@ export class Aether<
       );
     }
     if (fieldType instanceof GraphQLNonNull) {
-      // TODO: we could implement a __NonNullPlan in future; currently we just
+      // TODO: we could implement a __NonNullStep in future; currently we just
       // defer that to GraphQL.js
       return this.planFieldReturnType(
         fieldType.ofType,
@@ -1952,7 +1952,7 @@ export class Aether<
         },
         isListCapablePlan(plan)
           ? () =>
-              (plan as ListCapablePlan<any>).listItem(
+              (plan as ListCapableStep<any>).listItem(
                 this.itemPlanFor(plan, listDepth),
               )
           : () => this.itemPlanFor(plan, listDepth),
@@ -1978,7 +1978,7 @@ export class Aether<
       const oldPlansLength = this.planCount;
       const valuePlan = withGlobalState(
         { aether: this, parentPathIdentity: pathIdentity },
-        () => new __ValuePlan(),
+        () => new __ValueStep(),
       );
       this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
 
@@ -2015,16 +2015,16 @@ export class Aether<
       if (fieldType instanceof GraphQLObjectType) {
         if (isDev) {
           // Check that the plan we're dealing with is the one the user declared
-          const ExpectedPlan = fieldType.extensions?.graphile?.Plan;
-          if (ExpectedPlan && !(plan instanceof ExpectedPlan)) {
+          const ExpectedStep = fieldType.extensions?.graphile?.Step;
+          if (ExpectedStep && !(plan instanceof ExpectedStep)) {
             if (debugPlanVerboseEnabled) {
               this.logPlansByPath();
             }
             throw new Error(
-              `Plan mis-match: expected ${
-                ExpectedPlan.name
+              `Step mis-match: expected ${
+                ExpectedStep.name
               } at '${pathIdentity}', but instead found ${
-                (plan as ExecutablePlan).constructor.name
+                (plan as ExecutableStep).constructor.name
               } (${plan})`,
             );
           }
@@ -2263,7 +2263,7 @@ export class Aether<
     objectType: GraphQLObjectType,
     fieldNode: FieldNode,
     planResolver: FieldPlanResolver<any, any, any>,
-    parentPlan: ExecutablePlan,
+    parentPlan: ExecutableStep,
     field: GraphQLField<any, any>,
   ) {
     const oldPlansLength = this.planCount;
@@ -2314,7 +2314,7 @@ export class Aether<
 
     const planOptions: PlanOptions = {
       stream:
-        streamDirective && isStreamablePlan(plan as ExecutablePlan<any>)
+        streamDirective && isStreamablePlan(plan as ExecutableStep<any>)
           ? {
               initialCount:
                 Number(
@@ -2363,14 +2363,14 @@ export class Aether<
       const plan = this.plans[id];
       const referencingPlanIsAllowed =
         // Required so that we can access the underlying value plan.
-        plan instanceof __TrackedObjectPlan;
+        plan instanceof __TrackedObjectStep;
       if (!referencingPlanIsAllowed) {
         for (const key in plan) {
           const val = plan[key];
-          if (val instanceof ExecutablePlan) {
+          if (val instanceof ExecutableStep) {
             errors.push(
               new Error(
-                `ERROR: ExecutablePlan ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.aether.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
+                `ERROR: ExecutableStep ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.aether.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
               ),
             );
           }
@@ -2395,21 +2395,21 @@ export class Aether<
   public processPlans(
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
-    callback: (plan: ExecutablePlan<any>) => ExecutablePlan<any>,
+    callback: (plan: ExecutableStep<any>) => ExecutableStep<any>,
     {
       onPlanReplacement,
       offset = 0,
     }: {
       onPlanReplacement?: (
-        originalPlan: ExecutablePlan,
-        replacementPlan: ExecutablePlan,
+        originalPlan: ExecutableStep,
+        replacementPlan: ExecutableStep,
       ) => void;
       offset?: number;
     } = {},
   ): void {
     depth = 0;
-    const processed = new Set<ExecutablePlan>();
-    const processPlan = (plan: ExecutablePlan): void => {
+    const processed = new Set<ExecutableStep>();
+    const processPlan = (plan: ExecutableStep): void => {
       if (!plan) {
         return;
       }
@@ -2470,7 +2470,7 @@ export class Aether<
           }
         }
       }
-      let replacementPlan: ExecutablePlan;
+      let replacementPlan: ExecutableStep;
       const oldPlansLength = this.planCount;
       try {
         replacementPlan = withGlobalState(
@@ -2574,7 +2574,7 @@ export class Aether<
       loops++;
     } while (replacements > 0);
     debugPlanVerbose(
-      "ExecutablePlan deduplication complete after %o loops",
+      "ExecutableStep deduplication complete after %o loops",
       loops,
     );
   }
@@ -2586,7 +2586,7 @@ export class Aether<
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    const thirdAndFutureLoopReplacedPlans: ExecutablePlan[] = [];
+    const thirdAndFutureLoopReplacedPlans: ExecutableStep[] = [];
     for (let loops = 0; loops < MAX_OPTIMIZATION_LOOPS; loops++) {
       let replacedPlan = false;
       this.processPlans(
@@ -2594,10 +2594,10 @@ export class Aether<
         "dependents-first",
         (plan) => this.optimizePlan(plan),
         {
-          onPlanReplacement: (_originalPlan, _replacementPlan) => {
+          onPlanReplacement: (_originalStep, _replacementStep) => {
             replacedPlan = true;
             if (loops >= 3) {
-              thirdAndFutureLoopReplacedPlans.push(_originalPlan);
+              thirdAndFutureLoopReplacedPlans.push(_originalStep);
             }
             // TODO: we should be able to optimize this - we know the new and old
             // plan so we should be able to look at just the original plan's
@@ -2617,7 +2617,7 @@ export class Aether<
     );
   }
 
-  private isPeer(planA: ExecutablePlan, planB: ExecutablePlan): boolean {
+  private isPeer(planA: ExecutableStep, planB: ExecutableStep): boolean {
     // Can only merge if plan is of same type.
     if (planA.constructor !== planB.constructor) {
       return false;
@@ -2646,14 +2646,14 @@ export class Aether<
    * Finds suitable peers and passes them to the plan's deduplicate method (if
    * any found).
    */
-  private deduplicatePlan(plan: ExecutablePlan): ExecutablePlan {
+  private deduplicatePlan(plan: ExecutableStep): ExecutableStep {
     if (plan.hasSideEffects) {
       // Never deduplicate plans with side effects.
       return plan;
     }
 
-    if (plan instanceof __ItemPlan) {
-      // __ItemPlan cannot be deduplicated
+    if (plan instanceof __ItemStep) {
+      // __ItemStep cannot be deduplicated
       return plan;
     }
 
@@ -2701,12 +2701,12 @@ export class Aether<
       if (this.itemPlanIdByListPlanId[plan.id] !== undefined) {
         const itemPlan = this.plans[
           this.itemPlanIdByListPlanId[plan.id]!
-        ] as __ItemPlan<any>;
+        ] as __ItemStep<any>;
         const replacementItemPlan = this.itemPlanFor(
           replacementPlan,
           itemPlan.depth,
         );
-        // Replace the __ItemPlan for this entry
+        // Replace the __ItemStep for this entry
         this.itemPlanIdByListPlanId[plan.id] = replacementItemPlan.id;
       }
       if (debugPlanVerboseEnabled) {
@@ -2726,9 +2726,9 @@ export class Aether<
   }
 
   /**
-   * Implements the `OptimizePlan` algorithm.
+   * Implements the `OptimizeStep` algorithm.
    */
-  private optimizePlan(plan: ExecutablePlan): ExecutablePlan {
+  private optimizePlan(plan: ExecutableStep): ExecutableStep {
     if (plan.isOptimized && !plan.allowMultipleOptimizations) {
       return plan;
     }
@@ -2753,8 +2753,8 @@ export class Aether<
    * Implements the `MarkPlanActive` algorithm.
    */
   private markPlanActive(
-    plan: ExecutablePlan,
-    activePlans: Set<ExecutablePlan>,
+    plan: ExecutableStep,
+    activePlans: Set<ExecutableStep>,
   ): void {
     if (activePlans.has(plan)) {
       return;
@@ -2770,7 +2770,7 @@ export class Aether<
    * Implements the `TreeShakePlans` algorithm.
    */
   private treeShakePlans(): void {
-    const activePlans = new Set<ExecutablePlan>();
+    const activePlans = new Set<ExecutableStep>();
 
     // The root subscription plan, if any, should be marked as active
     if (this.subscriptionItemPlanId) {
@@ -2850,13 +2850,13 @@ export class Aether<
   }
 
   private walkTreeFirstPlanUsages(
-    callback: (treeNode: TreeNode, plan: ExecutablePlan) => void,
+    callback: (treeNode: TreeNode, plan: ExecutableStep) => void,
   ) {
-    const recurse = (treeNode: TreeNode, knownPlans: Set<ExecutablePlan>) => {
-      const processPlan = (plan: ExecutablePlan): void => {
+    const recurse = (treeNode: TreeNode, knownPlans: Set<ExecutableStep>) => {
+      const processPlan = (plan: ExecutableStep): void => {
         if (!knownPlans.has(plan)) {
           // Must come first to avoid race conditions
-          if (plan instanceof __ListTransformPlan) {
+          if (plan instanceof __ListTransformStep) {
             // TODO: this entire `if` statement is a big hack; we should add transforms to the treeNode elsewhere...
             const transformPathIdentity =
               treeNode.pathIdentity + `@${plan.id}[]`;
@@ -2992,22 +2992,22 @@ export class Aether<
     } = {
       0: this.rootBucket,
     };
-    const processedPlans = new Set<ExecutablePlan>();
-    const processPlan = (plan: ExecutablePlan) => {
+    const processedPlans = new Set<ExecutableStep>();
+    const processPlan = (plan: ExecutableStep) => {
       if (processedPlans.has(plan)) {
         return;
       }
       processedPlans.add(plan);
 
       if (
-        // TODO: should this be "if (plan instanceof __ValuePlan)"?
+        // TODO: should this be "if (plan instanceof __ValueStep)"?
         (
           [
             this.rootSelectionSetPlan,
             this.variableValuesPlan,
             this.contextPlan,
             this.rootValuePlan,
-          ] as ExecutablePlan[]
+          ] as ExecutableStep[]
         ).includes(plan)
       ) {
         (plan.groupIds as any) = [0];
@@ -3117,7 +3117,7 @@ export class Aether<
           | { polymorphicPlanIds: string[]; typeNames: string[] },
       );
 
-      const itemPlanId = plan instanceof __ItemPlan ? plan.id : undefined;
+      const itemPlanId = plan instanceof __ItemStep ? plan.id : undefined;
       // Plans that are in a new group get their own bucket
       const groupId =
         plan.primaryGroupId !== 0 &&
@@ -3143,9 +3143,9 @@ export class Aether<
 
       let parent: BucketDefinition | null | undefined = undefined;
 
-      const itemPlan = plan instanceof __ItemPlan ? plan : null;
+      const itemPlan = plan instanceof __ItemStep ? plan : null;
       const transformPlan = itemPlan?.transformPlanId
-        ? (this.plans[itemPlan.transformPlanId]! as __ListTransformPlan<
+        ? (this.plans[itemPlan.transformPlanId]! as __ListTransformStep<
             any,
             any,
             any
@@ -3352,7 +3352,7 @@ export class Aether<
        * Moves a plan (and any of its dependencies) out of `bucket` and into
        * the bucket's parent instead.
        */
-      const exfiltrate = (plan: ExecutablePlan, bucket: BucketDefinition) => {
+      const exfiltrate = (plan: ExecutableStep, bucket: BucketDefinition) => {
         if (plan.bucketId !== bucket.id) {
           return;
         }
@@ -3399,8 +3399,8 @@ export class Aether<
      * `queries/interfaces-single-table/nested-more.test.graphql` test in
      * `dataplan-pg`. In this test a PG row is selected, and its `type`
      * attribute is both output to a regular GraphQL field _and_ used to
-     * resolve the `__typename` of the object via the `PgPolymorphicPlan`. We
-     * need the `PgPolymorphicPlan` to be executed first so that we can create
+     * resolve the `__typename` of the object via the `PgPolymorphicStep`. We
+     * need the `PgPolymorphicStep` to be executed first so that we can create
      * the object, before setting the value for the `type` field of that
      * object. Thus we must not set the path identities as soon as the
      * associated plan completes.
@@ -3411,7 +3411,7 @@ export class Aether<
      */
 
     const getDeepestBucket = (
-      plan: ExecutablePlan,
+      plan: ExecutableStep,
       planPathIdentity: string,
     ): BucketDefinition => {
       const planBucket = this.buckets[plan.bucketId];
@@ -3501,7 +3501,7 @@ export class Aether<
                     }
                     const deepestBucket = getDeepestBucket(plan, pathIdentity);
                     if (deepestBucket === bucket) {
-                      return [pathIdentity, plan] as [string, ExecutablePlan];
+                      return [pathIdentity, plan] as [string, ExecutableStep];
                     } else {
                       return null;
                     }
@@ -3814,10 +3814,10 @@ export class Aether<
   }
 
   /**
-   * Implements the `FinalizePlans` and `FinalizePlan` algorithms.
+   * Implements the `FinalizePlans` and `FinalizeStep` algorithms.
    */
   private finalizePlans(): void {
-    const distinctActivePlansInReverseOrder = new Set<ExecutablePlan>();
+    const distinctActivePlansInReverseOrder = new Set<ExecutableStep>();
     const ids = this.getPlanIds();
     for (const i of ids.reverse()) {
       const plan = this.plans[i];
@@ -3833,18 +3833,18 @@ export class Aether<
 
   /**
    * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive, so
-   * caches results.  Useful for tracking down all the `__ItemPlan`s.
+   * caches results.  Useful for tracking down all the `__ItemStep`s.
    */
   private findPath(
-    ancestorPlan: ExecutablePlan<any>,
-    descendentPlan: ExecutablePlan<any>,
-  ): ReadonlyArray<ExecutablePlan<any>> | null {
+    ancestorPlan: ExecutableStep<any>,
+    descendentPlan: ExecutableStep<any>,
+  ): ReadonlyArray<ExecutableStep<any>> | null {
     const known = ancestorPlan._pathByDescendent.get(descendentPlan);
     if (known !== undefined) {
       return known;
     } else if (ancestorPlan === descendentPlan) {
       return EMPTY_ARRAY;
-    } else if (descendentPlan instanceof __ValuePlan) {
+    } else if (descendentPlan instanceof __ValueStep) {
       return EMPTY_ARRAY;
     } else if (this.phase !== "ready") {
       throw new Error("Only call findPath when aether is ready");
@@ -3871,10 +3871,10 @@ export class Aether<
 
   counter = 1;
   private executePlan<T>(
-    plan: ExecutablePlan<T>,
+    plan: ExecutableStep<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
-    visitedPlans = new Set<ExecutablePlan>(),
+    visitedPlans = new Set<ExecutableStep>(),
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
   ): PromiseOrDirect<any[]> {
@@ -3932,15 +3932,15 @@ export class Aether<
   }
 
   /**
-   * Implements `ExecutePlan`.
+   * Implements `ExecuteStep`.
    *
    * @remarks `await` is forbidden to avoid race conditions
    */
   private executePlanAlt<T>(
-    plan: ExecutablePlan<T>,
+    plan: ExecutableStep<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
-    visitedPlans = new Set<ExecutablePlan>(),
+    visitedPlans = new Set<ExecutableStep>(),
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
   ): PromiseOrDirect<any[]> {
@@ -3957,12 +3957,12 @@ export class Aether<
     }
     if (visitedPlans.has(plan)) {
       throw new Error(
-        `ExecutablePlan execution recursion error: attempted to execute ${plan} again`,
+        `ExecutableStep execution recursion error: attempted to execute ${plan} again`,
       );
     }
     visitedPlans.add(plan);
-    if (plan instanceof __ItemPlan) {
-      // Shortcut evaluation because __ItemPlan cannot be executed.
+    if (plan instanceof __ItemStep) {
+      // Shortcut evaluation because __ItemStep cannot be executed.
       return planResultses.map((planResults) =>
         planResults == null || isCrystalError(planResults)
           ? planResults
@@ -4054,14 +4054,14 @@ export class Aether<
 
         continue;
       }
-      if (plan instanceof __ValuePlan) {
+      if (plan instanceof __ValueStep) {
         const planResults = bucketPlanResultses[0].planResults;
         throw new Error(
-          `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValuePlan ${plan} (bucketId: '${
+          `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValueStep ${plan} (bucketId: '${
             plan.bucketId
           }', groups: ${plan.groupIds.join(
             ", ",
-          )}) for execution; however __ValuePlan must never be executed - the value should already exist in the cache: ${crystalPrint(
+          )}) for execution; however __ValueStep must never be executed - the value should already exist in the cache: ${crystalPrint(
             planResults,
           )}.`,
         );
@@ -4311,9 +4311,9 @@ export class Aether<
       };
       // Note: the `execute` method on plans is responsible for memoizing
       // results into `meta`.
-      if (plan instanceof __ItemPlan) {
+      if (plan instanceof __ItemStep) {
         throw new Error(
-          "Should never attempt to execute __ItemPlan; that should be handled within executeBatch",
+          "Should never attempt to execute __ItemStep; that should be handled within executeBatch",
         );
       }
       const planOptions = this.planOptionsByPlan.get(plan);
@@ -4322,7 +4322,7 @@ export class Aether<
       // If plan is sync and safe then execute, store and return results (there's no risk of a race condition)
       if (
         plan.isSyncAndSafe &&
-        !(plan instanceof __ListTransformPlan) &&
+        !(plan instanceof __ListTransformStep) &&
         !(isSubscribe || planOptions?.stream)
       ) {
         let crystalError: CrystalError | undefined;
@@ -4383,7 +4383,7 @@ export class Aether<
       if (debugExecuteEnabled)
         console.timeLog(`plan\t${plan}`, "async execution");
 
-      // Plan's not synchronous
+      // Step's not synchronous
 
       // TODO: this is a hack! We should write the new execution algorithm...
       return this.executePlanOld(
@@ -4407,7 +4407,7 @@ export class Aether<
   }
 
   /**
-   * Implements `ExecutePlan`.
+   * Implements `ExecuteStep`.
    *
    * @remarks `await` is forbidden in this method to avoid race conditions.
    *
@@ -4415,10 +4415,10 @@ export class Aether<
    * it was `defer()`-heavy, so performance suffered.
    */
   private executePlanOld<T>(
-    plan: ExecutablePlan<T>,
+    plan: ExecutableStep<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
-    visitedPlans = new Set<ExecutablePlan>(),
+    visitedPlans = new Set<ExecutableStep>(),
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
   ): PromiseOrDirect<any[]> {
@@ -4435,12 +4435,12 @@ export class Aether<
     }
     //if (visitedPlans.has(plan)) {
     //  throw new Error(
-    //    `ExecutablePlan execution recursion error: attempted to execute ${plan} again`,
+    //    `ExecutableStep execution recursion error: attempted to execute ${plan} again`,
     //  );
     //}
     //visitedPlans.add(plan);
-    if (plan instanceof __ItemPlan) {
-      // Shortcut evaluation because __ItemPlan cannot be executed.
+    if (plan instanceof __ItemStep) {
+      // Shortcut evaluation because __ItemStep cannot be executed.
       return planResultses.map((planResults) =>
         planResults == null || isCrystalError(planResults)
           ? planResults
@@ -4487,13 +4487,13 @@ export class Aether<
         }
         continue;
       }
-      if (plan instanceof __ValuePlan) {
+      if (plan instanceof __ValueStep) {
         throw new Error(
-          `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValuePlan ${plan} (bucketId: '${
+          `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValueStep ${plan} (bucketId: '${
             plan.bucketId
           }', groups: ${plan.groupIds.join(
             ", ",
-          )}) for execution; however __ValuePlan must never be executed - the value should already exist in the cache: ${crystalPrint(
+          )}) for execution; however __ValueStep must never be executed - the value should already exist in the cache: ${crystalPrint(
             planResults,
           )}.`,
         );
@@ -4622,10 +4622,10 @@ export class Aether<
    * plans - those that have not been executed yet.
    */
   private async executePlanPending<T>(
-    plan: ExecutablePlan<T>,
+    plan: ExecutableStep<T>,
     crystalContext: CrystalContext,
     pendingPlanResultses: ReadonlyArray<PlanResults>,
-    visitedPlans: Set<ExecutablePlan>,
+    visitedPlans: Set<ExecutableStep>,
     depth: number,
     planCacheForPendingPlanResultses: PlanCacheForPlanResultses,
   ): Promise<any[]> {
@@ -4723,9 +4723,9 @@ export class Aether<
       }
       // Note: the `execute` method on plans is responsible for memoizing
       // results into `meta`.
-      if (plan instanceof __ItemPlan) {
+      if (plan instanceof __ItemStep) {
         throw new Error(
-          "Should never attempt to execute __ItemPlan; that should be handled within executeBatch",
+          "Should never attempt to execute __ItemStep; that should be handled within executeBatch",
         );
       }
       const planOptions = this.planOptionsByPlan.get(plan);
@@ -4735,8 +4735,8 @@ export class Aether<
         eventEmitter: crystalContext.eventEmitter,
       };
       const pendingResults =
-        plan instanceof __ListTransformPlan
-          ? // __ListTransformPlan gets custom execution.
+        plan instanceof __ListTransformStep
+          ? // __ListTransformStep gets custom execution.
             await this.executeTransformPlan(
               plan,
               crystalContext,
@@ -4745,7 +4745,7 @@ export class Aether<
               planCacheForRealPendingPlanResultses,
             )
           : isSubscribe || planOptions?.stream
-          ? await (plan as unknown as StreamablePlan<unknown>).stream(
+          ? await (plan as unknown as StreamableStep<unknown>).stream(
               dependencyValuesList,
               extra,
               isSubscribe ? { initialCount: 0 } : planOptions!.stream!,
@@ -4781,7 +4781,7 @@ export class Aether<
         // AsyncIterable, or arbitrary data (including an array).
         const rawPendingResult =
           hasDependencies ||
-          plan instanceof __ListTransformPlan ||
+          plan instanceof __ListTransformStep ||
           plan.hasSideEffects
             ? pendingResults[i]
             : pendingResults[0];
@@ -4818,10 +4818,10 @@ export class Aether<
   }
 
   private async executeTransformPlan(
-    plan: __ListTransformPlan<any, any, any>,
+    plan: __ListTransformStep<any, any, any>,
     crystalContext: CrystalContext,
     planResultses: readonly PlanResults[],
-    visitedPlans: Set<ExecutablePlan>,
+    visitedPlans: Set<ExecutableStep>,
     planCacheForPlanResultses: PlanCacheForPlanResultses,
   ) {
     const itemPlanId = this.transformDependencyPlanIdByTransformPlanId[plan.id];
@@ -4860,7 +4860,7 @@ export class Aether<
         assert.strictEqual(
           list.length,
           values.length,
-          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformPlan",
+          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformStep",
         );
       }
       const initialState = plan.initialState();
@@ -4884,17 +4884,17 @@ export class Aether<
    *
    * @internal
    */
-  public dangerouslyGetPlan(id: string): ExecutablePlan {
+  public dangerouslyGetPlan(id: string): ExecutableStep {
     return this.plans[id];
   }
 
   /**
    * Adds a plan to the known plans and returns the number to use as the plan
-   * id. ONLY to be used from Plan, user code should never call this directly.
+   * id. ONLY to be used from Step, user code should never call this directly.
    *
    * @internal
    */
-  public _addPlan(plan: ExecutablePlan): string {
+  public _addStep(plan: ExecutableStep): string {
     if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
       throw new Error(
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
@@ -4907,11 +4907,11 @@ export class Aether<
 
   /**
    * Adds a plan to the known plans and returns the number to use as the plan
-   * id. ONLY to be used from Plan, user code should never call this directly.
+   * id. ONLY to be used from Step, user code should never call this directly.
    *
    * @internal
    */
-  public _addModifierPlan(plan: ModifierPlan<any>): string {
+  public _addModifierStep(plan: ModifierStep<any>): string {
     if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
       throw new Error(
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
@@ -5096,7 +5096,7 @@ export class Aether<
 
   private executeLayers(
     crystalContext: CrystalContext,
-    layers: ExecutablePlan[],
+    layers: ExecutableStep[],
     // Even when AsyncIterators are involved, this will always be a concrete array
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     rawProcessResults: ProcessResults | undefined,
@@ -5138,7 +5138,7 @@ export class Aether<
       );
     }
 
-    if (layerPlan instanceof __ItemPlan) {
+    if (layerPlan instanceof __ItemStep) {
       // Derive new PlanResultses from the existing ones.
       const depId = layerPlan.dependencies[0];
       const dep = this.plans[depId];
@@ -5154,7 +5154,7 @@ export class Aether<
               layerPlan.bucketId,
               layerPlan.id,
             );
-            // TODO: review this entire `if` statement; it was added to support __ListTransformPlan.
+            // TODO: review this entire `if` statement; it was added to support __ListTransformStep.
             // I wasn't sure what to do here... so I returned existingResult...
             // and the tests started passing again... so... ¯\_(ツ)_/¯
             return existingResult;
@@ -5518,9 +5518,9 @@ export class Aether<
     crystalContext: CrystalContext,
     pathIdentity: string,
     fieldDigest: FieldDigest,
-    sideEffectPlans: ReadonlyArray<ExecutablePlan>,
-    plan: ExecutablePlan,
-    itemPlan: ExecutablePlan,
+    sideEffectPlans: ReadonlyArray<ExecutableStep>,
+    plan: ExecutableStep,
+    itemPlan: ExecutableStep,
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
     allowPrefetch = true,
@@ -5709,8 +5709,8 @@ export class Aether<
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     pathIdentity: string,
-    plan: ExecutablePlan,
-    itemPlan: ExecutablePlan,
+    plan: ExecutableStep,
+    itemPlan: ExecutableStep,
     planCacheForPlanResultses: PlanCacheForPlanResultses,
     processResults: ProcessResults | undefined = undefined,
   ) {
@@ -5726,10 +5726,10 @@ export class Aether<
 
     /**
      * We'll always have at least one layer, but for itemPlans that depend on
-     * `__ItemPlan`s we'll have one additional layer for each
-     * `__ItemPlan` and intermediate plans.
+     * `__ItemStep`s we'll have one additional layer for each
+     * `__ItemStep` and intermediate plans.
      */
-    const layers: Array<ExecutablePlan<any>> = [plan, ...path];
+    const layers: Array<ExecutableStep<any>> = [plan, ...path];
 
     if (debugExecuteEnabled) {
       debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
@@ -6038,8 +6038,8 @@ export class Aether<
 
   public getPlan: (
     id: string,
-    requestingPlan: ExecutablePlan,
-  ) => ExecutablePlan = isDev
+    requestingPlan: ExecutableStep,
+  ) => ExecutableStep = isDev
     ? (id, requestingPlan) => {
         if (
           !["plan", "validate", "deduplicate", "optimize"].includes(this.phase)
@@ -6068,18 +6068,18 @@ export class Aether<
         }
         return plan;
       }
-    : (id, _requestingPlan) => this.plans[id];
+    : (id, _requestingStep) => this.plans[id];
 
-  public isOptimized(plan: ExecutablePlan): boolean {
+  public isOptimized(plan: ExecutableStep): boolean {
     return plan.isOptimized;
   }
 }
 
 /**
- * Implements `PopulateValuePlan`
+ * Implements `PopulateValueStep`
  */
 export function populateValuePlan(
-  valuePlan: ExecutablePlan,
+  valuePlan: ExecutableStep,
   crystalObject: CrystalObject,
   object: unknown,
   label: string,
@@ -6114,7 +6114,7 @@ function treeNodePath(
   while ((n = n.parent) && n.pathIdentity.startsWith(startPathIdentity)) {
     path.unshift(n);
   }
-  // Find the next `GraphQLList` / `__ItemPlan` position (not including self)
+  // Find the next `GraphQLList` / `__ItemStep` position (not including self)
   const listChangeIndex = path.findIndex((v, i) => {
     if (i === 0) {
       return false;
@@ -6140,7 +6140,7 @@ function isTypePlanned(
   namedType: GraphQLNamedType,
 ): boolean {
   if (namedType instanceof GraphQLObjectType) {
-    return !!namedType.extensions?.graphile?.Plan;
+    return !!namedType.extensions?.graphile?.Step;
   } else if (
     namedType instanceof GraphQLUnionType ||
     namedType instanceof GraphQLInterfaceType
@@ -6152,7 +6152,7 @@ function isTypePlanned(
     let firstHadPlan = null;
     let i = 0;
     for (const type of types) {
-      const hasPlan = !!type.extensions?.graphile?.Plan;
+      const hasPlan = !!type.extensions?.graphile?.Step;
       if (firstHadPlan === null) {
         firstHadPlan = hasPlan;
       } else if (hasPlan !== firstHadPlan) {
@@ -6219,10 +6219,10 @@ function getParentPathIdentity(pathIdentity: string): string | null {
 
 function addPlanIdsToBucket(
   bucket: BucketDefinition,
-  dependencyPlans: ExecutablePlan[],
+  dependencyPlans: ExecutableStep[],
   attemptedBuckets: BucketDefinition[] = [],
 ): void {
-  const next: ExecutablePlan[] = [];
+  const next: ExecutableStep[] = [];
   dependencyPlans.forEach((plan) => {
     if (plan.bucketId !== bucket.id) {
       if (!bucket.copyPlanIds.includes(plan.id)) {

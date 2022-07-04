@@ -12,7 +12,7 @@ import {
 import type { Aether } from "./aether.js";
 import { isDev } from "./dev.js";
 import type { FieldAndGroup, GroupedSelections } from "./interfaces.js";
-import type { __TrackedObjectPlan } from "./plans/index.js";
+import type { __TrackedObjectStep } from "./steps/index.js";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.
@@ -43,7 +43,7 @@ export function getDirectiveArg(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
-  variableValuesPlan: __TrackedObjectPlan,
+  variableValuesPlan: __TrackedObjectStep,
 ): unknown {
   const directive = getDirective(selection, directiveName);
   const argument = directive?.arguments?.find(

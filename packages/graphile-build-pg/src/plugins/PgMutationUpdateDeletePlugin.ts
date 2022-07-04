@@ -1,22 +1,22 @@
 import "graphile-config";
 
 import type {
-  PgClassSinglePlan,
-  PgDeletePlan,
+  PgClassSingleStep,
+  PgDeleteStep,
   PgSource,
   PgSourceUnique,
   PgTypeColumn,
-  PgUpdatePlan,
+  PgUpdateStep,
 } from "@dataplan/pg";
 import { pgDelete, pgUpdate } from "@dataplan/pg";
 import type {
-  __InputObjectPlan,
-  __TrackedObjectPlan,
-  ExecutablePlan,
+  __InputObjectStep,
+  __TrackedObjectStep,
+  ExecutableStep,
   FieldArgs,
-  InputPlan,
+  InputStep,
 } from "dataplanner";
-import { lambda, object, ObjectPlan } from "dataplanner";
+import { lambda, object, ObjectStep } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
@@ -264,7 +264,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               isPgDeletePayloadType: mode === "delete",
               pgSource: source,
             },
-            ObjectPlan,
+            ObjectStep,
             () => {
               return {
                 description: build.wrapDescription(
@@ -315,10 +315,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               plan: EXPORTABLE(
                                 () =>
                                   function plan(
-                                    $object: ObjectPlan<{
+                                    $object: ObjectStep<{
                                       result:
-                                        | PgUpdatePlan<any, any, any>
-                                        | PgDeletePlan<any, any, any>;
+                                        | PgUpdateStep<any, any, any>
+                                        | PgDeleteStep<any, any, any>;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -346,8 +346,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 plan: EXPORTABLE(
                                   (handler, lambda, nodeIdCodec) =>
                                     function plan(
-                                      $object: ObjectPlan<{
-                                        result: PgClassSinglePlan<
+                                      $object: ObjectStep<{
+                                        result: PgClassSingleStep<
                                           any,
                                           any,
                                           any,
@@ -459,8 +459,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                           plan: EXPORTABLE(
                             () =>
                               function plan(
-                                $input: ObjectPlan<any>,
-                                value: InputPlan,
+                                $input: ObjectStep<any>,
+                                value: InputStep,
                               ) {
                                 $input.set("clientMutationId", value);
                               },
@@ -515,8 +515,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               plan: EXPORTABLE(
                                 () =>
                                   function plan(
-                                    $object: ObjectPlan<{
-                                      result: PgUpdatePlan<any, any, any>;
+                                    $object: ObjectStep<{
+                                      result: PgUpdateStep<any, any, any>;
                                     }>,
                                   ) {
                                     const $record =
@@ -696,10 +696,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               () =>
                                 function plan(
                                   _: any,
-                                  $object: ObjectPlan<{
+                                  $object: ObjectStep<{
                                     result:
-                                      | PgUpdatePlan<any, any, any>
-                                      | PgDeletePlan<any, any, any>;
+                                      | PgUpdateStep<any, any, any>
+                                      | PgDeleteStep<any, any, any>;
                                   }>,
                                 ) {
                                   return $object;
@@ -725,7 +725,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               : (EXPORTABLE(
                                   (object, pgUpdate, source, specFromArgs) =>
                                     function plan(
-                                      _$root: ExecutablePlan,
+                                      _$root: ExecutableStep,
                                       args: FieldArgs,
                                     ) {
                                       return object({
@@ -751,7 +751,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             : (EXPORTABLE(
                                 (object, pgDelete, source, specFromArgs) =>
                                   function plan(
-                                    _$root: ExecutablePlan,
+                                    _$root: ExecutableStep,
                                     args: FieldArgs,
                                   ) {
                                     return object({

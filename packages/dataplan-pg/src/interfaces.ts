@@ -1,4 +1,4 @@
-import type { ExecutablePlan } from "dataplanner";
+import type { ExecutableStep } from "dataplanner";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgTypeColumns } from "./codecs.js";
@@ -7,16 +7,16 @@ import type {
   PgSourceRelation,
   PgSourceUnique,
 } from "./datasource.js";
-import type { PgDeletePlan } from "./plans/pgDelete.js";
-import type { PgInsertPlan } from "./plans/pgInsert.js";
-import type { PgSelectSinglePlan } from "./plans/pgSelectSingle.js";
-import type { PgUpdatePlan } from "./plans/pgUpdate.js";
+import type { PgDeleteStep } from "./steps/pgDelete.js";
+import type { PgInsertStep } from "./steps/pgInsert.js";
+import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
+import type { PgUpdateStep } from "./steps/pgUpdate.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
-export type PgClassSinglePlan<
+export type PgClassSingleStep<
   TColumns extends PgTypeColumns | undefined,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
@@ -26,10 +26,10 @@ export type PgClassSinglePlan<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 > =
-  | PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
-  | PgInsertPlan<TColumns, TUniques, TRelations>
-  | PgUpdatePlan<TColumns, TUniques, TRelations>
-  | PgDeletePlan<TColumns, TUniques, TRelations>;
+  | PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
+  | PgInsertStep<TColumns, TUniques, TRelations>
+  | PgUpdateStep<TColumns, TUniques, TRelations>
+  | PgDeleteStep<TColumns, TUniques, TRelations>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -169,12 +169,12 @@ export interface PgEnumTypeCodec<TValue extends string>
 }
 
 /**
- * A PgTypedExecutablePlan has a 'pgCodec' property which means we don't need
+ * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutablePlan<
+export interface PgTypedExecutableStep<
   TCodec extends PgTypeCodec<any, any, any>,
-> extends ExecutablePlan<any> {
+> extends ExecutableStep<any> {
   pgCodec: TCodec;
 }
 
@@ -209,18 +209,18 @@ export type TuplePlanMap<
     [key in keyof TColumns as Exclude<
       key,
       keyof TTuple[number]
-    >]?: ExecutablePlan<ReturnType<TColumns[key]["pg2gql"]>>;
+    >]?: ExecutableStep<ReturnType<TColumns[key]["pg2gql"]>>;
   } & {
     // Required unique combination of columns
-    [key in TTuple[number]]: ExecutablePlan<
+    [key in TTuple[number]]: ExecutableStep<
       ReturnType<TColumns[key]["pg2gql"]>
     >;
   };
 };
 
 /**
- * Represents a spec like `{user_id: ExecutablePlan}` or
- * `{organization_id: ExecutablePlan, item_id: ExecutablePlan}`. The keys in
+ * Represents a spec like `{user_id: ExecutableStep}` or
+ * `{organization_id: ExecutableStep, item_id: ExecutableStep}`. The keys in
  * the spec can be any of the columns in TColumns, however there must be at
  * least one of the unique sets of columns represented (as specified in
  * TUniqueColumns) - you can then add arbitrary additional columns if you need

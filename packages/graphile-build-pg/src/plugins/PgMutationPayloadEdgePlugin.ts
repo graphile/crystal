@@ -1,9 +1,9 @@
 import "graphile-build";
 import "graphile-config";
 
-import type { PgClassSinglePlan, PgSourceUnique } from "@dataplan/pg";
-import type { ObjectPlan } from "dataplanner";
-import { connection, constant, EdgePlan } from "dataplanner";
+import type { PgClassSingleStep, PgSourceUnique } from "@dataplan/pg";
+import type { ObjectStep } from "dataplanner";
+import { connection, constant, EdgeStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type {
   GraphQLEnumType,
@@ -164,7 +164,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 // TODO: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
                   (
-                    EdgePlan,
+                    EdgeStep,
                     applyOrderToPlan,
                     connection,
                     constant,
@@ -173,8 +173,8 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     tableOrderByTypeName,
                   ) =>
                     function plan(
-                      $mutation: ObjectPlan<{
-                        record: PgClassSinglePlan<any, any, any, any>;
+                      $mutation: ObjectStep<{
+                        record: PgClassSingleStep<any, any, any, any>;
                       }>,
                       args,
                       info: { schema: GraphQLSchema },
@@ -200,10 +200,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
                       const $connection = connection($select) as any;
                       const $single = $select.single();
-                      return new EdgePlan($connection, $single);
+                      return new EdgeStep($connection, $single);
                     },
                   [
-                    EdgePlan,
+                    EdgeStep,
                     applyOrderToPlan,
                     connection,
                     constant,

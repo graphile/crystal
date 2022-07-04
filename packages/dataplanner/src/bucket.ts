@@ -5,7 +5,7 @@ import type { CrystalError } from ".";
 import { isCrystalError, newCrystalError } from "./error.js";
 import type { ExecutionEventEmitter } from "./interfaces.js";
 import { $$concreteType, $$idempotent } from "./interfaces.js";
-import type { ExecutablePlan } from "./plan.js";
+import type { ExecutableStep } from "./plan.js";
 import { isPolymorphicData } from "./polymorphic.js";
 import { arrayOfLength } from "./utils.js";
 
@@ -89,10 +89,10 @@ export interface BucketDefinitionFieldOutputMap {
  * execution. A "BucketDefinition" is used to both identify the bucket and to
  * specify why it exists and how it behaves.
  *
- * Every `ExecutablePlan` belongs to exactly one bucket, specified by
+ * Every `ExecutableStep` belongs to exactly one bucket, specified by
  * `plan.bucketId`. Which bucket the plan belongs to is determined by:
  *
- * - `__ItemPlan`s trigger a new bucket for themselves and anything
+ * - `__ItemStep`s trigger a new bucket for themselves and anything
  *   that depends on them.  This covers "list", "stream" and "subscription".
  * - Otherwise, plans that cross a `@defer` boundary (i.e. they're needed to resolve a
  *   `@defer`'d fragment but they aren't required to resolve the parent selection
@@ -115,7 +115,7 @@ export interface BucketDefinitionFieldOutputMap {
  * 3. where the result of executing the plan is stored
  * 4. when the plan execution cache is allowed to be GC'd
  *
- * NOTE: `__ListTransformPlan`'s effectively have a temporary bucket inside
+ * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
  * them (built on the `__Item`) that's thrown away once the transform is
  * complete.
  *
@@ -137,7 +137,7 @@ export interface BucketDefinition {
    * intermediary), as such they have a list of "root path identities" they
    * represent. For `group` buckets this is the rootPathIdentities of the
    * group, for `item` buckets this is the path identities that the
-   * `__ItemPlan`'s parent serves plus `[]`.
+   * `__ItemStep`'s parent serves plus `[]`.
    */
   rootPathIdentities: string[];
 
@@ -191,8 +191,8 @@ export interface BucketDefinition {
   // TODO: a stream interface should really have that the stream item is both
   // deferred (group) and item.
   /**
-   * If this bucket was caused by an `__ItemPlan` (list, stream, subscription)
-   * then what's the id of that `__ItemPlan`.
+   * If this bucket was caused by an `__ItemStep` (list, stream, subscription)
+   * then what's the id of that `__ItemStep`.
    */
   itemPlanId?: string;
   /**
@@ -214,16 +214,16 @@ export interface BucketDefinition {
    *
    * Consider splitting 'item' into:
    *
-   * - list - represents plans starting at an `__ItemPlan` from a list
-   * - stream - represents plans starting at an `__ItemPlan` from a list that has `@stream` (async iterator)
-   * - subscription - represents plans starting at an `__ItemPlan` from a subscription (async iterator)
+   * - list - represents plans starting at an `__ItemStep` from a list
+   * - stream - represents plans starting at an `__ItemStep` from a list that has `@stream` (async iterator)
+   * - subscription - represents plans starting at an `__ItemStep` from a subscription (async iterator)
    *
    * Consider splitting 'group' into:
    *
    * - mutation - plans that are for a mutations' resulting selection set
    * - defer - represents plans that are `@defer`-red
    *
-   * @stream should not increase the groupId until the `__ItemPlan`? (Maybe
+   * @stream should not increase the groupId until the `__ItemStep`? (Maybe
    * this is already the case?) How does @stream affect buckets?
    */
 
@@ -234,8 +234,8 @@ export interface BucketDefinition {
    */
   copyPlanIds: string[];
 
-  plans: ExecutablePlan[];
-  startPlans: ExecutablePlan[];
+  plans: ExecutableStep[];
+  startPlans: ExecutableStep[];
 }
 
 /**

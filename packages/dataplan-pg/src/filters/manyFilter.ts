@@ -1,21 +1,21 @@
-import { ModifierPlan } from "dataplanner";
+import { ModifierStep } from "dataplanner";
 import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource.js";
-import { TempTablePlan } from "../plans/tempTable.js";
-import { ClassFilterPlan } from "./classFilter.js";
+import { TempTableStep } from "../steps/tempTable.js";
+import { ClassFilterStep } from "./classFilter.js";
 
-export class ManyFilterPlan<
+export class ManyFilterStep<
   TChildDataSource extends PgSource<any, any, any, any>,
-> extends ModifierPlan<ClassFilterPlan> {
+> extends ModifierStep<ClassFilterStep> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "ManyFilterPlan",
+    exportName: "ManyFilterStep",
   };
 
-  public $some: TempTablePlan<TChildDataSource> | null = null;
+  public $some: TempTableStep<TChildDataSource> | null = null;
   constructor(
-    $parentFilterPlan: ClassFilterPlan,
+    $parentFilterPlan: ClassFilterStep,
     public childDataSource: TChildDataSource,
     private myAttrs: string[],
     private theirAttrs: string[],
@@ -29,7 +29,7 @@ export class ManyFilterPlan<
   }
 
   some() {
-    const $table = new TempTablePlan(this.$parent, this.childDataSource);
+    const $table = new TempTableStep(this.$parent, this.childDataSource);
 
     // Implement the relationship
     this.myAttrs.forEach((attr, i) => {
@@ -40,7 +40,7 @@ export class ManyFilterPlan<
       );
     });
 
-    const $filter = new ClassFilterPlan($table.wherePlan(), $table.alias);
+    const $filter = new ClassFilterStep($table.wherePlan(), $table.alias);
     this.$some = $table;
     return $filter;
   }

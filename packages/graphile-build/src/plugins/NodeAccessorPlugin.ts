@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type {
-  ExecutablePlan,
+  ExecutableStep,
   FieldArgs,
   NodeIdCodec,
   NodeIdHandler,
@@ -87,7 +87,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
                     function plan(
-                      _$parent: ExecutablePlan<any>,
+                      _$parent: ExecutableStep<any>,
                       args: FieldArgs,
                     ) {
                       const $spec = lambda(

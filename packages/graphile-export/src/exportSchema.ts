@@ -1378,15 +1378,15 @@ function exportSchemaTypeDefs({
     if (type instanceof GraphQLObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
-      if (type.extensions.graphile?.Plan) {
+      if (type.extensions.graphile?.Step) {
         typeProperties.push(
           t.objectProperty(
-            t.identifier("__Plan"),
+            t.identifier("__Step"),
             convertToIdentifierViaAST(
               file,
-              type.extensions.graphile.Plan,
-              `${type.name}ExpectedPlan`,
-              `${type.name}.extensions.Plan`,
+              type.extensions.graphile.Step,
+              `${type.name}ExpectedStep`,
+              `${type.name}.extensions.Step`,
             ),
           ),
         );
@@ -1398,7 +1398,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.graphile?.plan,
-              `${type.name}.${fieldName}Plan`,
+              `${type.name}.${fieldName}Step`,
               `${type.name}.fields[${fieldName}].extensions.graphile.plan`,
             )
           : null;
@@ -1406,7 +1406,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.graphile?.subscribePlan,
-              `${type.name}.${fieldName}SubscribePlan`,
+              `${type.name}.${fieldName}SubscribeStep`,
               `${type.name}.fields[${fieldName}].extensions.graphile.subscribePlan`,
             )
           : null;
@@ -1445,7 +1445,7 @@ function exportSchemaTypeDefs({
                       ? convertToIdentifierViaAST(
                           file,
                           arg.extensions.graphile.inputPlan,
-                          `${type.name}.${fieldName}.${argName}InputPlan`,
+                          `${type.name}.${fieldName}.${argName}InputStep`,
                           `${type.name}.fields[${fieldName}].args[${argName}].extensions.graphile.inputPlan`,
                         )
                       : null,
@@ -1453,7 +1453,7 @@ function exportSchemaTypeDefs({
                       ? convertToIdentifierViaAST(
                           file,
                           arg.extensions.graphile.applyPlan,
-                          `${type.name}.${fieldName}.${argName}ApplyPlan`,
+                          `${type.name}.${fieldName}.${argName}ApplyStep`,
                           `${type.name}.fields[${fieldName}].args[${argName}].extensions.graphile.applyPlan`,
                         )
                       : null,
@@ -1510,7 +1510,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.graphile?.inputPlan,
-              `${type.name}.${fieldName}InputPlan`,
+              `${type.name}.${fieldName}InputStep`,
               `${type.name}.fields[${fieldName}].extensions.graphile.inputPlan`,
             )
           : null;
@@ -1519,7 +1519,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.graphile?.applyPlan,
-              `${type.name}.${fieldName}ApplyPlan`,
+              `${type.name}.${fieldName}ApplyStep`,
               `${type.name}.fields[${fieldName}].extensions.graphile.applyPlan`,
             )
           : null;
@@ -1571,7 +1571,7 @@ function exportSchemaTypeDefs({
         ? convertToIdentifierViaAST(
             file,
             config.extensions?.graphile?.plan,
-            `${type.name}Plan`,
+            `${type.name}Step`,
             `${type.name}.extensions.graphile.plan`,
           )
         : null;
@@ -1625,7 +1625,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               enumValueConfig.extensions.graphile.applyPlan,
-              `${type.name}_${enumValueName}ApplyPlan`,
+              `${type.name}_${enumValueName}ApplyStep`,
               `${type.name}.values[${enumValueName}].extensions.graphile.applyPlan`,
             )
           : null;

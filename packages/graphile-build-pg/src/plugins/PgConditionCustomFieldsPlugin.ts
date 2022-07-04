@@ -1,8 +1,8 @@
 import "graphile-config";
 
 import type {
-  PgConditionPlan,
-  PgSelectPlan,
+  PgConditionStep,
+  PgSelectStep,
   PgSource,
   PgSourceParameter,
 } from "@dataplan/pg";
@@ -90,8 +90,8 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                     applyPlan: EXPORTABLE(
                       (pgFieldSource, sql) =>
                         function plan(
-                          $condition: PgConditionPlan<
-                            PgSelectPlan<any, any, any, any>
+                          $condition: PgConditionStep<
+                            PgSelectStep<any, any, any, any>
                           >,
                           val,
                         ) {

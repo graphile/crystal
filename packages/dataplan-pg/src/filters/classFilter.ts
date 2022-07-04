@@ -1,19 +1,19 @@
-import type { ExecutablePlan } from "dataplanner";
-import { ModifierPlan } from "dataplanner";
+import type { ExecutableStep } from "dataplanner";
+import { ModifierStep } from "dataplanner";
 import type { SQL } from "pg-sql2";
 
 import type { PgTypeCodec } from "../interfaces.js";
-import type { PgConditionPlan } from "../plans/pgCondition.js";
+import type { PgConditionStep } from "../steps/pgCondition.js";
 
-export class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
+export class ClassFilterStep extends ModifierStep<PgConditionStep<any>> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "ClassFilterPlan",
+    exportName: "ClassFilterStep",
   };
 
   private conditions: SQL[] = [];
 
-  constructor(parent: PgConditionPlan<any>, public readonly alias: SQL) {
+  constructor(parent: PgConditionStep<any>, public readonly alias: SQL) {
     super(parent);
   }
 
@@ -22,7 +22,7 @@ export class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
   }
 
   placeholder(
-    $plan: ExecutablePlan<any>,
+    $plan: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL {
     return this.$parent.placeholder($plan, codec);

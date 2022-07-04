@@ -4,7 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
-import { access, ExecutablePlan } from "dataplanner";
+import { access, ExecutableStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
@@ -299,7 +299,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 type: GraphQLFloat,
                 plan: EXPORTABLE(
                   (access) =>
-                    function plan($r: ExecutablePlan<any>) {
+                    function plan($r: ExecutableStep<any>) {
                       return access($r, ["seconds"]);
                     },
                   [access],
@@ -313,7 +313,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 type: GraphQLInt,
                 plan: EXPORTABLE(
                   (access) =>
-                    function plan($r: ExecutablePlan<any>) {
+                    function plan($r: ExecutableStep<any>) {
                       return access($r, ["minutes"]);
                     },
                   [access],
@@ -327,7 +327,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 type: GraphQLInt,
                 plan: EXPORTABLE(
                   (access) =>
-                    function plan($r: ExecutablePlan<any>) {
+                    function plan($r: ExecutableStep<any>) {
                       return access($r, ["hours"]);
                     },
                   [access],
@@ -341,7 +341,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 type: GraphQLInt,
                 plan: EXPORTABLE(
                   (access) =>
-                    function plan($r: ExecutablePlan<any>) {
+                    function plan($r: ExecutableStep<any>) {
                       return access($r, ["days"]);
                     },
                   [access],
@@ -355,7 +355,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 type: GraphQLInt,
                 plan: EXPORTABLE(
                   (access) =>
-                    function plan($r: ExecutablePlan<any>) {
+                    function plan($r: ExecutableStep<any>) {
                       return access($r, ["months"]);
                     },
                   [access],
@@ -369,7 +369,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 type: GraphQLInt,
                 plan: EXPORTABLE(
                   (access) =>
-                    function plan($r: ExecutablePlan<any>) {
+                    function plan($r: ExecutableStep<any>) {
                       return access($r, ["years"]);
                     },
                   [access],
@@ -381,7 +381,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           build.registerObjectType(
             inflection.builtin("Interval"),
             { isPgIntervalType: true },
-            ExecutablePlan,
+            ExecutableStep,
             () => ({
               description: build.wrapDescription(
                 "An interval of time that has passed where the smallest distinct unit is a second.",

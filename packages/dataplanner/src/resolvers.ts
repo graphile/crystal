@@ -24,7 +24,7 @@ import {
   $$verbatim,
 } from "./interfaces.js";
 import type { PlanResults } from "./planResults.js";
-import { __ValuePlan } from "./plans/index.js";
+import { __ValueStep } from "./steps/index.js";
 import { ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
 
 const debug = debugFactory("dataplanner:resolvers");
@@ -137,9 +137,9 @@ function makeParentCrystalObject(
       );
     }
     const parentPlan = aether.dangerouslyGetPlan(parentPlanId); // TODO: assert that this is handled for us
-    if (!(parentPlan instanceof __ValuePlan)) {
+    if (!(parentPlan instanceof __ValueStep)) {
       throw new Error(
-        `Expected parent field (which returned non-crystal object) to be a __ValuePlan, instead found ${parentPlan})`,
+        `Expected parent field (which returned non-crystal object) to be a __ValueStep, instead found ${parentPlan})`,
       );
     }
 

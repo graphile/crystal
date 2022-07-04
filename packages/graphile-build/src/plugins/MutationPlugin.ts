@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { __ValuePlan } from "dataplanner";
+import { __ValueStep } from "dataplanner";
 
 import { version } from "../index.js";
 import { isValidObjectType } from "../utils.js";
@@ -31,7 +31,7 @@ export const MutationPlugin: GraphileConfig.Plugin = {
             {
               isRootMutation: true,
             },
-            __ValuePlan,
+            __ValueStep,
             () => {
               return {
                 description:

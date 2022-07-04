@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectPlan, PgSourceUnique } from "@dataplan/pg";
+import type { PgSelectStep, PgSourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
@@ -60,7 +60,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (plan: PgSelectPlan<any, any, any, any>) => {
+                      (plan: PgSelectStep<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           plan.orderBy({
@@ -88,7 +88,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (plan: PgSelectPlan<any, any, any, any>) => {
+                      (plan: PgSelectStep<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           plan.orderBy({

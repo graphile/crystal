@@ -15,8 +15,8 @@ import type {
   PromiseOrDirect,
 } from "./interfaces.js";
 import { $$concreteType } from "./interfaces.js";
-import type { ExecutablePlan } from "./plan.js";
-import { __ListTransformPlan } from "./plans/index.js";
+import type { ExecutableStep } from "./plan.js";
+import { __ListTransformStep } from "./steps/index.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 
 // optimization
@@ -135,7 +135,7 @@ export function executeBucket(
   // Function definitions below here
 
   function reallyCompletedPlan(
-    finishedPlan: ExecutablePlan,
+    finishedPlan: ExecutableStep,
   ): void | Promise<void> {
     inProgressPlans.delete(finishedPlan);
     pendingPlans.delete(finishedPlan);
@@ -166,7 +166,7 @@ export function executeBucket(
   }
 
   function completedPlan(
-    finishedPlan: ExecutablePlan,
+    finishedPlan: ExecutableStep,
     result: CrystalValuesList<any>,
     noNewErrors = false,
   ): void | Promise<void> {
@@ -207,7 +207,7 @@ export function executeBucket(
   }
 
   function executeListTransform(
-    plan: __ListTransformPlan<any, any, any>,
+    plan: __ListTransformStep<any, any, any>,
     // TODO: review these unused arguments
     _dependencies: (readonly any[])[],
     _extra: ExecutionExtra,
@@ -319,7 +319,7 @@ export function executeBucket(
 
   // Slow mode...
   function reallyExecutePlanWithErrors(
-    plan: ExecutablePlan,
+    plan: ExecutableStep,
     dependencies: ReadonlyArray<any>[],
     extra: ExecutionExtra,
   ) {
@@ -341,7 +341,7 @@ export function executeBucket(
         depList.filter((_, index) => !errors[index]),
       );
       const resultWithoutErrors =
-        plan instanceof __ListTransformPlan
+        plan instanceof __ListTransformStep
           ? executeListTransform(plan, dependenciesWithoutErrors, extra)
           : plan.execute(dependenciesWithoutErrors, extra);
       if (isPromiseLike(resultWithoutErrors)) {
@@ -362,11 +362,11 @@ export function executeBucket(
 
   // Fast mode!
   function reallyExecutePlanWithNoErrors(
-    plan: ExecutablePlan,
+    plan: ExecutableStep,
     dependencies: ReadonlyArray<any>[],
     extra: ExecutionExtra,
   ) {
-    return plan instanceof __ListTransformPlan
+    return plan instanceof __ListTransformStep
       ? executeListTransform(plan, dependencies, extra)
       : plan.execute(dependencies, extra);
   }
@@ -377,7 +377,7 @@ export function executeBucket(
   /**
    * This function MIGHT throw or reject, so be sure to handle that.
    */
-  function executePlan(plan: ExecutablePlan): void | PromiseLike<void> {
+  function executePlan(plan: ExecutableStep): void | PromiseLike<void> {
     if (inProgressPlans.has(plan)) {
       return;
     }

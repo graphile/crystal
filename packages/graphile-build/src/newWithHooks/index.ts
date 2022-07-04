@@ -1,7 +1,7 @@
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
-  ExecutablePlan,
+  ExecutableStep,
   GraphileFieldConfig,
   OutputPlanForType,
 } from "dataplanner";
@@ -61,7 +61,7 @@ export type NewWithHooksFunction = <
   klass: { new (spec: SpecForType<TType>): TType },
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
-  Plan?: { new (...args: any[]): ExecutablePlan<any> } | null,
+  Step?: { new (...args: any[]): ExecutableStep<any> } | null,
 ) => TType;
 
 /**
@@ -76,7 +76,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
     Type,
     inSpec,
     inScope,
-    Plan,
+    Step,
   ) {
     if (!inScope) {
       // eslint-disable-next-line no-console
@@ -172,8 +172,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
                 TContext extends BaseGraphQLContext,
-                TParentPlan extends ExecutablePlan<any>,
-                TFieldPlan extends OutputPlanForType<TType>,
+                TParentStep extends ExecutableStep<any>,
+                TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
               >(
                 fieldScope: GraphileBuild.ScopeObjectFieldsField,
@@ -181,8 +181,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   | GraphileFieldConfig<
                       TType,
                       TContext,
-                      TParentPlan,
-                      TFieldPlan,
+                      TParentStep,
+                      TFieldStep,
                       TArgs
                     >
                   | ((
@@ -190,15 +190,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     ) => GraphileFieldConfig<
                       TType,
                       TContext,
-                      TParentPlan,
-                      TFieldPlan,
+                      TParentStep,
+                      TFieldStep,
                       TArgs
                     >),
               ): GraphileFieldConfig<
                 TType,
                 TContext,
-                TParentPlan,
-                TFieldPlan,
+                TParentStep,
+                TFieldStep,
                 TArgs
               > => {
                 const { fieldName } = fieldScope;
@@ -334,7 +334,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             },
           };
           const Self = new GraphQLObjectType(
-            objectSpec(finalSpec, Plan ?? null),
+            objectSpec(finalSpec, Step ?? null),
           );
           return Self;
         }

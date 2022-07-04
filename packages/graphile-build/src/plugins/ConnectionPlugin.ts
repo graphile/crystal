@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import type { EdgeCapablePlan, PageInfoCapablePlan } from "dataplanner";
-import { ConnectionPlan, ExecutablePlan } from "dataplanner";
+import type { EdgeCapableStep, PageInfoCapableStep } from "dataplanner";
+import { ConnectionStep, ExecutableStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 
@@ -88,8 +88,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                   ...scope,
                   isConnectionEdgeType: true,
                 },
-                ExecutablePlan as unknown as {
-                  new (...args: any[]): EdgeCapablePlan<any>;
+                ExecutableStep as unknown as {
+                  new (...args: any[]): EdgeCapableStep<any>;
                 },
                 () => ({
                   description: build.wrapDescription(
@@ -115,7 +115,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           ),
                           type: Cursor,
                           plan: EXPORTABLE(
-                            () => ($edge: EdgeCapablePlan<any>) =>
+                            () => ($edge: EdgeCapableStep<any>) =>
                               $edge.cursor(),
                             [],
                           ),
@@ -132,7 +132,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           ),
                           type: nullableIf(!nonNullNode, NodeType),
                           plan: EXPORTABLE(
-                            () => ($edge: EdgeCapablePlan<any>) => $edge.node(),
+                            () => ($edge: EdgeCapableStep<any>) => $edge.node(),
                             [],
                           ),
                         }),
@@ -140,17 +140,17 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                     };
                   },
                 }),
-                `ConnectionPlan building edge type for ${typeName}`,
+                `ConnectionStep building edge type for ${typeName}`,
               );
 
               // Register connection
-              build.registerObjectType<ConnectionPlan<any, any, any>>(
+              build.registerObjectType<ConnectionStep<any, any, any>>(
                 connectionTypeName,
                 {
                   ...scope,
                   isConnectionType: true,
                 },
-                ConnectionPlan,
+                ConnectionStep,
                 () => {
                   const NodeType = build.getOutputTypeByName(typeName);
                   const EdgeType = build.getOutputTypeByName(edgeTypeName);
@@ -180,7 +180,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           plan: EXPORTABLE(
                             () =>
                               function plan(
-                                $connection: ConnectionPlan<any, any, any>,
+                                $connection: ConnectionStep<any, any, any>,
                               ) {
                                 return $connection.nodes();
                               },
@@ -205,7 +205,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           plan: EXPORTABLE(
                             () =>
                               function plan(
-                                $connection: ConnectionPlan<any, any, any>,
+                                $connection: ConnectionStep<any, any, any>,
                               ) {
                                 return $connection.edges();
                               },
@@ -226,7 +226,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           plan: EXPORTABLE(
                             () =>
                               function plan(
-                                $connection: ConnectionPlan<any, any, any>,
+                                $connection: ConnectionStep<any, any, any>,
                               ) {
                                 // TODO: why is this a TypeScript issue without the 'any'?
                                 return $connection.pageInfo() as any;
@@ -256,8 +256,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
           registerObjectType(
             inflection.builtin("PageInfo"),
             { isPageInfo: true },
-            ExecutablePlan as unknown as {
-              new (...args: any[]): PageInfoCapablePlan;
+            ExecutableStep as unknown as {
+              new (...args: any[]): PageInfoCapableStep;
             },
             () => ({
               description: build.wrapDescription(

@@ -30,7 +30,7 @@ import { inspect } from "util";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
-import type { InputPlan } from "./input.js";
+import type { InputStep } from "./input.js";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
@@ -38,7 +38,7 @@ import type {
   GraphileInputFieldConfig,
   OutputPlanForType,
 } from "./interfaces.js";
-import type { ExecutablePlan, ModifierPlan } from "./plan.js";
+import type { ExecutableStep, ModifierStep } from "./plan.js";
 
 /**
  * The parent object is used as the key in `GetValuePlanId()`; for root level
@@ -314,12 +314,12 @@ export function arraysMatch<T>(
 
 export type ObjectTypeFields<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
+  TParentStep extends ExecutableStep<any>,
 > = {
   [key: string]: GraphileFieldConfig<
     GraphQLOutputType,
     TContext,
-    TParentPlan,
+    TParentStep,
     any,
     any
   >;
@@ -327,8 +327,8 @@ export type ObjectTypeFields<
 
 export type ObjectTypeSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
-  TFields extends ObjectTypeFields<TContext, TParentPlan>,
+  TParentStep extends ExecutableStep<any>,
+  TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
   fields: TFields | (() => TFields);
 };
@@ -338,20 +338,20 @@ export type ObjectTypeSpec<
  */
 export function objectSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
-  TFields extends ObjectTypeFields<TContext, TParentPlan>,
+  TParentStep extends ExecutableStep<any>,
+  TFields extends ObjectTypeFields<TContext, TParentStep>,
 >(
-  spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
-  Plan: { new (...args: any[]): TParentPlan } | null,
+  spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
+  Step: { new (...args: any[]): TParentStep } | null,
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
-    ...(Plan
+    ...(Step
       ? {
           extensions: {
             ...spec.extensions,
             graphile: {
-              Plan: Plan,
+              Step: Step,
               ...spec.extensions?.graphile,
             },
           },
@@ -361,7 +361,7 @@ export function objectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = objectFieldSpec<TContext, TParentPlan>(fields[key]);
+        o[key] = objectFieldSpec<TContext, TParentStep>(fields[key]);
         return o;
       }, {} as GraphQLFieldConfigMap<any, TContext>);
       return modifiedFields;
@@ -372,28 +372,28 @@ export function objectSpec<
 
 export type GraphileObjectType<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
-  TFields extends ObjectTypeFields<TContext, TParentPlan>,
+  TParentStep extends ExecutableStep<any>,
+  TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = GraphQLObjectType<
-  TParentPlan extends ExecutablePlan<infer U> ? U : never,
+  TParentStep extends ExecutableStep<infer U> ? U : never,
   TContext
-> & { TParentPlan: TParentPlan; TFields: TFields };
+> & { TParentStep: TParentStep; TFields: TFields };
 
 /**
  * @remarks This is a mess because the first two generics need to be specified manually, but the latter one we want inferred.
  */
 export function newObjectTypeBuilder<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
->(Plan: {
-  new (...args: any[]): TParentPlan;
-}): <TFields extends ObjectTypeFields<TContext, TParentPlan>>(
-  spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
-) => GraphileObjectType<TContext, TParentPlan, TFields> {
+  TParentStep extends ExecutableStep<any>,
+>(Step: {
+  new (...args: any[]): TParentStep;
+}): <TFields extends ObjectTypeFields<TContext, TParentStep>>(
+  spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
+) => GraphileObjectType<TContext, TParentStep, TFields> {
   return (spec) =>
-    new GraphQLObjectType(objectSpec(spec, Plan)) as GraphileObjectType<
+    new GraphQLObjectType(objectSpec(spec, Step)) as GraphileObjectType<
       TContext,
-      TParentPlan,
+      TParentStep,
       any
     >;
 }
@@ -403,8 +403,8 @@ export function newObjectTypeBuilder<
  */
 export function objectFieldSpec<
   TContext extends BaseGraphQLContext,
-  TSource extends ExecutablePlan<any>,
-  TResult extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TSource extends ExecutableStep<any>,
+  TResult extends ExecutableStep<any> = ExecutableStep<any>,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
   graphileSpec: GraphileFieldConfig<
@@ -462,25 +462,25 @@ export function objectFieldSpec<
  */
 export function newGraphileFieldConfigBuilder<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
+  TParentStep extends ExecutableStep<any>,
 >(): <
   TType extends GraphQLOutputType,
-  TFieldPlan extends OutputPlanForType<TType>,
+  TFieldStep extends OutputPlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 >(
-  config: GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>,
+  config: GraphileFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>,
 ) => typeof config {
   return (config) => config;
 }
 
 export type GraphileInputFieldConfigMap<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ModifierPlan<any>,
+  TParentStep extends ModifierStep<any>,
 > = {
   [key: string]: GraphileInputFieldConfig<
     GraphQLInputType,
     TContext,
-    TParentPlan,
+    TParentStep,
     any,
     any
   >;
@@ -488,18 +488,18 @@ export type GraphileInputFieldConfigMap<
 
 export type InputObjectTypeSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ModifierPlan<any>,
-  TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>,
+  TParentStep extends ModifierStep<any>,
+  TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>,
 > = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
   fields: TFields | (() => TFields);
 };
 
 function inputObjectSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ModifierPlan<any>,
-  TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>,
+  TParentStep extends ModifierStep<any>,
+  TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>,
 >(
-  spec: InputObjectTypeSpec<TContext, TParentPlan, TFields>,
+  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -507,7 +507,7 @@ function inputObjectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = inputObjectFieldSpec<TContext, TParentPlan>(fields[key]);
+        o[key] = inputObjectFieldSpec<TContext, TParentStep>(fields[key]);
         return o;
       }, {} as GraphQLInputFieldConfigMap);
       return modifiedFields;
@@ -518,24 +518,24 @@ function inputObjectSpec<
 
 export type GraphileInputObjectType<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ModifierPlan<any>,
-  TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>,
+  TParentStep extends ModifierStep<any>,
+  TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>,
 > = GraphQLInputObjectType & {
   TContext: TContext;
-  TParentPlan: TParentPlan;
+  TParentStep: TParentStep;
   TFields: TFields;
 };
 
 export function newInputObjectTypeBuilder<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ModifierPlan<any>,
->(): <TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>>(
-  spec: InputObjectTypeSpec<TContext, TParentPlan, TFields>,
-) => GraphileInputObjectType<TContext, TParentPlan, TFields> {
+  TParentStep extends ModifierStep<any>,
+>(): <TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>>(
+  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
+) => GraphileInputObjectType<TContext, TParentStep, TFields> {
   return (spec) =>
     new GraphQLInputObjectType(
       inputObjectSpec(spec),
-    ) as GraphileInputObjectType<TContext, TParentPlan, any>;
+    ) as GraphileInputObjectType<TContext, TParentStep, any>;
 }
 
 /**
@@ -543,9 +543,9 @@ export function newInputObjectTypeBuilder<
  */
 export function inputObjectFieldSpec<
   TContext extends BaseGraphQLContext,
-  TParent extends ModifierPlan<any>,
-  TResult extends ModifierPlan<TParent> = ModifierPlan<TParent>,
-  TInput extends InputPlan = InputPlan,
+  TParent extends ModifierStep<any>,
+  TResult extends ModifierStep<TParent> = ModifierStep<TParent>,
+  TInput extends InputStep = InputStep,
 >(
   graphileSpec: GraphileInputFieldConfig<
     GraphQLInputType,
@@ -580,8 +580,8 @@ export function inputObjectFieldSpec<
  * belongs to a different group - this should opt them out of optimisation.
  */
 export function planGroupsOverlap(
-  plan1: ExecutablePlan,
-  plan2: ExecutablePlan,
+  plan1: ExecutableStep,
+  plan2: ExecutableStep,
 ): boolean {
   return plan1.groupIds.some((id) => plan2.groupIds.includes(id));
 }

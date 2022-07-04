@@ -21,16 +21,16 @@ import type {
 import type { Aether } from "./aether.js";
 import type { Deferred } from "./deferred.js";
 import type { CrystalError } from "./error.js";
-import type { InputPlan } from "./input.js";
-import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan.js";
+import type { InputStep } from "./input.js";
+import type { ExecutableStep, ListCapableStep, ModifierStep } from "./plan.js";
 import type { PlanResults, PlanResultsBucket } from "./planResults.js";
-import type { __InputDynamicScalarPlan } from "./plans/__inputDynamicScalar.js";
+import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
-  __InputListPlan,
-  __InputObjectPlan,
-  __InputStaticLeafPlan,
-  __TrackedObjectPlan,
-} from "./plans/index.js";
+  __InputListStep,
+  __InputObjectStep,
+  __InputStaticLeafStep,
+  __TrackedObjectStep,
+} from "./steps/index.js";
 import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
 
 export interface DataPlannerFieldExtensions {
@@ -55,7 +55,7 @@ export interface DataPlannerInputFieldExtensions {
 }
 
 export interface DataPlannerObjectTypeExtensions {
-  Plan?: { new (...args: any[]): ExecutablePlan };
+  Step?: { new (...args: any[]): ExecutableStep };
 }
 
 export interface DataPlannerEnumTypeExtensions {}
@@ -211,9 +211,9 @@ export interface CrystalObject {
 export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;
-  sideEffectPlans: ReadonlyArray<ExecutablePlan>;
-  plan: ExecutablePlan;
-  itemPlan: ExecutablePlan;
+  sideEffectPlans: ReadonlyArray<ExecutableStep>;
+  plan: ExecutableStep;
+  itemPlan: ExecutableStep;
   entries: Array<[CrystalObject, Deferred<any>]>;
 }
 
@@ -257,13 +257,13 @@ export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
 // TODO: rename
 export interface FieldArgs {
-  get(path?: string | string[]): ExecutablePlan;
-  getRaw(path?: string | string[]): InputPlan;
-  apply($target: ExecutablePlan | ModifierPlan, path?: string | string[]): void;
+  get(path?: string | string[]): ExecutableStep;
+  getRaw(path?: string | string[]): InputStep;
+  apply($target: ExecutableStep | ModifierStep, path?: string | string[]): void;
 }
 
 /**
- * Plan resolvers are like regular resolvers except they're called beforehand,
+ * Step resolvers are like regular resolvers except they're called beforehand,
  * they return plans rather than values, and they only run once for lists
  * rather than for each item in the list.
  *
@@ -281,51 +281,51 @@ export interface FieldArgs {
  */
 export type FieldPlanResolver<
   _TArgs extends BaseGraphQLArguments,
-  TParentPlan extends ExecutablePlan<any> | null,
-  TResultPlan extends ExecutablePlan<any>,
+  TParentStep extends ExecutableStep<any> | null,
+  TResultStep extends ExecutableStep<any>,
 > = (
-  $parentPlan: TParentPlan,
+  $parentPlan: TParentStep,
   args: FieldArgs,
   info: {
     field: GraphQLField<any, any, any>;
     schema: GraphQLSchema;
   },
-) => TResultPlan;
+) => TResultStep;
 
 // TODO: review _TContext
 /**
  * Fields on input objects can have plans; the plan resolver is passed a parent plan
  * (from an argument, or from a parent input object) or null if none, and an
  * input plan that represents the value the user will pass to this field. The
- * resolver must return either a ModifierPlan or null.
+ * resolver must return either a ModifierStep or null.
  */
 export type InputObjectFieldInputPlanResolver<
-  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
 > = (
   input: FieldArgs,
   info: {
     schema: GraphQLSchema;
     entity: GraphQLInputField;
   },
-) => TResultPlan;
+) => TResultStep;
 
 export type InputObjectFieldApplyPlanResolver<
-  TFieldPlan extends ExecutablePlan<any> | ModifierPlan<any> =
-    | ExecutablePlan<any>
-    | ModifierPlan<any>,
-  TResultPlan extends ModifierPlan<
-    ExecutablePlan<any> | ModifierPlan<any>
-  > | null | void = ModifierPlan<
-    ExecutablePlan<any> | ModifierPlan<any>
+  TFieldStep extends ExecutableStep<any> | ModifierStep<any> =
+    | ExecutableStep<any>
+    | ModifierStep<any>,
+  TResultStep extends ModifierStep<
+    ExecutableStep<any> | ModifierStep<any>
+  > | null | void = ModifierStep<
+    ExecutableStep<any> | ModifierStep<any>
   > | null | void,
 > = (
-  $fieldPlan: TFieldPlan,
+  $fieldPlan: TFieldStep,
   input: FieldArgs,
   info: {
     schema: GraphQLSchema;
     entity: GraphQLInputField;
   },
-) => TResultPlan;
+) => TResultStep;
 
 export type InputObjectTypeInputPlanResolver = (
   input: FieldArgs,
@@ -333,7 +333,7 @@ export type InputObjectTypeInputPlanResolver = (
     schema: GraphQLSchema;
     type: GraphQLInputObjectType;
   },
-) => ExecutablePlan;
+) => ExecutableStep;
 
 // TODO: review _TContext
 /**
@@ -341,101 +341,101 @@ export type InputObjectTypeInputPlanResolver = (
  * plan that represents the _parent_ field of the field the arg is defined on),
  * the field plan (the plan that represents the field the arg is defined on)
  * and an input plan that represents the value the user will pass to this
- * argument. The resolver must return either a ModifierPlan or null.
+ * argument. The resolver must return either a ModifierStep or null.
  */
 export type ArgumentInputPlanResolver<
-  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
-  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
 > = (
-  $parentPlan: TParentPlan,
+  $parentPlan: TParentStep,
   input: FieldArgs,
   info: {
     schema: GraphQLSchema;
     entity: GraphQLArgument;
   },
-) => TResultPlan;
+) => TResultStep;
 
 export type ArgumentApplyPlanResolver<
-  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
-  TFieldPlan extends ExecutablePlan<any> | ModifierPlan<any> =
-    | ExecutablePlan<any>
-    | ModifierPlan<any>,
-  TResultPlan extends
-    | ExecutablePlan
-    | ModifierPlan<ExecutablePlan | ModifierPlan>
+  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TFieldStep extends ExecutableStep<any> | ModifierStep<any> =
+    | ExecutableStep<any>
+    | ModifierStep<any>,
+  TResultStep extends
+    | ExecutableStep
+    | ModifierStep<ExecutableStep | ModifierStep>
     | null
     | void =
-    | ExecutablePlan
-    | ModifierPlan<ExecutablePlan | ModifierPlan>
+    | ExecutableStep
+    | ModifierStep<ExecutableStep | ModifierStep>
     | null
     | void,
 > = (
-  $parentPlan: TParentPlan,
-  $fieldPlan: TFieldPlan,
+  $parentPlan: TParentStep,
+  $fieldPlan: TFieldStep,
   input: FieldArgs,
   info: {
     schema: GraphQLSchema;
     entity: GraphQLArgument;
   },
-) => TResultPlan;
+) => TResultStep;
 
 /**
  * GraphQLScalarTypes can have plans, these are passed the field plan and must
  * return an executable plan.
  */
 export type ScalarPlanResolver<
-  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
-  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
-> = ($parentPlan: TParentPlan, info: { schema: GraphQLSchema }) => TResultPlan;
+  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
+> = ($parentPlan: TParentStep, info: { schema: GraphQLSchema }) => TResultStep;
 
 /**
  * GraphQLScalarTypes can have plans, these are passed the field plan and must
  * return an executable plan.
  */
 export type ScalarInputPlanResolver<
-  TResultPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
 > = (
-  $inputValue: InputPlan,
+  $inputValue: InputStep,
   /*
-    | __InputListPlan
-    | __InputStaticLeafPlan
-    | __InputDynamicScalarPlan,
+    | __InputListStep
+    | __InputStaticLeafStep
+    | __InputDynamicScalarStep,
   */
   info: { schema: GraphQLSchema; type: GraphQLScalarType },
-) => TResultPlan;
+) => TResultStep;
 
 /**
  * EXPERIMENTAL!
  *
  * NOTE: this is an `any` because we want to allow users to specify
- * subclasses of ExecutablePlan but TypeScript only wants to allow
+ * subclasses of ExecutableStep but TypeScript only wants to allow
  * superclasses.
  *
  * @internal
  */
 export type EnumValueApplyPlanResolver<
-  TParentPlan extends ExecutablePlan | ModifierPlan =
-    | ExecutablePlan
-    | ModifierPlan,
-> = ($parent: TParentPlan) => ModifierPlan | void;
+  TParentStep extends ExecutableStep | ModifierStep =
+    | ExecutableStep
+    | ModifierStep,
+> = ($parent: TParentStep) => ModifierStep | void;
 
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
 type OutputPlanForNamedType<TType extends GraphQLType> =
-  TType extends GraphileObjectType<any, infer TPlan, any>
-    ? TPlan
-    : ExecutablePlan<any>;
+  TType extends GraphileObjectType<any, infer TStep, any>
+    ? TStep
+    : ExecutableStep<any>;
 
-// TODO: this is completely wrong now; ListCapablePlan is no longer required to be supported for lists.
+// TODO: this is completely wrong now; ListCapableStep is no longer required to be supported for lists.
 export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>>
     : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>>
     : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>>
     : TType extends GraphQLList<infer U>
-    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>>
     : TType extends GraphQLNonNull<infer U>
     ? OutputPlanForNamedType<U>
     : OutputPlanForNamedType<TType>;
@@ -445,7 +445,7 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
 type InputPlanForNamedType<TType extends GraphQLType> =
   TType extends GraphileInputObjectType<any, infer U, any>
     ? U
-    : ModifierPlan<any>;
+    : ModifierStep<any>;
 type InputPlanForType<TType extends GraphQLInputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
     ? InputPlanForNamedType<U>
@@ -482,15 +482,15 @@ type OutputPlanForType<TType extends GraphQLOutputType> =
   infer U
 >
   ? U extends GraphQLOutputType
-    ? ListCapablePlan<any, OutputPlanForType<U>>
+    ? ListCapableStep<any, OutputPlanForType<U>>
     : never
   : TType extends GraphQLNonNull<infer V>
   ? V extends GraphQLOutputType
     ? OutputPlanForType<V>
     : never
   : TType extends GraphQLScalarType | GraphQLEnumType
-  ? ExecutablePlan<boolean | number | string>
-  : ExecutablePlan<{ [key: string]: any }>;
+  ? ExecutableStep<boolean | number | string>
+  : ExecutableStep<{ [key: string]: any }>;
 
 type InputPlanForType<TType extends GraphQLInputType> =
   TType extends GraphQLList<infer U>
@@ -503,7 +503,7 @@ type InputPlanForType<TType extends GraphQLInputType> =
       : never
     : TType extends GraphQLScalarType | GraphQLEnumType
     ? null
-    : ExecutablePlan<{ [key: string]: any }> | null;
+    : ExecutableStep<{ [key: string]: any }> | null;
 
 type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
   infer U
@@ -526,18 +526,18 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
 export type GraphileFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends ExecutablePlan<any>, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListPlan
+  TParentStep extends ExecutableStep<any> | null,
+  TFieldStep extends ExecutableStep<any>, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
-  plan?: FieldPlanResolver<TArgs, TParentPlan, TFieldPlan>;
-  subscribePlan?: FieldPlanResolver<TArgs, TParentPlan, TFieldPlan>;
+  plan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
+  subscribePlan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
   args?: GraphileFieldConfigArgumentMap<
     TType,
     TContext,
-    TParentPlan,
-    TFieldPlan
+    TParentStep,
+    TFieldStep
   >;
 };
 
@@ -547,14 +547,14 @@ export type GraphileFieldConfig<
 export type GraphileFieldConfigArgumentMap<
   _TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends ExecutablePlan<any>, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListPlan
+  TParentStep extends ExecutableStep<any> | null,
+  TFieldStep extends ExecutableStep<any>, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListStep
 > = {
   [argName: string]: GraphileArgumentConfig<
     any,
     TContext,
-    TParentPlan,
-    TFieldPlan,
+    TParentStep,
+    TFieldStep,
     any,
     any
   >;
@@ -566,10 +566,10 @@ export type GraphileFieldConfigArgumentMap<
 export type GraphileArgumentConfig<
   TInputType extends GraphQLInputType,
   _TContext extends BaseGraphQLContext,
-  _TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends ExecutablePlan<any>,
-  _TArgumentPlan extends TFieldPlan extends ExecutablePlan<any>
-    ? ModifierPlan<TFieldPlan> | null
+  _TParentStep extends ExecutableStep<any> | null,
+  TFieldStep extends ExecutableStep<any>,
+  _TArgumentStep extends TFieldStep extends ExecutableStep<any>
+    ? ModifierStep<TFieldStep> | null
     : null,
   _TInput extends InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
@@ -584,8 +584,8 @@ export type GraphileArgumentConfig<
 export type GraphileInputFieldConfig<
   TInputType extends GraphQLInputType,
   _TContext extends BaseGraphQLContext,
-  _TParentPlan extends ModifierPlan<any>,
-  _TResultPlan extends InputPlanForType<TInputType>,
+  _TParentStep extends ModifierStep<any>,
+  _TResultStep extends InputPlanForType<TInputType>,
   _TInput extends InputTypeFor<TInputType>,
 > = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
@@ -599,7 +599,7 @@ export type GraphileInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  get<TKey extends keyof TArgs>(key: TKey): InputPlan;
+  get<TKey extends keyof TArgs>(key: TKey): InputStep;
 };
 
 /**
@@ -644,7 +644,7 @@ export interface PlanOptimizeOptions {
 }
 
 /**
- * A subscriber provides realtime data, a SubscribePlan can subscribe to a
+ * A subscriber provides realtime data, a SubscribeStep can subscribe to a
  * given topic (string) and will receive an AsyncIterableIterator with messages
  * published to that topic (standard pub/sub semantics).
  */
@@ -674,7 +674,7 @@ export type NodeIdHandler<
     [key: string]: NodeIdCodec<any>;
   },
   TCodecName extends keyof TCodecs = keyof TCodecs,
-  TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
 > = {
   /**
    * Which codec are we using to encode/decode the NodeID string?
@@ -693,18 +693,18 @@ export type NodeIdHandler<
    * of this plan is fed into `match`, it should return `true`.
    */
   plan(
-    $thing: TNodePlan,
-  ): ExecutablePlan<TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any>;
+    $thing: TNodeStep,
+  ): ExecutableStep<TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any>;
 
   /**
    * The recprocal of `plan`, given the return value of plan, this should
    * return a plan that results in the original node.
    */
   get(
-    plan: ExecutablePlan<
+    plan: ExecutableStep<
       TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any
     >,
-  ): TNodePlan;
+  ): TNodeStep;
 };
 
 export type BaseEventMap = Record<string, any>;

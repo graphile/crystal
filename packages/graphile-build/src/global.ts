@@ -1,7 +1,7 @@
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
-  ExecutablePlan,
+  ExecutableStep,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
   GraphileInputFieldConfig,
@@ -116,13 +116,13 @@ declare global {
 
     /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GraphileFieldConfigMap<
-      TParentPlan extends ExecutablePlan<any> | null,
+      TParentStep extends ExecutableStep<any> | null,
       TContext extends BaseGraphQLContext,
     > = {
       [fieldName: string]: GraphileFieldConfig<
         any,
         TContext,
-        TParentPlan,
+        TParentStep,
         any,
         any
       >;
@@ -130,17 +130,17 @@ declare global {
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
     interface GraphileObjectTypeConfig<
-      TParentPlan extends ExecutablePlan<any> | null,
+      TParentStep extends ExecutableStep<any> | null,
       TContext extends BaseGraphQLContext,
     > extends Omit<
         GraphQLObjectTypeConfig<unknown, TContext>,
         "fields" | "interfaces"
       > {
       fields?:
-        | GraphileFieldConfigMap<TParentPlan, TContext>
+        | GraphileFieldConfigMap<TParentStep, TContext>
         | ((
             context: ContextObjectFields,
-          ) => GraphileFieldConfigMap<TParentPlan, TContext>);
+          ) => GraphileFieldConfigMap<TParentStep, TContext>);
       interfaces?:
         | GraphQLInterfaceType[]
         | ((context: ContextObjectInterfaces) => GraphQLInterfaceType[]);
@@ -261,13 +261,13 @@ declare global {
        * scope so that other plugins may hook it; it can also be helpful to
        * indicate where a conflict has occurred.
        */
-      registerObjectType<TPlan extends ExecutablePlan<any> | null>(
+      registerObjectType<TStep extends ExecutableStep<any> | null>(
         typeName: string,
         scope: ScopeObject,
-        Plan: TPlan extends ExecutablePlan<any>
-          ? { new (...args: any[]): TPlan }
+        Step: TStep extends ExecutableStep<any>
+          ? { new (...args: any[]): TStep }
           : null,
-        specGenerator: () => Omit<GraphileObjectTypeConfig<TPlan, any>, "name">,
+        specGenerator: () => Omit<GraphileObjectTypeConfig<TStep, any>, "name">,
         origin: string | null | undefined,
       ): void;
 
@@ -324,7 +324,7 @@ declare global {
         Constructor: { new (spec: any): GraphQLNamedType };
         scope: GraphileBuild.SomeScope;
         origin: string | null | undefined;
-        Plan?: { new (...args: any[]): ExecutablePlan<any> } | null;
+        Step?: { new (...args: any[]): ExecutableStep<any> } | null;
       } | null;
 
       /**
@@ -629,23 +629,23 @@ declare global {
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
       TContext extends BaseGraphQLContext,
-      TParentPlan extends ExecutablePlan<any>,
-      TFieldPlan extends OutputPlanForType<TType>,
+      TParentStep extends ExecutableStep<any>,
+      TFieldStep extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,
     >(
       fieldScope: ScopeObjectFieldsField,
       spec:
-        | GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>
+        | GraphileFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>
         | ((
             context: ContextObjectFieldsField,
           ) => GraphileFieldConfig<
             TType,
             TContext,
-            TParentPlan,
-            TFieldPlan,
+            TParentStep,
+            TFieldStep,
             TArgs
           >),
-    ) => GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>;
+    ) => GraphileFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>;
 
     type InterfaceFieldWithHooksFunction = (
       fieldScope: ScopeInterfaceFieldsField,

@@ -11,9 +11,9 @@ interface CommonOptions {
 }
 
 const KNOWN_IMPORTS: Array<[string, string]> = [
-  ["dataplanner", "BasePlan"],
-  ["dataplanner", "ExecutablePlan"],
-  ["dataplanner", "ModifierPlan"],
+  ["dataplanner", "BaseStep"],
+  ["dataplanner", "ExecutableStep"],
+  ["dataplanner", "ModifierStep"],
 ];
 
 export const ExportSubclasses: Rule.RuleModule = {
@@ -21,7 +21,7 @@ export const ExportSubclasses: Rule.RuleModule = {
     type: "suggestion",
     docs: {
       description:
-        "Looks for classes that extend BasePlan, ExecutablePlan or ModifierPlan.",
+        "Looks for classes that extend BaseStep, ExecutableStep or ModifierStep.",
       recommended: true,
       url: "TODO",
     },

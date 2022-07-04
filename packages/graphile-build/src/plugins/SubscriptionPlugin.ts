@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { __ValuePlan } from "dataplanner";
+import { __ValueStep } from "dataplanner";
 
 import { version } from "../index.js";
 import { isValidObjectType } from "../utils.js";
@@ -32,7 +32,7 @@ export const SubscriptionPlugin: GraphileConfig.Plugin = {
             {
               isRootSubscription: true,
             },
-            __ValuePlan,
+            __ValueStep,
             () => {
               return {
                 description: `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`,

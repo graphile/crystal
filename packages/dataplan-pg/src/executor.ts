@@ -6,9 +6,9 @@ import type {
   CrystalResultStreamList,
   CrystalValuesList,
   Deferred,
-  ExecutablePlan,
+  ExecutableStep,
   ExecutionEventEmitter,
-  ObjectPlan,
+  ObjectStep,
   PromiseOrDirect,
 } from "dataplanner";
 import { defer, isAsyncIterable, isDev } from "dataplanner";
@@ -98,8 +98,8 @@ export type PgExecutorContext<TSettings = any> = {
 };
 
 export type PgExecutorContextPlans<TSettings = any> = {
-  pgSettings: ExecutablePlan<TSettings>;
-  withPgClient: ExecutablePlan<WithPgClient>;
+  pgSettings: ExecutableStep<TSettings>;
+  withPgClient: ExecutableStep<WithPgClient>;
 };
 
 export type PgExecutorInput<TInput> = {
@@ -130,18 +130,18 @@ export type PgExecutorSubscribeOptions = {
 /**
  * Represents a PostgreSQL database connection, can be used for issuing queries
  * to the database. Used by PgSource but also directly by things like
- * PgSimpleFunctionCallPlan. Was once PgDataSource itself. Multiple PgExecutors
+ * PgSimpleFunctionCallStep. Was once PgDataSource itself. Multiple PgExecutors
  * can exist in the same schema. PgExecutor is also responsible for things like
  * caching.
  */
 export class PgExecutor<TSettings = any> {
   public name: string;
-  private contextCallback: () => ObjectPlan<PgExecutorContextPlans<TSettings>>;
+  private contextCallback: () => ObjectStep<PgExecutorContextPlans<TSettings>>;
   private $$cache: symbol;
 
   constructor(options: {
     name: string;
-    context: () => ObjectPlan<PgExecutorContextPlans<TSettings>>;
+    context: () => ObjectStep<PgExecutorContextPlans<TSettings>>;
   }) {
     const { name, context } = options;
     this.name = name;
@@ -153,8 +153,8 @@ export class PgExecutor<TSettings = any> {
     return chalk.bold.blue(`PgExecutor(${this.name})`);
   }
 
-  // public context(): ExecutablePlan<any>
-  public context(): ObjectPlan<PgExecutorContextPlans<TSettings>> {
+  // public context(): ExecutableStep<any>
+  public context(): ObjectStep<PgExecutorContextPlans<TSettings>> {
     return this.contextCallback();
   }
 

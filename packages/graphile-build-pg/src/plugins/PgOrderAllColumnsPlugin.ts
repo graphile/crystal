@@ -7,8 +7,8 @@ import type {
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSelectPlan } from "@dataplan/pg";
-import type { ExecutablePlan, ModifierPlan } from "dataplanner";
+import { PgSelectStep } from "@dataplan/pg";
+import type { ExecutableStep, ModifierStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumValueConfigMap } from "graphql";
 
@@ -132,17 +132,17 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                     graphile: {
                       applyPlan: EXPORTABLE(
                         (
-                            PgSelectPlan,
+                            PgSelectStep,
                             column,
                             columnName,
                             isUnique,
                             orderByNullsLast,
                             sql,
                           ) =>
-                          (plan: ExecutablePlan | ModifierPlan): void => {
-                            if (!(plan instanceof PgSelectPlan)) {
+                          (plan: ExecutableStep | ModifierStep): void => {
+                            if (!(plan instanceof PgSelectStep)) {
                               throw new Error(
-                                "Expected a PgSelectPlan when applying ordering value",
+                                "Expected a PgSelectStep when applying ordering value",
                               );
                             }
                             plan.orderBy({
@@ -162,7 +162,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                             }
                           },
                         [
-                          PgSelectPlan,
+                          PgSelectStep,
                           column,
                           columnName,
                           isUnique,
@@ -191,17 +191,17 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                     graphile: {
                       applyPlan: EXPORTABLE(
                         (
-                            PgSelectPlan,
+                            PgSelectStep,
                             column,
                             columnName,
                             isUnique,
                             orderByNullsLast,
                             sql,
                           ) =>
-                          (plan: ExecutablePlan | ModifierPlan): void => {
-                            if (!(plan instanceof PgSelectPlan)) {
+                          (plan: ExecutableStep | ModifierStep): void => {
+                            if (!(plan instanceof PgSelectStep)) {
                               throw new Error(
-                                "Expected a PgSelectPlan when applying ordering value",
+                                "Expected a PgSelectStep when applying ordering value",
                               );
                             }
                             plan.orderBy({
@@ -221,7 +221,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                             }
                           },
                         [
-                          PgSelectPlan,
+                          PgSelectStep,
                           column,
                           columnName,
                           isUnique,

@@ -68,11 +68,11 @@ export {
   PgExecutorOptions,
   WithPgClient,
 } from "./executor.js";
-export { BooleanFilterPlan } from "./filters/booleanFilter.js";
-export { ClassFilterPlan } from "./filters/classFilter.js";
-export { ManyFilterPlan } from "./filters/manyFilter.js";
+export { BooleanFilterStep } from "./filters/booleanFilter.js";
+export { ClassFilterStep } from "./filters/classFilter.js";
+export { ManyFilterStep } from "./filters/manyFilter.js";
 export {
-  PgClassSinglePlan,
+  PgClassSingleStep,
   PgDecode,
   PgEncode,
   PgEnumTypeCodec,
@@ -80,28 +80,28 @@ export {
   PgOrderSpec,
   PgTypeCodec,
   PgTypeCodecExtensions,
-  PgTypedExecutablePlan,
+  PgTypedExecutableStep,
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
 export { PgSubscriber } from "./PgSubscriber.js";
 export {
   pgClassExpression,
-  PgClassExpressionPlan,
-} from "./plans/pgClassExpression.js";
+  PgClassExpressionStep,
+} from "./steps/pgClassExpression.js";
 export {
-  PgConditionCapableParentPlan,
-  PgConditionPlan,
-} from "./plans/pgCondition.js";
-export { PgCursorPlan } from "./plans/pgCursor.js";
-export { pgDelete, PgDeletePlan } from "./plans/pgDelete.js";
-export { pgInsert, PgInsertPlan } from "./plans/pgInsert.js";
-export { pgPageInfo, PgPageInfoPlan } from "./plans/pgPageInfo.js";
+  PgConditionCapableParentStep,
+  PgConditionStep,
+} from "./steps/pgCondition.js";
+export { PgCursorStep } from "./steps/pgCursor.js";
+export { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
+export { pgInsert, PgInsertStep } from "./steps/pgInsert.js";
+export { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 export {
   pgPolymorphic,
-  PgPolymorphicPlan,
+  PgPolymorphicStep,
   PgPolymorphicTypeMap,
-} from "./plans/pgPolymorphic.js";
+} from "./steps/pgPolymorphic.js";
 export {
   pgSelect,
   PgSelectArgumentDigest,
@@ -112,23 +112,23 @@ export {
   PgSelectLockCallback,
   PgSelectMode,
   PgSelectOptions,
-  PgSelectParsedCursorPlan,
-  PgSelectPlan,
+  PgSelectParsedCursorStep,
+  PgSelectStep,
   sqlFromArgDigests,
-} from "./plans/pgSelect.js";
+} from "./steps/pgSelect.js";
 export {
   pgSelectSingleFromRecord,
-  PgSelectSinglePlan,
+  PgSelectSingleStep,
   PgSelectSinglePlanOptions,
-} from "./plans/pgSelectSingle.js";
+} from "./steps/pgSelectSingle.js";
 export {
   pgSingleTablePolymorphic,
-  PgSingleTablePolymorphicPlan,
-} from "./plans/pgSingleTablePolymorphic.js";
-export { pgUpdate, PgUpdatePlan } from "./plans/pgUpdate.js";
+  PgSingleTablePolymorphicStep,
+} from "./steps/pgSingleTablePolymorphic.js";
+export { pgUpdate, PgUpdateStep } from "./steps/pgUpdate.js";
 export {
   pgValidateParsedCursor,
-  PgValidateParsedCursorPlan,
-} from "./plans/pgValidateParsedCursor.js";
-export { TempTablePlan } from "./plans/tempTable.js";
-export { toPg, ToPgPlan } from "./plans/toPg.js";
+  PgValidateParsedCursorStep,
+} from "./steps/pgValidateParsedCursor.js";
+export { TempTableStep } from "./steps/tempTable.js";
+export { toPg, ToPgStep } from "./steps/toPg.js";

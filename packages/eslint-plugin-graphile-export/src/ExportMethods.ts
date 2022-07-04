@@ -172,7 +172,7 @@ function processNode(
           // Wrap with EXPORTABLE
           reportProblem(context, options, {
             node: node as unknown as ESTreeNode,
-            message: "Plan value is not exportable.",
+            message: "Step value is not exportable.",
             suggest: [
               {
                 desc: "convert to exportable",

@@ -19,30 +19,30 @@ import { inspect } from "util";
 
 import type { Aether } from "./aether.js";
 import * as assert from "./assert.js";
-import { __InputDynamicScalarPlan } from "./plans/__inputDynamicScalar.js";
-import { __InputObjectPlan } from "./plans/__inputObject.js";
+import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
+import { __InputObjectStep } from "./steps/__inputObject.js";
 import {
-  __InputListPlan,
-  __InputStaticLeafPlan,
-  __TrackedObjectPlan,
-} from "./plans/index.js";
+  __InputListStep,
+  __InputStaticLeafStep,
+  __TrackedObjectStep,
+} from "./steps/index.js";
 
 // TODO: should this have `__` prefix?
-export type InputPlan =
-  | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
-  | __InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
-  | __InputStaticLeafPlan // .eval(), .evalIs()
-  | __InputDynamicScalarPlan // .eval(), .evalIs()
-  | __InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
+export type InputStep =
+  | __TrackedObjectStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
+  | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
+  | __InputStaticLeafStep // .eval(), .evalIs()
+  | __InputDynamicScalarStep // .eval(), .evalIs()
+  | __InputObjectStep; // .get(), .eval(), .evalHas(), .evalIs(null)
 
 export function assertInputPlan(
   itemPlan: unknown,
-): asserts itemPlan is InputPlan {
-  if (itemPlan instanceof __TrackedObjectPlan) return;
-  if (itemPlan instanceof __InputListPlan) return;
-  if (itemPlan instanceof __InputStaticLeafPlan) return;
-  if (itemPlan instanceof __InputObjectPlan) return;
-  throw new Error(`Expected an InputPlan, but found ${itemPlan}`);
+): asserts itemPlan is InputStep {
+  if (itemPlan instanceof __TrackedObjectStep) return;
+  if (itemPlan instanceof __InputListStep) return;
+  if (itemPlan instanceof __InputStaticLeafStep) return;
+  if (itemPlan instanceof __InputObjectStep) return;
+  throw new Error(`Expected an InputStep, but found ${itemPlan}`);
 }
 
 export function graphqlGetTypeForNode(
@@ -84,7 +84,7 @@ export function inputPlan(
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
-): InputPlan {
+): InputStep {
   let inputValue = rawInputValue;
   if (inputValue?.kind === "Variable") {
     const variableName = inputValue.name.value;
@@ -116,20 +116,20 @@ export function inputPlan(
     const valuePlan = inputPlan(aether, innerType, inputValue);
     return inputNonNullPlan(aether, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    return new __InputListPlan(inputType, inputValue);
+    return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
       const scalarType = assertScalarType(inputType);
       // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
       // scalars that have variables in subfields.)
-      return new __InputDynamicScalarPlan(scalarType, inputValue);
+      return new __InputDynamicScalarStep(scalarType, inputValue);
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
       // none of which can contain a variable:
-      return new __InputStaticLeafPlan(inputType, inputValue);
+      return new __InputStaticLeafStep(inputType, inputValue);
     }
   } else if (inputType instanceof GraphQLInputObjectType) {
-    return new __InputObjectPlan(inputType, inputValue);
+    return new __InputObjectStep(inputType, inputValue);
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -152,7 +152,7 @@ function inputVariablePlan(
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
   defaultValue: ValueNode | undefined = undefined,
-): InputPlan {
+): InputStep {
   if (
     variableType instanceof GraphQLNonNull &&
     !(inputType instanceof GraphQLNonNull)
@@ -182,8 +182,8 @@ function inputVariablePlan(
 }
 
 /**
- * Implements `InputNonNullPlan`.
+ * Implements `InputNonNullStep`.
  */
-function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
+function inputNonNullPlan(_aether: Aether, innerPlan: InputStep): InputStep {
   return innerPlan;
 }

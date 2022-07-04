@@ -14,33 +14,33 @@ import {
 } from "graphql";
 
 import type {
-  __InputObjectPlan,
-  __TrackedObjectPlan,
+  __InputObjectStep,
+  __TrackedObjectStep,
   Aether,
 } from "./index.js";
-import type { InputPlan } from "./input.js";
+import type { InputStep } from "./input.js";
 import type {
   FieldArgs,
   InputObjectTypeInputPlanResolver,
   TrackedArguments,
 } from "./interfaces.js";
-import type { ModifierPlan } from "./plan.js";
-import { assertExecutablePlan, ExecutablePlan } from "./plan.js";
-import type { __ItemPlan } from "./plans/__item.js";
-import { constant } from "./plans/constant.js";
-import { list } from "./plans/list.js";
-import { object } from "./plans/object.js";
+import type { ModifierStep } from "./plan.js";
+import { assertExecutablePlan, ExecutableStep } from "./plan.js";
+import type { __ItemStep } from "./steps/__item.js";
+import { constant } from "./steps/constant.js";
+import { list } from "./steps/list.js";
+import { object } from "./steps/object.js";
 
 export function withFieldArgsForArguments<
-  T extends ExecutablePlan,
-  TParentPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  T extends ExecutableStep,
+  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
 >(
   aether: Aether,
-  parentPlan: TParentPlan,
+  parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
   callback: (fieldArgs: FieldArgs) => T,
-): Exclude<T, undefined | null | void> | TParentPlan {
+): Exclude<T, undefined | null | void> | TParentStep {
   const fields: {
     [key: string]: GraphQLArgument;
   } = {};
@@ -59,18 +59,18 @@ export function withFieldArgsForArguments<
 }
 
 function withFieldArgsForArgumentsOrInputObject<
-  T extends ExecutablePlan | ModifierPlan | null | void,
-  TParentPlan extends ExecutablePlan,
+  T extends ExecutableStep | ModifierStep | null | void,
+  TParentStep extends ExecutableStep,
 >(
   aether: Aether,
   typeContainingFields: GraphQLInputType | null,
-  parentPlan: TParentPlan,
-  $current: TrackedArguments | InputPlan, //__TrackedObjectPlan | __InputObjectPlan,
+  parentPlan: TParentStep,
+  $current: TrackedArguments | InputStep, //__TrackedObjectStep | __InputObjectStep,
   fields: {
     [key: string]: GraphQLArgument | GraphQLInputField;
   } | null,
   callback: (fieldArgs: FieldArgs) => T,
-): Exclude<T, undefined | null | void> | TParentPlan {
+): Exclude<T, undefined | null | void> | TParentStep {
   const schema = aether.schema;
   const analyzedCoordinates: string[] = [];
 
@@ -91,11 +91,11 @@ function withFieldArgsForArgumentsOrInputObject<
 
     const $currentObject = $current as
       | TrackedArguments
-      | __TrackedObjectPlan
-      | __InputObjectPlan;
+      | __TrackedObjectStep
+      | __InputObjectStep;
 
     const argName = path.shift()!;
-    let $value = ($currentObject.get as (argName: string) => InputPlan)(
+    let $value = ($currentObject.get as (argName: string) => InputStep)(
       argName,
     );
     let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
@@ -116,9 +116,9 @@ function withFieldArgsForArgumentsOrInputObject<
         );
       }
       $value = (
-        ($value as __TrackedObjectPlan | __InputObjectPlan).get as (
+        ($value as __TrackedObjectStep | __InputObjectStep).get as (
           name: string,
-        ) => InputPlan
+        ) => InputStep
       )(name);
       /*
       if ($value.evalIs(undefined)) {
@@ -134,7 +134,7 @@ function withFieldArgsForArgumentsOrInputObject<
 
   function planArgumentOrInputField(
     details: ReturnType<typeof getArgOnceOnly>,
-    $toPlan: ExecutablePlan | ModifierPlan | null,
+    $toPlan: ExecutableStep | ModifierStep | null,
   ) {
     const plan = aether.withModifiers(() => {
       const { argOrField, $value } = details;
@@ -199,22 +199,22 @@ function withFieldArgsForArgumentsOrInputObject<
   }
 
   function getPlannedValue(
-    $value: InputPlan,
+    $value: InputStep,
     currentType: GraphQLInputType,
-  ): ExecutablePlan {
+  ): ExecutableStep {
     if (isNonNullType(currentType)) {
       return getPlannedValue($value, currentType.ofType);
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
         throw new Error(
-          `GraphileInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListPlan or __TrackedObjectPlan (i.e. to have 'evalLength')`,
+          `GraphileInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
         );
       }
       const l = $value.evalLength();
       if (l == null) {
         return constant(null);
       }
-      const entries: ExecutablePlan[] = [];
+      const entries: ExecutableStep[] = [];
       for (let i = 0; i < l; i++) {
         const entry = getPlannedValue($value.at(i), currentType.ofType);
         entries.push(entry);
@@ -260,9 +260,9 @@ function withFieldArgsForArgumentsOrInputObject<
   }
 
   function applyPlannedValue(
-    $value: InputPlan,
+    $value: InputStep,
     currentType: GraphQLInputType,
-    $toPlan: ExecutablePlan | ModifierPlan,
+    $toPlan: ExecutableStep | ModifierStep,
   ): void {
     if (isNonNullType(currentType)) {
       applyPlannedValue($value, currentType.ofType, $toPlan);
@@ -270,7 +270,7 @@ function withFieldArgsForArgumentsOrInputObject<
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
         throw new Error(
-          `GraphileInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListPlan or __TrackedObjectPlan (i.e. to have 'evalLength')`,
+          `GraphileInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
         );
       }
       const l = $value.evalLength();
@@ -328,7 +328,7 @@ function withFieldArgsForArgumentsOrInputObject<
             "You cannot call `get()` without a path in this situation",
           );
         } else {
-          return getPlannedValue($current as InputPlan, typeContainingFields);
+          return getPlannedValue($current as InputStep, typeContainingFields);
         }
       }
       const details = getArgOnceOnly(path);
@@ -340,7 +340,7 @@ function withFieldArgsForArgumentsOrInputObject<
     getRaw(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
-        if ($current instanceof ExecutablePlan) {
+        if ($current instanceof ExecutableStep) {
           return $current;
         } else {
           throw new Error("You must getRaw a specific argument by name");
@@ -352,7 +352,7 @@ function withFieldArgsForArgumentsOrInputObject<
     apply($target, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
-        if (typeContainingFields && ($current as InputPlan).evalIs(undefined)) {
+        if (typeContainingFields && ($current as InputStep).evalIs(undefined)) {
           return;
         }
         if (fields) {
@@ -367,7 +367,7 @@ function withFieldArgsForArgumentsOrInputObject<
             );
           } else {
             return applyPlannedValue(
-              $current as InputPlan,
+              $current as InputStep,
               typeContainingFields,
               $target,
             );
@@ -391,8 +391,8 @@ function withFieldArgsForArgumentsOrInputObject<
     },
   };
   const plan = (callback(fieldArgs) ?? parentPlan) as
-    | ExecutablePlan
-    | ModifierPlan;
+    | ExecutableStep
+    | ModifierStep;
 
   // Now handled all the remaining coordinates
   if (!analyzedCoordinates.includes("")) {
@@ -432,15 +432,15 @@ function withFieldArgsForArgumentsOrInputObject<
 }
 
 function withFieldArgsForArgOrField<
-  T extends ExecutablePlan | ModifierPlan | null | void,
-  TParentPlan extends ExecutablePlan,
+  T extends ExecutableStep | ModifierStep | null | void,
+  TParentStep extends ExecutableStep,
 >(
   aether: Aether,
-  parentPlan: TParentPlan,
+  parentPlan: TParentStep,
   argOrField: GraphQLArgument | GraphQLInputField,
-  $value: InputPlan,
+  $value: InputStep,
   callback: (fieldArgs: FieldArgs) => T,
-): Exclude<T, undefined | null | void> | TParentPlan {
+): Exclude<T, undefined | null | void> | TParentStep {
   const type = argOrField.type;
   const nullableType = getNullableType(type);
   const fields = isInputObjectType(nullableType)
@@ -459,7 +459,7 @@ function withFieldArgsForArgOrField<
 const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver =
   (input, info) => {
     const fields = info.type.getFields();
-    const obj: { [key: string]: ExecutablePlan } = {};
+    const obj: { [key: string]: ExecutableStep } = {};
     for (const fieldName in fields) {
       obj[fieldName] = input.get(fieldName);
     }

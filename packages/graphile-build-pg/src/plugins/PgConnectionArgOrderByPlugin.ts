@@ -2,15 +2,15 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSelectParsedCursorPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
+  PgSelectParsedCursorStep,
+  PgSelectStep,
+  PgSelectSingleStep,
   PgTypeCodec,
 } from "@dataplan/pg";
 import type {
-  ConnectionPlan,
+  ConnectionStep,
   GraphileFieldConfigArgumentMap,
-  InputPlan,
+  InputStep,
 } from "dataplanner";
 import { getEnumValueConfig } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -149,10 +149,10 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                     (applyOrderToPlan, tableOrderByTypeName) =>
                       function plan(
                         _: any,
-                        $connection: ConnectionPlan<
-                          PgSelectSinglePlan<any, any, any, any>,
-                          PgSelectParsedCursorPlan,
-                          PgSelectPlan<any, any, any, any>
+                        $connection: ConnectionStep<
+                          PgSelectSingleStep<any, any, any, any>,
+                          PgSelectParsedCursorStep,
+                          PgSelectStep<any, any, any, any>
                         >,
                         val,
                         info: { schema: GraphQLSchema },
@@ -174,7 +174,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                     (applyOrderToPlan, tableOrderByTypeName) =>
                       function plan(
                         _: any,
-                        $select: PgSelectPlan<any, any, any, any>,
+                        $select: PgSelectStep<any, any, any, any>,
                         val,
                         info: { schema: GraphQLSchema },
                       ) {
@@ -202,8 +202,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
 export const applyOrderToPlan = EXPORTABLE(
   (getEnumValueConfig, inspect) =>
     (
-      $select: PgSelectPlan<any, any, any, any>,
-      $value: InputPlan,
+      $select: PgSelectStep<any, any, any, any>,
+      $value: InputStep,
       TableOrderByType: GraphQLEnumType,
     ) => {
       const val = $value.eval();

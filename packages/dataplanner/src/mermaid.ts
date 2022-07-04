@@ -5,8 +5,8 @@
 import type { Aether } from ".";
 import type { BucketDefinitionFieldOutputMap } from "./bucket.js";
 import { crystalPrintPathIdentity } from "./crystalPrint.js";
-import type { ExecutablePlan } from "./plan.js";
-import { __ItemPlan, __ListTransformPlan } from "./plans/index.js";
+import type { ExecutableStep } from "./plan.js";
+import { __ItemStep, __ListTransformStep } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
 
 /**
@@ -120,9 +120,9 @@ export function printPlanGraph(
   };
 
   const planIdMap = Object.create(null);
-  const planId = (plan: ExecutablePlan): string => {
+  const planId = (plan: ExecutableStep): string => {
     if (!planIdMap[plan.id]) {
-      const planName = plan.constructor.name.replace(/Plan$/, "");
+      const planName = plan.constructor.name.replace(/Step$/, "");
       const planNode = `${planName}${plan.id}`;
       planIdMap[plan.id] = planNode;
       const rawMeta = plan.toStringMeta();
@@ -140,14 +140,14 @@ export function printPlanGraph(
         meta ? `\n<${meta}>` : ""
       }`;
       const [lBrace, rBrace] =
-        plan instanceof __ItemPlan
+        plan instanceof __ItemStep
           ? [">", "]"]
           : plan.isSyncAndSafe
           ? ["[", "]"]
           : ["[[", "]]"];
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
-        : plan instanceof __ItemPlan
+        : plan instanceof __ItemStep
         ? "itemplan"
         : "plan";
       graph.push(
@@ -224,13 +224,13 @@ export function printPlanGraph(
       return planId(plans[depId]);
     });
     const transformItemPlanNode =
-      plan instanceof __ListTransformPlan
+      plan instanceof __ListTransformStep
         ? planId(
             plans[aether.transformDependencyPlanIdByTransformPlanId[plan.id]],
           )
         : null;
     if (depNodes.length > 0) {
-      if (plan instanceof __ItemPlan) {
+      if (plan instanceof __ItemStep) {
         const [firstDep, ...rest] = depNodes;
         const arrow = plan.transformPlanId == null ? "==>" : "-.->";
         graph.push(`    ${firstDep} ${arrow} ${planNode}`);

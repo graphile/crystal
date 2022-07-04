@@ -1,7 +1,7 @@
 import "./global.js";
 
 import chalk from "chalk";
-import type { ExecutablePlan } from "dataplanner";
+import type { ExecutableStep } from "dataplanner";
 import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLBoolean,
@@ -70,7 +70,7 @@ export default function makeNewBuild(
       scope: GraphileBuild.SomeScope;
       specGenerator: any;
       origin: string | null | undefined;
-      Plan?: { new (...args: any[]): ExecutablePlan<any> } | null;
+      Step?: { new (...args: any[]): ExecutableStep<any> } | null;
     };
   } = {};
 
@@ -81,7 +81,7 @@ export default function makeNewBuild(
     klass: { new (spec: any): GraphQLNamedType },
     typeName: string,
     scope: GraphileBuild.SomeScope,
-    Plan: { new (...args: any[]): ExecutablePlan<any> } | null,
+    Step: { new (...args: any[]): ExecutableStep<any> } | null,
     specGenerator: () => any,
     origin: string | null | undefined,
   ) {
@@ -114,7 +114,7 @@ export default function makeNewBuild(
       scope,
       specGenerator,
       origin,
-      Plan,
+      Step,
     };
   }
 
@@ -172,8 +172,8 @@ export default function makeNewBuild(
 
     behavior: new Behavior(),
 
-    registerObjectType(typeName, scope, Plan, specGenerator, origin) {
-      register(GraphQLObjectType, typeName, scope, Plan, specGenerator, origin);
+    registerObjectType(typeName, scope, Step, specGenerator, origin) {
+      register(GraphQLObjectType, typeName, scope, Step, specGenerator, origin);
     },
     registerUnionType(typeName, scope, specGenerator, origin) {
       register(GraphQLUnionType, typeName, scope, null, specGenerator, origin);
@@ -232,12 +232,12 @@ export default function makeNewBuild(
 
       const details = typeRegistry[typeName];
       if (details != null) {
-        const { klass: Constructor, scope, origin, Plan } = details;
+        const { klass: Constructor, scope, origin, Step } = details;
         return Object.assign(Object.create(null), {
           Constructor,
           scope,
           origin,
-          Plan,
+          Step,
         });
       }
       return null;
@@ -249,7 +249,7 @@ export default function makeNewBuild(
       } else {
         const details = typeRegistry[typeName];
         if (details != null) {
-          const { klass, scope, specGenerator, Plan } = details;
+          const { klass, scope, specGenerator, Step } = details;
 
           const spec = specGenerator();
           // No need to have the user specify name, and they're forbidden from
@@ -265,7 +265,7 @@ export default function makeNewBuild(
             klass,
             spec,
             scope,
-            Plan,
+            Step,
           );
 
           allTypes[typeName] = type;

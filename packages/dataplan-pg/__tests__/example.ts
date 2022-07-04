@@ -19,8 +19,8 @@
  */
 
 import type {
-  __TrackedObjectPlan,
-  __ValuePlan,
+  __TrackedObjectStep,
+  __ValueStep,
   BaseGraphQLContext,
 } from "dataplanner";
 import { stripAnsi } from "dataplanner";
@@ -44,7 +44,7 @@ import type { WithPgClient } from "../src/index.js";
   +--------------------------------------------------------------------------+*/
 
 /*
-class ConnectionPlan<TSubplan extends ExecutablePlan<any>> extends ExecutablePlan<Opaque<any>> {
+class ConnectionStep<TSubplan extends ExecutableStep<any>> extends ExecutableStep<Opaque<any>> {
   constructor(public readonly subplan: TSubplan) {
     super();
   }

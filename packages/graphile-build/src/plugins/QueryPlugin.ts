@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { __ValuePlan } from "dataplanner";
+import { __ValueStep } from "dataplanner";
 
 import { isValidObjectType } from "../utils.js";
 
@@ -31,7 +31,7 @@ export const QueryPlugin: GraphileConfig.Plugin = {
             {
               isRootQuery: true,
             },
-            __ValuePlan,
+            __ValueStep,
             () => {
               return {
                 description:

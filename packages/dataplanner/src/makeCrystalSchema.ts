@@ -26,7 +26,7 @@ import type {
   InputObjectFieldInputPlanResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
-import type { ExecutablePlan } from "./plan.js";
+import type { ExecutableStep } from "./plan.js";
 import { crystalResolve, dataplannerResolver } from "./resolvers.js";
 
 // TODO:TS: improve the types here!
@@ -54,7 +54,7 @@ export type FieldPlans =
  * The plans/config for each field of a GraphQL object type.
  */
 export type ObjectPlans = {
-  __Plan?: { new (...args: any[]): ExecutablePlan<any> };
+  __Step?: { new (...args: any[]): ExecutableStep<any> };
 } & {
   [fieldName: string]: FieldPlans;
 };
@@ -146,8 +146,8 @@ export function makeCrystalSchema(details: {
       const objSpec = spec as ObjectPlans;
       const fields = type.getFields();
       for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
-        if (fieldName === "__Plan") {
-          (type.extensions as any).graphile = { Plan: fieldSpec };
+        if (fieldName === "__Step") {
+          (type.extensions as any).graphile = { Step: fieldSpec };
           continue;
         }
 

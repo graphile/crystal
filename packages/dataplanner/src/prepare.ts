@@ -78,7 +78,7 @@ export function dataplannerPrepare(
     }
     rootValue[$$extensions]?.explain?.operations.push({
       type: "mermaid-js",
-      title: "Plan",
+      title: "Step",
       diagram: aether[$$contextPlanCache],
     });
   }

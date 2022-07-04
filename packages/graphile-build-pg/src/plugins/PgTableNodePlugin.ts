@@ -1,8 +1,8 @@
 import "graphile-build";
 import "graphile-config";
 
-import type { PgSelectSinglePlan, PgSource, PgTypeCodec } from "@dataplan/pg";
-import type { ListPlan } from "dataplanner";
+import type { PgSelectSingleStep, PgSource, PgTypeCodec } from "@dataplan/pg";
+import type { ListStep } from "dataplanner";
 import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
@@ -93,7 +93,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                 )
               : EXPORTABLE(
                   (constant, identifier, list, pk) =>
-                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                    ($record: PgSelectSingleStep<any, any, any, any>) => {
                       return list([
                         constant(identifier),
                         ...pk.map((column) => $record.get(column)),
@@ -115,7 +115,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                   [pgSource, access],
                 )
               : EXPORTABLE(
-                  (access, pgSource, pk) => ($list: ListPlan<any[]>) => {
+                  (access, pgSource, pk) => ($list: ListStep<any[]>) => {
                     const spec = pk.reduce((memo, column, index) => {
                       memo[column] = access($list, [index + 1]);
                       return memo;

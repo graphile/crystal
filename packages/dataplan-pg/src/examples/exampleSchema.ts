@@ -10,26 +10,26 @@
  * interested in might be useful.
  */
 
-import { jsonParse, JSONParsePlan } from "@dataplan/json";
+import { jsonParse, JSONParseStep } from "@dataplan/json";
 import * as crypto from "crypto";
 import type {
-  __InputObjectPlan,
-  __InputStaticLeafPlan,
-  __TrackedObjectPlan,
-  AccessPlan,
+  __InputObjectStep,
+  __InputStaticLeafStep,
+  __TrackedObjectStep,
+  AccessStep,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   CrystalSubscriber,
-  ExecutablePlan,
+  ExecutableStep,
   GraphileArgumentConfig,
-  ListPlan,
+  ListStep,
 } from "dataplanner";
 import {
-  __ListTransformPlan,
-  __ValuePlan,
+  __ListTransformStep,
+  __ValueStep,
   aether,
   connection,
-  ConnectionPlan,
+  ConnectionStep,
   constant,
   context,
   dataplannerEnforce,
@@ -68,10 +68,10 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type {
-  PgConditionPlan,
+  PgConditionStep,
   PgExecutorContextPlans,
-  PgInsertPlan,
-  PgSelectPlan,
+  PgInsertStep,
+  PgSelectStep,
   PgSubscriber,
   PgTypeCodec,
   PgTypeColumn,
@@ -81,33 +81,33 @@ import type {
 import type { PgTypeColumns } from "../codecs.js";
 import { listOfType } from "../codecs.js";
 import {
-  BooleanFilterPlan,
-  ClassFilterPlan,
+  BooleanFilterStep,
+  ClassFilterStep,
   enumType,
-  ManyFilterPlan,
+  ManyFilterStep,
   pgClassExpression,
-  PgClassExpressionPlan,
+  PgClassExpressionStep,
   pgDelete,
-  PgDeletePlan,
+  PgDeleteStep,
   PgEnumSource,
   PgExecutor,
   pgInsert,
   pgPolymorphic,
   pgSelect,
   pgSelectSingleFromRecord,
-  PgSelectSinglePlan,
+  PgSelectSingleStep,
   pgSingleTablePolymorphic,
   PgSource,
   PgSourceBuilder,
   pgUpdate,
-  PgUpdatePlan,
+  PgUpdateStep,
   recordType,
   TYPES,
 } from "../index.js";
-import { PgPageInfoPlan } from "../plans/pgPageInfo.js";
-import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic.js";
-import type { PgSelectParsedCursorPlan } from "../plans/pgSelect.js";
-import { sqlFromArgDigests } from "../plans/pgSelect.js";
+import { PgPageInfoStep } from "../steps/pgPageInfo.js";
+import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
+import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
+import { sqlFromArgDigests } from "../steps/pgSelect.js";
 
 declare module ".." {
   interface PgEnumSourceExtensions {
@@ -150,28 +150,28 @@ export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
   const deoptimizeIfAppropriate = EXPORTABLE(
-    (__ListTransformPlan, options) =>
+    (__ListTransformStep, options) =>
       <
-        TPlan extends
-          | PgSelectPlan<any, any, any, any>
-          | PgSelectSinglePlan<any, any, any, any>
-          | PgClassExpressionPlan<any, any, any, any, any, any>
-          | __ListTransformPlan<
-              PgSelectPlan<any, any, any, any>,
+        TStep extends
+          | PgSelectStep<any, any, any, any>
+          | PgSelectSingleStep<any, any, any, any>
+          | PgClassExpressionStep<any, any, any, any, any, any>
+          | __ListTransformStep<
+              PgSelectStep<any, any, any, any>,
               any,
               any,
               any
             >,
       >(
-        plan: TPlan,
-      ): TPlan => {
+        plan: TStep,
+      ): TStep => {
         if (options.deoptimize) {
           const innerPlan =
-            plan instanceof __ListTransformPlan
+            plan instanceof __ListTransformStep
               ? plan.getListPlan()
               : (plan as
-                  | PgSelectPlan<any, any, any, any>
-                  | PgSelectSinglePlan<any, any, any, any>);
+                  | PgSelectStep<any, any, any, any>
+                  | PgSelectSingleStep<any, any, any, any>);
           if ("getClassPlan" in innerPlan) {
             innerPlan.getClassPlan().setInliningForbidden();
           } else if ("setInliningForbidden" in innerPlan) {
@@ -180,10 +180,10 @@ export function makeExampleSchema(
         }
         return plan;
       },
-    [__ListTransformPlan, options],
+    [__ListTransformStep, options],
   );
   type PgSelectPlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgSelectPlan<
+    PgSelectStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"],
@@ -191,7 +191,7 @@ export function makeExampleSchema(
     >;
   type PgSelectSinglePlanFromSource<
     TSource extends PgSource<any, any, any, any>,
-  > = PgSelectSinglePlan<
+  > = PgSelectSingleStep<
     TSource["TColumns"],
     TSource["TUniques"],
     TSource["TRelations"],
@@ -199,21 +199,21 @@ export function makeExampleSchema(
   >;
   type PgConnectionPlanFromSource<
     TSource extends PgSource<any, any, any, any>,
-  > = ConnectionPlan<
-    PgSelectSinglePlan<
+  > = ConnectionStep<
+    PgSelectSingleStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"],
       TSource["TParameters"]
     >,
-    PgSelectParsedCursorPlan,
-    PgSelectPlan<
+    PgSelectParsedCursorStep,
+    PgSelectStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"],
       TSource["TParameters"]
     >,
-    PgSelectSinglePlan<
+    PgSelectSingleStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"],
@@ -221,81 +221,81 @@ export function makeExampleSchema(
     >
   >;
   type PgInsertPlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgInsertPlan<
+    PgInsertStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"]
     >;
   type PgUpdatePlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgUpdatePlan<
+    PgUpdateStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"]
     >;
   type PgDeletePlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgDeletePlan<
+    PgDeleteStep<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"]
     >;
 
-  // type MessagesPlan = PgSelectPlanFromSource<typeof messageSource>;
-  type MessageConnectionPlan = PgConnectionPlanFromSource<typeof messageSource>;
-  type MessagePlan = PgSelectSinglePlanFromSource<typeof messageSource>;
-  // type UsersPlan = PgSelectPlanFromSource<typeof userSource>;
-  type UserPlan = PgSelectSinglePlanFromSource<typeof userSource>;
-  // type ForumsPlan = PgSelectPlanFromSource<typeof forumSource>;
-  type ForumPlan = PgSelectSinglePlanFromSource<typeof forumSource>;
-  type PersonPlan = PgSelectSinglePlanFromSource<typeof personSource>;
-  type PersonBookmarkPlan = PgSelectSinglePlanFromSource<
+  // type MessagesStep = PgSelectPlanFromSource<typeof messageSource>;
+  type MessageConnectionStep = PgConnectionPlanFromSource<typeof messageSource>;
+  type MessageStep = PgSelectSinglePlanFromSource<typeof messageSource>;
+  // type UsersStep = PgSelectPlanFromSource<typeof userSource>;
+  type UserStep = PgSelectSinglePlanFromSource<typeof userSource>;
+  // type ForumsStep = PgSelectPlanFromSource<typeof forumSource>;
+  type ForumStep = PgSelectSinglePlanFromSource<typeof forumSource>;
+  type PersonStep = PgSelectSinglePlanFromSource<typeof personSource>;
+  type PersonBookmarkStep = PgSelectSinglePlanFromSource<
     typeof personBookmarksSource
   >;
-  type PostPlan = PgSelectSinglePlanFromSource<typeof postSource>;
-  type CommentPlan = PgSelectSinglePlanFromSource<typeof commentSource>;
-  type SingleTableItemsPlan = PgSelectPlanFromSource<
+  type PostStep = PgSelectSinglePlanFromSource<typeof postSource>;
+  type CommentStep = PgSelectSinglePlanFromSource<typeof commentSource>;
+  type SingleTableItemsStep = PgSelectPlanFromSource<
     typeof singleTableItemsSource
   >;
-  type SingleTableItemPlan = PgSelectSinglePlanFromSource<
+  type SingleTableItemStep = PgSelectSinglePlanFromSource<
     typeof singleTableItemsSource
   >;
-  type RelationalItemsPlan = PgSelectPlanFromSource<
+  type RelationalItemsStep = PgSelectPlanFromSource<
     typeof relationalItemsSource
   >;
-  type RelationalItemPlan = PgSelectSinglePlanFromSource<
+  type RelationalItemStep = PgSelectSinglePlanFromSource<
     typeof relationalItemsSource
   >;
-  type RelationalTopicPlan = PgSelectSinglePlanFromSource<
+  type RelationalTopicStep = PgSelectSinglePlanFromSource<
     typeof relationalTopicsSource
   >;
-  type RelationalPostPlan = PgSelectSinglePlanFromSource<
+  type RelationalPostStep = PgSelectSinglePlanFromSource<
     typeof relationalPostsSource
   >;
-  type RelationalDividerPlan = PgSelectSinglePlanFromSource<
+  type RelationalDividerStep = PgSelectSinglePlanFromSource<
     typeof relationalDividersSource
   >;
-  type RelationalChecklistPlan = PgSelectSinglePlanFromSource<
+  type RelationalChecklistStep = PgSelectSinglePlanFromSource<
     typeof relationalChecklistsSource
   >;
-  type RelationalChecklistItemPlan = PgSelectSinglePlanFromSource<
+  type RelationalChecklistItemStep = PgSelectSinglePlanFromSource<
     typeof relationalChecklistItemsSource
   >;
-  type UnionItemsPlan = PgSelectPlanFromSource<typeof unionItemsSource>;
-  type UnionItemPlan = PgSelectSinglePlanFromSource<typeof unionItemsSource>;
-  type UnionTopicPlan = PgSelectSinglePlanFromSource<typeof unionTopicsSource>;
-  type UnionPostPlan = PgSelectSinglePlanFromSource<typeof unionPostsSource>;
-  type UnionDividerPlan = PgSelectSinglePlanFromSource<
+  type UnionItemsStep = PgSelectPlanFromSource<typeof unionItemsSource>;
+  type UnionItemStep = PgSelectSinglePlanFromSource<typeof unionItemsSource>;
+  type UnionTopicStep = PgSelectSinglePlanFromSource<typeof unionTopicsSource>;
+  type UnionPostStep = PgSelectSinglePlanFromSource<typeof unionPostsSource>;
+  type UnionDividerStep = PgSelectSinglePlanFromSource<
     typeof unionDividersSource
   >;
-  type UnionChecklistPlan = PgSelectSinglePlanFromSource<
+  type UnionChecklistStep = PgSelectSinglePlanFromSource<
     typeof unionChecklistsSource
   >;
-  type UnionChecklistItemPlan = PgSelectSinglePlanFromSource<
+  type UnionChecklistItemStep = PgSelectSinglePlanFromSource<
     typeof unionChecklistItemsSource
   >;
-  type RelationalCommentablesPlan = PgSelectPlanFromSource<
+  type RelationalCommentablesStep = PgSelectPlanFromSource<
     typeof relationalCommentableSource
   >;
-  type RelationalCommentablePlan = PgSelectSinglePlanFromSource<
+  type RelationalCommentableStep = PgSelectSinglePlanFromSource<
     typeof relationalCommentableSource
   >;
 
@@ -398,7 +398,7 @@ export function makeExampleSchema(
    * Applies auth checks to the plan; we are using a placeholder here for now.
    */
   const selectAuth = EXPORTABLE(
-    (sql) => ($plan: PgSelectPlan<any, any, any, any>) => {
+    (sql) => ($plan: PgSelectStep<any, any, any, any>) => {
       $plan.where(sql`true /* authorization checks */`);
     },
     [sql],
@@ -1925,7 +1925,7 @@ export function makeExampleSchema(
       type,
       plan: EXPORTABLE(
         (attrName) =>
-          function plan($entity: PgSelectSinglePlan<any, any, any, any>) {
+          function plan($entity: PgSelectSingleStep<any, any, any, any>) {
             return $entity.get(attrName);
           },
         [attrName],
@@ -2032,8 +2032,8 @@ export function makeExampleSchema(
     }),
   });
 
-  const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>(
-    PgSelectSinglePlan,
+  const User = newObjectTypeBuilder<OurGraphQLContext, UserStep>(
+    PgSelectSingleStep,
   )({
     name: "User",
     fields: () => ({
@@ -2175,8 +2175,8 @@ export function makeExampleSchema(
       },
     },
   });
-  const Message = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>(
-    PgSelectSinglePlan,
+  const Message = newObjectTypeBuilder<OurGraphQLContext, MessageStep>(
+    PgSelectSingleStep,
   )({
     name: "Message",
     fields: () => ({
@@ -2201,8 +2201,8 @@ export function makeExampleSchema(
     }),
   });
 
-  const MessageEdge = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>(
-    PgSelectSinglePlan,
+  const MessageEdge = newObjectTypeBuilder<OurGraphQLContext, MessageStep>(
+    PgSelectSingleStep,
   )({
     name: "MessageEdge",
     fields: {
@@ -2229,8 +2229,8 @@ export function makeExampleSchema(
     },
   });
 
-  const PageInfo = newObjectTypeBuilder<OurGraphQLContext, PgPageInfoPlan<any>>(
-    PgPageInfoPlan,
+  const PageInfo = newObjectTypeBuilder<OurGraphQLContext, PgPageInfoStep<any>>(
+    PgPageInfoStep,
   )({
     name: "PageInfo",
     fields: {
@@ -2255,8 +2255,8 @@ export function makeExampleSchema(
 
   const MessagesConnection = newObjectTypeBuilder<
     OurGraphQLContext,
-    MessageConnectionPlan
-  >(ConnectionPlan)({
+    MessageConnectionStep
+  >(ConnectionStep)({
     name: "MessagesConnection",
     fields: {
       edges: {
@@ -2271,7 +2271,7 @@ export function makeExampleSchema(
       },
       nodes: newGraphileFieldConfigBuilder<
         OurGraphQLContext,
-        MessageConnectionPlan
+        MessageConnectionStep
       >()({
         type: new GraphQLList(Message),
         plan: EXPORTABLE(
@@ -2284,7 +2284,7 @@ export function makeExampleSchema(
       }),
       pageInfo: newGraphileFieldConfigBuilder<
         OurGraphQLContext,
-        MessageConnectionPlan
+        MessageConnectionStep
       >()({
         type: new GraphQLNonNull(PageInfo),
         plan: EXPORTABLE(
@@ -2328,18 +2328,18 @@ export function makeExampleSchema(
     },
   });
 
-  function makeIncludeArchivedArg<TFieldPlan>(
-    getClassPlan: ($fieldPlan: TFieldPlan) => PgSelectPlanFromSource<any>,
+  function makeIncludeArchivedArg<TFieldStep>(
+    getClassPlan: ($fieldPlan: TFieldStep) => PgSelectPlanFromSource<any>,
   ): GraphileArgumentConfig<any, any, any, any, any, any> {
     return {
       type: IncludeArchived,
       applyPlan: EXPORTABLE(
-        (PgSelectSinglePlan, TYPES, getClassPlan, sql) =>
-          function plan($parent: ExecutablePlan<any>, $field: TFieldPlan, val) {
+        (PgSelectSingleStep, TYPES, getClassPlan, sql) =>
+          function plan($parent: ExecutableStep<any>, $field: TFieldStep, val) {
             const $messages = getClassPlan($field);
             const $value = val.getRaw() as
-              | __InputStaticLeafPlan
-              | __TrackedObjectPlan;
+              | __InputStaticLeafStep
+              | __TrackedObjectStep;
             if ($value.evalIs("YES")) {
               // No restriction
             } else if ($value.evalIs("EXCLUSIVELY")) {
@@ -2347,7 +2347,7 @@ export function makeExampleSchema(
             } else if (
               $value.evalIs("INHERIT") &&
               // INHERIT only works if the parent has an archived_at column.
-              $parent instanceof PgSelectSinglePlan &&
+              $parent instanceof PgSelectSingleStep &&
               !!$parent.source.codec.columns.archived_at
             ) {
               $messages.where(
@@ -2362,7 +2362,7 @@ export function makeExampleSchema(
               $messages.where(sql`${$messages.alias}.archived_at is null`);
             }
           },
-        [PgSelectSinglePlan, TYPES, getClassPlan, sql],
+        [PgSelectSingleStep, TYPES, getClassPlan, sql],
       ),
       defaultValue: "INHERIT",
     };
@@ -2370,7 +2370,7 @@ export function makeExampleSchema(
 
   const MessageCondition = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    PgConditionPlan<any>
+    PgConditionStep<any>
   >()({
     name: "MessageCondition",
     fields: {
@@ -2378,7 +2378,7 @@ export function makeExampleSchema(
         type: GraphQLBoolean,
         applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($condition: PgConditionPlan<any>, val) {
+            function plan($condition: PgConditionStep<any>, val) {
               const $value = val.getRaw();
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.featured is null`);
@@ -2399,7 +2399,7 @@ export function makeExampleSchema(
 
   const BooleanFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    BooleanFilterPlan
+    BooleanFilterStep
   >()({
     name: "BooleanFilter",
     fields: {
@@ -2427,7 +2427,7 @@ export function makeExampleSchema(
         type: GraphQLBoolean,
         applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($parent: BooleanFilterPlan, val) {
+            function plan($parent: BooleanFilterStep, val) {
               const $value = val.getRaw();
               if ($value.evalIs(null)) {
                 // Ignore
@@ -2448,27 +2448,27 @@ export function makeExampleSchema(
 
   const MessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ClassFilterPlan
+    ClassFilterStep
   >()({
     name: "MessageFilter",
     fields: {
       featured: {
         type: BooleanFilter,
         applyPlan: EXPORTABLE(
-          (BooleanFilterPlan, sql) =>
+          (BooleanFilterStep, sql) =>
             function plan($messageFilter, arg) {
               const $value = arg.getRaw();
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
-                const plan = new BooleanFilterPlan(
+                const plan = new BooleanFilterStep(
                   $messageFilter,
                   sql`${$messageFilter.alias}.featured`,
                 );
                 arg.apply(plan);
               }
             },
-          [BooleanFilterPlan, sql],
+          [BooleanFilterStep, sql],
         ),
       },
     },
@@ -2476,7 +2476,7 @@ export function makeExampleSchema(
 
   const ForumCondition = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    PgConditionPlan<any>
+    PgConditionStep<any>
   >()({
     name: "ForumCondition",
     fields: {
@@ -2484,7 +2484,7 @@ export function makeExampleSchema(
         type: GraphQLString,
         applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($condition: PgConditionPlan<any>, arg) {
+            function plan($condition: PgConditionStep<any>, arg) {
               const $value = arg.getRaw();
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.name is null`);
@@ -2505,7 +2505,7 @@ export function makeExampleSchema(
 
   const ForumToManyMessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ManyFilterPlan<typeof messageSource>
+    ManyFilterStep<typeof messageSource>
   >()({
     name: "ForumToManyMessageFilter",
     fields: {
@@ -2514,7 +2514,7 @@ export function makeExampleSchema(
         applyPlan: EXPORTABLE(
           () =>
             function plan(
-              $manyFilter: ManyFilterPlan<typeof messageSource>,
+              $manyFilter: ManyFilterStep<typeof messageSource>,
               arg,
             ) {
               const $value = arg.getRaw();
@@ -2531,18 +2531,18 @@ export function makeExampleSchema(
 
   const ForumFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ClassFilterPlan
+    ClassFilterStep
   >()({
     name: "ForumFilter",
     fields: {
       messages: {
         type: ForumToManyMessageFilter,
         applyPlan: EXPORTABLE(
-          (ManyFilterPlan, messageSource) =>
+          (ManyFilterStep, messageSource) =>
             function plan($condition, arg) {
               const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
-                const plan = new ManyFilterPlan(
+                const plan = new ManyFilterStep(
                   $condition,
                   messageSource,
                   ["id"],
@@ -2551,7 +2551,7 @@ export function makeExampleSchema(
                 arg.apply(plan);
               }
             },
-          [ManyFilterPlan, messageSource],
+          [ManyFilterStep, messageSource],
         ),
       },
     },
@@ -2559,8 +2559,8 @@ export function makeExampleSchema(
 
   const Forum: GraphQLObjectType<any, OurGraphQLContext> = newObjectTypeBuilder<
     OurGraphQLContext,
-    ForumPlan
-  >(PgSelectSinglePlan)({
+    ForumStep
+  >(PgSelectSingleStep)({
     name: "Forum",
     fields: () => ({
       id: attrField("id", GraphQLString),
@@ -2607,7 +2607,7 @@ export function makeExampleSchema(
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$forum: ForumPlan,
+                  _$forum: ForumStep,
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
                   arg,
                 ) {
@@ -2622,7 +2622,7 @@ export function makeExampleSchema(
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$forum: ForumPlan,
+                  _$forum: ForumStep,
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
                 ) {
                   return $messages.wherePlan();
@@ -2633,17 +2633,17 @@ export function makeExampleSchema(
           filter: {
             type: MessageFilter,
             applyPlan: EXPORTABLE(
-              (ClassFilterPlan) =>
+              (ClassFilterStep) =>
                 function plan(
-                  _$forum: ForumPlan,
+                  _$forum: ForumStep,
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
                 ) {
-                  return new ClassFilterPlan(
+                  return new ClassFilterStep(
                     $messages.wherePlan(),
                     $messages.alias,
                   );
                 },
-              [ClassFilterPlan],
+              [ClassFilterStep],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -2675,7 +2675,7 @@ export function makeExampleSchema(
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$forum: ForumPlan,
+                  _$forum: ForumStep,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   arg,
                 ) {
@@ -2717,18 +2717,18 @@ export function makeExampleSchema(
           filter: {
             type: MessageFilter,
             applyPlan: EXPORTABLE(
-              (ClassFilterPlan) =>
+              (ClassFilterStep) =>
                 function plan(
                   _$forum,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
-                  return new ClassFilterPlan(
+                  return new ClassFilterStep(
                     $messages.wherePlan(),
                     $messages.alias,
                   );
                 },
-              [ClassFilterPlan],
+              [ClassFilterStep],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -2870,7 +2870,7 @@ export function makeExampleSchema(
 
               // Group messages by the "featured" property
               const $grouped = groupBy($messagesFromOtherForums, ($message) =>
-                ($message as unknown as MessagePlan).get("featured"),
+                ($message as unknown as MessageStep).get("featured"),
               );
 
               // Since `groupBy` results in a `Map`, turn it into an array by just getting the values
@@ -2916,7 +2916,7 @@ export function makeExampleSchema(
   );
 
   const singleTableTypeName = EXPORTABLE(
-    (lambda, singleTableTypeNameCallback) => ($entity: SingleTableItemPlan) => {
+    (lambda, singleTableTypeNameCallback) => ($entity: SingleTableItemStep) => {
       const $type = $entity.get("type");
       const $typeName = lambda($type, singleTableTypeNameCallback);
       return $typeName;
@@ -2926,7 +2926,7 @@ export function makeExampleSchema(
 
   const singleTableItemInterface = EXPORTABLE(
     (pgSingleTablePolymorphic, singleTableTypeName) =>
-      ($item: SingleTableItemPlan) =>
+      ($item: SingleTableItemStep) =>
         pgSingleTablePolymorphic(singleTableTypeName($item), $item),
     [pgSingleTablePolymorphic, singleTableTypeName],
   );
@@ -2934,7 +2934,7 @@ export function makeExampleSchema(
   const relationalItemPolymorphicTypeMap = EXPORTABLE(
     (
       deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalItemPlan, string> => ({
+    ): PgPolymorphicTypeMap<RelationalItemStep, string> => ({
       RelationalTopic: {
         match: (t) => t === "TOPIC",
         plan: (_, $item) =>
@@ -2966,7 +2966,7 @@ export function makeExampleSchema(
 
   const relationalItemInterface = EXPORTABLE(
     (pgPolymorphic, relationalItemPolymorphicTypeMap) =>
-      ($item: RelationalItemPlan) =>
+      ($item: RelationalItemStep) =>
         pgPolymorphic(
           $item,
           $item.get("type"),
@@ -2976,7 +2976,7 @@ export function makeExampleSchema(
   );
 
   const unionItemPolymorphicTypeMap = EXPORTABLE(
-    (deoptimizeIfAppropriate): PgPolymorphicTypeMap<UnionItemPlan, string> => ({
+    (deoptimizeIfAppropriate): PgPolymorphicTypeMap<UnionItemStep, string> => ({
       UnionTopic: {
         match: (t) => t === "TOPIC",
         plan: (_, $item) =>
@@ -3007,7 +3007,7 @@ export function makeExampleSchema(
   );
 
   const unionItemUnion = EXPORTABLE(
-    (pgPolymorphic, unionItemPolymorphicTypeMap) => ($item: UnionItemPlan) =>
+    (pgPolymorphic, unionItemPolymorphicTypeMap) => ($item: UnionItemStep) =>
       pgPolymorphic($item, $item.get("type"), unionItemPolymorphicTypeMap),
     [pgPolymorphic, unionItemPolymorphicTypeMap],
   );
@@ -3015,7 +3015,7 @@ export function makeExampleSchema(
   const relationalCommentablePolymorphicTypeMap = EXPORTABLE(
     (
       deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalCommentablePlan, string> => ({
+    ): PgPolymorphicTypeMap<RelationalCommentableStep, string> => ({
       RelationalPost: {
         match: (t) => t === "POST",
         plan: (_, $item) =>
@@ -3037,7 +3037,7 @@ export function makeExampleSchema(
 
   const relationalCommentableInterface = EXPORTABLE(
     (pgPolymorphic, relationalCommentablePolymorphicTypeMap) =>
-      ($item: RelationalCommentablePlan) =>
+      ($item: RelationalCommentableStep) =>
         pgPolymorphic(
           $item,
           $item.get("type"),
@@ -3052,8 +3052,8 @@ export function makeExampleSchema(
       personSource,
       postSource,
     ): PgPolymorphicTypeMap<
-      | PgSelectSinglePlan<any, any, any, any>
-      | PgClassExpressionPlan<
+      | PgSelectSingleStep<any, any, any, any>
+      | PgClassExpressionStep<
           any,
           PgTypeCodec<any, any, any>,
           any,
@@ -3062,7 +3062,7 @@ export function makeExampleSchema(
           any
         >,
       number[],
-      ListPlan<ExecutablePlan<number>[]>
+      ListStep<ExecutableStep<number>[]>
     > => ({
       Person: {
         match: (v) => v[0] != null,
@@ -3091,11 +3091,11 @@ export function makeExampleSchema(
    * and so on.
    */
   const entityUnion = EXPORTABLE(
-    (PgSelectSinglePlan, entityPolymorphicTypeMap, list, pgPolymorphic) =>
+    (PgSelectSingleStep, entityPolymorphicTypeMap, list, pgPolymorphic) =>
       <TColumns extends typeof unionEntityColumns>(
         $item:
-          | PgSelectSinglePlan<TColumns, any, any, any>
-          | PgClassExpressionPlan<
+          | PgSelectSingleStep<TColumns, any, any, any>
+          | PgClassExpressionStep<
               TColumns,
               PgTypeCodec<TColumns, any, any>,
               any,
@@ -3109,24 +3109,24 @@ export function makeExampleSchema(
           list([
             // TODO: this ridiculous code is just to appease TypeScript; we should
             // be able to just `$item.get("person_id")`.
-            $item instanceof PgSelectSinglePlan
+            $item instanceof PgSelectSingleStep
               ? $item.get("person_id")
               : $item.get("person_id"),
-            $item instanceof PgSelectSinglePlan
+            $item instanceof PgSelectSingleStep
               ? $item.get("post_id")
               : $item.get("post_id"),
-            $item instanceof PgSelectSinglePlan
+            $item instanceof PgSelectSingleStep
               ? $item.get("comment_id")
               : $item.get("comment_id"),
           ]),
           entityPolymorphicTypeMap,
         ),
-    [PgSelectSinglePlan, entityPolymorphicTypeMap, list, pgPolymorphic],
+    [PgSelectSingleStep, entityPolymorphicTypeMap, list, pgPolymorphic],
   );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<OurGraphQLContext, PersonBookmarkPlan>(
-      PgSelectSinglePlan,
+    newObjectTypeBuilder<OurGraphQLContext, PersonBookmarkStep>(
+      PgSelectSingleStep,
     )({
       name: "PersonBookmark",
       fields: () => ({
@@ -3147,7 +3147,7 @@ export function makeExampleSchema(
     });
 
   const Person: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<OurGraphQLContext, PersonPlan>(PgSelectSinglePlan)({
+    newObjectTypeBuilder<OurGraphQLContext, PersonStep>(PgSelectSingleStep)({
       name: "Person",
       fields: () => ({
         personId: attrField("person_id", GraphQLInt),
@@ -3163,7 +3163,7 @@ export function makeExampleSchema(
             ) =>
               function plan($person) {
                 const $personId = $person.get("person_id");
-                const $items: SingleTableItemsPlan =
+                const $items: SingleTableItemsStep =
                   singleTableItemsSource.find({
                     author_id: $personId,
                   });
@@ -3190,7 +3190,7 @@ export function makeExampleSchema(
             ) =>
               function plan($person) {
                 const $personId = $person.get("person_id");
-                const $items: RelationalItemsPlan = relationalItemsSource.find({
+                const $items: RelationalItemsStep = relationalItemsSource.find({
                   author_id: $personId,
                 });
                 deoptimizeIfAppropriate($items);
@@ -3220,8 +3220,8 @@ export function makeExampleSchema(
 
   const Post: GraphQLObjectType<any, OurGraphQLContext> = newObjectTypeBuilder<
     OurGraphQLContext,
-    PostPlan
-  >(PgSelectSinglePlan)({
+    PostStep
+  >(PgSelectSingleStep)({
     name: "Post",
     fields: () => ({
       postId: attrField("post_id", GraphQLInt),
@@ -3231,7 +3231,7 @@ export function makeExampleSchema(
   });
 
   const Comment: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<OurGraphQLContext, CommentPlan>(PgSelectSinglePlan)({
+    newObjectTypeBuilder<OurGraphQLContext, CommentStep>(PgSelectSingleStep)({
       name: "Comment",
       fields: () => ({
         commentId: attrField("comment_id", GraphQLInt),
@@ -3268,7 +3268,7 @@ export function makeExampleSchema(
       type: SingleTableItem,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, singleTableItemInterface) =>
-          function plan($entity: SingleTableItemPlan) {
+          function plan($entity: SingleTableItemStep) {
             const $plan = $entity.singleRelation("parent");
             deoptimizeIfAppropriate($plan);
             return singleTableItemInterface($plan);
@@ -3286,8 +3286,8 @@ export function makeExampleSchema(
 
   const SingleTableTopic = newObjectTypeBuilder<
     OurGraphQLContext,
-    SingleTableItemPlan
-  >(PgSelectSinglePlan)({
+    SingleTableItemStep
+  >(PgSelectSingleStep)({
     name: "SingleTableTopic",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -3298,8 +3298,8 @@ export function makeExampleSchema(
 
   const SingleTablePost = newObjectTypeBuilder<
     OurGraphQLContext,
-    SingleTableItemPlan
-  >(PgSelectSinglePlan)({
+    SingleTableItemStep
+  >(PgSelectSingleStep)({
     name: "SingleTablePost",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -3312,8 +3312,8 @@ export function makeExampleSchema(
 
   const SingleTableDivider = newObjectTypeBuilder<
     OurGraphQLContext,
-    SingleTableItemPlan
-  >(PgSelectSinglePlan)({
+    SingleTableItemStep
+  >(PgSelectSingleStep)({
     name: "SingleTableDivider",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -3325,8 +3325,8 @@ export function makeExampleSchema(
 
   const SingleTableChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
-    SingleTableItemPlan
-  >(PgSelectSinglePlan)({
+    SingleTableItemStep
+  >(PgSelectSingleStep)({
     name: "SingleTableChecklist",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -3337,8 +3337,8 @@ export function makeExampleSchema(
 
   const SingleTableChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
-    SingleTableItemPlan
-  >(PgSelectSinglePlan)({
+    SingleTableItemStep
+  >(PgSelectSingleStep)({
     name: "SingleTableChecklistItem",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -3396,7 +3396,7 @@ export function makeExampleSchema(
       type: RelationalItem,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, relationalItemInterface) =>
-          function plan($entity: PgSelectSinglePlan<any, any, any, any>) {
+          function plan($entity: PgSelectSingleStep<any, any, any, any>) {
             const $plan = $entity.singleRelation("parent");
             deoptimizeIfAppropriate($plan);
             return relationalItemInterface($plan);
@@ -3426,8 +3426,8 @@ export function makeExampleSchema(
 
   const RelationalTopic = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalTopicPlan
-  >(PgSelectSinglePlan)({
+    RelationalTopicStep
+  >(PgSelectSingleStep)({
     name: "RelationalTopic",
     interfaces: [RelationalItem],
     fields: () => ({
@@ -3438,8 +3438,8 @@ export function makeExampleSchema(
 
   const RelationalPost = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalPostPlan
-  >(PgSelectSinglePlan)({
+    RelationalPostStep
+  >(PgSelectSingleStep)({
     name: "RelationalPost",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
@@ -3475,8 +3475,8 @@ export function makeExampleSchema(
 
   const RelationalDivider = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalDividerPlan
-  >(PgSelectSinglePlan)({
+    RelationalDividerStep
+  >(PgSelectSingleStep)({
     name: "RelationalDivider",
     interfaces: [RelationalItem],
     fields: () => ({
@@ -3488,8 +3488,8 @@ export function makeExampleSchema(
 
   const RelationalChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalChecklistPlan
-  >(PgSelectSinglePlan)({
+    RelationalChecklistStep
+  >(PgSelectSingleStep)({
     name: "RelationalChecklist",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
@@ -3500,8 +3500,8 @@ export function makeExampleSchema(
 
   const RelationalChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalChecklistItemPlan
-  >(PgSelectSinglePlan)({
+    RelationalChecklistItemStep
+  >(PgSelectSingleStep)({
     name: "RelationalChecklistItem",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
@@ -3525,8 +3525,8 @@ export function makeExampleSchema(
     ],
   });
 
-  const UnionTopic = newObjectTypeBuilder<OurGraphQLContext, UnionTopicPlan>(
-    PgSelectSinglePlan,
+  const UnionTopic = newObjectTypeBuilder<OurGraphQLContext, UnionTopicStep>(
+    PgSelectSingleStep,
   )({
     name: "UnionTopic",
     fields: () => ({
@@ -3535,8 +3535,8 @@ export function makeExampleSchema(
     }),
   });
 
-  const UnionPost = newObjectTypeBuilder<OurGraphQLContext, UnionPostPlan>(
-    PgSelectSinglePlan,
+  const UnionPost = newObjectTypeBuilder<OurGraphQLContext, UnionPostStep>(
+    PgSelectSingleStep,
   )({
     name: "UnionPost",
     fields: () => ({
@@ -3549,8 +3549,8 @@ export function makeExampleSchema(
 
   const UnionDivider = newObjectTypeBuilder<
     OurGraphQLContext,
-    UnionDividerPlan
-  >(PgSelectSinglePlan)({
+    UnionDividerStep
+  >(PgSelectSingleStep)({
     name: "UnionDivider",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -3561,8 +3561,8 @@ export function makeExampleSchema(
 
   const UnionChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
-    UnionChecklistPlan
-  >(PgSelectSinglePlan)({
+    UnionChecklistStep
+  >(PgSelectSingleStep)({
     name: "UnionChecklist",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -3572,8 +3572,8 @@ export function makeExampleSchema(
 
   const UnionChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
-    UnionChecklistItemPlan
-  >(PgSelectSinglePlan)({
+    UnionChecklistItemStep
+  >(PgSelectSingleStep)({
     name: "UnionChecklistItem",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -3594,8 +3594,8 @@ export function makeExampleSchema(
 
   const Query = newObjectTypeBuilder<
     OurGraphQLContext,
-    __ValuePlan<BaseGraphQLRootValue>
-  >(__ValuePlan)({
+    __ValueStep<BaseGraphQLRootValue>
+  >(__ValueStep)({
     name: "Query",
     fields: {
       forums: {
@@ -3615,7 +3615,7 @@ export function makeExampleSchema(
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
-                  _$root: __ValuePlan<BaseGraphQLRootValue>,
+                  _$root: __ValueStep<BaseGraphQLRootValue>,
                   $forums: PgSelectPlanFromSource<typeof forumSource>,
                   arg,
                 ) {
@@ -3644,17 +3644,17 @@ export function makeExampleSchema(
           filter: {
             type: ForumFilter,
             applyPlan: EXPORTABLE(
-              (ClassFilterPlan) =>
+              (ClassFilterStep) =>
                 function plan(
                   _$root,
                   $forums: PgSelectPlanFromSource<typeof forumSource>,
                 ) {
-                  return new ClassFilterPlan(
+                  return new ClassFilterStep(
                     $forums.wherePlan(),
                     $forums.alias,
                   );
                 },
-              [ClassFilterPlan],
+              [ClassFilterStep],
             ),
           },
         },
@@ -3713,18 +3713,18 @@ export function makeExampleSchema(
           filter: {
             type: MessageFilter,
             applyPlan: EXPORTABLE(
-              (ClassFilterPlan) =>
+              (ClassFilterStep) =>
                 function plan(
                   _$root: any,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
-                  return new ClassFilterPlan(
+                  return new ClassFilterStep(
                     $messages.wherePlan(),
                     $messages.alias,
                   );
                 },
-              [ClassFilterPlan],
+              [ClassFilterStep],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -4027,7 +4027,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (singleTableItemInterface, singleTableItemsSource) =>
             function plan(_$root, args) {
-              const $item: SingleTableItemPlan = singleTableItemsSource.get({
+              const $item: SingleTableItemStep = singleTableItemsSource.get({
                 id: args.get("id"),
               });
               return singleTableItemInterface($item);
@@ -4046,7 +4046,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (constant, singleTableItemsSource) =>
             function plan(_$root, args) {
-              const $item: SingleTableItemPlan = singleTableItemsSource.get({
+              const $item: SingleTableItemStep = singleTableItemsSource.get({
                 id: args.get("id"),
                 type: constant("TOPIC"),
               });
@@ -4066,7 +4066,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (relationalItemInterface, relationalItemsSource) =>
             function plan(_$root, args) {
-              const $item: RelationalItemPlan = relationalItemsSource.get({
+              const $item: RelationalItemStep = relationalItemsSource.get({
                 id: args.get("id"),
               });
               return relationalItemInterface($item);
@@ -4102,11 +4102,11 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $each: __ListTransformPlan<any, any, any, any>,
+                  $each: __ListTransformStep<any, any, any, any>,
                   val,
                 ) {
                   const $commentables =
-                    $each.getListPlan() as RelationalCommentablesPlan;
+                    $each.getListPlan() as RelationalCommentablesStep;
                   $commentables.setFirst(val.getRaw());
                   return null;
                 },
@@ -4123,7 +4123,7 @@ export function makeExampleSchema(
             sql,
           ) =>
             function plan() {
-              const $commentables: RelationalCommentablesPlan =
+              const $commentables: RelationalCommentablesStep =
                 relationalCommentableSource.find();
               $commentables.orderBy({
                 codec: TYPES.int,
@@ -4154,7 +4154,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (unionItemUnion, unionItemsSource) =>
             function plan(_$root, args) {
-              const $item: UnionItemPlan = unionItemsSource.get({
+              const $item: UnionItemStep = unionItemsSource.get({
                 id: args.get("id"),
               });
               return unionItemUnion($item);
@@ -4186,7 +4186,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (TYPES, each, sql, unionItemUnion, unionItemsSource) =>
             function plan() {
-              const $items: UnionItemsPlan = unionItemsSource.find();
+              const $items: UnionItemsStep = unionItemsSource.find();
               $items.orderBy({
                 codec: TYPES.int,
                 fragment: sql`${$items.alias}.id`,
@@ -4220,7 +4220,7 @@ export function makeExampleSchema(
                   pgCodec: TYPES.text,
                   name: "query",
                 },
-              ]) as PgSelectPlan<any, any, any, any>;
+              ]) as PgSelectStep<any, any, any, any>;
               deoptimizeIfAppropriate($plan);
               return each($plan, ($item) => entityUnion($item));
             },
@@ -4305,7 +4305,7 @@ export function makeExampleSchema(
   });
 
   type PgRecord<TDataSource extends PgSource<any, any, any, any>> =
-    PgClassExpressionPlan<
+    PgClassExpressionStep<
       TDataSource["TColumns"],
       PgTypeCodec<TDataSource["TColumns"], any, any>,
       TDataSource["TColumns"],
@@ -4317,7 +4317,7 @@ export function makeExampleSchema(
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgRecord<typeof relationalPostsSource>
-  >(PgClassExpressionPlan)({
+  >(PgClassExpressionStep)({
     name: "CreateRelationalPostPayload",
     fields: {
       post: {
@@ -4356,7 +4356,7 @@ export function makeExampleSchema(
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgUpdatePlanFromSource<typeof relationalPostsSource>
-  >(PgUpdatePlan)({
+  >(PgUpdateStep)({
     name: "UpdateRelationalPostByIdPayload",
     fields: {
       post: {
@@ -4395,7 +4395,7 @@ export function makeExampleSchema(
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgDeletePlanFromSource<typeof relationalPostsSource>
-  >(PgDeletePlan)({
+  >(PgDeleteStep)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
       // Since we've deleted the post we cannot go and fetch it; so we must
@@ -4439,8 +4439,8 @@ export function makeExampleSchema(
 
   const Mutation = newObjectTypeBuilder<
     OurGraphQLContext,
-    __ValuePlan<BaseGraphQLRootValue>
-  >(__ValuePlan)({
+    __ValueStep<BaseGraphQLRootValue>
+  >(__ValueStep)({
     name: "Mutation",
     fields: {
       createRelationalPost: {
@@ -4482,7 +4482,7 @@ export function makeExampleSchema(
               // `createRelationalPost`, `createThreeRelationalPosts` and
               // `createThreeRelationalPostsComputed` must return a common plan
               // type that `CreateRelationalPostPayload` can use; in this case a
-              // `PgClassExpressionPlan`
+              // `PgClassExpressionStep`
               return $post.record();
             },
           [constant, pgInsert, relationalItemsSource, relationalPostsSource],
@@ -4612,8 +4612,8 @@ export function makeExampleSchema(
 
   const ForumMessageSubscriptionPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    JSONParsePlan<{ id: string; op: string }>
-  >(JSONParsePlan)({
+    JSONParseStep<{ id: string; op: string }>
+  >(JSONParseStep)({
     name: "ForumMessageSubscriptionPayload",
     fields: {
       operationType: {
@@ -4643,8 +4643,8 @@ export function makeExampleSchema(
 
   const Subscription = newObjectTypeBuilder<
     OurGraphQLContext,
-    __ValuePlan<BaseGraphQLRootValue>
-  >(__ValuePlan)({
+    __ValueStep<BaseGraphQLRootValue>
+  >(__ValueStep)({
     name: "Subscription",
     fields: {
       forumMessage: {
@@ -4661,7 +4661,7 @@ export function makeExampleSchema(
               const $topic = lambda($forumId, (id) => `forum:${id}:message`);
               const $pgSubscriber = context<OurGraphQLContext>().get(
                 "pgSubscriber",
-              ) as unknown as AccessPlan<CrystalSubscriber>;
+              ) as unknown as AccessStep<CrystalSubscriber>;
 
               return listen($pgSubscriber, $topic, jsonParse);
             },

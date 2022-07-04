@@ -2,13 +2,13 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgConditionPlan,
-  PgSelectParsedCursorPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
+  PgConditionStep,
+  PgSelectParsedCursorStep,
+  PgSelectStep,
+  PgSelectSingleStep,
   PgTypeColumns,
 } from "@dataplan/pg";
-import type { ConnectionPlan } from "dataplanner";
+import type { ConnectionStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
@@ -125,8 +125,8 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                               applyPlan: EXPORTABLE(
                                 (column, columnName, sql) =>
                                   function plan(
-                                    $condition: PgConditionPlan<
-                                      PgSelectPlan<any, any, any, any>
+                                    $condition: PgConditionStep<
+                                      PgSelectStep<any, any, any, any>
                                     >,
                                     val,
                                   ) {
@@ -232,16 +232,16 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
               applyPlan: isPgFieldConnection
                 ? (
                     _condition,
-                    $connection: ConnectionPlan<
-                      PgSelectSinglePlan<any, any, any, any>,
-                      PgSelectParsedCursorPlan,
-                      PgSelectPlan<any, any, any, any>
+                    $connection: ConnectionStep<
+                      PgSelectSingleStep<any, any, any, any>,
+                      PgSelectParsedCursorStep,
+                      PgSelectStep<any, any, any, any>
                     >,
                   ) => {
                     const $select = $connection.getSubplan();
                     return $select.wherePlan();
                   }
-                : (_condition, $select: PgSelectPlan<any, any, any, any>) => {
+                : (_condition, $select: PgSelectStep<any, any, any, any>) => {
                     return $select.wherePlan();
                   },
             },

@@ -3,13 +3,13 @@ import chalk from "chalk";
 import type {
   CrystalResultStreamList,
   CrystalValuesList,
-  ObjectPlan,
+  ObjectStep,
 } from "dataplanner";
 import {
-  __ValuePlan,
+  __ValueStep,
   arraysMatch,
   constant,
-  ExecutablePlan,
+  ExecutableStep,
   getCurrentParentPathIdentity,
   partitionByIndex,
 } from "dataplanner";
@@ -37,17 +37,17 @@ import type {
   PgTypeCodec,
   PlanByUniques,
 } from "./interfaces.js";
-import type { PgClassExpressionPlan } from "./plans/pgClassExpression.js";
+import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
-  PgSelectPlan,
-} from "./plans/pgSelect.js";
-import { pgSelect } from "./plans/pgSelect.js";
+  PgSelectStep,
+} from "./steps/pgSelect.js";
+import { pgSelect } from "./steps/pgSelect.js";
 import type {
-  PgSelectSinglePlan,
+  PgSelectSingleStep,
   PgSelectSinglePlanOptions,
-} from "./plans/pgSelectSingle.js";
+} from "./steps/pgSelectSingle.js";
 
 // TODO: PgSourceRow and PgSourceRowAttribute are lies; we don't use them even
 // though we claim to. Everything that references them needs to be typed in a
@@ -188,7 +188,7 @@ export interface PgSourceOptions<
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
-  selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
+  selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
 
   name: string;
   identifier?: string;
@@ -231,7 +231,7 @@ export interface PgFunctionSourceOptions<
   uniques?: TUniques;
   extensions?: PgSourceExtensions;
   isMutation?: boolean;
-  selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
+  selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
 }
 // TODO: is there a better way?
 /**
@@ -365,7 +365,7 @@ export class PgSource<
   >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
-  private selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
+  private selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -758,8 +758,8 @@ export class PgSource<
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
   ): TColumns extends PgTypeColumns
-    ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
-    : PgClassExpressionPlan<
+    ? PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
+    : PgClassExpressionStep<
         undefined,
         PgTypeCodec<undefined, any, any>,
         TColumns,
@@ -796,9 +796,9 @@ export class PgSource<
 
   public find(
     spec: {
-      [key in keyof TColumns]?: ExecutablePlan | string | number;
+      [key in keyof TColumns]?: ExecutableStep | string | number;
     } = Object.create(null),
-  ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
+  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional sources; please use .execute()",
@@ -841,7 +841,7 @@ export class PgSource<
         );
       }
       return {
-        plan: plan instanceof ExecutablePlan ? plan : constant(plan),
+        plan: plan instanceof ExecutableStep ? plan : constant(plan),
         codec,
         matches: (alias: SQL) =>
           typeof column.expression === "function"
@@ -870,7 +870,7 @@ export class PgSource<
       return partitionByIndex(
         $select,
         ($row) =>
-          ($row as PgSelectSinglePlan<any, any, any, any>).select(
+          ($row as PgSelectSingleStep<any, any, any, any>).select(
             sqlPartitionByIndex,
             TYPES.int,
           ),
@@ -883,7 +883,7 @@ export class PgSource<
   }
 
   public applyAuthorizationChecksToPlan(
-    $plan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
+    $plan: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
   ): void {
     if (this.selectAuth) {
       this.selectAuth($plan);
@@ -892,7 +892,7 @@ export class PgSource<
     return;
   }
 
-  public context(): ObjectPlan<PgExecutorContextPlans> {
+  public context(): ObjectStep<PgExecutorContextPlans> {
     return this.executor.context();
   }
 

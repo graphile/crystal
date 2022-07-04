@@ -1,1 +1,1 @@
-export { jsonParse, JSONParsePlan, JSONValue } from "./plans/jsonParse.js";
+export { jsonParse, JSONParseStep, JSONValue } from "./steps/jsonParse.js";

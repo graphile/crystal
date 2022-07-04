@@ -2,12 +2,12 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSelectParsedCursorPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
+  PgSelectParsedCursorStep,
+  PgSelectStep,
+  PgSelectSingleStep,
 } from "@dataplan/pg";
 import type {
-  ConnectionPlan,
+  ConnectionStep,
   GraphileFieldConfigArgumentMap,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -76,10 +76,10 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                   () =>
                     function plan(
                       _: any,
-                      $connection: ConnectionPlan<
-                        PgSelectSinglePlan<any, any, any, any>,
-                        PgSelectParsedCursorPlan,
-                        PgSelectPlan<any, any, any, any>
+                      $connection: ConnectionStep<
+                        PgSelectSingleStep<any, any, any, any>,
+                        PgSelectParsedCursorStep,
+                        PgSelectStep<any, any, any, any>
                       >,
                       arg,
                     ) {
@@ -100,10 +100,10 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         () =>
                           function plan(
                             _: any,
-                            $connection: ConnectionPlan<
-                              PgSelectSinglePlan<any, any, any, any>,
-                              PgSelectParsedCursorPlan,
-                              PgSelectPlan<any, any, any, any>
+                            $connection: ConnectionStep<
+                              PgSelectSingleStep<any, any, any, any>,
+                              PgSelectParsedCursorStep,
+                              PgSelectStep<any, any, any, any>
                             >,
                             val,
                           ) {
@@ -126,10 +126,10 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                   () =>
                     function plan(
                       _: any,
-                      $connection: ConnectionPlan<
-                        PgSelectSinglePlan<any, any, any, any>,
-                        PgSelectParsedCursorPlan,
-                        PgSelectPlan<any, any, any, any>
+                      $connection: ConnectionStep<
+                        PgSelectSingleStep<any, any, any, any>,
+                        PgSelectParsedCursorStep,
+                        PgSelectStep<any, any, any, any>
                       >,
                       val,
                     ) {
@@ -150,10 +150,10 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         () =>
                           function plan(
                             _: any,
-                            $connection: ConnectionPlan<
-                              PgSelectSinglePlan<any, any, any, any>,
-                              PgSelectParsedCursorPlan,
-                              PgSelectPlan<any, any, any, any>
+                            $connection: ConnectionStep<
+                              PgSelectSingleStep<any, any, any, any>,
+                              PgSelectParsedCursorStep,
+                              PgSelectStep<any, any, any, any>
                             >,
                             val,
                           ) {
@@ -172,10 +172,10 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
                         () =>
                           function plan(
                             _: any,
-                            $connection: ConnectionPlan<
-                              PgSelectSinglePlan<any, any, any, any>,
-                              PgSelectParsedCursorPlan,
-                              PgSelectPlan<any, any, any, any>
+                            $connection: ConnectionStep<
+                              PgSelectSingleStep<any, any, any, any>,
+                              PgSelectParsedCursorStep,
+                              PgSelectStep<any, any, any, any>
                             >,
                             val,
                           ) {

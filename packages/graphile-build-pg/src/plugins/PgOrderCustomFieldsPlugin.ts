@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectPlan, PgSource, PgSourceParameter } from "@dataplan/pg";
+import type { PgSelectStep, PgSource, PgSourceParameter } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
@@ -84,7 +84,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                       graphile: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (plan: PgSelectPlan<any, any, any, any>) => {
+                            (plan: PgSelectStep<any, any, any, any>) => {
                               if (typeof pgFieldSource.source !== "function") {
                                 throw new Error(
                                   "Invalid computed column source",

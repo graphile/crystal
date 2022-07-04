@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { ExecutablePlan } from "dataplanner";
+import type { ExecutableStep } from "dataplanner";
 import { lambda } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInterfaceType } from "graphql";
@@ -76,7 +76,7 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
               type: new GraphQLNonNull(GraphQLID),
               plan: EXPORTABLE(
                 (handler, lambda, nodeIdCodecs) =>
-                  ($parent: ExecutablePlan<any>) => {
+                  ($parent: ExecutableStep<any>) => {
                     const specifier = handler.plan($parent);
                     return lambda(
                       specifier,

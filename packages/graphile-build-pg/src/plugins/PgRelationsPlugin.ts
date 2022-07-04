@@ -3,7 +3,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSelectSinglePlan,
+  PgSelectSingleStep,
   PgSource,
   PgSourceRelation,
   PgTypeCodec,
@@ -473,7 +473,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               : EXPORTABLE(
                   (localColumns, otherSource, remoteColumns) =>
                     function plan(
-                      $message: PgSelectSinglePlan<any, any, any, any>,
+                      $message: PgSelectSingleStep<any, any, any, any>,
                     ) {
                       const spec = remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
@@ -508,7 +508,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               : EXPORTABLE(
                   (localColumns, otherSource, remoteColumns) =>
                     function plan(
-                      $message: PgSelectSinglePlan<any, any, any, any>,
+                      $message: PgSelectSingleStep<any, any, any, any>,
                     ) {
                       const spec = remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
@@ -547,7 +547,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               : EXPORTABLE(
                   (connection, localColumns, otherSource, remoteColumns) =>
                     function plan(
-                      $message: PgSelectSinglePlan<any, any, any, any>,
+                      $message: PgSelectSingleStep<any, any, any, any>,
                     ) {
                       const spec = remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {

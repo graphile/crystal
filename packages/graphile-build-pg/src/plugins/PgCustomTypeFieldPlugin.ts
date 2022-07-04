@@ -6,30 +6,30 @@ import "./PgProceduresPlugin.js";
 import "graphile-config";
 
 import type {
-  PgClassSinglePlan,
+  PgClassSingleStep,
   PgSelectArgumentSpec,
-  PgSelectPlan,
+  PgSelectStep,
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
-  PgTypedExecutablePlan,
+  PgTypedExecutableStep,
 } from "@dataplan/pg";
-import { pgClassExpression, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
+import { pgClassExpression, PgSelectSingleStep, TYPES } from "@dataplan/pg";
 import type {
-  __InputObjectPlan,
-  __TrackedObjectPlan,
-  ExecutablePlan,
+  __InputObjectStep,
+  __TrackedObjectStep,
+  ExecutableStep,
   FieldArgs,
   FieldPlanResolver,
   GraphileFieldConfigArgumentMap,
-  InputPlan,
+  InputStep,
 } from "dataplanner";
 import {
-  __ListTransformPlan,
+  __ListTransformStep,
   connection,
   constant,
   object,
-  ObjectPlan,
+  ObjectStep,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
@@ -332,8 +332,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       plan: EXPORTABLE(
                         () =>
                           function plan(
-                            $input: ObjectPlan<any>,
-                            value: InputPlan,
+                            $input: ObjectStep<any>,
+                            value: InputStep,
                           ) {
                             $input.set("clientMutationId", value);
                           },
@@ -375,7 +375,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 isMutationPayload: true,
                 pgCodec: source.codec,
               },
-              ObjectPlan,
+              ObjectStep,
               () => ({
                 fields: () => {
                   const fields = {
@@ -383,7 +383,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       type: GraphQLString,
                       plan: EXPORTABLE(
                         (constant) =>
-                          function plan($object: ObjectPlan<any>) {
+                          function plan($object: ObjectStep<any>) {
                             return (
                               $object.getPlanForKey("clientMutationId", true) ??
                               constant(undefined)
@@ -414,8 +414,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     plan: EXPORTABLE(
                       () =>
                         (
-                          $object: ObjectPlan<{
-                            result: PgClassSinglePlan<any, any, any, any>;
+                          $object: ObjectStep<{
+                            result: PgClassSingleStep<any, any, any, any>;
                           }>,
                         ) => {
                           return $object.get("result");
@@ -601,7 +601,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         required,
                       } = argDetailsSimple[i];
                       const $raw = args.getRaw([...path, graphqlArgName]);
-                      let plan: ExecutablePlan;
+                      let plan: ExecutableStep;
                       if ($raw.evalIs(undefined)) {
                         if (
                           !required &&
@@ -648,7 +648,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<
                 any,
-                ExecutablePlan,
+                ExecutableStep,
                 any
               > = isRootQuery
                 ? // Not computed
@@ -673,11 +673,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   )
                 : // Otherwise computed:
                   EXPORTABLE(
-                    (PgSelectSinglePlan, makeArgs, pgClassExpression, source) =>
+                    (PgSelectSingleStep, makeArgs, pgClassExpression, source) =>
                       ($row, args, _info) => {
-                        if (!($row instanceof PgSelectSinglePlan)) {
+                        if (!($row instanceof PgSelectSingleStep)) {
                           throw new Error(
-                            `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,
+                            `Invalid plan, exepcted 'PgSelectSingleStep', but found ${$row}`,
                           );
                         }
                         const selectArgs = [
@@ -697,7 +697,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               return $row.placeholder(arg.plan, arg.pgCodec);
                             } else {
                               return $row.placeholder(
-                                arg.plan as PgTypedExecutablePlan<any>,
+                                arg.plan as PgTypedExecutableStep<any>,
                               );
                             }
                           });
@@ -713,7 +713,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         // TODO: or here, if scalar add select to `$row`?
                         return source.execute(selectArgs);
                       },
-                    [PgSelectSinglePlan, makeArgs, pgClassExpression, source],
+                    [PgSelectSingleStep, makeArgs, pgClassExpression, source],
                   );
 
               if (isRootMutation) {
@@ -743,7 +743,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         type: new GraphQLNonNull(inputType),
                         applyPlan: EXPORTABLE(
                           () =>
-                            function plan(_: any, $object: ObjectPlan<any>) {
+                            function plan(_: any, $object: ObjectStep<any>) {
                               return $object;
                             },
                           [],
@@ -842,7 +842,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               plan: EXPORTABLE(
                                 (connection, getSelectPlanFromParentAndArgs) =>
                                   function plan(
-                                    $parent: ExecutablePlan,
+                                    $parent: ExecutableStep,
                                     args,
                                     info,
                                   ) {
@@ -851,7 +851,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                         $parent,
                                         args,
                                         info,
-                                      ) as PgSelectPlan<any, any, any, any>;
+                                      ) as PgSelectStep<any, any, any, any>;
                                     return connection(
                                       $select,
                                       ($item) => $item,

@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PageInfoCapablePlan } from "dataplanner";
+import type { PageInfoCapableStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
@@ -47,7 +47,7 @@ export const PageInfoStartEndCursorPlugin: GraphileConfig.Plugin = {
                 ),
                 type: Cursor,
                 plan: EXPORTABLE(
-                  () => ($pageInfo: PageInfoCapablePlan) =>
+                  () => ($pageInfo: PageInfoCapableStep) =>
                     $pageInfo.startCursor(),
                   [],
                 ),
@@ -65,7 +65,7 @@ export const PageInfoStartEndCursorPlugin: GraphileConfig.Plugin = {
                 ),
                 type: Cursor,
                 plan: EXPORTABLE(
-                  () => ($pageInfo: PageInfoCapablePlan) =>
+                  () => ($pageInfo: PageInfoCapableStep) =>
                     $pageInfo.endCursor(),
                   [],
                 ),
