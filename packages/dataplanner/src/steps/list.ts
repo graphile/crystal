@@ -25,7 +25,7 @@ export class ListStep<
 
   toStringMeta() {
     return this.dependencies
-      .map((id) => this.aether.dangerouslyGetPlan(id).id)
+      .map((id) => this.aether.dangerouslyGetStep(id).id)
       .join(",");
   }
 

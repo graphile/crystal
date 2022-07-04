@@ -68,7 +68,7 @@ export class __InputListStep extends ExecutableStep {
         itemPlanIndex++
       ) {
         const itemStepId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.aether.dangerouslyGetPlan(itemStepId);
+        const itemPlan = this.aether.dangerouslyGetStep(itemStepId);
         assertInputStep(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;

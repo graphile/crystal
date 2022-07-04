@@ -111,7 +111,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.aether.dangerouslyGetPlan(
+    return this.aether.dangerouslyGetStep(
       this.dependencies[this.listPlanDepId],
     ) as TListStep;
   }
@@ -148,12 +148,12 @@ export class __ListTransformStep<
     // buckets.
     const transformDependencyStepId =
       this.aether.transformDependencyPlanIdByTransformStepId[this.id];
-    const transformDependencyPlan = this.aether.dangerouslyGetPlan(
+    const transformDependencyPlan = this.aether.dangerouslyGetStep(
       transformDependencyStepId,
     );
 
     const externalDependencies = new Set<ExecutableStep>();
-    const listPlan = this.aether.dangerouslyGetPlan(this.dependencies[0]);
+    const listPlan = this.aether.dangerouslyGetStep(this.dependencies[0]);
 
     const recurse = (innerPlan: ExecutableStep): boolean => {
       if (innerPlan === listPlan) {
@@ -162,7 +162,7 @@ export class __ListTransformStep<
       let hasInternal = false;
       const externals = [];
       for (const depId of innerPlan.dependencies) {
-        const dep = this.aether.dangerouslyGetPlan(depId);
+        const dep = this.aether.dangerouslyGetStep(depId);
         const internal = recurse(dep);
         if (internal) {
           hasInternal = true;
@@ -181,7 +181,7 @@ export class __ListTransformStep<
     recurse(transformDependencyPlan);
     if (externalDependencies.size > 0) {
       const itemStepId = this.aether.itemPlanIdByListTransformStepId[this.id]!;
-      const itemPlan = this.aether.dangerouslyGetPlan(itemStepId);
+      const itemPlan = this.aether.dangerouslyGetStep(itemStepId);
       for (const dep of externalDependencies) {
         this.addDependency(dep);
         (itemPlan.dependencies as Array<string>).push(dep.id);

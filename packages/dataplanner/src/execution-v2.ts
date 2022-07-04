@@ -212,7 +212,7 @@ export function executeBucket(
     _dependencies: (readonly any[])[],
     _extra: ExecutionExtra,
   ): PromiseOrDirect<any[]> {
-    const itemPlan = aether.dangerouslyGetPlan(plan.itemStepId!);
+    const itemPlan = aether.dangerouslyGetStep(plan.itemStepId!);
     const itemStepId = itemPlan.id;
     const itemBucketDefinition = aether.buckets[itemPlan.bucketId];
     if (!itemBucketDefinition) {

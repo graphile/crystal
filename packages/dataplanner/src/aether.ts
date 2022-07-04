@@ -1191,7 +1191,7 @@ export class Aether<
     this.processPlans("walking", "dependencies-first", (plan) => {
       for (const depId of plan.dependencies) {
         // id may have changed, so get this plan
-        const dep = this.dangerouslyGetPlan(depId);
+        const dep = this.dangerouslyGetStep(depId);
         plan._recursiveDependencyIds.add(dep.id);
         for (const depdep of dep._recursiveDependencyIds) {
           plan._recursiveDependencyIds.add(depdep);
@@ -1227,7 +1227,7 @@ export class Aether<
         continue;
       }
 
-      const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemStepId);
+      const itemPlan = this.dangerouslyGetStep(fieldDigest.itemStepId);
 
       // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
       const executedPlanIds = new Set<string>();
@@ -1241,7 +1241,7 @@ export class Aether<
         if (this.isUnplannedByPathIdentity[ancestorFieldDigest.pathIdentity]) {
           break;
         }
-        const ancestorItemPlan = this.dangerouslyGetPlan(
+        const ancestorItemPlan = this.dangerouslyGetStep(
           ancestorFieldDigest.itemStepId,
         );
         for (const id of ancestorItemPlan._recursiveDependencyIds) {
@@ -1286,8 +1286,8 @@ export class Aether<
           if (this.isUnplannedByPathIdentity[childFieldDigest.pathIdentity]) {
             continue;
           }
-          const childPlan = this.dangerouslyGetPlan(childFieldDigest.planId);
-          const childItemPlan = this.dangerouslyGetPlan(
+          const childPlan = this.dangerouslyGetStep(childFieldDigest.planId);
+          const childItemPlan = this.dangerouslyGetStep(
             childFieldDigest.itemStepId,
           );
 
@@ -1305,7 +1305,7 @@ export class Aether<
             ...childItemPlan._recursiveDependencyIds.values(),
           ].filter((id) => !executedPlanIds.has(id));
           const intermediatePlans = intermediatePlanIds.map((id) =>
-            this.dangerouslyGetPlan(id),
+            this.dangerouslyGetStep(id),
           );
           const asyncOrSideEffectPlans = intermediatePlans.filter(
             (plan) => !plan.isSyncAndSafe || plan.hasSideEffects,
@@ -4825,7 +4825,7 @@ export class Aether<
     planCacheForPlanResultses: PlanCacheForPlanResultses,
   ) {
     const itemStepId = this.transformDependencyPlanIdByTransformStepId[plan.id];
-    const itemPlan = this.dangerouslyGetPlan(itemStepId);
+    const itemPlan = this.dangerouslyGetStep(itemStepId);
     const listPlan = plan.dangerouslyGetListPlan();
     // TODO: can this be made more efficient?
     const depResults = await this.executeBatchInner(
@@ -4884,7 +4884,7 @@ export class Aether<
    *
    * @internal
    */
-  public dangerouslyGetPlan(id: string): ExecutableStep {
+  public dangerouslyGetStep(id: string): ExecutableStep {
     return this.plans[id];
   }
 
@@ -5167,7 +5167,7 @@ export class Aether<
               }' bucket yet (creating for ${layerPlan}, but already contains data from ${Object.keys(
                 bucket,
               )
-                .map((id) => this.dangerouslyGetPlan(id))
+                .map((id) => this.dangerouslyGetStep(id))
                 .join(", ")}). Data found: ${crystalPrint(bucket)}`,
             );
           }

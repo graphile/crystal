@@ -136,7 +136,7 @@ function makeParentCrystalObject(
         `Could not find a planId for (parent) path '${parentPathIdentity}'`,
       );
     }
-    const parentPlan = aether.dangerouslyGetPlan(parentStepId); // TODO: assert that this is handled for us
+    const parentPlan = aether.dangerouslyGetStep(parentStepId); // TODO: assert that this is handled for us
     if (!(parentPlan instanceof __ValueStep)) {
       throw new Error(
         `Expected parent field (which returned non-crystal object) to be a __ValueStep, instead found ${parentPlan})`,
