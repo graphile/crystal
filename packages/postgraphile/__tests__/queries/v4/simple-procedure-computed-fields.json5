@@ -1,0 +1,1163 @@
+{
+  allPeopleList: [
+    {
+      name: "John Smith",
+      firstName: "John",
+      friends: {
+        nodes: [
+          {
+            name: "Sara Smith",
+            firstName: "Sara",
+            friends: {
+              nodes: [
+                {
+                  name: "Budd Deey",
+                  firstName: "Budd",
+                },
+              ],
+            },
+          },
+          {
+            name: "Budd Deey",
+            firstName: "Budd",
+            friends: {
+              nodes: [
+                {
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      id: 1,
+      postsByAuthorId: {
+        nodes: [
+          {
+            headline: "You hit me with a cricket bat.",
+            headlineTrimmed: "You hit m…",
+            authorId: 1,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          {
+            headline: "Large bet on myself in round one.",
+            headlineTrimmed: "Large bet…",
+            authorId: 1,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+      },
+      postsByAuthorIdList: [
+        {
+          headline: "I hate yogurt. It’s just stuff with bits in.",
+          headlineTrimmed: "I hate yo…",
+          authorId: 1,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+        {
+          headline: "Is that a cooking show?",
+          headlineTrimmed: "Is that a…",
+          authorId: 1,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+      ],
+      roundOnePost: {
+        nodes: [
+          {
+            headline: "Large bet on myself in round one.",
+            headlineTrimmed: "Large bet…",
+            authorId: 1,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+      },
+      roundOnePostList: [
+        {
+          headline: "Large bet on myself in round one.",
+          headlineTrimmed: "Large bet…",
+          authorId: 1,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+      ],
+      compoundKeysByPersonId1: {
+        nodes: [
+          {
+            personId1: 1,
+            personId2: 2,
+          },
+        ],
+      },
+      compoundKeysByPersonId2: {
+        nodes: [
+          {
+            personId1: 2,
+            personId2: 1,
+          },
+        ],
+      },
+      compoundKeysByPersonId1List: [
+        {
+          personId1: 1,
+          personId2: 2,
+        },
+      ],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 2,
+          personId2: 1,
+        },
+      ],
+    },
+    {
+      name: "Sara Smith",
+      firstName: "Sara",
+      friends: {
+        nodes: [
+          {
+            name: "Budd Deey",
+            firstName: "Budd",
+            friends: {
+              nodes: [
+                {
+                  name: "Kathryn Ramirez",
+                  firstName: "Kathryn",
+                },
+              ],
+            },
+          },
+          {
+            name: "Kathryn Ramirez",
+            firstName: "Kathryn",
+            friends: {
+              nodes: [
+                {
+                  name: "Joe Tucker",
+                  firstName: "Joe",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      id: 2,
+      postsByAuthorId: {
+        nodes: [
+          {
+            headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+            headlineTrimmed: "It’s a fe…",
+            authorId: 2,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          {
+            headline: "What’s with you kids? Every other day it’s food, food, food.",
+            headlineTrimmed: "What’s wi…",
+            authorId: 2,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+      },
+      postsByAuthorIdList: [
+        {
+          headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+          headlineTrimmed: "No… It’s …",
+          authorId: 2,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+        {
+          headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+          headlineTrimmed: "It’s a fe…",
+          authorId: 2,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+      ],
+      roundOnePost: {
+        nodes: [],
+      },
+      roundOnePostList: [],
+      compoundKeysByPersonId1: {
+        nodes: [
+          {
+            personId1: 2,
+            personId2: 1,
+          },
+          {
+            personId1: 2,
+            personId2: 3,
+          },
+          {
+            personId1: 2,
+            personId2: 5,
+          },
+        ],
+      },
+      compoundKeysByPersonId2: {
+        nodes: [
+          {
+            personId1: 1,
+            personId2: 2,
+          },
+        ],
+      },
+      compoundKeysByPersonId1List: [
+        {
+          personId1: 2,
+          personId2: 1,
+        },
+        {
+          personId1: 2,
+          personId2: 3,
+        },
+        {
+          personId1: 2,
+          personId2: 5,
+        },
+      ],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 1,
+          personId2: 2,
+        },
+      ],
+    },
+    {
+      name: "Budd Deey",
+      firstName: "Budd",
+      friends: {
+        nodes: [
+          {
+            name: "Kathryn Ramirez",
+            firstName: "Kathryn",
+            friends: {
+              nodes: [
+                {
+                  name: "Joe Tucker",
+                  firstName: "Joe",
+                },
+              ],
+            },
+          },
+          {
+            name: "Joe Tucker",
+            firstName: "Joe",
+            friends: {
+              nodes: [
+                {
+                  name: "Twenty Seventwo",
+                  firstName: "Twenty",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      id: 3,
+      postsByAuthorId: {
+        nodes: [
+          {
+            headline: "You know how I sometimes have really brilliant ideas?",
+            headlineTrimmed: "You know …",
+            authorId: 3,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          {
+            headline: "They’re not aliens, they’re Earth…liens!",
+            headlineTrimmed: "They’re n…",
+            authorId: 3,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+      },
+      postsByAuthorIdList: [
+        {
+          headline: "Stop talking, brain thinking. Hush.",
+          headlineTrimmed: "Stop talk…",
+          authorId: 3,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+        {
+          headline: "You know how I sometimes have really brilliant ideas?",
+          headlineTrimmed: "You know …",
+          authorId: 3,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+      ],
+      roundOnePost: {
+        nodes: [],
+      },
+      roundOnePostList: [],
+      compoundKeysByPersonId1: {
+        nodes: [],
+      },
+      compoundKeysByPersonId2: {
+        nodes: [
+          {
+            personId1: 2,
+            personId2: 3,
+          },
+          {
+            personId1: 4,
+            personId2: 3,
+          },
+        ],
+      },
+      compoundKeysByPersonId1List: [],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 2,
+          personId2: 3,
+        },
+        {
+          personId1: 4,
+          personId2: 3,
+        },
+      ],
+    },
+    {
+      name: "Kathryn Ramirez",
+      firstName: "Kathryn",
+      friends: {
+        nodes: [
+          {
+            name: "Joe Tucker",
+            firstName: "Joe",
+            friends: {
+              nodes: [
+                {
+                  name: "Twenty Seventwo",
+                  firstName: "Twenty",
+                },
+              ],
+            },
+          },
+          {
+            name: "Twenty Seventwo",
+            firstName: "Twenty",
+            friends: {
+              nodes: [],
+            },
+          },
+        ],
+      },
+      id: 4,
+      postsByAuthorId: {
+        nodes: [],
+      },
+      postsByAuthorIdList: [],
+      roundOnePost: {
+        nodes: [],
+      },
+      roundOnePostList: [],
+      compoundKeysByPersonId1: {
+        nodes: [
+          {
+            personId1: 4,
+            personId2: 3,
+          },
+          {
+            personId1: 4,
+            personId2: 4,
+          },
+        ],
+      },
+      compoundKeysByPersonId2: {
+        nodes: [
+          {
+            personId1: 4,
+            personId2: 4,
+          },
+        ],
+      },
+      compoundKeysByPersonId1List: [
+        {
+          personId1: 4,
+          personId2: 3,
+        },
+        {
+          personId1: 4,
+          personId2: 4,
+        },
+      ],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 4,
+          personId2: 4,
+        },
+      ],
+    },
+    {
+      name: "Joe Tucker",
+      firstName: "Joe",
+      friends: {
+        nodes: [
+          {
+            name: "Twenty Seventwo",
+            firstName: "Twenty",
+            friends: {
+              nodes: [],
+            },
+          },
+        ],
+      },
+      id: 5,
+      postsByAuthorId: {
+        nodes: [
+          {
+            headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            headlineTrimmed: "Please, D…",
+            authorId: 5,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+      },
+      postsByAuthorIdList: [
+        {
+          headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          headlineTrimmed: "Please, D…",
+          authorId: 5,
+          computedIntervalSet: {
+            nodes: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          computedIntervalSetList: [
+            {
+              seconds: 12,
+            },
+          ],
+        },
+      ],
+      roundOnePost: {
+        nodes: [],
+      },
+      roundOnePostList: [],
+      compoundKeysByPersonId1: {
+        nodes: [],
+      },
+      compoundKeysByPersonId2: {
+        nodes: [
+          {
+            personId1: 2,
+            personId2: 5,
+          },
+        ],
+      },
+      compoundKeysByPersonId1List: [],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 2,
+          personId2: 5,
+        },
+      ],
+    },
+    {
+      name: "Twenty Seventwo",
+      firstName: "Twenty",
+      friends: {
+        nodes: [],
+      },
+      id: 6,
+      postsByAuthorId: {
+        nodes: [],
+      },
+      postsByAuthorIdList: [],
+      roundOnePost: {
+        nodes: [],
+      },
+      roundOnePostList: [],
+      compoundKeysByPersonId1: {
+        nodes: [],
+      },
+      compoundKeysByPersonId2: {
+        nodes: [],
+      },
+      compoundKeysByPersonId1List: [],
+      compoundKeysByPersonId2List: [],
+    },
+  ],
+  allPeople: {
+    nodes: [
+      {
+        id: 1,
+        name: "John Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "You hit me with a cricket bat.",
+              headlineTrimmed: "You hit m…",
+              authorId: 1,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            {
+              headline: "Large bet on myself in round one.",
+              headlineTrimmed: "Large bet…",
+              authorId: 1,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+          ],
+        },
+        postsByAuthorIdList: [
+          {
+            headline: "I hate yogurt. It’s just stuff with bits in.",
+            headlineTrimmed: "I hate yo…",
+            authorId: 1,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          {
+            headline: "Is that a cooking show?",
+            headlineTrimmed: "Is that a…",
+            authorId: 1,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+        roundOnePost: {
+          nodes: [
+            {
+              headline: "Large bet on myself in round one.",
+              headlineTrimmed: "Large bet…",
+              authorId: 1,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+          ],
+        },
+        roundOnePostList: [
+          {
+            headline: "Large bet on myself in round one.",
+            headlineTrimmed: "Large bet…",
+            authorId: 1,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+        compoundKeysByPersonId1: {
+          nodes: [
+            {
+              personId1: 1,
+              personId2: 2,
+            },
+          ],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 1,
+            },
+          ],
+        },
+        compoundKeysByPersonId1List: [
+          {
+            personId1: 1,
+            personId2: 2,
+          },
+        ],
+        compoundKeysByPersonId2List: [
+          {
+            personId1: 2,
+            personId2: 1,
+          },
+        ],
+      },
+      {
+        id: 2,
+        name: "Sara Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+              headlineTrimmed: "It’s a fe…",
+              authorId: 2,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            {
+              headline: "What’s with you kids? Every other day it’s food, food, food.",
+              headlineTrimmed: "What’s wi…",
+              authorId: 2,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+          ],
+        },
+        postsByAuthorIdList: [
+          {
+            headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+            headlineTrimmed: "No… It’s …",
+            authorId: 2,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          {
+            headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+            headlineTrimmed: "It’s a fe…",
+            authorId: 2,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+        roundOnePost: {
+          nodes: [],
+        },
+        roundOnePostList: [],
+        compoundKeysByPersonId1: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 1,
+            },
+            {
+              personId1: 2,
+              personId2: 3,
+            },
+            {
+              personId1: 2,
+              personId2: 5,
+            },
+          ],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 1,
+              personId2: 2,
+            },
+          ],
+        },
+        compoundKeysByPersonId1List: [
+          {
+            personId1: 2,
+            personId2: 1,
+          },
+          {
+            personId1: 2,
+            personId2: 3,
+          },
+          {
+            personId1: 2,
+            personId2: 5,
+          },
+        ],
+        compoundKeysByPersonId2List: [
+          {
+            personId1: 1,
+            personId2: 2,
+          },
+        ],
+      },
+      {
+        id: 3,
+        name: "Budd Deey",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "You know how I sometimes have really brilliant ideas?",
+              headlineTrimmed: "You know …",
+              authorId: 3,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            {
+              headline: "They’re not aliens, they’re Earth…liens!",
+              headlineTrimmed: "They’re n…",
+              authorId: 3,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+          ],
+        },
+        postsByAuthorIdList: [
+          {
+            headline: "Stop talking, brain thinking. Hush.",
+            headlineTrimmed: "Stop talk…",
+            authorId: 3,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+          {
+            headline: "You know how I sometimes have really brilliant ideas?",
+            headlineTrimmed: "You know …",
+            authorId: 3,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+        roundOnePost: {
+          nodes: [],
+        },
+        roundOnePostList: [],
+        compoundKeysByPersonId1: {
+          nodes: [],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 3,
+            },
+            {
+              personId1: 4,
+              personId2: 3,
+            },
+          ],
+        },
+        compoundKeysByPersonId1List: [],
+        compoundKeysByPersonId2List: [
+          {
+            personId1: 2,
+            personId2: 3,
+          },
+          {
+            personId1: 4,
+            personId2: 3,
+          },
+        ],
+      },
+      {
+        id: 4,
+        name: "Kathryn Ramirez",
+        postsByAuthorId: {
+          nodes: [],
+        },
+        postsByAuthorIdList: [],
+        roundOnePost: {
+          nodes: [],
+        },
+        roundOnePostList: [],
+        compoundKeysByPersonId1: {
+          nodes: [
+            {
+              personId1: 4,
+              personId2: 3,
+            },
+            {
+              personId1: 4,
+              personId2: 4,
+            },
+          ],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 4,
+              personId2: 4,
+            },
+          ],
+        },
+        compoundKeysByPersonId1List: [
+          {
+            personId1: 4,
+            personId2: 3,
+          },
+          {
+            personId1: 4,
+            personId2: 4,
+          },
+        ],
+        compoundKeysByPersonId2List: [
+          {
+            personId1: 4,
+            personId2: 4,
+          },
+        ],
+      },
+      {
+        id: 5,
+        name: "Joe Tucker",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              headlineTrimmed: "Please, D…",
+              authorId: 5,
+              computedIntervalSet: {
+                nodes: [
+                  {
+                    seconds: 12,
+                  },
+                ],
+              },
+              computedIntervalSetList: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+          ],
+        },
+        postsByAuthorIdList: [
+          {
+            headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            headlineTrimmed: "Please, D…",
+            authorId: 5,
+            computedIntervalSet: {
+              nodes: [
+                {
+                  seconds: 12,
+                },
+              ],
+            },
+            computedIntervalSetList: [
+              {
+                seconds: 12,
+              },
+            ],
+          },
+        ],
+        roundOnePost: {
+          nodes: [],
+        },
+        roundOnePostList: [],
+        compoundKeysByPersonId1: {
+          nodes: [],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [
+            {
+              personId1: 2,
+              personId2: 5,
+            },
+          ],
+        },
+        compoundKeysByPersonId1List: [],
+        compoundKeysByPersonId2List: [
+          {
+            personId1: 2,
+            personId2: 5,
+          },
+        ],
+      },
+      {
+        id: 6,
+        name: "Twenty Seventwo",
+        postsByAuthorId: {
+          nodes: [],
+        },
+        postsByAuthorIdList: [],
+        roundOnePost: {
+          nodes: [],
+        },
+        roundOnePostList: [],
+        compoundKeysByPersonId1: {
+          nodes: [],
+        },
+        compoundKeysByPersonId2: {
+          nodes: [],
+        },
+        compoundKeysByPersonId1List: [],
+        compoundKeysByPersonId2List: [],
+      },
+    ],
+  },
+}

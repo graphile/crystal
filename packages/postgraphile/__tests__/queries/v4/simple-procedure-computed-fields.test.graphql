@@ -1,0 +1,86 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allPeopleList {
+    name
+    firstName
+    friends {
+      nodes {
+        name
+        firstName
+        friends(first: 1) {
+          nodes {
+            name
+            firstName
+          }
+        }
+      }
+    }
+  }
+  allPeople {
+    nodes {
+      ...PersonFrag
+    }
+  }
+  allPeopleList {
+    ...PersonFrag
+  }
+}
+
+fragment PersonFrag on Person {
+  id
+  name
+  postsByAuthorId(last: 2) {
+    nodes {
+      ...PostFrag
+    }
+  }
+  postsByAuthorIdList(first: 2) {
+    ...PostFrag
+  }
+  roundOnePost: postsByAuthorId(condition: {headline: "Large bet on myself in round one."}) {
+    nodes {
+      ...PostFrag
+    }
+  }
+  roundOnePostList: postsByAuthorIdList(condition: {headline: "Large bet on myself in round one."}) {
+    ...PostFrag
+  }
+  compoundKeysByPersonId1 {
+    nodes {
+      ...PersonIdFrag
+    }
+  }
+  compoundKeysByPersonId2 {
+    nodes {
+      ...PersonIdFrag
+    }
+  }
+    compoundKeysByPersonId1List {
+      ...PersonIdFrag
+  }
+  compoundKeysByPersonId2List {
+      ...PersonIdFrag
+    }
+}
+
+fragment PostFrag on Post {
+  headline
+  headlineTrimmed
+  authorId
+  computedIntervalSet(first:1){
+    nodes{
+      seconds
+    }
+  }
+  computedIntervalSetList(first:1){
+    seconds
+  }
+}
+
+fragment PersonIdFrag on CompoundKey {
+  personId1
+  personId2
+}
