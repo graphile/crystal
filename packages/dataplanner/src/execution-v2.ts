@@ -1,6 +1,6 @@
 import { inspect } from "util";
 
-import type { Aether, CrystalError } from ".";
+import type { OpPlan, CrystalError } from ".";
 import type {
   Bucket,
   BucketDefinitionFieldOutputMap,
@@ -91,7 +91,7 @@ function mergeErrorsBackIn(
  * @internal
  */
 export function executeBucket(
-  aether: Aether,
+  opPlan: OpPlan,
   metaByStepId: CrystalContext["metaByStepId"],
   bucket: Bucket,
   requestContext: RequestContext,
@@ -212,9 +212,9 @@ export function executeBucket(
     _dependencies: (readonly any[])[],
     _extra: ExecutionExtra,
   ): PromiseOrDirect<any[]> {
-    const itemPlan = aether.dangerouslyGetStep(plan.itemStepId!);
+    const itemPlan = opPlan.dangerouslyGetStep(plan.itemStepId!);
     const itemStepId = itemPlan.id;
-    const itemBucketDefinition = aether.buckets[itemPlan.bucketId];
+    const itemBucketDefinition = opPlan.buckets[itemPlan.bucketId];
     if (!itemBucketDefinition) {
       throw new Error(
         `Could not determing the bucket to execute ${plan}'s inner data with`,
@@ -269,7 +269,7 @@ export function executeBucket(
     }
 
     const result = executeBucket(
-      aether,
+      opPlan,
       metaByStepId,
       itemBucket,
       requestContext,
@@ -286,7 +286,7 @@ export function executeBucket(
     function performTransform(): any[] {
       const result: any[] = [];
       const transformDepStepId =
-        aether.transformDependencyPlanIdByTransformStepId[plan.id];
+        opPlan.transformDependencyPlanIdByTransformStepId[plan.id];
       const depResults = itemStore[transformDepStepId];
       let offset = 0;
       for (let i = 0, l = listsLength; i < l; i++) {
@@ -546,7 +546,7 @@ export function executeBucket(
           hasErrors: bucket.hasErrors,
         };
         const r = rejectOnThrow(() =>
-          executeBucket(aether, metaByStepId, childBucket, requestContext),
+          executeBucket(opPlan, metaByStepId, childBucket, requestContext),
         );
         if (isPromiseLike(r)) {
           childPromises.push(r);

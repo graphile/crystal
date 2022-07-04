@@ -2,8 +2,8 @@ import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
-import { $$contextPlanCache } from "./aether.js";
-import { establishAether } from "./establishAether.js";
+import { $$contextPlanCache } from "./opPlan.js";
+import { establishOpPlan } from "./establishOpPlan.js";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
@@ -31,7 +31,7 @@ export interface CrystalPrepareOptions {
 /**
  * This method returns an object that you should use as the `rootValue` in your
  * call to GraphQL; it gives Graphile Crystal a chance to find/prepare an
- * Aether and even pre-emptively execute the request if possible. In fact, the
+ * OpPlan and even pre-emptively execute the request if possible. In fact, the
  * result from this might be suitable to return to the user directly if you
  * enable the `experimentalGraphQLBypass` (if this is the case then the
  * `$$bypassGraphQL` key will be set on the result object).
@@ -58,7 +58,7 @@ export function dataplannerPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const aether = establishAether({
+  const opPlan = establishOpPlan({
     schema,
     operation,
     fragments,
@@ -69,8 +69,8 @@ export function dataplannerPrepare(
 
   if (options.explain?.includes("mermaid-js")) {
     // Only build the plan once
-    if (aether[$$contextPlanCache] == null) {
-      aether[$$contextPlanCache] = aether.printPlanGraph({
+    if (opPlan[$$contextPlanCache] == null) {
+      opPlan[$$contextPlanCache] = opPlan.printPlanGraph({
         includePaths: isTest,
         printPathRelations: false,
         concise: !isTest,
@@ -79,11 +79,11 @@ export function dataplannerPrepare(
     rootValue[$$extensions]?.explain?.operations.push({
       type: "mermaid-js",
       title: "Step",
-      diagram: aether[$$contextPlanCache],
+      diagram: opPlan[$$contextPlanCache],
     });
   }
 
-  const preemptiveResult = aether.executePreemptive(
+  const preemptiveResult = opPlan.executePreemptive(
     variableValues,
     context,
     rootValue,
@@ -106,7 +106,7 @@ export function dataplannerPrepare(
     }
   }
 
-  const crystalContext = aether.newCrystalContext(
+  const crystalContext = opPlan.newCrystalContext(
     variableValues,
     context as any,
     rootValue,

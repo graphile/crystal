@@ -9,7 +9,7 @@ import {
   isUnionType,
 } from "graphql";
 
-import type { Aether } from "./aether.js";
+import type { OpPlan } from "./opPlan.js";
 import { isDev } from "./dev.js";
 import type { FieldAndGroup, GroupedSelections } from "./interfaces.js";
 import type { __TrackedObjectStep } from "./steps/index.js";
@@ -121,7 +121,7 @@ export interface Group {
  * @internal
  */
 export function graphqlCollectFields(
-  aether: Aether,
+  opPlan: OpPlan,
   parentStepId: string,
   objectType: GraphQLObjectType,
   groupedSelectionsList: GroupedSelections[],
@@ -135,9 +135,9 @@ export function graphqlCollectFields(
     listIndex++
   ) {
     const { groupId, selections } = groupedSelectionsList[listIndex];
-    const parent = aether.groups[groupId];
+    const parent = opPlan.groups[groupId];
     const objectTypeFields = objectType.getFields();
-    const trackedVariableValuesStep = aether.trackedVariableValuesStep;
+    const trackedVariableValuesStep = opPlan.trackedVariableValuesStep;
     for (let i = 0, l = selections.length; i < l; i++) {
       const selection = selections[i];
       if (
@@ -173,9 +173,9 @@ export function graphqlCollectFields(
             assertListType(fieldType);
           }
           const selectionGroupId = stream
-            ? aether.addGroup({ reason: "stream", parentStepId, parent })
+            ? opPlan.addGroup({ reason: "stream", parentStepId, parent })
             : isMutation
-            ? aether.addGroup({
+            ? opPlan.addGroup({
                 reason: "mutation",
                 parentStepId,
                 parent,
@@ -195,12 +195,12 @@ export function graphqlCollectFields(
             continue;
           }
           visitedFragments.add(fragmentSpreadName);
-          const fragment = aether.fragments[fragmentSpreadName];
+          const fragment = opPlan.fragments[fragmentSpreadName];
           if (fragment == null) {
             continue;
           }
           const fragmentTypeName = fragment.typeCondition.name.value;
-          const fragmentType = aether.schema.getType(fragmentTypeName);
+          const fragmentType = opPlan.schema.getType(fragmentTypeName);
           if (
             !fragmentType ||
             !(
@@ -216,9 +216,9 @@ export function graphqlCollectFields(
 
           const defer = getDirective(selection, "defer");
           const fragmentGroupId = defer
-            ? aether.addGroup({ reason: "defer", parentStepId, parent })
+            ? opPlan.addGroup({ reason: "defer", parentStepId, parent })
             : isMutation
-            ? aether.addGroup({
+            ? opPlan.addGroup({
                 reason: "mutationPayload",
                 parentStepId,
                 parent,
@@ -226,7 +226,7 @@ export function graphqlCollectFields(
             : groupId;
 
           graphqlCollectFields(
-            aether,
+            opPlan,
             parentStepId,
             objectType,
             [
@@ -245,7 +245,7 @@ export function graphqlCollectFields(
           const fragmentTypeAst = selection.typeCondition;
           if (fragmentTypeAst != null) {
             const fragmentTypeName = fragmentTypeAst.name.value;
-            const fragmentType = aether.schema.getType(fragmentTypeName);
+            const fragmentType = opPlan.schema.getType(fragmentTypeName);
             if (fragmentType == null) {
               throw new Error(
                 `We don't have a type named '${fragmentTypeName}'`,
@@ -272,11 +272,11 @@ export function graphqlCollectFields(
           // I've thus removed this, but we need to be sure it's correct to do
           // so.
           const fragmentGroupId = defer
-            ? aether.addGroup({ reason: "defer", parentStepId, parent })
+            ? opPlan.addGroup({ reason: "defer", parentStepId, parent })
             : groupId;
 
           graphqlCollectFields(
-            aether,
+            opPlan,
             parentStepId,
             objectType,
             [

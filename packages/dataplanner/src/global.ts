@@ -1,12 +1,12 @@
 import type { GraphQLOutputType } from "graphql";
 
-import type { Aether } from "./aether.js";
+import type { OpPlan } from "./opPlan.js";
 
 /**
  * @internal
  */
 export interface GlobalState {
-  aether: Aether;
+  opPlan: OpPlan;
   parentPathIdentity: string;
   // TODO: rename?
   currentGraphQLType?: GraphQLOutputType;
@@ -55,22 +55,22 @@ export function withGlobalState<T>(
 
 /**
  * Since plan functions are called synchronously _by us_ we don't need to pass
- * around a reference to Aether that users then have to pass back to us;
+ * around a reference to OpPlan that users then have to pass back to us;
  * instead we can pull it from this global state. This is not dissimilar to how
  * React's hooks work.
  */
-export function getCurrentAether(): Aether {
-  const aether = getGlobalState().aether;
-  if (!aether) {
+export function getCurrentOpPlan(): OpPlan {
+  const opPlan = getGlobalState().opPlan;
+  if (!opPlan) {
     throw new Error(
       "You have broken the rules of Graphile Crystal Plans; they must only be created synchronously from inside the relevant `plan` function.",
     );
   }
-  return aether;
+  return opPlan;
 }
 
 /**
- * Like with `getCurrentAether`, since plan functions are called synchronously
+ * Like with `getCurrentOpPlan`, since plan functions are called synchronously
  * _by us_ we can pull the current parentPathIdentity from global state.
  *
  * @internal

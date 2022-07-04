@@ -40,7 +40,7 @@ import {
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import { withFieldArgsForArguments } from "./aether-input.js";
+import { withFieldArgsForArguments } from "./opPlan-input.js";
 import * as assert from "./assert.js";
 import type {
   Bucket,
@@ -316,7 +316,7 @@ interface TreeNode {
   children: TreeNode[];
 }
 
-type AetherPhase =
+type OpPlanPhase =
   | "init"
   | "plan"
   | "validate"
@@ -330,10 +330,10 @@ const EMPTY_ARRAY = Object.freeze([] as any[]);
 // For logging indentation
 let depth = 0;
 
-const debugAether = debugFactory("dataplanner:aether");
-const debugPlan_ = debugAether.extend("plan");
+const debugOpPlan = debugFactory("dataplanner:opPlan");
+const debugPlan_ = debugOpPlan.extend("plan");
 const debugPlanVerbose_ = debugPlan_.extend("verbose");
-const debugExecute_ = debugAether.extend("execute");
+const debugExecute_ = debugOpPlan.extend("execute");
 const debugExecuteVerbose_ = debugExecute_.extend("verbose");
 
 const isDev = process.env.GRAPHILE_ENV === "development";
@@ -435,7 +435,7 @@ interface PrefetchConfig {
 }
 
 /**
- * See Aether.groups
+ * See OpPlan.groups
  */
 interface GroupAndChildren extends Group {
   id: number;
@@ -444,15 +444,15 @@ interface GroupAndChildren extends Group {
 }
 
 /**
- * Implements the `NewAether` algorithm.
+ * Implements the `NewOpPlan` algorithm.
  */
-export class Aether<
+export class OpPlan<
   TVariables extends BaseGraphQLVariables = any,
   TContext extends BaseGraphQLContext = any,
   TRootValue extends BaseGraphQLRootValue = any,
 > {
   /**
-   * What state is the Aether in?
+   * What state is the OpPlan in?
    *
    * 1. init
    * 2. plan
@@ -464,7 +464,7 @@ export class Aether<
    *
    * Once in 'ready' state we can execute the plan.
    */
-  private phase: AetherPhase = "init";
+  private phase: OpPlanPhase = "init";
 
   /**
    * A new 'group' is introduced whenever a field must evaluated at a later
@@ -502,7 +502,7 @@ export class Aether<
   private rootBucket: BucketDefinition;
 
   /**
-   * All the bucket definitions needed for this Aether.
+   * All the bucket definitions needed for this OpPlan.
    *
    * @internal
    */
@@ -518,7 +518,7 @@ export class Aether<
   private modifierPlanCount = 0;
 
   /**
-   * The full list of ExecutablePlans that this Aether has created.
+   * The full list of ExecutablePlans that this OpPlan has created.
    *
    * @remarks
    *
@@ -787,7 +787,7 @@ export class Aether<
 
   constructor(
     public readonly schema: GraphQLSchema,
-    // Note: whereas the `NewAether` algorithm refers to `document` and
+    // Note: whereas the `NewOpPlan` algorithm refers to `document` and
     // `operationName`; we use `operation` and `fragments` because they're
     // easier to access in GraphQL.js
     public readonly operation: OperationDefinitionNode,
@@ -840,7 +840,7 @@ export class Aether<
     this.phase = "plan";
     /** with global state (think: React hooks) */
     const wgs = withGlobalState.bind(null, {
-      aether: this,
+      opPlan: this,
       parentPathIdentity: GLOBAL_PATH,
     }) as <T>(cb: () => T) => T;
     this.rootSelectionSetStep = wgs(() => new __ValueStep());
@@ -1351,7 +1351,7 @@ export class Aether<
   }
 
   /**
-   * Implements the `PlanAetherQuery` algorithm.
+   * Implements the `PlanOpPlanQuery` algorithm.
    */
   private planQuery(): void {
     const rootType = this.schema.getQueryType();
@@ -1376,7 +1376,7 @@ export class Aether<
   }
 
   /**
-   * Implements the `PlanAetherMutation` algorithm.
+   * Implements the `PlanOpPlanMutation` algorithm.
    */
   private planMutation(): void {
     const rootType = this.schema.getMutationType();
@@ -1402,7 +1402,7 @@ export class Aether<
   }
 
   /**
-   * Implements the `PlanAetherSubscription` algorithm.
+   * Implements the `PlanOpPlanSubscription` algorithm.
    */
   private planSubscription(): void {
     const rootType = this.schema.getSubscriptionType();
@@ -1411,7 +1411,7 @@ export class Aether<
     }
     const selectionSet = this.operation.selectionSet;
     const wgs = withGlobalState.bind(null, {
-      aether: this,
+      opPlan: this,
       parentPathIdentity: ROOT_PATH,
     }) as <T>(cb: () => T) => T;
     const groupedFieldSet = wgs(() =>
@@ -1460,7 +1460,7 @@ export class Aether<
       // `~[]` rather than `~`?
       const nestedParentPathIdentity = ROOT_PATH;
       const streamItemPlan = withGlobalState(
-        { aether: this, parentPathIdentity: ROOT_PATH },
+        { opPlan: this, parentPathIdentity: ROOT_PATH },
         () => subscribePlan.itemPlan(this.itemPlanFor(subscribePlan)),
       );
       this.subscriptionItemStepId = streamItemPlan.id;
@@ -1526,7 +1526,7 @@ export class Aether<
     assertObjectType(objectType);
     const groupedFieldSet = withGlobalState(
       {
-        aether: this,
+        opPlan: this,
         parentPathIdentity: parentFieldPathIdentity,
       },
       () =>
@@ -1840,7 +1840,7 @@ export class Aether<
           const listPlan = newPlan.getListStep();
           const nestedParentPathIdentity = pathIdentity + `@${newPlan.id}[]`;
           const wgs = withGlobalState.bind(null, {
-            aether: this,
+            opPlan: this,
             parentPathIdentity: nestedParentPathIdentity,
           }) as <T>(cb: () => T) => T;
           const itemPlan = wgs(() => {
@@ -1873,7 +1873,7 @@ export class Aether<
 
         {
           const wgs = withGlobalState.bind(null, {
-            aether: this,
+            opPlan: this,
             parentPathIdentity: newPlan.parentPathIdentity,
           }) as <T>(cb: () => T) => T;
           wgs(() => {
@@ -1946,7 +1946,7 @@ export class Aether<
       // TODO: transform?
       const listItemPlan = withGlobalState(
         {
-          aether: this,
+          opPlan: this,
           parentPathIdentity: nestedParentPathIdentity,
           currentGraphQLType: fieldType,
         },
@@ -1977,7 +1977,7 @@ export class Aether<
 
       const oldPlansLength = this.planCount;
       const valuePlan = withGlobalState(
-        { aether: this, parentPathIdentity: pathIdentity },
+        { opPlan: this, parentPathIdentity: pathIdentity },
         () => new __ValueStep(),
       );
       this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
@@ -2001,7 +2001,7 @@ export class Aether<
     }
 
     const wgs = withGlobalState.bind(null, {
-      aether: this,
+      opPlan: this,
       parentPathIdentity: pathIdentity,
     }) as <T>(cb: () => T) => T;
     let childFieldDigests: FieldDigest[] | null;
@@ -2188,7 +2188,7 @@ export class Aether<
 
     const result = cb();
 
-    // Remove the modifier plans from aether and sort them ready for application.
+    // Remove the modifier plans from opPlan and sort them ready for application.
     const plansToApply = this.modifierPlans
       .splice(0, this.modifierPlans.length)
       .reverse();
@@ -2269,7 +2269,7 @@ export class Aether<
     const oldPlansLength = this.planCount;
     const fieldType = field.type;
     const wgs = withGlobalState.bind(null, {
-      aether: this,
+      opPlan: this,
       parentPathIdentity,
       currentGraphQLType: fieldType,
     }) as <T>(cb: () => T) => T;
@@ -2370,7 +2370,7 @@ export class Aether<
           if (val instanceof ExecutableStep) {
             errors.push(
               new Error(
-                `ERROR: ExecutableStep ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.aether.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
+                `ERROR: ExecutableStep ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.opPlan.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
               ),
             );
           }
@@ -2475,7 +2475,7 @@ export class Aether<
       try {
         replacementPlan = withGlobalState(
           {
-            aether: this,
+            opPlan: this,
             parentPathIdentity: plan.parentPathIdentity,
           },
           () => callback(plan),
@@ -3847,7 +3847,7 @@ export class Aether<
     } else if (descendentPlan instanceof __ValueStep) {
       return EMPTY_ARRAY;
     } else if (this.phase !== "ready") {
-      throw new Error("Only call findPath when aether is ready");
+      throw new Error("Only call findPath when opPlan is ready");
     }
 
     for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
@@ -5008,7 +5008,7 @@ export class Aether<
     rootValue: unknown,
   ): CrystalContext {
     const crystalContext: CrystalContext = {
-      aether: this,
+      opPlan: this,
       metaByStepId: Object.create(null),
       inProgressPlanResolutions: Object.entries(this.plans).reduce(
         (memo, [idx, plan]) => {
@@ -5087,7 +5087,7 @@ export class Aether<
       : this.newCrystalContext(variableValues, context, rootValue);
     const batch = this.newBatch(pathIdentity, returnType, crystalContext);
     this.batchByPathIdentity[pathIdentity] = batch;
-    // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
+    // (Note: when batch is executed it will delete itself from opPlan.batchByPathIdentity.)
     process.nextTick(() => {
       this.executeBatch(batch, crystalContext);
     });
@@ -5215,7 +5215,7 @@ export class Aether<
             const abort = defer<IteratorResult<any, any>>();
 
             //eslint-disable-next-line @typescript-eslint/no-this-alias
-            const aether = this;
+            const opPlan = this;
 
             const asyncIterator: AsyncIterableIterator<any> = {
               [Symbol.asyncIterator]() {
@@ -5249,7 +5249,7 @@ export class Aether<
                     return { done, value };
                   } else {
                     const value = (
-                      await aether.executeLayers(
+                      await opPlan.executeLayers(
                         crystalContext,
                         rest,
                         // TODO: batch this over a tick?
@@ -6013,7 +6013,7 @@ export class Aether<
   }
 
   /**
-   * Convert an Aether into a plan graph in mermaid-js format.
+   * Convert an OpPlan into a plan graph in mermaid-js format.
    */
   printPlanGraph(options: PrintPlanGraphOptions = {}): string {
     return printPlanGraph(this, options, {

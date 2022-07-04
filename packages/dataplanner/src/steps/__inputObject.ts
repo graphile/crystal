@@ -38,7 +38,7 @@ export class __InputObjectStep extends ExecutableStep {
         (val) => val.name.value === inputFieldName,
       );
       const plan = inputPlan(
-        this.aether,
+        this.opPlan,
         inputFieldType,
         inputFieldValue?.value,
         defaultValue,

@@ -6,7 +6,6 @@ import type {
   OperationDefinitionNode,
 } from "graphql";
 
-import { Aether } from "./aether.js";
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
 import type {
@@ -14,8 +13,9 @@ import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
+import { OpPlan } from "./opPlan.js";
 
-const debug = debugFactory("dataplanner:establishAether");
+const debug = debugFactory("dataplanner:establishOpPlan");
 
 type Fragments = {
   [key: string]: FragmentDefinitionNode;
@@ -27,7 +27,7 @@ interface LinkedList<T> {
 }
 
 /**
- * This represents the list of possible aethers for a specific document.
+ * This represents the list of possible opPlans for a specific document.
  *
  * @remarks
  *
@@ -36,16 +36,16 @@ interface LinkedList<T> {
  */
 interface Cache {
   /**
-   * Implemented as a linked list so the hot aethers can be kept at the top of the
+   * Implemented as a linked list so the hot opPlans can be kept at the top of the
    * list, and if the list grows beyond a maximum size we can drop the last
    * element.
    */
-  possibleAethers: LinkedList<Aether>;
+  possibleOpPlans: LinkedList<OpPlan>;
   fragments: Fragments;
 }
 
 /**
- * The starting point for finding/storing the relevant Aether for a request.
+ * The starting point for finding/storing the relevant OpPlan for a request.
  */
 type CacheByOperation = LRU<OperationDefinitionNode, Cache>;
 
@@ -85,26 +85,26 @@ function reallyAssertFragmentsMatch(
 const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
 
 /**
- * Implements the `IsAetherCompatible` algorithm.
+ * Implements the `IsOpPlanCompatible` algorithm.
  *
- * @remarks Due to the optimisation in `establishAether`, the schema, document
+ * @remarks Due to the optimisation in `establishOpPlan`, the schema, document
  * and operationName checks have already been performed.
  */
-export function isAetherCompatible<
+export function isOpPlanCompatible<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
-  aether: Aether<any, any, any>,
+  opPlan: OpPlan<any, any, any>,
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-): aether is Aether<TVariables, TContext, TRootValue> {
+): opPlan is OpPlan<TVariables, TContext, TRootValue> {
   const {
     variableValuesConstraints,
     contextConstraints,
     rootValueConstraints,
-  } = aether;
+  } = opPlan;
   if (!matchesConstraints(variableValuesConstraints, variableValues)) {
     return false;
   }
@@ -125,14 +125,14 @@ export function isAetherCompatible<
 const $$cacheByOperation = Symbol("cacheByOperation");
 
 /**
- * Implements the `EstablishAether` algorithm.
+ * Implements the `EstablishOpPlan` algorithm.
  *
- * @remarks Though EstablishAether accepts document and operationName, we
+ * @remarks Though EstablishOpPlan accepts document and operationName, we
  * instead accept operation and fragments since they're easier to get a hold of
  * in GraphQL.js.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function establishAether<
+export function establishOpPlan<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
@@ -143,7 +143,7 @@ export function establishAether<
   variableValues: TVariables;
   context: TContext;
   rootValue: TRootValue;
-}): Aether<TVariables, TContext, TRootValue> {
+}): OpPlan<TVariables, TContext, TRootValue> {
   const { schema, operation, fragments, variableValues, context, rootValue } =
     details;
   let cacheByOperation: CacheByOperation | undefined =
@@ -153,29 +153,29 @@ export function establishAether<
 
   // These two variables to make it easy to trim the linked list later.
   let count = 0;
-  let lastButOneItem: LinkedList<Aether> | null = null;
+  let lastButOneItem: LinkedList<OpPlan> | null = null;
 
   if (cache) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
 
-    let previousItem: LinkedList<Aether> | null = null;
-    let linkedItem: LinkedList<Aether> | null = cache.possibleAethers;
+    let previousItem: LinkedList<OpPlan> | null = null;
+    let linkedItem: LinkedList<OpPlan> | null = cache.possibleOpPlans;
     while (linkedItem) {
       if (
-        isAetherCompatible(linkedItem.value, variableValues, context, rootValue)
+        isOpPlanCompatible(linkedItem.value, variableValues, context, rootValue)
       ) {
         // Hoist to top of linked list
         if (previousItem) {
           // Remove linkedItem from existing chain
           previousItem.next = linkedItem.next;
           // Add rest of chain after linkedItem
-          linkedItem.next = cache.possibleAethers;
+          linkedItem.next = cache.possibleOpPlans;
           // linkedItem is now head of chain
-          cache.possibleAethers = linkedItem;
+          cache.possibleOpPlans = linkedItem;
         }
 
-        // We found a suitable Aether - use that!
+        // We found a suitable OpPlan - use that!
         return linkedItem.value;
       }
 
@@ -186,8 +186,8 @@ export function establishAether<
     }
   }
 
-  // No suitable Aether found, time to make one.
-  const aether = new Aether(
+  // No suitable OpPlan found, time to make one.
+  const opPlan = new OpPlan(
     schema,
     operation,
     fragments,
@@ -205,7 +205,7 @@ export function establishAether<
   if (!cache) {
     cache = {
       fragments,
-      possibleAethers: { value: aether, next: null },
+      possibleOpPlans: { value: opPlan, next: null },
     };
     cacheByOperation.set(operation, cache);
   } else {
@@ -217,12 +217,12 @@ export function establishAether<
       // TODO: we should announce this so that people know there's something that needs fixing in their schema (too much eval?)
     }
 
-    // Add new aether to top of the linked list.
-    cache.possibleAethers = {
-      value: aether,
-      next: cache.possibleAethers,
+    // Add new opPlan to top of the linked list.
+    cache.possibleOpPlans = {
+      value: opPlan,
+      next: cache.possibleOpPlans,
     };
   }
 
-  return aether;
+  return opPlan;
 }

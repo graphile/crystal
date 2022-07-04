@@ -31,7 +31,7 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
 
   toStringMeta(): string {
     return chalk.bold.yellow(
-      String(this.aether.dangerouslyGetStep(this.dependencies[0]).id),
+      String(this.opPlan.dangerouslyGetStep(this.dependencies[0]).id),
     );
   }
 

@@ -18,7 +18,7 @@ import type {
   SelectionNode,
 } from "graphql";
 
-import type { Aether } from "./aether.js";
+import type { OpPlan } from "./opPlan.js";
 import type { Deferred } from "./deferred.js";
 import type { CrystalError } from "./error.js";
 import type { InputStep } from "./input.js";
@@ -222,7 +222,7 @@ export interface Batch {
  * replaced.
  */
 export interface CrystalContext {
-  aether: Aether;
+  opPlan: OpPlan;
 
   metaByStepId: {
     [planId: string]: Record<string, unknown> | undefined;

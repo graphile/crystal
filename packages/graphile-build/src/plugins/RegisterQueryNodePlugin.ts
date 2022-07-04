@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { aether, constant } from "dataplanner";
+import { opPlan, constant } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
@@ -20,10 +20,10 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
             [],
           ),
           get: EXPORTABLE(
-            (aether) => () => {
-              return aether().rootValueStep;
+            (opPlan) => () => {
+              return opPlan().rootValueStep;
             },
-            [aether],
+            [opPlan],
           ),
           plan: EXPORTABLE(
             (constant) => () => {

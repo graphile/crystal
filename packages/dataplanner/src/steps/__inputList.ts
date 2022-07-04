@@ -45,14 +45,14 @@ export class __InputListStep extends ExecutableStep {
         inputValueIndex++
       ) {
         const inputValue = values[inputValueIndex];
-        const innerPlan = inputPlan(this.aether, innerType, inputValue);
+        const innerPlan = inputPlan(this.opPlan, innerType, inputValue);
         this.itemPlanIds.push(innerPlan.id);
         this.addDependency(innerPlan);
       }
     }
     // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
     // `InputNonNullStep`, but maybe it's not safe any more?
-    this.outOfBoundsStepId = inputPlan(this.aether, innerType, undefined).id;
+    this.outOfBoundsStepId = inputPlan(this.opPlan, innerType, undefined).id;
   }
 
   optimize() {
@@ -68,7 +68,7 @@ export class __InputListStep extends ExecutableStep {
         itemPlanIndex++
       ) {
         const itemStepId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.aether.dangerouslyGetStep(itemStepId);
+        const itemPlan = this.opPlan.dangerouslyGetStep(itemStepId);
         assertInputStep(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;

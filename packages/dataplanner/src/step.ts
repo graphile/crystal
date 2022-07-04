@@ -2,12 +2,12 @@ import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { Aether } from "./aether.js";
+import type { OpPlan } from "./opPlan.js";
 import { GLOBAL_PATH } from "./constants.js";
 import { crystalPrintPathIdentity } from "./crystalPrint.js";
 import { isDev, noop } from "./dev.js";
 import {
-  getCurrentAether,
+  getCurrentOpPlan,
   getCurrentParentPathIdentity,
   getDebug,
 } from "./global.js";
@@ -61,7 +61,7 @@ export const assertArgumentsFinalized = !isDev
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
-  public readonly aether: Aether;
+  public readonly opPlan: OpPlan;
   public isArgumentsFinalized = false;
   public isFinalized = false;
   public debug = getDebug();
@@ -77,8 +77,8 @@ export abstract class BaseStep {
   public hasSideEffects = false;
 
   constructor() {
-    const aether = getCurrentAether();
-    this.aether = aether;
+    const opPlan = getCurrentOpPlan();
+    this.opPlan = opPlan;
     this.parentPathIdentity = GLOBAL_PATH;
     this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
   }
@@ -137,7 +137,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
     new Map();
 
   /**
-   * Only assigned once aether is 'ready'.
+   * Only assigned once opPlan is 'ready'.
    *
    * @internal
    */
@@ -200,7 +200,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * bucket it is stored).
    *
    * This will be assigned whilst bucketIds are being allocated, just before
-   * the Aether becomes "ready".
+   * the OpPlan becomes "ready".
    *
    * @internal
    */
@@ -243,7 +243,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * complete.
    *
    * A value of -1 indicates that a bucket has not yet been assigned (buckets
-   * are assigned as the last step before the Aether is 'ready'.
+   * are assigned as the last step before the OpPlan is 'ready'.
    *
    * @internal
    */
@@ -263,11 +263,11 @@ export class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
-    this.id = this.aether._addStep(this);
+    this.id = this.opPlan._addStep(this);
   }
 
   protected getStep(id: string): ExecutableStep {
-    return this.aether.getStep(id, this);
+    return this.opPlan.getStep(id, this);
   }
 
   protected getDep(depId: number): ExecutableStep {
@@ -486,7 +486,7 @@ export abstract class ModifierStep<
   public readonly id: string;
   constructor(protected readonly $parent: TParentStep) {
     super();
-    this.id = this.aether._addModifierStep(this);
+    this.id = this.opPlan._addModifierStep(this);
   }
 
   /**

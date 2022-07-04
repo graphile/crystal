@@ -27,7 +27,7 @@ import type {
 import {
   __ListTransformStep,
   __ValueStep,
-  aether,
+  opPlan,
   connection,
   ConnectionStep,
   constant,
@@ -4343,11 +4343,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (aether) =>
+          (opPlan) =>
             function plan() {
-              return aether().rootValueStep;
+              return opPlan().rootValueStep;
             },
-          [aether],
+          [opPlan],
         ),
       },
     },
@@ -4382,11 +4382,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (aether) =>
+          (opPlan) =>
             function plan() {
-              return aether().rootValueStep;
+              return opPlan().rootValueStep;
             },
-          [aether],
+          [opPlan],
         ),
       },
     },
@@ -4427,11 +4427,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (aether) =>
+          (opPlan) =>
             function plan() {
-              return aether().rootValueStep;
+              return opPlan().rootValueStep;
             },
-          [aether],
+          [opPlan],
         ),
       },
     },

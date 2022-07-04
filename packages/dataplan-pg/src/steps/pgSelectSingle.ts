@@ -116,7 +116,7 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    if (this.aether.isOptimized(this)) {
+    if (this.opPlan.isOptimized(this)) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
     const plan = this.getStep(this.classStepId);

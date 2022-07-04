@@ -7,13 +7,13 @@ import type { AccessStep } from "./access.js";
 // TODO: rename to __TrackedValueStep? Seems to represent values as well as
 // objects.
 /**
- * Implements the `__TrackedObjectStep(aether, object, constraints, path)`
+ * Implements the `__TrackedObjectStep(opPlan, object, constraints, path)`
  * algorithm used to allow runtime AND plan-time access to the three special
  * entities: `variableValues`, `rootValue` and `context`.
  *
  * ExecutableStep-time access can evaluate the `object` passed to the constructor, and
- * will add constraints to the relevant aether.variableValuesConstraints,
- * aether.rootValueConstraints or aether.contextConstraints to ensure that all
+ * will add constraints to the relevant opPlan.variableValuesConstraints,
+ * opPlan.rootValueConstraints or opPlan.contextConstraints to ensure that all
  * future variableValues, rootValues and context will match the assumptions
  * made.
  *
@@ -21,7 +21,7 @@ import type { AccessStep } from "./access.js";
  * **NOT** reference the `object` passed to the constructor.
  *
  * In core this will be used for evaluating `@skip`, `@include`, `@defer` and
- * `@stream` directives so that a different Aether will be used if these would
+ * `@stream` directives so that a different OpPlan will be used if these would
  * change the query plan, but it can also be used within plan resolvers to
  * branch the logic of a plan based on something in these entities.
  */
@@ -45,7 +45,7 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
 
   /**
    * A reference to the relevant
-   * aether.variableValuesConstraints/contextConstraints/rootValueConstraints.
+   * opPlan.variableValuesConstraints/contextConstraints/rootValueConstraints.
    *
    * @internal
    */
@@ -118,11 +118,11 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
   }
 
   /**
-   * Evaluates the current value, and adds a constraint to the Aether to ensure
+   * Evaluates the current value, and adds a constraint to the OpPlan to ensure
    * that all future evaluations of this property will always return the same
    * value.
    *
-   * **WARNING**: avoid using this where possible, it causes Aethers to split.
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
    *
    * **WARNING**: this is the most expensive eval, if you need to eval, prefer evalIs, evalHas, etc instead.
    */
@@ -138,12 +138,12 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
 
   /**
    * Evaluates if the current value is equal to this specific value, and adds a
-   * constraint to the Aether to ensure that all future evaluations of this
+   * constraint to the OpPlan to ensure that all future evaluations of this
    * check will always return the same (boolean) result.
    *
    * Should only be used on scalars.
    *
-   * **WARNING**: avoid using this where possible, it causes Aethers to split.
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
    */
   evalIs(expectedValue: unknown): boolean {
     const { value, path } = this;
@@ -159,10 +159,10 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
 
   /**
    * Evaluates if the current value is an object with the given key, and adds a
-   * constraint to the Aether to ensure that all future evaluations of this
+   * constraint to the OpPlan to ensure that all future evaluations of this
    * check will always return the same (boolean) result.
    *
-   * **WARNING**: avoid using this where possible, it causes Aethers to split.
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
    */
   evalHas(key: string): boolean {
     const { value, path } = this;
@@ -184,10 +184,10 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
 
   /**
    * Evaluates the length of the current value (assumed to be an array), and
-   * adds a constraint to the Aether to ensure that all future values will have
+   * adds a constraint to the OpPlan to ensure that all future values will have
    * the same length.
    *
-   * **WARNING**: avoid using this where possible, it causes Aethers to split.
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
    */
   evalLength(): number | null {
     const { value, path } = this;

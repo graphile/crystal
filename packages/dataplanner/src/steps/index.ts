@@ -1,16 +1,16 @@
-import type { Aether } from "../aether.js";
-import { getCurrentAether, getDebug, setDebug } from "../global.js";
+import type { OpPlan } from "../opPlan.js";
+import { getCurrentOpPlan, getDebug, setDebug } from "../global.js";
 import type { BaseGraphQLContext } from "../interfaces.js";
 import type { __ValueStep } from "./__value.js";
 
-export function aether(): Aether {
-  return getCurrentAether();
+export function opPlan(): OpPlan {
+  return getCurrentOpPlan();
 }
 
 export function context<
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
 >(): __ValueStep<TContext> {
-  return aether().contextStep;
+  return opPlan().contextStep;
 }
 
 /**

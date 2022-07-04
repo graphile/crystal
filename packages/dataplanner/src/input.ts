@@ -17,7 +17,7 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
-import type { Aether } from "./aether.js";
+import type { OpPlan } from "./opPlan.js";
 import * as assert from "./assert.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
@@ -46,12 +46,12 @@ export function assertInputStep(
 }
 
 export function graphqlGetTypeForNode(
-  aether: Aether,
+  opPlan: OpPlan,
   node: NamedTypeNode | ListTypeNode | NonNullTypeNode,
 ): GraphQLType {
   switch (node.kind) {
     case Kind.NAMED_TYPE: {
-      const type = aether.schema.getType(node.name.value);
+      const type = opPlan.schema.getType(node.name.value);
       if (!type) {
         // Should not happen since the GraphQL operation has already been
         // validated against the schema.
@@ -62,9 +62,9 @@ export function graphqlGetTypeForNode(
       return type;
     }
     case Kind.LIST_TYPE:
-      return new GraphQLList(graphqlGetTypeForNode(aether, node.type));
+      return new GraphQLList(graphqlGetTypeForNode(opPlan, node.type));
     case Kind.NON_NULL_TYPE:
-      return new GraphQLNonNull(graphqlGetTypeForNode(aether, node.type));
+      return new GraphQLNonNull(graphqlGetTypeForNode(opPlan, node.type));
     default: {
       const never: never = node;
       throw new Error(`Unknown node kind; node: ${inspect(never)}`);
@@ -80,7 +80,7 @@ export function graphqlGetTypeForNode(
  * @internal
  */
 export function inputPlan(
-  aether: Aether,
+  opPlan: OpPlan,
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
@@ -88,7 +88,7 @@ export function inputPlan(
   let inputValue = rawInputValue;
   if (inputValue?.kind === "Variable") {
     const variableName = inputValue.name.value;
-    const variableDefinition = aether.operation.variableDefinitions?.find(
+    const variableDefinition = opPlan.operation.variableDefinitions?.find(
       (def) => def.variable.name.value === variableName,
     );
     if (!variableDefinition) {
@@ -96,12 +96,12 @@ export function inputPlan(
       // validated.
       throw new Error(`No definition for variable '${variableName}' found`);
     }
-    const variableType = graphqlGetTypeForNode(aether, variableDefinition.type);
+    const variableType = graphqlGetTypeForNode(opPlan, variableDefinition.type);
     if (!isInputType(variableType)) {
       throw new Error(`Expected varible type to be an input type`);
     }
     return inputVariablePlan(
-      aether,
+      opPlan,
       variableName,
       variableType,
       inputType,
@@ -113,8 +113,8 @@ export function inputPlan(
   inputValue = inputValue ?? defaultValue;
   if (inputType instanceof GraphQLNonNull) {
     const innerType = inputType.ofType;
-    const valuePlan = inputPlan(aether, innerType, inputValue);
-    return inputNonNullPlan(aether, valuePlan);
+    const valuePlan = inputPlan(opPlan, innerType, inputValue);
+    return inputNonNullPlan(opPlan, valuePlan);
   } else if (inputType instanceof GraphQLList) {
     return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
@@ -147,7 +147,7 @@ function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
 }
 
 function inputVariablePlan(
-  aether: Aether,
+  opPlan: OpPlan,
   variableName: string,
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
@@ -159,7 +159,7 @@ function inputVariablePlan(
   ) {
     const unwrappedVariableType = variableType.ofType;
     return inputVariablePlan(
-      aether,
+      opPlan,
       variableName,
       unwrappedVariableType,
       inputType,
@@ -168,7 +168,7 @@ function inputVariablePlan(
   }
   const typesMatch = doTypesMatch(variableType, inputType);
   assert.ok(typesMatch, "Expected variable and input types to match");
-  const variableValuePlan = aether.trackedVariableValuesStep.get(variableName);
+  const variableValuePlan = opPlan.trackedVariableValuesStep.get(variableName);
   if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
     // There's no default value, or we know for sure that our variable will be
     // set (even if null) and thus the default will not be used; use the variable.
@@ -177,13 +177,13 @@ function inputVariablePlan(
     // `defaultValue` is NOT undefined, and we know variableValue is
     // `undefined` (and always will be); we're going to loop back and pretend
     // that no value was passed in the first place (instead of the variable):
-    return inputPlan(aether, inputType, undefined, defaultValue);
+    return inputPlan(opPlan, inputType, undefined, defaultValue);
   }
 }
 
 /**
  * Implements `InputNonNullStep`.
  */
-function inputNonNullPlan(_aether: Aether, innerPlan: InputStep): InputStep {
+function inputNonNullPlan(_opPlan: OpPlan, innerPlan: InputStep): InputStep {
   return innerPlan;
 }

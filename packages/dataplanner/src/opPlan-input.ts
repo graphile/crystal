@@ -16,7 +16,7 @@ import {
 import type {
   __InputObjectStep,
   __TrackedObjectStep,
-  Aether,
+  OpPlan,
 } from "./index.js";
 import type { InputStep } from "./input.js";
 import type {
@@ -35,7 +35,7 @@ export function withFieldArgsForArguments<
   T extends ExecutableStep,
   TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
 >(
-  aether: Aether,
+  opPlan: OpPlan,
   parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
@@ -49,7 +49,7 @@ export function withFieldArgsForArguments<
     fields[arg.name] = arg;
   }
   return withFieldArgsForArgumentsOrInputObject(
-    aether,
+    opPlan,
     null,
     parentPlan,
     $all,
@@ -62,7 +62,7 @@ function withFieldArgsForArgumentsOrInputObject<
   T extends ExecutableStep | ModifierStep | null | void,
   TParentStep extends ExecutableStep,
 >(
-  aether: Aether,
+  opPlan: OpPlan,
   typeContainingFields: GraphQLInputType | null,
   parentPlan: TParentStep,
   $current: TrackedArguments | InputStep, //__TrackedObjectStep | __InputObjectStep,
@@ -71,7 +71,7 @@ function withFieldArgsForArgumentsOrInputObject<
   } | null,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
-  const schema = aether.schema;
+  const schema = opPlan.schema;
   const analyzedCoordinates: string[] = [];
 
   const getArgOnceOnly = (inPath: string | string[]) => {
@@ -136,11 +136,11 @@ function withFieldArgsForArgumentsOrInputObject<
     details: ReturnType<typeof getArgOnceOnly>,
     $toPlan: ExecutableStep | ModifierStep | null,
   ) {
-    const plan = aether.withModifiers(() => {
+    const plan = opPlan.withModifiers(() => {
       const { argOrField, $value } = details;
 
       return withFieldArgsForArgOrField(
-        aether,
+        opPlan,
         parentPlan,
         argOrField,
         $value,
@@ -225,7 +225,7 @@ function withFieldArgsForArgumentsOrInputObject<
         currentType.extensions.graphile?.inputPlan ||
         defaultInputObjectTypeInputPlanResolver;
       return withFieldArgsForArgumentsOrInputObject(
-        aether,
+        opPlan,
         currentType,
         parentPlan,
         $value as any,
@@ -288,7 +288,7 @@ function withFieldArgsForArgumentsOrInputObject<
         const resolver = field.extensions.graphile?.applyPlan;
         if (resolver) {
           withFieldArgsForArgumentsOrInputObject(
-            aether,
+            opPlan,
             currentType,
             parentPlan,
             $value as any,
@@ -435,7 +435,7 @@ function withFieldArgsForArgOrField<
   T extends ExecutableStep | ModifierStep | null | void,
   TParentStep extends ExecutableStep,
 >(
-  aether: Aether,
+  opPlan: OpPlan,
   parentPlan: TParentStep,
   argOrField: GraphQLArgument | GraphQLInputField,
   $value: InputStep,
@@ -447,7 +447,7 @@ function withFieldArgsForArgOrField<
     ? nullableType.getFields()
     : null;
   return withFieldArgsForArgumentsOrInputObject(
-    aether,
+    opPlan,
     type,
     parentPlan,
     $value,

@@ -123,7 +123,7 @@ export interface BucketDefinitionFieldOutputMap {
  */
 export interface BucketDefinition {
   /**
-   * The array index of this BucketDefinition in Aether.buckets
+   * The array index of this BucketDefinition in OpPlan.buckets
    */
   id: number;
 
@@ -165,7 +165,7 @@ export interface BucketDefinition {
   /**
    * Some plans that execute within this bucket may be output to a particular
    * path identity or list of path identities (as dictated by a reverse lookup
-   * on Aether's planIdByPathIdentity). This output map is a digest of this
+   * on OpPlan's planIdByPathIdentity). This output map is a digest of this
    * information.
    */
   outputMap: {

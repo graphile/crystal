@@ -2,7 +2,7 @@
  * This file contains all our utilities for dealing with Mermaid-js
  */
 
-import type { Aether } from ".";
+import type { OpPlan } from ".";
 import type { BucketDefinitionFieldOutputMap } from "./bucket.js";
 import { crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { ExecutableStep } from "./step.js";
@@ -75,13 +75,13 @@ export interface PrintPlanGraphOptions {
 }
 
 /**
- * Convert an Aether into a plan graph; call this via `aether.printPlanGraph()`
+ * Convert an OpPlan into a plan graph; call this via `opPlan.printPlanGraph()`
  * rather than calling this function directly.
  *
  * @internal
  */
 export function printPlanGraph(
-  aether: Aether,
+  opPlan: OpPlan,
   {
     // printPathRelations = false,
     includePaths = true,
@@ -91,8 +91,8 @@ export function printPlanGraph(
     pathIdentitiesByStepId,
     plans,
   }: {
-    pathIdentitiesByStepId: ReturnType<Aether["getPathIdentitiesByStepId"]>;
-    plans: Aether["plans"];
+    pathIdentitiesByStepId: ReturnType<OpPlan["getPathIdentitiesByStepId"]>;
+    plans: OpPlan["plans"];
   },
 ): string {
   const color = (i: number) => {
@@ -135,7 +135,7 @@ export function printPlanGraph(
           ? ""
           : ` {${plan.groupIds}}`;
       const planString = `${planName}[${plan.id.replace(/^_/, "")}${
-        aether.buckets.length > 1 ? `∈${plan.bucketId}` : ""
+        opPlan.buckets.length > 1 ? `∈${plan.bucketId}` : ""
       }${plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""}]${groups}${
         meta ? `\n<${meta}>` : ""
       }`;
@@ -167,9 +167,9 @@ export function printPlanGraph(
       pathIdMap[pathIdentity] = `P${++pathCounter}`;
       const [lBrace, rBrace] = isItemStep
         ? [">", "]"]
-        : aether.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
+        : opPlan.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
         ? ["[/", "\\]"]
-        : aether.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
+        : opPlan.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
         ? ["([", "])"]
         : ["{{", "}}"];
       graph.push(
@@ -203,14 +203,14 @@ export function printPlanGraph(
           }
         }
       };
-      recurse(aether.rootFieldDigest!);
+      recurse(opPlan.rootFieldDigest!);
     }
     graph.push("    %% end");
     */
 
   graph.push("");
   graph.push("    %% define plans");
-  aether.processPlans("printingPlans", "dependencies-first", (plan) => {
+  opPlan.processPlans("printingPlans", "dependencies-first", (plan) => {
     planId(plan);
     return plan;
   });
@@ -218,7 +218,7 @@ export function printPlanGraph(
   graph.push("");
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = {};
-  aether.processPlans("printingPlanDeps", "dependencies-first", (plan) => {
+  opPlan.processPlans("printingPlanDeps", "dependencies-first", (plan) => {
     const planNode = planId(plan);
     const depNodes = plan.dependencies.map((depId) => {
       return planId(plans[depId]);
@@ -226,7 +226,7 @@ export function printPlanGraph(
     const transformItemPlanNode =
       plan instanceof __ListTransformStep
         ? planId(
-            plans[aether.transformDependencyPlanIdByTransformStepId[plan.id]],
+            plans[opPlan.transformDependencyPlanIdByTransformStepId[plan.id]],
           )
         : null;
     if (depNodes.length > 0) {
@@ -309,13 +309,13 @@ export function printPlanGraph(
           }
         }
       };
-      recurse(aether.rootFieldDigest!);
+      recurse(opPlan.rootFieldDigest!);
     }
     */
 
   graph.push("");
   graph.push("    subgraph Buckets");
-  for (const bucket of aether.buckets) {
+  for (const bucket of opPlan.buckets) {
     const plansAndIds = Object.entries(plans).filter(
       ([id, plan]) => plan && plan.id === id && plan.bucketId === bucket.id,
     );
@@ -330,7 +330,7 @@ export function printPlanGraph(
       const reasons: string[] = [];
       if (bucket.groupId != null) {
         reasons.push(
-          `group${bucket.groupId}[${aether.groups[bucket.groupId].reason}]`,
+          `group${bucket.groupId}[${opPlan.groups[bucket.groupId].reason}]`,
         );
       }
       if (bucket.itemStepId != null) {
@@ -399,7 +399,7 @@ export function printPlanGraph(
       ].join(",")} bucket${bucket.id}`,
     );
   }
-  for (const bucket of aether.buckets) {
+  for (const bucket of opPlan.buckets) {
     const childNodes = bucket.children.map((c) => `Bucket${c.id}`);
     if (childNodes.length > 0) {
       graph.push(`    Bucket${bucket.id} --> ${childNodes.join(" & ")}`);

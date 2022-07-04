@@ -111,7 +111,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.aether.dangerouslyGetStep(
+    return this.opPlan.dangerouslyGetStep(
       this.dependencies[this.listPlanDepId],
     ) as TListStep;
   }
@@ -128,7 +128,7 @@ export class __ListTransformStep<
         peer.listItem === this.listItem
       ) {
         // TODO: We shouldn't return `peer` until we alias the replacement id in
-        // aether.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
+        // opPlan.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
         // Also `itemPlanIdByListTransformStepId`.
         //
         // return peer;
@@ -147,13 +147,13 @@ export class __ListTransformStep<
     // dependencies as their own so that pluarility is correct for the
     // buckets.
     const transformDependencyStepId =
-      this.aether.transformDependencyPlanIdByTransformStepId[this.id];
-    const transformDependencyPlan = this.aether.dangerouslyGetStep(
+      this.opPlan.transformDependencyPlanIdByTransformStepId[this.id];
+    const transformDependencyPlan = this.opPlan.dangerouslyGetStep(
       transformDependencyStepId,
     );
 
     const externalDependencies = new Set<ExecutableStep>();
-    const listPlan = this.aether.dangerouslyGetStep(this.dependencies[0]);
+    const listPlan = this.opPlan.dangerouslyGetStep(this.dependencies[0]);
 
     const recurse = (innerPlan: ExecutableStep): boolean => {
       if (innerPlan === listPlan) {
@@ -162,7 +162,7 @@ export class __ListTransformStep<
       let hasInternal = false;
       const externals = [];
       for (const depId of innerPlan.dependencies) {
-        const dep = this.aether.dangerouslyGetStep(depId);
+        const dep = this.opPlan.dangerouslyGetStep(depId);
         const internal = recurse(dep);
         if (internal) {
           hasInternal = true;
@@ -180,8 +180,8 @@ export class __ListTransformStep<
 
     recurse(transformDependencyPlan);
     if (externalDependencies.size > 0) {
-      const itemStepId = this.aether.itemPlanIdByListTransformStepId[this.id]!;
-      const itemPlan = this.aether.dangerouslyGetStep(itemStepId);
+      const itemStepId = this.opPlan.itemPlanIdByListTransformStepId[this.id]!;
+      const itemPlan = this.opPlan.dangerouslyGetStep(itemStepId);
       for (const dep of externalDependencies) {
         this.addDependency(dep);
         (itemPlan.dependencies as Array<string>).push(dep.id);

@@ -20,7 +20,7 @@ debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { Aether } from "./aether.js";
+import { OpPlan } from "./opPlan.js";
 import { ROOT_PATH } from "./constants.js";
 import { dataplannerEnforce } from "./dataplannerEnforce.js";
 import { defer, Deferred } from "./deferred.js";
@@ -104,7 +104,7 @@ import {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
-  aether,
+  opPlan,
   connection,
   ConnectionCapableStep,
   ConnectionStep,
@@ -200,8 +200,8 @@ export {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
-  Aether,
-  aether,
+  OpPlan,
+  opPlan,
   ArgumentApplyPlanResolver,
   ArgumentInputPlanResolver,
   arrayOfLength,
@@ -354,7 +354,7 @@ exportAsMany({
   crystalPrint,
   crystalPrintPathIdentity,
   makeCrystalSchema,
-  Aether,
+  OpPlan,
   ROOT_PATH,
   defer,
   dataplannerEnforce,
@@ -375,7 +375,7 @@ exportAsMany({
   __ValueStep,
   access,
   AccessStep,
-  aether,
+  opPlan,
   connection,
   ConnectionStep,
   constant,

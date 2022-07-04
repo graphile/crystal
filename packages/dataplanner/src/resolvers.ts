@@ -5,14 +5,14 @@ import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
-import { populateValuePlan } from "./aether.js";
+import { populateValuePlan } from "./opPlan.js";
 import { ROOT_PATH } from "./constants.js";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { noop } from "./dev.js";
 import { isCrystalError } from "./error.js";
-import { establishAether } from "./establishAether.js";
+import { establishOpPlan } from "./establishOpPlan.js";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces.js";
 import {
   $$concreteType,
@@ -75,7 +75,7 @@ export function isCrystalWrapped<T>(
   return typeof t === "function" && $$crystalWrapped in t;
 }
 
-const getAetherFromResolver = <TContext extends object>(
+const getOpPlanFromResolver = <TContext extends object>(
   context: TContext,
   info: GraphQLResolveInfo,
 ) => {
@@ -91,7 +91,7 @@ const getAetherFromResolver = <TContext extends object>(
     rootValue,
   } = info;
   // const alias = getAliasFromResolveInfo(info);
-  const aether = establishAether({
+  const opPlan = establishOpPlan({
     schema,
     operation,
     fragments,
@@ -99,7 +99,7 @@ const getAetherFromResolver = <TContext extends object>(
     context,
     rootValue,
   });
-  return aether;
+  return opPlan;
 };
 
 /**
@@ -128,15 +128,15 @@ function makeParentCrystalObject(
       ? pathToPathIdentity(path.prev)
       : ROOT_PATH;
     const { crystalContext } = batch;
-    const { aether } = crystalContext;
+    const { opPlan } = crystalContext;
     const parentStepId =
-      aether.itemPlanIdByFieldPathIdentity[parentPathIdentity];
+      opPlan.itemPlanIdByFieldPathIdentity[parentPathIdentity];
     if (parentStepId == null) {
       throw new Error(
         `Could not find a planId for (parent) path '${parentPathIdentity}'`,
       );
     }
-    const parentPlan = aether.dangerouslyGetStep(parentStepId); // TODO: assert that this is handled for us
+    const parentPlan = opPlan.dangerouslyGetStep(parentStepId); // TODO: assert that this is handled for us
     if (!(parentPlan instanceof __ValueStep)) {
       throw new Error(
         `Expected parent field (which returned non-crystal object) to be a __ValueStep, instead found ${parentPlan})`,
@@ -220,7 +220,7 @@ function dataplannerResolverOrSubscriber<
       // the entire operation if plans are used everywhere. Even more optimised
       // would be if we can share the same {crystalContext} across multiple
       // `rootValue`s for multiple parallel executions (must be within the same
-      // aether) - e.g. as a result of multiple identical subscription
+      // opPlan) - e.g. as a result of multiple identical subscription
       // operations.
 
       /**
@@ -250,24 +250,24 @@ function dataplannerResolverOrSubscriber<
         possiblyParentCrystalObject = source;
       }
 
-      const aether = possiblyParentCrystalObject
-        ? possiblyParentCrystalObject[$$crystalContext].aether
-        : getAetherFromResolver(context, info);
+      const opPlan = possiblyParentCrystalObject
+        ? possiblyParentCrystalObject[$$crystalContext].opPlan
+        : getOpPlanFromResolver(context, info);
       const pathIdentity = isSubscribe
         ? ROOT_PATH
         : possiblyParentCrystalObject != null
-        ? aether.pathIdentityByParentPathIdentity[
+        ? opPlan.pathIdentityByParentPathIdentity[
             possiblyParentCrystalObject[$$pathIdentity]
           ][info.path.typename!][info.path.key]
         : pathToPathIdentity(info.path);
       const isUnplanned =
-        aether.isUnplannedByPathIdentity[pathIdentity] === true;
+        opPlan.isUnplannedByPathIdentity[pathIdentity] === true;
 
       // IMPORTANT: there must be no `await` between here and `getBatchResult`.
       /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
       const batch =
-        aether.batchByPathIdentity[pathIdentity] ??
-        aether.makeBatch(
+        opPlan.batchByPathIdentity[pathIdentity] ??
+        opPlan.makeBatch(
           pathIdentity,
           info.returnType,
           possiblyParentCrystalObject,
@@ -293,7 +293,7 @@ function dataplannerResolverOrSubscriber<
         }, noop);
       }
       if (userSpecifiedResolver != null) {
-        // At this point, Aether will already have performed the relevant
+        // At this point, OpPlan will already have performed the relevant
         // checks to ensure this is safe to do. The values returned through
         // here must never be CrystalObjects (or lists thereof).
         return resultPromise.then((result) => {
