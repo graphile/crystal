@@ -2434,18 +2434,23 @@ export class OpPlan<
       // Process dependents first
       const first = new Set<string>();
       if (order === "dependents-first") {
-        Object.values(this.plans).forEach((possibleDependent) => {
-          if (!possibleDependent) {
-            return;
+        for (const id in this.plans) {
+          const possibleDependent = this.plans[id];
+          if (
+            !possibleDependent ||
+            possibleDependent.id !== id ||
+            possibleDependent.id === plan.id
+          ) {
+            continue;
           }
-          // Cannot just use the number since the number could be an alias
-          const dependencies = possibleDependent.dependencies.map(
-            (depId) => this.plans[depId],
-          );
-          if (dependencies.includes(plan)) {
-            first.add(possibleDependent.id);
+          for (const depId of possibleDependent.dependencies) {
+            const dep = this.plans[depId];
+            if (dep === plan) {
+              first.add(possibleDependent.id);
+              break;
+            }
           }
-        });
+        }
       } else {
         plan.dependencies.forEach((depId) => {
           const dependency = this.plans[depId];
@@ -2668,23 +2673,19 @@ export class OpPlan<
       return plan;
     }
 
-    const seenIds = new Set();
-    seenIds.add(plan.id);
-    const peers = Object.entries(this.plans)
-      .filter(([id, potentialPeer]) => {
-        if (
-          potentialPeer &&
-          potentialPeer.id === id &&
-          !potentialPeer.hasSideEffects &&
-          !seenIds.has(potentialPeer.id) &&
-          this.isPeer(plan, potentialPeer)
-        ) {
-          seenIds.add(potentialPeer.id);
-          return true;
-        }
-        return false;
-      })
-      .map((tuple) => tuple[1]);
+    const peers: ExecutableStep[] = [];
+    for (const id in this.plans) {
+      const potentialPeer = this.plans[id];
+      if (!potentialPeer || potentialPeer.id !== id) {
+        continue;
+      }
+      if (potentialPeer.hasSideEffects) {
+        continue;
+      }
+      if (this.isPeer(plan, potentialPeer)) {
+        peers.push(potentialPeer);
+      }
+    }
 
     // TODO: should we keep this optimisation, or should we remove it so that
     // plans that are "smarter" than us can return replacement plans even if
@@ -3329,6 +3330,11 @@ export class OpPlan<
 
       const bucket = getBucket();
       if (polymorphicDetails && !polymorphicDetails.local) {
+        if (plan.bucketId === -1) {
+          // TODO: validate this decision
+          // No bucket, but not local... Huh? Guess we'll shove it in the parent bucket
+          plan.bucketId = bucket.parent!.id;
+        }
         addPlanIdsToBucket(bucket, [plan]);
       } else {
         plan.bucketId = bucket.id;
@@ -6247,6 +6253,11 @@ function addPlanIdsToBucket(
 ): void {
   const next: ExecutableStep[] = [];
   dependencyPlans.forEach((plan) => {
+    if (plan.bucketId === -1) {
+      throw new Error(
+        `Attempted to add ${plan} to bucket ${bucket.id}, but it doesn't have a bucket yet`,
+      );
+    }
     if (plan.bucketId !== bucket.id) {
       if (!bucket.copyPlanIds.includes(plan.id)) {
         bucket.copyPlanIds.push(plan.id);
@@ -6257,7 +6268,7 @@ function addPlanIdsToBucket(
   if (next.length) {
     if (!bucket.parent) {
       throw new Error(
-        `Attempted to add ${next} to bucket ${attemptedBuckets?.[0]?.id}, but did not find their parent buckets in the chain. (i.e. the plan heirarchy is malformed.)`,
+        `Attempted to add ${next} (bucket[0] = ${next[0].bucketId}) to bucket ${attemptedBuckets?.[0]?.id}, but did not find their parent buckets in the chain. (i.e. the plan heirarchy is malformed.)`,
         //`${plan} (bucket ${plan.bucketId}) depends on ${dep} (bucket ${dep.bucketId}), but bucket ${dep.bucketId} does not appear in bucket ${plan.bucketId}'s ancestors.`,
       );
     }
