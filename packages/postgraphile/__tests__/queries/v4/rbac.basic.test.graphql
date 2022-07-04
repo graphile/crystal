@@ -1,0 +1,20 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> ignoreRBAC: false
+
+query {
+  personSecretByPersonId(personId: 3) { nodeId personId secret }
+  allPersonSecrets { nodes { nodeId personId secret } }
+  personForSecret: personById(id: 1) { nodeId personSecretByPersonId { nodeId personId secret } }
+
+  leftArmById(id: 42) { nodeId id personId lengthInMetres mood }
+  allLeftArms { nodes { nodeId id personId lengthInMetres mood } }
+  personForLeftArm: personById(id: 2) { nodeId leftArmByPersonId { nodeId id personId lengthInMetres mood } }
+
+  postById(id:7) { nodeId id headline body authorId }
+  allPosts { nodes { nodeId id headline body authorId } }
+  personForPosts: personById(id: 3) { nodeId postsByAuthorId { nodes { nodeId id headline body authorId } } }
+
+  # https://github.com/graphile/postgraphile/issues/812
+  returnTableWithoutGrants { nodeId personId1 personId2 }
+}

@@ -1,0 +1,205 @@
+{
+  personSecretByPersonId: {
+    nodeId: "WyJwZXJzb25fc2VjcmV0cyIsM10=",
+    personId: 3,
+    secret: "I once got stuck trying to retrieve something embarassing from between two panes of glass",
+  },
+  allPersonSecrets: {
+    nodes: [
+      {
+        nodeId: "WyJwZXJzb25fc2VjcmV0cyIsMl0=",
+        personId: 2,
+        secret: "Sara Smith is not really my name!",
+      },
+      {
+        nodeId: "WyJwZXJzb25fc2VjcmV0cyIsM10=",
+        personId: 3,
+        secret: "I once got stuck trying to retrieve something embarassing from between two panes of glass",
+      },
+      {
+        nodeId: "WyJwZXJzb25fc2VjcmV0cyIsNV0=",
+        personId: 5,
+        secret: "My only secret is that I have no secrets!",
+      },
+      {
+        nodeId: "WyJwZXJzb25fc2VjcmV0cyIsNl0=",
+        personId: 6,
+        secret: "I don't think the bug I test for will ever return!",
+      },
+    ],
+  },
+  personForSecret: {
+    nodeId: "WyJwZW9wbGUiLDFd",
+    personSecretByPersonId: null,
+  },
+  leftArmById: {
+    nodeId: "WyJsZWZ0X2FybXMiLDQyXQ==",
+    id: 42,
+    personId: 4,
+    lengthInMetres: 0.6,
+    mood: "neutral",
+  },
+  allLeftArms: {
+    nodes: [
+      {
+        nodeId: "WyJsZWZ0X2FybXMiLDQyXQ==",
+        id: 42,
+        personId: 4,
+        lengthInMetres: 0.6,
+        mood: "neutral",
+      },
+      {
+        nodeId: "WyJsZWZ0X2FybXMiLDQ1XQ==",
+        id: 45,
+        personId: 2,
+        lengthInMetres: 0.7,
+        mood: "neutral",
+      },
+      {
+        nodeId: "WyJsZWZ0X2FybXMiLDQ3XQ==",
+        id: 47,
+        personId: 5,
+        lengthInMetres: 0.65,
+        mood: "neutral",
+      },
+      {
+        nodeId: "WyJsZWZ0X2FybXMiLDUwXQ==",
+        id: 50,
+        personId: 1,
+        lengthInMetres: 0.65,
+        mood: "neutral",
+      },
+    ],
+  },
+  personForLeftArm: {
+    nodeId: "WyJwZW9wbGUiLDJd",
+    leftArmByPersonId: {
+      nodeId: "WyJsZWZ0X2FybXMiLDQ1XQ==",
+      id: 45,
+      personId: 2,
+      lengthInMetres: 0.7,
+      mood: "neutral",
+    },
+  },
+  postById: {
+    nodeId: "WyJwb3N0cyIsN10=",
+    id: 7,
+    headline: "Large bet on myself in round one.",
+    body: null,
+    authorId: 1,
+  },
+  allPosts: {
+    nodes: [
+      {
+        nodeId: "WyJwb3N0cyIsMV0=",
+        id: 1,
+        headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+        body: null,
+        authorId: 2,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsMl0=",
+        id: 2,
+        headline: "I hate yogurt. It’s just stuff with bits in.",
+        body: null,
+        authorId: 1,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsM10=",
+        id: 3,
+        headline: "Is that a cooking show?",
+        body: null,
+        authorId: 1,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsNF0=",
+        id: 4,
+        headline: "You hit me with a cricket bat.",
+        body: null,
+        authorId: 1,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsNV0=",
+        id: 5,
+        headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+        body: null,
+        authorId: 5,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsNl0=",
+        id: 6,
+        headline: "Stop talking, brain thinking. Hush.",
+        body: null,
+        authorId: 3,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsN10=",
+        id: 7,
+        headline: "Large bet on myself in round one.",
+        body: null,
+        authorId: 1,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsOF0=",
+        id: 8,
+        headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+        body: null,
+        authorId: 2,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsOV0=",
+        id: 9,
+        headline: "You know how I sometimes have really brilliant ideas?",
+        body: null,
+        authorId: 3,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsMTBd",
+        id: 10,
+        headline: "What’s with you kids? Every other day it’s food, food, food.",
+        body: null,
+        authorId: 2,
+      },
+      {
+        nodeId: "WyJwb3N0cyIsMTFd",
+        id: 11,
+        headline: "They’re not aliens, they’re Earth…liens!",
+        body: null,
+        authorId: 3,
+      },
+    ],
+  },
+  personForPosts: {
+    nodeId: "WyJwZW9wbGUiLDNd",
+    postsByAuthorId: {
+      nodes: [
+        {
+          nodeId: "WyJwb3N0cyIsNl0=",
+          id: 6,
+          headline: "Stop talking, brain thinking. Hush.",
+          body: null,
+          authorId: 3,
+        },
+        {
+          nodeId: "WyJwb3N0cyIsOV0=",
+          id: 9,
+          headline: "You know how I sometimes have really brilliant ideas?",
+          body: null,
+          authorId: 3,
+        },
+        {
+          nodeId: "WyJwb3N0cyIsMTFd",
+          id: 11,
+          headline: "They’re not aliens, they’re Earth…liens!",
+          body: null,
+          authorId: 3,
+        },
+      ],
+    },
+  },
+  returnTableWithoutGrants: {
+    nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+    personId1: 1,
+    personId2: 2,
+  },
+}
