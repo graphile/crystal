@@ -6196,7 +6196,7 @@ function deeper(
       return deeper(bucket2, bucket1, false);
     } else {
       throw new Error(
-        `bucket1 and bucket2 do not exist on the same lineage - one is not an ancestor of the other`,
+        `bucket1 (id: ${bucket1.id}, rootPathIdentities: ${bucket1.rootPathIdentities}) and bucket2 (id: ${bucket2.id}, rootPathIdentities: ${bucket2.rootPathIdentities}) do not exist on the same lineage - one is not an ancestor of the other`,
       );
     }
   }
