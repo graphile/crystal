@@ -1,0 +1,124 @@
+{
+  allCompoundKeys: {
+    nodes: [
+      {
+        personId1: 1,
+        personId2: 2,
+        extra: null,
+        personByPersonId1: {
+          name: "John Smith",
+          email: "john.smith@email.com",
+        },
+        personByPersonId2: {
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 1,
+        extra: false,
+        personByPersonId1: {
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+        },
+        personByPersonId2: {
+          name: "John Smith",
+          email: "john.smith@email.com",
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 3,
+        extra: null,
+        personByPersonId1: {
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+        },
+        personByPersonId2: {
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 5,
+        extra: true,
+        personByPersonId1: {
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+        },
+        personByPersonId2: {
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+        },
+      },
+      {
+        personId1: 4,
+        personId2: 3,
+        extra: true,
+        personByPersonId1: {
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+        },
+        personByPersonId2: {
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+        },
+      },
+      {
+        personId1: 4,
+        personId2: 4,
+        extra: false,
+        personByPersonId1: {
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+        },
+        personByPersonId2: {
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+        },
+      },
+    ],
+  },
+  allForeignKeys: {
+    nodes: [
+      {
+        personId: 5,
+        compoundKey1: 2,
+        compoundKey2: 1,
+        personByPersonId: {
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+        },
+        compoundKeyByCompoundKey1AndCompoundKey2: {
+          personId1: 2,
+          personId2: 1,
+          extra: false,
+        },
+      },
+      {
+        personId: null,
+        compoundKey1: 4,
+        compoundKey2: 4,
+        personByPersonId: null,
+        compoundKeyByCompoundKey1AndCompoundKey2: {
+          personId1: 4,
+          personId2: 4,
+          extra: false,
+        },
+      },
+      {
+        personId: null,
+        compoundKey1: 2,
+        compoundKey2: 1,
+        personByPersonId: null,
+        compoundKeyByCompoundKey1AndCompoundKey2: {
+          personId1: 2,
+          personId2: 1,
+          extra: false,
+        },
+      },
+    ],
+  },
+}
