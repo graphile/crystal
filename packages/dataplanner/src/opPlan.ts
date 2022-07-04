@@ -2432,7 +2432,7 @@ export class OpPlan<
         return false;
       };
       // Process dependents first
-      const first = new Set<string>();
+      const first = new Set<ExecutableStep>();
       if (order === "dependents-first") {
         for (const id in this.plans) {
           const possibleDependent = this.plans[id];
@@ -2446,7 +2446,7 @@ export class OpPlan<
           for (const depId of possibleDependent.dependencies) {
             const dep = this.plans[depId];
             if (dep === plan) {
-              first.add(possibleDependent.id);
+              first.add(possibleDependent);
               break;
             }
           }
@@ -2454,11 +2454,10 @@ export class OpPlan<
       } else {
         plan.dependencies.forEach((depId) => {
           const dependency = this.plans[depId];
-          first.add(dependency.id);
+          first.add(dependency);
         });
       }
-      for (const depId of first) {
-        const depPlan = this.plans[depId];
+      for (const depPlan of first) {
         if (depPlan && !processed.has(depPlan)) {
           if (debugPlanVerboseEnabled) {
             debugPlanVerbose(
