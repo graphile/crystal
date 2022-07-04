@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access515["Access[515∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access516["Access[516∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object517["Object[517∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access181["Access[181∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access182["Access[182∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object183["Object[183∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Connection184["Connection[184∈0]<br />ᐸ180ᐳ"]:::plan
     PgSelect185[["PgSelect[185∈0]<br />ᐸtypesᐳ"]]:::plan
     __Item186>"__Item[186∈1]<br />ᐸ185ᐳ"]:::itemplan
@@ -179,10 +179,10 @@ graph TD
     PgClassExpression545["PgClassExpression[545∈15]<br />ᐸ”c”.”edge_...ge_case__)ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access515
-    __Value3 --> Access516
-    Access515 & Access516 --> Object517
-    Object517 & Connection184 --> PgSelect185
+    __Value3 --> Access181
+    __Value3 --> Access182
+    Access181 & Access182 --> Object183
+    Object183 & Connection184 --> PgSelect185
     PgSelect185 ==> __Item186
     __Item186 --> PgSelectSingle187
     PgSelectSingle187 --> Map546
@@ -219,7 +219,7 @@ graph TD
     PgSelectSingle263 --> PgClassExpression264
     PgSelectSingle263 --> PgClassExpression265
     PgSelectSingle263 --> PgClassExpression267
-    Object517 & Connection286 & __InputStaticLeaf295 & __InputStaticLeaf299 & __InputStaticLeaf300 & __InputStaticLeaf307 & __InputStaticLeaf311 & __InputStaticLeaf312 & __InputStaticLeaf315 & Constant318 & __InputStaticLeaf320 & __InputStaticLeaf321 --> PgSelect287
+    Object183 & Connection286 & __InputStaticLeaf295 & __InputStaticLeaf299 & __InputStaticLeaf300 & __InputStaticLeaf307 & __InputStaticLeaf311 & __InputStaticLeaf312 & __InputStaticLeaf315 & Constant318 & __InputStaticLeaf320 & __InputStaticLeaf321 --> PgSelect287
     PgSelect287 ==> __Item288
     __Item288 --> PgSelectSingle289
     PgSelectSingle289 --> PgClassExpression290
@@ -234,7 +234,7 @@ graph TD
     PgSelectSingle289 --> PgClassExpression323
     __InputStaticLeaf332 & __InputStaticLeaf333 & __InputStaticLeaf334 & __InputStaticLeaf335 & __InputStaticLeaf336 & __InputStaticLeaf337 --> Object341
     __InputStaticLeaf325 & __InputStaticLeaf326 & __InputStaticLeaf327 & __InputStaticLeaf329 & __InputStaticLeaf330 & Object341 & __InputStaticLeaf338 --> Object340
-    Object517 & PgClassExpression293 & Object340 --> PgSelect342
+    Object183 & PgClassExpression293 & Object340 --> PgSelect342
     PgSelect342 ==> __Item346
     __Item346 --> PgSelectSingle347
     PgSelectSingle347 --> PgClassExpression348
@@ -288,7 +288,7 @@ graph TD
     PgSelectSingle402 --> PgClassExpression409
     PgClassExpression409 --> List410
     List410 --> PgCursor408
-    Object517 & Connection436 --> PgSelect437
+    Object183 & Connection436 --> PgSelect437
     PgSelect437 ==> __Item438
     __Item438 --> PgSelectSingle439
     PgSelectSingle439 --> PgClassExpression440
@@ -316,7 +316,7 @@ graph TD
     Map565 --> PgSelectSingle519
     PgSelectSingle519 --> PgClassExpression520
     PgSelectSingle519 --> PgClassExpression521
-    Object517 & Connection538 --> PgSelect539
+    Object183 & Connection538 --> PgSelect539
     PgSelect539 ==> __Item540
     __Item540 --> PgSelectSingle541
     PgSelectSingle541 --> PgClassExpression542
@@ -546,11 +546,11 @@ graph TD
     subgraph "Buckets for queries/v4/procedure-computed-fields"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allTypes ᐸ-O- 184<br />⠀⠀⠀allTypes.nodes ᐸ-A- 185<br />⠀⠀allPosts ᐸ-O- 286<br />⠀⠀⠀allPosts.nodes ᐸ-A- 287<br />⠀⠀allPeople ᐸ-O- 436<br />⠀⠀⠀allPeople.nodes ᐸ-A- 437<br />⠀⠀allEdgeCases ᐸ-O- 538<br />⠀⠀⠀allEdgeCases.nodes ᐸ-A- 539"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,Connection184,PgSelect185,Connection286,PgSelect287,__InputStaticLeaf295,__InputStaticLeaf299,__InputStaticLeaf300,__InputStaticLeaf307,__InputStaticLeaf311,__InputStaticLeaf312,__InputStaticLeaf315,Constant318,__InputStaticLeaf320,__InputStaticLeaf321,__InputStaticLeaf325,__InputStaticLeaf326,__InputStaticLeaf327,__InputStaticLeaf329,__InputStaticLeaf330,__InputStaticLeaf332,__InputStaticLeaf333,__InputStaticLeaf334,__InputStaticLeaf335,__InputStaticLeaf336,__InputStaticLeaf337,__InputStaticLeaf338,Object340,Object341,Connection381,Connection436,PgSelect437,Connection468,__InputStaticLeaf478,Connection503,Access515,Access516,Object517,Connection538,PgSelect539 bucket0
+    class Bucket0,__Value0,__Value3,Access181,Access182,Object183,Connection184,PgSelect185,Connection286,PgSelect287,__InputStaticLeaf295,__InputStaticLeaf299,__InputStaticLeaf300,__InputStaticLeaf307,__InputStaticLeaf311,__InputStaticLeaf312,__InputStaticLeaf315,Constant318,__InputStaticLeaf320,__InputStaticLeaf321,__InputStaticLeaf325,__InputStaticLeaf326,__InputStaticLeaf327,__InputStaticLeaf329,__InputStaticLeaf330,__InputStaticLeaf332,__InputStaticLeaf333,__InputStaticLeaf334,__InputStaticLeaf335,__InputStaticLeaf336,__InputStaticLeaf337,__InputStaticLeaf338,Object340,Object341,Connection381,Connection436,PgSelect437,Connection468,__InputStaticLeaf478,Connection503,Connection538,PgSelect539 bucket0
     Bucket1("Bucket 1 (item186)<br />Deps: 185<br />~ᐳQuery.allTypesᐳTypesConnection.nodes[]<br />⠀ROOT ᐸ-O- 187<br />⠀⠀compoundType ᐸ-O- 194<br />⠀⠀⠀compoundType.a ᐸ-L- 195<br />⠀⠀⠀compoundType.fooBar ᐸ-L- 196<br />⠀⠀⠀compoundType.computedField ᐸ-L- 198<br />⠀⠀nestedCompoundType ᐸ-O- 205<br />⠀⠀⠀nestedCompoundType.a ᐸ-O- 212<br />⠀⠀⠀⠀nestedCompoundType.a.a ᐸ-L- 213<br />⠀⠀⠀⠀nestedCompoundType.a.fooBar ᐸ-L- 214<br />⠀⠀⠀⠀nestedCompoundType.a.computedField ᐸ-L- 216<br />⠀⠀⠀nestedCompoundType.b ᐸ-O- 223<br />⠀⠀⠀⠀nestedCompoundType.b.a ᐸ-L- 224<br />⠀⠀⠀⠀nestedCompoundType.b.fooBar ᐸ-L- 225<br />⠀⠀⠀⠀nestedCompoundType.b.computedField ᐸ-L- 227<br />⠀⠀nullableCompoundType ᐸ-O- 234<br />⠀⠀⠀nullableCompoundType.a ᐸ-L- 235<br />⠀⠀⠀nullableCompoundType.fooBar ᐸ-L- 236<br />⠀⠀⠀nullableCompoundType.computedField ᐸ-L- 238<br />⠀⠀nullableNestedCompoundType ᐸ-O- 245<br />⠀⠀⠀nullableNestedCompoundType.a ᐸ-O- 252<br />⠀⠀⠀⠀nullableNestedCompoundType.a.a ᐸ-L- 253<br />⠀⠀⠀⠀nullableNestedCompoundType.a.fooBar ᐸ-L- 254<br />⠀⠀⠀⠀nullableNestedCompoundType.a.computedField ᐸ-L- 256<br />⠀⠀⠀nullableNestedCompoundType.b ᐸ-O- 263<br />⠀⠀⠀⠀nullableNestedCompoundType.b.a ᐸ-L- 264<br />⠀⠀⠀⠀nullableNestedCompoundType.b.fooBar ᐸ-L- 265<br />⠀⠀⠀⠀nullableNestedCompoundType.b.computedField ᐸ-L- 267"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item186,PgSelectSingle187,PgSelectSingle194,PgClassExpression195,PgClassExpression196,PgClassExpression198,PgSelectSingle205,PgSelectSingle212,PgClassExpression213,PgClassExpression214,PgClassExpression216,PgSelectSingle223,PgClassExpression224,PgClassExpression225,PgClassExpression227,PgSelectSingle234,PgClassExpression235,PgClassExpression236,PgClassExpression238,PgSelectSingle245,PgSelectSingle252,PgClassExpression253,PgClassExpression254,PgClassExpression256,PgSelectSingle263,PgClassExpression264,PgClassExpression265,PgClassExpression267,Map546,Map548,Map550,Map552,Map554,Map556,Map558,Map560 bucket1
-    Bucket2("Bucket 2 (item288)<br />Deps: 287, 517, 340, 381<br />~ᐳQuery.allPostsᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 289<br />⠀⠀headline ᐸ-L- 290<br />⠀⠀a ᐸ-L- 294<br />⠀⠀b ᐸ-L- 298<br />⠀⠀c ᐸ-L- 302<br />⠀⠀d ᐸ-L- 306<br />⠀⠀e ᐸ-L- 310<br />⠀⠀f ᐸ-L- 314<br />⠀⠀g ᐸ-L- 319<br />⠀⠀h ᐸ-L- 323<br />⠀⠀computedCompoundTypeArray ᐸ-A- 342<br />⠀⠀computedTextArray ᐸ-A- 360<br />⠀⠀computedIntervalArray ᐸ-A- 363<br />⠀⠀computedIntervalSet ᐸ-O- 381<br />⠀⠀⠀computedIntervalSet.nodes ᐸ-A- 383<br />⠀⠀⠀computedIntervalSet.edges ᐸ-A- 397"):::bucket
+    Bucket2("Bucket 2 (item288)<br />Deps: 287, 183, 340, 381<br />~ᐳQuery.allPostsᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 289<br />⠀⠀headline ᐸ-L- 290<br />⠀⠀a ᐸ-L- 294<br />⠀⠀b ᐸ-L- 298<br />⠀⠀c ᐸ-L- 302<br />⠀⠀d ᐸ-L- 306<br />⠀⠀e ᐸ-L- 310<br />⠀⠀f ᐸ-L- 314<br />⠀⠀g ᐸ-L- 319<br />⠀⠀h ᐸ-L- 323<br />⠀⠀computedCompoundTypeArray ᐸ-A- 342<br />⠀⠀computedTextArray ᐸ-A- 360<br />⠀⠀computedIntervalArray ᐸ-A- 363<br />⠀⠀computedIntervalSet ᐸ-O- 381<br />⠀⠀⠀computedIntervalSet.nodes ᐸ-A- 383<br />⠀⠀⠀computedIntervalSet.edges ᐸ-A- 397"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item288,PgSelectSingle289,PgClassExpression290,PgClassExpression293,PgClassExpression294,PgClassExpression298,PgClassExpression302,PgClassExpression306,PgClassExpression310,PgClassExpression314,PgClassExpression319,PgClassExpression323,PgSelect342,PgClassExpression360,PgClassExpression363,__ListTransform383,__ListTransform397,Access562 bucket2
     Bucket3("Bucket 3 (item346)<br />Deps: 342<br />~ᐳQuery.allPostsᐳPostsConnection.nodes[]ᐳPost.computedCompoundTypeArray[]<br />⠀ROOT ᐸ-O- 347<br />⠀⠀a ᐸ-L- 348<br />⠀⠀b ᐸ-L- 349<br />⠀⠀c ᐸ-L- 350<br />⠀⠀d ᐸ-L- 351<br />⠀⠀e ᐸ-L- 352<br />⠀⠀f ᐸ-L- 353<br />⠀⠀g ᐸ-O- 354<br />⠀⠀⠀g.seconds ᐸ-L- 355<br />⠀⠀⠀g.minutes ᐸ-L- 356<br />⠀⠀⠀g.hours ᐸ-L- 357<br />⠀⠀fooBar ᐸ-L- 358"):::bucket

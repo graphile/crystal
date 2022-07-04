@@ -16,6 +16,43 @@ lateral (
   ) as __func_in_inout__(v)
 ) as __func_in_inout_result__
 
+select
+  __func_out__.v::text as "0"
+from "c"."func_out"() as __func_out__(v)
+
+select
+  __func_out_out__."first_out"::text as "0",
+  __func_out_out__."second_out" as "1",
+  (not (__func_out_out__ is null))::text as "2"
+from "c"."func_out_out"() as __func_out_out__
+
+select
+  __func_out_out_unnamed__."column1"::text as "0",
+  __func_out_out_unnamed__."column2" as "1",
+  (not (__func_out_out_unnamed__ is null))::text as "2"
+from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__
+
+select
+  __func_out_table__."id"::text as "0"
+from "c"."func_out_table"() as __func_out_table__
+
+select
+  __func_out_unnamed__.v::text as "0"
+from "c"."func_out_unnamed"() as __func_out_unnamed__(v)
+
+select
+  __func_out_unnamed_out_out_unnamed__."column1"::text as "0",
+  __func_out_unnamed_out_out_unnamed__."column3"::text as "1",
+  __func_out_unnamed_out_out_unnamed__."o2" as "2",
+  (not (__func_out_unnamed_out_out_unnamed__ is null))::text as "3"
+from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__
+
+select
+  __search_test_summaries__."id"::text as "0",
+  to_char(__search_test_summaries__."total_duration", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
+  (not (__search_test_summaries__ is null))::text as "2"
+from "c"."search_test_summaries"() as __search_test_summaries__
+
 select __func_in_out_result__.*
 from (
   select
@@ -29,10 +66,6 @@ lateral (
     __func_in_out_identifiers__.idx as "1"
   from "c"."func_in_out"(__func_in_out_identifiers__."id0") as __func_in_out__(v)
 ) as __func_in_out_result__
-
-select
-  __func_out__.v::text as "0"
-from "c"."func_out"() as __func_out__(v)
 
 select __func_out_complex_result__.*
 from (
@@ -128,12 +161,6 @@ lateral (
   ) as __func_out_complex_setof__
 ) as __func_out_complex_setof_result__
 
-select
-  __func_out_out__."first_out"::text as "0",
-  __func_out_out__."second_out" as "1",
-  (not (__func_out_out__ is null))::text as "2"
-from "c"."func_out_out"() as __func_out_out__
-
 select __func_out_out_compound_type_result__.*
 from (
   select
@@ -166,12 +193,6 @@ select
 from "c"."func_out_out_setof"() as __func_out_out_setof__
 
 select
-  __func_out_out_unnamed__."column1"::text as "0",
-  __func_out_out_unnamed__."column2" as "1",
-  (not (__func_out_out_unnamed__ is null))::text as "2"
-from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__
-
-select
   __func_out_setof__.v::text as "0"
 from "c"."func_out_setof"() as __func_out_setof__(v)
 
@@ -180,27 +201,12 @@ select
 from "c"."func_out_setof"() as __func_out_setof__(v)
 
 select
-  __func_out_table__."id"::text as "0"
-from "c"."func_out_table"() as __func_out_table__
-
-select
   __func_out_table_setof__."id"::text as "0"
 from "c"."func_out_table_setof"() as __func_out_table_setof__
 
 select
   (count(*))::text as "0"
 from "c"."func_out_table_setof"() as __func_out_table_setof__
-
-select
-  __func_out_unnamed__.v::text as "0"
-from "c"."func_out_unnamed"() as __func_out_unnamed__(v)
-
-select
-  __func_out_unnamed_out_out_unnamed__."column1"::text as "0",
-  __func_out_unnamed_out_out_unnamed__."column3"::text as "1",
-  __func_out_unnamed_out_out_unnamed__."o2" as "2",
-  (not (__func_out_unnamed_out_out_unnamed__ is null))::text as "3"
-from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__
 
 select __func_returns_table_multi_col_result__.*
 from (
@@ -431,9 +437,3 @@ lateral (
   left outer join "c"."person_secret" as __person_secret_2
   on (__person_2."id"::"int4" = __person_secret_2."person_id")
 ) as __query_output_two_rows_result__
-
-select
-  __search_test_summaries__."id"::text as "0",
-  to_char(__search_test_summaries__."total_duration", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
-  (not (__search_test_summaries__ is null))::text as "2"
-from "c"."search_test_summaries"() as __search_test_summaries__

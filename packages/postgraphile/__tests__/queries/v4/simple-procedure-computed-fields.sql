@@ -30,13 +30,13 @@ lateral (
         __post__."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_2.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_2.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set_2(v)
           limit 1
         ) _) as "2",
@@ -54,13 +54,13 @@ lateral (
         __post_2."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_3.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_3.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_2) as __post_computed_interval_set_3(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_4.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_4.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_2) as __post_computed_interval_set_4(v)
           limit 1
         ) _) as "2",
@@ -78,13 +78,13 @@ lateral (
         __post_3."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_5.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_5.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_3) as __post_computed_interval_set_5(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_6.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_6.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_3) as __post_computed_interval_set_6(v)
           limit 1
         ) _) as "2",
@@ -104,13 +104,13 @@ lateral (
         __post_4."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_7.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_7.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_4) as __post_computed_interval_set_7(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_8.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_8.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_4) as __post_computed_interval_set_8(v)
           limit 1
         ) _) as "2",
@@ -186,13 +186,13 @@ lateral (
         __post__."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_2.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_2.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set_2(v)
           limit 1
         ) _) as "2",
@@ -210,13 +210,13 @@ lateral (
         __post_2."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_3.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_3.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_2) as __post_computed_interval_set_3(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_4.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_4.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_2) as __post_computed_interval_set_4(v)
           limit 1
         ) _) as "2",
@@ -234,13 +234,13 @@ lateral (
         __post_3."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_5.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_5.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_3) as __post_computed_interval_set_5(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_6.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_6.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_3) as __post_computed_interval_set_6(v)
           limit 1
         ) _) as "2",
@@ -260,13 +260,13 @@ lateral (
         __post_4."headline" as "0",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_7.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_7.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_4) as __post_computed_interval_set_7(v)
           limit 1
         ) _) as "1",
         (select json_agg(_) from (
           select
-            to_char(__post_computed_interval_set_8.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0"
+            to_char(__post_computed_interval_set_8.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_4) as __post_computed_interval_set_8(v)
           limit 1
         ) _) as "2",

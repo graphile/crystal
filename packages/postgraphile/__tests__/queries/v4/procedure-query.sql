@@ -22,7 +22,7 @@ from "a"."query_text_array"() as __query_text_array__(v)
 
 select
   (
-    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'))
+    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
     from unnest(__query_interval_array__.v) t
   )::text as "0"
 from "a"."query_interval_array"() as __query_interval_array__(v)
@@ -322,7 +322,7 @@ lateral (
     __compound_type_query__."d" as "3",
     __compound_type_query__."e"::text as "4",
     __compound_type_query__."f"::text as "5",
-    to_char(__compound_type_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    to_char(__compound_type_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
     __compound_type_query__."foo_bar"::text as "7",
     (not (__compound_type_query__ is null))::text as "8",
     __compound_type_query_identifiers__.idx as "9"
@@ -337,7 +337,7 @@ select
   __compound_type_set_query__."d" as "4",
   __compound_type_set_query__."e"::text as "5",
   __compound_type_set_query__."f"::text as "6",
-  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "7",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "7",
   __compound_type_set_query__."foo_bar"::text as "8",
   (not (__compound_type_set_query__ is null))::text as "9"
 from "c"."compound_type_set_query"() as __compound_type_set_query__
@@ -358,7 +358,7 @@ lateral (
     __compound_type_array_query__."d" as "3",
     __compound_type_array_query__."e"::text as "4",
     __compound_type_array_query__."f"::text as "5",
-    to_char(__compound_type_array_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    to_char(__compound_type_array_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
     __compound_type_array_query__."foo_bar"::text as "7",
     (not (__compound_type_array_query__ is null))::text as "8",
     __compound_type_array_query_identifiers__.idx as "9"
@@ -534,7 +534,7 @@ lateral (
     __query_compound_type_array__."d" as "3",
     __query_compound_type_array__."e"::text as "4",
     __query_compound_type_array__."f"::text as "5",
-    to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
     __query_compound_type_array__."foo_bar"::text as "7",
     (not (__query_compound_type_array__ is null))::text as "8",
     __query_compound_type_array_identifiers__.idx as "9"
@@ -542,7 +542,7 @@ lateral (
 ) as __query_compound_type_array_result__
 
 select
-  to_char(__query_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0",
+  to_char(__query_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
   (row_number() over (partition by 1))::text as "1"
 from "a"."query_interval_set"() as __query_interval_set__(v)
 

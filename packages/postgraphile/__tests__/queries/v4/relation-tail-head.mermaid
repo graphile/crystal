@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access83["Access[83∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access84["Access[84∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object85["Object[85∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access20["Access[20∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access21["Access[21∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object22["Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Connection23["Connection[23∈0]<br />ᐸ19ᐳ"]:::plan
     PgSelect24[["PgSelect[24∈0]<br />ᐸcompoundKeyᐳ"]]:::plan
     __Item25>"__Item[25∈1]<br />ᐸ24ᐳ"]:::itemplan
@@ -45,10 +45,10 @@ graph TD
     PgClassExpression90["PgClassExpression[90∈2]<br />ᐸ__compound...__.”extra”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access83
-    __Value3 --> Access84
-    Access83 & Access84 --> Object85
-    Object85 & Connection23 --> PgSelect24
+    __Value3 --> Access20
+    __Value3 --> Access21
+    Access20 & Access21 --> Object22
+    Object22 & Connection23 --> PgSelect24
     PgSelect24 ==> __Item25
     __Item25 --> PgSelectSingle26
     PgSelectSingle26 --> PgClassExpression27
@@ -62,7 +62,7 @@ graph TD
     Map93 --> PgSelectSingle45
     PgSelectSingle45 --> PgClassExpression46
     PgSelectSingle45 --> PgClassExpression47
-    Object85 & Connection64 --> PgSelect65
+    Object22 & Connection64 --> PgSelect65
     PgSelect65 ==> __Item66
     __Item66 --> PgSelectSingle67
     PgSelectSingle67 --> PgClassExpression68
@@ -135,7 +135,7 @@ graph TD
     subgraph "Buckets for queries/v4/relation-tail-head"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allCompoundKeys ᐸ-O- 23<br />⠀⠀⠀allCompoundKeys.nodes ᐸ-A- 24<br />⠀⠀allForeignKeys ᐸ-O- 64<br />⠀⠀⠀allForeignKeys.nodes ᐸ-A- 65"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,Connection23,PgSelect24,Connection64,PgSelect65,Access83,Access84,Object85 bucket0
+    class Bucket0,__Value0,__Value3,Access20,Access21,Object22,Connection23,PgSelect24,Connection64,PgSelect65 bucket0
     Bucket1("Bucket 1 (item25)<br />Deps: 24<br />~ᐳQuery.allCompoundKeysᐳCompoundKeysConnection.nodes[]<br />⠀ROOT ᐸ-O- 26<br />⠀⠀personId1 ᐸ-L- 27<br />⠀⠀personId2 ᐸ-L- 28<br />⠀⠀extra ᐸ-L- 29<br />⠀⠀personByPersonId1 ᐸ-O- 36<br />⠀⠀⠀personByPersonId1.name ᐸ-L- 37<br />⠀⠀⠀personByPersonId1.email ᐸ-L- 38<br />⠀⠀personByPersonId2 ᐸ-O- 45<br />⠀⠀⠀personByPersonId2.name ᐸ-L- 46<br />⠀⠀⠀personByPersonId2.email ᐸ-L- 47"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item25,PgSelectSingle26,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgSelectSingle36,PgClassExpression37,PgClassExpression38,PgSelectSingle45,PgClassExpression46,PgClassExpression47,Map91,Map93 bucket1

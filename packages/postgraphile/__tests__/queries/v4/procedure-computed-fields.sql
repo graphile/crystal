@@ -66,7 +66,7 @@ lateral (
     __post__."headline" as "0",
     (select json_agg(_) from (
       select
-        to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US') as "0",
+        to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
         (row_number() over (partition by 1))::text as "1"
       from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
     ) _) as "1",
@@ -103,7 +103,7 @@ lateral (
     ) as "10",
     ("a"."post_computed_text_array"(__post__))::text as "11",
     (
-      select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'))
+      select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
       from unnest("a"."post_computed_interval_array"(__post__)) t
     )::text as "12",
     __post_identifiers__.idx as "13"
@@ -158,7 +158,7 @@ lateral (
     __post_computed_compound_type_array__."d" as "3",
     __post_computed_compound_type_array__."e"::text as "4",
     __post_computed_compound_type_array__."f"::text as "5",
-    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US') as "6",
+    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
     __post_computed_compound_type_array__."foo_bar"::text as "7",
     (not (__post_computed_compound_type_array__ is null))::text as "8",
     __post_computed_compound_type_array_identifiers__.idx as "9"

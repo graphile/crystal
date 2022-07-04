@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access349["Access[349∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access350["Access[350∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object351["Object[351∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access24["Access[24∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access25["Access[25∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object26["Object[26∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Connection27["Connection[27∈0]<br />ᐸ23ᐳ"]:::plan
     PgSelect28[["PgSelect[28∈0]<br />ᐸhousesᐳ"]]:::plan
     __Item29>"__Item[29∈1]<br />ᐸ28ᐳ"]:::itemplan
@@ -189,10 +189,10 @@ graph TD
     Lambda395["Lambda[395∈0]<br />ᐸencodeᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access349
-    __Value3 --> Access350
-    Access349 & Access350 --> Object351
-    Object351 & Connection27 --> PgSelect28
+    __Value3 --> Access24
+    __Value3 --> Access25
+    Access24 & Access25 --> Object26
+    Object26 & Connection27 --> PgSelect28
     PgSelect28 ==> __Item29
     __Item29 --> PgSelectSingle30
     PgSelectSingle30 --> PgClassExpression32
@@ -315,7 +315,7 @@ graph TD
     Constant356 & PgClassExpression357 --> List358
     List358 --> Lambda359
     PgSelectSingle355 --> PgClassExpression361
-    Object351 & __InputStaticLeaf362 & __InputStaticLeaf363 --> PgSelect364
+    Object26 & __InputStaticLeaf362 & __InputStaticLeaf363 --> PgSelect364
     PgSelect364 --> First368
     First368 --> PgSelectSingle369
     PgSelectSingle369 --> PgClassExpression370
@@ -328,7 +328,7 @@ graph TD
     __InputStaticLeaf378 --> Lambda379
     Lambda379 --> Access380
     Lambda379 --> Access381
-    Object351 & Access380 & Access381 --> PgSelect382
+    Object26 & Access380 & Access381 --> PgSelect382
     PgSelect382 --> First386
     First386 --> PgSelectSingle387
     PgSelectSingle387 --> PgClassExpression388
@@ -556,7 +556,7 @@ graph TD
     subgraph "Buckets for queries/v4/smart_comment_relations.houses"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allHouses ᐸ-O- 27<br />⠀⠀⠀allHouses.nodes ᐸ-A- 28<br />⠀⠀brothersGotADateToKeep ᐸ-O- 369<br />⠀⠀⠀brothersGotADateToKeep.cantHangAround ᐸ-L- 370<br />⠀⠀⠀brothersGotADateToKeep.in ᐸ-L- 371<br />⠀⠀⠀brothersGotADateToKeep.of ᐸ-L- 372<br />⠀⠀⠀brothersGotADateToKeep.z ᐸ-L- 377<br />⠀⠀nothingEverSlowsHerDown ᐸ-O- 387<br />⠀⠀⠀nothingEverSlowsHerDown.andAMessIsNotAllowed ᐸ-L- 388<br />⠀⠀⠀nothingEverSlowsHerDown.in ᐸ-L- 389<br />⠀⠀⠀nothingEverSlowsHerDown.of ᐸ-L- 390<br />⠀⠀⠀nothingEverSlowsHerDown.z ᐸ-L- 395"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,Connection27,PgSelect28,Constant31,Constant49,Connection74,Constant78,Constant91,Constant106,Connection131,Constant135,Constant148,Constant162,Connection187,Constant191,Constant204,Constant218,Connection243,Constant247,Constant271,Connection296,Constant300,Constant313,Constant327,Access349,Access350,Object351,Connection352,Constant356,__InputStaticLeaf362,__InputStaticLeaf363,PgSelect364,First368,PgSelectSingle369,PgClassExpression370,PgClassExpression371,PgClassExpression372,Constant373,PgClassExpression374,PgClassExpression375,List376,Lambda377,__InputStaticLeaf378,Lambda379,Access380,Access381,PgSelect382,First386,PgSelectSingle387,PgClassExpression388,PgClassExpression389,PgClassExpression390,Constant391,PgClassExpression392,PgClassExpression393,List394,Lambda395 bucket0
+    class Bucket0,__Value0,__Value3,Access24,Access25,Object26,Connection27,PgSelect28,Constant31,Constant49,Connection74,Constant78,Constant91,Constant106,Connection131,Constant135,Constant148,Constant162,Connection187,Constant191,Constant204,Constant218,Connection243,Constant247,Constant271,Connection296,Constant300,Constant313,Constant327,Connection352,Constant356,__InputStaticLeaf362,__InputStaticLeaf363,PgSelect364,First368,PgSelectSingle369,PgClassExpression370,PgClassExpression371,PgClassExpression372,Constant373,PgClassExpression374,PgClassExpression375,List376,Lambda377,__InputStaticLeaf378,Lambda379,Access380,Access381,PgSelect382,First386,PgSelectSingle387,PgClassExpression388,PgClassExpression389,PgClassExpression390,Constant391,PgClassExpression392,PgClassExpression393,List394,Lambda395 bucket0
     Bucket1("Bucket 1 (item29)<br />Deps: 28, 31, 49, 78, 91, 106, 135, 148, 162, 191, 204, 218, 247, 271, 300, 313, 327, 356, 74, 131, 243, 296, 187, 352<br />~ᐳQuery.allHousesᐳHousesConnection.nodes[]<br />⠀ROOT ᐸ-O- 30<br />⠀⠀streetId ᐸ-L- 32<br />⠀⠀propertyId ᐸ-L- 33<br />⠀⠀nodeId ᐸ-L- 35<br />⠀⠀buildingName ᐸ-L- 36<br />⠀⠀propertyNameOrNumber ᐸ-L- 37<br />⠀⠀streetName ᐸ-L- 38<br />⠀⠀buildingId ᐸ-L- 40<br />⠀⠀streetByStreetId ᐸ-O- 48<br />⠀⠀⠀streetByStreetId.id ᐸ-L- 50<br />⠀⠀⠀streetByStreetId.nodeId ᐸ-L- 52<br />⠀⠀⠀streetByStreetId.name ᐸ-L- 54<br />⠀⠀⠀streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 74<br />⠀⠀⠀⠀streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 396<br />⠀⠀buildingByBuildingId ᐸ-O- 90<br />⠀⠀⠀buildingByBuildingId.id ᐸ-L- 92<br />⠀⠀⠀buildingByBuildingId.nodeId ᐸ-L- 94<br />⠀⠀⠀buildingByBuildingId.name ᐸ-L- 96<br />⠀⠀⠀buildingByBuildingId.floors ᐸ-L- 97<br />⠀⠀⠀buildingByBuildingId.isPrimary ᐸ-L- 98<br />⠀⠀⠀buildingByBuildingId.namedAfterStreet ᐸ-O- 105<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.id ᐸ-L- 107<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.nodeId ᐸ-L- 109<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.name ᐸ-L- 111<br />⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.buildingsNamedAfterStreet ᐸ-O- 131<br />⠀⠀⠀⠀⠀buildingByBuildingId.namedAfterStreet.buildingsNamedAfterStreet.nodes ᐸ-A- 414<br />⠀⠀⠀buildingByBuildingId.propertyByPropertyId ᐸ-O- 147<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.id ᐸ-L- 149<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.nodeId ᐸ-L- 151<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetId ᐸ-L- 153<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.nameOrNumber ᐸ-L- 154<br />⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId ᐸ-O- 161<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.id ᐸ-L- 163<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.nodeId ᐸ-L- 165<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.name ᐸ-L- 167<br />⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 187<br />⠀⠀⠀⠀⠀⠀buildingByBuildingId.propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 417<br />⠀⠀propertyByPropertyId ᐸ-O- 203<br />⠀⠀⠀propertyByPropertyId.id ᐸ-L- 205<br />⠀⠀⠀propertyByPropertyId.nodeId ᐸ-L- 207<br />⠀⠀⠀propertyByPropertyId.streetId ᐸ-L- 209<br />⠀⠀⠀propertyByPropertyId.nameOrNumber ᐸ-L- 210<br />⠀⠀⠀propertyByPropertyId.streetByStreetId ᐸ-O- 217<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.id ᐸ-L- 219<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.nodeId ᐸ-L- 221<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.name ᐸ-L- 223<br />⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 243<br />⠀⠀⠀⠀⠀propertyByPropertyId.streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 409<br />⠀⠀streetPropertyByStreetIdAndPropertyId ᐸ-O- 260<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.strId ᐸ-L- 261<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propId ᐸ-L- 262<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.currentOwner ᐸ-L- 263<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId ᐸ-O- 270<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.id ᐸ-L- 272<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.nodeId ᐸ-L- 274<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.name ᐸ-L- 276<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.buildingsNamedAfterStreet ᐸ-O- 296<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.streetByStrId.buildingsNamedAfterStreet.nodes ᐸ-A- 399<br />⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId ᐸ-O- 312<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.id ᐸ-L- 314<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.nodeId ᐸ-L- 316<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetId ᐸ-L- 318<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.nameOrNumber ᐸ-L- 319<br />⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId ᐸ-O- 326<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.id ᐸ-L- 328<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.nodeId ᐸ-L- 330<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.name ᐸ-L- 332<br />⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.buildingsNamedAfterStreet ᐸ-O- 352<br />⠀⠀⠀⠀⠀⠀streetPropertyByStreetIdAndPropertyId.propertyByPropId.streetByStreetId.buildingsNamedAfterStreet.nodes ᐸ-A- 402"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item29,PgSelectSingle30,PgClassExpression32,PgClassExpression33,List34,Lambda35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression40,PgSelectSingle48,PgClassExpression50,List51,Lambda52,PgClassExpression54,PgSelectSingle90,PgClassExpression92,List93,Lambda94,PgClassExpression96,PgClassExpression97,PgClassExpression98,PgSelectSingle105,PgClassExpression107,List108,Lambda109,PgClassExpression111,PgSelectSingle147,PgClassExpression149,List150,Lambda151,PgClassExpression153,PgClassExpression154,PgSelectSingle161,PgClassExpression163,List164,Lambda165,PgClassExpression167,PgSelectSingle203,PgClassExpression205,List206,Lambda207,PgClassExpression209,PgClassExpression210,PgSelectSingle217,PgClassExpression219,List220,Lambda221,PgClassExpression223,PgSelectSingle260,PgClassExpression261,PgClassExpression262,PgClassExpression263,PgSelectSingle270,PgClassExpression272,List273,Lambda274,PgClassExpression276,PgSelectSingle312,PgClassExpression314,List315,Lambda316,PgClassExpression318,PgClassExpression319,PgSelectSingle326,PgClassExpression328,List329,Lambda330,PgClassExpression332,Access396,Map397,Access399,Map400,Access402,Map403,Map405,Map407,Access409,Map410,Map412,Access414,Map415,Access417,Map418,Map420,Map422 bucket1

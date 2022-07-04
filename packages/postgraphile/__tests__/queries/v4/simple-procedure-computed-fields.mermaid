@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access768["Access[768∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access769["Access[769∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object770["Object[770∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access25["Access[25∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access26["Access[26∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object27["Object[27∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     __InputStaticLeaf231["__InputStaticLeaf[231∈0]"]:::plan
     __InputStaticLeaf291["__InputStaticLeaf[291∈0]"]:::plan
     PgSelect24[["PgSelect[24∈0]<br />ᐸpersonᐳ"]]:::plan
@@ -277,10 +277,10 @@ graph TD
     PgClassExpression774["PgClassExpression[774∈46]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access768
-    __Value3 --> Access769
-    Access768 & Access769 --> Object770
-    Object770 & __InputStaticLeaf231 & __InputStaticLeaf291 --> PgSelect24
+    __Value3 --> Access25
+    __Value3 --> Access26
+    Access25 & Access26 --> Object27
+    Object27 & __InputStaticLeaf231 & __InputStaticLeaf291 --> PgSelect24
     PgSelect24 ==> __Item28
     __Item28 --> PgSelectSingle29
     PgSelectSingle29 --> PgClassExpression30
@@ -415,7 +415,7 @@ graph TD
     __Item420 --> PgSelectSingle421
     PgSelectSingle421 --> PgClassExpression422
     PgSelectSingle421 --> PgClassExpression423
-    Object770 & Connection449 & __InputStaticLeaf582 & __InputStaticLeaf642 --> PgSelect450
+    Object27 & Connection449 & __InputStaticLeaf582 & __InputStaticLeaf642 --> PgSelect450
     PgSelect450 ==> __Item451
     __Item451 --> PgSelectSingle452
     PgSelectSingle452 --> PgClassExpression453
@@ -870,7 +870,7 @@ graph TD
     subgraph "Buckets for queries/v4/simple-procedure-computed-fields"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPeopleList ᐸ-A- 24<br />⠀⠀allPeople ᐸ-O- 449<br />⠀⠀⠀allPeople.nodes ᐸ-A- 450"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect24,Connection58,__InputStaticLeaf68,Connection93,__InputStaticLeaf105,Connection123,__InputStaticLeaf133,Connection143,__InputStaticLeaf190,Connection200,__InputStaticLeaf231,Connection243,__InputStaticLeaf253,Connection263,__InputStaticLeaf291,__InputStaticLeaf310,Connection320,Connection361,Connection384,Connection449,PgSelect450,__InputStaticLeaf456,Connection474,__InputStaticLeaf484,Connection494,__InputStaticLeaf541,Connection551,__InputStaticLeaf582,Connection594,__InputStaticLeaf604,Connection614,__InputStaticLeaf642,__InputStaticLeaf661,Connection671,Connection712,Connection735,Access768,Access769,Object770 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect24,Access25,Access26,Object27,Connection58,__InputStaticLeaf68,Connection93,__InputStaticLeaf105,Connection123,__InputStaticLeaf133,Connection143,__InputStaticLeaf190,Connection200,__InputStaticLeaf231,Connection243,__InputStaticLeaf253,Connection263,__InputStaticLeaf291,__InputStaticLeaf310,Connection320,Connection361,Connection384,Connection449,PgSelect450,__InputStaticLeaf456,Connection474,__InputStaticLeaf484,Connection494,__InputStaticLeaf541,Connection551,__InputStaticLeaf582,Connection594,__InputStaticLeaf604,Connection614,__InputStaticLeaf642,__InputStaticLeaf661,Connection671,Connection712,Connection735 bucket0
     Bucket1("Bucket 1 (item28)<br />Deps: 24, 58, 123, 243, 361, 384, 93, 143, 200, 263, 320<br />~ᐳQuery.allPeopleList[]<br />⠀ROOT ᐸ-O- 29<br />⠀⠀name ᐸ-L- 30<br />⠀⠀firstName ᐸ-L- 32<br />⠀⠀friends ᐸ-O- 58<br />⠀⠀⠀friends.nodes ᐸ-A- 60<br />⠀⠀id ᐸ-L- 103<br />⠀⠀postsByAuthorId ᐸ-O- 123<br />⠀⠀⠀postsByAuthorId.nodes ᐸ-A- 780<br />⠀⠀roundOnePost ᐸ-O- 243<br />⠀⠀⠀roundOnePost.nodes ᐸ-A- 786<br />⠀⠀compoundKeysByPersonId1 ᐸ-O- 361<br />⠀⠀⠀compoundKeysByPersonId1.nodes ᐸ-A- 791<br />⠀⠀compoundKeysByPersonId2 ᐸ-O- 384<br />⠀⠀⠀compoundKeysByPersonId2.nodes ᐸ-A- 793<br />⠀⠀postsByAuthorIdList ᐸ-A- 783<br />⠀⠀roundOnePostList ᐸ-A- 789<br />⠀⠀compoundKeysByPersonId1List ᐸ-A- 790<br />⠀⠀compoundKeysByPersonId2List ᐸ-A- 792"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item28,PgSelectSingle29,PgClassExpression30,PgClassExpression32,__ListTransform60,PgClassExpression103,Access776,Access779,Reverse780,Access783,Access786,Access789,Access790,Access791,Access792,Access793 bucket1

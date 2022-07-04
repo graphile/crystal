@@ -18,6 +18,11 @@ lateral (
 ) as __person_secret_result__
 
 select
+  __return_table_without_grants__."person_id_1"::text as "0",
+  __return_table_without_grants__."person_id_2"::text as "1"
+from "c"."return_table_without_grants"() as __return_table_without_grants__
+
+select
   __person_secret__."person_id"::text as "0",
   __person_secret__."sekrit" as "1"
 from "c"."person_secret" as __person_secret__
@@ -156,8 +161,3 @@ lateral (
   )
   order by __person__."id" asc
 ) as __person_result__
-
-select
-  __return_table_without_grants__."person_id_1"::text as "0",
-  __return_table_without_grants__."person_id_2"::text as "1"
-from "c"."return_table_without_grants"() as __return_table_without_grants__

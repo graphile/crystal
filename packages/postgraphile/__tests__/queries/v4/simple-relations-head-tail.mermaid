@@ -9,9 +9,9 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access97["Access[97∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access98["Access[98∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object99["Object[99∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access25["Access[25∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access26["Access[26∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object27["Object[27∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     __InputStaticLeaf55["__InputStaticLeaf[55∈0]"]:::plan
     PgSelect24[["PgSelect[24∈0]<br />ᐸpersonᐳ"]]:::plan
     __Item28>"__Item[28∈1]<br />ᐸ24ᐳ"]:::itemplan
@@ -45,10 +45,10 @@ graph TD
     PgClassExpression119["PgClassExpression[119∈6]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access97
-    __Value3 --> Access98
-    Access97 & Access98 --> Object99
-    Object99 & __InputStaticLeaf55 --> PgSelect24
+    __Value3 --> Access25
+    __Value3 --> Access26
+    Access25 & Access26 --> Object27
+    Object27 & __InputStaticLeaf55 --> PgSelect24
     PgSelect24 ==> __Item28
     __Item28 --> PgSelectSingle29
     PgSelectSingle29 --> PgClassExpression30
@@ -73,7 +73,7 @@ graph TD
     __Item100 --> PgSelectSingle101
     PgSelectSingle101 --> PgClassExpression102
     PgSelectSingle101 --> PgClassExpression103
-    Object99 --> PgSelect112
+    Object27 --> PgSelect112
     PgSelect112 ==> __Item116
     __Item116 --> PgSelectSingle117
     PgSelectSingle117 --> PgClassExpression118
@@ -134,7 +134,7 @@ graph TD
     subgraph "Buckets for queries/v4/simple-relations-head-tail"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPeopleList ᐸ-A- 24<br />⠀⠀allCompoundKeysList ᐸ-A- 112"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect24,__InputStaticLeaf55,Access97,Access98,Object99,PgSelect112 bucket0
+    class Bucket0,__Value0,__Value3,PgSelect24,Access25,Access26,Object27,__InputStaticLeaf55,PgSelect112 bucket0
     Bucket1("Bucket 1 (item28)<br />Deps: 24<br />~ᐳQuery.allPeopleList[]<br />⠀ROOT ᐸ-O- 29<br />⠀⠀id ᐸ-L- 30<br />⠀⠀name ᐸ-L- 31<br />⠀⠀postsByAuthorIdList ᐸ-A- 120<br />⠀⠀roundOnePost ᐸ-A- 121<br />⠀⠀compoundKeysByPersonId1List ᐸ-A- 122<br />⠀⠀compoundKeysByPersonId2List ᐸ-A- 123"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item28,PgSelectSingle29,PgClassExpression30,PgClassExpression31,Access120,Access121,Access122,Access123 bucket1
