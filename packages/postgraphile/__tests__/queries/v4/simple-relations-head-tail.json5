@@ -1,0 +1,171 @@
+{
+  allPeopleList: [
+    {
+      id: 1,
+      name: "John Smith",
+      postsByAuthorIdList: [
+        {
+          headline: "I hate yogurt. It’s just stuff with bits in.",
+          authorId: 1,
+        },
+        {
+          headline: "Is that a cooking show?",
+          authorId: 1,
+        },
+      ],
+      roundOnePost: [
+        {
+          headline: "Large bet on myself in round one.",
+          authorId: 1,
+        },
+      ],
+      compoundKeysByPersonId1List: [
+        {
+          personId1: 1,
+          personId2: 2,
+        },
+      ],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 2,
+          personId2: 1,
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: "Sara Smith",
+      postsByAuthorIdList: [
+        {
+          headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+          authorId: 2,
+        },
+        {
+          headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+          authorId: 2,
+        },
+      ],
+      roundOnePost: [],
+      compoundKeysByPersonId1List: [
+        {
+          personId1: 2,
+          personId2: 1,
+        },
+        {
+          personId1: 2,
+          personId2: 3,
+        },
+        {
+          personId1: 2,
+          personId2: 5,
+        },
+      ],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 1,
+          personId2: 2,
+        },
+      ],
+    },
+    {
+      id: 3,
+      name: "Budd Deey",
+      postsByAuthorIdList: [
+        {
+          headline: "Stop talking, brain thinking. Hush.",
+          authorId: 3,
+        },
+        {
+          headline: "You know how I sometimes have really brilliant ideas?",
+          authorId: 3,
+        },
+      ],
+      roundOnePost: [],
+      compoundKeysByPersonId1List: [],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 2,
+          personId2: 3,
+        },
+        {
+          personId1: 4,
+          personId2: 3,
+        },
+      ],
+    },
+    {
+      id: 4,
+      name: "Kathryn Ramirez",
+      postsByAuthorIdList: [],
+      roundOnePost: [],
+      compoundKeysByPersonId1List: [
+        {
+          personId1: 4,
+          personId2: 3,
+        },
+        {
+          personId1: 4,
+          personId2: 4,
+        },
+      ],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 4,
+          personId2: 4,
+        },
+      ],
+    },
+    {
+      id: 5,
+      name: "Joe Tucker",
+      postsByAuthorIdList: [
+        {
+          headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          authorId: 5,
+        },
+      ],
+      roundOnePost: [],
+      compoundKeysByPersonId1List: [],
+      compoundKeysByPersonId2List: [
+        {
+          personId1: 2,
+          personId2: 5,
+        },
+      ],
+    },
+    {
+      id: 6,
+      name: "Twenty Seventwo",
+      postsByAuthorIdList: [],
+      roundOnePost: [],
+      compoundKeysByPersonId1List: [],
+      compoundKeysByPersonId2List: [],
+    },
+  ],
+  allCompoundKeysList: [
+    {
+      personId1: 1,
+      personId2: 2,
+    },
+    {
+      personId1: 2,
+      personId2: 1,
+    },
+    {
+      personId1: 2,
+      personId2: 3,
+    },
+    {
+      personId1: 2,
+      personId2: 5,
+    },
+    {
+      personId1: 4,
+      personId2: 3,
+    },
+    {
+      personId1: 4,
+      personId2: 4,
+    },
+  ],
+}

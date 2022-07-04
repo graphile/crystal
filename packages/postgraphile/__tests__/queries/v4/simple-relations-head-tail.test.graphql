@@ -1,0 +1,30 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+query {
+  allPeopleList {
+    id
+    name
+    postsByAuthorIdList(first: 2) {
+      headline
+      authorId
+    }
+    roundOnePost: postsByAuthorIdList(condition: {headline: "Large bet on myself in round one."}) {
+      headline
+      authorId
+    }
+    compoundKeysByPersonId1List {
+      personId1
+      personId2
+    }
+    compoundKeysByPersonId2List {
+      personId1
+      personId2
+    }
+  }
+  allCompoundKeysList {
+    personId1
+    personId2
+  }
+}
