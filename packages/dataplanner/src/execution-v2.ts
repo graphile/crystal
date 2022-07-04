@@ -1,6 +1,6 @@
 import { inspect } from "util";
 
-import type { OpPlan, CrystalError } from ".";
+import type { CrystalError, OpPlan } from ".";
 import type {
   Bucket,
   BucketDefinitionFieldOutputMap,

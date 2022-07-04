@@ -17,8 +17,8 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
-import type { OpPlan } from "./opPlan.js";
 import * as assert from "./assert.js";
+import type { OpPlan } from "./opPlan.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
 import {

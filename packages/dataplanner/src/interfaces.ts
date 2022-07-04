@@ -18,12 +18,12 @@ import type {
   SelectionNode,
 } from "graphql";
 
-import type { OpPlan } from "./opPlan.js";
 import type { Deferred } from "./deferred.js";
 import type { CrystalError } from "./error.js";
 import type { InputStep } from "./input.js";
-import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
+import type { OpPlan } from "./opPlan.js";
 import type { PlanResults, PlanResultsBucket } from "./planResults.js";
+import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
   __InputListStep,

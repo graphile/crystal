@@ -27,7 +27,6 @@ import type {
 import {
   __ListTransformStep,
   __ValueStep,
-  opPlan,
   connection,
   ConnectionStep,
   constant,
@@ -44,6 +43,7 @@ import {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
+  opPlan,
   resolveType,
 } from "dataplanner";
 import { writeFileSync } from "fs";
@@ -62,7 +62,6 @@ import {
   GraphQLUnionType,
   printSchema,
 } from "graphql";
-import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 //import prettier from "prettier";
 import { inspect } from "util";
@@ -2784,7 +2783,14 @@ export function makeExampleSchema(
       randomUser: {
         type: User,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, pgSelect, sql, sqlFromArgDigests, userSource) => function plan($forum) {
+          (
+            deoptimizeIfAppropriate,
+            pgSelect,
+            sql,
+            sqlFromArgDigests,
+            userSource,
+          ) =>
+            function plan($forum) {
               const $user = pgSelect({
                 source: userSource,
                 identifiers: [],
@@ -2802,7 +2808,13 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate($user);
               return $user;
             },
-          [deoptimizeIfAppropriate, pgSelect, sql, sqlFromArgDigests, userSource],
+          [
+            deoptimizeIfAppropriate,
+            pgSelect,
+            sql,
+            sqlFromArgDigests,
+            userSource,
+          ],
         ),
       },
 
@@ -3451,7 +3463,8 @@ export function makeExampleSchema(
       titleLower: {
         type: GraphQLString,
         plan: EXPORTABLE(
-          (pgSelect, scalarTextSource, sql, sqlFromArgDigests) => function plan($entity) {
+          (pgSelect, scalarTextSource, sql, sqlFromArgDigests) =>
+            function plan($entity) {
               return pgSelect({
                 source: scalarTextSource,
                 identifiers: [],

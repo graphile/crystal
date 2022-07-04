@@ -10,12 +10,10 @@ import type {
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { sqlFromArgDigests } from "@dataplan/pg";
-import { PgSource, recordType } from "@dataplan/pg";
+import { PgSource, recordType, sqlFromArgDigests } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
-import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import { version } from "../index.js";

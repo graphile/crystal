@@ -6,8 +6,8 @@ import type {
 import { Kind } from "graphql";
 import { inspect } from "util";
 
-import type { OpPlan } from "./opPlan.js";
 import type { FieldAndGroup } from "./interfaces.js";
+import type { OpPlan } from "./opPlan.js";
 
 /**
  * Implements the `MergeSelectionSets` algorithm from the GraphQL spec.

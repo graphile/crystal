@@ -2,10 +2,10 @@ import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
-import { $$contextPlanCache } from "./opPlan.js";
 import { establishOpPlan } from "./establishOpPlan.js";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
+import { $$contextPlanCache } from "./opPlan.js";
 import { isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";

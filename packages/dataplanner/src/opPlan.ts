@@ -40,7 +40,6 @@ import {
 import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import { withFieldArgsForArguments } from "./opPlan-input.js";
 import * as assert from "./assert.js";
 import type {
   Bucket,
@@ -97,6 +96,16 @@ import {
 } from "./interfaces.js";
 import type { PrintPlanGraphOptions } from "./mermaid.js";
 import { printPlanGraph } from "./mermaid.js";
+import { withFieldArgsForArguments } from "./opPlan-input.js";
+import type { PlanResultsBucket } from "./planResults.js";
+import { PlanResults } from "./planResults.js";
+import { assertPolymorphicData } from "./polymorphic.js";
+import {
+  $$crystalWrapped,
+  isCrystalObject,
+  isCrystalWrapped,
+  newCrystalObject,
+} from "./resolvers.js";
 import type {
   ListCapableStep,
   ModifierStep,
@@ -111,8 +120,6 @@ import {
   isListCapableStep,
   isStreamableStep,
 } from "./step.js";
-import type { PlanResultsBucket } from "./planResults.js";
-import { PlanResults } from "./planResults.js";
 import type { __InputObjectStep } from "./steps/index.js";
 import {
   __ItemStep,
@@ -121,13 +128,6 @@ import {
   access,
 } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/listTransform.js";
-import { assertPolymorphicData } from "./polymorphic.js";
-import {
-  $$crystalWrapped,
-  isCrystalObject,
-  isCrystalWrapped,
-  newCrystalObject,
-} from "./resolvers.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {
   arrayOfLength,

@@ -2,7 +2,6 @@ import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { OpPlan } from "./opPlan.js";
 import { GLOBAL_PATH } from "./constants.js";
 import { crystalPrintPathIdentity } from "./crystalPrint.js";
 import { isDev, noop } from "./dev.js";
@@ -19,6 +18,7 @@ import type {
   PlanOptimizeOptions,
   PromiseOrDirect,
 } from "./interfaces.js";
+import type { OpPlan } from "./opPlan.js";
 import type { __ItemStep } from "./steps/index.js";
 
 function reallyAssertFinalized(plan: BaseStep): void {

@@ -45,8 +45,8 @@ import type {
 } from "./steps/pgSelect.js";
 import { pgSelect } from "./steps/pgSelect.js";
 import type {
-  PgSelectSingleStep,
   PgSelectSinglePlanOptions,
+  PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
 
 // TODO: PgSourceRow and PgSourceRowAttribute are lies; we don't use them even

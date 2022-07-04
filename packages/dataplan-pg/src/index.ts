@@ -118,8 +118,8 @@ export {
 } from "./steps/pgSelect.js";
 export {
   pgSelectSingleFromRecord,
-  PgSelectSingleStep,
   PgSelectSinglePlanOptions,
+  PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
 export {
   pgSingleTablePolymorphic,

@@ -5,7 +5,6 @@ import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
-import { populateValuePlan } from "./opPlan.js";
 import { ROOT_PATH } from "./constants.js";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { Deferred } from "./deferred.js";
@@ -23,6 +22,7 @@ import {
   $$planResults,
   $$verbatim,
 } from "./interfaces.js";
+import { populateValuePlan } from "./opPlan.js";
 import type { PlanResults } from "./planResults.js";
 import { __ValueStep } from "./steps/index.js";
 import { ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";

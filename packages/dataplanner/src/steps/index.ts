@@ -1,6 +1,6 @@
-import type { OpPlan } from "../opPlan.js";
 import { getCurrentOpPlan, getDebug, setDebug } from "../global.js";
 import type { BaseGraphQLContext } from "../interfaces.js";
+import type { OpPlan } from "../opPlan.js";
 import type { __ValueStep } from "./__value.js";
 
 export function opPlan(): OpPlan {
@@ -52,7 +52,7 @@ export {
 } from "./listTransform.js";
 export { ActualKeyByDesiredKey, makeMapper, map, MapStep } from "./map.js";
 export { node, NodeStep } from "./node.js";
-export { object, ObjectStep, ObjectPlanMeta } from "./object.js";
+export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";
 export { setter, SetterCapableStep, SetterStep } from "./setter.js";

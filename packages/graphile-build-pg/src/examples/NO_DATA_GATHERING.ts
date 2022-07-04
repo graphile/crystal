@@ -11,8 +11,8 @@ import {
   PgSource,
   PgSourceBuilder,
   recordType,
-  TYPES,
   sqlFromArgDigests,
+  TYPES,
 } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
@@ -308,7 +308,7 @@ async function main() {
   );
 
   const uniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
+    (PgSource, TYPES, executor, sql, sqlFromArgDigests) =>
       new PgSource({
         executor,
         codec: TYPES.int,
@@ -328,11 +328,11 @@ async function main() {
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, TYPES, executor, sql, sqlFromArgDigests],
   );
 
   const forumsUniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, forumsCodec, sql) =>
+    (PgSource, TYPES, executor, forumsCodec, sql, sqlFromArgDigests) =>
       new PgSource({
         executor,
         codec: TYPES.int,
@@ -363,11 +363,11 @@ async function main() {
           },
         },
       }),
-    [PgSource, TYPES, executor, forumsCodec, sql],
+    [PgSource, TYPES, executor, forumsCodec, sql, sqlFromArgDigests],
   );
 
   const forumsRandomUser = EXPORTABLE(
-    (PgSource, executor, forumsCodec, sql, usersCodec) =>
+    (PgSource, executor, forumsCodec, sql, sqlFromArgDigests, usersCodec) =>
       new PgSource({
         executor,
         codec: usersCodec,
@@ -390,11 +390,11 @@ async function main() {
           },
         },
       }),
-    [PgSource, executor, forumsCodec, sql, usersCodec],
+    [PgSource, executor, forumsCodec, sql, sqlFromArgDigests, usersCodec],
   );
 
   const forumsFeaturedMessages = EXPORTABLE(
-    (PgSource, executor, forumsCodec, messagesCodec, sql) =>
+    (PgSource, executor, forumsCodec, messagesCodec, sql, sqlFromArgDigests) =>
       new PgSource({
         executor,
         codec: messagesCodec,
@@ -417,7 +417,7 @@ async function main() {
           },
         },
       }),
-    [PgSource, executor, forumsCodec, messagesCodec, sql],
+    [PgSource, executor, forumsCodec, messagesCodec, sql, sqlFromArgDigests],
   );
 
   // We're crafting our own input

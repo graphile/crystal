@@ -9,9 +9,9 @@ import {
   isUnionType,
 } from "graphql";
 
-import type { OpPlan } from "./opPlan.js";
 import { isDev } from "./dev.js";
 import type { FieldAndGroup, GroupedSelections } from "./interfaces.js";
+import type { OpPlan } from "./opPlan.js";
 import type { __TrackedObjectStep } from "./steps/index.js";
 
 /**

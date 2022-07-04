@@ -1768,7 +1768,6 @@ export class PgSelectStep<
             : null;
           const offset = lower0;
 
-
           return [limit, offset];
         },
       );

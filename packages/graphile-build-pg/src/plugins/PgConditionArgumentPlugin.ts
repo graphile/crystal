@@ -4,8 +4,8 @@ import "graphile-config";
 import type {
   PgConditionStep,
   PgSelectParsedCursorStep,
-  PgSelectStep,
   PgSelectSingleStep,
+  PgSelectStep,
   PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "dataplanner";

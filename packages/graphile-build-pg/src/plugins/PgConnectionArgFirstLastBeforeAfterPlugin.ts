@@ -3,8 +3,8 @@ import "graphile-config";
 
 import type {
   PgSelectParsedCursorStep,
-  PgSelectStep,
   PgSelectSingleStep,
+  PgSelectStep,
 } from "@dataplan/pg";
 import type {
   ConnectionStep,

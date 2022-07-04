@@ -20,7 +20,6 @@ debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { OpPlan } from "./opPlan.js";
 import { ROOT_PATH } from "./constants.js";
 import { dataplannerEnforce } from "./dataplannerEnforce.js";
 import { defer, Deferred } from "./deferred.js";
@@ -78,6 +77,16 @@ import {
   ScalarPlanResolver,
   TypedEventEmitter,
 } from "./interfaces.js";
+import { OpPlan } from "./opPlan.js";
+import { polymorphicWrap, resolveType } from "./polymorphic.js";
+import {
+  $$crystalWrapped,
+  crystalResolve,
+  CrystalWrapDetails,
+  dataplannerResolver,
+  dataplannerSubscriber,
+  isCrystalWrapped,
+} from "./resolvers.js";
 import {
   assertListCapableStep,
   BaseStep,
@@ -104,7 +113,6 @@ import {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
-  opPlan,
   connection,
   ConnectionCapableStep,
   ConnectionStep,
@@ -139,8 +147,9 @@ import {
   node,
   NodeStep,
   object,
-  ObjectStep,
   ObjectPlanMeta,
+  ObjectStep,
+  opPlan,
   PageInfoCapableStep,
   partitionByIndex,
   reverse,
@@ -150,15 +159,6 @@ import {
   SetterCapableStep,
   SetterStep,
 } from "./steps/index.js";
-import { polymorphicWrap, resolveType } from "./polymorphic.js";
-import {
-  $$crystalWrapped,
-  crystalResolve,
-  CrystalWrapDetails,
-  dataplannerResolver,
-  dataplannerSubscriber,
-  isCrystalWrapped,
-} from "./resolvers.js";
 import { stripAnsi } from "./stripAnsi.js";
 import { subscribe } from "./subscribe.js";
 import {
@@ -200,8 +200,6 @@ export {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
-  OpPlan,
-  opPlan,
   ArgumentApplyPlanResolver,
   ArgumentInputPlanResolver,
   arrayOfLength,
@@ -317,12 +315,14 @@ export {
   object,
   objectFieldSpec,
   ObjectLikeStep,
-  ObjectStep,
   ObjectPlanMeta,
   ObjectPlans,
   objectSpec,
+  ObjectStep,
   ObjectTypeFields,
   ObjectTypeSpec,
+  OpPlan,
+  opPlan,
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,

@@ -9,9 +9,9 @@ import type {
   NodeIdHandler,
   PolymorphicData,
 } from "../interfaces.js";
+import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
 import { ExecutableStep } from "../step.js";
-import { polymorphicWrap } from "../polymorphic.js";
 import { access } from "./access.js";
 import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
