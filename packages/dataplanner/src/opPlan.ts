@@ -3609,7 +3609,9 @@ export class OpPlan<
               );
             if (matchingParentPathIdentities.length !== 1) {
               throw new Error(
-                `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec>: Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
+                `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec>: Bad bucketing; couldn't find match for '${pathIdentity}' (from ${plan}) in bucket ${
+                  bucket.id
+                }'s rootPathIdentities: '${bucket.rootPathIdentities.join(
                   "', '",
                 )}'`,
               );
