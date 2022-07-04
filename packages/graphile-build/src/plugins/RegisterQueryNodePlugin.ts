@@ -21,7 +21,7 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
           ),
           get: EXPORTABLE(
             (aether) => () => {
-              return aether().rootValuePlan;
+              return aether().rootValueStep;
             },
             [aether],
           ),

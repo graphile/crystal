@@ -39,7 +39,7 @@ export const QueryQueryPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (aether) =>
                     function plan() {
-                      return aether().rootValuePlan;
+                      return aether().rootValueStep;
                     },
                   [aether],
                 ),

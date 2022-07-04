@@ -43,7 +43,7 @@ export function getDirectiveArg(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
-  variableValuesPlan: __TrackedObjectStep,
+  variableValuesStep: __TrackedObjectStep,
 ): unknown {
   const directive = getDirective(selection, directiveName);
   const argument = directive?.arguments?.find(
@@ -53,7 +53,7 @@ export function getDirectiveArg(
     const value = argument.value;
     switch (value.kind) {
       case "Variable": {
-        return variableValuesPlan.get(value.name.value).eval();
+        return variableValuesStep.get(value.name.value).eval();
       }
       case "BooleanValue": {
         return value.value;
@@ -137,11 +137,11 @@ export function graphqlCollectFields(
     const { groupId, selections } = groupedSelectionsList[listIndex];
     const parent = aether.groups[groupId];
     const objectTypeFields = objectType.getFields();
-    const trackedVariableValuesPlan = aether.trackedVariableValuesPlan;
+    const trackedVariableValuesStep = aether.trackedVariableValuesStep;
     for (let i = 0, l = selections.length; i < l; i++) {
       const selection = selections[i];
       if (
-        getDirectiveArg(selection, "skip", "if", trackedVariableValuesPlan) ===
+        getDirectiveArg(selection, "skip", "if", trackedVariableValuesStep) ===
         true
       ) {
         continue;
@@ -151,7 +151,7 @@ export function graphqlCollectFields(
           selection,
           "include",
           "if",
-          trackedVariableValuesPlan,
+          trackedVariableValuesStep,
         ) === false
       ) {
         continue;

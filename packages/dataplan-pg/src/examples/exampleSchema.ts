@@ -4345,7 +4345,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (aether) =>
             function plan() {
-              return aether().rootValuePlan;
+              return aether().rootValueStep;
             },
           [aether],
         ),
@@ -4384,7 +4384,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (aether) =>
             function plan() {
-              return aether().rootValuePlan;
+              return aether().rootValueStep;
             },
           [aether],
         ),
@@ -4429,7 +4429,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (aether) =>
             function plan() {
-              return aether().rootValuePlan;
+              return aether().rootValueStep;
             },
           [aether],
         ),

@@ -10,7 +10,7 @@ export function aether(): Aether {
 export function context<
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
 >(): __ValueStep<TContext> {
-  return aether().contextPlan;
+  return aether().contextStep;
 }
 
 /**

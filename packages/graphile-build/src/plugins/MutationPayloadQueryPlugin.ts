@@ -40,7 +40,7 @@ export const MutationPayloadQueryPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (aether) =>
                     function plan() {
-                      return aether().rootValuePlan;
+                      return aether().rootValueStep;
                     },
                   [aether],
                 ),

@@ -168,7 +168,7 @@ function inputVariablePlan(
   }
   const typesMatch = doTypesMatch(variableType, inputType);
   assert.ok(typesMatch, "Expected variable and input types to match");
-  const variableValuePlan = aether.trackedVariableValuesPlan.get(variableName);
+  const variableValuePlan = aether.trackedVariableValuesStep.get(variableName);
   if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
     // There's no default value, or we know for sure that our variable will be
     // set (even if null) and thus the default will not be used; use the variable.

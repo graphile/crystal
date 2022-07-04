@@ -705,7 +705,7 @@ export class Aether<
    *
    * @internal
    */
-  public readonly rootSelectionSetPlan: __ValueStep<object>;
+  public readonly rootSelectionSetStep: __ValueStep<object>;
   /**
    * @internal
    */
@@ -713,11 +713,11 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly variableValuesPlan: __ValueStep<TVariables>;
+  public readonly variableValuesStep: __ValueStep<TVariables>;
   /**
    * @internal
    */
-  public readonly trackedVariableValuesPlan: __TrackedObjectStep<TVariables>;
+  public readonly trackedVariableValuesStep: __TrackedObjectStep<TVariables>;
   /**
    * @internal
    */
@@ -725,11 +725,11 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly contextPlan: __ValueStep<TContext>;
+  public readonly contextStep: __ValueStep<TContext>;
   /**
    * @internal
    */
-  public readonly trackedContextPlan: __TrackedObjectStep<TContext>;
+  public readonly trackedContextStep: __TrackedObjectStep<TContext>;
   /**
    * @internal
    */
@@ -737,11 +737,11 @@ export class Aether<
   /**
    * @internal
    */
-  public readonly rootValuePlan: __ValueStep<TRootValue>;
+  public readonly rootValueStep: __ValueStep<TRootValue>;
   /**
    * @internal
    */
-  public readonly trackedRootValuePlan: __TrackedObjectStep<TRootValue>;
+  public readonly trackedRootValueStep: __TrackedObjectStep<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
   public readonly queryTypeName: string;
   public readonly mutationTypeName: string | undefined;
@@ -843,61 +843,61 @@ export class Aether<
       aether: this,
       parentPathIdentity: GLOBAL_PATH,
     }) as <T>(cb: () => T) => T;
-    this.rootSelectionSetPlan = wgs(() => new __ValueStep());
-    this.variableValuesPlan = wgs(() => new __ValueStep());
+    this.rootSelectionSetStep = wgs(() => new __ValueStep());
+    this.variableValuesStep = wgs(() => new __ValueStep());
     debugPlanVerbose(
-      "Constructed variableValuesPlan %s",
-      this.variableValuesPlan,
+      "Constructed variableValuesStep %s",
+      this.variableValuesStep,
     );
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
-    this.trackedVariableValuesPlan = wgs(
+    this.trackedVariableValuesStep = wgs(
       () =>
         new __TrackedObjectStep(
           variableValues,
-          this.variableValuesPlan,
+          this.variableValuesStep,
           this.variableValuesConstraints,
         ),
     );
     if (debugPlanVerboseEnabled) {
       debugPlanVerbose(
-        "Constructed trackedVariableValuesPlan %s",
-        this.trackedVariableValuesPlan,
+        "Constructed trackedVariableValuesStep %s",
+        this.trackedVariableValuesStep,
       );
     }
-    this.contextPlan = wgs(() => new __ValueStep());
-    debugPlanVerbose("Constructed contextPlan %s", this.contextPlan);
-    this.trackedContextPlan = wgs(
+    this.contextStep = wgs(() => new __ValueStep());
+    debugPlanVerbose("Constructed contextStep %s", this.contextStep);
+    this.trackedContextStep = wgs(
       () =>
         new __TrackedObjectStep(
           context,
-          this.contextPlan,
+          this.contextStep,
           this.contextConstraints,
         ),
     );
     if (debugPlanVerboseEnabled) {
       debugPlanVerbose(
-        "Constructed trackedContextPlan %s",
-        this.trackedContextPlan,
+        "Constructed trackedContextStep %s",
+        this.trackedContextStep,
       );
     }
-    this.rootValuePlan = wgs(() => new __ValueStep());
-    debugPlanVerbose("Constructed rootValuePlan %s", this.rootValuePlan);
-    this.trackedRootValuePlan = wgs(
+    this.rootValueStep = wgs(() => new __ValueStep());
+    debugPlanVerbose("Constructed rootValueStep %s", this.rootValueStep);
+    this.trackedRootValueStep = wgs(
       () =>
         new __TrackedObjectStep(
           rootValue,
-          this.rootValuePlan,
+          this.rootValueStep,
           this.rootValueConstraints,
         ),
     );
     if (debugPlanVerboseEnabled) {
       debugPlanVerbose(
-        "Constructed trackedRootValuePlan %s",
-        this.trackedRootValuePlan,
+        "Constructed trackedRootValueStep %s",
+        this.trackedRootValueStep,
       );
     }
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
-      [ROOT_PATH]: this.rootSelectionSetPlan.id,
+      [ROOT_PATH]: this.rootSelectionSetStep.id,
     });
     this.isUnplannedByPathIdentity = Object.create(null);
     this.itemPlanIdByFieldPathIdentity = Object.assign(Object.create(null), {
@@ -913,7 +913,7 @@ export class Aether<
     this.groups.push({
       id: 0,
       parent: null,
-      parentStepId: this.rootSelectionSetPlan.id,
+      parentStepId: this.rootSelectionSetStep.id,
       reason: "root",
       children: [],
     });
@@ -1339,8 +1339,8 @@ export class Aether<
       isPolymorphic: false,
       isTypeName: false,
       isLeaf: false,
-      planId: this.rootSelectionSetPlan.id,
-      itemStepId: this.rootSelectionSetPlan.id,
+      planId: this.rootSelectionSetStep.id,
+      itemStepId: this.rootSelectionSetStep.id,
       listDepth: 0,
       childFieldDigests,
     };
@@ -1362,7 +1362,7 @@ export class Aether<
     const { fieldDigests } = this.planSelectionSet(
       ROOT_PATH,
       ROOT_PATH,
-      this.trackedRootValuePlan,
+      this.trackedRootValueStep,
       rootType,
       [
         {
@@ -1387,7 +1387,7 @@ export class Aether<
     const { fieldDigests } = this.planSelectionSet(
       ROOT_PATH,
       ROOT_PATH,
-      this.trackedRootValuePlan,
+      this.trackedRootValueStep,
       rootType,
       [
         {
@@ -1415,7 +1415,7 @@ export class Aether<
       parentPathIdentity: ROOT_PATH,
     }) as <T>(cb: () => T) => T;
     const groupedFieldSet = wgs(() =>
-      graphqlCollectFields(this, this.trackedRootValuePlan.id, rootType, [
+      graphqlCollectFields(this, this.trackedRootValueStep.id, rootType, [
         {
           groupId: 0,
           selections: selectionSet.selections,
@@ -1448,7 +1448,7 @@ export class Aether<
         rootType,
         field,
         subscriptionPlanResolver,
-        this.trackedRootValuePlan,
+        this.trackedRootValueStep,
         fieldSpec,
       );
       this.subscriptionStepId = subscribePlan.id;
@@ -1485,7 +1485,7 @@ export class Aether<
       );
       this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     } else {
-      const subscribePlan = this.trackedRootValuePlan;
+      const subscribePlan = this.trackedRootValueStep;
       this.subscriptionStepId = subscribePlan.id;
       this.finalizeArgumentsSince(0, ROOT_PATH);
       const { fieldDigests } = this.planSelectionSet(
@@ -2322,7 +2322,7 @@ export class Aether<
                     fieldNode,
                     "stream",
                     "initialCount",
-                    this.trackedVariableValuesPlan,
+                    this.trackedVariableValuesStep,
                   ),
                 ) || 0,
             }
@@ -3003,10 +3003,10 @@ export class Aether<
         // TODO: should this be "if (plan instanceof __ValueStep)"?
         (
           [
-            this.rootSelectionSetPlan,
-            this.variableValuesPlan,
-            this.contextPlan,
-            this.rootValuePlan,
+            this.rootSelectionSetStep,
+            this.variableValuesStep,
+            this.contextStep,
+            this.rootValueStep,
           ] as ExecutableStep[]
         ).includes(plan)
       ) {
@@ -5031,33 +5031,33 @@ export class Aether<
     );
     crystalContext.rootCrystalObject = rootCrystalObject;
 
-    if (this.rootSelectionSetPlan.bucketId >= 0) {
+    if (this.rootSelectionSetStep.bucketId >= 0) {
       /*#__INLINE__*/ populateValuePlan(
-        this.rootSelectionSetPlan,
+        this.rootSelectionSetStep,
         rootCrystalObject,
         Object.create(null),
         "rootSelectionSet",
       );
     }
-    if (this.variableValuesPlan.bucketId >= 0) {
+    if (this.variableValuesStep.bucketId >= 0) {
       /*#__INLINE__*/ populateValuePlan(
-        this.variableValuesPlan,
+        this.variableValuesStep,
         rootCrystalObject,
         variableValues,
         "variableValues",
       );
     }
-    if (this.contextPlan.bucketId >= 0) {
+    if (this.contextStep.bucketId >= 0) {
       /*#__INLINE__*/ populateValuePlan(
-        this.contextPlan,
+        this.contextStep,
         rootCrystalObject,
         context,
         "context",
       );
     }
-    if (this.rootValuePlan.bucketId >= 0) {
+    if (this.rootValueStep.bucketId >= 0) {
       /*#__INLINE__*/ populateValuePlan(
-        this.rootValuePlan,
+        this.rootValueStep,
         rootCrystalObject,
         rootValue,
         "rootValue",
@@ -5797,10 +5797,10 @@ export class Aether<
       input,
       noDepsList: Object.freeze(arrayOfLength(input.length)),
       store: Object.assign(Object.create(null), {
-        [this.rootSelectionSetPlan.id]: roots,
-        [this.variableValuesPlan.id]: vars,
-        [this.contextPlan.id]: ctxs,
-        [this.rootValuePlan.id]: rvs,
+        [this.rootSelectionSetStep.id]: roots,
+        [this.variableValuesStep.id]: vars,
+        [this.contextStep.id]: ctxs,
+        [this.rootValueStep.id]: rvs,
       }),
       hasErrors: false,
     };

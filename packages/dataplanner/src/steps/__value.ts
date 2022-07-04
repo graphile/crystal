@@ -21,11 +21,11 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
 
   toStringMeta(): string | null {
     switch (this) {
-      case this.aether.rootValuePlan:
+      case this.aether.rootValueStep:
         return "rootValue";
-      case this.aether.variableValuesPlan as __ValueStep<unknown>:
+      case this.aether.variableValuesStep as __ValueStep<unknown>:
         return "variableValues";
-      case this.aether.contextPlan as __ValueStep<unknown>:
+      case this.aether.contextStep as __ValueStep<unknown>:
         return "context";
       default:
         return null;
