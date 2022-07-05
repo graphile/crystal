@@ -1,0 +1,504 @@
+{
+  a: {
+    clientMutationId: null,
+    type: {
+      nodeId: "WyJ0eXBlcyIsMjAxXQ==",
+      id: 201,
+      smallint: 30,
+      bigint: "467131188225",
+      numeric: "15.2",
+      decimal: "15.2",
+      boolean: false,
+      varchar: "abc",
+      enum: "RED",
+      enumArray: [
+        "RED",
+        "GREEN",
+      ],
+      domain: 6,
+      domain2: 5,
+      textArray: [
+        "have",
+        "you",
+        "ever",
+        "been",
+        "down",
+        "the",
+        "water",
+        "spout",
+        "?",
+      ],
+      json: "{\"x\":1,\"y\":2,\"z\":3}",
+      jsonb: "{\"a\":1,\"b\":2,\"c\":3}",
+      numrange: {
+        start: {
+          value: "50",
+          inclusive: true,
+        },
+        end: null,
+      },
+      daterange: {
+        start: {
+          value: "1927-11-06",
+          inclusive: true,
+        },
+        end: {
+          value: "1927-11-07",
+          inclusive: false,
+        },
+      },
+      anIntRange: {
+        start: null,
+        end: {
+          value: 500,
+          inclusive: false,
+        },
+      },
+      timestamp: "2016-10-07T16:12:21.747269",
+      timestamptz: "2016-10-09T16:12:45.218676-04:00",
+      date: "2016-10-15",
+      time: "19:13:18.625699",
+      timetz: "13:13:29.585176-04",
+      interval: {
+        seconds: 1,
+        minutes: 2,
+        hours: 3,
+        days: 4,
+        months: 5,
+        years: 6,
+      },
+      intervalArray: [
+        {
+          seconds: 2,
+          minutes: 3,
+          hours: 4,
+          days: 5,
+          months: 6,
+          years: 7,
+        },
+        {
+          seconds: 3,
+          minutes: 4,
+          hours: 5,
+          days: 6,
+          months: 7,
+          years: 8,
+        },
+      ],
+      money: 1234567.89,
+      compoundType: {
+        a: 123,
+        b: "abc",
+        c: "GREEN",
+        d: "<UUID 1>",
+        e: "FOO_BAR",
+        f: "_EMPTY_",
+        fooBar: 20,
+      },
+      nestedCompoundType: {
+        a: {
+          a: 456,
+          b: "def",
+          c: "BLUE",
+          d: "<UUID 2>",
+          e: "BAR_FOO",
+          f: "ONE",
+          fooBar: 42,
+        },
+        b: {
+          a: 789,
+          b: "ghi",
+          c: "RED",
+          d: "<UUID 3>",
+          e: "BAZ_QUX",
+          f: "_EMPTY_",
+          fooBar: -8,
+        },
+        bazBuz: 0,
+      },
+      point: {
+        x: 1,
+        y: 3,
+      },
+      nullablePoint: null,
+      inet: null,
+      cidr: "192.168.0.0/16",
+      macaddr: "0c:af:ec:0f:fe:e0",
+      textArrayDomain: [
+        "TEXT 2098288669218571759",
+        "TEXT 2098288669218571760",
+        "TEXT 2098288669218571761",
+      ],
+      int8ArrayDomain: [
+        "2098288669218571759",
+        "2098288669218571760",
+        "2098288669218571761",
+      ],
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  b: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDkwMDBd",
+      id: 9000,
+      name: "John Smith Jr.",
+      email: "johnny.boy.smith@email.com",
+      about: "Son of Sara and John Smith.",
+      config: {
+        a: "5",
+        b: "6",
+        null_string: "null",
+        actually_null: null,
+        "_\"\\_$@£$)(@*£$": "_\"\\_$@£$)(@*£$",
+      },
+      lastLoginFromIp: "172.16.1.2",
+      lastLoginFromSubnet: "172.16.0.0/12",
+      userMac: "00:00:00:00:00:00",
+      issue27UserExists: false,
+    },
+    a: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs5MDAwXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    b: {
+      cursor: "WyJwcmltYXJ5X2tleV9kZXNjIixbOTAwMF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    c: {
+      cursor: "WyJpZF9hc2MiLFs5MDAwXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    d: {
+      cursor: "WyJpZF9kZXNjIixbOTAwMF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    e: {
+      cursor: "WyJlbWFpbF9hc2MiLFsiam9obm55LmJveS5zbWl0aEBlbWFpbC5jb20iXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    f: {
+      cursor: "WyJlbWFpbF9kZXNjIixbImpvaG5ueS5ib3kuc21pdGhAZW1haWwuY29tIl1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    g: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs5MDAwXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    h: {
+      cursor: "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJqb2hubnkuYm95LnNtaXRoQGVtYWlsLmNvbSIsOTAwMF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  c: {
+    clientMutationId: "hello",
+    person: {
+      nodeId: "WyJwZW9wbGUiLDIwXQ==",
+      id: 20,
+      name: "Best Pal",
+      email: "best.pal@email.com",
+      about: "My archnemisis is Budd Deey.",
+      config: null,
+      lastLoginFromIp: "192.168.0.42",
+      lastLoginFromSubnet: "192.168.0.0/16",
+      userMac: "00:00:00:00:00:00",
+      issue27UserExists: false,
+    },
+    a: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    b: {
+      cursor: "WyJwcmltYXJ5X2tleV9kZXNjIixbMjBdXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    c: {
+      cursor: "WyJpZF9hc2MiLFsyMF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    d: {
+      cursor: "WyJpZF9kZXNjIixbMjBdXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    e: {
+      cursor: "WyJlbWFpbF9hc2MiLFsiYmVzdC5wYWxAZW1haWwuY29tIl1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    f: {
+      cursor: "WyJlbWFpbF9kZXNjIixbImJlc3QucGFsQGVtYWlsLmNvbSJdXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    g: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    h: {
+      cursor: "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJiZXN0LnBhbEBlbWFpbC5jb20iLDIwXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  d: {
+    clientMutationId: "world",
+    compoundKey: {
+      nodeId: "WyJjb21wb3VuZF9rZXlzIiw5MDAwLDIwXQ==",
+      personId1: 9000,
+      personId2: 20,
+      extra: false,
+      personByPersonId1: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+      personByPersonId2: {
+        nodeId: "WyJwZW9wbGUiLDIwXQ==",
+        name: "Best Pal",
+      },
+    },
+    personByPersonId1: {
+      nodeId: "WyJwZW9wbGUiLDkwMDBd",
+      name: "John Smith Jr.",
+    },
+    personByPersonId2: {
+      nodeId: "WyJwZW9wbGUiLDIwXQ==",
+      name: "Best Pal",
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  e: {
+    edgeCase: {
+      notNullHasDefault: true,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  f: {
+    edgeCase: {
+      notNullHasDefault: false,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  g: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDE5OThd",
+      id: 1998,
+      name: "Budd Deey",
+      email: "budd.deey.the.second@email.com",
+      about: null,
+      config: {
+        a: "5",
+        b: "6",
+        null_string: "null",
+        actually_null: null,
+      },
+      lastLoginFromIp: "10.0.1.42",
+      lastLoginFromSubnet: "10.0.0.0/8",
+      userMac: "aa:bb:cc:dd:ee:ff",
+      issue27UserExists: false,
+    },
+    a: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    b: {
+      cursor: "WyJwcmltYXJ5X2tleV9kZXNjIixbMTk5OF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    c: {
+      cursor: "WyJpZF9hc2MiLFsxOTk4XV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    d: {
+      cursor: "WyJpZF9kZXNjIixbMTk5OF1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    e: {
+      cursor: "WyJlbWFpbF9hc2MiLFsiYnVkZC5kZWV5LnRoZS5zZWNvbmRAZW1haWwuY29tIl1d",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    f: {
+      cursor: "WyJlbWFpbF9kZXNjIixbImJ1ZGQuZGVleS50aGUuc2Vjb25kQGVtYWlsLmNvbSJdXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    g: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    h: {
+      cursor: "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJidWRkLmRlZXkudGhlLnNlY29uZEBlbWFpbC5jb20iLDE5OThdXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDE5OThd",
+        name: "Budd Deey",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  h: {
+    person: {
+      issue27UserExists: true,
+    },
+  },
+  i: {
+    defaultValue: {
+      id: 2000,
+      nullValue: null,
+    },
+  },
+  j: {
+    post: {
+      id: 12,
+      headline: "super headline",
+      comptypes: [
+        {
+          schedule: "2009-10-24T04:23:54-04:00",
+          isOptimised: true,
+        },
+        {
+          schedule: "2008-10-24T04:23:54-04:00",
+          isOptimised: false,
+        },
+        {
+          schedule: "2007-10-24T04:23:54-04:00",
+          isOptimised: null,
+        },
+      ],
+    },
+  },
+  k: {
+    post: {
+      id: 13,
+      headline: "super headline 2",
+      comptypes: [
+        {
+          schedule: "2008-10-24T04:17:54-04:00",
+          isOptimised: true,
+        },
+        {
+          schedule: "2007-10-24T04:17:54-04:00",
+          isOptimised: false,
+        },
+        {
+          schedule: "2006-10-24T04:17:54-04:00",
+          isOptimised: null,
+        },
+      ],
+      personByAuthorId: {
+        id: 1,
+      },
+    },
+    p2: {
+      personByAuthorId: {
+        email: "john.smith@email.com",
+      },
+    },
+    postEdge: {
+      node: {
+        id: 13,
+        headline: "super headline 2",
+        comptypes: [
+          {
+            schedule: "2008-10-24T04:17:54-04:00",
+            isOptimised: true,
+          },
+          {
+            schedule: "2007-10-24T04:17:54-04:00",
+            isOptimised: false,
+          },
+          {
+            schedule: "2006-10-24T04:17:54-04:00",
+            isOptimised: null,
+          },
+        ],
+        personByAuthorId: {
+          name: "John Smith",
+        },
+      },
+    },
+    personByAuthorId: {
+      createdAt: null,
+    },
+  },
+}

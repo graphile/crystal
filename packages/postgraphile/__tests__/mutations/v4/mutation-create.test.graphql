@@ -1,0 +1,395 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> variableValues: { "config": { "a": "5", "b": "6", "actually_null": null, "null_string": "null", "_\"\\_$@£$)(@*£$": "_\"\\_$@£$)(@*£$" } }
+
+mutation CreateMutation($config: KeyValueHash!) {
+  a: createType(input: {
+    type: {
+      id: 201
+      smallint: 30
+      bigint: "467131188225"
+      numeric: "15.2"
+      decimal: "15.2"
+      boolean: false
+      varchar: "abc"
+      enum: RED
+      enumArray: [RED, GREEN]
+      domain: 6
+      domain2: 5
+      textArray: ["have", "you", "ever", "been", "down", "the", "water", "spout", "?"]
+      json: "{\"x\":1,\"y\":2,\"z\":3}"
+      jsonb: "{\"a\":1,\"b\":2,\"c\":3}"
+      numrange: {
+        start: { value: "50", inclusive: true }
+      }
+      daterange: {
+        start: { value: "1927-11-05", inclusive: false }
+        end: { value: "1927-11-07", inclusive: false }
+      }
+      anIntRange: {
+        end: { value: 500, inclusive: false }
+      }
+      timestamp: "2016-10-07 16:12:21.747269"
+      timestamptz: "2016-10-09 16:12:45.218676-04"
+      date: "2016-10-15"
+      time: "19:13:18.625699"
+      timetz: "13:13:29.585176"
+      interval: {
+        seconds: 1
+        minutes: 2
+        hours: 3
+        days: 4
+        months: 5
+        years: 6
+      }
+      intervalArray: [
+        {
+          seconds: 2
+          minutes: 3
+          hours: 4
+          days: 5
+          months: 6
+          years: 7
+        }
+        {
+          seconds: 3
+          minutes: 4
+          hours: 5
+          days: 6
+          months: 7
+          years: 8
+        }
+      ]
+      money: 1234567.89
+      compoundType: {
+        a: 123,
+        b: "abc"
+        c: GREEN
+        d: "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf"
+        e: FOO_BAR
+        f: _EMPTY_
+        fooBar: 20
+      }
+      nestedCompoundType: {
+        a: {
+          a: 456
+          b: "def"
+          c: BLUE
+          d: "79863dcf-0433-4c3d-bc51-978326d4546f"
+          e: BAR_FOO
+          f: ONE
+          fooBar: 42
+        }
+        b: {
+          a: 789
+          b: "ghi"
+          c: RED
+          d: "b687ee42-c515-4544-b742-525e39517e7d"
+          e: BAZ_QUX
+          f: _EMPTY_
+          fooBar: -8
+        }
+        bazBuz: 0
+      }
+      point: {
+        x: 1
+        y: 3
+      },
+      cidr: "192.168.0.0/16",
+      macaddr: "0cafec0ffee0"
+      textArrayDomain: [
+        "TEXT 2098288669218571759"
+        "TEXT 2098288669218571760"
+        "TEXT 2098288669218571761"
+      ]
+      int8ArrayDomain: [
+        "2098288669218571759"
+        "2098288669218571760"
+        "2098288669218571761"
+      ]
+    }
+  }) {
+    clientMutationId
+    type {
+      nodeId
+      id
+      smallint
+      bigint
+      numeric
+      decimal
+      boolean
+      varchar
+      enum
+      enumArray
+      domain
+      domain2
+      textArray
+      json
+      jsonb
+      numrange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      daterange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      anIntRange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      timestamp
+      timestamptz
+      date
+      time
+      timetz
+      interval { seconds minutes hours days months years }
+      intervalArray { seconds minutes hours days months years }
+      money
+      compoundType { a b c d e f fooBar }
+      nestedCompoundType {
+        a { a b c d e f fooBar }
+        b { a b c d e f fooBar }
+        bazBuz
+      }
+      point { x y }
+      nullablePoint { x y }
+      inet
+      cidr
+      macaddr
+      textArrayDomain
+      int8ArrayDomain
+    }
+    query { nodeId }
+  }
+  b: createPerson(input: {
+    person: {
+      id: 9000
+      name: "John Smith Jr."
+      email: "johnny.boy.smith@email.com"
+      about: "Son of Sara and John Smith."
+      config: $config
+      lastLoginFromIp: "172.16.1.2"
+      lastLoginFromSubnet: "172.16.0.0/12"
+      userMac: "00:00:00:00:00:00"
+    }
+  }) { ...createPersonPayload }
+  c: createPerson(input: {
+    clientMutationId: "hello",
+    person: {
+      id: 20
+      name: "Best Pal"
+      email: "best.pal@email.com"
+      about: "My archnemisis is Budd Deey."
+      config: null
+      lastLoginFromIp: "192.168.0.42"
+      lastLoginFromSubnet: "192.168.0.0/16"
+      userMac: "0000.0000.0000"
+    }
+  }) { ...createPersonPayload }
+  d: createCompoundKey(input: {
+    clientMutationId: "world",
+    compoundKey: {
+      personId1: 9000
+      personId2: 20
+      extra: false
+    }
+  }) {
+    clientMutationId
+    compoundKey {
+      nodeId
+      personId1
+      personId2
+      extra
+      personByPersonId1 {
+        nodeId
+        name
+      }
+      personByPersonId2 {
+        nodeId
+        name
+      }
+    }
+    personByPersonId1 {
+      nodeId
+      name
+    }
+    personByPersonId2 {
+      nodeId
+      name
+    }
+    query { nodeId }
+  }
+  e: createEdgeCase(input: {
+    edgeCase: {
+      notNullHasDefault: true
+    }
+  }) {
+    edgeCase {
+      notNullHasDefault
+    }
+    query { nodeId }
+  }
+  f: createEdgeCase(input: {
+    edgeCase: {}
+  }) {
+    edgeCase {
+      notNullHasDefault
+    }
+    query { nodeId }
+  }
+  g: createPerson(input: {
+    person: {
+      id: 1998
+      name: "Budd Deey"
+      email: "budd.deey.the.second@email.com"
+      about: null
+      config: {
+        a: 5,
+        b: 6,
+        actually_null: null,
+        null_string: "null"
+      }
+      lastLoginFromIp: "10.0.1.42"
+      lastLoginFromSubnet: "10.0.0.0/8"
+      userMac: "aa-bb-cc-dd-ee-ff"
+    }
+  }) { ...createPersonPayload }
+  h: createPerson(input: {
+    person: {
+      id: 1999
+      name: "Twenty Seven"
+      email: "graphile-build.issue.27@example.com"
+      about: null
+    }
+  }) {
+    person {
+      issue27UserExists: exists(email: "graphile-build.issue.27@example.com")
+    }
+  }
+  i: createDefaultValue(input: {
+    defaultValue: {
+      id: 2000
+      nullValue: null
+    }
+  }) {
+    defaultValue {
+      id
+      nullValue
+    }
+  }
+  j: createPost(input: {
+    post: {
+      headline: "super headline",
+      comptypes: [
+        {
+          schedule: "2009-10-24 10:23:54+02",
+          isOptimised: true
+        },
+        {
+          schedule: "2008-10-24 10:23:54+02",
+          isOptimised: false
+        },
+        {
+          schedule: "2007-10-24 10:23:54+02",
+          isOptimised: null
+        }
+      ]
+    }
+  }) {
+    post {
+      id
+      headline
+      comptypes {
+        schedule
+        isOptimised
+      }
+    }
+  }
+  k: createPost(input: {
+    post: {
+      authorId: 1
+      headline: "super headline 2",
+      comptypes: [
+        {
+          schedule: "2008-10-24 10:17:54+02",
+          isOptimised: true
+        },
+        {
+          schedule: "2007-10-24 10:17:54+02",
+          isOptimised: false
+        },
+        {
+          schedule: "2006-10-24 10:17:54+02",
+          isOptimised: null
+        }
+      ]
+    }
+  }) {
+    post {
+      id
+      headline
+      comptypes {
+        schedule
+        isOptimised
+      }
+      personByAuthorId {
+        id
+      }
+    }
+    p2: post {
+      personByAuthorId {
+        email
+      }
+    }
+    postEdge {
+      node {
+        id
+        headline
+        comptypes {
+          schedule
+          isOptimised
+        }
+        personByAuthorId {
+          name
+        }
+      }
+    }
+    personByAuthorId {
+      createdAt
+    }
+  }
+}
+
+fragment createPersonPayload on CreatePersonPayload {
+  clientMutationId
+  person {
+    nodeId
+    id
+    name
+    email
+    about
+    config
+    lastLoginFromIp
+    lastLoginFromSubnet
+    userMac
+    issue27UserExists: exists(email: "graphile-build.issue.27@example.com")
+  }
+  a: personEdge(orderBy: PRIMARY_KEY_ASC) { ...peopleEdge }
+  b: personEdge(orderBy: PRIMARY_KEY_DESC) { ...peopleEdge }
+  c: personEdge(orderBy: ID_ASC) { ...peopleEdge }
+  d: personEdge(orderBy: ID_DESC) { ...peopleEdge }
+  e: personEdge(orderBy: EMAIL_ASC) { ...peopleEdge }
+  f: personEdge(orderBy: EMAIL_DESC) { ...peopleEdge }
+  g: personEdge(orderBy: NATURAL) { ...peopleEdge }
+  h: personEdge(orderBy: [EMAIL_DESC, ID_DESC]) { ...peopleEdge }
+  query { nodeId }
+}
+
+fragment peopleEdge on PeopleEdge {
+  cursor
+  node {
+    nodeId
+    name
+  }
+}
