@@ -1,8 +1,8 @@
 {
   jsonIdentity: "{\"a\":1,\"b\":2,\"c\":3}",
-  jsonbIdentity: "{\"a\":1,\"b\":2,\"c\":3}",
+  jsonbIdentity: "{\"a\": 1, \"b\": 2, \"c\": 3}",
   jsonIdentityIssue85: "[{\"amount\":\"44\"},{\"amount\":null}]",
-  jsonbIdentityIssue85: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  jsonbIdentityIssue85: "[{\"amount\": \"44\"}, {\"amount\": null}]",
   add1Query: 3,
   add2Query: 4,
   add3Query: null,
