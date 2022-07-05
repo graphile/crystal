@@ -1,0 +1,66 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0]"]:::plan
+    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
+    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
+    Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object11["Object[11]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect8[["PgSelect[8]<br />ᐸrangeTestᐳ"]]:::plan
+    First12["First[12]"]:::plan
+    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrangeTestᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14]<br />ᐸ__range_test__.”num”ᐳ"]:::plan
+    Access15["Access[15]<br />ᐸ14.startᐳ"]:::plan
+    Access16["Access[16]<br />ᐸ15.valueᐳ"]:::plan
+    Access17["Access[17]<br />ᐸ15.inclusiveᐳ"]:::plan
+    Access18["Access[18]<br />ᐸ14.endᐳ"]:::plan
+    Access19["Access[19]<br />ᐸ18.valueᐳ"]:::plan
+    Access20["Access[20]<br />ᐸ18.inclusiveᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access9
+    __Value3 --> Access10
+    Access9 & Access10 --> Object11
+    Object11 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    PgClassExpression14 --> Access15
+    Access15 --> Access16
+    Access15 --> Access17
+    PgClassExpression14 --> Access18
+    Access18 --> Access19
+    Access18 --> Access20
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P13["ᐳrangeTestById"]
+    PgSelectSingle13 -.-> P13
+    P14["ᐳr…dᐳnum"]
+    PgClassExpression14 -.-> P14
+    P15["ᐳr…dᐳnumᐳstart"]
+    Access15 -.-> P15
+    P16["ᐳr…dᐳnumᐳs…tᐳvalue"]
+    Access16 -.-> P16
+    P17["ᐳr…dᐳnumᐳs…tᐳinclusive"]
+    Access17 -.-> P17
+    P18["ᐳr…dᐳnumᐳend"]
+    Access18 -.-> P18
+    P19["ᐳr…dᐳnumᐳendᐳvalue"]
+    Access19 -.-> P19
+    P20["ᐳr…dᐳnumᐳendᐳinclusive"]
+    Access20 -.-> P20
+
+    subgraph "Buckets for queries/v4/numeric"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀rangeTestById ᐸ-O- 13<br />⠀⠀⠀rangeTestById.num ᐸ-O- 14<br />⠀⠀⠀⠀rangeTestById.num.start ᐸ-O- 15<br />⠀⠀⠀⠀⠀rangeTestById.num.start.value ᐸ-L- 16<br />⠀⠀⠀⠀⠀rangeTestById.num.start.inclusive ᐸ-L- 17<br />⠀⠀⠀⠀rangeTestById.num.end ᐸ-O- 18<br />⠀⠀⠀⠀⠀rangeTestById.num.end.value ᐸ-L- 19<br />⠀⠀⠀⠀⠀rangeTestById.num.end.inclusive ᐸ-L- 20"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,Access15,Access16,Access17,Access18,Access19,Access20 bucket0
+    end
