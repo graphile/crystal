@@ -1,0 +1,9 @@
+## expect(errors).toBeFalsy();
+## expect(data.authenticateFail.jwtToken).toBe(null);
+#> jwtPgTypeIdentifier: '"b"."jwt_token"'
+#> jwtSecret: true
+mutation {
+  authenticateFail(input: {}) {
+    jwtToken
+  }
+}
