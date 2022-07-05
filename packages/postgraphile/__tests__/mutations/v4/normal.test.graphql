@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy();
+mutation {
+  authenticate(input: {a: 1, b: "2", c: "3"}) {
+    jwtToken {
+      role
+      exp
+      a
+      b
+      c
+    }
+  }
+}

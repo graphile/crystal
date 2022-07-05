@@ -1,0 +1,11 @@
+{
+  authenticate: {
+    jwtToken: {
+      role: "yay",
+      exp: "2130969600",
+      a: 1,
+      b: "2",
+      c: "3",
+    },
+  },
+}
