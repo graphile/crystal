@@ -1,75 +1,19 @@
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  select __local_1__.*
+select __authenticate_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"numeric" as "id1",
+    (ids.value->>2)::"int8" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __authenticate_identifiers__,
+lateral (
+  select
+    (not (__authenticate__ is null))::text as "0",
+    __authenticate_identifiers__.idx as "1"
   from "b"."authenticate"(
-    $1,
-    $2,
-    $3
-  ) __local_1__
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
-
-with __local_0__ as (
-  select (
-    str::"b"."jwt_token"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  json_build_object(
-    'role'::text,
-    (__local_0__)."role",
-    'exp'::text,
-    (
-      (__local_0__)."exp"
-    )::text,
-    'a'::text,
-    (__local_0__)."a",
-    'b'::text,
-    (
-      (__local_0__)."b"
-    )::text,
-    'c'::text,
-    (
-      (__local_0__)."c"
-    )::text
-  )
-) as "value",
-to_json(
-  (
-    to_json(
-      json_build_object(
-        'role'::text,
-        (__local_0__)."role",
-        'exp'::text,
-        (
-          (__local_0__)."exp"
-        )::text,
-        'a'::text,
-        (__local_0__)."a",
-        'b'::text,
-        (
-          (__local_0__)."b"
-        )::text,
-        'c'::text,
-        (
-          (__local_0__)."c"
-        )::text
-      )
-    )
-  )
-) as "@jwtToken"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
+    __authenticate_identifiers__."id0",
+    __authenticate_identifiers__."id1",
+    __authenticate_identifiers__."id2"
+  ) as __authenticate__
+) as __authenticate_result__

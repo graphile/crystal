@@ -1,6 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> jwtPgTypeIdentifier: '"b"."jwt_token"'
-#> jwtSecret: true
+#> jwtSecret: 'true'
 mutation {
   authenticate(input: {a: 1, b: "2", c: "3"}) {
     jwtToken
