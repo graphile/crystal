@@ -843,8 +843,17 @@ export const assertResultsMatch = async (
 ): Promise<void> => {
   const { data: data1 } = await result1;
   const { data: data2 } = await result2;
-  const maskedData1 = mask(data1, config);
-  const maskedData2 = mask(data2, config);
+  const data1a = makeResultSnapshotSafe(data1, {
+    uuid: new Map<string, number>(),
+    uuidCounter: 1,
+  });
+  const data2a = makeResultSnapshotSafe(data1, {
+    uuid: new Map<string, number>(),
+    uuidCounter: 1,
+  });
+
+  const maskedData1 = mask(data1a, config);
+  const maskedData2 = mask(data2a, config);
   expect(maskedData2).toEqual(maskedData1);
 };
 
