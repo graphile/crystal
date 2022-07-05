@@ -59,6 +59,9 @@ import { makeV4Preset } from "../src/presets/v4.js";
  */
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
+const SHARED_JWT_SECRET =
+  "This is static for the tests, use a better one if you set one!";
+
 // TODO: this file shares a lot in common with the equivalent file in
 // dataplan-pg; we should extract the common utilities.
 
@@ -859,5 +862,14 @@ function applyV4Stuff(
   preset: GraphileConfig.Preset,
   config: Record<string, any>,
 ): void {
-  (preset.extends as Array<GraphileConfig.Preset>).push(makeV4Preset(config));
+  (preset.extends as Array<GraphileConfig.Preset>).push(
+    makeV4Preset({
+      ...config,
+      ...(config.jwtSecret === true
+        ? {
+            jwtSecret: SHARED_JWT_SECRET,
+          }
+        : null),
+    }),
+  );
 }
