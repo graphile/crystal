@@ -144,11 +144,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                         any,
                         any
                       >;
-                      const spec = columnNames.reduce((memo, columnName) => {
-                        memo[columnName] = $record.get(columnName);
-                        return memo;
-                      }, {});
-                      return object(spec);
+                      return $record.record();
                     },
                   [columnNames, object],
                 ),
