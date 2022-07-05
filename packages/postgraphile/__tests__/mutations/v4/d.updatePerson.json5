@@ -1,0 +1,15 @@
+{
+  updatePersonById: {
+    person: {
+      id: 1,
+      firstName: "John",
+      lastName: "Doe",
+      colNoCreate: "update2",
+      colNoUpdate: "col_no_update1",
+      colNoOrder: "update1",
+      colNoFilter: "update3",
+      colNoCreateUpdate: "col_no_create_update1",
+      colNoCreateUpdateOrderFilter: "col_no_create_update_order_filter1",
+    },
+  },
+}

@@ -1,0 +1,25 @@
+## expect(errors).toBeFalsy();
+#> schema: ["d"]
+mutation {
+  updatePersonById(input:{
+    id:1
+    personPatch:{
+      lastName:"Doe"
+      colNoOrder:"update1"
+      colNoCreate:"update2"
+      colNoFilter:"update3"
+    }
+  }) {
+    person{
+      id
+      firstName
+      lastName
+      colNoCreate
+      colNoUpdate
+      colNoOrder
+      colNoFilter
+      colNoCreateUpdate
+      colNoCreateUpdateOrderFilter
+    }
+  }
+}
