@@ -954,133 +954,149 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 });
                 const rangeInputTypeName = inflection.inputType(rangeTypeName);
 
-                build.registerObjectType(
-                  rangeBoundTypeName,
-                  {
-                    isPgRangeBoundType: true,
-                    pgCodec: codec,
-                  },
-                  null, // TODO
-                  () => ({
-                    description: build.wrapDescription(
-                      "The value at one end of a range. A range can either include this value, or not.",
-                      "type",
-                    ),
-                    fields: () => ({
-                      value: {
-                        description: build.wrapDescription(
-                          "The value at one end of our range.",
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(
-                          build.getOutputTypeByName(underlyingOutputTypeName!),
-                        ),
-                      },
-                      inclusive: {
-                        description: build.wrapDescription(
-                          "Whether or not the value of this bound is included in the range.",
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(GraphQLBoolean),
-                      },
+                if (!build.getTypeMetaByName(rangeBoundTypeName)) {
+                  build.registerObjectType(
+                    rangeBoundTypeName,
+                    {
+                      isPgRangeBoundType: true,
+                      pgCodec: codec,
+                    },
+                    null, // TODO
+                    () => ({
+                      description: build.wrapDescription(
+                        "The value at one end of a range. A range can either include this value, or not.",
+                        "type",
+                      ),
+                      fields: () => ({
+                        value: {
+                          description: build.wrapDescription(
+                            "The value at one end of our range.",
+                            "field",
+                          ),
+                          type: new GraphQLNonNull(
+                            build.getOutputTypeByName(
+                              underlyingOutputTypeName!,
+                            ),
+                          ),
+                        },
+                        inclusive: {
+                          description: build.wrapDescription(
+                            "Whether or not the value of this bound is included in the range.",
+                            "field",
+                          ),
+                          type: new GraphQLNonNull(GraphQLBoolean),
+                        },
+                      }),
                     }),
-                  }),
-                  "PgCodecsPlugin enum range bound output",
-                );
+                    `PgCodecsPlugin enum range bound output for codec '${codec.name}'`,
+                  );
+                }
 
-                build.registerInputObjectType(
-                  rangeBoundInputTypeName,
-                  {
-                    isPgRangeBoundInputType: true,
-                    pgCodec: codec,
-                  },
-                  () => ({
-                    description: build.wrapDescription(
-                      "The value at one end of a range. A range can either include this value, or not.",
-                      "type",
-                    ),
-                    fields: () => ({
-                      value: {
-                        description: build.wrapDescription(
-                          "The value at one end of our range.",
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(
-                          build.getInputTypeByName(underlyingInputTypeName!),
-                        ),
-                      },
-                      inclusive: {
-                        description: build.wrapDescription(
-                          "Whether or not the value of this bound is included in the range.",
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(GraphQLBoolean),
-                      },
+                if (!build.getTypeMetaByName(rangeBoundInputTypeName)) {
+                  build.registerInputObjectType(
+                    rangeBoundInputTypeName,
+                    {
+                      isPgRangeBoundInputType: true,
+                      pgCodec: codec,
+                    },
+                    () => ({
+                      description: build.wrapDescription(
+                        "The value at one end of a range. A range can either include this value, or not.",
+                        "type",
+                      ),
+                      fields: () => ({
+                        value: {
+                          description: build.wrapDescription(
+                            "The value at one end of our range.",
+                            "field",
+                          ),
+                          type: new GraphQLNonNull(
+                            build.getInputTypeByName(underlyingInputTypeName!),
+                          ),
+                        },
+                        inclusive: {
+                          description: build.wrapDescription(
+                            "Whether or not the value of this bound is included in the range.",
+                            "field",
+                          ),
+                          type: new GraphQLNonNull(GraphQLBoolean),
+                        },
+                      }),
                     }),
-                  }),
-                  "PgCodecsPlugin enum range bound input",
-                );
-                build.registerObjectType(
-                  rangeTypeName,
-                  {
-                    isPgRangeType: true,
-                    pgCodec: codec,
-                  },
-                  null, // TODO
-                  () => ({
-                    description: build.wrapDescription(
-                      `A range of \`${underlyingOutputTypeName}\`.`,
-                      "type",
-                    ),
-                    fields: () => ({
-                      start: {
-                        description: build.wrapDescription(
-                          "The starting bound of our range.",
-                          "field",
-                        ),
-                        type: build.getOutputTypeByName(rangeBoundTypeName!),
-                      },
-                      end: {
-                        description: build.wrapDescription(
-                          "The ending bound of our range.",
-                          "field",
-                        ),
-                        type: build.getOutputTypeByName(rangeBoundTypeName!),
-                      },
+                    "PgCodecsPlugin enum range bound input",
+                  );
+                }
+
+                if (!build.getTypeMetaByName(rangeTypeName)) {
+                  build.registerObjectType(
+                    rangeTypeName,
+                    {
+                      isPgRangeType: true,
+                      pgCodec: codec,
+                    },
+                    null, // TODO
+                    () => ({
+                      description: build.wrapDescription(
+                        `A range of \`${underlyingOutputTypeName}\`.`,
+                        "type",
+                      ),
+                      fields: () => ({
+                        start: {
+                          description: build.wrapDescription(
+                            "The starting bound of our range.",
+                            "field",
+                          ),
+                          type: build.getOutputTypeByName(rangeBoundTypeName!),
+                        },
+                        end: {
+                          description: build.wrapDescription(
+                            "The ending bound of our range.",
+                            "field",
+                          ),
+                          type: build.getOutputTypeByName(rangeBoundTypeName!),
+                        },
+                      }),
                     }),
-                  }),
-                  "PgCodecsPlugin enum range output",
-                );
-                build.registerInputObjectType(
-                  rangeInputTypeName,
-                  {
-                    isPgRangeInputType: true,
-                    pgCodec: codec,
-                  },
-                  () => ({
-                    description: build.wrapDescription(
-                      `A range of \`${underlyingInputTypeName}\`.`,
-                      "type",
-                    ),
-                    fields: () => ({
-                      start: {
-                        description: build.wrapDescription(
-                          "The starting bound of our range.",
-                          "field",
-                        ),
-                        type: build.getInputTypeByName(rangeBoundInputTypeName),
-                      },
-                      end: {
-                        description: build.wrapDescription(
-                          "The ending bound of our range.",
-                          "field",
-                        ),
-                        type: build.getInputTypeByName(rangeBoundInputTypeName),
-                      },
+                    "PgCodecsPlugin enum range output",
+                  );
+                }
+
+                if (!build.getTypeMetaByName(rangeInputTypeName)) {
+                  build.registerInputObjectType(
+                    rangeInputTypeName,
+                    {
+                      isPgRangeInputType: true,
+                      pgCodec: codec,
+                    },
+                    () => ({
+                      description: build.wrapDescription(
+                        `A range of \`${underlyingInputTypeName}\`.`,
+                        "type",
+                      ),
+                      fields: () => ({
+                        start: {
+                          description: build.wrapDescription(
+                            "The starting bound of our range.",
+                            "field",
+                          ),
+                          type: build.getInputTypeByName(
+                            rangeBoundInputTypeName,
+                          ),
+                        },
+                        end: {
+                          description: build.wrapDescription(
+                            "The ending bound of our range.",
+                            "field",
+                          ),
+                          type: build.getInputTypeByName(
+                            rangeBoundInputTypeName,
+                          ),
+                        },
+                      }),
                     }),
-                  }),
-                  "PgCodecsPlugin enum range input",
-                );
+                    "PgCodecsPlugin enum range input",
+                  );
+                }
 
                 build.setGraphQLTypeForPgCodec(codec, "output", rangeTypeName);
                 build.setGraphQLTypeForPgCodec(
