@@ -1,12 +1,13 @@
 import "graphile-config";
 
-import type { PgTypeCodec } from "@dataplan/pg";
+import type { PgSelectSingleStep, PgTypeCodec } from "@dataplan/pg";
 // import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { object } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -107,41 +108,42 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                     }
                     return memo;
                   }, {} as any);
-                  return signJwt(
-                    token,
-                    pgJwtSecret,
-                    Object.assign(
-                      {},
-                      pgJwtSignOptions,
-                      token.aud ||
-                        (pgJwtSignOptions && pgJwtSignOptions.audience)
-                        ? null
-                        : {
-                            audience: "postgraphile",
-                          },
-                      token.iss || (pgJwtSignOptions && pgJwtSignOptions.issuer)
-                        ? null
-                        : {
-                            issuer: "postgraphile",
-                          },
-                      token.exp ||
-                        (pgJwtSignOptions && pgJwtSignOptions.expiresIn)
-                        ? null
-                        : {
-                            expiresIn: "1 day",
-                          },
-                    ),
+                  const options = Object.assign(
+                    Object.create(null),
+                    pgJwtSignOptions,
+                    token.aud || (pgJwtSignOptions && pgJwtSignOptions.audience)
+                      ? null
+                      : {
+                          audience: "postgraphile",
+                        },
+                    token.iss || (pgJwtSignOptions && pgJwtSignOptions.issuer)
+                      ? null
+                      : {
+                          issuer: "postgraphile",
+                        },
+                    token.exp ||
+                      (pgJwtSignOptions && pgJwtSignOptions.expiresIn)
+                      ? null
+                      : {
+                          expiresIn: "1 day",
+                        },
                   );
+                  return signJwt(token, pgJwtSecret, options);
                 },
               [columnNames, pgJwtSecret, pgJwtSignOptions, signJwt],
             ),
             extensions: {
               graphile: {
-                // TODO!
-                /*
+                // TODO: optimized version of this
                 plan: EXPORTABLE(
                   (columnNames, object) =>
-                    function plan($record) {
+                    function plan($in) {
+                      const $record = $in as PgSelectSingleStep<
+                        any,
+                        any,
+                        any,
+                        any
+                      >;
                       const spec = columnNames.reduce((memo, columnName) => {
                         memo[columnName] = $record.get(columnName);
                         return memo;
@@ -150,7 +152,6 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                     },
                   [columnNames, object],
                 ),
-                */
               },
             },
           }),
