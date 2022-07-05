@@ -42,6 +42,8 @@ import {
 } from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
+import type { JwtPayload } from "jsonwebtoken";
+import { decode } from "jsonwebtoken";
 import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
@@ -670,6 +672,19 @@ function makeResultSnapshotSafe(
     }
     const keys = Object.keys(data);
     return keys.reduce((memo, key) => {
+      if (key.startsWith("jwt") && typeof data[key] === "string") {
+        try {
+          const content = decode(data[key]) as JwtPayload;
+          if (typeof content.iat === "number") {
+            content.iat = "<number>" as any;
+          }
+
+          memo[key] = `JWT<${JSON5.stringify(content)} (unverified)>`;
+          return memo;
+        } catch (e) {
+          // ignore
+        }
+      }
       memo[key] = makeResultSnapshotSafe(data[key], replacements);
       return memo;
     }, {} as any);
