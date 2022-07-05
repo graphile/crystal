@@ -1,0 +1,14 @@
+{
+  rangeTestById: {
+    int8: {
+      start: {
+        value: "-98765432109876543",
+        inclusive: true,
+      },
+      end: {
+        value: "22222222222222222",
+        inclusive: false,
+      },
+    },
+  },
+}

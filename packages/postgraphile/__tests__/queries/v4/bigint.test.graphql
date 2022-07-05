@@ -1,0 +1,4 @@
+## expect(errors).toBeFalsy();
+## expect(data.rangeTestById.int8).toEqual({ start: { value: "-98765432109876543", inclusive: true }, end: { value: "22222222222222222", inclusive: false } })
+#> schema: ['ranges']
+{rangeTestById(id:934) {int8{start {value inclusive} end { value inclusive } }}}
