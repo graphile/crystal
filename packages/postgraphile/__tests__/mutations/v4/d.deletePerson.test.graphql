@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy();
+#> schema: ["d"]
+mutation {
+  deletePersonById(input:{
+    id: 1
+  }) {
+    person{
+      id
+      firstName
+      lastName
+      colNoCreate
+      colNoUpdate
+      colNoOrder
+      colNoFilter
+      colNoCreateUpdate
+      colNoCreateUpdateOrderFilter
+    }
+  }
+}
