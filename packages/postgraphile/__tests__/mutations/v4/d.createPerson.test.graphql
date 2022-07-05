@@ -1,0 +1,24 @@
+## expect(errors).toBeFalsy();
+#> schema: ["d"]
+mutation {
+  createPerson(input:{
+    person:{
+      lastName:"Doe"
+      colNoOrder:"create1"
+      colNoUpdate:"create2"
+      colNoFilter:"create3"
+    }
+  }) {
+    person{
+      id
+      firstName
+      lastName
+      colNoCreate
+      colNoUpdate
+      colNoOrder
+      colNoFilter
+      colNoCreateUpdate
+      colNoCreateUpdateOrderFilter
+    }
+  }
+}

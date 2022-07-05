@@ -1,0 +1,15 @@
+{
+  createPerson: {
+    person: {
+      id: 10,
+      firstName: null,
+      lastName: "Doe",
+      colNoCreate: "col_no_create",
+      colNoUpdate: "create2",
+      colNoOrder: "create1",
+      colNoFilter: "create3",
+      colNoCreateUpdate: "col_no_create_update",
+      colNoCreateUpdateOrderFilter: "col_no_create_update_order_filter",
+    },
+  },
+}
