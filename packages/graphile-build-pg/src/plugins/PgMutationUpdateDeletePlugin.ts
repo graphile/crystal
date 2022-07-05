@@ -457,7 +457,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             "field",
                           ),
                           type: GraphQLString,
-                          plan: EXPORTABLE(
+                          applyPlan: EXPORTABLE(
                             () =>
                               function plan(
                                 $input: ObjectStep<any>,
@@ -513,7 +513,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: new GraphQLNonNull(TablePatch!),
-                              plan: EXPORTABLE(
+                              applyPlan: EXPORTABLE(
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
@@ -719,7 +719,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                     "object",
                                     "pgUpdate",
                                     "source",
-                                    `return (_$root, args) => object({result: pgUpdate(source, ${specFromArgsString})})`,
+                                    `\
+return (_$root, args) => {
+  const plan = object({result: pgUpdate(source, ${specFromArgsString})});
+  args.apply(plan);
+  return plan;
+}`,
                                   ) as any,
                                   [object, pgUpdate, source],
                                 )
@@ -729,12 +734,14 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                       _$root: ExecutableStep,
                                       args: FieldArgs,
                                     ) {
-                                      return object({
+                                      const plan = object({
                                         result: pgUpdate(
                                           source,
                                           specFromArgs(args),
                                         ),
                                       });
+                                      args.apply(plan);
+                                      return plan;
                                     },
                                   [object, pgUpdate, source, specFromArgs],
                                 ) as any)
@@ -745,7 +752,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   "object",
                                   "pgDelete",
                                   "source",
-                                  `return (_$root, args) => object({result: pgDelete(source, ${specFromArgsString})})`,
+                                  `\
+return (_$root, args) => {
+  const plan = object({result: pgDelete(source, ${specFromArgsString})});
+  args.apply(plan);
+  return plan
+}`,
                                 ) as any,
                                 [object, pgDelete, source],
                               )
@@ -755,12 +767,14 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                     _$root: ExecutableStep,
                                     args: FieldArgs,
                                   ) {
-                                    return object({
+                                    const plan = object({
                                       result: pgDelete(
                                         source,
                                         specFromArgs(args),
                                       ),
                                     });
+                                    args.apply(plan);
+                                    return plan;
                                   },
                                 [object, pgDelete, source, specFromArgs],
                               ) as any),
