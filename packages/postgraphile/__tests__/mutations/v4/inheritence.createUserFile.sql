@@ -1,98 +1,29 @@
-SAVEPOINT graphql_mutation
+insert into "inheritence"."user" as __user__ ("id", "name") values ($1::"int4", $2::"text") returning
+  __user__."id"::text as "0",
+  __user__."name" as "1"
 
-with __local_0__ as (
-  insert into "inheritence"."user" (
-    "id",
-    "name"
-  ) values(
-    $1,
-    $2
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+
+insert into "inheritence"."user_file" as __user_file__ ("filename", "user_id") values ($1::"text", $2::"int4") returning
+  __user_file__."id"::text as "0",
+  __user_file__."filename" as "1",
+  __user_file__."user_id"::text as "2"
+
+
+select __user_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __user_identifiers__,
+lateral (
+  select
+    __user__."id"::text as "0",
+    __user__."name" as "1",
+    __user_identifiers__.idx as "2"
+  from "inheritence"."user" as __user__
+  where (
+    __user__."id" = __user_identifiers__."id0"
   )
-)::text
-from __local_0__
-
-with __local_0__ as (
-  select (
-    str::"inheritence"."user"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."name")
-    )
-  )
-) as "@user"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
-
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  insert into "inheritence"."user_file" (
-    "filename",
-    "user_id"
-  ) values(
-    $1,
-    $2
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
-
-with __local_0__ as (
-  select (
-    str::"inheritence"."user_file"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'filename'::text,
-      (__local_0__."filename"),
-      '@userByUserId'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_1__."id"),
-          'name'::text,
-          (__local_1__."name")
-        ) as object
-        from "inheritence"."user" as __local_1__
-        where (__local_0__."user_id" = __local_1__."id") and (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@userFile"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
+  order by __user__."id" asc
+) as __user_result__
