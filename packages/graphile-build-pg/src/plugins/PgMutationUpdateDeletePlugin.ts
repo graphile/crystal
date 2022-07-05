@@ -299,7 +299,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                       ),
                       type: GraphQLString,
                     },
-                    ...(mode === "update" && TableType
+                    // TODO: default to `...(mode === "update" && TableType`; we only want the record on delete for v4 compatibility
+                    ...(TableType
                       ? {
                           [tableName]: fieldWithHooks(
                             {
