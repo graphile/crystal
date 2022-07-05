@@ -1,5 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["d"]
+#> mask: ['createPerson.person.id']
 mutation {
   createPerson(input:{
     person:{
