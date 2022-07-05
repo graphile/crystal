@@ -1,0 +1,8 @@
+## expect(errors).toBeFalsy();
+#> jwtPgTypeIdentifier: '"b"."jwt_token"'
+#> jwtSecret: true
+mutation {
+  authenticate(input: {a: 1, b: "1234567890123456789.123456789", c: "987654321098765432"}) {
+    jwtToken
+  }
+}
