@@ -1,5 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["enum_tables"]
+#> mask: ['createReferencingTable.referencingTable.id']
 mutation {
   createReferencingTable(
     input: { referencingTable: { enum1: A3, enum2: B4 } }
