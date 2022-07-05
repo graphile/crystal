@@ -466,6 +466,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             const behavior = getBehavior(codec.extensions);
             const defaultBehavior = [
               "select",
+              "table",
               ...(!codec.isAnonymous ? ["insert", "update"] : []),
               ...(simpleCollections === "both"
                 ? ["connection", "list"]
@@ -473,6 +474,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 ? ["list"]
                 : ["connection"]),
             ].join(" ");
+
+            const isTable = build.behavior.matches(
+              behavior,
+              "table",
+              defaultBehavior,
+            );
+            if (!isTable) {
+              return;
+            }
 
             const selectable = build.behavior.matches(
               behavior,

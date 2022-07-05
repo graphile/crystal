@@ -58,7 +58,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
           // It's a JWT type!
           pgCodec.extensions ||= {};
           pgCodec.extensions.tags ||= {};
-          pgCodec.extensions.tags.behavior = ["jwt"];
+          pgCodec.extensions.tags.behavior = ["-table", "jwt"];
         }
       },
     },
