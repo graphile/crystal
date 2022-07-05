@@ -108,8 +108,20 @@ export function augmentIntrospection(
     classoid: string,
     objoid: string,
     objsubid?: number,
+    fallback?: {
+      classoid: string;
+      objoid: string;
+      objsubid?: number;
+    },
   ): PgSmartTagsAndDescription => {
-    const description = getDescription(classoid, objoid, objsubid);
+    let description = getDescription(classoid, objoid, objsubid);
+    if (description == null && fallback) {
+      description = getDescription(
+        fallback.classoid,
+        fallback.objoid,
+        fallback.objsubid,
+      );
+    }
     return parseSmartComment(description);
   };
 
@@ -138,7 +150,10 @@ export function augmentIntrospection(
     entity.getIndexes = memo(() => getIndexes(entity._id));
     entity.getDescription = memo(() => getDescription(PG_CLASS, entity._id, 0));
     entity.getTagsAndDescription = memo(() =>
-      getTagsAndDescription(PG_CLASS, entity._id, 0),
+      getTagsAndDescription(PG_CLASS, entity._id, 0, {
+        classoid: PG_TYPE,
+        objoid: entity.reltype,
+      }),
     );
   });
   introspection.attributes.forEach((entity) => {

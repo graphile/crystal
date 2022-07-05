@@ -115,7 +115,7 @@ export interface PgClass {
    * The OID of the data type that corresponds to this table's row type, if any; zero for indexes, sequences, and toast
    * tables, which have no pg_type entry
    */
-  reltype: PgOid | null;
+  reltype: PgOid;
 
   /** For typed tables, the OID of the underlying composite type; zero for all other relations */
   reloftype: PgOid | null;
