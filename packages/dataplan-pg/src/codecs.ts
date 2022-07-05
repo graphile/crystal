@@ -681,13 +681,15 @@ const viaNumeric = castVia(sql`numeric`);
  */
 const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   const sqlFormat = sql.literal(format);
+  function castFromPg(frag: SQL) {
+    return sql`to_char(${prefix}${frag}, ${sqlFormat}::text)`;
+  }
   return {
-    castFromPg(frag) {
-      return sql`to_char(${prefix}${frag}, ${sqlFormat}::text)`;
-    },
+    castFromPg,
     listCastFromPg(frag) {
       return sql`(${sql.indent(
-        sql`select array_agg(${this.castFromPg!(
+        sql`select array_agg(${castFromPg.call(
+          this,
           sql`t`,
         )})\nfrom unnest(${frag}) t`,
       )})::text`;
