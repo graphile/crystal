@@ -554,30 +554,69 @@ export function rangeOfCodec<
   undefined
 > {
   const { extensions } = config;
+  const needsCast = innerCodec.castFromPg;
   return {
     name,
     sqlType: identifier,
     extensions,
     rangeOfCodec: innerCodec,
-    fromPg(value) {
-      const parsed = rangeParse(value);
-      return {
-        start:
-          parsed.lower != null
-            ? {
-                value: parsed.lower,
-                inclusive: parsed.isLowerBoundClosed(),
-              }
-            : null,
-        end:
-          parsed.upper != null
-            ? {
-                value: parsed.upper,
-                inclusive: parsed.isUpperBoundClosed(),
-              }
-            : null,
-      };
-    },
+    ...(needsCast
+      ? {
+          castFromPg(frag) {
+            return sql`json_build_array(lower_inc(${frag}), ${innerCodec.castFromPg!(
+              sql`lower(${frag})`,
+            )}, ${innerCodec.castFromPg!(
+              sql`upper(${frag})`,
+            )}, upper_inc(${frag}))::text`;
+          },
+          listCastFromPg(frag) {
+            return sql`(${sql.indent(
+              sql`select array_agg(${this.castFromPg!(
+                sql`t`,
+              )})\nfrom unnest(${frag}) t`,
+            )})::text`;
+          },
+        }
+      : null),
+    fromPg: needsCast
+      ? function (value) {
+          const json = JSON.parse(value);
+          return {
+            start:
+              json[1] != null
+                ? {
+                    value: json[1],
+                    inclusive: !!json[0],
+                  }
+                : null,
+            end:
+              json[2] != null
+                ? {
+                    value: json[2],
+                    inclusive: !!json[3],
+                  }
+                : null,
+          };
+        }
+      : function (value) {
+          const parsed = rangeParse(value);
+          return {
+            start:
+              parsed.lower != null
+                ? {
+                    value: parsed.lower,
+                    inclusive: parsed.isLowerBoundClosed(),
+                  }
+                : null,
+            end:
+              parsed.upper != null
+                ? {
+                    value: parsed.upper,
+                    inclusive: parsed.isUpperBoundClosed(),
+                  }
+                : null,
+          };
+        },
     toPg(value) {
       let str = "";
       if (value.start == null) {
@@ -646,7 +685,9 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
     },
     listCastFromPg(frag) {
       return sql`(${sql.indent(
-        sql`select array_agg(to_char(${prefix}t, ${sqlFormat}::text))\nfrom unnest(${frag}) t`,
+        sql`select array_agg(${this.castFromPg!(
+          sql`t`,
+        )})\nfrom unnest(${frag}) t`,
       )})::text`;
     },
   };
@@ -684,7 +725,10 @@ export const TYPES = {
   xml: t<string>("xml"),
   citext: t<string>("citext", verbatim),
   uuid: t<string>("uuid", verbatim),
-  timestamp: t<string>("timestamp", viaDateFormat("YYYY-MM-DD HH24:MI:SS.US")),
+  timestamp: t<string>(
+    "timestamp",
+    viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.US'),
+  ),
   timestamptz: t<string>(
     "timestamptz",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
