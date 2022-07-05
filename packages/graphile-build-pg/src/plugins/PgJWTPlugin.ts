@@ -17,7 +17,7 @@ declare global {
     }
 
     interface GraphileBuildGatherOptions {
-      jwtType?: [string, string];
+      pgJwtType?: [string, string];
     }
 
     interface ScopeScalar {
@@ -52,8 +52,8 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
     hooks: {
       pgCodecs_PgTypeCodec(info, { pgCodec, pgType }) {
         if (
-          info.options.jwtType?.[1] === pgType.typname &&
-          info.options.jwtType?.[0] === pgType.getNamespace()!.nspname
+          info.options.pgJwtType?.[1] === pgType.typname &&
+          info.options.pgJwtType?.[0] === pgType.getNamespace()!.nspname
         ) {
           // It's a JWT type!
           pgCodec.extensions ||= {};
