@@ -56,6 +56,12 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         const plural = !source.isUnique || !!source.codec.arrayOfCodec;
         return plural ? this.pluralize(name) : name;
       },
+      edgeType(previous, options, typeName) {
+        return this.upperCamelCase(`${this.pluralize(typeName)}-edge`);
+      },
+      edgeField(previous, options, typeName) {
+        return this.camelCase(`${typeName}-edge`);
+      },
     },
   },
 };
