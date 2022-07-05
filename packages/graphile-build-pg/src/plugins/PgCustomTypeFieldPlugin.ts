@@ -370,7 +370,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             const isVoid = source.codec === TYPES.void;
 
             const returnGraphQLTypeName = build.getGraphQLTypeNameByPgCodec(
-              source.codec,
+              source.codec.arrayOfCodec ?? source.codec,
               "output",
             );
             const resultFieldName =
