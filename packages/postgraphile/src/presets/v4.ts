@@ -9,6 +9,7 @@ export interface V4Options {
   pgForbidSetofFunctionsToReturnNull?: boolean;
   dynamicJson?: boolean;
   jwtPgTypeIdentifier?: string;
+  jwtSecret?: string;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -104,6 +105,11 @@ export const makeV4Preset = (
       pgForbidSetofFunctionsToReturnNull:
         options.pgForbidSetofFunctionsToReturnNull ?? false,
       jsonScalarAsString: options.dynamicJson !== true,
+      ...(options.jwtSecret != null
+        ? {
+            pgJwtSecret: options.jwtSecret,
+          }
+        : null),
     },
     gather: {
       ...(options.jwtPgTypeIdentifier
