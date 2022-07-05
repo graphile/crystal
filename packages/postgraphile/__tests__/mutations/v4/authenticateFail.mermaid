@@ -18,6 +18,7 @@ graph TD
     First13["First[13∈1@1]"]:::plan
     PgSelectSingle14["PgSelectSingle[14∈1@1]<br />ᐸauthenticate_failᐳ"]:::plan
     Object15["Object[15∈1@1]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression16["PgClassExpression[16∈1]<br />ᐸ__authenticate_fail__ᐳ"]:::plan
 
     %% plan dependencies
     __Value5 --> __TrackedObject6
@@ -28,6 +29,7 @@ graph TD
     PgSelect9 --> First13
     First13 --> PgSelectSingle14
     PgSelectSingle14 --> Object15
+    PgSelectSingle14 --> PgClassExpression16
 
     %% plan-to-path relationships
     P0["~"]
@@ -43,6 +45,6 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
     Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.authenticateFail<br />⠀ROOT ᐸ-O- 15<br />⠀⠀jwtToken ᐸ-L- 14"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect9,Access10,Access11,Object12,First13,PgSelectSingle14,Object15 bucket1
+    class Bucket1,PgSelect9,Access10,Access11,Object12,First13,PgSelectSingle14,Object15,PgClassExpression16 bucket1
     Bucket0 --> Bucket1
     end
