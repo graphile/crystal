@@ -1,0 +1,10 @@
+{
+  createReferencingTable: {
+    referencingTable: {
+      id: 435,
+      enum1: "A3",
+      enum2: "B4",
+      enum3: null,
+    },
+  },
+}

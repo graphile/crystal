@@ -1,0 +1,14 @@
+## expect(errors).toBeFalsy();
+#> schema: ["enum_tables"]
+mutation {
+  createReferencingTable(
+    input: { referencingTable: { enum1: A3, enum2: B4 } }
+  ) {
+    referencingTable {
+      id
+      enum1
+      enum2
+      enum3
+    }
+  }
+}
