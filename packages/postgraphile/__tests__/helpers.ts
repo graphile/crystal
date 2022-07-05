@@ -725,6 +725,10 @@ function mask(data: any, config: any) {
   const copy = JSON.parse(JSON.stringify(data));
   const known: any[] = [];
   const maskIt = (v: any) => {
+    if (!v) {
+      // Make sure `null` and `undefined` don't get masked
+      return v;
+    }
     let i = known.indexOf(v);
     if (i < 0) {
       i = known.push(v) - 1;
