@@ -1,0 +1,84 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __InputStaticLeaf12["__InputStaticLeaf[12∈1@1]"]:::plan
+    __InputStaticLeaf13["__InputStaticLeaf[13∈1@1]"]:::plan
+    __InputStaticLeaf14["__InputStaticLeaf[14∈1@1]"]:::plan
+    __InputStaticLeaf15["__InputStaticLeaf[15∈1@1]"]:::plan
+    Access17["Access[17∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access18["Access[18∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object19["Object[19∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgInsert16[["PgInsert[16∈1@1]"]]:::sideeffectplan
+    Object20["Object[20∈1@1]<br />ᐸ{result,last_name,col_no_update,col_no_order,col_no_filter}ᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21∈1@1]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22∈1@1]<br />ᐸ__person__.”first_name”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1@1]<br />ᐸ__person__.”last_name”ᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24∈1@1]<br />ᐸ__person__...no_create”ᐳ"]:::plan
+    PgClassExpression25["PgClassExpression[25∈1@1]<br />ᐸ__person__...no_update”ᐳ"]:::plan
+    PgClassExpression26["PgClassExpression[26∈1@1]<br />ᐸ__person__..._no_order”ᐳ"]:::plan
+    PgClassExpression27["PgClassExpression[27∈1@1]<br />ᐸ__person__...no_filter”ᐳ"]:::plan
+    PgClassExpression28["PgClassExpression[28∈1@1]<br />ᐸ__person__...te_update”ᐳ"]:::plan
+    PgClassExpression29["PgClassExpression[29∈1@1]<br />ᐸ__person__...er_filter”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value5 --> __TrackedObject6
+    __Value3 --> Access17
+    __Value3 --> Access18
+    Access17 & Access18 --> Object19
+    Object19 --> PgInsert16
+    PgInsert16 & __InputStaticLeaf12 & __InputStaticLeaf13 & __InputStaticLeaf14 & __InputStaticLeaf15 --> Object20
+    PgInsert16 --> PgClassExpression21
+    PgInsert16 --> PgClassExpression22
+    PgInsert16 --> PgClassExpression23
+    PgInsert16 --> PgClassExpression24
+    PgInsert16 --> PgClassExpression25
+    PgInsert16 --> PgClassExpression26
+    PgInsert16 --> PgClassExpression27
+    PgInsert16 --> PgClassExpression28
+    PgInsert16 --> PgClassExpression29
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P16["ᐳc…nᐳperson"]
+    PgInsert16 -.-> P16
+    P20["ᐳcreatePerson"]
+    Object20 -.-> P20
+    P21["ᐳc…nᐳp…nᐳid"]
+    PgClassExpression21 -.-> P21
+    P22["ᐳc…nᐳp…nᐳfirstName"]
+    PgClassExpression22 -.-> P22
+    P23["ᐳc…nᐳp…nᐳlastName"]
+    PgClassExpression23 -.-> P23
+    P24["ᐳc…nᐳp…nᐳcolNoCreate"]
+    PgClassExpression24 -.-> P24
+    P25["ᐳc…nᐳp…nᐳcolNoUpdate"]
+    PgClassExpression25 -.-> P25
+    P26["ᐳc…nᐳp…nᐳcolNoOrder"]
+    PgClassExpression26 -.-> P26
+    P27["ᐳc…nᐳp…nᐳcolNoFilter"]
+    PgClassExpression27 -.-> P27
+    P28["ᐳc…nᐳp…nᐳcolNoCreateUpdate"]
+    PgClassExpression28 -.-> P28
+    P29["ᐳc…nᐳp…nᐳcolNoCreateUpdateOrderFilter"]
+    PgClassExpression29 -.-> P29
+
+    subgraph "Buckets for mutations/v4/d.createPerson"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.createPerson<br />⠀ROOT ᐸ-O- 20<br />⠀⠀person ᐸ-O- 16<br />⠀⠀⠀person.id ᐸ-L- 21<br />⠀⠀⠀person.firstName ᐸ-L- 22<br />⠀⠀⠀person.lastName ᐸ-L- 23<br />⠀⠀⠀person.colNoCreate ᐸ-L- 24<br />⠀⠀⠀person.colNoUpdate ᐸ-L- 25<br />⠀⠀⠀person.colNoOrder ᐸ-L- 26<br />⠀⠀⠀person.colNoFilter ᐸ-L- 27<br />⠀⠀⠀person.colNoCreateUpdate ᐸ-L- 28<br />⠀⠀⠀person.colNoCreateUpdateOrderFilter ᐸ-L- 29"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,PgInsert16,Access17,Access18,Object19,Object20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29 bucket1
+    Bucket0 --> Bucket1
+    end
