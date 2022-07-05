@@ -2458,6 +2458,8 @@ export class OpPlan<
         });
       }
       for (const depId of first) {
+        // NOTE: we need to look this up again because it may have changed due
+        // to `processPlan`.
         const depPlan = this.plans[depId];
         if (depPlan && !processed.has(depPlan)) {
           if (debugPlanVerboseEnabled) {
