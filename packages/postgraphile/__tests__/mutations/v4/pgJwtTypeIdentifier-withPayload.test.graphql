@@ -1,0 +1,20 @@
+## expect(errors).toBeFalsy();
+#> jwtPgTypeIdentifier: '"b"."jwt_token"'
+#> jwtSecret: true
+mutation {
+  authenticatePayload(input: {a: 1, b: "2", c: "3"}) {
+    authPayload {
+      jwt
+      id
+      admin
+      personById {
+        id
+        name
+      }
+    }
+    personById {
+      id
+      name
+    }
+  }
+}
