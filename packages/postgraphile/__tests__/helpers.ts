@@ -699,6 +699,33 @@ function makePayloadSnapshotSafe(
   return makeResultSnapshotSafe(p, replacements);
 }
 
+function mask(data: any, config: any) {
+  if (!config.mask) {
+    return data;
+  }
+  const masks = Array.isArray(config.mask) ? config.mask : [config.mask];
+  const copy = JSON.parse(JSON.stringify(data));
+  const known: any[] = [];
+  const maskIt = (v: any) => {
+    let i = known.indexOf(v);
+    if (i < 0) {
+      i = known.push(v) - 1;
+    }
+    return `<MASKED-${i}>`;
+  };
+  for (const mask of masks) {
+    const parts = mask.split(".");
+    let obj = copy;
+    for (let i = 0, l = parts.length - 1; i < l && obj; i++) {
+      obj = obj[parts[i]];
+    }
+    if (obj) {
+      obj[parts[parts.length - 1]] = maskIt(obj[parts[parts.length - 1]]);
+    }
+  }
+  return copy;
+}
+
 /**
  * Build the snapshot for the given mode ('only') and then assert it matches
  * (or store it).
@@ -713,7 +740,7 @@ export const assertSnapshotsMatch = async (
     ext?: string;
   },
 ): Promise<void> => {
-  const { path, result, ext } = props;
+  const { path, result, ext, config } = props;
   const basePath = path.replace(/\.test\.graphql$/, "");
   if (basePath === path) {
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
@@ -730,9 +757,10 @@ export const assertSnapshotsMatch = async (
           makePayloadSnapshotSafe(payload, replacements),
         )
       : makePayloadSnapshotSafe(data, replacements);
+    const maskedResults = mask(processedResults, config);
     const formattedData =
       //prettier.format(
-      JSON5.stringify(processedResults, {
+      JSON5.stringify(maskedResults, {
         space: 2,
         quote: '"',
       }) + "\n";
@@ -793,15 +821,19 @@ export const assertSnapshotsMatch = async (
 export const assertResultsMatch = async (
   result1: ReturnType<typeof runTestQuery>,
   result2: ReturnType<typeof runTestQuery>,
+  { config }: { config: any },
 ): Promise<void> => {
   const { data: data1 } = await result1;
   const { data: data2 } = await result2;
-  expect(data2).toEqual(data1);
+  const maskedData1 = mask(data1, config);
+  const maskedData2 = mask(data2, config);
+  expect(maskedData2).toEqual(maskedData1);
 };
 
 export const assertErrorsMatch = async (
   result1: ReturnType<typeof runTestQuery>,
   result2: ReturnType<typeof runTestQuery>,
+  { config }: { config: any },
 ): Promise<void> => {
   const { errors: errors1 } = await result1;
   const { errors: errors2 } = await result2;

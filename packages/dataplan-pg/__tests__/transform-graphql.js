@@ -164,17 +164,17 @@ if (config.checkErrorSnapshots) {
 ${
   options.includeDeoptimize
     ? `
-it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2));
-it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(result1, result2));
+it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2, { config }));
+it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(result1, result2, { config }));
 `
     : ``
 }
 it('returns same data for optimized vs unprepared${
         options.includeDeoptimize ? ` deoptimized` : ``
-      }', () => assertResultsMatch(result1, result3));
+      }', () => assertResultsMatch(result1, result3, { config }));
 it('returns same errors for optimized vs unprepared${
         options.includeDeoptimize ? ` deoptimized` : ``
-      }', () => assertErrorsMatch(result1, result3));
+      }', () => assertErrorsMatch(result1, result3, { config }));
 
 ${
   options.includeDeoptimize
