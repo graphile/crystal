@@ -6,6 +6,8 @@ export interface PgSourceTags extends PgSmartTagsDict {
 
   /** For a computed column function/etc, what field name should we use? */
   fieldName: string;
+  /** For a computed column function that performs a mutation, what field name should we use on the payload to store the result? */
+  resultFieldName: string;
   behavior: string | string[];
   primaryKey: string;
   foreignKey: string | string[];
@@ -49,6 +51,7 @@ declare module "@dataplan/pg" {
   interface PgSourceExtensions {
     tags: Partial<PgSourceTags>;
     description?: string;
+    singleOutputParameterName?: string;
   }
 
   interface PgSourceUniqueExtensions {

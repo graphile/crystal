@@ -5,6 +5,7 @@
 import type {
   PgFunctionSourceOptions,
   PgSelectArgumentDigest,
+  PgSourceExtensions,
   PgSourceOptions,
   PgSourceParameter,
   PgTypeCodec,
@@ -391,6 +392,25 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
+          const { tags, description } = pgProc.getTagsAndDescription();
+
+          const extensions: PgSourceExtensions = { tags, description };
+
+          if (outOrInoutArgs.length === 1) {
+            const outOrInoutArg = (() => {
+              for (let i = 0, l = numberOfArguments; i < l; i++) {
+                const trueArgName = pgProc.proargnames?.[i];
+                const argMode = pgProc.proargmodes?.[i] ?? "i";
+                if (argMode === "i" || argMode === "o") {
+                  return trueArgName;
+                }
+              }
+            })();
+            if (outOrInoutArg) {
+              extensions.singleOutputParameterName = outOrInoutArgs[0];
+            }
+          }
+
           if (
             !returnCodec.isAnonymous &&
             (returnCodec.columns || returnCodec.arrayOfCodec?.columns)
@@ -434,6 +454,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               returnsArray,
               returnsSetof,
               isMutation,
+              extensions,
             };
 
             await info.process("pgProcedures_functionSource_options", {
@@ -457,6 +478,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               codec: returnCodec,
               uniques: [],
               isMutation,
+              extensions,
             };
             await info.process("pgProcedures_PgSource_options", {
               databaseName,

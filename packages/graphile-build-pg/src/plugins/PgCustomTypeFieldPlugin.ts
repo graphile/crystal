@@ -49,6 +49,7 @@ declare global {
     }
     interface InflectionCustomFieldMutationResult {
       source: PgSource<any, any, any, PgSourceParameter[]>;
+      returnGraphQLTypeName: string;
     }
 
     interface Inflection {
@@ -368,9 +369,17 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
             const isVoid = source.codec === TYPES.void;
 
-            const resultFieldName = inflection.functionMutationResultFieldName({
-              source,
-            });
+            const returnGraphQLTypeName = build.getGraphQLTypeNameByPgCodec(
+              source.codec,
+              "output",
+            );
+            const resultFieldName =
+              isVoid || !returnGraphQLTypeName
+                ? null
+                : inflection.functionMutationResultFieldName({
+                    source,
+                    returnGraphQLTypeName,
+                  });
 
             build.registerObjectType(
               payloadTypeName,
@@ -403,7 +412,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     build,
                     source,
                   );
-                  if (!baseType) {
+                  if (!baseType || !resultFieldName) {
                     console.warn(
                       `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
                     );

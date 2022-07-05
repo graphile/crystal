@@ -32,7 +32,29 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         return previous!.call(this, details);
       },
       functionMutationResultFieldName(previous, options, details) {
-        return this.camelCase(details.source.codec.name);
+        const { source, returnGraphQLTypeName } = details;
+        if (source.extensions?.tags?.resultFieldName) {
+          return source.extensions.tags.resultFieldName;
+        }
+        let name;
+        if (source.extensions?.singleOutputParameterName) {
+          name = this.camelCase(source.extensions.singleOutputParameterName);
+        } else if (returnGraphQLTypeName === "Int") {
+          name = "integer";
+        } else if (returnGraphQLTypeName === "Float") {
+          name = "float";
+        } else if (returnGraphQLTypeName === "Boolean") {
+          name = "boolean";
+        } else if (returnGraphQLTypeName === "String") {
+          name = "string";
+        } else if (source.codec.isAnonymous) {
+          // returns a record type
+          name = "result";
+        } else {
+          name = this.camelCase(returnGraphQLTypeName);
+        }
+        const plural = !source.isUnique || !!source.codec.arrayOfCodec;
+        return plural ? this.pluralize(name) : name;
       },
     },
   },
