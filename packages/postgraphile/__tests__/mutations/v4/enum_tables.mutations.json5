@@ -1,0 +1,20 @@
+{
+  deleteLetterDescriptionByLetter: {
+    letterDescription: {
+      id: 103,
+      letter: "C",
+      letterViaView: "C",
+    },
+  },
+  createLetterDescription: {
+    letterDescription: {
+      id: 105,
+      letter: "C",
+      letterViaView: "C",
+      description: "One does like to see the letter C",
+    },
+  },
+  referencingTableMutation: {
+    integer: 435,
+  },
+}

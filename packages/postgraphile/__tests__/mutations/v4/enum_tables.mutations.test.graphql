@@ -1,0 +1,31 @@
+## expect(errors).toBeFalsy();
+#> schema: ["enum_tables"]
+mutation {
+  deleteLetterDescriptionByLetter(input: { letter: C }) {
+    letterDescription {
+      id
+      letter
+      letterViaView
+    }
+  }
+  createLetterDescription(
+    input: {
+      letterDescription: {
+        letter: C
+        letterViaView: C
+        description: "One does like to see the letter C"
+      }
+    }
+  ) {
+    letterDescription {
+      id
+      letter
+      letterViaView
+      description
+    }
+  }
+
+  referencingTableMutation(input: { t: { enum1: A1, enum2: B2, enum3: C4 } }) {
+    integer
+  }
+}
