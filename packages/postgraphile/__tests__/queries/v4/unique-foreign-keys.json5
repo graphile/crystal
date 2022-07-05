@@ -1,0 +1,69 @@
+{
+  allCompoundKeys: {
+    nodes: [
+      {
+        personId1: 1,
+        personId2: 2,
+        uniqueForeignKeyByCompoundKey1AndCompoundKey2: null,
+      },
+      {
+        personId1: 2,
+        personId2: 1,
+        uniqueForeignKeyByCompoundKey1AndCompoundKey2: {
+          compoundKey1: 2,
+          compoundKey2: 1,
+          compoundKeyByCompoundKey1AndCompoundKey2: {
+            personId1: 2,
+            personId2: 1,
+            uniqueForeignKeyByCompoundKey1AndCompoundKey2: {
+              compoundKey1: 2,
+              compoundKey2: 1,
+            },
+          },
+        },
+      },
+      {
+        personId1: 2,
+        personId2: 3,
+        uniqueForeignKeyByCompoundKey1AndCompoundKey2: null,
+      },
+      {
+        personId1: 2,
+        personId2: 5,
+        uniqueForeignKeyByCompoundKey1AndCompoundKey2: {
+          compoundKey1: 2,
+          compoundKey2: 5,
+          compoundKeyByCompoundKey1AndCompoundKey2: {
+            personId1: 2,
+            personId2: 5,
+            uniqueForeignKeyByCompoundKey1AndCompoundKey2: {
+              compoundKey1: 2,
+              compoundKey2: 5,
+            },
+          },
+        },
+      },
+      {
+        personId1: 4,
+        personId2: 3,
+        uniqueForeignKeyByCompoundKey1AndCompoundKey2: null,
+      },
+      {
+        personId1: 4,
+        personId2: 4,
+        uniqueForeignKeyByCompoundKey1AndCompoundKey2: {
+          compoundKey1: 4,
+          compoundKey2: 4,
+          compoundKeyByCompoundKey1AndCompoundKey2: {
+            personId1: 4,
+            personId2: 4,
+            uniqueForeignKeyByCompoundKey1AndCompoundKey2: {
+              compoundKey1: 4,
+              compoundKey2: 4,
+            },
+          },
+        },
+      },
+    ],
+  },
+}
