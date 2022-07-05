@@ -1,0 +1,71 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈1@1]"]:::plan
+    __InputStaticLeaf10["__InputStaticLeaf[10∈1@1]"]:::plan
+    __InputStaticLeaf11["__InputStaticLeaf[11∈1@1]"]:::plan
+    Access13["Access[13∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access14["Access[14∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object15["Object[15∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect12[["PgSelect[12∈1@1]<br />ᐸauthenticateᐳ"]]:::sideeffectplan
+    First16["First[16∈1@1]"]:::plan
+    PgSelectSingle17["PgSelectSingle[17∈1@1]<br />ᐸauthenticateᐳ"]:::plan
+    Object18["Object[18∈1@1]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression19["PgClassExpression[19∈1@1]<br />ᐸ__authenticate__.”role”ᐳ"]:::plan
+    PgClassExpression20["PgClassExpression[20∈1@1]<br />ᐸ__authenticate__.”exp”ᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21∈1@1]<br />ᐸ__authenticate__.”a”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22∈1@1]<br />ᐸ__authenticate__.”b”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈1@1]<br />ᐸ__authenticate__.”c”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value5 --> __TrackedObject6
+    __Value3 --> Access13
+    __Value3 --> Access14
+    Access13 & Access14 --> Object15
+    Object15 & __InputStaticLeaf9 & __InputStaticLeaf10 & __InputStaticLeaf11 --> PgSelect12
+    PgSelect12 --> First16
+    First16 --> PgSelectSingle17
+    PgSelectSingle17 --> Object18
+    PgSelectSingle17 --> PgClassExpression19
+    PgSelectSingle17 --> PgClassExpression20
+    PgSelectSingle17 --> PgClassExpression21
+    PgSelectSingle17 --> PgClassExpression22
+    PgSelectSingle17 --> PgClassExpression23
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P17["ᐳa…eᐳjwtToken"]
+    PgSelectSingle17 -.-> P17
+    P18["ᐳauthenticate"]
+    Object18 -.-> P18
+    P19["ᐳa…eᐳj…nᐳrole"]
+    PgClassExpression19 -.-> P19
+    P20["ᐳa…eᐳj…nᐳexp"]
+    PgClassExpression20 -.-> P20
+    P21["ᐳa…eᐳj…nᐳa"]
+    PgClassExpression21 -.-> P21
+    P22["ᐳa…eᐳj…nᐳb"]
+    PgClassExpression22 -.-> P22
+    P23["ᐳa…eᐳj…nᐳc"]
+    PgClassExpression23 -.-> P23
+
+    subgraph "Buckets for mutations/v4/normal"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.authenticate<br />⠀ROOT ᐸ-O- 18<br />⠀⠀jwtToken ᐸ-O- 17<br />⠀⠀⠀jwtToken.role ᐸ-L- 19<br />⠀⠀⠀jwtToken.exp ᐸ-L- 20<br />⠀⠀⠀jwtToken.a ᐸ-L- 21<br />⠀⠀⠀jwtToken.b ᐸ-L- 22<br />⠀⠀⠀jwtToken.c ᐸ-L- 23"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__InputStaticLeaf9,__InputStaticLeaf10,__InputStaticLeaf11,PgSelect12,Access13,Access14,Object15,First16,PgSelectSingle17,Object18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket1
+    Bucket0 --> Bucket1
+    end
