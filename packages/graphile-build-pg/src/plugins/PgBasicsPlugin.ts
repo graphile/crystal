@@ -84,6 +84,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
 
         const getGraphQLTypeNameByPgCodec: GraphileBuild.GetGraphQLTypeNameByPgCodec =
           (codec, situation) => {
+            if (codec.arrayOfCodec) {
+              throw new Error(
+                "Do not use getGraphQLTypeNameByPgCodec with an array type, find the underlying type instead",
+              );
+            }
             const meta = pgCodecMetaLookup.get(codec);
             if (!meta) {
               throw new Error(
@@ -98,6 +103,10 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           codec,
           situation,
         ) => {
+          if (codec.arrayOfCodec) {
+            const type = getGraphQLTypeByPgCodec(codec.arrayOfCodec, situation);
+            return type ? new build.graphql.GraphQLList(type) : null;
+          }
           const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
           return typeName ? build.getTypeByName(typeName) ?? null : null;
         };
