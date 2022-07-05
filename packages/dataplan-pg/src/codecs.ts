@@ -315,7 +315,7 @@ function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
     for (let i = 0; i < columnCount; i++) {
       const [columnName, spec] = columnDefs[i];
       const entry = tuple[i];
-      record[columnName] = spec.codec.fromPg(entry);
+      record[columnName] = entry == null ? null : spec.codec.fromPg(entry);
     }
     return record;
   };
