@@ -401,6 +401,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (!(isPgTableType || isMutationPayload) || !codec) {
           return fields;
         }
+        // TODO: change the default so that we don't do this on
+        // isMutationPayload; only do that for V4 compat. (It's redundant vs
+        // just using the object type directly)
         const source = build.input.pgSources.find((s) => s.codec === codec);
         if (!source) {
           return fields;
