@@ -555,25 +555,30 @@ export function rangeOfCodec<
 > {
   const { extensions } = config;
   const needsCast = innerCodec.castFromPg;
+
+  const castFromPg = needsCast
+    ? function castFromPg(frag: SQL) {
+        return sql`json_build_array(${sql.indent(
+          sql`lower_inc(${frag}),\n${innerCodec.castFromPg!(
+            sql`lower(${frag})`,
+          )},\n${innerCodec.castFromPg!(
+            sql`upper(${frag})`,
+          )},\nupper_inc(${frag})`,
+        )})::text`;
+      }
+    : null;
+
   return {
     name,
     sqlType: identifier,
     extensions,
     rangeOfCodec: innerCodec,
-    ...(needsCast
+    ...(castFromPg
       ? {
-          castFromPg(frag) {
-            return sql`json_build_array(${sql.indent(
-              sql`lower_inc(${frag}),\n${innerCodec.castFromPg!(
-                sql`lower(${frag})`,
-              )},\n${innerCodec.castFromPg!(
-                sql`upper(${frag})`,
-              )},\nupper_inc(${frag})`,
-            )})::text`;
-          },
+          castFromPg,
           listCastFromPg(frag) {
             return sql`(${sql.indent(
-              sql`select array_agg(${this.castFromPg!(
+              sql`select array_agg(${castFromPg(
                 sql`t`,
               )})\nfrom unnest(${frag}) t`,
             )})::text`;
