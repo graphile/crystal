@@ -2,7 +2,7 @@
   a: {
     edges: [
       {
-        cursor: "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMV1d",
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
         node: {
           testviewid: 1,
           col1: 11,
@@ -10,7 +10,7 @@
         },
       },
       {
-        cursor: "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMl1d",
+        cursor: "WyJuYXR1cmFsIiwyXQ==",
         node: {
           testviewid: 2,
           col1: 12,
@@ -18,7 +18,7 @@
         },
       },
       {
-        cursor: "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbM11d",
+        cursor: "WyJuYXR1cmFsIiwzXQ==",
         node: {
           testviewid: 3,
           col1: 13,
@@ -30,7 +30,7 @@
   b: {
     edges: [
       {
-        cursor: "WyJjb2wxX2Rlc2MiLFsxMywzXV0=",
+        cursor: "WyJkZGM5NjlkZjVjIiwxM10=",
         node: {
           testviewid: 3,
           col1: 13,
@@ -38,7 +38,7 @@
         },
       },
       {
-        cursor: "WyJjb2wxX2Rlc2MiLFsxMiwyXV0=",
+        cursor: "WyJkZGM5NjlkZjVjIiwxMl0=",
         node: {
           testviewid: 2,
           col1: 12,
@@ -46,7 +46,7 @@
         },
       },
       {
-        cursor: "WyJjb2wxX2Rlc2MiLFsxMSwxXV0=",
+        cursor: "WyJkZGM5NjlkZjVjIiwxMV0=",
         node: {
           testviewid: 1,
           col1: 11,

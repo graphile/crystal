@@ -1,0 +1,100 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    Access20["Access[20∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access21["Access[21∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object22["Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection23["Connection[23∈0]<br />ᐸ19ᐳ"]:::plan
+    PgSelect24[["PgSelect[24∈0]<br />ᐸtestviewᐳ"]]:::plan
+    __Item25>"__Item[25∈1]<br />ᐸ24ᐳ"]:::itemplan
+    PgSelectSingle26["PgSelectSingle[26∈1]<br />ᐸtestviewᐳ"]:::plan
+    PgClassExpression28["PgClassExpression[28∈1]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
+    List29["List[29∈1]<br />ᐸ28ᐳ"]:::plan
+    PgCursor27["PgCursor[27∈1]"]:::plan
+    PgClassExpression30["PgClassExpression[30∈1]<br />ᐸ__testview...estviewid”ᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__testview__.”col1”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__testview__.”col2”ᐳ"]:::plan
+    Connection49["Connection[49∈0]<br />ᐸ45ᐳ"]:::plan
+    PgSelect50[["PgSelect[50∈0]<br />ᐸtestviewᐳ"]]:::plan
+    __Item51>"__Item[51∈2]<br />ᐸ50ᐳ"]:::itemplan
+    PgSelectSingle52["PgSelectSingle[52∈2]<br />ᐸtestviewᐳ"]:::plan
+    PgClassExpression54["PgClassExpression[54∈2]<br />ᐸ__testview__.”col1”ᐳ"]:::plan
+    List55["List[55∈2]<br />ᐸ54ᐳ"]:::plan
+    PgCursor53["PgCursor[53∈2]"]:::plan
+    PgClassExpression56["PgClassExpression[56∈2]<br />ᐸ__testview...estviewid”ᐳ"]:::plan
+    PgClassExpression58["PgClassExpression[58∈2]<br />ᐸ__testview__.”col2”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value3 --> Access20
+    __Value3 --> Access21
+    Access20 & Access21 --> Object22
+    Object22 & Connection23 --> PgSelect24
+    PgSelect24 ==> __Item25
+    __Item25 --> PgSelectSingle26
+    PgSelectSingle26 --> PgClassExpression28
+    PgClassExpression28 --> List29
+    List29 --> PgCursor27
+    PgSelectSingle26 --> PgClassExpression30
+    PgSelectSingle26 --> PgClassExpression31
+    PgSelectSingle26 --> PgClassExpression32
+    Object22 & Connection49 --> PgSelect50
+    PgSelect50 ==> __Item51
+    __Item51 --> PgSelectSingle52
+    PgSelectSingle52 --> PgClassExpression54
+    PgClassExpression54 --> List55
+    List55 --> PgCursor53
+    PgSelectSingle52 --> PgClassExpression56
+    PgSelectSingle52 --> PgClassExpression58
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P23["ᐳa"]
+    Connection23 -.-> P23
+    P24["ᐳaᐳedges"]
+    PgSelect24 -.-> P24
+    P26["ᐳaᐳedges[]<br />ᐳaᐳe…]ᐳnode"]
+    PgSelectSingle26 -.-> P26
+    P27["ᐳaᐳe…]ᐳcursor"]
+    PgCursor27 -.-> P27
+    P30["ᐳaᐳe…]ᐳnodeᐳtestviewid"]
+    PgClassExpression30 -.-> P30
+    P31["ᐳaᐳe…]ᐳnodeᐳcol1"]
+    PgClassExpression31 -.-> P31
+    P32["ᐳaᐳe…]ᐳnodeᐳcol2"]
+    PgClassExpression32 -.-> P32
+    P49["ᐳb"]
+    Connection49 -.-> P49
+    P50["ᐳbᐳedges"]
+    PgSelect50 -.-> P50
+    P52["ᐳbᐳedges[]<br />ᐳbᐳe…]ᐳnode"]
+    PgSelectSingle52 -.-> P52
+    P53["ᐳbᐳe…]ᐳcursor"]
+    PgCursor53 -.-> P53
+    P54["ᐳbᐳe…]ᐳnodeᐳcol1"]
+    PgClassExpression54 -.-> P54
+    P56["ᐳbᐳe…]ᐳnodeᐳtestviewid"]
+    PgClassExpression56 -.-> P56
+    P58["ᐳbᐳe…]ᐳnodeᐳcol2"]
+    PgClassExpression58 -.-> P58
+
+    subgraph "Buckets for queries/v4/view"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-O- 23<br />⠀⠀⠀a.edges ᐸ-A- 24<br />⠀⠀b ᐸ-O- 49<br />⠀⠀⠀b.edges ᐸ-A- 50"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,Access20,Access21,Object22,Connection23,PgSelect24,Connection49,PgSelect50 bucket0
+    Bucket1("Bucket 1 (item25)<br />Deps: 24<br />~ᐳQuery.aᐳTestviewsConnection.edges[]<br />⠀ROOT ᐸ-O- 26<br />⠀⠀node ᐸ-O- 26<br />⠀⠀⠀node.testviewid ᐸ-L- 30<br />⠀⠀⠀node.col1 ᐸ-L- 31<br />⠀⠀⠀node.col2 ᐸ-L- 32<br />⠀⠀cursor ᐸ-L- 27"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item25,PgSelectSingle26,PgCursor27,PgClassExpression28,List29,PgClassExpression30,PgClassExpression31,PgClassExpression32 bucket1
+    Bucket2("Bucket 2 (item51)<br />Deps: 50<br />~ᐳQuery.bᐳTestviewsConnection.edges[]<br />⠀ROOT ᐸ-O- 52<br />⠀⠀node ᐸ-O- 52<br />⠀⠀⠀node.col1 ᐸ-L- 54<br />⠀⠀⠀node.testviewid ᐸ-L- 56<br />⠀⠀⠀node.col2 ᐸ-L- 58<br />⠀⠀cursor ᐸ-L- 53"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item51,PgSelectSingle52,PgCursor53,PgClassExpression54,List55,PgClassExpression56,PgClassExpression58 bucket2
+    Bucket0 --> Bucket1 & Bucket2
+    end
