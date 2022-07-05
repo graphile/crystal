@@ -563,11 +563,13 @@ export function rangeOfCodec<
     ...(needsCast
       ? {
           castFromPg(frag) {
-            return sql`json_build_array(lower_inc(${frag}), ${innerCodec.castFromPg!(
-              sql`lower(${frag})`,
-            )}, ${innerCodec.castFromPg!(
-              sql`upper(${frag})`,
-            )}, upper_inc(${frag}))::text`;
+            return sql`json_build_array(${sql.indent(
+              sql`lower_inc(${frag}),\n${innerCodec.castFromPg!(
+                sql`lower(${frag})`,
+              )},\n${innerCodec.castFromPg!(
+                sql`upper(${frag})`,
+              )},\nupper_inc(${frag})`,
+            )})::text`;
           },
           listCastFromPg(frag) {
             return sql`(${sql.indent(
