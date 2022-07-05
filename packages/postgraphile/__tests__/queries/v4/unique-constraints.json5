@@ -1,0 +1,16 @@
+{
+  a: {
+    name: "Sara Smith",
+    email: "sara.smith@email.com",
+  },
+  b: null,
+  c: {
+    personId1: 1,
+    personId2: 2,
+  },
+  d: {
+    personId1: 4,
+    personId2: 4,
+  },
+  e: null,
+}
