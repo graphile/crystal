@@ -1,73 +1,56 @@
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  select __local_1__.*
+select __authenticate_payload_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"numeric" as "id1",
+    (ids.value->>2)::"int8" as "id2"
+  from json_array_elements($1::json) with ordinality as ids
+) as __authenticate_payload_identifiers__,
+lateral (
+  select
+    __authenticate_payload__."jwt"::text as "0",
+    __authenticate_payload__."id"::text as "1",
+    __authenticate_payload__."admin"::text as "2",
+    (not (__authenticate_payload__ is null))::text as "3",
+    __authenticate_payload_identifiers__.idx as "4"
   from "b"."authenticate_payload"(
-    $1,
-    $2,
-    $3
-  ) __local_1__
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
+    __authenticate_payload_identifiers__."id0",
+    __authenticate_payload_identifiers__."id1",
+    __authenticate_payload_identifiers__."id2"
+  ) as __authenticate_payload__
+) as __authenticate_payload_result__
 
-with __local_0__ as (
-  select (
-    str::"b"."auth_payload"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'jwt'::text,
-      (
-        case when (
-          (__local_0__."jwt") is not distinct
-          from null
-        ) then null else to_json((__local_0__."jwt")) end
-      ),
-      'id'::text,
-      (__local_0__."id"),
-      'admin'::text,
-      (__local_0__."admin"),
-      '@personById'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_1__."id"),
-          'name'::text,
-          (__local_1__."person_full_name")
-        ) as object
-        from "c"."person" as __local_1__
-        where (__local_0__."id" = __local_1__."id") and (TRUE) and (TRUE)
-      )
-    )
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
+  where (
+    __person__."id" = __person_identifiers__."id0"
   )
-) as "@authPayload",
-to_json(
-  (
-    select json_build_object(
-      'id'::text,
-      (__local_2__."id"),
-      'name'::text,
-      (__local_2__."person_full_name")
-    ) as object
-    from "c"."person" as __local_2__
-    where (__local_0__."id" = __local_2__."id") and (TRUE) and (TRUE)
-  )
-) as "@personById"
-from __local_0__ as __local_0__
-where (
-  not (__local_0__ is null)
-) and (TRUE) and (TRUE)
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+select __jwt_token_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"b"."jwt_token" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __jwt_token_identifiers__,
+lateral (
+  select
+    __jwt_token__::text as "0",
+    (not (__jwt_token__ is null))::text as "1",
+    __jwt_token_identifiers__.idx as "2"
+  from (select (__jwt_token_identifiers__."id0").*) as __jwt_token__
+) as __jwt_token_result__
