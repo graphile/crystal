@@ -1,5 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["enum_tables"]
+#> mask: ['deleteLetterDescriptionByLetter.letterDescription.id', 'createLetterDescription.letterDescription.id', 'referencingTableMutation.integer']
 mutation {
   deleteLetterDescriptionByLetter(input: { letter: C }) {
     letterDescription {
