@@ -1,0 +1,85 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈1@1]"]:::plan
+    __InputStaticLeaf13["__InputStaticLeaf[13∈1@1]"]:::plan
+    __InputStaticLeaf14["__InputStaticLeaf[14∈1@1]"]:::plan
+    __InputStaticLeaf15["__InputStaticLeaf[15∈1@1]"]:::plan
+    __InputStaticLeaf16["__InputStaticLeaf[16∈1@1]"]:::plan
+    Access20["Access[20∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access21["Access[21∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object22["Object[22∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgUpdate19[["PgUpdate[19∈1@1]"]]:::sideeffectplan
+    Object23["Object[23∈1@1]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24∈1@1]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression25["PgClassExpression[25∈1@1]<br />ᐸ__person__.”first_name”ᐳ"]:::plan
+    PgClassExpression26["PgClassExpression[26∈1@1]<br />ᐸ__person__.”last_name”ᐳ"]:::plan
+    PgClassExpression27["PgClassExpression[27∈1@1]<br />ᐸ__person__...no_create”ᐳ"]:::plan
+    PgClassExpression28["PgClassExpression[28∈1@1]<br />ᐸ__person__...no_update”ᐳ"]:::plan
+    PgClassExpression29["PgClassExpression[29∈1@1]<br />ᐸ__person__..._no_order”ᐳ"]:::plan
+    PgClassExpression30["PgClassExpression[30∈1@1]<br />ᐸ__person__...no_filter”ᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈1@1]<br />ᐸ__person__...te_update”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1@1]<br />ᐸ__person__...er_filter”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value5 --> __TrackedObject6
+    __Value3 --> Access20
+    __Value3 --> Access21
+    Access20 & Access21 --> Object22
+    Object22 & __InputStaticLeaf9 & __InputStaticLeaf13 & __InputStaticLeaf14 & __InputStaticLeaf15 & __InputStaticLeaf16 --> PgUpdate19
+    PgUpdate19 --> Object23
+    PgUpdate19 --> PgClassExpression24
+    PgUpdate19 --> PgClassExpression25
+    PgUpdate19 --> PgClassExpression26
+    PgUpdate19 --> PgClassExpression27
+    PgUpdate19 --> PgClassExpression28
+    PgUpdate19 --> PgClassExpression29
+    PgUpdate19 --> PgClassExpression30
+    PgUpdate19 --> PgClassExpression31
+    PgUpdate19 --> PgClassExpression32
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P19["ᐳu…dᐳperson"]
+    PgUpdate19 -.-> P19
+    P23["ᐳupdatePersonById"]
+    Object23 -.-> P23
+    P24["ᐳu…dᐳp…nᐳid"]
+    PgClassExpression24 -.-> P24
+    P25["ᐳu…dᐳp…nᐳfirstName"]
+    PgClassExpression25 -.-> P25
+    P26["ᐳu…dᐳp…nᐳlastName"]
+    PgClassExpression26 -.-> P26
+    P27["ᐳu…dᐳp…nᐳcolNoCreate"]
+    PgClassExpression27 -.-> P27
+    P28["ᐳu…dᐳp…nᐳcolNoUpdate"]
+    PgClassExpression28 -.-> P28
+    P29["ᐳu…dᐳp…nᐳcolNoOrder"]
+    PgClassExpression29 -.-> P29
+    P30["ᐳu…dᐳp…nᐳcolNoFilter"]
+    PgClassExpression30 -.-> P30
+    P31["ᐳu…dᐳp…nᐳcolNoCreateUpdate"]
+    PgClassExpression31 -.-> P31
+    P32["ᐳu…dᐳp…nᐳcolNoCreateUpdateOrderFilter"]
+    PgClassExpression32 -.-> P32
+
+    subgraph "Buckets for mutations/v4/d.updatePerson"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.updatePersonById<br />⠀ROOT ᐸ-O- 23<br />⠀⠀person ᐸ-O- 19<br />⠀⠀⠀person.id ᐸ-L- 24<br />⠀⠀⠀person.firstName ᐸ-L- 25<br />⠀⠀⠀person.lastName ᐸ-L- 26<br />⠀⠀⠀person.colNoCreate ᐸ-L- 27<br />⠀⠀⠀person.colNoUpdate ᐸ-L- 28<br />⠀⠀⠀person.colNoOrder ᐸ-L- 29<br />⠀⠀⠀person.colNoFilter ᐸ-L- 30<br />⠀⠀⠀person.colNoCreateUpdate ᐸ-L- 31<br />⠀⠀⠀person.colNoCreateUpdateOrderFilter ᐸ-L- 32"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__InputStaticLeaf9,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf16,PgUpdate19,Access20,Access21,Object22,Object23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32 bucket1
+    Bucket0 --> Bucket1
+    end

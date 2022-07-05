@@ -1,56 +1,10 @@
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  update "d"."person" set "last_name" = $1,
-  "col_no_create" = $2,
-  "col_no_order" = $3,
-  "col_no_filter" = $4
-  where (
-    "id" = $5
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
-
-with __local_0__ as (
-  select (
-    str::"d"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'firstName'::text,
-      (__local_0__."first_name"),
-      'lastName'::text,
-      (__local_0__."last_name"),
-      'colNoCreate'::text,
-      (__local_0__."col_no_create"),
-      'colNoUpdate'::text,
-      (__local_0__."col_no_update"),
-      'colNoOrder'::text,
-      (__local_0__."col_no_order"),
-      'colNoFilter'::text,
-      (__local_0__."col_no_filter"),
-      'colNoCreateUpdate'::text,
-      (__local_0__."col_no_create_update"),
-      'colNoCreateUpdateOrderFilter'::text,
-      (__local_0__."col_no_create_update_order_filter")
-    )
-  )
-) as "@person"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
+update "d"."person" as __person__ set "last_name" = $1::"varchar", "col_no_create" = $2::"text", "col_no_order" = $3::"text", "col_no_filter" = $4::"text" where (__person__."id" = $5::"int4") returning
+  __person__."id"::text as "0",
+  __person__."first_name" as "1",
+  __person__."last_name" as "2",
+  __person__."col_no_create" as "3",
+  __person__."col_no_update" as "4",
+  __person__."col_no_order" as "5",
+  __person__."col_no_filter" as "6",
+  __person__."col_no_create_update" as "7",
+  __person__."col_no_create_update_order_filter" as "8"
