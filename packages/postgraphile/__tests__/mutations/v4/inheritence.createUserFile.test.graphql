@@ -1,0 +1,26 @@
+## expect(errors).toBeFalsy();
+#> schema: ["inheritence"]
+mutation {
+  createUser(input: {
+    user: {
+      id: 1
+      name: "Bobby Tables"
+    }
+  }) {
+    user {
+      nodeId
+      id
+      name
+    }
+  }
+  createUserFile(input: {userFile: {filename: "foo.txt", userId: 1}}) {
+    userFile {
+      id
+      filename
+      userByUserId {
+        id
+        name
+      }
+    }
+  }
+}

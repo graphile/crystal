@@ -1,0 +1,19 @@
+{
+  createUser: {
+    user: {
+      nodeId: "WyJ1c2VycyIsMV0=",
+      id: 1,
+      name: "Bobby Tables",
+    },
+  },
+  createUserFile: {
+    userFile: {
+      id: 1,
+      filename: "foo.txt",
+      userByUserId: {
+        id: 1,
+        name: "Bobby Tables",
+      },
+    },
+  },
+}
