@@ -9,7 +9,12 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { arraysMatch, connection } from "dataplanner";
+import {
+  arraysMatch,
+  connection,
+  ExecutableStep,
+  ObjectStep,
+} from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
@@ -390,10 +395,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         } = build;
         const {
           Self,
-          scope: { isPgTableType, pgCodec: codec },
+          scope: { isPgTableType, pgCodec: codec, isMutationPayload },
           fieldWithHooks,
         } = context;
-        if (!isPgTableType || !codec) {
+        if (!(isPgTableType || isMutationPayload) || !codec) {
           return fields;
         }
         const source = build.input.pgSources.find((s) => s.codec === codec);
@@ -453,18 +458,23 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   typeof localColumnName === "string" &&
                   isSafeIdentifier(localColumnName),
               );
+            const recordOrResult = isMutationPayload
+              ? `$record.get("result")`
+              : `$record`;
             const singleRecordPlan = clean
               ? // Optimise function for both execution and export.
                 // eslint-disable-next-line graphile-export/exhaustive-deps
                 (EXPORTABLE(
                   new Function(
                     "otherSource",
-                    `return $messages => otherSource.get({ ${remoteColumns
+                    `return $record => otherSource.get({ ${remoteColumns
                       .map(
                         (remoteColumnName, i) =>
                           `${
                             remoteColumnName as string
-                          }: $messages.get(${JSON.stringify(localColumns[i])})`,
+                          }: ${recordOrResult}.get(${JSON.stringify(
+                            localColumns[i],
+                          )})`,
                       )
                       .join(", ")} })`,
                   ) as any,
@@ -473,11 +483,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               : EXPORTABLE(
                   (localColumns, otherSource, remoteColumns) =>
                     function plan(
-                      $message: PgSelectSingleStep<any, any, any, any>,
+                      $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
                     ) {
+                      const $record = (
+                        isMutationPayload
+                          ? ($in as ObjectStep).get("result")
+                          : $in
+                      ) as PgSelectSingleStep<any, any, any, any>;
                       const spec = remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $message.get(
+                          memo[remoteColumnName] = $record.get(
                             localColumns[i] as string,
                           );
                           return memo;
@@ -494,12 +509,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                 (EXPORTABLE(
                   new Function(
                     "otherSource",
-                    `return $messages => otherSource.find({ ${remoteColumns
+                    `return $record => otherSource.find({ ${remoteColumns
                       .map(
                         (remoteColumnName, i) =>
                           `${
                             remoteColumnName as string
-                          }: $messages.get(${JSON.stringify(localColumns[i])})`,
+                          }: ${recordOrResult}.get(${JSON.stringify(
+                            localColumns[i],
+                          )})`,
                       )
                       .join(", ")} })`,
                   ) as any,
@@ -508,11 +525,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               : EXPORTABLE(
                   (localColumns, otherSource, remoteColumns) =>
                     function plan(
-                      $message: PgSelectSingleStep<any, any, any, any>,
+                      $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
                     ) {
+                      const $record = (
+                        isMutationPayload
+                          ? ($in as ObjectStep).get("result")
+                          : $in
+                      ) as PgSelectSingleStep<any, any, any, any>;
                       const spec = remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $message.get(
+                          memo[remoteColumnName] = $record.get(
                             localColumns[i] as string,
                           );
                           return memo;
@@ -530,11 +552,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   new Function(
                     "otherSource",
                     "connection",
-                    `return $messages => {
+                    `return $record => {
   const $records = otherSource.find({ ${remoteColumns
     .map(
       (remoteColumnName, i) =>
-        `${remoteColumnName as string}: $messages.get(${JSON.stringify(
+        `${remoteColumnName as string}: ${recordOrResult}.get(${JSON.stringify(
           localColumns[i],
         )})`,
     )
@@ -547,11 +569,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               : EXPORTABLE(
                   (connection, localColumns, otherSource, remoteColumns) =>
                     function plan(
-                      $message: PgSelectSingleStep<any, any, any, any>,
+                      $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
                     ) {
+                      const $record = (
+                        isMutationPayload
+                          ? ($in as ObjectStep).get("result")
+                          : $in
+                      ) as PgSelectSingleStep<any, any, any, any>;
                       const spec = remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $message.get(
+                          memo[remoteColumnName] = $record.get(
                             localColumns[i] as string,
                           );
                           return memo;
