@@ -115,7 +115,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: new GraphQLNonNull(TableInput),
-                              plan: EXPORTABLE(
+                              applyPlan: EXPORTABLE(
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
@@ -260,10 +260,12 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     type: payloadType,
                     plan: EXPORTABLE(
                       (object, pgInsert, source) =>
-                        function plan() {
-                          return object({
+                        function plan(_: any, args) {
+                          const plan = object({
                             result: pgInsert(source, {}),
                           });
+                          args.apply(plan);
+                          return plan;
                         },
                       [object, pgInsert, source],
                     ),
