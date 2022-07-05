@@ -120,12 +120,14 @@ import {
   isListCapableStep,
   isStreamableStep,
 } from "./step.js";
-import type { __InputObjectStep } from "./steps/index.js";
 import {
+  __InputObjectStep,
   __ItemStep,
   __TrackedObjectStep,
   __ValueStep,
   access,
+  constant,
+  ConstantStep,
 } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/listTransform.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -1442,7 +1444,7 @@ export class OpPlan<
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
-      const subscribePlan = this.planField(
+      const { haltTree, plan: subscribePlan } = this.planField(
         ROOT_PATH,
         ROOT_PATH,
         rootType,
@@ -1451,6 +1453,9 @@ export class OpPlan<
         this.trackedRootValueStep,
         fieldSpec,
       );
+      if (haltTree) {
+        throw new Error("Failed to setup subscription");
+      }
       this.subscriptionStepId = subscribePlan.id;
       const oldPlansLength = this.planCount;
 
@@ -1734,8 +1739,9 @@ export class OpPlan<
 
       let plan: ExecutableStep | PolymorphicStep;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
+      let haltTree = false;
       if (typeof planResolver === "function") {
-        plan = this.planField(
+        ({ plan, haltTree } = this.planField(
           path,
           pathIdentity,
           objectType,
@@ -1743,7 +1749,7 @@ export class OpPlan<
           planResolver,
           parentPlan,
           objectField,
-        );
+        ));
       } else {
         // There's no plan resolver; use the parent plan
         plan = parentPlan;
@@ -1766,6 +1772,12 @@ export class OpPlan<
           Object.create(null);
       }
 
+      const isLeaf = isLeafType(namedReturnType);
+      const isPolymorphic =
+        isInterfaceType(namedReturnType) || isUnionType(namedReturnType);
+      if (!isLeaf && !isPolymorphic) {
+        assertObjectType(namedReturnType);
+      }
       // Now we're building the child plans, the parentPathIdentity becomes
       // actually our identity.
       const { itemPlan, listDepth, childFieldDigests, itemPathIdentity } =
@@ -1778,15 +1790,10 @@ export class OpPlan<
           treeNode,
           returnRaw && !namedResultTypeIsLeaf,
           namedResultTypeIsLeaf,
+          0,
+          haltTree,
         );
       this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
-
-      const isPolymorphic =
-        isInterfaceType(namedReturnType) || isUnionType(namedReturnType);
-      const isLeaf = isLeafType(namedReturnType);
-      if (!isLeaf && !isPolymorphic) {
-        assertObjectType(namedReturnType);
-      }
 
       const fieldDigest: FieldDigest = {
         parentFieldDigest: null,
@@ -1903,13 +1910,22 @@ export class OpPlan<
     treeNode: TreeNode,
     useValuePlan: boolean,
     isLeaf: boolean,
-    listDepth = 0,
+    listDepth: number,
+    haltTree: boolean,
   ): {
     listDepth: number;
     itemPlan: ExecutableStep<any>;
     childFieldDigests: FieldDigest[] | null;
     itemPathIdentity: string;
   } {
+    if (haltTree) {
+      return {
+        listDepth,
+        itemPlan: plan,
+        childFieldDigests: null,
+        itemPathIdentity: pathIdentity,
+      };
+    }
     if (isDev) {
       assert.strictEqual(
         isLeaf,
@@ -1930,6 +1946,7 @@ export class OpPlan<
         useValuePlan,
         isLeaf,
         listDepth,
+        haltTree,
       );
     } else if (fieldType instanceof GraphQLList) {
       const nestedParentPathIdentity = pathIdentity + "[]";
@@ -1970,6 +1987,7 @@ export class OpPlan<
         useValuePlan,
         isLeaf,
         listDepth + 1,
+        haltTree,
       );
     } else if (useValuePlan) {
       // We don't do this check first because we need the TreeNode manipulation
@@ -1997,6 +2015,7 @@ export class OpPlan<
         false,
         isLeaf,
         listDepth,
+        haltTree,
       );
     }
 
@@ -2292,6 +2311,12 @@ export class OpPlan<
           }),
       ),
     );
+    let haltTree = false;
+    if (plan === null || (plan instanceof ConstantStep && plan.isNull())) {
+      // Constantly null; do not plan any further in this tree.
+      plan = plan || constant(null);
+      haltTree = true;
+    }
     assertExecutableStep(plan, pathIdentity);
 
     // TODO: Check SameStreamDirective still exists in @stream spec at release.
@@ -2316,7 +2341,9 @@ export class OpPlan<
 
     const planOptions: PlanOptions = {
       stream:
-        streamDirective && isStreamableStep(plan as ExecutableStep<any>)
+        !haltTree &&
+        streamDirective &&
+        isStreamableStep(plan as ExecutableStep<any>)
           ? {
               initialCount:
                 Number(
@@ -2351,7 +2378,7 @@ export class OpPlan<
     // After deduplication, this plan may have been substituted; get the
     // updated reference.
     plan = this.plans[plan.id]!;
-    return plan;
+    return { plan, haltTree };
   }
 
   private getStepIds(offset = 0) {
@@ -3610,9 +3637,14 @@ export class OpPlan<
               } else {
                 const fields: ObjectCreatorFields = Object.create(null);
                 if (!fieldDigest.childFieldDigests) {
-                  throw new Error(
-                    `GraphileInternalError<18101261-6949-4de5-b3b9-22919fb4fccf>: Processing an object type, childFieldDigests is expected to exist`,
-                  );
+                  return {
+                    type: "O",
+                    notNull,
+                    objectCreator: () => null as any,
+                  };
+                  // throw new Error(
+                  //   `GraphileInternalError<18101261-6949-4de5-b3b9-22919fb4fccf>: Processing an object type, childFieldDigests is expected to exist`,
+                  // );
                 }
                 for (const childFieldDigest of fieldDigest.childFieldDigests) {
                   if (fields[childFieldDigest.responseKey]) {

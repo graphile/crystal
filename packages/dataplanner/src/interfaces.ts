@@ -290,7 +290,7 @@ export type FieldPlanResolver<
     field: GraphQLField<any, any, any>;
     schema: GraphQLSchema;
   },
-) => TResultStep;
+) => TResultStep | null;
 
 // TODO: review _TContext
 /**

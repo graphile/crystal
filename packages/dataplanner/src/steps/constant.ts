@@ -19,6 +19,10 @@ export class ConstantStep<TData> extends ExecutableStep<TData> {
   execute(values: [[undefined]]): CrystalResultsList<TData> {
     return arrayOfLength(values[0].length, this.data);
   }
+
+  isNull() {
+    return this.data === null;
+  }
 }
 
 function isTemplateStringsArray(data: any): data is TemplateStringsArray {
