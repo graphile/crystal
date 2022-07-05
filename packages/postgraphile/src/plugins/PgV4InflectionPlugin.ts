@@ -31,6 +31,9 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         }
         return previous!.call(this, details);
       },
+      functionMutationResultFieldName(previous, options, details) {
+        return this.camelCase(details.source.codec.name);
+      },
     },
   },
 };

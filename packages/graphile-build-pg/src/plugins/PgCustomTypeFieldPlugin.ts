@@ -47,6 +47,9 @@ declare global {
       param: PgSourceParameter;
       index: number;
     }
+    interface InflectionCustomFieldMutationResult {
+      source: PgSource<any, any, any, PgSourceParameter[]>;
+    }
 
     interface Inflection {
       _functionName(
@@ -108,6 +111,10 @@ declare global {
       scalarFunctionEdgeType(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
+      ): string;
+      functionMutationResultFieldName(
+        this: Inflection,
+        details: InflectionCustomFieldMutationResult,
       ): string;
     }
   }
@@ -278,6 +285,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
       scalarFunctionEdgeType(options, details) {
         return this.edgeType(this.upperCamelCase(this._functionName(details)));
       },
+      functionMutationResultFieldName(_options, _details) {
+        return "result";
+      },
     },
   },
 
@@ -358,16 +368,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
             const isVoid = source.codec === TYPES.void;
 
-            // TODO:
-            /*
-          const resultFieldName = inflection.functionMutationResultFieldName(
-            proc,
-            getNamedType(type),
-            proc.returnsSet || rawReturnType.isPgArray,
-            outputArgNames
-          );
-          */
-            const resultFieldName = `result`;
+            const resultFieldName = inflection.functionMutationResultFieldName({
+              source,
+            });
 
             build.registerObjectType(
               payloadTypeName,
