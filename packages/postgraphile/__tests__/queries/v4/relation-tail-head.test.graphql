@@ -17,7 +17,9 @@ query {
       }
     }
   }
-  allForeignKeys {
+  allForeignKeys(
+    orderBy: [PERSON_ID_ASC, COMPOUND_KEY_1_DESC, COMPOUND_KEY_2_ASC]
+  ) {
     nodes {
       personId
       compoundKey1
