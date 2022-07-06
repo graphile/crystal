@@ -63,7 +63,9 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   planForType(type: GraphQLObjectType): ExecutableStep {
     const spec = this.possibleTypes[type.name];
     if (spec) {
-      return spec.get(access(this.getDep(this.specPlanDep), [spec.codecName]));
+      return spec.get(
+        spec.getSpec(access(this.getDep(this.specPlanDep), [spec.codecName])),
+      );
     } else {
       return constant(null);
     }
