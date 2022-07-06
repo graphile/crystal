@@ -9,11 +9,10 @@ import type {
   PgUpdateStep,
 } from "@dataplan/pg";
 import { pgDelete, pgUpdate } from "@dataplan/pg";
+import type { ExecutableStep, FieldArgs } from "dataplanner";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
-  ExecutableStep,
-  FieldArgs,
   InputStep,
   specFromNodeId,
 } from "dataplanner";
@@ -278,7 +277,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     source.codec.extensions,
                     source.extensions,
                   ]);
-                  // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
                   const deletedNodeIdFieldName = inflection.deletedNodeId({
                     source,
                   });
@@ -568,6 +566,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           scope: { isRootMutation },
           fieldWithHooks,
         } = context;
+        const nodeIdFieldName = build.inflection.nodeIdFieldName?.();
         if (!isRootMutation) {
           return fields;
         }
@@ -645,10 +644,13 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                  * optimised function, otherwise we must play it safe and not
                  * do that.
                  */
-                const clean = uniqueColumns.every(
-                  ([columnName, fieldName]) =>
-                    isSafeIdentifier(columnName) && isSafeIdentifier(fieldName),
-                );
+                const clean =
+                  uniqueMode === "keys" &&
+                  uniqueColumns.every(
+                    ([columnName, fieldName]) =>
+                      isSafeIdentifier(columnName) &&
+                      isSafeIdentifier(fieldName),
+                  );
 
                 /**
                  * Builds a pgUpdate/pgDelete spec describing the row to
@@ -668,22 +670,47 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                       .join(", ")} }`
                   : null;
 
+                const tableTypeName = inflection.tableType(source.codec);
+                const handler = build.getNodeIdHandler(tableTypeName);
+                const codec = handler
+                  ? build.getNodeIdCodec(handler.codecName)
+                  : null;
+
+                if (uniqueMode !== "keys" && (!codec || !handler)) {
+                  throw new Error(
+                    `Failed to get node handler/codec for '${tableTypeName}'`,
+                  );
+                }
+
                 /**
                  * The fallback to `specFromArgsString`; builds a
                  * pgUpdate/pgDelete spec describing the row to update/delete.
                  */
-                const specFromArgs = EXPORTABLE(
-                  (uniqueColumns) => (args: FieldArgs) => {
-                    return uniqueColumns.reduce(
-                      (memo, [columnName, fieldName]) => {
-                        memo[columnName] = args.get(["input", fieldName]);
-                        return memo;
-                      },
-                      {},
-                    );
-                  },
-                  [uniqueColumns],
-                );
+                const specFromArgs =
+                  uniqueMode === "keys"
+                    ? EXPORTABLE(
+                        (uniqueColumns) => (args: FieldArgs) => {
+                          return uniqueColumns.reduce(
+                            (memo, [columnName, fieldName]) => {
+                              memo[columnName] = args.get(["input", fieldName]);
+                              return memo;
+                            },
+                            Object.create(null),
+                          );
+                        },
+                        [uniqueColumns],
+                      )
+                    : EXPORTABLE(
+                        (codec, handler, nodeIdFieldName, specFromNodeId) =>
+                          (args: FieldArgs) => {
+                            const $nodeId = args.get([
+                              "input",
+                              nodeIdFieldName,
+                            ]);
+                            return specFromNodeId(codec!, handler!, $nodeId);
+                          },
+                        [codec, handler, nodeIdFieldName, specFromNodeId],
+                      );
 
                 return build.extend(
                   fields,
