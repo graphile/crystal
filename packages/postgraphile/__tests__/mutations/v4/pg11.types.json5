@@ -1,0 +1,44 @@
+{
+  updateTypeById: {
+    type: {
+      id: 12,
+      regrole: "postgraphile_test_authenticator",
+      regnamespace: "pg11",
+      bigintDomainArrayDomain: [
+        "2098288669218571759",
+        "2098288669218571760",
+        "2098288669218571761",
+      ],
+      domainConstrainedCompoundType: {
+        a: 1,
+        b: null,
+        c: null,
+        d: null,
+        e: null,
+        f: null,
+        fooBar: null,
+      },
+    },
+  },
+  createType: {
+    type: {
+      id: 15,
+      regrole: "postgraphile_test_visitor",
+      regnamespace: "c",
+      bigintDomainArrayDomain: [
+        "2098288669218571759",
+        "2098288669218571760",
+        "2098288669218571761",
+      ],
+      domainConstrainedCompoundType: {
+        a: 1,
+        b: null,
+        c: null,
+        d: null,
+        e: null,
+        f: null,
+        fooBar: null,
+      },
+    },
+  },
+}

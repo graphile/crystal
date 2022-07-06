@@ -1,0 +1,64 @@
+## expect(errors).toBeFalsy();
+#> schema: ["pg11"]
+#> requiresPg: 110000
+mutation {
+  # Must come next to last
+  updateTypeById(
+    input: {
+      id: 12
+      typePatch: {
+        regrole: "postgraphile_test_authenticator"
+        regnamespace: "pg11"
+        bigintDomainArrayDomain: [
+          "2098288669218571759"
+          "2098288669218571760"
+          "2098288669218571761"
+        ]
+        domainConstrainedCompoundType: { a: 1 }
+      }
+    }
+  ) {
+    type {
+      ...type
+    }
+  }
+  # Must come last
+  createType(
+    input: {
+      type: {
+        regrole: "postgraphile_test_visitor"
+        regnamespace: "c"
+        bigintDomainArrayDomain: [
+          "2098288669218571759"
+          "2098288669218571760"
+          "2098288669218571761"
+        ]
+        domainConstrainedCompoundType: { a: 1 }
+      }
+    }
+  ) {
+    type {
+      ...type
+    }
+  }
+}
+
+fragment type on Type {
+  id
+  regrole
+  regnamespace
+  bigintDomainArrayDomain
+  domainConstrainedCompoundType {
+    ...domainConstrainedCompoundType
+  }
+}
+
+fragment domainConstrainedCompoundType on DomainConstrainedCompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
+}
