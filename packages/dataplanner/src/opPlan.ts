@@ -469,6 +469,11 @@ export class OpPlan<
   private phase: OpPlanPhase = "init";
 
   /**
+   * Gets updated as we work our way through the plan, useful for making errors more helpful.
+   */
+  public loc: string[] = [];
+
+  /**
    * A new 'group' is introduced whenever a field must evaluated at a later
    * time:
    *
@@ -948,7 +953,11 @@ export class OpPlan<
       }
     } catch (e) {
       // TODO: raise this somewhere critical
-      console.error(`Error occurred during query planning: \n${e.stack || e}`);
+      console.error(
+        `Error occurred during query planning (at '${this.loc.join(
+          "' > '",
+        )}'): \n${e.stack || e}`,
+      );
       if (debugPlanVerboseEnabled) {
         this.logPlansByPath();
       }
@@ -1356,6 +1365,7 @@ export class OpPlan<
    * Implements the `PlanOpPlanQuery` algorithm.
    */
   private planQuery(): void {
+    this.loc = ["planQuery"];
     const rootType = this.schema.getQueryType();
     if (!rootType) {
       throw new Error("No query type found in schema");
@@ -1381,6 +1391,7 @@ export class OpPlan<
    * Implements the `PlanOpPlanMutation` algorithm.
    */
   private planMutation(): void {
+    this.loc = ["planMutation"];
     const rootType = this.schema.getMutationType();
     if (!rootType) {
       throw new Error("No mutation type found in schema");
@@ -1407,6 +1418,7 @@ export class OpPlan<
    * Implements the `PlanOpPlanSubscription` algorithm.
    */
   private planSubscription(): void {
+    this.loc = ["planSubscription"];
     const rootType = this.schema.getSubscriptionType();
     if (!rootType) {
       throw new Error("No subscription type found in schema");
@@ -1528,6 +1540,7 @@ export class OpPlan<
     parentTreeNode: TreeNode,
     isMutation = false,
   ): { fieldDigests: FieldDigest[] } {
+    this.loc.push(`planSelectionSet(${objectType.name} @ ${path})`);
     assertObjectType(objectType);
     const groupedFieldSet = withGlobalState(
       {
@@ -1821,6 +1834,7 @@ export class OpPlan<
       fieldDigests.push(fieldDigest);
     }
 
+    this.loc.pop();
     return { fieldDigests };
   }
 
@@ -2287,6 +2301,7 @@ export class OpPlan<
     parentPlan: ExecutableStep,
     field: GraphQLField<any, any>,
   ) {
+    this.loc.push(`planField(${pathIdentity})`);
     const oldPlansLength = this.planCount;
     const fieldType = field.type;
     const wgs = withGlobalState.bind(null, {
@@ -2378,6 +2393,7 @@ export class OpPlan<
     // After deduplication, this plan may have been substituted; get the
     // updated reference.
     plan = this.plans[plan.id]!;
+    this.loc.pop();
     return { plan, haltTree };
   }
 

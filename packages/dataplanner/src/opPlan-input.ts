@@ -41,6 +41,7 @@ export function withFieldArgsForArguments<
   field: GraphQLField<any, any, any>,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
+  opPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
     [key: string]: GraphQLArgument;
   } = {};
@@ -48,7 +49,7 @@ export function withFieldArgsForArguments<
   for (const arg of args) {
     fields[arg.name] = arg;
   }
-  return withFieldArgsForArgumentsOrInputObject(
+  const result = withFieldArgsForArgumentsOrInputObject(
     opPlan,
     null,
     parentPlan,
@@ -56,6 +57,9 @@ export function withFieldArgsForArguments<
     fields,
     callback,
   );
+  opPlan.loc.pop();
+
+  return result;
 }
 
 function withFieldArgsForArgumentsOrInputObject<
@@ -75,6 +79,7 @@ function withFieldArgsForArgumentsOrInputObject<
   const analyzedCoordinates: string[] = [];
 
   const getArgOnceOnly = (inPath: string | string[]) => {
+    opPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
     if (path.length < 1) {
       throw new Error("Invalid");
@@ -129,6 +134,7 @@ function withFieldArgsForArgumentsOrInputObject<
       type = getNullableType(argOrField.type);
     }
 
+    opPlan.loc.pop();
     return { $value, argOrField, type };
   };
 
@@ -136,6 +142,7 @@ function withFieldArgsForArgumentsOrInputObject<
     details: ReturnType<typeof getArgOnceOnly>,
     $toPlan: ExecutableStep | ModifierStep | null,
   ) {
+    opPlan.loc.push(`planArgumentOrInputField(${details.argOrField.name})`);
     const plan = opPlan.withModifiers(() => {
       const { argOrField, $value } = details;
 
@@ -195,10 +202,21 @@ function withFieldArgsForArgumentsOrInputObject<
         },
       );
     });
+    opPlan.loc.pop();
     return plan;
   }
 
   function getPlannedValue(
+    $value: InputStep,
+    currentType: GraphQLInputType,
+  ): ExecutableStep {
+    opPlan.loc.push(`getPlannedValue(${$value},${currentType})`);
+    const result = getPlannedValue_($value, currentType);
+    opPlan.loc.pop();
+    return result;
+  }
+
+  function getPlannedValue_(
     $value: InputStep,
     currentType: GraphQLInputType,
   ): ExecutableStep {
@@ -395,6 +413,7 @@ function withFieldArgsForArgumentsOrInputObject<
     | ModifierStep;
 
   // Now handled all the remaining coordinates
+  opPlan.loc.push("handle_remaining");
   if (
     !analyzedCoordinates.includes("") &&
     plan != null &&
@@ -431,6 +450,7 @@ function withFieldArgsForArgumentsOrInputObject<
       process(fields);
     }
   }
+  opPlan.loc.pop();
 
   return plan as any;
 }
