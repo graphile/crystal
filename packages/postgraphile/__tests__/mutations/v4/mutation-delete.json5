@@ -145,7 +145,7 @@
     clientMutationId: null,
     deletedPersonId: "WyJwZW9wbGUiLDFd",
     personEdge: {
-      cursor: "WyJmaXJzdF9uYW1lX2FzYyIsWyJKb2huIiwxXV0=",
+      cursor: "WyI0YzJiZDUxMDAzIiwiSm9obiIsMV0=",
       node: {
         firstName: "John",
         id: 1,
