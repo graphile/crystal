@@ -354,13 +354,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   {
                     clientMutationId: {
                       type: GraphQLString,
-                      plan: EXPORTABLE(
+                      applyPlan: EXPORTABLE(
                         () =>
                           function plan(
                             $input: ObjectStep<any>,
-                            value: InputStep,
+                            val: FieldArgs,
                           ) {
-                            $input.set("clientMutationId", value);
+                            $input.set("clientMutationId", val.get());
                           },
                         [],
                       ),

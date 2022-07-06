@@ -462,9 +462,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             () =>
                               function plan(
                                 $input: ObjectStep<any>,
-                                value: InputStep,
+                                val: FieldArgs,
                               ) {
-                                $input.set("clientMutationId", value);
+                                $input.set("clientMutationId", val.get());
                               },
                             [],
                           ),
