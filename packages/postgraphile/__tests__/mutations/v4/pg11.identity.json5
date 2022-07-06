@@ -1,0 +1,20 @@
+{
+  a: {
+    alwaysAsIdentity: {
+      id: 1,
+      t: "test",
+    },
+  },
+  b: {
+    byDefaultAsIdentity: {
+      id: 1,
+      t: "test",
+    },
+  },
+  c: {
+    byDefaultAsIdentity: {
+      id: 100,
+      t: "test",
+    },
+  },
+}
