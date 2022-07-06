@@ -790,7 +790,9 @@ ${duration}
   ): Promise<PgClientResult<TData>> {
     const { context, text, values } = options;
 
-    const queryResult = await this._execute<TData>(context, text, values);
+    const queryResult = await this.withTransaction(context, (execute) =>
+      execute<TData>(text, values),
+    );
 
     // TODO: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
