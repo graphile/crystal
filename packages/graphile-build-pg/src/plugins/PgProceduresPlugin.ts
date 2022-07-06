@@ -401,13 +401,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               for (let i = 0, l = numberOfArguments; i < l; i++) {
                 const trueArgName = pgProc.proargnames?.[i];
                 const argMode = pgProc.proargmodes?.[i] ?? "i";
-                if (argMode === "i" || argMode === "o") {
+                if (argMode === "b" || argMode === "o") {
                   return trueArgName;
                 }
               }
             })();
             if (outOrInoutArg) {
-              extensions.singleOutputParameterName = outOrInoutArgs[0];
+              extensions.singleOutputParameterName = outOrInoutArg;
             }
           }
 
