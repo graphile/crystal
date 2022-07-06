@@ -1,133 +1,57 @@
-SAVEPOINT graphql_mutation
+update "pg11"."types" as __types__ set "regrole" = $1::"regrole", "regnamespace" = $2::"regnamespace", "bigint_domain_array_domain" = $3::"c"."bigint_domain_array_domain", "domain_constrained_compound_type" = $4::"pg11"."domain_constrained_compound_type" where (__types__."id" = $5::"int4") returning
+  __types__."id"::text as "0",
+  __types__."regrole"::text as "1",
+  __types__."regnamespace"::text as "2",
+  __types__."bigint_domain_array_domain"::text as "3",
+  __types__."domain_constrained_compound_type"::text as "4"
 
-with __local_0__ as (
-  update "pg11"."types" set "regrole" = $1,
-  "regnamespace" = $2,
-  "bigint_domain_array_domain" = array[$3,
-  $4,
-  $5]::"c"."_bigint_domain",
-  "domain_constrained_compound_type" = row(
-    $6::"pg_catalog"."int4",
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
-  )::"c"."compound_type"
-  where (
-    "id" = $7
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
 
-with __local_0__ as (
-  select (
-    str::"pg11"."types"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'regrole'::text,
-      (__local_0__."regrole"),
-      'regnamespace'::text,
-      (__local_0__."regnamespace"),
-      'bigintDomainArrayDomain'::text,
-      (
-        case when (__local_0__."bigint_domain_array_domain") is null then null else array(
-          select (val)::text
-          from unnest((__local_0__."bigint_domain_array_domain")) as unnest(val)
-        ) end
-      ),
-      'domainConstrainedCompoundType'::text,
-      (__local_0__."domain_constrained_compound_type")
-    )
-  )
-) as "@type"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __temporary_source1_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"pg11"."domain_constrained_compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __temporary_source1_identifiers__,
+lateral (
+  select
+    __temporary_source1__."a"::text as "0",
+    __temporary_source1__."b" as "1",
+    __temporary_source1__."c"::text as "2",
+    __temporary_source1__."d" as "3",
+    __temporary_source1__."e"::text as "4",
+    __temporary_source1__."f"::text as "5",
+    __temporary_source1__."foo_bar"::text as "6",
+    (not (__temporary_source1__ is null))::text as "7",
+    __temporary_source1_identifiers__.idx as "8"
+  from (select (__temporary_source1_identifiers__."id0").*) as __temporary_source1__
+) as __temporary_source1_result__
 
-RELEASE SAVEPOINT graphql_mutation
+insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_domain_array_domain", "domain_constrained_compound_type") values ($1::"regrole", $2::"regnamespace", $3::"c"."bigint_domain_array_domain", $4::"pg11"."domain_constrained_compound_type") returning
+  __types__."id"::text as "0",
+  __types__."regrole"::text as "1",
+  __types__."regnamespace"::text as "2",
+  __types__."bigint_domain_array_domain"::text as "3",
+  __types__."domain_constrained_compound_type"::text as "4"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  insert into "pg11"."types" (
-    "regrole",
-    "regnamespace",
-    "bigint_domain_array_domain",
-    "domain_constrained_compound_type"
-  ) values(
-    $1,
-    $2,
-    array[$3,
-    $4,
-    $5]::"c"."_bigint_domain",
-    row(
-      $6::"pg_catalog"."int4",
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL
-    )::"c"."compound_type"
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
-
-with __local_0__ as (
-  select (
-    str::"pg11"."types"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'regrole'::text,
-      (__local_0__."regrole"),
-      'regnamespace'::text,
-      (__local_0__."regnamespace"),
-      'bigintDomainArrayDomain'::text,
-      (
-        case when (__local_0__."bigint_domain_array_domain") is null then null else array(
-          select (val)::text
-          from unnest((__local_0__."bigint_domain_array_domain")) as unnest(val)
-        ) end
-      ),
-      'domainConstrainedCompoundType'::text,
-      (__local_0__."domain_constrained_compound_type")
-    )
-  )
-) as "@type"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
+select __temporary_source1_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"pg11"."domain_constrained_compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __temporary_source1_identifiers__,
+lateral (
+  select
+    __temporary_source1__."a"::text as "0",
+    __temporary_source1__."b" as "1",
+    __temporary_source1__."c"::text as "2",
+    __temporary_source1__."d" as "3",
+    __temporary_source1__."e"::text as "4",
+    __temporary_source1__."f"::text as "5",
+    __temporary_source1__."foo_bar"::text as "6",
+    (not (__temporary_source1__ is null))::text as "7",
+    __temporary_source1_identifiers__.idx as "8"
+  from (select (__temporary_source1_identifiers__."id0").*) as __temporary_source1__
+) as __temporary_source1_result__
