@@ -734,7 +734,7 @@ const stripSubnet32 = {
  */
 export const TYPES = {
   void: t<void>("void"), // void: 2278
-  boolean: t<boolean>("bool", { fromPg: (value) => value === "true" }),
+  boolean: t<boolean>("bool", { fromPg: (value) => value[0] === "t" }),
   int2: t<number>("int2", { fromPg: parseAsInt }),
   int: t<number>("int4", { fromPg: parseAsInt }),
   bigint: t<string>("int8"),
