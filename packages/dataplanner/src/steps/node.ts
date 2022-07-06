@@ -123,3 +123,22 @@ export function node<TCodecs extends { [key: string]: NodeIdCodec<any> }>(
 ): NodeStep<TCodecs> {
   return new NodeStep(codecs, possibleTypes, $id);
 }
+
+export function specFromNodeId(
+  codec: NodeIdCodec<any>,
+  handler: NodeIdHandler<any>,
+  $id: ExecutableStep<string>,
+) {
+  const $decoded = lambda($id, (raw) => {
+    try {
+      const decoded = codec.decode(raw);
+      if (handler.match(decoded)) {
+        return decoded;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  });
+  return handler.getSpec($decoded);
+}

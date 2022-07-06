@@ -158,6 +158,7 @@ import {
   setter,
   SetterCapableStep,
   SetterStep,
+  specFromNodeId,
 } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
 import { subscribe } from "./subscribe.js";
@@ -344,6 +345,7 @@ export {
   setter,
   SetterCapableStep,
   SetterStep,
+  specFromNodeId,
   StreamableStep,
   stripAnsi,
   subscribe,
@@ -390,6 +392,7 @@ exportAsMany({
   listTransform,
   first,
   node,
+  specFromNodeId,
   NodeStep,
   FirstStep,
   last,

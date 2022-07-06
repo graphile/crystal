@@ -9,12 +9,13 @@ import type {
   PgUpdateStep,
 } from "@dataplan/pg";
 import { pgDelete, pgUpdate } from "@dataplan/pg";
-import type {
+import {
   __InputObjectStep,
   __TrackedObjectStep,
   ExecutableStep,
   FieldArgs,
   InputStep,
+  specFromNodeId,
 } from "dataplanner";
 import { lambda, object, ObjectStep } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";

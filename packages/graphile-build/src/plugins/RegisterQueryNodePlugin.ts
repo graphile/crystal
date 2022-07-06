@@ -19,6 +19,7 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
             },
             [],
           ),
+          getSpec: () => "irrelevant",
           get: EXPORTABLE(
             (opPlan) => () => {
               return opPlan().rootValueStep;

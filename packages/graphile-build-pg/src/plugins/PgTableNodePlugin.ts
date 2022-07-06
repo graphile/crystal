@@ -101,29 +101,32 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                     },
                   [constant, identifier, list, pk],
                 ),
-            get: clean
+            getSpec: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
                   new Function(
-                    "pgSource",
                     "access",
-                    `return $list => pgSource.get({ ${pk.map(
+                    `return $list => ({ ${pk.map(
                       (columnName, index) =>
                         `${columnName}: access($list, [${index + 1}])`,
                     )} })`,
                   ) as any,
-                  [pgSource, access],
+                  [access],
                 )
               : EXPORTABLE(
-                  (access, pgSource, pk) => ($list: ListStep<any[]>) => {
+                  (access, pk) => ($list: ListStep<any[]>) => {
                     const spec = pk.reduce((memo, column, index) => {
                       memo[column] = access($list, [index + 1]);
                       return memo;
                     }, {});
-                    return pgSource.get(spec);
+                    return spec;
                   },
-                  [access, pgSource, pk],
+                  [access, pk],
                 ),
+            get: EXPORTABLE(
+              (pgSource) => (spec: any) => pgSource.get(spec),
+              [pgSource],
+            ),
             match: EXPORTABLE(
               (identifier) => (obj) => {
                 return obj[0] === identifier;

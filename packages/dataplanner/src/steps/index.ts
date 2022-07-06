@@ -51,7 +51,7 @@ export {
   ListTransformReduce,
 } from "./listTransform.js";
 export { ActualKeyByDesiredKey, makeMapper, map, MapStep } from "./map.js";
-export { node, NodeStep } from "./node.js";
+export { node, NodeStep, specFromNodeId } from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";

@@ -675,6 +675,7 @@ export type NodeIdHandler<
   },
   TCodecName extends keyof TCodecs = keyof TCodecs,
   TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TSpec = any,
 > = {
   /**
    * Which codec are we using to encode/decode the NodeID string?
@@ -697,14 +698,24 @@ export type NodeIdHandler<
   ): ExecutableStep<TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any>;
 
   /**
-   * The recprocal of `plan`, given the return value of plan, this should
-   * return a plan that results in the original node.
+   * Returns a specification based on the Node ID, this can be in any format
+   * you like. It is intended to then be fed into `get` or handled in your own
+   * code as you see fit. (When used directly, it's primarily useful for
+   * referencing a node without actually fetching it - e.g. allowing you to
+   * delete a node by its ID without first fetching it.)
    */
-  get(
+  getSpec(
     plan: ExecutableStep<
       TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any
     >,
-  ): TNodeStep;
+  ): TSpec;
+
+  /**
+   * Combined with `getSpec`, this forms the recprocal of `plan`; i.e.
+   * `get(getSpec( plan(node) ))` should return a plan that results in the
+   * original node.
+   */
+  get(spec: TSpec): TNodeStep;
 };
 
 export type BaseEventMap = Record<string, any>;
