@@ -174,16 +174,18 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   ) =>
                     function plan(
                       $mutation: ObjectStep<{
-                        record: PgClassSingleStep<any, any, any, any>;
+                        result: PgClassSingleStep<any, any, any, any>;
                       }>,
                       args,
                       info: { schema: GraphQLSchema },
                     ) {
-                      const $record = $mutation.getStepForKey("record", true);
-                      if (!$record) return constant(null);
+                      const $result = $mutation.getStepForKey("result", true);
+                      if (!$result) {
+                        return constant(null);
+                      }
 
                       const spec = pkColumns.reduce((memo, columnName) => {
-                        memo[columnName] = $record.get(columnName);
+                        memo[columnName] = $result.get(columnName);
                         return memo;
                       }, {});
                       const $select = source.find(spec);
