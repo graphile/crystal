@@ -9,70 +9,70 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access29["Access[29∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access30["Access[30∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object31["Object[31∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection32["Connection[32∈0]<br />ᐸ28ᐳ"]:::plan
-    PgSelect33[["PgSelect[33∈0]<br />ᐸpersonᐳ"]]:::plan
-    __Item34>"__Item[34∈1]<br />ᐸ33ᐳ"]:::itemplan
-    PgSelectSingle35["PgSelectSingle[35∈1]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression37["PgClassExpression[37∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    Connection63["Connection[63∈0]<br />ᐸ59ᐳ"]:::plan
-    PgSelect64[["PgSelect[64∈0]<br />ᐸpersonᐳ"]]:::plan
-    __Item65>"__Item[65∈2]<br />ᐸ64ᐳ"]:::itemplan
-    PgSelectSingle66["PgSelectSingle[66∈2]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression67["PgClassExpression[67∈2]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression68["PgClassExpression[68∈2]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    Access31["Access[31∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access32["Access[32∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object33["Object[33∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection34["Connection[34∈0]<br />ᐸ30ᐳ"]:::plan
+    PgSelect35[["PgSelect[35∈0]<br />ᐸpersonᐳ"]]:::plan
+    __Item36>"__Item[36∈1]<br />ᐸ35ᐳ"]:::itemplan
+    PgSelectSingle37["PgSelectSingle[37∈1]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression39["PgClassExpression[39∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    Connection67["Connection[67∈0]<br />ᐸ63ᐳ"]:::plan
+    PgSelect68[["PgSelect[68∈0]<br />ᐸpersonᐳ"]]:::plan
+    __Item69>"__Item[69∈2]<br />ᐸ68ᐳ"]:::itemplan
+    PgSelectSingle70["PgSelectSingle[70∈2]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression71["PgClassExpression[71∈2]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression72["PgClassExpression[72∈2]<br />ᐸ__person__...full_name”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access29
-    __Value3 --> Access30
-    Access29 & Access30 --> Object31
-    Object31 & Connection32 --> PgSelect33
-    PgSelect33 ==> __Item34
-    __Item34 --> PgSelectSingle35
-    PgSelectSingle35 --> PgClassExpression36
-    PgSelectSingle35 --> PgClassExpression37
-    Object31 & Connection63 --> PgSelect64
-    PgSelect64 ==> __Item65
-    __Item65 --> PgSelectSingle66
-    PgSelectSingle66 --> PgClassExpression67
-    PgSelectSingle66 --> PgClassExpression68
+    __Value3 --> Access31
+    __Value3 --> Access32
+    Access31 & Access32 --> Object33
+    Object33 & Connection34 --> PgSelect35
+    PgSelect35 ==> __Item36
+    __Item36 --> PgSelectSingle37
+    PgSelectSingle37 --> PgClassExpression38
+    PgSelectSingle37 --> PgClassExpression39
+    Object33 & Connection67 --> PgSelect68
+    PgSelect68 ==> __Item69
+    __Item69 --> PgSelectSingle70
+    PgSelectSingle70 --> PgClassExpression71
+    PgSelectSingle70 --> PgClassExpression72
 
     %% plan-to-path relationships
     P0["~"]
     __Value0 -.-> P0
-    P32["ᐳasc"]
-    Connection32 -.-> P32
-    P33["ᐳascᐳnodes"]
-    PgSelect33 -.-> P33
-    P35["ᐳascᐳnodes[]"]
-    PgSelectSingle35 -.-> P35
-    P36["ᐳascᐳn…]ᐳid"]
-    PgClassExpression36 -.-> P36
-    P37["ᐳascᐳn…]ᐳname"]
-    PgClassExpression37 -.-> P37
-    P63["ᐳdesc"]
-    Connection63 -.-> P63
-    P64["ᐳdescᐳnodes"]
-    PgSelect64 -.-> P64
-    P66["ᐳdescᐳnodes[]"]
-    PgSelectSingle66 -.-> P66
-    P67["ᐳdescᐳn…]ᐳid"]
-    PgClassExpression67 -.-> P67
-    P68["ᐳdescᐳn…]ᐳname"]
-    PgClassExpression68 -.-> P68
+    P34["ᐳasc"]
+    Connection34 -.-> P34
+    P35["ᐳascᐳnodes"]
+    PgSelect35 -.-> P35
+    P37["ᐳascᐳnodes[]"]
+    PgSelectSingle37 -.-> P37
+    P38["ᐳascᐳn…]ᐳid"]
+    PgClassExpression38 -.-> P38
+    P39["ᐳascᐳn…]ᐳname"]
+    PgClassExpression39 -.-> P39
+    P67["ᐳdesc"]
+    Connection67 -.-> P67
+    P68["ᐳdescᐳnodes"]
+    PgSelect68 -.-> P68
+    P70["ᐳdescᐳnodes[]"]
+    PgSelectSingle70 -.-> P70
+    P71["ᐳdescᐳn…]ᐳid"]
+    PgClassExpression71 -.-> P71
+    P72["ᐳdescᐳn…]ᐳname"]
+    PgClassExpression72 -.-> P72
 
     subgraph "Buckets for queries/v4/connections-order-computed-column"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀asc ᐸ-O- 32<br />⠀⠀⠀asc.nodes ᐸ-A- 33<br />⠀⠀desc ᐸ-O- 63<br />⠀⠀⠀desc.nodes ᐸ-A- 64"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀asc ᐸ-O- 34<br />⠀⠀⠀asc.nodes ᐸ-A- 35<br />⠀⠀desc ᐸ-O- 67<br />⠀⠀⠀desc.nodes ᐸ-A- 68"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,Access29,Access30,Object31,Connection32,PgSelect33,Connection63,PgSelect64 bucket0
-    Bucket1("Bucket 1 (item34)<br />Deps: 33<br />~ᐳQuery.ascᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 35<br />⠀⠀id ᐸ-L- 36<br />⠀⠀name ᐸ-L- 37"):::bucket
+    class Bucket0,__Value0,__Value3,Access31,Access32,Object33,Connection34,PgSelect35,Connection67,PgSelect68 bucket0
+    Bucket1("Bucket 1 (item36)<br />Deps: 35<br />~ᐳQuery.ascᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 37<br />⠀⠀id ᐸ-L- 38<br />⠀⠀name ᐸ-L- 39"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item34,PgSelectSingle35,PgClassExpression36,PgClassExpression37 bucket1
-    Bucket2("Bucket 2 (item65)<br />Deps: 64<br />~ᐳQuery.descᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 66<br />⠀⠀id ᐸ-L- 67<br />⠀⠀name ᐸ-L- 68"):::bucket
+    class Bucket1,__Item36,PgSelectSingle37,PgClassExpression38,PgClassExpression39 bucket1
+    Bucket2("Bucket 2 (item69)<br />Deps: 68<br />~ᐳQuery.descᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 70<br />⠀⠀id ᐸ-L- 71<br />⠀⠀name ᐸ-L- 72"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item65,PgSelectSingle66,PgClassExpression67,PgClassExpression68 bucket2
+    class Bucket2,__Item69,PgSelectSingle70,PgClassExpression71,PgClassExpression72 bucket2
     Bucket0 --> Bucket1 & Bucket2
     end

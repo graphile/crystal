@@ -9,77 +9,77 @@ graph TD
     %% define plans
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access29["Access[29∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access30["Access[30∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object31["Object[31∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection32["Connection[32∈0]<br />ᐸ28ᐳ"]:::plan
-    PgSelect33[["PgSelect[33∈0]<br />ᐸpersonᐳ"]]:::plan
-    First34["First[34∈0]"]:::plan
-    PgSelectSingle35["PgSelectSingle[35∈0]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression36["PgClassExpression[36∈0]<br />ᐸcount(*)ᐳ"]:::plan
-    Connection62["Connection[62∈0]<br />ᐸ58ᐳ"]:::plan
-    PgSelect63[["PgSelect[63∈0]<br />ᐸpersonᐳ"]]:::plan
-    __Item64>"__Item[64∈1]<br />ᐸ63ᐳ"]:::itemplan
-    PgSelectSingle65["PgSelectSingle[65∈1]<br />ᐸpersonᐳ"]:::plan
-    Connection91["Connection[91∈0]<br />ᐸ87ᐳ"]:::plan
-    Access125["Access[125∈1]<br />ᐸ64.0ᐳ"]:::plan
-    First93["First[93∈1]"]:::plan
-    PgSelectSingle94["PgSelectSingle[94∈1]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression95["PgClassExpression[95∈1]<br />ᐸcount(*)ᐳ"]:::plan
-    Connection120["Connection[120∈0]<br />ᐸ116ᐳ"]:::plan
-    PgSelect121[["PgSelect[121∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
-    First122["First[122∈0]"]:::plan
-    PgSelectSingle123["PgSelectSingle[123∈0]<br />ᐸtable_set_queryᐳ"]:::plan
-    PgClassExpression124["PgClassExpression[124∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    Access31["Access[31∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access32["Access[32∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object33["Object[33∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Connection34["Connection[34∈0]<br />ᐸ30ᐳ"]:::plan
+    PgSelect35[["PgSelect[35∈0]<br />ᐸpersonᐳ"]]:::plan
+    First36["First[36∈0]"]:::plan
+    PgSelectSingle37["PgSelectSingle[37∈0]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    Connection66["Connection[66∈0]<br />ᐸ62ᐳ"]:::plan
+    PgSelect67[["PgSelect[67∈0]<br />ᐸpersonᐳ"]]:::plan
+    __Item68>"__Item[68∈1]<br />ᐸ67ᐳ"]:::itemplan
+    PgSelectSingle69["PgSelectSingle[69∈1]<br />ᐸpersonᐳ"]:::plan
+    Connection97["Connection[97∈0]<br />ᐸ93ᐳ"]:::plan
+    Access133["Access[133∈1]<br />ᐸ68.0ᐳ"]:::plan
+    First99["First[99∈1]"]:::plan
+    PgSelectSingle100["PgSelectSingle[100∈1]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression101["PgClassExpression[101∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    Connection128["Connection[128∈0]<br />ᐸ124ᐳ"]:::plan
+    PgSelect129[["PgSelect[129∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
+    First130["First[130∈0]"]:::plan
+    PgSelectSingle131["PgSelectSingle[131∈0]<br />ᐸtable_set_queryᐳ"]:::plan
+    PgClassExpression132["PgClassExpression[132∈0]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
-    __Value3 --> Access29
-    __Value3 --> Access30
-    Access29 & Access30 --> Object31
-    Object31 & Connection32 --> PgSelect33
-    PgSelect33 --> First34
-    First34 --> PgSelectSingle35
-    PgSelectSingle35 --> PgClassExpression36
-    Object31 & Connection62 --> PgSelect63
-    PgSelect63 ==> __Item64
-    __Item64 --> PgSelectSingle65
-    __Item64 --> Access125
-    Access125 --> First93
-    First93 --> PgSelectSingle94
-    PgSelectSingle94 --> PgClassExpression95
-    Object31 & Connection120 --> PgSelect121
-    PgSelect121 --> First122
-    First122 --> PgSelectSingle123
-    PgSelectSingle123 --> PgClassExpression124
+    __Value3 --> Access31
+    __Value3 --> Access32
+    Access31 & Access32 --> Object33
+    Object33 & Connection34 --> PgSelect35
+    PgSelect35 --> First36
+    First36 --> PgSelectSingle37
+    PgSelectSingle37 --> PgClassExpression38
+    Object33 & Connection66 --> PgSelect67
+    PgSelect67 ==> __Item68
+    __Item68 --> PgSelectSingle69
+    __Item68 --> Access133
+    Access133 --> First99
+    First99 --> PgSelectSingle100
+    PgSelectSingle100 --> PgClassExpression101
+    Object33 & Connection128 --> PgSelect129
+    PgSelect129 --> First130
+    First130 --> PgSelectSingle131
+    PgSelectSingle131 --> PgClassExpression132
 
     %% plan-to-path relationships
     P0["~"]
     __Value0 -.-> P0
-    P32["ᐳa"]
-    Connection32 -.-> P32
-    P36["ᐳaᐳtotalCount"]
-    PgClassExpression36 -.-> P36
-    P62["ᐳb"]
-    Connection62 -.-> P62
-    P63["ᐳbᐳnodes"]
-    PgSelect63 -.-> P63
-    P65["ᐳbᐳnodes[]"]
-    PgSelectSingle65 -.-> P65
-    P91["ᐳbᐳn…]ᐳfriends"]
-    Connection91 -.-> P91
-    P95["ᐳbᐳn…]ᐳf…sᐳtotalCount"]
-    PgClassExpression95 -.-> P95
-    P120["ᐳc"]
-    Connection120 -.-> P120
-    P124["ᐳcᐳtotalCount"]
-    PgClassExpression124 -.-> P124
+    P34["ᐳa"]
+    Connection34 -.-> P34
+    P38["ᐳaᐳtotalCount"]
+    PgClassExpression38 -.-> P38
+    P66["ᐳb"]
+    Connection66 -.-> P66
+    P67["ᐳbᐳnodes"]
+    PgSelect67 -.-> P67
+    P69["ᐳbᐳnodes[]"]
+    PgSelectSingle69 -.-> P69
+    P97["ᐳbᐳn…]ᐳfriends"]
+    Connection97 -.-> P97
+    P101["ᐳbᐳn…]ᐳf…sᐳtotalCount"]
+    PgClassExpression101 -.-> P101
+    P128["ᐳc"]
+    Connection128 -.-> P128
+    P132["ᐳcᐳtotalCount"]
+    PgClassExpression132 -.-> P132
 
     subgraph "Buckets for queries/v4/connections-totalCount"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-O- 32<br />⠀⠀⠀a.totalCount ᐸ-L- 36<br />⠀⠀b ᐸ-O- 62<br />⠀⠀⠀b.nodes ᐸ-A- 63<br />⠀⠀c ᐸ-O- 120<br />⠀⠀⠀c.totalCount ᐸ-L- 124"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀a ᐸ-O- 34<br />⠀⠀⠀a.totalCount ᐸ-L- 38<br />⠀⠀b ᐸ-O- 66<br />⠀⠀⠀b.nodes ᐸ-A- 67<br />⠀⠀c ᐸ-O- 128<br />⠀⠀⠀c.totalCount ᐸ-L- 132"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,Access29,Access30,Object31,Connection32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36,Connection62,PgSelect63,Connection91,Connection120,PgSelect121,First122,PgSelectSingle123,PgClassExpression124 bucket0
-    Bucket1("Bucket 1 (item64)<br />Deps: 63, 91<br />~ᐳQuery.bᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 65<br />⠀⠀friends ᐸ-O- 91<br />⠀⠀⠀friends.totalCount ᐸ-L- 95"):::bucket
+    class Bucket0,__Value0,__Value3,Access31,Access32,Object33,Connection34,PgSelect35,First36,PgSelectSingle37,PgClassExpression38,Connection66,PgSelect67,Connection97,Connection128,PgSelect129,First130,PgSelectSingle131,PgClassExpression132 bucket0
+    Bucket1("Bucket 1 (item68)<br />Deps: 67, 97<br />~ᐳQuery.bᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 69<br />⠀⠀friends ᐸ-O- 97<br />⠀⠀⠀friends.totalCount ᐸ-L- 101"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item64,PgSelectSingle65,First93,PgSelectSingle94,PgClassExpression95,Access125 bucket1
+    class Bucket1,__Item68,PgSelectSingle69,First99,PgSelectSingle100,PgClassExpression101,Access133 bucket1
     Bucket0 --> Bucket1
     end

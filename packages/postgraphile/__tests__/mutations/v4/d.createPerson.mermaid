@@ -19,7 +19,7 @@ graph TD
     Access18["Access[18∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object19["Object[19∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgInsert16[["PgInsert[16∈1@1]"]]:::sideeffectplan
-    Object20["Object[20∈1@1]<br />ᐸ{result,last_name,col_no_update,col_no_order,col_no_filter}ᐳ"]:::plan
+    Object20["Object[20∈1@1]<br />ᐸ{result}ᐳ"]:::plan
     PgClassExpression21["PgClassExpression[21∈1@1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression22["PgClassExpression[22∈1@1]<br />ᐸ__person__.”first_name”ᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈1@1]<br />ᐸ__person__.”last_name”ᐳ"]:::plan
@@ -35,8 +35,8 @@ graph TD
     __Value3 --> Access17
     __Value3 --> Access18
     Access17 & Access18 --> Object19
-    Object19 --> PgInsert16
-    PgInsert16 & __InputStaticLeaf12 & __InputStaticLeaf13 & __InputStaticLeaf14 & __InputStaticLeaf15 --> Object20
+    Object19 & __InputStaticLeaf12 & __InputStaticLeaf13 & __InputStaticLeaf14 & __InputStaticLeaf15 --> PgInsert16
+    PgInsert16 --> Object20
     PgInsert16 --> PgClassExpression21
     PgInsert16 --> PgClassExpression22
     PgInsert16 --> PgClassExpression23
