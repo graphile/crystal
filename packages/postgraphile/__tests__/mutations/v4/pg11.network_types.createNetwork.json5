@@ -1,0 +1,12 @@
+{
+  createNetwork: {
+    network: {
+      nodeId: "WyJuZXR3b3JrcyIsOV0=",
+      id: 9,
+      inet: "10.0.0.0",
+      cidr: "10.0.0.0/8",
+      macaddr: "00:00:00:00:00:00",
+      macaddr8: "00:00:00:00:00:00:00:00",
+    },
+  },
+}
