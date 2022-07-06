@@ -6,12 +6,11 @@
 ## expect(queries[0].text).not.toContain('__relational_posts__::text')
 ## expect(queries[0].text).toContain('__relational_posts__."id"::text')
 
-## expect(errors).toBeFalsy()
+## expect(errors).toHaveLength(1)
 
 ## expect(data.d1.id).toEqual(4)
 
 ## expect(data.d2).toBe(null)
-## expect(errors).toBeFalsy()
 
 mutation {
   d1: deleteRelationalPostById(input: { id: 4 }) {

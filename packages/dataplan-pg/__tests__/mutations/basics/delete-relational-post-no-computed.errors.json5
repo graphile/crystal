@@ -1,0 +1,14 @@
+[
+  {
+    message: "No values were deleted in collection 'relational_posts' because no values you can delete were found matching these criteria.",
+    locations: [
+      {
+        line: 16,
+        column: 3,
+      },
+    ],
+    path: [
+      'd2',
+    ],
+  },
+]

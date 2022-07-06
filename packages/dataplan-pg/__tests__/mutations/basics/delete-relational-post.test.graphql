@@ -1,11 +1,10 @@
-## expect(errors).toBeFalsy()
 ## expect(data.d1.post.id).toEqual(4)
 ## expect(data.d1.post.title).toEqual('Better planning')
 ## expect(data.d1.post.description).toEqual(null)
 ## expect(data.d1.post.note).toEqual(null)
 
 ## expect(data.d2).toBe(null)
-## expect(errors).toBeFalsy()
+## expect(errors).toHaveLength(1)
 
 mutation {
   d1: deleteRelationalPostById(input: { id: 4 }) {
