@@ -33,7 +33,7 @@ mutation CreateMutation($config: KeyValueHash!) {
       timestamptz: "2016-10-09 16:12:45.218676-04"
       date: "2016-10-15"
       time: "19:13:18.625699"
-      timetz: "13:13:29.585176"
+      timetz: "13:13:29.585176-04"
       interval: {
         seconds: 1
         minutes: 2
