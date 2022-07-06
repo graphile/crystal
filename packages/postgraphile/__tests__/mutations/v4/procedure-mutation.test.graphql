@@ -1,0 +1,48 @@
+## expect(errors).toHaveLength(1);
+#> schema: ["a", "b", "c"]
+mutation {
+  jsonIdentityMutation(input: { json: "{\"a\":1,\"b\":2,\"c\":3}" }) { json }
+  jsonbIdentityMutation(input: { json: "{\"a\":1,\"b\":2,\"c\":3}" }) { json }
+  jsonIdentityMutationIssue85: jsonIdentityMutation(input: { json: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
+  jsonbIdentityMutationIssue85: jsonbIdentityMutation(input: { json: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
+  jsonbIdentityMutationPlpgsqlIssue85: jsonbIdentityMutationPlpgsql(input: { _theJson: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
+  jsonbIdentityMutationPlpgsqlWithDefaultIssue85: jsonbIdentityMutationPlpgsqlWithDefault(input: {}) { json }
+  jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85: jsonbIdentityMutationPlpgsqlWithDefault(input: { _theJson: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
+  add1Mutation(input: { arg0: 1, arg1: 2 }) { clientMutationId integer }
+  add2Mutation(input: { clientMutationId: "hello", a: 2, b: 2 }) { clientMutationId integer }
+  add3Mutation(input: { clientMutationId: "world", arg1: 5 }) { clientMutationId integer }
+  add4Mutation(input: { arg0: 1, b: 3 }) { integer }
+  add4MutationError(input: { arg0: 1, b: 3 }) { integer }
+  mult1(input: { arg0: 0, arg1: 1 }) { integer }
+  mult2(input: { arg0: 1, arg1: 1 }) { integer }
+  mult3(input: { arg0: 1, arg1: 2 }) { integer }
+  mult4(input: { arg0: 5, arg1: 2 }) { integer }
+  typesMutation(input: { a: "50", b: false, c: "xyz", d: [1, 2, 3], e: "{\"a\":1,\"b\":2,\"c\":3}", f: { start: { value: 1, inclusive: false }, end: { value: 5, inclusive: false } } }) { boolean }
+  compoundTypeMutation(input: { object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: FOO_BAR, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 } }) { compoundType { a b c d e f g { seconds minutes hours } fooBar } }
+  compoundTypeSetMutation(input: { object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: FOO_BAR, f: _EMPTY_, g: {hours: 5}, fooBar: 8 } }) { compoundTypes { a b c d e f g { seconds minutes hours } fooBar } }
+  compoundTypeArrayMutation(input: { object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: FOO_BAR, f: _EMPTY_, g: { hours: 5}, fooBar: 8 } }) { compoundTypes { a b c d e f g { seconds minutes hours } fooBar } }
+  tableMutation(input: { id: 5 }) { post { nodeId id headline authorId } personByAuthorId { id name } postEdge { cursor node { id headline } } }
+  tableMutationReturningNull: tableMutation(input: { id: -1 }) { post { nodeId id headline authorId } personByAuthorId { id name } postEdge { cursor node { id headline } } }
+  tableSetMutation(input: {}) { people { name } }
+  intSetMutation(input: { x: 5, z: 6 }) { integers }
+  noArgsMutation(input: { clientMutationId: "x" }) { clientMutationId integer }
+  returnVoidMutation(input: {}) { __typename }
+  guidFn(input: {g: null}) { guid }
+  guidFn2: guidFn(input: {g: "0123456789abcde"}) { guid }
+  postMany(input: {posts: [
+    {id: 7, headline: "headline", body: "body", authorId: 9000, enums: AWAITING, comptypes: {schedule: "2009-10-24 10:23:54+02", isOptimised: true}},
+    {id: 8, headline: "headline", body: "body", authorId: 9000, enums: AWAITING, comptypes: {schedule: "2009-10-24 10:23:54+02", isOptimised: null}},
+    {id: 9, headline: "headline", body: "body", authorId: 9000, enums: AWAITING, comptypes: {schedule: "2009-10-24 10:23:54+02", isOptimised: false}}
+  ]}) { posts { id headline comptypes { schedule isOptimised } } }
+  postWithSuffix(input: {
+    post: {id: 15, headline: "headline_", body: "body"},
+    suffix: "test"
+  }) { post { id headline } }
+  issue756Mutation(input:{}) { issue756 { id ts } }
+  issue756SetMutation(input:{}) { issue756S { id ts } }
+
+  mutationCompoundTypeArray(input: {object: {a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5}, fooBar: 8}}) { compoundTypes { a b c d e f g { seconds minutes hours } fooBar } }
+  mutationTextArray(input: {}) { strings }
+  mutationIntervalArray(input: {}) { intervals { seconds minutes hours days months years } }
+  mutationIntervalSet(input: {}) { intervals { seconds minutes hours days months years } }
+}

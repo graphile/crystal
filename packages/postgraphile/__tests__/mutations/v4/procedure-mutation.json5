@@ -1,0 +1,357 @@
+{
+  jsonIdentityMutation: {
+    json: "{\"a\":1,\"b\":2,\"c\":3}",
+  },
+  jsonbIdentityMutation: {
+    json: "{\"a\":1,\"b\":2,\"c\":3}",
+  },
+  jsonIdentityMutationIssue85: {
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  },
+  jsonbIdentityMutationIssue85: {
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  },
+  jsonbIdentityMutationPlpgsqlIssue85: {
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  },
+  jsonbIdentityMutationPlpgsqlWithDefaultIssue85: {
+    json: "[]",
+  },
+  jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85: {
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+  },
+  add1Mutation: {
+    clientMutationId: null,
+    integer: 3,
+  },
+  add2Mutation: {
+    clientMutationId: "hello",
+    integer: 4,
+  },
+  add3Mutation: {
+    clientMutationId: "world",
+    integer: null,
+  },
+  add4Mutation: {
+    integer: 4,
+  },
+  add4MutationError: null,
+  mult1: {
+    integer: 0,
+  },
+  mult2: {
+    integer: 1,
+  },
+  mult3: {
+    integer: 2,
+  },
+  mult4: {
+    integer: 10,
+  },
+  typesMutation: {
+    boolean: false,
+  },
+  compoundTypeMutation: {
+    compoundType: {
+      a: 420,
+      b: "easy cheesy baked potatoes",
+      c: "RED",
+      d: null,
+      e: "FOO_BAR",
+      f: "_EMPTY_",
+      g: {
+        seconds: 0,
+        minutes: 0,
+        hours: 5,
+      },
+      fooBar: 8,
+    },
+  },
+  compoundTypeSetMutation: {
+    compoundTypes: [
+      {
+        a: 419,
+        b: "easy cheesy baked potatoes",
+        c: "RED",
+        d: null,
+        e: "FOO_BAR",
+        f: "_EMPTY_",
+        g: {
+          seconds: 0,
+          minutes: 0,
+          hours: 5,
+        },
+        fooBar: 8,
+      },
+      {
+        a: 420,
+        b: "easy cheesy baked potatoes",
+        c: "RED",
+        d: null,
+        e: "FOO_BAR",
+        f: "_EMPTY_",
+        g: {
+          seconds: 0,
+          minutes: 0,
+          hours: 5,
+        },
+        fooBar: 8,
+      },
+    ],
+  },
+  compoundTypeArrayMutation: {
+    compoundTypes: [
+      {
+        a: 419,
+        b: "easy cheesy baked potatoes",
+        c: "RED",
+        d: null,
+        e: "FOO_BAR",
+        f: "_EMPTY_",
+        g: {
+          seconds: 0,
+          minutes: 0,
+          hours: 5,
+        },
+        fooBar: 8,
+      },
+      null,
+      {
+        a: 420,
+        b: "easy cheesy baked potatoes",
+        c: "RED",
+        d: null,
+        e: "FOO_BAR",
+        f: "_EMPTY_",
+        g: {
+          seconds: 0,
+          minutes: 0,
+          hours: 5,
+        },
+        fooBar: 8,
+      },
+    ],
+  },
+  tableMutation: {
+    post: {
+      nodeId: "WyJwb3N0cyIsNV0=",
+      id: 5,
+      headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      authorId: 5,
+    },
+    personByAuthorId: {
+      id: 5,
+      name: "Joe Tucker",
+    },
+    postEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+      node: {
+        id: 5,
+        headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      },
+    },
+  },
+  tableMutationReturningNull: {
+    post: null,
+    personByAuthorId: null,
+    postEdge: null,
+  },
+  tableSetMutation: {
+    people: [
+      {
+        name: "John Smith",
+      },
+      {
+        name: "Sara Smith",
+      },
+      {
+        name: "Budd Deey",
+      },
+      {
+        name: "Kathryn Ramirez",
+      },
+      {
+        name: "Joe Tucker",
+      },
+      {
+        name: "Twenty Seventwo",
+      },
+    ],
+  },
+  intSetMutation: {
+    integers: [
+      1,
+      2,
+      3,
+      4,
+      5,
+      null,
+      6,
+    ],
+  },
+  noArgsMutation: {
+    clientMutationId: "x",
+    integer: 2,
+  },
+  returnVoidMutation: {
+    __typename: "ReturnVoidMutationPayload",
+  },
+  guidFn: {
+    guid: null,
+  },
+  guidFn2: {
+    guid: "0123456789abcde",
+  },
+  postMany: {
+    posts: [
+      {
+        id: 7,
+        headline: "headline",
+        comptypes: [
+          {
+            schedule: "2009-10-24T04:23:54-04:00",
+            isOptimised: true,
+          },
+        ],
+      },
+      {
+        id: 8,
+        headline: "headline",
+        comptypes: [
+          {
+            schedule: "2009-10-24T04:23:54-04:00",
+            isOptimised: null,
+          },
+        ],
+      },
+      {
+        id: 9,
+        headline: "headline",
+        comptypes: [
+          {
+            schedule: "2009-10-24T04:23:54-04:00",
+            isOptimised: false,
+          },
+        ],
+      },
+    ],
+  },
+  postWithSuffix: {
+    post: {
+      id: 15,
+      headline: "headline_test",
+    },
+  },
+  issue756Mutation: {
+    issue756: null,
+  },
+  issue756SetMutation: {
+    issue756S: [
+      {
+        id: 1,
+        ts: "1999-06-10T20:00:00-04:00",
+      },
+      null,
+      {
+        id: 2,
+        ts: "1999-06-10T20:00:00-04:00",
+      },
+    ],
+  },
+  mutationCompoundTypeArray: {
+    compoundTypes: [
+      {
+        a: 419,
+        b: "easy cheesy baked potatoes",
+        c: "RED",
+        d: null,
+        e: "BAR_FOO",
+        f: "_EMPTY_",
+        g: {
+          seconds: 0,
+          minutes: 0,
+          hours: 5,
+        },
+        fooBar: 8,
+      },
+      null,
+      {
+        a: 420,
+        b: "easy cheesy baked potatoes",
+        c: "RED",
+        d: null,
+        e: "BAR_FOO",
+        f: "_EMPTY_",
+        g: {
+          seconds: 0,
+          minutes: 0,
+          hours: 5,
+        },
+        fooBar: 8,
+      },
+    ],
+  },
+  mutationTextArray: {
+    strings: [
+      "str1",
+      "str2",
+      "str3",
+    ],
+  },
+  mutationIntervalArray: {
+    intervals: [
+      {
+        seconds: 12,
+        minutes: 0,
+        hours: 0,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+      {
+        seconds: 0,
+        minutes: 0,
+        hours: 3,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+      {
+        seconds: 7,
+        minutes: 36,
+        hours: 9,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+    ],
+  },
+  mutationIntervalSet: {
+    intervals: [
+      {
+        seconds: 12,
+        minutes: 0,
+        hours: 0,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+      {
+        seconds: 0,
+        minutes: 0,
+        hours: 3,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+      {
+        seconds: 7,
+        minutes: 36,
+        hours: 9,
+        days: 0,
+        months: 0,
+        years: 0,
+      },
+    ],
+  },
+}

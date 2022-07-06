@@ -1,0 +1,14 @@
+[
+  {
+    message: 'Deliberate error',
+    locations: [
+      {
+        line: 13,
+        column: 3,
+      },
+    ],
+    path: [
+      'add4MutationError',
+    ],
+  },
+]
