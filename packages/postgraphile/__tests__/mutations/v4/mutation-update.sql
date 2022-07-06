@@ -1,839 +1,443 @@
-SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about" = $2::"text" where (__person__."id" = $3::"int4") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-with __local_0__ as (
-  update "c"."person" set "person_full_name" = $1,
-  "about" = $2
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "id" = $3
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "email" = $2::"b"."email" where (__person__."id" = $3::"int4") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  update "c"."person" set "person_full_name" = $1,
-  "email" = $2
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "id" = $3
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id" = $2::"int4") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  update "c"."person" set "about" = $1
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "id" = $2
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id" = $2::"int4") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  update "c"."person" set "about" = NULL
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "id" = $1
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about" = $2::"text" where (__person__."id" = $3::"int4") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  update "c"."person" set "person_full_name" = $1,
-  "about" = $2
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "id" = $3
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "about" = $1::"text" where (__person__."email" = $2::"b"."email") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  update "c"."person" set "about" = $1
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "email" = $2
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
+  __compound_key__."person_id_1"::text as "0",
+  __compound_key__."person_id_2"::text as "1",
+  __compound_key__."extra"::text as "2"
 
-SAVEPOINT graphql_mutation
 
-with __local_0__ as (
-  update "c"."compound_key" set "person_id_1" = $1,
-  "extra" = $2
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
   where (
-    "person_id_1" = $3
+    __person__."id" = __person_identifiers__."id0"
   )
-  and (
-    "person_id_2" = $4
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."compound_key"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(
-        __local_0__."person_id_1",
-        __local_0__."person_id_2"
-      ),
-      'personId1'::text,
-      (__local_0__."person_id_1"),
-      'personId2'::text,
-      (__local_0__."person_id_2"),
-      'extra'::text,
-      (__local_0__."extra"),
-      '@personByPersonId1'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_1__."id"),
-          'name'::text,
-          (__local_1__."person_full_name")
-        ) as object
-        from "c"."person" as __local_1__
-        where (__local_0__."person_id_1" = __local_1__."id") and (TRUE) and (TRUE)
-      ),
-      '@personByPersonId2'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_2__."id"),
-          'name'::text,
-          (__local_2__."person_full_name")
-        ) as object
-        from "c"."person" as __local_2__
-        where (__local_0__."person_id_2" = __local_2__."id") and (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@compoundKey"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
+  __compound_key__."person_id_1"::text as "0",
+  __compound_key__."person_id_2"::text as "1",
+  __compound_key__."extra"::text as "2"
 
-RELEASE SAVEPOINT graphql_mutation
 
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  update "c"."compound_key" set "person_id_1" = $1,
-  "extra" = $2
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
   where (
-    "person_id_1" = $3
+    __person__."id" = __person_identifiers__."id0"
   )
-  and (
-    "person_id_2" = $4
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."compound_key"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(
-        __local_0__."person_id_1",
-        __local_0__."person_id_2"
-      ),
-      'personId1'::text,
-      (__local_0__."person_id_1"),
-      'personId2'::text,
-      (__local_0__."person_id_2"),
-      'extra'::text,
-      (__local_0__."extra"),
-      '@personByPersonId1'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_1__."id"),
-          'name'::text,
-          (__local_1__."person_full_name")
-        ) as object
-        from "c"."person" as __local_1__
-        where (__local_0__."person_id_1" = __local_1__."id") and (TRUE) and (TRUE)
-      ),
-      '@personByPersonId2'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_2__."id"),
-          'name'::text,
-          (__local_2__."person_full_name")
-        ) as object
-        from "c"."person" as __local_2__
-        where (__local_0__."person_id_2" = __local_2__."id") and (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@compoundKey"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
-
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  update "c"."compound_key" set "extra" = $1
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
   where (
-    "person_id_1" = $2
+    __person__."id" = __person_identifiers__."id0"
   )
-  and (
-    "person_id_2" = $3
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."compound_key"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(
-        __local_0__."person_id_1",
-        __local_0__."person_id_2"
-      ),
-      'personId1'::text,
-      (__local_0__."person_id_1"),
-      'personId2'::text,
-      (__local_0__."person_id_2"),
-      'extra'::text,
-      (__local_0__."extra"),
-      '@personByPersonId1'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_1__."id"),
-          'name'::text,
-          (__local_1__."person_full_name")
-        ) as object
-        from "c"."person" as __local_1__
-        where (__local_0__."person_id_1" = __local_1__."id") and (TRUE) and (TRUE)
-      ),
-      '@personByPersonId2'::text,
-      (
-        select json_build_object(
-          'id'::text,
-          (__local_2__."id"),
-          'name'::text,
-          (__local_2__."person_full_name")
-        ) as object
-        from "c"."person" as __local_2__
-        where (__local_0__."person_id_2" = __local_2__."id") and (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@compoundKey"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+update "c"."compound_key" as __compound_key__ set "extra" = $1::"bool" where ((__compound_key__."person_id_1" = $2::"int4") and (__compound_key__."person_id_2" = $3::"int4")) returning
+  __compound_key__."person_id_1"::text as "0",
+  __compound_key__."person_id_2"::text as "1",
+  __compound_key__."extra"::text as "2"
 
-RELEASE SAVEPOINT graphql_mutation
 
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  update "c"."person" set "email" = $1
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
   where (
-    "email" = $2
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'email'::text,
-      (__local_0__."email"),
-      'about'::text,
-      (__local_0__."about"),
-      '@issue27UserExists'::text,
-      (
-        select to_json(__local_1__) as "value"
-        from "c"."person_exists"(
-          __local_0__,
-          $2
-        ) as __local_1__
-        where (TRUE) and (TRUE)
-      )
-    )
-  )
-) as "@person",
-to_json(
-  (
-    json_build_object(
-      '__order_primary_key_asc'::text,
-      json_build_array(
-        'primary_key_asc'::text,
-        json_build_array(__local_0__."id")
-      ),
-      '__identifiers'::text,
-      json_build_array(__local_0__."id"),
-      '@node'::text,
-      (
-        json_build_object(
-          '__identifiers'::text,
-          json_build_array(__local_0__."id"),
-          'id'::text,
-          (__local_0__."id")
-        )
-      )
-    )
-  )
-) as "@personEdge"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
-
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  update "a"."default_value" set "null_value" = NULL
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
   where (
-    "id" = $1
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"a"."default_value"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'nullValue'::text,
-      (__local_0__."null_value")
-    )
-  )
-) as "@defaultValue"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+update "c"."person" as __person__ set "email" = $1::"b"."email" where (__person__."email" = $2::"b"."email") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."about" as "3",
+  __person__::text as "4"
 
-RELEASE SAVEPOINT graphql_mutation
 
-SAVEPOINT graphql_mutation
-
-with __local_0__ as (
-  update "a"."no_primary_key" set "str" = $1
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person_identifiers__.idx as "1"
+  from "c"."person" as __person__
   where (
-    "id" = $2
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
+    __person__."id" = __person_identifiers__."id0"
   )
-)::text
-from __local_0__
+  order by __person__."id" asc
+) as __person_result__
 
-with __local_0__ as (
-  select (
-    str::"a"."no_primary_key"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'str'::text,
-      (__local_0__."str")
-    )
-  )
-) as "@noPrimaryKey"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0",
+    (ids.value->>1)::"b"."email" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_exists"(
+      __person__,
+      __person_identifiers__."id1"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__
 
-RELEASE SAVEPOINT graphql_mutation
+update "a"."default_value" as __default_value__ set "null_value" = $1::"text" where (__default_value__."id" = $2::"int4") returning
+  __default_value__."id"::text as "0",
+  __default_value__."null_value" as "1"
+
+
+update "a"."no_primary_key" as __no_primary_key__ set "str" = $1::"text" where (__no_primary_key__."id" = $2::"int4") returning
+  __no_primary_key__."id"::text as "0",
+  __no_primary_key__."str" as "1"
