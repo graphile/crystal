@@ -1,6 +1,6 @@
 [
   {
-    message: "No values were deleted in collection 'posts' because no values you can delete were found matching these criteria.",
+    message: "No values were deleted in collection 'post' because no values you can delete were found matching these criteria.",
     locations: [
       {
         line: 4,
@@ -24,7 +24,7 @@
     ],
   },
   {
-    message: "No values were deleted in collection 'posts' because no values you can delete were found matching these criteria.",
+    message: "No values were deleted in collection 'post' because no values you can delete were found matching these criteria.",
     locations: [
       {
         line: 9,
