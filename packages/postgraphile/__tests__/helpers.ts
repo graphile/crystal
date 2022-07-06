@@ -117,6 +117,7 @@ beforeAll(() => {
     connectionString,
   });
   testPool.on("connect", (client) => {
+    client.on("error", () => {});
     client.query(`set TimeZone to 'UTC'`);
   });
   testPool.on("error", (e) => {
