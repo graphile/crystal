@@ -90,11 +90,11 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                       _$parent: ExecutableStep<any>,
                       args: FieldArgs,
                     ) {
-                      const $spec = lambda(
+                      const $decoded = lambda(
                         args.get(nodeIdFieldName),
                         specForHandler(handler, codec),
                       );
-                      return handler.get($spec);
+                      return handler.get(handler.getSpec($decoded));
                     },
                   [codec, handler, lambda, nodeIdFieldName, specForHandler],
                 ),
