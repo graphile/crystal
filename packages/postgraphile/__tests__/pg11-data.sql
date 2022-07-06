@@ -1,5 +1,7 @@
 delete from pg11.types cascade;
 delete from pg11.network cascade;
+alter table pg11.always_as_identity alter column id restart with 1;
+alter table pg11.by_default_as_identity alter column id restart with 1;
 
 insert into pg11.network values
   (1, '192.168.0.0', '192.168.0.0/16', '08:00:2b:01:02:03', '08:00:2b:01:02:03:04:05'),
