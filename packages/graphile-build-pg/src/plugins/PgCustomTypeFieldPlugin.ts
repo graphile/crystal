@@ -7,13 +7,17 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
+  PgDeleteStep,
+  PgInsertStep,
   PgSelectArgumentSpec,
   PgSelectStep,
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
   PgTypedExecutableStep,
+  PgUpdateStep,
 } from "@dataplan/pg";
+import { pgSelectSingleFromRecord } from "@dataplan/pg";
 import { pgClassExpression, PgSelectSingleStep, TYPES } from "@dataplan/pg";
 import type {
   __InputObjectStep,
@@ -215,6 +219,16 @@ function defaultProcSourceBehavior(
   }
 
   return behavior.join(" ");
+}
+
+function hasRecord(
+  $row: ExecutableStep,
+): $row is
+  | PgSelectSingleStep<any, any, any, any>
+  | PgInsertStep<any, any, any>
+  | PgUpdateStep<any, any, any>
+  | PgDeleteStep<any, any, any> {
+  return "record" in $row && typeof ($row as any).record === "function";
 }
 
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
@@ -685,13 +699,28 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   )
                 : // Otherwise computed:
                   EXPORTABLE(
-                    (PgSelectSingleStep, makeArgs, pgClassExpression, source) =>
-                      ($row, args, _info) => {
-                        if (!($row instanceof PgSelectSingleStep)) {
+                    (
+                        PgSelectSingleStep,
+                        hasRecord,
+                        makeArgs,
+                        pgClassExpression,
+                        pgSelectSingleFromRecord,
+                        source,
+                      ) =>
+                      ($in, args, _info) => {
+                        if (!hasRecord($in)) {
+                          // TODO: these should be PgInsertSingleStep, etc
                           throw new Error(
-                            `Invalid plan, exepcted 'PgSelectSingleStep', but found ${$row}`,
+                            `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertStep', 'PgUpdateStep' or 'PgDeleteStep', but found ${$in}`,
                           );
                         }
+                        const $row =
+                          $in instanceof PgSelectSingleStep
+                            ? $in
+                            : pgSelectSingleFromRecord(
+                                $in.source,
+                                $in.record(),
+                              );
                         const selectArgs = [
                           { plan: $row.record() },
                           ...makeArgs(args),
@@ -725,7 +754,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         // TODO: or here, if scalar add select to `$row`?
                         return source.execute(selectArgs);
                       },
-                    [PgSelectSingleStep, makeArgs, pgClassExpression, source],
+                    [
+                      PgSelectSingleStep,
+                      hasRecord,
+                      makeArgs,
+                      pgClassExpression,
+                      pgSelectSingleFromRecord,
+                      source,
+                    ],
                   );
 
               if (isRootMutation) {
