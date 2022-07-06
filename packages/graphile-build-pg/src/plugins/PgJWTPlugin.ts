@@ -1,13 +1,13 @@
 import "graphile-config";
 
 import type { PgSelectSingleStep, PgTypeCodec } from "@dataplan/pg";
+import { object } from "dataplanner";
 // import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { object } from "dataplanner";
 
 declare global {
   namespace GraphileBuild {
@@ -136,8 +136,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
               graphile: {
                 // TODO: optimized version of this
                 plan: EXPORTABLE(
-                  (columnNames, object) =>
-                    function plan($in) {
+                  () => function plan($in) {
                       const $record = $in as PgSelectSingleStep<
                         any,
                         any,
@@ -146,7 +145,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                       >;
                       return $record.record();
                     },
-                  [columnNames, object],
+                  [],
                 ),
               },
             },
