@@ -29,7 +29,11 @@ delete from a.post cascade;
 delete from a.no_primary_key cascade;
 delete from a.foreign_key cascade;
 delete from a.default_value cascade;
+delete from inheritence.user_file cascade;
+delete from inheritence.file cascade;
 alter table b.types enable trigger user;
+
+alter sequence inheritence.file_id_seq restart with 1;
 
 insert into a.no_primary_key (id, str) values
   (1, 'one'),
