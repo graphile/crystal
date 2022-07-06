@@ -954,9 +954,9 @@ export class OpPlan<
     } catch (e) {
       // TODO: raise this somewhere critical
       console.error(
-        `Error occurred during query planning (at '${this.loc.join(
-          "' > '",
-        )}'): \n${e.stack || e}`,
+        `Error occurred during query planning (at ${this.loc.join(" > ")}): \n${
+          e.stack || e
+        }`,
       );
       if (debugPlanVerboseEnabled) {
         this.logPlansByPath();
@@ -1365,7 +1365,7 @@ export class OpPlan<
    * Implements the `PlanOpPlanQuery` algorithm.
    */
   private planQuery(): void {
-    this.loc = ["planQuery"];
+    this.loc.push("planQuery()");
     const rootType = this.schema.getQueryType();
     if (!rootType) {
       throw new Error("No query type found in schema");
@@ -1385,13 +1385,14 @@ export class OpPlan<
       this.rootTreeNode,
     );
     this.setRootFieldDigest(this.queryType, fieldDigests);
+    this.loc.pop();
   }
 
   /**
    * Implements the `PlanOpPlanMutation` algorithm.
    */
   private planMutation(): void {
-    this.loc = ["planMutation"];
+    this.loc.push("planMutation()");
     const rootType = this.schema.getMutationType();
     if (!rootType) {
       throw new Error("No mutation type found in schema");
@@ -1412,13 +1413,14 @@ export class OpPlan<
       true,
     );
     this.setRootFieldDigest(this.mutationType!, fieldDigests);
+    this.loc.pop();
   }
 
   /**
    * Implements the `PlanOpPlanSubscription` algorithm.
    */
   private planSubscription(): void {
-    this.loc = ["planSubscription"];
+    this.loc.push("planSubscription");
     const rootType = this.schema.getSubscriptionType();
     if (!rootType) {
       throw new Error("No subscription type found in schema");
@@ -1525,6 +1527,7 @@ export class OpPlan<
       );
       this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     }
+    this.loc.pop();
   }
 
   /**
