@@ -34,3 +34,4 @@ on (
     __foreign_key__."compound_key_2"::"int4" = __compound_key__."person_id_2"
   )
 )
+order by __foreign_key__."person_id" asc, __foreign_key__."compound_key_1" desc, __foreign_key__."compound_key_2" asc

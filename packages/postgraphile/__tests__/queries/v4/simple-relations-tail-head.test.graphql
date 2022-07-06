@@ -2,7 +2,7 @@
 #> schema: ["a", "b", "c"]
 #> subscriptions: true
 #> simpleCollections: "both"
-query{
+query {
   allCompoundKeysList {
     personId1
     personId2
@@ -16,7 +16,9 @@ query{
       email
     }
   }
-  allForeignKeysList {
+  allForeignKeysList(
+    orderBy: [PERSON_ID_ASC, COMPOUND_KEY_1_DESC, COMPOUND_KEY_2_ASC]
+  ) {
     personId
     compoundKey1
     compoundKey2
