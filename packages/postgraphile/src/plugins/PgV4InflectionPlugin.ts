@@ -62,6 +62,11 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
       edgeField(previous, options, typeName) {
         return this.camelCase(`${typeName}-edge`);
       },
+      deletedNodeId(previous, options, { source }) {
+        return this.camelCase(
+          `deleted-${this._singularizedSourceName(source)}-id`,
+        );
+      },
     },
   },
 };
