@@ -117,6 +117,7 @@ export {
   sqlFromArgDigests,
 } from "./steps/pgSelect.js";
 export {
+  pgSelectFromRecord,
   pgSelectSingleFromRecord,
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,

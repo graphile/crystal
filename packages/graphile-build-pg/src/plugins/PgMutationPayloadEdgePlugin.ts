@@ -4,7 +4,7 @@ import "graphile-config";
 import {
   PgClassSingleStep,
   PgDeleteStep,
-  pgSelectSingleFromRecord,
+  pgSelectFromRecord,
   PgSourceUnique,
 } from "@dataplan/pg";
 import type { ObjectStep } from "dataplanner";
@@ -193,10 +193,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
                       const $select = (() => {
                         if ($result instanceof PgDeleteStep) {
-                          return pgSelectSingleFromRecord(
+                          return pgSelectFromRecord(
                             $result.source,
                             $result.record(),
-                          ).getClassStep();
+                          );
                         } else {
                           const spec = pkColumns.reduce((memo, columnName) => {
                             memo[columnName] = $result.get(columnName);

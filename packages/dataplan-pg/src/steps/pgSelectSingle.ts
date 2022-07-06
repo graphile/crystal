@@ -581,6 +581,39 @@ export class PgSelectSingleStep<
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
+export function pgSelectFromRecord<
+  TColumns extends PgTypeColumns,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgTypeColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends PgSourceParameter[] | undefined = undefined,
+>(
+  source: PgSource<TColumns, TUniques, TRelations, TParameters>,
+  record: PgClassExpressionStep<
+    TColumns,
+    PgTypeCodec<TColumns, any, any>,
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >,
+): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+  return new PgSelectStep<TColumns, TUniques, TRelations, TParameters>({
+    source,
+    identifiers: [],
+    from: (record) => sql`(select (${record.placeholder}).*)`,
+    args: [{ plan: record, pgCodec: source.codec }],
+    joinAsLateral: true,
+  }) as PgSelectStep<TColumns, TUniques, TRelations, TParameters>;
+}
+
+/**
+ * Given a plan that represents a single record (via
+ * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
+ */
 export function pgSelectSingleFromRecord<
   TColumns extends PgTypeColumns,
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
@@ -602,19 +635,20 @@ export function pgSelectSingleFromRecord<
   >,
 ): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters> {
   // TODO: we should be able to optimise this so that `plan.record()` returns the original record again.
-  return new PgSelectStep<TColumns, TUniques, TRelations, TParameters>({
-    source,
-    identifiers: [],
-    from: (record) => sql`(select (${record.placeholder}).*)`,
-    args: [{ plan: record, pgCodec: source.codec }],
-    joinAsLateral: true,
-  }).single() as PgSelectSingleStep<
+  return pgSelectFromRecord(source, record).single() as PgSelectSingleStep<
     TColumns,
     TUniques,
     TRelations,
     TParameters
   >;
 }
+
+Object.defineProperty(pgSelectFromRecord, "$$export", {
+  value: {
+    moduleName: "@dataplan/pg",
+    exportName: "pgSelectFromRecord",
+  },
+});
 
 Object.defineProperty(pgSelectSingleFromRecord, "$$export", {
   value: {
