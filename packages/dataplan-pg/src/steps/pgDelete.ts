@@ -269,7 +269,16 @@ export class PgDeleteStep<
         text,
         values: sqlValues,
       });
-      return rows[0] ?? (rowCount === 0 ? null : {});
+      return (
+        rows[0] ??
+        (rowCount === 0
+          ? Promise.reject(
+              new Error(
+                `No values were deleted in collection '${this.source.name}' because no values you can delete were found matching these criteria.`,
+              ),
+            )
+          : {})
+      );
     });
   }
 
