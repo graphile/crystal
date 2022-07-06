@@ -27,7 +27,7 @@ import type {
 import type { ModifierStep } from "./step.js";
 import { assertExecutableStep, ExecutableStep } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
-import { constant } from "./steps/constant.js";
+import { constant, ConstantStep } from "./steps/constant.js";
 import { list } from "./steps/list.js";
 import { object } from "./steps/object.js";
 
@@ -395,7 +395,11 @@ function withFieldArgsForArgumentsOrInputObject<
     | ModifierStep;
 
   // Now handled all the remaining coordinates
-  if (!analyzedCoordinates.includes("")) {
+  if (
+    !analyzedCoordinates.includes("") &&
+    plan != null &&
+    !(plan instanceof ConstantStep && plan.isNull())
+  ) {
     if (!fields) {
       fieldArgs.apply(plan);
     } else {
