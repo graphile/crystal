@@ -1,0 +1,38 @@
+[
+  {
+    message: "No values were deleted in collection 'posts' because no values you can delete were found matching these criteria.",
+    locations: [
+      {
+        line: 4,
+        column: 3,
+      },
+    ],
+    path: [
+      'c',
+    ],
+  },
+  {
+    message: 'Nope.',
+    locations: [
+      {
+        line: 6,
+        column: 3,
+      },
+    ],
+    path: [
+      'd2',
+    ],
+  },
+  {
+    message: "No values were deleted in collection 'posts' because no values you can delete were found matching these criteria.",
+    locations: [
+      {
+        line: 9,
+        column: 3,
+      },
+    ],
+    path: [
+      'g',
+    ],
+  },
+]

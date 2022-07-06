@@ -1,0 +1,160 @@
+{
+  a: {
+    clientMutationId: null,
+    deletedPostId: "WyJwb3N0cyIsMV0=",
+    post: {
+      nodeId: "WyJwb3N0cyIsMV0=",
+      id: 1,
+      headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+      authorId: 2,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  b: {
+    clientMutationId: "hello",
+    deletedPostId: "WyJwb3N0cyIsMl0=",
+    post: {
+      nodeId: "WyJwb3N0cyIsMl0=",
+      id: 2,
+      headline: "I hate yogurt. It’s just stuff with bits in.",
+      authorId: 1,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  c: null,
+  d: {
+    clientMutationId: "world",
+    deletedPostId: "WyJwb3N0cyIsM10=",
+    post: {
+      nodeId: "WyJwb3N0cyIsM10=",
+      id: 3,
+      headline: "Is that a cooking show?",
+      authorId: 1,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  d2: null,
+  e: {
+    clientMutationId: null,
+    deletedPostId: "WyJwb3N0cyIsNl0=",
+    post: {
+      nodeId: "WyJwb3N0cyIsNl0=",
+      id: 6,
+      headline: "Stop talking, brain thinking. Hush.",
+      authorId: 3,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  f: {
+    clientMutationId: "hello",
+    deletedPostId: "WyJwb3N0cyIsOV0=",
+    post: {
+      nodeId: "WyJwb3N0cyIsOV0=",
+      id: 9,
+      headline: "You know how I sometimes have really brilliant ideas?",
+      authorId: 3,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  g: null,
+  h: {
+    clientMutationId: "world",
+    deletedPostId: "WyJwb3N0cyIsMTFd",
+    post: {
+      nodeId: "WyJwb3N0cyIsMTFd",
+      id: 11,
+      headline: "They’re not aliens, they’re Earth…liens!",
+      authorId: 3,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  i: {
+    clientMutationId: null,
+    deletedCompoundKeyId: "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+    compoundKey: {
+      nodeId: "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+      personId1: 4,
+      personId2: 3,
+      personByPersonId1: {
+        nodeId: "WyJwZW9wbGUiLDRd",
+        name: "Kathryn Ramirez",
+      },
+      personByPersonId2: {
+        nodeId: "WyJwZW9wbGUiLDNd",
+        name: "Budd Deey",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  j: {
+    clientMutationId: null,
+    deletedCompoundKeyId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+    compoundKey: {
+      nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      personId1: 2,
+      personId2: 3,
+      personByPersonId1: {
+        nodeId: "WyJwZW9wbGUiLDJd",
+        name: "Sara Smith",
+      },
+      personByPersonId2: {
+        nodeId: "WyJwZW9wbGUiLDNd",
+        name: "Budd Deey",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  k: {
+    clientMutationId: null,
+    deletedPersonId: "WyJwZW9wbGUiLDNd",
+    query: {
+      nodeId: "query",
+    },
+  },
+  l: {
+    clientMutationId: null,
+    deletedPersonId: "WyJwZW9wbGUiLDZd",
+    person: {
+      nodeId: "WyJwZW9wbGUiLDZd",
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "graphile-build.issue.27.exists@example.com",
+      issue27UserExists: false,
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  m: {
+    clientMutationId: null,
+    deletedPersonId: "WyJwZW9wbGUiLDFd",
+    personEdge: {
+      cursor: "WyJmaXJzdF9uYW1lX2FzYyIsWyJKb2huIiwxXV0=",
+      node: {
+        firstName: "John",
+        id: 1,
+        nodeId: "WyJwZW9wbGUiLDFd",
+        email: "john.smith@email.com",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+}

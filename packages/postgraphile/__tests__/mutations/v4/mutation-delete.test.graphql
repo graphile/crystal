@@ -1,0 +1,84 @@
+## expect(errors).toHaveLength(3);
+#> schema: ["a", "b", "c"]
+mutation {
+  a: deletePost(input: { nodeId: "WyJwb3N0cyIsMV0=" }) { ...deletePostPayload }
+  b: deletePost(input: { nodeId: "WyJwb3N0cyIsMl0=", clientMutationId: "hello" }) { ...deletePostPayload }
+  c: deletePost(input: { nodeId: "WyJwb3N0cyIsMjAwMF0=" }) { ...deletePostPayload }
+  d: deletePost(input: { nodeId: "WyJwb3N0cyIsM10=", clientMutationId: "world" }) { ...deletePostPayload }
+  d2: deleteTypeById(input: { id: 11, clientMutationId: "throw error" }) { clientMutationId deletedTypeId }
+  e: deletePostById(input: { id: 6 }) { ...deletePostPayload }
+  f: deletePostById(input: { id: 9, clientMutationId: "hello" }) { ...deletePostPayload }
+  g: deletePostById(input: { id: 2000 }) { ...deletePostPayload }
+  h: deletePostById(input: { id: 11, clientMutationId: "world" }) { ...deletePostPayload }
+  i: deleteCompoundKey(input: { nodeId: "WyJjb21wb3VuZF9rZXlzIiw0LDNd" }) { ...deleteCompoundKeyPayload }
+  j: deleteCompoundKeyByPersonId1AndPersonId2(input: { personId1: 2, personId2:3 }) { ...deleteCompoundKeyPayload }
+	k: deletePersonByEmail(input: { email: "budd.deey@email.com" }) { ...deletePersonPayload }
+	l: deletePersonByEmail(input: { email: "graphile-build.issue.27.exists@example.com" }) { ...deletePersonPayload2 }
+  m: deletePersonById(input: { id: 1 }) { ...deletePersonPayloadWithEdge }
+}
+
+fragment deletePostPayload on DeletePostPayload {
+  clientMutationId
+  deletedPostId
+  post {
+    nodeId
+    id
+    headline
+    authorId
+  }
+  query { nodeId }
+}
+
+fragment deleteCompoundKeyPayload on DeleteCompoundKeyPayload {
+  clientMutationId
+  deletedCompoundKeyId
+  compoundKey {
+    nodeId
+    personId1
+    personId2
+    personByPersonId1 {
+      nodeId
+      name
+    }
+    personByPersonId2 {
+      nodeId
+      name
+    }
+  }
+  query { nodeId }
+}
+
+fragment deletePersonPayload on DeletePersonPayload {
+  clientMutationId
+  deletedPersonId
+  query { nodeId }
+}
+fragment deletePersonPayload2 on DeletePersonPayload {
+  clientMutationId
+  deletedPersonId
+  person {
+    nodeId
+    id
+    name
+    email
+    issue27UserExists: exists(email: "graphile-build.issue.27.exists@example.com")
+  }
+  query { nodeId }
+}
+
+fragment deletePersonPayloadWithEdge on DeletePersonPayload {
+  clientMutationId
+  deletedPersonId
+  personEdge(orderBy: FIRST_NAME_ASC) {
+    cursor
+    node {
+      firstName
+      id
+      nodeId
+      email
+    }
+  }
+  query {
+    nodeId
+  }
+}
