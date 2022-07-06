@@ -1,0 +1,185 @@
+{
+  mutationInInout: {
+    ino: 15,
+  },
+  mutationInOut: {
+    o: 52,
+  },
+  mutationOut: {
+    o: 42,
+  },
+  mutationOutComplex: {
+    result: {
+      x: 2,
+      y: {
+        a: 1,
+        b: "2",
+        c: "BLUE",
+      },
+      z: {
+        nodeId: "WyJwZW9wbGUiLDFd",
+        id: 1,
+        name: "John Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              nodeId: "WyJwb3N0cyIsMl0=",
+              id: 2,
+            },
+            {
+              nodeId: "WyJwb3N0cyIsM10=",
+              id: 3,
+            },
+            {
+              nodeId: "WyJwb3N0cyIsNF0=",
+              id: 4,
+            },
+            {
+              nodeId: "WyJwb3N0cyIsN10=",
+              id: 7,
+            },
+          ],
+        },
+      },
+    },
+  },
+  mutationOutComplexSetof: {
+    results: [
+      {
+        x: 2,
+        y: {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+        },
+        z: {
+          nodeId: "WyJwZW9wbGUiLDFd",
+          id: 1,
+          name: "John Smith",
+          postsByAuthorId: {
+            nodes: [
+              {
+                nodeId: "WyJwb3N0cyIsMl0=",
+                id: 2,
+              },
+              {
+                nodeId: "WyJwb3N0cyIsM10=",
+                id: 3,
+              },
+              {
+                nodeId: "WyJwb3N0cyIsNF0=",
+                id: 4,
+              },
+              {
+                nodeId: "WyJwb3N0cyIsN10=",
+                id: 7,
+              },
+            ],
+          },
+        },
+      },
+    ],
+  },
+  mutationOutOut: {
+    result: {
+      firstOut: 42,
+      secondOut: "out",
+    },
+  },
+  mutationOutOutCompoundType: {
+    result: {
+      o1: 20,
+      o2: {
+        a: 1,
+        b: "2",
+        c: "BLUE",
+      },
+    },
+  },
+  mutationOutOutSetof: {
+    results: [
+      {
+        o1: 42,
+        o2: "out",
+      },
+      {
+        o1: 43,
+        o2: "out2",
+      },
+    ],
+  },
+  mutationOutOutUnnamed: {
+    result: {
+      arg1: 42,
+      arg2: "out",
+    },
+  },
+  mutationOutSetof: {
+    os: [
+      42,
+      43,
+    ],
+  },
+  mutationOutTable: {
+    person: {
+      nodeId: "WyJwZW9wbGUiLDFd",
+      id: 1,
+    },
+  },
+  mutationOutTableSetof: {
+    people: [
+      {
+        nodeId: "WyJwZW9wbGUiLDFd",
+        id: 1,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDJd",
+        id: 2,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDNd",
+        id: 3,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDRd",
+        id: 4,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDVd",
+        id: 5,
+      },
+      {
+        nodeId: "WyJwZW9wbGUiLDZd",
+        id: 6,
+      },
+    ],
+  },
+  mutationOutUnnamed: {
+    integer: 42,
+  },
+  mutationOutUnnamedOutOutUnnamed: {
+    result: {
+      arg1: 42,
+      arg3: 3,
+      o2: "out2",
+    },
+  },
+  mutationReturnsTableMultiCol: {
+    results: [
+      {
+        col1: 62,
+        col2: "out",
+      },
+      {
+        col1: 63,
+        col2: "out2",
+      },
+    ],
+  },
+  mutationReturnsTableOneCol: {
+    col1S: [
+      62,
+      63,
+    ],
+  },
+}
