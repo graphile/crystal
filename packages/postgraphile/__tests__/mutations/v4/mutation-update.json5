@@ -1,0 +1,221 @@
+{
+  a: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDFd",
+      id: 1,
+      name: "John Smith Sr.",
+      email: "john.smith@email.com",
+      about: "An older John Smith",
+      issue27UserExists: true,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDFd",
+        id: 1,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  b: {
+    clientMutationId: "hello",
+    person: {
+      nodeId: "WyJwZW9wbGUiLDJd",
+      id: 2,
+      name: "Sarah Smith",
+      email: "sarah.smith@email.com",
+      about: null,
+      issue27UserExists: true,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDJd",
+        id: 2,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  c: {
+    clientMutationId: "world",
+    person: {
+      nodeId: "WyJwZW9wbGUiLDJd",
+      id: 2,
+      name: "Sarah Smith",
+      email: "sarah.smith@email.com",
+      about: "Now with an “H.”",
+      issue27UserExists: true,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDJd",
+        id: 2,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  i: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDJd",
+      id: 2,
+      name: "Sarah Smith",
+      email: "sarah.smith@email.com",
+      about: null,
+      issue27UserExists: true,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDJd",
+        id: 2,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  d: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDNd",
+      id: 3,
+      name: "Best Pal",
+      email: "budd.deey@email.com",
+      about: "I have taken over Budd’s account. Hehehe.",
+      issue27UserExists: true,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDNd",
+        id: 3,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  e: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDRd",
+      id: 4,
+      name: "Kathryn Ramirez",
+      email: "kathryn.ramirez@email.com",
+      about: "Make art not friends.",
+      issue27UserExists: true,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDRd",
+        id: 4,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  f: {
+    clientMutationId: null,
+    compoundKey: {
+      nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDJd",
+      personId1: 2,
+      personId2: 2,
+      extra: true,
+      personByPersonId1: {
+        id: 2,
+        name: "Sarah Smith",
+      },
+      personByPersonId2: {
+        id: 2,
+        name: "Sarah Smith",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  g: {
+    clientMutationId: "hello",
+    compoundKey: {
+      nodeId: "WyJjb21wb3VuZF9rZXlzIiwzLDJd",
+      personId1: 3,
+      personId2: 2,
+      extra: false,
+      personByPersonId1: {
+        id: 3,
+        name: "Best Pal",
+      },
+      personByPersonId2: {
+        id: 2,
+        name: "Sarah Smith",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  h: {
+    clientMutationId: "world",
+    compoundKey: {
+      nodeId: "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+      personId1: 4,
+      personId2: 3,
+      extra: false,
+      personByPersonId1: {
+        id: 4,
+        name: "Kathryn Ramirez",
+      },
+      personByPersonId2: {
+        id: 3,
+        name: "Best Pal",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  j: {
+    clientMutationId: null,
+    person: {
+      nodeId: "WyJwZW9wbGUiLDZd",
+      id: 6,
+      name: "Twenty Seventwo",
+      email: "somethingelse@example.com",
+      about: null,
+      issue27UserExists: false,
+    },
+    personEdge: {
+      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDZd",
+        id: 6,
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+  k: {
+    defaultValue: {
+      id: 1,
+      nullValue: null,
+    },
+  },
+  l: {
+    noPrimaryKey: {
+      id: 1,
+      str: "New String",
+    },
+  },
+}

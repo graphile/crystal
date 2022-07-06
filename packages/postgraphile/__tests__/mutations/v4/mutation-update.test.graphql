@@ -1,0 +1,136 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+mutation {
+  a: updatePerson(input: {
+    nodeId: "WyJwZW9wbGUiLDFd",
+    personPatch: {
+      name: "John Smith Sr."
+      about: "An older John Smith"
+    }
+  }) { ...updatePersonPayload }
+  b: updatePerson(input: {
+    clientMutationId: "hello"
+    nodeId: "WyJwZW9wbGUiLDJd",
+    personPatch: {
+      name: "Sarah Smith"
+      email: "sarah.smith@email.com"
+    }
+  }) { ...updatePersonPayload }
+  c: updatePerson(input: {
+    clientMutationId: "world"
+    nodeId: "WyJwZW9wbGUiLDJd"
+    personPatch: {
+      about: "Now with an “H.”"
+    }
+  }) { ...updatePersonPayload }
+  i: updatePerson(input: {
+    nodeId: "WyJwZW9wbGUiLDJd"
+    personPatch: {
+      about: null
+    }
+  }) { ...updatePersonPayload }
+  d: updatePersonById(input: {
+    id: 3
+    personPatch: {
+      name: "Best Pal"
+      about: "I have taken over Budd’s account. Hehehe."
+    }
+  }) { ...updatePersonPayload }
+  e: updatePersonByEmail(input: {
+    email: "kathryn.ramirez@email.com"
+    personPatch: {
+      about: "Make art not friends."
+    }
+  }) { ...updatePersonPayload }
+  f: updateCompoundKey(input: {
+    nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd"
+    compoundKeyPatch: {
+      personId1: 2
+      extra: true
+    }
+  }) { ...updateCompoundKeyPayload }
+  g: updateCompoundKeyByPersonId1AndPersonId2(input: {
+    clientMutationId: "hello"
+    personId1: 2
+    personId2: 2
+    compoundKeyPatch: {
+      personId1: 3
+      extra: false
+    }
+  }) { ...updateCompoundKeyPayload }
+  h: updateCompoundKeyByPersonId1AndPersonId2(input: {
+    clientMutationId: "world"
+    personId1: 4
+    personId2: 3
+    compoundKeyPatch: {
+      extra: false
+    }
+  }) { ...updateCompoundKeyPayload }
+  j: updatePersonByEmail(input: {
+    email: "graphile-build.issue.27.exists@example.com"
+    personPatch: {
+      email: "somethingelse@example.com"
+    }
+  }) { ...updatePersonPayload }
+  k: updateDefaultValueById(input: {
+    id: 1
+    defaultValuePatch: {
+      nullValue: null
+    }
+  }) {
+    defaultValue {
+      id
+      nullValue
+    }
+  }
+  l: updateNoPrimaryKeyById(input: {
+    id: 1
+    noPrimaryKeyPatch: {
+      str: "New String"
+    }
+  }) {
+    noPrimaryKey {
+      id
+      str
+    }
+  }
+}
+
+fragment updatePersonPayload on UpdatePersonPayload {
+  clientMutationId
+  person {
+    nodeId
+    id
+    name
+    email
+    about
+    issue27UserExists: exists(email: "graphile-build.issue.27.exists@example.com")
+  }
+  personEdge {
+    cursor
+    node {
+      nodeId
+      id
+    }
+  }
+  query { nodeId }
+}
+
+fragment updateCompoundKeyPayload on UpdateCompoundKeyPayload {
+  clientMutationId
+  compoundKey {
+    nodeId
+    personId1
+    personId2
+    extra
+    personByPersonId1 {
+      id
+      name
+    }
+    personByPersonId2 {
+      id
+      name
+    }
+  }
+  query { nodeId }
+}
