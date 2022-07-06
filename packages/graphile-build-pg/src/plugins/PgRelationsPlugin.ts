@@ -395,9 +395,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         } = build;
         const {
           Self,
-          scope: { isPgTableType, pgCodec: codec, isMutationPayload },
+          scope: { isPgTableType, pgCodec, pgTypeSource, isMutationPayload },
           fieldWithHooks,
         } = context;
+        const codec = pgTypeSource?.codec ?? pgCodec;
         if (!(isPgTableType || isMutationPayload) || !codec) {
           return fields;
         }
