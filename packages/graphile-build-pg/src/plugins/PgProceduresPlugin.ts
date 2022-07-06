@@ -188,14 +188,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
            * If there's two or more OUT or inout arguments INOUT, or any TABLE
            * arguments then we'll need to generate a codec for the payload.
            */
-          const hasTableArg =
-            pgProc.proargmodes?.some((m) => m === "t") ?? false;
-          const outOrInoutArgs =
-            pgProc.proargmodes?.filter((m) => m === "o" || m === "b") ?? [];
+          const outOrInoutOrTableArgModes =
+            pgProc.proargmodes?.filter(
+              (m) => m === "o" || m === "b" || m === "t",
+            ) ?? [];
           const isRecordReturnType =
             pgProc.prorettype === "2249"; /* OID of the 'record' type */
           const needsPayloadCodecToBeGenerated =
-            (hasTableArg && isRecordReturnType) || outOrInoutArgs.length > 1;
+            outOrInoutOrTableArgModes.length > 1;
 
           const debugProcName = `${namespace.nspname}.${pgProc.proname}`;
 
@@ -396,12 +396,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const extensions: PgSourceExtensions = { tags, description };
 
-          if (outOrInoutArgs.length === 1) {
+          if (outOrInoutOrTableArgModes.length === 1) {
             const outOrInoutArg = (() => {
               for (let i = 0, l = numberOfArguments; i < l; i++) {
                 const trueArgName = pgProc.proargnames?.[i];
                 const argMode = pgProc.proargmodes?.[i] ?? "i";
-                if (argMode === "b" || argMode === "o") {
+                if (argMode === "b" || argMode === "o" || argMode === "t") {
                   return trueArgName;
                 }
               }
