@@ -1,7 +1,12 @@
 import "graphile-build";
 import "graphile-config";
 
-import type { PgClassSingleStep, PgSourceUnique } from "@dataplan/pg";
+import {
+  PgClassSingleStep,
+  PgDeleteStep,
+  pgSelectSingleFromRecord,
+  PgSourceUnique,
+} from "@dataplan/pg";
 import type { ObjectStep } from "dataplanner";
 import { connection, constant, EdgeStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -186,11 +191,20 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                         return constant(null);
                       }
 
-                      const spec = pkColumns.reduce((memo, columnName) => {
-                        memo[columnName] = $result.get(columnName);
-                        return memo;
-                      }, {});
-                      const $select = source.find(spec);
+                      const $select = (() => {
+                        if ($result instanceof PgDeleteStep) {
+                          return pgSelectSingleFromRecord(
+                            $result.source,
+                            $result.record(),
+                          ).getClassStep();
+                        } else {
+                          const spec = pkColumns.reduce((memo, columnName) => {
+                            memo[columnName] = $result.get(columnName);
+                            return memo;
+                          }, {});
+                          return source.find(spec);
+                        }
+                      })();
 
                       // Perform ordering
                       const $value = args.getRaw("orderBy");
