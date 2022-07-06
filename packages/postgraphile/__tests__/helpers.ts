@@ -59,6 +59,16 @@ import { makeV4Preset } from "../src/presets/v4.js";
  */
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
+async function getServerVersionNum(pgClient: Pool | PoolClient) {
+  const versionResult = await pgClient.query("show server_version_num;");
+  return parseInt(versionResult.rows[0].server_version_num, 10);
+}
+
+const kitchenSinkData = () =>
+  fsp.readFile(`${__dirname}/kitchen-sink-data.sql`, "utf8");
+
+const pg11Data = () => fsp.readFile(`${__dirname}/pg11-data.sql`, "utf8");
+
 const SHARED_JWT_SECRET =
   "This is static for the tests, use a better one if you set one!";
 
@@ -405,6 +415,17 @@ export async function runTestQuery(
 
   if (path.includes("/v4")) {
     applyV4Stuff(preset, config);
+  }
+
+  if (!testPool) {
+    throw new Error("No pool!");
+  }
+
+  // Load test data
+  await testPool.query(await kitchenSinkData());
+  const serverVersionNum = await getServerVersionNum(testPool);
+  if (serverVersionNum >= 110000) {
+    await testPool.query(await pg11Data());
   }
 
   const { schema, config: _config, contextCallback } = await makeSchema(preset);
