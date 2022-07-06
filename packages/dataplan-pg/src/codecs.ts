@@ -156,8 +156,12 @@ function t<TFromJavaScript = any, TFromPostgres = string>(
   };
 }
 
+/**
+ * | To put a double quote or backslash in a quoted composite field value,
+ * | precede it with a backslash.
+ */
 function pgWrapQuotesInCompositeValue(str: string): string {
-  return `"${str.replace(/"/g, '""')}"`;
+  return `"${str.replace(/["\\]/g, "\\$&")}"`;
 }
 
 function toRecordString(val: SQLRawValue): string {
@@ -170,9 +174,22 @@ function toRecordString(val: SQLRawValue): string {
   } else if (Array.isArray(val)) {
     const parts = val.map((v) => toListString(v));
     return `{${parts.join(",")}}`;
-  } else if (/[(),]/.test(val) || val.length === 0) {
-    // > You can put double quotes around any field value, and must do so if
-    // > it contains commas or parentheses.
+  } else if (/[(),"\\]/.test(val) || val.length === 0) {
+    /*
+     * The Postgres manual states:
+     *
+     * > You can put double quotes around any field value, and must do so if
+     * > it contains commas or parentheses.
+     *
+     * Also:
+     *
+     * > In particular, fields containing parentheses, commas, double quotes,
+     * > or backslashes must be double-quoted. [...] Alternatively, you can
+     * > avoid quoting and use backslash-escaping to protect all data
+     * > characters that would otherwise be taken as composite syntax.
+     *
+     * We're going to go with double quoting.
+     */
     return pgWrapQuotesInCompositeValue(val);
   } else {
     return String(val);
