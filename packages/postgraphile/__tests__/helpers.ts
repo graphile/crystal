@@ -118,7 +118,7 @@ beforeAll(() => {
   });
   testPool.on("connect", (client) => {
     client.on("error", () => {});
-    client.query(`set TimeZone to 'UTC'`);
+    client.query(`set TimeZone to 'UTC'`).catch(() => {});
   });
   testPool.on("error", (e) => {
     console.error("Pool error:", e);
@@ -254,7 +254,7 @@ function clientForSettings(
 
   clientAndReleasePromise = (async () => {
     const poolClient = await testPool.connect();
-    poolClient.query("begin");
+    await poolClient.query("begin");
 
     // Set the claims
     const setCalls: string[] = [];
@@ -274,7 +274,7 @@ function clientForSettings(
     const pendingQueries = new Set<Promise<any>>();
     function q<T>(promise: Promise<T>): Promise<T> {
       pendingQueries.add(promise);
-      promise.finally(() => pendingQueries.delete(promise));
+      promise.finally(() => pendingQueries.delete(promise)).catch(() => {});
       return promise;
     }
     const clientAndRelease: ClientAndRelease = {
