@@ -766,7 +766,7 @@ export const TYPES = {
   ),
   timetz: t<string>(
     "timetz",
-    viaDateFormat("HH24:MI:SS.US", sql`date '1970-01-01' + `),
+    viaDateFormat("HH24:MI:SS.USTZHTZM", sql`date '1970-01-01' + `),
   ),
   inet: t<string>("inet", stripSubnet32),
   regproc: t<string>("regproc"),
