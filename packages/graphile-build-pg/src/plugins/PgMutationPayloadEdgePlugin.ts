@@ -1,12 +1,8 @@
 import "graphile-build";
 import "graphile-config";
 
-import {
-  PgClassSingleStep,
-  PgDeleteStep,
-  pgSelectFromRecord,
-  PgSourceUnique,
-} from "@dataplan/pg";
+import type { PgClassSingleStep, PgSourceUnique } from "@dataplan/pg";
+import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { ObjectStep } from "dataplanner";
 import { connection, constant, EdgeStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -172,9 +168,11 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (
                     EdgeStep,
+                    PgDeleteStep,
                     applyOrderToPlan,
                     connection,
                     constant,
+                    pgSelectFromRecord,
                     pkColumns,
                     source,
                     tableOrderByTypeName,
@@ -222,9 +220,11 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     },
                   [
                     EdgeStep,
+                    PgDeleteStep,
                     applyOrderToPlan,
                     connection,
                     constant,
+                    pgSelectFromRecord,
                     pkColumns,
                     source,
                     tableOrderByTypeName,
