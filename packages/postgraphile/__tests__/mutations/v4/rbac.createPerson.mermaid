@@ -1,0 +1,96 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __InputStaticLeaf11["__InputStaticLeaf[11∈1@1]"]:::plan
+    __InputStaticLeaf13["__InputStaticLeaf[13∈1@1]"]:::plan
+    __InputStaticLeaf14["__InputStaticLeaf[14∈1@1]"]:::plan
+    __InputStaticLeaf16["__InputStaticLeaf[16∈1@1]"]:::plan
+    __InputStaticLeaf17["__InputStaticLeaf[17∈1@1]"]:::plan
+    __InputStaticLeaf19["__InputStaticLeaf[19∈1@1]"]:::plan
+    Access26["Access[26∈1@1]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access27["Access[27∈1@1]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object28["Object[28∈1@1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    List30["List[30∈1@1]<br />ᐸ13,14ᐳ"]:::plan
+    Object31["Object[31∈1@1]<br />ᐸ{url}ᐳ"]:::plan
+    PgInsert25[["PgInsert[25∈1@1]"]]:::sideeffectplan
+    Object29["Object[29∈1@1]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈1@1]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈1@1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈1@1]<br />ᐸ__person__.”aliases”ᐳ"]:::plan
+    __Item35>"__Item[35∈2@1]<br />ᐸ34ᐳ"]:::itemplan
+    PgClassExpression36["PgClassExpression[36∈1@1]<br />ᐸ__person__.”about”ᐳ"]:::plan
+    PgClassExpression37["PgClassExpression[37∈1@1]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈1@1]<br />ᐸ__person__.”site”ᐳ"]:::plan
+    PgSelect39[["PgSelect[39∈1@1]<br />ᐸwrappedUrlᐳ"]]:::plan
+    First43["First[43∈1@1]"]:::plan
+    PgSelectSingle44["PgSelectSingle[44∈1@1]<br />ᐸwrappedUrlᐳ"]:::plan
+    PgClassExpression45["PgClassExpression[45∈1@1]<br />ᐸ__wrapped_url__.”url”ᐳ"]:::plan
+
+    %% plan dependencies
+    __Value5 --> __TrackedObject6
+    __Value3 --> Access26
+    __Value3 --> Access27
+    Access26 & Access27 --> Object28
+    __InputStaticLeaf13 & __InputStaticLeaf14 --> List30
+    __InputStaticLeaf19 --> Object31
+    Object28 & __InputStaticLeaf11 & List30 & __InputStaticLeaf16 & __InputStaticLeaf17 & Object31 --> PgInsert25
+    PgInsert25 --> Object29
+    PgInsert25 --> PgClassExpression32
+    PgInsert25 --> PgClassExpression33
+    PgInsert25 --> PgClassExpression34
+    PgClassExpression34 ==> __Item35
+    PgInsert25 --> PgClassExpression36
+    PgInsert25 --> PgClassExpression37
+    PgInsert25 --> PgClassExpression38
+    Object28 & PgClassExpression38 --> PgSelect39
+    PgSelect39 --> First43
+    First43 --> PgSelectSingle44
+    PgSelectSingle44 --> PgClassExpression45
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P25["ᐳc…nᐳperson"]
+    PgInsert25 -.-> P25
+    P29["ᐳcreatePerson"]
+    Object29 -.-> P29
+    P32["ᐳc…nᐳp…nᐳid"]
+    PgClassExpression32 -.-> P32
+    P33["ᐳc…nᐳp…nᐳname"]
+    PgClassExpression33 -.-> P33
+    P34["ᐳc…nᐳp…nᐳaliases"]
+    PgClassExpression34 -.-> P34
+    P35["ᐳc…nᐳp…nᐳaliases[]"]
+    __Item35 -.-> P35
+    P36["ᐳc…nᐳp…nᐳabout"]
+    PgClassExpression36 -.-> P36
+    P37["ᐳc…nᐳp…nᐳemail"]
+    PgClassExpression37 -.-> P37
+    P44["ᐳc…nᐳp…nᐳsite"]
+    PgSelectSingle44 -.-> P44
+    P45["ᐳc…nᐳp…nᐳsiteᐳurl"]
+    PgClassExpression45 -.-> P45
+
+    subgraph "Buckets for mutations/v4/rbac.createPerson"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6 bucket0
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 3<br />~ᐳMutation.createPerson<br />⠀ROOT ᐸ-O- 29<br />⠀⠀person ᐸ-O- 25<br />⠀⠀⠀person.id ᐸ-L- 32<br />⠀⠀⠀person.name ᐸ-L- 33<br />⠀⠀⠀person.aliases ᐸ-A- 34<br />⠀⠀⠀person.about ᐸ-L- 36<br />⠀⠀⠀person.email ᐸ-L- 37<br />⠀⠀⠀person.site ᐸ-O- 44<br />⠀⠀⠀⠀person.site.url ᐸ-L- 45"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__InputStaticLeaf11,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,PgInsert25,Access26,Access27,Object28,Object29,List30,Object31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgSelect39,First43,PgSelectSingle44,PgClassExpression45 bucket1
+    Bucket2("Bucket 2 (item35)<br />Deps: 34<br />~ᐳMutation.createPersonᐳCreatePersonPayload.personᐳPerson.aliases[]<br />⠀ROOT ᐸ-L- 35"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item35 bucket2
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    end
