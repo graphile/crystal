@@ -363,8 +363,12 @@ export class EdgeStep<
   }
 
   execute(values: Array<CrystalValuesList<any>>): CrystalResultsList<any> {
-    // Fake execution; data actually comes from the child plans
-    return arrayOfLength(values[0].length, EMPTY_OBJECT);
+    // Handle nulls; everything else comes from the child plans
+    const results: any[] = [];
+    for (let i = 0, l = values[0].length; i < l; i++) {
+      results[i] = values[0][i] == null ? null : EMPTY_OBJECT;
+    }
+    return results;
   }
 }
 
