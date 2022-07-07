@@ -1,0 +1,11 @@
+{
+  updateLeftArmById: {
+    leftArm: {
+      nodeId: "WyJsZWZ0X2FybXMiLDQ3XQ==",
+      id: 47,
+      personId: 5,
+      lengthInMetres: 0.65,
+      mood: "jovial",
+    },
+  },
+}

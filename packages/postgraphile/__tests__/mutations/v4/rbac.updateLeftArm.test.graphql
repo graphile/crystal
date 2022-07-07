@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> ignoreRBAC: false
+mutation {
+  updateLeftArmById(input:{
+    id: 47
+    leftArmPatch:{
+      mood: "jovial"
+    }
+  }) {
+    leftArm {
+      nodeId
+      id
+      personId
+      lengthInMetres
+      mood
+    }
+  }
+}
