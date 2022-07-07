@@ -507,7 +507,7 @@ export class PgSelectSingleStep<
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const columns = this.source.codec.columns;
-    if (columns && this.getClassStep().mode === "normal") {
+    if (columns && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
       // nonNullExpression (indirectly).
