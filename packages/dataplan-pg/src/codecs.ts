@@ -46,6 +46,10 @@ import type {
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
+// TODO: the `toPg` method should currently never be called with
+// null/undefined; but this does happen quite often. Instead we should
+// auto-handle null/undefined in toPg.
+
 export type PgTypeColumnViaExplicit = { relation: string; attribute: string };
 export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
 
