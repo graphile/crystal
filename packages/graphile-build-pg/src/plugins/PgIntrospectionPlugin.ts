@@ -520,10 +520,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               const introspectionQuery = makeIntrospectionQuery();
               const {
                 rows: [row],
-              } = await withPgClientFromPgSource(database, null, (client) =>
-                client.query<{ introspection: string }>({
-                  text: introspectionQuery,
-                }),
+              } = await withPgClientFromPgSource(
+                database,
+                database.pgSettingsForIntrospection ?? null,
+                (client) =>
+                  client.query<{ introspection: string }>({
+                    text: introspectionQuery,
+                  }),
               );
               if (!row) {
                 throw new Error("Introspection failed");

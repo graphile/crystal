@@ -47,7 +47,10 @@ declare global {
       /** Return settings to set in the session */
       pgSettings?: (
         graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
-      ) => object | null;
+      ) => { [key: string]: string } | null;
+
+      /** Settings to set in the session that performs introspection (during gather phase) */
+      pgSettingsForIntrospection?: { [key: string]: string } | null;
 
       /** The key on 'context' where the pgSettings for this DB will be sourced */
       pgSettingsKey?: KeysOfType<
