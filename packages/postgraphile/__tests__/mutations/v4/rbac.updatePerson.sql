@@ -1,75 +1,23 @@
-SAVEPOINT graphql_mutation
+update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "aliases" = $2::"text"[], "about" = $3::"text", "email" = $4::"b"."email", "site" = $5::"b"."wrapped_url" where (__person__."id" = $6::"int4") returning
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."aliases"::text as "2",
+  __person__."about" as "3",
+  __person__."email" as "4",
+  __person__."site"::text as "5"
 
-with __local_0__ as (
-  update "c"."person" set "person_full_name" = $1,
-  "aliases" = array[$2,
-  $3]::"pg_catalog"."_text",
-  "about" = NULL,
-  "email" = $4,
-  "site" = row(
-    $5::"b"."not_null_url"
-  )::"b"."wrapped_url"
-  where (
-    "id" = $6
-  ) returning *
-)
-select (
-  (
-    case when __local_0__ is null then null else __local_0__ end
-  )
-)::text
-from __local_0__
 
-with __local_0__ as (
-  select (
-    str::"c"."person"
-  ).*
-  from unnest(
-    (
-      $1
-    )::text[]
-  ) str
-)
-select to_json(
-  (
-    json_build_object(
-      'id'::text,
-      (__local_0__."id"),
-      'name'::text,
-      (__local_0__."person_full_name"),
-      'aliases'::text,
-      (
-        case when (__local_0__."aliases") is null then null when coalesce(
-          array_length(
-            (__local_0__."aliases"),
-            1
-          ),
-          0
-        ) = 0 then '[]'::json else (
-          select json_agg(__local_1__)
-          from unnest((__local_0__."aliases")) as __local_1__
-        ) end
-      ),
-      'about'::text,
-      (__local_0__."about"),
-      'email'::text,
-      (__local_0__."email"),
-      'site'::text,
-      (
-        case when (
-          (__local_0__."site") is not distinct
-          from null
-        ) then null else json_build_object(
-          'url'::text,
-          (
-            (__local_0__."site")."url"
-          )
-        ) end
-      )
-    )
-  )
-) as "@person"
-from __local_0__ as __local_0__
-where (TRUE) and (TRUE)
-
-RELEASE SAVEPOINT graphql_mutation
+select __wrapped_url_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"b"."wrapped_url" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __wrapped_url_identifiers__,
+lateral (
+  select
+    __wrapped_url__."url" as "0",
+    (not (__wrapped_url__ is null))::text as "1",
+    __wrapped_url_identifiers__.idx as "2"
+  from (select (__wrapped_url_identifiers__."id0").*) as __wrapped_url__
+) as __wrapped_url_result__
