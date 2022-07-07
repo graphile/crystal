@@ -1,0 +1,11 @@
+{
+  createLeftArm: {
+    leftArm: {
+      nodeId: "WyJsZWZ0X2FybXMiLDEwMF0=",
+      id: 100,
+      personId: 3,
+      lengthInMetres: 0.66,
+      mood: "neutral",
+    },
+  },
+}
