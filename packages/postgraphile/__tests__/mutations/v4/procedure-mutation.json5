@@ -3,22 +3,22 @@
     json: "{\"a\":1,\"b\":2,\"c\":3}",
   },
   jsonbIdentityMutation: {
-    json: "{\"a\":1,\"b\":2,\"c\":3}",
+    json: "{\"a\": 1, \"b\": 2, \"c\": 3}",
   },
   jsonIdentityMutationIssue85: {
     json: "[{\"amount\":\"44\"},{\"amount\":null}]",
   },
   jsonbIdentityMutationIssue85: {
-    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+    json: "[{\"amount\": \"44\"}, {\"amount\": null}]",
   },
   jsonbIdentityMutationPlpgsqlIssue85: {
-    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+    json: "[{\"amount\": \"44\"}, {\"amount\": null}]",
   },
   jsonbIdentityMutationPlpgsqlWithDefaultIssue85: {
     json: "[]",
   },
   jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85: {
-    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
+    json: "[{\"amount\": \"44\"}, {\"amount\": null}]",
   },
   add1Mutation: {
     clientMutationId: null,
@@ -144,7 +144,7 @@
       name: "Joe Tucker",
     },
     postEdge: {
-      cursor: "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+      cursor: "WyI2Nzc2ZDM3ZjcwIiw1XQ==",
       node: {
         id: 5,
         headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
@@ -209,7 +209,7 @@
         headline: "headline",
         comptypes: [
           {
-            schedule: "2009-10-24T04:23:54-04:00",
+            schedule: "2009-10-24T08:23:54.000000+0000",
             isOptimised: true,
           },
         ],
@@ -219,7 +219,7 @@
         headline: "headline",
         comptypes: [
           {
-            schedule: "2009-10-24T04:23:54-04:00",
+            schedule: "2009-10-24T08:23:54.000000+0000",
             isOptimised: null,
           },
         ],
@@ -229,7 +229,7 @@
         headline: "headline",
         comptypes: [
           {
-            schedule: "2009-10-24T04:23:54-04:00",
+            schedule: "2009-10-24T08:23:54.000000+0000",
             isOptimised: false,
           },
         ],
