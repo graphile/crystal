@@ -9,12 +9,8 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import {
-  arraysMatch,
-  connection,
-  ExecutableStep,
-  ObjectStep,
-} from "dataplanner";
+import type { ObjectStep } from "dataplanner";
+import { arraysMatch, connection, ExecutableStep } from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
@@ -485,7 +481,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   [otherSource],
                 ) as any)
               : EXPORTABLE(
-                  (localColumns, otherSource, remoteColumns) =>
+                  (
+                    isMutationPayload,
+                    localColumns,
+                    otherSource,
+                    remoteColumns,
+                  ) =>
                     function plan(
                       $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
                     ) {
@@ -505,7 +506,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       );
                       return otherSource.get(spec);
                     },
-                  [localColumns, otherSource, remoteColumns],
+                  [isMutationPayload, localColumns, otherSource, remoteColumns],
                 );
 
             const listPlan = clean
@@ -527,7 +528,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   [otherSource],
                 ) as any)
               : EXPORTABLE(
-                  (localColumns, otherSource, remoteColumns) =>
+                  (
+                    isMutationPayload,
+                    localColumns,
+                    otherSource,
+                    remoteColumns,
+                  ) =>
                     function plan(
                       $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
                     ) {
@@ -547,7 +553,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       );
                       return otherSource.find(spec);
                     },
-                  [localColumns, otherSource, remoteColumns],
+                  [isMutationPayload, localColumns, otherSource, remoteColumns],
                 );
 
             const connectionPlan = clean
@@ -571,7 +577,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                   [otherSource, connection],
                 ) as any)
               : EXPORTABLE(
-                  (connection, localColumns, otherSource, remoteColumns) =>
+                  (
+                    connection,
+                    isMutationPayload,
+                    localColumns,
+                    otherSource,
+                    remoteColumns,
+                  ) =>
                     function plan(
                       $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
                     ) {
@@ -591,7 +603,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       );
                       return connection(otherSource.find(spec));
                     },
-                  [connection, localColumns, otherSource, remoteColumns],
+                  [
+                    connection,
+                    isMutationPayload,
+                    localColumns,
+                    otherSource,
+                    remoteColumns,
+                  ],
                 );
 
             if (
