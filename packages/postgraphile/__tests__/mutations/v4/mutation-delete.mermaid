@@ -262,11 +262,11 @@ graph TD
     PgSelect366[["PgSelect[366∈14@14]<br />ᐸpersonᐳ"]]:::plan
     First371["First[371∈14@14]"]:::plan
     PgSelectSingle372["PgSelectSingle[372∈14@14]<br />ᐸpersonᐳ"]:::plan
-    Edge373["Edge[373∈14@14]"]:::plan
     PgClassExpression375["PgClassExpression[375∈14@14]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
     PgClassExpression376["PgClassExpression[376∈14@14]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List377["List[377∈14@14]<br />ᐸ375,376ᐳ"]:::plan
     PgCursor374["PgCursor[374∈14@14]"]:::plan
+    Edge373["Edge[373∈14@14]"]:::plan
     Constant381["Constant[381∈14@14]"]:::plan
     List383["List[383∈14@14]<br />ᐸ381,376ᐳ"]:::plan
     Lambda384["Lambda[384∈14@14]<br />ᐸencodeᐳ"]:::plan
@@ -465,11 +465,11 @@ graph TD
     Object15 & PgClassExpression365 --> PgSelect366
     PgSelect366 --> First371
     First371 --> PgSelectSingle372
-    PgSelectSingle372 --> Edge373
     PgSelectSingle372 --> PgClassExpression375
     PgSelectSingle372 --> PgClassExpression376
     PgClassExpression375 & PgClassExpression376 --> List377
     List377 --> PgCursor374
+    PgSelectSingle372 & PgCursor374 --> Edge373
     Constant381 & PgClassExpression376 --> List383
     List383 --> Lambda384
     PgSelectSingle372 --> PgClassExpression385

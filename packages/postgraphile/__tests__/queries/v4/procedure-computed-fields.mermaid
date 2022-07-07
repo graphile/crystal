@@ -134,13 +134,13 @@ graph TD
     __Item423>"__Item[423∈9]<br />ᐸ419ᐳ"]:::itemplan
     PgSelectSingle424["PgSelectSingle[424∈9]<br />ᐸpost_computed_interval_setᐳ"]:::plan
     PgClassExpression425["PgClassExpression[425∈9]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
+    PgClassExpression431["PgClassExpression[431∈9]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
+    List432["List[432∈9]<br />ᐸ431ᐳ"]:::plan
+    PgCursor430["PgCursor[430∈9]"]:::plan
     Edge426["Edge[426∈9]"]:::plan
     Access427["Access[427∈9]<br />ᐸ425.secondsᐳ"]:::plan
     Access428["Access[428∈9]<br />ᐸ425.minutesᐳ"]:::plan
     Access429["Access[429∈9]<br />ᐸ425.hoursᐳ"]:::plan
-    PgClassExpression431["PgClassExpression[431∈9]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
-    List432["List[432∈9]<br />ᐸ431ᐳ"]:::plan
-    PgCursor430["PgCursor[430∈9]"]:::plan
     Connection460["Connection[460∈0]<br />ᐸ456ᐳ"]:::plan
     PgSelect461[["PgSelect[461∈0]<br />ᐸpersonᐳ"]]:::plan
     __Item462>"__Item[462∈10]<br />ᐸ461ᐳ"]:::itemplan
@@ -281,13 +281,13 @@ graph TD
     __ListTransform419 ==> __Item423
     __Item423 --> PgSelectSingle424
     PgSelectSingle424 --> PgClassExpression425
-    PgClassExpression425 --> Edge426
-    PgClassExpression425 --> Access427
-    PgClassExpression425 --> Access428
-    PgClassExpression425 --> Access429
     PgSelectSingle424 --> PgClassExpression431
     PgClassExpression431 --> List432
     List432 --> PgCursor430
+    PgClassExpression425 & PgCursor430 --> Edge426
+    PgClassExpression425 --> Access427
+    PgClassExpression425 --> Access428
+    PgClassExpression425 --> Access429
     Object199 & Connection460 --> PgSelect461
     PgSelect461 ==> __Item462
     __Item462 --> PgSelectSingle463

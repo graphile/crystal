@@ -29,10 +29,10 @@ graph TD
     PgSelectSingle50["PgSelectSingle[50∈3]<br />ᐸbadly_behaved_functionᐳ"]:::plan
     __Item51>"__Item[51∈4]<br />ᐸ48ᐳ"]:::itemplan
     PgSelectSingle52["PgSelectSingle[52∈4]<br />ᐸbadly_behaved_functionᐳ"]:::plan
-    Edge53["Edge[53∈4]"]:::plan
     PgClassExpression55["PgClassExpression[55∈4]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
     List56["List[56∈4]<br />ᐸ55ᐳ"]:::plan
     PgCursor54["PgCursor[54∈4]"]:::plan
+    Edge53["Edge[53∈4]"]:::plan
     Constant57["Constant[57∈0]"]:::plan
     PgClassExpression58["PgClassExpression[58∈4]<br />ᐸ__badly_be...ion__.”id”ᐳ"]:::plan
     List59["List[59∈4]<br />ᐸ57,58ᐳ"]:::plan
@@ -60,10 +60,10 @@ graph TD
     __Item49 --> PgSelectSingle50
     __ListTransform48 ==> __Item51
     __Item51 --> PgSelectSingle52
-    PgSelectSingle52 --> Edge53
     PgSelectSingle52 --> PgClassExpression55
     PgClassExpression55 --> List56
     List56 --> PgCursor54
+    PgSelectSingle52 & PgCursor54 --> Edge53
     PgSelectSingle52 --> PgClassExpression58
     Constant57 & PgClassExpression58 --> List59
     List59 --> Lambda60

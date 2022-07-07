@@ -247,10 +247,10 @@ graph TD
     PgSelect365[["PgSelect[365∈23@21]<br />ᐸpostᐳ"]]:::plan
     First370["First[370∈23@21]"]:::plan
     PgSelectSingle371["PgSelectSingle[371∈23@21]<br />ᐸpostᐳ"]:::plan
-    Edge372["Edge[372∈23@21]"]:::plan
     PgClassExpression374["PgClassExpression[374∈23@21]<br />ᐸ__post__.”id”ᐳ"]:::plan
     List375["List[375∈23@21]<br />ᐸ374ᐳ"]:::plan
     PgCursor373["PgCursor[373∈23@21]"]:::plan
+    Edge372["Edge[372∈23@21]"]:::plan
     PgClassExpression377["PgClassExpression[377∈23@21]<br />ᐸ__post__.”headline”ᐳ"]:::plan
     __InputStaticLeaf380["__InputStaticLeaf[380∈24@22]"]:::plan
     PgSelect381[["PgSelect[381∈24@22]<br />ᐸtable_mutationᐳ"]]:::sideeffectplan
@@ -271,10 +271,10 @@ graph TD
     PgSelect408[["PgSelect[408∈24@22]<br />ᐸpostᐳ"]]:::plan
     First413["First[413∈24@22]"]:::plan
     PgSelectSingle414["PgSelectSingle[414∈24@22]<br />ᐸpostᐳ"]:::plan
-    Edge415["Edge[415∈24@22]"]:::plan
     PgClassExpression417["PgClassExpression[417∈24@22]<br />ᐸ__post__.”id”ᐳ"]:::plan
     List418["List[418∈24@22]<br />ᐸ417ᐳ"]:::plan
     PgCursor416["PgCursor[416∈24@22]"]:::plan
+    Edge415["Edge[415∈24@22]"]:::plan
     PgClassExpression420["PgClassExpression[420∈24@22]<br />ᐸ__post__.”headline”ᐳ"]:::plan
     PgSelect423[["PgSelect[423∈25@23]<br />ᐸtable_set_mutationᐳ"]]:::sideeffectplan
     Object427["Object[427∈25@23]<br />ᐸ{result}ᐳ"]:::plan
@@ -602,10 +602,10 @@ graph TD
     Object13 & PgClassExpression346 --> PgSelect365
     PgSelect365 --> First370
     First370 --> PgSelectSingle371
-    PgSelectSingle371 --> Edge372
     PgSelectSingle371 --> PgClassExpression374
     PgClassExpression374 --> List375
     List375 --> PgCursor373
+    PgSelectSingle371 & PgCursor373 --> Edge372
     PgSelectSingle371 --> PgClassExpression377
     Object13 & __InputStaticLeaf380 --> PgSelect381
     PgSelect381 --> First385
@@ -624,10 +624,10 @@ graph TD
     Object13 & PgClassExpression389 --> PgSelect408
     PgSelect408 --> First413
     First413 --> PgSelectSingle414
-    PgSelectSingle414 --> Edge415
     PgSelectSingle414 --> PgClassExpression417
     PgClassExpression417 --> List418
     List418 --> PgCursor416
+    PgSelectSingle414 & PgCursor416 --> Edge415
     PgSelectSingle414 --> PgClassExpression420
     Object13 --> PgSelect423
     PgSelect423 --> Object427
