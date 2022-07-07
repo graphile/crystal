@@ -36,6 +36,7 @@ alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
 alter sequence c.issue756_id_seq restart with 1;
+alter sequence b.types_id_seq restart with 1;
 
 insert into a.no_primary_key (id, str) values
   (1, 'one'),
