@@ -103,7 +103,6 @@ function withFieldArgsForArgumentsOrInputObject<
     let $value = ($currentObject.get as (argName: string) => InputStep)(
       argName,
     );
-    let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
 
     /*
     if ($value.evalIs(undefined)) {
@@ -111,6 +110,8 @@ function withFieldArgsForArgumentsOrInputObject<
     }
     */
 
+    let parentType = typeContainingFields;
+    let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
     let type = getNullableType(argOrField.type);
 
     while (path.length > 0) {
@@ -130,12 +131,13 @@ function withFieldArgsForArgumentsOrInputObject<
         return undefined;
       }
       */
+      parentType = type;
       argOrField = type.getFields()[name];
       type = getNullableType(argOrField.type);
     }
 
     opPlan.loc.pop();
-    return { $value, argOrField, type };
+    return { $value, argOrField, type, parentType };
   };
 
   function planArgumentOrInputField(
@@ -144,7 +146,7 @@ function withFieldArgsForArgumentsOrInputObject<
   ) {
     opPlan.loc.push(`planArgumentOrInputField(${details.argOrField.name})`);
     const plan = opPlan.withModifiers(() => {
-      const { argOrField, $value } = details;
+      const { argOrField, $value, parentType } = details;
 
       return withFieldArgsForArgOrField(
         opPlan,
@@ -152,7 +154,7 @@ function withFieldArgsForArgumentsOrInputObject<
         argOrField,
         $value,
         (fieldArgs) => {
-          if (!typeContainingFields) {
+          if (!parentType) {
             const arg = argOrField as GraphQLArgument;
             if ($toPlan) {
               const argResolver = arg.extensions.graphile?.applyPlan;
