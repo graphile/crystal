@@ -1,0 +1,10 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> ignoreRBAC: false
+mutation {
+  deletePersonById(input:{
+    id: 3
+  }) {
+    deletedPersonId
+  }
+}
