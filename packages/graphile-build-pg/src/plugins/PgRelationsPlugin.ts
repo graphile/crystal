@@ -10,7 +10,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ObjectStep } from "dataplanner";
-import { arraysMatch, connection, ExecutableStep } from "dataplanner";
+import { arraysMatch, connection } from "dataplanner";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";

@@ -1,8 +1,6 @@
 import "graphile-config";
 
 import type { PgSelectSingleStep, PgTypeCodec } from "@dataplan/pg";
-import { object } from "dataplanner";
-// import { object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 
@@ -136,7 +134,8 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
               graphile: {
                 // TODO: optimized version of this
                 plan: EXPORTABLE(
-                  () => function plan($in) {
+                  () =>
+                    function plan($in) {
                       const $record = $in as PgSelectSingleStep<
                         any,
                         any,

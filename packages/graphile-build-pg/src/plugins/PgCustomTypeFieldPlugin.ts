@@ -17,8 +17,12 @@ import type {
   PgTypedExecutableStep,
   PgUpdateStep,
 } from "@dataplan/pg";
-import { pgSelectSingleFromRecord } from "@dataplan/pg";
-import { pgClassExpression, PgSelectSingleStep, TYPES } from "@dataplan/pg";
+import {
+  pgSelectSingleFromRecord,
+  pgClassExpression,
+  PgSelectSingleStep,
+  TYPES,
+} from "@dataplan/pg";
 import type {
   __InputObjectStep,
   __TrackedObjectStep,
@@ -26,7 +30,6 @@ import type {
   FieldArgs,
   FieldPlanResolver,
   GraphileFieldConfigArgumentMap,
-  InputStep,
 } from "dataplanner";
 import {
   __ListTransformStep,
