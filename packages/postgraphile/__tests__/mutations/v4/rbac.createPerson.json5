@@ -1,0 +1,17 @@
+{
+  createPerson: {
+    person: {
+      id: 10,
+      name: "Jane Doe",
+      aliases: [
+        "Jay Doe",
+        "JD",
+      ],
+      about: "Unknown",
+      email: "jane.doe@example.com",
+      site: {
+        url: "http://example.com",
+      },
+    },
+  },
+}

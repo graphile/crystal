@@ -1,0 +1,28 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> ignoreRBAC: false
+mutation {
+  createPerson(input:{
+    person:{
+      name:"Jane Doe"
+      aliases: ["Jay Doe", "JD"]
+      about: "Unknown"
+      email: "jane.doe@example.com"
+      site: {
+        url: "http://example.com"
+      }
+    }
+  }) {
+    person{
+      id
+      name
+      aliases
+      about
+      email
+      site {
+        url
+      }
+      #createdAt # Can't include - it changes
+    }
+  }
+}
