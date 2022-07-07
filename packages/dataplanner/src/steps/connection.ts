@@ -322,6 +322,7 @@ export class EdgeStep<
   isSyncAndSafe = true;
 
   private connectionStepId: string;
+  private cursorDepId: number | null = null;
 
   constructor(
     $connection: ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>,
@@ -351,11 +352,15 @@ export class EdgeStep<
   }
 
   cursor(): ExecutableStep<string | null> {
+    if (this.cursorDepId != null) {
+      return this.getDep(this.cursorDepId);
+    }
     const $item = this.getItemStep();
     const $cursor =
       this.getConnectionStep().cursorPlan?.($item) ??
       ($item as ExecutableStep & { cursor?: () => ExecutableStep }).cursor?.();
     if ($cursor) {
+      this.cursorDepId = this.addDependency($cursor);
       return $cursor;
     } else {
       throw new Error(`No cursor plan known for '${$item}'`);
@@ -366,7 +371,11 @@ export class EdgeStep<
     // Handle nulls; everything else comes from the child plans
     const results: any[] = [];
     for (let i = 0, l = values[0].length; i < l; i++) {
-      results[i] = values[0][i] == null ? null : EMPTY_OBJECT;
+      results[i] =
+        values[0][i] == null &&
+        (this.cursorDepId == null || values[this.cursorDepId][i] == null)
+          ? null
+          : EMPTY_OBJECT;
     }
     return results;
   }
