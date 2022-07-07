@@ -1,0 +1,17 @@
+{
+  updatePersonById: {
+    person: {
+      id: 3,
+      name: "Budd Daay",
+      aliases: [
+        "BD",
+        "Buddy",
+      ],
+      about: null,
+      email: "buddy@example.com",
+      site: {
+        url: "http://buddy.com",
+      },
+    },
+  },
+}
