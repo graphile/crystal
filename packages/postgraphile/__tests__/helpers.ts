@@ -362,6 +362,7 @@ export async function runTestQuery(
     directPg?: boolean;
     schema?: string | string[];
     graphileBuildOptions?: any;
+    ignoreRBAC?: boolean;
   },
   options: {
     callback?: (
@@ -403,6 +404,19 @@ export async function runTestQuery(
         name: "main",
         withPgClientKey: "withPgClient",
         pgSettingsKey: "pgSettings",
+        pgSettingsForIntrospection:
+          config.ignoreRBAC == false
+            ? {
+                role: "postgraphile_test_authenticator",
+              }
+            : null,
+        pgSettings:
+          config.ignoreRBAC === false
+            ? () => ({
+                role: "postgraphile_test_visitor",
+                "jwt.claims.user_id": "3",
+              })
+            : undefined,
         schemas: schemas,
         adaptorSettings: {
           connectionString,
