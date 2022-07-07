@@ -1,0 +1,11 @@
+{
+  leftArmIdentity: {
+    leftArm: {
+      nodeId: "WyJsZWZ0X2FybXMiLDkwMDFd",
+      id: 9001,
+      personId: 99,
+      lengthInMetres: 77,
+      mood: "jubilant",
+    },
+  },
+}

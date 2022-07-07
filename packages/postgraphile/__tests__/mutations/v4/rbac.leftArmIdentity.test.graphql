@@ -1,0 +1,22 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> ignoreRBAC: false
+mutation {
+  leftArmIdentity(input:{
+    leftArm:{
+      # Note we can specify all the fields here because it uses the base type
+      id: 9001 # it's over 9000!
+      personId: 99
+      lengthInMetres: 77
+      mood: "jubilant"
+    }
+  }) {
+    leftArm {
+      nodeId
+      id
+      personId
+      lengthInMetres
+      mood
+    }
+  }
+}
