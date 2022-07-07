@@ -18,8 +18,8 @@ import type {
   PgUpdateStep,
 } from "@dataplan/pg";
 import {
-  pgSelectSingleFromRecord,
   pgClassExpression,
+  pgSelectSingleFromRecord,
   PgSelectSingleStep,
   TYPES,
 } from "@dataplan/pg";
