@@ -4294,10 +4294,12 @@ export class OpPlan<
             dependencyIndex < dependenciesCount;
             dependencyIndex++
           ) {
-            dependencyValuesList[dependencyIndex].splice(
-              pendingPlanResultsesIndex,
-              1,
-            );
+            const list = dependencyValuesList[dependencyIndex];
+            // This used to be a splice, but that was unsafe. This executor is going in the trash soon anyway, so I don't care too much about the performance repurcussions
+            dependencyValuesList[dependencyIndex] = [
+              ...list.slice(0, pendingPlanResultsesIndex),
+              ...list.slice(pendingPlanResultsesIndex + 1),
+            ];
           }
         }
       }
@@ -4360,10 +4362,12 @@ export class OpPlan<
               dependencyIndex < dependenciesCount;
               dependencyIndex++
             ) {
-              dependencyValuesList[dependencyIndex].splice(
-                pendingPlanResultsesIndex,
-                1,
-              );
+              const list = dependencyValuesList[dependencyIndex];
+              // This used to be a splice, but that was unsafe. This executor is going in the trash soon anyway, so I don't care too much about the performance repurcussions
+              dependencyValuesList[dependencyIndex] = [
+                ...list.slice(0, pendingPlanResultsesIndex),
+                ...list.slice(pendingPlanResultsesIndex + 1),
+              ];
             }
           } else {
             toExecute.push(
