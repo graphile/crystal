@@ -690,7 +690,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   EXPORTABLE(
                     (makeArgs, object, source) => ($root, args, _info) => {
                       const selectArgs = makeArgs(args, ["input"]);
-                      const $result = source.execute(selectArgs);
+                      const $result = source.execute(selectArgs, "mutation");
                       return object({
                         result: $result,
                       });

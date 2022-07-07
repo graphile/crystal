@@ -114,6 +114,7 @@ export type PgExecutorOptions = {
   queryValuesSymbol?: symbol | null;
   name?: string;
   eventEmitter: ExecutionEventEmitter | undefined;
+  useTransaction?: boolean;
 };
 
 export type PgExecutorMutationOptions = {
@@ -335,29 +336,44 @@ ${duration}
     const valuesCount = values.length;
     const results: Array<Deferred<Array<TOutput>> | undefined> = [];
 
-    // Group by context
-    const groupMap = new Map<
-      PgExecutorContext,
-      Array<{
-        queryValues: readonly any[];
-        resultIndex: number;
-      }>
-    >();
-    for (let resultIndex = 0, l = valuesCount; resultIndex < l; resultIndex++) {
-      results[resultIndex] = undefined;
-      const { context, queryValues } = values[resultIndex];
+    const batches = (() => {
+      if (common.useTransaction) {
+        // If we're using a transaction, use a separate batch for each query.
+        return values.map(
+          ({ context, queryValues }, resultIndex) =>
+            [context, [{ queryValues, resultIndex }]] as const,
+        );
+      } else {
+        // Group by context
+        const groupMap = new Map<
+          PgExecutorContext,
+          Array<{
+            queryValues: readonly any[];
+            resultIndex: number;
+          }>
+        >();
+        for (
+          let resultIndex = 0, l = valuesCount;
+          resultIndex < l;
+          resultIndex++
+        ) {
+          results[resultIndex] = undefined;
+          const { context, queryValues } = values[resultIndex];
 
-      let entry = groupMap.get(context);
-      if (!entry) {
-        entry = [];
-        groupMap.set(context, entry);
+          let entry = groupMap.get(context);
+          if (!entry) {
+            entry = [];
+            groupMap.set(context, entry);
+          }
+          entry.push({ queryValues, resultIndex });
+        }
+        return groupMap.entries();
       }
-      entry.push({ queryValues, resultIndex });
-    }
+    })();
 
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
-    for (const [context, batch] of groupMap.entries()) {
+    for (const [context, batch] of batches) {
       promises.push(
         (async () => {
           // TODO: cache must factor in placeholders.
@@ -451,12 +467,13 @@ ${duration}
               // TODO: we could probably make this more efficient by grouping the
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
-              const queryResult = await this._execute<TOutput>(
-                context,
-                text,
-                sqlValues,
-                name,
-              );
+              const queryResult = common.useTransaction
+                ? await this.executeMutation<TOutput>({
+                    context,
+                    text,
+                    values: sqlValues,
+                  })
+                : await this._execute<TOutput>(context, text, sqlValues, name);
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);

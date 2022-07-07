@@ -210,7 +210,7 @@ function assertSensible(plan: ExecutableStep): void {
   }
 }
 
-export type PgSelectMode = "normal" | "aggregate";
+export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
 export interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
   /**
@@ -1267,6 +1267,7 @@ export class PgSelectStep<
         queryValuesSymbol: this.queryValuesSymbol,
         name,
         eventEmitter,
+        useTransaction: this.mode === "mutation",
       },
     );
     // debugExecute("%s; result: %c", this, executionResult);

@@ -41,6 +41,7 @@ import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
+  PgSelectMode,
   PgSelectStep,
 } from "./steps/pgSelect.js";
 import { pgSelect } from "./steps/pgSelect.js";
@@ -852,11 +853,15 @@ export class PgSource<
     return pgSelect({ source: this, identifiers });
   }
 
-  execute(args: Array<PgSelectArgumentSpec> = []) {
+  execute(
+    args: Array<PgSelectArgumentSpec> = [],
+    mode: PgSelectMode = "normal",
+  ) {
     const $select = pgSelect({
       source: this,
       identifiers: [],
       args,
+      mode,
     });
     if (this.isMutation) {
       $select.hasSideEffects = true;
