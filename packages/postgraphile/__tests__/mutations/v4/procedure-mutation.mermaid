@@ -1,0 +1,1270 @@
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+
+
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __TrackedObject6["__TrackedObject[6∈0]"]:::plan
+    __InputStaticLeaf9["__InputStaticLeaf[9∈1@1]"]:::plan
+    Access11["Access[11∈0] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36}<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access12["Access[12∈0] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36}<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object13["Object[13∈0] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36}<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect10[["PgSelect[10∈1@1]<br />ᐸjson_identity_mutationᐳ"]]:::sideeffectplan
+    First14["First[14∈1@1]"]:::plan
+    PgSelectSingle15["PgSelectSingle[15∈1@1]<br />ᐸjson_identity_mutationᐳ"]:::plan
+    PgClassExpression16["PgClassExpression[16∈1@1]<br />ᐸ__json_ide...tation__.vᐳ"]:::plan
+    Object17["Object[17∈1@1]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf20["__InputStaticLeaf[20∈2@2]"]:::plan
+    PgSelect21[["PgSelect[21∈2@2]<br />ᐸjsonb_identity_mutationᐳ"]]:::sideeffectplan
+    First25["First[25∈2@2]"]:::plan
+    PgSelectSingle26["PgSelectSingle[26∈2@2]<br />ᐸjsonb_identity_mutationᐳ"]:::plan
+    PgClassExpression27["PgClassExpression[27∈2@2]<br />ᐸ__jsonb_id...tation__.vᐳ"]:::plan
+    Object28["Object[28∈2@2]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf31["__InputStaticLeaf[31∈3@3]"]:::plan
+    PgSelect32[["PgSelect[32∈3@3]<br />ᐸjson_identity_mutationᐳ"]]:::sideeffectplan
+    First36["First[36∈3@3]"]:::plan
+    PgSelectSingle37["PgSelectSingle[37∈3@3]<br />ᐸjson_identity_mutationᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈3@3]<br />ᐸ__json_ide...tation__.vᐳ"]:::plan
+    Object39["Object[39∈3@3]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf42["__InputStaticLeaf[42∈4@4]"]:::plan
+    PgSelect43[["PgSelect[43∈4@4]<br />ᐸjsonb_identity_mutationᐳ"]]:::sideeffectplan
+    First47["First[47∈4@4]"]:::plan
+    PgSelectSingle48["PgSelectSingle[48∈4@4]<br />ᐸjsonb_identity_mutationᐳ"]:::plan
+    PgClassExpression49["PgClassExpression[49∈4@4]<br />ᐸ__jsonb_id...tation__.vᐳ"]:::plan
+    Object50["Object[50∈4@4]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf53["__InputStaticLeaf[53∈5@5]"]:::plan
+    PgSelect54[["PgSelect[54∈5@5]<br />ᐸjsonb_identity_mutation_plpgsqlᐳ"]]:::sideeffectplan
+    First58["First[58∈5@5]"]:::plan
+    PgSelectSingle59["PgSelectSingle[59∈5@5]<br />ᐸjsonb_identity_mutation_plpgsqlᐳ"]:::plan
+    PgClassExpression60["PgClassExpression[60∈5@5]<br />ᐸ__jsonb_id...lpgsql__.vᐳ"]:::plan
+    Object61["Object[61∈5@5]<br />ᐸ{result}ᐳ"]:::plan
+    PgSelect65[["PgSelect[65∈6@6]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"]]:::sideeffectplan
+    First69["First[69∈6@6]"]:::plan
+    PgSelectSingle70["PgSelectSingle[70∈6@6]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"]:::plan
+    PgClassExpression71["PgClassExpression[71∈6@6]<br />ᐸ__jsonb_id...efault__.vᐳ"]:::plan
+    Object72["Object[72∈6@6]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf75["__InputStaticLeaf[75∈7@7]"]:::plan
+    PgSelect76[["PgSelect[76∈7@7]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"]]:::sideeffectplan
+    First80["First[80∈7@7]"]:::plan
+    PgSelectSingle81["PgSelectSingle[81∈7@7]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"]:::plan
+    PgClassExpression82["PgClassExpression[82∈7@7]<br />ᐸ__jsonb_id...efault__.vᐳ"]:::plan
+    Object83["Object[83∈7@7]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf86["__InputStaticLeaf[86∈8@8]"]:::plan
+    __InputStaticLeaf87["__InputStaticLeaf[87∈8@8]"]:::plan
+    PgSelect88[["PgSelect[88∈8@8]<br />ᐸadd_1_mutationᐳ"]]:::sideeffectplan
+    First92["First[92∈8@8]"]:::plan
+    PgSelectSingle93["PgSelectSingle[93∈8@8]<br />ᐸadd_1_mutationᐳ"]:::plan
+    PgClassExpression94["PgClassExpression[94∈8@8]<br />ᐸ__add_1_mutation__.vᐳ"]:::plan
+    Object95["Object[95∈8@8]<br />ᐸ{result}ᐳ"]:::plan
+    Constant96["Constant[96∈8@8]"]:::plan
+    __InputStaticLeaf98["__InputStaticLeaf[98∈9@9]"]:::plan
+    __InputStaticLeaf99["__InputStaticLeaf[99∈9@9]"]:::plan
+    __InputStaticLeaf100["__InputStaticLeaf[100∈9@9]"]:::plan
+    PgSelect101[["PgSelect[101∈9@9]<br />ᐸadd_2_mutationᐳ"]]:::sideeffectplan
+    First105["First[105∈9@9]"]:::plan
+    PgSelectSingle106["PgSelectSingle[106∈9@9]<br />ᐸadd_2_mutationᐳ"]:::plan
+    PgClassExpression107["PgClassExpression[107∈9@9]<br />ᐸ__add_2_mutation__.vᐳ"]:::plan
+    Object108["Object[108∈9@9]<br />ᐸ{result,clientMutationId}ᐳ"]:::plan
+    __InputStaticLeaf110["__InputStaticLeaf[110∈10@10]"]:::plan
+    __InputStaticLeaf112["__InputStaticLeaf[112∈10@10]"]:::plan
+    Constant113["Constant[113∈10@10]"]:::plan
+    PgSelect114[["PgSelect[114∈10@10]<br />ᐸadd_3_mutationᐳ"]]:::sideeffectplan
+    First118["First[118∈10@10]"]:::plan
+    PgSelectSingle119["PgSelectSingle[119∈10@10]<br />ᐸadd_3_mutationᐳ"]:::plan
+    PgClassExpression120["PgClassExpression[120∈10@10]<br />ᐸ__add_3_mutation__.vᐳ"]:::plan
+    Object121["Object[121∈10@10]<br />ᐸ{result,clientMutationId}ᐳ"]:::plan
+    __InputStaticLeaf124["__InputStaticLeaf[124∈11@11]"]:::plan
+    __InputStaticLeaf125["__InputStaticLeaf[125∈11@11]"]:::plan
+    PgSelect126[["PgSelect[126∈11@11]<br />ᐸadd_4_mutationᐳ"]]:::sideeffectplan
+    First130["First[130∈11@11]"]:::plan
+    PgSelectSingle131["PgSelectSingle[131∈11@11]<br />ᐸadd_4_mutationᐳ"]:::plan
+    PgClassExpression132["PgClassExpression[132∈11@11]<br />ᐸ__add_4_mutation__.vᐳ"]:::plan
+    Object133["Object[133∈11@11]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf136["__InputStaticLeaf[136∈12@12]"]:::plan
+    __InputStaticLeaf137["__InputStaticLeaf[137∈12@12]"]:::plan
+    PgSelect138[["PgSelect[138∈12@12]<br />ᐸadd_4_mutation_errorᐳ"]]:::sideeffectplan
+    First142["First[142∈12@12]"]:::plan
+    PgSelectSingle143["PgSelectSingle[143∈12@12]<br />ᐸadd_4_mutation_errorᐳ"]:::plan
+    PgClassExpression144["PgClassExpression[144∈12@12]<br />ᐸ__add_4_mu..._error__.vᐳ"]:::plan
+    Object145["Object[145∈12@12]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf148["__InputStaticLeaf[148∈13@13]"]:::plan
+    __InputStaticLeaf149["__InputStaticLeaf[149∈13@13]"]:::plan
+    PgSelect150[["PgSelect[150∈13@13]<br />ᐸmult_1ᐳ"]]:::sideeffectplan
+    First154["First[154∈13@13]"]:::plan
+    PgSelectSingle155["PgSelectSingle[155∈13@13]<br />ᐸmult_1ᐳ"]:::plan
+    PgClassExpression156["PgClassExpression[156∈13@13]<br />ᐸ__mult_1__.vᐳ"]:::plan
+    Object157["Object[157∈13@13]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf160["__InputStaticLeaf[160∈14@14]"]:::plan
+    __InputStaticLeaf161["__InputStaticLeaf[161∈14@14]"]:::plan
+    PgSelect162[["PgSelect[162∈14@14]<br />ᐸmult_2ᐳ"]]:::sideeffectplan
+    First166["First[166∈14@14]"]:::plan
+    PgSelectSingle167["PgSelectSingle[167∈14@14]<br />ᐸmult_2ᐳ"]:::plan
+    PgClassExpression168["PgClassExpression[168∈14@14]<br />ᐸ__mult_2__.vᐳ"]:::plan
+    Object169["Object[169∈14@14]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf172["__InputStaticLeaf[172∈15@15]"]:::plan
+    __InputStaticLeaf173["__InputStaticLeaf[173∈15@15]"]:::plan
+    PgSelect174[["PgSelect[174∈15@15]<br />ᐸmult_3ᐳ"]]:::sideeffectplan
+    First178["First[178∈15@15]"]:::plan
+    PgSelectSingle179["PgSelectSingle[179∈15@15]<br />ᐸmult_3ᐳ"]:::plan
+    PgClassExpression180["PgClassExpression[180∈15@15]<br />ᐸ__mult_3__.vᐳ"]:::plan
+    Object181["Object[181∈15@15]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf184["__InputStaticLeaf[184∈16@16]"]:::plan
+    __InputStaticLeaf185["__InputStaticLeaf[185∈16@16]"]:::plan
+    PgSelect186[["PgSelect[186∈16@16]<br />ᐸmult_4ᐳ"]]:::sideeffectplan
+    First190["First[190∈16@16]"]:::plan
+    PgSelectSingle191["PgSelectSingle[191∈16@16]<br />ᐸmult_4ᐳ"]:::plan
+    PgClassExpression192["PgClassExpression[192∈16@16]<br />ᐸ__mult_4__.vᐳ"]:::plan
+    Object193["Object[193∈16@16]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf196["__InputStaticLeaf[196∈17@17]"]:::plan
+    __InputStaticLeaf197["__InputStaticLeaf[197∈17@17]"]:::plan
+    __InputStaticLeaf198["__InputStaticLeaf[198∈17@17]"]:::plan
+    __InputStaticLeaf200["__InputStaticLeaf[200∈17@17]"]:::plan
+    __InputStaticLeaf201["__InputStaticLeaf[201∈17@17]"]:::plan
+    __InputStaticLeaf202["__InputStaticLeaf[202∈17@17]"]:::plan
+    __InputStaticLeaf204["__InputStaticLeaf[204∈17@17]"]:::plan
+    __InputStaticLeaf207["__InputStaticLeaf[207∈17@17]"]:::plan
+    __InputStaticLeaf208["__InputStaticLeaf[208∈17@17]"]:::plan
+    __InputStaticLeaf210["__InputStaticLeaf[210∈17@17]"]:::plan
+    __InputStaticLeaf211["__InputStaticLeaf[211∈17@17]"]:::plan
+    List212["List[212∈17@17]<br />ᐸ200,201,202ᐳ"]:::plan
+    Object213["Object[213∈17@17]<br />ᐸ{value,inclusive}ᐳ"]:::plan
+    Object214["Object[214∈17@17]<br />ᐸ{value,inclusive}ᐳ"]:::plan
+    Object215["Object[215∈17@17]<br />ᐸ{start,end}ᐳ"]:::plan
+    PgSelect216[["PgSelect[216∈17@17]<br />ᐸtypes_mutationᐳ"]]:::sideeffectplan
+    First220["First[220∈17@17]"]:::plan
+    PgSelectSingle221["PgSelectSingle[221∈17@17]<br />ᐸtypes_mutationᐳ"]:::plan
+    PgClassExpression222["PgClassExpression[222∈17@17]<br />ᐸ__types_mutation__.vᐳ"]:::plan
+    Object223["Object[223∈17@17]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf227["__InputStaticLeaf[227∈18@18]"]:::plan
+    __InputStaticLeaf228["__InputStaticLeaf[228∈18@18]"]:::plan
+    __InputStaticLeaf229["__InputStaticLeaf[229∈18@18]"]:::plan
+    __InputStaticLeaf231["__InputStaticLeaf[231∈18@18]"]:::plan
+    __InputStaticLeaf232["__InputStaticLeaf[232∈18@18]"]:::plan
+    __InputStaticLeaf234["__InputStaticLeaf[234∈18@18]"]:::plan
+    __InputStaticLeaf235["__InputStaticLeaf[235∈18@18]"]:::plan
+    __InputStaticLeaf236["__InputStaticLeaf[236∈18@18]"]:::plan
+    __InputStaticLeaf237["__InputStaticLeaf[237∈18@18]"]:::plan
+    __InputStaticLeaf238["__InputStaticLeaf[238∈18@18]"]:::plan
+    __InputStaticLeaf239["__InputStaticLeaf[239∈18@18]"]:::plan
+    __InputStaticLeaf240["__InputStaticLeaf[240∈18@18]"]:::plan
+    Object242["Object[242∈18@18]<br />ᐸ{seconds,minutes,hours,days,months,years}ᐳ"]:::plan
+    Object241["Object[241∈18@18]<br />ᐸ{a,b,c,e,f,g,foo_bar}ᐳ"]:::plan
+    PgSelect243[["PgSelect[243∈18@18]<br />ᐸcompound_type_mutationᐳ"]]:::sideeffectplan
+    First247["First[247∈18@18]"]:::plan
+    PgSelectSingle248["PgSelectSingle[248∈18@18]<br />ᐸcompound_type_mutationᐳ"]:::plan
+    Object249["Object[249∈18@18]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression250["PgClassExpression[250∈18@18]<br />ᐸ__compound...tion__.”a”ᐳ"]:::plan
+    PgClassExpression251["PgClassExpression[251∈18@18]<br />ᐸ__compound...tion__.”b”ᐳ"]:::plan
+    PgClassExpression252["PgClassExpression[252∈18@18]<br />ᐸ__compound...tion__.”c”ᐳ"]:::plan
+    PgClassExpression253["PgClassExpression[253∈18@18]<br />ᐸ__compound...tion__.”d”ᐳ"]:::plan
+    PgClassExpression254["PgClassExpression[254∈18@18]<br />ᐸ__compound...tion__.”e”ᐳ"]:::plan
+    PgClassExpression255["PgClassExpression[255∈18@18]<br />ᐸ__compound...tion__.”f”ᐳ"]:::plan
+    PgClassExpression256["PgClassExpression[256∈18@18]<br />ᐸ__compound...tion__.”g”ᐳ"]:::plan
+    Access257["Access[257∈18@18]<br />ᐸ256.secondsᐳ"]:::plan
+    Access258["Access[258∈18@18]<br />ᐸ256.minutesᐳ"]:::plan
+    Access259["Access[259∈18@18]<br />ᐸ256.hoursᐳ"]:::plan
+    PgClassExpression260["PgClassExpression[260∈18@18]<br />ᐸ__compound....”foo_bar”ᐳ"]:::plan
+    __InputStaticLeaf264["__InputStaticLeaf[264∈19@19]"]:::plan
+    __InputStaticLeaf265["__InputStaticLeaf[265∈19@19]"]:::plan
+    __InputStaticLeaf266["__InputStaticLeaf[266∈19@19]"]:::plan
+    __InputStaticLeaf268["__InputStaticLeaf[268∈19@19]"]:::plan
+    __InputStaticLeaf269["__InputStaticLeaf[269∈19@19]"]:::plan
+    __InputStaticLeaf271["__InputStaticLeaf[271∈19@19]"]:::plan
+    __InputStaticLeaf272["__InputStaticLeaf[272∈19@19]"]:::plan
+    __InputStaticLeaf273["__InputStaticLeaf[273∈19@19]"]:::plan
+    __InputStaticLeaf274["__InputStaticLeaf[274∈19@19]"]:::plan
+    __InputStaticLeaf275["__InputStaticLeaf[275∈19@19]"]:::plan
+    __InputStaticLeaf276["__InputStaticLeaf[276∈19@19]"]:::plan
+    __InputStaticLeaf277["__InputStaticLeaf[277∈19@19]"]:::plan
+    Object279["Object[279∈19@19]<br />ᐸ{seconds,minutes,hours,days,months,years}ᐳ"]:::plan
+    Object278["Object[278∈19@19]<br />ᐸ{a,b,c,e,f,g,foo_bar}ᐳ"]:::plan
+    PgSelect280[["PgSelect[280∈19@19]<br />ᐸcompound_type_set_mutationᐳ"]]:::sideeffectplan
+    Object284["Object[284∈19@19]<br />ᐸ{result}ᐳ"]:::plan
+    __Item285>"__Item[285∈20@19]<br />ᐸ280ᐳ"]:::itemplan
+    PgSelectSingle286["PgSelectSingle[286∈20@19]<br />ᐸcompound_type_set_mutationᐳ"]:::plan
+    PgClassExpression287["PgClassExpression[287∈20@19]<br />ᐸ__compound...tion__.”a”ᐳ"]:::plan
+    PgClassExpression288["PgClassExpression[288∈20@19]<br />ᐸ__compound...tion__.”b”ᐳ"]:::plan
+    PgClassExpression289["PgClassExpression[289∈20@19]<br />ᐸ__compound...tion__.”c”ᐳ"]:::plan
+    PgClassExpression290["PgClassExpression[290∈20@19]<br />ᐸ__compound...tion__.”d”ᐳ"]:::plan
+    PgClassExpression291["PgClassExpression[291∈20@19]<br />ᐸ__compound...tion__.”e”ᐳ"]:::plan
+    PgClassExpression292["PgClassExpression[292∈20@19]<br />ᐸ__compound...tion__.”f”ᐳ"]:::plan
+    PgClassExpression293["PgClassExpression[293∈20@19]<br />ᐸ__compound...tion__.”g”ᐳ"]:::plan
+    Access294["Access[294∈20@19]<br />ᐸ293.secondsᐳ"]:::plan
+    Access295["Access[295∈20@19]<br />ᐸ293.minutesᐳ"]:::plan
+    Access296["Access[296∈20@19]<br />ᐸ293.hoursᐳ"]:::plan
+    PgClassExpression297["PgClassExpression[297∈20@19]<br />ᐸ__compound....”foo_bar”ᐳ"]:::plan
+    __InputStaticLeaf301["__InputStaticLeaf[301∈21@20]"]:::plan
+    __InputStaticLeaf302["__InputStaticLeaf[302∈21@20]"]:::plan
+    __InputStaticLeaf303["__InputStaticLeaf[303∈21@20]"]:::plan
+    __InputStaticLeaf305["__InputStaticLeaf[305∈21@20]"]:::plan
+    __InputStaticLeaf306["__InputStaticLeaf[306∈21@20]"]:::plan
+    __InputStaticLeaf308["__InputStaticLeaf[308∈21@20]"]:::plan
+    __InputStaticLeaf309["__InputStaticLeaf[309∈21@20]"]:::plan
+    __InputStaticLeaf310["__InputStaticLeaf[310∈21@20]"]:::plan
+    __InputStaticLeaf311["__InputStaticLeaf[311∈21@20]"]:::plan
+    __InputStaticLeaf312["__InputStaticLeaf[312∈21@20]"]:::plan
+    __InputStaticLeaf313["__InputStaticLeaf[313∈21@20]"]:::plan
+    __InputStaticLeaf314["__InputStaticLeaf[314∈21@20]"]:::plan
+    Object316["Object[316∈21@20]<br />ᐸ{seconds,minutes,hours,days,months,years}ᐳ"]:::plan
+    Object315["Object[315∈21@20]<br />ᐸ{a,b,c,e,f,g,foo_bar}ᐳ"]:::plan
+    PgSelect317[["PgSelect[317∈21@20]<br />ᐸcompound_type_array_mutationᐳ"]]:::sideeffectplan
+    Object321["Object[321∈21@20]<br />ᐸ{result}ᐳ"]:::plan
+    __Item322>"__Item[322∈22@20]<br />ᐸ317ᐳ"]:::itemplan
+    PgSelectSingle323["PgSelectSingle[323∈22@20]<br />ᐸcompound_type_array_mutationᐳ"]:::plan
+    PgClassExpression324["PgClassExpression[324∈22@20]<br />ᐸ__compound...tion__.”a”ᐳ"]:::plan
+    PgClassExpression325["PgClassExpression[325∈22@20]<br />ᐸ__compound...tion__.”b”ᐳ"]:::plan
+    PgClassExpression326["PgClassExpression[326∈22@20]<br />ᐸ__compound...tion__.”c”ᐳ"]:::plan
+    PgClassExpression327["PgClassExpression[327∈22@20]<br />ᐸ__compound...tion__.”d”ᐳ"]:::plan
+    PgClassExpression328["PgClassExpression[328∈22@20]<br />ᐸ__compound...tion__.”e”ᐳ"]:::plan
+    PgClassExpression329["PgClassExpression[329∈22@20]<br />ᐸ__compound...tion__.”f”ᐳ"]:::plan
+    PgClassExpression330["PgClassExpression[330∈22@20]<br />ᐸ__compound...tion__.”g”ᐳ"]:::plan
+    Access331["Access[331∈22@20]<br />ᐸ330.secondsᐳ"]:::plan
+    Access332["Access[332∈22@20]<br />ᐸ330.minutesᐳ"]:::plan
+    Access333["Access[333∈22@20]<br />ᐸ330.hoursᐳ"]:::plan
+    PgClassExpression334["PgClassExpression[334∈22@20]<br />ᐸ__compound....”foo_bar”ᐳ"]:::plan
+    __InputStaticLeaf337["__InputStaticLeaf[337∈23@21]"]:::plan
+    PgSelect338[["PgSelect[338∈23@21]<br />ᐸtable_mutationᐳ"]]:::sideeffectplan
+    First342["First[342∈23@21]"]:::plan
+    PgSelectSingle343["PgSelectSingle[343∈23@21]<br />ᐸtable_mutationᐳ"]:::plan
+    Object344["Object[344∈23@21]<br />ᐸ{result}ᐳ"]:::plan
+    Constant345["Constant[345∈23@21]"]:::plan
+    PgClassExpression346["PgClassExpression[346∈23@21]<br />ᐸ__table_mutation__.”id”ᐳ"]:::plan
+    List347["List[347∈23@21]<br />ᐸ345,346ᐳ"]:::plan
+    Lambda348["Lambda[348∈23@21]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression350["PgClassExpression[350∈23@21]<br />ᐸ__table_mu...”headline”ᐳ"]:::plan
+    PgClassExpression351["PgClassExpression[351∈23@21]<br />ᐸ__table_mu...author_id”ᐳ"]:::plan
+    PgSelect353[["PgSelect[353∈23@21]<br />ᐸpersonᐳ"]]:::plan
+    First357["First[357∈23@21]"]:::plan
+    PgSelectSingle358["PgSelectSingle[358∈23@21]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression359["PgClassExpression[359∈23@21]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression360["PgClassExpression[360∈23@21]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgSelect365[["PgSelect[365∈23@21]<br />ᐸpostᐳ"]]:::plan
+    First370["First[370∈23@21]"]:::plan
+    PgSelectSingle371["PgSelectSingle[371∈23@21]<br />ᐸpostᐳ"]:::plan
+    Edge372["Edge[372∈23@21]"]:::plan
+    PgClassExpression374["PgClassExpression[374∈23@21]<br />ᐸ__post__.”id”ᐳ"]:::plan
+    List375["List[375∈23@21]<br />ᐸ374ᐳ"]:::plan
+    PgCursor373["PgCursor[373∈23@21]"]:::plan
+    PgClassExpression377["PgClassExpression[377∈23@21]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    __InputStaticLeaf380["__InputStaticLeaf[380∈24@22]"]:::plan
+    PgSelect381[["PgSelect[381∈24@22]<br />ᐸtable_mutationᐳ"]]:::sideeffectplan
+    First385["First[385∈24@22]"]:::plan
+    PgSelectSingle386["PgSelectSingle[386∈24@22]<br />ᐸtable_mutationᐳ"]:::plan
+    Object387["Object[387∈24@22]<br />ᐸ{result}ᐳ"]:::plan
+    Constant388["Constant[388∈24@22]"]:::plan
+    PgClassExpression389["PgClassExpression[389∈24@22]<br />ᐸ__table_mutation__.”id”ᐳ"]:::plan
+    List390["List[390∈24@22]<br />ᐸ388,389ᐳ"]:::plan
+    Lambda391["Lambda[391∈24@22]<br />ᐸencodeᐳ"]:::plan
+    PgClassExpression393["PgClassExpression[393∈24@22]<br />ᐸ__table_mu...”headline”ᐳ"]:::plan
+    PgClassExpression394["PgClassExpression[394∈24@22]<br />ᐸ__table_mu...author_id”ᐳ"]:::plan
+    PgSelect396[["PgSelect[396∈24@22]<br />ᐸpersonᐳ"]]:::plan
+    First400["First[400∈24@22]"]:::plan
+    PgSelectSingle401["PgSelectSingle[401∈24@22]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression402["PgClassExpression[402∈24@22]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression403["PgClassExpression[403∈24@22]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgSelect408[["PgSelect[408∈24@22]<br />ᐸpostᐳ"]]:::plan
+    First413["First[413∈24@22]"]:::plan
+    PgSelectSingle414["PgSelectSingle[414∈24@22]<br />ᐸpostᐳ"]:::plan
+    Edge415["Edge[415∈24@22]"]:::plan
+    PgClassExpression417["PgClassExpression[417∈24@22]<br />ᐸ__post__.”id”ᐳ"]:::plan
+    List418["List[418∈24@22]<br />ᐸ417ᐳ"]:::plan
+    PgCursor416["PgCursor[416∈24@22]"]:::plan
+    PgClassExpression420["PgClassExpression[420∈24@22]<br />ᐸ__post__.”headline”ᐳ"]:::plan
+    PgSelect423[["PgSelect[423∈25@23]<br />ᐸtable_set_mutationᐳ"]]:::sideeffectplan
+    Object427["Object[427∈25@23]<br />ᐸ{result}ᐳ"]:::plan
+    __Item428>"__Item[428∈26@23]<br />ᐸ423ᐳ"]:::itemplan
+    PgSelectSingle429["PgSelectSingle[429∈26@23]<br />ᐸtable_set_mutationᐳ"]:::plan
+    PgClassExpression430["PgClassExpression[430∈26@23]<br />ᐸ__table_se...full_name”ᐳ"]:::plan
+    __InputStaticLeaf433["__InputStaticLeaf[433∈27@24]"]:::plan
+    __InputStaticLeaf435["__InputStaticLeaf[435∈27@24]"]:::plan
+    Constant436["Constant[436∈27@24]"]:::plan
+    PgSelect437[["PgSelect[437∈27@24]<br />ᐸint_set_mutationᐳ"]]:::sideeffectplan
+    Object441["Object[441∈27@24]<br />ᐸ{result}ᐳ"]:::plan
+    __Item442>"__Item[442∈28@24]<br />ᐸ437ᐳ"]:::itemplan
+    PgSelectSingle443["PgSelectSingle[443∈28@24]<br />ᐸint_set_mutationᐳ"]:::plan
+    PgClassExpression444["PgClassExpression[444∈28@24]<br />ᐸ__int_set_mutation__.vᐳ"]:::plan
+    __InputStaticLeaf446["__InputStaticLeaf[446∈29@25]"]:::plan
+    PgSelect447[["PgSelect[447∈29@25]<br />ᐸno_args_mutationᐳ"]]:::sideeffectplan
+    First451["First[451∈29@25]"]:::plan
+    PgSelectSingle452["PgSelectSingle[452∈29@25]<br />ᐸno_args_mutationᐳ"]:::plan
+    PgClassExpression453["PgClassExpression[453∈29@25]<br />ᐸ__no_args_mutation__.vᐳ"]:::plan
+    Object454["Object[454∈29@25]<br />ᐸ{result,clientMutationId}ᐳ"]:::plan
+    PgSelect457[["PgSelect[457∈30@26]<br />ᐸreturn_void_mutationᐳ"]]:::sideeffectplan
+    First461["First[461∈30@26]"]:::plan
+    PgSelectSingle462["PgSelectSingle[462∈30@26]<br />ᐸreturn_void_mutationᐳ"]:::plan
+    PgClassExpression463["PgClassExpression[463∈30@26]<br />ᐸ__return_v...tation__.vᐳ"]:::plan
+    Object464["Object[464∈30@26]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf467["__InputStaticLeaf[467∈31@27]"]:::plan
+    PgSelect468[["PgSelect[468∈31@27]<br />ᐸguid_fnᐳ"]]:::sideeffectplan
+    First472["First[472∈31@27]"]:::plan
+    PgSelectSingle473["PgSelectSingle[473∈31@27]<br />ᐸguid_fnᐳ"]:::plan
+    PgClassExpression474["PgClassExpression[474∈31@27]<br />ᐸ__guid_fn__.vᐳ"]:::plan
+    Object475["Object[475∈31@27]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf478["__InputStaticLeaf[478∈32@28]"]:::plan
+    PgSelect479[["PgSelect[479∈32@28]<br />ᐸguid_fnᐳ"]]:::sideeffectplan
+    First483["First[483∈32@28]"]:::plan
+    PgSelectSingle484["PgSelectSingle[484∈32@28]<br />ᐸguid_fnᐳ"]:::plan
+    PgClassExpression485["PgClassExpression[485∈32@28]<br />ᐸ__guid_fn__.vᐳ"]:::plan
+    Object486["Object[486∈32@28]<br />ᐸ{result}ᐳ"]:::plan
+    __InputStaticLeaf491["__InputStaticLeaf[491∈33@29]"]:::plan
+    __InputStaticLeaf492["__InputStaticLeaf[492∈33@29]"]:::plan
+    __InputStaticLeaf493["__InputStaticLeaf[493∈33@29]"]:::plan
+    __InputStaticLeaf494["__InputStaticLeaf[494∈33@29]"]:::plan
+    __InputStaticLeaf496["__InputStaticLeaf[496∈33@29]"]:::plan
+    __InputStaticLeaf500["__InputStaticLeaf[500∈33@29]"]:::plan
+    __InputStaticLeaf501["__InputStaticLeaf[501∈33@29]"]:::plan
+    __InputStaticLeaf506["__InputStaticLeaf[506∈33@29]"]:::plan
+    __InputStaticLeaf507["__InputStaticLeaf[507∈33@29]"]:::plan
+    __InputStaticLeaf508["__InputStaticLeaf[508∈33@29]"]:::plan
+    __InputStaticLeaf509["__InputStaticLeaf[509∈33@29]"]:::plan
+    __InputStaticLeaf511["__InputStaticLeaf[511∈33@29]"]:::plan
+    __InputStaticLeaf515["__InputStaticLeaf[515∈33@29]"]:::plan
+    __InputStaticLeaf516["__InputStaticLeaf[516∈33@29]"]:::plan
+    __InputStaticLeaf521["__InputStaticLeaf[521∈33@29]"]:::plan
+    __InputStaticLeaf522["__InputStaticLeaf[522∈33@29]"]:::plan
+    __InputStaticLeaf523["__InputStaticLeaf[523∈33@29]"]:::plan
+    __InputStaticLeaf524["__InputStaticLeaf[524∈33@29]"]:::plan
+    __InputStaticLeaf526["__InputStaticLeaf[526∈33@29]"]:::plan
+    __InputStaticLeaf530["__InputStaticLeaf[530∈33@29]"]:::plan
+    __InputStaticLeaf531["__InputStaticLeaf[531∈33@29]"]:::plan
+    List547["List[547∈33@29]<br />ᐸ496ᐳ"]:::plan
+    Object548["Object[548∈33@29]<br />ᐸ{schedule,is_optimised}ᐳ"]:::plan
+    List549["List[549∈33@29]<br />ᐸ548ᐳ"]:::plan
+    Object546["Object[546∈33@29]<br />ᐸ{id,headline,body,author_id,enums,comptypes}ᐳ"]:::plan
+    List551["List[551∈33@29]<br />ᐸ511ᐳ"]:::plan
+    Object552["Object[552∈33@29]<br />ᐸ{schedule,is_optimised}ᐳ"]:::plan
+    List553["List[553∈33@29]<br />ᐸ552ᐳ"]:::plan
+    Object550["Object[550∈33@29]<br />ᐸ{id,headline,body,author_id,enums,comptypes}ᐳ"]:::plan
+    List555["List[555∈33@29]<br />ᐸ526ᐳ"]:::plan
+    Object556["Object[556∈33@29]<br />ᐸ{schedule,is_optimised}ᐳ"]:::plan
+    List557["List[557∈33@29]<br />ᐸ556ᐳ"]:::plan
+    Object554["Object[554∈33@29]<br />ᐸ{id,headline,body,author_id,enums,comptypes}ᐳ"]:::plan
+    List558["List[558∈33@29]<br />ᐸ546,550,554ᐳ"]:::plan
+    PgSelect559[["PgSelect[559∈33@29]<br />ᐸpost_manyᐳ"]]:::sideeffectplan
+    Object563["Object[563∈33@29]<br />ᐸ{result}ᐳ"]:::plan
+    __Item564>"__Item[564∈34@29]<br />ᐸ559ᐳ"]:::itemplan
+    PgSelectSingle565["PgSelectSingle[565∈34@29]<br />ᐸpost_manyᐳ"]:::plan
+    PgClassExpression566["PgClassExpression[566∈34@29]<br />ᐸ__post_many__.”id”ᐳ"]:::plan
+    PgClassExpression567["PgClassExpression[567∈34@29]<br />ᐸ__post_man...”headline”ᐳ"]:::plan
+    PgClassExpression568["PgClassExpression[568∈34@29]<br />ᐸ__post_man...comptypes”ᐳ"]:::plan
+    PgSelect569[["PgSelect[569∈34@29]<br />ᐸcomptypeᐳ"]]:::plan
+    __Item573>"__Item[573∈35@29]<br />ᐸ569ᐳ"]:::itemplan
+    PgSelectSingle574["PgSelectSingle[574∈35@29]<br />ᐸcomptypeᐳ"]:::plan
+    PgClassExpression575["PgClassExpression[575∈35@29]<br />ᐸ__comptype__.”schedule”ᐳ"]:::plan
+    PgClassExpression576["PgClassExpression[576∈35@29]<br />ᐸ__comptype...optimised”ᐳ"]:::plan
+    __InputStaticLeaf580["__InputStaticLeaf[580∈36@30]"]:::plan
+    __InputStaticLeaf581["__InputStaticLeaf[581∈36@30]"]:::plan
+    __InputStaticLeaf582["__InputStaticLeaf[582∈36@30]"]:::plan
+    __InputStaticLeaf590["__InputStaticLeaf[590∈36@30]"]:::plan
+    Object591["Object[591∈36@30]<br />ᐸ{id,headline,body}ᐳ"]:::plan
+    PgSelect592[["PgSelect[592∈36@30]<br />ᐸpost_with_suffixᐳ"]]:::sideeffectplan
+    First596["First[596∈36@30]"]:::plan
+    PgSelectSingle597["PgSelectSingle[597∈36@30]<br />ᐸpost_with_suffixᐳ"]:::plan
+    Object598["Object[598∈36@30]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression599["PgClassExpression[599∈36@30]<br />ᐸ__post_wit...fix__.”id”ᐳ"]:::plan
+    PgClassExpression600["PgClassExpression[600∈36@30]<br />ᐸ__post_wit...”headline”ᐳ"]:::plan
+    PgSelect603[["PgSelect[603∈37@31]<br />ᐸissue756_mutationᐳ"]]:::sideeffectplan
+    First607["First[607∈37@31]"]:::plan
+    PgSelectSingle608["PgSelectSingle[608∈37@31]<br />ᐸissue756_mutationᐳ"]:::plan
+    Object609["Object[609∈37@31]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression610["PgClassExpression[610∈37@31]<br />ᐸ__issue756...ion__.”id”ᐳ"]:::plan
+    PgClassExpression611["PgClassExpression[611∈37@31]<br />ᐸ__issue756...ion__.”ts”ᐳ"]:::plan
+    PgSelect614[["PgSelect[614∈38@32]<br />ᐸissue756_set_mutationᐳ"]]:::sideeffectplan
+    Object618["Object[618∈38@32]<br />ᐸ{result}ᐳ"]:::plan
+    __Item619>"__Item[619∈39@32]<br />ᐸ614ᐳ"]:::itemplan
+    PgSelectSingle620["PgSelectSingle[620∈39@32]<br />ᐸissue756_set_mutationᐳ"]:::plan
+    PgClassExpression621["PgClassExpression[621∈39@32]<br />ᐸ__issue756...ion__.”id”ᐳ"]:::plan
+    PgClassExpression622["PgClassExpression[622∈39@32]<br />ᐸ__issue756...ion__.”ts”ᐳ"]:::plan
+    __InputStaticLeaf626["__InputStaticLeaf[626∈40@33]"]:::plan
+    __InputStaticLeaf627["__InputStaticLeaf[627∈40@33]"]:::plan
+    __InputStaticLeaf628["__InputStaticLeaf[628∈40@33]"]:::plan
+    __InputStaticLeaf630["__InputStaticLeaf[630∈40@33]"]:::plan
+    __InputStaticLeaf631["__InputStaticLeaf[631∈40@33]"]:::plan
+    __InputStaticLeaf633["__InputStaticLeaf[633∈40@33]"]:::plan
+    __InputStaticLeaf634["__InputStaticLeaf[634∈40@33]"]:::plan
+    __InputStaticLeaf635["__InputStaticLeaf[635∈40@33]"]:::plan
+    __InputStaticLeaf636["__InputStaticLeaf[636∈40@33]"]:::plan
+    __InputStaticLeaf637["__InputStaticLeaf[637∈40@33]"]:::plan
+    __InputStaticLeaf638["__InputStaticLeaf[638∈40@33]"]:::plan
+    __InputStaticLeaf639["__InputStaticLeaf[639∈40@33]"]:::plan
+    Object641["Object[641∈40@33]<br />ᐸ{seconds,minutes,hours,days,months,years}ᐳ"]:::plan
+    Object640["Object[640∈40@33]<br />ᐸ{a,b,c,e,f,g,foo_bar}ᐳ"]:::plan
+    PgSelect642[["PgSelect[642∈40@33]<br />ᐸmutation_compound_type_arrayᐳ"]]:::sideeffectplan
+    Object646["Object[646∈40@33]<br />ᐸ{result}ᐳ"]:::plan
+    __Item647>"__Item[647∈41@33]<br />ᐸ642ᐳ"]:::itemplan
+    PgSelectSingle648["PgSelectSingle[648∈41@33]<br />ᐸmutation_compound_type_arrayᐳ"]:::plan
+    PgClassExpression649["PgClassExpression[649∈41@33]<br />ᐸ__mutation...rray__.”a”ᐳ"]:::plan
+    PgClassExpression650["PgClassExpression[650∈41@33]<br />ᐸ__mutation...rray__.”b”ᐳ"]:::plan
+    PgClassExpression651["PgClassExpression[651∈41@33]<br />ᐸ__mutation...rray__.”c”ᐳ"]:::plan
+    PgClassExpression652["PgClassExpression[652∈41@33]<br />ᐸ__mutation...rray__.”d”ᐳ"]:::plan
+    PgClassExpression653["PgClassExpression[653∈41@33]<br />ᐸ__mutation...rray__.”e”ᐳ"]:::plan
+    PgClassExpression654["PgClassExpression[654∈41@33]<br />ᐸ__mutation...rray__.”f”ᐳ"]:::plan
+    PgClassExpression655["PgClassExpression[655∈41@33]<br />ᐸ__mutation...rray__.”g”ᐳ"]:::plan
+    Access656["Access[656∈41@33]<br />ᐸ655.secondsᐳ"]:::plan
+    Access657["Access[657∈41@33]<br />ᐸ655.minutesᐳ"]:::plan
+    Access658["Access[658∈41@33]<br />ᐸ655.hoursᐳ"]:::plan
+    PgClassExpression659["PgClassExpression[659∈41@33]<br />ᐸ__mutation....”foo_bar”ᐳ"]:::plan
+    PgSelect662[["PgSelect[662∈42@34]<br />ᐸmutation_text_arrayᐳ"]]:::sideeffectplan
+    First666["First[666∈42@34]"]:::plan
+    PgSelectSingle667["PgSelectSingle[667∈42@34]<br />ᐸmutation_text_arrayᐳ"]:::plan
+    PgClassExpression668["PgClassExpression[668∈42@34]<br />ᐸ__mutation..._array__.vᐳ"]:::plan
+    Object669["Object[669∈42@34]<br />ᐸ{result}ᐳ"]:::plan
+    __Item670>"__Item[670∈43@34]<br />ᐸ668ᐳ"]:::itemplan
+    PgSelect673[["PgSelect[673∈44@35]<br />ᐸmutation_interval_arrayᐳ"]]:::sideeffectplan
+    First677["First[677∈44@35]"]:::plan
+    PgSelectSingle678["PgSelectSingle[678∈44@35]<br />ᐸmutation_interval_arrayᐳ"]:::plan
+    PgClassExpression679["PgClassExpression[679∈44@35]<br />ᐸ__mutation..._array__.vᐳ"]:::plan
+    Object680["Object[680∈44@35]<br />ᐸ{result}ᐳ"]:::plan
+    __Item681>"__Item[681∈45@35]<br />ᐸ679ᐳ"]:::itemplan
+    Access682["Access[682∈45@35]<br />ᐸ681.secondsᐳ"]:::plan
+    Access683["Access[683∈45@35]<br />ᐸ681.minutesᐳ"]:::plan
+    Access684["Access[684∈45@35]<br />ᐸ681.hoursᐳ"]:::plan
+    Access685["Access[685∈45@35]<br />ᐸ681.daysᐳ"]:::plan
+    Access686["Access[686∈45@35]<br />ᐸ681.monthsᐳ"]:::plan
+    Access687["Access[687∈45@35]<br />ᐸ681.yearsᐳ"]:::plan
+    PgSelect690[["PgSelect[690∈46@36]<br />ᐸmutation_interval_setᐳ"]]:::sideeffectplan
+    Object694["Object[694∈46@36]<br />ᐸ{result}ᐳ"]:::plan
+    __Item695>"__Item[695∈47@36]<br />ᐸ690ᐳ"]:::itemplan
+    PgSelectSingle696["PgSelectSingle[696∈47@36]<br />ᐸmutation_interval_setᐳ"]:::plan
+    PgClassExpression697["PgClassExpression[697∈47@36]<br />ᐸ__mutation...al_set__.vᐳ"]:::plan
+    Access698["Access[698∈47@36]<br />ᐸ697.secondsᐳ"]:::plan
+    Access699["Access[699∈47@36]<br />ᐸ697.minutesᐳ"]:::plan
+    Access700["Access[700∈47@36]<br />ᐸ697.hoursᐳ"]:::plan
+    Access701["Access[701∈47@36]<br />ᐸ697.daysᐳ"]:::plan
+    Access702["Access[702∈47@36]<br />ᐸ697.monthsᐳ"]:::plan
+    Access703["Access[703∈47@36]<br />ᐸ697.yearsᐳ"]:::plan
+
+    %% plan dependencies
+    __Value5 --> __TrackedObject6
+    __Value3 --> Access11
+    __Value3 --> Access12
+    Access11 & Access12 --> Object13
+    Object13 & __InputStaticLeaf9 --> PgSelect10
+    PgSelect10 --> First14
+    First14 --> PgSelectSingle15
+    PgSelectSingle15 --> PgClassExpression16
+    PgClassExpression16 --> Object17
+    Object13 & __InputStaticLeaf20 --> PgSelect21
+    PgSelect21 --> First25
+    First25 --> PgSelectSingle26
+    PgSelectSingle26 --> PgClassExpression27
+    PgClassExpression27 --> Object28
+    Object13 & __InputStaticLeaf31 --> PgSelect32
+    PgSelect32 --> First36
+    First36 --> PgSelectSingle37
+    PgSelectSingle37 --> PgClassExpression38
+    PgClassExpression38 --> Object39
+    Object13 & __InputStaticLeaf42 --> PgSelect43
+    PgSelect43 --> First47
+    First47 --> PgSelectSingle48
+    PgSelectSingle48 --> PgClassExpression49
+    PgClassExpression49 --> Object50
+    Object13 & __InputStaticLeaf53 --> PgSelect54
+    PgSelect54 --> First58
+    First58 --> PgSelectSingle59
+    PgSelectSingle59 --> PgClassExpression60
+    PgClassExpression60 --> Object61
+    Object13 --> PgSelect65
+    PgSelect65 --> First69
+    First69 --> PgSelectSingle70
+    PgSelectSingle70 --> PgClassExpression71
+    PgClassExpression71 --> Object72
+    Object13 & __InputStaticLeaf75 --> PgSelect76
+    PgSelect76 --> First80
+    First80 --> PgSelectSingle81
+    PgSelectSingle81 --> PgClassExpression82
+    PgClassExpression82 --> Object83
+    Object13 & __InputStaticLeaf86 & __InputStaticLeaf87 --> PgSelect88
+    PgSelect88 --> First92
+    First92 --> PgSelectSingle93
+    PgSelectSingle93 --> PgClassExpression94
+    PgClassExpression94 --> Object95
+    Object13 & __InputStaticLeaf99 & __InputStaticLeaf100 --> PgSelect101
+    PgSelect101 --> First105
+    First105 --> PgSelectSingle106
+    PgSelectSingle106 --> PgClassExpression107
+    PgClassExpression107 & __InputStaticLeaf98 --> Object108
+    Object13 & Constant113 & __InputStaticLeaf112 --> PgSelect114
+    PgSelect114 --> First118
+    First118 --> PgSelectSingle119
+    PgSelectSingle119 --> PgClassExpression120
+    PgClassExpression120 & __InputStaticLeaf110 --> Object121
+    Object13 & __InputStaticLeaf124 & __InputStaticLeaf125 --> PgSelect126
+    PgSelect126 --> First130
+    First130 --> PgSelectSingle131
+    PgSelectSingle131 --> PgClassExpression132
+    PgClassExpression132 --> Object133
+    Object13 & __InputStaticLeaf136 & __InputStaticLeaf137 --> PgSelect138
+    PgSelect138 --> First142
+    First142 --> PgSelectSingle143
+    PgSelectSingle143 --> PgClassExpression144
+    PgClassExpression144 --> Object145
+    Object13 & __InputStaticLeaf148 & __InputStaticLeaf149 --> PgSelect150
+    PgSelect150 --> First154
+    First154 --> PgSelectSingle155
+    PgSelectSingle155 --> PgClassExpression156
+    PgClassExpression156 --> Object157
+    Object13 & __InputStaticLeaf160 & __InputStaticLeaf161 --> PgSelect162
+    PgSelect162 --> First166
+    First166 --> PgSelectSingle167
+    PgSelectSingle167 --> PgClassExpression168
+    PgClassExpression168 --> Object169
+    Object13 & __InputStaticLeaf172 & __InputStaticLeaf173 --> PgSelect174
+    PgSelect174 --> First178
+    First178 --> PgSelectSingle179
+    PgSelectSingle179 --> PgClassExpression180
+    PgClassExpression180 --> Object181
+    Object13 & __InputStaticLeaf184 & __InputStaticLeaf185 --> PgSelect186
+    PgSelect186 --> First190
+    First190 --> PgSelectSingle191
+    PgSelectSingle191 --> PgClassExpression192
+    PgClassExpression192 --> Object193
+    __InputStaticLeaf200 & __InputStaticLeaf201 & __InputStaticLeaf202 --> List212
+    __InputStaticLeaf207 & __InputStaticLeaf208 --> Object213
+    __InputStaticLeaf210 & __InputStaticLeaf211 --> Object214
+    Object213 & Object214 --> Object215
+    Object13 & __InputStaticLeaf196 & __InputStaticLeaf197 & __InputStaticLeaf198 & List212 & __InputStaticLeaf204 & Object215 --> PgSelect216
+    PgSelect216 --> First220
+    First220 --> PgSelectSingle221
+    PgSelectSingle221 --> PgClassExpression222
+    PgClassExpression222 --> Object223
+    __InputStaticLeaf234 & __InputStaticLeaf235 & __InputStaticLeaf236 & __InputStaticLeaf237 & __InputStaticLeaf238 & __InputStaticLeaf239 --> Object242
+    __InputStaticLeaf227 & __InputStaticLeaf228 & __InputStaticLeaf229 & __InputStaticLeaf231 & __InputStaticLeaf232 & Object242 & __InputStaticLeaf240 --> Object241
+    Object13 & Object241 --> PgSelect243
+    PgSelect243 --> First247
+    First247 --> PgSelectSingle248
+    PgSelectSingle248 --> Object249
+    PgSelectSingle248 --> PgClassExpression250
+    PgSelectSingle248 --> PgClassExpression251
+    PgSelectSingle248 --> PgClassExpression252
+    PgSelectSingle248 --> PgClassExpression253
+    PgSelectSingle248 --> PgClassExpression254
+    PgSelectSingle248 --> PgClassExpression255
+    PgSelectSingle248 --> PgClassExpression256
+    PgClassExpression256 --> Access257
+    PgClassExpression256 --> Access258
+    PgClassExpression256 --> Access259
+    PgSelectSingle248 --> PgClassExpression260
+    __InputStaticLeaf271 & __InputStaticLeaf272 & __InputStaticLeaf273 & __InputStaticLeaf274 & __InputStaticLeaf275 & __InputStaticLeaf276 --> Object279
+    __InputStaticLeaf264 & __InputStaticLeaf265 & __InputStaticLeaf266 & __InputStaticLeaf268 & __InputStaticLeaf269 & Object279 & __InputStaticLeaf277 --> Object278
+    Object13 & Object278 --> PgSelect280
+    PgSelect280 --> Object284
+    PgSelect280 ==> __Item285
+    __Item285 --> PgSelectSingle286
+    PgSelectSingle286 --> PgClassExpression287
+    PgSelectSingle286 --> PgClassExpression288
+    PgSelectSingle286 --> PgClassExpression289
+    PgSelectSingle286 --> PgClassExpression290
+    PgSelectSingle286 --> PgClassExpression291
+    PgSelectSingle286 --> PgClassExpression292
+    PgSelectSingle286 --> PgClassExpression293
+    PgClassExpression293 --> Access294
+    PgClassExpression293 --> Access295
+    PgClassExpression293 --> Access296
+    PgSelectSingle286 --> PgClassExpression297
+    __InputStaticLeaf308 & __InputStaticLeaf309 & __InputStaticLeaf310 & __InputStaticLeaf311 & __InputStaticLeaf312 & __InputStaticLeaf313 --> Object316
+    __InputStaticLeaf301 & __InputStaticLeaf302 & __InputStaticLeaf303 & __InputStaticLeaf305 & __InputStaticLeaf306 & Object316 & __InputStaticLeaf314 --> Object315
+    Object13 & Object315 --> PgSelect317
+    PgSelect317 --> Object321
+    PgSelect317 ==> __Item322
+    __Item322 --> PgSelectSingle323
+    PgSelectSingle323 --> PgClassExpression324
+    PgSelectSingle323 --> PgClassExpression325
+    PgSelectSingle323 --> PgClassExpression326
+    PgSelectSingle323 --> PgClassExpression327
+    PgSelectSingle323 --> PgClassExpression328
+    PgSelectSingle323 --> PgClassExpression329
+    PgSelectSingle323 --> PgClassExpression330
+    PgClassExpression330 --> Access331
+    PgClassExpression330 --> Access332
+    PgClassExpression330 --> Access333
+    PgSelectSingle323 --> PgClassExpression334
+    Object13 & __InputStaticLeaf337 --> PgSelect338
+    PgSelect338 --> First342
+    First342 --> PgSelectSingle343
+    PgSelectSingle343 --> Object344
+    PgSelectSingle343 --> PgClassExpression346
+    Constant345 & PgClassExpression346 --> List347
+    List347 --> Lambda348
+    PgSelectSingle343 --> PgClassExpression350
+    PgSelectSingle343 --> PgClassExpression351
+    Object13 & PgClassExpression351 --> PgSelect353
+    PgSelect353 --> First357
+    First357 --> PgSelectSingle358
+    PgSelectSingle358 --> PgClassExpression359
+    PgSelectSingle358 --> PgClassExpression360
+    Object13 & PgClassExpression346 --> PgSelect365
+    PgSelect365 --> First370
+    First370 --> PgSelectSingle371
+    PgSelectSingle371 --> Edge372
+    PgSelectSingle371 --> PgClassExpression374
+    PgClassExpression374 --> List375
+    List375 --> PgCursor373
+    PgSelectSingle371 --> PgClassExpression377
+    Object13 & __InputStaticLeaf380 --> PgSelect381
+    PgSelect381 --> First385
+    First385 --> PgSelectSingle386
+    PgSelectSingle386 --> Object387
+    PgSelectSingle386 --> PgClassExpression389
+    Constant388 & PgClassExpression389 --> List390
+    List390 --> Lambda391
+    PgSelectSingle386 --> PgClassExpression393
+    PgSelectSingle386 --> PgClassExpression394
+    Object13 & PgClassExpression394 --> PgSelect396
+    PgSelect396 --> First400
+    First400 --> PgSelectSingle401
+    PgSelectSingle401 --> PgClassExpression402
+    PgSelectSingle401 --> PgClassExpression403
+    Object13 & PgClassExpression389 --> PgSelect408
+    PgSelect408 --> First413
+    First413 --> PgSelectSingle414
+    PgSelectSingle414 --> Edge415
+    PgSelectSingle414 --> PgClassExpression417
+    PgClassExpression417 --> List418
+    List418 --> PgCursor416
+    PgSelectSingle414 --> PgClassExpression420
+    Object13 --> PgSelect423
+    PgSelect423 --> Object427
+    PgSelect423 ==> __Item428
+    __Item428 --> PgSelectSingle429
+    PgSelectSingle429 --> PgClassExpression430
+    Object13 & __InputStaticLeaf433 & Constant436 & __InputStaticLeaf435 --> PgSelect437
+    PgSelect437 --> Object441
+    PgSelect437 ==> __Item442
+    __Item442 --> PgSelectSingle443
+    PgSelectSingle443 --> PgClassExpression444
+    Object13 --> PgSelect447
+    PgSelect447 --> First451
+    First451 --> PgSelectSingle452
+    PgSelectSingle452 --> PgClassExpression453
+    PgClassExpression453 & __InputStaticLeaf446 --> Object454
+    Object13 --> PgSelect457
+    PgSelect457 --> First461
+    First461 --> PgSelectSingle462
+    PgSelectSingle462 --> PgClassExpression463
+    PgClassExpression463 --> Object464
+    Object13 & __InputStaticLeaf467 --> PgSelect468
+    PgSelect468 --> First472
+    First472 --> PgSelectSingle473
+    PgSelectSingle473 --> PgClassExpression474
+    PgClassExpression474 --> Object475
+    Object13 & __InputStaticLeaf478 --> PgSelect479
+    PgSelect479 --> First483
+    First483 --> PgSelectSingle484
+    PgSelectSingle484 --> PgClassExpression485
+    PgClassExpression485 --> Object486
+    __InputStaticLeaf496 --> List547
+    __InputStaticLeaf500 & __InputStaticLeaf501 --> Object548
+    Object548 --> List549
+    __InputStaticLeaf491 & __InputStaticLeaf492 & __InputStaticLeaf493 & __InputStaticLeaf494 & List547 & List549 --> Object546
+    __InputStaticLeaf511 --> List551
+    __InputStaticLeaf515 & __InputStaticLeaf516 --> Object552
+    Object552 --> List553
+    __InputStaticLeaf506 & __InputStaticLeaf507 & __InputStaticLeaf508 & __InputStaticLeaf509 & List551 & List553 --> Object550
+    __InputStaticLeaf526 --> List555
+    __InputStaticLeaf530 & __InputStaticLeaf531 --> Object556
+    Object556 --> List557
+    __InputStaticLeaf521 & __InputStaticLeaf522 & __InputStaticLeaf523 & __InputStaticLeaf524 & List555 & List557 --> Object554
+    Object546 & Object550 & Object554 --> List558
+    Object13 & List558 --> PgSelect559
+    PgSelect559 --> Object563
+    PgSelect559 ==> __Item564
+    __Item564 --> PgSelectSingle565
+    PgSelectSingle565 --> PgClassExpression566
+    PgSelectSingle565 --> PgClassExpression567
+    PgSelectSingle565 --> PgClassExpression568
+    Object13 & PgClassExpression568 --> PgSelect569
+    PgSelect569 ==> __Item573
+    __Item573 --> PgSelectSingle574
+    PgSelectSingle574 --> PgClassExpression575
+    PgSelectSingle574 --> PgClassExpression576
+    __InputStaticLeaf580 & __InputStaticLeaf581 & __InputStaticLeaf582 --> Object591
+    Object13 & Object591 & __InputStaticLeaf590 --> PgSelect592
+    PgSelect592 --> First596
+    First596 --> PgSelectSingle597
+    PgSelectSingle597 --> Object598
+    PgSelectSingle597 --> PgClassExpression599
+    PgSelectSingle597 --> PgClassExpression600
+    Object13 --> PgSelect603
+    PgSelect603 --> First607
+    First607 --> PgSelectSingle608
+    PgSelectSingle608 --> Object609
+    PgSelectSingle608 --> PgClassExpression610
+    PgSelectSingle608 --> PgClassExpression611
+    Object13 --> PgSelect614
+    PgSelect614 --> Object618
+    PgSelect614 ==> __Item619
+    __Item619 --> PgSelectSingle620
+    PgSelectSingle620 --> PgClassExpression621
+    PgSelectSingle620 --> PgClassExpression622
+    __InputStaticLeaf633 & __InputStaticLeaf634 & __InputStaticLeaf635 & __InputStaticLeaf636 & __InputStaticLeaf637 & __InputStaticLeaf638 --> Object641
+    __InputStaticLeaf626 & __InputStaticLeaf627 & __InputStaticLeaf628 & __InputStaticLeaf630 & __InputStaticLeaf631 & Object641 & __InputStaticLeaf639 --> Object640
+    Object13 & Object640 --> PgSelect642
+    PgSelect642 --> Object646
+    PgSelect642 ==> __Item647
+    __Item647 --> PgSelectSingle648
+    PgSelectSingle648 --> PgClassExpression649
+    PgSelectSingle648 --> PgClassExpression650
+    PgSelectSingle648 --> PgClassExpression651
+    PgSelectSingle648 --> PgClassExpression652
+    PgSelectSingle648 --> PgClassExpression653
+    PgSelectSingle648 --> PgClassExpression654
+    PgSelectSingle648 --> PgClassExpression655
+    PgClassExpression655 --> Access656
+    PgClassExpression655 --> Access657
+    PgClassExpression655 --> Access658
+    PgSelectSingle648 --> PgClassExpression659
+    Object13 --> PgSelect662
+    PgSelect662 --> First666
+    First666 --> PgSelectSingle667
+    PgSelectSingle667 --> PgClassExpression668
+    PgClassExpression668 --> Object669
+    PgClassExpression668 ==> __Item670
+    Object13 --> PgSelect673
+    PgSelect673 --> First677
+    First677 --> PgSelectSingle678
+    PgSelectSingle678 --> PgClassExpression679
+    PgClassExpression679 --> Object680
+    PgClassExpression679 ==> __Item681
+    __Item681 --> Access682
+    __Item681 --> Access683
+    __Item681 --> Access684
+    __Item681 --> Access685
+    __Item681 --> Access686
+    __Item681 --> Access687
+    Object13 --> PgSelect690
+    PgSelect690 --> Object694
+    PgSelect690 ==> __Item695
+    __Item695 --> PgSelectSingle696
+    PgSelectSingle696 --> PgClassExpression697
+    PgClassExpression697 --> Access698
+    PgClassExpression697 --> Access699
+    PgClassExpression697 --> Access700
+    PgClassExpression697 --> Access701
+    PgClassExpression697 --> Access702
+    PgClassExpression697 --> Access703
+
+    %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P16["ᐳj…nᐳjson"]
+    PgClassExpression16 -.-> P16
+    P17["ᐳjsonIdentityMutation"]
+    Object17 -.-> P17
+    P27["ᐳj…nᐳjson"]
+    PgClassExpression27 -.-> P27
+    P28["ᐳjsonbIdentityMutation"]
+    Object28 -.-> P28
+    P38["ᐳj…5ᐳjson"]
+    PgClassExpression38 -.-> P38
+    P39["ᐳjsonIdentityMutationIssue85"]
+    Object39 -.-> P39
+    P49["ᐳj…5ᐳjson"]
+    PgClassExpression49 -.-> P49
+    P50["ᐳjsonbIdentityMutationIssue85"]
+    Object50 -.-> P50
+    P60["ᐳj…5ᐳjson"]
+    PgClassExpression60 -.-> P60
+    P61["ᐳjsonbIdentityMutationPlpgsqlIssue85"]
+    Object61 -.-> P61
+    P71["ᐳj…5ᐳjson"]
+    PgClassExpression71 -.-> P71
+    P72["ᐳjsonbIdentityMutationPlpgsqlWithDefaultIssue85"]
+    Object72 -.-> P72
+    P82["ᐳj…5ᐳjson"]
+    PgClassExpression82 -.-> P82
+    P83["ᐳjsonbIdentityMutationPlpgsqlOverridingDefaultIssue85"]
+    Object83 -.-> P83
+    P94["ᐳa…nᐳinteger"]
+    PgClassExpression94 -.-> P94
+    P95["ᐳadd1Mutation"]
+    Object95 -.-> P95
+    P96["ᐳa…nᐳclientMutationId"]
+    Constant96 -.-> P96
+    P98["ᐳa…nᐳclientMutationId"]
+    __InputStaticLeaf98 -.-> P98
+    P107["ᐳa…nᐳinteger"]
+    PgClassExpression107 -.-> P107
+    P108["ᐳadd2Mutation"]
+    Object108 -.-> P108
+    P110["ᐳa…nᐳclientMutationId"]
+    __InputStaticLeaf110 -.-> P110
+    P120["ᐳa…nᐳinteger"]
+    PgClassExpression120 -.-> P120
+    P121["ᐳadd3Mutation"]
+    Object121 -.-> P121
+    P132["ᐳa…nᐳinteger"]
+    PgClassExpression132 -.-> P132
+    P133["ᐳadd4Mutation"]
+    Object133 -.-> P133
+    P144["ᐳa…rᐳinteger"]
+    PgClassExpression144 -.-> P144
+    P145["ᐳadd4MutationError"]
+    Object145 -.-> P145
+    P156["ᐳm…1ᐳinteger"]
+    PgClassExpression156 -.-> P156
+    P157["ᐳmult1"]
+    Object157 -.-> P157
+    P168["ᐳm…2ᐳinteger"]
+    PgClassExpression168 -.-> P168
+    P169["ᐳmult2"]
+    Object169 -.-> P169
+    P180["ᐳm…3ᐳinteger"]
+    PgClassExpression180 -.-> P180
+    P181["ᐳmult3"]
+    Object181 -.-> P181
+    P192["ᐳm…4ᐳinteger"]
+    PgClassExpression192 -.-> P192
+    P193["ᐳmult4"]
+    Object193 -.-> P193
+    P222["ᐳt…nᐳboolean"]
+    PgClassExpression222 -.-> P222
+    P223["ᐳtypesMutation"]
+    Object223 -.-> P223
+    P248["ᐳc…nᐳcompoundType"]
+    PgSelectSingle248 -.-> P248
+    P249["ᐳcompoundTypeMutation"]
+    Object249 -.-> P249
+    P250["ᐳc…nᐳc…eᐳa"]
+    PgClassExpression250 -.-> P250
+    P251["ᐳc…nᐳc…eᐳb"]
+    PgClassExpression251 -.-> P251
+    P252["ᐳc…nᐳc…eᐳc"]
+    PgClassExpression252 -.-> P252
+    P253["ᐳc…nᐳc…eᐳd"]
+    PgClassExpression253 -.-> P253
+    P254["ᐳc…nᐳc…eᐳe"]
+    PgClassExpression254 -.-> P254
+    P255["ᐳc…nᐳc…eᐳf"]
+    PgClassExpression255 -.-> P255
+    P256["ᐳc…nᐳc…eᐳg"]
+    PgClassExpression256 -.-> P256
+    P257["ᐳc…nᐳc…eᐳgᐳseconds"]
+    Access257 -.-> P257
+    P258["ᐳc…nᐳc…eᐳgᐳminutes"]
+    Access258 -.-> P258
+    P259["ᐳc…nᐳc…eᐳgᐳhours"]
+    Access259 -.-> P259
+    P260["ᐳc…nᐳc…eᐳfooBar"]
+    PgClassExpression260 -.-> P260
+    P280["ᐳc…nᐳcompoundTypes"]
+    PgSelect280 -.-> P280
+    P284["ᐳcompoundTypeSetMutation"]
+    Object284 -.-> P284
+    P286["ᐳc…nᐳcompoundTypes[]"]
+    PgSelectSingle286 -.-> P286
+    P287["ᐳc…nᐳc…]ᐳa"]
+    PgClassExpression287 -.-> P287
+    P288["ᐳc…nᐳc…]ᐳb"]
+    PgClassExpression288 -.-> P288
+    P289["ᐳc…nᐳc…]ᐳc"]
+    PgClassExpression289 -.-> P289
+    P290["ᐳc…nᐳc…]ᐳd"]
+    PgClassExpression290 -.-> P290
+    P291["ᐳc…nᐳc…]ᐳe"]
+    PgClassExpression291 -.-> P291
+    P292["ᐳc…nᐳc…]ᐳf"]
+    PgClassExpression292 -.-> P292
+    P293["ᐳc…nᐳc…]ᐳg"]
+    PgClassExpression293 -.-> P293
+    P294["ᐳc…nᐳc…]ᐳgᐳseconds"]
+    Access294 -.-> P294
+    P295["ᐳc…nᐳc…]ᐳgᐳminutes"]
+    Access295 -.-> P295
+    P296["ᐳc…nᐳc…]ᐳgᐳhours"]
+    Access296 -.-> P296
+    P297["ᐳc…nᐳc…]ᐳfooBar"]
+    PgClassExpression297 -.-> P297
+    P317["ᐳc…nᐳcompoundTypes"]
+    PgSelect317 -.-> P317
+    P321["ᐳcompoundTypeArrayMutation"]
+    Object321 -.-> P321
+    P323["ᐳc…nᐳcompoundTypes[]"]
+    PgSelectSingle323 -.-> P323
+    P324["ᐳc…nᐳc…]ᐳa"]
+    PgClassExpression324 -.-> P324
+    P325["ᐳc…nᐳc…]ᐳb"]
+    PgClassExpression325 -.-> P325
+    P326["ᐳc…nᐳc…]ᐳc"]
+    PgClassExpression326 -.-> P326
+    P327["ᐳc…nᐳc…]ᐳd"]
+    PgClassExpression327 -.-> P327
+    P328["ᐳc…nᐳc…]ᐳe"]
+    PgClassExpression328 -.-> P328
+    P329["ᐳc…nᐳc…]ᐳf"]
+    PgClassExpression329 -.-> P329
+    P330["ᐳc…nᐳc…]ᐳg"]
+    PgClassExpression330 -.-> P330
+    P331["ᐳc…nᐳc…]ᐳgᐳseconds"]
+    Access331 -.-> P331
+    P332["ᐳc…nᐳc…]ᐳgᐳminutes"]
+    Access332 -.-> P332
+    P333["ᐳc…nᐳc…]ᐳgᐳhours"]
+    Access333 -.-> P333
+    P334["ᐳc…nᐳc…]ᐳfooBar"]
+    PgClassExpression334 -.-> P334
+    P343["ᐳt…nᐳpost"]
+    PgSelectSingle343 -.-> P343
+    P344["ᐳtableMutation"]
+    Object344 -.-> P344
+    P346["ᐳt…nᐳpostᐳid"]
+    PgClassExpression346 -.-> P346
+    P348["ᐳt…nᐳpostᐳnodeId"]
+    Lambda348 -.-> P348
+    P350["ᐳt…nᐳpostᐳheadline"]
+    PgClassExpression350 -.-> P350
+    P351["ᐳt…nᐳpostᐳauthorId"]
+    PgClassExpression351 -.-> P351
+    P358["ᐳt…nᐳpersonByAuthorId"]
+    PgSelectSingle358 -.-> P358
+    P359["ᐳt…nᐳp…dᐳid"]
+    PgClassExpression359 -.-> P359
+    P360["ᐳt…nᐳp…dᐳname"]
+    PgClassExpression360 -.-> P360
+    P371["ᐳt…nᐳp…eᐳnode"]
+    PgSelectSingle371 -.-> P371
+    P372["ᐳt…nᐳpostEdge"]
+    Edge372 -.-> P372
+    P373["ᐳt…nᐳp…eᐳcursor"]
+    PgCursor373 -.-> P373
+    P374["ᐳt…nᐳp…eᐳnodeᐳid"]
+    PgClassExpression374 -.-> P374
+    P377["ᐳt…nᐳp…eᐳnodeᐳheadline"]
+    PgClassExpression377 -.-> P377
+    P386["ᐳt…lᐳpost"]
+    PgSelectSingle386 -.-> P386
+    P387["ᐳtableMutationReturningNull"]
+    Object387 -.-> P387
+    P389["ᐳt…lᐳpostᐳid"]
+    PgClassExpression389 -.-> P389
+    P391["ᐳt…lᐳpostᐳnodeId"]
+    Lambda391 -.-> P391
+    P393["ᐳt…lᐳpostᐳheadline"]
+    PgClassExpression393 -.-> P393
+    P394["ᐳt…lᐳpostᐳauthorId"]
+    PgClassExpression394 -.-> P394
+    P401["ᐳt…lᐳpersonByAuthorId"]
+    PgSelectSingle401 -.-> P401
+    P402["ᐳt…lᐳp…dᐳid"]
+    PgClassExpression402 -.-> P402
+    P403["ᐳt…lᐳp…dᐳname"]
+    PgClassExpression403 -.-> P403
+    P414["ᐳt…lᐳp…eᐳnode"]
+    PgSelectSingle414 -.-> P414
+    P415["ᐳt…lᐳpostEdge"]
+    Edge415 -.-> P415
+    P416["ᐳt…lᐳp…eᐳcursor"]
+    PgCursor416 -.-> P416
+    P417["ᐳt…lᐳp…eᐳnodeᐳid"]
+    PgClassExpression417 -.-> P417
+    P420["ᐳt…lᐳp…eᐳnodeᐳheadline"]
+    PgClassExpression420 -.-> P420
+    P423["ᐳt…nᐳpeople"]
+    PgSelect423 -.-> P423
+    P427["ᐳtableSetMutation"]
+    Object427 -.-> P427
+    P429["ᐳt…nᐳpeople[]"]
+    PgSelectSingle429 -.-> P429
+    P430["ᐳt…nᐳp…]ᐳname"]
+    PgClassExpression430 -.-> P430
+    P437["ᐳi…nᐳintegers"]
+    PgSelect437 -.-> P437
+    P441["ᐳintSetMutation"]
+    Object441 -.-> P441
+    P444["ᐳi…nᐳintegers[]"]
+    PgClassExpression444 -.-> P444
+    P446["ᐳn…nᐳclientMutationId"]
+    __InputStaticLeaf446 -.-> P446
+    P453["ᐳn…nᐳinteger"]
+    PgClassExpression453 -.-> P453
+    P454["ᐳnoArgsMutation"]
+    Object454 -.-> P454
+    P464["ᐳreturnVoidMutation"]
+    Object464 -.-> P464
+    P474["ᐳg…nᐳguid"]
+    PgClassExpression474 -.-> P474
+    P475["ᐳguidFn"]
+    Object475 -.-> P475
+    P485["ᐳg…2ᐳguid"]
+    PgClassExpression485 -.-> P485
+    P486["ᐳguidFn2"]
+    Object486 -.-> P486
+    P559["ᐳp…yᐳposts"]
+    PgSelect559 -.-> P559
+    P563["ᐳpostMany"]
+    Object563 -.-> P563
+    P565["ᐳp…yᐳposts[]"]
+    PgSelectSingle565 -.-> P565
+    P566["ᐳp…yᐳp…]ᐳid"]
+    PgClassExpression566 -.-> P566
+    P567["ᐳp…yᐳp…]ᐳheadline"]
+    PgClassExpression567 -.-> P567
+    P569["ᐳp…yᐳp…]ᐳcomptypes"]
+    PgSelect569 -.-> P569
+    P574["ᐳp…yᐳp…]ᐳcomptypes[]"]
+    PgSelectSingle574 -.-> P574
+    P575["ᐳp…yᐳp…]ᐳc…]ᐳschedule"]
+    PgClassExpression575 -.-> P575
+    P576["ᐳp…yᐳp…]ᐳc…]ᐳisOptimised"]
+    PgClassExpression576 -.-> P576
+    P597["ᐳp…xᐳpost"]
+    PgSelectSingle597 -.-> P597
+    P598["ᐳpostWithSuffix"]
+    Object598 -.-> P598
+    P599["ᐳp…xᐳpostᐳid"]
+    PgClassExpression599 -.-> P599
+    P600["ᐳp…xᐳpostᐳheadline"]
+    PgClassExpression600 -.-> P600
+    P608["ᐳi…nᐳissue756"]
+    PgSelectSingle608 -.-> P608
+    P609["ᐳissue756Mutation"]
+    Object609 -.-> P609
+    P610["ᐳi…nᐳi…6ᐳid"]
+    PgClassExpression610 -.-> P610
+    P611["ᐳi…nᐳi…6ᐳts"]
+    PgClassExpression611 -.-> P611
+    P614["ᐳi…nᐳissue756S"]
+    PgSelect614 -.-> P614
+    P618["ᐳissue756SetMutation"]
+    Object618 -.-> P618
+    P620["ᐳi…nᐳissue756S[]"]
+    PgSelectSingle620 -.-> P620
+    P621["ᐳi…nᐳi…]ᐳid"]
+    PgClassExpression621 -.-> P621
+    P622["ᐳi…nᐳi…]ᐳts"]
+    PgClassExpression622 -.-> P622
+    P642["ᐳm…yᐳcompoundTypes"]
+    PgSelect642 -.-> P642
+    P646["ᐳmutationCompoundTypeArray"]
+    Object646 -.-> P646
+    P648["ᐳm…yᐳcompoundTypes[]"]
+    PgSelectSingle648 -.-> P648
+    P649["ᐳm…yᐳc…]ᐳa"]
+    PgClassExpression649 -.-> P649
+    P650["ᐳm…yᐳc…]ᐳb"]
+    PgClassExpression650 -.-> P650
+    P651["ᐳm…yᐳc…]ᐳc"]
+    PgClassExpression651 -.-> P651
+    P652["ᐳm…yᐳc…]ᐳd"]
+    PgClassExpression652 -.-> P652
+    P653["ᐳm…yᐳc…]ᐳe"]
+    PgClassExpression653 -.-> P653
+    P654["ᐳm…yᐳc…]ᐳf"]
+    PgClassExpression654 -.-> P654
+    P655["ᐳm…yᐳc…]ᐳg"]
+    PgClassExpression655 -.-> P655
+    P656["ᐳm…yᐳc…]ᐳgᐳseconds"]
+    Access656 -.-> P656
+    P657["ᐳm…yᐳc…]ᐳgᐳminutes"]
+    Access657 -.-> P657
+    P658["ᐳm…yᐳc…]ᐳgᐳhours"]
+    Access658 -.-> P658
+    P659["ᐳm…yᐳc…]ᐳfooBar"]
+    PgClassExpression659 -.-> P659
+    P668["ᐳm…yᐳstrings"]
+    PgClassExpression668 -.-> P668
+    P669["ᐳmutationTextArray"]
+    Object669 -.-> P669
+    P670["ᐳm…yᐳstrings[]"]
+    __Item670 -.-> P670
+    P679["ᐳm…yᐳintervals"]
+    PgClassExpression679 -.-> P679
+    P680["ᐳmutationIntervalArray"]
+    Object680 -.-> P680
+    P681["ᐳm…yᐳintervals[]"]
+    __Item681 -.-> P681
+    P682["ᐳm…yᐳi…]ᐳseconds"]
+    Access682 -.-> P682
+    P683["ᐳm…yᐳi…]ᐳminutes"]
+    Access683 -.-> P683
+    P684["ᐳm…yᐳi…]ᐳhours"]
+    Access684 -.-> P684
+    P685["ᐳm…yᐳi…]ᐳdays"]
+    Access685 -.-> P685
+    P686["ᐳm…yᐳi…]ᐳmonths"]
+    Access686 -.-> P686
+    P687["ᐳm…yᐳi…]ᐳyears"]
+    Access687 -.-> P687
+    P690["ᐳm…tᐳintervals"]
+    PgSelect690 -.-> P690
+    P694["ᐳmutationIntervalSet"]
+    Object694 -.-> P694
+    P697["ᐳm…tᐳintervals[]"]
+    PgClassExpression697 -.-> P697
+    P698["ᐳm…tᐳi…]ᐳseconds"]
+    Access698 -.-> P698
+    P699["ᐳm…tᐳi…]ᐳminutes"]
+    Access699 -.-> P699
+    P700["ᐳm…tᐳi…]ᐳhours"]
+    Access700 -.-> P700
+    P701["ᐳm…tᐳi…]ᐳdays"]
+    Access701 -.-> P701
+    P702["ᐳm…tᐳi…]ᐳmonths"]
+    Access702 -.-> P702
+    P703["ᐳm…tᐳi…]ᐳyears"]
+    Access703 -.-> P703
+
+    subgraph "Buckets for mutations/v4/procedure-mutation"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,__TrackedObject6,Access11,Access12,Object13 bucket0
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: 13<br />~ᐳMutation.jsonIdentityMutation<br />⠀ROOT ᐸ-O- 17<br />⠀⠀json ᐸ-L- 16"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__InputStaticLeaf9,PgSelect10,First14,PgSelectSingle15,PgClassExpression16,Object17 bucket1
+    Bucket2("Bucket 2 (group2[mutation])<br />Deps: 13<br />~ᐳMutation.jsonbIdentityMutation<br />⠀ROOT ᐸ-O- 28<br />⠀⠀json ᐸ-L- 27"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__InputStaticLeaf20,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,Object28 bucket2
+    Bucket3("Bucket 3 (group3[mutation])<br />Deps: 13<br />~ᐳMutation.jsonIdentityMutationIssue85<br />⠀ROOT ᐸ-O- 39<br />⠀⠀json ᐸ-L- 38"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__InputStaticLeaf31,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,Object39 bucket3
+    Bucket4("Bucket 4 (group4[mutation])<br />Deps: 13<br />~ᐳMutation.jsonbIdentityMutationIssue85<br />⠀ROOT ᐸ-O- 50<br />⠀⠀json ᐸ-L- 49"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__InputStaticLeaf42,PgSelect43,First47,PgSelectSingle48,PgClassExpression49,Object50 bucket4
+    Bucket5("Bucket 5 (group5[mutation])<br />Deps: 13<br />~ᐳMutation.jsonbIdentityMutationPlpgsqlIssue85<br />⠀ROOT ᐸ-O- 61<br />⠀⠀json ᐸ-L- 60"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__InputStaticLeaf53,PgSelect54,First58,PgSelectSingle59,PgClassExpression60,Object61 bucket5
+    Bucket6("Bucket 6 (group6[mutation])<br />Deps: 13<br />~ᐳMutation.jsonbIdentityMutationPlpgsqlWithDefaultIssue85<br />⠀ROOT ᐸ-O- 72<br />⠀⠀json ᐸ-L- 71"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,PgSelect65,First69,PgSelectSingle70,PgClassExpression71,Object72 bucket6
+    Bucket7("Bucket 7 (group7[mutation])<br />Deps: 13<br />~ᐳMutation.jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85<br />⠀ROOT ᐸ-O- 83<br />⠀⠀json ᐸ-L- 82"):::bucket
+    classDef bucket7 stroke:#808000
+    class Bucket7,__InputStaticLeaf75,PgSelect76,First80,PgSelectSingle81,PgClassExpression82,Object83 bucket7
+    Bucket8("Bucket 8 (group8[mutation])<br />Deps: 13<br />~ᐳMutation.add1Mutation<br />⠀ROOT ᐸ-O- 95<br />⠀⠀integer ᐸ-L- 94<br />⠀⠀clientMutationId ᐸ-L- 96"):::bucket
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8,__InputStaticLeaf86,__InputStaticLeaf87,PgSelect88,First92,PgSelectSingle93,PgClassExpression94,Object95,Constant96 bucket8
+    Bucket9("Bucket 9 (group9[mutation])<br />Deps: 13<br />~ᐳMutation.add2Mutation<br />⠀ROOT ᐸ-O- 108<br />⠀⠀clientMutationId ᐸ-L- 98<br />⠀⠀integer ᐸ-L- 107"):::bucket
+    classDef bucket9 stroke:#ff0000
+    class Bucket9,__InputStaticLeaf98,__InputStaticLeaf99,__InputStaticLeaf100,PgSelect101,First105,PgSelectSingle106,PgClassExpression107,Object108 bucket9
+    Bucket10("Bucket 10 (group10[mutation])<br />Deps: 13<br />~ᐳMutation.add3Mutation<br />⠀ROOT ᐸ-O- 121<br />⠀⠀clientMutationId ᐸ-L- 110<br />⠀⠀integer ᐸ-L- 120"):::bucket
+    classDef bucket10 stroke:#ffff00
+    class Bucket10,__InputStaticLeaf110,__InputStaticLeaf112,Constant113,PgSelect114,First118,PgSelectSingle119,PgClassExpression120,Object121 bucket10
+    Bucket11("Bucket 11 (group11[mutation])<br />Deps: 13<br />~ᐳMutation.add4Mutation<br />⠀ROOT ᐸ-O- 133<br />⠀⠀integer ᐸ-L- 132"):::bucket
+    classDef bucket11 stroke:#00ffff
+    class Bucket11,__InputStaticLeaf124,__InputStaticLeaf125,PgSelect126,First130,PgSelectSingle131,PgClassExpression132,Object133 bucket11
+    Bucket12("Bucket 12 (group12[mutation])<br />Deps: 13<br />~ᐳMutation.add4MutationError<br />⠀ROOT ᐸ-O- 145<br />⠀⠀integer ᐸ-L- 144"):::bucket
+    classDef bucket12 stroke:#4169e1
+    class Bucket12,__InputStaticLeaf136,__InputStaticLeaf137,PgSelect138,First142,PgSelectSingle143,PgClassExpression144,Object145 bucket12
+    Bucket13("Bucket 13 (group13[mutation])<br />Deps: 13<br />~ᐳMutation.mult1<br />⠀ROOT ᐸ-O- 157<br />⠀⠀integer ᐸ-L- 156"):::bucket
+    classDef bucket13 stroke:#3cb371
+    class Bucket13,__InputStaticLeaf148,__InputStaticLeaf149,PgSelect150,First154,PgSelectSingle155,PgClassExpression156,Object157 bucket13
+    Bucket14("Bucket 14 (group14[mutation])<br />Deps: 13<br />~ᐳMutation.mult2<br />⠀ROOT ᐸ-O- 169<br />⠀⠀integer ᐸ-L- 168"):::bucket
+    classDef bucket14 stroke:#a52a2a
+    class Bucket14,__InputStaticLeaf160,__InputStaticLeaf161,PgSelect162,First166,PgSelectSingle167,PgClassExpression168,Object169 bucket14
+    Bucket15("Bucket 15 (group15[mutation])<br />Deps: 13<br />~ᐳMutation.mult3<br />⠀ROOT ᐸ-O- 181<br />⠀⠀integer ᐸ-L- 180"):::bucket
+    classDef bucket15 stroke:#ff00ff
+    class Bucket15,__InputStaticLeaf172,__InputStaticLeaf173,PgSelect174,First178,PgSelectSingle179,PgClassExpression180,Object181 bucket15
+    Bucket16("Bucket 16 (group16[mutation])<br />Deps: 13<br />~ᐳMutation.mult4<br />⠀ROOT ᐸ-O- 193<br />⠀⠀integer ᐸ-L- 192"):::bucket
+    classDef bucket16 stroke:#f5deb3
+    class Bucket16,__InputStaticLeaf184,__InputStaticLeaf185,PgSelect186,First190,PgSelectSingle191,PgClassExpression192,Object193 bucket16
+    Bucket17("Bucket 17 (group17[mutation])<br />Deps: 13<br />~ᐳMutation.typesMutation<br />⠀ROOT ᐸ-O- 223<br />⠀⠀boolean ᐸ-L- 222"):::bucket
+    classDef bucket17 stroke:#696969
+    class Bucket17,__InputStaticLeaf196,__InputStaticLeaf197,__InputStaticLeaf198,__InputStaticLeaf200,__InputStaticLeaf201,__InputStaticLeaf202,__InputStaticLeaf204,__InputStaticLeaf207,__InputStaticLeaf208,__InputStaticLeaf210,__InputStaticLeaf211,List212,Object213,Object214,Object215,PgSelect216,First220,PgSelectSingle221,PgClassExpression222,Object223 bucket17
+    Bucket18("Bucket 18 (group18[mutation])<br />Deps: 13<br />~ᐳMutation.compoundTypeMutation<br />⠀ROOT ᐸ-O- 249<br />⠀⠀compoundType ᐸ-O- 248<br />⠀⠀⠀compoundType.a ᐸ-L- 250<br />⠀⠀⠀compoundType.b ᐸ-L- 251<br />⠀⠀⠀compoundType.c ᐸ-L- 252<br />⠀⠀⠀compoundType.d ᐸ-L- 253<br />⠀⠀⠀compoundType.e ᐸ-L- 254<br />⠀⠀⠀compoundType.f ᐸ-L- 255<br />⠀⠀⠀compoundType.g ᐸ-O- 256<br />⠀⠀⠀⠀compoundType.g.seconds ᐸ-L- 257<br />⠀⠀⠀⠀compoundType.g.minutes ᐸ-L- 258<br />⠀⠀⠀⠀compoundType.g.hours ᐸ-L- 259<br />⠀⠀⠀compoundType.fooBar ᐸ-L- 260"):::bucket
+    classDef bucket18 stroke:#00bfff
+    class Bucket18,__InputStaticLeaf227,__InputStaticLeaf228,__InputStaticLeaf229,__InputStaticLeaf231,__InputStaticLeaf232,__InputStaticLeaf234,__InputStaticLeaf235,__InputStaticLeaf236,__InputStaticLeaf237,__InputStaticLeaf238,__InputStaticLeaf239,__InputStaticLeaf240,Object241,Object242,PgSelect243,First247,PgSelectSingle248,Object249,PgClassExpression250,PgClassExpression251,PgClassExpression252,PgClassExpression253,PgClassExpression254,PgClassExpression255,PgClassExpression256,Access257,Access258,Access259,PgClassExpression260 bucket18
+    Bucket19("Bucket 19 (group19[mutation])<br />Deps: 13<br />~ᐳMutation.compoundTypeSetMutation<br />⠀ROOT ᐸ-O- 284<br />⠀⠀compoundTypes ᐸ-A- 280"):::bucket
+    classDef bucket19 stroke:#7f007f
+    class Bucket19,__InputStaticLeaf264,__InputStaticLeaf265,__InputStaticLeaf266,__InputStaticLeaf268,__InputStaticLeaf269,__InputStaticLeaf271,__InputStaticLeaf272,__InputStaticLeaf273,__InputStaticLeaf274,__InputStaticLeaf275,__InputStaticLeaf276,__InputStaticLeaf277,Object278,Object279,PgSelect280,Object284 bucket19
+    Bucket20("Bucket 20 (item285)<br />Deps: 280<br />~ᐳMutation.compoundTypeSetMutationᐳCompoundTypeSetMutationPayload.compoundTypes[]<br />⠀ROOT ᐸ-O- 286<br />⠀⠀a ᐸ-L- 287<br />⠀⠀b ᐸ-L- 288<br />⠀⠀c ᐸ-L- 289<br />⠀⠀d ᐸ-L- 290<br />⠀⠀e ᐸ-L- 291<br />⠀⠀f ᐸ-L- 292<br />⠀⠀g ᐸ-O- 293<br />⠀⠀⠀g.seconds ᐸ-L- 294<br />⠀⠀⠀g.minutes ᐸ-L- 295<br />⠀⠀⠀g.hours ᐸ-L- 296<br />⠀⠀fooBar ᐸ-L- 297"):::bucket
+    classDef bucket20 stroke:#ffa500
+    class Bucket20,__Item285,PgSelectSingle286,PgClassExpression287,PgClassExpression288,PgClassExpression289,PgClassExpression290,PgClassExpression291,PgClassExpression292,PgClassExpression293,Access294,Access295,Access296,PgClassExpression297 bucket20
+    Bucket21("Bucket 21 (group20[mutation])<br />Deps: 13<br />~ᐳMutation.compoundTypeArrayMutation<br />⠀ROOT ᐸ-O- 321<br />⠀⠀compoundTypes ᐸ-A- 317"):::bucket
+    classDef bucket21 stroke:#0000ff
+    class Bucket21,__InputStaticLeaf301,__InputStaticLeaf302,__InputStaticLeaf303,__InputStaticLeaf305,__InputStaticLeaf306,__InputStaticLeaf308,__InputStaticLeaf309,__InputStaticLeaf310,__InputStaticLeaf311,__InputStaticLeaf312,__InputStaticLeaf313,__InputStaticLeaf314,Object315,Object316,PgSelect317,Object321 bucket21
+    Bucket22("Bucket 22 (item322)<br />Deps: 317<br />~ᐳMutation.compoundTypeArrayMutationᐳCompoundTypeArrayMutationPayload.compoundTypes[]<br />⠀ROOT ᐸ-O- 323<br />⠀⠀a ᐸ-L- 324<br />⠀⠀b ᐸ-L- 325<br />⠀⠀c ᐸ-L- 326<br />⠀⠀d ᐸ-L- 327<br />⠀⠀e ᐸ-L- 328<br />⠀⠀f ᐸ-L- 329<br />⠀⠀g ᐸ-O- 330<br />⠀⠀⠀g.seconds ᐸ-L- 331<br />⠀⠀⠀g.minutes ᐸ-L- 332<br />⠀⠀⠀g.hours ᐸ-L- 333<br />⠀⠀fooBar ᐸ-L- 334"):::bucket
+    classDef bucket22 stroke:#7fff00
+    class Bucket22,__Item322,PgSelectSingle323,PgClassExpression324,PgClassExpression325,PgClassExpression326,PgClassExpression327,PgClassExpression328,PgClassExpression329,PgClassExpression330,Access331,Access332,Access333,PgClassExpression334 bucket22
+    Bucket23("Bucket 23 (group21[mutation])<br />Deps: 13<br />~ᐳMutation.tableMutation<br />⠀ROOT ᐸ-O- 344<br />⠀⠀post ᐸ-O- 343<br />⠀⠀⠀post.id ᐸ-L- 346<br />⠀⠀⠀post.nodeId ᐸ-L- 348<br />⠀⠀⠀post.headline ᐸ-L- 350<br />⠀⠀⠀post.authorId ᐸ-L- 351<br />⠀⠀personByAuthorId ᐸ-O- 358<br />⠀⠀⠀personByAuthorId.id ᐸ-L- 359<br />⠀⠀⠀personByAuthorId.name ᐸ-L- 360<br />⠀⠀postEdge ᐸ-O- 372<br />⠀⠀⠀postEdge.node ᐸ-O- 371<br />⠀⠀⠀⠀postEdge.node.id ᐸ-L- 374<br />⠀⠀⠀⠀postEdge.node.headline ᐸ-L- 377<br />⠀⠀⠀postEdge.cursor ᐸ-L- 373"):::bucket
+    classDef bucket23 stroke:#ff1493
+    class Bucket23,__InputStaticLeaf337,PgSelect338,First342,PgSelectSingle343,Object344,Constant345,PgClassExpression346,List347,Lambda348,PgClassExpression350,PgClassExpression351,PgSelect353,First357,PgSelectSingle358,PgClassExpression359,PgClassExpression360,PgSelect365,First370,PgSelectSingle371,Edge372,PgCursor373,PgClassExpression374,List375,PgClassExpression377 bucket23
+    Bucket24("Bucket 24 (group22[mutation])<br />Deps: 13<br />~ᐳMutation.tableMutationReturningNull<br />⠀ROOT ᐸ-O- 387<br />⠀⠀post ᐸ-O- 386<br />⠀⠀⠀post.id ᐸ-L- 389<br />⠀⠀⠀post.nodeId ᐸ-L- 391<br />⠀⠀⠀post.headline ᐸ-L- 393<br />⠀⠀⠀post.authorId ᐸ-L- 394<br />⠀⠀personByAuthorId ᐸ-O- 401<br />⠀⠀⠀personByAuthorId.id ᐸ-L- 402<br />⠀⠀⠀personByAuthorId.name ᐸ-L- 403<br />⠀⠀postEdge ᐸ-O- 415<br />⠀⠀⠀postEdge.node ᐸ-O- 414<br />⠀⠀⠀⠀postEdge.node.id ᐸ-L- 417<br />⠀⠀⠀⠀postEdge.node.headline ᐸ-L- 420<br />⠀⠀⠀postEdge.cursor ᐸ-L- 416"):::bucket
+    classDef bucket24 stroke:#808000
+    class Bucket24,__InputStaticLeaf380,PgSelect381,First385,PgSelectSingle386,Object387,Constant388,PgClassExpression389,List390,Lambda391,PgClassExpression393,PgClassExpression394,PgSelect396,First400,PgSelectSingle401,PgClassExpression402,PgClassExpression403,PgSelect408,First413,PgSelectSingle414,Edge415,PgCursor416,PgClassExpression417,List418,PgClassExpression420 bucket24
+    Bucket25("Bucket 25 (group23[mutation])<br />Deps: 13<br />~ᐳMutation.tableSetMutation<br />⠀ROOT ᐸ-O- 427<br />⠀⠀people ᐸ-A- 423"):::bucket
+    classDef bucket25 stroke:#dda0dd
+    class Bucket25,PgSelect423,Object427 bucket25
+    Bucket26("Bucket 26 (item428)<br />Deps: 423<br />~ᐳMutation.tableSetMutationᐳTableSetMutationPayload.people[]<br />⠀ROOT ᐸ-O- 429<br />⠀⠀name ᐸ-L- 430"):::bucket
+    classDef bucket26 stroke:#ff0000
+    class Bucket26,__Item428,PgSelectSingle429,PgClassExpression430 bucket26
+    Bucket27("Bucket 27 (group24[mutation])<br />Deps: 13<br />~ᐳMutation.intSetMutation<br />⠀ROOT ᐸ-O- 441<br />⠀⠀integers ᐸ-A- 437"):::bucket
+    classDef bucket27 stroke:#ffff00
+    class Bucket27,__InputStaticLeaf433,__InputStaticLeaf435,Constant436,PgSelect437,Object441 bucket27
+    Bucket28("Bucket 28 (item442)<br />Deps: 437<br />~ᐳMutation.intSetMutationᐳIntSetMutationPayload.integers[]<br />⠀ROOT ᐸ-L- 444"):::bucket
+    classDef bucket28 stroke:#00ffff
+    class Bucket28,__Item442,PgSelectSingle443,PgClassExpression444 bucket28
+    Bucket29("Bucket 29 (group25[mutation])<br />Deps: 13<br />~ᐳMutation.noArgsMutation<br />⠀ROOT ᐸ-O- 454<br />⠀⠀clientMutationId ᐸ-L- 446<br />⠀⠀integer ᐸ-L- 453"):::bucket
+    classDef bucket29 stroke:#4169e1
+    class Bucket29,__InputStaticLeaf446,PgSelect447,First451,PgSelectSingle452,PgClassExpression453,Object454 bucket29
+    Bucket30("Bucket 30 (group26[mutation])<br />Deps: 13<br />~ᐳMutation.returnVoidMutation<br />⠀ROOT ᐸ-O- 464"):::bucket
+    classDef bucket30 stroke:#3cb371
+    class Bucket30,PgSelect457,First461,PgSelectSingle462,PgClassExpression463,Object464 bucket30
+    Bucket31("Bucket 31 (group27[mutation])<br />Deps: 13<br />~ᐳMutation.guidFn<br />⠀ROOT ᐸ-O- 475<br />⠀⠀guid ᐸ-L- 474"):::bucket
+    classDef bucket31 stroke:#a52a2a
+    class Bucket31,__InputStaticLeaf467,PgSelect468,First472,PgSelectSingle473,PgClassExpression474,Object475 bucket31
+    Bucket32("Bucket 32 (group28[mutation])<br />Deps: 13<br />~ᐳMutation.guidFn2<br />⠀ROOT ᐸ-O- 486<br />⠀⠀guid ᐸ-L- 485"):::bucket
+    classDef bucket32 stroke:#ff00ff
+    class Bucket32,__InputStaticLeaf478,PgSelect479,First483,PgSelectSingle484,PgClassExpression485,Object486 bucket32
+    Bucket33("Bucket 33 (group29[mutation])<br />Deps: 13<br />~ᐳMutation.postMany<br />⠀ROOT ᐸ-O- 563<br />⠀⠀posts ᐸ-A- 559"):::bucket
+    classDef bucket33 stroke:#f5deb3
+    class Bucket33,__InputStaticLeaf491,__InputStaticLeaf492,__InputStaticLeaf493,__InputStaticLeaf494,__InputStaticLeaf496,__InputStaticLeaf500,__InputStaticLeaf501,__InputStaticLeaf506,__InputStaticLeaf507,__InputStaticLeaf508,__InputStaticLeaf509,__InputStaticLeaf511,__InputStaticLeaf515,__InputStaticLeaf516,__InputStaticLeaf521,__InputStaticLeaf522,__InputStaticLeaf523,__InputStaticLeaf524,__InputStaticLeaf526,__InputStaticLeaf530,__InputStaticLeaf531,Object546,List547,Object548,List549,Object550,List551,Object552,List553,Object554,List555,Object556,List557,List558,PgSelect559,Object563 bucket33
+    Bucket34("Bucket 34 (item564)<br />Deps: 559, 13<br />~ᐳMutation.postManyᐳPostManyPayload.posts[]<br />⠀ROOT ᐸ-O- 565<br />⠀⠀id ᐸ-L- 566<br />⠀⠀headline ᐸ-L- 567<br />⠀⠀comptypes ᐸ-A- 569"):::bucket
+    classDef bucket34 stroke:#696969
+    class Bucket34,__Item564,PgSelectSingle565,PgClassExpression566,PgClassExpression567,PgClassExpression568,PgSelect569 bucket34
+    Bucket35("Bucket 35 (item573)<br />Deps: 569<br />~ᐳMutation.postManyᐳPostManyPayload.posts[]ᐳPost.comptypes[]<br />⠀ROOT ᐸ-O- 574<br />⠀⠀schedule ᐸ-L- 575<br />⠀⠀isOptimised ᐸ-L- 576"):::bucket
+    classDef bucket35 stroke:#00bfff
+    class Bucket35,__Item573,PgSelectSingle574,PgClassExpression575,PgClassExpression576 bucket35
+    Bucket36("Bucket 36 (group30[mutation])<br />Deps: 13<br />~ᐳMutation.postWithSuffix<br />⠀ROOT ᐸ-O- 598<br />⠀⠀post ᐸ-O- 597<br />⠀⠀⠀post.id ᐸ-L- 599<br />⠀⠀⠀post.headline ᐸ-L- 600"):::bucket
+    classDef bucket36 stroke:#7f007f
+    class Bucket36,__InputStaticLeaf580,__InputStaticLeaf581,__InputStaticLeaf582,__InputStaticLeaf590,Object591,PgSelect592,First596,PgSelectSingle597,Object598,PgClassExpression599,PgClassExpression600 bucket36
+    Bucket37("Bucket 37 (group31[mutation])<br />Deps: 13<br />~ᐳMutation.issue756Mutation<br />⠀ROOT ᐸ-O- 609<br />⠀⠀issue756 ᐸ-O- 608<br />⠀⠀⠀issue756.id ᐸ-L- 610<br />⠀⠀⠀issue756.ts ᐸ-L- 611"):::bucket
+    classDef bucket37 stroke:#ffa500
+    class Bucket37,PgSelect603,First607,PgSelectSingle608,Object609,PgClassExpression610,PgClassExpression611 bucket37
+    Bucket38("Bucket 38 (group32[mutation])<br />Deps: 13<br />~ᐳMutation.issue756SetMutation<br />⠀ROOT ᐸ-O- 618<br />⠀⠀issue756S ᐸ-A- 614"):::bucket
+    classDef bucket38 stroke:#0000ff
+    class Bucket38,PgSelect614,Object618 bucket38
+    Bucket39("Bucket 39 (item619)<br />Deps: 614<br />~ᐳMutation.issue756SetMutationᐳIssue756SetMutationPayload.issue756S[]<br />⠀ROOT ᐸ-O- 620<br />⠀⠀id ᐸ-L- 621<br />⠀⠀ts ᐸ-L- 622"):::bucket
+    classDef bucket39 stroke:#7fff00
+    class Bucket39,__Item619,PgSelectSingle620,PgClassExpression621,PgClassExpression622 bucket39
+    Bucket40("Bucket 40 (group33[mutation])<br />Deps: 13<br />~ᐳMutation.mutationCompoundTypeArray<br />⠀ROOT ᐸ-O- 646<br />⠀⠀compoundTypes ᐸ-A- 642"):::bucket
+    classDef bucket40 stroke:#ff1493
+    class Bucket40,__InputStaticLeaf626,__InputStaticLeaf627,__InputStaticLeaf628,__InputStaticLeaf630,__InputStaticLeaf631,__InputStaticLeaf633,__InputStaticLeaf634,__InputStaticLeaf635,__InputStaticLeaf636,__InputStaticLeaf637,__InputStaticLeaf638,__InputStaticLeaf639,Object640,Object641,PgSelect642,Object646 bucket40
+    Bucket41("Bucket 41 (item647)<br />Deps: 642<br />~ᐳMutation.mutationCompoundTypeArrayᐳMutationCompoundTypeArrayPayload.compoundTypes[]<br />⠀ROOT ᐸ-O- 648<br />⠀⠀a ᐸ-L- 649<br />⠀⠀b ᐸ-L- 650<br />⠀⠀c ᐸ-L- 651<br />⠀⠀d ᐸ-L- 652<br />⠀⠀e ᐸ-L- 653<br />⠀⠀f ᐸ-L- 654<br />⠀⠀g ᐸ-O- 655<br />⠀⠀⠀g.seconds ᐸ-L- 656<br />⠀⠀⠀g.minutes ᐸ-L- 657<br />⠀⠀⠀g.hours ᐸ-L- 658<br />⠀⠀fooBar ᐸ-L- 659"):::bucket
+    classDef bucket41 stroke:#808000
+    class Bucket41,__Item647,PgSelectSingle648,PgClassExpression649,PgClassExpression650,PgClassExpression651,PgClassExpression652,PgClassExpression653,PgClassExpression654,PgClassExpression655,Access656,Access657,Access658,PgClassExpression659 bucket41
+    Bucket42("Bucket 42 (group34[mutation])<br />Deps: 13<br />~ᐳMutation.mutationTextArray<br />⠀ROOT ᐸ-O- 669<br />⠀⠀strings ᐸ-A- 668"):::bucket
+    classDef bucket42 stroke:#dda0dd
+    class Bucket42,PgSelect662,First666,PgSelectSingle667,PgClassExpression668,Object669 bucket42
+    Bucket43("Bucket 43 (item670)<br />Deps: 668<br />~ᐳMutation.mutationTextArrayᐳMutationTextArrayPayload.strings[]<br />⠀ROOT ᐸ-L- 670"):::bucket
+    classDef bucket43 stroke:#ff0000
+    class Bucket43,__Item670 bucket43
+    Bucket44("Bucket 44 (group35[mutation])<br />Deps: 13<br />~ᐳMutation.mutationIntervalArray<br />⠀ROOT ᐸ-O- 680<br />⠀⠀intervals ᐸ-A- 679"):::bucket
+    classDef bucket44 stroke:#ffff00
+    class Bucket44,PgSelect673,First677,PgSelectSingle678,PgClassExpression679,Object680 bucket44
+    Bucket45("Bucket 45 (item681)<br />Deps: 679<br />~ᐳMutation.mutationIntervalArrayᐳMutationIntervalArrayPayload.intervals[]<br />⠀ROOT ᐸ-O- 681<br />⠀⠀seconds ᐸ-L- 682<br />⠀⠀minutes ᐸ-L- 683<br />⠀⠀hours ᐸ-L- 684<br />⠀⠀days ᐸ-L- 685<br />⠀⠀months ᐸ-L- 686<br />⠀⠀years ᐸ-L- 687"):::bucket
+    classDef bucket45 stroke:#00ffff
+    class Bucket45,__Item681,Access682,Access683,Access684,Access685,Access686,Access687 bucket45
+    Bucket46("Bucket 46 (group36[mutation])<br />Deps: 13<br />~ᐳMutation.mutationIntervalSet<br />⠀ROOT ᐸ-O- 694<br />⠀⠀intervals ᐸ-A- 690"):::bucket
+    classDef bucket46 stroke:#4169e1
+    class Bucket46,PgSelect690,Object694 bucket46
+    Bucket47("Bucket 47 (item695)<br />Deps: 690<br />~ᐳMutation.mutationIntervalSetᐳMutationIntervalSetPayload.intervals[]<br />⠀ROOT ᐸ-O- 697<br />⠀⠀seconds ᐸ-L- 698<br />⠀⠀minutes ᐸ-L- 699<br />⠀⠀hours ᐸ-L- 700<br />⠀⠀days ᐸ-L- 701<br />⠀⠀months ᐸ-L- 702<br />⠀⠀years ᐸ-L- 703"):::bucket
+    classDef bucket47 stroke:#3cb371
+    class Bucket47,__Item695,PgSelectSingle696,PgClassExpression697,Access698,Access699,Access700,Access701,Access702,Access703 bucket47
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13 & Bucket14 & Bucket15 & Bucket16 & Bucket17 & Bucket18 & Bucket19 & Bucket21 & Bucket23 & Bucket24 & Bucket25 & Bucket27 & Bucket29 & Bucket30 & Bucket31 & Bucket32 & Bucket33 & Bucket36 & Bucket37 & Bucket38 & Bucket40 & Bucket42 & Bucket44 & Bucket46
+    Bucket19 --> Bucket20
+    Bucket21 --> Bucket22
+    Bucket25 --> Bucket26
+    Bucket27 --> Bucket28
+    Bucket33 --> Bucket34
+    Bucket34 --> Bucket35
+    Bucket38 --> Bucket39
+    Bucket40 --> Bucket41
+    Bucket42 --> Bucket43
+    Bucket44 --> Bucket45
+    Bucket46 --> Bucket47
+    end
