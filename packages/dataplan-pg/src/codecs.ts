@@ -474,7 +474,10 @@ export function listOfType<
             )} to an array (send a PR!)`,
           );
         }
-        return `"${String(str).replace(/"/g, '""')}"`;
+        // > To put a double quote or backslash in a quoted array element
+        // > value, precede it with a backslash.
+        // -- https://www.postgresql.org/docs/current/arrays.html#ARRAYS-IO
+        return `"${String(str).replace(/[\\"]/g, "\\$&")}"`;
       });
 
       return `{${encoded.join(typeDelim)}}`;
