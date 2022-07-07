@@ -599,7 +599,7 @@ create function c.func_out_table(out c.person) as $$
 $$ language sql stable;
 
 create function c.func_out_table_setof(out c.person) returns setof c.person as $$
-  select * from c.person;
+  select * from c.person order by person.id asc;
 $$ language sql stable;
 
 create function c.func_out_out_compound_type(i1 int, out o1 int, out o2 c.compound_type) as $$
