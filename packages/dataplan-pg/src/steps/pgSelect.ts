@@ -1254,9 +1254,10 @@ export class PgSelectStep<
           context,
           queryValues:
             identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                  codec.toPg(values[dependencyIndex][i]),
-                )
+              ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                  const val = values[dependencyIndex][i];
+                  return val == null ? null : codec.toPg(val);
+                })
               : EMPTY_ARRAY,
         };
       }),
