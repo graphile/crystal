@@ -22,10 +22,7 @@
           firstName: "John",
         },
       },
-      {
-        cursor: null,
-        node: null,
-      },
+      null,
       {
         cursor: "WyJuYXR1cmFsIiwzXQ==",
         node: {
