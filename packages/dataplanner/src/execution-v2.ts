@@ -496,7 +496,7 @@ export function executeBucket(
         );
         setter.setRoot(value);
 
-        if (isNestedListBucket) {
+        if (value != null && isNestedListBucket) {
           if (Array.isArray(value)) {
             const nestedPathIdentity = setter.rootPathIdentity + "[]";
             processListChildren(nestedPathIdentity, rawValue, value, index);
