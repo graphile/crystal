@@ -4561,8 +4561,8 @@ export function makeExampleSchema(
                       pgCodec: TYPES.text,
                     },
                   ],
+                  mode: "mutation",
                 });
-                $post.hasSideEffects = true;
               }
 
               // See NOTE in createRelationalPost plan.

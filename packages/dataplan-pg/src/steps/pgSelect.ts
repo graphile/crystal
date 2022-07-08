@@ -766,6 +766,8 @@ export class PgSelectStep<
       }
     });
 
+    this.hasSideEffects = this.mode === "mutation";
+
     debugPlanVerbose(
       `%s (%s) constructor (%s; %s)`,
       this,
@@ -773,6 +775,7 @@ export class PgSelectStep<
       cloneFrom ? "clone" : "original",
       this.mode,
     );
+
     return this;
   }
 

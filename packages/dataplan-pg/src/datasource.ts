@@ -855,7 +855,7 @@ export class PgSource<
 
   execute(
     args: Array<PgSelectArgumentSpec> = [],
-    mode: PgSelectMode = "normal",
+    mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ) {
     const $select = pgSelect({
       source: this,
@@ -863,9 +863,6 @@ export class PgSource<
       args,
       mode,
     });
-    if (this.isMutation) {
-      $select.hasSideEffects = true;
-    }
     if (this.isUnique) {
       return $select.single();
     }
