@@ -167,7 +167,7 @@ export class ConnectionStep<
   }
 
   /**
-   * This should not be called after 'finalizeArguments' has been called.
+   * This should not be called after the arguments have been finalized.
    */
   public getSubplan(): TStep {
     if (this.isArgumentsFinalized) {
@@ -187,7 +187,7 @@ export class ConnectionStep<
    * - performing aggregates e.g. totalCount across the entire collection
    * - determining fields for pageInfo, e.g. is there a next/previous page
    *
-   * This cannot be called before 'finalizeArguments' has been called.
+   * This cannot be called before the arguments have been finalized.
    */
   public cloneSubplanWithoutPagination(
     ...args: ParametersExceptFirst<TStep["connectionClone"]>
@@ -208,7 +208,7 @@ export class ConnectionStep<
    * constraints (before, after, first, last, offset). It's useful for
    * returning the actual edges and nodes of the connection.
    *
-   * This cannot be called before 'finalizeArguments' has been called.
+   * This cannot be called before the arguments have been finalized.
    */
   public cloneSubplanWithPagination(
     // TODO:TS: ugh. The `|[]` shouldn't be needed.

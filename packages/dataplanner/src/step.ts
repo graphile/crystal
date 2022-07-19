@@ -2,14 +2,10 @@ import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import { GLOBAL_PATH } from "./constants.js";
-import { crystalPrintPathIdentity } from "./crystalPrint.js";
 import { isDev, noop } from "./dev.js";
-import {
-  getCurrentOpPlan,
-  getCurrentParentPathIdentity,
-  getDebug,
-} from "./global.js";
+import type { LayerPlan } from "./engine/LayerPlan.js";
+import { currentLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
+import { getDebug } from "./global.js";
 import type {
   CrystalResultsList,
   CrystalResultStreamList,
@@ -18,7 +14,6 @@ import type {
   PlanOptimizeOptions,
   PromiseOrDirect,
 } from "./interfaces.js";
-import type { OpPlan } from "./opPlan.js";
 import type { __ItemStep } from "./steps/index.js";
 
 function reallyAssertFinalized(plan: BaseStep): void {
@@ -29,19 +24,8 @@ function reallyAssertFinalized(plan: BaseStep): void {
   }
 }
 
-function reallyAssertArgumentsFinalized(plan: BaseStep): void {
-  if (!plan.isArgumentsFinalized) {
-    throw new Error(
-      `Step ${plan} is not finalized with respect to arguments; did you forget to call \`super.finalizeArguments()\` from its \`finalizeArguments()\` method?`,
-    );
-  }
-}
-
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
-export const assertArgumentsFinalized = !isDev
-  ? noop
-  : reallyAssertArgumentsFinalized;
 
 /**
  * The base abstract plan type; you should not extend this directly - instead
@@ -61,12 +45,10 @@ export const assertArgumentsFinalized = !isDev
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
-  public readonly opPlan: OpPlan;
+  public readonly layerPlan: LayerPlan;
   public isArgumentsFinalized = false;
   public isFinalized = false;
   public debug = getDebug();
-  public parentPathIdentity: string;
-  protected readonly createdWithParentPathIdentity: string;
 
   // TODO: change hasSideEffects to getter/setter, forbid setting after a
   // particular phase.
@@ -77,10 +59,8 @@ export abstract class BaseStep {
   public hasSideEffects = false;
 
   constructor() {
-    const opPlan = getCurrentOpPlan();
-    this.opPlan = opPlan;
-    this.parentPathIdentity = GLOBAL_PATH;
-    this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
+    const layerPlan = currentLayerPlan();
+    this.layerPlan = layerPlan;
   }
 
   public toString(): string {
@@ -88,9 +68,7 @@ export abstract class BaseStep {
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }@${chalk.bold.yellow(
-        crystalPrintPathIdentity(this.parentPathIdentity),
-      )}`,
+      }`,
     );
   }
 
@@ -99,16 +77,6 @@ export abstract class BaseStep {
    */
   public toStringMeta(): string | null {
     return null;
-  }
-
-  public finalizeArguments(): void {
-    if (!this.isArgumentsFinalized) {
-      this.isArgumentsFinalized = true;
-    } else {
-      throw new Error(
-        `Step ${this} has already been finalized with respect to arguments - do not call \`finalizeArguments()\` from user code!`,
-      );
-    }
   }
 
   public finalize(): void {
@@ -137,7 +105,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
     new Map();
 
   /**
-   * Only assigned once opPlan is 'ready'.
+   * Only assigned once operationPlan is 'ready'.
    *
    * @internal
    */
@@ -174,6 +142,16 @@ export class ExecutableStep<TData = any> extends BaseStep {
   private readonly _dependencies: string[] = [];
 
   /**
+   * The ids for plans that depend on this plan; useful when performing
+   * "dependents first" tasks. Cannot be fully trusted unless "treeShakeSteps"
+   * has been called, since some of these dependents may not exist in the
+   * future.
+   *
+   * @internal
+   */
+  public readonly _dependents: string[] = [];
+
+  /**
    * The ids for plans this plan will need data from in order to execute.
    */
   public readonly dependencies: ReadonlyArray<string> = this._dependencies;
@@ -183,7 +161,20 @@ export class ExecutableStep<TData = any> extends BaseStep {
    */
   public dependentPlans: Array<ExecutableStep> = [];
 
-  public readonly id: string;
+  /**
+   * Every layer plan has exactly one parent step. This is the reverse relationship.
+   *
+   * @internal
+   */
+  public childLayerPlans: Array<LayerPlan> = [];
+
+  /**
+   * We reserve the right to change our mind as to whether this is a string or
+   * number.
+   *
+   * @internal
+   */
+  public readonly id: number;
   /**
    * The group ids this plan is associated with (e.g. if the field this plan
    * was spawned from came from multiple selection sets in the GraphQL
@@ -200,7 +191,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * bucket it is stored).
    *
    * This will be assigned whilst bucketIds are being allocated, just before
-   * the OpPlan becomes "ready".
+   * the OperationPlan becomes "ready".
    *
    * @internal
    */
@@ -243,7 +234,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * complete.
    *
    * A value of -1 indicates that a bucket has not yet been assigned (buckets
-   * are assigned as the last step before the OpPlan is 'ready'.
+   * are assigned as the last step before the OperationPlan is 'ready'.
    *
    * @internal
    */
@@ -263,11 +254,11 @@ export class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
-    this.id = this.opPlan._addStep(this);
+    this.id = this.layerPlan._addStep(this);
   }
 
   protected getStep(id: string): ExecutableStep {
-    return this.opPlan.getStep(id, this);
+    return this.layerPlan.getStep(id, this);
   }
 
   protected getDep(depId: number): ExecutableStep {
@@ -288,8 +279,6 @@ export class ExecutableStep<TData = any> extends BaseStep {
         {
           colors: true,
         },
-      )}@${chalk.bold.yellow(
-        crystalPrintPathIdentity(this.parentPathIdentity),
       )}]`,
     );
   }
@@ -486,7 +475,7 @@ export abstract class ModifierStep<
   public readonly id: string;
   constructor(protected readonly $parent: TParentStep) {
     super();
-    this.id = this.opPlan._addModifierStep(this);
+    this.id = this.layerPlan._addModifierStep(this);
   }
 
   /**

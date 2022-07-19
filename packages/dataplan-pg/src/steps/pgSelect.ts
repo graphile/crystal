@@ -1861,11 +1861,6 @@ export class PgSelectStep<
     return { sql: query, extraSelectIndexes };
   }
 
-  public finalizeArguments(): void {
-    this._lockAllParameters();
-    return super.finalizeArguments();
-  }
-
   public finalize(): void {
     // In case we have any lock actions in future:
     this.lock();
@@ -2104,6 +2099,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   deduplicate(
     peers: PgSelectStep<any, any, any, any>[],
   ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+    this._lockAllParameters();
     const identical = peers.find((p) => {
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
