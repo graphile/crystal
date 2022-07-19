@@ -115,7 +115,8 @@ Polymorphism
      it
   3. when we deduplicate after each field, we allow deduplication with "sibling"
      layerplan's steps (sibling layerplans are layerplans that have the same
-     parent layerplan and all relate to the same instance of polymorphism)
+     parent layerplan and all relate to the same instance of polymorphism (i.e.
+     the same rootPlanId?))
   4. if we successfully deduplicate against another layerplan's step then we
      create a new layerplan between both our and the other layerplan's parent
      (which is shared) and we now inherit from that layerplan

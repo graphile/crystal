@@ -16,7 +16,7 @@ import {
 } from "../index.js";
 import type { PlanOptions } from "../interfaces.js";
 import { assertFinalized, isStreamableStep } from "../step.js";
-import type { LayerPlanReasonStream } from "./LayerPlan.js";
+import { arraysMatch } from "../utils.js";
 import { LayerPlan } from "./LayerPlan.js";
 import type { SchemaDigest } from "./lib/digestSchema.js";
 import { digestSchema } from "./lib/digestSchema.js";
@@ -667,8 +667,54 @@ export class OperationPlan {
     console.log("TODO: treeShakeSteps");
   }
 
-  // TODO: move this to LayerPlan, have LayerPlan store the "stream" options
+  private isCompatibleLayerPlan(a: LayerPlan<any>, b: LayerPlan<any>): boolean {
+    // Same
+    if (a === b) {
+      return true;
+    }
+    // They must both be polymorphic to continue
+    if (a.reason.type !== "polymorphic" || b.reason.type !== "polymorphic") {
+      return false;
+    }
+    // They must both have the same parent to continue
+    if (a.parentLayerPlan !== b.parentLayerPlan) {
+      return false;
+    }
+    // They must both relate to the same rootStepId to continue
+    if (this.steps[a.rootStepId!] !== this.steps[b.rootStepId!]) {
+      return false;
+    }
+    return true;
+  }
+
+  private isPeer(planA: ExecutableStep, planB: ExecutableStep): boolean {
+    // Can only merge if plan is of same type.
+    if (planA.constructor !== planB.constructor) {
+      return false;
+    }
+
+    // Can only merge if the plans exist in compatible LayerPlans
+    if (!this.isCompatibleLayerPlan(planA.layerPlan, planB.layerPlan)) {
+      return false;
+    }
+
+    // Can only merge if the dependencies are the same.
+    if (
+      !arraysMatch(
+        planA.dependencies,
+        planB.dependencies,
+        (depA, depB) => this.steps[depA] === this.steps[depB],
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   private deduplicateStep(step: ExecutableStep) {
+    step.isArgumentsFinalized = true;
+
     if (step.hasSideEffects) {
       // Never deduplicate plans with side effects.
       return step;
@@ -679,8 +725,9 @@ export class OperationPlan {
       return step;
     }
 
-    const planOptions = this.planOptionsByPlan.get(step);
+    const planOptions = this.getPlanOptionsForStep(step);
     const shouldStream = !!planOptions?.stream;
+    // TODO: revisit this decision in the context of SAGE.
     if (shouldStream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
@@ -689,8 +736,8 @@ export class OperationPlan {
     }
 
     const peers: ExecutableStep[] = [];
-    for (const id in this.plans) {
-      const potentialPeer = this.plans[id];
+    for (let id = 0; id < this.stepCount; id++) {
+      const potentialPeer = this.steps[id];
       if (!potentialPeer || potentialPeer.id !== id) {
         continue;
       }
@@ -709,40 +756,31 @@ export class OperationPlan {
       return step;
     }
 
-    const replacementPlan = step.deduplicate(peers);
-    if (replacementPlan !== step) {
-      if (!peers.includes(replacementPlan)) {
+    const replacementStep = step.deduplicate(peers);
+    if (replacementStep !== step) {
+      if (!peers.includes(replacementStep)) {
         throw new Error(
-          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${replacementPlan}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
+          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${replacementStep}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
         );
       }
-      if (this.itemPlanIdByListStepId[step.id] !== undefined) {
-        const itemPlan = this.plans[
-          this.itemPlanIdByListStepId[step.id]!
-        ] as __ItemStep<any>;
-        const replacementItemPlan = this.itemPlanFor(
-          replacementPlan,
-          itemPlan.depth,
-        );
-        // Replace the __ItemStep for this entry
-        this.itemPlanIdByListStepId[step.id] = replacementItemPlan.id;
-      }
-      if (debugPlanVerboseEnabled) {
-        debugPlanVerbose(
-          "Deduplicated %c with peers %c => %c",
-          step,
-          peers,
-          replacementPlan,
-        );
-      }
-    } else {
-      if (debugPlanVerboseEnabled) {
-        debugPlanVerbose("Didn't deduplicate %c with peers %c", step, peers);
+
+      // TODO: this used to handle `__ItemStep` deduplication. Not sure if that is needed under SAGE
+
+      // Now to handle bucket changes
+      if (step.layerPlan !== replacementStep.layerPlan) {
+        if (
+          step.layerPlan.reason.type !== "polymorphic" ||
+          replacementStep.layerPlan.reason.type !== "polymorphic"
+        ) {
+          throw new Error(
+            `Unexpected LayerPlan mismatch when deduplicating ${step} to ${replacementStep}`,
+          );
+        }
+        // Create a new layerplan above both these layerplans and push replacementStep into it
       }
     }
-    return replacementPlan;
 
-    step.isArgumentsFinalized = true;
+    return replacementStep;
   }
 
   /**
@@ -766,6 +804,23 @@ export class OperationPlan {
     this.maxDeduplicatedStepId = this.stepCount - 1;
   }
 
+  private getPlanOptionsForStep(step: ExecutableStep): PlanOptions {
+    // NOTE: streams can only be merged if their parameters are compatible
+    // (namely they need to have equivalent `initialCount`)
+    const streamLayerPlan = step.childLayerPlans.find(
+      (lp) => lp.reason.type === "stream",
+    );
+
+    return {
+      stream:
+        streamLayerPlan &&
+        isStreamableStep(step) &&
+        streamLayerPlan.parentStep === step
+          ? { initialCount: streamLayerPlan.reason.initialCount }
+          : null,
+    };
+  }
+
   /**
    * Calls the 'optimize' method on a plan, which may cause the plan to
    * communicate with its (deep) dependencies, and even to replace itself with
@@ -776,21 +831,8 @@ export class OperationPlan {
       return step;
     }
 
-    // NOTE: streams can only be merged if their parameters are compatible
-    // (namely they need to have equivalent `initialCount`)
-    const streamLayerPlan = step.childLayerPlans.find(
-      (lp) => lp.reason.type === "stream",
-    );
-
     // We know if it's streaming or not based on the LayerPlan it's contained within.
-    const planOptions: PlanOptions = {
-      stream:
-        streamLayerPlan &&
-        isStreamableStep(step) &&
-        streamLayerPlan.parentStep === step
-          ? { initialCount: streamLayerPlan.reason.initialCount }
-          : null,
-    };
+    const planOptions = this.getPlanOptionsForStep(step);
     const replacementStep = step.optimize(planOptions);
     step.isOptimized = true;
     return replacementStep;
