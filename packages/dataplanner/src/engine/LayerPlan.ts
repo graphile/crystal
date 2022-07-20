@@ -3,9 +3,25 @@ import * as assert from "assert";
 import type { ExecutableStep, ModifierStep } from "../step";
 import type { OperationPlan } from "./OperationPlan";
 
+/*
+ * Branching: e.g. polymorphic, conditional, etc - means that different
+ * directions can be chosen - the plan "branches" at that point based on a
+ * condition. We should not push plans up into parents _unless_ every branch
+ * uses the same plan; otherwise we're making the parent do more work than
+ * necessary.
+ *
+ * Deferred: e.g. mutation, subscription, defer, stream - means that the values
+ * are calculated "at a later time". We must not push plans up into parents
+ * because the values could be out of date (mutations, subscriptions) or would
+ * do premature calculation (stream, defer) thus slowing initial payload
+ * delivery.
+ */
+
+/** Non-branching, non-deferred */
 export interface LayerPlanReasonRoot {
   type: "root";
 }
+/** Non-branching, non-deferred */
 export interface LayerPlanReasonList {
   type: "list";
   /**
@@ -15,6 +31,7 @@ export interface LayerPlanReasonList {
    */
   parentPlanId: number;
 }
+/** Non-branching, deferred */
 export interface LayerPlanReasonStream {
   type: "stream";
   initialCount: number;
@@ -26,21 +43,50 @@ export interface LayerPlanReasonStream {
    */
   parentPlanId: number;
 }
+/** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
   type: "subscription";
 }
+/** Non-branching, deferred */
 export interface LayerPlanReasonMutationField {
   type: "mutationField";
 }
+/** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
+  typeNames: string[]; // Could be polymorphic
   label?: string;
 }
+/** Branching, non-deferred */
 export interface LayerPlanReasonPolymorphic {
   type: "polymorphic";
+  typeNames: string[];
 }
+/** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
   type: "subroutine";
+}
+
+export function isBranching(layerPlan: LayerPlan<any>): boolean {
+  return layerPlan.reason.type === "polymorphic";
+}
+export function isDeferred(layerPlan: LayerPlan<any>): boolean {
+  const t = layerPlan.reason.type;
+  return (
+    t === "stream" ||
+    t === "subscription" ||
+    t === "mutationField" ||
+    t === "defer"
+  );
+}
+export function isPolymorphic(layerPlan: LayerPlan<any>): boolean {
+  const t = layerPlan.reason.type;
+  return (
+    t === "polymorphic" ||
+    (t === "defer" &&
+      (layerPlan as LayerPlan<LayerPlanReasonDefer>).reason.typeNames.length >
+        1)
+  );
 }
 
 export type LayerPlanReason =

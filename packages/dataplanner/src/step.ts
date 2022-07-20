@@ -139,7 +139,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  private readonly _dependencies: string[] = [];
+  private readonly _dependencies: number[] = [];
 
   /**
    * The ids for plans that depend on this plan; useful when performing
@@ -149,12 +149,12 @@ export class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  public readonly _dependents: string[] = [];
+  public readonly _dependents: number[] = [];
 
   /**
    * The ids for plans this plan will need data from in order to execute.
    */
-  public readonly dependencies: ReadonlyArray<string> = this._dependencies;
+  public readonly dependencies: ReadonlyArray<number> = this._dependencies;
 
   /**
    * @internal
@@ -166,7 +166,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  public childLayerPlans: Array<LayerPlan> = [];
+  public childLayerPlans: Array<LayerPlan<any>> = [];
 
   /**
    * We reserve the right to change our mind as to whether this is a string or
@@ -257,7 +257,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
     this.id = this.layerPlan._addStep(this);
   }
 
-  protected getStep(id: string): ExecutableStep {
+  protected getStep(id: number): ExecutableStep {
     return this.layerPlan.getStep(id, this);
   }
 
@@ -283,17 +283,17 @@ export class ExecutableStep<TData = any> extends BaseStep {
     );
   }
 
-  protected addDependency(plan: ExecutableStep): number {
+  protected addDependency(step: ExecutableStep): number {
     if (this.isFinalized) {
       throw new Error(
-        "You cannot add a dependency after the plan is finalized.",
+        "You cannot add a dependency after the step is finalized.",
       );
     }
     if (isDev) {
-      if (!(plan instanceof ExecutableStep)) {
+      if (!(step instanceof ExecutableStep)) {
         throw new Error(
-          `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
-            plan,
+          `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
+            step,
           )}'`,
         );
       }
@@ -307,8 +307,8 @@ export class ExecutableStep<TData = any> extends BaseStep {
      * boundaries (since `__ItemStep` opts out of this) which allows us to
      * optimise more plans.
      * /
-    if (plan.parentPathIdentity.length > this.parentPathIdentity.length) {
-      this.parentPathIdentity = plan.parentPathIdentity;
+    if (step.parentPathIdentity.length > this.parentPathIdentity.length) {
+      this.parentPathIdentity = step.parentPathIdentity;
       if (
         !this.createdWithParentPathIdentity.startsWith(this.parentPathIdentity)
       ) {
@@ -319,18 +319,22 @@ export class ExecutableStep<TData = any> extends BaseStep {
     }
     */
 
-    const existingIndex = this._dependencies.indexOf(plan.id);
+    const existingIndex = this._dependencies.indexOf(step.id);
     if (existingIndex >= 0) {
       return existingIndex;
     }
-    return this._dependencies.push(plan.id) - 1;
+    return this._dependencies.push(step.id) - 1;
   }
 
   /**
-   * Our chance to replace ourself with one of our peers.
+   * Given a list of "peer" steps, return a list of these `peers` that are
+   * equivalent to this step.
+   *
+   * NOTE: equivalence goes both ways: `a.deduplicate([b]).includes(b)` if and
+   * only if `b.deduplicate([a]).includes(a)`.
    */
-  public deduplicate(_peers: ExecutableStep[]): ExecutableStep {
-    return this;
+  public deduplicate(_peers: ExecutableStep[]): ExecutableStep[] {
+    return [];
   }
 
   /**

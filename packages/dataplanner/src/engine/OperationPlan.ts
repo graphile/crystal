@@ -519,6 +519,23 @@ export class OperationPlan {
     }
   }
 
+  private replaceStep(
+    originalStep: ExecutableStep,
+    replacementStep: ExecutableStep,
+  ): void {
+    // Replace all references to `step` with `replacementStep`
+    for (const id in this.steps) {
+      if (this.steps[id]?.id === originalStep.id) {
+        this.steps[id] = replacementStep;
+      }
+    }
+
+    // TODO: we should be able to optimize this - we know the new and old
+    // plan so we should be able to look at just the original plan's
+    // dependencies and see if they're needed any more or not.
+    this.treeShakeSteps();
+  }
+
   // TODO: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
@@ -531,14 +548,6 @@ export class OperationPlan {
     fromStepId: number,
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutableStep<any>) => ExecutableStep<any>,
-    {
-      onPlanReplacement,
-    }: {
-      onPlanReplacement?: (
-        originalPlan: ExecutableStep,
-        replacementPlan: ExecutableStep,
-      ) => void;
-    } = {},
   ): void {
     if (fromStepId === this.stepCount) {
       // Nothing to do since there are no plans to process
@@ -612,12 +621,7 @@ export class OperationPlan {
       }
 
       if (replacementStep != step) {
-        // Replace all references to `step` with `replacementStep`
-        for (const id in this.steps) {
-          if (this.steps[id]?.id === step.id) {
-            this.steps[id] = replacementStep;
-          }
-        }
+        this.replaceStep(step, replacementStep);
 
         for (const planId in deepDependenciesByStepId) {
           const set = deepDependenciesByStepId[planId];
@@ -625,8 +629,6 @@ export class OperationPlan {
             set.add(replacementStep);
           }
         }
-
-        onPlanReplacement?.(step, replacementStep);
       }
 
       if (this.stepCount > previousStepCount) {
@@ -756,32 +758,103 @@ export class OperationPlan {
       return step;
     }
 
-    const replacementStep = step.deduplicate(peers);
-    if (replacementStep !== step) {
-      if (!peers.includes(replacementStep)) {
+    const equivalentSteps = step.deduplicate(peers);
+    if (equivalentSteps.length > 0) {
+      if (
+        !equivalentSteps.every((replacementStep) =>
+          peers.includes(replacementStep),
+        )
+      ) {
         throw new Error(
-          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${replacementStep}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
+          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
         );
       }
 
-      // TODO: this used to handle `__ItemStep` deduplication. Not sure if that is needed under SAGE
+      const allEquivalentSteps = [step, ...equivalentSteps];
 
-      // Now to handle bucket changes
-      if (step.layerPlan !== replacementStep.layerPlan) {
-        if (
-          step.layerPlan.reason.type !== "polymorphic" ||
-          replacementStep.layerPlan.reason.type !== "polymorphic"
-        ) {
-          throw new Error(
-            `Unexpected LayerPlan mismatch when deduplicating ${step} to ${replacementStep}`,
-          );
+      // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
+      let minDepth = Infinity;
+      let stepsAtMinDepth: ExecutableStep[] = [];
+      for (let i = 0, l = allEquivalentSteps.length; i < l; i++) {
+        const step = allEquivalentSteps[i];
+        let depth = 0;
+        let layer = step.layerPlan;
+        while ((layer = layer.parentLayerPlan)) {
+          depth++;
         }
-        // Create a new layerplan above both these layerplans and push replacementStep into it
+        if (depth < minDepth) {
+          minDepth = depth;
+          stepsAtMinDepth = [step];
+        } else if (depth === minDepth) {
+          stepsAtMinDepth.push(step);
+        }
       }
+      const layersAtMinDepth = [
+        ...new Set(stepsAtMinDepth.map((s) => s.layerPlan)),
+      ];
+      if (layersAtMinDepth.length === 1) {
+        // Hooray, one winning layer!
+        stepsAtMinDepth.sort((a, z) => a.id - z.id);
+        const winner = stepsAtMinDepth[0];
+        // Everything else is equivalent to winner!
+        for (const equivalentStep of allEquivalentSteps) {
+          if (equivalentStep !== winner) {
+            this.replaceStep(equivalentStep, winner);
+          }
+        }
+        return winner;
+      } else {
+        const polymorphic;
+        // TODO:
+        throw new Error("TODO!");
+        // Now to handle bucket changes
+        if (step.layerPlan !== replacementStep.layerPlan) {
+          if (
+            step.layerPlan.reason.type !== "polymorphic" ||
+            replacementStep.layerPlan.reason.type !== "polymorphic"
+          ) {
+            throw new Error(
+              `Unexpected LayerPlan mismatch when deduplicating ${step} to ${replacementStep}`,
+            );
+          }
+          // Create a new layerplan above both these layerplans and push replacementStep into it
+        }
+      }
+    } else {
+      return step;
     }
-
-    return replacementStep;
   }
+
+  /*
+   * TODO: calculation if peers for deduplicate is too expensive, and shouldn't
+   * be done in an expensive loop. Alternative:
+   *
+   * 1. build a `list` of the steps to deduplicate
+   * 2. sort this `list` into "dependencies first" order
+   * 3. for each step in this `list`:
+   *    1. calculate the list of "compatible" LayerPlans for this step (using
+   *       cache of results of this step where possible)
+   *    2. find all the "peer" steps within these LayerPlans
+   *    3. calculate the equivalents for this step
+   *    4. pick the winning equivalent, replace all other instances with this
+   *    5. remove the replaced (and winning) steps from the `list`
+   *
+   * "compatible" layer plans are calculated by walking up the layer plan tree,
+   * however:
+   *   - do not pass the LayerPlan of one of the dependencies
+   *   - do not pass a "deferred" layer plan
+   *
+   * "Pick the winning equivalent" is challenging, here's current thought:
+   *
+   * 1. find the shallowest LayerPlans (logic already written above)
+   * 2. if just one shallowest LayerPlan, winner is lowest-id plan from this LayerPlan
+   * 3. otherwise, if all shallowest LayerPlans are polymorphic... ARGH!
+   *
+   * ARGH! WHAT DOES THIS MEAN FOR BRANCHING/NON-BRANCHING PLANS. We can
+   * guarantee that the dependencies must be at least a layer up (otherwise how
+   * can these be peers with the same dependencies?). For non-branching
+   * non-deferred plans, push it a layer up.
+   */
 
   /**
    * Gives us a chance to replace nearly-duplicate plans with other existing
@@ -854,23 +927,18 @@ export class OperationPlan {
           ? (step) => this.optimizeStep(step)
           : (step) => {
               if (step.allowMultipleOptimizations) {
-                return this.optimizeStep(step);
+                const replacement = this.optimizeStep(step);
+                if (replacement !== step) {
+                  replacedPlan = true;
+                  if (loops >= 3) {
+                    thirdAndFutureLoopReplacedPlans.push(step);
+                  }
+                }
+                return replacement;
               } else {
                 return step;
               }
             },
-        {
-          onPlanReplacement: (_originalStep, _replacementStep) => {
-            replacedPlan = true;
-            if (loops >= 3) {
-              thirdAndFutureLoopReplacedPlans.push(_originalStep);
-            }
-            // TODO: we should be able to optimize this - we know the new and old
-            // plan so we should be able to look at just the original plan's
-            // dependencies and see if they're needed any more or not.
-            this.treeShakeSteps();
-          },
-        },
       );
       if (!replacedPlan) {
         return;
