@@ -138,9 +138,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   constructor(
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
-    parentStep: ExecutableStep | null,
     public readonly reason: TReason,
-  ) {
+  ) //parentStep: ExecutableStep | null,
+  {
     this.id = operationPlan.addLayerPlan(this);
     if (!parentLayerPlan) {
       assert.strictEqual(
@@ -149,10 +149,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         "All but the first LayerPlan must have a parent",
       );
     } else {
-      assert.ok(
-        parentStep != null,
-        "Non-root LayerPlan must have a parentStep",
-      );
+      // assert.ok(
+      //   parentStep != null,
+      //   "Non-root LayerPlan must have a parentStep",
+      // );
     }
     // TODO: parentStep.childLayerPlans.push(this); ?
   }
