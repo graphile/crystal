@@ -1186,12 +1186,14 @@ export class OperationPlan {
       (lp) => lp.reason.type === "stream",
     );
 
+    // TODO: if step isn't streamable, don't create a streamLayerPlan because
+    // there's no point (and then we can leverage better optimisations).
+
     return {
       stream:
-        streamLayerPlan &&
-        isStreamableStep(step) &&
-        streamLayerPlan.parentStep === step
-          ? { initialCount: streamLayerPlan.reason.initialCount }
+        streamLayerPlan && isStreamableStep(step)
+          ? // && streamLayerPlan.parentStep === step
+            { initialCount: streamLayerPlan.reason.initialCount }
           : null,
     };
   }
@@ -1262,7 +1264,7 @@ export class OperationPlan {
       "No modifier steps expected when performing finalizeSteps",
     );
     for (const [stepId, step] of Object.entries(this.steps)) {
-      if (step && step.id === stepId) {
+      if (step && step.id === Number(stepId)) {
         step.finalize();
         assertFinalized(step);
         if (isDev) {
