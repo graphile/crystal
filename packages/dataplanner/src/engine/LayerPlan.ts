@@ -67,10 +67,10 @@ export interface LayerPlanReasonSubroutine {
   type: "subroutine";
 }
 
-export function isBranching(layerPlan: LayerPlan<any>): boolean {
+export function isBranchingLayerPlan(layerPlan: LayerPlan<any>): boolean {
   return layerPlan.reason.type === "polymorphic";
 }
-export function isDeferred(layerPlan: LayerPlan<any>): boolean {
+export function isDeferredLayerPlan(layerPlan: LayerPlan<any>): boolean {
   const t = layerPlan.reason.type;
   return (
     t === "stream" ||
@@ -79,7 +79,7 @@ export function isDeferred(layerPlan: LayerPlan<any>): boolean {
     t === "defer"
   );
 }
-export function isPolymorphic(layerPlan: LayerPlan<any>): boolean {
+export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
   const t = layerPlan.reason.type;
   return (
     t === "polymorphic" ||
@@ -112,7 +112,7 @@ export type LayerPlanReason =
  *
  * Every layer plan is caused by a parent plan.
  */
-export class LayerPlan<TReason extends LayerPlanReason> {
+export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   id: number;
 
   /**
@@ -138,7 +138,7 @@ export class LayerPlan<TReason extends LayerPlanReason> {
   constructor(
     public readonly operationPlan: OperationPlan,
     public readonly parentLayerPlan: LayerPlan<any> | null,
-    public readonly parentStep: ExecutableStep,
+    public parentStep: ExecutableStep | null,
     public readonly reason: TReason,
   ) {
     this.id = operationPlan.addLayerPlan(this);
@@ -148,8 +148,13 @@ export class LayerPlan<TReason extends LayerPlanReason> {
         0,
         "All but the first LayerPlan must have a parent",
       );
+    } else {
+      assert.ok(
+        parentStep != null,
+        "Non-root LayerPlan must have a parentStep",
+      );
     }
-    parentStep.childLayerPlans.push(this);
+    // TODO: parentStep.childLayerPlans.push(this); ?
   }
 
   /** @internal Use plan.getStep(id) instead. */

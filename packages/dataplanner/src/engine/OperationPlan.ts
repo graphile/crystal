@@ -17,7 +17,7 @@ import {
 import type { PlanOptions } from "../interfaces.js";
 import { assertFinalized, isStreamableStep } from "../step.js";
 import { arraysMatch } from "../utils.js";
-import { LayerPlan } from "./LayerPlan.js";
+import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import type { SchemaDigest } from "./lib/digestSchema.js";
 import { digestSchema } from "./lib/digestSchema.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
@@ -134,7 +134,7 @@ export class OperationPlan {
     this.phase = "plan";
 
     // Set up the shared steps for variables, context and rootValue
-    this.rootLayerPlan = new LayerPlan(this, null);
+    this.rootLayerPlan = new LayerPlan(this, null, null, { type: "root" });
     [this.variableValuesStep, this.trackedVariableValuesStep] = this.track(
       variableValues,
       this.variableValuesConstraints,
@@ -147,6 +147,7 @@ export class OperationPlan {
       rootValue,
       this.rootValueConstraints,
     );
+    this.rootLayerPlan.parentStep = this.trackedRootValueStep;
 
     this.deduplicateSteps();
 
@@ -185,7 +186,7 @@ export class OperationPlan {
     this.makeMetaByStepId = new Function(
       `return { ${Object.entries(this.steps)
         .map(([planId, plan]) =>
-          plan && plan.id === planId
+          plan && plan.id === Number(planId)
             ? `${JSON.stringify(plan.id)}: Object.create(null)`
             : null,
         )
@@ -669,34 +670,9 @@ export class OperationPlan {
     console.log("TODO: treeShakeSteps");
   }
 
-  private isCompatibleLayerPlan(a: LayerPlan<any>, b: LayerPlan<any>): boolean {
-    // Same
-    if (a === b) {
-      return true;
-    }
-    // They must both be polymorphic to continue
-    if (a.reason.type !== "polymorphic" || b.reason.type !== "polymorphic") {
-      return false;
-    }
-    // They must both have the same parent to continue
-    if (a.parentLayerPlan !== b.parentLayerPlan) {
-      return false;
-    }
-    // They must both relate to the same rootStepId to continue
-    if (this.steps[a.rootStepId!] !== this.steps[b.rootStepId!]) {
-      return false;
-    }
-    return true;
-  }
-
   private isPeer(planA: ExecutableStep, planB: ExecutableStep): boolean {
     // Can only merge if plan is of same type.
     if (planA.constructor !== planB.constructor) {
-      return false;
-    }
-
-    // Can only merge if the plans exist in compatible LayerPlans
-    if (!this.isCompatibleLayerPlan(planA.layerPlan, planB.layerPlan)) {
       return false;
     }
 
@@ -737,6 +713,46 @@ export class OperationPlan {
       return step;
     }
 
+    /**
+     * "compatible" layer plans are calculated by walking up the layer plan tree,
+     * however:
+     *
+     * - do not pass the LayerPlan of one of the dependencies
+     * - do not pass a "deferred" layer plan
+     *
+     * If the current LayerPlan is a polymorphic layer plan then we can also
+     * include its siblings.
+     */
+    const compatibleLayerPlans: LayerPlan[] = [];
+    let currentLayerPlan: LayerPlan | null = step.layerPlan;
+    const doNotPass = step.dependencies.map(
+      (depId) => this.steps[depId].layerPlan,
+    );
+
+    do {
+      compatibleLayerPlans.push(currentLayerPlan);
+
+      if (currentLayerPlan.reason.type === "polymorphic") {
+        for (const potentialSibling of this.layerPlans) {
+          if (
+            potentialSibling.parentLayerPlan === currentLayerPlan &&
+            potentialSibling.reason.type === "polymorphic" &&
+            this.steps[potentialSibling.rootStepId!] ===
+              this.steps[currentLayerPlan.rootStepId!]
+          ) {
+            compatibleLayerPlans.push(potentialSibling);
+          }
+        }
+      }
+
+      if (doNotPass.includes(currentLayerPlan)) {
+        break;
+      }
+      if (isDeferredLayerPlan(currentLayerPlan)) {
+        break;
+      }
+    } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
+
     const peers: ExecutableStep[] = [];
     for (let id = 0; id < this.stepCount; id++) {
       const potentialPeer = this.steps[id];
@@ -746,9 +762,13 @@ export class OperationPlan {
       if (potentialPeer.hasSideEffects) {
         continue;
       }
-      if (this.isPeer(step, potentialPeer)) {
-        peers.push(potentialPeer);
+      if (!compatibleLayerPlans.includes(potentialPeer.layerPlan)) {
+        continue;
       }
+      if (!this.isPeer(step, potentialPeer)) {
+        continue;
+      }
+      peers.push(potentialPeer);
     }
 
     // TODO: should we keep this optimisation, or should we remove it so that
@@ -778,7 +798,7 @@ export class OperationPlan {
       for (let i = 0, l = allEquivalentSteps.length; i < l; i++) {
         const step = allEquivalentSteps[i];
         let depth = 0;
-        let layer = step.layerPlan;
+        let layer: LayerPlan | null = step.layerPlan;
         while ((layer = layer.parentLayerPlan)) {
           depth++;
         }
@@ -804,6 +824,15 @@ export class OperationPlan {
         }
         return winner;
       } else {
+        if (isDev) {
+          layersAtMinDepth.forEach((lp) => {
+            assert.strictEqual(
+              lp.reason.type,
+              "polymorphic",
+              `If there's more than one layer plan at the min depth then they must all be polymorphic otherwise how could the layers be compatible?`,
+            );
+          });
+        }
         const polymorphic;
         // TODO:
         throw new Error("TODO!");
