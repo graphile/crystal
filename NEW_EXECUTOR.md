@@ -1,5 +1,8 @@
 NEXT UP:
 
+- IMPORTANT: when planning polymorphism we MUST call
+  polymorphicDeduplicateSteps() correctly!
+
 - Is it safe for layerplan to deduplicate? Do we need to enable de-duplication
   across layers? How do we merge layerPlans? (Is it if they have the same root
   item step id?)
