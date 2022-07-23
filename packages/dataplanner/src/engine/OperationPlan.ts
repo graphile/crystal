@@ -682,52 +682,10 @@ export class OperationPlan {
     console.log("TODO: treeShakeSteps");
   }
 
-  private isPeer(planA: ExecutableStep, planB: ExecutableStep): boolean {
-    // Can only merge if plan is of same type.
-    if (planA.constructor !== planB.constructor) {
-      return false;
-    }
-
-    // Can only merge if the dependencies are the same.
-    if (
-      !arraysMatch(
-        planA.dependencies,
-        planB.dependencies,
-        (depA, depB) => this.steps[depA] === this.steps[depB],
-      )
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private _deduplicateInnerLogic(
+  private getPeers(
     step: ExecutableStep,
-    alsoIncludeLayerPlans: LayerPlan[] = [],
-  ) {
-    step.isArgumentsFinalized = true;
-
-    if (step.hasSideEffects) {
-      // Never deduplicate plans with side effects.
-      return null;
-    }
-
-    if (step instanceof __ItemStep) {
-      // __ItemStep cannot be deduplicated
-      return null;
-    }
-
-    const planOptions = this.getPlanOptionsForStep(step);
-    const shouldStream = !!planOptions?.stream;
-    // TODO: revisit this decision in the context of SAGE.
-    if (shouldStream) {
-      // Never deduplicate streaming plans, we cannot reference the stream more
-      // than once (and we aim to not cache the stream because we want its
-      // entries to be garbage collected).
-      return null;
-    }
-
+    alsoIncludeLayerPlans: LayerPlan[],
+  ): ExecutableStep[] {
     /**
      * "compatible" layer plans are calculated by walking up the layer plan tree,
      * however:
@@ -780,17 +738,64 @@ export class OperationPlan {
       if (!potentialPeer || potentialPeer.id !== id) {
         continue;
       }
+
       if (potentialPeer.hasSideEffects) {
         continue;
       }
+
       if (!compatibleLayerPlans.includes(potentialPeer.layerPlan)) {
         continue;
       }
-      if (!this.isPeer(step, potentialPeer)) {
+
+      // Can only merge if plan is of same type.
+      if (step.constructor !== potentialPeer.constructor) {
         continue;
       }
+
+      // Can only merge if the dependencies are the same.
+      if (
+        !arraysMatch(
+          step.dependencies,
+          potentialPeer.dependencies,
+          (depA, depB) => this.steps[depA] === this.steps[depB],
+        )
+      ) {
+        continue;
+      }
+
       peers.push(potentialPeer);
     }
+
+    return peers;
+  }
+
+  private _deduplicateInnerLogic(
+    step: ExecutableStep,
+    alsoIncludeLayerPlans: LayerPlan[] = [],
+  ) {
+    step.isArgumentsFinalized = true;
+
+    if (step.hasSideEffects) {
+      // Never deduplicate plans with side effects.
+      return null;
+    }
+
+    if (step instanceof __ItemStep) {
+      // __ItemStep cannot be deduplicated
+      return null;
+    }
+
+    const planOptions = this.getPlanOptionsForStep(step);
+    const shouldStream = !!planOptions?.stream;
+    // TODO: revisit this decision in the context of SAGE.
+    if (shouldStream) {
+      // Never deduplicate streaming plans, we cannot reference the stream more
+      // than once (and we aim to not cache the stream because we want its
+      // entries to be garbage collected).
+      return null;
+    }
+
+    const peers = this.getPeers(step, alsoIncludeLayerPlans);
 
     // TODO: should we keep this optimisation, or should we remove it so that
     // plans that are "smarter" than us can return replacement plans even if
