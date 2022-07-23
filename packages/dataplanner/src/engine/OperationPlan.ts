@@ -17,6 +17,7 @@ import {
 import type { PlanOptions } from "../interfaces.js";
 import { assertFinalized, isStreamableStep } from "../step.js";
 import { arraysMatch } from "../utils.js";
+import type { LayerPlanReasonPolymorphic } from "./LayerPlan.js";
 import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import type { SchemaDigest } from "./lib/digestSchema.js";
 import { digestSchema } from "./lib/digestSchema.js";
@@ -134,7 +135,7 @@ export class OperationPlan {
     this.phase = "plan";
 
     // Set up the shared steps for variables, context and rootValue
-    this.rootLayerPlan = new LayerPlan(this, null, null, { type: "root" });
+    this.rootLayerPlan = new LayerPlan(this, null, { type: "root" });
     [this.variableValuesStep, this.trackedVariableValuesStep] = this.track(
       variableValues,
       this.variableValuesConstraints,
@@ -147,7 +148,7 @@ export class OperationPlan {
       rootValue,
       this.rootValueConstraints,
     );
-    this.rootLayerPlan.parentStep = this.trackedRootValueStep;
+    // this.rootLayerPlan.parentStep = this.trackedRootValueStep;
 
     this.deduplicateSteps();
 
@@ -537,6 +538,17 @@ export class OperationPlan {
     this.treeShakeSteps();
   }
 
+  private replaceSteps(
+    originalSteps: ExecutableStep[],
+    replaceStep: ExecutableStep,
+  ): void {
+    for (const originalStep of originalSteps) {
+      if (originalStep !== replaceStep) {
+        this.replaceStep(originalStep, replaceStep);
+      }
+    }
+  }
+
   // TODO: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
@@ -690,17 +702,20 @@ export class OperationPlan {
     return true;
   }
 
-  private deduplicateStep(step: ExecutableStep) {
+  private _deduplicateInnerLogic(
+    step: ExecutableStep,
+    alsoIncludeLayerPlans: LayerPlan[] = [],
+  ) {
     step.isArgumentsFinalized = true;
 
     if (step.hasSideEffects) {
       // Never deduplicate plans with side effects.
-      return step;
+      return null;
     }
 
     if (step instanceof __ItemStep) {
       // __ItemStep cannot be deduplicated
-      return step;
+      return null;
     }
 
     const planOptions = this.getPlanOptionsForStep(step);
@@ -710,7 +725,7 @@ export class OperationPlan {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
       // entries to be garbage collected).
-      return step;
+      return null;
     }
 
     /**
@@ -723,15 +738,20 @@ export class OperationPlan {
      * If the current LayerPlan is a polymorphic layer plan then we can also
      * include its siblings.
      */
-    const compatibleLayerPlans: LayerPlan[] = [];
+    const compatibleLayerPlans: LayerPlan[] = [...alsoIncludeLayerPlans];
     let currentLayerPlan: LayerPlan | null = step.layerPlan;
     const doNotPass = step.dependencies.map(
       (depId) => this.steps[depId].layerPlan,
     );
 
     do {
-      compatibleLayerPlans.push(currentLayerPlan);
+      if (!compatibleLayerPlans.includes(currentLayerPlan)) {
+        compatibleLayerPlans.push(currentLayerPlan);
+      }
 
+      /*
+       * NOTE: this has been disabled in favour of using
+       * `polymorphicDeduplicateSteps` method.
       if (currentLayerPlan.reason.type === "polymorphic") {
         for (const potentialSibling of this.layerPlans) {
           if (
@@ -744,6 +764,7 @@ export class OperationPlan {
           }
         }
       }
+      */
 
       if (doNotPass.includes(currentLayerPlan)) {
         break;
@@ -775,83 +796,72 @@ export class OperationPlan {
     // plans that are "smarter" than us can return replacement plans even if
     // they're not peers?
     if (peers.length === 0) {
-      return step;
+      return null;
     }
 
     const equivalentSteps = step.deduplicate(peers);
-    if (equivalentSteps.length > 0) {
-      if (
-        !equivalentSteps.every((replacementStep) =>
-          peers.includes(replacementStep),
-        )
-      ) {
-        throw new Error(
-          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
-        );
-      }
+    if (equivalentSteps.length === 0) {
+      // No equivalents, we're the original
+      return null;
+    }
 
-      const allEquivalentSteps = [step, ...equivalentSteps];
+    if (
+      !equivalentSteps.every((replacementStep) =>
+        peers.includes(replacementStep),
+      )
+    ) {
+      throw new Error(
+        `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
+      );
+    }
 
-      // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
-      let minDepth = Infinity;
-      let stepsAtMinDepth: ExecutableStep[] = [];
-      for (let i = 0, l = allEquivalentSteps.length; i < l; i++) {
-        const step = allEquivalentSteps[i];
-        let depth = 0;
-        let layer: LayerPlan | null = step.layerPlan;
-        while ((layer = layer.parentLayerPlan)) {
-          depth++;
-        }
-        if (depth < minDepth) {
-          minDepth = depth;
-          stepsAtMinDepth = [step];
-        } else if (depth === minDepth) {
-          stepsAtMinDepth.push(step);
-        }
+    const allEquivalentSteps = [step, ...equivalentSteps];
+
+    // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
+    let minDepth = Infinity;
+    let stepsAtMinDepth: ExecutableStep[] = [];
+    for (let i = 0, l = allEquivalentSteps.length; i < l; i++) {
+      const step = allEquivalentSteps[i];
+      let depth = 0;
+      let layer: LayerPlan | null = step.layerPlan;
+      while ((layer = layer.parentLayerPlan)) {
+        depth++;
       }
-      const layersAtMinDepth = [
-        ...new Set(stepsAtMinDepth.map((s) => s.layerPlan)),
-      ];
-      if (layersAtMinDepth.length === 1) {
-        // Hooray, one winning layer!
-        stepsAtMinDepth.sort((a, z) => a.id - z.id);
-        const winner = stepsAtMinDepth[0];
-        // Everything else is equivalent to winner!
-        for (const equivalentStep of allEquivalentSteps) {
-          if (equivalentStep !== winner) {
-            this.replaceStep(equivalentStep, winner);
-          }
-        }
-        return winner;
-      } else {
-        if (isDev) {
-          layersAtMinDepth.forEach((lp) => {
-            assert.strictEqual(
-              lp.reason.type,
-              "polymorphic",
-              `If there's more than one layer plan at the min depth then they must all be polymorphic otherwise how could the layers be compatible?`,
-            );
-          });
-        }
-        const polymorphic;
-        // TODO:
-        throw new Error("TODO!");
-        // Now to handle bucket changes
-        if (step.layerPlan !== replacementStep.layerPlan) {
-          if (
-            step.layerPlan.reason.type !== "polymorphic" ||
-            replacementStep.layerPlan.reason.type !== "polymorphic"
-          ) {
-            throw new Error(
-              `Unexpected LayerPlan mismatch when deduplicating ${step} to ${replacementStep}`,
-            );
-          }
-          // Create a new layerplan above both these layerplans and push replacementStep into it
-        }
+      if (depth < minDepth) {
+        minDepth = depth;
+        stepsAtMinDepth = [step];
+      } else if (depth === minDepth) {
+        stepsAtMinDepth.push(step);
       }
-    } else {
+    }
+    const layersAtMinDepth = [
+      ...new Set(stepsAtMinDepth.map((s) => s.layerPlan)),
+    ];
+    layersAtMinDepth.sort((a, z) => a.id - z.id);
+    stepsAtMinDepth.sort((a, z) => a.id - z.id);
+    return { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps };
+  }
+
+  private deduplicateStep(step: ExecutableStep) {
+    const result = this._deduplicateInnerLogic(step);
+    if (result == null) {
       return step;
     }
+
+    const { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps } = result;
+    assert.strictEqual(
+      layersAtMinDepth.length,
+      1,
+      "How did we find more than one layer at the min depth?! Polymorphics should be handled via polymorphicDeduplicateSteps",
+    );
+
+    // Hooray, one winning layer! Find the first one by id.
+    const winner = stepsAtMinDepth[0];
+
+    // Everything else is equivalent to winner!
+    this.replaceSteps(allEquivalentSteps, winner);
+
+    return winner;
   }
 
   /*
@@ -904,6 +914,264 @@ export class OperationPlan {
       (step) => this.deduplicateStep(step),
     );
     this.maxDeduplicatedStepId = this.stepCount - 1;
+  }
+
+  /**
+   * When deduplicating polymorphic plans we have to put a bit more effort in.
+   * This should only be called after planning the fields (but not their
+   * items/selection sets) for each possible type in a polymorphic selection.
+   *
+   * The starting state should be that we have a set of polymorphicLayerPlans
+   * covering all the possible types. Note that some of these layers may cover
+   * more than one potential type, this might be the case if they each return
+   * the exact same plan as their polymorphic item plan.
+   *
+   * We'll then scan over the list of not-yet-deduplicated steps and make a
+   * list of just the steps that aren't dependent on any of the other steps in
+   * this list. We'll then deduplicate these, picking the highest bucket that
+   * any of them are in. If that bucket is not polymorphic that's fine. If that
+   * bucket is polymorphic but it's the same bucket for all then that's fine.
+   * If, however, it's more than one polymorphic bucket then we'll create a new
+   * polymorphic bucket that's above all these buckets and make these buckets a
+   * child of it (and push this step into that bucket); that is unless a
+   * perfectly matching bucket already exists.
+   *
+   * Then we repeat.
+   *
+   * TODO: the above isn't quite right because as the LayerPlans restructure we
+   * won't always be able to full deduplicate (possibly).
+   *
+   * TODO: no idea if this is complete.
+   */
+  polymorphicDeduplicateSteps() {
+    const previousStepCount = this.stepCount;
+    const fromStepId = this.maxDeduplicatedStepId + 1;
+    const pendingSteps: ExecutableStep[] = [];
+
+    for (let stepId = fromStepId; stepId < previousStepCount; stepId++) {
+      const step = this.steps[stepId];
+      pendingSteps.push(step);
+    }
+
+    while (pendingSteps.length > 0) {
+      /** The steps that aren't dependent on any other steps in this batch */
+      const topSteps: ExecutableStep[] = [];
+      for (let i = pendingSteps.length - 1; i >= 0; i--) {
+        const step = pendingSteps[i];
+        if (
+          !step.dependencies.some((depId) =>
+            pendingSteps.includes(this.steps[depId]),
+          )
+        ) {
+          topSteps.push(step);
+          pendingSteps.splice(i, 1);
+        }
+      }
+      topSteps.reverse();
+
+      assert.ok(
+        topSteps.length > 0,
+        "There must be a cycle in the dependencies; this is not allowed.",
+      );
+
+      // Now go calculate the equivalent steps for each of these
+      const seen = new Set<ExecutableStep>();
+      const results: Exclude<
+        ReturnType<typeof this._deduplicateInnerLogic>,
+        null
+      >[] = [];
+      for (const step of topSteps) {
+        if (seen.has(step)) {
+          continue;
+        }
+        seen.add(step);
+
+        let includeLayerPlans: LayerPlan[] = [];
+        if (step.layerPlan.reason.type === "polymorphic") {
+          // Siblings of `step.layerPlan`
+          const my = step.layerPlan;
+          includeLayerPlans = this.layerPlans.filter(
+            (lp) =>
+              lp.parentLayerPlan === my.parentLayerPlan &&
+              lp.reason.type === "polymorphic" &&
+              lp.rootStepId === my.rootStepId,
+          );
+        }
+        const result = this._deduplicateInnerLogic(step, includeLayerPlans);
+
+        if (!result) {
+          continue;
+        }
+        const { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps } =
+          result;
+        if (layersAtMinDepth.length === 1) {
+          // Simples!
+          const winner = stepsAtMinDepth[0];
+          this.replaceSteps(allEquivalentSteps, winner);
+          for (const equivalentStep of allEquivalentSteps) {
+            seen.add(equivalentStep);
+          }
+        } else {
+          // Polymorphic... handle later
+          results.push(result);
+        }
+      }
+
+      // It's later now, time to handle the polymorphic ones
+      while (results.length > 0) {
+        /*
+         * "Ooo, polymorphic time." <cracks knuckles>
+         *
+         * So we've got a bunch of results for our "deduplicated" plans. We've
+         * not _actually_ deduplicated them, just figured out the equivalents.
+         * Now we need to act.
+         */
+
+        // First up, lets find the results that affect the most layers. We know
+        // they all affect at least 2 layers.
+        let winners: typeof results = [];
+        let winningCount = 0;
+        for (const result of results) {
+          if (result?.layersAtMinDepth.length > winningCount) {
+            winners = [result];
+            winningCount = result?.layersAtMinDepth.length;
+          }
+        }
+
+        // So all these ${winners} affect ${winningCount} layers. Lets find out
+        // which layer combination is most popular.
+        const comboCounts: { [combo: string]: typeof results } =
+          Object.create(null);
+        let winningCombo: typeof results = [];
+        for (const winner of winners) {
+          const combo = winner.layersAtMinDepth.map((l) => l.id).join(",");
+          if (!comboCounts[combo]) {
+            comboCounts[combo] = [winner];
+          } else {
+            comboCounts[combo].push(winner);
+          }
+          if (comboCounts[combo].length > winningCombo.length) {
+            winningCombo = comboCounts[combo];
+          }
+        }
+
+        // And the typeNames for this combo
+        const typeNames = winningCombo[0].layersAtMinDepth
+          .flatMap((l) => (l.reason as LayerPlanReasonPolymorphic).typeNames)
+          .sort();
+        // TODO: assert typeNames is unique if isDev. (It should be!)
+
+        // Does the existing parent of each of these already match?
+        const oneLayer = winningCombo[0].layersAtMinDepth[0];
+        const parent = oneLayer.parentLayerPlan;
+        if (!parent) {
+          throw new Error(
+            "GraphileInternalError<c7e37f4d-d7ea-4f29-98f5-c0781b5f4293>: how could a polymorphic LayerPlan not have a parent?",
+          );
+        }
+
+        // Remove these results from the 'results' list
+        for (const result of winningCombo) {
+          const i = results.indexOf(result);
+          assert.ok(i >= 0, "result wasn't in results?!");
+          // TODO: should results be a Set to make splicing cheaper?
+          results.splice(i, 1);
+        }
+
+        if (
+          parent.reason.type === "polymorphic" &&
+          parent.rootStepId === oneLayer.rootStepId &&
+          arraysMatch(parent.reason.typeNames.sort(), typeNames)
+        ) {
+          // Yes, parent matches so we can just hoist to here!
+          for (const result of winningCombo) {
+            const winner = result.allEquivalentSteps[0];
+            winner.layerPlan = parent;
+            this.replaceSteps(result.allEquivalentSteps, winner);
+          }
+        } else {
+          // Not equivalent, need to create a new bucket and shove all the
+          // plans into it
+          const newPolymorphicLayerPlan = new LayerPlan(this, parent, {
+            type: "polymorphic",
+            typeNames,
+          });
+          winningCombo[0].layersAtMinDepth.forEach((layer) => {
+            layer.parentLayerPlan = newPolymorphicLayerPlan;
+          });
+          for (const result of winningCombo) {
+            const winner = result.allEquivalentSteps[0];
+            winner.layerPlan = newPolymorphicLayerPlan;
+            this.replaceSteps(result.allEquivalentSteps, winner);
+          }
+
+          // Doing this restructuring of the LayerPlans has invalidated
+          // `results`; we need to account for this.
+          // Loop backwards due to splice. Also remember we're pushing and
+          // don't want to process the newly pushed values.
+          for (
+            let resultIndex = results.length - 1;
+            resultIndex >= 0;
+            resultIndex--
+          ) {
+            const result = results[resultIndex];
+            const parents = new Set([
+              ...result.layersAtMinDepth.map((l) => l.parentLayerPlan),
+            ]);
+            if (parents.size > 1) {
+              // One of parents is presumably newPolymorphicLayerPlan... There
+              // should only be two I guess?
+              assert.strictEqual(
+                parents.size,
+                2,
+                "GraphileInternalError<6b6a3a15-fad0-4f2f-a3a2-51b984b3e22d>: consistency check",
+              );
+
+              // Original values
+              const { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps } =
+                result;
+
+              // Remove this old result
+              results.splice(resultIndex, 1);
+
+              // Add new results for each of the parents
+              for (const parent of parents) {
+                // Find the subset for this parent
+                const newLayersAtMinDepth = layersAtMinDepth.filter(
+                  (l) => l.parentLayerPlan === parent,
+                );
+                const newStepsAtMinDepth = stepsAtMinDepth.filter((s) =>
+                  newLayersAtMinDepth.includes(s.layerPlan),
+                );
+                const newAllEquivalentSteps = allEquivalentSteps.filter((s) => {
+                  // This step has to be "within" one of the newLayersAtMinDepth, but potentially deep.
+                  let p: LayerPlan | null = s.layerPlan;
+                  while (p) {
+                    if (newLayersAtMinDepth.includes(p)) {
+                      return true;
+                    }
+
+                    p = p.parentLayerPlan;
+                  }
+                  return false;
+                });
+                const newResult: typeof result = {
+                  allEquivalentSteps: newAllEquivalentSteps,
+                  stepsAtMinDepth: newStepsAtMinDepth,
+                  layersAtMinDepth: newLayersAtMinDepth,
+                };
+                results.push(newResult);
+              }
+              // TODO: if isDev check that all values from the original
+              // `result` are represented in the `newResult`s.
+            }
+          }
+        }
+      }
+    }
+
+    // Finally:
+    this.maxDeduplicatedStepId = previousStepCount - 1;
   }
 
   private getPlanOptionsForStep(step: ExecutableStep): PlanOptions {

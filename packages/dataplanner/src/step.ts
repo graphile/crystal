@@ -45,7 +45,7 @@ export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
-  public readonly layerPlan: LayerPlan;
+  public layerPlan: LayerPlan;
   public isArgumentsFinalized = false;
   public isFinalized = false;
   public debug = getDebug();

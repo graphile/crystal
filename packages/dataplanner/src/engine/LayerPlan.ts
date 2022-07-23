@@ -137,8 +137,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   constructor(
     public readonly operationPlan: OperationPlan,
-    public readonly parentLayerPlan: LayerPlan<any> | null,
-    public parentStep: ExecutableStep | null,
+    public parentLayerPlan: LayerPlan | null,
+    parentStep: ExecutableStep | null,
     public readonly reason: TReason,
   ) {
     this.id = operationPlan.addLayerPlan(this);
