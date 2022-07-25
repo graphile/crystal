@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import type {
+  FieldNode,
   FragmentDefinitionNode,
   GraphQLField,
   GraphQLObjectType,
@@ -9,7 +10,10 @@ import type {
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
-import { graphqlCollectFields } from "../graphqlCollectFields.js";
+import {
+  getDirectiveArg,
+  graphqlCollectFields,
+} from "../graphqlCollectFields.js";
 import type { ModifierStep } from "../index.js";
 import {
   __ItemStep,
@@ -17,9 +21,20 @@ import {
   __ValueStep,
   ExecutableStep,
 } from "../index.js";
-import type { PlanOptions } from "../interfaces.js";
-import { assertFinalized, isStreamableStep } from "../step.js";
-import { arraysMatch } from "../utils.js";
+import { inputPlan } from "../input.js";
+import type {
+  FieldPlanResolver,
+  StepOptions,
+  TrackedArguments,
+} from "../interfaces.js";
+import { withFieldArgsForArguments } from "../opPlan-input.js";
+import {
+  assertExecutableStep,
+  assertFinalized,
+  isStreamableStep,
+} from "../step.js";
+import { constant, ConstantStep } from "../steps/constant.js";
+import { arraysMatch, defaultValueToValueNode } from "../utils.js";
 import type { LayerPlanReasonPolymorphic } from "./LayerPlan.js";
 import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import type { SchemaDigest } from "./lib/digestSchema.js";
@@ -265,7 +280,7 @@ export class OperationPlan {
 
   /** @internal Use plan.getStep(id) instead. */
   public getStep: (
-    id: string,
+    id: number,
     requestingStep: ExecutableStep,
   ) => ExecutableStep = isDev
     ? (id, requestingStep) => {
@@ -403,19 +418,19 @@ export class OperationPlan {
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
-      const { haltTree, plan: subscribePlan } = this.planField(
+      const { haltTree, step: subscribeStep } = this.planField(
         [field.alias?.value ?? fieldName],
         rootType,
         field,
         subscriptionPlanResolver,
         this.trackedRootValueStep,
         fieldSpec,
+        this.rootLayerPlan,
       );
       if (haltTree) {
         throw new Error("Failed to setup subscription");
       }
-      this.subscriptionStepId = subscribePlan.id;
-      const oldStepsLength = this.stepCount;
+      this.subscriptionStepId = subscribeStep.id;
 
       const subscriptionEventLayerPlan = new LayerPlan(
         this,
@@ -427,7 +442,7 @@ export class OperationPlan {
 
       const streamItemPlan = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
-        () => subscribePlan.itemPlan(this.itemStepFor(subscribePlan)),
+        () => subscribeStep.itemPlan(this.itemStepFor(subscribeStep)),
       );
       this.subscriptionItemStepId = streamItemPlan.id;
       this.deduplicateSteps();
@@ -439,12 +454,12 @@ export class OperationPlan {
       );
     } else {
       // TODO: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
-      const subscribePlan = this.trackedRootValueStep;
-      this.subscriptionStepId = subscribePlan.id;
+      const subscribeStep = this.trackedRootValueStep;
+      this.subscriptionStepId = subscribeStep.id;
       this.deduplicateSteps();
       this.planSelectionSet(
         [],
-        subscribePlan,
+        subscribeStep,
         rootType,
         selectionSet.selections,
       );
@@ -477,6 +492,174 @@ export class OperationPlan {
     isMutation = false,
   ) {
     throw new Error("TODO");
+  }
+
+  private planField(
+    path: string[],
+    objectType: GraphQLObjectType,
+    fieldNode: FieldNode,
+    planResolver: FieldPlanResolver<any, any, any>,
+    parentPlan: ExecutableStep,
+    field: GraphQLField<any, any>,
+    layerPlan: LayerPlan,
+  ) {
+    this.loc.push(`planField(${path.join(".")})`);
+    const trackedArguments = withGlobalLayerPlan(layerPlan, () =>
+      this.getTrackedArguments(objectType, fieldNode),
+    );
+
+    let step = withGlobalLayerPlan(layerPlan, () =>
+      withFieldArgsForArguments(
+        this,
+        parentPlan,
+        trackedArguments,
+        field,
+        (fieldArgs) =>
+          planResolver(parentPlan, fieldArgs, {
+            field,
+            schema: this.schema,
+          }),
+      ),
+    );
+    let haltTree = false;
+    if (step === null || (step instanceof ConstantStep && step.isNull())) {
+      // Constantly null; do not step any further in this tree.
+      step = step || constant(null);
+      haltTree = true;
+    }
+    assertExecutableStep(step);
+
+    // TODO: Check SameStreamDirective still exists in @stream spec at release.
+    /*
+     * `SameStreamDirective`
+     * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+     * ensures that every field that has `@stream` must have the same
+     * `@stream` arguments; so we can just check the first node in the
+     * merged set to see our stream options. NOTE: if this changes before
+     * release then we may need to find the stream with the largest
+     * `initialCount` to figure what to do; something like:
+     *
+     *      const streamDirective = firstField.directives?.filter(
+     *        (d) => d.name.value === "stream",
+     *      ).sort(
+     *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+     *      )[0]
+     */
+    const streamDirective = fieldNode.directives?.find(
+      (d) => d.name.value === "stream",
+    );
+
+    const stepOptions: StepOptions = {
+      stream:
+        !haltTree &&
+        streamDirective &&
+        isStreamableStep(step as ExecutableStep<any>)
+          ? {
+              initialCount:
+                Number(
+                  getDirectiveArg(
+                    fieldNode,
+                    "stream",
+                    "initialCount",
+                    this.trackedVariableValuesStep,
+                  ),
+                ) || 0,
+            }
+          : null,
+    };
+    step._stepOptions = stepOptions;
+
+    // Now that the field has been planned (including arguments, but NOT
+    // including selection set) we can deduplicate it to see if any of its
+    // peers are identical.
+    this.deduplicateSteps();
+
+    // After deduplication, this step may have been substituted; get the
+    // updated reference.
+    step = this.steps[step.id]!;
+    this.loc.pop();
+    return { step, haltTree };
+  }
+
+  /**
+   * A replacement for GraphQL's
+   * `CoerceArgumentValues` that factors in tracked variables.
+   *
+   * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
+   */
+  private getTrackedArguments(
+    objectType: GraphQLObjectType,
+    field: FieldNode,
+  ): TrackedArguments {
+    const trackedArgumentValues = Object.create(null);
+    if (field.arguments) {
+      const argumentValues = field.arguments;
+      const fieldName = field.name.value;
+      const fieldSpec = objectType.getFields()[fieldName];
+      const argumentDefinitions = fieldSpec.args;
+
+      const seenNames = new Set();
+      for (const argumentDefinition of argumentDefinitions) {
+        const argumentName = argumentDefinition.name;
+        if (seenNames.has(argumentName)) {
+          throw new Error(
+            `Argument name '${argumentName}' seen twice; aborting.`,
+          );
+        }
+        seenNames.add(argumentName);
+        const argumentType = argumentDefinition.type;
+        const defaultValue = defaultValueToValueNode(
+          argumentType,
+          argumentDefinition.defaultValue,
+        );
+        const argumentValue = argumentValues.find(
+          (v) => v.name.value === argumentName,
+        );
+        const argumentPlan = inputPlan(
+          this,
+          argumentType,
+          argumentValue?.value,
+          defaultValue,
+        );
+        trackedArgumentValues[argumentName] = argumentPlan;
+      }
+    }
+    return {
+      // TODO: should this be FieldArgs?
+      get(name) {
+        return trackedArgumentValues[name];
+      },
+    };
+  }
+
+  public withModifiers<T>(cb: () => T): T {
+    // Stash previous modifiers
+    const previousStack = this.modifierSteps.splice(
+      0,
+      this.modifierSteps.length,
+    );
+    const previousCount = this.modifierStepCount;
+    this.modifierStepCount = 0;
+
+    const result = cb();
+
+    // Remove the modifier plans from opPlan and sort them ready for application.
+    const plansToApply = this.modifierSteps
+      .splice(0, this.modifierSteps.length)
+      .reverse();
+
+    // Restore previous modifiers
+    this.modifierStepCount = previousCount;
+    for (const mod of previousStack) {
+      this.modifierSteps.push(mod);
+    }
+
+    // Apply the plans.
+    for (let i = 0, l = plansToApply.length; i < l; i++) {
+      plansToApply[i].apply();
+    }
+
+    return result;
   }
 
   /**
@@ -793,8 +976,8 @@ export class OperationPlan {
       return null;
     }
 
-    const planOptions = this.getPlanOptionsForStep(step);
-    const shouldStream = !!planOptions?.stream;
+    const stepOptions = this.getStepOptionsForStep(step);
+    const shouldStream = !!stepOptions?.stream;
     // TODO: revisit this decision in the context of SAGE.
     if (shouldStream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
@@ -1187,7 +1370,9 @@ export class OperationPlan {
     this.maxDeduplicatedStepId = previousStepCount - 1;
   }
 
-  private getPlanOptionsForStep(step: ExecutableStep): PlanOptions {
+  private getStepOptionsForStep(step: ExecutableStep): StepOptions {
+    return step._stepOptions;
+    /*
     // NOTE: streams can only be merged if their parameters are compatible
     // (namely they need to have equivalent `initialCount`)
     const streamLayerPlan = step.childLayerPlans.find(
@@ -1204,6 +1389,7 @@ export class OperationPlan {
             { initialCount: streamLayerPlan.reason.initialCount }
           : null,
     };
+    */
   }
 
   /**
@@ -1217,8 +1403,8 @@ export class OperationPlan {
     }
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
-    const planOptions = this.getPlanOptionsForStep(step);
-    const replacementStep = step.optimize(planOptions);
+    const stepOptions = this.getStepOptionsForStep(step);
+    const replacementStep = step.optimize(stepOptions);
     step.isOptimized = true;
     return replacementStep;
   }

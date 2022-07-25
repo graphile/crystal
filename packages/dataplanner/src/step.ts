@@ -13,6 +13,7 @@ import type {
   ExecutionExtra,
   PlanOptimizeOptions,
   PromiseOrDirect,
+  StepOptions,
 } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 
@@ -252,6 +253,9 @@ export class ExecutableStep<TData = any> extends BaseStep {
    */
   public allowMultipleOptimizations = false;
 
+  /** @internal */
+  public _stepOptions: StepOptions = { stream: null };
+
   constructor() {
     super();
     this.id = this.layerPlan._addStep(this);
@@ -410,11 +414,10 @@ export function isExecutableStep<TData = any>(
 
 export function assertExecutableStep<TData>(
   plan: BaseStep | null | undefined | void,
-  pathIdentity: string,
 ): asserts plan is ExecutableStep<TData> {
   if (!isExecutableStep(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be an executable plan, but it does not implement the 'execute' method.`,
+      `The plan returned should be an executable plan, but it does not implement the 'execute' method.`,
     );
   }
 }

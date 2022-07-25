@@ -603,25 +603,25 @@ export type TrackedArguments<
 /**
  * `@stream` directive meta.
  */
-export interface PlanStreamOptions {
+export interface StepStreamOptions {
   initialCount: number;
 }
 /**
  * Additional details about the planning for a field; currently only relates to
  * the `@stream` directive.
  */
-export interface PlanOptions {
+export interface StepOptions {
   /**
    * Details for the `@stream` directive.
    */
-  stream: PlanStreamOptions | null;
+  stream: StepStreamOptions | null;
 }
 
 /**
  * Options passed to the `optimize` method of a plan to give more context.
  */
-export interface PlanOptimizeOptions {
-  stream: PlanStreamOptions | null;
+export interface StepOptimizeOptions {
+  stream: StepStreamOptions | null;
 }
 
 /**

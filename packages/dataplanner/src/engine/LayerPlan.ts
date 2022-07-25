@@ -138,9 +138,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   constructor(
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
-    public readonly reason: TReason,
-  ) //parentStep: ExecutableStep | null,
-  {
+    public readonly reason: TReason, //parentStep: ExecutableStep | null,
+  ) {
     this.id = operationPlan.addLayerPlan(this);
     if (!parentLayerPlan) {
       assert.strictEqual(
@@ -158,7 +157,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   /** @internal Use plan.getStep(id) instead. */
-  public getStep(id: string, requestingStep: ExecutableStep): ExecutableStep {
+  public getStep(id: number, requestingStep: ExecutableStep): ExecutableStep {
     return this.operationPlan.getStep(id, requestingStep);
   }
 

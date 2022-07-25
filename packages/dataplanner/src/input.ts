@@ -18,7 +18,7 @@ import {
 import { inspect } from "util";
 
 import * as assert from "./assert.js";
-import type { OpPlan } from "./opPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
 import {
@@ -46,7 +46,7 @@ export function assertInputStep(
 }
 
 export function graphqlGetTypeForNode(
-  opPlan: OpPlan,
+  opPlan: OperationPlan,
   node: NamedTypeNode | ListTypeNode | NonNullTypeNode,
 ): GraphQLType {
   switch (node.kind) {
@@ -80,7 +80,7 @@ export function graphqlGetTypeForNode(
  * @internal
  */
 export function inputPlan(
-  opPlan: OpPlan,
+  opPlan: OperationPlan,
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
@@ -147,7 +147,7 @@ function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
 }
 
 function inputVariablePlan(
-  opPlan: OpPlan,
+  opPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
@@ -184,6 +184,9 @@ function inputVariablePlan(
 /**
  * Implements `InputNonNullStep`.
  */
-function inputNonNullPlan(_opPlan: OpPlan, innerPlan: InputStep): InputStep {
+function inputNonNullPlan(
+  _opPlan: OperationPlan,
+  innerPlan: InputStep,
+): InputStep {
   return innerPlan;
 }

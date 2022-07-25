@@ -13,11 +13,8 @@ import {
   isScalarType,
 } from "graphql";
 
-import type {
-  __InputObjectStep,
-  __TrackedObjectStep,
-  OpPlan,
-} from "./index.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
+import type { __InputObjectStep, __TrackedObjectStep } from "./index.js";
 import type { InputStep } from "./input.js";
 import type {
   FieldArgs,
@@ -35,7 +32,7 @@ export function withFieldArgsForArguments<
   T extends ExecutableStep,
   TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
 >(
-  opPlan: OpPlan,
+  opPlan: OperationPlan,
   parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
@@ -66,7 +63,7 @@ function withFieldArgsForArgumentsOrInputObject<
   T extends ExecutableStep | ModifierStep | null | void,
   TParentStep extends ExecutableStep,
 >(
-  opPlan: OpPlan,
+  opPlan: OperationPlan,
   typeContainingFields: GraphQLInputType | null,
   parentPlan: TParentStep,
   $current: TrackedArguments | InputStep, //__TrackedObjectStep | __InputObjectStep,
