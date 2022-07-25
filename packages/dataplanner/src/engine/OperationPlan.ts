@@ -1,12 +1,24 @@
+import LRU from "@graphile/lru";
 import * as assert from "assert";
 import type {
   FieldNode,
   FragmentDefinitionNode,
   GraphQLField,
   GraphQLObjectType,
+  GraphQLOutputType,
   GraphQLSchema,
   OperationDefinitionNode,
   SelectionNode,
+} from "graphql";
+import { isObjectType } from "graphql";
+import { getNullableType, isListType } from "graphql";
+import { isNonNullType } from "graphql";
+import { isInterfaceType, isUnionType } from "graphql";
+import {
+  assertObjectType,
+  defaultFieldResolver,
+  getNamedType,
+  isLeafType,
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
@@ -28,18 +40,28 @@ import type {
   TrackedArguments,
 } from "../interfaces.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
+import { $$crystalWrapped, isCrystalWrapped } from "../resolvers.js";
+import type { ListCapableStep, PolymorphicStep } from "../step.js";
+import { isListCapableStep } from "../step.js";
 import {
   assertExecutableStep,
   assertFinalized,
   isStreamableStep,
 } from "../step.js";
+import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
-import { arraysMatch, defaultValueToValueNode } from "../utils.js";
+import {
+  arraysMatch,
+  defaultValueToValueNode,
+  findVariableNamesUsed,
+  isTypePlanned,
+} from "../utils.js";
 import type { LayerPlanReasonPolymorphic } from "./LayerPlan.js";
 import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import type { SchemaDigest } from "./lib/digestSchema.js";
 import { digestSchema } from "./lib/digestSchema.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
+import { OutputPlan } from "./OutputPlan.js";
 
 const BEFORE = -1;
 const AFTER = 1;
@@ -157,6 +179,11 @@ export class OperationPlan {
   public readonly itemStepIdByListStepId: {
     [listStepId: number]: number | undefined;
   } = Object.create(null);
+
+  /**
+   * If true, then this operation doesn't use (custom) resolvers.
+   */
+  public pure = true;
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -351,7 +378,14 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
+    const outputPlan = new OutputPlan(
+      this.rootLayerPlan,
+      this.rootValueStep,
+      "root",
+      true,
+    );
     this.planSelectionSet(
+      outputPlan,
       [],
       this.trackedRootValueStep,
       rootType,
@@ -370,7 +404,14 @@ export class OperationPlan {
       throw new Error("No mutation type found in schema");
     }
     this.deduplicateSteps();
+    const outputPlan = new OutputPlan(
+      this.rootLayerPlan,
+      this.rootValueStep,
+      "root",
+      true,
+    );
     this.planSelectionSet(
+      outputPlan,
       [],
       this.trackedRootValueStep,
       rootType,
@@ -398,6 +439,9 @@ export class OperationPlan {
         selectionSet.selections,
       ),
     );
+    if (groupedFieldSet.deferred.length > 0) {
+      throw new Error("@defer forbidden on subscription root selection set");
+    }
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.fields.keys()) {
       if (firstKey !== undefined) {
@@ -419,13 +463,13 @@ export class OperationPlan {
       fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
       const { haltTree, step: subscribeStep } = this.planField(
+        this.rootLayerPlan,
         [field.alias?.value ?? fieldName],
         rootType,
         field,
         subscriptionPlanResolver,
         this.trackedRootValueStep,
         fieldSpec,
-        this.rootLayerPlan,
       );
       if (haltTree) {
         throw new Error("Failed to setup subscription");
@@ -446,7 +490,14 @@ export class OperationPlan {
       );
       this.subscriptionItemStepId = streamItemPlan.id;
       this.deduplicateSteps();
+      const outputPlan = new OutputPlan(
+        subscriptionEventLayerPlan,
+        this.rootValueStep,
+        "root",
+        true,
+      );
       this.planSelectionSet(
+        outputPlan,
         [],
         streamItemPlan,
         rootType,
@@ -457,7 +508,21 @@ export class OperationPlan {
       const subscribeStep = this.trackedRootValueStep;
       this.subscriptionStepId = subscribeStep.id;
       this.deduplicateSteps();
+      const subscriptionEventLayerPlan = new LayerPlan(
+        this,
+        this.rootLayerPlan,
+        {
+          type: "subscription",
+        },
+      );
+      const outputPlan = new OutputPlan(
+        subscriptionEventLayerPlan,
+        this.rootValueStep,
+        "root",
+        true,
+      );
       this.planSelectionSet(
+        outputPlan,
         [],
         subscribeStep,
         rootType,
@@ -484,24 +549,309 @@ export class OperationPlan {
     return itemPlan;
   }
 
+  /**
+   *
+   * @param outputPlan - The output plan that this selection set is being added to
+   * @param path - The path within the outputPlan that we're adding stuff (only for root/object OutputPlans)
+   * @param parentStep - The step that represents the selection set root
+   * @param objectType - The object type that this selection set is being evaluated for (note polymorphic selection should already have been handled by this point)
+   * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
+   * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
+   */
   private planSelectionSet(
+    outputPlan: OutputPlan,
     path: string[],
-    parentPlan: ExecutableStep,
+    parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
     isMutation = false,
   ) {
-    throw new Error("TODO");
+    this.loc.push(
+      `planSelectionSet(${objectType.name} @ ${
+        outputPlan.layerPlan.id
+      } @ ${path.join(".")})`,
+    );
+    assertObjectType(objectType);
+    const groupedFieldSet = withGlobalLayerPlan(outputPlan.layerPlan, () =>
+      graphqlCollectFields(
+        this,
+        parentStep.id,
+        objectType,
+        selections,
+        isMutation,
+      ),
+    );
+    const objectTypeFields = objectType.getFields();
+    // TODO: don't forget about deferreds!
+    for (const [responseKey, fields] of groupedFieldSet.fields.entries()) {
+      // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
+      const field = fields[0];
+      const fieldName = field.name.value;
+
+      // This is presumed to exist because the operation passed validation.
+      const objectField = objectTypeFields[fieldName];
+
+      if (fieldName.startsWith("__")) {
+        if (fieldName === "__typename") {
+          outputPlan.addChild(responseKey, { mode: "__typename" });
+        } else {
+          const variableNames = findVariableNamesUsed(this, field);
+          outputPlan.addChild(responseKey, {
+            mode: "introspection",
+            field,
+            variableNames,
+            // TODO: if variableNames.length === 0 we should be able to optimize this!
+            introspectionCacheByVariableValues: new LRU({
+              maxLength: 3,
+            }),
+          });
+        }
+        continue;
+      }
+      const fieldType = objectTypeFields[fieldName].type;
+      const rawPlanResolver = objectField.extensions?.graphile?.plan;
+      const namedReturnType = getNamedType(fieldType);
+      const namedResultTypeIsLeaf = isLeafType(namedReturnType);
+
+      /**
+       * This could be the crystal resolver or a user-supplied resolver or
+       * nothing.
+       */
+      const rawResolver = objectField.resolve;
+
+      /**
+       * This will never be the crystal resolver - only ever the user-supplied
+       * resolver or nothing
+       */
+      const graphqlResolver =
+        rawResolver && isCrystalWrapped(rawResolver)
+          ? rawResolver[$$crystalWrapped].original
+          : rawResolver;
+
+      const usesDefaultResolver =
+        !graphqlResolver || graphqlResolver === defaultFieldResolver;
+
+      // Apply a default plan to fields that do not have a plan nor a resolver.
+      const planResolver =
+        rawPlanResolver ??
+        (usesDefaultResolver ? makeDefaultPlan(fieldName) : undefined);
+
+      /*
+       *  When considering resolvers on fields, there's three booleans to
+       *  consider:
+       *
+       *  - typeIsPlanned: Does the type the field is defined on expect a plan?
+       *    - NOTE: the root types (Query, Mutation, Subscription) implicitly
+       *      expect the "root plan"
+       *  - fieldHasPlan: Does the field define a `plan()` method?
+       *  - resultIsPlanned: Does the named type that the field returns (the
+       *    "named field type") expect a plan?
+       *    - NOTE: only object types, unions and interfaces may expect plans;
+       *      but not all of them do.
+       *    - NOTE: a union/interface expects a plan iff ANY of its object
+       *      types expect plans
+       *    - NOTE: if ANY object type in an interface/union expects a plan
+       *      then ALL object types within the interface/union must expect
+       *      plans.
+       *    - NOTE: scalars and enums never expect a plan.
+       *
+       *  These booleans impact:
+       *
+       *  - Whether there must be a `plan()` declaration and what the "parent"
+       *    argument is to the same
+       *    - If typeIsPlanned:
+       *      - Assert: `fieldHasPlan` must be true
+       *      - Pass through the parent plan
+       *    - Else, if resultIsPlanned:
+       *      - Assert: `fieldHasPlan` must be true
+       *      - Pass through a `__ValueStep` representing the parent value.
+       *    - Else, if fieldHasPlan:
+       *      - Pass through a `__ValueStep` representing the parent value.
+       *    - Else
+       *      - No action necessary.
+       *  - If the field may define `resolve()` and what the "parent" argument
+       *    is to the same
+       *    - If resultIsPlanned
+       *      - Assert: there must not be a `resolve()`
+       *      - Crystal provides pure resolver.
+       *    - Else if fieldHasPlan (which may be implied by typeIsPlanned
+       *      above)
+       *      - If `resolve()` is not set:
+       *        - crystal will return the value from the plan directly
+       *      - Otherwise:
+       *        - Crystal will wrap this resolver and will call `resolve()` (or
+       *          default resolver) with the plan result.  IMPORTANT: you may
+       *          want to use an `ObjectStep` so that the parent object is of
+       *          the expected shape; e.g. your plan might return
+       *          `object({username: $username})` for a `User.username` field.
+       *    - Else
+       *      - Leave `resolve()` untouched - do not even wrap it.
+       *      - (Failing that, use a __ValueStep and return the result
+       *        directly.)
+       */
+
+      const typePlan = objectType.extensions?.graphile?.Step;
+
+      if (graphqlResolver) {
+        this.pure = false;
+      }
+
+      /*
+        namedReturnType instanceof GraphQLInterfaceType ||
+        namedReturnType instanceof GraphQLUnionType
+        */
+      const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
+      const fieldHasPlan = !!planResolver;
+
+      // Return raw data if either the user has their own resolver _or_ it's a leaf field.
+      const returnRaw = graphqlResolver != null || namedResultTypeIsLeaf;
+
+      if (typePlan && !fieldHasPlan) {
+        throw new Error(
+          `Every field within a planned type must have a plan; object type ${
+            objectType.name
+          } expects a ${typePlan.name || "ExecutableStep"} however field ${
+            objectType.name
+          }.${fieldName} has no plan. Please add an 'extensions.graphile.plan' callback to this field.`,
+        );
+      }
+
+      if (!typePlan && resultIsPlanned && !fieldHasPlan) {
+        throw new Error(
+          `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; however this field has no plan() method to produce such a plan; please add 'extensions.graphile.plan' to this field.`,
+        );
+      }
+
+      if (resultIsPlanned && graphqlResolver) {
+        throw new Error(
+          `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; this means that ${objectType.name}.${fieldName} is forbidden from defining a GraphQL resolver.`,
+        );
+      }
+
+      // this.returnRawValueByPathIdentity[pathIdentity] = returnRaw;
+
+      let step: ExecutableStep | PolymorphicStep;
+      // this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
+      let haltTree = false;
+      if (typeof planResolver === "function") {
+        ({ step, haltTree } = this.planField(
+          outputPlan.layerPlan,
+          path,
+          objectType,
+          field,
+          planResolver,
+          parentStep,
+          objectField,
+        ));
+      } else {
+        // TODO: should this use the default plan resolver?
+        // There's no step resolver; use the parent step
+        step = parentStep;
+        // TODO: this.isUnplannedByPathIdentity[pathIdentity] = true;
+      }
+
+      // this.planIdByPathIdentity[pathIdentity] = step.id;
+
+      if (haltTree) {
+        // TODO!
+        throw new Error("TODO: haltTree");
+      } else {
+        this.planIntoOutputPlan(outputPlan, responseKey, fieldType, step);
+      }
+
+      // TODO: this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+    }
+
+    this.loc.pop();
+  }
+
+  private planIntoOutputPlan(
+    outputPlan: OutputPlan,
+    responseKey: string | null,
+    fieldType: GraphQLOutputType,
+    step: ExecutableStep,
+    listDepth = 0,
+  ) {
+    const nullableFieldType = getNullableType(fieldType);
+    const isNonNull = nullableFieldType !== fieldType;
+    if (isListType(nullableFieldType)) {
+      const $item = withGlobalLayerPlan(
+        outputPlan.layerPlan,
+        isListCapableStep(step)
+          ? () =>
+              (step as ListCapableStep<any>).listItem(
+                this.itemStepFor(step, listDepth),
+              )
+          : () => this.itemStepFor(step, listDepth),
+      );
+      /*
+      const fieldOutputPlan = new OutputPlan(
+        $item.layerPlan,
+        $item,
+        "array",
+        isNonNull,
+      );
+      */
+      outputPlan.addChild(responseKey, {
+        mode: "array",
+        outputPlan: fieldOutputPlan,
+      });
+      this.planIntoOutputPlan(
+        fieldOutputPlan,
+        null,
+        nullableFieldType.ofType,
+        $item,
+        listDepth + 1,
+      );
+      return fieldOutputPlan;
+    } else if (isLeafType(nullableFieldType)) {
+    } else if (isObjectType(nullableFieldType)) {
+    } else {
+      // Polymorphic?
+      const isUnion = isUnionType(nullableFieldType);
+      const isInterface = isInterfaceType(nullableFieldType);
+      assert.ok(
+        isUnion || isInterface,
+        `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
+      );
+    }
+
+    const fieldOutputPlan = new OutputPlan(
+      outputPlan.layerPlan,
+      step,
+      isLeaf ? "leaf" : isList ? "array" : "object",
+      isNonNull,
+    );
+
+    outputPlan.setKey(responseKey, {
+      mode: "OutputPlan",
+      outputPlan: fieldOutputPlan,
+    });
+
+    // Now we're building the child plans, the parentPathIdentity becomes
+    // actually our identity.
+    this.planFieldReturnType(
+      fieldType,
+      fieldAndGroups,
+      pathIdentity,
+      pathIdentity,
+      step,
+      treeNode,
+      returnRaw && !namedResultTypeIsLeaf,
+      namedResultTypeIsLeaf,
+      0,
+      haltTree,
+    );
   }
 
   private planField(
+    layerPlan: LayerPlan,
     path: string[],
     objectType: GraphQLObjectType,
     fieldNode: FieldNode,
     planResolver: FieldPlanResolver<any, any, any>,
-    parentPlan: ExecutableStep,
+    parentStep: ExecutableStep,
     field: GraphQLField<any, any>,
-    layerPlan: LayerPlan,
   ) {
     this.loc.push(`planField(${path.join(".")})`);
     const trackedArguments = withGlobalLayerPlan(layerPlan, () =>
@@ -511,11 +861,11 @@ export class OperationPlan {
     let step = withGlobalLayerPlan(layerPlan, () =>
       withFieldArgsForArguments(
         this,
-        parentPlan,
+        parentStep,
         trackedArguments,
         field,
         (fieldArgs) =>
-          planResolver(parentPlan, fieldArgs, {
+          planResolver(parentStep, fieldArgs, {
             field,
             schema: this.schema,
           }),
@@ -1471,4 +1821,8 @@ export class OperationPlan {
       }
     }
   }
+}
+
+function makeDefaultPlan(fieldName: string) {
+  return ($step: ExecutableStep<any>) => access($step, [fieldName]);
 }

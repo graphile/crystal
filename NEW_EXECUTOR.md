@@ -1,5 +1,10 @@
 NEXT UP:
 
+- Side effect plans
+
+- polymorphicDeduplicateSteps: need to delete the LayerPlans that aren't needed
+  any more (because their plans were shifted up a layer)
+
 - IMPORTANT: when planning polymorphism we MUST call
   polymorphicDeduplicateSteps() correctly!
 
@@ -9,6 +14,11 @@ NEXT UP:
 - LayerPlan should take charge of stream options (`planOptionsByPlan`)
 - LayerPlan should take charge of deduplication
 - LayerPlan should take charge of tree shaking (via OutputPlan too)
+
+- Consider splitting OperationPlan into GraphQLOperationPlan and DataPlannerCore
+  (where core contains the steps/deduplication/etc and GraphQLOperationPlan
+  deals with GraphQL selection sets/etc)
+  - If we do this, consider renaming OutputPlan to GraphQLOutputPlan
 
 New classes:
 

@@ -1,4 +1,7 @@
 import type {
+  ArgumentNode,
+  DirectiveNode,
+  FieldNode,
   GraphQLEnumValueConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
@@ -6,10 +9,16 @@ import type {
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectTypeConfig,
   GraphQLInputType,
+  GraphQLNamedType,
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
+  GraphQLSchema,
   ObjectFieldNode,
-  ValueNode,
+  SelectionNode,
+  ValueNode} from "graphql";
+import {
+  GraphQLInterfaceType,
+  GraphQLUnionType
 } from "graphql";
 import {
   GraphQLBoolean,
@@ -30,6 +39,7 @@ import { inspect } from "util";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { InputStep } from "./input.js";
 import type {
   BaseGraphQLArguments,
@@ -662,4 +672,185 @@ export function arrayOfLength(length: number, fill?: any) {
     arr[i] = fill;
   }
   return arr;
+}
+
+function findVariableNamesUsedInValueNode(
+  valueNode: ValueNode,
+  variableNames: Set<string>,
+): void {
+  switch (valueNode.kind) {
+    case Kind.INT:
+    case Kind.FLOAT:
+    case Kind.STRING:
+    case Kind.BOOLEAN:
+    case Kind.NULL:
+    case Kind.ENUM: {
+      // Static -> no variables
+      return;
+    }
+    case Kind.LIST: {
+      for (const value of valueNode.values) {
+        findVariableNamesUsedInValueNode(value, variableNames);
+      }
+      return;
+    }
+    case Kind.OBJECT: {
+      for (const field of valueNode.fields) {
+        findVariableNamesUsedInValueNode(field.value, variableNames);
+      }
+      return;
+    }
+    case Kind.VARIABLE: {
+      variableNames.add(valueNode.name.value);
+      return;
+    }
+    default: {
+      const never: never = valueNode;
+      throw new Error(`Unsupported valueNode: ${JSON.stringify(never)}`);
+    }
+  }
+}
+
+function findVariableNamesUsedInDirectives(
+  directives: readonly DirectiveNode[] | undefined,
+  variableNames: Set<string>,
+) {
+  if (directives) {
+    for (const dir of directives) {
+      if (dir.arguments) {
+        for (const arg of dir.arguments) {
+          findVariableNamesUsedInValueNode(arg.value, variableNames);
+        }
+      }
+    }
+  }
+}
+
+function findVariableNamesUsedInArguments(
+  args: readonly ArgumentNode[] | undefined,
+  variableNames: Set<string>,
+) {
+  if (args) {
+    for (const arg of args) {
+      findVariableNamesUsedInValueNode(arg.value, variableNames);
+    }
+  }
+}
+
+function findVariableNamesUsedInSelectionNode(
+  operationPlan: OperationPlan,
+  selection: SelectionNode,
+  variableNames: Set<string>,
+) {
+  findVariableNamesUsedInDirectives(selection.directives, variableNames);
+  switch (selection.kind) {
+    case Kind.FIELD: {
+      findVariableNamesUsedInFieldNode(operationPlan, selection, variableNames);
+      return;
+    }
+    case Kind.INLINE_FRAGMENT: {
+      findVariableNamesUsedInDirectives(selection.directives, variableNames);
+      for (const innerSelection of selection.selectionSet.selections) {
+        findVariableNamesUsedInSelectionNode(
+          operationPlan,
+          innerSelection,
+          variableNames,
+        );
+      }
+      return;
+    }
+    case Kind.FRAGMENT_SPREAD: {
+      findVariableNamesUsedInDirectives(selection.directives, variableNames);
+      const fragmentName = selection.name.value;
+      const fragment = operationPlan.fragments[fragmentName];
+      findVariableNamesUsedInDirectives(fragment.directives, variableNames);
+      if (fragment.variableDefinitions?.length) {
+        throw new Error(
+          "DataPlanner doesn't support variable definitions on fragments yet.",
+        );
+      }
+      for (const innerSelection of fragment.selectionSet.selections) {
+        findVariableNamesUsedInSelectionNode(
+          operationPlan,
+          innerSelection,
+          variableNames,
+        );
+      }
+      return;
+    }
+    default: {
+      const never: never = selection;
+      throw new Error(`Unsupported selection ${(never as any).kind}`);
+    }
+  }
+}
+function findVariableNamesUsedInFieldNode(
+  operationPlan: OperationPlan,
+  field: FieldNode,
+  variableNames: Set<string>,
+) {
+  findVariableNamesUsedInArguments(field.arguments, variableNames);
+  findVariableNamesUsedInDirectives(field.directives, variableNames);
+  if (field.selectionSet) {
+    for (const selection of field.selectionSet.selections) {
+      findVariableNamesUsedInSelectionNode(
+        operationPlan,
+        selection,
+        variableNames,
+      );
+    }
+  }
+}
+
+/**
+ * Given a FieldNode, recursively walks and finds all the variable references,
+ * returning a list of the (unique) variable names used.
+ */
+export function findVariableNamesUsed(
+  operationPlan: OperationPlan,
+  field: FieldNode,
+): string[] {
+  const variableNames = new Set<string>();
+  findVariableNamesUsedInFieldNode(operationPlan, field, variableNames);
+  return [...variableNames].sort();
+}
+
+export function isTypePlanned(
+  schema: GraphQLSchema,
+  namedType: GraphQLNamedType,
+): boolean {
+  if (namedType instanceof GraphQLObjectType) {
+    return !!namedType.extensions?.graphile?.Step;
+  } else if (
+    namedType instanceof GraphQLUnionType ||
+    namedType instanceof GraphQLInterfaceType
+  ) {
+    const types =
+      namedType instanceof GraphQLUnionType
+        ? namedType.getTypes()
+        : schema.getImplementations(namedType).objects;
+    let firstHadPlan = null;
+    let i = 0;
+    for (const type of types) {
+      const hasPlan = !!type.extensions?.graphile?.Step;
+      if (firstHadPlan === null) {
+        firstHadPlan = hasPlan;
+      } else if (hasPlan !== firstHadPlan) {
+        // TODO: validate this at schema build time
+        throw new Error(
+          `The '${namedType.name}' interface or union type's first type '${
+            types[0]
+          }' ${
+            firstHadPlan ? "expected a plan" : "did not expect a plan"
+          }, however the type '${type}' (index = ${i}) ${
+            hasPlan ? "expected a plan" : "did not expect a plan"
+          }. All types in an interface or union must be in agreement about whether a plan is expected or not.`,
+        );
+      }
+      i++;
+    }
+    return !!firstHadPlan;
+  } else {
+    return false;
+  }
 }
