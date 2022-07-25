@@ -1,6 +1,5 @@
-import type { DirectiveNode, SelectionNode } from "graphql";
+import type { DirectiveNode, FieldNode, SelectionNode } from "graphql";
 import {
-  assertListType,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLUnionType,
@@ -9,9 +8,7 @@ import {
   isUnionType,
 } from "graphql";
 
-import { isDev } from "./dev.js";
-import type { FieldAndGroup, GroupedSelections } from "./interfaces.js";
-import type { OpPlan } from "./opPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { __TrackedObjectStep } from "./steps/index.js";
 
 /**
@@ -113,6 +110,14 @@ export interface Group {
 }
 
 /**
+ * @internal
+ */
+export interface SelectionSetDigest {
+  fields: Map<string, FieldNode[]>;
+  deferred: SelectionSetDigest[];
+}
+
+/**
  * Implements the `GraphQLCollectFields` algorithm - like `CollectFields` the
  * GraphQL spec, but modified such that access to variables is tracked.
  *
@@ -121,88 +126,116 @@ export interface Group {
  * @internal
  */
 export function graphqlCollectFields(
-  opPlan: OpPlan,
-  parentStepId: string,
+  opPlan: OperationPlan,
+  parentStepId: number,
   objectType: GraphQLObjectType,
-  groupedSelectionsList: GroupedSelections[],
+  selections: readonly SelectionNode[],
   isMutation = false,
   visitedFragments = new Set<string>(),
-  groupedFields = new Map<string, FieldAndGroup[]>(),
-): Map<string, FieldAndGroup[]> {
-  for (
-    let listIndex = 0, listLength = groupedSelectionsList.length;
-    listIndex < listLength;
-    listIndex++
-  ) {
-    const { groupId, selections } = groupedSelectionsList[listIndex];
-    const parent = opPlan.groups[groupId];
-    const objectTypeFields = objectType.getFields();
-    const trackedVariableValuesStep = opPlan.trackedVariableValuesStep;
-    for (let i = 0, l = selections.length; i < l; i++) {
-      const selection = selections[i];
-      if (
-        getDirectiveArg(selection, "skip", "if", trackedVariableValuesStep) ===
-        true
-      ) {
-        continue;
-      }
-      if (
-        getDirectiveArg(
-          selection,
-          "include",
-          "if",
-          trackedVariableValuesStep,
-        ) === false
-      ) {
-        continue;
-      }
-      switch (selection.kind) {
-        case "Field": {
-          const field = selection;
-          const responseKey = field.alias?.value ?? field.name.value;
-          let groupForResponseKey = groupedFields.get(responseKey);
-          if (!groupForResponseKey) {
-            groupForResponseKey = [];
-            groupedFields.set(responseKey, groupForResponseKey);
-          }
+  selectionSetDigest: SelectionSetDigest = { fields: new Map(), deferred: [] },
+): SelectionSetDigest {
+  // const objectTypeFields = objectType.getFields();
+  const trackedVariableValuesStep = opPlan.trackedVariableValuesStep;
+  for (let i = 0, l = selections.length; i < l; i++) {
+    const selection = selections[i];
+    if (
+      getDirectiveArg(selection, "skip", "if", trackedVariableValuesStep) ===
+      true
+    ) {
+      continue;
+    }
+    if (
+      getDirectiveArg(selection, "include", "if", trackedVariableValuesStep) ===
+      false
+    ) {
+      continue;
+    }
+    switch (selection.kind) {
+      case "Field": {
+        const field = selection;
+        const responseKey = field.alias?.value ?? field.name.value;
+        let groupForResponseKey: FieldNode[] | undefined =
+          selectionSetDigest.fields.get(responseKey);
+        if (!groupForResponseKey) {
+          groupForResponseKey = [];
+          selectionSetDigest.fields.set(responseKey, groupForResponseKey);
+        }
 
+        /*
           const stream = getDirective(field, "stream");
           if (stream && isDev) {
             const fieldName = field.name.value;
             const fieldType = objectTypeFields[fieldName].type;
             assertListType(fieldType);
           }
-          const selectionGroupId = stream
-            ? opPlan.addGroup({ reason: "stream", parentStepId, parent })
-            : isMutation
-            ? opPlan.addGroup({
-                reason: "mutation",
-                parentStepId,
-                parent,
-                responseKey,
-              })
-            : groupId;
+          */
 
-          groupForResponseKey.push({
-            field,
-            groupId: selectionGroupId,
-          });
-          break;
+        groupForResponseKey.push(field);
+        break;
+      }
+      case "FragmentSpread": {
+        const fragmentSpreadName = selection.name.value;
+        if (visitedFragments.has(fragmentSpreadName)) {
+          continue;
         }
-        case "FragmentSpread": {
-          const fragmentSpreadName = selection.name.value;
-          if (visitedFragments.has(fragmentSpreadName)) {
-            continue;
-          }
-          visitedFragments.add(fragmentSpreadName);
-          const fragment = opPlan.fragments[fragmentSpreadName];
-          if (fragment == null) {
-            continue;
-          }
-          const fragmentTypeName = fragment.typeCondition.name.value;
+        visitedFragments.add(fragmentSpreadName);
+        const fragment = opPlan.fragments[fragmentSpreadName];
+        if (fragment == null) {
+          continue;
+        }
+        const fragmentTypeName = fragment.typeCondition.name.value;
+        const fragmentType = opPlan.schema.getType(fragmentTypeName);
+        if (
+          !fragmentType ||
+          !(
+            isObjectType(fragmentType) ||
+            isInterfaceType(fragmentType) ||
+            isUnionType(fragmentType)
+          ) ||
+          !graphqlDoesFragmentTypeApply(objectType, fragmentType)
+        ) {
+          continue;
+        }
+        const fragmentSelectionSet = fragment.selectionSet;
+
+        const defer = getDirective(selection, "defer");
+        if (defer) {
+          const deferredDigest: SelectionSetDigest = {
+            fields: new Map(),
+            deferred: [],
+          };
+          selectionSetDigest.deferred.push(deferredDigest);
+          graphqlCollectFields(
+            opPlan,
+            parentStepId,
+            objectType,
+            fragmentSelectionSet.selections,
+            isMutation,
+            visitedFragments,
+            deferredDigest,
+          );
+        } else {
+          graphqlCollectFields(
+            opPlan,
+            parentStepId,
+            objectType,
+            fragmentSelectionSet.selections,
+            isMutation,
+            visitedFragments,
+            selectionSetDigest,
+          );
+        }
+        break;
+      }
+      case "InlineFragment": {
+        const fragmentTypeAst = selection.typeCondition;
+        if (fragmentTypeAst != null) {
+          const fragmentTypeName = fragmentTypeAst.name.value;
           const fragmentType = opPlan.schema.getType(fragmentTypeName);
+          if (fragmentType == null) {
+            throw new Error(`We don't have a type named '${fragmentTypeName}'`);
+          }
           if (
-            !fragmentType ||
             !(
               isObjectType(fragmentType) ||
               isInterfaceType(fragmentType) ||
@@ -212,87 +245,39 @@ export function graphqlCollectFields(
           ) {
             continue;
           }
-          const fragmentSelectionSet = fragment.selectionSet;
+        }
+        const fragmentSelectionSet = selection.selectionSet;
 
-          const defer = getDirective(selection, "defer");
-          const fragmentGroupId = defer
-            ? opPlan.addGroup({ reason: "defer", parentStepId, parent })
-            : isMutation
-            ? opPlan.addGroup({
-                reason: "mutationPayload",
-                parentStepId,
-                parent,
-              })
-            : groupId;
-
+        const defer = getDirective(selection, "defer");
+        if (defer) {
+          const deferredDigest: SelectionSetDigest = {
+            fields: new Map(),
+            deferred: [],
+          };
+          selectionSetDigest.deferred.push(deferredDigest);
           graphqlCollectFields(
             opPlan,
             parentStepId,
             objectType,
-            [
-              {
-                groupId: fragmentGroupId,
-                selections: fragmentSelectionSet.selections,
-              },
-            ],
-            false,
+            fragmentSelectionSet.selections,
+            isMutation,
             visitedFragments,
-            groupedFields,
+            deferredDigest,
           );
-          break;
-        }
-        case "InlineFragment": {
-          const fragmentTypeAst = selection.typeCondition;
-          if (fragmentTypeAst != null) {
-            const fragmentTypeName = fragmentTypeAst.name.value;
-            const fragmentType = opPlan.schema.getType(fragmentTypeName);
-            if (fragmentType == null) {
-              throw new Error(
-                `We don't have a type named '${fragmentTypeName}'`,
-              );
-            }
-            if (
-              !(
-                isObjectType(fragmentType) ||
-                isInterfaceType(fragmentType) ||
-                isUnionType(fragmentType)
-              ) ||
-              !graphqlDoesFragmentTypeApply(objectType, fragmentType)
-            ) {
-              continue;
-            }
-          }
-          const fragmentSelectionSet = selection.selectionSet;
-
-          const defer = getDirective(selection, "defer");
-
-          // TODO: previously we bumped the groupId here if it was a mutation;
-          // however it doesn't seem that this is actually desired/necessary
-          // since the parent selection set would already have been bumped.
-          // I've thus removed this, but we need to be sure it's correct to do
-          // so.
-          const fragmentGroupId = defer
-            ? opPlan.addGroup({ reason: "defer", parentStepId, parent })
-            : groupId;
-
+        } else {
           graphqlCollectFields(
             opPlan,
             parentStepId,
             objectType,
-            [
-              {
-                groupId: fragmentGroupId,
-                selections: fragmentSelectionSet.selections,
-              },
-            ],
-            false,
+            fragmentSelectionSet.selections,
+            isMutation,
             visitedFragments,
-            groupedFields,
+            selectionSetDigest,
           );
-          break;
         }
+        break;
       }
     }
   }
-  return groupedFields;
+  return selectionSetDigest;
 }

@@ -1,6 +1,5 @@
 import type EventEmitter from "events";
 import type {
-  FieldNode,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLField,
@@ -15,13 +14,12 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
-  SelectionNode,
 } from "graphql";
 
 import type { Deferred } from "./deferred.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { CrystalError } from "./error.js";
 import type { InputStep } from "./input.js";
-import type { OpPlan } from "./opPlan.js";
 import type { PlanResults, PlanResultsBucket } from "./planResults.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -222,7 +220,7 @@ export interface Batch {
  * replaced.
  */
 export interface CrystalContext {
-  opPlan: OpPlan;
+  opPlan: OperationPlan;
 
   metaByStepId: {
     [planId: string]: Record<string, unknown> | undefined;
@@ -601,23 +599,6 @@ export type TrackedArguments<
 > = {
   get<TKey extends keyof TArgs>(key: TKey): InputStep;
 };
-
-/**
- * Represents the selections that happen within a particular group within a
- * particular point in the GraphQL document.
- */
-export interface GroupedSelections {
-  groupId: number;
-  selections: ReadonlyArray<SelectionNode>;
-}
-
-/**
- * Represents an individual field and it's group.
- */
-export interface FieldAndGroup {
-  groupId: number;
-  field: FieldNode;
-}
 
 /**
  * `@stream` directive meta.

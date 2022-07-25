@@ -1,12 +1,15 @@
 import * as assert from "assert";
 import type {
   FragmentDefinitionNode,
+  GraphQLField,
   GraphQLObjectType,
   GraphQLSchema,
   OperationDefinitionNode,
+  SelectionNode,
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
+import { graphqlCollectFields } from "../graphqlCollectFields.js";
 import type { ModifierStep } from "../index.js";
 import {
   __ItemStep,
@@ -97,7 +100,7 @@ export class OperationPlan {
   /** Stores the actual variableValues. @internal */
   private readonly variableValuesStep: __ValueStep<{ [key: string]: any }>;
   /** A step for accessing variableValues in a tracked manner (allowing eval). @internal */
-  private readonly trackedVariableValuesStep: __TrackedObjectStep<{
+  public readonly trackedVariableValuesStep: __TrackedObjectStep<{
     [key: string]: any;
   }>;
 
@@ -118,6 +121,27 @@ export class OperationPlan {
   public readonly trackedRootValueStep: __TrackedObjectStep<any>;
 
   private makeMetaByStepId: () => { [planId: string]: Record<string, any> };
+
+  /**
+   * The plan id for the plan that represents the subscription (if any).
+   *
+   * @internal
+   */
+  public subscriptionStepId: number | undefined;
+
+  /**
+   * The plan id for the plan that represents a single payload in the subscription stream (if any)
+   *
+   * @internal
+   */
+  public subscriptionItemStepId: number | undefined;
+
+  /**
+   * @internal
+   */
+  public readonly itemStepIdByListStepId: {
+    [listStepId: number]: number | undefined;
+  } = Object.create(null);
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -312,20 +336,12 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
-    const { fieldDigests } = this.planSelectionSet(
-      ROOT_PATH,
-      ROOT_PATH,
+    this.planSelectionSet(
+      [],
       this.trackedRootValueStep,
       rootType,
-      [
-        {
-          groupId: 0,
-          selections: this.operation.selectionSet.selections,
-        },
-      ],
-      this.rootTreeNode,
+      this.operation.selectionSet.selections,
     );
-    this.setRootFieldDigest(this.queryType, fieldDigests);
     this.loc.pop();
   }
 
@@ -338,22 +354,14 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No mutation type found in schema");
     }
-    this.finalizeArgumentsSince(0, ROOT_PATH);
-    const { fieldDigests } = this.planSelectionSet(
-      ROOT_PATH,
-      ROOT_PATH,
+    this.deduplicateSteps();
+    this.planSelectionSet(
+      [],
       this.trackedRootValueStep,
       rootType,
-      [
-        {
-          groupId: 0,
-          selections: this.operation.selectionSet.selections,
-        },
-      ],
-      this.rootTreeNode,
+      this.operation.selectionSet.selections,
       true,
     );
-    this.setRootFieldDigest(this.mutationType!, fieldDigests);
     this.loc.pop();
   }
 
@@ -367,32 +375,28 @@ export class OperationPlan {
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const wgs = withGlobalState.bind(null, {
-      opPlan: this,
-      parentPathIdentity: ROOT_PATH,
-    }) as <T>(cb: () => T) => T;
-    const groupedFieldSet = wgs(() =>
-      graphqlCollectFields(this, this.trackedRootValueStep.id, rootType, [
-        {
-          groupId: 0,
-          selections: selectionSet.selections,
-        },
-      ]),
+    const groupedFieldSet = withGlobalLayerPlan(this.rootLayerPlan, () =>
+      graphqlCollectFields(
+        this,
+        this.trackedRootValueStep.id,
+        rootType,
+        selectionSet.selections,
+      ),
     );
     let firstKey: string | undefined = undefined;
-    for (const key of groupedFieldSet.keys()) {
+    for (const key of groupedFieldSet.fields.keys()) {
       if (firstKey !== undefined) {
         throw new Error("subscriptions may only have one top-level field");
       }
       firstKey = key;
     }
     assert.ok(firstKey != null, "selection set cannot be empty");
-    const fields = groupedFieldSet.get(firstKey);
+    const fields = groupedFieldSet.fields.get(firstKey);
     if (!fields) {
       throw new Error("Consistency error.");
     }
-    // TODO: maybe assert that all fields have groupId: 0?
-    const { field, groupId: _groupId } = fields[0];
+    // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
+    const field = fields[0];
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
@@ -400,8 +404,7 @@ export class OperationPlan {
       fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
       const { haltTree, plan: subscribePlan } = this.planField(
-        ROOT_PATH,
-        ROOT_PATH,
+        [field.alias?.value ?? fieldName],
         rootType,
         field,
         subscriptionPlanResolver,
@@ -412,63 +415,68 @@ export class OperationPlan {
         throw new Error("Failed to setup subscription");
       }
       this.subscriptionStepId = subscribePlan.id;
-      const oldPlansLength = this.planCount;
+      const oldStepsLength = this.stepCount;
 
-      // TODO: this is a LIE! This should be `ROOT_PATH + "[]"` but that breaks
-      // everything... We've worked around it elsewhere, but maybe all path
-      // identities inside a subscription operation should assume ROOT_PATH of
-      // `~[]` rather than `~`?
-      const nestedParentPathIdentity = ROOT_PATH;
-      const streamItemPlan = withGlobalState(
-        { opPlan: this, parentPathIdentity: ROOT_PATH },
-        () => subscribePlan.itemPlan(this.itemPlanFor(subscribePlan)),
+      const subscriptionEventLayerPlan = new LayerPlan(
+        this,
+        this.rootLayerPlan,
+        {
+          type: "subscription",
+        },
+      );
+
+      const streamItemPlan = withGlobalLayerPlan(
+        subscriptionEventLayerPlan,
+        () => subscribePlan.itemPlan(this.itemStepFor(subscribePlan)),
       );
       this.subscriptionItemStepId = streamItemPlan.id;
-      this.finalizeArgumentsSince(oldPlansLength, ROOT_PATH);
-      const { fieldDigests } = this.planSelectionSet(
-        nestedParentPathIdentity,
-        nestedParentPathIdentity,
+      this.deduplicateSteps();
+      this.planSelectionSet(
+        [],
         streamItemPlan,
         rootType,
-        [
-          {
-            groupId: 0,
-            selections: selectionSet.selections,
-          },
-        ],
-        this.rootTreeNode,
+        selectionSet.selections,
       );
-      assert.strictEqual(
-        fieldDigests.length,
-        1,
-        "Expected exactly one subscription field",
-      );
-      this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     } else {
+      // TODO: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
       const subscribePlan = this.trackedRootValueStep;
       this.subscriptionStepId = subscribePlan.id;
-      this.finalizeArgumentsSince(0, ROOT_PATH);
-      const { fieldDigests } = this.planSelectionSet(
-        ROOT_PATH,
-        ROOT_PATH,
+      this.deduplicateSteps();
+      this.planSelectionSet(
+        [],
         subscribePlan,
         rootType,
-        [
-          {
-            groupId: 0,
-            selections: selectionSet.selections,
-          },
-        ],
-        this.rootTreeNode,
+        selectionSet.selections,
       );
-      assert.strictEqual(
-        fieldDigests.length,
-        1,
-        "Expected exactly one subscription field",
-      );
-      this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     }
     this.loc.pop();
+  }
+
+  /**
+   * Gets the item plan for a given parent list plan - this ensures we only
+   * create one item plan per parent plan.
+   */
+  private itemStepFor<TData>(
+    listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
+    depth = 0,
+  ): __ItemStep<TData> {
+    const itemStepId = this.itemStepIdByListStepId[listStep.id];
+    if (itemStepId !== undefined) {
+      return this.steps[itemStepId] as __ItemStep<TData>;
+    }
+    const itemPlan = new __ItemStep(listStep, depth);
+    this.itemStepIdByListStepId[listStep.id] = itemPlan.id;
+    return itemPlan;
+  }
+
+  private planSelectionSet(
+    path: string[],
+    parentPlan: ExecutableStep,
+    objectType: GraphQLObjectType,
+    selections: readonly SelectionNode[],
+    isMutation = false,
+  ) {
+    throw new Error("TODO");
   }
 
   /**
