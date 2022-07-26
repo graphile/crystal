@@ -10,6 +10,7 @@ import type {
   OperationDefinitionNode,
   SelectionNode,
 } from "graphql";
+import { isEnumType, isScalarType } from "graphql";
 import { isObjectType } from "graphql";
 import { getNullableType, isListType } from "graphql";
 import { isNonNullType } from "graphql";
@@ -486,7 +487,7 @@ export class OperationPlan {
 
       const streamItemPlan = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
-        () => subscribeStep.itemPlan(this.itemStepFor(subscribeStep)),
+        () => subscribeStep.itemPlan(new __ItemStep(subscribeStep)),
       );
       this.subscriptionItemStepId = streamItemPlan.id;
       this.deduplicateSteps();
@@ -536,7 +537,7 @@ export class OperationPlan {
    * Gets the item plan for a given parent list plan - this ensures we only
    * create one item plan per parent plan.
    */
-  private itemStepFor<TData>(
+  private itemStepForListStep<TData>(
     listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
     depth = 0,
   ): __ItemStep<TData> {
@@ -544,7 +545,15 @@ export class OperationPlan {
     if (itemStepId !== undefined) {
       return this.steps[itemStepId] as __ItemStep<TData>;
     }
-    const itemPlan = new __ItemStep(listStep, depth);
+    // Create a new LayerPlan for this list item
+    const layerPlan = new LayerPlan(this, listStep.layerPlan, {
+      type: "list",
+      parentPlanId: listStep.id,
+    });
+    const itemPlan = withGlobalLayerPlan(
+      layerPlan,
+      () => new __ItemStep(listStep, depth),
+    );
     this.itemStepIdByListStepId[listStep.id] = itemPlan.id;
     return itemPlan;
   }
@@ -557,20 +566,64 @@ export class OperationPlan {
    * @param objectType - The object type that this selection set is being evaluated for (note polymorphic selection should already have been handled by this point)
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
+   * @param customRecurse - By default we'll auto-recurse, but you can add recursion to a queue instead (e.g. when handling polymorphism); if you provide this then we also won't deduplicate
    */
   private planSelectionSet(
     outputPlan: OutputPlan,
-    path: string[],
+    path: readonly string[],
     parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
     isMutation = false,
+    customRecurse: null | ((nextUp: () => void) => void) = null,
   ) {
     this.loc.push(
       `planSelectionSet(${objectType.name} @ ${
         outputPlan.layerPlan.id
       } @ ${path.join(".")})`,
     );
+    interface NextUp {
+      haltTree: boolean;
+      stepId: number;
+      responseKey: string;
+      fieldType: GraphQLOutputType;
+      field: FieldNode;
+    }
+    const nextUp: NextUp[] = [];
+
+    const processNextUp = () => {
+      for (const {
+        haltTree,
+        stepId,
+        responseKey,
+        fieldType,
+        field,
+      } of nextUp) {
+        // May have changed due to deduplicate
+        const step = this.steps[stepId];
+        // TODO: is `outputPlan` unchanged here after polymorphicDeduplicateSteps?
+        if (haltTree) {
+          const isNonNull = isNonNullType(fieldType);
+          outputPlan.addChild(objectType, responseKey, {
+            mode: "null",
+            isNonNull,
+          });
+        } else {
+          this.planIntoOutputPlan(
+            outputPlan,
+            [...path, responseKey],
+            field.selectionSet?.selections,
+            objectType,
+            responseKey,
+            fieldType,
+            step,
+          );
+        }
+
+        // TODO: this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+      }
+    };
+
     assertObjectType(objectType);
     const groupedFieldSet = withGlobalLayerPlan(outputPlan.layerPlan, () =>
       graphqlCollectFields(
@@ -593,10 +646,10 @@ export class OperationPlan {
 
       if (fieldName.startsWith("__")) {
         if (fieldName === "__typename") {
-          outputPlan.addChild(responseKey, { mode: "__typename" });
+          outputPlan.addChild(objectType, responseKey, { mode: "__typename" });
         } else {
           const variableNames = findVariableNamesUsed(this, field);
-          outputPlan.addChild(responseKey, {
+          outputPlan.addChild(objectType, responseKey, {
             mode: "introspection",
             field,
             variableNames,
@@ -742,6 +795,9 @@ export class OperationPlan {
           planResolver,
           parentStep,
           objectField,
+          // If we have a customRecurse then don't deduplicate because we'll be
+          // calling polymorphicDeduplicateSteps later.
+          !customRecurse,
         ));
       } else {
         // TODO: should this use the default plan resolver?
@@ -751,61 +807,111 @@ export class OperationPlan {
       }
 
       // this.planIdByPathIdentity[pathIdentity] = step.id;
+      nextUp.push({ haltTree, stepId: step.id, responseKey, fieldType, field });
+    }
 
-      if (haltTree) {
-        // TODO!
-        throw new Error("TODO: haltTree");
-      } else {
-        this.planIntoOutputPlan(outputPlan, responseKey, fieldType, step);
-      }
-
-      // TODO: this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+    if (customRecurse) {
+      customRecurse(() => processNextUp());
+    } else {
+      processNextUp();
     }
 
     this.loc.pop();
   }
 
+  // Similar to the old 'planFieldReturnType'
   private planIntoOutputPlan(
-    outputPlan: OutputPlan,
+    parentOutputPlan: OutputPlan,
+    path: readonly string[],
+    selections: readonly SelectionNode[] | undefined,
+    parentObjectType: GraphQLObjectType | null,
     responseKey: string | null,
     fieldType: GraphQLOutputType,
-    step: ExecutableStep,
+    $step: ExecutableStep,
     listDepth = 0,
   ) {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
     if (isListType(nullableFieldType)) {
-      const $item = withGlobalLayerPlan(
-        outputPlan.layerPlan,
-        isListCapableStep(step)
-          ? () =>
-              (step as ListCapableStep<any>).listItem(
-                this.itemStepFor(step, listDepth),
-              )
-          : () => this.itemStepFor(step, listDepth),
-      );
-      /*
-      const fieldOutputPlan = new OutputPlan(
-        $item.layerPlan,
-        $item,
+      const listOutputPlan = new OutputPlan(
+        parentOutputPlan.layerPlan,
+        $step,
         "array",
         isNonNull,
       );
-      */
-      outputPlan.addChild(responseKey, {
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
         mode: "array",
-        outputPlan: fieldOutputPlan,
+        listOutputPlan: listOutputPlan,
       });
+
+      const $__item = this.itemStepForListStep($step, listDepth);
+      const $item = isListCapableStep($step)
+        ? withGlobalLayerPlan($__item.layerPlan, () =>
+            ($step as ListCapableStep<any>).listItem($__item),
+          )
+        : $__item;
       this.planIntoOutputPlan(
-        fieldOutputPlan,
+        listOutputPlan,
+        [],
+        selections,
+        null,
         null,
         nullableFieldType.ofType,
         $item,
         listDepth + 1,
       );
-      return fieldOutputPlan;
-    } else if (isLeafType(nullableFieldType)) {
+    } else if (isScalarType(nullableFieldType)) {
+      const scalarPlanResolver = nullableFieldType.extensions?.graphile?.plan;
+      const $leaf =
+        typeof scalarPlanResolver === "function"
+          ? withGlobalLayerPlan($step.layerPlan, () =>
+              scalarPlanResolver($step, { schema: this.schema }),
+            )
+          : $step;
+
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
+        mode: "leaf",
+        stepId: $leaf.id,
+      });
+    } else if (isEnumType(nullableFieldType)) {
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
+        mode: "leaf",
+        stepId: $step.id,
+      });
     } else if (isObjectType(nullableFieldType)) {
+      if (isDev) {
+        // Check that the plan we're dealing with is the one the user declared
+        const ExpectedStep = nullableFieldType.extensions?.graphile?.Step;
+        if (ExpectedStep && !($step instanceof ExpectedStep)) {
+          throw new Error(
+            `Step mis-match: expected ${ExpectedStep.name}, but instead found ${
+              ($step as ExecutableStep).constructor.name
+            } (${$step})`,
+          );
+        }
+        if (!selections) {
+          throw new Error(
+            `GraphileInternalError<7fe4f7d1-01d2-4f1e-add6-5aa6936938c9>: no selections on a GraphQLObjectType?!`,
+          );
+        }
+      }
+      const objectOutputPlan = new OutputPlan(
+        $step.layerPlan,
+        $step,
+        "object",
+        isNonNull,
+      );
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
+        mode: "object",
+        outputPlan: objectOutputPlan,
+      });
+      this.planSelectionSet(
+        objectOutputPlan,
+        path,
+        $step,
+        nullableFieldType,
+        selections!,
+      );
     } else {
       // Polymorphic?
       const isUnion = isUnionType(nullableFieldType);
@@ -814,34 +920,8 @@ export class OperationPlan {
         isUnion || isInterface,
         `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
       );
+      throw new Error("TODO");
     }
-
-    const fieldOutputPlan = new OutputPlan(
-      outputPlan.layerPlan,
-      step,
-      isLeaf ? "leaf" : isList ? "array" : "object",
-      isNonNull,
-    );
-
-    outputPlan.setKey(responseKey, {
-      mode: "OutputPlan",
-      outputPlan: fieldOutputPlan,
-    });
-
-    // Now we're building the child plans, the parentPathIdentity becomes
-    // actually our identity.
-    this.planFieldReturnType(
-      fieldType,
-      fieldAndGroups,
-      pathIdentity,
-      pathIdentity,
-      step,
-      treeNode,
-      returnRaw && !namedResultTypeIsLeaf,
-      namedResultTypeIsLeaf,
-      0,
-      haltTree,
-    );
   }
 
   private planField(
@@ -852,6 +932,7 @@ export class OperationPlan {
     planResolver: FieldPlanResolver<any, any, any>,
     parentStep: ExecutableStep,
     field: GraphQLField<any, any>,
+    deduplicate = true,
   ) {
     this.loc.push(`planField(${path.join(".")})`);
     const trackedArguments = withGlobalLayerPlan(layerPlan, () =>
@@ -919,14 +1000,17 @@ export class OperationPlan {
     };
     step._stepOptions = stepOptions;
 
-    // Now that the field has been planned (including arguments, but NOT
-    // including selection set) we can deduplicate it to see if any of its
-    // peers are identical.
-    this.deduplicateSteps();
+    if (deduplicate) {
+      // Now that the field has been planned (including arguments, but NOT
+      // including selection set) we can deduplicate it to see if any of its
+      // peers are identical.
+      this.deduplicateSteps();
 
-    // After deduplication, this step may have been substituted; get the
-    // updated reference.
-    step = this.steps[step.id]!;
+      // After deduplication, this step may have been substituted; get the
+      // updated reference.
+      step = this.steps[step.id]!;
+    }
+
     this.loc.pop();
     return { step, haltTree };
   }

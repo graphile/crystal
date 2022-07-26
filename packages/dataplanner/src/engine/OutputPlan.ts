@@ -1,6 +1,6 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
-import type { FieldNode, GraphQLError } from "graphql";
+import type { FieldNode, GraphQLError, GraphQLObjectType } from "graphql";
 
 import { isDev } from "../dev.js";
 import type { ExecutableStep } from "../step.js";
@@ -17,7 +17,7 @@ import type { LayerPlan } from "./LayerPlan.js";
  * Note 'root' and 'object' are basically the same, except root doesn't care
  * about the plan value.
  */
-export type OutputPlanMode = "root" | "object" | "array" | "leaf";
+export type OutputPlanMode = "root" | "object" | "array" | "leaf" | "null";
 
 export type KeyModeTypename = {
   mode: "__typename";
@@ -52,13 +52,24 @@ export type KeyModeObject = {
 };
 export type KeyModeArray = {
   mode: "array";
-  outputPlan: OutputPlan;
+  listOutputPlan: OutputPlan;
+};
+export type KeyModeLeaf = {
+  mode: "leaf";
+  stepId: number;
+};
+export type KeyModeNull = {
+  mode: "null";
+  /** If true, we must always throw an error */
+  isNonNull: boolean;
 };
 export type OutputPlanChild =
   | KeyModeTypename
   | KeyModeIntrospection
   | KeyModeObject
-  | KeyModeArray;
+  | KeyModeArray
+  | KeyModeLeaf
+  | KeyModeNull;
 
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
@@ -77,10 +88,18 @@ export class OutputPlan {
   public rootStepId: number;
 
   /**
-   * For root/object output plans, the keys to set on the resulting object
+   * The list of response keys known, in the same order as they occur in the
+   * GraphQL document.
+   */
+  public knownKeys: string[] = [];
+
+  /**
+   * For root/object output plans, the keys to set on the resulting object grouped by the concrete object type name
    */
   public keys: {
-    [key: string]: OutputPlanChild;
+    [typeName: string]: {
+      [key: string]: OutputPlanChild;
+    };
   } = Object.create(null);
 
   /**
@@ -97,31 +116,57 @@ export class OutputPlan {
     this.rootStepId = rootStep.id;
   }
 
-  addChild(key: string | null, child: OutputPlanChild): void {
-    if (typeof key === "string") {
+  addChild(
+    type: GraphQLObjectType | null,
+    key: string | null,
+    child: OutputPlanChild,
+  ): void {
+    if (this.mode === "root" || this.mode === "object") {
       if (isDev) {
+        if (typeof key !== "string") {
+          throw new Error(
+            `GraphileInternalError<7334ec50-23dc-442a-8ffa-19664c9eb79f>: Key must be provided in ${this.mode} OutputPlan mode`,
+          );
+        }
+        if (type == null) {
+          throw new Error(
+            `GraphileInternalError<638cebef-4ec6-49f4-b681-2f390fb1c0fc>: Type must be provided in ${this.mode} OutputPlan mode.`,
+          );
+        }
         assert.ok(
           ["root", "object"].includes(this.mode),
           "Can only addChild on root/object output plans",
         );
+        if (this.keys[type.name][key]) {
+          throw new Error(
+            `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set`,
+          );
+        }
       }
-      if (this.keys[key]) {
-        throw new Error(
-          `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set`,
-        );
+      if (!this.knownKeys.includes(key!)) {
+        this.knownKeys.push(key!);
       }
-      this.keys[key] = child;
+      this.keys[type!.name][key!] = child;
     } else {
       if (isDev) {
+        if (key != null) {
+          throw new Error(
+            `GraphileInternalError<7de67325-a02f-4619-b118-61bb2d84f33b>: Key must not be provided in ${this.mode} OutputPlan mode`,
+          );
+        }
+        assert.ok(
+          type == null,
+          "If key is not provided then type must not be also",
+        );
         assert.ok(
           ["array"].includes(this.mode),
           "Can only addChild on root/object output plans",
         );
-      }
-      if (this.child) {
-        throw new Error(
-          `GraphileInternalError<07059d9d-a47d-441f-b834-683cca1d856a>: child already set`,
-        );
+        if (this.child) {
+          throw new Error(
+            `GraphileInternalError<07059d9d-a47d-441f-b834-683cca1d856a>: child already set`,
+          );
+        }
       }
       this.child = child;
     }
