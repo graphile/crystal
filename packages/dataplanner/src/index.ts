@@ -25,6 +25,7 @@ import { dataplannerEnforce } from "./dataplannerEnforce.js";
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { OperationPlan } from "./engine/OperationPlan.js";
 import { CrystalError, isCrystalError } from "./error.js";
 import { DataPlannerExecuteOptions, execute } from "./execute.js";
 import { InputStep } from "./input.js";
@@ -69,14 +70,13 @@ import {
   NodeIdCodec,
   NodeIdHandler,
   OutputPlanForType,
-  PlanOptimizeOptions,
-  PlanStreamOptions,
   PolymorphicData,
   PromiseOrDirect,
   ScalarPlanResolver,
+  StepOptimizeOptions,
+  StepStreamOptions,
   TypedEventEmitter,
 } from "./interfaces.js";
-import { OpPlan } from "./opPlan.js";
 import { polymorphicWrap, resolveType } from "./polymorphic.js";
 import {
   $$crystalWrapped,
@@ -148,7 +148,7 @@ import {
   object,
   ObjectPlanMeta,
   ObjectStep,
-  opPlan,
+  operationPlan,
   PageInfoCapableStep,
   partitionByIndex,
   reverse,
@@ -320,14 +320,12 @@ export {
   ObjectStep,
   ObjectTypeFields,
   ObjectTypeSpec,
-  OpPlan,
-  opPlan,
+  OperationPlan,
+  operationPlan,
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
   planGroupsOverlap,
-  PlanOptimizeOptions,
-  PlanStreamOptions,
   PolymorphicData,
   PolymorphicStep,
   polymorphicWrap,
@@ -344,6 +342,8 @@ export {
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  StepOptimizeOptions,
+  StepStreamOptions,
   StreamableStep,
   stripAnsi,
   subscribe,
@@ -354,7 +354,7 @@ exportAsMany({
   crystalPrint,
   crystalPrintPathIdentity,
   makeCrystalSchema,
-  OpPlan,
+  OperationPlan,
   ROOT_PATH,
   defer,
   dataplannerEnforce,
@@ -375,7 +375,7 @@ exportAsMany({
   __ValueStep,
   access,
   AccessStep,
-  opPlan,
+  operationPlan,
   connection,
   ConnectionStep,
   constant,

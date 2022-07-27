@@ -84,7 +84,7 @@ export class PgSelectSingleStep<
   public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
   public readonly itemStepId: number;
   public readonly mode: PgSelectMode;
-  private classStepId: string;
+  private classStepId: number;
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
   private _coalesceToEmptyObject = false;
@@ -116,7 +116,7 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    if (this.opPlan.isOptimized(this)) {
+    if (this.isOptimized) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
     const plan = this.getStep(this.classStepId);

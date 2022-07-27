@@ -122,7 +122,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * The root step is different for different layer step reasons:
    *
-   * - root: the `opPlan.rootValue`
+   * - root: the `operationPlan.rootValue`
    * - list: the `__ItemStep`
    * - stream: also the `__ItemStep`
    * - subscription: also the `__ItemStep`
@@ -134,6 +134,18 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    * @internal
    */
   public rootStepId: number | null = null;
+
+  /**
+   * Which plans the results for which are available in a parent bucket need to
+   * be "copied across" to this bucket because plans in this bucket still
+   * reference them?
+   *
+   * @internal
+   */
+  public copyPlanIds: number[] = [];
+
+  /** @internal */
+  public children: LayerPlan[] = [];
 
   constructor(
     public readonly operationPlan: OperationPlan,
@@ -148,12 +160,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         "All but the first LayerPlan must have a parent",
       );
     } else {
-      // assert.ok(
-      //   parentStep != null,
-      //   "Non-root LayerPlan must have a parentStep",
-      // );
+      assert.ok(
+        reason.type != "root",
+        "Non-root LayerPlan must have a parentStep",
+      );
+      parentLayerPlan.children.push(this);
     }
-    // TODO: parentStep.childLayerPlans.push(this); ?
   }
 
   /** @internal Use plan.getStep(id) instead. */

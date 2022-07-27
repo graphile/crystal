@@ -2,7 +2,7 @@
  * This file contains all our utilities for dealing with Mermaid-js
  */
 
-import type { OpPlan } from ".";
+import type { OperationPlan } from ".";
 import type { BucketDefinitionFieldOutputMap } from "./bucket.js";
 import { crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { ExecutableStep } from "./step.js";
@@ -75,24 +75,22 @@ export interface PrintPlanGraphOptions {
 }
 
 /**
- * Convert an OpPlan into a plan graph; call this via `opPlan.printPlanGraph()`
+ * Convert an OpPlan into a plan graph; call this via `operationPlan.printPlanGraph()`
  * rather than calling this function directly.
  *
  * @internal
  */
 export function printPlanGraph(
-  opPlan: OpPlan,
+  operationPlan: OperationPlan,
   {
     // printPathRelations = false,
     includePaths = true,
     concise = false,
   }: PrintPlanGraphOptions,
   {
-    pathIdentitiesByStepId,
-    plans,
+    steps,
   }: {
-    pathIdentitiesByStepId: ReturnType<OpPlan["getPathIdentitiesByStepId"]>;
-    plans: OpPlan["plans"];
+    steps: OperationPlan["steps"];
   },
 ): string {
   const color = (i: number) => {
@@ -134,11 +132,9 @@ export function printPlanGraph(
         plan.groupIds.length === 1 && plan.groupIds[0] === plan.primaryGroupId
           ? ""
           : ` {${plan.groupIds}}`;
-      const planString = `${planName}[${plan.id.replace(/^_/, "")}${
-        opPlan.buckets.length > 1 ? `∈${plan.bucketId}` : ""
-      }${plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""}]${groups}${
-        meta ? `\n<${meta}>` : ""
-      }`;
+      const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}${
+        plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""
+      }]${groups}${meta ? `\n<${meta}>` : ""}`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
           ? [">", "]"]
@@ -167,9 +163,9 @@ export function printPlanGraph(
       pathIdMap[pathIdentity] = `P${++pathCounter}`;
       const [lBrace, rBrace] = isItemStep
         ? [">", "]"]
-        : opPlan.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
+        : operationPlan.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
         ? ["[/", "\\]"]
-        : opPlan.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
+        : operationPlan.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
         ? ["([", "])"]
         : ["{{", "}}"];
       graph.push(
@@ -203,68 +199,83 @@ export function printPlanGraph(
           }
         }
       };
-      recurse(opPlan.rootFieldDigest!);
+      recurse(operationPlan.rootFieldDigest!);
     }
     graph.push("    %% end");
     */
 
   graph.push("");
-  graph.push("    %% define plans");
-  opPlan.processPlans("printingPlans", "dependencies-first", (plan) => {
-    planId(plan);
-    return plan;
-  });
+  graph.push("    %% define steps");
+  operationPlan.processSteps(
+    "printingPlans",
+    0,
+    "dependencies-first",
+    (plan) => {
+      planId(plan);
+      return plan;
+    },
+  );
 
   graph.push("");
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = {};
-  opPlan.processPlans("printingPlanDeps", "dependencies-first", (plan) => {
-    const planNode = planId(plan);
-    const depNodes = plan.dependencies.map((depId) => {
-      return planId(plans[depId]);
-    });
-    const transformItemPlanNode =
+  operationPlan.processSteps(
+    "printingPlanDeps",
+    0,
+    "dependencies-first",
+    (plan) => {
+      const planNode = planId(plan);
+      const depNodes = plan.dependencies.map((depId) => {
+        return planId(steps[depId]);
+      });
+      const transformItemPlanNode = null;
+      // TODO: bucket steps need to be factored in here.
+      /*
       plan instanceof __ListTransformStep
         ? planId(
-            plans[opPlan.transformDependencyPlanIdByTransformStepId[plan.id]],
+            steps[operationPlan.transformDependencyPlanIdByTransformStepId[plan.id]],
           )
         : null;
-    if (depNodes.length > 0) {
-      if (plan instanceof __ItemStep) {
-        const [firstDep, ...rest] = depNodes;
-        const arrow = plan.transformStepId == null ? "==>" : "-.->";
-        graph.push(`    ${firstDep} ${arrow} ${planNode}`);
-        if (rest.length > 0) {
-          graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
-        }
-      } else {
-        if (
-          concise &&
-          plan.dependentPlans.length === 0 &&
-          depNodes.length === 1
-        ) {
-          // Try alternating the nodes so they render closer together
-          const depNode = depNodes[0];
-          if (chainByDep[depNode] === undefined) {
-            graph.push(`    ${depNode} --> ${planNode}`);
-          } else {
-            graph.push(`    ${chainByDep[depNode]} o--o ${planNode}`);
+        */
+      if (depNodes.length > 0) {
+        if (plan instanceof __ItemStep) {
+          const [firstDep, ...rest] = depNodes;
+          const arrow = plan.transformStepId == null ? "==>" : "-.->";
+          graph.push(`    ${firstDep} ${arrow} ${planNode}`);
+          if (rest.length > 0) {
+            graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
           }
-          chainByDep[depNode] = planNode;
         } else {
-          graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+          if (
+            concise &&
+            plan.dependentPlans.length === 0 &&
+            depNodes.length === 1
+          ) {
+            // Try alternating the nodes so they render closer together
+            const depNode = depNodes[0];
+            if (chainByDep[depNode] === undefined) {
+              graph.push(`    ${depNode} --> ${planNode}`);
+            } else {
+              graph.push(`    ${chainByDep[depNode]} o--o ${planNode}`);
+            }
+            chainByDep[depNode] = planNode;
+          } else {
+            graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+          }
         }
       }
-    }
-    if (transformItemPlanNode) {
-      graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
-    }
-    return plan;
-  });
+      if (transformItemPlanNode) {
+        graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
+      }
+      return plan;
+    },
+  );
 
   if (includePaths) {
     graph.push("");
     graph.push("    %% plan-to-path relationships");
+    // TODO: what should this be now?
+    /*
     {
       for (const [pathStepId, pathIdentities] of Object.entries(
         pathIdentitiesByStepId,
@@ -288,19 +299,20 @@ export function printPlanGraph(
           .join("\n");
         const pathNode = `P${pathStepId}`;
         graph.push(`    ${pathNode}[${mermaidEscape(text)}]`);
-        graph.push(`    ${planId(plans[pathStepId])} -.-> ${pathNode}`);
+        graph.push(`    ${planId(steps[pathStepId])} -.-> ${pathNode}`);
       }
     }
+    */
   }
   /*
     {
       const recurse = (parent: FieldDigest) => {
         const parentId = pathId(parent.pathIdentity);
-        graph.push(`    ${planId(plans[parent.planId])} -.-> ${parentId}`);
+        graph.push(`    ${planId(steps[parent.planId])} -.-> ${parentId}`);
         if (parent.pathIdentity !== parent.itemPathIdentity) {
           const itemId = pathId(parent.itemPathIdentity);
           graph.push(
-            `    ${planId(plans[parent.itemStepId])} -.-> ${itemId}`,
+            `    ${planId(steps[parent.itemStepId])} -.-> ${itemId}`,
           );
         }
         if (parent.childFieldDigests) {
@@ -309,43 +321,20 @@ export function printPlanGraph(
           }
         }
       };
-      recurse(opPlan.rootFieldDigest!);
+      recurse(operationPlan.rootFieldDigest!);
     }
     */
 
   graph.push("");
   graph.push("    subgraph Buckets");
-  for (const bucket of opPlan.buckets) {
-    const plansAndIds = Object.entries(plans).filter(
-      ([id, plan]) => plan && plan.id === id && plan.bucketId === bucket.id,
+  for (const bucket of operationPlan.layerPlans) {
+    const plansAndIds = Object.entries(steps).filter(
+      ([id, plan]) =>
+        plan && plan.id === Number(id) && plan.bucketId === bucket.id,
     );
-    const raisonDEtre = (() => {
-      if (
-        bucket.groupId === 0 &&
-        bucket.itemStepId == null &&
-        bucket.polymorphicPlanIds == null
-      ) {
-        return "root";
-      }
-      const reasons: string[] = [];
-      if (bucket.groupId != null) {
-        reasons.push(
-          `group${bucket.groupId}[${opPlan.groups[bucket.groupId].reason}]`,
-        );
-      }
-      if (bucket.itemStepId != null) {
-        reasons.push(`item${bucket.itemStepId}`);
-      }
-      if (bucket.polymorphicPlanIds != null) {
-        reasons.push(
-          `polymorphic${bucket.polymorphicPlanIds.join(
-            "&",
-          )}[${bucket.polymorphicTypeNames!.join("|")}]`,
-        );
-      }
-      return reasons.join(", ");
-    })();
+    const raisonDEtre = bucket.reason.type;
     const outputMapStuff: string[] = [];
+    /*
     const processObject = (
       obj: { [fieldName: string]: BucketDefinitionFieldOutputMap },
       path = "⠀⠀",
@@ -374,7 +363,7 @@ export function printPlanGraph(
         `Bucket ${bucket.id} (${raisonDEtre})\n${
           bucket.copyPlanIds.length > 0
             ? `Deps: ${bucket.copyPlanIds
-                .map((pId) => plans[pId].id.replace(/^_/, ""))
+                .map((pId) => steps[pId].id.replace(/^_/, ""))
                 .join(", ")}\n`
             : ""
         }${(concise
@@ -391,6 +380,7 @@ export function printPlanGraph(
         }${outputMapStuff.join("\n")}`,
       )}):::bucket`,
     );
+    */
     graph.push(`    classDef bucket${bucket.id} stroke:${color(bucket.id)}`);
     graph.push(
       `    class ${[
@@ -399,7 +389,7 @@ export function printPlanGraph(
       ].join(",")} bucket${bucket.id}`,
     );
   }
-  for (const bucket of opPlan.buckets) {
+  for (const bucket of operationPlan.layerPlans) {
     const childNodes = bucket.children.map((c) => `Bucket${c.id}`);
     if (childNodes.length > 0) {
       graph.push(`    Bucket${bucket.id} --> ${childNodes.join(" & ")}`);

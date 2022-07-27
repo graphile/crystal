@@ -10,8 +10,9 @@ import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { noop } from "./dev.js";
+import { populateValuePlan } from "./engine/populateValuePlan.js";
 import { isCrystalError } from "./error.js";
-import { establishOpPlan } from "./establishOpPlan.js";
+import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces.js";
 import {
   $$concreteType,
@@ -22,7 +23,6 @@ import {
   $$planResults,
   $$verbatim,
 } from "./interfaces.js";
-import { populateValuePlan } from "./opPlan.js";
 import type { PlanResults } from "./planResults.js";
 import { __ValueStep } from "./steps/index.js";
 import { ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
@@ -91,7 +91,7 @@ const getOpPlanFromResolver = <TContext extends object>(
     rootValue,
   } = info;
   // const alias = getAliasFromResolveInfo(info);
-  const opPlan = establishOpPlan({
+  const operationPlan = establishOperationPlan({
     schema,
     operation,
     fragments,
@@ -99,7 +99,7 @@ const getOpPlanFromResolver = <TContext extends object>(
     context,
     rootValue,
   });
-  return opPlan;
+  return operationPlan;
 };
 
 /**
@@ -128,15 +128,15 @@ function makeParentCrystalObject(
       ? pathToPathIdentity(path.prev)
       : ROOT_PATH;
     const { crystalContext } = batch;
-    const { opPlan } = crystalContext;
+    const { operationPlan } = crystalContext;
     const parentStepId =
-      opPlan.itemPlanIdByFieldPathIdentity[parentPathIdentity];
+      operationPlan.itemPlanIdByFieldPathIdentity[parentPathIdentity];
     if (parentStepId == null) {
       throw new Error(
         `Could not find a planId for (parent) path '${parentPathIdentity}'`,
       );
     }
-    const parentPlan = opPlan.dangerouslyGetStep(parentStepId); // TODO: assert that this is handled for us
+    const parentPlan = operationPlan.dangerouslyGetStep(parentStepId); // TODO: assert that this is handled for us
     if (!(parentPlan instanceof __ValueStep)) {
       throw new Error(
         `Expected parent field (which returned non-crystal object) to be a __ValueStep, instead found ${parentPlan})`,
@@ -220,7 +220,7 @@ function dataplannerResolverOrSubscriber<
       // the entire operation if plans are used everywhere. Even more optimised
       // would be if we can share the same {crystalContext} across multiple
       // `rootValue`s for multiple parallel executions (must be within the same
-      // opPlan) - e.g. as a result of multiple identical subscription
+      // operationPlan) - e.g. as a result of multiple identical subscription
       // operations.
 
       /**
@@ -250,24 +250,24 @@ function dataplannerResolverOrSubscriber<
         possiblyParentCrystalObject = source;
       }
 
-      const opPlan = possiblyParentCrystalObject
-        ? possiblyParentCrystalObject[$$crystalContext].opPlan
+      const operationPlan = possiblyParentCrystalObject
+        ? possiblyParentCrystalObject[$$crystalContext].operationPlan
         : getOpPlanFromResolver(context, info);
       const pathIdentity = isSubscribe
         ? ROOT_PATH
         : possiblyParentCrystalObject != null
-        ? opPlan.pathIdentityByParentPathIdentity[
+        ? operationPlan.pathIdentityByParentPathIdentity[
             possiblyParentCrystalObject[$$pathIdentity]
           ][info.path.typename!][info.path.key]
         : pathToPathIdentity(info.path);
       const isUnplanned =
-        opPlan.isUnplannedByPathIdentity[pathIdentity] === true;
+        operationPlan.isUnplannedByPathIdentity[pathIdentity] === true;
 
       // IMPORTANT: there must be no `await` between here and `getBatchResult`.
       /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
       const batch =
-        opPlan.batchByPathIdentity[pathIdentity] ??
-        opPlan.makeBatch(
+        operationPlan.batchByPathIdentity[pathIdentity] ??
+        operationPlan.makeBatch(
           pathIdentity,
           info.returnType,
           possiblyParentCrystalObject,

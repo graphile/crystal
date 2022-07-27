@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { opPlan } from "dataplanner";
+import { operationPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
@@ -37,11 +37,10 @@ export const QueryQueryPlugin: GraphileConfig.Plugin = {
                   "Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.",
                 type: new GraphQLNonNull(Self),
                 plan: EXPORTABLE(
-                  (opPlan) =>
-                    function plan() {
-                      return opPlan().rootValueStep;
+                  (operationPlan) => function plan() {
+                      return operationPlan().rootValueStep;
                     },
-                  [opPlan],
+                  [operationPlan],
                 ),
               },
             },

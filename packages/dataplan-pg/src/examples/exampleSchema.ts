@@ -43,7 +43,7 @@ import {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
-  opPlan,
+  operationPlan,
   resolveType,
 } from "dataplanner";
 import { writeFileSync } from "fs";
@@ -4356,11 +4356,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (opPlan) =>
+          (operationPlan) =>
             function plan() {
-              return opPlan().rootValueStep;
+              return operationPlan().rootValueStep;
             },
-          [opPlan],
+          [operationPlan],
         ),
       },
     },
@@ -4395,11 +4395,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (opPlan) =>
+          (operationPlan) =>
             function plan() {
-              return opPlan().rootValueStep;
+              return operationPlan().rootValueStep;
             },
-          [opPlan],
+          [operationPlan],
         ),
       },
     },
@@ -4440,11 +4440,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (opPlan) =>
+          (operationPlan) =>
             function plan() {
-              return opPlan().rootValueStep;
+              return operationPlan().rootValueStep;
             },
-          [opPlan],
+          [operationPlan],
         ),
       },
     },

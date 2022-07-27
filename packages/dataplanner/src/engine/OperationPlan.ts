@@ -112,7 +112,8 @@ export class OperationPlan {
    */
   public loc: string[] = [];
 
-  private layerPlans: LayerPlan[] = [];
+  /** @internal */
+  public layerPlans: LayerPlan[] = [];
   private rootLayerPlan: LayerPlan;
 
   private stepCount = 0;
@@ -931,6 +932,7 @@ export class OperationPlan {
         `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
       );
       throw new Error("TODO");
+      // TODO: this is next!
     }
   }
 

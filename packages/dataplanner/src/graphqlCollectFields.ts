@@ -126,7 +126,7 @@ export interface SelectionSetDigest {
  * @internal
  */
 export function graphqlCollectFields(
-  opPlan: OperationPlan,
+  operationPlan: OperationPlan,
   parentStepId: number,
   objectType: GraphQLObjectType,
   selections: readonly SelectionNode[],
@@ -135,7 +135,7 @@ export function graphqlCollectFields(
   selectionSetDigest: SelectionSetDigest = { fields: new Map(), deferred: [] },
 ): SelectionSetDigest {
   // const objectTypeFields = objectType.getFields();
-  const trackedVariableValuesStep = opPlan.trackedVariableValuesStep;
+  const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
     if (
@@ -179,12 +179,12 @@ export function graphqlCollectFields(
           continue;
         }
         visitedFragments.add(fragmentSpreadName);
-        const fragment = opPlan.fragments[fragmentSpreadName];
+        const fragment = operationPlan.fragments[fragmentSpreadName];
         if (fragment == null) {
           continue;
         }
         const fragmentTypeName = fragment.typeCondition.name.value;
-        const fragmentType = opPlan.schema.getType(fragmentTypeName);
+        const fragmentType = operationPlan.schema.getType(fragmentTypeName);
         if (
           !fragmentType ||
           !(
@@ -206,7 +206,7 @@ export function graphqlCollectFields(
           };
           selectionSetDigest.deferred.push(deferredDigest);
           graphqlCollectFields(
-            opPlan,
+            operationPlan,
             parentStepId,
             objectType,
             fragmentSelectionSet.selections,
@@ -216,7 +216,7 @@ export function graphqlCollectFields(
           );
         } else {
           graphqlCollectFields(
-            opPlan,
+            operationPlan,
             parentStepId,
             objectType,
             fragmentSelectionSet.selections,
@@ -231,7 +231,7 @@ export function graphqlCollectFields(
         const fragmentTypeAst = selection.typeCondition;
         if (fragmentTypeAst != null) {
           const fragmentTypeName = fragmentTypeAst.name.value;
-          const fragmentType = opPlan.schema.getType(fragmentTypeName);
+          const fragmentType = operationPlan.schema.getType(fragmentTypeName);
           if (fragmentType == null) {
             throw new Error(`We don't have a type named '${fragmentTypeName}'`);
           }
@@ -256,7 +256,7 @@ export function graphqlCollectFields(
           };
           selectionSetDigest.deferred.push(deferredDigest);
           graphqlCollectFields(
-            opPlan,
+            operationPlan,
             parentStepId,
             objectType,
             fragmentSelectionSet.selections,
@@ -266,7 +266,7 @@ export function graphqlCollectFields(
           );
         } else {
           graphqlCollectFields(
-            opPlan,
+            operationPlan,
             parentStepId,
             objectType,
             fragmentSelectionSet.selections,

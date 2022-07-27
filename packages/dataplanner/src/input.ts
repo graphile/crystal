@@ -46,12 +46,12 @@ export function assertInputStep(
 }
 
 export function graphqlGetTypeForNode(
-  opPlan: OperationPlan,
+  operationPlan: OperationPlan,
   node: NamedTypeNode | ListTypeNode | NonNullTypeNode,
 ): GraphQLType {
   switch (node.kind) {
     case Kind.NAMED_TYPE: {
-      const type = opPlan.schema.getType(node.name.value);
+      const type = operationPlan.schema.getType(node.name.value);
       if (!type) {
         // Should not happen since the GraphQL operation has already been
         // validated against the schema.
@@ -62,9 +62,11 @@ export function graphqlGetTypeForNode(
       return type;
     }
     case Kind.LIST_TYPE:
-      return new GraphQLList(graphqlGetTypeForNode(opPlan, node.type));
+      return new GraphQLList(graphqlGetTypeForNode(operationPlan, node.type));
     case Kind.NON_NULL_TYPE:
-      return new GraphQLNonNull(graphqlGetTypeForNode(opPlan, node.type));
+      return new GraphQLNonNull(
+        graphqlGetTypeForNode(operationPlan, node.type),
+      );
     default: {
       const never: never = node;
       throw new Error(`Unknown node kind; node: ${inspect(never)}`);
@@ -80,7 +82,7 @@ export function graphqlGetTypeForNode(
  * @internal
  */
 export function inputPlan(
-  opPlan: OperationPlan,
+  operationPlan: OperationPlan,
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
@@ -88,20 +90,24 @@ export function inputPlan(
   let inputValue = rawInputValue;
   if (inputValue?.kind === "Variable") {
     const variableName = inputValue.name.value;
-    const variableDefinition = opPlan.operation.variableDefinitions?.find(
-      (def) => def.variable.name.value === variableName,
-    );
+    const variableDefinition =
+      operationPlan.operation.variableDefinitions?.find(
+        (def) => def.variable.name.value === variableName,
+      );
     if (!variableDefinition) {
       // Should not happen since the GraphQL operation has already been
       // validated.
       throw new Error(`No definition for variable '${variableName}' found`);
     }
-    const variableType = graphqlGetTypeForNode(opPlan, variableDefinition.type);
+    const variableType = graphqlGetTypeForNode(
+      operationPlan,
+      variableDefinition.type,
+    );
     if (!isInputType(variableType)) {
       throw new Error(`Expected varible type to be an input type`);
     }
     return inputVariablePlan(
-      opPlan,
+      operationPlan,
       variableName,
       variableType,
       inputType,
@@ -113,8 +119,8 @@ export function inputPlan(
   inputValue = inputValue ?? defaultValue;
   if (inputType instanceof GraphQLNonNull) {
     const innerType = inputType.ofType;
-    const valuePlan = inputPlan(opPlan, innerType, inputValue);
-    return inputNonNullPlan(opPlan, valuePlan);
+    const valuePlan = inputPlan(operationPlan, innerType, inputValue);
+    return inputNonNullPlan(operationPlan, valuePlan);
   } else if (inputType instanceof GraphQLList) {
     return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
@@ -147,7 +153,7 @@ function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
 }
 
 function inputVariablePlan(
-  opPlan: OperationPlan,
+  operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
@@ -159,7 +165,7 @@ function inputVariablePlan(
   ) {
     const unwrappedVariableType = variableType.ofType;
     return inputVariablePlan(
-      opPlan,
+      operationPlan,
       variableName,
       unwrappedVariableType,
       inputType,
@@ -168,7 +174,8 @@ function inputVariablePlan(
   }
   const typesMatch = doTypesMatch(variableType, inputType);
   assert.ok(typesMatch, "Expected variable and input types to match");
-  const variableValuePlan = opPlan.trackedVariableValuesStep.get(variableName);
+  const variableValuePlan =
+    operationPlan.trackedVariableValuesStep.get(variableName);
   if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
     // There's no default value, or we know for sure that our variable will be
     // set (even if null) and thus the default will not be used; use the variable.
@@ -177,7 +184,7 @@ function inputVariablePlan(
     // `defaultValue` is NOT undefined, and we know variableValue is
     // `undefined` (and always will be); we're going to loop back and pretend
     // that no value was passed in the first place (instead of the variable):
-    return inputPlan(opPlan, inputType, undefined, defaultValue);
+    return inputPlan(operationPlan, inputType, undefined, defaultValue);
   }
 }
 

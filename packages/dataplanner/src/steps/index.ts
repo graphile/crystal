@@ -1,16 +1,17 @@
-import { getCurrentOpPlan, getDebug, setDebug } from "../global.js";
+import { currentLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
+import { getDebug, setDebug } from "../global.js";
+import type { OperationPlan } from "../index.js";
 import type { BaseGraphQLContext } from "../interfaces.js";
-import type { OpPlan } from "../opPlan.js";
 import type { __ValueStep } from "./__value.js";
 
-export function opPlan(): OpPlan {
-  return getCurrentOpPlan();
+export function operationPlan(): OperationPlan {
+  return currentLayerPlan().operationPlan;
 }
 
 export function context<
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
 >(): __ValueStep<TContext> {
-  return opPlan().contextStep;
+  return operationPlan().contextStep as __ValueStep<any>;
 }
 
 /**

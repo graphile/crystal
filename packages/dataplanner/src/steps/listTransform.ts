@@ -138,6 +138,8 @@ export class __ListTransformStep<
   }
 
   finalize() {
+    // TODO: the commented code below needs to be factored into the new planner.
+    /*
     // __ListTransformStep must list all their child chain's external
     // dependencies as their own so that pluarility is correct for the
     // buckets.
@@ -182,6 +184,7 @@ export class __ListTransformStep<
         (itemPlan.dependencies as Array<string>).push(dep.id);
       }
     }
+    */
     return super.finalize();
   }
 

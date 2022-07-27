@@ -220,7 +220,7 @@ export interface Batch {
  * replaced.
  */
 export interface CrystalContext {
-  opPlan: OperationPlan;
+  operationPlan: OperationPlan;
 
   metaByStepId: {
     [planId: string]: Record<string, unknown> | undefined;

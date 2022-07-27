@@ -90,7 +90,7 @@ export class PlanResults {
    * Sets the plan result for the given plan.bucketId and
    * plan.id.
    */
-  public set(bucketId: number, planId: string, data: any): any {
+  public set(bucketId: number, planId: number, data: any): any {
     const bucket = this.getBucket(bucketId);
     if (isDev && planId in bucket) {
       throw new Error(

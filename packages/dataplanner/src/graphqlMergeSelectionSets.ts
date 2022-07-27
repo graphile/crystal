@@ -6,8 +6,8 @@ import type {
 import { Kind } from "graphql";
 import { inspect } from "util";
 
+import type { OperationPlan } from "./index.js";
 import type { FieldAndGroup } from "./interfaces.js";
-import type { OpPlan } from "./opPlan.js";
 
 /**
  * Implements the `MergeSelectionSets` algorithm from the GraphQL spec.
@@ -39,7 +39,7 @@ export function graphqlMergeSelectionSets(
  * fragment on them or on one of the interfaces they implement).
  */
 export function typesUsedInSelections(
-  opPlan: OpPlan,
+  operationPlan: OperationPlan,
   types: ReadonlyArray<GraphQLObjectType>,
   selections: ReadonlyArray<SelectionNode>,
 ): GraphQLObjectType[] {
@@ -49,7 +49,7 @@ export function typesUsedInSelections(
     switch (selection.kind) {
       case "FragmentSpread": {
         // Assumed to exist because query passed validation.
-        const fragment = opPlan.fragments[selection.name.value];
+        const fragment = operationPlan.fragments[selection.name.value];
         const typeCondition = fragment.typeCondition;
         typeNamesMap[typeCondition.name.value] = true;
         break;
@@ -72,7 +72,7 @@ export function typesUsedInSelections(
     (t) =>
       typeNamesMap[t.name] ||
       t.getInterfaces().some((i) => typeNamesMap[i.name]) ||
-      opPlan.unionsContainingObjectType[t.name].some(
+      operationPlan.unionsContainingObjectType[t.name].some(
         (u) => typeNamesMap[u.name],
       ),
   );
@@ -84,7 +84,7 @@ export function typesUsedInSelections(
  * interfaces it implements), false otherwise.
  */
 export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-  opPlan: OpPlan,
+  operationPlan: OperationPlan,
   interfaceType: GraphQLInterfaceType,
   selections: readonly SelectionNode[],
 ): boolean {
@@ -94,7 +94,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
     switch (selection.kind) {
       case Kind.FRAGMENT_SPREAD: {
         // Assumed to exist because query passed validation.
-        const fragment = opPlan.fragments[selection.name.value];
+        const fragment = operationPlan.fragments[selection.name.value];
         const typeCondition = fragment.typeCondition;
         const matchingInterfaceType = types.find(
           (t) => t.name === typeCondition.name.value,
@@ -102,7 +102,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
         if (matchingInterfaceType && fragment.selectionSet.selections) {
           const result =
             interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-              opPlan,
+              operationPlan,
               matchingInterfaceType,
               fragment.selectionSet.selections,
             );
@@ -121,7 +121,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
           if (matchingInterfaceType && selection.selectionSet.selections) {
             const result =
               interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-                opPlan,
+                operationPlan,
                 matchingInterfaceType,
                 selection.selectionSet.selections,
               );

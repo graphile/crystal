@@ -2,10 +2,10 @@ import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
-import { establishOpPlan } from "./establishOpPlan.js";
+import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import { $$contextPlanCache } from "./opPlan.js";
+import { $$contextPlanCache } from "./operationPlan.js";
 import { isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";
@@ -58,7 +58,7 @@ export function dataplannerPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const opPlan = establishOpPlan({
+  const operationPlan = establishOperationPlan({
     schema,
     operation,
     fragments,
@@ -69,8 +69,8 @@ export function dataplannerPrepare(
 
   if (options.explain?.includes("mermaid-js")) {
     // Only build the plan once
-    if (opPlan[$$contextPlanCache] == null) {
-      opPlan[$$contextPlanCache] = opPlan.printPlanGraph({
+    if (operationPlan[$$contextPlanCache] == null) {
+      operationPlan[$$contextPlanCache] = operationPlan.printPlanGraph({
         includePaths: isTest,
         printPathRelations: false,
         concise: !isTest,
@@ -79,11 +79,11 @@ export function dataplannerPrepare(
     rootValue[$$extensions]?.explain?.operations.push({
       type: "mermaid-js",
       title: "Step",
-      diagram: opPlan[$$contextPlanCache],
+      diagram: operationPlan[$$contextPlanCache],
     });
   }
 
-  const preemptiveResult = opPlan.executePreemptive(
+  const preemptiveResult = operationPlan.executePreemptive(
     variableValues,
     context,
     rootValue,
@@ -106,7 +106,7 @@ export function dataplannerPrepare(
     }
   }
 
-  const crystalContext = opPlan.newCrystalContext(
+  const crystalContext = operationPlan.newCrystalContext(
     variableValues,
     context as any,
     rootValue,
