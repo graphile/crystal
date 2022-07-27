@@ -1,19 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
-import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
-import type { Path } from "graphql/jsutils/Path";
 
-import { ROOT_PATH } from "./constants.js";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
-import type { Deferred } from "./deferred.js";
-import { defer } from "./deferred.js";
-import { noop } from "./dev.js";
-import { populateValuePlan } from "./engine/populateValuePlan.js";
 import { isCrystalError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type { Batch, CrystalContext, CrystalObject } from "./interfaces.js";
+import type { CrystalContext, CrystalObject } from "./interfaces.js";
 import {
   $$concreteType,
   $$crystalContext,
@@ -25,37 +18,11 @@ import {
 } from "./interfaces.js";
 import type { PlanResults } from "./planResults.js";
 import { __ValueStep } from "./steps/index.js";
-import { ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
-
-const debug = debugFactory("dataplanner:resolvers");
-const debugVerbose = debug.extend("verbose");
+import { sharedNull } from "./utils.js";
 
 /*
  * **IMPORTANT**: This whole file is part of execution-v1 and is being phased out.
  */
-
-/**
- * Takes a path from GraphQLResolveInfo and returns the equivalent "path
- * identity". This is part of execution-v1 so is being phased out.
- */
-function pathToPathIdentity(initialPath: Path): string {
-  /**
-   * We're building the pathIdentity from the end backwards, so this represents
-   * the tail.
-   */
-  let tailPathIdentity = "";
-  let path: Path | undefined = initialPath;
-  while (path != null) {
-    if (path.typename) {
-      tailPathIdentity = `>${path.typename}.${path.key}${tailPathIdentity}`;
-    } else {
-      // List keys become `[]`
-      tailPathIdentity = `[]${tailPathIdentity}`;
-    }
-    path = path.prev;
-  }
-  return `${ROOT_PATH}${tailPathIdentity}`;
-}
 
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");
 
@@ -75,7 +42,7 @@ export function isCrystalWrapped<T>(
   return typeof t === "function" && $$crystalWrapped in t;
 }
 
-const getOpPlanFromResolver = <TContext extends object>(
+const getOperationPlanFromResolver = <TContext extends object>(
   context: TContext,
   info: GraphQLResolveInfo,
 ) => {
@@ -101,69 +68,6 @@ const getOpPlanFromResolver = <TContext extends object>(
   });
   return operationPlan;
 };
-
-/**
- * Makes a CrystalObject to represent the value we received from the parent
- * resolver, since that was not using crystal.
- */
-function makeParentCrystalObject(
-  batch: Batch,
-  info: GraphQLResolveInfo,
-  pathIdentity: string,
-  source: object | null | undefined,
-): CrystalObject {
-  const parentObject: object | CrystalObject = source ?? ROOT_VALUE_OBJECT;
-  const { path } = info;
-  // TODO: we're not actually using id below
-  const crystalContext = batch.crystalContext;
-  if (!path.prev) {
-    // Special workaround for the root object.
-    return crystalContext.rootCrystalObject;
-  } else {
-    // TODO: I think using path.prev here is a bug; should it be the first
-    // path.prev that has a type name? It happens to work currently because we
-    // only use it at the root, but if we were starting crystal resolution on a
-    // field of something returned from a list field things may be different.
-    const parentPathIdentity = path.prev
-      ? pathToPathIdentity(path.prev)
-      : ROOT_PATH;
-    const { crystalContext } = batch;
-    const { operationPlan } = crystalContext;
-    const parentStepId =
-      operationPlan.itemPlanIdByFieldPathIdentity[parentPathIdentity];
-    if (parentStepId == null) {
-      throw new Error(
-        `Could not find a planId for (parent) path '${parentPathIdentity}'`,
-      );
-    }
-    const parentPlan = operationPlan.dangerouslyGetStep(parentStepId); // TODO: assert that this is handled for us
-    if (!(parentPlan instanceof __ValueStep)) {
-      throw new Error(
-        `Expected parent field (which returned non-crystal object) to be a __ValueStep, instead found ${parentPlan})`,
-      );
-    }
-
-    const parentPlanResults = crystalContext.rootCrystalObject[$$planResults];
-    const { parentType } = info;
-
-    const parentCrystalObject = newCrystalObject(
-      parentPathIdentity,
-      parentType.name,
-      crystalContext,
-      parentPlanResults,
-    );
-
-    populateValuePlan(parentPlan, parentCrystalObject, parentObject, "parent");
-
-    debugVerbose(
-      "👉  Created a new crystal object to represent the parent of %p: %c (results: %c)",
-      pathIdentity,
-      parentCrystalObject,
-      parentPlanResults,
-    );
-    return parentCrystalObject;
-  }
-}
 
 /**
  * Wraps the given resolver function (or the default resolver) in a
@@ -250,76 +154,10 @@ function dataplannerResolverOrSubscriber<
         possiblyParentCrystalObject = source;
       }
 
-      const operationPlan = possiblyParentCrystalObject
+      const _operationPlan = possiblyParentCrystalObject
         ? possiblyParentCrystalObject[$$crystalContext].operationPlan
-        : getOpPlanFromResolver(context, info);
-      const pathIdentity = isSubscribe
-        ? ROOT_PATH
-        : possiblyParentCrystalObject != null
-        ? operationPlan.pathIdentityByParentPathIdentity[
-            possiblyParentCrystalObject[$$pathIdentity]
-          ][info.path.typename!][info.path.key]
-        : pathToPathIdentity(info.path);
-      const isUnplanned =
-        operationPlan.isUnplannedByPathIdentity[pathIdentity] === true;
-
-      // IMPORTANT: there must be no `await` between here and `getBatchResult`.
-      /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
-      const batch =
-        operationPlan.batchByPathIdentity[pathIdentity] ??
-        operationPlan.makeBatch(
-          pathIdentity,
-          info.returnType,
-          possiblyParentCrystalObject,
-          info.variableValues,
-          context,
-          info.rootValue,
-        );
-      const parentCrystalObject =
-        possiblyParentCrystalObject ??
-        makeParentCrystalObject(batch, info, pathIdentity, source);
-      const resultPromise = getBatchResult(batch, parentCrystalObject);
-      /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
-
-      if (debugVerbose.enabled) {
-        resultPromise.then((result) => {
-          debugVerbose(
-            `👈 %p/%c for %s; result: %c`,
-            pathIdentity,
-            parentCrystalObject[$$id],
-            parentCrystalObject,
-            result,
-          );
-        }, noop);
-      }
-      if (userSpecifiedResolver != null) {
-        // At this point, OpPlan will already have performed the relevant
-        // checks to ensure this is safe to do. The values returned through
-        // here must never be CrystalObjects (or lists thereof).
-        return resultPromise.then((result) => {
-          if (debugVerbose.enabled) {
-            debugVerbose(
-              "   Calling real resolver for %s.%s with %o",
-              info.parentType.name,
-              info.fieldName,
-              result,
-            );
-          }
-          return userSpecifiedResolver(result, argumentValues, context, info);
-        });
-      } else if (isUnplanned) {
-        // If the field is unplanned then we want the default resolver to
-        // extract the relevant property.
-        return resultPromise.then((result) =>
-          defaultFieldResolver(result, argumentValues, context, info),
-        );
-      } else {
-        // In the case of planned leaf fields this will just be the underlying
-        // data to return; however in all other cases this is either a
-        // CrystalObject or an n-dimensional list of CrystalObjects, or a
-        // stream of these things.
-        return resultPromise;
-      }
+        : getOperationPlanFromResolver(context, info);
+      throw new Error("TODO");
     };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,
@@ -399,16 +237,4 @@ export function isCrystalObject(input: any): input is CrystalObject {
   return (
     typeof input === "object" && input !== null && input[$$planResults] != null
   );
-}
-
-/**
- * Implements `GetBatchResult`.
- */
-function getBatchResult(
-  batch: Batch,
-  parentCrystalObject: CrystalObject,
-): Deferred<any> {
-  const deferred = defer();
-  batch.entries.push([parentCrystalObject, deferred]);
-  return deferred;
 }
