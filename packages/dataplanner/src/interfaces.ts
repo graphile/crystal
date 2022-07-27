@@ -163,7 +163,7 @@ export interface PolymorphicData<TType extends string = string, _TData = any> {
 }
 
 export interface IndexByListItemStepId {
-  [listItemStepId: string]: number;
+  [listItemStepId: number]: number;
 }
 
 /**
@@ -223,11 +223,11 @@ export interface CrystalContext {
   operationPlan: OperationPlan;
 
   metaByStepId: {
-    [planId: string]: Record<string, unknown> | undefined;
+    [planId: number]: Record<string, unknown> | undefined;
   };
 
   inProgressPlanResolutions: {
-    [planId: string]: Map<PlanResultsBucket, Deferred<any>>;
+    [planId: number]: Map<PlanResultsBucket, Deferred<any>>;
   };
 
   rootCrystalObject: CrystalObject;

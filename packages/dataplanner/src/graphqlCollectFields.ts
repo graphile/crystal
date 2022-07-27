@@ -99,19 +99,6 @@ function graphqlDoesFragmentTypeApply(
 /**
  * @internal
  */
-export interface Group {
-  parent: Group | null;
-  parentStepId: string;
-  reason: "root" | "defer" | "stream" | "mutation" | "mutationPayload";
-  /**
-   * Only set for 'mutation'
-   */
-  responseKey?: string;
-}
-
-/**
- * @internal
- */
 export interface SelectionSetDigest {
   fields: Map<string, FieldNode[]>;
   deferred: SelectionSetDigest[];

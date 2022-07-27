@@ -17,8 +17,8 @@ export class __InputListStep extends ExecutableStep {
   };
   isSyncAndSafe = true;
 
-  private itemPlanIds: string[] = [];
-  private outOfBoundsStepId: string;
+  private itemPlanIds: number[] = [];
+  private outOfBoundsStepId: number;
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,

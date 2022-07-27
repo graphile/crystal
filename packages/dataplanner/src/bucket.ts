@@ -232,7 +232,7 @@ export interface BucketDefinition {
    * be "copied across" to this bucket because plans in this bucket still
    * reference them?
    */
-  copyPlanIds: string[];
+  copyPlanIds: number[];
 
   plans: ExecutableStep[];
   startPlans: ExecutableStep[];
@@ -388,7 +388,7 @@ export interface Bucket {
    * Every entry in the store is a list with the same length as the bucket has
    * `size`.
    */
-  store: { [planId: string]: any[] };
+  store: { [planId: number]: any[] };
 
   /**
    * If an error occurred at any stage we need to drop down to more careful

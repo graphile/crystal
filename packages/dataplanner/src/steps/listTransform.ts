@@ -74,7 +74,7 @@ export class __ListTransformStep<
   private meta: string | null;
 
   /** Set during query planning.  */
-  public itemStepId: string | null = null;
+  public itemStepId: number | null = null;
 
   constructor(
     options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,

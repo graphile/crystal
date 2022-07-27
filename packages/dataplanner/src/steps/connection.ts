@@ -73,7 +73,7 @@ export class ConnectionStep<
   };
   isSyncAndSafe = true;
 
-  private subplanId: string;
+  private subplanId: number;
 
   // Pagination stuff
   private _firstDepId: number | null = null;
@@ -321,7 +321,7 @@ export class EdgeStep<
   };
   isSyncAndSafe = true;
 
-  private connectionStepId: string;
+  private connectionStepId: number;
   private cursorDepId: number | null = null;
 
   constructor(

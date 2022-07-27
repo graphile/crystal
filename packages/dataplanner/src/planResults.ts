@@ -11,7 +11,7 @@ let planResultsId = 0;
  * @internal
  */
 export interface PlanResultsBucket {
-  [planId: string]: any;
+  [planId: number]: any;
 }
 
 // TODO: rewrite this comment to refer to bucketId rather than commonAncestorPathIdentity
@@ -108,7 +108,7 @@ export class PlanResults {
    * Gets the plan result (if any) for the given plan.bucketId and
    * plan.id.
    */
-  public get(bucketId: number, planId: string): any {
+  public get(bucketId: number, planId: number): any {
     return this.store[bucketId]?.[planId];
   }
 
@@ -131,7 +131,7 @@ export class PlanResults {
    * Determines if there is a plan result for the given
    * plan.bucketId and plan.id.
    */
-  public has(bucketId: number, planId: string): boolean {
+  public has(bucketId: number, planId: number): boolean {
     return this.store[bucketId] !== undefined
       ? planId in this.store[bucketId]!
       : false;

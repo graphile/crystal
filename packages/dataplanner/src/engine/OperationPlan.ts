@@ -159,7 +159,7 @@ export class OperationPlan {
   /** Allows accessing rootValue in a tracked manner (allowing eval). @internal */
   public readonly trackedRootValueStep: __TrackedObjectStep<any>;
 
-  private makeMetaByStepId: () => { [planId: string]: Record<string, any> };
+  private makeMetaByStepId: () => { [planId: number]: Record<string, any> };
 
   /**
    * The plan id for the plan that represents the subscription (if any).
@@ -1206,7 +1206,7 @@ export class OperationPlan {
 
     // Calculate the deep dependencies of every step in `steps`
     const deepDependenciesByStepId: {
-      [dependentStepId: string]: Set<ExecutableStep>;
+      [dependentStepId: number]: Set<ExecutableStep>;
     } = Object.create(null);
     const calculateDependencies = (
       step: ExecutableStep,
