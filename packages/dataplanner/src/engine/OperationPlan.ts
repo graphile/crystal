@@ -7,19 +7,23 @@ import type {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
+  GraphQLUnionType,
   OperationDefinitionNode,
   SelectionNode,
 } from "graphql";
-import { isEnumType, isScalarType } from "graphql";
-import { isObjectType } from "graphql";
-import { getNullableType, isListType } from "graphql";
-import { isNonNullType } from "graphql";
-import { isInterfaceType, isUnionType } from "graphql";
 import {
   assertObjectType,
   defaultFieldResolver,
   getNamedType,
+  getNullableType,
+  isEnumType,
+  isInterfaceType,
   isLeafType,
+  isListType,
+  isNonNullType,
+  isObjectType,
+  isScalarType,
+  isUnionType,
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
@@ -43,10 +47,10 @@ import type {
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import { $$crystalWrapped, isCrystalWrapped } from "../resolvers.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
-import { isListCapableStep } from "../step.js";
 import {
   assertExecutableStep,
   assertFinalized,
+  isListCapableStep,
   isStreamableStep,
 } from "../step.js";
 import { access } from "../steps/access.js";
@@ -90,6 +94,9 @@ export class OperationPlan {
   private queryType: GraphQLObjectType;
   private mutationType: GraphQLObjectType | null;
   private subscriptionType: GraphQLObjectType | null;
+  public readonly unionsContainingObjectType: {
+    [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
+  };
 
   private schemaDigest: SchemaDigest;
   private operationType: "query" | "mutation" | "subscription";
@@ -197,6 +204,22 @@ export class OperationPlan {
     public readonly context: { [key: string]: any },
     public readonly rootValue: any,
   ) {
+    const queryType = schema.getQueryType();
+    assert.ok(queryType, "Schema must have a query type");
+    this.queryType = queryType;
+    this.mutationType = schema.getMutationType() ?? null;
+    this.subscriptionType = schema.getSubscriptionType() ?? null;
+
+    const allTypes = Object.values(schema.getTypeMap());
+    const allUnions = allTypes.filter(isUnionType);
+    const allObjectTypes = allTypes.filter(isObjectType);
+    this.unionsContainingObjectType = Object.create(null);
+    for (const objectType of allObjectTypes) {
+      this.unionsContainingObjectType[objectType.name] = allUnions.filter((u) =>
+        u.getTypes().includes(objectType),
+      );
+    }
+
     this.schemaDigest = digestSchema(schema);
     this.operationType = operation.operation;
 
@@ -890,6 +913,7 @@ export class OperationPlan {
         stepId: $step.id,
       });
     } else if (isObjectType(nullableFieldType)) {
+      // TODO: graphqlMergeSelectionSets ?
       if (isDev) {
         // Check that the plan we're dealing with is the one the user declared
         const ExpectedStep = nullableFieldType.extensions?.graphile?.Step;
@@ -925,6 +949,7 @@ export class OperationPlan {
       );
     } else {
       // Polymorphic?
+      // TODO: graphqlMergeSelectionSets ?
       const isUnion = isUnionType(nullableFieldType);
       const isInterface = isInterfaceType(nullableFieldType);
       assert.ok(
@@ -938,7 +963,7 @@ export class OperationPlan {
 
   private planField(
     layerPlan: LayerPlan,
-    path: string[],
+    path: readonly string[],
     objectType: GraphQLObjectType,
     fieldNode: FieldNode,
     planResolver: FieldPlanResolver<any, any, any>,

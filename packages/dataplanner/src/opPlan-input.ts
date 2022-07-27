@@ -353,7 +353,7 @@ function withFieldArgsForArgumentsOrInputObject<
       const details = getArgOnceOnly(path);
       const plan = planArgumentOrInputField(details, null);
 
-      assertExecutableStep(plan, `UNKNOWN` /* TODO: pathIdentity */);
+      assertExecutableStep(plan);
       return plan;
     },
     getRaw(path) {
@@ -460,7 +460,7 @@ function withFieldArgsForArgOrField<
   T extends ExecutableStep | ModifierStep | null | void,
   TParentStep extends ExecutableStep,
 >(
-  operationPlan: OpPlan,
+  operationPlan: OperationPlan,
   parentPlan: TParentStep,
   argOrField: GraphQLArgument | GraphQLInputField,
   $value: InputStep,

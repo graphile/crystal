@@ -7,31 +7,6 @@ import { Kind } from "graphql";
 import { inspect } from "util";
 
 import type { OperationPlan } from "./index.js";
-import type { FieldAndGroup } from "./interfaces.js";
-
-/**
- * Implements the `MergeSelectionSets` algorithm from the GraphQL spec.
- *
- * @see https://spec.graphql.org/draft/#MergeSelectionSets()
- */
-export function graphqlMergeSelectionSets(
-  fields: FieldAndGroup[],
-): { groupId: number; selections: SelectionNode[] }[] {
-  const selectionSetsByGroupId: Record<number, SelectionNode[]> = {};
-  for (let i = 0, l = fields.length; i < l; i++) {
-    const { field, groupId } = fields[i];
-    const fieldSelectionSet = field.selectionSet;
-    if (fieldSelectionSet) {
-      if (!selectionSetsByGroupId[groupId]) {
-        selectionSetsByGroupId[groupId] = [];
-      }
-      selectionSetsByGroupId[groupId].push(...fieldSelectionSet.selections);
-    }
-  }
-  return Object.entries(selectionSetsByGroupId).map(
-    ([groupId, selections]) => ({ groupId: Number(groupId), selections }),
-  );
-}
 
 /**
  * Given a list of object types and a list of selections, returns only the
