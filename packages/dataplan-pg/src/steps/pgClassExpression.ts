@@ -259,20 +259,19 @@ export class PgClassExpressionStep<
     TUniques,
     TRelations,
     TParameters
-  > {
+  >[] {
     const parentPlan = this.getParentStep();
     const classPlan =
       parentPlan instanceof PgSelectSingleStep
         ? parentPlan.getClassStep()
         : null;
-    const equivalentPeer = peers.find(
+    return peers.filter(
       (p) =>
         sql.isEquivalent(this.expression, p.expression, {
           symbolSubstitutes: (classPlan as any)?._symbolSubstitutes,
         }),
       // TODO: when we defer placeholders until finalize we'll need to do additional comparison here
     );
-    return equivalentPeer ?? this;
   }
 
   public toSQL(): SQL {

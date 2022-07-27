@@ -27,7 +27,6 @@ import { defer, Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import { CrystalError, isCrystalError } from "./error.js";
 import { DataPlannerExecuteOptions, execute } from "./execute.js";
-import { getCurrentParentPathIdentity } from "./global.js";
 import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
@@ -259,7 +258,6 @@ export {
   FilterPlanMemo,
   first,
   FirstStep,
-  getCurrentParentPathIdentity,
   getEnumValueConfig,
   GraphileArgumentConfig,
   GraphileFieldConfig,
@@ -433,6 +431,5 @@ exportAsMany({
   isPromiseLike,
   isDev,
   noop,
-  getCurrentParentPathIdentity,
   getEnumValueConfig,
 });

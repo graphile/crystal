@@ -136,7 +136,7 @@ export class OperationPlan {
   /** Constraints based on evaluating variables. @internal */
   public readonly variableValuesConstraints: Constraint[] = [];
   /** Stores the actual variableValues. @internal */
-  private readonly variableValuesStep: __ValueStep<{ [key: string]: any }>;
+  public readonly variableValuesStep: __ValueStep<{ [key: string]: any }>;
   /** A step for accessing variableValues in a tracked manner (allowing eval). @internal */
   public readonly trackedVariableValuesStep: __TrackedObjectStep<{
     [key: string]: any;
@@ -338,6 +338,16 @@ export class OperationPlan {
         return plan;
       }
     : (id, _requestingStep) => this.steps[id];
+
+  /**
+   * Get a plan without specifying who requested it; this disables all the
+   * caller checks. Only intended to be called from internal code.
+   *
+   * @internal
+   */
+  public dangerouslyGetStep(id: number): ExecutableStep {
+    return this.steps[id];
+  }
 
   private planOperation() {
     try {

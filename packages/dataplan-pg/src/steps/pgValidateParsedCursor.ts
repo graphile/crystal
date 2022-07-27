@@ -26,17 +26,15 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
     this.addDependency($parsedCursorPlan);
   }
 
-  deduplicate(plans: PgValidateParsedCursorStep[]): PgValidateParsedCursorStep {
-    for (const plan of plans) {
-      if (
+  deduplicate(
+    plans: PgValidateParsedCursorStep[],
+  ): PgValidateParsedCursorStep[] {
+    return plans.filter(
+      (plan) =>
         plan.digest === this.digest &&
         plan.orderCount === this.orderCount &&
-        plan.beforeOrAfter === this.beforeOrAfter
-      ) {
-        return plan;
-      }
-    }
-    return this;
+        plan.beforeOrAfter === this.beforeOrAfter,
+    );
   }
 
   execute(

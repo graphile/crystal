@@ -1,13 +1,9 @@
 import type { GraphQLOutputType } from "graphql";
 
-import type { OpPlan } from "./opPlan.js";
-
 /**
  * @internal
  */
 export interface GlobalState {
-  opPlan: OpPlan;
-  parentPathIdentity: string;
   // TODO: rename?
   currentGraphQLType?: GraphQLOutputType;
 }
@@ -51,32 +47,6 @@ export function withGlobalState<T>(
   } finally {
     globalState = null;
   }
-}
-
-/**
- * Since plan functions are called synchronously _by us_ we don't need to pass
- * around a reference to OpPlan that users then have to pass back to us;
- * instead we can pull it from this global state. This is not dissimilar to how
- * React's hooks work.
- */
-export function getCurrentOpPlan(): OpPlan {
-  const opPlan = getGlobalState().opPlan;
-  if (!opPlan) {
-    throw new Error(
-      "You have broken the rules of Graphile Crystal Plans; they must only be created synchronously from inside the relevant `plan` function.",
-    );
-  }
-  return opPlan;
-}
-
-/**
- * Like with `getCurrentOpPlan`, since plan functions are called synchronously
- * _by us_ we can pull the current parentPathIdentity from global state.
- *
- * @internal
- */
-export function getCurrentParentPathIdentity(): string {
-  return getGlobalState().parentPathIdentity;
 }
 
 /**

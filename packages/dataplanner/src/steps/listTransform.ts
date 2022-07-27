@@ -1,6 +1,5 @@
 import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
-import { getCurrentParentPathIdentity } from "../global.js";
 import type { CrystalResultsList } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep } from "../step.js";
@@ -81,7 +80,6 @@ export class __ListTransformStep<
     options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,
   ) {
     super();
-    this.parentPathIdentity = getCurrentParentPathIdentity();
     const {
       listPlan,
       itemPlanCallback,
@@ -118,23 +116,20 @@ export class __ListTransformStep<
 
   deduplicate(
     peers: __ListTransformStep<any, any, any, any>[],
-  ): __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep> {
-    for (const peer of peers) {
-      if (
+  ): __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep>[] {
+    return peers.filter(
+      (peer) =>
         peer.itemPlanCallback === this.itemPlanCallback &&
         peer.initialState === this.initialState &&
         peer.reduceCallback === this.reduceCallback &&
         peer.finalizeCallback === this.finalizeCallback &&
-        peer.listItem === this.listItem
-      ) {
-        // TODO: We shouldn't return `peer` until we alias the replacement id in
-        // opPlan.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
-        // Also `itemPlanIdByListTransformStepId`.
-        //
-        // return peer;
-      }
-    }
-    return this;
+        peer.listItem === this.listItem,
+    );
+    // TODO: We shouldn't return `peer` until we alias the replacement id in
+    // opPlan.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
+    // Also `itemPlanIdByListTransformStepId`.
+    //
+    // return peer;
   }
 
   // ListTransform plans must _NOT_ optimize away. They must persist.

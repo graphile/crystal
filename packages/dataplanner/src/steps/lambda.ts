@@ -25,13 +25,8 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
     return (this.fn as any).displayName || this.fn.name;
   }
 
-  deduplicate(peers: LambdaStep<any, any>[]): LambdaStep<TIn, TOut> {
-    for (const peer of peers) {
-      if (peer.fn === this.fn) {
-        return peer;
-      }
-    }
-    return this;
+  deduplicate(peers: LambdaStep<any, any>[]): LambdaStep<TIn, TOut>[] {
+    return peers.filter((peer) => peer.fn === this.fn);
   }
 
   execute(values: [CrystalValuesList<TIn>]): CrystalResultsList<TOut> {

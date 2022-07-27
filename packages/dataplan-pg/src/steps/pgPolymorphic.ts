@@ -71,11 +71,10 @@ export class PgPolymorphicStep<
 
   deduplicate(
     peers: PgPolymorphicStep<any, any, any>[],
-  ): PgPolymorphicStep<TItemStep, TTypeSpecifier, TTypeSpecifierStep> {
-    const identical = peers.find((peer) => {
+  ): PgPolymorphicStep<TItemStep, TTypeSpecifier, TTypeSpecifierStep>[] {
+    return peers.filter((peer) => {
       return peer.possibleTypes === this.possibleTypes;
     }) as any;
-    return identical ?? this;
   }
 
   itemPlan(): TItemStep {

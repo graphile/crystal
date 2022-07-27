@@ -62,8 +62,13 @@ export class PgSingleTablePolymorphicStep<
 
   deduplicate(
     peers: PgSingleTablePolymorphicStep<any, any, any, any>[],
-  ): PgSingleTablePolymorphicStep<TColumns, TUniques, TRelations, TParameters> {
-    return peers[0] ?? this;
+  ): PgSingleTablePolymorphicStep<
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >[] {
+    return peers;
   }
 
   planForType(_type: GraphQLObjectType): ExecutableStep {

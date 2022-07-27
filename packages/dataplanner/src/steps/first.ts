@@ -21,8 +21,8 @@ export class FirstStep<TData> extends ExecutableStep<TData> {
     return values[0].map((list) => list?.[0]);
   }
 
-  deduplicate(peers: FirstStep<TData>[]): FirstStep<TData> {
-    return peers.length > 0 ? peers[0] : this;
+  deduplicate(peers: FirstStep<TData>[]): FirstStep<TData>[] {
+    return peers;
   }
 
   optimize() {

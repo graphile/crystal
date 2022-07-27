@@ -5,14 +5,15 @@ import { inspect } from "util";
 import { isDev, noop } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
 import { currentLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
   ExecutionExtra,
-  PlanOptimizeOptions,
   PromiseOrDirect,
+  StepOptimizeOptions,
   StepOptions,
 } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
@@ -47,6 +48,8 @@ export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
   public layerPlan: LayerPlan;
+  /** @deprecated please use layerPlan.operationPlan instead */
+  public opPlan: OperationPlan;
   public isArgumentsFinalized = false;
   public isFinalized = false;
   public debug = getDebug();
@@ -62,6 +65,7 @@ export abstract class BaseStep {
   constructor() {
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
+    this.opPlan = layerPlan.operationPlan;
   }
 
   public toString(): string {
@@ -345,7 +349,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize(_options: PlanOptimizeOptions): ExecutableStep {
+  public optimize(_options: StepOptimizeOptions): ExecutableStep {
     return this;
   }
 

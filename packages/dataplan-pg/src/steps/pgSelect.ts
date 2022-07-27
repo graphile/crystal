@@ -2098,9 +2098,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
   deduplicate(
     peers: PgSelectStep<any, any, any, any>[],
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters>[] {
     this._lockAllParameters();
-    const identical = peers.find((p) => {
+    const identicalSteps = peers.filter((p) => {
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2255,7 +2255,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
       return true;
     });
-    if (identical) {
+    return identicalSteps.map((identical) => {
       if (
         typeof this.symbol === "symbol" &&
         typeof identical.symbol === "symbol"
@@ -2281,8 +2281,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         return each(identical, mapper);
 
       */
-    }
-    return this;
+    });
   }
 
   private mergeSelectsWith<TOtherStep extends PgSelectStep<any, any, any, any>>(

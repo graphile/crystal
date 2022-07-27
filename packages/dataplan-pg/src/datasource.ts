@@ -10,7 +10,6 @@ import {
   arraysMatch,
   constant,
   ExecutableStep,
-  getCurrentParentPathIdentity,
   partitionByIndex,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
@@ -787,7 +786,7 @@ export class PgSource<
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
           ", ",
-        )}}) at child field (TODO: which one?) of '${getCurrentParentPathIdentity()}' but that combination of columns is not unique (uniques: ${JSON.stringify(
+        )}}) at child field (TODO: which one?) but that combination of columns is not unique (uniques: ${JSON.stringify(
           this.uniques,
         )}). Did you mean to call .find() instead?`,
       );

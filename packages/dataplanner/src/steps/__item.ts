@@ -1,6 +1,5 @@
 import chalk from "chalk";
 
-import { getCurrentParentPathIdentity } from "../global.js";
 import { ExecutableStep } from "../step.js";
 
 /**
@@ -25,7 +24,6 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
     public readonly depth = 0,
   ) {
     super();
-    this.parentPathIdentity = getCurrentParentPathIdentity();
     this.addDependency(parentPlan);
   }
 

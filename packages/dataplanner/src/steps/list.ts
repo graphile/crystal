@@ -70,8 +70,8 @@ export class ListStep<
     return result;
   }
 
-  deduplicate(peers: ListStep<TPlanTuple>[]): ListStep<TPlanTuple> {
-    return peers.length > 0 ? peers[0] : this;
+  deduplicate(peers: ListStep<TPlanTuple>[]): ListStep<TPlanTuple>[] {
+    return peers;
   }
 
   /**

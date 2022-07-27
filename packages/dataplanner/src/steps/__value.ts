@@ -16,16 +16,16 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
 
   constructor() {
     super();
-    this.parentPathIdentity = this.createdWithParentPathIdentity;
   }
 
   toStringMeta(): string | null {
     switch (this) {
-      case this.opPlan.rootValueStep:
+      case this.layerPlan.operationPlan.rootValueStep:
         return "rootValue";
-      case this.opPlan.variableValuesStep as __ValueStep<unknown>:
+      case this.layerPlan.operationPlan
+        .variableValuesStep as __ValueStep<unknown>:
         return "variableValues";
-      case this.opPlan.contextStep as __ValueStep<unknown>:
+      case this.layerPlan.operationPlan.contextStep as __ValueStep<unknown>:
         return "context";
       default:
         return null;
