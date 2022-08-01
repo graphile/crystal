@@ -158,6 +158,19 @@ export class OutputPlan {
     public readonly nonNull: boolean,
   ) {
     this.rootStepId = rootStep.id;
+    if (type.mode === "polymorphic") {
+      if (this.layerPlan.reason.type !== "polymorphic") {
+        throw new Error(
+          "Polymorphic output plan with non-polymorphic layer plan?",
+        );
+      }
+      const typeNames = this.layerPlan.reason.typeNames;
+      for (const typeName of typeNames) {
+        this.keys[typeName] = Object.create(null);
+      }
+    } else if (type.mode === "object" || type.mode === "root") {
+      this.keys[type.typeName] = Object.create(null);
+    }
   }
 
   addChild(
@@ -190,9 +203,14 @@ export class OutputPlan {
           ["root", "object"].includes(this.type.mode),
           "Can only addChild on root/object output plans",
         );
+        if (!this.keys[type.name]) {
+          throw new Error(
+            `GraphileInternalError<58c311df-8bbc-4dad-bd1f-562cc38f9a06>: type '${type.name}' not known to this OutputPlan`,
+          );
+        }
         if (this.keys[type.name][key]) {
           throw new Error(
-            `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set`,
+            `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set for type '${type.name}' key '${key}'`,
           );
         }
       }

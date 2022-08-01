@@ -22,8 +22,8 @@ export interface LayerPlanReasonRoot {
   type: "root";
 }
 /** Non-branching, non-deferred */
-export interface LayerPlanReasonList {
-  type: "list";
+export interface LayerPlanReasonListItem {
+  type: "listItem";
   /**
    * Can be used such that the same LayerPlan can be used for two lists for
    * the same parent plan. In this case an additional output plan would be
@@ -91,7 +91,7 @@ export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
 
 export type LayerPlanReason =
   | LayerPlanReasonRoot
-  | LayerPlanReasonList
+  | LayerPlanReasonListItem
   | LayerPlanReasonStream
   | LayerPlanReasonSubscription
   | LayerPlanReasonMutationField

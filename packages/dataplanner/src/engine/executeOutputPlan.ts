@@ -339,16 +339,13 @@ export function executeOutputPlan(
             }
           }
 
-          const [childBucket, childBucketIndex] = (() => {
-            if (childOutputPlan.layerPlan === outputPlan.layerPlan) {
-              // Same layer; straightforward
-              return [bucket, bucketIndex];
-            } else {
-              // Need to execute new output plan against a different bucket
-              // TODO!
-              throw new Error("TODO");
-            }
-          })();
+          const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+            childOutputPlan,
+            outputPlan,
+            bucket,
+            bucketIndex,
+          );
+
           const result =
             executeOutputPlan(
               childCtx,
@@ -403,10 +400,14 @@ export function executeOutputPlan(
       }
 
       // Now to populate the children...
-      const childBucket: Bucket = null;
-      const childBucketStartIndex: number = null;
       for (let i = 0; i < l; i++) {
-        const childBucketIndex = childBucketStartIndex + i;
+        const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+          childOutputPlan,
+          outputPlan,
+          bucket,
+          bucketIndex,
+          i,
+        );
         const newPath = [...ctx.path, i];
         const childCtx = {
           ...ctx,
@@ -546,4 +547,32 @@ function doItHandleNull(
       return ctx.nullRoot.handle(error);
     }
   }
+}
+
+function getChildBucketAndIndex(
+  childOutputPlan: OutputPlan,
+  outputPlan: OutputPlan,
+  bucket: Bucket,
+  bucketIndex: number,
+  arrayIndex: number | null = null,
+): [Bucket, number] {
+  if ((arrayIndex == null) === (outputPlan.type.mode === "array")) {
+    throw new Error(
+      "GraphileInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
+    );
+  }
+  if (childOutputPlan.layerPlan === outputPlan.layerPlan) {
+    // Same layer; straightforward
+    return [bucket, bucketIndex];
+  }
+
+  if (childOutputPlan.type.mode === "polymorphic") {
+    // TODO
+  }
+  if (childOutputPlan.type.mode === "array") {
+    // TODO
+  }
+
+  // Need to execute new output plan against a different bucket
+  throw new Error("TODO");
 }
