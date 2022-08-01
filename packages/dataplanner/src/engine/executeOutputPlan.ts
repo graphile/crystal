@@ -1,30 +1,19 @@
 import * as assert from "assert";
-import { GraphQLError } from "graphql";
+import type { DocumentNode, FieldNode } from "graphql";
+import { executeSync, GraphQLError, Kind, OperationTypeNode } from "graphql";
 import { inspect } from "util";
 
-import type { Bucket, RequestContext } from "../bucket";
-import { isDev } from "../dev";
-import type { CrystalError } from "../error";
-import { newFieldError } from "../error";
-import { newCrystalError } from "../error";
-import { isCrystalError } from "../error";
-import type { PromiseOrDirect } from "../interfaces";
-import { $$concreteType } from "../interfaces";
-import { isPolymorphicData } from "../polymorphic";
-import { arrayOfLength } from "../utils";
-import type { LayerPlan } from "./LayerPlan";
-import type { OutputPlan } from "./OutputPlan";
+import type { Bucket, RequestContext } from "../bucket.js";
+import { isDev } from "../dev.js";
+import { isCrystalError } from "../error.js";
+import { $$concreteType } from "../interfaces.js";
+import { isPolymorphicData } from "../polymorphic.js";
+import { arrayOfLength } from "../utils.js";
+import type { OutputPlan } from "./OutputPlan.js";
 
 export type OutputPath = Array<string | number>;
 export interface OutputStream {
   asyncIterable: AsyncIterableIterator<any>;
-}
-
-/** @internal */
-export interface OutputResult {
-  data?: any;
-  streams: OutputStream[];
-  errors: OutputError[];
 }
 
 // /**
@@ -170,30 +159,13 @@ export interface OutputResult {
 //   }
 // }
 
-/**
- * To help us avoid having too many promises/awaits/etc, we add our work to the
- * queue and then exhaust the queue as much as we can synchronously.
- */
-interface NextStep {
-  /** path */
-  p: Array<string | number>;
-  /** target */
-  t: object;
-  /** key */
-  k: string;
-  /** outputPlan */
-  o: OutputPlan;
-  /** streams */
-  s: OutputStream[];
-  /** errors */
-  e: OutputError[];
-}
-
-type NextStepByLayerPlan = { [layerPlanId: number]: NextStep[] };
-
 interface PayloadRoot {
   streams: OutputStream[];
   errors: GraphQLError[];
+  queue: Array<SubsequentPayloadSpec>;
+
+  /** @internal VERY DANGEROUS */
+  variables: { [key: string]: any };
 }
 
 class NullHandler {
@@ -256,9 +228,8 @@ class NullHandler {
 
 interface OutputPlanContext extends RequestContext {
   root: PayloadRoot;
-  queue: Array<SubsequentPayloadSpec>;
   path: ReadonlyArray<string | number>;
-  nullHander: NullHandler;
+  nullRoot: NullHandler;
 }
 
 interface SubsequentPayloadSpec {
@@ -293,16 +264,14 @@ export function executeOutputPlan(
     // > not be further affected. That is, only one error should be added to the
     // > errors list per field.
     // -- https://spec.graphql.org/draft/#sel-EANTNDLAACNAn7V
-    return ctx.nullHander.handle(
-      new GraphQLError(
-        bucketRootValue.message,
-        null,
-        null,
-        null,
-        ctx.path,
-        bucketRootValue,
-        null,
-      ),
+    throw new GraphQLError(
+      bucketRootValue.message,
+      null,
+      null,
+      null,
+      ctx.path,
+      bucketRootValue,
+      null,
     );
   }
   switch (outputPlan.type.mode) {
@@ -326,89 +295,90 @@ export function executeOutputPlan(
       }
       const data = outputPlan.objectCreator!(typeName);
       for (const [key, spec] of Object.entries(outputPlan.keys[typeName])) {
-        // __typename already handled
-        if (spec.type === "outputPlan") {
-          const newPath = [...ctx.path, key];
-          const childCtx: OutputPlanContext = {
-            ...ctx,
-            path: newPath,
-            nullHander: new NullHandler(
-              ctx.nullHander,
-              spec.isNonNull,
-              newPath,
-            ),
-          };
-          try {
-            const t = spec.outputPlan.layerPlan.reason.type;
-            if (isDev) {
-              if (
-                t === "subroutine" ||
-                t === "subscription" ||
-                t === "stream" ||
-                t === "defer"
-              ) {
-                throw new Error(
-                  `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
-                );
-              }
+        if (spec.type === "__typename") {
+          // __typename already handled
+          continue;
+        }
+        if (isDev) {
+          assert.strictEqual(spec.type, "outputPlan");
+        }
+        const newPath = [...ctx.path, key];
+        const childOutputPlan = spec.outputPlan;
+        const childCtx: OutputPlanContext = {
+          ...ctx,
+          path: newPath,
+          nullRoot: spec.isNonNull
+            ? ctx.nullRoot
+            : new NullHandler(ctx.nullRoot, spec.isNonNull, newPath),
+        };
 
-              if (
-                t !== "root" &&
-                t !== "polymorphic" &&
-                t !== "list" &&
-                t !== "mutationField"
-              ) {
-                const never: never = t;
-                throw new Error(
-                  `GraphileInternalError<992ffd55-dc1a-46e5-9df8-cc6a62901386>: unexpected layerplan reason '${never}'`,
-                );
-              }
+        const doIt = (): unknown => {
+          const t = spec.outputPlan.layerPlan.reason.type;
+          if (isDev) {
+            if (
+              t === "subroutine" ||
+              t === "subscription" ||
+              t === "stream" ||
+              t === "defer"
+            ) {
+              throw new Error(
+                `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
+              );
             }
 
-            // Already executed; building a single payload from the result
-            const childOutputPlan = spec.outputPlan;
+            if (
+              t !== "root" &&
+              t !== "polymorphic" &&
+              t !== "list" &&
+              t !== "mutationField"
+            ) {
+              const never: never = t;
+              throw new Error(
+                `GraphileInternalError<992ffd55-dc1a-46e5-9df8-cc6a62901386>: unexpected layerplan reason '${never}'`,
+              );
+            }
+          }
+
+          const [childBucket, childBucketIndex] = (() => {
             if (childOutputPlan.layerPlan === outputPlan.layerPlan) {
-              const [childBucket, childBucketIndex] = [bucket, bucketIndex];
-              const result =
-                executeOutputPlan(
-                  childCtx,
-                  childOutputPlan,
-                  childBucket,
-                  childBucketIndex,
-                ) ?? null;
-              if (result === null && spec.isNonNull) {
-                throw new GraphQLError(
-                  // TODO: properly populate this error!
-                  "non-null violation",
-                  null,
-                  null,
-                  null,
-                  childCtx.path,
-                  null,
-                  null,
-                );
-              }
-              if (
-                childOutputPlan.type.mode === "array" &&
-                childOutputPlan.type.streamedOutputPlan
-              ) {
-                // Add the stream to the queue
-                const queueItem: SubsequentPayloadSpec = {
-                  ctx: childCtx,
-                  bucket,
-                  bucketIndex,
-                  outputPlan: childOutputPlan.type.streamedOutputPlan,
-                };
-                childCtx.queue.push(queueItem);
-                childCtx.nullHander.onAbort(() => {
-                  // Remove stream from the queue before it even starts
-                  childCtx.queue.splice(childCtx.queue.indexOf(queueItem), 1);
-                });
-              }
-              data[key] = result;
+              // Same layer; straightforward
+              return [bucket, bucketIndex];
             } else {
+              // Need to execute new output plan against a different bucket
               throw new Error("TODO");
             }
+          })();
+          const result =
+            executeOutputPlan(
+              childCtx,
+              childOutputPlan,
+              childBucket,
+              childBucketIndex,
+            ) ?? null;
+          return result;
+        };
+
+        if (spec.isNonNull) {
+          // No try/catch for us, raise to the parent if need be
+          const result = doIt();
+          if (result === null) {
+            throw new GraphQLError(
+              // TODO: properly populate this error!
+              "non-null violation",
+              null,
+              null,
+              null,
+              childCtx.path,
+              null,
+              null,
+            );
+          }
+          data[key] = result;
+        } else {
+          // We're nullable, we can catch errors!
+          try {
+            // If it's null, that's fine - we're nullable!
+            data[key] = doIt();
           } catch (e) {
             // Ensure it's a GraphQL error
             const error =
@@ -423,13 +393,10 @@ export function executeOutputPlan(
                     e,
                     null,
                   );
-            if (spec.isNonNull) {
-              // Bubble
-              throw error;
-            } else {
-              // Add to errors, cancel any nested deferreds, return null
-              return childCtx.nullHander.handle(error);
-            }
+            // Handle the error
+            data[key] = childCtx.nullRoot.handle(error);
+            // Continue at next sibling
+            continue;
           }
         }
       }
@@ -443,21 +410,108 @@ export function executeOutputPlan(
           bucketIndex,
           outputPlan: defer,
         };
-        ctx.queue.push(queueItem);
-        ctx.nullHander.onAbort(() => {
+        ctx.root.queue.push(queueItem);
+        ctx.nullRoot.onAbort(() => {
           // Remove defer from the queue before it even starts
-          ctx.queue.splice(ctx.queue.indexOf(queueItem), 1);
+          ctx.root.queue.splice(ctx.root.queue.indexOf(queueItem), 1);
         });
       }
 
-      break;
+      return data;
     }
     case "array": {
+      if (!Array.isArray(bucketRootValue)) {
+        if (bucketRootValue != null) {
+          console.warn(
+            `Hit fallback for value ${inspect(
+              bucketRootValue,
+            )} coercion to mode ${outputPlan.type.mode}`,
+          );
+        }
+        return null;
+      }
+      const data = arrayOfLength(bucketRootValue.length);
+      if (outputPlan.type.streamedOutputPlan) {
+        // Add the stream to the queue
+        const queueItem: SubsequentPayloadSpec = {
+          ctx,
+          bucket,
+          bucketIndex,
+          outputPlan: outputPlan.type.streamedOutputPlan,
+        };
+        ctx.root.queue.push(queueItem);
+        ctx.nullRoot.onAbort(() => {
+          // Remove stream from the queue before it even starts
+          ctx.root.queue.splice(ctx.root.queue.indexOf(queueItem), 1);
+        });
+      }
+      return data;
     }
     case "null": {
+      return null;
     }
     case "leaf": {
+      if (ctx.insideGraphQL) {
+        // Don't serialize to avoid the double serialization problem
+        return bucketRootValue;
+      } else {
+        return outputPlan.type.serialize(bucketRootValue);
+      }
+    }
+    case "introspection": {
+      const {
+        field: rawField,
+        introspectionCacheByVariableValues,
+        variableNames,
+      } = outputPlan.type;
+      const field: FieldNode = {
+        ...rawField,
+        alias: { kind: Kind.NAME, value: "a" },
+      };
+      const document: DocumentNode = {
+        definitions: [
+          {
+            kind: Kind.OPERATION_DEFINITION,
+            operation: OperationTypeNode.QUERY,
+            selectionSet: {
+              kind: Kind.SELECTION_SET,
+              selections: [field],
+            },
+          },
+        ],
+        kind: Kind.DOCUMENT,
+      };
+      const variableValues: Record<string, any> = {};
+      for (const variableName of variableNames) {
+        variableValues[variableName] = ctx.root.variables[variableName];
+      }
+      // TODO: make this canonical
+      const canonical = JSON.stringify(variableValues);
+      const cached = introspectionCacheByVariableValues.get(canonical);
+      if (cached) {
+        return cached;
+      }
+      const graphqlResult = executeSync({
+        schema: outputPlan.layerPlan.operationPlan.schema,
+        document,
+        variableValues,
+      });
+      if (graphqlResult.errors) {
+        console.error("INTROSPECTION FAILED!");
+        console.error(graphqlResult);
+        throw new GraphQLError("INTROSPECTION FAILED!");
+      }
+      const result = graphqlResult.data!.a;
+      introspectionCacheByVariableValues.set(canonical, result);
+      return result;
+    }
+    default: {
+      const never: never = outputPlan.type;
+      throw new Error(
+        `GraphileInternalError<e6c19c03-6d13-4568-929e-d9deac9214a3>: don't know how to handle ${inspect(
+          never,
+        )}`,
+      );
     }
   }
-  return null as any;
 }

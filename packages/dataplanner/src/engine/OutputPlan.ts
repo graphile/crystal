@@ -33,10 +33,7 @@ export type OutputPlanTypeIntrospection = {
    * Key: canonical JSON stringify of the variables used.
    * Value: the GraphQL result (`{data, errors}`) for this.
    */
-  introspectionCacheByVariableValues: LRU<
-    string,
-    { data: any; errors?: GraphQLError[] }
-  >;
+  introspectionCacheByVariableValues: LRU<string, unknown>;
 };
 export type OutputPlanTypeRoot = {
   /**
