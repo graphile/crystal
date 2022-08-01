@@ -78,3 +78,21 @@ export function newNonNullError(planId: number | null) {
 export function isCrystalError(value: any): value is CrystalError {
   return value != null && value.constructor === _CrystalError;
 }
+
+class FieldError {
+  constructor(
+    public readonly originalError: CrystalError,
+    public readonly path: ReadonlyArray<string | number>,
+  ) {}
+}
+
+export function newFieldError(
+  originalError: CrystalError,
+  path: ReadonlyArray<string | number>,
+) {
+  return new FieldError(originalError, path);
+}
+
+export function isFieldError(thing: any): thing is FieldError {
+  return thing instanceof FieldError;
+}

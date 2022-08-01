@@ -2,13 +2,15 @@ import * as assert from "assert";
 import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "../bucket";
-import type { CrystalError } from "../error";
+import type { CrystalError} from "../error";
+import { newFieldError } from "../error";
 import { newCrystalError } from "../error";
 import { isCrystalError } from "../error";
 import type { PromiseOrDirect } from "../interfaces";
 import { $$concreteType } from "../interfaces";
 import { isPolymorphicData } from "../polymorphic";
 import { arrayOfLength } from "../utils";
+import type { LayerPlan } from "./LayerPlan";
 import type { OutputPlan } from "./OutputPlan";
 
 export type OutputPath = Array<string | number>;
@@ -171,6 +173,32 @@ export interface OutputResult {
 //   }
 // }
 
+/**
+ * To help us avoid having too many promises/awaits/etc, we add our work to the
+ * queue and then exhaust the queue as much as we can synchronously.
+ */
+interface NextStep {
+  /** path */
+  p: Array<string | number>;
+  /** target */
+  t: object;
+  /** key */
+  k: string;
+  /** outputPlan */
+  o: OutputPlan;
+  /** streams */
+  s: OutputStream[];
+  /** errors */
+  e: OutputError[];
+}
+
+type NextStepByLayerPlan = { [layerPlanId: number]: NextStep[] };
+
+interface PayloadRoot {
+  streams: OutputStream[];
+  errors: OutputError[];
+}
+
 // TODO: to start with we're going to do looping here; but later we can compile
 // the output plans (even nested ones) into simple functions that just generate
 // the resulting objects directly without looping.
@@ -178,45 +206,78 @@ export interface OutputResult {
  * @internal
  */
 export function executeOutputPlan(
+  requestContext: RequestContext,
+  root: PayloadRoot,
   outputPlan: OutputPlan,
   bucket: Bucket,
-  paths: Array<string | number>[],
-  requestContext: RequestContext,
-): PromiseOrDirect<OutputResult[]> {
+  bucketIndex: number,
+  path: Array<string | number>,
+  queue: NextStepByLayerPlan,
+): unknown {
+  const { streams, errors } = root;
   assert.strictEqual(
     bucket.isComplete,
     true,
     "Can only process an output plan for a completed bucket",
   );
-  for (let i = 0, l = bucket.size; i < l; i++) {
-    const rootValue = bucket.store[outputPlan.rootStepId][i];
-    const path = paths[i];
-    let data;
-    const streams: OutputStream[] = [];
-    const errors: OutputError[] = [];
-    if (isCrystalError(rootValue)) {
-      data = null;
-      errors.push({ error: rootValue, path: path });
-    } else {
-      switch (outputPlan.mode) {
-        case "root":
-        case "object": {
-          if (outputPlan.mode === "root") {
-            data = Object.create(null);
-          } else {
-            const typeName = isPolymorphicData(rootValue)
-              ? rootValue[$$concreteType]
-              : outputPlan.concreteType;
-            assert.ok(typeName, "Could not determine concreteType for object");
-            return spec.objectCreator(typeName);
+  const bucketRootValue = bucket.store[outputPlan.rootStepId][bucketIndex];
+
+  const output = (
+    object: Record<string, unknown>,
+    key: string,
+    childOutputPlan: OutputPlan,
+  ) => {
+    queue[childOutputPlan.layerPlan.id].push({
+      p: [...path, key],
+      t: object,
+      k: key,
+      o: childOutputPlan,
+      s: streams,
+      e: errors,
+    });
+  };
+
+  if (isCrystalError(bucketRootValue)) {
+    // > If the field returns null because of a field error which has already
+    // > been added to the "errors" list in the response, the "errors" list must
+    // > not be further affected. That is, only one error should be added to the
+    // > errors list per field.
+    // -- https://spec.graphql.org/draft/#sel-EANTNDLAACNAn7V
+    return newFieldError(bucketRootValue, path);
+  } else {
+    switch (outputPlan.type.mode) {
+      case "root":
+      case "object":
+      case "polymorphic": {
+        let typeName: string;
+        if (outputPlan.type.mode === "root") {
+          typeName = outputPlan.type.typeName;
+        } else if (bucketRootValue == null) {
+          return null;
+        } else if (outputPlan.type.mode === "object") {
+          typeName = outputPlan.type.typeName;
+        } else {
+          assert.ok(
+            isPolymorphicData(bucketRootValue),
+            "Expected polymorphic data",
+          );
+          typeName = bucketRootValue[$$concreteType];
+          assert.ok(typeName, "Could not determine concreteType for object");
+        }
+        data = outputPlan.objectCreator!(typeName);
+        for (const [key, spec] of Object.entries(outputPlan.keys[typeName])) {
+          // __typename already handled
+          if (spec.type === "outputPlan") {
+            output(data, key, spec.outputPlan);
           }
         }
-        case "array": {
-        }
-        case "null": {
-        }
-        case "leaf": {
-        }
+        break;
+      }
+      case "array": {
+      }
+      case "null": {
+      }
+      case "leaf": {
       }
     }
   }

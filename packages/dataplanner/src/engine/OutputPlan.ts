@@ -2,43 +2,19 @@ import type LRU from "@graphile/lru";
 import * as assert from "assert";
 import type {
   FieldNode,
-  GraphQLEnumType,
   GraphQLError,
   GraphQLObjectType,
   GraphQLScalarType,
 } from "graphql";
+import { isObjectType } from "graphql";
+import { inspect } from "util";
 
 import { isDev } from "../dev.js";
+import { $$concreteType, $$verbatim } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
-/**
- * - `root` - always return `{}`
- * - `object` - if non-null return `{}` otherwise `null`
- * - `array` - if non-null then assert it's a list and return a list with the
- *   same length, otherwise `null`
- * - `leaf` - return the value - typically useful for lists (and streams) of
- *   scalars.
- *
- * Note 'root' and 'object' are basically the same, except root doesn't care
- * about the plan value.
- */
-export type OutputPlanMode =
-  | { mode: "root"; typeName: string }
-  | {
-      mode: "object";
-      /** If null, polymorphic, otherwise concrete object type */
-      typeName: string | null;
-    }
-  | { mode: "array" }
-  | { mode: "leaf"; type: GraphQLScalarType | GraphQLEnumType }
-  | { mode: "null" };
-
-export type KeyModeTypename = {
-  mode: "__typename";
-  isNonNull: true;
-};
-export type KeyModeIntrospection = {
+export type OutputPlanTypeIntrospection = {
   mode: "introspection";
   /**
    * The GraphQL introspection field selection (may include arguments/etc). We
@@ -63,34 +39,84 @@ export type KeyModeIntrospection = {
   >;
   isNonNull: boolean;
 };
-export type KeyModeObject = {
+export type OutputPlanTypeRoot = {
+  /**
+   * Always return `{}`
+   */
+  mode: "root";
+  typeName: string;
+  isNonNull: boolean;
+};
+export type OutputPlanTypeObject = {
+  /**
+   * Return `{}` if non-null
+   */
   mode: "object";
-  outputPlan: OutputPlan;
+  typeName: string;
   isNonNull: boolean;
 };
-export type KeyModeArray = {
+export type OutputPlanTypePolymorphicObject = {
+  /**
+   * Return `{}` if non-null
+   */
+  mode: "polymorphic";
+  isNonNull: boolean;
+};
+export type OutputPlanTypeArray = {
+  /**
+   * Return a list of the same length if an array
+   */
   mode: "array";
-  listOutputPlan: OutputPlan;
   isNonNull: boolean;
 };
-export type KeyModeLeaf = {
+export type OutputPlanTypeLeaf = {
+  /**
+   * Return the value.
+   */
   mode: "leaf";
   stepId: number;
   isNonNull: boolean;
   serialize: GraphQLScalarType["serialize"];
 };
-export type KeyModeNull = {
+export type OutputPlanTypeNull = {
   mode: "null";
   /** If true, we must always throw an error */
   isNonNull: boolean;
 };
-export type OutputPlanChild =
-  | KeyModeTypename
-  | KeyModeIntrospection
-  | KeyModeObject
-  | KeyModeArray
-  | KeyModeLeaf
-  | KeyModeNull;
+
+/**
+ * Thanks to `@stream`, output plans must handle their own nullability concerns
+ * and we might need an output plan for any of these:
+ *
+ * - A concrete object
+ * - A polymorphic object
+ * - A leaf (enum/scalar)
+ * - Something we know will always be null
+ * - A list of any of the above
+ * - A list of lists
+ *
+ * In addition to the above, we also need to cover
+ *
+ * - The root object (which is like a concrete object, except it's never null)
+ * - Introspection
+ */
+export type OutputPlanType =
+  | OutputPlanTypeRoot
+  | OutputPlanTypeObject
+  | OutputPlanTypePolymorphicObject
+  | OutputPlanTypeLeaf
+  | OutputPlanTypeNull
+  | OutputPlanTypeArray
+  | OutputPlanTypeIntrospection;
+
+export type OutputPlanKeyValue =
+  | {
+      type: "outputPlan";
+      outputPlan: OutputPlan;
+    }
+  | {
+      type: "__typename";
+    };
 
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
@@ -100,6 +126,7 @@ export type OutputPlanChild =
  * - data?: the data for this layer, could be object, array or leaf (see OutputPlanMode)
  * - errors: a list of errors that occurred (if any), including path details _within the output plan_
  * - streams: a list of streams that were created
+ *
  */
 export class OutputPlan {
   /**
@@ -109,29 +136,27 @@ export class OutputPlan {
   public rootStepId: number;
 
   /**
-   * The list of response keys known, in the same order as they occur in the
-   * GraphQL document.
-   */
-  public knownKeys: string[] = [];
-
-  /**
-   * For root/object output plans, the keys to set on the resulting object grouped by the concrete object type name
+   * For root/object output plans, the keys to set on the resulting object
+   * grouped by the concrete object type name.
+   *
+   * IMPORTANT: the order of these keys is significant, they MUST match the
+   * order in the request otherwise we break GraphQL spec compliance!
    */
   public keys: {
     [typeName: string]: {
-      [key: string]: OutputPlanChild;
+      [key: string]: OutputPlanKeyValue;
     };
   } = Object.create(null);
 
   /**
    * For list output plans, the output plan that describes the list children.
    */
-  public child: OutputPlanChild | null = null;
+  public child: OutputPlan | null = null;
 
   constructor(
     public layerPlan: LayerPlan,
     rootStep: ExecutableStep,
-    public readonly mode: OutputPlanMode,
+    public readonly type: OutputPlanType,
     public readonly nonNull: boolean,
   ) {
     this.rootStepId = rootStep.id;
@@ -140,22 +165,31 @@ export class OutputPlan {
   addChild(
     type: GraphQLObjectType | null,
     key: string | null,
-    child: OutputPlanChild,
+    child: OutputPlanKeyValue,
   ): void {
-    if (this.mode === "root" || this.mode === "object") {
+    if (
+      this.type.mode === "root" ||
+      this.type.mode === "object" ||
+      this.type.mode === "polymorphic"
+    ) {
       if (isDev) {
         if (typeof key !== "string") {
           throw new Error(
-            `GraphileInternalError<7334ec50-23dc-442a-8ffa-19664c9eb79f>: Key must be provided in ${this.mode} OutputPlan mode`,
+            `GraphileInternalError<7334ec50-23dc-442a-8ffa-19664c9eb79f>: Key must be provided in ${this.type.mode} OutputPlan mode`,
           );
         }
         if (type == null) {
           throw new Error(
-            `GraphileInternalError<638cebef-4ec6-49f4-b681-2f390fb1c0fc>: Type must be provided in ${this.mode} OutputPlan mode.`,
+            `GraphileInternalError<638cebef-4ec6-49f4-b681-2f390fb1c0fc>: Type must be provided in ${this.type.mode} OutputPlan mode.`,
+          );
+        }
+        if (!isObjectType(type)) {
+          throw new Error(
+            `GraphileInternalError<eaa87576-1d50-49be-990a-345a9b57b998>: Type must provided in ${this.type.mode} OutputPlan mode must be an object type, instead saw '${type}'.`,
           );
         }
         assert.ok(
-          ["root", "object"].includes(this.mode),
+          ["root", "object"].includes(this.type.mode),
           "Can only addChild on root/object output plans",
         );
         if (this.keys[type.name][key]) {
@@ -164,32 +198,147 @@ export class OutputPlan {
           );
         }
       }
-      if (!this.knownKeys.includes(key!)) {
-        this.knownKeys.push(key!);
-      }
       this.keys[type!.name][key!] = child;
-    } else {
+    } else if (this.type.mode === "array") {
       if (isDev) {
         if (key != null) {
           throw new Error(
-            `GraphileInternalError<7de67325-a02f-4619-b118-61bb2d84f33b>: Key must not be provided in ${this.mode} OutputPlan mode`,
+            `GraphileInternalError<7de67325-a02f-4619-b118-61bb2d84f33b>: Key must not be provided in ${this.type.mode} OutputPlan mode`,
           );
         }
-        assert.ok(
-          type == null,
-          "If key is not provided then type must not be also",
-        );
-        assert.ok(
-          ["array"].includes(this.mode),
-          "Can only addChild on root/object output plans",
-        );
+        assert.ok(type == null, "Array should not specify type");
         if (this.child) {
           throw new Error(
             `GraphileInternalError<07059d9d-a47d-441f-b834-683cca1d856a>: child already set`,
           );
         }
       }
-      this.child = child;
+      if (child.type === "outputPlan") {
+        this.child = child.outputPlan;
+      } else {
+        throw new Error(
+          `GraphileInternalError<7525c854-9145-4c6d-8d60-79c14f040519>: Array child must be an outputPlan`,
+        );
+      }
+    } else {
+      throw new Error(
+        `GraphileInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
+      );
     }
   }
+
+  /** @internal */
+  public objectCreator: ((typeName: string) => Record<string, unknown>) | null =
+    null;
+  finalize() {
+    if (["root", "object", "polymorphic"].includes(this.type.mode)) {
+      this.objectCreator = this.makeObjectCreator();
+    }
+  }
+
+  getLayerPlans(layerPlans = new Set<LayerPlan>()): Set<LayerPlan> {
+    // Find all the layerPlans referenced
+    layerPlans.add(this.layerPlan);
+    if (this.child) {
+      if (this.child.layerPlan != this.layerPlan) {
+        this.child.getLayerPlans(layerPlans);
+      } else {
+        throw new Error(
+          "GraphileInternalError<4013e05f-b8ed-41ea-a869-204232d02763>: how could the child be in the same layer?",
+        );
+      }
+    }
+    for (const typeName in this.keys) {
+      for (const key in this.keys[typeName]) {
+        const spec = this.keys[typeName][key];
+        if (spec.type === "outputPlan") {
+          if (spec.outputPlan.layerPlan !== this.layerPlan) {
+            spec.outputPlan.getLayerPlans(layerPlans);
+            layerPlans.add(spec.outputPlan.layerPlan);
+          }
+        }
+      }
+    }
+    return layerPlans;
+  }
+  makeNextStepByLayerPlan(): Record<number, any[]> {
+    const layerPlans = this.getLayerPlans();
+    const map = Object.create(null);
+    for (const layerPlan of layerPlans) {
+      map[layerPlan.id] = [];
+    }
+    return map;
+  }
+
+  /**
+   * Returns a function that, given a type name, creates an object with the
+   * fields in the given order.
+   */
+  makeObjectCreator(): (typeName: string | null) => Record<string, unknown> {
+    const supportedTypeNames = Object.keys(this.keys);
+    const possibilities: string[] = [];
+    for (const typeName of supportedTypeNames) {
+      const fields = this.keys[typeName];
+      const keys = Object.keys(fields);
+      /*
+       * NOTE: because we use `Object.create(verbatimPrototype)` (and
+       * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
+       * set keys such as `__proto__`. This would not be safe if we were to use
+       * `{}` instead.
+       */
+      const unsafeKeys = keys.filter(
+        (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
+      );
+      if (unsafeKeys.length > 0) {
+        throw new Error(
+          `Unsafe keys: ${unsafeKeys.join(
+            ",",
+          )}; these don't conform to 'Name' in the GraphQL spec`,
+        );
+      }
+
+      const handler = `\
+if (typeName === ${JSON.stringify(typeName)}) {
+  return Object.assign(Object.create(verbatimPrototype), {
+  [$$concreteType]: typeName,
+${Object.entries(fields)
+  .map(([fieldName, keyValue]) => {
+    switch (keyValue.type) {
+      case "outputPlan":
+        return `    ${JSON.stringify(fieldName)}: undefined,\n`;
+      case "__typename":
+        return `    ${JSON.stringify(fieldName)}: typeName,\n`;
+      default: {
+        const never: never = keyValue;
+        throw new Error(
+          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${inspect(
+            never,
+          )}`,
+        );
+      }
+    }
+  })
+  .join("")}
+  });
+}`;
+      possibilities.push(handler);
+    }
+    const functionBody = `\
+return typeName => {
+${possibilities.join("\n")}
+throw new Error(\`GraphileInternalError<03e5d669-5029-41d6-bfbe-5ec563d3fc5b>: Unhandled typeName '\${typeName}'\`);
 }
+`;
+    const f = new Function("verbatimPrototype", "$$concreteType", functionBody);
+    return f(verbatimPrototype, $$concreteType) as any;
+  }
+}
+
+/**
+ * Use this via `Object.create(verbatimPrototype)` to mark an object as being
+ * allowed to be used verbatim (i.e. it can be returned directly to the user
+ * without having to go through GraphQL.js).
+ */
+const verbatimPrototype = Object.freeze(
+  Object.assign(Object.create(null), { [$$verbatim]: true }),
+);
