@@ -144,6 +144,7 @@ export class OutputPlan {
    * For list output plans, the output plan that describes the list children.
    */
   public child: OutputPlan | null = null;
+  public childIsNonNull = false;
 
   /**
    * For root/object/polymorphic output plan types only.
@@ -212,6 +213,7 @@ export class OutputPlan {
       }
       if (child.type === "outputPlan") {
         this.child = child.outputPlan;
+        this.childIsNonNull = child.isNonNull;
       } else {
         throw new Error(
           `GraphileInternalError<7525c854-9145-4c6d-8d60-79c14f040519>: Array child must be an outputPlan`,

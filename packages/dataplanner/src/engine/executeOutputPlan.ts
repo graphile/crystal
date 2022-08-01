@@ -345,6 +345,7 @@ export function executeOutputPlan(
               return [bucket, bucketIndex];
             } else {
               // Need to execute new output plan against a different bucket
+              // TODO!
               throw new Error("TODO");
             }
           })();
@@ -358,47 +359,7 @@ export function executeOutputPlan(
           return result;
         };
 
-        if (spec.isNonNull) {
-          // No try/catch for us, raise to the parent if need be
-          const result = doIt();
-          if (result === null) {
-            throw new GraphQLError(
-              // TODO: properly populate this error!
-              "non-null violation",
-              null,
-              null,
-              null,
-              childCtx.path,
-              null,
-              null,
-            );
-          }
-          data[key] = result;
-        } else {
-          // We're nullable, we can catch errors!
-          try {
-            // If it's null, that's fine - we're nullable!
-            data[key] = doIt();
-          } catch (e) {
-            // Ensure it's a GraphQL error
-            const error =
-              e instanceof GraphQLError
-                ? e
-                : new GraphQLError(
-                    e.message,
-                    null,
-                    null,
-                    null,
-                    childCtx.path,
-                    e,
-                    null,
-                  );
-            // Handle the error
-            data[key] = childCtx.nullRoot.handle(error);
-            // Continue at next sibling
-            continue;
-          }
-        }
+        data[key] = doItHandleNull(spec.isNonNull, doIt, childCtx);
       }
 
       // Everything seems okay; queue any deferred payloads
@@ -430,7 +391,40 @@ export function executeOutputPlan(
         }
         return null;
       }
-      const data = arrayOfLength(bucketRootValue.length);
+
+      const data = [];
+      const l = bucketRootValue.length;
+      const childOutputPlan = outputPlan.child;
+      const childIsNonNull = outputPlan.childIsNonNull;
+      if (!childOutputPlan) {
+        throw new Error(
+          "GraphileInternalError<48fabdc8-ce84-45ec-ac20-35a2af9098e0>: No child output plan for list bucket?",
+        );
+      }
+
+      // Now to populate the children...
+      const childBucket: Bucket = null;
+      const childBucketStartIndex: number = null;
+      for (let i = 0; i < l; i++) {
+        const childBucketIndex = childBucketStartIndex + i;
+        const newPath = [...ctx.path, i];
+        const childCtx = {
+          ...ctx,
+          path: newPath,
+          nullRoot: childIsNonNull
+            ? ctx.nullRoot
+            : new NullHandler(ctx.nullRoot, childIsNonNull, newPath),
+        };
+        const doIt = () =>
+          executeOutputPlan(
+            childCtx,
+            childOutputPlan,
+            childBucket,
+            childBucketIndex,
+          ) ?? null;
+        data[i] = doItHandleNull(childIsNonNull, doIt, childCtx);
+      }
+
       if (outputPlan.type.streamedOutputPlan) {
         // Add the stream to the queue
         const queueItem: SubsequentPayloadSpec = {
@@ -512,6 +506,44 @@ export function executeOutputPlan(
           never,
         )}`,
       );
+    }
+  }
+}
+
+function doItHandleNull(
+  isNonNull: boolean,
+  doIt: () => unknown,
+  ctx: OutputPlanContext,
+) {
+  if (isNonNull) {
+    // No try/catch for us, raise to the parent if need be
+    const result = doIt();
+    if (result === null) {
+      throw new GraphQLError(
+        // TODO: properly populate this error!
+        "non-null violation",
+        null,
+        null,
+        null,
+        ctx.path,
+        null,
+        null,
+      );
+    }
+    return result;
+  } else {
+    // We're nullable, we can catch errors!
+    try {
+      // If it's null, that's fine - we're nullable!
+      return doIt();
+    } catch (e) {
+      // Ensure it's a GraphQL error
+      const error =
+        e instanceof GraphQLError
+          ? e
+          : new GraphQLError(e.message, null, null, null, ctx.path, e, null);
+      // Handle the error
+      return ctx.nullRoot.handle(error);
     }
   }
 }
