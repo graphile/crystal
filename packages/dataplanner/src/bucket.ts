@@ -73,4 +73,10 @@ export interface Bucket {
 
   /** Set this true when the bucket is fully executed */
   isComplete: boolean;
+
+  /**
+   * If an error occurred at any stage we need to drop down to more careful
+   * (and slower) handling.
+   */
+  hasErrors: boolean;
 }

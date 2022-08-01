@@ -64,6 +64,8 @@ export interface LayerPlanReasonPolymorphic {
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
+  // NOTE: the plan that has a subroutine should call executeBucket from within
+  // `execute`.
   type: "subroutine";
 }
 

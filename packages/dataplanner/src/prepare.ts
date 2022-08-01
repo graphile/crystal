@@ -5,6 +5,7 @@ import { buildExecutionContext } from "graphql/execution/execute";
 
 import type { Bucket, RequestContext } from "./bucket.js";
 import { BucketSetter } from "./bucket.js";
+import { executeBucket } from "./engine/executeBucket.js";
 import type { OutputResult } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
