@@ -15,11 +15,9 @@ import type {
   GraphQLSchema,
   ObjectFieldNode,
   SelectionNode,
-  ValueNode} from "graphql";
-import {
-  GraphQLInterfaceType,
-  GraphQLUnionType
+  ValueNode,
 } from "graphql";
+import { GraphQLInterfaceType, GraphQLUnionType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -670,6 +668,20 @@ export function arrayOfLength(length: number, fill?: any) {
   const arr = [];
   for (let i = 0; i < length; i++) {
     arr[i] = fill;
+  }
+  return arr;
+}
+
+/**
+ * Builds an array of length `length` calling `fill` for each entry in the
+ * list and storing the result.
+ *
+ * @internal
+ */
+export function arrayOfLengthCb(length: number, fill: () => any) {
+  const arr = [];
+  for (let i = 0; i < length; i++) {
+    arr[i] = fill();
   }
   return arr;
 }

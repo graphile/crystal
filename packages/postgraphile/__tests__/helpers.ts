@@ -506,7 +506,6 @@ export async function runTestQuery(
               contextValue,
             },
             {
-              experimentalGraphQLBypass: true,
               explain: ["mermaid-js"],
             },
           )
@@ -518,7 +517,6 @@ export async function runTestQuery(
               contextValue,
             },
             {
-              experimentalGraphQLBypass: true,
               explain: ["mermaid-js"],
             },
           );

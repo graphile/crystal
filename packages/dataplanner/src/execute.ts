@@ -16,7 +16,6 @@ import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 
 export interface DataPlannerExecuteOptions {
-  experimentalGraphQLBypass?: boolean;
   explain?: CrystalPrepareOptions["explain"];
 }
 
@@ -85,7 +84,6 @@ export function withDataPlannerArgs(
     : undefined;
 
   const rootValue = dataplannerPrepare(args, {
-    experimentalGraphQLBypass: options.experimentalGraphQLBypass ?? true,
     explain: options.explain,
   });
   let next;

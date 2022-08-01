@@ -2,23 +2,20 @@ import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
+import type { Bucket, RequestContext } from "./bucket.js";
+import { BucketSetter } from "./bucket.js";
+import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
+import type { OperationPlan } from "./index.js";
 import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import { $$contextPlanCache } from "./operationPlan.js";
-import { isPromiseLike } from "./utils.js";
+import { arrayOfLength, arrayOfLengthCb, isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";
+const $$contextPlanCache = Symbol("contextPlanCache");
+const $$bypassGraphQL = Symbol("bypassGraphQL");
 
 export interface CrystalPrepareOptions {
-  /**
-   * If enabled, we'll try and return the data in the same shape as GraphQL
-   * would have done, and if possible will set the $$bypassGraphQL key on the
-   * result. In this case you can use `bypassGraphQLExecute` instead of
-   * GraphQL's execute method to actually execute the GraphQL request.
-   */
-  experimentalGraphQLBypass?: boolean;
-
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
    *
@@ -28,13 +25,84 @@ export interface CrystalPrepareOptions {
   explain?: string[] | null;
 }
 
+export function executePreemptive(
+  operationPlan: OperationPlan,
+  variableValues: any,
+  context: any,
+  rootValue: any,
+) {
+  // TODO: batch this method so it can process multiple GraphQL requests in parallel
+  const vars = [variableValues];
+  const ctxs = [context];
+  const rvs = [rootValue];
+  const rootBucket: Bucket = {
+    layerPlan: operationPlan.rootLayerPlan,
+    noDepsList: Object.freeze(arrayOfLength(vars.length)),
+    store: Object.assign(Object.create(null), {
+      [operationPlan.variableValuesStep.id]: vars,
+      [operationPlan.contextStep.id]: ctxs,
+      [operationPlan.rootValueStep.id]: rvs,
+    }),
+  };
+  const metaByStepId = operationPlan.makeMetaByStepId();
+  const requestContext: RequestContext = {
+    toSerialize: [],
+    eventEmitter: rootValue?.[$$eventEmitter],
+  };
+  await executeBucket(rootBucket, metaByStepId, requestContext);
+  executeOutputPlan(operationPlan.rootOutputPlan, p);
+  const finalize = (list: any[]) => {
+    const result = list[0];
+    if (typeof result == "object" && result != null) {
+      /*
+       * Perform serialization of the GraphQLScalars we've met. We do it here
+       * because it allows for DataPlanner to be executed inside of a GraphQL
+       * resolver without serializing the data twice (which would lead to
+       * issues). In future we should do this inline _when being executed via
+       * DataPlanner execute_ as an optimization, but for now we favour
+       * consistency of the other code.
+       */
+      let hasSerializationErrors = false;
+      const rollback: any[] = [];
+      for (let i = 0, l = requestContext.toSerialize.length; i < l; i++) {
+        const { o, k, s } = requestContext.toSerialize[i];
+        const value = o[k];
+        rollback[i] = value;
+        try {
+          o[k] = s(value);
+        } catch (e) {
+          hasSerializationErrors = true;
+          break;
+        }
+      }
+      if (hasSerializationErrors) {
+        // To avoid double serialization issues, we need to roll these values
+        // back to their unserialized forms before passing to GraphQL.js
+        for (let i = 0, l = rollback.length; i < l; i++) {
+          const { o, k } = requestContext.toSerialize[i];
+          o[k] = rollback[i];
+        }
+      } else {
+        // Safe to bypass GraphQL!
+        result[$$bypassGraphQL] = true;
+      }
+    }
+    return result;
+  };
+  if (isPromiseLike(p)) {
+    return p.then(finalize);
+  } else {
+    return finalize(p);
+  }
+}
+
 /**
  * This method returns an object that you should use as the `rootValue` in your
  * call to GraphQL; it gives Graphile Crystal a chance to find/prepare an
  * OpPlan and even pre-emptively execute the request if possible. In fact, the
- * result from this might be suitable to return to the user directly if you
- * enable the `experimentalGraphQLBypass` (if this is the case then the
- * `$$bypassGraphQL` key will be set on the result object).
+ * result from this might be suitable to return to the user directly (if this
+ * is the case then the `$$bypassGraphQL` key will be set on the result
+ * object).
  *
  * @internal
  */
@@ -83,11 +151,11 @@ export function dataplannerPrepare(
     });
   }
 
-  const preemptiveResult = operationPlan.executePreemptive(
+  const preemptiveResult = executePreemptive(
+    operationPlan,
     variableValues,
     context,
     rootValue,
-    options.experimentalGraphQLBypass ?? false,
   );
   if (preemptiveResult) {
     if (rootValue[$$extensions]) {

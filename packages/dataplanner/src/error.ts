@@ -1,3 +1,5 @@
+import { GraphQLError } from "graphql";
+
 /**
  * Internally we wrap errors that occur in a CrystalError; this allows us to do
  * simple `instanceof` checks to see if a value is an actual value or an error.
@@ -41,6 +43,31 @@ class _CrystalError extends Error implements CrystalError {
  * @internal
  */
 export function newCrystalError(error: Error, planId: number | null) {
+  return new _CrystalError(error, planId);
+}
+
+/**
+ * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
+ *
+ * @internal
+ */
+export function newNonNullError(planId: number | null) {
+  const message = "";
+  const nodes = null;
+  const source = null;
+  const positions = null;
+  const path = null;
+  const originalError = null;
+  const extensions = null;
+  const error = new GraphQLError(
+    message,
+    nodes,
+    source,
+    positions,
+    path,
+    originalError,
+    extensions,
+  );
   return new _CrystalError(error, planId);
 }
 

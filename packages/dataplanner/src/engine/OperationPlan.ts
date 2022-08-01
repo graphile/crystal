@@ -44,6 +44,8 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
+import type { PrintPlanGraphOptions } from "../mermaid.js";
+import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import { $$crystalWrapped, isCrystalWrapped } from "../resolvers.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
@@ -90,6 +92,10 @@ type OperationPlanPhase =
   | "finalize"
   | "ready";
 
+export interface MetaByStepId {
+  [planId: number]: Record<string, any>;
+}
+
 export class OperationPlan {
   private queryType: GraphQLObjectType;
   private mutationType: GraphQLObjectType | null;
@@ -121,7 +127,8 @@ export class OperationPlan {
 
   /** @internal */
   public layerPlans: LayerPlan[] = [];
-  private rootLayerPlan: LayerPlan;
+  /** @internal */
+  public rootLayerPlan: LayerPlan;
 
   private stepCount = 0;
   private modifierStepCount = 0;
@@ -166,7 +173,8 @@ export class OperationPlan {
   /** Allows accessing rootValue in a tracked manner (allowing eval). @internal */
   public readonly trackedRootValueStep: __TrackedObjectStep<any>;
 
-  private makeMetaByStepId: () => { [planId: number]: Record<string, any> };
+  /** @internal */
+  public makeMetaByStepId: () => MetaByStepId;
 
   /**
    * The plan id for the plan that represents the subscription (if any).
@@ -1941,6 +1949,15 @@ export class OperationPlan {
         }
       }
     }
+  }
+
+  /**
+   * Convert an OpPlan into a plan graph in mermaid-js format.
+   */
+  printPlanGraph(options: PrintPlanGraphOptions = {}): string {
+    return printPlanGraph(this, options, {
+      steps: this.steps,
+    });
   }
 }
 

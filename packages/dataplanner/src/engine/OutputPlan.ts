@@ -1,6 +1,11 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
-import type { FieldNode, GraphQLError, GraphQLObjectType } from "graphql";
+import type {
+  FieldNode,
+  GraphQLError,
+  GraphQLObjectType,
+  GraphQLScalarType,
+} from "graphql";
 
 import { isDev } from "../dev.js";
 import type { ExecutableStep } from "../step.js";
@@ -21,6 +26,7 @@ export type OutputPlanMode = "root" | "object" | "array" | "leaf" | "null";
 
 export type KeyModeTypename = {
   mode: "__typename";
+  isNonNull: true;
 };
 export type KeyModeIntrospection = {
   mode: "introspection";
@@ -45,18 +51,23 @@ export type KeyModeIntrospection = {
     string,
     { data: any; errors?: GraphQLError[] }
   >;
+  isNonNull: boolean;
 };
 export type KeyModeObject = {
   mode: "object";
   outputPlan: OutputPlan;
+  isNonNull: boolean;
 };
 export type KeyModeArray = {
   mode: "array";
   listOutputPlan: OutputPlan;
+  isNonNull: boolean;
 };
 export type KeyModeLeaf = {
   mode: "leaf";
   stepId: number;
+  isNonNull: boolean;
+  serialize: GraphQLScalarType["serialize"];
 };
 export type KeyModeNull = {
   mode: "null";

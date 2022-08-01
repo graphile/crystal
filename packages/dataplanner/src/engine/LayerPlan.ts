@@ -100,23 +100,35 @@ export type LayerPlanReason =
   | LayerPlanReasonSubroutine;
 
 /**
- * A layer plan represents (via "reason") either the root (root), when
- * something happens at a later time (mutationField, defer), when plurality
- * changes (list, stream, subscription, polymorphic), or when a subprocess
- * needs to be computed (subroutine).
+ * A LayerPlan represents (via "reason") either the root (root), when something
+ * happens at a later time (mutationField, defer), when plurality changes
+ * (list, stream, subscription, polymorphic), or when a subprocess needs to be
+ * computed (subroutine).
  *
  * Layer plans belong to an operation plan.
  *
- * Every layer plan (except for the root layer plan) as exactly one parent
+ * Every layer plan (except for the root layer plan) has exactly one parent
  * layer plan.
  *
- * Every layer plan is caused by a parent plan.
+ * Every layer plan is caused by a parent step.
+ *
+ * The LayerPlan of a step influences:
+ *
+ * 1. how steps are deduplicated
+ * 2. the order in which the steps are executed
+ * 3. where the result of executing the step is stored
+ * 4. when the step execution cache is allowed to be GC'd
+ *
+ * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
+ * them (built on the `__Item`) that's thrown away once the transform is
+ * complete.
+ *
  */
 export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   id: number;
 
   /**
-   * Every layer step has a "root step" that shapes the value the layer
+   * Every layer plan has a "root step" that shapes the value the layer
    * returns. Note that this step may be dependent on other steps included in
    * the LayerPlan, or could be provided externally.
    *
@@ -146,6 +158,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   /** @internal */
   public children: LayerPlan[] = [];
+
+  /** @internal */
+  steps: ExecutableStep[] = [];
+  /** @internal */
+  startSteps: ExecutableStep[] = [];
 
   constructor(
     public readonly operationPlan: OperationPlan,

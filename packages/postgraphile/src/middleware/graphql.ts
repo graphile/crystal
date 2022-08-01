@@ -84,7 +84,6 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const { exposePlan = false } = config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const dataplannerOptions: DataPlannerExecuteOptions = {
-    experimentalGraphQLBypass: true,
     // TODO: revisit 'exposePlan'
     explain: exposePlan ? ["mermaid-js", "sql"] : null,
   };
