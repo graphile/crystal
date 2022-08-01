@@ -1,3 +1,4 @@
+import * as assert from "assert";
 import type { ExecutionArgs } from "graphql";
 import type { ExecutionResult } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
@@ -33,13 +34,16 @@ export async function executePreemptive(
   rootValue: any,
 ) {
   // TODO: batch this method so it can process multiple GraphQL requests in parallel
+  const requestIndex = [0];
   const vars = [variableValues];
   const ctxs = [context];
   const rvs = [rootValue];
   const rootBucket: Bucket = {
+    isComplete: false,
     layerPlan: operationPlan.rootLayerPlan,
     noDepsList: Object.freeze(arrayOfLength(vars.length)),
     store: Object.assign(Object.create(null), {
+      "-1": requestIndex,
       [operationPlan.variableValuesStep.id]: vars,
       [operationPlan.contextStep.id]: ctxs,
       [operationPlan.rootValueStep.id]: rvs,
@@ -49,24 +53,34 @@ export async function executePreemptive(
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
     metaByStepId: operationPlan.makeMetaByStepId(),
+    insideGraphQL: false,
   };
 
-  // await executeBucket(rootBucket, requestContext);
-  const p = executeOutputPlan(
-    operationPlan.rootOutputPlan,
-    rootBucket,
-    requestContext,
-  );
+  const bucketPromise = executeBucket(rootBucket, requestContext);
 
   const finalize = (list: OutputResult[]) => {
+    assert.strictEqual(list.length, 1, "We don't support batching yet :(");
     const result = list[0];
     result[$$bypassGraphQL] = true;
     return result;
   };
-  if (isPromiseLike(p)) {
-    return p.then(finalize);
+
+  const output = () => {
+    const outputPromise = executeOutputPlan(
+      operationPlan.rootOutputPlan,
+      rootBucket,
+      requestContext,
+    );
+    if (isPromiseLike(outputPromise)) {
+      return outputPromise.then(finalize);
+    } else {
+      return finalize(outputPromise);
+    }
+  };
+  if (isPromiseLike(bucketPromise)) {
+    return bucketPromise.then(output);
   } else {
-    return finalize(p);
+    return output();
   }
 }
 

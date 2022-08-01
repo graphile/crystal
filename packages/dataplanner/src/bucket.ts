@@ -48,6 +48,11 @@ export interface Bucket {
   layerPlan: LayerPlan;
 
   /**
+   * How many entries are there in the bucket?
+   */
+  size: number;
+
+  /**
    * An array of the same size as the bucket to feed to plans that have no
    * dependencies so they output the right number of results.
    */
@@ -57,5 +62,15 @@ export interface Bucket {
    * Every entry in the store is a list with the same length as the bucket has
    * `size`.
    */
-  store: { [planId: number]: any[] };
+  store: {
+    /**
+     * -1 is the request indexes, so we can associate the results back to the
+     * request that triggered them.
+     */
+    "-1": number[];
+    [planId: number]: any[];
+  };
+
+  /** Set this true when the bucket is fully executed */
+  isComplete: boolean;
 }

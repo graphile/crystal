@@ -2,6 +2,7 @@ import type LRU from "@graphile/lru";
 import * as assert from "assert";
 import type {
   FieldNode,
+  GraphQLEnumType,
   GraphQLError,
   GraphQLObjectType,
   GraphQLScalarType,
@@ -22,7 +23,16 @@ import type { LayerPlan } from "./LayerPlan.js";
  * Note 'root' and 'object' are basically the same, except root doesn't care
  * about the plan value.
  */
-export type OutputPlanMode = "root" | "object" | "array" | "leaf" | "null";
+export type OutputPlanMode =
+  | { mode: "root"; typeName: string }
+  | {
+      mode: "object";
+      /** If null, polymorphic, otherwise concrete object type */
+      typeName: string | null;
+    }
+  | { mode: "array" }
+  | { mode: "leaf"; type: GraphQLScalarType | GraphQLEnumType }
+  | { mode: "null" };
 
 export type KeyModeTypename = {
   mode: "__typename";
