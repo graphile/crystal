@@ -37,7 +37,6 @@ export type OutputPlanTypeIntrospection = {
     string,
     { data: any; errors?: GraphQLError[] }
   >;
-  isNonNull: boolean;
 };
 export type OutputPlanTypeRoot = {
   /**
@@ -45,7 +44,6 @@ export type OutputPlanTypeRoot = {
    */
   mode: "root";
   typeName: string;
-  isNonNull: boolean;
 };
 export type OutputPlanTypeObject = {
   /**
@@ -53,21 +51,19 @@ export type OutputPlanTypeObject = {
    */
   mode: "object";
   typeName: string;
-  isNonNull: boolean;
 };
 export type OutputPlanTypePolymorphicObject = {
   /**
    * Return `{}` if non-null
    */
   mode: "polymorphic";
-  isNonNull: boolean;
 };
 export type OutputPlanTypeArray = {
   /**
    * Return a list of the same length if an array
    */
   mode: "array";
-  isNonNull: boolean;
+  streamedOutputPlan?: OutputPlan;
 };
 export type OutputPlanTypeLeaf = {
   /**
@@ -75,13 +71,11 @@ export type OutputPlanTypeLeaf = {
    */
   mode: "leaf";
   stepId: number;
-  isNonNull: boolean;
   serialize: GraphQLScalarType["serialize"];
 };
 export type OutputPlanTypeNull = {
   mode: "null";
   /** If true, we must always throw an error */
-  isNonNull: boolean;
 };
 
 /**
@@ -113,6 +107,7 @@ export type OutputPlanKeyValue =
   | {
       type: "outputPlan";
       outputPlan: OutputPlan;
+      isNonNull: boolean;
     }
   | {
       type: "__typename";
@@ -152,6 +147,11 @@ export class OutputPlan {
    * For list output plans, the output plan that describes the list children.
    */
   public child: OutputPlan | null = null;
+
+  /**
+   * For root/object/polymorphic output plan types only.
+   */
+  public deferredOutputPlans: OutputPlan[] = [];
 
   constructor(
     public layerPlan: LayerPlan,

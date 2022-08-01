@@ -1,5 +1,6 @@
 NEXT UP:
 
+- Strip @defer/@stream from introspection before handing to GraphQL.js
 - Side effect plans
 
 - polymorphicDeduplicateSteps: need to delete the LayerPlans that aren't needed
