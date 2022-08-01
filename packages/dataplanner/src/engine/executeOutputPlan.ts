@@ -1,4 +1,6 @@
+import type { RequestContext } from "../bucket";
 import type { CrystalError } from "../error";
+import type { PromiseOrDirect } from "../interfaces";
 import type { OutputPlan } from "./OutputPlan";
 
 export type OutputPath = Array<string | number>;
@@ -24,9 +26,10 @@ export interface OutputResult {
 /**
  * @internal
  */
-export async function executeOutputPlan(
+export function executeOutputPlan(
   outputPlan: OutputPlan,
   bucket: Bucket,
-): Promise<OutputResult> {
+  requestContext: RequestContext,
+): PromiseOrDirect<OutputResult[]> {
   return null as any;
 }

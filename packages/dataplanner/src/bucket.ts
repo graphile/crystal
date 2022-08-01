@@ -1,22 +1,33 @@
-import type { GraphQLScalarType } from "graphql";
+// import type { GraphQLScalarType } from "graphql";
 
 import type { LayerPlan } from "./engine/LayerPlan";
+import type { MetaByStepId } from "./engine/OperationPlan";
 import type { ExecutionEventEmitter } from "./interfaces.js";
 
 /**
  * @internal
  */
 export interface RequestContext {
-  readonly toSerialize: Array<{
-    /** object (or array) */
-    o: object;
-    /** key (or index) */
-    k: string | number;
-    /** serializer */
-    s: GraphQLScalarType["serialize"];
-  }>;
+  // readonly toSerialize: Array<{
+  //   /** object (or array) */
+  //   o: object;
+  //   /** key (or index) */
+  //   k: string | number;
+  //   /** serializer */
+  //   s: GraphQLScalarType["serialize"];
+  //   /** GraphQL request path */
+  //   p: Array<string | number>;
+  // }>;
 
   readonly eventEmitter: ExecutionEventEmitter | undefined;
+
+  metaByStepId: MetaByStepId;
+
+  /**
+   * If we're running inside GraphQL then we should not serialize scalars,
+   * otherwise we'll face the double-serialization problem.
+   */
+  insideGraphQL: boolean;
 }
 
 /**

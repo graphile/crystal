@@ -75,20 +75,15 @@ export function bucketValue(
       return spec.objectCreator(typeName);
     }
     case "leaf": {
-      if (spec.serialize[$$idempotent]) {
+      if (requestContext.insideGraphQL) {
+        // Do not serialize inside GraphQL, GraphQL will do that for us (and handle any errors)
+        return value;
+      } else {
         try {
           return spec.serialize(value);
         } catch (e) {
           return handleNullOrError(newCrystalError(e, null));
         }
-      } else {
-        // Queue serialization to take place when we know no errors can occur
-        requestContext.toSerialize.push({
-          o: object,
-          k: key,
-          s: spec.serialize,
-        });
-        return value;
       }
     }
     case "null": {

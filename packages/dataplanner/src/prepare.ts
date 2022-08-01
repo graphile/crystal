@@ -4,6 +4,7 @@ import { buildExecutionContext } from "graphql/execution/execute";
 
 import type { Bucket, RequestContext } from "./bucket.js";
 import { BucketSetter } from "./bucket.js";
+import type { OutputResult } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
@@ -25,7 +26,7 @@ export interface CrystalPrepareOptions {
   explain?: string[] | null;
 }
 
-export function executePreemptive(
+export async function executePreemptive(
   operationPlan: OperationPlan,
   variableValues: any,
   context: any,
@@ -44,49 +45,22 @@ export function executePreemptive(
       [operationPlan.rootValueStep.id]: rvs,
     }),
   };
-  const metaByStepId = operationPlan.makeMetaByStepId();
   const requestContext: RequestContext = {
-    toSerialize: [],
+    // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
+    metaByStepId: operationPlan.makeMetaByStepId(),
   };
-  await executeBucket(rootBucket, metaByStepId, requestContext);
-  executeOutputPlan(operationPlan.rootOutputPlan, p);
-  const finalize = (list: any[]) => {
+
+  // await executeBucket(rootBucket, requestContext);
+  const p = executeOutputPlan(
+    operationPlan.rootOutputPlan,
+    rootBucket,
+    requestContext,
+  );
+
+  const finalize = (list: OutputResult[]) => {
     const result = list[0];
-    if (typeof result == "object" && result != null) {
-      /*
-       * Perform serialization of the GraphQLScalars we've met. We do it here
-       * because it allows for DataPlanner to be executed inside of a GraphQL
-       * resolver without serializing the data twice (which would lead to
-       * issues). In future we should do this inline _when being executed via
-       * DataPlanner execute_ as an optimization, but for now we favour
-       * consistency of the other code.
-       */
-      let hasSerializationErrors = false;
-      const rollback: any[] = [];
-      for (let i = 0, l = requestContext.toSerialize.length; i < l; i++) {
-        const { o, k, s } = requestContext.toSerialize[i];
-        const value = o[k];
-        rollback[i] = value;
-        try {
-          o[k] = s(value);
-        } catch (e) {
-          hasSerializationErrors = true;
-          break;
-        }
-      }
-      if (hasSerializationErrors) {
-        // To avoid double serialization issues, we need to roll these values
-        // back to their unserialized forms before passing to GraphQL.js
-        for (let i = 0, l = rollback.length; i < l; i++) {
-          const { o, k } = requestContext.toSerialize[i];
-          o[k] = rollback[i];
-        }
-      } else {
-        // Safe to bypass GraphQL!
-        result[$$bypassGraphQL] = true;
-      }
-    }
+    result[$$bypassGraphQL] = true;
     return result;
   };
   if (isPromiseLike(p)) {
