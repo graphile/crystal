@@ -11,6 +11,11 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
+import type { LayerPlan } from "./LayerPlan.js";
+
+function noop() {
+  /*noop*/
+}
 
 /**
  * Calls the callback, catching any errors and turning them into rejected
@@ -292,41 +297,98 @@ export function executeBucket(
 
     // TODO: create a JIT factory for this at planning time
     const childPromises: PromiseLike<any>[] = [];
-    for (const childLayerPlan of childLayerPlans) {
+
+    // This promise should never reject
+    let mutationQueue: PromiseLike<void> | null = null;
+    /**
+     * Ensures that callback is only called once all other enqueued callbacks
+     * are called.
+     */
+    const enqueue = <T>(callback: () => PromiseOrDirect<T>): PromiseLike<T> => {
+      const result = (mutationQueue ?? Promise.resolve()).then(callback);
+      mutationQueue = result.then(noop, noop);
+      return result;
+    };
+
+    loop: for (const childLayerPlan of childLayerPlans) {
+      const copyPlanIds = childLayerPlan.copyPlanIds;
       switch (childLayerPlan.reason.type) {
         case "listItem": {
-          // processListChildren?
-          throw new Error("TODO");
+          const store: Bucket["store"] = Object.create(null);
+          const map: Map<number, number[]> = new Map();
+          const noDepsList: undefined[] = [];
+
+          const listPlanId = childLayerPlan.reason.parentPlanId;
+          const listPlanStore = bucket.store[listPlanId];
+
+          // Prepare store with an empty list for each copyPlanId
+          for (const planId of copyPlanIds) {
+            store[planId] = [];
+          }
+
+          // We'll typically be creating more listItem bucket entries than we
+          // have parent buckets, so we must "multiply up" the store entries.
+          for (
+            let originalIndex = 0;
+            originalIndex < bucket.size;
+            originalIndex++
+          ) {
+            const list: any[] | null | undefined | CrystalError =
+              listPlanStore[originalIndex];
+            if (Array.isArray(list)) {
+              const newIndexes: number[] = [];
+              map.set(originalIndex, newIndexes);
+              for (let j = 0, l = list.length; j < l; j++) {
+                const newIndex = noDepsList.push(undefined) - 1;
+                newIndexes.push(newIndex);
+                for (const planId of copyPlanIds) {
+                  store[planId][newIndex] = bucket.store[planId][originalIndex];
+                }
+              }
+            }
+          }
+
+          // Reference
+          const childBucket = newBucket(childLayerPlan, noDepsList, store);
+          bucket.children[childLayerPlan.id] = {
+            bucket: childBucket,
+            map,
+          };
+
+          // Execute
+          const result = executeBucket(childBucket, requestContext);
+          if (isPromiseLike(result)) {
+            childPromises.push(result);
+          }
+
+          break;
         }
         case "mutationField": {
-          // BE SURE TO SERIALIZE!
-          throw new Error("TODO");
+          const store: Bucket["store"] = Object.create(null);
+          const map: Map<number, number> = new Map();
+          // This is a 1-to-1 map, so we can mostly just copy from parent bucket
+          const noDepsList = bucket.noDepsList;
+          for (let i = 0; i < bucket.size; i++) {
+            map.set(i, i);
+          }
+          for (const planId of copyPlanIds) {
+            store[planId] = bucket.store[planId];
+          }
 
-          /*
-          const childBucket: Bucket = {
-            isComplete: false,
-            size: 0,
-            layerPlan: childLayerPlan,
-            store: Object.create(null),
-            hasErrors: bucket.hasErrors,
-            layerPlan: child.layerPlan,
-            store: child.store,
-            noDepsList: arrayOfLength(child.input.length),
-            hasErrors: bucket.hasErrors,
+          // Reference
+          const childBucket = newBucket(childLayerPlan, noDepsList, store);
+          bucket.children[childLayerPlan.id] = {
+            bucket: childBucket,
+            map,
           };
-          for (const planId of childLayerPlan.copyPlanIds) {
-            entry.store[planId] = [];
-          }
-          if (childLayerPlan.reason.type === "listItem") {
-            entry.store[childLayerPlan.rootStepId!] = [];
-          }
-          const r = rejectOnThrow(() =>
+
+          // Enqueue for execution (mutations must run in order)
+          const promise = enqueue(() =>
             executeBucket(childBucket, requestContext),
           );
-          if (isPromiseLike(r)) {
-            childPromises.push(r);
-          }
-          */
+          childPromises.push(promise);
+
+          break;
         }
         case "polymorphic": {
           throw new Error("TODO");
@@ -336,10 +398,11 @@ export function executeBucket(
         case "defer":
         case "stream": {
           // Ignore; these are handled elsewhere
-          continue;
+          continue loop;
         }
         case "root": {
           throw new Error(
+            // *confused emoji*
             "GraphileInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
           );
         }
@@ -353,13 +416,29 @@ export function executeBucket(
     }
 
     if (childPromises.length > 0) {
-      return Promise.all(childPromises).then(() => {});
+      return Promise.all(childPromises).then(() => {
+        bucket.isComplete = true;
+        return;
+      });
     } else {
+      bucket.isComplete = true;
       return;
     }
-
-    // Function definitions below here
-
-    bucket.isComplete = true;
   }
+}
+
+function newBucket(
+  layerPlan: LayerPlan,
+  noDepsList: readonly undefined[],
+  store: Bucket["store"],
+): Bucket {
+  return {
+    layerPlan,
+    isComplete: false,
+    size: noDepsList.length,
+    store,
+    hasErrors: false,
+    noDepsList,
+    children: Object.create(null),
+  };
 }

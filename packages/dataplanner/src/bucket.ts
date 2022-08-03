@@ -2,7 +2,7 @@
 
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByStepId } from "./engine/OperationPlan";
-import type { ExecutionEventEmitter } from "./interfaces.js";
+import type { ExecutionEventEmitter, PromiseOrDirect } from "./interfaces.js";
 
 /**
  * @internal
@@ -79,4 +79,14 @@ export interface Bucket {
    * (and slower) handling.
    */
   hasErrors: boolean;
+
+  /**
+   * The child buckets of this bucket.
+   */
+  children: {
+    [layerPlanId: number]: {
+      bucket: Bucket;
+      map: Map<number, number | number[]>;
+    };
+  };
 }
