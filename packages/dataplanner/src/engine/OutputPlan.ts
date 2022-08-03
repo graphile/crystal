@@ -155,7 +155,6 @@ export class OutputPlan {
     public layerPlan: LayerPlan,
     rootStep: ExecutableStep,
     public readonly type: OutputPlanType,
-    public readonly nonNull: boolean,
   ) {
     this.rootStepId = rootStep.id;
     if (type.mode === "polymorphic") {

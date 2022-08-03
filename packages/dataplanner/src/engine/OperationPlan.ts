@@ -647,7 +647,10 @@ export class OperationPlan {
         if (haltTree) {
           const isNonNull = isNonNullType(fieldType);
           outputPlan.addChild(objectType, responseKey, {
-            mode: "null",
+            type: "outputPlan",
+            outputPlan: new OutputPlan(outputPlan.layerPlan, step, {
+              mode: "null",
+            }),
             isNonNull,
           });
         } else {

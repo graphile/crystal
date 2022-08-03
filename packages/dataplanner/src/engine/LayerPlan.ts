@@ -28,6 +28,8 @@ export interface LayerPlanReasonListItem {
    * Can be used such that the same LayerPlan can be used for two lists for
    * the same parent plan. In this case an additional output plan would be
    * added to the LayerPlan.
+   *
+   * Also needed for execution (see `executeBucket`).
    */
   parentPlanId: number;
 }
@@ -61,6 +63,10 @@ export interface LayerPlanReasonDefer {
 export interface LayerPlanReasonPolymorphic {
   type: "polymorphic";
   typeNames: string[];
+  /**
+   * Needed for execution (see `executeBucket`).
+   */
+  parentPlanId: number;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {

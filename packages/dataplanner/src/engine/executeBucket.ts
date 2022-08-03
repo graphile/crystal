@@ -10,6 +10,8 @@ import type {
   ExecutionExtra,
   PromiseOrDirect,
 } from "../interfaces.js";
+import { $$concreteType } from "../interfaces.js";
+import { assertPolymorphicData } from "../polymorphic.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
@@ -391,7 +393,51 @@ export function executeBucket(
           break;
         }
         case "polymorphic": {
-          throw new Error("TODO");
+          const store: Bucket["store"] = Object.create(null);
+          const map: Map<number, number> = new Map();
+          const noDepsList: undefined[] = [];
+
+          // We're only copying over the entries that match this type (note:
+          // they may end up being null, but that's okay)
+          const targetTypeNames = childLayerPlan.reason.typeNames;
+          const polymorphicPlanId = childLayerPlan.reason.parentPlanId;
+          const polymorphicPlanStore = bucket.store[polymorphicPlanId];
+
+          for (
+            let originalIndex = 0;
+            originalIndex < bucket.size;
+            originalIndex++
+          ) {
+            const value = polymorphicPlanStore[originalIndex];
+            if (value == null) {
+              continue;
+            }
+            assertPolymorphicData(value);
+            const typeName = value[$$concreteType];
+            if (!targetTypeNames.includes(typeName)) {
+              continue;
+            }
+            const newIndex = noDepsList.push(undefined) - 1;
+            map.set(originalIndex, newIndex);
+            for (const planId of copyPlanIds) {
+              store[planId][newIndex] = bucket.store[planId][originalIndex];
+            }
+          }
+
+          // Reference
+          const childBucket = newBucket(childLayerPlan, noDepsList, store);
+          bucket.children[childLayerPlan.id] = {
+            bucket: childBucket,
+            map,
+          };
+
+          // Execute
+          const result = executeBucket(childBucket, requestContext);
+          if (isPromiseLike(result)) {
+            childPromises.push(result);
+          }
+
+          break;
         }
         case "subroutine":
         case "subscription":
