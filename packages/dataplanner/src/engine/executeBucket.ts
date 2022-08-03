@@ -1,3 +1,4 @@
+import * as assert from "assert";
 import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "../bucket.js";
@@ -478,6 +479,22 @@ function newBucket(
   noDepsList: readonly undefined[],
   store: Bucket["store"],
 ): Bucket {
+  if (isDev) {
+    // Some validations
+    const l = noDepsList.length;
+    assert.ok(l > 0, "No need to create an empty bucket!");
+    for (const [key, list] of Object.entries(store)) {
+      assert.ok(
+        Array.isArray(list),
+        `Store entry for step '${key}' for layerPlan '${layerPlan.id}' should be a list`,
+      );
+      assert.strictEqual(
+        list.length,
+        l,
+        `Store entry for step '${key}' for layerPlan '${layerPlan.id}' should have same length as bucket`,
+      );
+    }
+  }
   return {
     layerPlan,
     isComplete: false,
