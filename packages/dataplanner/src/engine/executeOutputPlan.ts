@@ -9,7 +9,6 @@ import { isCrystalError } from "../error.js";
 import type { PromiseOrDirect } from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
-import { arrayOfLength } from "../utils.js";
 import type { OutputPlan } from "./OutputPlan.js";
 
 export type OutputPath = Array<string | number>;
@@ -160,12 +159,28 @@ export interface OutputStream {
 //   }
 // }
 
+/**
+ * @internal
+ */
 interface PayloadRoot {
-  streams: OutputStream[];
+  /**
+   * The errors that have occurred; these are proper GraphQLErrors and will be
+   * returned directly to clients so they must be complete.
+   */
   errors: GraphQLError[];
+  /**
+   * Stream/defer queues - we don't start executing these until after the main
+   * payload is completed (to allow for a non-null boundary to abort
+   * execution).
+   */
   queue: Array<SubsequentPayloadSpec>;
 
-  /** @internal VERY DANGEROUS */
+  /**
+   * VERY DANGEROUS. This is _only_ to pass variables through to introspection
+   * selections, it shouldn't be used for anything else.
+   *
+   * @internal
+   * */
   variables: { [key: string]: any };
 }
 
@@ -234,7 +249,7 @@ export interface OutputPlanContext extends RequestContext {
   nullRoot: NullHandler;
 }
 
-interface SubsequentPayloadSpec {
+export interface SubsequentPayloadSpec {
   ctx: OutputPlanContext;
   bucket: Bucket;
   bucketIndex: number;

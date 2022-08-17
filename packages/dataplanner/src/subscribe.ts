@@ -3,10 +3,10 @@ import type {
   ExecutionArgs,
   ExecutionResult,
 } from "graphql";
+import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import type { DataPlannerExecuteOptions } from "./execute.js";
 import { withDataPlannerArgs } from "./execute.js";
-import type { PromiseOrDirect } from "./interfaces.js";
 
 /**
  * Use this instead of GraphQL.js' subscribe method and we'll automatically
@@ -15,7 +15,7 @@ import type { PromiseOrDirect } from "./interfaces.js";
 export function subscribe(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
-): PromiseOrDirect<
+): PromiseOrValue<
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {

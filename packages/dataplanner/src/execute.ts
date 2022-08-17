@@ -5,6 +5,7 @@ import type {
   ExecutionResult,
 } from "graphql";
 import { execute as graphqlExecute } from "graphql";
+import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { inspect } from "util";
 
 import type {
@@ -15,6 +16,7 @@ import type {
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import type { CrystalPrepareOptions } from "./prepare.js";
 import { dataplannerPrepare } from "./prepare.js";
+import { isPromiseLike } from "./utils.js";
 
 export interface DataPlannerExecuteOptions {
   explain?: CrystalPrepareOptions["explain"];
@@ -27,7 +29,7 @@ export interface DataPlannerExecuteOptions {
 export function withDataPlannerArgs(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
-): PromiseOrDirect<
+): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   if (process.env.NODE_ENV === "development") {
@@ -90,7 +92,12 @@ export function withDataPlannerArgs(
   if (unlisten) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
   }
-  return rootValue;
+  // Convert from PromiseOrDirect to PromiseOrValue
+  if (isPromiseLike(rootValue)) {
+    return Promise.resolve(rootValue);
+  } else {
+    return rootValue;
+  }
 }
 
 /**
@@ -100,7 +107,7 @@ export function withDataPlannerArgs(
 export function execute(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
-): PromiseOrDirect<
+): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   return withDataPlannerArgs(args, options);

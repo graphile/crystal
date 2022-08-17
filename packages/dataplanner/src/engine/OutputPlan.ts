@@ -48,26 +48,29 @@ export type OutputPlanTypeObject = {
    */
   mode: "object";
   typeName: string;
+  deferLabel: string | null;
 };
 export type OutputPlanTypePolymorphicObject = {
   /**
    * Return `{}` if non-null
    */
   mode: "polymorphic";
+  deferLabel: string | null;
 };
 export type OutputPlanTypeArray = {
   /**
    * Return a list of the same length if an array
    */
   mode: "array";
-  streamedOutputPlan?: OutputPlan;
+  streamedOutputPlan: OutputPlan | null;
+  streamLabel: string | null;
 };
 export type OutputPlanTypeLeaf = {
   /**
    * Return the value.
    */
   mode: "leaf";
-  stepId: number;
+  // stepId: number;
   serialize: GraphQLScalarType["serialize"];
 };
 export type OutputPlanTypeNull = {
@@ -118,9 +121,8 @@ export type OutputPlanKeyValue =
  * - data?: the data for this layer, could be object, array or leaf (see OutputPlanMode)
  * - errors: a list of errors that occurred (if any), including path details _within the output plan_
  * - streams: a list of streams that were created
- *
  */
-export class OutputPlan {
+export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   /**
    * The step that represents the root value. How this is used depends on the
    * OutputPlanMode.
@@ -147,14 +149,25 @@ export class OutputPlan {
   public childIsNonNull = false;
 
   /**
-   * For root/object/polymorphic output plan types only.
+   * For object/polymorphic output plan types only.
    */
-  public deferredOutputPlans: OutputPlan[] = [];
+  public deferredOutputPlans: OutputPlan<
+    OutputPlanTypeObject | OutputPlanTypePolymorphicObject
+  >[] = [];
 
   constructor(
     public layerPlan: LayerPlan,
+    /**
+     * For root, object and polymorphic this could represent an object or null.
+     *
+     * For array it's the list itself (or null) and dictates the length of the result.
+     *
+     * For leaf, it's the leaf plan itself.
+     *
+     * For `introspection`, `null` it's irrelevant. Use `constant(null)` or whatever.
+     */
     rootStep: ExecutableStep,
-    public readonly type: OutputPlanType,
+    public readonly type: TType,
   ) {
     this.rootStepId = rootStep.id;
     if (type.mode === "polymorphic") {

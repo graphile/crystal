@@ -1,9 +1,11 @@
+import * as assert from "assert";
 import type { ExecutionArgs } from "graphql";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
 } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
+import { isAsyncIterable } from "iterall";
 
 import type { Bucket, RequestContext } from "./bucket.js";
 import { executeBucket } from "./engine/executeBucket.js";
@@ -12,7 +14,7 @@ import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { PromiseOrDirect } from "./interfaces.js";
-import { $$data, $$eventEmitter, $$extensions } from "./interfaces.js";
+import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";
@@ -78,14 +80,26 @@ export function executePreemptive(
     data: unknown,
     ctx: OutputPlanContext,
   ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
-    if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
-      throw new Error("TODO: streams");
+    if (isAsyncIterable(data)) {
+      // It's a stream (either `subscription` or `@stream`)! Batch execute the child bucket for
+      // each entry in the stream, and then the output plan for that.
+      assert.strictEqual(ctx.root.queue.length, 0, "Stream cannot also queue");
+      throw new Error("TODO: stream");
     } else {
-      return Object.assign(Object.create(bypassGraphQLObj), {
-        data,
-        errors: ctx.root.errors,
-        extensions: rootValue[$$extensions],
-      });
+      if (ctx.root.queue.length > 0) {
+        throw new Error("TODO: queue");
+        // TODO: we should return an async iterable, the first entry in this
+        // should `{data, hasNext: true, ...}` and then we stream these results
+        // into it. Fresh `NullHandler`, new (deeper) path. Label.
+      } else {
+        return Object.assign(Object.create(bypassGraphQLObj), {
+          data,
+          errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
+          extensions: rootValue[$$extensions] ?? undefined,
+          hasNext: undefined,
+          label: undefined,
+        });
+      }
     }
   };
 
@@ -93,19 +107,21 @@ export function executePreemptive(
     ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
   > => {
     const path: (string | number)[] = [];
+    const nullRoot = new NullHandler(null, true, path);
+    let setRootNull = false;
+    nullRoot.onAbort(() => {
+      setRootNull = true;
+    });
     const ctx: OutputPlanContext = {
       ...requestContext,
       root: {
-        streams: [],
         errors: [],
         queue: [],
-        // This is _only_ to pass through to introspection selections, it
-        // shouldn't be used for anything else.
         variables:
           rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
       },
       path,
-      nullRoot: new NullHandler(null, true, path),
+      nullRoot,
     };
     const resultOrPromise = executeOutputPlan(
       ctx,
@@ -114,9 +130,11 @@ export function executePreemptive(
       bucketIndex,
     );
     if (isPromiseLike(resultOrPromise)) {
-      return resultOrPromise.then((result) => finalize(result, ctx));
+      return resultOrPromise.then((result) =>
+        finalize(setRootNull ? null : result, ctx),
+      );
     } else {
-      return finalize(resultOrPromise, ctx);
+      return finalize(setRootNull ? null : resultOrPromise, ctx);
     }
   };
   if (isPromiseLike(bucketPromise)) {

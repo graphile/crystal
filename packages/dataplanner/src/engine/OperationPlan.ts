@@ -129,7 +129,9 @@ export class OperationPlan {
   public layerPlans: LayerPlan[] = [];
   /** @internal */
   public rootLayerPlan: LayerPlan;
-  public rootOutputPlan: OutputPlan;
+  // Assigned during OperationPlan.planOperation(), guaranteed to exist after
+  // initialization.
+  public rootOutputPlan!: OutputPlan;
 
   private stepCount = 0;
   private modifierStepCount = 0;
@@ -588,8 +590,9 @@ export class OperationPlan {
     }
     // Create a new LayerPlan for this list item
     const layerPlan = new LayerPlan(this, listStep.layerPlan, {
-      type: "list",
+      type: "listItem",
       parentPlanId: listStep.id,
+      streamLabel: null,
     });
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
@@ -690,16 +693,20 @@ export class OperationPlan {
 
       if (fieldName.startsWith("__")) {
         if (fieldName === "__typename") {
-          outputPlan.addChild(objectType, responseKey, { mode: "__typename" });
+          outputPlan.addChild(objectType, responseKey, { type: "__typename" });
         } else {
           const variableNames = findVariableNamesUsed(this, field);
           outputPlan.addChild(objectType, responseKey, {
-            mode: "introspection",
-            field,
-            variableNames,
-            // TODO: if variableNames.length === 0 we should be able to optimize this!
-            introspectionCacheByVariableValues: new LRU({
-              maxLength: 3,
+            type: "outputPlan",
+            isNonNull: fieldName === "__schema",
+            outputPlan: new OutputPlan(outputPlan.layerPlan, constant(null), {
+              mode: "introspection",
+              field,
+              variableNames,
+              // TODO: if variableNames.length === 0 we should be able to optimize this!
+              introspectionCacheByVariableValues: new LRU({
+                maxLength: 3,
+              }),
             }),
           });
         }
@@ -877,15 +884,15 @@ export class OperationPlan {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
     if (isListType(nullableFieldType)) {
-      const listOutputPlan = new OutputPlan(
-        parentOutputPlan.layerPlan,
-        $step,
-        "array",
-        isNonNull,
-      );
-      parentOutputPlan.addChild(parentObjectType, responseKey, {
+      const listOutputPlan = new OutputPlan(parentOutputPlan.layerPlan, $step, {
         mode: "array",
-        listOutputPlan: listOutputPlan,
+        streamedOutputPlan: null,
+        streamLabel: null,
+      });
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
+        type: "outputPlan",
+        outputPlan: listOutputPlan,
+        isNonNull,
       });
 
       const $__item = this.itemStepForListStep($step, listDepth);
@@ -914,13 +921,22 @@ export class OperationPlan {
           : $step;
 
       parentOutputPlan.addChild(parentObjectType, responseKey, {
-        mode: "leaf",
-        stepId: $leaf.id,
+        type: "outputPlan",
+        isNonNull,
+        outputPlan: new OutputPlan($leaf.layerPlan, $leaf, {
+          mode: "leaf",
+          stepId: $leaf.id,
+          serialize: nullableFieldType.serialize,
+        }),
       });
     } else if (isEnumType(nullableFieldType)) {
       parentOutputPlan.addChild(parentObjectType, responseKey, {
-        mode: "leaf",
-        stepId: $step.id,
+        type: "outputPlan",
+        isNonNull,
+        outputPlan: new OutputPlan($step.layerPlan, $step, {
+          mode: "leaf",
+          serialize: nullableFieldType.serialize,
+        }),
       });
     } else if (isObjectType(nullableFieldType)) {
       // TODO: graphqlMergeSelectionSets ?
@@ -940,15 +956,15 @@ export class OperationPlan {
           );
         }
       }
-      const objectOutputPlan = new OutputPlan(
-        $step.layerPlan,
-        $step,
-        "object",
-        isNonNull,
-      );
-      parentOutputPlan.addChild(parentObjectType, responseKey, {
+      const objectOutputPlan = new OutputPlan($step.layerPlan, $step, {
         mode: "object",
+        deferLabel: null,
+        typeName: nullableFieldType.name,
+      });
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
+        type: "outputPlan",
         outputPlan: objectOutputPlan,
+        isNonNull,
       });
       this.planSelectionSet(
         objectOutputPlan,
@@ -1769,9 +1785,14 @@ export class OperationPlan {
         } else {
           // Not equivalent, need to create a new bucket and shove all the
           // plans into it
+          if (!parent.rootStepId) {
+            throw new Error("Need parent step");
+          }
           const newPolymorphicLayerPlan = new LayerPlan(this, parent, {
             type: "polymorphic",
             typeNames,
+            // TODO: is this right?
+            parentPlanId: parent.rootStepId,
           });
           winningCombo[0].layersAtMinDepth.forEach((layer) => {
             layer.parentLayerPlan = newPolymorphicLayerPlan;
