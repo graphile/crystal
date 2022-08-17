@@ -467,6 +467,9 @@ export function executeOutputPlan(
       return null;
     }
     case "leaf": {
+      if (bucketRootValue == null) {
+        return null;
+      }
       if (ctx.insideGraphQL) {
         // Don't serialize to avoid the double serialization problem
         return bucketRootValue;
