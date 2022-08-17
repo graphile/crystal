@@ -1307,8 +1307,10 @@ export class OperationPlan {
     const processStepsFrom = (fromStepId: number) => {
       for (let stepId = fromStepId; stepId < previousStepCount; stepId++) {
         const step = this.steps[stepId];
-        steps.push(step);
-        calculateDependencies(step);
+        if (step) {
+          steps.push(step);
+          calculateDependencies(step);
+        }
       }
       steps.sort(sorter);
     };
@@ -1372,8 +1374,59 @@ export class OperationPlan {
     }
   }
 
+  private markStepActive(
+    step: ExecutableStep,
+    activeSteps: Set<ExecutableStep>,
+  ): void {
+    if (activeSteps.has(step)) {
+      return;
+    }
+    activeSteps.add(step);
+    for (let i = 0, l = step.dependencies.length; i < l; i++) {
+      const id = step.dependencies[i];
+      this.markStepActive(this.steps[id], activeSteps);
+    }
+  }
+
   private treeShakeSteps() {
-    console.log("TODO: treeShakeSteps");
+    const activeSteps = new Set<ExecutableStep>();
+
+    // The root subscription step, if any, should be marked as active
+    if (this.subscriptionItemStepId) {
+      const step = this.steps[this.subscriptionItemStepId];
+      this.markStepActive(step, activeSteps);
+    }
+
+    // TODO: ensure side-effect plans are handled nicely
+
+    // TODO: ensure plans in 'subprocedure' layerPlans are marked active
+
+    // Now walk through all the output plans and mark every used plan as
+    // active.
+    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+      if (outputPlan.rootStepId) {
+        this.markStepActive(this.steps[outputPlan.rootStepId], activeSteps);
+      }
+    });
+
+    for (let i = 0, l = this.steps.length; i < l; i++) {
+      const step = this.steps[i];
+      if (step && !activeSteps.has(step)) {
+        // if (debugPlanVerboseEnabled && step.id === i) {
+        //   debugPlanVerbose(`Deleting step %c during tree shaking`, step);
+        // }
+
+        // We're going to delete this step. Theoretically nothing can reference
+        // it, so it should not cause any issues. If it does, it's due to a
+        // programming bug somewhere where we're referencing a step that hasn't
+        // been added to the relevant dependencies. As such; I'm going
+        // to bypass TypeScript here and delete the node whilst still letting
+        // TypeScript guarantee it exists - better that the user gets a runtime
+        // error trying to use it rather than using a nonsense step.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.steps[i] = null as any;
+      }
+    }
   }
 
   private getPeers(
@@ -1982,20 +2035,28 @@ export class OperationPlan {
 
   /** Finalizes each output plan */
   private finalizeOutputPlans(): void {
-    this.finalizeOutputPlan(this.rootOutputPlan);
+    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) =>
+      outputPlan.finalize(),
+    );
   }
 
-  private finalizeOutputPlan(outputPlan: OutputPlan): void {
-    outputPlan.finalize();
+  private walkOutputPlans(
+    outputPlan: OutputPlan,
+    callback: (outputPlan: OutputPlan) => void,
+  ): void {
+    callback(outputPlan);
     if (outputPlan.child) {
-      this.finalizeOutputPlan(outputPlan.child);
+      this.walkOutputPlans(outputPlan.child, callback);
     }
     for (const key of Object.values(outputPlan.keys).flatMap((o) =>
       Object.values(o),
     )) {
       if (key.type === "outputPlan") {
-        this.finalizeOutputPlan(key.outputPlan);
+        this.walkOutputPlans(key.outputPlan, callback);
       }
+    }
+    for (const defer of outputPlan.deferredOutputPlans) {
+      this.walkOutputPlans(defer, callback);
     }
   }
 
