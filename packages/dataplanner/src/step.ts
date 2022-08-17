@@ -147,21 +147,14 @@ export class ExecutableStep<TData = any> extends BaseStep {
   private readonly _dependencies: number[] = [];
 
   /**
-   * The ids for plans that depend on this plan; useful when performing
-   * "dependents first" tasks. Cannot be fully trusted unless "treeShakeSteps"
-   * has been called, since some of these dependents may not exist in the
-   * future.
-   *
-   * @internal
-   */
-  public readonly _dependents: number[] = [];
-
-  /**
    * The ids for plans this plan will need data from in order to execute.
    */
   public readonly dependencies: ReadonlyArray<number> = this._dependencies;
 
   /**
+   * The plans that depend on this plan. Not populated until the 'finalize'
+   * phase; so don't rely on it until the OperationPlan is 'ready'.
+   *
    * @internal
    */
   public dependentPlans: Array<ExecutableStep> = [];

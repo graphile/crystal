@@ -14,6 +14,7 @@ import type {
 } from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { assertPolymorphicData } from "../polymorphic.js";
+import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
@@ -245,6 +246,10 @@ export function executeBucket(
       return;
     }
     inProgressSteps.add(step);
+    if (step instanceof __ValueStep) {
+      // Bypass execution
+      return reallyCompletedStep(step);
+    }
     try {
       const meta = metaByStepId[step.id]!;
       const extra = {

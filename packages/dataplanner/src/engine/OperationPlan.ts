@@ -280,6 +280,8 @@ export class OperationPlan {
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizeSteps();
 
+    this.finalizeLayerPlans();
+
     this.finalizeOutputPlans();
 
     this.phase = "ready";
@@ -2030,7 +2032,27 @@ export class OperationPlan {
             `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
           );
         }
+        for (const depId of step.dependencies) {
+          this.steps[depId].dependentPlans.push(step);
+        }
       }
+    }
+  }
+
+  private finalizeLayerPlans(): void {
+    for (const layerPlan of this.layerPlans) {
+      layerPlan.steps = this.steps.filter(
+        (s) => s !== null && s.layerPlan === layerPlan,
+      );
+      layerPlan.startSteps = layerPlan.steps.filter((s) => {
+        for (const depId of s.dependencies) {
+          const dep = this.steps[depId];
+          if (dep.layerPlan === layerPlan) {
+            return false;
+          }
+        }
+        return true;
+      });
     }
   }
 
