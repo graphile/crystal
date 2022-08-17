@@ -494,7 +494,9 @@ export function executeOutputPlan(
               selections: [field],
             },
           },
+          ...Object.values(outputPlan.layerPlan.operationPlan.fragments),
         ],
+
         kind: Kind.DOCUMENT,
       };
       const variableValues: Record<string, any> = {};
