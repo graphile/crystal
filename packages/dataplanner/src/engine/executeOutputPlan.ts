@@ -310,7 +310,11 @@ export function executeOutputPlan(
         typeName = bucketRootValue[$$concreteType];
         assert.ok(typeName, "Could not determine concreteType for object");
       }
-      const data = outputPlan.objectCreator!(typeName);
+      assert.ok(
+        outputPlan.objectCreator,
+        `GraphileInternalError<2c75b7a7-e78d-47bb-936c-b6e030452d30>: ${outputPlan}.objectCreator was not constructed yet`,
+      );
+      const data = outputPlan.objectCreator(typeName);
       for (const [key, spec] of Object.entries(outputPlan.keys[typeName])) {
         if (spec.type === "__typename") {
           // __typename already handled

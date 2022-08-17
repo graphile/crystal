@@ -280,6 +280,8 @@ export class OperationPlan {
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizeSteps();
 
+    this.finalizeOutputPlans();
+
     this.phase = "ready";
 
     // this.walkFinalizedPlans();
@@ -699,15 +701,19 @@ export class OperationPlan {
           outputPlan.addChild(objectType, responseKey, {
             type: "outputPlan",
             isNonNull: fieldName === "__schema",
-            outputPlan: new OutputPlan(outputPlan.layerPlan, constant(null), {
-              mode: "introspection",
-              field,
-              variableNames,
-              // TODO: if variableNames.length === 0 we should be able to optimize this!
-              introspectionCacheByVariableValues: new LRU({
-                maxLength: 3,
-              }),
-            }),
+            outputPlan: new OutputPlan(
+              outputPlan.layerPlan,
+              this.rootValueStep,
+              {
+                mode: "introspection",
+                field,
+                variableNames,
+                // TODO: if variableNames.length === 0 we should be able to optimize this!
+                introspectionCacheByVariableValues: new LRU({
+                  maxLength: 3,
+                }),
+              },
+            ),
           });
         }
         continue;
@@ -1970,6 +1976,25 @@ export class OperationPlan {
             `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
           );
         }
+      }
+    }
+  }
+
+  /** Finalizes each output plan */
+  private finalizeOutputPlans(): void {
+    this.finalizeOutputPlan(this.rootOutputPlan);
+  }
+
+  private finalizeOutputPlan(outputPlan: OutputPlan): void {
+    outputPlan.finalize();
+    if (outputPlan.child) {
+      this.finalizeOutputPlan(outputPlan.child);
+    }
+    for (const key of Object.values(outputPlan.keys).flatMap((o) =>
+      Object.values(o),
+    )) {
+      if (key.type === "outputPlan") {
+        this.finalizeOutputPlan(key.outputPlan);
       }
     }
   }
