@@ -1275,6 +1275,7 @@ export class OperationPlan {
       deepDependenciesByStepId[step.id] = deepDeps = new Set();
       for (const depId of step.dependencies) {
         const depStep = this.steps[depId];
+        deepDeps.add(depStep);
         const depDeepDeps = calculateDependencies(depStep);
         for (const deepDepStep of depDeepDeps) {
           deepDeps.add(deepDepStep);
