@@ -8,8 +8,8 @@ import type {
   ExecutionExtra,
   InputStep,
   LambdaStep,
-  PlanOptimizeOptions,
-  PlanStreamOptions,
+  StepOptimizeOptions,
+  StepStreamOptions,
   StreamableStep,
 } from "dataplanner";
 import {
@@ -32,6 +32,7 @@ import {
   planGroupsOverlap,
   reverse,
   reverseArray,
+  stepADependsOnStepB,
 } from "dataplanner";
 import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -456,7 +457,7 @@ export class PgSelectStep<
    * initialCount). Set during the `optimize` call - do not trust it before
    * then. If null then the plan is not expected to stream.
    */
-  private streamOptions: PlanStreamOptions | null = null;
+  private streamOptions: StepStreamOptions | null = null;
 
   /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
@@ -2314,12 +2315,22 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec } = placeholder;
       const dep = this.getStep(this.dependencies[dependencyIndex]);
-      if (
-        // I am uncertain on this code.
-        isStaticInputStep(dep) ||
-        (otherPlan.parentPathIdentity.length > dep.parentPathIdentity.length &&
-          otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity))
-      ) {
+      /*
+       * We have dependency `dep`. We're attempting to merge ourself into
+       * `otherPlan`. We have two situations we need to handle:
+       *
+       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
+       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
+       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
+       *    result of selecting an expression in the `otherPlan`), in which
+       *    case we should turn it into an SQL expression and inline that.
+       */
+
+      // TODO:perf: we know dep can't depend on otherPlan if
+      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
+      // `otherPlan`'s layerPlan.
+      const depDependsOnOtherPlan = stepADependsOnStepB(dep, otherPlan);
+      if (!depDependsOnOtherPlan) {
         // Either dep is a static input plan (which isn't dependent on anything
         // else) or otherPlan is deeper than dep; either way we can use the dep
         // directly within otherPlan.
@@ -2354,7 +2365,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     }
   }
 
-  optimize({ stream }: PlanOptimizeOptions): ExecutableStep {
+  optimize({ stream }: StepOptimizeOptions): ExecutableStep {
     // TODO: should this be in 'beforeLock'?
     this.limitAndOffsetSQL = this.planLimitAndOffset();
 

@@ -866,3 +866,23 @@ export function isTypePlanned(
     return false;
   }
 }
+
+export function stepADependsOnStepB(
+  stepA: ExecutableStep,
+  stepB: ExecutableStep,
+): boolean {
+  if (stepA === stepB) {
+    throw new Error("Invalid call to stepADependsOnStepB");
+  }
+  // Depth-first search for match
+  for (const depId of stepA.dependencies) {
+    const dep = stepA.layerPlan.operationPlan.dangerouslyGetStep(depId);
+    if (dep === stepB) {
+      return true;
+    }
+    if (stepADependsOnStepB(dep, stepB)) {
+      return true;
+    }
+  }
+  return false;
+}

@@ -179,6 +179,7 @@ import {
   ObjectTypeFields,
   ObjectTypeSpec,
   planGroupsOverlap,
+  stepADependsOnStepB,
 } from "./utils.js";
 
 export { isAsyncIterable } from "iterall";
@@ -342,6 +343,7 @@ export {
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  stepADependsOnStepB,
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
@@ -427,6 +429,7 @@ exportAsMany({
   objectFieldSpec,
   objectSpec,
   arrayOfLength,
+  stepADependsOnStepB,
   planGroupsOverlap,
   isPromiseLike,
   isDev,
