@@ -6,6 +6,7 @@ import { inspect } from "util";
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { isCrystalError } from "../error.js";
+import type { PromiseOrDirect } from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import { arrayOfLength } from "../utils.js";
@@ -168,7 +169,8 @@ interface PayloadRoot {
   variables: { [key: string]: any };
 }
 
-class NullHandler {
+/** @internal */
+export class NullHandler {
   root: PayloadRoot | null = null;
   children: NullHandler[] = [];
   callbacks: Array<() => void> = [];
@@ -226,7 +228,7 @@ class NullHandler {
   }
 }
 
-interface OutputPlanContext extends RequestContext {
+export interface OutputPlanContext extends RequestContext {
   root: PayloadRoot;
   path: ReadonlyArray<string | number>;
   nullRoot: NullHandler;
@@ -250,7 +252,7 @@ export function executeOutputPlan(
   outputPlan: OutputPlan,
   bucket: Bucket,
   bucketIndex: number,
-): unknown {
+): PromiseOrDirect<unknown> {
   assert.strictEqual(
     bucket.isComplete,
     true,
@@ -329,7 +331,7 @@ export function executeOutputPlan(
             if (
               t !== "root" &&
               t !== "polymorphic" &&
-              t !== "list" &&
+              t !== "listItem" &&
               t !== "mutationField"
             ) {
               const never: never = t;

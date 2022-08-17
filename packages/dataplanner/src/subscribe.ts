@@ -3,15 +3,10 @@ import type {
   ExecutionArgs,
   ExecutionResult,
 } from "graphql";
-import { subscribe as graphqlSubscribe } from "graphql";
-import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import type { DataPlannerExecuteOptions } from "./execute.js";
-import {
-  addExtensionsToExecutionResult,
-  withDataPlannerArgs,
-} from "./execute.js";
-import { isPromiseLike } from "./utils.js";
+import { withDataPlannerArgs } from "./execute.js";
+import type { PromiseOrDirect } from "./interfaces.js";
 
 /**
  * Use this instead of GraphQL.js' subscribe method and we'll automatically
@@ -20,33 +15,9 @@ import { isPromiseLike } from "./utils.js";
 export function subscribe(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
-): PromiseOrValue<
+): PromiseOrDirect<
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {
-  return withDataPlannerArgs(args, options, subscribeInner);
-}
-
-/**
- * @internal
- */
-function subscribeInner(
-  args: ExecutionArgs,
-  rootValue: any,
-): PromiseOrValue<
-  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
-> {
-  const realArgs = args.rootValue !== rootValue ? { ...args, rootValue } : args;
-  const subscribeResult =
-    // TODO: support bypassing
-    /*(realArgs.rootValue as any)?.[$$bypassGraphQL]
-    ? bypassGraphQLExecute(realArgs)
-    :*/ graphqlSubscribe(realArgs);
-  if (isPromiseLike(subscribeResult)) {
-    return subscribeResult.then((r) =>
-      addExtensionsToExecutionResult(r, rootValue),
-    );
-  } else {
-    return addExtensionsToExecutionResult(subscribeResult, rootValue);
-  }
+  return withDataPlannerArgs(args, options);
 }

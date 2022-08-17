@@ -1,18 +1,19 @@
-import * as assert from "assert";
 import type { ExecutionArgs } from "graphql";
-import type { ExecutionResult } from "graphql/execution/execute";
+import type {
+  AsyncExecutionResult,
+  ExecutionResult,
+} from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
 
 import type { Bucket, RequestContext } from "./bucket.js";
-import { BucketSetter } from "./bucket.js";
 import { executeBucket } from "./engine/executeBucket.js";
-import type { OutputResult } from "./engine/executeOutputPlan.js";
-import { executeOutputPlan } from "./engine/executeOutputPlan.js";
+import type { OutputPlanContext } from "./engine/executeOutputPlan.js";
+import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
-import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces.js";
-import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import { arrayOfLength, arrayOfLengthCb, isPromiseLike } from "./utils.js";
+import type { PromiseOrDirect } from "./interfaces.js";
+import { $$data, $$eventEmitter, $$extensions } from "./interfaces.js";
+import { arrayOfLength, isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";
 const $$contextPlanCache = Symbol("contextPlanCache");
@@ -28,13 +29,24 @@ export interface CrystalPrepareOptions {
   explain?: string[] | null;
 }
 
-export async function executePreemptive(
+const bypassGraphQLObj = Object.assign(Object.create(null), {
+  [$$bypassGraphQL]: true,
+});
+
+export function executePreemptive(
   operationPlan: OperationPlan,
   variableValues: any,
   context: any,
   rootValue: any,
-) {
+): PromiseOrDirect<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
+> {
   // TODO: batch this method so it can process multiple GraphQL requests in parallel
+
+  // TODO: when we batch, we need to change `bucketIndex` and `size`!
+  const bucketIndex = 0;
+  const size = 1;
+
   const requestIndex = [0];
   const vars = [variableValues];
   const ctxs = [context];
@@ -42,13 +54,16 @@ export async function executePreemptive(
   const rootBucket: Bucket = {
     isComplete: false,
     layerPlan: operationPlan.rootLayerPlan,
-    noDepsList: Object.freeze(arrayOfLength(vars.length)),
+    size,
+    noDepsList: Object.freeze(arrayOfLength(size)),
     store: Object.assign(Object.create(null), {
       "-1": requestIndex,
       [operationPlan.variableValuesStep.id]: vars,
       [operationPlan.contextStep.id]: ctxs,
       [operationPlan.rootValueStep.id]: rvs,
     }),
+    hasErrors: false,
+    children: {},
   };
   const requestContext: RequestContext = {
     // toSerialize: [],
@@ -59,23 +74,49 @@ export async function executePreemptive(
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
 
-  const finalize = (list: OutputResult[]) => {
-    assert.strictEqual(list.length, 1, "We don't support batching yet :(");
-    const result = list[0];
-    result[$$bypassGraphQL] = true;
-    return result;
+  const finalize = (
+    data: unknown,
+    ctx: OutputPlanContext,
+  ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
+    if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
+      throw new Error("TODO: streams");
+    } else {
+      return Object.assign(Object.create(bypassGraphQLObj), {
+        data,
+        errors: ctx.root.errors,
+        extensions: rootValue[$$extensions],
+      });
+    }
   };
 
-  const output = () => {
-    const outputPromise = executeOutputPlan(
+  const output = (): PromiseOrDirect<
+    ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
+  > => {
+    const path: (string | number)[] = [];
+    const ctx: OutputPlanContext = {
+      ...requestContext,
+      root: {
+        streams: [],
+        errors: [],
+        queue: [],
+        // This is _only_ to pass through to introspection selections, it
+        // shouldn't be used for anything else.
+        variables:
+          rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+      },
+      path,
+      nullRoot: new NullHandler(null, true, path),
+    };
+    const resultOrPromise = executeOutputPlan(
+      ctx,
       operationPlan.rootOutputPlan,
       rootBucket,
-      requestContext,
+      bucketIndex,
     );
-    if (isPromiseLike(outputPromise)) {
-      return outputPromise.then(finalize);
+    if (isPromiseLike(resultOrPromise)) {
+      return resultOrPromise.then((result) => finalize(result, ctx));
     } else {
-      return finalize(outputPromise);
+      return finalize(resultOrPromise, ctx);
     }
   };
   if (isPromiseLike(bucketPromise)) {
@@ -98,7 +139,9 @@ export async function executePreemptive(
 export function dataplannerPrepare(
   args: ExecutionArgs,
   options: CrystalPrepareOptions = {},
-): PromiseOrDirect<CrystalObject | { [$$data]: any }> {
+): PromiseOrDirect<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
+> {
   const {
     schema,
     contextValue: context,
@@ -108,10 +151,12 @@ export function dataplannerPrepare(
   } = args;
   const exeContext = buildExecutionContext(args);
 
-  // If a list of errors was returned, abort our transform and defer to
-  // graphql-js.
+  // If a list of errors was returned, abort
   if (Array.isArray(exeContext) || "length" in exeContext) {
-    return args.rootValue as any;
+    return Object.assign(Object.create(bypassGraphQLObj), {
+      errors: exeContext,
+      extensions: rootValue[$$extensions],
+    });
   }
 
   const { operation, fragments, variableValues } = exeContext;
@@ -140,46 +185,5 @@ export function dataplannerPrepare(
     });
   }
 
-  const preemptiveResult = executePreemptive(
-    operationPlan,
-    variableValues,
-    context,
-    rootValue,
-  );
-  if (preemptiveResult) {
-    if (rootValue[$$extensions]) {
-      if (isPromiseLike(preemptiveResult)) {
-        return preemptiveResult.then((r) => {
-          r[$$extensions] = rootValue[$$extensions];
-          return r;
-        });
-      } else {
-        preemptiveResult[$$extensions] = rootValue[$$extensions];
-        preemptiveResult[$$eventEmitter] = rootValue[$$eventEmitter];
-        return preemptiveResult;
-      }
-    } else {
-      return preemptiveResult;
-    }
-  }
-
-  const crystalContext = operationPlan.newCrystalContext(
-    variableValues,
-    context as any,
-    rootValue,
-  );
-  if (rootValue[$$extensions]) {
-    crystalContext.rootCrystalObject[$$extensions] = rootValue[$$extensions];
-  }
-  return crystalContext.rootCrystalObject;
-}
-
-// TODO: should we assert `$$bypassGraphQL` in here, or not? Presumably the performance impact would be negligible.
-/**
- * Use this instead of the `execute` method if `$$bypassGraphQL` is set.
- *
- * @internal
- */
-export function bypassGraphQLExecute(args: ExecutionArgs): ExecutionResult {
-  return Object.assign(Object.create(null), { data: args.rootValue as any });
+  return executePreemptive(operationPlan, variableValues, context, rootValue);
 }

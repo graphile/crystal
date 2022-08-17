@@ -5,28 +5,29 @@ import type {
   ExecutionResult,
 } from "graphql";
 import { execute as graphqlExecute } from "graphql";
-import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
-import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
-import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
-import { $$bypassGraphQL, $$eventEmitter, $$extensions } from "./interfaces.js";
+import type {
+  ExecutionEventEmitter,
+  ExecutionEventMap,
+  PromiseOrDirect,
+} from "./interfaces.js";
+import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import type { CrystalPrepareOptions } from "./prepare.js";
-import { bypassGraphQLExecute, dataplannerPrepare } from "./prepare.js";
-import { isPromiseLike } from "./utils.js";
+import { dataplannerPrepare } from "./prepare.js";
 
 export interface DataPlannerExecuteOptions {
   explain?: CrystalPrepareOptions["explain"];
 }
 
 /**
+ * Used by `execute` and `subscribe`.
  * @internal
  */
 export function withDataPlannerArgs(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
-  callback: typeof executeInner,
-): PromiseOrValue<
+): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   if (process.env.NODE_ENV === "development") {
@@ -86,20 +87,10 @@ export function withDataPlannerArgs(
   const rootValue = dataplannerPrepare(args, {
     explain: options.explain,
   });
-  let next;
-  if (isPromiseLike(rootValue)) {
-    next = rootValue.then((rootValue) =>
-      callback(args, rootValue),
-    ) as PromiseOrValue<
-      ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
-    >;
-  } else {
-    next = callback(args, rootValue);
-  }
   if (unlisten) {
-    Promise.resolve(next).then(unlisten, unlisten);
+    Promise.resolve(rootValue).then(unlisten, unlisten);
   }
-  return next;
+  return rootValue;
 }
 
 /**
@@ -109,87 +100,8 @@ export function withDataPlannerArgs(
 export function execute(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
-): PromiseOrValue<
+): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  return withDataPlannerArgs(args, options, executeInner);
-}
-
-/**
- * @internal
- */
-function executeInner(
-  args: ExecutionArgs,
-  rootValue: any,
-): PromiseOrValue<
-  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
-> {
-  const realArgs = args.rootValue !== rootValue ? { ...args, rootValue } : args;
-  const executeResult = (realArgs.rootValue as any)?.[$$bypassGraphQL]
-    ? bypassGraphQLExecute(realArgs)
-    : graphqlExecute(realArgs);
-  if (isPromiseLike(executeResult)) {
-    return executeResult.then((r) =>
-      addExtensionsToExecutionResult(r, rootValue),
-    );
-  } else {
-    return addExtensionsToExecutionResult(executeResult, rootValue);
-  }
-}
-
-/**
- * @internal
- */
-export function addExtensionsToExecutionResult<
-  T extends ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>,
->(executionResult: T, rootValue: any): T {
-  const extensions = rootValue[$$extensions];
-  if (!extensions) {
-    return executionResult;
-  }
-  if (isAsyncIterable(executionResult)) {
-    let first = true;
-    return {
-      ...executionResult,
-      next(...args: any[]) {
-        if (first) {
-          first = false;
-          const val = executionResult.next(...(args as any));
-          if (isPromiseLike(val)) {
-            return val.then((iteratorResult) => {
-              if (iteratorResult.value) {
-                return {
-                  ...iteratorResult,
-                  value: mergeExtensions(iteratorResult.value, extensions),
-                };
-              } else {
-                return iteratorResult;
-              }
-            });
-          } else {
-            return mergeExtensions(val, extensions);
-          }
-        } else {
-          return executionResult.next(...(args as any));
-        }
-      },
-    } as AsyncGenerator<AsyncExecutionResult, void, void> as any;
-  } else {
-    return mergeExtensions(executionResult, extensions) as any;
-  }
-}
-
-/**
- * @internal
- */
-function mergeExtensions<T extends ExecutionResult | AsyncExecutionResult>(
-  executionResult: T,
-  extensions: any,
-): T {
-  if (!executionResult.extensions) {
-    executionResult.extensions = extensions;
-  } else {
-    Object.assign(executionResult.extensions, extensions);
-  }
-  return executionResult;
+  return withDataPlannerArgs(args, options);
 }

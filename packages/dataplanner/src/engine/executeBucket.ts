@@ -2,8 +2,9 @@ import * as assert from "assert";
 import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "../bucket.js";
+import { isDev } from "../dev.js";
 import type { CrystalError } from "../error.js";
-import { newCrystalError } from "../error.js";
+import { isCrystalError, newCrystalError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
 import { __ListTransformStep } from "../index.js";
 import type {

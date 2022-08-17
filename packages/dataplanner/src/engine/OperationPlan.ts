@@ -129,6 +129,7 @@ export class OperationPlan {
   public layerPlans: LayerPlan[] = [];
   /** @internal */
   public rootLayerPlan: LayerPlan;
+  public rootOutputPlan: OutputPlan;
 
   private stepCount = 0;
   private modifierStepCount = 0;
@@ -421,12 +422,11 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
-    const outputPlan = new OutputPlan(
-      this.rootLayerPlan,
-      this.rootValueStep,
-      "root",
-      true,
-    );
+    const outputPlan = new OutputPlan(this.rootLayerPlan, this.rootValueStep, {
+      mode: "root",
+      typeName: this.queryType.name,
+    });
+    this.rootOutputPlan = outputPlan;
     this.planSelectionSet(
       outputPlan,
       [],
@@ -442,17 +442,16 @@ export class OperationPlan {
    */
   private planMutation(): void {
     this.loc.push("planMutation()");
-    const rootType = this.schema.getMutationType();
+    const rootType = this.mutationType;
     if (!rootType) {
       throw new Error("No mutation type found in schema");
     }
     this.deduplicateSteps();
-    const outputPlan = new OutputPlan(
-      this.rootLayerPlan,
-      this.rootValueStep,
-      "root",
-      true,
-    );
+    const outputPlan = new OutputPlan(this.rootLayerPlan, this.rootValueStep, {
+      mode: "root",
+      typeName: rootType.name,
+    });
+    this.rootOutputPlan = outputPlan;
     this.planSelectionSet(
       outputPlan,
       [],
@@ -469,7 +468,7 @@ export class OperationPlan {
    */
   private planSubscription(): void {
     this.loc.push("planSubscription");
-    const rootType = this.schema.getSubscriptionType();
+    const rootType = this.subscriptionType;
     if (!rootType) {
       throw new Error("No subscription type found in schema");
     }
@@ -536,9 +535,9 @@ export class OperationPlan {
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
         this.rootValueStep,
-        "root",
-        true,
+        { mode: "root", typeName: rootType.name },
       );
+      this.rootOutputPlan = outputPlan;
       this.planSelectionSet(
         outputPlan,
         [],
@@ -561,9 +560,9 @@ export class OperationPlan {
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
         this.rootValueStep,
-        "root",
-        true,
+        { mode: "root", typeName: rootType.name },
       );
+      this.rootOutputPlan = outputPlan;
       this.planSelectionSet(
         outputPlan,
         [],
