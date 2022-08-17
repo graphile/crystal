@@ -9,7 +9,10 @@ import { isAsyncIterable } from "iterall";
 
 import type { Bucket, RequestContext } from "./bucket.js";
 import { executeBucket } from "./engine/executeBucket.js";
-import type { OutputPlanContext } from "./engine/executeOutputPlan.js";
+import type {
+  OutputPlanContext,
+  PayloadRoot,
+} from "./engine/executeOutputPlan.js";
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
@@ -107,19 +110,21 @@ export function executePreemptive(
     ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
   > => {
     const path: (string | number)[] = [];
+    const root: PayloadRoot = {
+      errors: [],
+      queue: [],
+      variables:
+        rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+    };
     const nullRoot = new NullHandler(null, true, path);
+    nullRoot.root = root;
     let setRootNull = false;
     nullRoot.onAbort(() => {
       setRootNull = true;
     });
     const ctx: OutputPlanContext = {
       ...requestContext,
-      root: {
-        errors: [],
-        queue: [],
-        variables:
-          rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
-      },
+      root,
       path,
       nullRoot,
     };

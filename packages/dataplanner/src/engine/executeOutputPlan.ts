@@ -162,7 +162,7 @@ export interface OutputStream {
 /**
  * @internal
  */
-interface PayloadRoot {
+export interface PayloadRoot {
   /**
    * The errors that have occurred; these are proper GraphQLErrors and will be
    * returned directly to clients so they must be complete.
