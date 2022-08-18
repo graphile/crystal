@@ -178,7 +178,6 @@ import {
   objectSpec,
   ObjectTypeFields,
   ObjectTypeSpec,
-  planGroupsOverlap,
   stepADependsOnStepB,
 } from "./utils.js";
 
@@ -326,7 +325,6 @@ export {
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
-  planGroupsOverlap,
   PolymorphicData,
   PolymorphicStep,
   polymorphicWrap,
@@ -430,7 +428,6 @@ exportAsMany({
   objectSpec,
   arrayOfLength,
   stepADependsOnStepB,
-  planGroupsOverlap,
   isPromiseLike,
   isDev,
   noop,

@@ -126,13 +126,9 @@ export function printPlanGraph(
       const meta =
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
 
-      const groups =
-        plan.groupIds.length === 1 && plan.groupIds[0] === plan.primaryGroupId
-          ? ""
-          : ` {${plan.groupIds}}`;
-      const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}${
-        plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""
-      }]${groups}${meta ? `\n<${meta}>` : ""}`;
+      const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
+        meta ? `\n<${meta}>` : ""
+      }`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
           ? [">", "]"]

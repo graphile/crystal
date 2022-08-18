@@ -173,27 +173,6 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * @internal
    */
   public readonly id: number;
-  /**
-   * The group ids this plan is associated with (e.g. if the field this plan
-   * was spawned from came from multiple selection sets in the GraphQL
-   * document, some may have been deferred/streamed/etc which may lead to
-   * multiple groupIds).
-   *
-   * @internal
-   */
-  public readonly groupIds: number[] = [];
-
-  /**
-   * The deepest group that can be accessed by all `groupIds`; this dictates
-   * when the plan will actually be executed (and also influences into which
-   * bucket it is stored).
-   *
-   * This will be assigned whilst bucketIds are being allocated, just before
-   * the OperationPlan becomes "ready".
-   *
-   * @internal
-   */
-  public primaryGroupId = -1;
 
   /**
    * This identifies the deepest pathIdentity that is a common ancestor to all
@@ -270,11 +249,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
-        this.groupIds.length === 0
-          ? chalk.grey(`{?}`)
-          : this.groupIds.length === 1 && this.groupIds[0] === 0
-          ? ""
-          : chalk.grey(`{${this.groupIds.join(",")}}`)
+        this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
       }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
         this.id,
         {

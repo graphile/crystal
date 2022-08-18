@@ -29,7 +29,6 @@ import {
   lambda,
   list,
   map,
-  planGroupsOverlap,
   reverse,
   reverseArray,
   stepADependsOnStepB,
@@ -2428,11 +2427,14 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             continue;
           }
 
+          // TODO: Don't allow merging across a stream/defer/subscription boundary
+          /*
           if (!planGroupsOverlap(this, t2)) {
             // We're not in the same group (i.e. there's probably a @defer or
             // @stream between us) - do not merge.
             continue;
           }
+          */
 
           if (t === undefined && p === undefined) {
             p = p2;

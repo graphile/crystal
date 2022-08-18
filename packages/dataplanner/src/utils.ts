@@ -577,23 +577,6 @@ export function inputObjectFieldSpec<
     : spec;
 }
 
-/**
- * Returns true if plan1 and plan2 have at least one groupId in common, false
- * otherwise.
- *
- * @remarks This relates generally to the `@stream`/`@defer` directives -
- * adding `@stream` or `@defer` pushes execution of the given selection to a
- * later stage, in Crystal we represent this by putting the plans in different
- * "groups". In general you shouldn't merge a plan into a parent plan that
- * belongs to a different group - this should opt them out of optimisation.
- */
-export function planGroupsOverlap(
-  plan1: ExecutableStep,
-  plan2: ExecutableStep,
-): boolean {
-  return plan1.groupIds.some((id) => plan2.groupIds.includes(id));
-}
-
 const $$valueConfigByValue = Symbol("valueConfigByValue");
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
