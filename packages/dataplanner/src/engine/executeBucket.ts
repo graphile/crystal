@@ -321,7 +321,7 @@ export function executeBucket(
     };
 
     loop: for (const childLayerPlan of childLayerPlans) {
-      const copyPlanIds = childLayerPlan.copyPlanIds;
+      const copyStepIds = childLayerPlan.copyPlanIds;
       switch (childLayerPlan.reason.type) {
         case "listItem": {
           const store: Bucket["store"] = Object.create(null);
@@ -339,7 +339,7 @@ export function executeBucket(
           store[itemStepId] = [];
 
           // Prepare store with an empty list for each copyPlanId
-          for (const planId of copyPlanIds) {
+          for (const planId of copyStepIds) {
             store[planId] = [];
           }
 
@@ -359,7 +359,7 @@ export function executeBucket(
                 const newIndex = noDepsList.push(undefined) - 1;
                 newIndexes.push(newIndex);
                 store[itemStepId][newIndex] = list[j];
-                for (const planId of copyPlanIds) {
+                for (const planId of copyStepIds) {
                   store[planId][newIndex] = bucket.store[planId][originalIndex];
                 }
               }
@@ -389,7 +389,7 @@ export function executeBucket(
           for (let i = 0; i < bucket.size; i++) {
             map.set(i, i);
           }
-          for (const planId of copyPlanIds) {
+          for (const planId of copyStepIds) {
             store[planId] = bucket.store[planId];
           }
 
@@ -435,7 +435,7 @@ export function executeBucket(
             }
             const newIndex = noDepsList.push(undefined) - 1;
             map.set(originalIndex, newIndex);
-            for (const planId of copyPlanIds) {
+            for (const planId of copyStepIds) {
               store[planId][newIndex] = bucket.store[planId][originalIndex];
             }
           }
