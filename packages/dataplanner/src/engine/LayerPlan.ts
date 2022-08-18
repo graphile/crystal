@@ -174,11 +174,23 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   startSteps: ExecutableStep[] = [];
 
+  /**
+   * The list of layerPlans that steps added to this LayerPlan may depend upon.
+   *
+   * @internal
+   */
+  ancestry: LayerPlan[];
+
   constructor(
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
   ) {
+    if (parentLayerPlan) {
+      this.ancestry = [...parentLayerPlan.ancestry, this];
+    } else {
+      this.ancestry = [this];
+    }
     this.id = operationPlan.addLayerPlan(this);
     if (!parentLayerPlan) {
       assert.strictEqual(

@@ -31,7 +31,7 @@ import {
   map,
   reverse,
   reverseArray,
-  stepADependsOnStepB,
+  stepAMayDependOnStepB,
 } from "dataplanner";
 import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -177,6 +177,7 @@ export type PgSelectIdentifierSpec =
 
 export type PgSelectArgumentSpec =
   | {
+      // TODO: Rename to step
       plan: ExecutableStep<any>;
       pgCodec: PgTypeCodec<any, any, any, any>;
       name?: string;
@@ -2328,8 +2329,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
       // TODO:perf: we know dep can't depend on otherPlan if
       // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
       // `otherPlan`'s layerPlan.
-      const depDependsOnOtherPlan = stepADependsOnStepB(dep, otherPlan);
-      if (!depDependsOnOtherPlan) {
+      if (stepAMayDependOnStepB(otherPlan, dep)) {
         // Either dep is a static input plan (which isn't dependent on anything
         // else) or otherPlan is deeper than dep; either way we can use the dep
         // directly within otherPlan.

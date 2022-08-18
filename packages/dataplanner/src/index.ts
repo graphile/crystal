@@ -179,6 +179,7 @@ import {
   ObjectTypeFields,
   ObjectTypeSpec,
   stepADependsOnStepB,
+  stepAMayDependOnStepB,
 } from "./utils.js";
 
 export { isAsyncIterable } from "iterall";
@@ -342,6 +343,7 @@ export {
   SetterStep,
   specFromNodeId,
   stepADependsOnStepB,
+  stepAMayDependOnStepB,
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
@@ -428,6 +430,7 @@ exportAsMany({
   objectSpec,
   arrayOfLength,
   stepADependsOnStepB,
+  stepAMayDependOnStepB,
   isPromiseLike,
   isDev,
   noop,

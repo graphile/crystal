@@ -869,3 +869,16 @@ export function stepADependsOnStepB(
   }
   return false;
 }
+
+/**
+ * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
+ * mostly relates to heirarchy.)
+ */
+export function stepAMayDependOnStepB(
+  $a: ExecutableStep,
+  $b: ExecutableStep,
+): boolean {
+  return (
+    $a.layerPlan.ancestry.includes($b.layerPlan) && !stepADependsOnStepB($b, $a)
+  );
+}
