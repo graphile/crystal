@@ -359,17 +359,17 @@ export function printPlanGraph(
     */
     graph.push(
       `    Bucket${bucket.id}(${mermaidEscape(
-        `Bucket ${bucket.id} (${raisonDEtre})\n${
+        `Bucket ${bucket.id} (${raisonDEtre})${
           bucket.copyPlanIds.length > 0
-            ? `Deps: ${bucket.copyPlanIds
+            ? `\nDeps: ${bucket.copyPlanIds
                 .map((pId) => steps[pId].id)
                 .join(", ")}\n`
             : ""
-        }\n${
+        }${
           bucket.rootStepId != null
-            ? `⠀ROOT <-${bucket.reason.type}- ${bucket.rootStepId}\n`
+            ? `\nROOT ${operationPlan.dangerouslyGetStep(bucket.rootStepId)}`
             : ""
-        }${outputMapStuff.join("\n")}`,
+        }\n${outputMapStuff.join("\n")}`,
       )}):::bucket`,
     );
     graph.push(`    classDef bucket${bucket.id} stroke:${color(bucket.id)}`);
