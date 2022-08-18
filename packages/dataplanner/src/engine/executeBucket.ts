@@ -328,8 +328,15 @@ export function executeBucket(
           const map: Map<number, number[]> = new Map();
           const noDepsList: undefined[] = [];
 
-          const listPlanId = childLayerPlan.reason.parentPlanId;
-          const listPlanStore = bucket.store[listPlanId];
+          const listStepId = childLayerPlan.reason.parentPlanId;
+          const listStepStore = bucket.store[listStepId];
+
+          const itemStepId = childLayerPlan.rootStepId;
+          assert.ok(
+            itemStepId != null,
+            "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+          );
+          store[itemStepId] = [];
 
           // Prepare store with an empty list for each copyPlanId
           for (const planId of copyPlanIds) {
@@ -344,13 +351,14 @@ export function executeBucket(
             originalIndex++
           ) {
             const list: any[] | null | undefined | CrystalError =
-              listPlanStore[originalIndex];
+              listStepStore[originalIndex];
             if (Array.isArray(list)) {
               const newIndexes: number[] = [];
               map.set(originalIndex, newIndexes);
               for (let j = 0, l = list.length; j < l; j++) {
                 const newIndex = noDepsList.push(undefined) - 1;
                 newIndexes.push(newIndex);
+                store[itemStepId][newIndex] = list[j];
                 for (const planId of copyPlanIds) {
                   store[planId][newIndex] = bucket.store[planId][originalIndex];
                 }

@@ -31,6 +31,7 @@ export interface LayerPlanReasonListItem {
    *
    * Also needed for execution (see `executeBucket`).
    */
+  // TODO: rename to parentStepId
   parentPlanId: number;
 }
 /** Non-branching, deferred */
@@ -143,7 +144,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    * The root step is different for different layer step reasons:
    *
    * - root: the `operationPlan.rootValue`
-   * - list: the `__ItemStep`
+   * - listItem: the `__ItemStep`
    * - stream: also the `__ItemStep`
    * - subscription: also the `__ItemStep`
    * - mutationField: the result plan of the mutation field
@@ -162,6 +163,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
+  // TODO: rename to copyStepIds
   public copyPlanIds: number[] = [];
 
   /** @internal */

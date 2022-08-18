@@ -602,6 +602,7 @@ export class OperationPlan {
       layerPlan,
       () => new __ItemStep(listStep, depth),
     );
+    layerPlan.rootStepId = itemPlan.id;
     this.itemStepIdByListStepId[listStep.id] = itemPlan.id;
     return itemPlan;
   }
