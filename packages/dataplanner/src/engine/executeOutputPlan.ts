@@ -592,13 +592,33 @@ function getChildBucketAndIndex(
     return [bucket, bucketIndex];
   }
 
-  if (childOutputPlan.type.mode === "polymorphic") {
-    // TODO
-  }
-  if (childOutputPlan.type.mode === "array") {
-    // TODO
+  const child = bucket.children[childOutputPlan.layerPlan.id];
+  if (!child) {
+    throw new Error(
+      `GraphileInternalError<c354573b-7714-4b5b-9db1-0beae1074fec>: Could not find child for layer plan '${childOutputPlan.layerPlan.id}' in bucket for layerPlan '${bucket.layerPlan.id}'`,
+    );
   }
 
-  // Need to execute new output plan against a different bucket
-  throw new Error("TODO");
+  const out = child.map.get(bucketIndex);
+  assert.ok(
+    out != null,
+    `GraphileInternalError<e955b964-7bad-4649-84aa-a2a076c6b9ea>: Could not find a matching entry in the map for bucket index ${bucketIndex}`,
+  );
+  if (arrayIndex == null) {
+    assert.ok(
+      !Array.isArray(out),
+      "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
+    );
+    return [child.bucket, out];
+  } else {
+    assert.ok(
+      Array.isArray(out),
+      "GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array",
+    );
+    assert.ok(
+      out.length > arrayIndex,
+      `GraphileInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
+    );
+    return [child.bucket, out[arrayIndex]];
+  }
 }

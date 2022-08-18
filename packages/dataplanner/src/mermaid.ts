@@ -356,29 +356,22 @@ export function printPlanGraph(
       }
     };
     processObject(bucket.outputMap);
+    */
     graph.push(
       `    Bucket${bucket.id}(${mermaidEscape(
         `Bucket ${bucket.id} (${raisonDEtre})\n${
           bucket.copyPlanIds.length > 0
             ? `Deps: ${bucket.copyPlanIds
-                .map((pId) => steps[pId].id.replace(/^_/, ""))
+                .map((pId) => steps[pId].id)
                 .join(", ")}\n`
             : ""
-        }${(concise
-          ? bucket.rootPathIdentities.map((p) =>
-              crystalPrintPathIdentity(p, 2, 3),
-            )
-          : bucket.rootPathIdentities
-        ).join("\n")}\n${
-          bucket.rootOutputStepId != null
-            ? `⠀ROOT <-${
-                bucket.rootOutputModeType ?? "?"
-              }- ${bucket.rootOutputStepId.replace(/^_/, "")}\n`
+        }\n${
+          bucket.rootStepId != null
+            ? `⠀ROOT <-${bucket.reason.type}- ${bucket.rootStepId}\n`
             : ""
         }${outputMapStuff.join("\n")}`,
       )}):::bucket`,
     );
-    */
     graph.push(`    classDef bucket${bucket.id} stroke:${color(bucket.id)}`);
     graph.push(
       `    class ${[

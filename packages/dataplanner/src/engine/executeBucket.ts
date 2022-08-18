@@ -6,6 +6,7 @@ import { isDev } from "../dev.js";
 import type { CrystalError } from "../error.js";
 import { isCrystalError, newCrystalError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
+import { __ItemStep } from "../index.js";
 import { __ListTransformStep } from "../index.js";
 import type {
   CrystalValuesList,
@@ -246,7 +247,7 @@ export function executeBucket(
       return;
     }
     inProgressSteps.add(step);
-    if (step instanceof __ValueStep) {
+    if (step instanceof __ValueStep || step instanceof __ItemStep) {
       // Bypass execution
       return reallyCompletedStep(step);
     }
