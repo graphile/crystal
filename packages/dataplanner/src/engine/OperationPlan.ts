@@ -1331,6 +1331,7 @@ export class OperationPlan {
       } catch (e) {
         console.error(
           `Error occurred whilst processing ${step} in ${order} mode`,
+          e,
         );
         throw e;
       }
