@@ -20,6 +20,7 @@ export class __InputStaticLeafStep<TLeaf = any> extends ExecutableStep<TLeaf> {
   private readonly coercedValue: any;
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
     super();
+    this.layerPlan = this.layerPlan.operationPlan.rootLayerPlan;
     // `coerceInputValue` throws on coercion failure. NOTE: it's only safe for
     // us to call coerceInputValue because we already know this is a scalar,
     // *not* a variable, and not an object/list therefore cannot _contain_ a
