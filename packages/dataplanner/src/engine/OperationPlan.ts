@@ -1451,9 +1451,15 @@ export class OperationPlan {
      */
     const compatibleLayerPlans: LayerPlan[] = [...alsoIncludeLayerPlans];
     let currentLayerPlan: LayerPlan | null = step.layerPlan;
-    const doNotPass = step.dependencies.map(
-      (depId) => this.steps[depId].layerPlan,
-    );
+    const doNotPass = step.dependencies.map((depId) => {
+      if (isDev) {
+        assert.ok(
+          this.steps[depId] != null,
+          `GraphileInternalError<825a1c5c-ad15-49fc-a340-159799061daf>: step '${depId}' has been deleted; but '${step}' depends on it. Bug in tree shaking?`,
+        );
+      }
+      return this.steps[depId].layerPlan;
+    });
 
     do {
       if (!compatibleLayerPlans.includes(currentLayerPlan)) {
