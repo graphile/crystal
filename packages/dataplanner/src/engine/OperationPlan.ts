@@ -1229,10 +1229,12 @@ export class OperationPlan {
       }
     }
 
-    // TODO: we should be able to optimize this - we know the new and old
-    // plan so we should be able to look at just the original plan's
-    // dependencies and see if they're needed any more or not.
-    this.treeShakeSteps();
+    if (this.phase != "plan") {
+      // TODO: we should be able to optimize this - we know the new and old
+      // plan so we should be able to look at just the original plan's
+      // dependencies and see if they're needed any more or not.
+      this.treeShakeSteps();
+    }
   }
 
   private replaceSteps(
