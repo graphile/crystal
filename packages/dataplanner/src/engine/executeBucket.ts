@@ -366,17 +366,19 @@ export function executeBucket(
             }
           }
 
-          // Reference
-          const childBucket = newBucket(childLayerPlan, noDepsList, store);
-          bucket.children[childLayerPlan.id] = {
-            bucket: childBucket,
-            map,
-          };
+          if (noDepsList.length > 0) {
+            // Reference
+            const childBucket = newBucket(childLayerPlan, noDepsList, store);
+            bucket.children[childLayerPlan.id] = {
+              bucket: childBucket,
+              map,
+            };
 
-          // Execute
-          const result = executeBucket(childBucket, requestContext);
-          if (isPromiseLike(result)) {
-            childPromises.push(result);
+            // Execute
+            const result = executeBucket(childBucket, requestContext);
+            if (isPromiseLike(result)) {
+              childPromises.push(result);
+            }
           }
 
           break;
