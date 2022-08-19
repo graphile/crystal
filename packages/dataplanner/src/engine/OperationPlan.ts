@@ -991,7 +991,7 @@ export class OperationPlan {
         isUnion || isInterface,
         `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
       );
-      throw new Error("TODO");
+      throw new Error("TODO<0aed3965-4a7e-42b8-b5f8-903f2911a8cb>");
       // TODO: this is next!
     }
   }

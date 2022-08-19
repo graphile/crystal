@@ -87,10 +87,10 @@ export function executePreemptive(
       // It's a stream (either `subscription` or `@stream`)! Batch execute the child bucket for
       // each entry in the stream, and then the output plan for that.
       assert.strictEqual(ctx.root.queue.length, 0, "Stream cannot also queue");
-      throw new Error("TODO: stream");
+      throw new Error("TODO<172acb34-c9d4-48f5-a26f-1b37260ecc14>: stream");
     } else {
       if (ctx.root.queue.length > 0) {
-        throw new Error("TODO: queue");
+        throw new Error("TODO<bd02851e-9b84-410e-b6ad-d2f28f795962>: queue");
         // TODO: we should return an async iterable, the first entry in this
         // should `{data, hasNext: true, ...}` and then we stream these results
         // into it. Fresh `NullHandler`, new (deeper) path. Label.
