@@ -1310,7 +1310,7 @@ export class OperationPlan {
       } else if (deepDependenciesByStepId[z.id].has(a)) {
         return -Z_DEPENDS_ON_A;
       } else {
-        return z.id - a.id;
+        return 0;
       }
     };
 
@@ -1326,7 +1326,7 @@ export class OperationPlan {
           calculateDependencies(step);
         }
       }
-      steps.sort(sorter);
+      steps.sort((a, z) => z.id - a.id).sort(sorter);
     };
     processStepsFrom(fromStepId);
 
