@@ -235,9 +235,17 @@ export class OperationPlan {
     this.operationType = operation.operation;
 
     this.phase = "plan";
+    this.rootLayerPlan = new LayerPlan(this, null, { type: "root" });
+
+    // TODO: delete this.
+    // This doesn't do anything, it only exists to align plans more closely
+    // with an older version of the planner (to reduce the diff).
+    const _rootSelectionSetStep = withGlobalLayerPlan(
+      this.rootLayerPlan,
+      () => new __ValueStep(),
+    );
 
     // Set up the shared steps for variables, context and rootValue
-    this.rootLayerPlan = new LayerPlan(this, null, { type: "root" });
     [this.variableValuesStep, this.trackedVariableValuesStep] = this.track(
       variableValues,
       this.variableValuesConstraints,
