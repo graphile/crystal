@@ -273,6 +273,10 @@ export function executeOutputPlan(
     true,
     "Can only process an output plan for a completed bucket",
   );
+  assert.ok(
+    bucket.store[outputPlan.rootStepId],
+    `GraphileInternalError<aa9cde16-67da-4f30-9f63-3b3cbb7cb0b9>: No store entry for bucket(${bucket.layerPlan.id}/${bucket.layerPlan.reason.type})'s rootStepId ${bucket.layerPlan.rootStepId}`,
+  );
   const bucketRootValue = bucket.store[outputPlan.rootStepId][bucketIndex];
 
   if (isCrystalError(bucketRootValue)) {

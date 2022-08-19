@@ -267,6 +267,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     if (["root", "object", "polymorphic"].includes(this.type.mode)) {
       this.objectCreator = this.makeObjectCreator();
     }
+
+    this.rootStepId = this.layerPlan.operationPlan.dangerouslyGetStep(
+      this.rootStepId,
+    ).id;
   }
 
   getLayerPlans(layerPlans = new Set<LayerPlan>()): Set<LayerPlan> {
