@@ -343,7 +343,7 @@ export class OperationPlan {
    * @internal
    */
   public _addModifierStep(step: ModifierStep<any>): string {
-    if (!["step", "validate", "optimize"].includes(this.phase)) {
+    if (!["plan", "validate", "optimize"].includes(this.phase)) {
       throw new Error(
         `Creating a step during the '${this.phase}' phase is forbidden.`,
       );
