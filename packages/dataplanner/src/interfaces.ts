@@ -16,6 +16,7 @@ import type {
   GraphQLType,
 } from "graphql";
 
+import type { Bucket, RequestContext } from "./bucket.js";
 import type { Deferred } from "./deferred.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { CrystalError } from "./error.js";
@@ -750,4 +751,11 @@ export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 export interface ExecutionExtra {
   meta: Record<string, unknown>;
   eventEmitter: ExecutionEventEmitter | undefined;
+
+  // These are only needed for subroutine plans, don't use them as we may
+  // remove them later.
+  /** @internal */
+  _bucket: Bucket;
+  /** @internal */
+  _requestContext: RequestContext;
 }

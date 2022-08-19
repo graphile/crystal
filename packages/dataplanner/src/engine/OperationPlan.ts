@@ -2082,10 +2082,10 @@ export class OperationPlan {
         case "root":
         case "defer":
         case "subscription":
-        case "mutationField":
-        case "subroutine": {
+        case "mutationField": {
           break;
         }
+        case "subroutine":
         case "polymorphic":
         case "stream":
         case "listItem": {

@@ -17,7 +17,7 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
   /**
    * @internal
    */
-  public transformStepId?: string;
+  public transformStepId?: number;
 
   constructor(
     parentPlan: ExecutableStep<TData> | ExecutableStep<TData[]>,
@@ -35,5 +35,14 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
 
   execute(): never {
     throw new Error("__ItemStep must never execute");
+  }
+
+  public finalize(): void {
+    super.finalize();
+    if (this.transformStepId != null) {
+      this.transformStepId = this.opPlan.dangerouslyGetStep(
+        this.transformStepId,
+      ).id;
+    }
   }
 }

@@ -253,9 +253,11 @@ export function executeBucket(
     }
     try {
       const meta = metaByStepId[step.id]!;
-      const extra = {
+      const extra: ExecutionExtra = {
         meta,
         eventEmitter: requestContext.eventEmitter,
+        _bucket: bucket,
+        _requestContext: requestContext,
       };
       const dependencies: ReadonlyArray<any>[] = [];
       const depCount = step.dependencies.length;
@@ -497,7 +499,8 @@ export function executeBucket(
   }
 }
 
-function newBucket(
+/** @internal */
+export function newBucket(
   layerPlan: LayerPlan,
   noDepsList: readonly undefined[],
   store: Bucket["store"],

@@ -49,11 +49,13 @@ export function withGlobalState<T>(
   }
 }
 
+// TODO: remove this.
 /**
  * @internal
  */
 export function getCurrentGraphQLType(): GraphQLOutputType | undefined {
-  return getGlobalState().currentGraphQLType;
+  // return getGlobalState().currentGraphQLType;
+  return { name: "GET_CURRENT_GRAPHQL_TYPE_NO_LONGER_SUPPORTED" } as any;
 }
 
 let debug = false;

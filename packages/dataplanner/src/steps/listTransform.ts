@@ -1,9 +1,22 @@
+import * as assert from "assert";
 import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
-import type { CrystalResultsList } from "../interfaces.js";
+import type { Bucket } from "../bucket.js";
+import { isDev } from "../dev.js";
+import { executeBucket, newBucket } from "../engine/executeBucket.js";
+import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
+import { LayerPlan } from "../engine/LayerPlan.js";
+import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
+import type { CrystalError } from "../error.js";
+import type {
+  CrystalResultsList,
+  CrystalValuesList,
+  ExecutionExtra,
+} from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep } from "../step.js";
-import type { __ItemStep } from "./__item.js";
+import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isPromiseLike } from "../utils.js";
+import { __ItemStep } from "./__item.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,
@@ -59,7 +72,8 @@ export class __ListTransformStep<
     moduleName: "dataplanner",
     exportName: "__ListTransformStep",
   };
-  isSyncAndSafe = true;
+  // TODO: change this to 'true' and rewrite execute to be synchronous
+  isSyncAndSafe = false;
 
   private listPlanDepId: number;
   public itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
@@ -75,6 +89,8 @@ export class __ListTransformStep<
 
   /** Set during query planning.  */
   public itemStepId: number | null = null;
+
+  private subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
 
   constructor(
     options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,
@@ -98,6 +114,37 @@ export class __ListTransformStep<
     this.listItem = listItem;
     this.namedType = namedType;
     this.meta = meta ?? null;
+
+    // Plan this subroutine
+    this.subroutineLayer = new LayerPlan(
+      this.layerPlan.operationPlan,
+      this.layerPlan,
+      {
+        type: "subroutine",
+        parentPlanId: this.id,
+      },
+    );
+    const itemPlan = withGlobalLayerPlan(this.subroutineLayer, () => {
+      // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
+      const $__listItem = new __ItemStep(listPlan);
+      $__listItem.transformStepId = this.id;
+      const $listItem = isListCapableStep(listPlan)
+        ? listPlan.listItem($__listItem)
+        : $__listItem;
+      const $newListItem = this.itemPlanCallback($listItem as any);
+
+      if (
+        this.isSyncAndSafe &&
+        (!$__listItem.isSyncAndSafe ||
+          !$listItem.isSyncAndSafe ||
+          !$newListItem.isSyncAndSafe)
+      ) {
+        // TODO: log this deopt?
+        this.isSyncAndSafe = false;
+      }
+      return $newListItem;
+    });
+    this.subroutineLayer.rootStepId = itemPlan.id;
   }
 
   toStringMeta() {
@@ -188,10 +235,93 @@ export class __ListTransformStep<
     return super.finalize();
   }
 
-  execute(): CrystalResultsList<TMemo> {
-    throw new Error(
-      "__ListTransformStep must never execute, Crystal handles this internally",
+  async execute(
+    values: [CrystalValuesList<any[] | null | undefined | CrystalError>],
+    extra: ExecutionExtra,
+  ): Promise<CrystalResultsList<TMemo>> {
+    const bucket = extra._bucket;
+
+    const childLayerPlan = this.subroutineLayer;
+    const copyStepIds = childLayerPlan.copyPlanIds;
+
+    const store: Bucket["store"] = Object.create(null);
+    const map: Map<number, number[]> = new Map();
+    const noDepsList: undefined[] = [];
+
+    const itemStepId = childLayerPlan.rootStepId;
+    assert.ok(
+      itemStepId != null,
+      "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
     );
+    store[itemStepId] = [];
+
+    // Prepare store with an empty list for each copyPlanId
+    for (const planId of copyStepIds) {
+      store[planId] = [];
+    }
+
+    const listValues = values[this.listPlanDepId];
+
+    // We'll typically be creating more listItem bucket entries than we
+    // have parent buckets, so we must "multiply up" the store entries.
+    for (
+      let originalIndex = 0;
+      originalIndex < listValues.length;
+      originalIndex++
+    ) {
+      const list = listValues[originalIndex];
+      if (Array.isArray(list)) {
+        const newIndexes: number[] = [];
+        map.set(originalIndex, newIndexes);
+        for (let j = 0, l = list.length; j < l; j++) {
+          const newIndex = noDepsList.push(undefined) - 1;
+          newIndexes.push(newIndex);
+          store[itemStepId][newIndex] = list[j];
+          for (const planId of copyStepIds) {
+            store[planId][newIndex] = bucket.store[planId][originalIndex];
+          }
+        }
+      }
+    }
+
+    if (noDepsList.length > 0) {
+      const childBucket = newBucket(childLayerPlan, noDepsList, store);
+      await executeBucket(childBucket, extra._requestContext);
+    }
+
+    const depResults = store[childLayerPlan.rootStepId!];
+
+    return listValues.map((list: any, originalIndex: number) => {
+      if (list == null) {
+        return list;
+      }
+      const indexes = map.get(originalIndex);
+      if (!Array.isArray(list) || !Array.isArray(indexes)) {
+        // TODO: should this be an error?
+        console.warn(
+          `Either list or values was not an array when processing ${this}`,
+        );
+        return null;
+      }
+      const values = indexes.map((idx) => depResults[originalIndex][idx]);
+      if (isDev) {
+        assert.strictEqual(
+          list.length,
+          values.length,
+          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformStep",
+        );
+      }
+      const initialState = this.initialState();
+      const reduceResult = list.reduce(
+        (memo, entireItemValue, listEntryIndex) =>
+          this.reduceCallback(memo, entireItemValue, values[listEntryIndex]),
+        initialState,
+      );
+      const finalResult = this.finalizeCallback
+        ? this.finalizeCallback(reduceResult)
+        : reduceResult;
+      return finalResult;
+    });
   }
 }
 
