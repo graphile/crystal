@@ -2042,8 +2042,12 @@ export class OperationPlan {
             `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
           );
         }
-        for (const depId of step.dependencies) {
-          this.steps[depId].dependentPlans.push(step);
+        for (let i = 0, l = step.dependencies.length; i < l; i++) {
+          const dep = this.steps[step.dependencies[i]];
+          // Overwrite the dependency id with its resolved ID so we don't need
+          // to look it up in executeBucket
+          (step.dependencies as number[])[i] = dep.id;
+          dep.dependentPlans.push(step);
         }
       }
     }
