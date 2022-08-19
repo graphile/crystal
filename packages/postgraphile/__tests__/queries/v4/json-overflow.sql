@@ -109,202 +109,202 @@ from (
 ) as __post_identifiers__,
 lateral (
   select
-    __post__."headline" as "0",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id0"
-    ) as "1",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id1"
-    ) as "2",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id2"
-    ) as "3",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id3"
-    ) as "4",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id4"
-    ) as "5",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id5"
-    ) as "6",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id6"
-    ) as "7",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id7"
-    ) as "8",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id8"
-    ) as "9",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id9"
-    ) as "10",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id10"
-    ) as "11",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id11"
-    ) as "12",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id12"
-    ) as "13",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id13"
-    ) as "14",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id14"
-    ) as "15",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id15"
-    ) as "16",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id16"
-    ) as "17",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id17"
-    ) as "18",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id18"
-    ) as "19",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id19"
-    ) as "20",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id20"
-    ) as "21",
-    "a"."post_headline_trimmed"(
-      __post__,
-      __post_identifiers__."id21"
-    ) as "22",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id22"
-    ) as "23",
+    ) as "0",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id23"
-    ) as "24",
+    ) as "1",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id24"
-    ) as "25",
+    ) as "2",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id25"
-    ) as "26",
+    ) as "3",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id26"
-    ) as "27",
+    ) as "4",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id27"
-    ) as "28",
+    ) as "5",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id28"
-    ) as "29",
+    ) as "6",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id29"
-    ) as "30",
+    ) as "7",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id30"
-    ) as "31",
+    ) as "8",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id31"
-    ) as "32",
+    ) as "9",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id32"
-    ) as "33",
+    ) as "10",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id33"
-    ) as "34",
+    ) as "11",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id34"
-    ) as "35",
+    ) as "12",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id35"
-    ) as "36",
+    ) as "13",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id36"
-    ) as "37",
+    ) as "14",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id37"
-    ) as "38",
+    ) as "15",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id38"
-    ) as "39",
+    ) as "16",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id39"
-    ) as "40",
+    ) as "17",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id40"
-    ) as "41",
+    ) as "18",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id41"
-    ) as "42",
+    ) as "19",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id42"
-    ) as "43",
+    ) as "20",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id43"
-    ) as "44",
+    ) as "21",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id44"
-    ) as "45",
+    ) as "22",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id45"
-    ) as "46",
+    ) as "23",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id46"
-    ) as "47",
+    ) as "24",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id47"
-    ) as "48",
+    ) as "25",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id48"
+    ) as "26",
+    __post__."headline" as "27",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id0"
+    ) as "28",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id1"
+    ) as "29",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id2"
+    ) as "30",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id3"
+    ) as "31",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id4"
+    ) as "32",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id5"
+    ) as "33",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id6"
+    ) as "34",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id7"
+    ) as "35",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id8"
+    ) as "36",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id9"
+    ) as "37",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id10"
+    ) as "38",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id11"
+    ) as "39",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id12"
+    ) as "40",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id13"
+    ) as "41",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id14"
+    ) as "42",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id15"
+    ) as "43",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id16"
+    ) as "44",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id17"
+    ) as "45",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id18"
+    ) as "46",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id19"
+    ) as "47",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id20"
+    ) as "48",
+    "a"."post_headline_trimmed"(
+      __post__,
+      __post_identifiers__."id21"
     ) as "49",
     "a"."post_headline_trimmed"(
       __post__,
