@@ -25,6 +25,7 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
+import { inspect } from "util";
 
 import type { Constraint } from "../constraints.js";
 import {
@@ -2075,6 +2076,31 @@ export class OperationPlan {
         }
         return true;
       });
+      // Update plan references so executeBucket doesn't need to do explicit lookups
+      const reason = layerPlan.reason;
+      switch (reason.type) {
+        case "root":
+        case "defer":
+        case "subscription":
+        case "mutationField":
+        case "subroutine": {
+          break;
+        }
+        case "polymorphic":
+        case "stream":
+        case "listItem": {
+          reason.parentPlanId = this.steps[reason.parentPlanId].id;
+          break;
+        }
+        default: {
+          const never: never = reason;
+          throw new Error(
+            `GraphileInternalError<0ac8d6d7-3a02-4c84-99c1-21ad77e3a8f7>: unrecognized layer plan reason ${inspect(
+              never,
+            )}`,
+          );
+        }
+      }
     }
   }
 
