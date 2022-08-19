@@ -1,6 +1,10 @@
 NEXT UP:
 
-- Strip @defer/@stream from introspection before handing to GraphQL.js
+- Fix all instances of GraphQLError so the errors come out right (particularly
+  connections-blankcursor.test.graphql)
+- Introspection:
+  - Strip @defer/@stream from introspection before handing to GraphQL.js
+  - Extract list of variables used, shallow-compare variables to use for cache
 - Side effect plans
 
 - polymorphicDeduplicateSteps: need to delete the LayerPlans that aren't needed
