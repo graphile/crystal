@@ -72,9 +72,6 @@ import { digestSchema } from "./lib/digestSchema.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
-const BEFORE = -1;
-const AFTER = 1;
-
 function isNotNullish<T>(v: T | undefined | null): v is T {
   return v != null;
 }
