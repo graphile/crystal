@@ -1326,48 +1326,38 @@ export class OperationPlan {
       return;
     }
 
-    // Calculate the deep dependencies of every step in `steps`
-    const deepDependenciesByStepId: {
-      [dependentStepId: number]: Set<ExecutableStep>;
-    } = Object.create(null);
-    const calculateDependencies = (
-      step: ExecutableStep,
-    ): Set<ExecutableStep> => {
-      let deepDeps: Set<ExecutableStep> = deepDependenciesByStepId[step.id];
-      if (deepDeps) {
-        return deepDeps;
-      }
-      deepDependenciesByStepId[step.id] = deepDeps = new Set();
-      for (const depId of step.dependencies) {
-        const depStep = this.steps[depId];
-        deepDeps.add(depStep);
-        const depDeepDeps = calculateDependencies(depStep);
-        for (const deepDepStep of depDeepDeps) {
-          deepDeps.add(deepDepStep);
-        }
-      }
-      return deepDeps;
-    };
-
-    // Sort steps into the order to be processed.
-    // If `a` depends on `z` then `a` should come before `z` in dependents-first mode
-    const A_DEPENDS_ON_Z = order === "dependents-first" ? BEFORE : AFTER;
-    // If `z` depends on `a` then `a` should come after `z` in dependents-first mode
-    const Z_DEPENDS_ON_A = order === "dependents-first" ? AFTER : BEFORE;
-    // We want to `.pop()` steps from our list because that's more performant
-    // than `.shift()`, so we actually sort into reverse order
-    const sorter = (a: ExecutableStep, z: ExecutableStep) => {
-      if (deepDependenciesByStepId[a.id].has(z)) {
-        return -A_DEPENDS_ON_Z;
-      } else if (deepDependenciesByStepId[z.id].has(a)) {
-        return -Z_DEPENDS_ON_A;
-      } else {
-        return 0;
-      }
-    };
-
     let previousStepCount = this.stepCount;
     const steps: ExecutableStep[] = [];
+
+    /** Sort steps into the order to be processed. */
+    const sortSteps = () => {
+      const ordered: ExecutableStep[] = [];
+      /** Adds 'step' to ordered, ensuring that all step's dependencies are there first */
+      const process = (step: ExecutableStep) => {
+        if (ordered.includes(step)) {
+          return;
+        }
+        const deps = step.dependencies.map((depId) => this.steps[depId]);
+        for (const dep of deps) {
+          if (steps.includes(dep)) {
+            process(dep);
+          }
+        }
+        ordered.push(step);
+      };
+      for (let i = 0, l = steps.length; i < l; i++) {
+        process(steps[i]);
+      }
+
+      // We want to `.pop()` steps from our list because that's more performant
+      // than `.shift()`, so we actually sort into reverse order
+      if (order === "dependencies-first") {
+        ordered.reverse();
+      } else {
+        //noop
+      }
+      steps.splice(0, steps.length, ...ordered);
+    };
 
     // DELIBERATELY shadows `fromStepId`
     const processStepsFrom = (fromStepId: number) => {
@@ -1375,10 +1365,9 @@ export class OperationPlan {
         const step = this.steps[stepId];
         if (step && step.id === stepId) {
           steps.push(step);
-          calculateDependencies(step);
         }
       }
-      steps.sort((a, z) => z.id - a.id).sort(sorter);
+      sortSteps();
     };
     processStepsFrom(fromStepId);
 
@@ -1398,13 +1387,6 @@ export class OperationPlan {
 
       if (replacementStep != step) {
         this.replaceStep(step, replacementStep);
-
-        for (const planId in deepDependenciesByStepId) {
-          const set = deepDependenciesByStepId[planId];
-          if (set.delete(step)) {
-            set.add(replacementStep);
-          }
-        }
       }
 
       if (this.stepCount > previousStepCount) {
