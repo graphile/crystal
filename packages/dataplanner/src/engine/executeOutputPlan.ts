@@ -298,8 +298,7 @@ export function executeOutputPlan(
   }
   switch (outputPlan.type.mode) {
     case "root":
-    case "object":
-    case "polymorphic": {
+    case "object": {
       let typeName: string;
       if (outputPlan.type.mode === "root") {
         typeName = outputPlan.type.typeName;
@@ -402,6 +401,37 @@ export function executeOutputPlan(
       }
 
       return data;
+    }
+    case "polymorphic": {
+      if (bucketRootValue == null) {
+        return null;
+      }
+      assert.ok(
+        isPolymorphicData(bucketRootValue),
+        "Expected polymorphic data",
+      );
+      const typeName = bucketRootValue[$$concreteType];
+      assert.ok(
+        typeName,
+        "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
+      );
+      const polymorphicOutputPlan = outputPlan.childByTypeName[typeName];
+      assert.ok(
+        polymorphicOutputPlan,
+        `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}'`,
+      );
+      const child = bucket.children[polymorphicOutputPlan.layerPlan.id];
+      assert.ok(
+        child,
+        `GraphileInternalError<d0cd0617-cc9a-4ad9-b376-4fb7de8e4d3b>: Couldn't find the child bucket`,
+      );
+      const childIndex = child.map.get(bucketIndex);
+      assert.ok(
+        typeof childIndex === "number",
+        `GraphileInternalError<f5f2cedb-f4c4-4201-9199-896e4d3e62bd>: Expected child index to be a number`,
+      );
+      executeOutputPlan(ctx, polymorphicOutputPlan, child.bucket, childIndex);
+      break;
     }
     case "array": {
       if (!Array.isArray(bucketRootValue)) {
