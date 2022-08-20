@@ -1,7 +1,9 @@
 NEXT UP:
 
-- Fix all instances of GraphQLError so the errors come out right (particularly
-  connections-blankcursor.test.graphql)
+- [x] Fix all instances of GraphQLError so the errors come out right
+      (particularly connections-blankcursor.test.graphql)
+- [ ] When using a constant for `node(id: "...")` we should be able to determine
+      what the type is and _only_ plan that type, not all Node types.
 - Introspection:
   - Strip @defer/@stream from introspection before handing to GraphQL.js
   - Extract list of variables used, shallow-compare variables to use for cache
