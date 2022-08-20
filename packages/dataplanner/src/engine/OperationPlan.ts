@@ -33,6 +33,10 @@ import {
   getDirectiveArg,
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
+import {
+  interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
+  typesUsedInSelections,
+} from "../graphqlMergeSelectionSets.js";
 import type { ModifierStep } from "../index.js";
 import {
   __ItemStep,
@@ -51,6 +55,7 @@ import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import { $$crystalWrapped, isCrystalWrapped } from "../resolvers.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
+import { isPolymorphicStep } from "../step.js";
 import {
   assertExecutableStep,
   assertFinalized,
@@ -1048,16 +1053,128 @@ export class OperationPlan {
         selections!,
       );
     } else {
-      // Polymorphic?
-      // TODO: graphqlMergeSelectionSets ?
+      // Polymorphic
       const isUnion = isUnionType(nullableFieldType);
       const isInterface = isInterfaceType(nullableFieldType);
       assert.ok(
         isUnion || isInterface,
         `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
       );
+      assert.ok(
+        selections,
+        "GraphileInternalError<d94e281c-1a10-463e-b7f5-2b0a3665d99b>: A polymorphic type with no selections is invalid",
+      );
+
+      /*
+       * Planning for polymorphic types is somewhat more complicated than for
+       * other types.
+       *
+       * First we ensure we're dealing with a polymorphic step.
+       */
+      assert.ok(
+        isPolymorphicStep($step),
+        `${$step} is not a polymorphic capable step, it must have a planForType method`,
+      );
+
+      /*
+       * Next, we figure out the list of `possibleTypes` based on the
+       * union/interface and any other constraints that we know. NOTE: we can't
+       * discount a type just because it doesn't have any fragments that apply
+       * to it - instead we must still plan an empty selection set, and we need
+       * to know it exists for that. See
+       * https://github.com/graphql/graphql-spec/issues/951#issuecomment-1140957685
+       */
+      const possibleObjectTypes = isUnion
+        ? typesUsedInSelections(this, nullableFieldType.getTypes(), selections)
+        : (() => {
+            const interfaceType = nullableFieldType;
+            const implementations =
+              this.schema.getImplementations(interfaceType).objects;
+            if (
+              interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+                this,
+                interfaceType,
+                selections,
+              )
+            ) {
+              return implementations;
+            } else {
+              return typesUsedInSelections(this, implementations, selections);
+            }
+          })();
+
+      /*
+       * Then we call the `planForType` method for each of these types. For
+       * each unique returned plan we create a polymorphic LayerPlan, creating
+       * a set of `polymorphicLayerPlans`.
+       */
+      const map = new Map<ExecutableStep, GraphQLObjectType[]>();
+      for (const type of possibleObjectTypes) {
+        const stepForType = $step.planForType(type);
+        const arr = map.get(stepForType) ?? [];
+        arr.push(type);
+        map.set(stepForType, arr);
+      }
+      // TODO: can we dedupe these steps and merge the types?
+
+      const polymorphicLayerPlanByObjectType = new Map<
+        GraphQLObjectType,
+        LayerPlan<LayerPlanReasonPolymorphic>
+      >();
+      const polymorphicLayerPlans: LayerPlan[] = [];
+      for (const [$root, types] of map.entries()) {
+        const polymorphicLayerPlan = new LayerPlan(this, $step.layerPlan, {
+          type: "polymorphic",
+          typeNames: types.map((t) => t.name),
+          parentPlanId: $step.id,
+        });
+        polymorphicLayerPlan.rootStepId = $root.id;
+        polymorphicLayerPlans.push(polymorphicLayerPlan);
+        for (const type of types) {
+          polymorphicLayerPlanByObjectType.set(type, polymorphicLayerPlan);
+        }
+      }
+
+      /*
+       * Then for each `possibleType` create a nested polymorphic LayerPlan
+       * (assuming the relevant one covers more than one type) and then plan
+       * the fields (BUT NOT THEIR SELECTION SETS) into this LayerPlan. DO NOT
+       * USE REGULAR DEDUPLICATION!
+       */
+      for (const type of possibleObjectTypes) {
+        const polymorphicLayerPlan =
+          polymorphicLayerPlanByObjectType.get(type)!;
+        const specificLayerPlan = (() => {
+          if (polymorphicLayerPlan.reason.typeNames.length === 1) {
+            return polymorphicLayerPlan;
+          }
+          const lp = new LayerPlan(this, polymorphicLayerPlan, {
+            type: "polymorphic",
+            typeNames: [type.name],
+            parentPlanId: $step.id,
+          });
+          lp.rootStepId = polymorphicLayerPlan.rootStepId;
+        })();
+      }
+
+      /*
+       * Then call `polymorphicDeduplicateSteps()`.
+       *
+       * Finally, plan the selection sets for all the fields we previously
+       * postponed.
+       */
+
+      const polymorphicOutputPlan = new OutputPlan(
+        $step.layerPlan,
+        $step,
+        {
+          mode: "polymorphic",
+          deferLabel: null,
+        },
+        node,
+      );
+
       throw new Error("TODO<0aed3965-4a7e-42b8-b5f8-903f2911a8cb>");
-      // TODO: this is next!
     }
   }
 

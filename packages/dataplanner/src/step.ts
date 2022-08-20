@@ -443,8 +443,16 @@ export function isStreamableStep<TData>(
 }
 
 export type PolymorphicStep = ExecutableStep & {
+  // TODO: rename me to stepForType
   planForType(objectType: GraphQLObjectType): ExecutableStep;
 };
+
+export function isPolymorphicStep(s: ExecutableStep): s is PolymorphicStep {
+  return (
+    "planForType" in s &&
+    typeof (s as PolymorphicStep).planForType === "function"
+  );
+}
 
 /**
  * Modifier plans modify their parent plan (which may be another ModifierStep
