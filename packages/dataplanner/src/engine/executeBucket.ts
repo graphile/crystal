@@ -443,6 +443,10 @@ export function executeBucket(
           const polymorphicPlanId = childLayerPlan.reason.parentPlanId;
           const polymorphicPlanStore = bucket.store[polymorphicPlanId];
 
+          for (const planId of copyStepIds) {
+            store[planId] = [];
+          }
+
           for (
             let originalIndex = 0;
             originalIndex < bucket.size;
