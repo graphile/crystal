@@ -1,8 +1,8 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
 import type {
+  ASTNode,
   FieldNode,
-  GraphQLError,
   GraphQLObjectType,
   GraphQLScalarType,
 } from "graphql";
@@ -108,9 +108,11 @@ export type OutputPlanKeyValue =
       type: "outputPlan";
       outputPlan: OutputPlan;
       isNonNull: boolean;
+      node: ASTNode | readonly ASTNode[];
     }
   | {
       type: "__typename";
+      node: ASTNode | readonly ASTNode[];
     };
 
 /**
@@ -123,6 +125,9 @@ export type OutputPlanKeyValue =
  * - streams: a list of streams that were created
  */
 export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
+  /** For errors */
+  public readonly node: ASTNode | readonly ASTNode[];
+
   /**
    * The step that represents the root value. How this is used depends on the
    * OutputPlanMode.
@@ -168,7 +173,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
      */
     rootStep: ExecutableStep,
     public readonly type: TType,
+    node: ASTNode | readonly ASTNode[],
   ) {
+    this.node = node;
     this.rootStepId = rootStep.id;
     if (type.mode === "polymorphic") {
       if (this.layerPlan.reason.type !== "polymorphic") {

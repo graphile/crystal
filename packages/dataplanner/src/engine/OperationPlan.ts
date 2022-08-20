@@ -1,6 +1,7 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import type {
+  ASTNode,
   FieldNode,
   FragmentDefinitionNode,
   GraphQLField,
@@ -437,10 +438,15 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
-    const outputPlan = new OutputPlan(this.rootLayerPlan, this.rootValueStep, {
-      mode: "root",
-      typeName: this.queryType.name,
-    });
+    const outputPlan = new OutputPlan(
+      this.rootLayerPlan,
+      this.rootValueStep,
+      {
+        mode: "root",
+        typeName: this.queryType.name,
+      },
+      this.operation.selectionSet.selections,
+    );
     this.rootOutputPlan = outputPlan;
     this.planSelectionSet(
       outputPlan,
@@ -462,10 +468,15 @@ export class OperationPlan {
       throw new Error("No mutation type found in schema");
     }
     this.deduplicateSteps();
-    const outputPlan = new OutputPlan(this.rootLayerPlan, this.rootValueStep, {
-      mode: "root",
-      typeName: rootType.name,
-    });
+    const outputPlan = new OutputPlan(
+      this.rootLayerPlan,
+      this.rootValueStep,
+      {
+        mode: "root",
+        typeName: rootType.name,
+      },
+      this.operation.selectionSet.selections,
+    );
     this.rootOutputPlan = outputPlan;
     this.planSelectionSet(
       outputPlan,
@@ -551,6 +562,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         this.rootValueStep,
         { mode: "root", typeName: rootType.name },
+        this.operation.selectionSet.selections,
       );
       this.rootOutputPlan = outputPlan;
       this.planSelectionSet(
@@ -576,6 +588,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         this.rootValueStep,
         { mode: "root", typeName: rootType.name },
+        this.operation.selectionSet.selections,
       );
       this.rootOutputPlan = outputPlan;
       this.planSelectionSet(
@@ -664,10 +677,16 @@ export class OperationPlan {
           const isNonNull = isNonNullType(fieldType);
           outputPlan.addChild(objectType, responseKey, {
             type: "outputPlan",
-            outputPlan: new OutputPlan(outputPlan.layerPlan, step, {
-              mode: "null",
-            }),
+            outputPlan: new OutputPlan(
+              outputPlan.layerPlan,
+              step,
+              {
+                mode: "null",
+              },
+              field,
+            ),
             isNonNull,
+            node: field,
           });
         } else {
           this.planIntoOutputPlan(
@@ -678,6 +697,7 @@ export class OperationPlan {
             responseKey,
             fieldType,
             step,
+            field,
           );
         }
 
@@ -707,7 +727,10 @@ export class OperationPlan {
 
       if (fieldName.startsWith("__")) {
         if (fieldName === "__typename") {
-          outputPlan.addChild(objectType, responseKey, { type: "__typename" });
+          outputPlan.addChild(objectType, responseKey, {
+            type: "__typename",
+            node: fields,
+          });
         } else {
           const variableNames = findVariableNamesUsed(this, field);
           outputPlan.addChild(objectType, responseKey, {
@@ -725,7 +748,9 @@ export class OperationPlan {
                   maxLength: 3,
                 }),
               },
+              fields,
             ),
+            node: fields,
           });
         }
         continue;
@@ -897,20 +922,27 @@ export class OperationPlan {
     responseKey: string | null,
     fieldType: GraphQLOutputType,
     $step: ExecutableStep,
+    node: ASTNode | readonly ASTNode[],
     listDepth = 0,
   ) {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
     if (isListType(nullableFieldType)) {
-      const listOutputPlan = new OutputPlan(parentOutputPlan.layerPlan, $step, {
-        mode: "array",
-        streamedOutputPlan: null,
-        streamLabel: null,
-      });
+      const listOutputPlan = new OutputPlan(
+        parentOutputPlan.layerPlan,
+        $step,
+        {
+          mode: "array",
+          streamedOutputPlan: null,
+          streamLabel: null,
+        },
+        node,
+      );
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         outputPlan: listOutputPlan,
         isNonNull,
+        node,
       });
 
       const $__item = this.itemStepForListStep($step, listDepth);
@@ -927,6 +959,7 @@ export class OperationPlan {
         null,
         nullableFieldType.ofType,
         $item,
+        node,
         listDepth + 1,
       );
     } else if (isScalarType(nullableFieldType)) {
@@ -941,20 +974,32 @@ export class OperationPlan {
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         isNonNull,
-        outputPlan: new OutputPlan($leaf.layerPlan, $leaf, {
-          mode: "leaf",
-          stepId: $leaf.id,
-          serialize: nullableFieldType.serialize,
-        }),
+        outputPlan: new OutputPlan(
+          $leaf.layerPlan,
+          $leaf,
+          {
+            mode: "leaf",
+            stepId: $leaf.id,
+            serialize: nullableFieldType.serialize,
+          },
+          node,
+        ),
+        node,
       });
     } else if (isEnumType(nullableFieldType)) {
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         isNonNull,
-        outputPlan: new OutputPlan($step.layerPlan, $step, {
-          mode: "leaf",
-          serialize: nullableFieldType.serialize,
-        }),
+        outputPlan: new OutputPlan(
+          $step.layerPlan,
+          $step,
+          {
+            mode: "leaf",
+            serialize: nullableFieldType.serialize,
+          },
+          node,
+        ),
+        node,
       });
     } else if (isObjectType(nullableFieldType)) {
       // TODO: graphqlMergeSelectionSets ?
@@ -974,15 +1019,21 @@ export class OperationPlan {
           );
         }
       }
-      const objectOutputPlan = new OutputPlan($step.layerPlan, $step, {
-        mode: "object",
-        deferLabel: null,
-        typeName: nullableFieldType.name,
-      });
+      const objectOutputPlan = new OutputPlan(
+        $step.layerPlan,
+        $step,
+        {
+          mode: "object",
+          deferLabel: null,
+          typeName: nullableFieldType.name,
+        },
+        node,
+      );
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         outputPlan: objectOutputPlan,
         isNonNull,
+        node,
       });
       this.planSelectionSet(
         objectOutputPlan,

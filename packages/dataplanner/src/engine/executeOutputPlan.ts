@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import type { DocumentNode, FieldNode } from "graphql";
+import type { ASTNode, DocumentNode, FieldNode } from "graphql";
 import { executeSync, GraphQLError, Kind, OperationTypeNode } from "graphql";
 import { inspect } from "util";
 
@@ -193,6 +193,7 @@ export class NullHandler {
     public parentNullHandler: NullHandler | null,
     private isNonNull: boolean,
     private path: ReadonlyArray<string | number>,
+    private node: ASTNode | readonly ASTNode[],
   ) {
     if (parentNullHandler) {
       this.root = parentNullHandler.root;
@@ -220,7 +221,7 @@ export class NullHandler {
           new GraphQLError(
             // TODO: properly populate this error!
             "non-null violation",
-            null,
+            this.node,
             null,
             null,
             this.path,
@@ -286,13 +287,13 @@ export function executeOutputPlan(
     // > errors list per field.
     // -- https://spec.graphql.org/draft/#sel-EANTNDLAACNAn7V
     throw new GraphQLError(
-      bucketRootValue.message,
-      null,
-      null,
-      null,
-      ctx.path,
-      bucketRootValue,
-      null,
+      bucketRootValue.originalError.message,
+      outputPlan.node, // node
+      undefined, // source
+      null, // positions
+      ctx.path, // path
+      bucketRootValue.originalError, // originalError
+      null, // extensions
     );
   }
   switch (outputPlan.type.mode) {
@@ -334,7 +335,7 @@ export function executeOutputPlan(
           path: newPath,
           nullRoot: spec.isNonNull
             ? ctx.nullRoot
-            : new NullHandler(ctx.nullRoot, spec.isNonNull, newPath),
+            : new NullHandler(ctx.nullRoot, spec.isNonNull, newPath, spec.node),
         };
 
         const doIt = (): unknown => {
@@ -439,7 +440,12 @@ export function executeOutputPlan(
           path: newPath,
           nullRoot: childIsNonNull
             ? ctx.nullRoot
-            : new NullHandler(ctx.nullRoot, childIsNonNull, newPath),
+            : new NullHandler(
+                ctx.nullRoot,
+                childIsNonNull,
+                newPath,
+                outputPlan.node,
+              ),
         };
         const doIt = () =>
           executeOutputPlan(
