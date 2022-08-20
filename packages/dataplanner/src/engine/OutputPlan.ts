@@ -199,6 +199,42 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     }
   }
 
+  public print(): string {
+    const type = this.type;
+    switch (type.mode) {
+      case "root":
+      case "object": {
+        return `${this.toString()}\n${Object.entries(this.keys[type.typeName])
+          .map(([fieldName, val]) => {
+            return `.${fieldName}: ${
+              val.type === "__typename"
+                ? `__typename(${type.typeName})`
+                : val.outputPlan.print().replace(/\n/g, "\n  ")
+            }`;
+          })
+          .join("\n")}`;
+      }
+      case "polymorphic": {
+        return `${this.toString()}\n${Object.entries(this.childByTypeName)
+          .map(([typeName, outputPlan]) => {
+            return `? ${typeName}: ${outputPlan
+              .print()
+              .replace(/\n/g, "\n  ")}`;
+          })
+          .join("\n")}`;
+      }
+      case "array": {
+        return `${this.toString()}\n  ${this.child!.print().replace(
+          /\n/g,
+          "\n  ",
+        )}`;
+      }
+      default: {
+        return this.toString();
+      }
+    }
+  }
+
   toString() {
     return `OutputPlan<${this.type.mode}|${this.layerPlan.id}|${this.rootStepId}>`;
   }
