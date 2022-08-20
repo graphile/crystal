@@ -7,7 +7,6 @@ import type { CrystalError } from "../error.js";
 import { isCrystalError, newCrystalError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
 import { __ItemStep } from "../index.js";
-import { __ListTransformStep } from "../index.js";
 import type {
   CrystalValuesList,
   ExecutionExtra,
