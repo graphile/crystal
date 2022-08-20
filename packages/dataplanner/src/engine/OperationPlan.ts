@@ -1110,6 +1110,7 @@ export class OperationPlan {
         {
           mode: "polymorphic",
           deferLabel: null,
+          typeNames: possibleObjectTypes.map((t) => t.name),
         },
         node,
       );
@@ -1153,7 +1154,7 @@ export class OperationPlan {
           {
             mode: "object",
             deferLabel: null,
-            typeName: nullableFieldType.name,
+            typeName: type.name,
           },
           node,
         );
@@ -1593,6 +1594,20 @@ export class OperationPlan {
         this.markStepActive(this.steps[outputPlan.rootStepId], activeSteps);
       }
     });
+
+    // TODO: had to add the code ensuring all the layer plan parentPlanId's
+    // existed to fix polymorphism, but it feels wrong. Should we be doing
+    // something different?
+
+    // Ensure all the layer plan parents exist
+    for (const layerPlan of this.layerPlans) {
+      if ("parentPlanId" in layerPlan.reason) {
+        this.markStepActive(
+          this.steps[layerPlan.reason.parentPlanId],
+          activeSteps,
+        );
+      }
+    }
 
     for (let i = 0, l = this.steps.length; i < l; i++) {
       const step = this.steps[i];
@@ -2307,6 +2322,11 @@ export class OperationPlan {
     callback(outputPlan);
     if (outputPlan.child) {
       this.walkOutputPlans(outputPlan.child, callback);
+    }
+    if (outputPlan.childByTypeName) {
+      Object.values(outputPlan.childByTypeName).forEach((childOutputPlan) => {
+        this.walkOutputPlans(childOutputPlan, callback);
+      });
     }
     for (const key of Object.values(outputPlan.keys).flatMap((o) =>
       Object.values(o),

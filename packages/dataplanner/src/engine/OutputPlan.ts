@@ -55,6 +55,7 @@ export type OutputPlanTypePolymorphicObject = {
    * Return `{}` if non-null
    */
   mode: "polymorphic";
+  typeNames: string[];
   deferLabel: string | null;
 };
 export type OutputPlanTypeArray = {
@@ -154,7 +155,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   public childIsNonNull = false;
 
   /**
-   * For object/polymorphic output plan types only.
+   * For polymorphic output plans, the Object output plan for each specific type.
+   */
+  public childByTypeName: {
+    [typeName: string]: OutputPlan<OutputPlanTypeObject>;
+  } = Object.create(null);
+
+  /**
+   * For object output plan types only.
    */
   public deferredOutputPlans: OutputPlan<
     OutputPlanTypeObject | OutputPlanTypePolymorphicObject
@@ -163,7 +171,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   constructor(
     public layerPlan: LayerPlan,
     /**
-     * For root, object and polymorphic this could represent an object or null.
+     * For root, this should always be an object.
+     *
+     * For object this could represent an object or null.
+     *
+     * For polymorphic this could represent a polymorphic object or null.
      *
      * For array it's the list itself (or null) and dictates the length of the result.
      *
@@ -178,12 +190,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     this.node = node;
     this.rootStepId = rootStep.id;
     if (type.mode === "polymorphic") {
-      if (this.layerPlan.reason.type !== "polymorphic") {
-        throw new Error(
-          "Polymorphic output plan with non-polymorphic layer plan?",
-        );
-      }
-      const typeNames = this.layerPlan.reason.typeNames;
+      const typeNames = type.typeNames;
       for (const typeName of typeNames) {
         this.keys[typeName] = Object.create(null);
       }
@@ -201,11 +208,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     key: string | null,
     child: OutputPlanKeyValue,
   ): void {
-    if (
-      this.type.mode === "root" ||
-      this.type.mode === "object" ||
-      this.type.mode === "polymorphic"
-    ) {
+    if (this.type.mode === "root" || this.type.mode === "object") {
       if (isDev) {
         if (typeof key !== "string") {
           throw new Error(
@@ -228,7 +231,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
         if (!this.keys[type.name]) {
           throw new Error(
-            `GraphileInternalError<58c311df-8bbc-4dad-bd1f-562cc38f9a06>: type '${type.name}' not known to this OutputPlan`,
+            `GraphileInternalError<58c311df-8bbc-4dad-bd1f-562cc38f9a06>: type '${type.name}' not known to this OutputPlan (${this.type.typeName})`,
           );
         }
         if (this.keys[type.name][key]) {
@@ -260,6 +263,26 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           `GraphileInternalError<7525c854-9145-4c6d-8d60-79c14f040519>: Array child must be an outputPlan`,
         );
       }
+    } else if (this.type.mode === "polymorphic") {
+      assert.ok(
+        type && this.type.typeNames.includes(type.name),
+        "GraphileInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
+      );
+      assert.strictEqual(
+        key,
+        null,
+        "GraphileInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
+      );
+      assert.ok(
+        child.type === "outputPlan",
+        "GraphileInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
+      );
+      assert.ok(
+        child.outputPlan.type.mode === "object",
+        "GraphileInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
+      );
+      this.childByTypeName[type.name] =
+        child.outputPlan as OutputPlan<OutputPlanTypeObject>;
     } else {
       throw new Error(
         `GraphileInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
@@ -271,7 +294,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   public objectCreator: ((typeName: string) => Record<string, unknown>) | null =
     null;
   finalize() {
-    if (["root", "object", "polymorphic"].includes(this.type.mode)) {
+    if (["root", "object"].includes(this.type.mode)) {
       this.objectCreator = this.makeObjectCreator();
     }
 
