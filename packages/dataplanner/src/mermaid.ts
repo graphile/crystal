@@ -326,7 +326,11 @@ export function printPlanGraph(
       ([id, plan]) =>
         plan && plan.id === Number(id) && plan.bucketId === bucket.id,
     );
-    const raisonDEtre = bucket.reason.type;
+    const raisonDEtre =
+      bucket.reason.type +
+      (bucket.reason.type === "polymorphic"
+        ? `(${bucket.reason.typeNames})`
+        : ``);
     const outputMapStuff: string[] = [];
     /*
     const processObject = (
@@ -355,7 +359,7 @@ export function printPlanGraph(
     */
     graph.push(
       `    Bucket${bucket.id}(${mermaidEscape(
-        `Bucket ${bucket.id} (${raisonDEtre})${
+        `Bucket ${bucket.id}\n(${raisonDEtre})${
           bucket.copyPlanIds.length > 0
             ? `\nDeps: ${bucket.copyPlanIds
                 .map((pId) => steps[pId].id)
