@@ -979,8 +979,8 @@ export class OperationPlan {
           $leaf,
           {
             mode: "leaf",
-            stepId: $leaf.id,
-            serialize: nullableFieldType.serialize,
+            // stepId: $leaf.id,
+            serialize: nullableFieldType.serialize.bind(nullableFieldType),
           },
           node,
         ),
@@ -995,7 +995,7 @@ export class OperationPlan {
           $step,
           {
             mode: "leaf",
-            serialize: nullableFieldType.serialize,
+            serialize: nullableFieldType.serialize.bind(nullableFieldType),
           },
           node,
         ),
