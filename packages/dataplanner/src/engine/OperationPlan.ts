@@ -1114,6 +1114,12 @@ export class OperationPlan {
         },
         node,
       );
+      parentOutputPlan.addChild(parentObjectType, responseKey, {
+        type: "outputPlan",
+        outputPlan: polymorphicOutputPlan,
+        isNonNull,
+        node,
+      });
 
       /*
        * Then we create a new polymorphic LayerPlan for each of these types,
