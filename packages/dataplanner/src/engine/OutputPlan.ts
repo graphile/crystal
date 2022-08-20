@@ -135,6 +135,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    */
   public rootStepId: number;
 
+  // TODO: since polymorphic handles branching, we can remove the `typeName` layer from this.
   /**
    * For root/object output plans, the keys to set on the resulting object
    * grouped by the concrete object type name.
