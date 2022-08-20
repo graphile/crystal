@@ -118,8 +118,23 @@ export function executeBucket(
     for (const potentialNextStep of finishedStep.dependentPlans) {
       const isPending = pendingSteps.has(potentialNextStep);
       const isSuitable = isPending
-        ? potentialNextStep.dependencies.every((depId) =>
-            Array.isArray(store[depId]),
+        ? potentialNextStep.dependencies.every(
+            isDev
+              ? (depId) => {
+                  if (Array.isArray(store[depId])) {
+                    return true;
+                  } else {
+                    const dep =
+                      bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
+                    assert.strictEqual(
+                      dep.layerPlan,
+                      bucket.layerPlan,
+                      `GraphileInternalError<4ca7f9f9-0a00-415f-b6f7-46858fde17c3>: Waiting on ${dep} but it'll never complete because it's not in this bucket (${bucket.layerPlan.id}); this is most likely a bug in copyPlanIds`,
+                    );
+                    return false;
+                  }
+                }
+              : (depId) => Array.isArray(store[depId]),
           )
         : false;
       if (isSuitable) {
