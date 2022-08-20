@@ -2106,6 +2106,26 @@ export class OperationPlan {
         }
         return true;
       });
+
+      // Populate copyPlanIds
+      // TODO:perf: this could probably be faster.
+      for (const step of layerPlan.steps) {
+        for (const depId of step.dependencies) {
+          const dep = this.steps[depId];
+          let currentLayerPlan: LayerPlan | null = layerPlan;
+
+          while (dep.layerPlan !== currentLayerPlan) {
+            currentLayerPlan.copyPlanIds.push(dep.id);
+            currentLayerPlan = currentLayerPlan.parentLayerPlan;
+            if (!currentLayerPlan) {
+              throw new Error(
+                `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan.id}`,
+              );
+            }
+          }
+        }
+      }
+
       // Update plan references so executeBucket doesn't need to do explicit lookups
       const reason = layerPlan.reason;
       switch (reason.type) {
