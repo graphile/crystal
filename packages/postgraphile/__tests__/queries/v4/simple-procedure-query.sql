@@ -1,11 +1,11 @@
 select
-  __compound_type_set_query__."a"::text as "0",
-  __compound_type_set_query__."b" as "1",
-  __compound_type_set_query__."c"::text as "2",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
+  __compound_type_set_query__."f"::text as "1",
+  __compound_type_set_query__."e"::text as "2",
   __compound_type_set_query__."d" as "3",
-  __compound_type_set_query__."e"::text as "4",
-  __compound_type_set_query__."f"::text as "5",
-  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+  __compound_type_set_query__."c"::text as "4",
+  __compound_type_set_query__."b" as "5",
+  __compound_type_set_query__."a"::text as "6",
   (not (__compound_type_set_query__ is null))::text as "7"
 from "c"."compound_type_set_query"() as __compound_type_set_query__
 limit 5
@@ -29,12 +29,13 @@ select
 from "a"."query_interval_set"() as __query_interval_set__(v)
 
 select
-  __post__."id"::text as "0",
   (select json_agg(_) from (
     select
       to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
     from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-  ) _) as "1"
+  ) _) as "0",
+  __post__::text as "1",
+  __post__."id"::text as "2"
 from "a"."post" as __post__
 order by __post__."id" asc
 limit 1
