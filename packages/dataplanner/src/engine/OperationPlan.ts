@@ -531,7 +531,7 @@ export class OperationPlan {
         this.rootLayerPlan,
         [field.alias?.value ?? fieldName],
         rootType,
-        field,
+        fields,
         subscriptionPlanResolver,
         this.trackedRootValueStep,
         fieldSpec,
@@ -655,7 +655,7 @@ export class OperationPlan {
       stepId: number;
       responseKey: string;
       fieldType: GraphQLOutputType;
-      field: FieldNode;
+      fieldNodes: FieldNode[];
     }
     const nextUp: NextUp[] = [];
 
@@ -665,7 +665,7 @@ export class OperationPlan {
         stepId,
         responseKey,
         fieldType,
-        field,
+        fieldNodes,
       } of nextUp) {
         // May have changed due to deduplicate
         const step = this.steps[stepId];
@@ -680,21 +680,23 @@ export class OperationPlan {
               {
                 mode: "null",
               },
-              field,
+              fieldNodes,
             ),
             isNonNull,
-            node: field,
+            node: fieldNodes,
           });
         } else {
           this.planIntoOutputPlan(
             outputPlan,
             [...path, responseKey],
-            field.selectionSet?.selections,
+            fieldNodes[0].selectionSet
+              ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
+              : undefined,
             objectType,
             responseKey,
             fieldType,
             step,
-            field,
+            fieldNodes,
           );
         }
 
@@ -714,9 +716,9 @@ export class OperationPlan {
     );
     const objectTypeFields = objectType.getFields();
     // TODO: don't forget about deferreds!
-    for (const [responseKey, fields] of groupedFieldSet.fields.entries()) {
+    for (const [responseKey, fieldNodes] of groupedFieldSet.fields.entries()) {
       // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
-      const field = fields[0];
+      const field = fieldNodes[0];
       const fieldName = field.name.value;
 
       // This is presumed to exist because the operation passed validation.
@@ -726,7 +728,7 @@ export class OperationPlan {
         if (fieldName === "__typename") {
           outputPlan.addChild(objectType, responseKey, {
             type: "__typename",
-            node: fields,
+            node: fieldNodes,
           });
         } else {
           const variableNames = findVariableNamesUsed(this, field);
@@ -745,9 +747,9 @@ export class OperationPlan {
                   maxLength: 3,
                 }),
               },
-              fields,
+              fieldNodes,
             ),
-            node: fields,
+            node: fieldNodes,
           });
         }
         continue;
@@ -882,7 +884,7 @@ export class OperationPlan {
           outputPlan.layerPlan,
           path,
           objectType,
-          field,
+          fieldNodes,
           planResolver,
           parentStep,
           objectField,
@@ -898,7 +900,13 @@ export class OperationPlan {
       }
 
       // this.planIdByPathIdentity[pathIdentity] = step.id;
-      nextUp.push({ haltTree, stepId: step.id, responseKey, fieldType, field });
+      nextUp.push({
+        haltTree,
+        stepId: step.id,
+        responseKey,
+        fieldType,
+        fieldNodes,
+      });
     }
 
     if (customRecurse) {
@@ -1057,7 +1065,7 @@ export class OperationPlan {
     layerPlan: LayerPlan,
     path: readonly string[],
     objectType: GraphQLObjectType,
-    fieldNode: FieldNode,
+    fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, any, any>,
     parentStep: ExecutableStep,
     field: GraphQLField<any, any>,
@@ -1065,7 +1073,7 @@ export class OperationPlan {
   ) {
     this.loc.push(`planField(${path.join(".")})`);
     const trackedArguments = withGlobalLayerPlan(layerPlan, () =>
-      this.getTrackedArguments(objectType, fieldNode),
+      this.getTrackedArguments(objectType, fieldNodes[0]),
     );
 
     let step = withGlobalLayerPlan(layerPlan, () =>
@@ -1105,7 +1113,7 @@ export class OperationPlan {
      *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
      *      )[0]
      */
-    const streamDirective = fieldNode.directives?.find(
+    const streamDirective = fieldNodes[0].directives?.find(
       (d) => d.name.value === "stream",
     );
 
@@ -1118,7 +1126,7 @@ export class OperationPlan {
               initialCount:
                 Number(
                   getDirectiveArg(
-                    fieldNode,
+                    fieldNodes[0],
                     "stream",
                     "initialCount",
                     this.trackedVariableValuesStep,
