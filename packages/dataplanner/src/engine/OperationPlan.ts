@@ -34,6 +34,7 @@ import {
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
 import {
+  fieldSelectionsForType,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
   typesUsedInSelections,
 } from "../graphqlMergeSelectionSets.js";
@@ -1103,67 +1104,6 @@ export class OperationPlan {
             }
           })();
 
-      /*
-       * Then we call the `planForType` method for each of these types. For
-       * each unique returned plan we create a polymorphic LayerPlan, creating
-       * a set of `polymorphicLayerPlans`.
-       */
-      const map = new Map<ExecutableStep, GraphQLObjectType[]>();
-      for (const type of possibleObjectTypes) {
-        const stepForType = $step.planForType(type);
-        const arr = map.get(stepForType) ?? [];
-        arr.push(type);
-        map.set(stepForType, arr);
-      }
-      // TODO: can we dedupe these steps and merge the types?
-
-      const polymorphicLayerPlanByObjectType = new Map<
-        GraphQLObjectType,
-        LayerPlan<LayerPlanReasonPolymorphic>
-      >();
-      const polymorphicLayerPlans: LayerPlan[] = [];
-      for (const [$root, types] of map.entries()) {
-        const polymorphicLayerPlan = new LayerPlan(this, $step.layerPlan, {
-          type: "polymorphic",
-          typeNames: types.map((t) => t.name),
-          parentPlanId: $step.id,
-        });
-        polymorphicLayerPlan.rootStepId = $root.id;
-        polymorphicLayerPlans.push(polymorphicLayerPlan);
-        for (const type of types) {
-          polymorphicLayerPlanByObjectType.set(type, polymorphicLayerPlan);
-        }
-      }
-
-      /*
-       * Then for each `possibleType` create a nested polymorphic LayerPlan
-       * (assuming the relevant one covers more than one type) and then plan
-       * the fields (BUT NOT THEIR SELECTION SETS) into this LayerPlan. DO NOT
-       * USE REGULAR DEDUPLICATION!
-       */
-      for (const type of possibleObjectTypes) {
-        const polymorphicLayerPlan =
-          polymorphicLayerPlanByObjectType.get(type)!;
-        const specificLayerPlan = (() => {
-          if (polymorphicLayerPlan.reason.typeNames.length === 1) {
-            return polymorphicLayerPlan;
-          }
-          const lp = new LayerPlan(this, polymorphicLayerPlan, {
-            type: "polymorphic",
-            typeNames: [type.name],
-            parentPlanId: $step.id,
-          });
-          lp.rootStepId = polymorphicLayerPlan.rootStepId;
-        })();
-      }
-
-      /*
-       * Then call `polymorphicDeduplicateSteps()`.
-       *
-       * Finally, plan the selection sets for all the fields we previously
-       * postponed.
-       */
-
       const polymorphicOutputPlan = new OutputPlan(
         $step.layerPlan,
         $step,
@@ -1174,7 +1114,81 @@ export class OperationPlan {
         node,
       );
 
-      throw new Error("TODO<0aed3965-4a7e-42b8-b5f8-903f2911a8cb>");
+      /*
+       * Then we create a new polymorphic LayerPlan for each of these types,
+       * and set the rootPlan of it to be the result of calling the
+       * `planForType` method the type.
+       */
+      const polymorphicLayerPlanByObjectType = new Map<
+        GraphQLObjectType,
+        LayerPlan<LayerPlanReasonPolymorphic>
+      >();
+      for (const type of possibleObjectTypes) {
+        const lp = new LayerPlan(this, $step.layerPlan, {
+          type: "polymorphic",
+          typeNames: [type.name],
+          parentPlanId: $step.id,
+        });
+        const stepForType = withGlobalLayerPlan(lp, () =>
+          $step.planForType(type),
+        );
+        lp.rootStepId = stepForType.id;
+        polymorphicLayerPlanByObjectType.set(type, lp);
+      }
+      // TODO: would it be faster to do some deduping here?
+      //
+      const queue: Array<() => void> = [];
+
+      /*
+       * Then plan the fields (BUT NOT THEIR SELECTION SETS) into this
+       * LayerPlan. DO NOT USE REGULAR DEDUPLICATION!
+       */
+      for (const type of possibleObjectTypes) {
+        const polymorphicLayerPlan =
+          polymorphicLayerPlanByObjectType.get(type)!;
+        const $root = this.steps[polymorphicLayerPlan.rootStepId!]!;
+        const objectOutputPlan = new OutputPlan(
+          polymorphicLayerPlan,
+          $root,
+          {
+            mode: "object",
+            deferLabel: null,
+            typeName: nullableFieldType.name,
+          },
+          node,
+        );
+        // find all selections compatible with `type`
+        const fieldNodes = fieldSelectionsForType(this, type, selections);
+        this.planSelectionSet(
+          objectOutputPlan,
+          path,
+          $root,
+          type,
+          fieldNodes,
+          false,
+          // DO NOT PROCESS SELECTION SET YET! Add to queue:
+          (cb) => queue.push(cb),
+        );
+        polymorphicOutputPlan.addChild(type, null, {
+          type: "outputPlan",
+          isNonNull,
+          outputPlan: objectOutputPlan,
+          node,
+        });
+      }
+
+      /*
+       * Then call `polymorphicDeduplicateSteps()`.
+       */
+      this.polymorphicDeduplicateSteps();
+
+      /*
+       * Finally, plan the selection sets for all the fields we previously
+       * postponed.
+       */
+      for (const cb of queue) {
+        cb();
+      }
     }
   }
 
