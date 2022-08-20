@@ -1373,7 +1373,7 @@ export class OperationPlan {
     const processStepsFrom = (fromStepId: number) => {
       for (let stepId = fromStepId; stepId < previousStepCount; stepId++) {
         const step = this.steps[stepId];
-        if (step) {
+        if (step && step.id === stepId) {
           steps.push(step);
           calculateDependencies(step);
         }
