@@ -886,8 +886,13 @@ export class OperationPlan {
       // this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       let haltTree = false;
       if (typeof planResolver === "function") {
+        const fieldLayerPlan = isMutation
+          ? new LayerPlan(this, outputPlan.layerPlan, {
+              type: "mutationField",
+            })
+          : outputPlan.layerPlan;
         ({ step, haltTree } = this.planField(
-          outputPlan.layerPlan,
+          fieldLayerPlan,
           path,
           objectType,
           fieldNodes,
