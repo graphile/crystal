@@ -1492,7 +1492,7 @@ export class OperationPlan {
     }
 
     let previousStepCount = this.stepCount;
-    const steps: ExecutableStep[] = [];
+    let steps: ExecutableStep[] = [];
 
     /** Sort steps into the order to be processed. */
     const sortSteps = () => {
@@ -1510,7 +1510,7 @@ export class OperationPlan {
         }
         ordered.push(step);
       };
-      for (let i = 0, l = steps.length; i < l; i++) {
+      for (let i = steps.length - 1; i >= 0; i--) {
         process(steps[i]);
       }
 
@@ -1521,7 +1521,7 @@ export class OperationPlan {
       } else {
         //noop
       }
-      steps.splice(0, steps.length, ...ordered);
+      steps = ordered;
     };
 
     // DELIBERATELY shadows `fromStepId`
