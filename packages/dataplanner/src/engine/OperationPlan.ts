@@ -665,6 +665,7 @@ export class OperationPlan {
       responseKey: string;
       fieldType: GraphQLOutputType;
       fieldNodes: FieldNode[];
+      fieldLayerPlan: LayerPlan;
     }
     const nextUp: NextUp[] = [];
 
@@ -675,6 +676,7 @@ export class OperationPlan {
         responseKey,
         fieldType,
         fieldNodes,
+        fieldLayerPlan,
       } of nextUp) {
         // May have changed due to deduplicate
         const step = this.steps[stepId];
@@ -684,7 +686,7 @@ export class OperationPlan {
           outputPlan.addChild(objectType, responseKey, {
             type: "outputPlan",
             outputPlan: new OutputPlan(
-              outputPlan.layerPlan,
+              fieldLayerPlan,
               step,
               {
                 mode: "null",
@@ -697,6 +699,7 @@ export class OperationPlan {
         } else {
           this.planIntoOutputPlan(
             outputPlan,
+            fieldLayerPlan,
             [...path, responseKey],
             fieldNodes[0].selectionSet
               ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
@@ -888,12 +891,12 @@ export class OperationPlan {
       let step: ExecutableStep | PolymorphicStep;
       // this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       let haltTree = false;
+      const fieldLayerPlan = isMutation
+        ? new LayerPlan(this, outputPlan.layerPlan, {
+            type: "mutationField",
+          })
+        : outputPlan.layerPlan;
       if (typeof planResolver === "function") {
-        const fieldLayerPlan = isMutation
-          ? new LayerPlan(this, outputPlan.layerPlan, {
-              type: "mutationField",
-            })
-          : outputPlan.layerPlan;
         ({ step, haltTree } = this.planField(
           fieldLayerPlan,
           path,
@@ -920,6 +923,7 @@ export class OperationPlan {
         responseKey,
         fieldType,
         fieldNodes,
+        fieldLayerPlan,
       });
     }
 
@@ -935,6 +939,8 @@ export class OperationPlan {
   // Similar to the old 'planFieldReturnType'
   private planIntoOutputPlan(
     parentOutputPlan: OutputPlan,
+    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
+    parentLayerPlan: LayerPlan,
     path: readonly string[],
     selections: readonly SelectionNode[] | undefined,
     parentObjectType: GraphQLObjectType | null,
@@ -948,7 +954,7 @@ export class OperationPlan {
     const isNonNull = nullableFieldType !== fieldType;
     if (isListType(nullableFieldType)) {
       const listOutputPlan = new OutputPlan(
-        parentOutputPlan.layerPlan,
+        parentLayerPlan,
         $step,
         {
           mode: "array",
@@ -972,6 +978,7 @@ export class OperationPlan {
         : $__item;
       this.planIntoOutputPlan(
         listOutputPlan,
+        listOutputPlan.layerPlan,
         [],
         selections,
         null,
@@ -985,7 +992,7 @@ export class OperationPlan {
       const scalarPlanResolver = nullableFieldType.extensions?.graphile?.plan;
       const $leaf =
         typeof scalarPlanResolver === "function"
-          ? withGlobalLayerPlan($step.layerPlan, () =>
+          ? withGlobalLayerPlan(parentLayerPlan, () =>
               scalarPlanResolver($step, { schema: this.schema }),
             )
           : $step;
@@ -1010,7 +1017,7 @@ export class OperationPlan {
         type: "outputPlan",
         isNonNull,
         outputPlan: new OutputPlan(
-          $step.layerPlan,
+          parentLayerPlan,
           $step,
           {
             mode: "leaf",
@@ -1039,7 +1046,7 @@ export class OperationPlan {
         }
       }
       const objectOutputPlan = new OutputPlan(
-        $step.layerPlan,
+        parentLayerPlan,
         $step,
         {
           mode: "object",
@@ -1113,7 +1120,7 @@ export class OperationPlan {
           })();
 
       const polymorphicOutputPlan = new OutputPlan(
-        $step.layerPlan,
+        parentLayerPlan,
         $step,
         {
           mode: "polymorphic",
