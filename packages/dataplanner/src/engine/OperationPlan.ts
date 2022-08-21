@@ -2283,6 +2283,9 @@ export class OperationPlan {
         let currentLayerPlan: LayerPlan | null = layerPlan;
 
         while (dep.layerPlan !== currentLayerPlan) {
+          if (currentLayerPlan.copyPlanIds.includes(dep.id)) {
+            break;
+          }
           currentLayerPlan.copyPlanIds.push(dep.id);
           currentLayerPlan = currentLayerPlan.parentLayerPlan;
           if (!currentLayerPlan) {
