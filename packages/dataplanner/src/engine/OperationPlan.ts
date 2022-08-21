@@ -1153,6 +1153,7 @@ export class OperationPlan {
       // TODO: would it be faster to do some deduping here?
       //
       const queue: Array<() => void> = [];
+      const polymorphicLayerPlans: LayerPlan<LayerPlanReasonPolymorphic>[] = [];
 
       /*
        * Then plan the fields (BUT NOT THEIR SELECTION SETS) into this
@@ -1161,6 +1162,7 @@ export class OperationPlan {
       for (const type of possibleObjectTypes) {
         const polymorphicLayerPlan =
           polymorphicLayerPlanByObjectType.get(type)!;
+        polymorphicLayerPlans.push(polymorphicLayerPlan);
         const $root = this.steps[polymorphicLayerPlan.rootStepId!]!;
         const objectOutputPlan = new OutputPlan(
           polymorphicLayerPlan,
@@ -1195,7 +1197,7 @@ export class OperationPlan {
       /*
        * Then call `polymorphicDeduplicateSteps()`.
        */
-      this.polymorphicDeduplicateSteps();
+      this.polymorphicDeduplicateSteps(polymorphicLayerPlans);
 
       /*
        * Finally, plan the selection sets for all the fields we previously
@@ -2007,7 +2009,10 @@ export class OperationPlan {
    *
    * TODO: no idea if this is complete.
    */
-  polymorphicDeduplicateSteps() {
+  polymorphicDeduplicateSteps(
+    // TODO: use this
+    polymorphicLayerPlans: LayerPlan<LayerPlanReasonPolymorphic>[],
+  ) {
     const previousStepCount = this.stepCount;
     const fromStepId = this.maxDeduplicatedStepId + 1;
     const pendingSteps: ExecutableStep[] = [];
