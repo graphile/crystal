@@ -321,15 +321,15 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    subgraph Buckets");
-  for (const bucket of operationPlan.layerPlans) {
+  for (const layerPlan of operationPlan.layerPlans) {
     const plansAndIds = Object.entries(steps).filter(
       ([id, plan]) =>
-        plan && plan.id === Number(id) && plan.bucketId === bucket.id,
+        plan && plan.id === Number(id) && plan.layerPlan === layerPlan,
     );
     const raisonDEtre =
-      bucket.reason.type +
-      (bucket.reason.type === "polymorphic"
-        ? `(${bucket.reason.typeNames})`
+      layerPlan.reason.type +
+      (layerPlan.reason.type === "polymorphic"
+        ? `(${layerPlan.reason.typeNames})`
         : ``);
     const outputMapStuff: string[] = [];
     /*
@@ -355,35 +355,37 @@ export function printPlanGraph(
         }
       }
     };
-    processObject(bucket.outputMap);
+    processObject(layerPlan.outputMap);
     */
     graph.push(
-      `    Bucket${bucket.id}(${mermaidEscape(
-        `Bucket ${bucket.id}\n(${raisonDEtre})${
-          bucket.copyPlanIds.length > 0
-            ? `\nDeps: ${bucket.copyPlanIds
+      `    Bucket${layerPlan.id}(${mermaidEscape(
+        `Bucket ${layerPlan.id}\n(${raisonDEtre})${
+          layerPlan.copyPlanIds.length > 0
+            ? `\nDeps: ${layerPlan.copyPlanIds
                 .map((pId) => steps[pId].id)
                 .join(", ")}\n`
             : ""
         }${
-          bucket.rootStepId != null
-            ? `\nROOT ${operationPlan.dangerouslyGetStep(bucket.rootStepId)}`
+          layerPlan.rootStepId != null
+            ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
             : ""
         }\n${outputMapStuff.join("\n")}`,
-      )}):::bucket`,
+      )}):::layerPlan`,
     );
-    graph.push(`    classDef bucket${bucket.id} stroke:${color(bucket.id)}`);
+    graph.push(
+      `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
+    );
     graph.push(
       `    class ${[
-        `Bucket${bucket.id}`,
+        `Bucket${layerPlan.id}`,
         ...plansAndIds.map(([, plan]) => planId(plan)),
-      ].join(",")} bucket${bucket.id}`,
+      ].join(",")} bucket${layerPlan.id}`,
     );
   }
-  for (const bucket of operationPlan.layerPlans) {
-    const childNodes = bucket.children.map((c) => `Bucket${c.id}`);
+  for (const layerPlan of operationPlan.layerPlans) {
+    const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
     if (childNodes.length > 0) {
-      graph.push(`    Bucket${bucket.id} --> ${childNodes.join(" & ")}`);
+      graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
     }
   }
   graph.push("    end");

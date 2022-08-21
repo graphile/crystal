@@ -47,6 +47,37 @@ export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
+  // TODO: this comment is WAY out of date.
+  /**
+   * This identifies the "bucket" into which this plan's results will be stored;
+   * the this is determined as:
+   *
+   * - If this is an __ItemStep then a new bucket is assigned (this covers
+   *   lists (whether streamed or not) and subscriptions)
+   * - Otherwise, if this plan is deferred, then the deferred bucket id
+   * - Otherwise, if no dependencies then the root bucket
+   * - Otherwise, if all dependencies buckets overlap then the containing
+   *   bucket (the largest bucket), and make this bucket dependent on the
+   *   relevant plans in the other buckets
+   * - Otherwise, a new bucket is created representing the union of the
+   *   largest non-overlapping buckets
+   *
+   * This value is then used to influence:
+   *
+   * 1. how plans are deduplicated
+   * 2. the order in which the plans are executed
+   * 3. where the result of executing the plan is stored
+   * 4. when the plan execution cache is allowed to be GC'd
+   *
+   * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
+   * them (built on the `__Item`) that's thrown away once the transform is
+   * complete.
+   *
+   * A value of -1 indicates that a bucket has not yet been assigned (buckets
+   * are assigned as the last step before the OperationPlan is 'ready'.
+   *
+   * @internal
+   */
   public layerPlan: LayerPlan;
   /** @deprecated please use layerPlan.operationPlan instead */
   public opPlan: OperationPlan;
@@ -181,41 +212,9 @@ export class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    *
-   * @deprecated Please use bucketId instead
+   * @deprecated Please use layerPlan instead
    */
   public commonAncestorPathIdentity = "";
-
-  /**
-   * This identifies the "bucket" into which this plan's results will be stored;
-   * the this is determined as:
-   *
-   * - If this is an __ItemStep then a new bucket is assigned (this covers
-   *   lists (whether streamed or not) and subscriptions)
-   * - Otherwise, if this plan is deferred, then the deferred bucket id
-   * - Otherwise, if no dependencies then the root bucket
-   * - Otherwise, if all dependencies buckets overlap then the containing
-   *   bucket (the largest bucket), and make this bucket dependent on the
-   *   relevant plans in the other buckets
-   * - Otherwise, a new bucket is created representing the union of the
-   *   largest non-overlapping buckets
-   *
-   * This value is then used to influence:
-   *
-   * 1. how plans are deduplicated
-   * 2. the order in which the plans are executed
-   * 3. where the result of executing the plan is stored
-   * 4. when the plan execution cache is allowed to be GC'd
-   *
-   * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
-   * them (built on the `__Item`) that's thrown away once the transform is
-   * complete.
-   *
-   * A value of -1 indicates that a bucket has not yet been assigned (buckets
-   * are assigned as the last step before the OperationPlan is 'ready'.
-   *
-   * @internal
-   */
-  public bucketId = -1;
 
   /**
    * True when `optimize` has been called at least once.
