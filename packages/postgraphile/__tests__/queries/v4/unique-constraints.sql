@@ -7,8 +7,8 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."email" as "0",
-    __person__."person_full_name" as "1",
+    __person__."person_full_name" as "0",
+    __person__."email" as "1",
     __person_identifiers__.idx as "2"
   from "c"."person" as __person__
   where (
@@ -26,8 +26,8 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."email" as "0",
-    __person__."person_full_name" as "1",
+    __person__."person_full_name" as "0",
+    __person__."email" as "1",
     __person_identifiers__.idx as "2"
   from "c"."person" as __person__
   where (
@@ -46,8 +46,8 @@ from (
 ) as __compound_key_identifiers__,
 lateral (
   select
-    __compound_key__."person_id_2"::text as "0",
-    __compound_key__."person_id_1"::text as "1",
+    __compound_key__."person_id_1"::text as "0",
+    __compound_key__."person_id_2"::text as "1",
     __compound_key_identifiers__.idx as "2"
   from "c"."compound_key" as __compound_key__
   where
@@ -69,8 +69,8 @@ from (
 ) as __compound_key_identifiers__,
 lateral (
   select
-    __compound_key__."person_id_2"::text as "0",
-    __compound_key__."person_id_1"::text as "1",
+    __compound_key__."person_id_1"::text as "0",
+    __compound_key__."person_id_2"::text as "1",
     __compound_key_identifiers__.idx as "2"
   from "c"."compound_key" as __compound_key__
   where
@@ -92,8 +92,8 @@ from (
 ) as __compound_key_identifiers__,
 lateral (
   select
-    __compound_key__."person_id_2"::text as "0",
-    __compound_key__."person_id_1"::text as "1",
+    __compound_key__."person_id_1"::text as "0",
+    __compound_key__."person_id_2"::text as "1",
     __compound_key_identifiers__.idx as "2"
   from "c"."compound_key" as __compound_key__
   where

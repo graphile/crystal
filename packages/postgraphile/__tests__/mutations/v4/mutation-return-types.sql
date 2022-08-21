@@ -44,9 +44,9 @@ from (
 ) as __mutation_out_complex_identifiers__,
 lateral (
   select
-    __mutation_out_complex__."z"::text as "0",
+    __mutation_out_complex__."x"::text as "0",
     __mutation_out_complex__."y"::text as "1",
-    __mutation_out_complex__."x"::text as "2",
+    __mutation_out_complex__."z"::text as "2",
     (not (__mutation_out_complex__ is null))::text as "3",
     __mutation_out_complex_identifiers__.idx as "4"
   from "c"."mutation_out_complex"(
@@ -64,9 +64,9 @@ from (
 ) as __compound_type_identifiers__,
 lateral (
   select
-    __compound_type__."c"::text as "0",
+    __compound_type__."a"::text as "0",
     __compound_type__."b" as "1",
-    __compound_type__."a"::text as "2",
+    __compound_type__."c"::text as "2",
     (not (__compound_type__ is null))::text as "3",
     __compound_type_identifiers__.idx as "4"
   from (select (__compound_type_identifiers__."id0").*) as __compound_type__
@@ -90,8 +90,8 @@ lateral (
       )
       order by __post__."id" asc
     ) _) as "0",
-    __person__."person_full_name" as "1",
-    __person__."id"::text as "2",
+    __person__."id"::text as "1",
+    __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc
@@ -107,9 +107,9 @@ from (
 ) as __mutation_out_complex_setof_identifiers__,
 lateral (
   select
-    __mutation_out_complex_setof__."z"::text as "0",
+    __mutation_out_complex_setof__."x"::text as "0",
     __mutation_out_complex_setof__."y"::text as "1",
-    __mutation_out_complex_setof__."x"::text as "2",
+    __mutation_out_complex_setof__."z"::text as "2",
     (not (__mutation_out_complex_setof__ is null))::text as "3",
     __mutation_out_complex_setof_identifiers__.idx as "4"
   from "c"."mutation_out_complex_setof"(
@@ -127,9 +127,9 @@ from (
 ) as __compound_type_identifiers__,
 lateral (
   select
-    __compound_type__."c"::text as "0",
+    __compound_type__."a"::text as "0",
     __compound_type__."b" as "1",
-    __compound_type__."a"::text as "2",
+    __compound_type__."c"::text as "2",
     (not (__compound_type__ is null))::text as "3",
     __compound_type_identifiers__.idx as "4"
   from (select (__compound_type_identifiers__."id0").*) as __compound_type__
@@ -153,16 +153,16 @@ lateral (
       )
       order by __post__."id" asc
     ) _) as "0",
-    __person__."person_full_name" as "1",
-    __person__."id"::text as "2",
+    __person__."id"::text as "1",
+    __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc
 ) as __person_result__
 
 select
-  __mutation_out_out__."second_out" as "0",
-  __mutation_out_out__."first_out"::text as "1",
+  __mutation_out_out__."first_out"::text as "0",
+  __mutation_out_out__."second_out" as "1",
   (not (__mutation_out_out__ is null))::text as "2"
 from "c"."mutation_out_out"() as __mutation_out_out__
 
@@ -175,8 +175,8 @@ from (
 ) as __mutation_out_out_compound_type_identifiers__,
 lateral (
   select
-    __mutation_out_out_compound_type__."o2"::text as "0",
-    __mutation_out_out_compound_type__."o1"::text as "1",
+    __mutation_out_out_compound_type__."o1"::text as "0",
+    __mutation_out_out_compound_type__."o2"::text as "1",
     (not (__mutation_out_out_compound_type__ is null))::text as "2",
     __mutation_out_out_compound_type_identifiers__.idx as "3"
   from "c"."mutation_out_out_compound_type"(__mutation_out_out_compound_type_identifiers__."id0") as __mutation_out_out_compound_type__
@@ -191,23 +191,23 @@ from (
 ) as __compound_type_identifiers__,
 lateral (
   select
-    __compound_type__."c"::text as "0",
+    __compound_type__."a"::text as "0",
     __compound_type__."b" as "1",
-    __compound_type__."a"::text as "2",
+    __compound_type__."c"::text as "2",
     (not (__compound_type__ is null))::text as "3",
     __compound_type_identifiers__.idx as "4"
   from (select (__compound_type_identifiers__."id0").*) as __compound_type__
 ) as __compound_type_result__
 
 select
-  __mutation_out_out_setof__."o2" as "0",
-  __mutation_out_out_setof__."o1"::text as "1",
+  __mutation_out_out_setof__."o1"::text as "0",
+  __mutation_out_out_setof__."o2" as "1",
   (not (__mutation_out_out_setof__ is null))::text as "2"
 from "c"."mutation_out_out_setof"() as __mutation_out_out_setof__
 
 select
-  __mutation_out_out_unnamed__."column2" as "0",
-  __mutation_out_out_unnamed__."column1"::text as "1",
+  __mutation_out_out_unnamed__."column1"::text as "0",
+  __mutation_out_out_unnamed__."column2" as "1",
   (not (__mutation_out_out_unnamed__ is null))::text as "2"
 from "c"."mutation_out_out_unnamed"() as __mutation_out_out_unnamed__
 
@@ -228,9 +228,9 @@ select
 from "c"."mutation_out_unnamed"() as __mutation_out_unnamed__(v)
 
 select
-  __mutation_out_unnamed_out_out_unnamed__."o2" as "0",
+  __mutation_out_unnamed_out_out_unnamed__."column1"::text as "0",
   __mutation_out_unnamed_out_out_unnamed__."column3"::text as "1",
-  __mutation_out_unnamed_out_out_unnamed__."column1"::text as "2",
+  __mutation_out_unnamed_out_out_unnamed__."o2" as "2",
   (not (__mutation_out_unnamed_out_out_unnamed__ is null))::text as "3"
 from "c"."mutation_out_unnamed_out_out_unnamed"() as __mutation_out_unnamed_out_out_unnamed__
 
@@ -243,8 +243,8 @@ from (
 ) as __mutation_returns_table_multi_col_identifiers__,
 lateral (
   select
-    __mutation_returns_table_multi_col__."col2" as "0",
-    __mutation_returns_table_multi_col__."col1"::text as "1",
+    __mutation_returns_table_multi_col__."col1"::text as "0",
+    __mutation_returns_table_multi_col__."col2" as "1",
     (not (__mutation_returns_table_multi_col__ is null))::text as "2",
     __mutation_returns_table_multi_col_identifiers__.idx as "3"
   from "c"."mutation_returns_table_multi_col"(__mutation_returns_table_multi_col_identifiers__."id0") as __mutation_returns_table_multi_col__

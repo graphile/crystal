@@ -283,14 +283,14 @@ from (
 ) as __compound_type_mutation_identifiers__,
 lateral (
   select
-    __compound_type_mutation__."foo_bar"::text as "0",
-    to_char(__compound_type_mutation__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
-    __compound_type_mutation__."f"::text as "2",
-    __compound_type_mutation__."e"::text as "3",
-    __compound_type_mutation__."d" as "4",
-    __compound_type_mutation__."c"::text as "5",
-    __compound_type_mutation__."b" as "6",
-    __compound_type_mutation__."a"::text as "7",
+    __compound_type_mutation__."a"::text as "0",
+    __compound_type_mutation__."b" as "1",
+    __compound_type_mutation__."c"::text as "2",
+    __compound_type_mutation__."d" as "3",
+    __compound_type_mutation__."e"::text as "4",
+    __compound_type_mutation__."f"::text as "5",
+    to_char(__compound_type_mutation__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+    __compound_type_mutation__."foo_bar"::text as "7",
     (not (__compound_type_mutation__ is null))::text as "8",
     __compound_type_mutation_identifiers__.idx as "9"
   from "b"."compound_type_mutation"(__compound_type_mutation_identifiers__."id0") as __compound_type_mutation__
@@ -305,14 +305,14 @@ from (
 ) as __compound_type_set_mutation_identifiers__,
 lateral (
   select
-    __compound_type_set_mutation__."foo_bar"::text as "0",
-    to_char(__compound_type_set_mutation__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
-    __compound_type_set_mutation__."f"::text as "2",
-    __compound_type_set_mutation__."e"::text as "3",
-    __compound_type_set_mutation__."d" as "4",
-    __compound_type_set_mutation__."c"::text as "5",
-    __compound_type_set_mutation__."b" as "6",
-    __compound_type_set_mutation__."a"::text as "7",
+    __compound_type_set_mutation__."a"::text as "0",
+    __compound_type_set_mutation__."b" as "1",
+    __compound_type_set_mutation__."c"::text as "2",
+    __compound_type_set_mutation__."d" as "3",
+    __compound_type_set_mutation__."e"::text as "4",
+    __compound_type_set_mutation__."f"::text as "5",
+    to_char(__compound_type_set_mutation__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+    __compound_type_set_mutation__."foo_bar"::text as "7",
     (not (__compound_type_set_mutation__ is null))::text as "8",
     __compound_type_set_mutation_identifiers__.idx as "9"
   from "b"."compound_type_set_mutation"(__compound_type_set_mutation_identifiers__."id0") as __compound_type_set_mutation__
@@ -327,14 +327,14 @@ from (
 ) as __compound_type_array_mutation_identifiers__,
 lateral (
   select
-    __compound_type_array_mutation__."foo_bar"::text as "0",
-    to_char(__compound_type_array_mutation__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
-    __compound_type_array_mutation__."f"::text as "2",
-    __compound_type_array_mutation__."e"::text as "3",
-    __compound_type_array_mutation__."d" as "4",
-    __compound_type_array_mutation__."c"::text as "5",
-    __compound_type_array_mutation__."b" as "6",
-    __compound_type_array_mutation__."a"::text as "7",
+    __compound_type_array_mutation__."a"::text as "0",
+    __compound_type_array_mutation__."b" as "1",
+    __compound_type_array_mutation__."c"::text as "2",
+    __compound_type_array_mutation__."d" as "3",
+    __compound_type_array_mutation__."e"::text as "4",
+    __compound_type_array_mutation__."f"::text as "5",
+    to_char(__compound_type_array_mutation__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+    __compound_type_array_mutation__."foo_bar"::text as "7",
     (not (__compound_type_array_mutation__ is null))::text as "8",
     __compound_type_array_mutation_identifiers__.idx as "9"
   from unnest("b"."compound_type_array_mutation"(__compound_type_array_mutation_identifiers__."id0")) as __compound_type_array_mutation__
@@ -349,8 +349,8 @@ from (
 ) as __table_mutation_identifiers__,
 lateral (
   select
-    __table_mutation__."headline" as "0",
-    __table_mutation__."id"::text as "1",
+    __table_mutation__."id"::text as "0",
+    __table_mutation__."headline" as "1",
     __table_mutation__."author_id"::text as "2",
     __table_mutation_identifiers__.idx as "3"
   from "c"."table_mutation"(__table_mutation_identifiers__."id0") as __table_mutation__
@@ -365,8 +365,8 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."person_full_name" as "0",
-    __person__."id"::text as "1",
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
     __person_identifiers__.idx as "2"
   from "c"."person" as __person__
   where (
@@ -384,8 +384,8 @@ from (
 ) as __post_identifiers__,
 lateral (
   select
-    __post__."headline" as "0",
-    __post__."id"::text as "1",
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
     __post_identifiers__.idx as "2"
   from "a"."post" as __post__
   where (
@@ -403,8 +403,8 @@ from (
 ) as __table_mutation_identifiers__,
 lateral (
   select
-    __table_mutation__."headline" as "0",
-    __table_mutation__."id"::text as "1",
+    __table_mutation__."id"::text as "0",
+    __table_mutation__."headline" as "1",
     __table_mutation__."author_id"::text as "2",
     __table_mutation_identifiers__.idx as "3"
   from "c"."table_mutation"(__table_mutation_identifiers__."id0") as __table_mutation__
@@ -419,8 +419,8 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."person_full_name" as "0",
-    __person__."id"::text as "1",
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
     __person_identifiers__.idx as "2"
   from "c"."person" as __person__
   where (
@@ -438,8 +438,8 @@ from (
 ) as __post_identifiers__,
 lateral (
   select
-    __post__."headline" as "0",
-    __post__."id"::text as "1",
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
     __post_identifiers__.idx as "2"
   from "a"."post" as __post__
   where (
@@ -517,9 +517,9 @@ from (
 ) as __post_many_identifiers__,
 lateral (
   select
-    __post_many__."comptypes"::text as "0",
+    __post_many__."id"::text as "0",
     __post_many__."headline" as "1",
-    __post_many__."id"::text as "2",
+    __post_many__."comptypes"::text as "2",
     __post_many_identifiers__.idx as "3"
   from "a"."post_many"(__post_many_identifiers__."id0") as __post_many__
 ) as __post_many_result__
@@ -533,8 +533,8 @@ from (
 ) as __comptype_identifiers__,
 lateral (
   select
-    __comptype__."is_optimised"::text as "0",
-    to_char(__comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
+    to_char(__comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    __comptype__."is_optimised"::text as "1",
     (not (__comptype__ is null))::text as "2",
     __comptype_identifiers__.idx as "3"
   from unnest(__comptype_identifiers__."id0") as __comptype__
@@ -550,8 +550,8 @@ from (
 ) as __post_with_suffix_identifiers__,
 lateral (
   select
-    __post_with_suffix__."headline" as "0",
-    __post_with_suffix__."id"::text as "1",
+    __post_with_suffix__."id"::text as "0",
+    __post_with_suffix__."headline" as "1",
     __post_with_suffix_identifiers__.idx as "2"
   from "a"."post_with_suffix"(
     __post_with_suffix_identifiers__."id0",
@@ -560,13 +560,13 @@ lateral (
 ) as __post_with_suffix_result__
 
 select
-  to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
-  __issue756_mutation__."id"::text as "1"
+  __issue756_mutation__."id"::text as "0",
+  to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
 from "c"."issue756_mutation"() as __issue756_mutation__
 
 select
-  to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
-  __issue756_set_mutation__."id"::text as "1"
+  __issue756_set_mutation__."id"::text as "0",
+  to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
 from "c"."issue756_set_mutation"() as __issue756_set_mutation__
 
 select __mutation_compound_type_array_result__.*
@@ -578,14 +578,14 @@ from (
 ) as __mutation_compound_type_array_identifiers__,
 lateral (
   select
-    __mutation_compound_type_array__."foo_bar"::text as "0",
-    to_char(__mutation_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
-    __mutation_compound_type_array__."f"::text as "2",
-    __mutation_compound_type_array__."e"::text as "3",
-    __mutation_compound_type_array__."d" as "4",
-    __mutation_compound_type_array__."c"::text as "5",
-    __mutation_compound_type_array__."b" as "6",
-    __mutation_compound_type_array__."a"::text as "7",
+    __mutation_compound_type_array__."a"::text as "0",
+    __mutation_compound_type_array__."b" as "1",
+    __mutation_compound_type_array__."c"::text as "2",
+    __mutation_compound_type_array__."d" as "3",
+    __mutation_compound_type_array__."e"::text as "4",
+    __mutation_compound_type_array__."f"::text as "5",
+    to_char(__mutation_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+    __mutation_compound_type_array__."foo_bar"::text as "7",
     (not (__mutation_compound_type_array__ is null))::text as "8",
     __mutation_compound_type_array_identifiers__.idx as "9"
   from unnest("a"."mutation_compound_type_array"(__mutation_compound_type_array_identifiers__."id0")) as __mutation_compound_type_array__

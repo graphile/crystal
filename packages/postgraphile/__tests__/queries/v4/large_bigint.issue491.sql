@@ -1,6 +1,6 @@
 select
-  __large_node_id__."text" as "0",
-  __large_node_id__."id"::text as "1"
+  __large_node_id__."id"::text as "0",
+  __large_node_id__."text" as "1"
 from "large_bigint"."large_node_id" as __large_node_id__
 order by __large_node_id__."id" asc
 
@@ -13,8 +13,8 @@ from (
 ) as __large_node_id_identifiers__,
 lateral (
   select
-    __large_node_id__."text" as "0",
-    __large_node_id__."id"::text as "1",
+    __large_node_id__."id"::text as "0",
+    __large_node_id__."text" as "1",
     __large_node_id_identifiers__.idx as "2"
   from "large_bigint"."large_node_id" as __large_node_id__
   where (
@@ -32,8 +32,8 @@ from (
 ) as __large_node_id_identifiers__,
 lateral (
   select
-    __large_node_id__."text" as "0",
-    __large_node_id__."id"::text as "1",
+    __large_node_id__."id"::text as "0",
+    __large_node_id__."text" as "1",
     __large_node_id_identifiers__.idx as "2"
   from "large_bigint"."large_node_id" as __large_node_id__
   where (

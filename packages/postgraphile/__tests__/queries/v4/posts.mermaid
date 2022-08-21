@@ -6,9 +6,9 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
-    %% define steps
+    %% define plans
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access28["Access[28∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access29["Access[29∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object30["Object[30∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
@@ -21,40 +21,36 @@ graph TD
     PgCursor35["PgCursor[35∈1]"]:::plan
     PgClassExpression39["PgClassExpression[39∈1]<br />ᐸ__post__.”headline”ᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈1]<br />ᐸ”a”.”post_...(__post__)ᐳ"]:::plan
-    Map134["Map[134∈1]<br />ᐸ34:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7,”8”:8,”9”:9,”10”:10,”11”:11,”12”:12}ᐳ"]:::plan
-    List135["List[135∈1]<br />ᐸ134ᐳ"]:::plan
-    First49["First[49∈1]"]:::plan
+    Map134["Map[134∈1]<br />ᐸ34:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13}ᐳ"]:::plan
     PgSelectSingle50["PgSelectSingle[50∈1]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression51["PgClassExpression[51∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression52["PgClassExpression[52∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression54["PgClassExpression[54∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    Map132["Map[132∈1]<br />ᐸ50:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7,”6”:8}ᐳ"]:::plan
-    List133["List[133∈1]<br />ᐸ132ᐳ"]:::plan
-    First60["First[60∈1]"]:::plan
+    Map130["Map[130∈1]<br />ᐸ50:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"]:::plan
     PgSelectSingle61["PgSelectSingle[61∈1]<br />ᐸperson_first_postᐳ"]:::plan
-    Connection89["Connection[89∈0]<br />ᐸ85ᐳ"]:::plan
-    PgClassExpression90["PgClassExpression[90∈1]<br />ᐸ__person_f...ost__.”id”ᐳ"]:::plan
-    PgClassExpression91["PgClassExpression[91∈1]<br />ᐸ__person_f...”headline”ᐳ"]:::plan
-    PgClassExpression95["PgClassExpression[95∈1]<br />ᐸ”a”.”post_...st_post__)ᐳ"]:::plan
-    Map130["Map[130∈1]<br />ᐸ61:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
-    List131["List[131∈1]<br />ᐸ130ᐳ"]:::plan
-    First101["First[101∈1]"]:::plan
-    PgSelectSingle102["PgSelectSingle[102∈1]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression103["PgClassExpression[103∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression104["PgClassExpression[104∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression106["PgClassExpression[106∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    Access129["Access[129∈1]<br />ᐸ49.1ᐳ"]:::plan
-    __ListTransform108[["__ListTransform[108∈1]<br />ᐸeach:107ᐳ"]]:::plan
-    Access128["Access[128∈1]<br />ᐸ49.0ᐳ"]:::plan
-    First112["First[112∈1]"]:::plan
-    PgSelectSingle113["PgSelectSingle[113∈1]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression114["PgClassExpression[114∈1]<br />ᐸcount(*)ᐳ"]:::plan
-    PgPageInfo115["PgPageInfo[115∈0]"]:::plan
-    __Item116>"__Item[116∈3]<br />ᐸ108ᐳ"]:::itemplan
-    PgSelectSingle117["PgSelectSingle[117∈3]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression118["PgClassExpression[118∈3]<br />ᐸ__person_friends__.”id”ᐳ"]:::plan
-    PgClassExpression119["PgClassExpression[119∈3]<br />ᐸ__person_f...full_name”ᐳ"]:::plan
-    PgClassExpression121["PgClassExpression[121∈3]<br />ᐸ”c”.”perso...friends__)ᐳ"]:::plan
+    PgClassExpression62["PgClassExpression[62∈1]<br />ᐸ__person_f...ost__.”id”ᐳ"]:::plan
+    PgClassExpression63["PgClassExpression[63∈1]<br />ᐸ__person_f...”headline”ᐳ"]:::plan
+    PgClassExpression67["PgClassExpression[67∈1]<br />ᐸ”a”.”post_...st_post__)ᐳ"]:::plan
+    Map128["Map[128∈1]<br />ᐸ61:{”0”:3,”1”:4,”2”:5}ᐳ"]:::plan
+    PgSelectSingle74["PgSelectSingle[74∈1]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression75["PgClassExpression[75∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression76["PgClassExpression[76∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression78["PgClassExpression[78∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
+    Connection106["Connection[106∈0]<br />ᐸ102ᐳ"]:::plan
+    Access132["Access[132∈1]<br />ᐸ134.8ᐳ"]:::plan
+    __ListTransform108["__ListTransform[108∈1]<br />ᐸeach:107ᐳ"]:::plan
+    __Item109>"__Item[109∈2]<br />ᐸ132ᐳ"]:::itemplan
+    PgSelectSingle110["PgSelectSingle[110∈2]<br />ᐸperson_friendsᐳ"]:::plan
+    __Item111>"__Item[111∈3]<br />ᐸ108ᐳ"]:::itemplan
+    PgSelectSingle112["PgSelectSingle[112∈3]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression113["PgClassExpression[113∈3]<br />ᐸ__person_friends__.”id”ᐳ"]:::plan
+    PgClassExpression114["PgClassExpression[114∈3]<br />ᐸ__person_f...full_name”ᐳ"]:::plan
+    PgClassExpression116["PgClassExpression[116∈3]<br />ᐸ”c”.”perso...friends__)ᐳ"]:::plan
+    Access133["Access[133∈1]<br />ᐸ134.9ᐳ"]:::plan
+    First118["First[118∈1]"]:::plan
+    PgSelectSingle119["PgSelectSingle[119∈1]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression120["PgClassExpression[120∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    PgPageInfo121["PgPageInfo[121∈0]"]:::plan
     First123["First[123∈1]"]:::plan
     PgSelectSingle124["PgSelectSingle[124∈1]<br />ᐸperson_friendsᐳ"]:::plan
     PgClassExpression126["PgClassExpression[126∈1]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
@@ -74,58 +70,115 @@ graph TD
     PgSelectSingle34 --> PgClassExpression39
     PgSelectSingle34 --> PgClassExpression43
     PgSelectSingle34 --> Map134
-    Map134 --> List135
-    List135 --> First49
-    First49 --> PgSelectSingle50
+    Map134 --> PgSelectSingle50
     PgSelectSingle50 --> PgClassExpression51
     PgSelectSingle50 --> PgClassExpression52
     PgSelectSingle50 --> PgClassExpression54
-    PgSelectSingle50 --> Map132
-    Map132 --> List133
-    List133 --> First60
-    First60 --> PgSelectSingle61
-    PgSelectSingle61 --> PgClassExpression90
-    PgSelectSingle61 --> PgClassExpression91
-    PgSelectSingle61 --> PgClassExpression95
-    PgSelectSingle61 --> Map130
-    Map130 --> List131
-    List131 --> First101
-    First101 --> PgSelectSingle102
-    PgSelectSingle102 --> PgClassExpression103
-    PgSelectSingle102 --> PgClassExpression104
-    PgSelectSingle102 --> PgClassExpression106
-    First49 --> Access129
-    Access129 --> __ListTransform108
-    First49 --> Access128
-    Access128 --> First112
-    First112 --> PgSelectSingle113
-    PgSelectSingle113 --> PgClassExpression114
-    __ListTransform108 ==> __Item116
-    __Item116 --> PgSelectSingle117
-    PgSelectSingle117 --> PgClassExpression118
-    PgSelectSingle117 --> PgClassExpression119
-    PgSelectSingle117 --> PgClassExpression121
-    Access129 --> First123
+    PgSelectSingle50 --> Map130
+    Map130 --> PgSelectSingle61
+    PgSelectSingle61 --> PgClassExpression62
+    PgSelectSingle61 --> PgClassExpression63
+    PgSelectSingle61 --> PgClassExpression67
+    PgSelectSingle61 --> Map128
+    Map128 --> PgSelectSingle74
+    PgSelectSingle74 --> PgClassExpression75
+    PgSelectSingle74 --> PgClassExpression76
+    PgSelectSingle74 --> PgClassExpression78
+    Map134 --> Access132
+    Access132 --> __ListTransform108
+    PgSelectSingle110 -.-> __ListTransform108
+    Access132 -.-> __Item109
+    __Item109 --> PgSelectSingle110
+    __ListTransform108 ==> __Item111
+    __Item111 --> PgSelectSingle112
+    PgSelectSingle112 --> PgClassExpression113
+    PgSelectSingle112 --> PgClassExpression114
+    PgSelectSingle112 --> PgClassExpression116
+    Map134 --> Access133
+    Access133 --> First118
+    First118 --> PgSelectSingle119
+    PgSelectSingle119 --> PgClassExpression120
+    Access132 --> First123
     First123 --> PgSelectSingle124
     PgSelectSingle124 --> PgClassExpression126
     PgClassExpression126 --> List127
     List127 --> PgCursor125
 
     %% plan-to-path relationships
+    P0["~"]
+    __Value0 -.-> P0
+    P31["ᐳallPosts"]
+    Connection31 -.-> P31
+    P32["ᐳa…sᐳedges"]
+    PgSelect32 -.-> P32
+    P34["ᐳa…sᐳedges[]<br />ᐳa…sᐳe…]ᐳnode"]
+    PgSelectSingle34 -.-> P34
+    P35["ᐳa…sᐳe…]ᐳcursor"]
+    PgCursor35 -.-> P35
+    P36["ᐳa…sᐳe…]ᐳnodeᐳid"]
+    PgClassExpression36 -.-> P36
+    P39["ᐳa…sᐳe…]ᐳnodeᐳheadline"]
+    PgClassExpression39 -.-> P39
+    P43["ᐳa…sᐳe…]ᐳnodeᐳheadlineTrimmed"]
+    PgClassExpression43 -.-> P43
+    P50["ᐳa…sᐳe…]ᐳnodeᐳauthor"]
+    PgSelectSingle50 -.-> P50
+    P51["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳid"]
+    PgClassExpression51 -.-> P51
+    P52["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳname"]
+    PgClassExpression52 -.-> P52
+    P54["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳfirstName"]
+    PgClassExpression54 -.-> P54
+    P61["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳfirstPost"]
+    PgSelectSingle61 -.-> P61
+    P62["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳid"]
+    PgClassExpression62 -.-> P62
+    P63["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳheadline"]
+    PgClassExpression63 -.-> P63
+    P67["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳheadlineTrimmed"]
+    PgClassExpression67 -.-> P67
+    P74["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳauthor"]
+    PgSelectSingle74 -.-> P74
+    P75["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳa…rᐳid"]
+    PgClassExpression75 -.-> P75
+    P76["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳa…rᐳname"]
+    PgClassExpression76 -.-> P76
+    P78["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…tᐳa…rᐳfirstName"]
+    PgClassExpression78 -.-> P78
+    P106["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳfriends"]
+    Connection106 -.-> P106
+    P108["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳnodes"]
+    __ListTransform108 -.-> P108
+    P110["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳnodes@108[]"]
+    PgSelectSingle110 -.-> P110
+    P112["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳnodes[]"]
+    PgSelectSingle112 -.-> P112
+    P113["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳn…]ᐳid"]
+    PgClassExpression113 -.-> P113
+    P114["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳn…]ᐳname"]
+    PgClassExpression114 -.-> P114
+    P116["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳn…]ᐳfirstName"]
+    PgClassExpression116 -.-> P116
+    P120["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳtotalCount"]
+    PgClassExpression120 -.-> P120
+    P121["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳpageInfo"]
+    PgPageInfo121 -.-> P121
+    P125["ᐳa…sᐳe…]ᐳnodeᐳa…rᐳf…sᐳp…oᐳstartCursor"]
+    PgCursor125 -.-> P125
 
     subgraph "Buckets for queries/v4/posts"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀allPosts ᐸ-O- 31<br />⠀⠀⠀allPosts.edges ᐸ-A- 32"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access28,Access29,Object30,Connection31,PgSelect32,Connection89,PgPageInfo115 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />Deps: 89, 115, 32<br /><br />ROOT __Item{1}ᐸ32ᐳ[33]"):::bucket
+    class Bucket0,__Value0,__Value3,Access28,Access29,Object30,Connection31,PgSelect32,Connection106,PgPageInfo121 bucket0
+    Bucket1("Bucket 1 (item33)<br />Deps: 32, 106, 121<br />~ᐳQuery.allPostsᐳPostsConnection.edges[]<br />⠀ROOT ᐸ-O- 34<br />⠀⠀node ᐸ-O- 34<br />⠀⠀⠀node.id ᐸ-L- 36<br />⠀⠀⠀node.headline ᐸ-L- 39<br />⠀⠀⠀node.headlineTrimmed ᐸ-L- 43<br />⠀⠀⠀node.author ᐸ-O- 50<br />⠀⠀⠀⠀node.author.id ᐸ-L- 51<br />⠀⠀⠀⠀node.author.name ᐸ-L- 52<br />⠀⠀⠀⠀node.author.firstName ᐸ-L- 54<br />⠀⠀⠀⠀node.author.firstPost ᐸ-O- 61<br />⠀⠀⠀⠀⠀node.author.firstPost.id ᐸ-L- 62<br />⠀⠀⠀⠀⠀node.author.firstPost.headline ᐸ-L- 63<br />⠀⠀⠀⠀⠀node.author.firstPost.headlineTrimmed ᐸ-L- 67<br />⠀⠀⠀⠀⠀node.author.firstPost.author ᐸ-O- 74<br />⠀⠀⠀⠀⠀⠀node.author.firstPost.author.id ᐸ-L- 75<br />⠀⠀⠀⠀⠀⠀node.author.firstPost.author.name ᐸ-L- 76<br />⠀⠀⠀⠀⠀⠀node.author.firstPost.author.firstName ᐸ-L- 78<br />⠀⠀⠀⠀node.author.friends ᐸ-O- 106<br />⠀⠀⠀⠀⠀node.author.friends.nodes ᐸ-A- 108<br />⠀⠀⠀⠀⠀node.author.friends.totalCount ᐸ-L- 120<br />⠀⠀⠀⠀⠀node.author.friends.pageInfo ᐸ-O- 121<br />⠀⠀⠀⠀⠀⠀node.author.friends.pageInfo.startCursor ᐸ-L- 125<br />⠀⠀cursor ᐸ-L- 35"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,First49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,First60,PgSelectSingle61,PgClassExpression90,PgClassExpression91,PgClassExpression95,First101,PgSelectSingle102,PgClassExpression103,PgClassExpression104,PgClassExpression106,__ListTransform108,First112,PgSelectSingle113,PgClassExpression114,First123,PgSelectSingle124,PgCursor125,PgClassExpression126,List127,Access128,Access129,Map130,List131,Map132,List133,Map134,List135 bucket1
-    Bucket2("Bucket 2<br />(subroutine)<br />ROOT null"):::bucket
+    class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression67,PgSelectSingle74,PgClassExpression75,PgClassExpression76,PgClassExpression78,__ListTransform108,First118,PgSelectSingle119,PgClassExpression120,First123,PgSelectSingle124,PgCursor125,PgClassExpression126,List127,Map128,Map130,Access132,Access133,Map134 bucket1
+    Bucket2("Bucket 2 (item109)<br />Deps: 132"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3<br />(listItem)<br />Deps: 108<br /><br />ROOT __Item{3}ᐸ108ᐳ[116]"):::bucket
+    class Bucket2,__Item109,PgSelectSingle110 bucket2
+    Bucket3("Bucket 3 (item111)<br />Deps: 108<br />~ᐳQuery.allPostsᐳPostsConnection.edges[]ᐳPostsEdge.nodeᐳPost.authorᐳPerson.friendsᐳPeopleConnection.nodes[]<br />⠀ROOT ᐸ-O- 112<br />⠀⠀id ᐸ-L- 113<br />⠀⠀name ᐸ-L- 114<br />⠀⠀firstName ᐸ-L- 116"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item116,PgSelectSingle117,PgClassExpression118,PgClassExpression119,PgClassExpression121 bucket3
+    class Bucket3,__Item111,PgSelectSingle112,PgClassExpression113,PgClassExpression114,PgClassExpression116 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     end
