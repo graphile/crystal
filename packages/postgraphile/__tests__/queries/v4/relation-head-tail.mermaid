@@ -21,10 +21,10 @@ graph TD
     PgClassExpression55["PgClassExpression[55∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression56["PgClassExpression[56∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     __InputStaticLeaf58["__InputStaticLeaf[58∈0]"]:::plan
-    Connection82["Connection[82∈1]<br />ᐸ78ᐳ"]:::plan
-    Connection108["Connection[108∈1]<br />ᐸ104ᐳ"]:::plan
-    Connection126["Connection[126∈1]<br />ᐸ122ᐳ"]:::plan
-    Connection144["Connection[144∈1]<br />ᐸ140ᐳ"]:::plan
+    Connection82["Connection[82∈0]<br />ᐸ78ᐳ"]:::plan
+    Connection108["Connection[108∈0]<br />ᐸ104ᐳ"]:::plan
+    Connection126["Connection[126∈0]<br />ᐸ122ᐳ"]:::plan
+    Connection144["Connection[144∈0]<br />ᐸ140ᐳ"]:::plan
     Access199["Access[199∈1]<br />ᐸ53.3ᐳ"]:::plan
     Reverse200["Reverse[200∈1]"]:::plan
     __Item146>"__Item[146∈2]<br />ᐸ200ᐳ"]:::itemplan
@@ -51,7 +51,7 @@ graph TD
     PgSelectSingle167["PgSelectSingle[167∈6]<br />ᐸcompoundKeyᐳ"]:::plan
     PgClassExpression168["PgClassExpression[168∈6]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
     PgClassExpression169["PgClassExpression[169∈6]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
-    Connection188["Connection[188∈6]<br />ᐸ184ᐳ"]:::plan
+    Connection188["Connection[188∈0]<br />ᐸ184ᐳ"]:::plan
     Access195["Access[195∈6]<br />ᐸ166.0ᐳ"]:::plan
     __Item190>"__Item[190∈7]<br />ᐸ195ᐳ"]:::itemplan
     PgSelectSingle191["PgSelectSingle[191∈7]<br />ᐸforeignKeyᐳ"]:::plan
@@ -107,10 +107,10 @@ graph TD
     subgraph "Buckets for queries/v4/relation-head-tail"
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,Connection51,PgSelect52,__InputStaticLeaf58,__InputStaticLeaf90,PgSelect165 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />Deps: 52, 58<br /><br />ROOT __Item{1}ᐸ52ᐳ[53]"):::bucket
+    class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,Connection51,PgSelect52,__InputStaticLeaf58,Connection82,__InputStaticLeaf90,Connection108,Connection126,Connection144,PgSelect165,Connection188 bucket0
+    Bucket1("Bucket 1<br />(listItem)<br />Deps: 82, 108, 126, 144, 52<br /><br />ROOT __Item{1}ᐸ52ᐳ[53]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item53,PgSelectSingle54,PgClassExpression55,PgClassExpression56,Connection82,Connection108,Connection126,Connection144,Access196,Access197,Access198,Access199,Reverse200 bucket1
+    class Bucket1,__Item53,PgSelectSingle54,PgClassExpression55,PgClassExpression56,Access196,Access197,Access198,Access199,Reverse200 bucket1
     Bucket2("Bucket 2<br />(listItem)<br />Deps: 200<br /><br />ROOT __Item{2}ᐸ200ᐳ[146]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item146,PgSelectSingle147,PgClassExpression148,PgClassExpression149 bucket2
@@ -123,9 +123,9 @@ graph TD
     Bucket5("Bucket 5<br />(listItem)<br />Deps: 196<br /><br />ROOT __Item{5}ᐸ196ᐳ[161]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item161,PgSelectSingle162,PgClassExpression163,PgClassExpression164 bucket5
-    Bucket6("Bucket 6<br />(listItem)<br />Deps: 165<br /><br />ROOT __Item{6}ᐸ165ᐳ[166]"):::bucket
+    Bucket6("Bucket 6<br />(listItem)<br />Deps: 188, 165<br /><br />ROOT __Item{6}ᐸ165ᐳ[166]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item166,PgSelectSingle167,PgClassExpression168,PgClassExpression169,Connection188,Access195 bucket6
+    class Bucket6,__Item166,PgSelectSingle167,PgClassExpression168,PgClassExpression169,Access195 bucket6
     Bucket7("Bucket 7<br />(listItem)<br />Deps: 195<br /><br />ROOT __Item{7}ᐸ195ᐳ[190]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item190,PgSelectSingle191,PgClassExpression192,PgClassExpression193,PgClassExpression194 bucket7

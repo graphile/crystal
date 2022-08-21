@@ -22,7 +22,7 @@ graph TD
     PgSelect94[["PgSelect[94∈0]<br />ᐸpersonᐳ"]]:::plan
     __Item95>"__Item[95∈1]<br />ᐸ94ᐳ"]:::itemplan
     PgSelectSingle96["PgSelectSingle[96∈1]<br />ᐸpersonᐳ"]:::plan
-    Connection124["Connection[124∈1]<br />ᐸ120ᐳ"]:::plan
+    Connection124["Connection[124∈0]<br />ᐸ120ᐳ"]:::plan
     Access133["Access[133∈1]<br />ᐸ95.0ᐳ"]:::plan
     First126["First[126∈1]"]:::plan
     PgSelectSingle127["PgSelectSingle[127∈1]<br />ᐸperson_friendsᐳ"]:::plan
@@ -57,9 +57,9 @@ graph TD
     subgraph "Buckets for queries/v4/connections-totalCount"
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,Connection62,Connection89,PgSelect90,First91,PgSelectSingle92,PgClassExpression93,PgSelect94,PgSelect129,First130,PgSelectSingle131,PgClassExpression132 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />Deps: 94<br /><br />ROOT __Item{1}ᐸ94ᐳ[95]"):::bucket
+    class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,Connection62,Connection89,PgSelect90,First91,PgSelectSingle92,PgClassExpression93,PgSelect94,Connection124,PgSelect129,First130,PgSelectSingle131,PgClassExpression132 bucket0
+    Bucket1("Bucket 1<br />(listItem)<br />Deps: 124, 94<br /><br />ROOT __Item{1}ᐸ94ᐳ[95]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item95,PgSelectSingle96,Connection124,First126,PgSelectSingle127,PgClassExpression128,Access133 bucket1
+    class Bucket1,__Item95,PgSelectSingle96,First126,PgSelectSingle127,PgClassExpression128,Access133 bucket1
     Bucket0 --> Bucket1
     end

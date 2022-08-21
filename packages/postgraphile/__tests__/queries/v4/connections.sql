@@ -266,22 +266,6 @@ lateral (
   from "c"."person" as __person__
   where (__person__."id" < __person_identifiers__."id0")
   order by __person__."id" desc
-  limit 2
-) as __person_result__
-
-select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
-lateral (
-  select
-    __person_identifiers__.idx as "0"
-  from "c"."person" as __person__
-  where (__person__."id" < __person_identifiers__."id0")
-  order by __person__."id" desc
   limit 3
 ) as __person_result__
 
@@ -305,22 +289,6 @@ lateral (
   from "c"."person" as __person__
   where (__person__."id" > __person_identifiers__."id0")
   order by __person__."id" asc
-  limit 1
-) as __person_result__
-
-select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
-lateral (
-  select
-    __person_identifiers__.idx as "0"
-  from "c"."person" as __person__
-  where (__person__."id" > __person_identifiers__."id0")
-  order by __person__."id" asc
   limit 2
 ) as __person_result__
 
@@ -341,22 +309,6 @@ lateral (
     __person__."person_full_name" as "5",
     __person__."id"::text as "6",
     __person_identifiers__.idx as "7"
-  from "c"."person" as __person__
-  where (__person__."id" > __person_identifiers__."id0")
-  order by __person__."id" desc
-  limit 1
-) as __person_result__
-
-select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
-lateral (
-  select
-    __person_identifiers__.idx as "0"
   from "c"."person" as __person__
   where (__person__."id" > __person_identifiers__."id0")
   order by __person__."id" desc

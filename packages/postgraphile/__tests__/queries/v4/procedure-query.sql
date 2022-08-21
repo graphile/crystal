@@ -560,22 +560,6 @@ from (
 ) as __table_set_query_plpgsql_identifiers__,
 lateral (
   select
-    __table_set_query_plpgsql_identifiers__.idx as "0"
-  from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
-  limit __table_set_query_plpgsql_identifiers__."id0"
-  offset __table_set_query_plpgsql_identifiers__."id1"
-) as __table_set_query_plpgsql_result__
-
-select __table_set_query_plpgsql_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_plpgsql_identifiers__,
-lateral (
-  select
     (row_number() over (partition by 1))::text as "0",
     __table_set_query_plpgsql__."id"::text as "1",
     __table_set_query_plpgsql__."person_full_name" as "2",
@@ -595,7 +579,10 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    __table_set_query_identifiers__.idx as "0"
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."id"::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
   from "c"."table_set_query"() as __table_set_query__
   limit __table_set_query_identifiers__."id0"
   offset __table_set_query_identifiers__."id1"
@@ -630,7 +617,10 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    __table_set_query_identifiers__.idx as "0"
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."id"::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
   from "c"."table_set_query"() as __table_set_query__
   limit __table_set_query_identifiers__."id0"
   offset __table_set_query_identifiers__."id1"
@@ -665,77 +655,10 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    __table_set_query_identifiers__.idx as "0"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
     (row_number() over (partition by 1))::text as "0",
     __table_set_query__."id"::text as "1",
     __table_set_query__."person_full_name" as "2",
     __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    __table_set_query_identifiers__.idx as "0"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."id"::text as "1",
-    __table_set_query__."person_full_name" as "2",
-    __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    __table_set_query_identifiers__.idx as "0"
   from "c"."table_set_query"() as __table_set_query__
   limit __table_set_query_identifiers__."id0"
   offset __table_set_query_identifiers__."id1"

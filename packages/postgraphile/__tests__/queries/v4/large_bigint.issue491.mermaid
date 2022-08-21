@@ -28,7 +28,7 @@ graph TD
     PgSelect41[["PgSelect[41∈0]<br />ᐸlargeNodeIdᐳ"]]:::plan
     __Item42>"__Item[42∈1]<br />ᐸ41ᐳ"]:::itemplan
     PgSelectSingle43["PgSelectSingle[43∈1]<br />ᐸlargeNodeIdᐳ"]:::plan
-    Constant44["Constant[44∈1]"]:::plan
+    Constant44["Constant[44∈0]"]:::plan
     PgClassExpression45["PgClassExpression[45∈1]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
     List46["List[46∈1]<br />ᐸ44,45ᐳ"]:::plan
     Lambda47["Lambda[47∈1]<br />ᐸencodeᐳ"]:::plan
@@ -79,9 +79,9 @@ graph TD
     subgraph "Buckets for queries/v4/large_bigint.issue491"
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access19,Access20,Object21,Connection22,__InputStaticLeaf23,Lambda24,Access25,PgSelect26,First30,PgSelectSingle31,__InputStaticLeaf32,Lambda33,Access34,PgSelect35,First39,PgSelectSingle40,PgSelect41,Constant50,PgClassExpression51,List52,Lambda53,PgClassExpression55,Constant56,PgClassExpression57,List58,Lambda59,PgClassExpression61 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />Deps: 41<br /><br />ROOT __Item{1}ᐸ41ᐳ[42]"):::bucket
+    class Bucket0,__Value3,__Value5,Access19,Access20,Object21,Connection22,__InputStaticLeaf23,Lambda24,Access25,PgSelect26,First30,PgSelectSingle31,__InputStaticLeaf32,Lambda33,Access34,PgSelect35,First39,PgSelectSingle40,PgSelect41,Constant44,Constant50,PgClassExpression51,List52,Lambda53,PgClassExpression55,Constant56,PgClassExpression57,List58,Lambda59,PgClassExpression61 bucket0
+    Bucket1("Bucket 1<br />(listItem)<br />Deps: 41, 44<br /><br />ROOT __Item{1}ᐸ41ᐳ[42]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item42,PgSelectSingle43,Constant44,PgClassExpression45,List46,Lambda47,PgClassExpression49 bucket1
+    class Bucket1,__Item42,PgSelectSingle43,PgClassExpression45,List46,Lambda47,PgClassExpression49 bucket1
     Bucket0 --> Bucket1
     end

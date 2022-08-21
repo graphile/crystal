@@ -32,7 +32,7 @@ graph TD
     List133["List[133∈1]<br />ᐸ132ᐳ"]:::plan
     First60["First[60∈1]"]:::plan
     PgSelectSingle61["PgSelectSingle[61∈1]<br />ᐸperson_first_postᐳ"]:::plan
-    Connection89["Connection[89∈1]<br />ᐸ85ᐳ"]:::plan
+    Connection89["Connection[89∈0]<br />ᐸ85ᐳ"]:::plan
     PgClassExpression90["PgClassExpression[90∈1]<br />ᐸ__person_f...ost__.”id”ᐳ"]:::plan
     PgClassExpression91["PgClassExpression[91∈1]<br />ᐸ__person_f...”headline”ᐳ"]:::plan
     PgClassExpression95["PgClassExpression[95∈1]<br />ᐸ”a”.”post_...st_post__)ᐳ"]:::plan
@@ -49,7 +49,7 @@ graph TD
     First112["First[112∈1]"]:::plan
     PgSelectSingle113["PgSelectSingle[113∈1]<br />ᐸperson_friendsᐳ"]:::plan
     PgClassExpression114["PgClassExpression[114∈1]<br />ᐸcount(*)ᐳ"]:::plan
-    PgPageInfo115["PgPageInfo[115∈1]"]:::plan
+    PgPageInfo115["PgPageInfo[115∈0]"]:::plan
     __Item116>"__Item[116∈3]<br />ᐸ108ᐳ"]:::itemplan
     PgSelectSingle117["PgSelectSingle[117∈3]<br />ᐸperson_friendsᐳ"]:::plan
     PgClassExpression118["PgClassExpression[118∈3]<br />ᐸ__person_friends__.”id”ᐳ"]:::plan
@@ -116,10 +116,10 @@ graph TD
     subgraph "Buckets for queries/v4/posts"
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access28,Access29,Object30,Connection31,PgSelect32 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />Deps: 32<br /><br />ROOT __Item{1}ᐸ32ᐳ[33]"):::bucket
+    class Bucket0,__Value3,__Value5,Access28,Access29,Object30,Connection31,PgSelect32,Connection89,PgPageInfo115 bucket0
+    Bucket1("Bucket 1<br />(listItem)<br />Deps: 89, 115, 32<br /><br />ROOT __Item{1}ᐸ32ᐳ[33]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,First49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,First60,PgSelectSingle61,Connection89,PgClassExpression90,PgClassExpression91,PgClassExpression95,First101,PgSelectSingle102,PgClassExpression103,PgClassExpression104,PgClassExpression106,__ListTransform108,First112,PgSelectSingle113,PgClassExpression114,PgPageInfo115,First123,PgSelectSingle124,PgCursor125,PgClassExpression126,List127,Access128,Access129,Map130,List131,Map132,List133,Map134,List135 bucket1
+    class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,First49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,First60,PgSelectSingle61,PgClassExpression90,PgClassExpression91,PgClassExpression95,First101,PgSelectSingle102,PgClassExpression103,PgClassExpression104,PgClassExpression106,__ListTransform108,First112,PgSelectSingle113,PgClassExpression114,First123,PgSelectSingle124,PgCursor125,PgClassExpression126,List127,Access128,Access129,Map130,List131,Map132,List133,Map134,List135 bucket1
     Bucket2("Bucket 2<br />(subroutine)<br />ROOT null"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
