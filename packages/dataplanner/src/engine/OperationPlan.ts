@@ -270,14 +270,17 @@ export class OperationPlan {
     // Plan the operation
     this.planOperation();
 
+    // Now perform hoisting (and repeat deduplication)
+    this.hoistSteps();
+
+    // Get rid of temporary steps before `optimize` triggers side-effects
+    this.treeShakeSteps();
+
     if (isDev) {
       this.phase = "validate";
       // Helpfully check steps don't do forbidden things.
       this.validateSteps();
     }
-
-    // Get rid of temporary steps
-    this.treeShakeSteps();
 
     this.phase = "optimize";
 
@@ -1402,7 +1405,7 @@ export class OperationPlan {
     const errors: Error[] = [];
     for (let stepId = offset; stepId < this.stepCount; stepId++) {
       const step = this.steps[stepId];
-      if (step.id === stepId) {
+      if (step && step.id === stepId) {
         const referencingPlanIsAllowed =
           // Required so that we can access the underlying value plan.
           step instanceof __TrackedObjectStep;
@@ -1842,9 +1845,6 @@ export class OperationPlan {
       return null;
     }
 
-    // Attempt to hoist the plan into a higher layer.
-    this.hoistStep(step);
-
     const peers = this.getPeers(step, alsoIncludeLayerPlans);
 
     // TODO: should we keep this optimisation, or should we remove it so that
@@ -1969,6 +1969,15 @@ export class OperationPlan {
       (step) => this.deduplicateStep(step),
     );
     this.maxDeduplicatedStepId = this.stepCount - 1;
+  }
+
+  private hoistSteps() {
+    this.processSteps("hoist", 0, "dependencies-first", (step) => {
+      this.hoistStep(step);
+      // Even if step wasn't hoisted, its deps may have been so we should still
+      // re-deduplicate it.
+      return this.deduplicateStep(step);
+    });
   }
 
   /**
