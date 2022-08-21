@@ -14,25 +14,25 @@ graph TD
     Access12["Access[12∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access13["Access[13∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object14["Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgSelect11[["PgSelect[11∈1]<br />ᐸmutation_in_inoutᐳ"]]:::sideeffectplan
+    PgSelect11[["PgSelect[11∈1]<br />ᐸmutation_in_inout(mutation)ᐳ"]]:::sideeffectplan
     First15["First[15∈1]"]:::plan
     PgSelectSingle16["PgSelectSingle[16∈1]<br />ᐸmutation_in_inoutᐳ"]:::plan
     PgClassExpression17["PgClassExpression[17∈1]<br />ᐸ__mutation_in_inout__.vᐳ"]:::plan
     Object18["Object[18∈1]<br />ᐸ{result}ᐳ"]:::plan
     __InputStaticLeaf21["__InputStaticLeaf[21∈0]"]:::plan
-    PgSelect22[["PgSelect[22∈2]<br />ᐸmutation_in_outᐳ"]]:::sideeffectplan
+    PgSelect22[["PgSelect[22∈2]<br />ᐸmutation_in_out(mutation)ᐳ"]]:::sideeffectplan
     First26["First[26∈2]"]:::plan
     PgSelectSingle27["PgSelectSingle[27∈2]<br />ᐸmutation_in_outᐳ"]:::plan
     PgClassExpression28["PgClassExpression[28∈2]<br />ᐸ__mutation_in_out__.vᐳ"]:::plan
     Object29["Object[29∈2]<br />ᐸ{result}ᐳ"]:::plan
-    PgSelect32[["PgSelect[32∈3]<br />ᐸmutation_outᐳ"]]:::sideeffectplan
+    PgSelect32[["PgSelect[32∈3]<br />ᐸmutation_out(mutation)ᐳ"]]:::sideeffectplan
     First36["First[36∈3]"]:::plan
     PgSelectSingle37["PgSelectSingle[37∈3]<br />ᐸmutation_outᐳ"]:::plan
     PgClassExpression38["PgClassExpression[38∈3]<br />ᐸ__mutation_out__.vᐳ"]:::plan
     Object39["Object[39∈3]<br />ᐸ{result}ᐳ"]:::plan
     __InputStaticLeaf42["__InputStaticLeaf[42∈0]"]:::plan
     __InputStaticLeaf43["__InputStaticLeaf[43∈0]"]:::plan
-    PgSelect44[["PgSelect[44∈4]<br />ᐸmutation_out_complexᐳ"]]:::sideeffectplan
+    PgSelect44[["PgSelect[44∈4]<br />ᐸmutation_out_complex(mutation)ᐳ"]]:::sideeffectplan
     First48["First[48∈4]"]:::plan
     PgSelectSingle49["PgSelectSingle[49∈4]<br />ᐸmutation_out_complexᐳ"]:::plan
     Object50["Object[50∈4]<br />ᐸ{result}ᐳ"]:::plan
@@ -63,7 +63,7 @@ graph TD
     Lambda107["Lambda[107∈5]<br />ᐸencodeᐳ"]:::plan
     __InputStaticLeaf111["__InputStaticLeaf[111∈0]"]:::plan
     __InputStaticLeaf112["__InputStaticLeaf[112∈0]"]:::plan
-    PgSelect113[["PgSelect[113∈6]<br />ᐸmutation_out_complex_setofᐳ"]]:::sideeffectplan
+    PgSelect113[["PgSelect[113∈6]<br />ᐸmutation_out_complex_setof(mutation)ᐳ"]]:::sideeffectplan
     Object117["Object[117∈6]<br />ᐸ{result}ᐳ"]:::plan
     __Item118>"__Item[118∈7]<br />ᐸ113ᐳ"]:::itemplan
     PgSelectSingle119["PgSelectSingle[119∈7]<br />ᐸmutation_out_complex_setofᐳ"]:::plan
@@ -92,14 +92,14 @@ graph TD
     PgClassExpression174["PgClassExpression[174∈8]<br />ᐸ__post__.”id”ᐳ"]:::plan
     List175["List[175∈8]<br />ᐸ173,174ᐳ"]:::plan
     Lambda176["Lambda[176∈8]<br />ᐸencodeᐳ"]:::plan
-    PgSelect180[["PgSelect[180∈9]<br />ᐸmutation_out_outᐳ"]]:::sideeffectplan
+    PgSelect180[["PgSelect[180∈9]<br />ᐸmutation_out_out(mutation)ᐳ"]]:::sideeffectplan
     First184["First[184∈9]"]:::plan
     PgSelectSingle185["PgSelectSingle[185∈9]<br />ᐸmutation_out_outᐳ"]:::plan
     Object186["Object[186∈9]<br />ᐸ{result}ᐳ"]:::plan
     PgClassExpression187["PgClassExpression[187∈9]<br />ᐸ__mutation...first_out”ᐳ"]:::plan
     PgClassExpression188["PgClassExpression[188∈9]<br />ᐸ__mutation...econd_out”ᐳ"]:::plan
     __InputStaticLeaf191["__InputStaticLeaf[191∈0]"]:::plan
-    PgSelect192[["PgSelect[192∈10]<br />ᐸmutation_out_out_compound_typeᐳ"]]:::sideeffectplan
+    PgSelect192[["PgSelect[192∈10]<br />ᐸmutation_out_out_compound_type(mutation)ᐳ"]]:::sideeffectplan
     First196["First[196∈10]"]:::plan
     PgSelectSingle197["PgSelectSingle[197∈10]<br />ᐸmutation_out_out_compound_typeᐳ"]:::plan
     Object198["Object[198∈10]<br />ᐸ{result}ᐳ"]:::plan
@@ -111,24 +111,24 @@ graph TD
     PgClassExpression207["PgClassExpression[207∈10]<br />ᐸ__compound_type__.”a”ᐳ"]:::plan
     PgClassExpression208["PgClassExpression[208∈10]<br />ᐸ__compound_type__.”b”ᐳ"]:::plan
     PgClassExpression209["PgClassExpression[209∈10]<br />ᐸ__compound_type__.”c”ᐳ"]:::plan
-    PgSelect212[["PgSelect[212∈11]<br />ᐸmutation_out_out_setofᐳ"]]:::sideeffectplan
+    PgSelect212[["PgSelect[212∈11]<br />ᐸmutation_out_out_setof(mutation)ᐳ"]]:::sideeffectplan
     Object216["Object[216∈11]<br />ᐸ{result}ᐳ"]:::plan
     __Item217>"__Item[217∈12]<br />ᐸ212ᐳ"]:::itemplan
     PgSelectSingle218["PgSelectSingle[218∈12]<br />ᐸmutation_out_out_setofᐳ"]:::plan
     PgClassExpression219["PgClassExpression[219∈12]<br />ᐸ__mutation...tof__.”o1”ᐳ"]:::plan
     PgClassExpression220["PgClassExpression[220∈12]<br />ᐸ__mutation...tof__.”o2”ᐳ"]:::plan
-    PgSelect223[["PgSelect[223∈13]<br />ᐸmutation_out_out_unnamedᐳ"]]:::sideeffectplan
+    PgSelect223[["PgSelect[223∈13]<br />ᐸmutation_out_out_unnamed(mutation)ᐳ"]]:::sideeffectplan
     First227["First[227∈13]"]:::plan
     PgSelectSingle228["PgSelectSingle[228∈13]<br />ᐸmutation_out_out_unnamedᐳ"]:::plan
     Object229["Object[229∈13]<br />ᐸ{result}ᐳ"]:::plan
     PgClassExpression230["PgClassExpression[230∈13]<br />ᐸ__mutation....”column1”ᐳ"]:::plan
     PgClassExpression231["PgClassExpression[231∈13]<br />ᐸ__mutation....”column2”ᐳ"]:::plan
-    PgSelect234[["PgSelect[234∈14]<br />ᐸmutation_out_setofᐳ"]]:::sideeffectplan
+    PgSelect234[["PgSelect[234∈14]<br />ᐸmutation_out_setof(mutation)ᐳ"]]:::sideeffectplan
     Object238["Object[238∈14]<br />ᐸ{result}ᐳ"]:::plan
     __Item239>"__Item[239∈15]<br />ᐸ234ᐳ"]:::itemplan
     PgSelectSingle240["PgSelectSingle[240∈15]<br />ᐸmutation_out_setofᐳ"]:::plan
     PgClassExpression241["PgClassExpression[241∈15]<br />ᐸ__mutation..._setof__.vᐳ"]:::plan
-    PgSelect244[["PgSelect[244∈16]<br />ᐸmutation_out_tableᐳ"]]:::sideeffectplan
+    PgSelect244[["PgSelect[244∈16]<br />ᐸmutation_out_table(mutation)ᐳ"]]:::sideeffectplan
     First248["First[248∈16]"]:::plan
     PgSelectSingle249["PgSelectSingle[249∈16]<br />ᐸmutation_out_tableᐳ"]:::plan
     Object250["Object[250∈16]<br />ᐸ{result}ᐳ"]:::plan
@@ -136,7 +136,7 @@ graph TD
     PgClassExpression252["PgClassExpression[252∈16]<br />ᐸ__mutation...ble__.”id”ᐳ"]:::plan
     List253["List[253∈16]<br />ᐸ251,252ᐳ"]:::plan
     Lambda254["Lambda[254∈16]<br />ᐸencodeᐳ"]:::plan
-    PgSelect258[["PgSelect[258∈17]<br />ᐸmutation_out_table_setofᐳ"]]:::sideeffectplan
+    PgSelect258[["PgSelect[258∈17]<br />ᐸmutation_out_table_setof(mutation)ᐳ"]]:::sideeffectplan
     Object262["Object[262∈17]<br />ᐸ{result}ᐳ"]:::plan
     __Item263>"__Item[263∈18]<br />ᐸ258ᐳ"]:::itemplan
     PgSelectSingle264["PgSelectSingle[264∈18]<br />ᐸmutation_out_table_setofᐳ"]:::plan
@@ -144,12 +144,12 @@ graph TD
     PgClassExpression266["PgClassExpression[266∈18]<br />ᐸ__mutation...tof__.”id”ᐳ"]:::plan
     List267["List[267∈18]<br />ᐸ265,266ᐳ"]:::plan
     Lambda268["Lambda[268∈18]<br />ᐸencodeᐳ"]:::plan
-    PgSelect272[["PgSelect[272∈19]<br />ᐸmutation_out_unnamedᐳ"]]:::sideeffectplan
+    PgSelect272[["PgSelect[272∈19]<br />ᐸmutation_out_unnamed(mutation)ᐳ"]]:::sideeffectplan
     First276["First[276∈19]"]:::plan
     PgSelectSingle277["PgSelectSingle[277∈19]<br />ᐸmutation_out_unnamedᐳ"]:::plan
     PgClassExpression278["PgClassExpression[278∈19]<br />ᐸ__mutation...nnamed__.vᐳ"]:::plan
     Object279["Object[279∈19]<br />ᐸ{result}ᐳ"]:::plan
-    PgSelect282[["PgSelect[282∈20]<br />ᐸmutation_out_unnamed_out_out_unnamedᐳ"]]:::sideeffectplan
+    PgSelect282[["PgSelect[282∈20]<br />ᐸmutation_out_unnamed_out_out_unnamed(mutation)ᐳ"]]:::sideeffectplan
     First286["First[286∈20]"]:::plan
     PgSelectSingle287["PgSelectSingle[287∈20]<br />ᐸmutation_out_unnamed_out_out_unnamedᐳ"]:::plan
     Object288["Object[288∈20]<br />ᐸ{result}ᐳ"]:::plan
@@ -157,14 +157,14 @@ graph TD
     PgClassExpression290["PgClassExpression[290∈20]<br />ᐸ__mutation....”column3”ᐳ"]:::plan
     PgClassExpression291["PgClassExpression[291∈20]<br />ᐸ__mutation...med__.”o2”ᐳ"]:::plan
     __InputStaticLeaf294["__InputStaticLeaf[294∈0]"]:::plan
-    PgSelect295[["PgSelect[295∈21]<br />ᐸmutation_returns_table_multi_colᐳ"]]:::sideeffectplan
+    PgSelect295[["PgSelect[295∈21]<br />ᐸmutation_returns_table_multi_col(mutation)ᐳ"]]:::sideeffectplan
     Object299["Object[299∈21]<br />ᐸ{result}ᐳ"]:::plan
     __Item300>"__Item[300∈22]<br />ᐸ295ᐳ"]:::itemplan
     PgSelectSingle301["PgSelectSingle[301∈22]<br />ᐸmutation_returns_table_multi_colᐳ"]:::plan
     PgClassExpression302["PgClassExpression[302∈22]<br />ᐸ__mutation...l__.”col1”ᐳ"]:::plan
     PgClassExpression303["PgClassExpression[303∈22]<br />ᐸ__mutation...l__.”col2”ᐳ"]:::plan
     __InputStaticLeaf306["__InputStaticLeaf[306∈0]"]:::plan
-    PgSelect307[["PgSelect[307∈23]<br />ᐸmutation_returns_table_one_colᐳ"]]:::sideeffectplan
+    PgSelect307[["PgSelect[307∈23]<br />ᐸmutation_returns_table_one_col(mutation)ᐳ"]]:::sideeffectplan
     Object311["Object[311∈23]<br />ᐸ{result}ᐳ"]:::plan
     __Item312>"__Item[312∈24]<br />ᐸ307ᐳ"]:::itemplan
     PgSelectSingle313["PgSelectSingle[313∈24]<br />ᐸmutation_returns_table_one_colᐳ"]:::plan
