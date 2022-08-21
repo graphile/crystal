@@ -1876,14 +1876,16 @@ export class OperationPlan {
       return null;
     }
 
-    if (
-      !equivalentSteps.every((replacementStep) =>
-        peers.includes(replacementStep),
-      )
-    ) {
-      throw new Error(
-        `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
-      );
+    if (isDev) {
+      if (
+        !equivalentSteps.every((replacementStep) =>
+          peers.includes(replacementStep),
+        )
+      ) {
+        throw new Error(
+          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
+        );
+      }
     }
 
     const allEquivalentSteps = [step, ...equivalentSteps];
