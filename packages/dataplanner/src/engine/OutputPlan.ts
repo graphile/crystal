@@ -237,7 +237,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   toString() {
-    return `OutputPlan<${this.type.mode}|${this.layerPlan.id}|${this.rootStepId}>`;
+    return `OutputPlan<${this.type.mode}∈${this.layerPlan.id}!${this.rootStepId}>`;
   }
 
   addChild(
