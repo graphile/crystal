@@ -1001,7 +1001,7 @@ export class OperationPlan {
         type: "outputPlan",
         isNonNull,
         outputPlan: new OutputPlan(
-          $leaf.layerPlan,
+          parentLayerPlan,
           $leaf,
           {
             mode: "leaf",
