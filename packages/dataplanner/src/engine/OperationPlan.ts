@@ -667,53 +667,56 @@ export class OperationPlan {
       fieldNodes: FieldNode[];
       fieldLayerPlan: LayerPlan;
     }
-    const nextUp: NextUp[] = [];
+    const nextUpList: NextUp[] = [];
 
-    const processNextUp = () => {
-      for (const {
+    const next: (nextUp: NextUp) => void = customRecurse
+      ? (nextUp) => void nextUpList.push(nextUp)
+      : (nextUp) => processNextUp(nextUp);
+
+    const processNextUp = (nextUp: NextUp): void => {
+      const {
         haltTree,
         stepId,
         responseKey,
         fieldType,
         fieldNodes,
         fieldLayerPlan,
-      } of nextUp) {
-        // May have changed due to deduplicate
-        const step = this.steps[stepId];
-        // TODO: is `outputPlan` unchanged here after polymorphicDeduplicateSteps?
-        if (haltTree) {
-          const isNonNull = isNonNullType(fieldType);
-          outputPlan.addChild(objectType, responseKey, {
-            type: "outputPlan",
-            outputPlan: new OutputPlan(
-              fieldLayerPlan,
-              step,
-              {
-                mode: "null",
-              },
-              fieldNodes,
-            ),
-            isNonNull,
-            node: fieldNodes,
-          });
-        } else {
-          this.planIntoOutputPlan(
-            outputPlan,
+      } = nextUp;
+      // May have changed due to deduplicate
+      const step = this.steps[stepId];
+      // TODO: is `outputPlan` unchanged here after polymorphicDeduplicateSteps?
+      if (haltTree) {
+        const isNonNull = isNonNullType(fieldType);
+        outputPlan.addChild(objectType, responseKey, {
+          type: "outputPlan",
+          outputPlan: new OutputPlan(
             fieldLayerPlan,
-            [...path, responseKey],
-            fieldNodes[0].selectionSet
-              ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
-              : undefined,
-            objectType,
-            responseKey,
-            fieldType,
             step,
+            {
+              mode: "null",
+            },
             fieldNodes,
-          );
-        }
-
-        // TODO: this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+          ),
+          isNonNull,
+          node: fieldNodes,
+        });
+      } else {
+        this.planIntoOutputPlan(
+          outputPlan,
+          fieldLayerPlan,
+          [...path, responseKey],
+          fieldNodes[0].selectionSet
+            ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
+            : undefined,
+          objectType,
+          responseKey,
+          fieldType,
+          step,
+          fieldNodes,
+        );
       }
+
+      // TODO: this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
     };
 
     assertObjectType(objectType);
@@ -917,7 +920,7 @@ export class OperationPlan {
       }
 
       // this.planIdByPathIdentity[pathIdentity] = step.id;
-      nextUp.push({
+      next({
         haltTree,
         stepId: step.id,
         responseKey,
@@ -928,9 +931,11 @@ export class OperationPlan {
     }
 
     if (customRecurse) {
-      customRecurse(() => processNextUp());
-    } else {
-      processNextUp();
+      customRecurse(() => {
+        for (const nextUp of nextUpList) {
+          processNextUp(nextUp);
+        }
+      });
     }
 
     this.loc.pop();
