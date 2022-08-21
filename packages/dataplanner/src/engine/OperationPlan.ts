@@ -1929,6 +1929,13 @@ export class OperationPlan {
     // Hooray, one winning layer! Find the first one by id.
     const winner = stepsAtMinDepth[0];
 
+    // Give the steps a chance to pass their responsibilities to the winner.
+    for (const target of allEquivalentSteps) {
+      if (winner !== target) {
+        target.deduplicatedWith(winner);
+      }
+    }
+
     // Everything else is equivalent to winner!
     this.replaceSteps(allEquivalentSteps, winner);
 

@@ -316,10 +316,20 @@ export class ExecutableStep<TData = any> extends BaseStep {
    *
    * NOTE: equivalence goes both ways: `a.deduplicate([b]).includes(b)` if and
    * only if `b.deduplicate([a]).includes(a)`.
+   *
+   * If you need to transform the peer to be equivalent you should do so via
+   * the `deduplicatedWith` callback later.
    */
   public deduplicate(_peers: ExecutableStep[]): ExecutableStep[] {
     return [];
   }
+
+  /**
+   * If this plan is replaced via deduplication, this method gives it a chance
+   * to hand over its responsibilities to its replacement.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public deduplicatedWith(replacement: ExecutableStep): void {}
 
   /**
    * Our chance to optimise the plan (which could go as far as to inline the

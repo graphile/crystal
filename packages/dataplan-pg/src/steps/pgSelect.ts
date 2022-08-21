@@ -2101,7 +2101,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     peers: PgSelectStep<any, any, any, any>[],
   ): PgSelectStep<TColumns, TUniques, TRelations, TParameters>[] {
     this._lockAllParameters();
-    const identicalSteps = peers.filter((p) => {
+    return peers.filter((p) => {
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2256,33 +2256,25 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
       return true;
     });
-    return identicalSteps.map((identical) => {
-      if (
-        typeof this.symbol === "symbol" &&
-        typeof identical.symbol === "symbol"
-      ) {
-        if (this.symbol !== identical.symbol) {
-          identical._symbolSubstitutes.set(this.symbol, identical.symbol);
-        } else {
-          // Fine :)
-        }
+  }
+
+  public deduplicatedWith(
+    replacement: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
+  ): void {
+    if (
+      typeof this.symbol === "symbol" &&
+      typeof replacement.symbol === "symbol"
+    ) {
+      if (this.symbol !== replacement.symbol) {
+        replacement._symbolSubstitutes.set(this.symbol, replacement.symbol);
+      } else {
+        // Fine :)
       }
+    }
 
-      if (this.fetchOneExtra) {
-        identical.fetchOneExtra = true;
-      }
-
-      return identical;
-      /* The following is now forbidden.
-
-        // Move the selects across and then replace ourself with a transform that
-        // maps the expected attribute ids from the `identical` plan.
-        const actualKeyByDesiredKey = this.mergeSelectsWith(identical);
-        const mapper = makeMapper(actualKeyByDesiredKey);
-        return each(identical, mapper);
-
-      */
-    });
+    if (this.fetchOneExtra) {
+      replacement.fetchOneExtra = true;
+    }
   }
 
   private mergeSelectsWith<TOtherStep extends PgSelectStep<any, any, any, any>>(
