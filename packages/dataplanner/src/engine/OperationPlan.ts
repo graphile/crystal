@@ -978,7 +978,7 @@ export class OperationPlan {
         : $__item;
       this.planIntoOutputPlan(
         listOutputPlan,
-        listOutputPlan.layerPlan,
+        $item.layerPlan,
         [],
         selections,
         null,
