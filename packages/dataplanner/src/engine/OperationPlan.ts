@@ -2413,6 +2413,10 @@ export class OperationPlan {
       // TODO:perf: this could probably be faster.
       // Populate copyPlanIds for each step
       for (const step of layerPlan.steps) {
+        // Items shouldn't have their "list" copied in.
+        if (step instanceof __ItemStep) {
+          continue;
+        }
         for (const depId of step.dependencies) {
           const dep = this.steps[depId];
           ensurePlanAvailableInLayer(dep, layerPlan);
