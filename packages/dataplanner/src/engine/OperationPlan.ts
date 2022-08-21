@@ -1899,7 +1899,7 @@ export class OperationPlan {
     return { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps };
   }
 
-  private deduplicateStep(step: ExecutableStep) {
+  private deduplicateStep(step: ExecutableStep): ExecutableStep {
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
       return step;
