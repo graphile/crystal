@@ -370,7 +370,7 @@ export function printPlanGraph(
             ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
             : ""
         }\n${outputMapStuff.join("\n")}`,
-      )}):::layerPlan`,
+      )}):::bucket`,
     );
     graph.push(
       `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
