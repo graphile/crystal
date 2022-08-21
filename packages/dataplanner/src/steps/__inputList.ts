@@ -25,7 +25,6 @@ export class __InputListStep extends ExecutableStep {
     private readonly inputValues: ValueNode | undefined,
   ) {
     super();
-    this.layerPlan = this.layerPlan.operationPlan.rootLayerPlan;
     assert.ok(
       inputType instanceof GraphQLList,
       "Expected inputType to be a List",

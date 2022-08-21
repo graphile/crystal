@@ -24,7 +24,6 @@ export class __InputObjectStep extends ExecutableStep {
     private inputValues: ValueNode | undefined,
   ) {
     super();
-    this.layerPlan = this.layerPlan.operationPlan.rootLayerPlan;
     const inputFieldDefinitions = inputObjectType.getFields();
     const inputFields =
       inputValues?.kind === "ObjectValue" ? inputValues.fields : undefined;

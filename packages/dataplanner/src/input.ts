@@ -18,6 +18,7 @@ import {
 import { inspect } from "util";
 
 import * as assert from "./assert.js";
+import { withGlobalLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
@@ -87,59 +88,61 @@ export function inputPlan(
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
 ): InputStep {
-  let inputValue = rawInputValue;
-  if (inputValue?.kind === "Variable") {
-    const variableName = inputValue.name.value;
-    const variableDefinition =
-      operationPlan.operation.variableDefinitions?.find(
-        (def) => def.variable.name.value === variableName,
+  return withGlobalLayerPlan(operationPlan.rootLayerPlan, () => {
+    let inputValue = rawInputValue;
+    if (inputValue?.kind === "Variable") {
+      const variableName = inputValue.name.value;
+      const variableDefinition =
+        operationPlan.operation.variableDefinitions?.find(
+          (def) => def.variable.name.value === variableName,
+        );
+      if (!variableDefinition) {
+        // Should not happen since the GraphQL operation has already been
+        // validated.
+        throw new Error(`No definition for variable '${variableName}' found`);
+      }
+      const variableType = graphqlGetTypeForNode(
+        operationPlan,
+        variableDefinition.type,
       );
-    if (!variableDefinition) {
-      // Should not happen since the GraphQL operation has already been
-      // validated.
-      throw new Error(`No definition for variable '${variableName}' found`);
+      if (!isInputType(variableType)) {
+        throw new Error(`Expected varible type to be an input type`);
+      }
+      return inputVariablePlan(
+        operationPlan,
+        variableName,
+        variableType,
+        inputType,
+        defaultValue,
+      );
     }
-    const variableType = graphqlGetTypeForNode(
-      operationPlan,
-      variableDefinition.type,
-    );
-    if (!isInputType(variableType)) {
-      throw new Error(`Expected varible type to be an input type`);
-    }
-    return inputVariablePlan(
-      operationPlan,
-      variableName,
-      variableType,
-      inputType,
-      defaultValue,
-    );
-  }
-  // Note: past here we know whether `defaultValue` will be used or not because
-  // we know `inputValue` is not a variable.
-  inputValue = inputValue ?? defaultValue;
-  if (inputType instanceof GraphQLNonNull) {
-    const innerType = inputType.ofType;
-    const valuePlan = inputPlan(operationPlan, innerType, inputValue);
-    return inputNonNullPlan(operationPlan, valuePlan);
-  } else if (inputType instanceof GraphQLList) {
-    return new __InputListStep(inputType, inputValue);
-  } else if (isLeafType(inputType)) {
-    if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
-      const scalarType = assertScalarType(inputType);
-      // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
-      // scalars that have variables in subfields.)
-      return new __InputDynamicScalarStep(scalarType, inputValue);
+    // Note: past here we know whether `defaultValue` will be used or not because
+    // we know `inputValue` is not a variable.
+    inputValue = inputValue ?? defaultValue;
+    if (inputType instanceof GraphQLNonNull) {
+      const innerType = inputType.ofType;
+      const valuePlan = inputPlan(operationPlan, innerType, inputValue);
+      return inputNonNullPlan(operationPlan, valuePlan);
+    } else if (inputType instanceof GraphQLList) {
+      return new __InputListStep(inputType, inputValue);
+    } else if (isLeafType(inputType)) {
+      if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
+        const scalarType = assertScalarType(inputType);
+        // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
+        // scalars that have variables in subfields.)
+        return new __InputDynamicScalarStep(scalarType, inputValue);
+      } else {
+        // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
+        // none of which can contain a variable:
+        return new __InputStaticLeafStep(inputType, inputValue);
+      }
+    } else if (inputType instanceof GraphQLInputObjectType) {
+      return new __InputObjectStep(inputType, inputValue);
     } else {
-      // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
-      // none of which can contain a variable:
-      return new __InputStaticLeafStep(inputType, inputValue);
+      const never: never = inputType;
+      throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
     }
-  } else if (inputType instanceof GraphQLInputObjectType) {
-    return new __InputObjectStep(inputType, inputValue);
-  } else {
-    const never: never = inputType;
-    throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
-  }
+  });
 }
 
 function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
