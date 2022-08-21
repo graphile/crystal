@@ -128,23 +128,23 @@ graph TD
     %% plan-to-path relationships
 
     subgraph "Buckets for queries/v4/enum_tables.queries"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 111<br /><br />ROOT __Item{1}ᐸ111ᐳ[112]"):::bucket
+    class Bucket0,__Value3,__Value5,Access21,Access22,Object23,Connection24,Connection42,Connection60,__InputStaticLeaf61,PgSelect62,First66,PgSelectSingle67,__InputStaticLeaf68,PgSelect69,First73,PgSelectSingle74,__InputStaticLeaf82,Connection92,__InputStaticLeaf101,Connection110,PgSelect111,PgSelect118,PgSelect125,PgClassExpression132,PgClassExpression133,PgClassExpression134,PgClassExpression135,PgClassExpression136,PgClassExpression137,PgClassExpression138,PgClassExpression139,PgSelect140,PgSelect147 bucket0
+    Bucket1("Bucket 1<br />(listItem)<br />Deps: 111<br /><br />ROOT __Item{1}ᐸ111ᐳ[112]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 118<br /><br />ROOT __Item{2}ᐸ118ᐳ[119]"):::bucket
+    class Bucket1,__Item112,PgSelectSingle113,PgClassExpression114,PgClassExpression115,PgClassExpression116,PgClassExpression117 bucket1
+    Bucket2("Bucket 2<br />(listItem)<br />Deps: 118<br /><br />ROOT __Item{2}ᐸ118ᐳ[119]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (listItem)<br />Deps: 125<br /><br />ROOT __Item{3}ᐸ125ᐳ[126]"):::bucket
+    class Bucket2,__Item119,PgSelectSingle120,PgClassExpression121,PgClassExpression122,PgClassExpression123,PgClassExpression124 bucket2
+    Bucket3("Bucket 3<br />(listItem)<br />Deps: 125<br /><br />ROOT __Item{3}ᐸ125ᐳ[126]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3 bucket3
-    Bucket4("Bucket 4 (listItem)<br />Deps: 140<br /><br />ROOT __Item{4}ᐸ140ᐳ[141]"):::bucket
+    class Bucket3,__Item126,PgSelectSingle127,PgClassExpression128,PgClassExpression129,PgClassExpression130,PgClassExpression131 bucket3
+    Bucket4("Bucket 4<br />(listItem)<br />Deps: 140<br /><br />ROOT __Item{4}ᐸ140ᐳ[141]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4 bucket4
-    Bucket5("Bucket 5 (listItem)<br />Deps: 147<br /><br />ROOT __Item{5}ᐸ147ᐳ[148]"):::bucket
+    class Bucket4,__Item141,PgSelectSingle142,PgClassExpression143,PgClassExpression144,PgClassExpression145,PgClassExpression146 bucket4
+    Bucket5("Bucket 5<br />(listItem)<br />Deps: 147<br /><br />ROOT __Item{5}ᐸ147ᐳ[148]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5 bucket5
+    class Bucket5,__Item148,PgSelectSingle149,PgClassExpression150,PgClassExpression151,PgClassExpression152,PgClassExpression153 bucket5
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5
     end
