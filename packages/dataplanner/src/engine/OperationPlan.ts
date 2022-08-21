@@ -1733,6 +1733,89 @@ export class OperationPlan {
     return peers;
   }
 
+  /**
+   * Attempts to hoist the step into a higher layerPlan to maximize
+   * deduplication.
+   */
+  private hoistStep(step: ExecutableStep) {
+    if (step.hasSideEffects) {
+      return;
+    }
+    if (step instanceof __ItemStep) {
+      return;
+    }
+    switch (step.layerPlan.reason.type) {
+      case "root": {
+        // There is no higher layerPlan
+        return;
+      }
+      case "subscription":
+      case "defer":
+      case "stream": {
+        // Should be deferred, don't evaluate early (unless it's cheap to do so)
+        if (step.isSyncAndSafe) {
+          // It's cheap, try and hoist it
+          break;
+        } else {
+          return;
+        }
+      }
+      case "polymorphic": {
+        // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
+        if (step.isSyncAndSafe) {
+          // It's cheap, try and hoist it.
+          // NOTE: this means this will run for non-matching types, which is
+          // not ideal. We may need to revert this.
+          // TODO: ensure this is safe.
+          break;
+        } else {
+          return;
+        }
+      }
+      case "subroutine": {
+        // Should be safe to hoist.
+        break;
+      }
+      case "listItem": {
+        // Should be safe to hoist so long as it doesn't depend on the
+        // `__ItemStep` itself (which is just a regular dependency, so it'll be
+        // checked later).
+        break;
+      }
+      case "mutationField": {
+        // NOTE: It's the user's responsibility to ensure that steps that have
+        // side effects are marked as such via `step.hasSideEffects = true`.
+        // TODO: warn user we're hoisting from a mutationField?
+        // TODO: maybe only hoist the isSyncAndSafe steps?
+        break;
+      }
+      default: {
+        const never: never = step.layerPlan.reason;
+        throw new Error(
+          `GraphileInternalError<81e3a7d4-aaa0-416b-abbb-a887734007bc>: unhandled layer plan reason ${inspect(
+            never,
+          )}`,
+        );
+      }
+    }
+
+    // Finally, check that none of its dependencies are in the same bucket.
+    const deps = step.dependencies.map((depId) => this.steps[depId]);
+    if (deps.some((dep) => dep.layerPlan === step.layerPlan)) {
+      return;
+    }
+
+    // All our checks passed, hoist it.
+    assert.ok(
+      step.layerPlan.parentLayerPlan !== null,
+      "GraphileInternalError<55c8940f-e8ac-4985-8b34-96fc6f81d62d>: A non-root layer plan had no parent?!",
+    );
+    step.layerPlan = step.layerPlan.parentLayerPlan;
+
+    // Now try and hoist it again!
+    this.hoistStep(step);
+  }
+
   private _deduplicateInnerLogic(
     step: ExecutableStep,
     alsoIncludeLayerPlans: LayerPlan[] = [],
@@ -1758,6 +1841,9 @@ export class OperationPlan {
       // entries to be garbage collected).
       return null;
     }
+
+    // Attempt to hoist the plan into a higher layer.
+    this.hoistStep(step);
 
     const peers = this.getPeers(step, alsoIncludeLayerPlans);
 
