@@ -781,7 +781,11 @@ export class PgSelectStep<
   }
 
   public toStringMeta(): string {
-    return this.name;
+    return (
+      this.name +
+      (this.fetchOneExtra ? "+1" : "") +
+      (this.mode === "normal" ? "" : `(${this.mode})`)
+    );
   }
 
   public lock(): void {
