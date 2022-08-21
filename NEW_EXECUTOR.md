@@ -1,5 +1,7 @@
 NEXT UP:
 
+- [ ] Why is `author_id` being unnecessarily selected for
+      `queries/connections/pagination-after`?
 - [x] Fix all instances of GraphQLError so the errors come out right
       (particularly connections-blankcursor.test.graphql)
 - [ ] When using a constant for `node(id: "...")` we should be able to determine
