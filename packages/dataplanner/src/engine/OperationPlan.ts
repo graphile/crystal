@@ -1510,16 +1510,18 @@ export class OperationPlan {
         }
         ordered.push(step);
       };
-      for (let i = steps.length - 1; i >= 0; i--) {
-        process(steps[i]);
-      }
 
       // We want to `.pop()` steps from our list because that's more performant
       // than `.shift()`, so we actually sort into reverse order
       if (order === "dependencies-first") {
+        for (let i = 0, l = steps.length; i < l; i++) {
+          process(steps[i]);
+        }
         ordered.reverse();
       } else {
-        //noop
+        for (let i = steps.length - 1; i >= 0; i--) {
+          process(steps[i]);
+        }
       }
       steps = ordered;
     };
