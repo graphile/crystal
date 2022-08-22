@@ -1,4 +1,5 @@
 import * as assert from "assert";
+import { isAsyncIterable, isIterable } from "iterall";
 import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "../bucket.js";
@@ -15,6 +16,7 @@ import type {
   ExecutionExtra,
   PromiseOrDirect,
 } from "../interfaces.js";
+import { $$streamMore } from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { assertPolymorphicData } from "../polymorphic.js";
 import { __ValueStep } from "../steps/__value.js";
@@ -176,20 +178,91 @@ export function executeBucket(
       store[finishedStep.id] = result;
       return reallyCompletedStep(finishedStep);
     } else {
-      // Need to complete promises, check for errors, etc
-      return Promise.allSettled(result).then((rs) => {
-        // Deliberate shadowing
-        const result = rs.map((t) => {
-          if (t.status === "fulfilled") {
-            return t.value;
+      // Need to complete promises, check for errors, etc.
+      // **DO NOT THROW, DO NOT ALLOW AN ERROR TO BE RAISED!**
+      // **USE DEFENSIVE PROGRAMMING HERE!**
+      return Promise.allSettled(result)
+        .then((resultSettledResult) => {
+          // Deliberate shadowing
+          const result: any[] = [];
+          const promises: PromiseLike<void>[] = [];
+          resultSettledResult.forEach((settledResult, resultIndex): void => {
+            console.log(settledResult, resultIndex);
+            if (settledResult.status === "fulfilled") {
+              if (isIterable(settledResult.value)) {
+                // Turn it from iterable into an array.
+                try {
+                  result[resultIndex] = [...settledResult.value];
+                } catch (e) {
+                  bucket.hasErrors = true;
+                  result[resultIndex] = newCrystalError(e, finishedStep.id);
+                }
+              } else if (isAsyncIterable(settledResult.value)) {
+                const streamOptions = finishedStep._stepOptions.stream;
+                const initialCount: number = streamOptions
+                  ? streamOptions.initialCount
+                  : Infinity;
+                if (initialCount === 0) {
+                  // Optimization - defer everything
+                  const arr: any[] = [];
+                  arr[$$streamMore] = settledResult.value;
+                  result[resultIndex] = arr;
+                } else {
+                  // Evaluate the first initialCount entries, rest is streamed.
+                  const promise = (async () => {
+                    try {
+                      let valuesSeen = 0;
+                      const arr: any[] = [];
+                      for await (const value of settledResult.value) {
+                        arr.push(value);
+                        if (++valuesSeen >= initialCount) {
+                          arr[$$streamMore] = settledResult.value;
+                          break;
+                        }
+                      }
+                      result[resultIndex] = arr;
+                    } catch (e) {
+                      bucket.hasErrors = true;
+                      result[resultIndex] = newCrystalError(e, finishedStep.id);
+                    }
+                  })();
+                  promises.push(promise);
+                }
+              } else {
+                result[resultIndex] = settledResult.value;
+              }
+            } else {
+              bucket.hasErrors = true;
+              result[resultIndex] = newCrystalError(
+                settledResult.reason,
+                finishedStep.id,
+              );
+            }
+          });
+          if (promises.length > 0) {
+            // This _should not_ throw.
+            return Promise.all(promises).then(() => {
+              console.dir(result);
+              store[finishedStep.id] = result;
+              return reallyCompletedStep(finishedStep);
+            });
           } else {
-            bucket.hasErrors = true;
-            return newCrystalError(t.reason, finishedStep.id);
+            store[finishedStep.id] = result;
+            return reallyCompletedStep(finishedStep);
           }
+        })
+        .then(null, (e) => {
+          // THIS SHOULD NEVER HAPPEN!
+          const crystalError = newCrystalError(
+            new Error(
+              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+            ),
+            finishedStep.id,
+          );
+          console.error(`${crystalError.originalError}\n  ${e}`);
+          store[finishedStep.id] = result.map(() => crystalError);
+          return reallyCompletedStep(finishedStep);
         });
-        store[finishedStep.id] = result;
-        return reallyCompletedStep(finishedStep);
-      });
     }
   }
 
