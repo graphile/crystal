@@ -10,8 +10,9 @@ import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "./bucket.js";
+import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
-import { executeBucket } from "./engine/executeBucket.js";
+import { executeBucket, newBucket } from "./engine/executeBucket.js";
 import type {
   OutputPlanContext,
   PayloadRoot,
@@ -21,7 +22,7 @@ import type {
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
-import type { JSONObject, JSONValue, PromiseOrDirect } from "./interfaces.js";
+import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 
@@ -42,6 +43,80 @@ export interface CrystalPrepareOptions {
 const bypassGraphQLObj = Object.assign(Object.create(null), {
   [$$bypassGraphQL]: true,
 });
+
+function noop() {}
+
+function processRoot(
+  ctx: OutputPlanContext,
+  iterator: ResultIterator,
+): PromiseOrDirect<void> {
+  const { streams, queue } = ctx.root;
+
+  if (isDev) {
+    // Cannot add to streams/queue now - we're finished. The streams/queue
+    // get their own new roots where addition streams/queue can be added.
+    Object.freeze(streams);
+    Object.freeze(queue);
+  }
+
+  const promises: PromiseLike<void>[] = [];
+  for (const stream of streams) {
+    promises.push(processStream(ctx, iterator, stream));
+  }
+  for (const deferred of queue) {
+    promises.push(processDeferred(iterator, deferred));
+  }
+
+  // Terminate the iterator when we're done
+  if (promises.length) {
+    return Promise.allSettled(promises).then(noop);
+  }
+}
+
+function outputBucket(
+  rootBucket: Bucket,
+  bucketIndex: number,
+  requestContext: RequestContext,
+  path: (string | number)[],
+): [ctx: OutputPlanContext, result: JSONValue | null] /*PromiseOrDirect<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
+>*/ {
+  const operationPlan = rootBucket.layerPlan.operationPlan;
+  const root: PayloadRoot = {
+    errors: [],
+    queue: [],
+    streams: [],
+    variables:
+      rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+  };
+  const nullRoot = new NullHandler(null, true, path, {
+    parentTypeName: null,
+    fieldName: null,
+    node: operationPlan.operation.selectionSet.selections,
+  });
+  nullRoot.root = root;
+  let setRootNull = false;
+  nullRoot.onAbort(() => {
+    setRootNull = true;
+  });
+  const ctx: OutputPlanContext = {
+    ...requestContext,
+    root,
+    path,
+    nullRoot,
+  };
+  const result = executeOutputPlan(
+    ctx,
+    operationPlan.rootOutputPlan,
+    rootBucket,
+    bucketIndex,
+  );
+  if (setRootNull) {
+    return [ctx, null];
+  } else {
+    return [ctx, result];
+  }
+}
 
 export function executePreemptive(
   operationPlan: OperationPlan,
@@ -85,7 +160,7 @@ export function executePreemptive(
   const bucketPromise = executeBucket(rootBucket, requestContext);
 
   const finalize = (
-    data: JSONObject | null | undefined,
+    data: JSONValue | null | undefined | AsyncIterable<any>,
     ctx: OutputPlanContext,
   ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
     if (isAsyncIterable(data)) {
@@ -115,33 +190,21 @@ export function executePreemptive(
           label: undefined,
         });
 
-        const { streams, queue } = ctx.root;
-
-        if (isDev) {
-          // Cannot add to streams/queue now - we're finished. The streams/queue
-          // get their own new roots where addition streams/queue can be added.
-          Object.freeze(streams);
-          Object.freeze(queue);
-        }
-
-        const promises: PromiseLike<void>[] = [];
-        for (const stream of streams) {
-          promises.push(processStream(iterator, stream));
-        }
-        for (const deferred of queue) {
-          promises.push(processDeferred(iterator, deferred));
-        }
-
-        // Terminate the iterator when we're done
-        Promise.allSettled(promises).then(() => {
+        const promise = processRoot(ctx, iterator);
+        if (isPromiseLike(promise)) {
+          promise.then(() => {
+            iterator.push({ hasNext: false });
+            iterator.return(undefined);
+          });
+        } else {
           iterator.push({ hasNext: false });
           iterator.return(undefined);
-        });
+        }
 
         return iterator;
       } else {
         return {
-          data,
+          data: data as any,
           errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
           extensions: rootValue[$$extensions] ?? undefined,
           hasNext: undefined,
@@ -150,50 +213,17 @@ export function executePreemptive(
     }
   };
 
-  const output = (): PromiseOrDirect<
-    ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
-  > => {
-    const path: (string | number)[] = [];
-    const root: PayloadRoot = {
-      errors: [],
-      queue: [],
-      streams: [],
-      variables:
-        rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
-    };
-    const nullRoot = new NullHandler(null, true, path, {
-      parentTypeName: null,
-      fieldName: null,
-      node: operationPlan.operation.selectionSet.selections,
-    });
-    nullRoot.root = root;
-    let setRootNull = false;
-    nullRoot.onAbort(() => {
-      setRootNull = true;
-    });
-    const ctx: OutputPlanContext = {
-      ...requestContext,
-      root,
-      path,
-      nullRoot,
-    };
-    const resultOrPromise = executeOutputPlan(
-      ctx,
-      operationPlan.rootOutputPlan,
+  const output = () => {
+    // Later we'll need to loop
+    const [ctx, result] = outputBucket(
       rootBucket,
       bucketIndex,
+      requestContext,
+      [],
     );
-    if (isPromiseLike(resultOrPromise)) {
-      return resultOrPromise.then((result) =>
-        finalize(setRootNull ? null : (result as JSONObject), ctx),
-      );
-    } else {
-      return finalize(
-        setRootNull ? null : (resultOrPromise as JSONObject),
-        ctx,
-      );
-    }
+    return finalize(result, ctx);
   };
+
   if (isPromiseLike(bucketPromise)) {
     return bucketPromise.then(output);
   } else {
@@ -349,16 +379,146 @@ function newIterator<T = any>(
   };
 }
 
-function processStream(
+async function processStream(
+  requestContext: RequestContext,
   iterator: ResultIterator,
-  stream: SubsequentStreamSpec,
+  spec: SubsequentStreamSpec,
 ): Promise<void> {
-  return Promise.resolve();
+  /** Resolve this when finished */
+  const whenDone = defer();
+
+  const operationPlan = spec.outputPlan.layerPlan.operationPlan;
+
+  type ResultTuple = [any, number];
+
+  let queue: null | ResultTuple[] = null;
+  let timeout: NodeJS.Timer | null = null;
+  timeout;
+
+  const _processQueue = (entries: ResultTuple[]) => {
+    const size = entries.length;
+    const store = Object.create(null);
+    const ctxs: OutputPlanContext[] = [];
+
+    let bucketIndex = 0;
+    for (const entry of entries) {
+      const [result] = entry;
+      store[spec.listItemStepId][bucketIndex] = result;
+      // TODO: we should be able to optimize this
+      bucketIndex++;
+    }
+
+    assert.strictEqual(bucketIndex, size);
+    const noDepsList = arrayOfLength(size, undefined);
+
+    // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
+    // const childBucketIndex = 0;
+    const rootBucket: Bucket = {
+      isComplete: false,
+      layerPlan: spec.outputPlan.layerPlan,
+      size,
+      noDepsList,
+      store,
+      hasErrors: false,
+      children: {},
+    };
+
+    const bucketPromise = executeBucket(rootBucket, requestContext);
+
+    const promises: PromiseLike<any>[] = [];
+
+    const output = () => {
+      for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
+        const actualIndex = entries[bucketIndex][1];
+        const [ctx, result] = outputBucket(
+          rootBucket,
+          bucketIndex,
+          requestContext,
+          [...spec.ctx.path, actualIndex],
+        );
+        iterator.push({
+          data: result,
+          hasNext: true,
+          label: spec.label,
+        });
+        const promise = processRoot(ctx, iterator);
+        if (isPromiseLike(promise)) {
+          promises.push(promise);
+        }
+      }
+    };
+
+    if (isPromiseLike(bucketPromise)) {
+      return bucketPromise.then(output);
+    } else {
+      return output();
+    }
+  };
+
+  let pendingQueues = 0;
+  const queueComplete = () => {
+    pendingQueues--;
+    if (loopComplete) {
+      whenDone.resolve();
+    }
+  };
+  const processQueue = () => {
+    timeout = null;
+    assert.ok(
+      queue,
+      "GraphileInternalError<bcf5cef8-2c60-419e-b942-14fd34b8caa7>: processQueue called with no queue",
+    );
+
+    // This is guaranteed to have at least one entry in it
+    const entries = queue;
+    queue = null;
+
+    try {
+      const result = _processQueue(entries);
+      if (isPromiseLike(result)) {
+        result.then(queueComplete, (e) => {
+          iterator.throw(e);
+        });
+      } else {
+        queueComplete();
+      }
+    } catch (e) {
+      iterator.throw(e);
+    }
+  };
+
+  const processResult = (result: any, payloadIndex: number) => {
+    if (queue) {
+      queue.push([result, payloadIndex]);
+    } else {
+      pendingQueues++;
+      queue = [[result, payloadIndex]];
+      // TODO: tune this delay
+      timeout = setTimeout(processQueue, 1);
+    }
+  };
+
+  let loopComplete = false;
+  try {
+    // TODO: need to unwrap this and loop manually so it's abortable
+    let payloadIndex = spec.startIndex;
+    for await (const result of spec.stream) {
+      processResult(result, payloadIndex);
+      payloadIndex++;
+    }
+  } finally {
+    loopComplete = true;
+    if (pendingQueues === 0) {
+      whenDone.resolve();
+    }
+    // TODO: cleanup
+  }
+  return whenDone;
 }
 
 function processDeferred(
   iterator: ResultIterator,
-  deferred: SubsequentPayloadSpec,
+  spec: SubsequentPayloadSpec,
 ): Promise<void> {
   return Promise.resolve();
 }

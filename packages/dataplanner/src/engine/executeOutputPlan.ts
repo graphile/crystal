@@ -130,7 +130,9 @@ export interface SubsequentStreamSpec {
   ctx: OutputPlanContext;
   bucket: Bucket;
   bucketIndex: number;
+  listItemStepId: number;
   outputPlan: OutputPlan;
+  label: string | undefined;
 }
 
 // TODO: to start with we're going to do looping here; but later we can compile
@@ -387,6 +389,10 @@ export function executeOutputPlan(
         | undefined;
       if (stream) {
         // Stream
+        assert.ok(
+          childOutputPlan.layerPlan.reason.type === "listItem",
+          "GraphileInternalError<b655ad6f-566a-480f-9802-1865bf0eaf0a>: bad assumption - expected stream to have listItem child",
+        );
         const streamItem: SubsequentStreamSpec = {
           stream,
           ctx,
@@ -394,6 +400,8 @@ export function executeOutputPlan(
           bucketIndex,
           outputPlan: childOutputPlan,
           startIndex: bucketRootValue.length,
+          label: childOutputPlan.layerPlan.reason.stream?.label,
+          listItemStepId: childOutputPlan.layerPlan.rootStepId!,
         };
         ctx.root.streams.push(streamItem);
         ctx.nullRoot.onAbort(() => {
