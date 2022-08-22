@@ -381,7 +381,12 @@ export function executeOutputPlan(
           return result;
         };
 
-        data[key] = doItHandleNull(spec.isNonNull, doIt, childCtx);
+        data[key] = doItHandleNull(
+          spec.isNonNull,
+          doIt,
+          childCtx,
+          outputPlan.node,
+        );
       }
 
       // Everything seems okay; queue any deferred payloads
@@ -493,7 +498,12 @@ export function executeOutputPlan(
             childBucket,
             childBucketIndex,
           ) ?? null;
-        data[i] = doItHandleNull(childIsNonNull, doIt, childCtx);
+        data[i] = doItHandleNull(
+          childIsNonNull,
+          doIt,
+          childCtx,
+          outputPlan.node,
+        );
       }
 
       if (outputPlan.type.streamedOutputPlan) {
@@ -590,6 +600,7 @@ function doItHandleNull(
   isNonNull: boolean,
   doIt: () => unknown,
   ctx: OutputPlanContext,
+  node: ASTNode | readonly ASTNode[],
 ) {
   if (isNonNull) {
     // No try/catch for us, raise to the parent if need be
@@ -598,7 +609,7 @@ function doItHandleNull(
       throw new GraphQLError(
         // TODO: properly populate this error!
         "non-null violation",
-        null,
+        node,
         null,
         null,
         ctx.path,
