@@ -1,16 +1,11 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
-import type {
-  ASTNode,
-  FieldNode,
-  GraphQLObjectType,
-  GraphQLScalarType,
-} from "graphql";
+import type { FieldNode, GraphQLObjectType, GraphQLScalarType } from "graphql";
 import { isObjectType } from "graphql";
 import { inspect } from "util";
 
 import { isDev } from "../dev.js";
-import type { LocationDetails } from "../interfaces.js";
+import type { JSONObject, JSONValue, LocationDetails } from "../interfaces.js";
 import { $$concreteType, $$verbatim } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import type { LayerPlan } from "./LayerPlan.js";
@@ -34,7 +29,7 @@ export type OutputPlanTypeIntrospection = {
    * Key: canonical JSON stringify of the variables used.
    * Value: the GraphQL result (`{data, errors}`) for this.
    */
-  introspectionCacheByVariableValues: LRU<string, unknown>;
+  introspectionCacheByVariableValues: LRU<string, JSONValue>;
 };
 export type OutputPlanTypeRoot = {
   /**
@@ -329,8 +324,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   /** @internal */
-  public objectCreator: ((typeName: string) => Record<string, unknown>) | null =
-    null;
+  public objectCreator: ((typeName: string) => JSONObject) | null = null;
   finalize() {
     if (["root", "object"].includes(this.type.mode)) {
       this.objectCreator = this.makeObjectCreator();
@@ -379,7 +373,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * Returns a function that, given a type name, creates an object with the
    * fields in the given order.
    */
-  makeObjectCreator(): (typeName: string | null) => Record<string, unknown> {
+  makeObjectCreator(): (typeName: string | null) => JSONObject {
     const supportedTypeNames = Object.keys(this.keys);
     const possibilities: string[] = [];
     for (const typeName of supportedTypeNames) {

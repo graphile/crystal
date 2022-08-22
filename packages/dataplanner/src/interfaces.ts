@@ -768,3 +768,15 @@ export interface LocationDetails {
   /** This should only be null for the root selection */
   fieldName: string | null;
 }
+
+export type JSONValue =
+  | boolean
+  | number
+  | string
+  | null
+  | JSONObject
+  | JSONArray;
+export interface JSONObject {
+  [key: string]: JSONValue;
+}
+export interface JSONArray extends Array<JSONValue> {}

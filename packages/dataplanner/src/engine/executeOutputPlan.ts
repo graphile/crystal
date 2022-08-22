@@ -6,7 +6,11 @@ import { inspect } from "util";
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { isCrystalError, newNonNullError } from "../error.js";
-import type { LocationDetails, PromiseOrDirect } from "../interfaces.js";
+import type {
+  JSONValue,
+  LocationDetails,
+  PromiseOrDirect,
+} from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { OutputPlan } from "./OutputPlan.js";
@@ -258,7 +262,7 @@ export function executeOutputPlan(
   outputPlan: OutputPlan,
   bucket: Bucket,
   bucketIndex: number,
-): PromiseOrDirect<unknown> {
+): JSONValue {
   assert.strictEqual(
     bucket.isComplete,
     true,
@@ -332,7 +336,7 @@ export function executeOutputPlan(
               ),
         };
 
-        const doIt = (): unknown => {
+        const doIt = (): JSONValue => {
           const t = spec.outputPlan.layerPlan.reason.type;
           if (isDev) {
             if (t === "subroutine" || t === "subscription" || t === "defer") {
@@ -523,7 +527,7 @@ export function executeOutputPlan(
         // Don't serialize to avoid the double serialization problem
         return bucketRootValue;
       } else {
-        return outputPlan.type.serialize(bucketRootValue);
+        return outputPlan.type.serialize(bucketRootValue) as JSONValue;
       }
     }
     case "introspection": {
@@ -571,7 +575,7 @@ export function executeOutputPlan(
         console.error(graphqlResult);
         throw new GraphQLError("INTROSPECTION FAILED!");
       }
-      const result = graphqlResult.data!.a;
+      const result = graphqlResult.data!.a as JSONValue;
       introspectionCacheByVariableValues.set(canonical, result);
       return result;
     }
@@ -586,12 +590,12 @@ export function executeOutputPlan(
   }
 }
 
-function doItHandleNull(
+function doItHandleNull<TVal extends JSONValue>(
   isNonNull: boolean,
-  doIt: () => unknown,
+  doIt: () => TVal,
   ctx: OutputPlanContext,
   locationDetails: LocationDetails,
-) {
+): TVal | null {
   if (isNonNull) {
     // No try/catch for us, raise to the parent if need be
     const result = doIt();
