@@ -407,7 +407,7 @@ async function processStream(
       store[spec.listItemStepId][bucketIndex] = result;
       for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
         store[copyPlanId][bucketIndex] =
-          spec.bucket[copyPlanId][spec.bucketIndex];
+          spec.bucket.store[copyPlanId][spec.bucketIndex];
       }
       // TODO: we should be able to optimize this
       bucketIndex++;
