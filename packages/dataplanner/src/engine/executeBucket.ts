@@ -198,12 +198,14 @@ export function executeBucket(
                   result[resultIndex] = newCrystalError(e, finishedStep.id);
                 }
               } else if (isAsyncIterable(settledResult.value)) {
+                const iterator = settledResult.value[Symbol.asyncIterator]();
+
                 const streamOptions = finishedStep._stepOptions.stream;
                 const initialCount: number = streamOptions
                   ? streamOptions.initialCount
                   : Infinity;
 
-                // TODO:critical: need to ensure that settledResult.value is terminated
+                // TODO:critical: need to ensure that iterator is terminated
                 // even if the stream is never consumed (e.g. if something else
                 // errors). For query/mutation we can do this when operation
                 // completes, for subscription we should do it after each
@@ -213,7 +215,7 @@ export function executeBucket(
                 if (initialCount === 0) {
                   // Optimization - defer everything
                   const arr: any[] = [];
-                  arr[$$streamMore] = settledResult.value;
+                  arr[$$streamMore] = iterator;
                   result[resultIndex] = arr;
                 } else {
                   // Evaluate the first initialCount entries, rest is streamed.
@@ -222,17 +224,29 @@ export function executeBucket(
                       let valuesSeen = 0;
                       const arr: any[] = [];
 
-                      // TODO:critical: manual looping required for early exit,
-                      // otherwise we'll get memory leaks. This is here just to
-                      // get something working for now.
+                      /*
+                       * We need to "shift" a few entries off the top of the
+                       * iterator, but still keep it iterable for the later
+                       * stream. To accomplish this we have to do manual
+                       * looping
+                       */
 
-                      for await (const value of settledResult.value) {
-                        arr.push(value);
+                      let resultPromise: Promise<IteratorResult<any, any>>;
+                      while ((resultPromise = iterator.next())) {
+                        const result = await resultPromise;
+                        if (result.done) {
+                          break;
+                        }
+                        arr.push(await result.value);
                         if (++valuesSeen >= initialCount) {
-                          arr[$$streamMore] = settledResult.value;
+                          // This is safe to do in the `while` since we checked
+                          // the `0` entries condition in the optimization
+                          // above.
+                          arr[$$streamMore] = iterator;
                           break;
                         }
                       }
+
                       result[resultIndex] = arr;
                     } catch (e) {
                       bucket.hasErrors = true;

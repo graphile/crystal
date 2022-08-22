@@ -78,6 +78,7 @@ function outputBucket(
   bucketIndex: number,
   requestContext: RequestContext,
   path: (string | number)[],
+  variables: { [key: string]: any },
 ): [ctx: OutputPlanContext, result: JSONValue | null] /*PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 >*/ {
@@ -86,8 +87,7 @@ function outputBucket(
     errors: [],
     queue: [],
     streams: [],
-    variables:
-      rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+    variables,
   };
   const nullRoot = new NullHandler(null, true, path, {
     parentTypeName: null,
@@ -220,6 +220,7 @@ export function executePreemptive(
       bucketIndex,
       requestContext,
       [],
+      rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
     );
     return finalize(result, ctx);
   };
@@ -387,8 +388,6 @@ async function processStream(
   /** Resolve this when finished */
   const whenDone = defer();
 
-  const operationPlan = spec.outputPlan.layerPlan.operationPlan;
-
   type ResultTuple = [any, number];
 
   let queue: null | ResultTuple[] = null;
@@ -398,7 +397,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store = Object.create(null);
-    const ctxs: OutputPlanContext[] = [];
+    store[spec.listItemStepId] = [];
 
     let bucketIndex = 0;
     for (const entry of entries) {
@@ -435,11 +434,15 @@ async function processStream(
           bucketIndex,
           requestContext,
           [...spec.ctx.path, actualIndex],
+          spec.ctx.root.variables,
         );
         iterator.push({
           data: result,
           hasNext: true,
           label: spec.label,
+          errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
+          extensions: undefined,
+          path: ctx.path,
         });
         const promise = processRoot(ctx, iterator);
         if (isPromiseLike(promise)) {
