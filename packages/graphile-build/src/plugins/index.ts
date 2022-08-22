@@ -14,6 +14,7 @@ import { PageInfoStartEndCursorPlugin } from "./PageInfoStartEndCursorPlugin.js"
 import { QueryPlugin } from "./QueryPlugin.js";
 import { QueryQueryPlugin } from "./QueryQueryPlugin.js";
 import { RegisterQueryNodePlugin } from "./RegisterQueryNodePlugin.js";
+import { StreamDeferPlugin } from "./StreamDeferPlugin.js";
 import { SubscriptionPlugin } from "./SubscriptionPlugin.js";
 import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
 import { TrimEmptyDescriptionsPlugin } from "./TrimEmptyDescriptionsPlugin.js";
@@ -35,6 +36,7 @@ export {
   QueryPlugin,
   QueryQueryPlugin,
   RegisterQueryNodePlugin,
+  StreamDeferPlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
   TrimEmptyDescriptionsPlugin,

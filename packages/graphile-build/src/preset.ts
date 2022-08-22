@@ -17,6 +17,7 @@ import {
   PageInfoStartEndCursorPlugin,
   QueryPlugin,
   RegisterQueryNodePlugin,
+  StreamDeferPlugin,
   SubscriptionPlugin,
   TrimEmptyDescriptionsPlugin,
 } from "./plugins/index.js";
@@ -27,6 +28,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     QueryPlugin,
     MutationPlugin,
     SubscriptionPlugin,
+    StreamDeferPlugin,
     ClientMutationIdDescriptionPlugin,
     MutationPayloadQueryPlugin,
     CursorTypePlugin,
