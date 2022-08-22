@@ -1,7 +1,7 @@
 import type { CreateFetcherOptions } from "@graphiql/toolkit";
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
 import type { Fetcher, FetcherParams, FetcherReturnType } from "graphiql";
-import type { ExecutionResult } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
@@ -146,9 +146,14 @@ export const useFetcher = (
   );
 
   const wrappedFetcher = useMemo(() => {
-    const processPayload = (result: ExecutionResult) => {
+    const processPayload = (
+      result: ExecutionResult | AsyncExecutionResult[] | AsyncExecutionResult,
+    ) => {
       if (!result) {
         return;
+      }
+      if (Array.isArray(result)) {
+        return result.forEach(processPayload);
       }
       // Legacy PostGraphile v4 support
       const legacy = (result as any).explain as
