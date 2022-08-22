@@ -187,7 +187,6 @@ export function executeBucket(
           const result: any[] = [];
           const promises: PromiseLike<void>[] = [];
           resultSettledResult.forEach((settledResult, resultIndex): void => {
-            console.log(settledResult, resultIndex);
             if (settledResult.status === "fulfilled") {
               if (isIterable(settledResult.value)) {
                 // Turn it from iterable into an array.
@@ -269,7 +268,6 @@ export function executeBucket(
           if (promises.length > 0) {
             // This _should not_ throw.
             return Promise.all(promises).then(() => {
-              console.dir(result);
               store[finishedStep.id] = result;
               return reallyCompletedStep(finishedStep);
             });
