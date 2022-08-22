@@ -188,7 +188,9 @@ export function executeBucket(
           const promises: PromiseLike<void>[] = [];
           resultSettledResult.forEach((settledResult, resultIndex): void => {
             if (settledResult.status === "fulfilled") {
-              if (isIterable(settledResult.value)) {
+              if (Array.isArray(settledResult.value)) {
+                result[resultIndex] = settledResult.value;
+              } else if (isIterable(settledResult.value)) {
                 // Turn it from iterable into an array.
                 try {
                   result[resultIndex] = [...settledResult.value];
