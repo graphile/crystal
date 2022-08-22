@@ -20,6 +20,7 @@ import type {
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
+import type { OutputPlan } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
@@ -74,6 +75,7 @@ function processRoot(
 }
 
 function outputBucket(
+  outputPlan: OutputPlan,
   rootBucket: Bucket,
   bucketIndex: number,
   requestContext: RequestContext,
@@ -105,12 +107,7 @@ function outputBucket(
     path,
     nullRoot,
   };
-  const result = executeOutputPlan(
-    ctx,
-    operationPlan.rootOutputPlan,
-    rootBucket,
-    bucketIndex,
-  );
+  const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
   if (setRootNull) {
     return [ctx, null];
   } else {
@@ -216,6 +213,7 @@ export function executePreemptive(
   const output = () => {
     // Later we'll need to loop
     const [ctx, result] = outputBucket(
+      operationPlan.rootOutputPlan,
       rootBucket,
       bucketIndex,
       requestContext,
@@ -399,10 +397,18 @@ async function processStream(
     const store = Object.create(null);
     store[spec.listItemStepId] = [];
 
+    for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
+      store[copyPlanId] = [];
+    }
+
     let bucketIndex = 0;
     for (const entry of entries) {
       const [result] = entry;
       store[spec.listItemStepId][bucketIndex] = result;
+      for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
+        store[copyPlanId][bucketIndex] =
+          spec.bucket[copyPlanId][spec.bucketIndex];
+      }
       // TODO: we should be able to optimize this
       bucketIndex++;
     }
@@ -430,6 +436,7 @@ async function processStream(
       for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
         const actualIndex = entries[bucketIndex][1];
         const [ctx, result] = outputBucket(
+          spec.outputPlan,
           rootBucket,
           bucketIndex,
           requestContext,
