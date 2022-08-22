@@ -7,14 +7,24 @@ import type { GraphQLSchema } from "graphql";
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
 import {
+  AddNodeInterfaceToSuitableTypesPlugin,
+  BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  NodeAccessorPlugin,
+  NodeIdCodecBase64JSONPlugin,
+  NodeIdCodecPipeStringPlugin,
+  NodePlugin,
+  PageInfoStartEndCursorPlugin,
   QueryPlugin,
   QueryQueryPlugin,
+  RegisterQueryNodePlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
+  TrimEmptyDescriptionsPlugin,
 } from "./plugins/index.js";
 import SchemaBuilder from "./SchemaBuilder.js";
 export {
@@ -331,14 +341,24 @@ export const buildSchema = (
 };
 
 export {
+  AddNodeInterfaceToSuitableTypesPlugin,
+  BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  NodeAccessorPlugin,
+  NodeIdCodecBase64JSONPlugin,
+  NodeIdCodecPipeStringPlugin,
+  NodePlugin,
+  PageInfoStartEndCursorPlugin,
   QueryPlugin,
   QueryQueryPlugin,
+  RegisterQueryNodePlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
+  TrimEmptyDescriptionsPlugin,
 };
 export { GatherPluginContext } from "./interfaces.js";
 export { defaultPreset } from "./preset.js";
