@@ -1,8 +1,7 @@
-import type { ExecutionResult } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 
 interface IHandlerResult {
   type: string;
-  payload: any;
   statusCode?: number;
 }
 export interface HTMLHandlerResult extends IHandlerResult {
@@ -16,6 +15,11 @@ export interface TextHandlerResult extends IHandlerResult {
 export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";
   payload: ExecutionResult;
+}
+/** @see {@link https://github.com/glasser/graphql-over-http/blob/dac9638459bb17dd3ade889334fc2fadee9d11e5/rfcs/IncrementalDelivery.md} */
+export interface GraphQLIncrementalHandlerResult extends IHandlerResult {
+  type: "graphqlIncremental";
+  iterator: AsyncGenerator<AsyncExecutionResult, void, undefined>;
 }
 export interface EventStreamEvent {
   /** The name of the event. Use simple names. Don't put newlines in it! */
@@ -33,5 +37,6 @@ export interface EventStreamHeandlerResult extends IHandlerResult {
 export type HandlerResult =
   | HTMLHandlerResult
   | GraphQLHandlerResult
+  | GraphQLIncrementalHandlerResult
   | TextHandlerResult
   | EventStreamHeandlerResult;

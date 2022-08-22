@@ -39,7 +39,10 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
     eventStreamRoute = "/graphql/stream",
   } = config.server ?? {};
 
-  const sendResult = (res: ServerResponse, handlerResult: HandlerResult) => {
+  const sendResult = (
+    res: ServerResponse,
+    handlerResult: HandlerResult,
+  ): void => {
     switch (handlerResult.type) {
       case "graphql": {
         const { payload, statusCode = 200 } = handlerResult;
@@ -65,6 +68,45 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
             : null),
         });
         res.end(JSON.stringify(payload));
+        break;
+      }
+      case "graphqlIncremental": {
+        const { iterator, statusCode = 200 } = handlerResult;
+        res.writeHead(statusCode, {
+          "Content-Type": 'multipart/mixed; boundary="-"',
+          "Transfer-Encoding": "chunked",
+          ...(watch
+            ? {
+                "X-GraphQL-Event-Stream": eventStreamRoute,
+              }
+            : null),
+        });
+
+        (async () => {
+          // TODO: use manual looping so the iterable can be aborted without awaiting the promise
+          try {
+            for await (const payload of iterator) {
+              res.write(
+                `\r\n---\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(
+                  payload,
+                )}`,
+              );
+            }
+          } finally {
+            res.write("\r\n-----\r\n");
+            res.end();
+          }
+        })().catch((e) => {
+          console.error(`Error occurred when streaming result: ${e}`);
+          try {
+            res.end();
+          } catch (e2) {
+            console.error(
+              `A further error occurred when terminating the request: ${e2}`,
+            );
+          }
+        });
+
         break;
       }
       case "text":

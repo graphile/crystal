@@ -129,7 +129,11 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
     try {
       const result = await dataplannerExecute(args, dataplannerOptions);
       if (isAsyncIterable(result)) {
-        throw new Error("We don't yet support async iterables");
+        return {
+          type: "graphqlIncremental",
+          statusCode: 200,
+          iterator: result,
+        };
       }
       return { type: "graphql", statusCode: 200, payload: result };
     } catch (e) {
