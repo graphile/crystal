@@ -10,6 +10,7 @@ import { isObjectType } from "graphql";
 import { inspect } from "util";
 
 import { isDev } from "../dev.js";
+import type { LocationDetails } from "../interfaces.js";
 import { $$concreteType, $$verbatim } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import type { LayerPlan } from "./LayerPlan.js";
@@ -109,11 +110,11 @@ export type OutputPlanKeyValue =
       type: "outputPlan";
       outputPlan: OutputPlan;
       isNonNull: boolean;
-      node: ASTNode | readonly ASTNode[];
+      locationDetails: LocationDetails;
     }
   | {
       type: "__typename";
-      node: ASTNode | readonly ASTNode[];
+      locationDetails: LocationDetails;
     };
 
 /**
@@ -127,7 +128,7 @@ export type OutputPlanKeyValue =
  */
 export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   /** For errors */
-  public readonly node: ASTNode | readonly ASTNode[];
+  public readonly locationDetails: LocationDetails;
 
   /**
    * The step that represents the root value. How this is used depends on the
@@ -186,9 +187,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
      */
     rootStep: ExecutableStep,
     public readonly type: TType,
-    node: ASTNode | readonly ASTNode[],
+    locationDetails: LocationDetails,
   ) {
-    this.node = node;
+    this.locationDetails = locationDetails;
     this.rootStepId = rootStep.id;
     if (type.mode === "polymorphic") {
       const typeNames = type.typeNames;

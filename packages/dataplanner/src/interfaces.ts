@@ -1,5 +1,6 @@
 import type EventEmitter from "events";
 import type {
+  ASTNode,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLField,
@@ -758,4 +759,12 @@ export interface ExecutionExtra {
   _bucket: Bucket;
   /** @internal */
   _requestContext: RequestContext;
+}
+
+export interface LocationDetails {
+  node: ASTNode | readonly ASTNode[];
+  /** This should only be null for the root selection */
+  parentTypeName: string | null;
+  /** This should only be null for the root selection */
+  fieldName: string | null;
 }

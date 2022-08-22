@@ -5,8 +5,8 @@ import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { isCrystalError } from "../error.js";
-import type { PromiseOrDirect } from "../interfaces.js";
+import { isCrystalError, newNonNullError } from "../error.js";
+import type { LocationDetails, PromiseOrDirect } from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { OutputPlan } from "./OutputPlan.js";
@@ -192,8 +192,8 @@ export class NullHandler {
   constructor(
     public parentNullHandler: NullHandler | null,
     private isNonNull: boolean,
-    private path: ReadonlyArray<string | number>,
-    private node: ASTNode | readonly ASTNode[],
+    private path: readonly (string | number)[],
+    private locationDetails: LocationDetails,
   ) {
     if (parentNullHandler) {
       this.root = parentNullHandler.root;
@@ -217,17 +217,7 @@ export class NullHandler {
     }
     if (value || this.isNonNull) {
       this.root.errors.push(
-        value ??
-          new GraphQLError(
-            // TODO: properly populate this error!
-            "non-null violation",
-            this.node,
-            null,
-            null,
-            this.path,
-            null,
-            null,
-          ),
+        value ?? nonNullError(this.locationDetails, this.path),
       );
     }
     this.abort();
@@ -288,7 +278,7 @@ export function executeOutputPlan(
     // -- https://spec.graphql.org/draft/#sel-EANTNDLAACNAn7V
     throw new GraphQLError(
       bucketRootValue.originalError.message,
-      outputPlan.node, // node
+      outputPlan.locationDetails.node, // node
       undefined, // source
       null, // positions
       ctx.path, // path
@@ -334,7 +324,12 @@ export function executeOutputPlan(
           path: newPath,
           nullRoot: spec.isNonNull
             ? ctx.nullRoot
-            : new NullHandler(ctx.nullRoot, spec.isNonNull, newPath, spec.node),
+            : new NullHandler(
+                ctx.nullRoot,
+                spec.isNonNull,
+                newPath,
+                spec.locationDetails,
+              ),
         };
 
         const doIt = (): unknown => {
@@ -385,7 +380,7 @@ export function executeOutputPlan(
           spec.isNonNull,
           doIt,
           childCtx,
-          outputPlan.node,
+          outputPlan.locationDetails,
         );
       }
 
@@ -488,7 +483,7 @@ export function executeOutputPlan(
                 ctx.nullRoot,
                 childIsNonNull,
                 newPath,
-                outputPlan.node,
+                outputPlan.locationDetails,
               ),
         };
         const doIt = () =>
@@ -502,7 +497,7 @@ export function executeOutputPlan(
           childIsNonNull,
           doIt,
           childCtx,
-          outputPlan.node,
+          outputPlan.locationDetails,
         );
       }
 
@@ -600,22 +595,13 @@ function doItHandleNull(
   isNonNull: boolean,
   doIt: () => unknown,
   ctx: OutputPlanContext,
-  node: ASTNode | readonly ASTNode[],
+  locationDetails: LocationDetails,
 ) {
   if (isNonNull) {
     // No try/catch for us, raise to the parent if need be
     const result = doIt();
     if (result === null) {
-      throw new GraphQLError(
-        // TODO: properly populate this error!
-        "non-null violation",
-        node,
-        null,
-        null,
-        ctx.path,
-        null,
-        null,
-      );
+      throw nonNullError(locationDetails, ctx.path);
     }
     return result;
   } else {
@@ -633,6 +619,34 @@ function doItHandleNull(
       return ctx.nullRoot.handle(error);
     }
   }
+}
+
+function nonNullError(
+  locationDetails: LocationDetails,
+  path: readonly (string | number)[],
+) {
+  const { parentTypeName, fieldName, node } = locationDetails;
+  if (!parentTypeName || !fieldName) {
+    return new GraphQLError(
+      // TODO: rename. Also this shouldn't happen?
+      `GraphileInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
+      node,
+      null,
+      null,
+      path,
+      null,
+      null,
+    );
+  }
+  return new GraphQLError(
+    `Cannot return null for non-nullable field ${parentTypeName}.${fieldName}.`,
+    node,
+    null,
+    null,
+    path,
+    null,
+    null,
+  );
 }
 
 function getChildBucketAndIndex(

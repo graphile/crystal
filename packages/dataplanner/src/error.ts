@@ -46,6 +46,7 @@ export function newCrystalError(error: Error, planId: number | null) {
   return new _CrystalError(error, planId);
 }
 
+// TODO: delete this?
 /**
  * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
  *

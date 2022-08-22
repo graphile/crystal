@@ -48,6 +48,7 @@ import {
 import { inputPlan } from "../input.js";
 import type {
   FieldPlanResolver,
+  LocationDetails,
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
@@ -444,6 +445,12 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
+    const locationDetails: LocationDetails = {
+      node: this.operation.selectionSet.selections,
+      parentTypeName: null,
+      // WHAT SHOULD fieldName be here?!
+      fieldName: null,
+    };
     const outputPlan = new OutputPlan(
       this.rootLayerPlan,
       this.rootValueStep,
@@ -451,7 +458,7 @@ export class OperationPlan {
         mode: "root",
         typeName: this.queryType.name,
       },
-      this.operation.selectionSet.selections,
+      locationDetails,
     );
     this.rootOutputPlan = outputPlan;
     this.planSelectionSet(
@@ -474,6 +481,12 @@ export class OperationPlan {
       throw new Error("No mutation type found in schema");
     }
     this.deduplicateSteps();
+    const locationDetails: LocationDetails = {
+      node: this.operation.selectionSet.selections,
+      parentTypeName: null,
+      // WHAT SHOULD fieldName be here?!
+      fieldName: null,
+    };
     const outputPlan = new OutputPlan(
       this.rootLayerPlan,
       this.rootValueStep,
@@ -481,7 +494,7 @@ export class OperationPlan {
         mode: "root",
         typeName: rootType.name,
       },
-      this.operation.selectionSet.selections,
+      locationDetails,
     );
     this.rootOutputPlan = outputPlan;
     this.planSelectionSet(
@@ -535,10 +548,16 @@ export class OperationPlan {
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
+    const path = [field.alias?.value ?? fieldName];
+    const locationDetails: LocationDetails = {
+      parentTypeName: rootType.name,
+      fieldName,
+      node: this.operation.selectionSet.selections,
+    };
     if (subscriptionPlanResolver) {
       const { haltTree, step: subscribeStep } = this.planField(
         this.rootLayerPlan,
-        [field.alias?.value ?? fieldName],
+        path,
         rootType,
         fields,
         subscriptionPlanResolver,
@@ -568,7 +587,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         this.rootValueStep,
         { mode: "root", typeName: rootType.name },
-        this.operation.selectionSet.selections,
+        locationDetails,
       );
       this.rootOutputPlan = outputPlan;
       this.planSelectionSet(
@@ -594,7 +613,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         this.rootValueStep,
         { mode: "root", typeName: rootType.name },
-        this.operation.selectionSet.selections,
+        locationDetails,
       );
       this.rootOutputPlan = outputPlan;
       this.planSelectionSet(
@@ -666,6 +685,7 @@ export class OperationPlan {
       fieldType: GraphQLOutputType;
       fieldNodes: FieldNode[];
       fieldLayerPlan: LayerPlan;
+      locationDetails: LocationDetails;
     }
     const nextUpList: NextUp[] = [];
 
@@ -681,6 +701,7 @@ export class OperationPlan {
         fieldType,
         fieldNodes,
         fieldLayerPlan,
+        locationDetails,
       } = nextUp;
       // May have changed due to deduplicate
       const step = this.steps[stepId];
@@ -695,10 +716,10 @@ export class OperationPlan {
             {
               mode: "null",
             },
-            fieldNodes,
+            locationDetails,
           ),
           isNonNull,
-          node: fieldNodes,
+          locationDetails,
         });
       } else {
         this.planIntoOutputPlan(
@@ -712,7 +733,7 @@ export class OperationPlan {
           responseKey,
           fieldType,
           step,
-          fieldNodes,
+          locationDetails,
         );
       }
 
@@ -736,6 +757,12 @@ export class OperationPlan {
       const field = fieldNodes[0];
       const fieldName = field.name.value;
 
+      const locationDetails: LocationDetails = {
+        parentTypeName: objectType.name,
+        fieldName,
+        node: fieldNodes,
+      };
+
       // This is presumed to exist because the operation passed validation.
       const objectField = objectTypeFields[fieldName];
 
@@ -743,7 +770,7 @@ export class OperationPlan {
         if (fieldName === "__typename") {
           outputPlan.addChild(objectType, responseKey, {
             type: "__typename",
-            node: fieldNodes,
+            locationDetails,
           });
         } else {
           const variableNames = findVariableNamesUsed(this, field);
@@ -762,9 +789,9 @@ export class OperationPlan {
                   maxLength: 3,
                 }),
               },
-              fieldNodes,
+              locationDetails,
             ),
-            node: fieldNodes,
+            locationDetails,
           });
         }
         continue;
@@ -927,6 +954,7 @@ export class OperationPlan {
         fieldType,
         fieldNodes,
         fieldLayerPlan,
+        locationDetails,
       });
     }
 
@@ -952,7 +980,7 @@ export class OperationPlan {
     responseKey: string | null,
     fieldType: GraphQLOutputType,
     $step: ExecutableStep,
-    node: ASTNode | readonly ASTNode[],
+    locationDetails: LocationDetails,
     listDepth = 0,
   ) {
     const nullableFieldType = getNullableType(fieldType);
@@ -966,13 +994,13 @@ export class OperationPlan {
           streamedOutputPlan: null,
           streamLabel: null,
         },
-        node,
+        locationDetails,
       );
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         outputPlan: listOutputPlan,
         isNonNull,
-        node,
+        locationDetails,
       });
 
       const $__item = this.itemStepForListStep($step, listDepth);
@@ -990,7 +1018,7 @@ export class OperationPlan {
         null,
         nullableFieldType.ofType,
         $item,
-        node,
+        locationDetails,
         listDepth + 1,
       );
     } else if (isScalarType(nullableFieldType)) {
@@ -1013,9 +1041,9 @@ export class OperationPlan {
             // stepId: $leaf.id,
             serialize: nullableFieldType.serialize.bind(nullableFieldType),
           },
-          node,
+          locationDetails,
         ),
-        node,
+        locationDetails,
       });
     } else if (isEnumType(nullableFieldType)) {
       parentOutputPlan.addChild(parentObjectType, responseKey, {
@@ -1028,9 +1056,9 @@ export class OperationPlan {
             mode: "leaf",
             serialize: nullableFieldType.serialize.bind(nullableFieldType),
           },
-          node,
+          locationDetails,
         ),
-        node,
+        locationDetails,
       });
     } else if (isObjectType(nullableFieldType)) {
       // TODO: graphqlMergeSelectionSets ?
@@ -1058,13 +1086,13 @@ export class OperationPlan {
           deferLabel: null,
           typeName: nullableFieldType.name,
         },
-        node,
+        locationDetails,
       );
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         outputPlan: objectOutputPlan,
         isNonNull,
-        node,
+        locationDetails,
       });
       this.planSelectionSet(
         objectOutputPlan,
@@ -1132,13 +1160,13 @@ export class OperationPlan {
           deferLabel: null,
           typeNames: possibleObjectTypes.map((t) => t.name),
         },
-        node,
+        locationDetails,
       );
       parentOutputPlan.addChild(parentObjectType, responseKey, {
         type: "outputPlan",
         outputPlan: polymorphicOutputPlan,
         isNonNull,
-        node,
+        locationDetails,
       });
 
       /*
@@ -1184,7 +1212,7 @@ export class OperationPlan {
             deferLabel: null,
             typeName: type.name,
           },
-          node,
+          locationDetails,
         );
         // find all selections compatible with `type`
         const fieldNodes = fieldSelectionsForType(this, type, selections);
@@ -1202,7 +1230,7 @@ export class OperationPlan {
           type: "outputPlan",
           isNonNull,
           outputPlan: objectOutputPlan,
-          node,
+          locationDetails,
         });
       }
 

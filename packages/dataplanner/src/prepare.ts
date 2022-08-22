@@ -116,12 +116,11 @@ export function executePreemptive(
       variables:
         rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
     };
-    const nullRoot = new NullHandler(
-      null,
-      true,
-      path,
-      operationPlan.operation.selectionSet.selections,
-    );
+    const nullRoot = new NullHandler(null, true, path, {
+      parentTypeName: null,
+      fieldName: null,
+      node: operationPlan.operation.selectionSet.selections,
+    });
     nullRoot.root = root;
     let setRootNull = false;
     nullRoot.onAbort(() => {
