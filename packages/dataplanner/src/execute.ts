@@ -108,7 +108,7 @@ export function execute(
   args: ExecutionArgs,
   options: DataPlannerExecuteOptions = {},
 ): PromiseOrValue<
-  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
   return withDataPlannerArgs(args, options);
 }

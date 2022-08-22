@@ -7,6 +7,7 @@ import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { isCrystalError } from "../error.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
+import { $$streamMore } from "../interfaces.js";
 import { $$concreteType } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { OutputPlan } from "./OutputPlan.js";
@@ -17,6 +18,17 @@ export interface OutputStream {
 }
 
 /**
+ * PayloadRoot handles the root-level of a payload, it's ultimately responsible
+ * for sharing the `data`/`errors` with the user. But it also handles the
+ * intermediate payloads for stream/defer.
+ *
+ * A standard GraphQL query/mutation request (one that doesn't use
+ * `@stream`/`@defer`) will have just one payload. A standard GraphQL
+ * subscription request gets one payload per subscription event.
+ *
+ * When we mix `@stream` and `@defer` into this, we will require (often quite a
+ * lot) more payloads.
+ *
  * @internal
  */
 export interface PayloadRoot {
@@ -25,12 +37,20 @@ export interface PayloadRoot {
    * returned directly to clients so they must be complete.
    */
   errors: GraphQLError[];
+
   /**
-   * Stream/defer queues - we don't start executing these until after the main
+   * Defer queue - we don't start executing these until after the main
    * payload is completed (to allow for a non-null boundary to abort
    * execution).
    */
   queue: Array<SubsequentPayloadSpec>;
+
+  /**
+   * Stream queue - we don't start executing these until after the main
+   * payload is completed (to allow for a non-null boundary to abort
+   * execution).
+   */
+  streams: Array<SubsequentStreamSpec>;
 
   /**
    * VERY DANGEROUS. This is _only_ to pass variables through to introspection
@@ -98,6 +118,15 @@ export interface OutputPlanContext extends RequestContext {
 }
 
 export interface SubsequentPayloadSpec {
+  ctx: OutputPlanContext;
+  bucket: Bucket;
+  bucketIndex: number;
+  outputPlan: OutputPlan;
+}
+
+export interface SubsequentStreamSpec {
+  stream: AsyncIterableIterator<any>;
+  startIndex: number;
   ctx: OutputPlanContext;
   bucket: Bucket;
   bucketIndex: number;
@@ -353,20 +382,26 @@ export function executeOutputPlan(
         );
       }
 
-      if (outputPlan.type.streamedOutputPlan) {
-        // Add the stream to the queue
-        const queueItem: SubsequentPayloadSpec = {
+      const stream = bucketRootValue[$$streamMore] as
+        | AsyncIterableIterator<any>
+        | undefined;
+      if (stream) {
+        // Stream
+        const streamItem: SubsequentStreamSpec = {
+          stream,
           ctx,
           bucket,
           bucketIndex,
-          outputPlan: outputPlan.type.streamedOutputPlan,
+          outputPlan: childOutputPlan,
+          startIndex: bucketRootValue.length,
         };
-        ctx.root.queue.push(queueItem);
+        ctx.root.streams.push(streamItem);
         ctx.nullRoot.onAbort(() => {
           // Remove stream from the queue before it even starts
-          ctx.root.queue.splice(ctx.root.queue.indexOf(queueItem), 1);
+          ctx.root.queue.splice(ctx.root.queue.indexOf(streamItem), 1);
         });
       }
+
       return data;
     }
     case "null": {
