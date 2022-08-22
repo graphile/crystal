@@ -154,7 +154,6 @@ export function executeOutputPlan(
   );
   const entry = bucket.store[outputPlan.rootStepId];
   if (!entry) {
-    console.dir(bucket.layerPlan);
     console.dir(bucket.store);
     throw new Error(
       `GraphileInternalError<aa9cde16-67da-4f30-9f63-3b3cbb7cb0b9>: No store entry for bucket(${bucket.layerPlan.id}/${bucket.layerPlan.reason.type})'s outputPlan.rootStepId ${outputPlan.rootStepId} (layer rootStepId: ${bucket.layerPlan.rootStepId})`,

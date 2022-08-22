@@ -512,7 +512,13 @@ async function processStream(
   try {
     // TODO: need to unwrap this and loop manually so it's abortable
     let payloadIndex = spec.startIndex;
-    for await (const result of spec.stream) {
+    let nextValuePromise: Promise<IteratorResult<any, any>>;
+    while ((nextValuePromise = spec.stream.next())) {
+      const iteratorResult = await nextValuePromise;
+      if (iteratorResult.done) {
+        break;
+      }
+      const result = iteratorResult.value;
       processResult(result, payloadIndex);
       payloadIndex++;
     }
