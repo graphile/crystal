@@ -152,11 +152,15 @@ export function executeOutputPlan(
     true,
     "Can only process an output plan for a completed bucket",
   );
-  assert.ok(
-    bucket.store[outputPlan.rootStepId],
-    `GraphileInternalError<aa9cde16-67da-4f30-9f63-3b3cbb7cb0b9>: No store entry for bucket(${bucket.layerPlan.id}/${bucket.layerPlan.reason.type})'s rootStepId ${bucket.layerPlan.rootStepId}`,
-  );
-  const bucketRootValue = bucket.store[outputPlan.rootStepId][bucketIndex];
+  const entry = bucket.store[outputPlan.rootStepId];
+  if (!entry) {
+    console.dir(bucket.layerPlan);
+    console.dir(bucket.store);
+    throw new Error(
+      `GraphileInternalError<aa9cde16-67da-4f30-9f63-3b3cbb7cb0b9>: No store entry for bucket(${bucket.layerPlan.id}/${bucket.layerPlan.reason.type})'s outputPlan.rootStepId ${outputPlan.rootStepId} (layer rootStepId: ${bucket.layerPlan.rootStepId})`,
+    );
+  }
+  const bucketRootValue = entry[bucketIndex];
 
   if (isCrystalError(bucketRootValue)) {
     // > If the field returns null because of a field error which has already
