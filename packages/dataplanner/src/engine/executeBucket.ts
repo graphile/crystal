@@ -202,6 +202,14 @@ export function executeBucket(
                 const initialCount: number = streamOptions
                   ? streamOptions.initialCount
                   : Infinity;
+
+                // TODO:critical: need to ensure that settledResult.value is terminated
+                // even if the stream is never consumed (e.g. if something else
+                // errors). For query/mutation we can do this when operation
+                // completes, for subscription we should do it after each
+                // individual payload (and all its streamed/deferred children)
+                // are complete before processing the next subscription event.
+
                 if (initialCount === 0) {
                   // Optimization - defer everything
                   const arr: any[] = [];
@@ -213,6 +221,11 @@ export function executeBucket(
                     try {
                       let valuesSeen = 0;
                       const arr: any[] = [];
+
+                      // TODO:critical: manual looping required for early exit,
+                      // otherwise we'll get memory leaks. This is here just to
+                      // get something working for now.
+
                       for await (const value of settledResult.value) {
                         arr.push(value);
                         if (++valuesSeen >= initialCount) {
