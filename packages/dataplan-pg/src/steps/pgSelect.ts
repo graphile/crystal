@@ -2004,6 +2004,60 @@ from json_array_elements(${sql.value(
           )}::json) with ordinality as ids`)}) as ${alias},
 lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           return { query, identifierIndex };
+        } else if (
+          (limit != null && limit >= 0) ||
+          (offset != null && offset > 0)
+        ) {
+          // TODO: make this nicer; combine with the `if` branch above?
+
+          const extraSelects: SQL[] = [];
+          const rowNumberIndexOffset =
+            forceOrder || limit != null || offset != null
+              ? extraSelects.push(
+                  sql`row_number() over (${sql.indent(
+                    this.buildOrderBy({ reverse: false }).sql,
+                  )})`,
+                ) - 1
+              : -1;
+
+          const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
+            extraSelects,
+          });
+          const rowNumberIndex =
+            rowNumberIndexOffset >= 0
+              ? extraSelectIndexes[rowNumberIndexOffset]
+              : null;
+          const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
+          /*
+           * This wrapper around the inner query is for @stream:
+           *
+           * - stream must be in the correct order, so if we have
+           *   `this.shouldReverseOrder()` then we must reverse the order
+           *   ourselves here;
+           * - stream can have an `initialCount` - we want to satisfy all
+           *   `initialCount` records from _each identifier group_ before we then
+           *   resolve the remaining records.
+           *
+           * NOTE: if neither of the above cases apply then we can skip this,
+           * even for @stream.
+           */
+          const wrappedInnerQuery =
+            rowNumberIndex != null ||
+            limit != null ||
+            (offset != null && offset > 0)
+              ? sql`select *\nfrom (${sql.indent(
+                  baseQuery,
+                )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
+                  String(rowNumberIndex),
+                )}${
+                  limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
+                }${
+                  offset != null && offset > 0
+                    ? sql`\noffset ${sql.literal(offset)}`
+                    : sql.blank
+                }`
+              : baseQuery;
+          return { query: wrappedInnerQuery, identifierIndex: null };
         } else {
           const { sql: query } = this.buildQuery();
           return { query, identifierIndex: null };
