@@ -59,8 +59,6 @@ export type OutputPlanTypeArray = {
    * Return a list of the same length if an array
    */
   mode: "array";
-  streamedOutputPlan: OutputPlan | null;
-  streamLabel: string | null;
 };
 export type OutputPlanTypeLeaf = {
   /**

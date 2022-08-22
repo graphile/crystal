@@ -643,7 +643,6 @@ export class OperationPlan {
     const layerPlan = new LayerPlan(this, listStep.layerPlan, {
       type: "listItem",
       parentPlanId: listStep.id,
-      streamLabel: null,
     });
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
@@ -991,8 +990,6 @@ export class OperationPlan {
         $step,
         {
           mode: "array",
-          streamedOutputPlan: null,
-          streamLabel: null,
         },
         locationDetails,
       );
