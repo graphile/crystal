@@ -33,18 +33,12 @@ export interface LayerPlanReasonListItem {
    */
   // TODO: rename to parentStepId
   parentPlanId: number;
-}
-/** Non-branching, deferred */
-export interface LayerPlanReasonStream {
-  type: "stream";
-  initialCount: number;
-  label?: string;
-  /**
-   * Can be used such that the same LayerPlan can be used for two streams for
-   * the same parent plan. In this case an additional output plan would be
-   * added to the LayerPlan.
-   */
-  parentPlanId: number;
+
+  /** If this listItem is to be streamed, the configuration for that streaming */
+  stream?: {
+    initialCount: number;
+    label?: string;
+  };
 }
 /** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
@@ -102,7 +96,6 @@ export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
 export type LayerPlanReason =
   | LayerPlanReasonRoot
   | LayerPlanReasonListItem
-  | LayerPlanReasonStream
   | LayerPlanReasonSubscription
   | LayerPlanReasonMutationField
   | LayerPlanReasonDefer

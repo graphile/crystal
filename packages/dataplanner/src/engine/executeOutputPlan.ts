@@ -335,12 +335,7 @@ export function executeOutputPlan(
         const doIt = (): unknown => {
           const t = spec.outputPlan.layerPlan.reason.type;
           if (isDev) {
-            if (
-              t === "subroutine" ||
-              t === "subscription" ||
-              t === "stream" ||
-              t === "defer"
-            ) {
+            if (t === "subroutine" || t === "subscription" || t === "defer") {
               throw new Error(
                 `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
               );

@@ -6,8 +6,11 @@ import { isDev } from "../dev.js";
 import type { CrystalError } from "../error.js";
 import { isCrystalError, newCrystalError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
+import { isStreamableStep } from "../index.js";
 import { __ItemStep } from "../index.js";
 import type {
+  CrystalResultsList,
+  CrystalResultStreamList,
   CrystalValuesList,
   ExecutionExtra,
   PromiseOrDirect,
@@ -190,6 +193,18 @@ export function executeBucket(
     }
   }
 
+  function executeOrStream(
+    step: ExecutableStep,
+    dependencies: ReadonlyArray<any>[],
+    extra: ExecutionExtra,
+  ): PromiseOrDirect<CrystalResultsList<any> | CrystalResultStreamList<any>> {
+    if (step._stepOptions.stream && isStreamableStep(step)) {
+      return step.stream(dependencies, extra, step._stepOptions.stream);
+    } else {
+      return step.execute(dependencies, extra);
+    }
+  }
+
   // Slow mode...
   /**
    * Execute the step, filtering out errors from the input dependencies and
@@ -217,7 +232,8 @@ export function executeBucket(
       const dependenciesWithoutErrors = dependencies.map((depList) =>
         depList.filter((_, index) => !errors[index]),
       );
-      const resultWithoutErrors = step.execute(
+      const resultWithoutErrors = executeOrStream(
+        step,
         dependenciesWithoutErrors,
         extra,
       );
@@ -247,7 +263,7 @@ export function executeBucket(
     dependencies: ReadonlyArray<any>[],
     extra: ExecutionExtra,
   ) {
-    return step.execute(dependencies, extra);
+    return executeOrStream(step, dependencies, extra);
   }
 
   // TODO: this function used to state that it would never throw/reject... but,
@@ -487,8 +503,7 @@ export function executeBucket(
         }
         case "subroutine":
         case "subscription":
-        case "defer":
-        case "stream": {
+        case "defer": {
           // Ignore; these are handled elsewhere
           continue loop;
         }

@@ -1797,8 +1797,7 @@ export class OperationPlan {
         return;
       }
       case "subscription":
-      case "defer":
-      case "stream": {
+      case "defer": {
         // Should be deferred, don't evaluate early (unless it's cheap to do so)
         if (step.isSyncAndSafe) {
           // It's cheap, try and hoist it
@@ -1827,6 +1826,7 @@ export class OperationPlan {
         // Should be safe to hoist so long as it doesn't depend on the
         // `__ItemStep` itself (which is just a regular dependency, so it'll be
         // checked later).
+        // NOTE: this is true even if the listItem streams.
         break;
       }
       case "mutationField": {
@@ -2476,7 +2476,6 @@ export class OperationPlan {
         }
         case "subroutine":
         case "polymorphic":
-        case "stream":
         case "listItem": {
           reason.parentPlanId = this.steps[reason.parentPlanId].id;
           break;
