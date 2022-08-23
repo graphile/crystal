@@ -190,7 +190,6 @@ export function executePreemptive(
         if (isPromiseLike(promise)) {
           promise.then(
             () => {
-              console.log("PROCESS ROOT COMPLETE");
               iterator.push({ hasNext: false });
               iterator.return(undefined);
             },
