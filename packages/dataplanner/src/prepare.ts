@@ -8,6 +8,7 @@ import { buildExecutionContext } from "graphql/execution/execute";
 import { isAsyncIterable } from "iterall";
 
 import type { Bucket, RequestContext } from "./bucket.js";
+import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
 import { executeBucket } from "./engine/executeBucket.js";
@@ -18,7 +19,7 @@ import type {
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
-import type { OutputPlan } from "./engine/OutputPlan.js";
+import type { OutputPlan, OutputPlanTypeObject } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
@@ -60,10 +61,10 @@ function processRoot(
 
   const promises: PromiseLike<void>[] = [];
   for (const stream of streams) {
-    promises.push(processStream(ctx, iterator, stream));
+    promises.push(processStream(ctx.requestContext, iterator, stream));
   }
   for (const deferred of queue) {
-    promises.push(processDeferred(iterator, deferred));
+    promises.push(processDeferred(ctx.requestContext, iterator, deferred));
   }
 
   // Terminate the iterator when we're done
@@ -77,7 +78,7 @@ function outputBucket(
   rootBucket: Bucket,
   bucketIndex: number,
   requestContext: RequestContext,
-  path: (string | number)[],
+  path: readonly (string | number)[],
   variables: { [key: string]: any },
 ): [ctx: OutputPlanContext, result: JSONValue | null] /*PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
@@ -100,7 +101,7 @@ function outputBucket(
     setRootNull = true;
   });
   const ctx: OutputPlanContext = {
-    ...requestContext,
+    requestContext,
     root,
     path,
     nullRoot,
@@ -538,9 +539,144 @@ async function processStream(
   return whenDone;
 }
 
+function processSingleDeferred(
+  requestContext: RequestContext,
+  outputPlan: OutputPlan,
+  specs: Array<[ResultIterator, SubsequentPayloadSpec]>,
+) {
+  const size = specs.length;
+  const store = Object.create(null);
+
+  for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
+    store[copyPlanId] = [];
+  }
+
+  let bucketIndex = 0;
+  for (const [iterator, spec] of specs) {
+    for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
+      store[copyPlanId][bucketIndex] =
+        spec.bucket.store[copyPlanId][spec.bucketIndex];
+    }
+    // TODO: we should be able to optimize this
+    bucketIndex++;
+  }
+
+  assert.strictEqual(bucketIndex, size);
+  const noDepsList = arrayOfLength(size, undefined);
+
+  // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
+  // const childBucketIndex = 0;
+  const rootBucket: Bucket = {
+    isComplete: false,
+    layerPlan: outputPlan.layerPlan,
+    size,
+    noDepsList,
+    store,
+    hasErrors: false,
+    children: {},
+  };
+
+  const bucketPromise = executeBucket(rootBucket, requestContext);
+
+  const output = (): void | Promise<void> => {
+    const promises: PromiseLike<any>[] = [];
+    for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
+      const [iterator, spec] = specs[bucketIndex];
+      const [ctx, result] = outputBucket(
+        spec.outputPlan,
+        rootBucket,
+        bucketIndex,
+        requestContext,
+        spec.ctx.path,
+        spec.ctx.root.variables,
+      );
+      iterator.push({
+        data: result,
+        hasNext: true,
+        label: spec.label,
+        errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
+        extensions: undefined,
+        path: ctx.path,
+      });
+      const promise = processRoot(ctx, iterator);
+      if (isPromiseLike(promise)) {
+        promises.push(promise);
+      }
+    }
+    if (promises.length) {
+      return Promise.all(promises).then(noop);
+    }
+  };
+
+  if (isPromiseLike(bucketPromise)) {
+    return bucketPromise.then(output);
+  } else {
+    return output();
+  }
+}
+
+function processBatches(
+  batchesByRequestContext: Map<
+    RequestContext,
+    Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
+  >,
+  whenDone: Deferred<void>,
+) {
+  // Key is only used for batching
+  const promises: PromiseLike<void>[] = [];
+  for (const [requestContext, batches] of batchesByRequestContext.entries()) {
+    for (const [outputPlan, specs] of batches.entries()) {
+      const promise = processSingleDeferred(requestContext, outputPlan, specs);
+      if (isPromiseLike(promise)) {
+        promises.push(promise);
+      }
+    }
+  }
+  if (promises.length > 0) {
+    Promise.all(promises).then(
+      () => whenDone.resolve(),
+      (e) => whenDone.reject(e),
+    );
+  } else {
+    whenDone.resolve();
+  }
+}
+
+function processBatch() {
+  const batchesByRequestContext = deferredBatchesByRequestContext;
+  deferredBatchesByRequestContext = new Map();
+  const whenDone = nextBatch!;
+  nextBatch = null;
+
+  processBatches(batchesByRequestContext, whenDone);
+}
+
+let deferredBatchesByRequestContext: Map<
+  RequestContext,
+  Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
+> = new Map();
+let nextBatch: Deferred<void> | null = null;
+
 function processDeferred(
+  requestContext: RequestContext,
   iterator: ResultIterator,
   spec: SubsequentPayloadSpec,
-): Promise<void> {
-  return Promise.resolve();
+): PromiseLike<void> {
+  let deferredBatches = deferredBatchesByRequestContext.get(requestContext);
+  if (!deferredBatches) {
+    deferredBatches = new Map();
+    deferredBatchesByRequestContext.set(requestContext, deferredBatches);
+  }
+  const list = deferredBatches.get(spec.outputPlan);
+  if (list) {
+    list.push([iterator, spec]);
+  } else {
+    deferredBatches.set(spec.outputPlan, [[iterator, spec]]);
+  }
+  if (!nextBatch) {
+    nextBatch = defer();
+    setTimeout(processBatch, 1);
+  }
+
+  return nextBatch;
 }

@@ -44,7 +44,7 @@ export type OutputPlanTypeObject = {
    */
   mode: "object";
   typeName: string;
-  deferLabel: string | null;
+  deferLabel: string | undefined;
 };
 export type OutputPlanTypePolymorphicObject = {
   /**
@@ -52,7 +52,7 @@ export type OutputPlanTypePolymorphicObject = {
    */
   mode: "polymorphic";
   typeNames: string[];
-  deferLabel: string | null;
+  deferLabel: string | undefined;
 };
 export type OutputPlanTypeArray = {
   /**

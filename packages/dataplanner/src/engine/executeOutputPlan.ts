@@ -111,7 +111,8 @@ export class NullHandler {
   }
 }
 
-export interface OutputPlanContext extends RequestContext {
+export interface OutputPlanContext {
+  requestContext: RequestContext;
   root: PayloadRoot;
   path: ReadonlyArray<string | number>;
   nullRoot: NullHandler;
@@ -122,6 +123,7 @@ export interface SubsequentPayloadSpec {
   bucket: Bucket;
   bucketIndex: number;
   outputPlan: OutputPlan;
+  label: string | undefined;
 }
 
 export interface SubsequentStreamSpec {
@@ -278,6 +280,7 @@ export function executeOutputPlan(
           bucket,
           bucketIndex,
           outputPlan: defer,
+          label: defer.type.deferLabel,
         };
         ctx.root.queue.push(queueItem);
         ctx.nullRoot.onAbort(() => {
@@ -422,7 +425,7 @@ export function executeOutputPlan(
       if (bucketRootValue == null) {
         return null;
       }
-      if (ctx.insideGraphQL) {
+      if (ctx.requestContext.insideGraphQL) {
         // Don't serialize to avoid the double serialization problem
         return bucketRootValue;
       } else {

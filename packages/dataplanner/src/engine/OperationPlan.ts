@@ -1080,7 +1080,7 @@ export class OperationPlan {
         $step,
         {
           mode: "object",
-          deferLabel: null,
+          deferLabel: undefined,
           typeName: nullableFieldType.name,
         },
         locationDetails,
@@ -1154,7 +1154,7 @@ export class OperationPlan {
         $step,
         {
           mode: "polymorphic",
-          deferLabel: null,
+          deferLabel: undefined,
           typeNames: possibleObjectTypes.map((t) => t.name),
         },
         locationDetails,
@@ -1206,7 +1206,7 @@ export class OperationPlan {
           $root,
           {
             mode: "object",
-            deferLabel: null,
+            deferLabel: undefined,
             typeName: type.name,
           },
           locationDetails,
