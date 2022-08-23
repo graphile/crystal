@@ -5,14 +5,12 @@ import type {
   ExecutionResult,
 } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
-import type { ObjMap } from "graphql/jsutils/ObjMap";
 import { isAsyncIterable } from "iterall";
-import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "./bucket.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
-import { executeBucket, newBucket } from "./engine/executeBucket.js";
+import { executeBucket } from "./engine/executeBucket.js";
 import type {
   OutputPlanContext,
   PayloadRoot,
