@@ -1,7 +1,15 @@
 NEXT UP:
 
+- [ ] Nested stream seems to trigger "value pushed into iterable after done;
+      ignoring"
+- [ ] Should stream be batched better? E.g. nested streams can be batched
+      together despite being triggered separately?
+- [ ] Defers should be batched, so sort out stream batching first and then
+      perhaps use that for defer too?
 - [ ] Why is `author_id` being unnecessarily selected for
       `queries/connections/pagination-after`?
+- [ ] Should be possible to avoid re-planning fields that are both
+      deferred/streamed and non-deferred/streamed - just reuse existing data.
 - [x] Fix all instances of GraphQLError so the errors come out right
       (particularly connections-blankcursor.test.graphql)
 - [ ] When using a constant for `node(id: "...")` we should be able to determine
