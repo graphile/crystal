@@ -167,40 +167,33 @@ export function graphqlCollectFields(
         "if",
         trackedVariableValuesStep,
       );
-      if (defer && deferIf !== false) {
-        const label =
-          evalDirectiveArg<string | null>(
-            selection,
-            "defer",
-            "label",
-            trackedVariableValuesStep,
-          ) ?? undefined;
-        const deferredDigest: SelectionSetDigest = {
-          label,
-          fields: new Map(),
-          deferred: [],
-        };
+      const label =
+        evalDirectiveArg<string | null>(
+          selection,
+          "defer",
+          "label",
+          trackedVariableValuesStep,
+        ) ?? undefined;
+      const deferredDigest: SelectionSetDigest | null =
+        !defer || deferIf === false
+          ? null
+          : {
+              label,
+              fields: new Map(),
+              deferred: [],
+            };
+      if (deferredDigest) {
         selectionSetDigest.deferred.push(deferredDigest);
-        graphqlCollectFields(
-          operationPlan,
-          parentStepId,
-          objectType,
-          fragmentSelectionSet.selections,
-          isMutation,
-          visitedFragments,
-          deferredDigest,
-        );
-      } else {
-        graphqlCollectFields(
-          operationPlan,
-          parentStepId,
-          objectType,
-          fragmentSelectionSet.selections,
-          isMutation,
-          visitedFragments,
-          selectionSetDigest,
-        );
       }
+      graphqlCollectFields(
+        operationPlan,
+        parentStepId,
+        objectType,
+        fragmentSelectionSet.selections,
+        isMutation,
+        visitedFragments,
+        deferredDigest ?? selectionSetDigest,
+      );
     };
 
     switch (selection.kind) {
@@ -213,19 +206,10 @@ export function graphqlCollectFields(
           groupForResponseKey = [];
           selectionSetDigest.fields.set(responseKey, groupForResponseKey);
         }
-
-        /*
-          const stream = getDirective(field, "stream");
-          if (stream && isDev) {
-            const fieldName = field.name.value;
-            const fieldType = objectTypeFields[fieldName].type;
-            assertListType(fieldType);
-          }
-          */
-
         groupForResponseKey.push(field);
         break;
       }
+
       case "FragmentSpread": {
         const fragmentSpreadName = selection.name.value;
         if (visitedFragments.has(fragmentSpreadName)) {
@@ -253,6 +237,7 @@ export function graphqlCollectFields(
         processFragment(selection, fragmentSelectionSet);
         break;
       }
+
       case "InlineFragment": {
         const fragmentTypeAst = selection.typeCondition;
         if (fragmentTypeAst != null) {
