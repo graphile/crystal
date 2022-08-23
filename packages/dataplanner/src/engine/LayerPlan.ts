@@ -51,7 +51,6 @@ export interface LayerPlanReasonMutationField {
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
-  typeNames: string[]; // Could be polymorphic
   label?: string;
 }
 /** Branching, non-deferred */
@@ -85,12 +84,7 @@ export function isDeferredLayerPlan(layerPlan: LayerPlan<any>): boolean {
 }
 export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
   const t = layerPlan.reason.type;
-  return (
-    t === "polymorphic" ||
-    (t === "defer" &&
-      (layerPlan as LayerPlan<LayerPlanReasonDefer>).reason.typeNames.length >
-        1)
-  );
+  return t === "polymorphic";
 }
 
 export type LayerPlanReason =

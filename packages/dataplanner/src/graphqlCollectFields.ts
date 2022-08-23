@@ -1,4 +1,9 @@
-import type { DirectiveNode, FieldNode, SelectionNode } from "graphql";
+import type {
+  DirectiveNode,
+  FieldNode,
+  SelectionNode,
+  SelectionSetNode,
+} from "graphql";
 import {
   GraphQLInterfaceType,
   GraphQLObjectType,
@@ -36,12 +41,12 @@ export function getDirective(
  *
  * TODO: inline.
  */
-export function getDirectiveArg(
+export function evalDirectiveArg<T = unknown>(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
   variableValuesStep: __TrackedObjectStep,
-): unknown {
+): T | undefined {
   const directive = getDirective(selection, directiveName);
   const argument = directive?.arguments?.find(
     (a) => a.name.value === argumentName,
@@ -53,13 +58,13 @@ export function getDirectiveArg(
         return variableValuesStep.get(value.name.value).eval();
       }
       case "BooleanValue": {
-        return value.value;
+        return value.value as any;
       }
       case "IntValue": {
-        return parseInt(value.value, 10);
+        return parseInt(value.value, 10) as any;
       }
       case "NullValue": {
-        return null;
+        return null as any;
       }
       default: {
         throw new Error(
@@ -100,6 +105,7 @@ function graphqlDoesFragmentTypeApply(
  * @internal
  */
 export interface SelectionSetDigest {
+  label: string | undefined;
   fields: Map<string, FieldNode[]>;
   deferred: SelectionSetDigest[];
 }
@@ -119,24 +125,84 @@ export function graphqlCollectFields(
   selections: readonly SelectionNode[],
   isMutation = false,
   visitedFragments = new Set<string>(),
-  selectionSetDigest: SelectionSetDigest = { fields: new Map(), deferred: [] },
+  selectionSetDigest: SelectionSetDigest = {
+    label: undefined,
+    fields: new Map(),
+    deferred: [],
+  },
 ): SelectionSetDigest {
   // const objectTypeFields = objectType.getFields();
   const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
     if (
-      getDirectiveArg(selection, "skip", "if", trackedVariableValuesStep) ===
-      true
+      evalDirectiveArg<boolean | null>(
+        selection,
+        "skip",
+        "if",
+        trackedVariableValuesStep,
+      ) === true
     ) {
       continue;
     }
     if (
-      getDirectiveArg(selection, "include", "if", trackedVariableValuesStep) ===
-      false
+      evalDirectiveArg<boolean | null>(
+        selection,
+        "include",
+        "if",
+        trackedVariableValuesStep,
+      ) === false
     ) {
       continue;
     }
+
+    const processFragment = (
+      selection: SelectionNode,
+      fragmentSelectionSet: SelectionSetNode,
+    ) => {
+      const defer = getDirective(selection, "defer");
+      const deferIf = evalDirectiveArg<boolean | null>(
+        selection,
+        "defer",
+        "if",
+        trackedVariableValuesStep,
+      );
+      if (defer && deferIf !== false) {
+        const label =
+          evalDirectiveArg<string | null>(
+            selection,
+            "defer",
+            "label",
+            trackedVariableValuesStep,
+          ) ?? undefined;
+        const deferredDigest: SelectionSetDigest = {
+          label,
+          fields: new Map(),
+          deferred: [],
+        };
+        selectionSetDigest.deferred.push(deferredDigest);
+        graphqlCollectFields(
+          operationPlan,
+          parentStepId,
+          objectType,
+          fragmentSelectionSet.selections,
+          isMutation,
+          visitedFragments,
+          deferredDigest,
+        );
+      } else {
+        graphqlCollectFields(
+          operationPlan,
+          parentStepId,
+          objectType,
+          fragmentSelectionSet.selections,
+          isMutation,
+          visitedFragments,
+          selectionSetDigest,
+        );
+      }
+    };
+
     switch (selection.kind) {
       case "Field": {
         const field = selection;
@@ -184,34 +250,7 @@ export function graphqlCollectFields(
           continue;
         }
         const fragmentSelectionSet = fragment.selectionSet;
-
-        const defer = getDirective(selection, "defer");
-        if (defer) {
-          const deferredDigest: SelectionSetDigest = {
-            fields: new Map(),
-            deferred: [],
-          };
-          selectionSetDigest.deferred.push(deferredDigest);
-          graphqlCollectFields(
-            operationPlan,
-            parentStepId,
-            objectType,
-            fragmentSelectionSet.selections,
-            isMutation,
-            visitedFragments,
-            deferredDigest,
-          );
-        } else {
-          graphqlCollectFields(
-            operationPlan,
-            parentStepId,
-            objectType,
-            fragmentSelectionSet.selections,
-            isMutation,
-            visitedFragments,
-            selectionSetDigest,
-          );
-        }
+        processFragment(selection, fragmentSelectionSet);
         break;
       }
       case "InlineFragment": {
@@ -234,34 +273,7 @@ export function graphqlCollectFields(
           }
         }
         const fragmentSelectionSet = selection.selectionSet;
-
-        const defer = getDirective(selection, "defer");
-        if (defer) {
-          const deferredDigest: SelectionSetDigest = {
-            fields: new Map(),
-            deferred: [],
-          };
-          selectionSetDigest.deferred.push(deferredDigest);
-          graphqlCollectFields(
-            operationPlan,
-            parentStepId,
-            objectType,
-            fragmentSelectionSet.selections,
-            isMutation,
-            visitedFragments,
-            deferredDigest,
-          );
-        } else {
-          graphqlCollectFields(
-            operationPlan,
-            parentStepId,
-            objectType,
-            fragmentSelectionSet.selections,
-            isMutation,
-            visitedFragments,
-            selectionSetDigest,
-          );
-        }
+        processFragment(selection, fragmentSelectionSet);
         break;
       }
     }
