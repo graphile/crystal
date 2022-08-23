@@ -1,5 +1,6 @@
 NEXT UP:
 
+- [ ] Deferred relation isn't being deferred?
 - [ ] Nested stream seems to trigger "value pushed into iterable after done;
       ignoring"
 - [ ] Should stream be batched better? E.g. nested streams can be batched
