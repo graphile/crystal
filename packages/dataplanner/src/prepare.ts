@@ -70,7 +70,7 @@ function processRoot(
 
   // Terminate the iterator when we're done
   if (promises.length) {
-    return Promise.allSettled(promises).then(noop);
+    return Promise.all(promises).then(noop);
   }
 }
 
@@ -189,10 +189,16 @@ export function executePreemptive(
 
         const promise = processRoot(ctx, iterator);
         if (isPromiseLike(promise)) {
-          promise.then(() => {
-            iterator.push({ hasNext: false });
-            iterator.return(undefined);
-          });
+          promise.then(
+            () => {
+              console.log("PROCESS ROOT COMPLETE");
+              iterator.push({ hasNext: false });
+              iterator.return(undefined);
+            },
+            (e) => {
+              iterator.throw(e);
+            },
+          );
         } else {
           iterator.push({ hasNext: false });
           iterator.return(undefined);
@@ -430,9 +436,8 @@ async function processStream(
 
     const bucketPromise = executeBucket(rootBucket, requestContext);
 
-    const promises: PromiseLike<any>[] = [];
-
     const output = () => {
+      const promises: PromiseLike<any>[] = [];
       for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
         const actualIndex = entries[bucketIndex][1];
         const [ctx, result] = outputBucket(
@@ -456,6 +461,9 @@ async function processStream(
           promises.push(promise);
         }
       }
+      if (promises.length) {
+        return Promise.all(promises).then(noop);
+      }
     };
 
     if (isPromiseLike(bucketPromise)) {
@@ -468,7 +476,7 @@ async function processStream(
   let pendingQueues = 0;
   const queueComplete = () => {
     pendingQueues--;
-    if (loopComplete) {
+    if (loopComplete && pendingQueues <= 0) {
       whenDone.resolve();
     }
   };
@@ -487,13 +495,13 @@ async function processStream(
       const result = _processQueue(entries);
       if (isPromiseLike(result)) {
         result.then(queueComplete, (e) => {
-          iterator.throw(e);
+          whenDone.reject(e);
         });
       } else {
         queueComplete();
       }
     } catch (e) {
-      iterator.throw(e);
+      whenDone.reject(e);
     }
   };
 
