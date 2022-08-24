@@ -7,8 +7,7 @@ import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { isCrystalError } from "../error.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
-import { $$streamMore } from "../interfaces.js";
-import { $$concreteType } from "../interfaces.js";
+import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { OutputPlan } from "./OutputPlan.js";
 
@@ -502,7 +501,7 @@ function doItHandleNull<TVal extends JSONValue>(
   if (isNonNull) {
     // No try/catch for us, raise to the parent if need be
     const result = doIt();
-    if (result === null) {
+    if (result == null) {
       throw nonNullError(locationDetails, ctx.path);
     }
     return result;
