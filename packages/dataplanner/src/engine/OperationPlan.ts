@@ -1864,9 +1864,15 @@ export class OperationPlan {
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
-        // TODO: warn user we're hoisting from a mutationField?
-        // TODO: maybe only hoist the isSyncAndSafe steps?
-        break;
+        if (step.isSyncAndSafe) {
+          // TODO: warn user we're hoisting from a mutationField?
+          break;
+        } else {
+          // Plans that rely on external state shouldn't be hoisted because
+          // their results may change after a mutation, so the mutation should
+          // run first.
+          return;
+        }
       }
       default: {
         const never: never = step.layerPlan.reason;
