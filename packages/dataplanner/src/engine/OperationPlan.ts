@@ -2451,8 +2451,78 @@ export class OperationPlan {
       layerPlan.steps = this.steps.filter(
         (s) => s !== null && s.layerPlan === layerPlan,
       );
-      layerPlan.startSteps = [
-        layerPlan.steps.filter((s) => {
+      // TODO: does this need sorting? Presumably lowest id first?
+      const sideEffectSteps = layerPlan.steps.filter((s) => s.hasSideEffects);
+      if (sideEffectSteps.length > 0) {
+        const processed = new Set<ExecutableStep>();
+
+        // TODO: we should be able to use a different algorithm that minimizes
+        // the number of layers in layerPlan.startSteps. This one is just a stub
+        // so I can continue my work.
+        const processSideEffectPlan = (step: ExecutableStep) => {
+          if (processed.has(step)) {
+            return;
+          }
+          processed.add(step);
+
+          const sideEffectDeps: ExecutableStep[] = [];
+          const rest: ExecutableStep[] = [];
+          for (let i = 0, l = step.dependencies.length; i < l; i++) {
+            const dep = this.steps[step.dependencies[i]];
+            if (dep.layerPlan !== layerPlan) {
+              continue;
+            }
+            if (processed.has(dep)) {
+              continue;
+            }
+            if (dep.hasSideEffects) {
+              sideEffectDeps.push(dep);
+            } else {
+              rest.push(dep);
+            }
+          }
+
+          // Call any side effects we're dependent on
+          for (const sideEffectDep of sideEffectDeps) {
+            processSideEffectPlan(sideEffectDep);
+          }
+
+          // TODO: this is silly, we should be able to group them together and
+          // run them in parallel, and they don't even have side effects!
+          for (const dep of rest) {
+            // if (!processed.has(dep)) {
+            processSideEffectPlan(dep);
+            // }
+          }
+
+          layerPlan.startSteps.push([step]);
+        };
+
+        for (const sideEffectStep of sideEffectSteps) {
+          processSideEffectPlan(sideEffectStep);
+        }
+
+        // Start steps have no dependencies inside this layerPlan _OTHER THAN_
+        // those already processed.
+        const startSteps = layerPlan.steps.filter((s) => {
+          if (processed.has(s)) {
+            return false;
+          }
+          for (const depId of s.dependencies) {
+            const dep = this.steps[depId];
+            if (dep.layerPlan === layerPlan && !processed.has(dep)) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        if (startSteps.length > 0) {
+          layerPlan.startSteps.push(startSteps);
+        }
+      } else {
+        // Start steps have no dependencies inside this layerPlan
+        const startSteps = layerPlan.steps.filter((s) => {
           for (const depId of s.dependencies) {
             const dep = this.steps[depId];
             if (dep.layerPlan === layerPlan) {
@@ -2460,8 +2530,10 @@ export class OperationPlan {
             }
           }
           return true;
-        }),
-      ];
+        });
+
+        layerPlan.startSteps.push(startSteps);
+      }
 
       /**
        * Adds the `dep` plan to the `copyPlanIds` for `layerPlan` and any
