@@ -7,8 +7,7 @@ import { isDev } from "../dev.js";
 import type { CrystalError } from "../error.js";
 import { isCrystalError, newCrystalError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
-import { isStreamableStep } from "../index.js";
-import { __ItemStep } from "../index.js";
+import { __ItemStep, isStreamableStep } from "../index.js";
 import type {
   CrystalResultsList,
   CrystalResultStreamList,
@@ -16,8 +15,7 @@ import type {
   ExecutionExtra,
   PromiseOrDirect,
 } from "../interfaces.js";
-import { $$streamMore } from "../interfaces.js";
-import { $$concreteType } from "../interfaces.js";
+import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { assertPolymorphicData } from "../polymorphic.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
