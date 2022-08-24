@@ -2250,8 +2250,10 @@ export class OperationPlan {
         } else {
           // Not equivalent, need to create a new bucket and shove all the
           // plans into it
-          if (!parent.rootStepId) {
-            throw new Error("Need parent step");
+          if (parent.rootStepId == null) {
+            throw new Error(
+              `GraphileInternalError<9a834619-346c-477b-8376-cba653f20bbc>: ${parent} has no rootStepId`,
+            );
           }
           const newPolymorphicLayerPlan = new LayerPlan(this, parent, {
             type: "polymorphic",
