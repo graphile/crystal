@@ -2261,6 +2261,7 @@ export class OperationPlan {
             // TODO: is this right?
             parentPlanId: parent.rootStepId,
           });
+          newPolymorphicLayerPlan.rootStepId = parent.rootStepId;
           winningCombo[0].layersAtMinDepth.forEach((layer) => {
             layer.parentLayerPlan = newPolymorphicLayerPlan;
           });
