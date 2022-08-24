@@ -2173,6 +2173,11 @@ export class OperationPlan {
           for (const equivalentStep of allEquivalentSteps) {
             seen.add(equivalentStep);
           }
+          for (const target of allEquivalentSteps) {
+            if (winner !== target) {
+              target.deduplicatedWith(winner);
+            }
+          }
         } else {
           // Polymorphic... handle later
           results.push(result);
@@ -2251,6 +2256,11 @@ export class OperationPlan {
             const winner = result.allEquivalentSteps[0];
             winner.layerPlan = parent;
             this.replaceSteps(result.allEquivalentSteps, winner);
+            for (const target of result.allEquivalentSteps) {
+              if (winner !== target) {
+                target.deduplicatedWith(winner);
+              }
+            }
           }
         } else {
           // Not equivalent, need to create a new bucket and shove all the
@@ -2274,6 +2284,11 @@ export class OperationPlan {
             const winner = result.allEquivalentSteps[0];
             winner.layerPlan = newPolymorphicLayerPlan;
             this.replaceSteps(result.allEquivalentSteps, winner);
+            for (const target of result.allEquivalentSteps) {
+              if (winner !== target) {
+                target.deduplicatedWith(winner);
+              }
+            }
           }
 
           // Doing this restructuring of the LayerPlans has invalidated
