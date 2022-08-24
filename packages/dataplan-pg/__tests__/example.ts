@@ -187,7 +187,7 @@ async function main() {
     }
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -197,7 +197,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -211,7 +211,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -232,7 +232,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         allMessagesConnection {
@@ -251,7 +251,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -284,7 +284,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums(first: 2) {
