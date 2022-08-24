@@ -98,7 +98,19 @@ async function main() {
   function logGraphQLResult(
     result: ExecutionResult<any> | AsyncExecutionResult,
   ): void {
-    const { data, errors } = result;
+    const { data, errors, extensions } = result;
+
+    const ops = (extensions?.explain as any)?.operations;
+    if (ops) {
+      for (const op of ops) {
+        if (op.type === "mermaid-js") {
+          console.log(op.diagram);
+        } else {
+          console.log(`UNKNOWN: ${op.type}`);
+        }
+      }
+    }
+
     const nicerErrors = errors?.map((e, idx) => {
       return idx > 0
         ? e.message // Flatten all but first error
@@ -146,13 +158,18 @@ async function main() {
     console.log();
     console.log();
     console.log();
-    const result = await dataplannerGraphql({
-      schema,
-      source,
-      variableValues,
-      contextValue,
-      rootValue: null,
-    });
+    const result = await dataplannerGraphql(
+      {
+        schema,
+        source,
+        variableValues,
+        contextValue,
+        rootValue: null,
+      },
+      {
+        // explain: ["mermaid-js"],
+      },
+    );
 
     console.log("GraphQL result:");
     if (isAsyncIterable(result)) {
