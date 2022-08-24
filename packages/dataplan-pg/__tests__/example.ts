@@ -18,20 +18,25 @@
  * column, but shows integration of external data into query planning.)
  */
 
+import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import type {
+  BaseGraphQLContext} from "dataplanner";
+import {
   __TrackedObjectStep,
   __ValueStep,
-  BaseGraphQLContext,
+  isAsyncIterable,
 } from "dataplanner";
 import { stripAnsi } from "dataplanner";
-import type { ExecutionResult } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { graphql } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
 
-import { schema } from "../src/examples/exampleSchema.js";
+import { makeExampleSchema } from "../src/examples/exampleSchema.js";
 import type { WithPgClient } from "../src/index.js";
+
+const schema = makeExampleSchema();
 
 // Convenience so we don't have to type these out each time. These used to be
 // separate plans, but required too much maintenance.
@@ -91,7 +96,9 @@ const testPool = new Pool({ connectionString: "graphile_crystal" });
 
 async function main() {
   //console.log(printSchema(schema));
-  function logGraphQLResult(result: ExecutionResult<any>): void {
+  function logGraphQLResult(
+    result: ExecutionResult<any> | AsyncExecutionResult,
+  ): void {
     const { data, errors } = result;
     const nicerErrors = errors?.map((e, idx) => {
       return idx > 0
@@ -124,15 +131,7 @@ async function main() {
   }
 
   async function test(source: string, variableValues = Object.create(null)) {
-    const withPgClient: WithPgClient = async (_pgSettings, callback) => {
-      const client = await testPool.connect();
-      try {
-        // TODO: set pgSettings within a transaction
-        return callback(client);
-      } finally {
-        client.release();
-      }
-    };
+    const withPgClient = makeNodePostgresWithPgClient(testPool);
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},
       withPgClient,
@@ -157,9 +156,18 @@ async function main() {
     });
 
     console.log("GraphQL result:");
-    logGraphQLResult(result);
-    if (result.errors) {
-      throw new Error("Aborting due to errors");
+    if (isAsyncIterable(result)) {
+      for await (const payload of result) {
+        logGraphQLResult(payload);
+        if (payload.errors) {
+          throw new Error("Aborting due to errors");
+        }
+      }
+    } else {
+      logGraphQLResult(result);
+      if (result.errors) {
+        throw new Error("Aborting due to errors");
+      }
     }
   }
 
