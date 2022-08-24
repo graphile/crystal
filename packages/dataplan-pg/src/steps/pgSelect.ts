@@ -2161,6 +2161,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   ): PgSelectStep<TColumns, TUniques, TRelations, TParameters>[] {
     this._lockAllParameters();
     return peers.filter((p) => {
+      if (p === this) {
+        return true;
+      }
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
