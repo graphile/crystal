@@ -91,16 +91,35 @@ export function executeBucket(
     layerPlan: { startSteps, children: childLayerPlans },
   } = bucket;
 
-  const starterPromises: PromiseLike<void>[] = [];
-  for (const step of startSteps) {
-    const r = rejectOnThrow(() => executeStep(step));
-    if (isPromiseLike(r)) {
-      starterPromises.push(r);
-    }
-  }
+  const l = startSteps.length;
 
-  if (starterPromises.length > 0) {
-    return Promise.all(starterPromises).then(executeSamePhaseChildren);
+  // Like a `for(i = 0; i < l; i++)` loop with some `await`s in it, except it does promise
+  // handling manually so that it can complete synchronously (no promises) if
+  // possible.
+  const nextSteps = (i: number): PromiseOrDirect<void> => {
+    if (i >= l) {
+      return;
+    }
+    bucket.cascadeEnabled = i === l - 1;
+    const steps = startSteps[i];
+    const starterPromises: PromiseLike<void>[] = [];
+    for (const step of steps) {
+      const r = rejectOnThrow(() => executeStep(step));
+      if (isPromiseLike(r)) {
+        starterPromises.push(r);
+      }
+    }
+    if (starterPromises.length > 0) {
+      return Promise.all(starterPromises).then(() => nextSteps(i + 1));
+    } else {
+      return nextSteps(i + 1);
+    }
+  };
+
+  const promise = nextSteps(0);
+
+  if (isPromiseLike(promise)) {
+    return promise.then(executeSamePhaseChildren);
   } else {
     return executeSamePhaseChildren();
   }
@@ -114,6 +133,10 @@ export function executeBucket(
     pendingSteps.delete(finishedStep);
     if (pendingSteps.size === 0) {
       // Finished!
+      return;
+    }
+    if (!bucket.cascadeEnabled) {
+      // Must be some side effects yet to run
       return;
     }
     const promises: PromiseLike<void>[] = [];
@@ -656,6 +679,7 @@ export function newBucket(
   }
   return {
     layerPlan,
+    cascadeEnabled: false,
     isComplete: false,
     size: noDepsList.length,
     store,

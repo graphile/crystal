@@ -134,6 +134,7 @@ export function executePreemptive(
   const rvs = [rootValue];
   const rootBucket: Bucket = {
     isComplete: false,
+    cascadeEnabled: false,
     layerPlan: operationPlan.rootLayerPlan,
     size,
     noDepsList: Object.freeze(arrayOfLength(size)),
@@ -424,6 +425,7 @@ async function processStream(
     // const childBucketIndex = 0;
     const rootBucket: Bucket = {
       isComplete: false,
+      cascadeEnabled: false,
       layerPlan: spec.outputPlan.layerPlan,
       size,
       noDepsList,
@@ -567,6 +569,7 @@ function processSingleDeferred(
   // const childBucketIndex = 0;
   const rootBucket: Bucket = {
     isComplete: false,
+    cascadeEnabled: false,
     layerPlan: outputPlan.layerPlan,
     size,
     noDepsList,

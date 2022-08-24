@@ -2445,15 +2445,17 @@ export class OperationPlan {
       layerPlan.steps = this.steps.filter(
         (s) => s !== null && s.layerPlan === layerPlan,
       );
-      layerPlan.startSteps = layerPlan.steps.filter((s) => {
-        for (const depId of s.dependencies) {
-          const dep = this.steps[depId];
-          if (dep.layerPlan === layerPlan) {
-            return false;
+      layerPlan.startSteps = [
+        layerPlan.steps.filter((s) => {
+          for (const depId of s.dependencies) {
+            const dep = this.steps[depId];
+            if (dep.layerPlan === layerPlan) {
+              return false;
+            }
           }
-        }
-        return true;
-      });
+          return true;
+        }),
+      ];
 
       /**
        * Adds the `dep` plan to the `copyPlanIds` for `layerPlan` and any

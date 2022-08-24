@@ -71,12 +71,27 @@ export interface Bucket {
     [planId: number]: any[];
   };
 
-  /** Set this true when the bucket is fully executed */
+  /**
+   * If true, we can trigger the next layer of steps when a step completes, if
+   * false then we cannot (presumably due to steps with side effects needing
+   * to run first).
+   *
+   * Initialize it to false.
+   */
+  cascadeEnabled: boolean;
+
+  /**
+   * Set this true when the bucket is fully executed.
+   *
+   * Initialize it to false.
+   */
   isComplete: boolean;
 
   /**
    * If an error occurred at any stage we need to drop down to more careful
    * (and slower) handling.
+   *
+   * Initialize it to false.
    */
   hasErrors: boolean;
 

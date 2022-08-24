@@ -159,8 +159,23 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   /** @internal */
   steps: ExecutableStep[] = [];
-  /** @internal */
-  startSteps: ExecutableStep[] = [];
+
+  /**
+   * Normally this will be a list with one element, which is a list of the
+   * steps in this layerPlan that aren't dependent on any other steps in this
+   * layerPlan - these will run first, and then execution will automatically
+   * cascade to the other plans in the LayerPlan as they complete.
+   *
+   * **HOWEVER**, when the layer contains steps that have side effects
+   * (step.hasSideEffects) it's essential that we run these steps before all
+   * the plans that aren't dependent on them, and that we do so in a serial
+   * order (one at a time). Keep in mind that these steps with side effects
+   * might be dependent on normal steps (without side effects), so those must
+   * be ran first _without_ triggering cascade. Fun.
+   *
+   * @internal
+   */
+  startSteps: Array<ExecutableStep[]> = [];
 
   /**
    * The list of layerPlans that steps added to this LayerPlan may depend upon.
