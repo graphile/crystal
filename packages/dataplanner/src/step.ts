@@ -281,7 +281,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
         throw new Error(
           //console.error(
           // This is not a GraphileInternalError
-          `Attempted to add '${step}' (layerPlan = ${step.layerPlan.id}) as a dependency of '${this}' (layerPlan = ${this.layerPlan.id}), but we cannot because that LayerPlan isn't an ancestor`,
+          `Attempted to add '${step}' (${step.layerPlan}) as a dependency of '${this}' (${this.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
         );
       }
     }
