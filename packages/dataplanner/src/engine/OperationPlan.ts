@@ -2284,6 +2284,9 @@ export class OperationPlan {
             const winner = result.allEquivalentSteps[0];
             winner.layerPlan = newPolymorphicLayerPlan;
             this.replaceSteps(result.allEquivalentSteps, winner);
+            // TODO: rewrite everything that has code like this (in the `for`
+            // loop above) to go through some common code so we don't miss
+            // anything else.
             for (const target of result.allEquivalentSteps) {
               if (winner !== target) {
                 target.deduplicatedWith(winner);
