@@ -1,7 +1,6 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import type {
-  ASTNode,
   FieldNode,
   FragmentDefinitionNode,
   GraphQLField,
@@ -58,11 +57,11 @@ import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import { $$crystalWrapped, isCrystalWrapped } from "../resolvers.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
-import { isPolymorphicStep } from "../step.js";
 import {
   assertExecutableStep,
   assertFinalized,
   isListCapableStep,
+  isPolymorphicStep,
   isStreamableStep,
 } from "../step.js";
 import { access } from "../steps/access.js";
