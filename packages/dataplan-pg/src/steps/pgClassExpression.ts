@@ -79,9 +79,6 @@ export class PgClassExpressionStep<
 
   public readonly expression: SQL;
 
-  placeholders: symbol[] = [];
-  placeholderIndexes: number[] = [];
-
   constructor(
     table: PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>,
     public readonly pgCodec: TExpressionCodec,
