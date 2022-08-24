@@ -2338,6 +2338,17 @@ export class OperationPlan {
 
     // Finally:
     this.maxDeduplicatedStepId = previousStepCount - 1;
+
+    // And because we completely destroyed the ancestry, rebuild it from scratch.
+    // TODO: optimize this!
+    for (const layerPlan of this.layerPlans) {
+      const ancestry = [layerPlan];
+      let current: LayerPlan | null = layerPlan;
+      while ((current = current.parentLayerPlan)) {
+        ancestry.unshift(current);
+      }
+      layerPlan.ancestry = ancestry;
+    }
   }
 
   private getStepOptionsForStep(step: ExecutableStep): StepOptions {
