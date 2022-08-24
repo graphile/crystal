@@ -24,13 +24,25 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title" as "1",
-    __relational_posts__."description" as "2",
-    __relational_posts__."note" as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_items__."id"::text as "5",
-    __relational_items_identifiers__.idx as "6"
+    __relational_topics__."id"::text as "1",
+    __relational_dividers__."id"::text as "2",
+    __relational_checklists__."id"::text as "3",
+    __relational_checklist_items__."id"::text as "4",
+    __relational_posts__."title" as "5",
+    __relational_posts__."description" as "6",
+    __relational_posts__."note" as "7",
+    __relational_posts__."id"::text as "8",
+    __relational_items__."id"::text as "9",
+    __relational_items_identifiers__.idx as "10"
   from interfaces_and_unions.relational_items as __relational_items__
+  left outer join interfaces_and_unions.relational_topics as __relational_topics__
+  on (__relational_items__."id"::"int4" = __relational_topics__."id")
+  left outer join interfaces_and_unions.relational_dividers as __relational_dividers__
+  on (__relational_items__."id"::"int4" = __relational_dividers__."id")
+  left outer join interfaces_and_unions.relational_checklists as __relational_checklists__
+  on (__relational_items__."id"::"int4" = __relational_checklists__."id")
+  left outer join interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
+  on (__relational_items__."id"::"int4" = __relational_checklist_items__."id")
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
   where
@@ -52,13 +64,25 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title" as "1",
-    __relational_posts__."description" as "2",
-    __relational_posts__."note" as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_items__."id"::text as "5",
-    __relational_items_identifiers__.idx as "6"
+    __relational_topics__."id"::text as "1",
+    __relational_dividers__."id"::text as "2",
+    __relational_checklists__."id"::text as "3",
+    __relational_checklist_items__."id"::text as "4",
+    __relational_posts__."title" as "5",
+    __relational_posts__."description" as "6",
+    __relational_posts__."note" as "7",
+    __relational_posts__."id"::text as "8",
+    __relational_items__."id"::text as "9",
+    __relational_items_identifiers__.idx as "10"
   from interfaces_and_unions.relational_items as __relational_items__
+  left outer join interfaces_and_unions.relational_topics as __relational_topics__
+  on (__relational_items__."id"::"int4" = __relational_topics__."id")
+  left outer join interfaces_and_unions.relational_dividers as __relational_dividers__
+  on (__relational_items__."id"::"int4" = __relational_dividers__."id")
+  left outer join interfaces_and_unions.relational_checklists as __relational_checklists__
+  on (__relational_items__."id"::"int4" = __relational_checklists__."id")
+  left outer join interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
+  on (__relational_items__."id"::"int4" = __relational_checklist_items__."id")
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
   where
@@ -80,13 +104,25 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title" as "1",
-    __relational_posts__."description" as "2",
-    __relational_posts__."note" as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_items__."id"::text as "5",
-    __relational_items_identifiers__.idx as "6"
+    __relational_topics__."id"::text as "1",
+    __relational_dividers__."id"::text as "2",
+    __relational_checklists__."id"::text as "3",
+    __relational_checklist_items__."id"::text as "4",
+    __relational_posts__."title" as "5",
+    __relational_posts__."description" as "6",
+    __relational_posts__."note" as "7",
+    __relational_posts__."id"::text as "8",
+    __relational_items__."id"::text as "9",
+    __relational_items_identifiers__.idx as "10"
   from interfaces_and_unions.relational_items as __relational_items__
+  left outer join interfaces_and_unions.relational_topics as __relational_topics__
+  on (__relational_items__."id"::"int4" = __relational_topics__."id")
+  left outer join interfaces_and_unions.relational_dividers as __relational_dividers__
+  on (__relational_items__."id"::"int4" = __relational_dividers__."id")
+  left outer join interfaces_and_unions.relational_checklists as __relational_checklists__
+  on (__relational_items__."id"::"int4" = __relational_checklists__."id")
+  left outer join interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
+  on (__relational_items__."id"::"int4" = __relational_checklist_items__."id")
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
   where
@@ -115,16 +151,28 @@ from (
 ) as __relational_items_identifiers__,
 lateral (
   select
-    __relational_items__."type"::text as "0",
-    __relational_posts__."title" as "1",
-    __relational_posts__."description" as "2",
-    __relational_posts__."note" as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_items__."id"::text as "5",
-    __relational_items_identifiers__.idx as "6"
+    __relational_posts__."note" as "0",
+    __relational_posts__."description" as "1",
+    __relational_posts__."title" as "2",
+    __relational_posts__."id"::text as "3",
+    __relational_checklist_items__."id"::text as "4",
+    __relational_checklists__."id"::text as "5",
+    __relational_dividers__."id"::text as "6",
+    __relational_topics__."id"::text as "7",
+    __relational_items__."type"::text as "8",
+    __relational_items__."id"::text as "9",
+    __relational_items_identifiers__.idx as "10"
   from interfaces_and_unions.relational_items as __relational_items__
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
+  left outer join interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
+  on (__relational_items__."id"::"int4" = __relational_checklist_items__."id")
+  left outer join interfaces_and_unions.relational_checklists as __relational_checklists__
+  on (__relational_items__."id"::"int4" = __relational_checklists__."id")
+  left outer join interfaces_and_unions.relational_dividers as __relational_dividers__
+  on (__relational_items__."id"::"int4" = __relational_dividers__."id")
+  left outer join interfaces_and_unions.relational_topics as __relational_topics__
+  on (__relational_items__."id"::"int4" = __relational_topics__."id")
   where
     (
       true /* authorization checks */
@@ -143,16 +191,28 @@ from (
 ) as __relational_items_identifiers__,
 lateral (
   select
-    __relational_items__."type"::text as "0",
-    __relational_posts__."title" as "1",
-    __relational_posts__."description" as "2",
-    __relational_posts__."note" as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_items__."id"::text as "5",
-    __relational_items_identifiers__.idx as "6"
+    __relational_posts__."note" as "0",
+    __relational_posts__."description" as "1",
+    __relational_posts__."title" as "2",
+    __relational_posts__."id"::text as "3",
+    __relational_checklist_items__."id"::text as "4",
+    __relational_checklists__."id"::text as "5",
+    __relational_dividers__."id"::text as "6",
+    __relational_topics__."id"::text as "7",
+    __relational_items__."id"::text as "8",
+    __relational_items__."type"::text as "9",
+    __relational_items_identifiers__.idx as "10"
   from interfaces_and_unions.relational_items as __relational_items__
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
+  left outer join interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
+  on (__relational_items__."id"::"int4" = __relational_checklist_items__."id")
+  left outer join interfaces_and_unions.relational_checklists as __relational_checklists__
+  on (__relational_items__."id"::"int4" = __relational_checklists__."id")
+  left outer join interfaces_and_unions.relational_dividers as __relational_dividers__
+  on (__relational_items__."id"::"int4" = __relational_dividers__."id")
+  left outer join interfaces_and_unions.relational_topics as __relational_topics__
+  on (__relational_items__."id"::"int4" = __relational_topics__."id")
   where
     (
       true /* authorization checks */
@@ -171,16 +231,28 @@ from (
 ) as __relational_items_identifiers__,
 lateral (
   select
-    __relational_items__."type"::text as "0",
-    __relational_posts__."title" as "1",
-    __relational_posts__."description" as "2",
-    __relational_posts__."note" as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_items__."id"::text as "5",
-    __relational_items_identifiers__.idx as "6"
+    __relational_posts__."note" as "0",
+    __relational_posts__."description" as "1",
+    __relational_posts__."title" as "2",
+    __relational_posts__."id"::text as "3",
+    __relational_checklist_items__."id"::text as "4",
+    __relational_checklists__."id"::text as "5",
+    __relational_dividers__."id"::text as "6",
+    __relational_topics__."id"::text as "7",
+    __relational_items__."id"::text as "8",
+    __relational_items__."type"::text as "9",
+    __relational_items_identifiers__.idx as "10"
   from interfaces_and_unions.relational_items as __relational_items__
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
+  left outer join interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
+  on (__relational_items__."id"::"int4" = __relational_checklist_items__."id")
+  left outer join interfaces_and_unions.relational_checklists as __relational_checklists__
+  on (__relational_items__."id"::"int4" = __relational_checklists__."id")
+  left outer join interfaces_and_unions.relational_dividers as __relational_dividers__
+  on (__relational_items__."id"::"int4" = __relational_dividers__."id")
+  left outer join interfaces_and_unions.relational_topics as __relational_topics__
+  on (__relational_items__."id"::"int4" = __relational_topics__."id")
   where
     (
       true /* authorization checks */
