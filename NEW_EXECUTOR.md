@@ -1,5 +1,11 @@
 NEXT UP:
 
+- [ ] `packages/dataplan-pg/__tests__/mutations/basics/create-relational-post-no-query.mermaid`
+      does a join against all tables even though it really only needs items and
+      posts. There's an explanation in the description of commit
+      `7dab34cc662aac8398157be16069f47ae5f35a0a` but though it's correct, a more
+      pragmatic approach may be to assume that the two records exist and still
+      optimize this away for the sake of efficiency
 - [ ] Deferred relation isn't being deferred?
 - [ ] Nested stream seems to trigger "value pushed into iterable after done;
       ignoring"
