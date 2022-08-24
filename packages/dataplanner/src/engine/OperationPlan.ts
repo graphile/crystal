@@ -2220,7 +2220,8 @@ export class OperationPlan {
         // TODO: assert typeNames is unique if isDev. (It should be!)
 
         // Does the existing parent of each of these already match?
-        const oneLayer = winningCombo[0].layersAtMinDepth[0];
+        const oneLayer = winningCombo[0]
+          .layersAtMinDepth[0] as LayerPlan<LayerPlanReasonPolymorphic>;
         const parent = oneLayer.parentLayerPlan;
         if (!parent) {
           throw new Error(
@@ -2259,9 +2260,9 @@ export class OperationPlan {
             type: "polymorphic",
             typeNames,
             // TODO: is this right?
-            parentPlanId: parent.rootStepId,
+            parentPlanId: oneLayer.reason.parentPlanId!,
           });
-          newPolymorphicLayerPlan.rootStepId = parent.rootStepId;
+          newPolymorphicLayerPlan.rootStepId = oneLayer.rootStepId;
           winningCombo[0].layersAtMinDepth.forEach((layer) => {
             layer.parentLayerPlan = newPolymorphicLayerPlan;
           });
@@ -2585,6 +2586,15 @@ export class OperationPlan {
           ensurePlanAvailableInLayer(dep, layerPlan);
         }
       }
+
+      // Copy polymorphic parentPlanId
+      for (const layerPlan of this.layerPlans) {
+        if (layerPlan.reason.type === "polymorphic") {
+          const parentStep = this.steps[layerPlan.reason.parentPlanId];
+          ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+        }
+      }
+
       // Populate copyPlanIds for output plans' rootStepId
       this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
         const rootPlan = this.steps[outputPlan.rootStepId];

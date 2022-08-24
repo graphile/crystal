@@ -140,6 +140,7 @@ export function executePreemptive(
     noDepsList: Object.freeze(arrayOfLength(size)),
     store: Object.assign(Object.create(null), {
       "-1": requestIndex,
+      [operationPlan.rootLayerPlan.rootStepId!]: requestIndex,
       [operationPlan.variableValuesStep.id]: vars,
       [operationPlan.contextStep.id]: ctxs,
       [operationPlan.rootValueStep.id]: rvs,
