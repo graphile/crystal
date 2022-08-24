@@ -52,7 +52,7 @@
     "graphiql-explorer": "^0.9.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "tslib": "^2.3.1",
+    "tslib": "^2.4.0",
     "yargs": "^17.4.1"
   },
   "engines": {
@@ -78,9 +78,9 @@
     "http-proxy": "^1.18.1",
     "jest": "^28.1.0",
     "nodemon": "^2.0.15",
-    "ts-loader": "^9.2.8",
-    "ts-node": "^10.7.0",
-    "typescript": "rc",
+    "ts-loader": "^9.3.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.1-rc",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
   }

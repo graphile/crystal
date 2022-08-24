@@ -27,7 +27,7 @@
   "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-json",
   "dependencies": {
     "chalk": "^4.1.2",
-    "tslib": "^2.3.1"
+    "tslib": "^2.4.0"
   },
   "engines": {
     "node": ">=14.17"
@@ -43,6 +43,6 @@
     "@types/jest": "^27.5.1",
     "jest": "^28.1.0",
     "jest-serializer-simple": "workspace:^",
-    "typescript": "rc"
+    "typescript": "^4.8.1-rc"
   }
 }
