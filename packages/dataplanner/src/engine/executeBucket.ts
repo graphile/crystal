@@ -570,53 +570,62 @@ export function executeBucket(
           break;
         }
         case "polymorphic": {
-          const store: Bucket["store"] = Object.create(null);
-          const map: Map<number, number> = new Map();
-          const noDepsList: undefined[] = [];
-
-          // We're only copying over the entries that match this type (note:
-          // they may end up being null, but that's okay)
-          const targetTypeNames = childLayerPlan.reason.typeNames;
           const polymorphicPlanId = childLayerPlan.reason.parentPlanId;
           const polymorphicPlanStore = bucket.store[polymorphicPlanId];
+          if (!polymorphicPlanStore) {
+            // TODO: what should happen here (if anything)?
+            // This was probably due to a CrystalError
+            break;
+          } else {
+            const store: Bucket["store"] = Object.create(null);
+            const map: Map<number, number> = new Map();
+            const noDepsList: undefined[] = [];
 
-          for (const planId of copyStepIds) {
-            store[planId] = [];
-          }
+            // We're only copying over the entries that match this type (note:
+            // they may end up being null, but that's okay)
+            const targetTypeNames = childLayerPlan.reason.typeNames;
 
-          for (
-            let originalIndex = 0;
-            originalIndex < bucket.size;
-            originalIndex++
-          ) {
-            const value = polymorphicPlanStore[originalIndex];
-            if (value == null) {
-              continue;
-            }
-            assertPolymorphicData(value);
-            const typeName = value[$$concreteType];
-            if (!targetTypeNames.includes(typeName)) {
-              continue;
-            }
-            const newIndex = noDepsList.push(undefined) - 1;
-            map.set(originalIndex, newIndex);
             for (const planId of copyStepIds) {
-              store[planId][newIndex] = bucket.store[planId][originalIndex];
+              store[planId] = [];
             }
-          }
 
-          if (noDepsList.length > 0) {
-            // Reference
-            const childBucket = newBucket(childLayerPlan, noDepsList, store);
-            bucket.children[childLayerPlan.id] = {
-              bucket: childBucket,
-              map,
-            };
+            for (
+              let originalIndex = 0;
+              originalIndex < bucket.size;
+              originalIndex++
+            ) {
+              const value = polymorphicPlanStore[originalIndex];
+              if (value == null) {
+                continue;
+              }
+              if (isCrystalError(value)) {
+                continue;
+              }
+              assertPolymorphicData(value);
+              const typeName = value[$$concreteType];
+              if (!targetTypeNames.includes(typeName)) {
+                continue;
+              }
+              const newIndex = noDepsList.push(undefined) - 1;
+              map.set(originalIndex, newIndex);
+              for (const planId of copyStepIds) {
+                store[planId][newIndex] = bucket.store[planId][originalIndex];
+              }
+            }
 
-            // Execute
-            const result = executeBucket(childBucket, requestContext);
-            if (isPromiseLike(result)) {
-              childPromises.push(result);
+            if (noDepsList.length > 0) {
+              // Reference
+              const childBucket = newBucket(childLayerPlan, noDepsList, store);
+              bucket.children[childLayerPlan.id] = {
+                bucket: childBucket,
+                map,
+              };
+
+              // Execute
+              const result = executeBucket(childBucket, requestContext);
+              if (isPromiseLike(result)) {
+                childPromises.push(result);
+              }
             }
           }
 
