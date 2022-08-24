@@ -1,5 +1,8 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
+  "ts-node": {
+    "experimentalResolver": true
+  },
   "compilerOptions": {
     "composite": true,
     "declaration": true,
