@@ -138,6 +138,9 @@ export class PgClassExpressionStep<
   }
 
   public toStringMeta(): string {
+    if (!this.expression) {
+      return "???";
+    }
     const expr = sql.compile(this.expression);
     if (expr.text.length > 23) {
       return (
