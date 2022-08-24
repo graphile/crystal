@@ -700,11 +700,15 @@ export class OperationPlan {
         responseKey,
         fieldType,
         fieldNodes,
-        fieldLayerPlan,
+        fieldLayerPlan: rawFieldLayerPlan,
         locationDetails,
         // Deliberately shadow
         outputPlan,
       } = nextUp;
+
+      // In case this was replaced by polymorphicDeduplicateSteps.
+      const fieldLayerPlan = this.layerPlans[rawFieldLayerPlan.id];
+
       // May have changed due to deduplicate
       const step = this.steps[stepId];
       // TODO: is `outputPlan` unchanged here after polymorphicDeduplicateSteps?
@@ -2340,15 +2344,56 @@ export class OperationPlan {
     // Finally:
     this.maxDeduplicatedStepId = previousStepCount - 1;
 
+    // Actually... can we bin a bunch of these layerPlans off now?
+    for (let i = 0, l = this.layerPlans.length; i < l; i++) {
+      const layerPlan = this.layerPlans[i];
+      if (
+        layerPlan.reason.type !== "polymorphic" ||
+        layerPlan.parentLayerPlan?.reason.type !== "polymorphic" ||
+        this.steps[layerPlan.parentLayerPlan.rootStepId!] !==
+          this.steps[layerPlan.rootStepId!]
+      ) {
+        continue;
+      }
+      const steps = this.steps.filter((s) => s.layerPlan === layerPlan);
+      if (steps.length === 0) {
+        // It has no steps, everything else looks fine, let's bin it off
+        const replacementLayerPlan = layerPlan.parentLayerPlan;
+
+        this.layerPlans[i] = replacementLayerPlan;
+
+        for (const lp of this.layerPlans) {
+          if (lp.parentLayerPlan === layerPlan) {
+            lp.parentLayerPlan = replacementLayerPlan;
+          }
+        }
+
+        this.walkOutputPlans(this.rootOutputPlan, (op) => {
+          if (op.layerPlan === layerPlan) {
+            op.layerPlan = replacementLayerPlan;
+          }
+        });
+      }
+    }
+
     // And because we completely destroyed the ancestry, rebuild it from scratch.
     // TODO: optimize this!
-    for (const layerPlan of this.layerPlans) {
+    for (let i = 0, l = this.layerPlans.length; i < l; i++) {
+      const layerPlan = this.layerPlans[i];
+      if (layerPlan.id !== i) {
+        continue;
+      }
       const ancestry = [layerPlan];
       let current: LayerPlan | null = layerPlan;
       while ((current = current.parentLayerPlan)) {
         ancestry.unshift(current);
       }
       layerPlan.ancestry = ancestry;
+      layerPlan.children = [
+        ...new Set(
+          this.layerPlans.filter((l) => l.parentLayerPlan === layerPlan),
+        ),
+      ];
     }
   }
 

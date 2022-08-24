@@ -570,7 +570,7 @@ function getChildBucketAndIndex(
   const child = bucket.children[childOutputPlan.layerPlan.id];
   if (!child) {
     throw new Error(
-      `GraphileInternalError<c354573b-7714-4b5b-9db1-0beae1074fec>: Could not find child for layer plan '${childOutputPlan.layerPlan.id}' in bucket for layerPlan '${bucket.layerPlan.id}'`,
+      `GraphileInternalError<c354573b-7714-4b5b-9db1-0beae1074fec>: Could not find child for '${childOutputPlan.layerPlan}' in bucket for '${bucket.layerPlan}'`,
     );
   }
 

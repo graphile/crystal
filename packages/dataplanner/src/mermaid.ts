@@ -321,7 +321,11 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    subgraph Buckets");
-  for (const layerPlan of operationPlan.layerPlans) {
+  for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
+    const layerPlan = operationPlan.layerPlans[i];
+    if (layerPlan.id !== i) {
+      continue;
+    }
     const plansAndIds = Object.entries(steps).filter(
       ([id, plan]) =>
         plan && plan.id === Number(id) && plan.layerPlan === layerPlan,
@@ -382,7 +386,11 @@ export function printPlanGraph(
       ].join(",")} bucket${layerPlan.id}`,
     );
   }
-  for (const layerPlan of operationPlan.layerPlans) {
+  for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
+    const layerPlan = operationPlan.layerPlans[i];
+    if (layerPlan.id !== i) {
+      continue;
+    }
     const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
     if (childNodes.length > 0) {
       graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
