@@ -19,16 +19,15 @@
  */
 
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
-import type {
-  BaseGraphQLContext} from "dataplanner";
+import type { BaseGraphQLContext } from "dataplanner";
 import {
   __TrackedObjectStep,
   __ValueStep,
+  dataplannerGraphql,
   isAsyncIterable,
+  stripAnsi,
 } from "dataplanner";
-import { stripAnsi } from "dataplanner";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
-import { graphql } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
@@ -147,7 +146,7 @@ async function main() {
     console.log();
     console.log();
     console.log();
-    const result = await graphql({
+    const result = await dataplannerGraphql({
       schema,
       source,
       variableValues,

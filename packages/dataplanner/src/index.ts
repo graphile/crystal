@@ -22,6 +22,7 @@ debugFactory.formatters.p = (pathIdentity) =>
 
 import { ROOT_PATH } from "./constants.js";
 import { dataplannerEnforce } from "./dataplannerEnforce.js";
+import { dataplannerGraphql } from "./dataplannerGraphql.js";
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
@@ -235,6 +236,7 @@ export {
   DataPlannerEnumValueExtensions,
   DataPlannerExecuteOptions,
   DataPlannerFieldExtensions,
+  dataplannerGraphql,
   DataPlannerInputFieldExtensions,
   DataPlannerObjectTypeExtensions,
   dataplannerResolver,
@@ -365,6 +367,7 @@ exportAsMany({
   defer,
   dataplannerEnforce,
   execute,
+  dataplannerGraphql,
   subscribe,
   __InputListStep,
   __InputObjectStep,
