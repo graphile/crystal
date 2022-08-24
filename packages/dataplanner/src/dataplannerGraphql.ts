@@ -6,6 +6,7 @@ import type {
 import { parse, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
+import type { DataPlannerExecuteOptions } from "./execute.js";
 import { execute } from "./execute.js";
 
 /**
@@ -14,6 +15,7 @@ import { execute } from "./execute.js";
  */
 export function dataplannerGraphql(
   args: GraphQLArgs,
+  options: DataPlannerExecuteOptions = {},
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
@@ -49,14 +51,17 @@ export function dataplannerGraphql(
   }
 
   // Execute
-  return execute({
-    schema,
-    document,
-    rootValue,
-    contextValue,
-    variableValues,
-    operationName,
-    fieldResolver,
-    typeResolver,
-  });
+  return execute(
+    {
+      schema,
+      document,
+      rootValue,
+      contextValue,
+      variableValues,
+      operationName,
+      fieldResolver,
+      typeResolver,
+    },
+    options,
+  );
 }
