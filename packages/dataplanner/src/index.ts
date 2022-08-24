@@ -180,6 +180,7 @@ import {
   ObjectTypeSpec,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
+  stepsAreInSamePhase,
 } from "./utils.js";
 
 export { isAsyncIterable } from "iterall";
@@ -345,6 +346,7 @@ export {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   StepOptimizeOptions,
+  stepsAreInSamePhase,
   StepStreamOptions,
   StreamableStep,
   stripAnsi,
@@ -431,6 +433,7 @@ exportAsMany({
   arrayOfLength,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
+  stepsAreInSamePhase,
   isPromiseLike,
   isDev,
   noop,

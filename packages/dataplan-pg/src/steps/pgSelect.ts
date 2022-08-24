@@ -32,6 +32,7 @@ import {
   reverse,
   reverseArray,
   stepAMayDependOnStepB,
+  stepsAreInSamePhase,
 } from "dataplanner";
 import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -2477,7 +2478,11 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             continue;
           }
 
-          // TODO: Don't allow merging across a stream/defer/subscription boundary
+          // Don't allow merging across a stream/defer/subscription boundary
+          if (!stepsAreInSamePhase(t2, this)) {
+            continue;
+          }
+
           /*
           if (!planGroupsOverlap(this, t2)) {
             // We're not in the same group (i.e. there's probably a @defer or

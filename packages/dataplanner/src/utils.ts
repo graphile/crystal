@@ -37,6 +37,7 @@ import { inspect } from "util";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
+import type { LayerPlan } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { InputStep } from "./input.js";
 import type {
@@ -880,5 +881,65 @@ export function stepAMayDependOnStepB(
 ): boolean {
   return (
     $a.layerPlan.ancestry.includes($b.layerPlan) && !stepADependsOnStepB($b, $a)
+  );
+}
+
+/**
+ * Indicates if `layerPlan` represents a layer that will be deferred somehow,
+ * e.g. a subscription, `@stream` or `@defer` root layer plan.
+ */
+function isBoundaryLayerPlan(layerPlan: LayerPlan): boolean {
+  const t = layerPlan.reason.type;
+  return (
+    // These indicate boundaries over which plans shouldn't be optimized
+    // together (generally).
+    t === "subscription" ||
+    t === "defer" ||
+    (t === "listItem" && Boolean(layerPlan.reason.stream))
+  );
+}
+
+/**
+ * For a regular GraphQL query with no `@stream`/`@defer`, the entire result is
+ * calculated and then the output is generated and sent to the client at once.
+ * Thus you can think of this as every plan is in the same "phase".
+ *
+ * However, if you introduce a `@stream`/`@defer` selection, then the steps
+ * inside that selection should run _later_ than the steps in the parent
+ * selection - they should run in two different phases. Similar is true for
+ * subscriptions.
+ *
+ * When optimizing your plans, if you are not careful you may end up pushing
+ * what should be later work into the earlier phase, resulting in the initial
+ * payload being delayed whilst things that should have been deferred are being
+ * calculated. Thus, you should generally check that two plans are in the same phase
+ * before you try and merge them.
+ *
+ * This is not a strict rule, though, because sometimes it makes more sense to
+ * push work into the parent phase because it would be faster overall to do
+ * that work there, and would not significantly delay the initial payload's
+ * execution time - for example it's unlikely that it would make sense to defer
+ * selecting an additional boolean column from a database table even if the
+ * operation indicates that's what you should do.
+ *
+ * As a step class author, it's your responsiblity to figure out the right
+ * approach. Once you have, you can use this function to help you, should you
+ * need it.
+ */
+export function stepsAreInSamePhase(
+  ancestor: ExecutableStep,
+  descendent: ExecutableStep,
+) {
+  let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
+  do {
+    if (currentLayerPlan === ancestor.layerPlan) {
+      return true;
+    }
+    if (isBoundaryLayerPlan(currentLayerPlan)) {
+      return false;
+    }
+  } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
+  throw new Error(
+    `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
   );
 }
