@@ -308,7 +308,7 @@ export function executeOutputPlan(
       const childOutputPlan = outputPlan.childByTypeName[typeName];
       assert.ok(
         childOutputPlan,
-        `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}'`,
+        `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
       );
       const [childBucket, childBucketIndex] = getChildBucketAndIndex(
         childOutputPlan,

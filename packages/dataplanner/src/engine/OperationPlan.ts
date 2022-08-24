@@ -1165,11 +1165,37 @@ export class OperationPlan {
        * Next, we figure out the list of `possibleTypes` based on the
        * union/interface and any other constraints that we know. NOTE: we can't
        * discount a type just because it doesn't have any fragments that apply
-       * to it - instead we must still plan an empty selection set, and we need
-       * to know it exists for that. See
+       * to it - instead we must still plan an empty selection set (or one just
+       * using `{__typename}`), and we need to know it exists for that. See
        * https://github.com/graphql/graphql-spec/issues/951#issuecomment-1140957685
        */
-      const possibleObjectTypes = isUnion
+      const allPossibleObjectTypes = isUnion
+        ? nullableFieldType.getTypes()
+        : this.schema.getImplementations(nullableFieldType).objects;
+
+      /*
+       * THIS IS OLD CODE, AND IT'S WRONG.
+       *
+       * The reason it's wrong is it can't process a query like the following,
+       * where there's only a `__typename` field in the selection set for a
+       * polymorphic selection set (not sure if the parent polymorphic
+       * selection set is required to reproduce the issue too...).
+       *
+       * ```
+       * {
+       *   singleTableItemById(id: 15) {
+       *     __typename
+       *     parent {
+       *       __typename
+       *     }
+       *   }
+       * }
+       * ```
+       * ---
+       *
+       * This is just the ones that select non-introspection fields - they need
+       * proper planning.
+      const relevantObjectTypes = isUnion
         ? typesUsedInSelections(this, nullableFieldType.getTypes(), selections)
         : (() => {
             const interfaceType = nullableFieldType;
@@ -1187,6 +1213,7 @@ export class OperationPlan {
               return typesUsedInSelections(this, implementations, selections);
             }
           })();
+       */
 
       const polymorphicOutputPlan = new OutputPlan(
         parentLayerPlan,
@@ -1194,7 +1221,7 @@ export class OperationPlan {
         {
           mode: "polymorphic",
           deferLabel: undefined,
-          typeNames: possibleObjectTypes.map((t) => t.name),
+          typeNames: allPossibleObjectTypes.map((t) => t.name),
         },
         locationDetails,
       );
@@ -1214,7 +1241,7 @@ export class OperationPlan {
         GraphQLObjectType,
         LayerPlan<LayerPlanReasonPolymorphic>
       >();
-      for (const type of possibleObjectTypes) {
+      for (const type of allPossibleObjectTypes) {
         const lp = new LayerPlan(this, $step.layerPlan, {
           type: "polymorphic",
           typeNames: [type.name],
@@ -1235,7 +1262,7 @@ export class OperationPlan {
        * Then plan the fields (BUT NOT THEIR SELECTION SETS) into this
        * LayerPlan. DO NOT USE REGULAR DEDUPLICATION!
        */
-      for (const type of possibleObjectTypes) {
+      for (const type of allPossibleObjectTypes) {
         const polymorphicLayerPlan =
           polymorphicLayerPlanByObjectType.get(type)!;
         polymorphicLayerPlans.push(polymorphicLayerPlan);
