@@ -210,6 +210,18 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
   }
 
+  toString() {
+    let chain = "";
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let current: LayerPlan | null = this;
+    while ((current = current.parentLayerPlan)) {
+      chain = chain + `∈${current.id}`;
+    }
+    return `LayerPlan<${this.id}${chain}?${this.reason.type}!${
+      this.rootStepId ?? "x"
+    }>`;
+  }
+
   /** @internal Use plan.getStep(id) instead. */
   public getStep(id: number, requestingStep: ExecutableStep): ExecutableStep {
     return this.operationPlan.getStep(id, requestingStep);
