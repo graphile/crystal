@@ -808,7 +808,7 @@ export class PgSource<
       throw new Error("Cannot call find if there's no columns");
     }
     const columns = this.codec.columns as NonNullable<TColumns>;
-    const keys = Object.keys(spec) as Array<keyof typeof columns>;
+    const keys = Object.keys(spec); /* as Array<keyof typeof columns>*/
     const invalidKeys = keys.filter((key) => columns[key] == null);
     if (invalidKeys.length > 0) {
       throw new Error(

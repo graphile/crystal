@@ -28,6 +28,7 @@ import type {
   __TrackedObjectStep,
   ExecutableStep,
   FieldArgs,
+  FieldInfo,
   FieldPlanResolver,
   GraphileFieldConfigArgumentMap,
 } from "dataplanner";
@@ -905,8 +906,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                 (connection, getSelectPlanFromParentAndArgs) =>
                                   function plan(
                                     $parent: ExecutableStep,
-                                    args,
-                                    info,
+                                    args: FieldArgs,
+                                    info: FieldInfo,
                                   ) {
                                     const $select =
                                       getSelectPlanFromParentAndArgs(

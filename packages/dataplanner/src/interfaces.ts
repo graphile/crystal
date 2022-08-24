@@ -267,6 +267,11 @@ export interface FieldArgs {
   apply($target: ExecutableStep | ModifierStep, path?: string | string[]): void;
 }
 
+export interface FieldInfo {
+  field: GraphQLField<any, any, any>;
+  schema: GraphQLSchema;
+}
+
 /**
  * Step resolvers are like regular resolvers except they're called beforehand,
  * they return plans rather than values, and they only run once for lists
@@ -291,10 +296,7 @@ export type FieldPlanResolver<
 > = (
   $parentPlan: TParentStep,
   args: FieldArgs,
-  info: {
-    field: GraphQLField<any, any, any>;
-    schema: GraphQLSchema;
-  },
+  info: FieldInfo,
 ) => TResultStep | null;
 
 // TODO: review _TContext
