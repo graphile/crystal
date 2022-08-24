@@ -370,7 +370,7 @@ export function printPlanGraph(
                 .join(", ")}\n`
             : ""
         }${
-          layerPlan.rootStepId != null
+          layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
             ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
             : ""
         }\n${outputMapStuff.join("\n")}`,
