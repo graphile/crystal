@@ -1220,11 +1220,12 @@ export class OperationPlan {
       /*
        * Now a polymorphic layer plan for all the plans to live in
        */
-      const polymorphicLayerPlan = new LayerPlan(this, $step.layerPlan, {
-        type: "polymorphic",
-        typeNames: allPossibleObjectTypes.map((t) => t.name),
-        parentPlanId: $step.id,
-      });
+      const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
+        path,
+        $step,
+        allPossibleObjectTypes,
+      );
+
       /*
        * And an output plan for it (knows how to branch the different object
        * output plans).
@@ -1282,6 +1283,45 @@ export class OperationPlan {
           locationDetails,
         });
       }
+    }
+  }
+
+  private polymorphicLayerPlanByPath = new Map<
+    string,
+    { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
+  >();
+  private getPolymorphicLayerPlan(
+    path: readonly string[],
+    $step: ExecutableStep,
+    allPossibleObjectTypes: readonly GraphQLObjectType[],
+  ): LayerPlan<LayerPlanReasonPolymorphic> {
+    const pathString = path.join("|");
+    const prev = this.polymorphicLayerPlanByPath.get(pathString);
+    if (prev) {
+      const { stepId, layerPlan } = prev;
+      if (this.steps[stepId] !== this.steps[$step.id]) {
+        throw new Error(
+          "GraphileInternalError<e01bdc40-7c89-41c6-8d84-56efa22c872a>: unexpected inconsistency when determining the polymorphic LayerPlan to use",
+        );
+      }
+      for (const t of allPossibleObjectTypes) {
+        if (!layerPlan.reason.typeNames.includes(t.name)) {
+          // TODO: do I need to do anything extra here?
+          layerPlan.reason.typeNames.push(t.name);
+        }
+      }
+      return layerPlan;
+    } else {
+      const layerPlan = new LayerPlan(this, $step.layerPlan, {
+        type: "polymorphic",
+        typeNames: allPossibleObjectTypes.map((t) => t.name),
+        parentPlanId: $step.id,
+      });
+      this.polymorphicLayerPlanByPath.set(pathString, {
+        stepId: $step.id,
+        layerPlan,
+      });
+      return layerPlan;
     }
   }
 
