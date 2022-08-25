@@ -1286,7 +1286,10 @@ export class OperationPlan {
       for (const type of allPossibleObjectTypes) {
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
-        polymorphicLayerPlan.polymorphicPaths.push(newPolymorphicPath);
+        polymorphicLayerPlan.polymorphicPaths = [
+          ...polymorphicLayerPlan.polymorphicPaths,
+          newPolymorphicPath,
+        ];
 
         const $root = withGlobalLayerPlan(
           polymorphicLayerPlan,
@@ -2069,11 +2072,9 @@ export class OperationPlan {
     // Give the steps a chance to pass their responsibilities to the winner.
     for (const target of allEquivalentSteps) {
       if (winner !== target) {
-        for (const p of target.polymorphicPaths) {
-          if (!winner.polymorphicPaths.includes(p)) {
-            winner.polymorphicPaths.push(p);
-          }
-        }
+        winner.polymorphicPaths = [
+          ...new Set([...winner.polymorphicPaths, ...target.polymorphicPaths]),
+        ];
         target.deduplicatedWith(winner);
       }
     }
