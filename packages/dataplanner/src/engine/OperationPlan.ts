@@ -2022,6 +2022,11 @@ export class OperationPlan {
     // Give the steps a chance to pass their responsibilities to the winner.
     for (const target of allEquivalentSteps) {
       if (winner !== target) {
+        for (const p of target.polymorphicPaths) {
+          if (!winner.polymorphicPaths.includes(p)) {
+            winner.polymorphicPaths.push(p);
+          }
+        }
         target.deduplicatedWith(winner);
       }
     }
