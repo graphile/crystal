@@ -216,8 +216,14 @@ export function executeBucket(
           const promises: PromiseLike<void>[] = [];
           resultSettledResult.forEach((settledResult, resultIndex): void => {
             if (settledResult.status === "fulfilled") {
-              if (Array.isArray(settledResult.value)) {
+              if (
+                // This is to stop some basic types being accidentally recogized as iterable/async iterator
+                Array.isArray(settledResult.value) ||
+                settledResult.value instanceof Map ||
+                settledResult.value instanceof Set
+              ) {
                 result[resultIndex] = settledResult.value;
+                // TODO: isIterable and isAsyncIterable are causing all _sorts_ of pain here. AVOID!
               } else if (isIterable(settledResult.value)) {
                 // Turn it from iterable into an array.
                 try {
