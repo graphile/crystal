@@ -2392,6 +2392,9 @@ export class OperationPlan {
     // Actually... can we bin a bunch of these layerPlans off now?
     for (let i = 0, l = this.layerPlans.length; i < l; i++) {
       const layerPlan = this.layerPlans[i];
+      if (layerPlan.id !== i) {
+        continue;
+      }
       if (
         layerPlan.reason.type !== "polymorphic" ||
         layerPlan.parentLayerPlan?.reason.type !== "polymorphic" ||
