@@ -59,6 +59,13 @@ export interface Bucket {
   noDepsList: readonly undefined[];
 
   /**
+   * The polymorphic path through which each of the entries (respectively) has
+   * travelled. This influences the steps that will be executed using the
+   * related inputs.
+   */
+  polymorphicPathList: readonly string[];
+
+  /**
    * Every entry in the store is a list with the same length as the bucket has
    * `size`.
    */

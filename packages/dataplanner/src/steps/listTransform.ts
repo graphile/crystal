@@ -250,6 +250,7 @@ export class __ListTransformStep<
     const copyStepIds = childLayerPlan.copyPlanIds;
 
     const store: Bucket["store"] = Object.create(null);
+    const polymorphicPathList: string[] = [];
     const map: Map<number, number[]> = new Map();
     let size = 0;
 
@@ -281,6 +282,8 @@ export class __ListTransformStep<
         for (let j = 0, l = list.length; j < l; j++) {
           const newIndex = size++;
           newIndexes.push(newIndex);
+          polymorphicPathList[newIndex] =
+            bucket.polymorphicPathList[originalIndex];
           store[itemStepId][newIndex] = list[j];
           for (const planId of copyStepIds) {
             store[planId][newIndex] = bucket.store[planId][originalIndex];
@@ -295,6 +298,7 @@ export class __ListTransformStep<
         size,
         store,
         hasErrors: bucket.hasErrors,
+        polymorphicPathList,
       });
       await executeBucket(childBucket, extra._requestContext);
     }

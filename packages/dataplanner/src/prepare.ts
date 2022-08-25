@@ -132,6 +132,7 @@ export function executePreemptive(
   const vars = [variableValues];
   const ctxs = [context];
   const rvs = [rootValue];
+  const polymorphicPathList = [operationPlan.rootLayerPlan.polymorphicPaths[0]];
   const rootBucket = newBucket({
     layerPlan: operationPlan.rootLayerPlan,
     size,
@@ -143,6 +144,7 @@ export function executePreemptive(
       [operationPlan.rootValueStep.id]: rvs,
     }),
     hasErrors: false,
+    polymorphicPathList,
   });
   const requestContext: RequestContext = {
     // toSerialize: [],
@@ -397,6 +399,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store = Object.create(null);
+    const polymorphicPathList: string[] = [];
     store[spec.listItemStepId] = [];
 
     for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
@@ -407,6 +410,9 @@ async function processStream(
     for (const entry of entries) {
       const [result] = entry;
       store[spec.listItemStepId][bucketIndex] = result;
+
+      polymorphicPathList[bucketIndex] =
+        spec.bucket.polymorphicPathList[spec.bucketIndex];
       for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
         store[copyPlanId][bucketIndex] =
           spec.bucket.store[copyPlanId][spec.bucketIndex];
@@ -424,6 +430,7 @@ async function processStream(
       size,
       store,
       hasErrors: false,
+      polymorphicPathList,
     });
 
     const bucketPromise = executeBucket(rootBucket, requestContext);
@@ -539,6 +546,7 @@ function processSingleDeferred(
 ) {
   const size = specs.length;
   const store = Object.create(null);
+  const polymorphicPathList: string[] = [];
 
   for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
     store[copyPlanId] = [];
@@ -546,6 +554,8 @@ function processSingleDeferred(
 
   let bucketIndex = 0;
   for (const [iterator, spec] of specs) {
+    polymorphicPathList[bucketIndex] =
+      spec.bucket.polymorphicPathList[spec.bucketIndex];
     for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
       store[copyPlanId][bucketIndex] =
         spec.bucket.store[copyPlanId][spec.bucketIndex];
@@ -563,6 +573,7 @@ function processSingleDeferred(
     size,
     store,
     hasErrors: false,
+    polymorphicPathList,
   });
 
   const bucketPromise = executeBucket(rootBucket, requestContext);

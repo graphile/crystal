@@ -478,6 +478,7 @@ export function executeBucket(
       switch (childLayerPlan.reason.type) {
         case "listItem": {
           const store: Bucket["store"] = Object.create(null);
+          const polymorphicPathList: string[] = [];
           const map: Map<number, number[]> = new Map();
           let size = 0;
 
@@ -518,6 +519,9 @@ export function executeBucket(
                 const newIndex = size++;
                 newIndexes.push(newIndex);
                 store[itemStepId][newIndex] = list[j];
+
+                polymorphicPathList[newIndex] =
+                  bucket.polymorphicPathList[originalIndex];
                 for (const planId of copyStepIds) {
                   store[planId][newIndex] = bucket.store[planId][originalIndex];
                 }
@@ -532,6 +536,7 @@ export function executeBucket(
               size,
               store,
               hasErrors: bucket.hasErrors,
+              polymorphicPathList,
             });
             bucket.children[childLayerPlan.id] = {
               bucket: childBucket,
@@ -549,6 +554,7 @@ export function executeBucket(
         }
         case "mutationField": {
           const store: Bucket["store"] = Object.create(null);
+          const polymorphicPathList = bucket.polymorphicPathList;
           const map: Map<number, number> = new Map();
           // This is a 1-to-1 map, so we can mostly just copy from parent bucket
           const size = bucket.size;
@@ -565,6 +571,7 @@ export function executeBucket(
             size,
             store,
             hasErrors: bucket.hasErrors,
+            polymorphicPathList,
           });
           bucket.children[childLayerPlan.id] = {
             bucket: childBucket,
@@ -590,6 +597,7 @@ export function executeBucket(
             );
           }
           const store: Bucket["store"] = Object.create(null);
+          const polymorphicPathList: string[] = [];
           const map: Map<number, number> = new Map();
           let size = 0;
 
@@ -629,6 +637,12 @@ export function executeBucket(
             }
             const newIndex = size++;
             map.set(originalIndex, newIndex);
+
+            // TODO:perf: might be faster if we look this up as a constant rather than using concatenation here
+            const newPolymorphicPath =
+              bucket.polymorphicPathList[originalIndex] + ">" + typeName;
+
+            polymorphicPathList[newIndex] = newPolymorphicPath;
             for (const planId of copyStepIds) {
               store[planId][newIndex] = bucket.store[planId][originalIndex];
             }
@@ -641,6 +655,7 @@ export function executeBucket(
               size,
               store,
               hasErrors: bucket.hasErrors,
+              polymorphicPathList,
             });
             bucket.children[childLayerPlan.id] = {
               bucket: childBucket,
@@ -691,7 +706,10 @@ export function executeBucket(
 
 /** @internal */
 export function newBucket(
-  spec: Pick<Bucket, "layerPlan" | "store" | "size" | "hasErrors">,
+  spec: Pick<
+    Bucket,
+    "layerPlan" | "store" | "size" | "hasErrors" | "polymorphicPathList"
+  >,
 ): Bucket {
   if (isDev) {
     // Some validations
