@@ -515,7 +515,17 @@ function doItHandleNull<TVal extends JSONValue>(
       // Ensure it's a GraphQL error
       const error =
         e instanceof GraphQLError
-          ? e
+          ? e.path
+            ? e
+            : new GraphQLError(
+                e.message,
+                null,
+                null,
+                null,
+                ctx.path,
+                e.originalError,
+                null,
+              )
           : new GraphQLError(e.message, null, null, null, ctx.path, e, null);
       // Handle the error
       return ctx.nullRoot.handle(error);
