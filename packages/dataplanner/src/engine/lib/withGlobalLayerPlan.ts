@@ -28,3 +28,9 @@ export function currentLayerPlan(): LayerPlan {
   }
   return lp;
 }
+
+export function currentPolymorphicPath(): string {
+  const lp = currentLayerPlan();
+  // A bit of a hack
+  return lp._currentPolymorphicPath;
+}

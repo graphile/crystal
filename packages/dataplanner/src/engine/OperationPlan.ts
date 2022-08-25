@@ -1218,16 +1218,7 @@ export class OperationPlan {
        */
 
       /*
-       * Now a polymorphic layer plan for all the plans to live in
-       */
-      const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
-        path,
-        $step,
-        allPossibleObjectTypes,
-      );
-
-      /*
-       * And an output plan for it (knows how to branch the different object
+       * An output plan for it (knows how to branch the different object
        * output plans).
        */
       const polymorphicOutputPlan = new OutputPlan(
@@ -1236,7 +1227,7 @@ export class OperationPlan {
         {
           mode: "polymorphic",
           deferLabel: undefined,
-          typeNames: polymorphicLayerPlan.reason.typeNames,
+          typeNames: allPossibleObjectTypes.map((t) => t.name),
         },
         locationDetails,
       );
@@ -1248,9 +1239,22 @@ export class OperationPlan {
       });
 
       /*
+       * Now a polymorphic layer plan for all the plans to live in
+       */
+      const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
+        path,
+        $step,
+        allPossibleObjectTypes,
+      );
+
+      /*
        * Now we need to loop through each type and plan it.
        */
       for (const type of allPossibleObjectTypes) {
+        // Bit of a hack, but saves passing it around through all the arguments
+        const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
+        polymorphicLayerPlan._currentPolymorphicPath = newPolymorphicPath;
+
         const $root = withGlobalLayerPlan(polymorphicLayerPlan, () =>
           $step.planForType(type),
         );
@@ -1270,7 +1274,7 @@ export class OperationPlan {
         this.planSelectionSet(
           objectOutputPlan,
           path,
-          `${polymorphicPath}>${type.name}`,
+          newPolymorphicPath,
           $root,
           type,
           fieldNodes,
