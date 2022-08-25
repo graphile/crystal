@@ -572,6 +572,13 @@ export function executeBucket(
         case "polymorphic": {
           const polymorphicPlanId = childLayerPlan.reason.parentPlanId;
           const polymorphicPlanStore = bucket.store[polymorphicPlanId];
+          if (!polymorphicPlanStore) {
+            throw new Error(
+              `GraphileInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${bucket.layerPlan.operationPlan.dangerouslyGetStep(
+                polymorphicPlanId,
+              )}' not found in bucket for '${bucket.layerPlan}'`,
+            );
+          }
           const store: Bucket["store"] = Object.create(null);
           const map: Map<number, number> = new Map();
           const noDepsList: undefined[] = [];
@@ -582,6 +589,15 @@ export function executeBucket(
 
           for (const planId of copyStepIds) {
             store[planId] = [];
+            if (!bucket.store[planId]) {
+              throw new Error(
+                `GraphileInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${childLayerPlan} wants to copy ${childLayerPlan.operationPlan.dangerouslyGetStep(
+                  planId,
+                )}, but bucket for ${
+                  bucket.layerPlan
+                } doesn't contain that plan`,
+              );
+            }
           }
 
           for (
