@@ -226,6 +226,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }>`;
   }
 
+  print(depth = 0) {
+    const output = [`${" ".repeat(depth * 2)}${this}`];
+    for (const child of this.children) {
+      output.push(child.print(depth + 1));
+    }
+    return output.join("\n");
+  }
+
   /** @internal Use plan.getStep(id) instead. */
   public getStep(id: number, requestingStep: ExecutableStep): ExecutableStep {
     return this.operationPlan.getStep(id, requestingStep);
