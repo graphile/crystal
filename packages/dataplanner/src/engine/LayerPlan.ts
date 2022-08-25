@@ -124,9 +124,6 @@ export type LayerPlanReason =
 export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   id: number;
 
-  // A bit of a hack
-  public _currentPolymorphicPath = "";
-
   /**
    * Every layer plan has a "root step" that shapes the value the layer
    * returns. Note that this step may be dependent on other steps included in

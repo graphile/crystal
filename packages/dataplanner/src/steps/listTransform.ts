@@ -123,28 +123,32 @@ export class __ListTransformStep<
         type: "subroutine",
         parentPlanId: this.id,
       },
-      this.layerPlan.polymorphicPaths,
+      listPlan.polymorphicPaths,
     );
-    const itemPlan = withGlobalLayerPlan(this.subroutineLayer, () => {
-      // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
-      const $__listItem = new __ItemStep(listPlan);
-      $__listItem.transformStepId = this.id;
-      const $listItem = isListCapableStep(listPlan)
-        ? listPlan.listItem($__listItem)
-        : $__listItem;
-      const $newListItem = this.itemPlanCallback($listItem as any);
+    const itemPlan = withGlobalLayerPlan(
+      this.subroutineLayer,
+      listPlan.polymorphicPaths,
+      () => {
+        // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
+        const $__listItem = new __ItemStep(listPlan);
+        $__listItem.transformStepId = this.id;
+        const $listItem = isListCapableStep(listPlan)
+          ? listPlan.listItem($__listItem)
+          : $__listItem;
+        const $newListItem = this.itemPlanCallback($listItem as any);
 
-      if (
-        this.isSyncAndSafe &&
-        (!$__listItem.isSyncAndSafe ||
-          !$listItem.isSyncAndSafe ||
-          !$newListItem.isSyncAndSafe)
-      ) {
-        // TODO: log this deopt?
-        this.isSyncAndSafe = false;
-      }
-      return $newListItem;
-    });
+        if (
+          this.isSyncAndSafe &&
+          (!$__listItem.isSyncAndSafe ||
+            !$listItem.isSyncAndSafe ||
+            !$newListItem.isSyncAndSafe)
+        ) {
+          // TODO: log this deopt?
+          this.isSyncAndSafe = false;
+        }
+        return $newListItem;
+      },
+    );
     this.subroutineLayer.rootStepId = itemPlan.id;
   }
 

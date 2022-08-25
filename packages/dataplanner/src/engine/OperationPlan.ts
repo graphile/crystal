@@ -80,6 +80,7 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
 const POLYMORPHIC_ROOT_PATH = "";
+const POLYMORPHIC_ROOT_PATHS = [POLYMORPHIC_ROOT_PATH];
 
 function isNotNullish<T>(v: T | undefined | null): v is T {
   return v != null;
@@ -243,14 +244,18 @@ export class OperationPlan {
     this.operationType = operation.operation;
 
     this.phase = "plan";
-    this.rootLayerPlan = new LayerPlan(this, null, { type: "root" }, [
-      POLYMORPHIC_ROOT_PATH,
-    ]);
+    this.rootLayerPlan = new LayerPlan(
+      this,
+      null,
+      { type: "root" },
+      POLYMORPHIC_ROOT_PATHS,
+    );
 
     // This doesn't do anything, it only exists to align plans more closely
     // with an older version of the planner (to reduce the diff).
     const rootSelectionSetStep = withGlobalLayerPlan(
       this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
       () => new __ValueStep(),
     );
     this.rootLayerPlan.rootStepId = rootSelectionSetStep.id;
@@ -524,13 +529,16 @@ export class OperationPlan {
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const groupedFieldSet = withGlobalLayerPlan(this.rootLayerPlan, () =>
-      graphqlCollectFields(
-        this,
-        this.trackedRootValueStep.id,
-        rootType,
-        selectionSet.selections,
-      ),
+    const groupedFieldSet = withGlobalLayerPlan(
+      this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
+      () =>
+        graphqlCollectFields(
+          this,
+          this.trackedRootValueStep.id,
+          rootType,
+          selectionSet.selections,
+        ),
     );
     if (groupedFieldSet.deferred.length > 0) {
       throw new Error("@defer forbidden on subscription root selection set");
@@ -564,6 +572,7 @@ export class OperationPlan {
       const { haltTree, step: subscribeStep } = this.planField(
         this.rootLayerPlan,
         path,
+        POLYMORPHIC_ROOT_PATH,
         rootType,
         fields,
         subscriptionPlanResolver,
@@ -586,6 +595,7 @@ export class OperationPlan {
 
       const streamItemPlan = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
         () => subscribeStep.itemPlan(new __ItemStep(subscribeStep)),
       );
       this.subscriptionItemStepId = streamItemPlan.id;
@@ -657,10 +667,11 @@ export class OperationPlan {
         type: "listItem",
         parentPlanId: listStep.id,
       },
-      listStep.layerPlan.polymorphicPaths,
+      listStep.polymorphicPaths,
     );
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
+      listStep.polymorphicPaths,
       () => new __ItemStep(listStep, depth),
     );
     layerPlan.rootStepId = itemPlan.id;
@@ -721,7 +732,6 @@ export class OperationPlan {
         // Deliberately shadow
         outputPlan,
       } = nextUp;
-      outputPlan.layerPlan._currentPolymorphicPath = polymorphicPath;
 
       // May have changed due to deduplicate
       const step = this.steps[stepId];
@@ -761,14 +771,17 @@ export class OperationPlan {
     };
 
     assertObjectType(objectType);
-    const groupedFieldSet = withGlobalLayerPlan(outputPlan.layerPlan, () =>
-      graphqlCollectFields(
-        this,
-        parentStep.id,
-        objectType,
-        selections,
-        isMutation,
-      ),
+    const groupedFieldSet = withGlobalLayerPlan(
+      outputPlan.layerPlan,
+      [polymorphicPath],
+      () =>
+        graphqlCollectFields(
+          this,
+          parentStep.id,
+          objectType,
+          selections,
+          isMutation,
+        ),
     );
     const objectTypeFields = objectType.getFields();
     const processGroupedFieldSet = (
@@ -962,6 +975,7 @@ export class OperationPlan {
           ({ step, haltTree } = this.planField(
             fieldLayerPlan,
             path,
+            polymorphicPath,
             objectType,
             fieldNodes,
             planResolver,
@@ -1063,7 +1077,7 @@ export class OperationPlan {
 
       const $__item = this.itemStepForListStep($step, listDepth);
       const $item = isListCapableStep($step)
-        ? withGlobalLayerPlan($__item.layerPlan, () =>
+        ? withGlobalLayerPlan($__item.layerPlan, [polymorphicPath], () =>
             ($step as ListCapableStep<any>).listItem($__item),
           )
         : $__item;
@@ -1084,7 +1098,7 @@ export class OperationPlan {
       const scalarPlanResolver = nullableFieldType.extensions?.graphile?.plan;
       const $leaf =
         typeof scalarPlanResolver === "function"
-          ? withGlobalLayerPlan(parentLayerPlan, () =>
+          ? withGlobalLayerPlan(parentLayerPlan, [polymorphicPath], () =>
               scalarPlanResolver($step, { schema: this.schema }),
             )
           : $step;
@@ -1276,10 +1290,11 @@ export class OperationPlan {
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
         polymorphicLayerPlan.polymorphicPaths.push(newPolymorphicPath);
-        polymorphicLayerPlan._currentPolymorphicPath = newPolymorphicPath;
 
-        const $root = withGlobalLayerPlan(polymorphicLayerPlan, () =>
-          $step.planForType(type),
+        const $root = withGlobalLayerPlan(
+          polymorphicLayerPlan,
+          [newPolymorphicPath],
+          () => $step.planForType(type),
         );
         polymorphicLayerPlan.rootStepIdByTypeName[type.name] = $root.id;
         const objectOutputPlan = new OutputPlan(
@@ -1360,6 +1375,7 @@ export class OperationPlan {
   private planField(
     layerPlan: LayerPlan,
     path: readonly string[],
+    polymorphicPath: string,
     objectType: GraphQLObjectType,
     fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, any, any>,
@@ -1368,11 +1384,13 @@ export class OperationPlan {
     deduplicate = true,
   ) {
     this.loc.push(`planField(${path.join(".")})`);
-    const trackedArguments = withGlobalLayerPlan(layerPlan, () =>
-      this.getTrackedArguments(objectType, fieldNodes[0]),
+    const trackedArguments = withGlobalLayerPlan(
+      layerPlan,
+      [polymorphicPath],
+      () => this.getTrackedArguments(objectType, fieldNodes[0]),
     );
 
-    let step = withGlobalLayerPlan(layerPlan, () =>
+    let step = withGlobalLayerPlan(layerPlan, [polymorphicPath], () =>
       withFieldArgsForArguments(
         this,
         parentStep,
@@ -1538,10 +1556,12 @@ export class OperationPlan {
   ): [__ValueStep<any>, __TrackedObjectStep] {
     const valueStep = withGlobalLayerPlan(
       this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
       () => new __ValueStep(),
     );
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
       () => new __TrackedObjectStep(value, valueStep, constraints),
     );
     return [valueStep, trackedObjectStep];
@@ -1677,8 +1697,10 @@ export class OperationPlan {
     const processStep = (step: ExecutableStep) => {
       let replacementStep: ExecutableStep = step;
       try {
-        replacementStep = withGlobalLayerPlan(step.layerPlan, () =>
-          callback(step),
+        replacementStep = withGlobalLayerPlan(
+          step.layerPlan,
+          step.polymorphicPaths,
+          () => callback(step),
         );
       } catch (e) {
         console.error(

@@ -6,7 +6,7 @@ import { isDev, noop } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
 import {
   currentLayerPlan,
-  currentPolymorphicPath,
+  currentPolymorphicPaths,
 } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
@@ -242,7 +242,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
-    this.polymorphicPaths = [currentPolymorphicPath()];
+    this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
   }
 
