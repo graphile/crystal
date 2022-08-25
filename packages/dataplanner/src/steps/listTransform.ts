@@ -251,7 +251,7 @@ export class __ListTransformStep<
 
     const store: Bucket["store"] = Object.create(null);
     const map: Map<number, number[]> = new Map();
-    const noDepsList: undefined[] = [];
+    let size = 0;
 
     const itemStepId = childLayerPlan.rootStepId;
     assert.ok(
@@ -279,7 +279,7 @@ export class __ListTransformStep<
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
         for (let j = 0, l = list.length; j < l; j++) {
-          const newIndex = noDepsList.push(undefined) - 1;
+          const newIndex = size++;
           newIndexes.push(newIndex);
           store[itemStepId][newIndex] = list[j];
           for (const planId of copyStepIds) {
@@ -289,8 +289,13 @@ export class __ListTransformStep<
       }
     }
 
-    if (noDepsList.length > 0) {
-      const childBucket = newBucket(childLayerPlan, noDepsList, store);
+    if (size > 0) {
+      const childBucket = newBucket({
+        layerPlan: childLayerPlan,
+        size,
+        store,
+        hasErrors: bucket.hasErrors,
+      });
       await executeBucket(childBucket, extra._requestContext);
     }
 

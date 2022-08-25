@@ -87,6 +87,8 @@ export interface Bucket {
    */
   isComplete: boolean;
 
+  // TODO: we should be able to convert this into a set of planIds that have
+  // errors, then we can use this as we cascade forward to the next bucket.
   /**
    * If an error occurred at any stage we need to drop down to more careful
    * (and slower) handling.

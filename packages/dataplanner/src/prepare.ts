@@ -11,7 +11,7 @@ import type { Bucket, RequestContext } from "./bucket.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
-import { executeBucket } from "./engine/executeBucket.js";
+import { executeBucket, newBucket } from "./engine/executeBucket.js";
 import type {
   OutputPlanContext,
   PayloadRoot,
@@ -132,12 +132,9 @@ export function executePreemptive(
   const vars = [variableValues];
   const ctxs = [context];
   const rvs = [rootValue];
-  const rootBucket: Bucket = {
-    isComplete: false,
-    cascadeEnabled: false,
+  const rootBucket = newBucket({
     layerPlan: operationPlan.rootLayerPlan,
     size,
-    noDepsList: Object.freeze(arrayOfLength(size)),
     store: Object.assign(Object.create(null), {
       "-1": requestIndex,
       [operationPlan.rootLayerPlan.rootStepId!]: requestIndex,
@@ -146,8 +143,7 @@ export function executePreemptive(
       [operationPlan.rootValueStep.id]: rvs,
     }),
     hasErrors: false,
-    children: {},
-  };
+  });
   const requestContext: RequestContext = {
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
@@ -420,20 +416,15 @@ async function processStream(
     }
 
     assert.strictEqual(bucketIndex, size);
-    const noDepsList = arrayOfLength(size, undefined);
 
     // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
     // const childBucketIndex = 0;
-    const rootBucket: Bucket = {
-      isComplete: false,
-      cascadeEnabled: false,
+    const rootBucket: Bucket = newBucket({
       layerPlan: spec.outputPlan.layerPlan,
       size,
-      noDepsList,
       store,
       hasErrors: false,
-      children: {},
-    };
+    });
 
     const bucketPromise = executeBucket(rootBucket, requestContext);
 
@@ -564,20 +555,15 @@ function processSingleDeferred(
   }
 
   assert.strictEqual(bucketIndex, size);
-  const noDepsList = arrayOfLength(size, undefined);
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
   // const childBucketIndex = 0;
-  const rootBucket: Bucket = {
-    isComplete: false,
-    cascadeEnabled: false,
+  const rootBucket = newBucket({
     layerPlan: outputPlan.layerPlan,
     size,
-    noDepsList,
     store,
     hasErrors: false,
-    children: {},
-  };
+  });
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
 

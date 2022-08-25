@@ -479,7 +479,7 @@ export function executeBucket(
         case "listItem": {
           const store: Bucket["store"] = Object.create(null);
           const map: Map<number, number[]> = new Map();
-          const noDepsList: undefined[] = [];
+          let size = 0;
 
           const listStepId = childLayerPlan.reason.parentPlanId;
           const listStepStore = bucket.store[listStepId];
@@ -515,7 +515,7 @@ export function executeBucket(
               const newIndexes: number[] = [];
               map.set(originalIndex, newIndexes);
               for (let j = 0, l = list.length; j < l; j++) {
-                const newIndex = noDepsList.push(undefined) - 1;
+                const newIndex = size++;
                 newIndexes.push(newIndex);
                 store[itemStepId][newIndex] = list[j];
                 for (const planId of copyStepIds) {
@@ -525,9 +525,14 @@ export function executeBucket(
             }
           }
 
-          if (noDepsList.length > 0) {
+          if (size > 0) {
             // Reference
-            const childBucket = newBucket(childLayerPlan, noDepsList, store);
+            const childBucket = newBucket({
+              layerPlan: childLayerPlan,
+              size,
+              store,
+              hasErrors: bucket.hasErrors,
+            });
             bucket.children[childLayerPlan.id] = {
               bucket: childBucket,
               map,
@@ -546,7 +551,7 @@ export function executeBucket(
           const store: Bucket["store"] = Object.create(null);
           const map: Map<number, number> = new Map();
           // This is a 1-to-1 map, so we can mostly just copy from parent bucket
-          const noDepsList = bucket.noDepsList;
+          const size = bucket.size;
           for (let i = 0; i < bucket.size; i++) {
             map.set(i, i);
           }
@@ -555,7 +560,12 @@ export function executeBucket(
           }
 
           // Reference
-          const childBucket = newBucket(childLayerPlan, noDepsList, store);
+          const childBucket = newBucket({
+            layerPlan: childLayerPlan,
+            size,
+            store,
+            hasErrors: bucket.hasErrors,
+          });
           bucket.children[childLayerPlan.id] = {
             bucket: childBucket,
             map,
@@ -581,7 +591,7 @@ export function executeBucket(
           }
           const store: Bucket["store"] = Object.create(null);
           const map: Map<number, number> = new Map();
-          const noDepsList: undefined[] = [];
+          let size = 0;
 
           // We're only copying over the entries that match this type (note:
           // they may end up being null, but that's okay)
@@ -617,16 +627,21 @@ export function executeBucket(
             if (!targetTypeNames.includes(typeName)) {
               continue;
             }
-            const newIndex = noDepsList.push(undefined) - 1;
+            const newIndex = size++;
             map.set(originalIndex, newIndex);
             for (const planId of copyStepIds) {
               store[planId][newIndex] = bucket.store[planId][originalIndex];
             }
           }
 
-          if (noDepsList.length > 0) {
+          if (size > 0) {
             // Reference
-            const childBucket = newBucket(childLayerPlan, noDepsList, store);
+            const childBucket = newBucket({
+              layerPlan: childLayerPlan,
+              size,
+              store,
+              hasErrors: bucket.hasErrors,
+            });
             bucket.children[childLayerPlan.id] = {
               bucket: childBucket,
               map,
@@ -676,34 +691,28 @@ export function executeBucket(
 
 /** @internal */
 export function newBucket(
-  layerPlan: LayerPlan,
-  noDepsList: readonly undefined[],
-  store: Bucket["store"],
+  spec: Pick<Bucket, "layerPlan" | "store" | "size" | "hasErrors">,
 ): Bucket {
   if (isDev) {
     // Some validations
-    const l = noDepsList.length;
-    assert.ok(l > 0, "No need to create an empty bucket!");
-    for (const [key, list] of Object.entries(store)) {
+    assert.ok(spec.size > 0, "No need to create an empty bucket!");
+    for (const [key, list] of Object.entries(spec.store)) {
       assert.ok(
         Array.isArray(list),
-        `Store entry for step '${key}' for layerPlan '${layerPlan.id}' should be a list`,
+        `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should be a list`,
       );
       assert.strictEqual(
         list.length,
-        l,
-        `Store entry for step '${key}' for layerPlan '${layerPlan.id}' should have same length as bucket`,
+        spec.size,
+        `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should have same length as bucket`,
       );
     }
   }
   return {
-    layerPlan,
-    cascadeEnabled: false,
+    ...spec,
     isComplete: false,
-    size: noDepsList.length,
-    store,
-    hasErrors: false,
-    noDepsList,
+    cascadeEnabled: false,
+    noDepsList: arrayOfLength(spec.size, undefined),
     children: Object.create(null),
   };
 }
