@@ -3,6 +3,7 @@
  */
 
 import type { OperationPlan } from ".";
+import type { LayerPlan } from "./engine/LayerPlan";
 import type { ExecutableStep } from "./step.js";
 import { __ItemStep, __ListTransformStep } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -373,7 +374,7 @@ export function printPlanGraph(
           layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
             ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
             : ""
-        }\n${outputMapStuff.join("\n")}`,
+        }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
       )}):::bucket`,
     );
     graph.push(
@@ -407,4 +408,9 @@ function pp(polymorphicPaths: ReadonlySet<string>) {
     return "";
   }
   return [...polymorphicPaths].map((p) => `${p}`).join("\n");
+}
+
+function startSteps(layerPlan: LayerPlan) {
+  return `
+${layerPlan.startSteps.map((s, i) => `${i + 1}: ${s}`).join("\n")}`;
 }
