@@ -266,6 +266,13 @@ export class __ListTransformStep<
     // Prepare store with an empty list for each copyPlanId
     for (const planId of copyStepIds) {
       store[planId] = [];
+      if (!bucket.store[planId]) {
+        throw new Error(
+          `GraphileInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
+            planId,
+          )}) listed in copyStepIds but not available in parent bucket for ${this}`,
+        );
+      }
     }
 
     const listValues = values[this.listPlanDepId];
