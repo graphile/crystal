@@ -2,12 +2,12 @@ import type { LayerPlan } from "../LayerPlan";
 
 let globalData: {
   layerPlan: LayerPlan;
-  polymorphicPaths: ReadonlyArray<string>;
+  polymorphicPaths: ReadonlySet<string>;
 } | null = null;
 
 export function withGlobalLayerPlan<T>(
   layerPlan: LayerPlan,
-  polymorphicPaths: ReadonlyArray<string>,
+  polymorphicPaths: ReadonlySet<string>,
   callback: () => T,
 ): T {
   const oldGlobalData = globalData;
@@ -32,7 +32,7 @@ export function currentLayerPlan(): LayerPlan {
   return lp;
 }
 
-export function currentPolymorphicPaths(): ReadonlyArray<string> {
+export function currentPolymorphicPaths(): ReadonlySet<string> {
   const pp = globalData?.polymorphicPaths;
   if (!pp) {
     throw new Error(

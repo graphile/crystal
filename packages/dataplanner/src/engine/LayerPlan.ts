@@ -192,7 +192,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
-    public polymorphicPaths: ReadonlyArray<string>,
+    public polymorphicPaths: ReadonlySet<string>,
   ) {
     if (parentLayerPlan) {
       this.ancestry = [...parentLayerPlan.ancestry, this];

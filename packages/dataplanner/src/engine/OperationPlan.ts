@@ -76,7 +76,9 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
 const POLYMORPHIC_ROOT_PATH = "";
-const POLYMORPHIC_ROOT_PATHS = [POLYMORPHIC_ROOT_PATH];
+const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
+  POLYMORPHIC_ROOT_PATH,
+]);
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
 
 function isNotNullish<T>(v: T | undefined | null): v is T {
@@ -770,7 +772,7 @@ export class OperationPlan {
     assertObjectType(objectType);
     const groupedFieldSet = withGlobalLayerPlan(
       outputPlan.layerPlan,
-      [polymorphicPath],
+      new Set([polymorphicPath]),
       () =>
         graphqlCollectFields(
           this,
@@ -1007,7 +1009,7 @@ export class OperationPlan {
               type: "defer",
               label: deferred.label,
             },
-            [polymorphicPath],
+            new Set([polymorphicPath]),
           );
           const deferredOutputPlan = new OutputPlan(
             deferredLayerPlan,
@@ -1054,6 +1056,7 @@ export class OperationPlan {
     locationDetails: LocationDetails,
     listDepth = 0,
   ) {
+    const polymorphicPaths = new Set([polymorphicPath]);
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
     if (isListType(nullableFieldType)) {
@@ -1074,7 +1077,7 @@ export class OperationPlan {
 
       const $__item = this.itemStepForListStep($step, listDepth);
       const $item = isListCapableStep($step)
-        ? withGlobalLayerPlan($__item.layerPlan, [polymorphicPath], () =>
+        ? withGlobalLayerPlan($__item.layerPlan, polymorphicPaths, () =>
             ($step as ListCapableStep<any>).listItem($__item),
           )
         : $__item;
@@ -1095,7 +1098,7 @@ export class OperationPlan {
       const scalarPlanResolver = nullableFieldType.extensions?.graphile?.plan;
       const $leaf =
         typeof scalarPlanResolver === "function"
-          ? withGlobalLayerPlan(parentLayerPlan, [polymorphicPath], () =>
+          ? withGlobalLayerPlan(parentLayerPlan, polymorphicPaths, () =>
               scalarPlanResolver($step, { schema: this.schema }),
             )
           : $step;
@@ -1286,14 +1289,14 @@ export class OperationPlan {
       for (const type of allPossibleObjectTypes) {
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
-        polymorphicLayerPlan.polymorphicPaths = [
+        polymorphicLayerPlan.polymorphicPaths = new Set([
           ...polymorphicLayerPlan.polymorphicPaths,
           newPolymorphicPath,
-        ];
+        ]);
 
         const $root = withGlobalLayerPlan(
           polymorphicLayerPlan,
-          [newPolymorphicPath],
+          new Set([newPolymorphicPath]),
           () => $step.planForType(type),
         );
         polymorphicLayerPlan.rootStepIdByTypeName[type.name] = $root.id;
@@ -1362,7 +1365,7 @@ export class OperationPlan {
           typeNames: allPossibleObjectTypes.map((t) => t.name),
           parentPlanId: $step.id,
         },
-        [],
+        new Set(),
       );
       this.polymorphicLayerPlanByPath.set(pathString, {
         stepId: $step.id,
@@ -1384,13 +1387,14 @@ export class OperationPlan {
     deduplicate = true,
   ) {
     this.loc.push(`planField(${path.join(".")})`);
+    const polymorphicPaths = new Set([polymorphicPath]);
     const trackedArguments = withGlobalLayerPlan(
       layerPlan,
-      [polymorphicPath],
+      polymorphicPaths,
       () => this.getTrackedArguments(objectType, fieldNodes[0]),
     );
 
-    let step = withGlobalLayerPlan(layerPlan, [polymorphicPath], () =>
+    let step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
       withFieldArgsForArguments(
         this,
         parentStep,
@@ -2072,9 +2076,10 @@ export class OperationPlan {
     // Give the steps a chance to pass their responsibilities to the winner.
     for (const target of allEquivalentSteps) {
       if (winner !== target) {
-        winner.polymorphicPaths = [
-          ...new Set([...winner.polymorphicPaths, ...target.polymorphicPaths]),
-        ];
+        winner.polymorphicPaths = new Set([
+          ...winner.polymorphicPaths,
+          ...target.polymorphicPaths,
+        ]);
         target.deduplicatedWith(winner);
       }
     }

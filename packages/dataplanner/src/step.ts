@@ -238,7 +238,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
   public _stepOptions: StepOptions = { stream: null };
 
   /** @internal */
-  public polymorphicPaths: ReadonlyArray<string>;
+  public polymorphicPaths: ReadonlySet<string>;
 
   constructor() {
     super();
