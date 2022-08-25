@@ -1974,6 +1974,30 @@ export class OperationPlan {
       step.layerPlan.parentLayerPlan !== null,
       "GraphileInternalError<55c8940f-e8ac-4985-8b34-96fc6f81d62d>: A non-root layer plan had no parent?!",
     );
+
+    // 1: adjust polymorphicPaths to fit new layerPlan
+    const parentPolymorphicPaths =
+      step.layerPlan.parentLayerPlan.polymorphicPaths;
+    const myPaths = [...step.polymorphicPaths];
+    if (parentPolymorphicPaths.has(myPaths[0])) {
+      // All the others must be valid too
+    } else {
+      const layerPaths = [...step.layerPlan.polymorphicPaths];
+      const newPaths = new Set<string>();
+      for (const path of parentPolymorphicPaths) {
+        const prefix = path + ">";
+        const matches = myPaths.filter((p) => p.startsWith(prefix));
+        const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
+        if (matches.length !== layerMatches.length) {
+          // Can't hoist because it's not used for all polymorphicPaths of this type
+          return;
+        } else if (matches.length > 0) {
+          newPaths.add(path);
+        }
+      }
+      step.polymorphicPaths = newPaths;
+    }
+    // 2: move it up a layer
     step.layerPlan = step.layerPlan.parentLayerPlan;
 
     // Now try and hoist it again!
