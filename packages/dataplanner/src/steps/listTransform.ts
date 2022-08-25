@@ -88,7 +88,7 @@ export class __ListTransformStep<
   private meta: string | null;
 
   /** Set during query planning.  */
-  public itemStepId: number | null = null;
+  public itemStepId!: number;
 
   private subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
 
@@ -132,6 +132,7 @@ export class __ListTransformStep<
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
         const $__listItem = new __ItemStep(listPlan);
         $__listItem.transformStepId = this.id;
+        this.itemStepId = $__listItem.id;
         const $listItem = isListCapableStep(listPlan)
           ? listPlan.listItem($__listItem)
           : $__listItem;
@@ -254,7 +255,8 @@ export class __ListTransformStep<
     const map: Map<number, number[]> = new Map();
     let size = 0;
 
-    const itemStepId = childLayerPlan.rootStepId;
+    // TODO: do this better!
+    const itemStepId = this.opPlan.dangerouslyGetStep(this.itemStepId).id;
     assert.ok(
       itemStepId != null,
       "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
@@ -317,7 +319,7 @@ export class __ListTransformStep<
         );
         return null;
       }
-      const values = indexes.map((idx) => depResults[originalIndex][idx]);
+      const values = indexes.map((idx) => depResults[idx]);
       if (isDev) {
         assert.strictEqual(
           list.length,
