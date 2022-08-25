@@ -486,7 +486,7 @@ export function executeBucket(
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
     if (pendingSteps.size > 0) {
       throw new Error(
-        `executeSamePhaseChildren called before all steps were complete! Remaining steps were: ${[
+        `GraphileInternalError<8c518856-6e96-425e-91ce-0e0713dbdead>: executeSamePhaseChildren called before all steps were complete! Remaining steps were: ${[
           ...pendingSteps,
         ].join(", ")}`,
       );
