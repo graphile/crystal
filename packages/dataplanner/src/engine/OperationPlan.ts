@@ -1799,6 +1799,14 @@ export class OperationPlan {
           activeSteps,
         );
       }
+      if (layerPlan.rootStepId) {
+        this.markStepActive(this.steps[layerPlan.rootStepId], activeSteps);
+      }
+      for (const typeRootStepId of Object.values(
+        layerPlan.rootStepIdByTypeName,
+      )) {
+        this.markStepActive(this.steps[typeRootStepId], activeSteps);
+      }
     }
 
     for (let i = 0, l = this.steps.length; i < l; i++) {
@@ -2284,6 +2292,30 @@ export class OperationPlan {
   }
 
   private finalizeLayerPlans(): void {
+    /**
+     * Adds the `dep` plan to the `copyPlanIds` for `layerPlan` and any
+     * ancestor layers until we hit the layerPlan that `dep` is from.
+     */
+    const ensurePlanAvailableInLayer = (
+      dep: ExecutableStep,
+      layerPlan: LayerPlan,
+    ): void => {
+      let currentLayerPlan: LayerPlan | null = layerPlan;
+
+      while (dep.layerPlan !== currentLayerPlan) {
+        if (currentLayerPlan.copyPlanIds.includes(dep.id)) {
+          break;
+        }
+        currentLayerPlan.copyPlanIds.push(dep.id);
+        currentLayerPlan = currentLayerPlan.parentLayerPlan;
+        if (!currentLayerPlan) {
+          throw new Error(
+            `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan.id}`,
+          );
+        }
+      }
+    };
+
     for (const layerPlan of this.layerPlans) {
       layerPlan.steps = this.steps.filter(
         (s) => s !== null && s.layerPlan === layerPlan,
@@ -2372,30 +2404,6 @@ export class OperationPlan {
         layerPlan.startSteps.push(startSteps);
       }
 
-      /**
-       * Adds the `dep` plan to the `copyPlanIds` for `layerPlan` and any
-       * ancestor layers until we hit the layerPlan that `dep` is from.
-       */
-      const ensurePlanAvailableInLayer = (
-        dep: ExecutableStep,
-        layerPlan: LayerPlan,
-      ): void => {
-        let currentLayerPlan: LayerPlan | null = layerPlan;
-
-        while (dep.layerPlan !== currentLayerPlan) {
-          if (currentLayerPlan.copyPlanIds.includes(dep.id)) {
-            break;
-          }
-          currentLayerPlan.copyPlanIds.push(dep.id);
-          currentLayerPlan = currentLayerPlan.parentLayerPlan;
-          if (!currentLayerPlan) {
-            throw new Error(
-              `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan.id}`,
-            );
-          }
-        }
-      };
-
       // TODO:perf: this could probably be faster.
       // Populate copyPlanIds for each step
       for (const step of layerPlan.steps) {
@@ -2409,19 +2417,24 @@ export class OperationPlan {
         }
       }
 
-      // Copy polymorphic parentPlanId
-      for (const layerPlan of this.layerPlans) {
-        if (layerPlan.reason.type === "polymorphic") {
-          const parentStep = this.steps[layerPlan.reason.parentPlanId];
-          ensurePlanAvailableInLayer(parentStep, layerPlan);
-        }
+      if (layerPlan.rootStepId) {
+        const $root = this.steps[layerPlan.rootStepId];
+        layerPlan.rootStepId = $root.id;
+        ensurePlanAvailableInLayer($root, layerPlan);
+      }
+      for (const [typeName, typeRootStepId] of Object.entries(
+        layerPlan.rootStepIdByTypeName,
+      )) {
+        const $root = this.steps[typeRootStepId];
+        layerPlan.rootStepIdByTypeName[typeName] = $root.id;
+        ensurePlanAvailableInLayer($root, layerPlan);
       }
 
-      // Populate copyPlanIds for output plans' rootStepId
-      this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
-        const rootPlan = this.steps[outputPlan.rootStepId];
-        ensurePlanAvailableInLayer(rootPlan, outputPlan.layerPlan);
-      });
+      // Copy polymorphic parentPlanId
+      if (layerPlan.reason.type === "polymorphic") {
+        const parentStep = this.steps[layerPlan.reason.parentPlanId];
+        ensurePlanAvailableInLayer(parentStep, layerPlan);
+      }
 
       // Update plan references so executeBucket doesn't need to do explicit lookups
       const reason = layerPlan.reason;
@@ -2448,6 +2461,12 @@ export class OperationPlan {
         }
       }
     }
+
+    // Populate copyPlanIds for output plans' rootStepId
+    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+      const rootPlan = this.steps[outputPlan.rootStepId];
+      ensurePlanAvailableInLayer(rootPlan, outputPlan.layerPlan);
+    });
   }
 
   /** Finalizes each output plan */
