@@ -2408,7 +2408,11 @@ export class OperationPlan {
         // It has no steps, everything else looks fine, let's bin it off
         const replacementLayerPlan = layerPlan.parentLayerPlan;
 
-        this.layerPlans[i] = replacementLayerPlan;
+        for (let j = 0; j < l; j++) {
+          if (this.layerPlans[j] === layerPlan) {
+            this.layerPlans[j] = replacementLayerPlan;
+          }
+        }
 
         for (const lp of this.layerPlans) {
           if (lp.parentLayerPlan === layerPlan) {
