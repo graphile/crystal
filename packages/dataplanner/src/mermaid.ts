@@ -128,7 +128,7 @@ export function printPlanGraph(
 
       const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
         meta ? `\n<${meta}>` : ""
-      }`;
+      }\n${plan.polymorphicPaths.map((p) => `-> ${p}`).join("\n")}`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
           ? [">", "]"]
@@ -373,7 +373,9 @@ export function printPlanGraph(
           layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
             ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
             : ""
-        }\n${outputMapStuff.join("\n")}`,
+        }\n${layerPlan.polymorphicPaths
+          .map((p) => `-> ${p}`)
+          .join("\n")}\n${outputMapStuff.join("\n")}`,
       )}):::bucket`,
     );
     graph.push(
