@@ -33,11 +33,7 @@ import {
   evalDirectiveArg,
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
-import {
-  fieldSelectionsForType,
-  interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
-  typesUsedInSelections,
-} from "../graphqlMergeSelectionSets.js";
+import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { ModifierStep } from "../index.js";
 import {
   __ItemStep,
@@ -81,6 +77,7 @@ import { OutputPlan } from "./OutputPlan.js";
 
 const POLYMORPHIC_ROOT_PATH = "";
 const POLYMORPHIC_ROOT_PATHS = [POLYMORPHIC_ROOT_PATH];
+Object.freeze(POLYMORPHIC_ROOT_PATHS);
 
 function isNotNullish<T>(v: T | undefined | null): v is T {
   return v != null;
