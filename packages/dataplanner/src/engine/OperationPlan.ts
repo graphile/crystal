@@ -2688,7 +2688,7 @@ export class OperationPlan {
       for (const layerPlan of this.layerPlans) {
         if (layerPlan.reason.type === "polymorphic") {
           const parentStep = this.steps[layerPlan.reason.parentPlanId];
-          ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+          ensurePlanAvailableInLayer(parentStep, layerPlan);
         }
       }
 
