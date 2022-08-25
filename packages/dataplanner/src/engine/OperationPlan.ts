@@ -68,7 +68,10 @@ import {
   findVariableNamesUsed,
   isTypePlanned,
 } from "../utils.js";
-import type { LayerPlanReasonPolymorphic } from "./LayerPlan.js";
+import type {
+  LayerPlanReasonPolymorphic,
+  LayerPlanReasonSubroutine,
+} from "./LayerPlan.js";
 import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import type { SchemaDigest } from "./lib/digestSchema.js";
 import { digestSchema } from "./lib/digestSchema.js";
@@ -2005,8 +2008,20 @@ export class OperationPlan {
       }
       step.polymorphicPaths = newPaths;
     }
+
+    const $subroutine =
+      step.layerPlan.reason.type === "subroutine"
+        ? this.steps[step.layerPlan.reason.parentPlanId]
+        : null;
+
     // 2: move it up a layer
     step.layerPlan = step.layerPlan.parentLayerPlan;
+
+    // 3: if it's was in a subroutine, the subroutine parent plan needs to list it as a dependency
+    if ($subroutine) {
+      // Naughty naughty
+      ($subroutine as any).addDependency(step);
+    }
 
     // Now try and hoist it again!
     this.hoistStep(step);
@@ -2508,6 +2523,35 @@ export class OperationPlan {
     return printPlanGraph(this, options, {
       steps: this.steps,
     });
+  }
+
+  finishSubroutine(
+    subroutineStep: ExecutableStep,
+    layerPlan: LayerPlan<LayerPlanReasonSubroutine>,
+  ): void {
+    // Now find anything that these plans are dependent on and make ourself
+    // dependent on them.
+    const process = (lp: LayerPlan, known: LayerPlan[]) => {
+      for (const step of this.steps) {
+        if (step.layerPlan === lp) {
+          console.log(`finishSubroutine: ${step}`);
+          for (const depId of step.dependencies) {
+            const dep = this.steps[depId];
+            if (!known.includes(dep.layerPlan)) {
+              // Naughty naughty
+              console.log(
+                `finishSubroutine: ${dep} added as dependency of ${subroutineStep}`,
+              );
+              (subroutineStep as any).addDependency(dep);
+            }
+          }
+        }
+      }
+      for (const child of lp.children) {
+        process(child, [...known, child]);
+      }
+    };
+    process(layerPlan, [layerPlan]);
   }
 }
 

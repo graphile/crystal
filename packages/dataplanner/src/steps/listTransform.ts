@@ -151,6 +151,8 @@ export class __ListTransformStep<
       },
     );
     this.subroutineLayer.rootStepId = itemPlan.id;
+
+    this.opPlan.finishSubroutine(this, this.subroutineLayer);
   }
 
   toStringMeta() {
