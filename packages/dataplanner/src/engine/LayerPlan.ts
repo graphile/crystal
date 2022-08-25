@@ -217,7 +217,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     while ((current = current.parentLayerPlan)) {
       chain = chain + `∈${current.id}`;
     }
-    return `LayerPlan<${this.id}${chain}?${this.reason.type}!${
+    const reasonExtra =
+      this.reason.type === "polymorphic"
+        ? `{${this.reason.typeNames.join(",")}}`
+        : "";
+    return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
       this.rootStepId ?? "x"
     }>`;
   }
