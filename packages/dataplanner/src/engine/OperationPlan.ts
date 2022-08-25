@@ -79,6 +79,8 @@ import { digestSchema } from "./lib/digestSchema.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
+const POLYMORPHIC_ROOT_PATH = "";
+
 function isNotNullish<T>(v: T | undefined | null): v is T {
   return v != null;
 }
@@ -241,7 +243,9 @@ export class OperationPlan {
     this.operationType = operation.operation;
 
     this.phase = "plan";
-    this.rootLayerPlan = new LayerPlan(this, null, { type: "root" });
+    this.rootLayerPlan = new LayerPlan(this, null, { type: "root" }, [
+      POLYMORPHIC_ROOT_PATH,
+    ]);
 
     // This doesn't do anything, it only exists to align plans more closely
     // with an older version of the planner (to reduce the diff).
@@ -464,7 +468,7 @@ export class OperationPlan {
     this.planSelectionSet(
       outputPlan,
       [],
-      "",
+      POLYMORPHIC_ROOT_PATH,
       this.trackedRootValueStep,
       rootType,
       this.operation.selectionSet.selections,
@@ -501,7 +505,7 @@ export class OperationPlan {
     this.planSelectionSet(
       outputPlan,
       [],
-      "",
+      POLYMORPHIC_ROOT_PATH,
       this.trackedRootValueStep,
       rootType,
       this.operation.selectionSet.selections,
@@ -577,6 +581,7 @@ export class OperationPlan {
         {
           type: "subscription",
         },
+        this.rootLayerPlan.polymorphicPaths,
       );
 
       const streamItemPlan = withGlobalLayerPlan(
@@ -595,7 +600,7 @@ export class OperationPlan {
       this.planSelectionSet(
         outputPlan,
         [],
-        "",
+        POLYMORPHIC_ROOT_PATH,
         streamItemPlan,
         rootType,
         selectionSet.selections,
@@ -611,6 +616,7 @@ export class OperationPlan {
         {
           type: "subscription",
         },
+        this.rootLayerPlan.polymorphicPaths,
       );
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
@@ -622,7 +628,7 @@ export class OperationPlan {
       this.planSelectionSet(
         outputPlan,
         [],
-        "",
+        POLYMORPHIC_ROOT_PATH,
         subscribeStep,
         rootType,
         selectionSet.selections,
@@ -644,10 +650,15 @@ export class OperationPlan {
       return this.steps[itemStepId] as __ItemStep<TData>;
     }
     // Create a new LayerPlan for this list item
-    const layerPlan = new LayerPlan(this, listStep.layerPlan, {
-      type: "listItem",
-      parentPlanId: listStep.id,
-    });
+    const layerPlan = new LayerPlan(
+      this,
+      listStep.layerPlan,
+      {
+        type: "listItem",
+        parentPlanId: listStep.id,
+      },
+      listStep.layerPlan.polymorphicPaths,
+    );
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
       () => new __ItemStep(listStep, depth),
@@ -710,6 +721,7 @@ export class OperationPlan {
         // Deliberately shadow
         outputPlan,
       } = nextUp;
+      outputPlan.layerPlan._currentPolymorphicPath = polymorphicPath;
 
       // May have changed due to deduplicate
       const step = this.steps[stepId];
@@ -937,9 +949,14 @@ export class OperationPlan {
         // this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
         let haltTree = false;
         const fieldLayerPlan = isMutation
-          ? new LayerPlan(this, outputPlan.layerPlan, {
-              type: "mutationField",
-            })
+          ? new LayerPlan(
+              this,
+              outputPlan.layerPlan,
+              {
+                type: "mutationField",
+              },
+              outputPlan.layerPlan.polymorphicPaths,
+            )
           : outputPlan.layerPlan;
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
@@ -972,10 +989,15 @@ export class OperationPlan {
       }
       if (groupedFieldSet.deferred) {
         for (const deferred of groupedFieldSet.deferred) {
-          const deferredLayerPlan = new LayerPlan(this, outputPlan.layerPlan, {
-            type: "defer",
-            label: deferred.label,
-          });
+          const deferredLayerPlan = new LayerPlan(
+            this,
+            outputPlan.layerPlan,
+            {
+              type: "defer",
+              label: deferred.label,
+            },
+            [polymorphicPath],
+          );
           const deferredOutputPlan = new OutputPlan(
             deferredLayerPlan,
             this.steps[outputPlan.rootStepId],
@@ -1253,6 +1275,7 @@ export class OperationPlan {
       for (const type of allPossibleObjectTypes) {
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
+        polymorphicLayerPlan.polymorphicPaths.push(newPolymorphicPath);
         polymorphicLayerPlan._currentPolymorphicPath = newPolymorphicPath;
 
         const $root = withGlobalLayerPlan(polymorphicLayerPlan, () =>
@@ -1316,11 +1339,16 @@ export class OperationPlan {
       }
       return layerPlan;
     } else {
-      const layerPlan = new LayerPlan(this, $step.layerPlan, {
-        type: "polymorphic",
-        typeNames: allPossibleObjectTypes.map((t) => t.name),
-        parentPlanId: $step.id,
-      });
+      const layerPlan = new LayerPlan(
+        this,
+        $step.layerPlan,
+        {
+          type: "polymorphic",
+          typeNames: allPossibleObjectTypes.map((t) => t.name),
+          parentPlanId: $step.id,
+        },
+        [],
+      );
       this.polymorphicLayerPlanByPath.set(pathString, {
         stepId: $step.id,
         layerPlan,

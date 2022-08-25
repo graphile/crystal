@@ -123,6 +123,7 @@ export class __ListTransformStep<
         type: "subroutine",
         parentPlanId: this.id,
       },
+      this.layerPlan.polymorphicPaths,
     );
     const itemPlan = withGlobalLayerPlan(this.subroutineLayer, () => {
       // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
