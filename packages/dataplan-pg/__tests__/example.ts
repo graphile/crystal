@@ -312,6 +312,58 @@ async function main() {
       }
     `);
   }
+
+  // interfaces-single-table/nested-more-fragments.test.graphql
+  await test(/* GraphQL */ `
+    {
+      people {
+        __typename
+        username
+        items: singleTableItemsList {
+          __typename
+          parent {
+            __typename
+            ...Item
+          }
+          ...Item
+        }
+      }
+    }
+
+    fragment Item on SingleTableItem {
+      id
+      type
+      type2
+      author {
+        __typename
+        username
+      }
+      position
+      createdAt
+      updatedAt
+      isExplicitlyArchived
+      archivedAt
+      ... on SingleTableTopic {
+        title
+      }
+      ... on SingleTablePost {
+        title
+        description
+        note
+      }
+      ... on SingleTableDivider {
+        title
+        color
+      }
+      ... on SingleTableChecklist {
+        title
+      }
+      ... on SingleTableChecklistItem {
+        description
+        note
+      }
+    }
+  `);
 }
 
 main()
