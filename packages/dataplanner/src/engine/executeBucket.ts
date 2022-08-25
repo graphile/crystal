@@ -217,22 +217,12 @@ export function executeBucket(
           resultSettledResult.forEach((settledResult, resultIndex): void => {
             if (settledResult.status === "fulfilled") {
               if (
-                // This is to stop some basic types being accidentally recogized as iterable/async iterator
-                Array.isArray(settledResult.value) ||
-                settledResult.value instanceof Map ||
-                settledResult.value instanceof Set
+                // Detects async iterables (but excludes all the basic types
+                // like arrays, Maps, Sets, etc that are also iterables) and
+                // handles them specially.
+                isAsyncIterable(settledResult.value) &&
+                !isIterable(settledResult.value)
               ) {
-                result[resultIndex] = settledResult.value;
-                // TODO: isIterable and isAsyncIterable are causing all _sorts_ of pain here. AVOID!
-              } else if (isIterable(settledResult.value)) {
-                // Turn it from iterable into an array.
-                try {
-                  result[resultIndex] = [...settledResult.value];
-                } catch (e) {
-                  bucket.hasErrors = true;
-                  result[resultIndex] = newCrystalError(e, finishedStep.id);
-                }
-              } else if (isAsyncIterable(settledResult.value)) {
                 const iterator = settledResult.value[Symbol.asyncIterator]();
 
                 const streamOptions = finishedStep._stepOptions.stream;
