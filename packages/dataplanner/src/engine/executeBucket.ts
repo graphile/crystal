@@ -21,6 +21,13 @@ import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
+// An error that indicates this entry was skipped because it didn't match
+// polymorphicPath.
+const POLY_SKIPPED = newCrystalError(
+  new Error("Polymorphic skipped; you should never see this"),
+  null,
+);
+
 function noop() {
   /*noop*/
 }
@@ -328,23 +335,42 @@ export function executeBucket(
 
   // Slow mode...
   /**
-   * Execute the step, filtering out errors from the input dependencies and
-   * then padding the lists back out at the end.
+   * Execute the step, filtering out errors and entries with non-matching
+   * polymorphicPaths from the input dependencies and then padding the lists
+   * back out at the end.
    */
-  function reallyExecuteStepWithErrors(
+  function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
     dependencies: ReadonlyArray<any>[],
+    polymorphicPathList: readonly string[],
     extra: ExecutionExtra,
   ) {
     const errors: { [index: number]: CrystalError } = Object.create(null);
     let foundErrors = false;
-    for (const depList of dependencies) {
-      for (let index = 0, l = depList.length; index < l; index++) {
-        const v = depList[index];
-        if (isCrystalError(v)) {
-          if (!errors[index]) {
-            foundErrors = true;
-            errors[index] = v;
+    for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
+      const polymorphicPath = polymorphicPathList[index];
+      if (!step.polymorphicPaths.has(polymorphicPath)) {
+        foundErrors = true;
+        if (isDev) {
+          errors[index] = newCrystalError(
+            new Error(
+              `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
+                ...step.polymorphicPaths,
+              ]}) has no match for '${polymorphicPath}'`,
+            ),
+            step.id,
+          );
+        } else {
+          errors[index] = POLY_SKIPPED;
+        }
+      } else if (extra._bucket.hasErrors) {
+        for (const depList of dependencies) {
+          const v = depList[index];
+          if (isCrystalError(v)) {
+            if (!errors[index]) {
+              foundErrors = true;
+              errors[index] = v;
+            }
           }
         }
       }
@@ -420,9 +446,17 @@ export function executeBucket(
       } else {
         dependencies.push(noDepsList);
       }
-      const result = bucket.hasErrors
-        ? reallyExecuteStepWithErrors(step, dependencies, extra)
-        : reallyExecuteStepWithNoErrors(step, dependencies, extra);
+      const isSelectiveStep =
+        step.polymorphicPaths.size !== step.layerPlan.polymorphicPaths.size;
+      const result =
+        bucket.hasErrors || isSelectiveStep
+          ? reallyExecuteStepWithErrorsOrSelective(
+              step,
+              dependencies,
+              bucket.polymorphicPathList,
+              extra,
+            )
+          : reallyExecuteStepWithNoErrors(step, dependencies, extra);
       if (isPromiseLike(result)) {
         return result.then(
           (values) => {
@@ -714,6 +748,19 @@ export function newBucket(
   if (isDev) {
     // Some validations
     assert.ok(spec.size > 0, "No need to create an empty bucket!");
+    assert.strictEqual(
+      spec.polymorphicPathList.length,
+      spec.size,
+      "polymorphicPathList length must match bucket size",
+    );
+    for (let i = 0, l = spec.size; i < l; i++) {
+      const p = spec.polymorphicPathList[i];
+      assert.strictEqual(
+        typeof p,
+        "string",
+        `Entry ${i} in polymorphicPathList for bucket for ${spec.layerPlan} was not a string`,
+      );
+    }
     for (const [key, list] of Object.entries(spec.store)) {
       assert.ok(
         Array.isArray(list),

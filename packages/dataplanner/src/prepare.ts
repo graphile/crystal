@@ -19,6 +19,7 @@ import type {
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
+import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan, OutputPlanTypeObject } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
@@ -132,7 +133,7 @@ export function executePreemptive(
   const vars = [variableValues];
   const ctxs = [context];
   const rvs = [rootValue];
-  const polymorphicPathList = [operationPlan.rootLayerPlan.polymorphicPaths[0]];
+  const polymorphicPathList = [POLYMORPHIC_ROOT_PATH];
   const rootBucket = newBucket({
     layerPlan: operationPlan.rootLayerPlan,
     size,

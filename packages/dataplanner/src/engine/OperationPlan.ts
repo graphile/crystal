@@ -75,7 +75,7 @@ import { digestSchema } from "./lib/digestSchema.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
-const POLYMORPHIC_ROOT_PATH = "";
+export const POLYMORPHIC_ROOT_PATH = "";
 const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
   POLYMORPHIC_ROOT_PATH,
 ]);
