@@ -2072,14 +2072,13 @@ export class OperationPlan {
 
     // Hooray, one winning layer! Find the first one by id.
     const winner = stepsAtMinDepth[0];
+    winner.polymorphicPaths = new Set(
+      stepsAtMinDepth.flatMap((s) => [...s.polymorphicPaths]),
+    );
 
     // Give the steps a chance to pass their responsibilities to the winner.
     for (const target of allEquivalentSteps) {
       if (winner !== target) {
-        winner.polymorphicPaths = new Set([
-          ...winner.polymorphicPaths,
-          ...target.polymorphicPaths,
-        ]);
         target.deduplicatedWith(winner);
       }
     }
