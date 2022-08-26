@@ -182,20 +182,8 @@ export function executeOutputPlan(
   switch (outputPlan.type.mode) {
     case "root":
     case "object": {
-      let typeName: string;
-      if (outputPlan.type.mode === "root") {
-        typeName = outputPlan.type.typeName;
-      } else if (bucketRootValue == null) {
+      if (outputPlan.type.mode !== "root" && bucketRootValue == null) {
         return null;
-      } else if (outputPlan.type.mode === "object") {
-        typeName = outputPlan.type.typeName;
-      } else {
-        assert.ok(
-          isPolymorphicData(bucketRootValue),
-          "Expected polymorphic data",
-        );
-        typeName = bucketRootValue[$$concreteType];
-        assert.ok(typeName, "Could not determine concreteType for object");
       }
       assert.ok(
         outputPlan.objectCreator,
