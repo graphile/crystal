@@ -6,19 +6,26 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
-    %% define plans
-    __Value0["__Value[0]"]:::plan
-    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    Access8["Access[8]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access9["Access[9]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object10["Object[10]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgSelect7[["PgSelect[7]<br />ᐸrandom_userᐳ"]]:::plan
-    First11["First[11]"]:::plan
-    PgSelectSingle12["PgSelectSingle[12]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression13["PgClassExpression[13]<br />ᐸ__random_u...”username”ᐳ"]:::plan
-    __Value15["__Value[15]"]:::plan
-    __Value16["__Value[16]"]:::plan
-    __Value17["__Value[17]"]:::plan
+    %% define steps
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access8["Access[8∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access9["Access[9∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object10["Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgSelect7[["PgSelect[7∈0]<br />ᐸrandom_userᐳ"]]:::plan
+    First11["First[11∈0]"]:::plan
+    PgSelectSingle12["PgSelectSingle[12∈0]<br />ᐸusersᐳ"]:::plan
+    PgClassExpression13["PgClassExpression[13∈0]<br />ᐸ__random_u...”username”ᐳ"]:::plan
+    Object15["Object[15∈0]<br />ᐸ{}ᐳ"]:::plan
+    GraphQLResolver16[["GraphQLResolver[16∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver18[["GraphQLResolver[18∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver20[["GraphQLResolver[20∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver22[["GraphQLResolver[22∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver24[["GraphQLResolver[24∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver26[["GraphQLResolver[26∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver28[["GraphQLResolver[28∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver30[["GraphQLResolver[30∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver32[["GraphQLResolver[32∈0]<br />ᐸresolveᐳ"]]:::plan
 
     %% plan dependencies
     __Value3 --> Access8
@@ -28,23 +35,20 @@ graph TD
     PgSelect7 --> First11
     First11 --> PgSelectSingle12
     PgSelectSingle12 --> PgClassExpression13
+    PgClassExpression13 & Object15 & __Value3 --> GraphQLResolver16
+    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver18
+    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver20
+    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver22
+    GraphQLResolver22 & Object15 & __Value3 --> GraphQLResolver24
+    GraphQLResolver24 & Object15 & __Value3 --> GraphQLResolver26
+    GraphQLResolver24 & Object15 & __Value3 --> GraphQLResolver28
+    GraphQLResolver22 & Object15 & __Value3 --> GraphQLResolver30
+    GraphQLResolver22 & Object15 & __Value3 --> GraphQLResolver32
 
     %% plan-to-path relationships
-    P0["~"]
-    __Value0 -.-> P0
-    P12["ᐳrandomUser"]
-    PgSelectSingle12 -.-> P12
-    P13["ᐳr…rᐳusername<br />ᐳr…rᐳusernameHashes"]
-    PgClassExpression13 -.-> P13
-    P15["ᐳr…rᐳu…sᐳmd5<br />ᐳr…rᐳu…sᐳself<br />ᐳr…rᐳu…sᐳsha256"]
-    __Value15 -.-> P15
-    P16["ᐳr…rᐳu…sᐳselfᐳMD5<br />ᐳr…rᐳu…sᐳselfᐳself<br />ᐳr…rᐳu…sᐳselfᐳSHA256<br />ᐳr…rᐳu…sᐳselfᐳSHA256_2"]
-    __Value16 -.-> P16
-    P17["ᐳr…rᐳu…sᐳselfᐳselfᐳmd5<br />ᐳr…rᐳu…sᐳselfᐳselfᐳsha256"]
-    __Value17 -.-> P17
 
     subgraph "Buckets for queries/resolvers/basics-object-recursive"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀randomUser ᐸ-O- 12<br />⠀⠀⠀randomUser.username ᐸ-L- 13<br />⠀⠀⠀randomUser.usernameHashes ᐸ-O- 13<br />⠀⠀⠀⠀randomUser.usernameHashes.md5 ᐸ-L- 15<br />⠀⠀⠀⠀randomUser.usernameHashes.self ᐸ-O- 15<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.MD5 ᐸ-L- 16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self ᐸ-O- 16<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.md5 ᐸ-L- 17<br />⠀⠀⠀⠀⠀⠀randomUser.usernameHashes.self.self.sha256 ᐸ-L- 17<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256 ᐸ-L- 16<br />⠀⠀⠀⠀⠀randomUser.usernameHashes.self.SHA256_2 ᐸ-L- 16<br />⠀⠀⠀⠀randomUser.usernameHashes.sha256 ᐸ-L- 15"):::bucket
+    Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,__Value15,__Value16,__Value17 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,Object15,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20,GraphQLResolver22,GraphQLResolver24,GraphQLResolver26,GraphQLResolver28,GraphQLResolver30,GraphQLResolver32 bucket0
     end
