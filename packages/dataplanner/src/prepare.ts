@@ -222,6 +222,7 @@ export function executePreemptive(
 
   const executeStreamPayload = (
     payload: any,
+    index: number,
   ): PromiseOrDirect<
     ExecutionResult | AsyncGenerator<AsyncExecutionResult>
   > => {
@@ -256,7 +257,11 @@ export function executePreemptive(
         [],
         rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
       );
-      return finalize(result, ctx, undefined);
+      return finalize(
+        result,
+        ctx,
+        index === 0 ? rootValue[$$extensions] ?? undefined : undefined,
+      );
     };
     if (isPromiseLike(bucketPromise)) {
       return bucketPromise.then(output);
@@ -315,6 +320,7 @@ export function executePreemptive(
       });
       (async () => {
         // eslint-disable-next-line no-constant-condition
+        let i = 0;
         while (true) {
           const next = await Promise.race([abort, stream.next()]);
           if (stopped || !next) {
@@ -330,7 +336,7 @@ export function executePreemptive(
           }
           const payload = await Promise.race([
             abort,
-            executeStreamPayload(value),
+            executeStreamPayload(value, i),
           ]);
           if (payload === undefined) {
             break;
@@ -343,6 +349,7 @@ export function executePreemptive(
           } else {
             iterator.push(payload);
           }
+          i++;
         }
       })().catch((e) => {
         iterator.throw(e);
