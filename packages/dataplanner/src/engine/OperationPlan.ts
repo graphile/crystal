@@ -75,8 +75,6 @@ import type {
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
-import type { SchemaDigest } from "./lib/digestSchema.js";
-import { digestSchema } from "./lib/digestSchema.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
@@ -117,7 +115,6 @@ export class OperationPlan {
     [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
   };
 
-  private schemaDigest: SchemaDigest;
   private operationType: "query" | "mutation" | "subscription";
 
   /**
@@ -230,7 +227,6 @@ export class OperationPlan {
       );
     }
 
-    this.schemaDigest = digestSchema(schema);
     this.operationType = operation.operation;
 
     this.phase = "plan";
@@ -956,10 +952,6 @@ export class OperationPlan {
           this.pure = false;
         }
 
-        /*
-        namedReturnType instanceof GraphQLInterfaceType ||
-        namedReturnType instanceof GraphQLUnionType
-        */
         const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
         const fieldHasPlan = !!planResolver;
 
@@ -2242,7 +2234,7 @@ export class OperationPlan {
    * Note that we work through dependents first so we can make sure that we
    * know all our dependent's needs before we optimise ourself.
    */
-  private optimizeSteps(): void {
+  private optimizeSteps() {
     const thirdAndFutureLoopReplacedPlans: ExecutableStep[] = [];
     for (let loops = 0; loops < MAX_OPTIMIZATION_LOOPS; loops++) {
       let replacedPlan = false;
