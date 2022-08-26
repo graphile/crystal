@@ -32,28 +32,6 @@ function noop() {
 }
 
 /**
- * Calls the callback, catching any errors and turning them into rejected
- * promises.
- *
- * @remarks
- *
- * When we're calling functions in loops and they may or may not be async
- * functions, there's a risk that they may throw and previous promises that may
- * have been added to an array to be handled later never get handled, causing
- * an unhandled promise rejection error which crashes the entire Node process.
- * This is not ideal. Thus we use this method to try to call the function, but
- * if it throws we turn it into a promise rejection which will not interrupt
- * the flow of these loops.
- */
-function rejectOnThrow<T>(cb: () => T): T | Promise<never> {
-  try {
-    return cb();
-  } catch (e) {
-    return Promise.reject(e);
-  }
-}
-
-/**
  * Takes a list of `results` (shorter than `resultCount`) and an object with
  * errors and indexes; returns a list of length `resultCount` with the results
  * from `results` but with errors injected at the indexes specified in
@@ -110,9 +88,13 @@ export function executeBucket(
     const steps = startSteps[i];
     const starterPromises: PromiseLike<void>[] = [];
     for (const step of steps) {
-      const r = rejectOnThrow(() => executeStep(step));
-      if (isPromiseLike(r)) {
-        starterPromises.push(r);
+      try {
+        const r = executeStep(step);
+        if (isPromiseLike(r)) {
+          starterPromises.push(r);
+        }
+      } catch (e) {
+        starterPromises.push(Promise.reject(e));
       }
     }
     if (starterPromises.length > 0) {
@@ -175,9 +157,13 @@ export function executeBucket(
           )
         : false;
       if (isSuitable) {
-        const r = rejectOnThrow(() => executeStep(potentialNextStep));
-        if (isPromiseLike(r)) {
-          promises.push(r);
+        try {
+          const r = executeStep(potentialNextStep);
+          if (isPromiseLike(r)) {
+            promises.push(r);
+          }
+        } catch (e) {
+          promises.push(Promise.reject(e));
         }
       }
     }
