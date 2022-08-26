@@ -4,7 +4,10 @@ import { inspect } from "util";
 
 import { isDev, noop } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
-import { currentLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
+import {
+  currentLayerPlan,
+  currentPolymorphicPaths,
+} from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import type {
@@ -234,8 +237,12 @@ export class ExecutableStep<TData = any> extends BaseStep {
   /** @internal */
   public _stepOptions: StepOptions = { stream: null };
 
+  /** @internal */
+  public polymorphicPaths: ReadonlySet<string>;
+
   constructor() {
     super();
+    this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
   }
 

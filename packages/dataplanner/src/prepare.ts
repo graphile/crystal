@@ -11,7 +11,7 @@ import type { Bucket, RequestContext } from "./bucket.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
-import { executeBucket } from "./engine/executeBucket.js";
+import { executeBucket, newBucket } from "./engine/executeBucket.js";
 import type {
   OutputPlanContext,
   PayloadRoot,
@@ -19,6 +19,7 @@ import type {
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
+import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan, OutputPlanTypeObject } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
@@ -132,12 +133,10 @@ export function executePreemptive(
   const vars = [variableValues];
   const ctxs = [context];
   const rvs = [rootValue];
-  const rootBucket: Bucket = {
-    isComplete: false,
-    cascadeEnabled: false,
+  const polymorphicPathList = [POLYMORPHIC_ROOT_PATH];
+  const rootBucket = newBucket({
     layerPlan: operationPlan.rootLayerPlan,
     size,
-    noDepsList: Object.freeze(arrayOfLength(size)),
     store: Object.assign(Object.create(null), {
       "-1": requestIndex,
       [operationPlan.rootLayerPlan.rootStepId!]: requestIndex,
@@ -146,8 +145,8 @@ export function executePreemptive(
       [operationPlan.rootValueStep.id]: rvs,
     }),
     hasErrors: false,
-    children: {},
-  };
+    polymorphicPathList,
+  });
   const requestContext: RequestContext = {
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
@@ -401,6 +400,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store = Object.create(null);
+    const polymorphicPathList: string[] = [];
     store[spec.listItemStepId] = [];
 
     for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
@@ -411,6 +411,9 @@ async function processStream(
     for (const entry of entries) {
       const [result] = entry;
       store[spec.listItemStepId][bucketIndex] = result;
+
+      polymorphicPathList[bucketIndex] =
+        spec.bucket.polymorphicPathList[spec.bucketIndex];
       for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
         store[copyPlanId][bucketIndex] =
           spec.bucket.store[copyPlanId][spec.bucketIndex];
@@ -420,20 +423,16 @@ async function processStream(
     }
 
     assert.strictEqual(bucketIndex, size);
-    const noDepsList = arrayOfLength(size, undefined);
 
     // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
     // const childBucketIndex = 0;
-    const rootBucket: Bucket = {
-      isComplete: false,
-      cascadeEnabled: false,
+    const rootBucket: Bucket = newBucket({
       layerPlan: spec.outputPlan.layerPlan,
       size,
-      noDepsList,
       store,
       hasErrors: false,
-      children: {},
-    };
+      polymorphicPathList,
+    });
 
     const bucketPromise = executeBucket(rootBucket, requestContext);
 
@@ -548,6 +547,7 @@ function processSingleDeferred(
 ) {
   const size = specs.length;
   const store = Object.create(null);
+  const polymorphicPathList: string[] = [];
 
   for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
     store[copyPlanId] = [];
@@ -555,6 +555,8 @@ function processSingleDeferred(
 
   let bucketIndex = 0;
   for (const [iterator, spec] of specs) {
+    polymorphicPathList[bucketIndex] =
+      spec.bucket.polymorphicPathList[spec.bucketIndex];
     for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
       store[copyPlanId][bucketIndex] =
         spec.bucket.store[copyPlanId][spec.bucketIndex];
@@ -564,20 +566,16 @@ function processSingleDeferred(
   }
 
   assert.strictEqual(bucketIndex, size);
-  const noDepsList = arrayOfLength(size, undefined);
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
   // const childBucketIndex = 0;
-  const rootBucket: Bucket = {
-    isComplete: false,
-    cascadeEnabled: false,
+  const rootBucket = newBucket({
     layerPlan: outputPlan.layerPlan,
     size,
-    noDepsList,
     store,
     hasErrors: false,
-    children: {},
-  };
+    polymorphicPathList,
+  });
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
 

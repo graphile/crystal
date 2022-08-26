@@ -935,6 +935,11 @@ export function stepsAreInSamePhase(
     if (currentLayerPlan === ancestor.layerPlan) {
       return true;
     }
+    if (currentLayerPlan.reason.type === "polymorphic") {
+      // TODO: can optimize this so that if all polymorphicPaths match then it
+      // passes
+      return false;
+    }
     if (isBoundaryLayerPlan(currentLayerPlan)) {
       return false;
     }

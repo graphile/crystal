@@ -59,6 +59,13 @@ export interface Bucket {
   noDepsList: readonly undefined[];
 
   /**
+   * The polymorphic path through which each of the entries (respectively) has
+   * travelled. This influences the steps that will be executed using the
+   * related inputs.
+   */
+  polymorphicPathList: readonly string[];
+
+  /**
    * Every entry in the store is a list with the same length as the bucket has
    * `size`.
    */
@@ -87,6 +94,8 @@ export interface Bucket {
    */
   isComplete: boolean;
 
+  // TODO: we should be able to convert this into a set of planIds that have
+  // errors, then we can use this as we cascade forward to the next bucket.
   /**
    * If an error occurred at any stage we need to drop down to more careful
    * (and slower) handling.

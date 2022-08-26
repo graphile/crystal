@@ -123,27 +123,32 @@ export class __ListTransformStep<
         type: "subroutine",
         parentPlanId: this.id,
       },
+      listPlan.polymorphicPaths,
     );
-    const itemPlan = withGlobalLayerPlan(this.subroutineLayer, () => {
-      // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
-      const $__listItem = new __ItemStep(listPlan);
-      $__listItem.transformStepId = this.id;
-      const $listItem = isListCapableStep(listPlan)
-        ? listPlan.listItem($__listItem)
-        : $__listItem;
-      const $newListItem = this.itemPlanCallback($listItem as any);
+    const itemPlan = withGlobalLayerPlan(
+      this.subroutineLayer,
+      listPlan.polymorphicPaths,
+      () => {
+        // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
+        const $__listItem = new __ItemStep(listPlan);
+        $__listItem.transformStepId = this.id;
+        const $listItem = isListCapableStep(listPlan)
+          ? listPlan.listItem($__listItem)
+          : $__listItem;
+        const $newListItem = this.itemPlanCallback($listItem as any);
 
-      if (
-        this.isSyncAndSafe &&
-        (!$__listItem.isSyncAndSafe ||
-          !$listItem.isSyncAndSafe ||
-          !$newListItem.isSyncAndSafe)
-      ) {
-        // TODO: log this deopt?
-        this.isSyncAndSafe = false;
-      }
-      return $newListItem;
-    });
+        if (
+          this.isSyncAndSafe &&
+          (!$__listItem.isSyncAndSafe ||
+            !$listItem.isSyncAndSafe ||
+            !$newListItem.isSyncAndSafe)
+        ) {
+          // TODO: log this deopt?
+          this.isSyncAndSafe = false;
+        }
+        return $newListItem;
+      },
+    );
     this.subroutineLayer.rootStepId = itemPlan.id;
   }
 
@@ -245,8 +250,9 @@ export class __ListTransformStep<
     const copyStepIds = childLayerPlan.copyPlanIds;
 
     const store: Bucket["store"] = Object.create(null);
+    const polymorphicPathList: string[] = [];
     const map: Map<number, number[]> = new Map();
-    const noDepsList: undefined[] = [];
+    let size = 0;
 
     const itemStepId = childLayerPlan.rootStepId;
     assert.ok(
@@ -274,8 +280,10 @@ export class __ListTransformStep<
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
         for (let j = 0, l = list.length; j < l; j++) {
-          const newIndex = noDepsList.push(undefined) - 1;
+          const newIndex = size++;
           newIndexes.push(newIndex);
+          polymorphicPathList[newIndex] =
+            bucket.polymorphicPathList[originalIndex];
           store[itemStepId][newIndex] = list[j];
           for (const planId of copyStepIds) {
             store[planId][newIndex] = bucket.store[planId][originalIndex];
@@ -284,8 +292,14 @@ export class __ListTransformStep<
       }
     }
 
-    if (noDepsList.length > 0) {
-      const childBucket = newBucket(childLayerPlan, noDepsList, store);
+    if (size > 0) {
+      const childBucket = newBucket({
+        layerPlan: childLayerPlan,
+        size,
+        store,
+        hasErrors: bucket.hasErrors,
+        polymorphicPathList,
+      });
       await executeBucket(childBucket, extra._requestContext);
     }
 

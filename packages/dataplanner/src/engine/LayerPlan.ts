@@ -144,6 +144,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    */
   public rootStepId: number | null = null;
 
+  public rootStepIdByTypeName: {
+    [typeName: string]: number;
+  } = Object.create(null);
+
   /**
    * Which plans the results for which are available in a parent bucket need to
    * be "copied across" to this bucket because plans in this bucket still
@@ -188,6 +192,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
+    public polymorphicPaths: ReadonlySet<string>,
   ) {
     if (parentLayerPlan) {
       this.ancestry = [...parentLayerPlan.ancestry, this];

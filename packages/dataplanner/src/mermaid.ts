@@ -128,7 +128,7 @@ export function printPlanGraph(
 
       const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
         meta ? `\n<${meta}>` : ""
-      }`;
+      }\n${pp(plan.polymorphicPaths)}`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
           ? [">", "]"]
@@ -369,7 +369,7 @@ export function printPlanGraph(
                 .map((pId) => steps[pId].id)
                 .join(", ")}\n`
             : ""
-        }${
+        }${pp(layerPlan.polymorphicPaths)}${
           layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
             ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
             : ""
@@ -400,4 +400,11 @@ export function printPlanGraph(
 
   const graphString = graph.join("\n");
   return graphString;
+}
+
+function pp(polymorphicPaths: ReadonlySet<string>) {
+  if (polymorphicPaths.size === 1 && polymorphicPaths.has("")) {
+    return "";
+  }
+  return [...polymorphicPaths].map((p) => `${p}`).join("\n");
 }
