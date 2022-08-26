@@ -18,20 +18,24 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import type {
+import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
+import type { BaseGraphQLContext } from "dataplanner";
+import {
   __TrackedObjectStep,
   __ValueStep,
-  BaseGraphQLContext,
+  dataplannerGraphql,
+  isAsyncIterable,
+  stripAnsi,
 } from "dataplanner";
-import { stripAnsi } from "dataplanner";
-import type { ExecutionResult } from "graphql";
-import { graphql } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
 
-import { schema } from "../src/examples/exampleSchema.js";
-import type { WithPgClient } from "../src/index.js";
+import { makeExampleSchema } from "../src/examples/exampleSchema.js";
+import { PgSubscriber, WithPgClient } from "../src/index.js";
+
+const schema = makeExampleSchema();
 
 // Convenience so we don't have to type these out each time. These used to be
 // separate plans, but required too much maintenance.
@@ -91,8 +95,22 @@ const testPool = new Pool({ connectionString: "graphile_crystal" });
 
 async function main() {
   //console.log(printSchema(schema));
-  function logGraphQLResult(result: ExecutionResult<any>): void {
-    const { data, errors } = result;
+  function logGraphQLResult(
+    result: ExecutionResult<any> | AsyncExecutionResult,
+  ): void {
+    const { data, errors, extensions } = result;
+
+    const ops = (extensions?.explain as any)?.operations;
+    if (ops) {
+      for (const op of ops) {
+        if (op.type === "mermaid-js") {
+          console.log(op.diagram);
+        } else {
+          console.log(`UNKNOWN: ${op.type}`);
+        }
+      }
+    }
+
     const nicerErrors = errors?.map((e, idx) => {
       return idx > 0
         ? e.message // Flatten all but first error
@@ -124,18 +142,12 @@ async function main() {
   }
 
   async function test(source: string, variableValues = Object.create(null)) {
-    const withPgClient: WithPgClient = async (_pgSettings, callback) => {
-      const client = await testPool.connect();
-      try {
-        // TODO: set pgSettings within a transaction
-        return callback(client);
-      } finally {
-        client.release();
-      }
-    };
+    const withPgClient = makeNodePostgresWithPgClient(testPool);
+    const pgSubscriber = new PgSubscriber(testPool);
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},
       withPgClient,
+      pgSubscriber,
     };
     console.log();
     console.log();
@@ -148,22 +160,36 @@ async function main() {
     console.log();
     console.log();
     console.log();
-    const result = await graphql({
-      schema,
-      source,
-      variableValues,
-      contextValue,
-      rootValue: null,
-    });
+    const result = await dataplannerGraphql(
+      {
+        schema,
+        source,
+        variableValues,
+        contextValue,
+        rootValue: null,
+      },
+      {
+        // explain: ["mermaid-js"],
+      },
+    );
 
     console.log("GraphQL result:");
-    logGraphQLResult(result);
-    if (result.errors) {
-      throw new Error("Aborting due to errors");
+    if (isAsyncIterable(result)) {
+      for await (const payload of result) {
+        logGraphQLResult(payload);
+        if (payload.errors) {
+          throw new Error("Aborting due to errors");
+        }
+      }
+    } else {
+      logGraphQLResult(result);
+      if (result.errors) {
+        throw new Error("Aborting due to errors");
+      }
     }
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -173,7 +199,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -187,7 +213,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -208,7 +234,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         allMessagesConnection {
@@ -227,7 +253,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -260,7 +286,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         forums(first: 2) {
@@ -288,6 +314,58 @@ async function main() {
       }
     `);
   }
+
+  // interfaces-single-table/nested-more-fragments.test.graphql
+  await test(/* GraphQL */ `
+    {
+      people {
+        __typename
+        username
+        items: singleTableItemsList {
+          __typename
+          parent {
+            __typename
+            ...Item
+          }
+          ...Item
+        }
+      }
+    }
+
+    fragment Item on SingleTableItem {
+      id
+      type
+      type2
+      author {
+        __typename
+        username
+      }
+      position
+      createdAt
+      updatedAt
+      isExplicitlyArchived
+      archivedAt
+      ... on SingleTableTopic {
+        title
+      }
+      ... on SingleTablePost {
+        title
+        description
+        note
+      }
+      ... on SingleTableDivider {
+        title
+        color
+      }
+      ... on SingleTableChecklist {
+        title
+      }
+      ... on SingleTableChecklistItem {
+        description
+        note
+      }
+    }
+  `);
 }
 
 main()

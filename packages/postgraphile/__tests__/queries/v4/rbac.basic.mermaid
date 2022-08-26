@@ -6,9 +6,9 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
-    %% define plans
-    __Value0["__Value[0∈0]"]:::plan
+    %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7["__InputStaticLeaf[7∈0]"]:::plan
     Access9["Access[9∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access10["Access[10∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
@@ -39,6 +39,8 @@ graph TD
     List54["List[54∈0]<br />ᐸ52,53ᐳ"]:::plan
     Lambda55["Lambda[55∈0]<br />ᐸencodeᐳ"]:::plan
     Map251["Map[251∈0]<br />ᐸ51:{”0”:0,”1”:1}ᐳ"]:::plan
+    List252["List[252∈0]<br />ᐸ251ᐳ"]:::plan
+    First61["First[61∈0]"]:::plan
     PgSelectSingle62["PgSelectSingle[62∈0]<br />ᐸpersonSecretᐳ"]:::plan
     Constant63["Constant[63∈0]"]:::plan
     PgClassExpression64["PgClassExpression[64∈0]<br />ᐸ__person_s...person_id”ᐳ"]:::plan
@@ -75,7 +77,9 @@ graph TD
     PgClassExpression121["PgClassExpression[121∈0]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List122["List[122∈0]<br />ᐸ120,121ᐳ"]:::plan
     Lambda123["Lambda[123∈0]<br />ᐸencodeᐳ"]:::plan
-    Map253["Map[253∈0]<br />ᐸ119:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"]:::plan
+    Map254["Map[254∈0]<br />ᐸ119:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"]:::plan
+    List255["List[255∈0]<br />ᐸ254ᐳ"]:::plan
+    First129["First[129∈0]"]:::plan
     PgSelectSingle130["PgSelectSingle[130∈0]<br />ᐸleftArmᐳ"]:::plan
     Constant131["Constant[131∈0]"]:::plan
     PgClassExpression132["PgClassExpression[132∈0]<br />ᐸ__left_arm__.”id”ᐳ"]:::plan
@@ -115,8 +119,8 @@ graph TD
     List199["List[199∈0]<br />ᐸ197,198ᐳ"]:::plan
     Lambda200["Lambda[200∈0]<br />ᐸencodeᐳ"]:::plan
     Connection226["Connection[226∈0]<br />ᐸ222ᐳ"]:::plan
-    Access255["Access[255∈0]<br />ᐸ195.0ᐳ"]:::plan
-    __Item228>"__Item[228∈4]<br />ᐸ255ᐳ"]:::itemplan
+    Access253["Access[253∈0]<br />ᐸ195.0ᐳ"]:::plan
+    __Item228>"__Item[228∈4]<br />ᐸ253ᐳ"]:::itemplan
     PgSelectSingle229["PgSelectSingle[229∈4]<br />ᐸpostᐳ"]:::plan
     Constant230["Constant[230∈0]"]:::plan
     PgClassExpression231["PgClassExpression[231∈4]<br />ᐸ__post__.”id”ᐳ"]:::plan
@@ -159,7 +163,9 @@ graph TD
     Constant52 & PgClassExpression53 --> List54
     List54 --> Lambda55
     PgSelectSingle51 --> Map251
-    Map251 --> PgSelectSingle62
+    Map251 --> List252
+    List252 --> First61
+    First61 --> PgSelectSingle62
     PgSelectSingle62 --> PgClassExpression64
     Constant63 & PgClassExpression64 --> List65
     List65 --> Lambda66
@@ -188,8 +194,10 @@ graph TD
     PgSelectSingle119 --> PgClassExpression121
     Constant120 & PgClassExpression121 --> List122
     List122 --> Lambda123
-    PgSelectSingle119 --> Map253
-    Map253 --> PgSelectSingle130
+    PgSelectSingle119 --> Map254
+    Map254 --> List255
+    List255 --> First129
+    First129 --> PgSelectSingle130
     PgSelectSingle130 --> PgClassExpression132
     Constant131 & PgClassExpression132 --> List133
     List133 --> Lambda134
@@ -220,8 +228,8 @@ graph TD
     PgSelectSingle196 --> PgClassExpression198
     Constant197 & PgClassExpression198 --> List199
     List199 --> Lambda200
-    First195 --> Access255
-    Access255 ==> __Item228
+    First195 --> Access253
+    Access253 ==> __Item228
     __Item228 --> PgSelectSingle229
     PgSelectSingle229 --> PgClassExpression231
     Constant230 & PgClassExpression231 --> List232
@@ -237,156 +245,20 @@ graph TD
     Constant244 & PgClassExpression245 & PgClassExpression246 --> List247
     List247 --> Lambda248
 
-    %% plan-to-path relationships
-    P0["~"]
-    __Value0 -.-> P0
-    P13["ᐳpersonSecretByPersonId"]
-    PgSelectSingle13 -.-> P13
-    P15["ᐳp…dᐳpersonId"]
-    PgClassExpression15 -.-> P15
-    P17["ᐳp…dᐳnodeId"]
-    Lambda17 -.-> P17
-    P19["ᐳp…dᐳsecret"]
-    PgClassExpression19 -.-> P19
-    P35["ᐳallPersonSecrets"]
-    Connection35 -.-> P35
-    P36["ᐳa…sᐳnodes"]
-    PgSelect36 -.-> P36
-    P38["ᐳa…sᐳnodes[]"]
-    PgSelectSingle38 -.-> P38
-    P40["ᐳa…sᐳn…]ᐳpersonId"]
-    PgClassExpression40 -.-> P40
-    P42["ᐳa…sᐳn…]ᐳnodeId"]
-    Lambda42 -.-> P42
-    P44["ᐳa…sᐳn…]ᐳsecret"]
-    PgClassExpression44 -.-> P44
-    P51["ᐳpersonForSecret"]
-    PgSelectSingle51 -.-> P51
-    P55["ᐳp…tᐳnodeId"]
-    Lambda55 -.-> P55
-    P62["ᐳp…tᐳpersonSecretByPersonId"]
-    PgSelectSingle62 -.-> P62
-    P64["ᐳp…tᐳp…dᐳpersonId"]
-    PgClassExpression64 -.-> P64
-    P66["ᐳp…tᐳp…dᐳnodeId"]
-    Lambda66 -.-> P66
-    P68["ᐳp…tᐳp…dᐳsecret"]
-    PgClassExpression68 -.-> P68
-    P75["ᐳleftArmById"]
-    PgSelectSingle75 -.-> P75
-    P77["ᐳl…dᐳid"]
-    PgClassExpression77 -.-> P77
-    P79["ᐳl…dᐳnodeId"]
-    Lambda79 -.-> P79
-    P81["ᐳl…dᐳpersonId"]
-    PgClassExpression81 -.-> P81
-    P82["ᐳl…dᐳlengthInMetres"]
-    PgClassExpression82 -.-> P82
-    P83["ᐳl…dᐳmood"]
-    PgClassExpression83 -.-> P83
-    P101["ᐳallLeftArms"]
-    Connection101 -.-> P101
-    P102["ᐳa…sᐳnodes"]
-    PgSelect102 -.-> P102
-    P104["ᐳa…sᐳnodes[]"]
-    PgSelectSingle104 -.-> P104
-    P106["ᐳa…sᐳn…]ᐳid"]
-    PgClassExpression106 -.-> P106
-    P108["ᐳa…sᐳn…]ᐳnodeId"]
-    Lambda108 -.-> P108
-    P110["ᐳa…sᐳn…]ᐳpersonId"]
-    PgClassExpression110 -.-> P110
-    P111["ᐳa…sᐳn…]ᐳlengthInMetres"]
-    PgClassExpression111 -.-> P111
-    P112["ᐳa…sᐳn…]ᐳmood"]
-    PgClassExpression112 -.-> P112
-    P119["ᐳpersonForLeftArm"]
-    PgSelectSingle119 -.-> P119
-    P123["ᐳp…mᐳnodeId"]
-    Lambda123 -.-> P123
-    P130["ᐳp…mᐳleftArmByPersonId"]
-    PgSelectSingle130 -.-> P130
-    P132["ᐳp…mᐳl…dᐳid"]
-    PgClassExpression132 -.-> P132
-    P134["ᐳp…mᐳl…dᐳnodeId"]
-    Lambda134 -.-> P134
-    P136["ᐳp…mᐳl…dᐳpersonId"]
-    PgClassExpression136 -.-> P136
-    P137["ᐳp…mᐳl…dᐳlengthInMetres"]
-    PgClassExpression137 -.-> P137
-    P138["ᐳp…mᐳl…dᐳmood"]
-    PgClassExpression138 -.-> P138
-    P145["ᐳpostById"]
-    PgSelectSingle145 -.-> P145
-    P147["ᐳp…dᐳid"]
-    PgClassExpression147 -.-> P147
-    P149["ᐳp…dᐳnodeId"]
-    Lambda149 -.-> P149
-    P151["ᐳp…dᐳheadline"]
-    PgClassExpression151 -.-> P151
-    P152["ᐳp…dᐳbody"]
-    PgClassExpression152 -.-> P152
-    P153["ᐳp…dᐳauthorId"]
-    PgClassExpression153 -.-> P153
-    P178["ᐳallPosts"]
-    Connection178 -.-> P178
-    P179["ᐳa…sᐳnodes"]
-    PgSelect179 -.-> P179
-    P181["ᐳa…sᐳnodes[]"]
-    PgSelectSingle181 -.-> P181
-    P183["ᐳa…sᐳn…]ᐳid"]
-    PgClassExpression183 -.-> P183
-    P185["ᐳa…sᐳn…]ᐳnodeId"]
-    Lambda185 -.-> P185
-    P187["ᐳa…sᐳn…]ᐳheadline"]
-    PgClassExpression187 -.-> P187
-    P188["ᐳa…sᐳn…]ᐳbody"]
-    PgClassExpression188 -.-> P188
-    P189["ᐳa…sᐳn…]ᐳauthorId"]
-    PgClassExpression189 -.-> P189
-    P196["ᐳpersonForPosts"]
-    PgSelectSingle196 -.-> P196
-    P200["ᐳp…sᐳnodeId"]
-    Lambda200 -.-> P200
-    P226["ᐳp…sᐳpostsByAuthorId"]
-    Connection226 -.-> P226
-    P229["ᐳp…sᐳp…dᐳnodes[]"]
-    PgSelectSingle229 -.-> P229
-    P231["ᐳp…sᐳp…dᐳn…]ᐳid"]
-    PgClassExpression231 -.-> P231
-    P233["ᐳp…sᐳp…dᐳn…]ᐳnodeId"]
-    Lambda233 -.-> P233
-    P235["ᐳp…sᐳp…dᐳn…]ᐳheadline"]
-    PgClassExpression235 -.-> P235
-    P236["ᐳp…sᐳp…dᐳn…]ᐳbody"]
-    PgClassExpression236 -.-> P236
-    P237["ᐳp…sᐳp…dᐳn…]ᐳauthorId"]
-    PgClassExpression237 -.-> P237
-    P243["ᐳreturnTableWithoutGrants"]
-    PgSelectSingle243 -.-> P243
-    P245["ᐳr…sᐳpersonId1"]
-    PgClassExpression245 -.-> P245
-    P246["ᐳr…sᐳpersonId2"]
-    PgClassExpression246 -.-> P246
-    P248["ᐳr…sᐳnodeId"]
-    Lambda248 -.-> P248
-    P255["ᐳp…sᐳp…dᐳnodes"]
-    Access255 -.-> P255
-
     subgraph "Buckets for queries/v4/rbac.basic"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀personSecretByPersonId ᐸ-O- 13<br />⠀⠀⠀personSecretByPersonId.personId ᐸ-L- 15<br />⠀⠀⠀personSecretByPersonId.nodeId ᐸ-L- 17<br />⠀⠀⠀personSecretByPersonId.secret ᐸ-L- 19<br />⠀⠀allPersonSecrets ᐸ-O- 35<br />⠀⠀⠀allPersonSecrets.nodes ᐸ-A- 36<br />⠀⠀personForSecret ᐸ-O- 51<br />⠀⠀⠀personForSecret.nodeId ᐸ-L- 55<br />⠀⠀⠀personForSecret.personSecretByPersonId ᐸ-O- 62<br />⠀⠀⠀⠀personForSecret.personSecretByPersonId.personId ᐸ-L- 64<br />⠀⠀⠀⠀personForSecret.personSecretByPersonId.nodeId ᐸ-L- 66<br />⠀⠀⠀⠀personForSecret.personSecretByPersonId.secret ᐸ-L- 68<br />⠀⠀leftArmById ᐸ-O- 75<br />⠀⠀⠀leftArmById.id ᐸ-L- 77<br />⠀⠀⠀leftArmById.nodeId ᐸ-L- 79<br />⠀⠀⠀leftArmById.personId ᐸ-L- 81<br />⠀⠀⠀leftArmById.lengthInMetres ᐸ-L- 82<br />⠀⠀⠀leftArmById.mood ᐸ-L- 83<br />⠀⠀allLeftArms ᐸ-O- 101<br />⠀⠀⠀allLeftArms.nodes ᐸ-A- 102<br />⠀⠀personForLeftArm ᐸ-O- 119<br />⠀⠀⠀personForLeftArm.nodeId ᐸ-L- 123<br />⠀⠀⠀personForLeftArm.leftArmByPersonId ᐸ-O- 130<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.id ᐸ-L- 132<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.nodeId ᐸ-L- 134<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.personId ᐸ-L- 136<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.lengthInMetres ᐸ-L- 137<br />⠀⠀⠀⠀personForLeftArm.leftArmByPersonId.mood ᐸ-L- 138<br />⠀⠀postById ᐸ-O- 145<br />⠀⠀⠀postById.id ᐸ-L- 147<br />⠀⠀⠀postById.nodeId ᐸ-L- 149<br />⠀⠀⠀postById.headline ᐸ-L- 151<br />⠀⠀⠀postById.body ᐸ-L- 152<br />⠀⠀⠀postById.authorId ᐸ-L- 153<br />⠀⠀allPosts ᐸ-O- 178<br />⠀⠀⠀allPosts.nodes ᐸ-A- 179<br />⠀⠀personForPosts ᐸ-O- 196<br />⠀⠀⠀personForPosts.nodeId ᐸ-L- 200<br />⠀⠀⠀personForPosts.postsByAuthorId ᐸ-O- 226<br />⠀⠀⠀⠀personForPosts.postsByAuthorId.nodes ᐸ-A- 255<br />⠀⠀returnTableWithoutGrants ᐸ-O- 243<br />⠀⠀⠀returnTableWithoutGrants.personId1 ᐸ-L- 245<br />⠀⠀⠀returnTableWithoutGrants.personId2 ᐸ-L- 246<br />⠀⠀⠀returnTableWithoutGrants.nodeId ᐸ-L- 248"):::bucket
+    Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression19,Connection35,PgSelect36,Constant39,__InputStaticLeaf45,PgSelect46,First50,PgSelectSingle51,Constant52,PgClassExpression53,List54,Lambda55,PgSelectSingle62,Constant63,PgClassExpression64,List65,Lambda66,PgClassExpression68,__InputStaticLeaf69,PgSelect70,First74,PgSelectSingle75,Constant76,PgClassExpression77,List78,Lambda79,PgClassExpression81,PgClassExpression82,PgClassExpression83,Connection101,PgSelect102,Constant105,__InputStaticLeaf113,PgSelect114,First118,PgSelectSingle119,Constant120,PgClassExpression121,List122,Lambda123,PgSelectSingle130,Constant131,PgClassExpression132,List133,Lambda134,PgClassExpression136,PgClassExpression137,PgClassExpression138,__InputStaticLeaf139,PgSelect140,First144,PgSelectSingle145,Constant146,PgClassExpression147,List148,Lambda149,PgClassExpression151,PgClassExpression152,PgClassExpression153,Connection178,PgSelect179,Constant182,__InputStaticLeaf190,PgSelect191,First195,PgSelectSingle196,Constant197,PgClassExpression198,List199,Lambda200,Connection226,Constant230,PgSelect238,First242,PgSelectSingle243,Constant244,PgClassExpression245,PgClassExpression246,List247,Lambda248,Map251,Map253,Access255 bucket0
-    Bucket1("Bucket 1 (item37)<br />Deps: 36, 39<br />~ᐳQuery.allPersonSecretsᐳPersonSecretsConnection.nodes[]<br />⠀ROOT ᐸ-O- 38<br />⠀⠀personId ᐸ-L- 40<br />⠀⠀nodeId ᐸ-L- 42<br />⠀⠀secret ᐸ-L- 44"):::bucket
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression19,Connection35,PgSelect36,Constant39,__InputStaticLeaf45,PgSelect46,First50,PgSelectSingle51,Constant52,PgClassExpression53,List54,Lambda55,First61,PgSelectSingle62,Constant63,PgClassExpression64,List65,Lambda66,PgClassExpression68,__InputStaticLeaf69,PgSelect70,First74,PgSelectSingle75,Constant76,PgClassExpression77,List78,Lambda79,PgClassExpression81,PgClassExpression82,PgClassExpression83,Connection101,PgSelect102,Constant105,__InputStaticLeaf113,PgSelect114,First118,PgSelectSingle119,Constant120,PgClassExpression121,List122,Lambda123,First129,PgSelectSingle130,Constant131,PgClassExpression132,List133,Lambda134,PgClassExpression136,PgClassExpression137,PgClassExpression138,__InputStaticLeaf139,PgSelect140,First144,PgSelectSingle145,Constant146,PgClassExpression147,List148,Lambda149,PgClassExpression151,PgClassExpression152,PgClassExpression153,Connection178,PgSelect179,Constant182,__InputStaticLeaf190,PgSelect191,First195,PgSelectSingle196,Constant197,PgClassExpression198,List199,Lambda200,Connection226,Constant230,PgSelect238,First242,PgSelectSingle243,Constant244,PgClassExpression245,PgClassExpression246,List247,Lambda248,Map251,List252,Access253,Map254,List255 bucket0
+    Bucket1("Bucket 1<br />(listItem)<br />Deps: 39<br /><br />ROOT __Item{1}ᐸ36ᐳ[37]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item37,PgSelectSingle38,PgClassExpression40,List41,Lambda42,PgClassExpression44 bucket1
-    Bucket2("Bucket 2 (item103)<br />Deps: 102, 105<br />~ᐳQuery.allLeftArmsᐳLeftArmsConnection.nodes[]<br />⠀ROOT ᐸ-O- 104<br />⠀⠀id ᐸ-L- 106<br />⠀⠀nodeId ᐸ-L- 108<br />⠀⠀personId ᐸ-L- 110<br />⠀⠀lengthInMetres ᐸ-L- 111<br />⠀⠀mood ᐸ-L- 112"):::bucket
+    Bucket2("Bucket 2<br />(listItem)<br />Deps: 105<br /><br />ROOT __Item{2}ᐸ102ᐳ[103]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item103,PgSelectSingle104,PgClassExpression106,List107,Lambda108,PgClassExpression110,PgClassExpression111,PgClassExpression112 bucket2
-    Bucket3("Bucket 3 (item180)<br />Deps: 179, 182<br />~ᐳQuery.allPostsᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 181<br />⠀⠀id ᐸ-L- 183<br />⠀⠀nodeId ᐸ-L- 185<br />⠀⠀headline ᐸ-L- 187<br />⠀⠀body ᐸ-L- 188<br />⠀⠀authorId ᐸ-L- 189"):::bucket
+    Bucket3("Bucket 3<br />(listItem)<br />Deps: 182<br /><br />ROOT __Item{3}ᐸ179ᐳ[180]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item180,PgSelectSingle181,PgClassExpression183,List184,Lambda185,PgClassExpression187,PgClassExpression188,PgClassExpression189 bucket3
-    Bucket4("Bucket 4 (item228)<br />Deps: 255, 230<br />~ᐳQuery.personForPostsᐳPerson.postsByAuthorIdᐳPostsConnection.nodes[]<br />⠀ROOT ᐸ-O- 229<br />⠀⠀id ᐸ-L- 231<br />⠀⠀nodeId ᐸ-L- 233<br />⠀⠀headline ᐸ-L- 235<br />⠀⠀body ᐸ-L- 236<br />⠀⠀authorId ᐸ-L- 237"):::bucket
+    Bucket4("Bucket 4<br />(listItem)<br />Deps: 230<br /><br />ROOT __Item{4}ᐸ253ᐳ[228]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item228,PgSelectSingle229,PgClassExpression231,List232,Lambda233,PgClassExpression235,PgClassExpression236,PgClassExpression237 bucket4
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4

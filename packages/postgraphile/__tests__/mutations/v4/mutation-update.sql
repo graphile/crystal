@@ -1,9 +1,9 @@
 update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about" = $2::"text" where (__person__."id" = $3::"int4") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*
@@ -45,11 +45,11 @@ lateral (
 ) as __person_result__
 
 update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "email" = $2::"b"."email" where (__person__."id" = $3::"int4") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*
@@ -91,11 +91,11 @@ lateral (
 ) as __person_result__
 
 update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id" = $2::"int4") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*
@@ -137,11 +137,11 @@ lateral (
 ) as __person_result__
 
 update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id" = $2::"int4") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*
@@ -183,11 +183,11 @@ lateral (
 ) as __person_result__
 
 update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about" = $2::"text" where (__person__."id" = $3::"int4") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*
@@ -229,11 +229,11 @@ lateral (
 ) as __person_result__
 
 update "c"."person" as __person__ set "about" = $1::"text" where (__person__."email" = $2::"b"."email") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*
@@ -275,9 +275,9 @@ lateral (
 ) as __person_result__
 
 update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
-  __compound_key__."person_id_1"::text as "0",
-  __compound_key__."person_id_2"::text as "1",
-  __compound_key__."extra"::text as "2"
+  __compound_key__."extra"::text as "0",
+  __compound_key__."person_id_1"::text as "1",
+  __compound_key__."person_id_2"::text as "2"
 
 
 select __person_result__.*
@@ -300,9 +300,9 @@ lateral (
 ) as __person_result__
 
 update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
-  __compound_key__."person_id_1"::text as "0",
-  __compound_key__."person_id_2"::text as "1",
-  __compound_key__."extra"::text as "2"
+  __compound_key__."extra"::text as "0",
+  __compound_key__."person_id_1"::text as "1",
+  __compound_key__."person_id_2"::text as "2"
 
 
 select __person_result__.*
@@ -344,9 +344,9 @@ lateral (
 ) as __person_result__
 
 update "c"."compound_key" as __compound_key__ set "extra" = $1::"bool" where ((__compound_key__."person_id_1" = $2::"int4") and (__compound_key__."person_id_2" = $3::"int4")) returning
-  __compound_key__."person_id_1"::text as "0",
-  __compound_key__."person_id_2"::text as "1",
-  __compound_key__."extra"::text as "2"
+  __compound_key__."extra"::text as "0",
+  __compound_key__."person_id_1"::text as "1",
+  __compound_key__."person_id_2"::text as "2"
 
 
 select __person_result__.*
@@ -388,11 +388,11 @@ lateral (
 ) as __person_result__
 
 update "c"."person" as __person__ set "email" = $1::"b"."email" where (__person__."email" = $2::"b"."email") returning
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."about" as "3",
-  __person__::text as "4"
+  __person__."person_full_name" as "0",
+  __person__."email" as "1",
+  __person__."about" as "2",
+  __person__::text as "3",
+  __person__."id"::text as "4"
 
 
 select __person_result__.*

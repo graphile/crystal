@@ -10,8 +10,8 @@ from (
 lateral (
   select
     __authenticate_payload__."jwt"::text as "0",
-    __authenticate_payload__."id"::text as "1",
-    __authenticate_payload__."admin"::text as "2",
+    __authenticate_payload__."admin"::text as "1",
+    __authenticate_payload__."id"::text as "2",
     (not (__authenticate_payload__ is null))::text as "3",
     __authenticate_payload_identifiers__.idx as "4"
   from "b"."authenticate_payload"(
@@ -20,6 +20,21 @@ lateral (
     __authenticate_payload_identifiers__."id2"
   ) as __authenticate_payload__
 ) as __authenticate_payload_result__
+
+select __jwt_token_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"b"."jwt_token" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __jwt_token_identifiers__,
+lateral (
+  select
+    __jwt_token__::text as "0",
+    (not (__jwt_token__ is null))::text as "1",
+    __jwt_token_identifiers__.idx as "2"
+  from (select (__jwt_token_identifiers__."id0").*) as __jwt_token__
+) as __jwt_token_result__
 
 select __person_result__.*
 from (
@@ -39,18 +54,3 @@ lateral (
   )
   order by __person__."id" asc
 ) as __person_result__
-
-select __jwt_token_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."jwt_token" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jwt_token_identifiers__,
-lateral (
-  select
-    __jwt_token__::text as "0",
-    (not (__jwt_token__ is null))::text as "1",
-    __jwt_token_identifiers__.idx as "2"
-  from (select (__jwt_token_identifiers__."id0").*) as __jwt_token__
-) as __jwt_token_result__

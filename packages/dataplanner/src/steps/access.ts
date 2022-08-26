@@ -172,7 +172,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   isSyncAndSafe = true;
 
   private destructure: (value: TData) => any;
-  private parentStepId: string;
+  private parentStepId: number;
   allowMultipleOptimizations = true;
 
   constructor(
@@ -226,7 +226,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     super.finalize();
   }
 
-  deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData> {
+  deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {
     const myPath = JSON.stringify(this.path);
     const peersWithSamePath = peers.filter(
       (p) => p.fallback === this.fallback && JSON.stringify(p.path) === myPath,
@@ -237,9 +237,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
       this.path,
       peersWithSamePath,
     );
-    return peersWithSamePath.length > 0
-      ? (peersWithSamePath[0] as AccessStep<TData>)
-      : this;
+    return peersWithSamePath as AccessStep<TData>[];
   }
 }
 

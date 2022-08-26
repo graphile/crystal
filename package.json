@@ -36,9 +36,9 @@
     "@types/jest": "^27.5.1",
     "@types/mock-fs": "4.13.1",
     "@types/node": "^16.11.15",
-    "@typescript-eslint/eslint-plugin": "^5.8.0",
-    "@typescript-eslint/parser": "^5.8.0",
-    "@typescript-eslint/typescript-estree": "^5.8.0",
+    "@typescript-eslint/eslint-plugin": "^5.34.0",
+    "@typescript-eslint/parser": "^5.34.0",
+    "@typescript-eslint/typescript-estree": "^5.34.0",
     "babel-jest": "^28.1.0",
     "babel-plugin-transform-import-meta": "^2.1.1",
     "concurrently": "^6.5.1",
@@ -61,7 +61,7 @@
     "prettier": "^2.5.1",
     "typedoc": "^0.22.15",
     "typedoc-monorepo-link-types": "^0.0.2",
-    "typescript": "rc",
+    "typescript": "^4.8.1-rc",
     "webpack": "^5.65.0"
   },
   "workspaces": [

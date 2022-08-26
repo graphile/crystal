@@ -20,7 +20,7 @@ export class PgCursorStep<
   isSyncAndSafe = true;
 
   private cursorValuesDepId: number;
-  private classSingleStepId: string;
+  private classSingleStepId: number;
   private digest: string;
 
   constructor(itemPlan: TStep) {

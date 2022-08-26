@@ -1,4 +1,7 @@
 import type {
+  ArgumentNode,
+  DirectiveNode,
+  FieldNode,
   GraphQLEnumValueConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
@@ -6,9 +9,12 @@ import type {
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectTypeConfig,
   GraphQLInputType,
+  GraphQLNamedType,
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
+  GraphQLSchema,
   ObjectFieldNode,
+  SelectionNode,
   ValueNode,
 } from "graphql";
 import {
@@ -18,11 +24,13 @@ import {
   GraphQLID,
   GraphQLInputObjectType,
   GraphQLInt,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLString,
+  GraphQLUnionType,
   Kind,
 } from "graphql";
 import { inspect } from "util";
@@ -30,6 +38,8 @@ import { inspect } from "util";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
+import type { LayerPlan } from "./engine/LayerPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { InputStep } from "./input.js";
 import type {
   BaseGraphQLArguments,
@@ -569,23 +579,6 @@ export function inputObjectFieldSpec<
     : spec;
 }
 
-/**
- * Returns true if plan1 and plan2 have at least one groupId in common, false
- * otherwise.
- *
- * @remarks This relates generally to the `@stream`/`@defer` directives -
- * adding `@stream` or `@defer` pushes execution of the given selection to a
- * later stage, in Crystal we represent this by putting the plans in different
- * "groups". In general you shouldn't merge a plan into a parent plan that
- * belongs to a different group - this should opt them out of optimisation.
- */
-export function planGroupsOverlap(
-  plan1: ExecutableStep,
-  plan2: ExecutableStep,
-): boolean {
-  return plan1.groupIds.some((id) => plan2.groupIds.includes(id));
-}
-
 const $$valueConfigByValue = Symbol("valueConfigByValue");
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
@@ -662,4 +655,297 @@ export function arrayOfLength(length: number, fill?: any) {
     arr[i] = fill;
   }
   return arr;
+}
+
+/**
+ * Builds an array of length `length` calling `fill` for each entry in the
+ * list and storing the result.
+ *
+ * @internal
+ */
+export function arrayOfLengthCb(length: number, fill: () => any) {
+  const arr = [];
+  for (let i = 0; i < length; i++) {
+    arr[i] = fill();
+  }
+  return arr;
+}
+
+function findVariableNamesUsedInValueNode(
+  valueNode: ValueNode,
+  variableNames: Set<string>,
+): void {
+  switch (valueNode.kind) {
+    case Kind.INT:
+    case Kind.FLOAT:
+    case Kind.STRING:
+    case Kind.BOOLEAN:
+    case Kind.NULL:
+    case Kind.ENUM: {
+      // Static -> no variables
+      return;
+    }
+    case Kind.LIST: {
+      for (const value of valueNode.values) {
+        findVariableNamesUsedInValueNode(value, variableNames);
+      }
+      return;
+    }
+    case Kind.OBJECT: {
+      for (const field of valueNode.fields) {
+        findVariableNamesUsedInValueNode(field.value, variableNames);
+      }
+      return;
+    }
+    case Kind.VARIABLE: {
+      variableNames.add(valueNode.name.value);
+      return;
+    }
+    default: {
+      const never: never = valueNode;
+      throw new Error(`Unsupported valueNode: ${JSON.stringify(never)}`);
+    }
+  }
+}
+
+function findVariableNamesUsedInDirectives(
+  directives: readonly DirectiveNode[] | undefined,
+  variableNames: Set<string>,
+) {
+  if (directives) {
+    for (const dir of directives) {
+      if (dir.arguments) {
+        for (const arg of dir.arguments) {
+          findVariableNamesUsedInValueNode(arg.value, variableNames);
+        }
+      }
+    }
+  }
+}
+
+function findVariableNamesUsedInArguments(
+  args: readonly ArgumentNode[] | undefined,
+  variableNames: Set<string>,
+) {
+  if (args) {
+    for (const arg of args) {
+      findVariableNamesUsedInValueNode(arg.value, variableNames);
+    }
+  }
+}
+
+function findVariableNamesUsedInSelectionNode(
+  operationPlan: OperationPlan,
+  selection: SelectionNode,
+  variableNames: Set<string>,
+) {
+  findVariableNamesUsedInDirectives(selection.directives, variableNames);
+  switch (selection.kind) {
+    case Kind.FIELD: {
+      findVariableNamesUsedInFieldNode(operationPlan, selection, variableNames);
+      return;
+    }
+    case Kind.INLINE_FRAGMENT: {
+      findVariableNamesUsedInDirectives(selection.directives, variableNames);
+      for (const innerSelection of selection.selectionSet.selections) {
+        findVariableNamesUsedInSelectionNode(
+          operationPlan,
+          innerSelection,
+          variableNames,
+        );
+      }
+      return;
+    }
+    case Kind.FRAGMENT_SPREAD: {
+      findVariableNamesUsedInDirectives(selection.directives, variableNames);
+      const fragmentName = selection.name.value;
+      const fragment = operationPlan.fragments[fragmentName];
+      findVariableNamesUsedInDirectives(fragment.directives, variableNames);
+      if (fragment.variableDefinitions?.length) {
+        throw new Error(
+          "DataPlanner doesn't support variable definitions on fragments yet.",
+        );
+      }
+      for (const innerSelection of fragment.selectionSet.selections) {
+        findVariableNamesUsedInSelectionNode(
+          operationPlan,
+          innerSelection,
+          variableNames,
+        );
+      }
+      return;
+    }
+    default: {
+      const never: never = selection;
+      throw new Error(`Unsupported selection ${(never as any).kind}`);
+    }
+  }
+}
+function findVariableNamesUsedInFieldNode(
+  operationPlan: OperationPlan,
+  field: FieldNode,
+  variableNames: Set<string>,
+) {
+  findVariableNamesUsedInArguments(field.arguments, variableNames);
+  findVariableNamesUsedInDirectives(field.directives, variableNames);
+  if (field.selectionSet) {
+    for (const selection of field.selectionSet.selections) {
+      findVariableNamesUsedInSelectionNode(
+        operationPlan,
+        selection,
+        variableNames,
+      );
+    }
+  }
+}
+
+/**
+ * Given a FieldNode, recursively walks and finds all the variable references,
+ * returning a list of the (unique) variable names used.
+ */
+export function findVariableNamesUsed(
+  operationPlan: OperationPlan,
+  field: FieldNode,
+): string[] {
+  const variableNames = new Set<string>();
+  findVariableNamesUsedInFieldNode(operationPlan, field, variableNames);
+  return [...variableNames].sort();
+}
+
+export function isTypePlanned(
+  schema: GraphQLSchema,
+  namedType: GraphQLNamedType,
+): boolean {
+  if (namedType instanceof GraphQLObjectType) {
+    return !!namedType.extensions?.graphile?.Step;
+  } else if (
+    namedType instanceof GraphQLUnionType ||
+    namedType instanceof GraphQLInterfaceType
+  ) {
+    const types =
+      namedType instanceof GraphQLUnionType
+        ? namedType.getTypes()
+        : schema.getImplementations(namedType).objects;
+    let firstHadPlan = null;
+    let i = 0;
+    for (const type of types) {
+      const hasPlan = !!type.extensions?.graphile?.Step;
+      if (firstHadPlan === null) {
+        firstHadPlan = hasPlan;
+      } else if (hasPlan !== firstHadPlan) {
+        // TODO: validate this at schema build time
+        throw new Error(
+          `The '${namedType.name}' interface or union type's first type '${
+            types[0]
+          }' ${
+            firstHadPlan ? "expected a plan" : "did not expect a plan"
+          }, however the type '${type}' (index = ${i}) ${
+            hasPlan ? "expected a plan" : "did not expect a plan"
+          }. All types in an interface or union must be in agreement about whether a plan is expected or not.`,
+        );
+      }
+      i++;
+    }
+    return !!firstHadPlan;
+  } else {
+    return false;
+  }
+}
+
+export function stepADependsOnStepB(
+  stepA: ExecutableStep,
+  stepB: ExecutableStep,
+): boolean {
+  if (stepA === stepB) {
+    throw new Error("Invalid call to stepADependsOnStepB");
+  }
+  // Depth-first search for match
+  for (const depId of stepA.dependencies) {
+    const dep = stepA.layerPlan.operationPlan.dangerouslyGetStep(depId);
+    if (dep === stepB) {
+      return true;
+    }
+    if (stepADependsOnStepB(dep, stepB)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
+ * mostly relates to heirarchy.)
+ */
+export function stepAMayDependOnStepB(
+  $a: ExecutableStep,
+  $b: ExecutableStep,
+): boolean {
+  return (
+    $a.layerPlan.ancestry.includes($b.layerPlan) && !stepADependsOnStepB($b, $a)
+  );
+}
+
+/**
+ * Indicates if `layerPlan` represents a layer that will be deferred somehow,
+ * e.g. a subscription, `@stream` or `@defer` root layer plan.
+ */
+function isBoundaryLayerPlan(layerPlan: LayerPlan): boolean {
+  const t = layerPlan.reason.type;
+  return (
+    // These indicate boundaries over which plans shouldn't be optimized
+    // together (generally).
+    t === "subscription" ||
+    t === "defer" ||
+    (t === "listItem" && Boolean(layerPlan.reason.stream))
+  );
+}
+
+/**
+ * For a regular GraphQL query with no `@stream`/`@defer`, the entire result is
+ * calculated and then the output is generated and sent to the client at once.
+ * Thus you can think of this as every plan is in the same "phase".
+ *
+ * However, if you introduce a `@stream`/`@defer` selection, then the steps
+ * inside that selection should run _later_ than the steps in the parent
+ * selection - they should run in two different phases. Similar is true for
+ * subscriptions.
+ *
+ * When optimizing your plans, if you are not careful you may end up pushing
+ * what should be later work into the earlier phase, resulting in the initial
+ * payload being delayed whilst things that should have been deferred are being
+ * calculated. Thus, you should generally check that two plans are in the same phase
+ * before you try and merge them.
+ *
+ * This is not a strict rule, though, because sometimes it makes more sense to
+ * push work into the parent phase because it would be faster overall to do
+ * that work there, and would not significantly delay the initial payload's
+ * execution time - for example it's unlikely that it would make sense to defer
+ * selecting an additional boolean column from a database table even if the
+ * operation indicates that's what you should do.
+ *
+ * As a step class author, it's your responsiblity to figure out the right
+ * approach. Once you have, you can use this function to help you, should you
+ * need it.
+ */
+export function stepsAreInSamePhase(
+  ancestor: ExecutableStep,
+  descendent: ExecutableStep,
+) {
+  let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
+  do {
+    if (currentLayerPlan === ancestor.layerPlan) {
+      return true;
+    }
+    if (currentLayerPlan.reason.type === "polymorphic") {
+      // TODO: can optimize this so that if all polymorphicPaths match then it
+      // passes
+      return false;
+    }
+    if (isBoundaryLayerPlan(currentLayerPlan)) {
+      return false;
+    }
+  } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
+  throw new Error(
+    `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
+  );
 }

@@ -13,11 +13,8 @@ import {
   isScalarType,
 } from "graphql";
 
-import type {
-  __InputObjectStep,
-  __TrackedObjectStep,
-  OpPlan,
-} from "./index.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
+import type { __InputObjectStep, __TrackedObjectStep } from "./index.js";
 import type { InputStep } from "./input.js";
 import type {
   FieldArgs,
@@ -35,13 +32,13 @@ export function withFieldArgsForArguments<
   T extends ExecutableStep,
   TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
 >(
-  opPlan: OpPlan,
+  operationPlan: OperationPlan,
   parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
-  callback: (fieldArgs: FieldArgs) => T,
+  callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
-  opPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
+  operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
     [key: string]: GraphQLArgument;
   } = {};
@@ -50,14 +47,14 @@ export function withFieldArgsForArguments<
     fields[arg.name] = arg;
   }
   const result = withFieldArgsForArgumentsOrInputObject(
-    opPlan,
+    operationPlan,
     null,
     parentPlan,
     $all,
     fields,
     callback,
   );
-  opPlan.loc.pop();
+  operationPlan.loc.pop();
 
   return result;
 }
@@ -66,7 +63,7 @@ function withFieldArgsForArgumentsOrInputObject<
   T extends ExecutableStep | ModifierStep | null | void,
   TParentStep extends ExecutableStep,
 >(
-  opPlan: OpPlan,
+  operationPlan: OperationPlan,
   typeContainingFields: GraphQLInputType | null,
   parentPlan: TParentStep,
   $current: TrackedArguments | InputStep, //__TrackedObjectStep | __InputObjectStep,
@@ -75,11 +72,11 @@ function withFieldArgsForArgumentsOrInputObject<
   } | null,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
-  const schema = opPlan.schema;
+  const schema = operationPlan.schema;
   const analyzedCoordinates: string[] = [];
 
   const getArgOnceOnly = (inPath: string | string[]) => {
-    opPlan.loc.push(`getArgOnceOnly('${inPath}')`);
+    operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
     if (path.length < 1) {
       throw new Error("Invalid");
@@ -136,7 +133,7 @@ function withFieldArgsForArgumentsOrInputObject<
       type = getNullableType(argOrField.type);
     }
 
-    opPlan.loc.pop();
+    operationPlan.loc.pop();
     return { $value, argOrField, type, parentType };
   };
 
@@ -144,12 +141,14 @@ function withFieldArgsForArgumentsOrInputObject<
     details: ReturnType<typeof getArgOnceOnly>,
     $toPlan: ExecutableStep | ModifierStep | null,
   ) {
-    opPlan.loc.push(`planArgumentOrInputField(${details.argOrField.name})`);
-    const plan = opPlan.withModifiers(() => {
+    operationPlan.loc.push(
+      `planArgumentOrInputField(${details.argOrField.name})`,
+    );
+    const plan = operationPlan.withModifiers(() => {
       const { argOrField, $value, parentType } = details;
 
       return withFieldArgsForArgOrField(
-        opPlan,
+        operationPlan,
         parentPlan,
         argOrField,
         $value,
@@ -204,7 +203,7 @@ function withFieldArgsForArgumentsOrInputObject<
         },
       );
     });
-    opPlan.loc.pop();
+    operationPlan.loc.pop();
     return plan;
   }
 
@@ -212,9 +211,9 @@ function withFieldArgsForArgumentsOrInputObject<
     $value: InputStep,
     currentType: GraphQLInputType,
   ): ExecutableStep {
-    opPlan.loc.push(`getPlannedValue(${$value},${currentType})`);
+    operationPlan.loc.push(`getPlannedValue(${$value},${currentType})`);
     const result = getPlannedValue_($value, currentType);
-    opPlan.loc.pop();
+    operationPlan.loc.pop();
     return result;
   }
 
@@ -245,7 +244,7 @@ function withFieldArgsForArgumentsOrInputObject<
         currentType.extensions.graphile?.inputPlan ||
         defaultInputObjectTypeInputPlanResolver;
       return withFieldArgsForArgumentsOrInputObject(
-        opPlan,
+        operationPlan,
         currentType,
         parentPlan,
         $value as any,
@@ -308,7 +307,7 @@ function withFieldArgsForArgumentsOrInputObject<
         const resolver = field.extensions.graphile?.applyPlan;
         if (resolver) {
           withFieldArgsForArgumentsOrInputObject(
-            opPlan,
+            operationPlan,
             currentType,
             parentPlan,
             $value as any,
@@ -354,7 +353,7 @@ function withFieldArgsForArgumentsOrInputObject<
       const details = getArgOnceOnly(path);
       const plan = planArgumentOrInputField(details, null);
 
-      assertExecutableStep(plan, `UNKNOWN` /* TODO: pathIdentity */);
+      assertExecutableStep(plan);
       return plan;
     },
     getRaw(path) {
@@ -415,7 +414,7 @@ function withFieldArgsForArgumentsOrInputObject<
     | ModifierStep;
 
   // Now handled all the remaining coordinates
-  opPlan.loc.push("handle_remaining");
+  operationPlan.loc.push("handle_remaining");
   if (
     !analyzedCoordinates.includes("") &&
     plan != null &&
@@ -452,7 +451,7 @@ function withFieldArgsForArgumentsOrInputObject<
       process(fields);
     }
   }
-  opPlan.loc.pop();
+  operationPlan.loc.pop();
 
   return plan as any;
 }
@@ -461,7 +460,7 @@ function withFieldArgsForArgOrField<
   T extends ExecutableStep | ModifierStep | null | void,
   TParentStep extends ExecutableStep,
 >(
-  opPlan: OpPlan,
+  operationPlan: OperationPlan,
   parentPlan: TParentStep,
   argOrField: GraphQLArgument | GraphQLInputField,
   $value: InputStep,
@@ -473,7 +472,7 @@ function withFieldArgsForArgOrField<
     ? nullableType.getFields()
     : null;
   return withFieldArgsForArgumentsOrInputObject(
-    opPlan,
+    operationPlan,
     type,
     parentPlan,
     $value,

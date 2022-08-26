@@ -35,7 +35,9 @@ export class __InputDynamicScalarStep<
           const variableName = inputValue.name.value;
           this.variableNames.push(variableName);
           const variableValuePlan =
-            this.opPlan.trackedVariableValuesStep.get(variableName);
+            this.layerPlan.operationPlan.trackedVariableValuesStep.get(
+              variableName,
+            );
           this.addDependency(variableValuePlan);
           return;
         }

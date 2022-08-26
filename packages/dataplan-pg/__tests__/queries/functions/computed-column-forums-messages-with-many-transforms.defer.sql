@@ -11,10 +11,10 @@ where
 order by __forums__."id" asc
 
 select
-  __messages__."body" as "0",
+  __messages__."forum_id" as "0",
   __messages__."featured"::text as "1",
   __messages__."id" as "2",
-  __messages__."forum_id" as "3"
+  __messages__."body" as "3"
 from app_public.messages as __messages__
 where (
   true /* authorization checks */

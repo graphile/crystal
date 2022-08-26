@@ -1,7 +1,7 @@
 select
   __forums__."name" as "0",
-  __forums__."id" as "1",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2"
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
+  __forums__."id" as "2"
 from app_public.forums as __forums__
 where
   (
@@ -25,7 +25,8 @@ lateral (
     __users__."username" as "1",
     __users__."gravatar_url" as "2",
     __messages__."id" as "3",
-    __messages_identifiers__.idx as "4"
+    __messages__."author_id" as "4",
+    __messages_identifiers__.idx as "5"
   from app_public.messages as __messages__
   left outer join app_public.users as __users__
   on (__messages__."author_id"::"uuid" = __users__."id")

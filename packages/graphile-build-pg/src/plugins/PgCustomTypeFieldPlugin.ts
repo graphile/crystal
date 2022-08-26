@@ -28,6 +28,7 @@ import type {
   __TrackedObjectStep,
   ExecutableStep,
   FieldArgs,
+  FieldInfo,
   FieldPlanResolver,
   GraphileFieldConfigArgumentMap,
 } from "dataplanner";
@@ -37,6 +38,7 @@ import {
   constant,
   object,
   ObjectStep,
+  stepAMayDependOnStepB,
 } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
@@ -709,6 +711,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         pgClassExpression,
                         pgSelectSingleFromRecord,
                         source,
+                        stepAMayDependOnStepB,
                       ) =>
                       ($in, args, _info) => {
                         if (!hasRecord($in)) {
@@ -717,16 +720,24 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertStep', 'PgUpdateStep' or 'PgDeleteStep', but found ${$in}`,
                           );
                         }
-                        const $row =
-                          $in instanceof PgSelectSingleStep
-                            ? $in
-                            : pgSelectSingleFromRecord(
-                                $in.source,
-                                $in.record(),
-                              );
+                        const extraSelectArgs = makeArgs(args);
+                        /**
+                         * An optimisation - if all our dependencies are
+                         * compatible with the expression's class plan then we
+                         * can inline ourselves into that, otherwise we must
+                         * issue the query separately.
+                         */
+                        const canUseExpressionDirectly =
+                          $in instanceof PgSelectSingleStep &&
+                          extraSelectArgs.every((a) =>
+                            stepAMayDependOnStepB($in.getClassStep(), a.plan),
+                          );
+                        const $row = canUseExpressionDirectly
+                          ? $in
+                          : pgSelectSingleFromRecord($in.source, $in.record());
                         const selectArgs = [
                           { plan: $row.record() },
-                          ...makeArgs(args),
+                          ...extraSelectArgs,
                         ];
                         if (
                           source.isUnique &&
@@ -764,6 +775,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       pgClassExpression,
                       pgSelectSingleFromRecord,
                       source,
+                      stepAMayDependOnStepB,
                     ],
                   );
 
@@ -894,8 +906,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                 (connection, getSelectPlanFromParentAndArgs) =>
                                   function plan(
                                     $parent: ExecutableStep,
-                                    args,
-                                    info,
+                                    args: FieldArgs,
+                                    info: FieldInfo,
                                   ) {
                                     const $select =
                                       getSelectPlanFromParentAndArgs(

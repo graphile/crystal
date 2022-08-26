@@ -8,32 +8,9 @@ from (
 lateral (
   select
     __union_items__."type"::text as "0",
-    __union_topics__."id"::text as "1",
-    __union_topics__."title" as "2",
-    __union_posts__."id"::text as "3",
-    __union_posts__."title" as "4",
-    __union_posts__."description" as "5",
-    __union_posts__."note" as "6",
-    __union_dividers__."id"::text as "7",
-    __union_dividers__."title" as "8",
-    __union_dividers__."color" as "9",
-    __union_checklists__."id"::text as "10",
-    __union_checklists__."title" as "11",
-    __union_checklist_items__."id"::text as "12",
-    __union_checklist_items__."description" as "13",
-    __union_checklist_items__."note" as "14",
-    __union_items_identifiers__.idx as "15"
+    __union_items__."id"::text as "1",
+    __union_items_identifiers__.idx as "2"
   from interfaces_and_unions.union_items as __union_items__
-  left outer join interfaces_and_unions.union_topics as __union_topics__
-  on (__union_items__."id"::"int4" = __union_topics__."id")
-  left outer join interfaces_and_unions.union_posts as __union_posts__
-  on (__union_items__."id"::"int4" = __union_posts__."id")
-  left outer join interfaces_and_unions.union_dividers as __union_dividers__
-  on (__union_items__."id"::"int4" = __union_dividers__."id")
-  left outer join interfaces_and_unions.union_checklists as __union_checklists__
-  on (__union_items__."id"::"int4" = __union_checklists__."id")
-  left outer join interfaces_and_unions.union_checklist_items as __union_checklist_items__
-  on (__union_items__."id"::"int4" = __union_checklist_items__."id")
   where
     (
       true /* authorization checks */
@@ -42,3 +19,25 @@ lateral (
     )
   order by __union_items__."id" asc
 ) as __union_items_result__
+
+select __union_topics_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __union_topics_identifiers__,
+lateral (
+  select
+    __union_topics__."id"::text as "0",
+    __union_topics__."title" as "1",
+    __union_topics_identifiers__.idx as "2"
+  from interfaces_and_unions.union_topics as __union_topics__
+  where
+    (
+      true /* authorization checks */
+    ) and (
+      __union_topics__."id" = __union_topics_identifiers__."id0"
+    )
+  order by __union_topics__."id" asc
+) as __union_topics_result__

@@ -2,23 +2,23 @@ import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import { GLOBAL_PATH } from "./constants.js";
-import { crystalPrintPathIdentity } from "./crystalPrint.js";
 import { isDev, noop } from "./dev.js";
+import type { LayerPlan } from "./engine/LayerPlan.js";
 import {
-  getCurrentOpPlan,
-  getCurrentParentPathIdentity,
-  getDebug,
-} from "./global.js";
+  currentLayerPlan,
+  currentPolymorphicPaths,
+} from "./engine/lib/withGlobalLayerPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
+import { getDebug } from "./global.js";
 import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
   ExecutionExtra,
-  PlanOptimizeOptions,
   PromiseOrDirect,
+  StepOptimizeOptions,
+  StepOptions,
 } from "./interfaces.js";
-import type { OpPlan } from "./opPlan.js";
 import type { __ItemStep } from "./steps/index.js";
 
 function reallyAssertFinalized(plan: BaseStep): void {
@@ -29,19 +29,8 @@ function reallyAssertFinalized(plan: BaseStep): void {
   }
 }
 
-function reallyAssertArgumentsFinalized(plan: BaseStep): void {
-  if (!plan.isArgumentsFinalized) {
-    throw new Error(
-      `Step ${plan} is not finalized with respect to arguments; did you forget to call \`super.finalizeArguments()\` from its \`finalizeArguments()\` method?`,
-    );
-  }
-}
-
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
-export const assertArgumentsFinalized = !isDev
-  ? noop
-  : reallyAssertArgumentsFinalized;
 
 /**
  * The base abstract plan type; you should not extend this directly - instead
@@ -61,12 +50,43 @@ export const assertArgumentsFinalized = !isDev
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
-  public readonly opPlan: OpPlan;
+  // TODO: this comment is WAY out of date.
+  /**
+   * This identifies the "bucket" into which this plan's results will be stored;
+   * the this is determined as:
+   *
+   * - If this is an __ItemStep then a new bucket is assigned (this covers
+   *   lists (whether streamed or not) and subscriptions)
+   * - Otherwise, if this plan is deferred, then the deferred bucket id
+   * - Otherwise, if no dependencies then the root bucket
+   * - Otherwise, if all dependencies buckets overlap then the containing
+   *   bucket (the largest bucket), and make this bucket dependent on the
+   *   relevant plans in the other buckets
+   * - Otherwise, a new bucket is created representing the union of the
+   *   largest non-overlapping buckets
+   *
+   * This value is then used to influence:
+   *
+   * 1. how plans are deduplicated
+   * 2. the order in which the plans are executed
+   * 3. where the result of executing the plan is stored
+   * 4. when the plan execution cache is allowed to be GC'd
+   *
+   * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
+   * them (built on the `__Item`) that's thrown away once the transform is
+   * complete.
+   *
+   * A value of -1 indicates that a bucket has not yet been assigned (buckets
+   * are assigned as the last step before the OperationPlan is 'ready'.
+   *
+   * @internal
+   */
+  public layerPlan: LayerPlan;
+  /** @deprecated please use layerPlan.operationPlan instead */
+  public opPlan: OperationPlan;
   public isArgumentsFinalized = false;
   public isFinalized = false;
   public debug = getDebug();
-  public parentPathIdentity: string;
-  protected readonly createdWithParentPathIdentity: string;
 
   // TODO: change hasSideEffects to getter/setter, forbid setting after a
   // particular phase.
@@ -77,10 +97,9 @@ export abstract class BaseStep {
   public hasSideEffects = false;
 
   constructor() {
-    const opPlan = getCurrentOpPlan();
-    this.opPlan = opPlan;
-    this.parentPathIdentity = GLOBAL_PATH;
-    this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
+    const layerPlan = currentLayerPlan();
+    this.layerPlan = layerPlan;
+    this.opPlan = layerPlan.operationPlan;
   }
 
   public toString(): string {
@@ -88,9 +107,7 @@ export abstract class BaseStep {
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }@${chalk.bold.yellow(
-        crystalPrintPathIdentity(this.parentPathIdentity),
-      )}`,
+      }`,
     );
   }
 
@@ -99,16 +116,6 @@ export abstract class BaseStep {
    */
   public toStringMeta(): string | null {
     return null;
-  }
-
-  public finalizeArguments(): void {
-    if (!this.isArgumentsFinalized) {
-      this.isArgumentsFinalized = true;
-    } else {
-      throw new Error(
-        `Step ${this} has already been finalized with respect to arguments - do not call \`finalizeArguments()\` from user code!`,
-      );
-    }
   }
 
   public finalize(): void {
@@ -137,7 +144,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
     new Map();
 
   /**
-   * Only assigned once opPlan is 'ready'.
+   * Only assigned once operationPlan is 'ready'.
    *
    * @internal
    */
@@ -155,6 +162,9 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * - The `execute` method must NEVER return a promise
    * - The values within the list returned from `execute` must NEVER include
    *   promises or CrystalError objects
+   * - The result of calling `execute` should not differ after a
+   *   `step.hasSideEffects` has executed (i.e. it should be pure, only
+   *   dependent on its deps and use no external state)
    *
    * It's acceptable for the `execute` method to throw if it needs to.
    *
@@ -171,84 +181,37 @@ export class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  private readonly _dependencies: string[] = [];
+  private readonly _dependencies: number[] = [];
 
   /**
    * The ids for plans this plan will need data from in order to execute.
    */
-  public readonly dependencies: ReadonlyArray<string> = this._dependencies;
+  public readonly dependencies: ReadonlyArray<number> = this._dependencies;
 
   /**
+   * The plans that depend on this plan. Not populated until the 'finalize'
+   * phase; so don't rely on it until the OperationPlan is 'ready'.
+   *
    * @internal
    */
   public dependentPlans: Array<ExecutableStep> = [];
 
-  public readonly id: string;
   /**
-   * The group ids this plan is associated with (e.g. if the field this plan
-   * was spawned from came from multiple selection sets in the GraphQL
-   * document, some may have been deferred/streamed/etc which may lead to
-   * multiple groupIds).
+   * Every layer plan has exactly one parent step. This is the reverse relationship.
    *
    * @internal
    */
-  public readonly groupIds: number[] = [];
+  public childLayerPlans: Array<LayerPlan<any>> = [];
 
   /**
-   * The deepest group that can be accessed by all `groupIds`; this dictates
-   * when the plan will actually be executed (and also influences into which
-   * bucket it is stored).
-   *
-   * This will be assigned whilst bucketIds are being allocated, just before
-   * the OpPlan becomes "ready".
+   * We reserve the right to change our mind as to whether this is a string or
+   * number.
    *
    * @internal
    */
-  public primaryGroupId = -1;
+  public readonly id: number;
 
   /**
-   * This identifies the deepest pathIdentity that is a common ancestor to all
-   * the places this plan is used. This value is then used to influence where
-   * the result of executing the plan is stored.
-   *
-   * @internal
-   *
-   * @deprecated Please use bucketId instead
-   */
-  public commonAncestorPathIdentity = "";
-
-  /**
-   * This identifies the "bucket" into which this plan's results will be stored;
-   * the this is determined as:
-   *
-   * - If this is an __ItemStep then a new bucket is assigned (this covers
-   *   lists (whether streamed or not) and subscriptions)
-   * - Otherwise, if this plan is deferred, then the deferred bucket id
-   * - Otherwise, if no dependencies then the root bucket
-   * - Otherwise, if all dependencies buckets overlap then the containing
-   *   bucket (the largest bucket), and make this bucket dependent on the
-   *   relevant plans in the other buckets
-   * - Otherwise, a new bucket is created representing the union of the
-   *   largest non-overlapping buckets
-   *
-   * This value is then used to influence:
-   *
-   * 1. how plans are deduplicated
-   * 2. the order in which the plans are executed
-   * 3. where the result of executing the plan is stored
-   * 4. when the plan execution cache is allowed to be GC'd
-   *
-   * NOTE: `__ListTransformStep`'s effectively have a temporary bucket inside
-   * them (built on the `__Item`) that's thrown away once the transform is
-   * complete.
-   *
-   * A value of -1 indicates that a bucket has not yet been assigned (buckets
-   * are assigned as the last step before the OpPlan is 'ready'.
-   *
-   * @internal
-   */
-  public bucketId = -1;
-
   /**
    * True when `optimize` has been called at least once.
    */
@@ -261,13 +224,20 @@ export class ExecutableStep<TData = any> extends BaseStep {
    */
   public allowMultipleOptimizations = false;
 
+  /** @internal */
+  public _stepOptions: StepOptions = { stream: null };
+
+  /** @internal */
+  public polymorphicPaths: ReadonlySet<string>;
+
   constructor() {
     super();
-    this.id = this.opPlan._addStep(this);
+    this.polymorphicPaths = currentPolymorphicPaths();
+    this.id = this.layerPlan._addStep(this);
   }
 
-  protected getStep(id: string): ExecutableStep {
-    return this.opPlan.getStep(id, this);
+  protected getStep(id: number): ExecutableStep {
+    return this.layerPlan.getStep(id, this);
   }
 
   protected getDep(depId: number): ExecutableStep {
@@ -278,77 +248,74 @@ export class ExecutableStep<TData = any> extends BaseStep {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
-        this.groupIds.length === 0
-          ? chalk.grey(`{?}`)
-          : this.groupIds.length === 1 && this.groupIds[0] === 0
-          ? ""
-          : chalk.grey(`{${this.groupIds.join(",")}}`)
+        this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
       }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
         this.id,
         {
           colors: true,
         },
-      )}@${chalk.bold.yellow(
-        crystalPrintPathIdentity(this.parentPathIdentity),
       )}]`,
     );
   }
 
-  protected addDependency(plan: ExecutableStep): number {
+  protected addDependency(step: ExecutableStep): number {
     if (this.isFinalized) {
       throw new Error(
-        "You cannot add a dependency after the plan is finalized.",
+        "You cannot add a dependency after the step is finalized.",
       );
     }
     if (isDev) {
-      if (!(plan instanceof ExecutableStep)) {
+      if (!(step instanceof ExecutableStep)) {
         throw new Error(
-          `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
-            plan,
+          `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
+            step,
           )}'`,
         );
       }
-    }
 
-    /*
-    
-    / *
-     * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all
-     * of our dependencies; this effectively means that we only care about list
-     * boundaries (since `__ItemStep` opts out of this) which allows us to
-     * optimise more plans.
-     * /
-    if (plan.parentPathIdentity.length > this.parentPathIdentity.length) {
-      this.parentPathIdentity = plan.parentPathIdentity;
-      if (
-        !this.createdWithParentPathIdentity.startsWith(this.parentPathIdentity)
-      ) {
+      // Check that we can actually add this as a dependency
+      if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
         throw new Error(
-          `${this} was created in '${this.createdWithParentPathIdentity}' but we have a dependency on '${this.parentPathIdentity}' which is outside of this path.`,
+          //console.error(
+          // This is not a GraphileInternalError
+          `Attempted to add '${step}' (${step.layerPlan}) as a dependency of '${this}' (${this.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
         );
       }
     }
-    */
 
-    const existingIndex = this._dependencies.indexOf(plan.id);
+    const existingIndex = this._dependencies.indexOf(step.id);
     if (existingIndex >= 0) {
       return existingIndex;
     }
-    return this._dependencies.push(plan.id) - 1;
+    return this._dependencies.push(step.id) - 1;
   }
 
   /**
-   * Our chance to replace ourself with one of our peers.
+   * Given a list of "peer" steps, return a list of these `peers` that are
+   * equivalent to this step.
+   *
+   * NOTE: equivalence goes both ways: `a.deduplicate([b]).includes(b)` if and
+   * only if `b.deduplicate([a]).includes(a)`.
+   *
+   * If you need to transform the peer to be equivalent you should do so via
+   * the `deduplicatedWith` callback later.
    */
-  public deduplicate(_peers: ExecutableStep[]): ExecutableStep {
-    return this;
+  public deduplicate(_peers: ExecutableStep[]): ExecutableStep[] {
+    return [];
   }
+
+  /**
+   * If this plan is replaced via deduplication, this method gives it a chance
+   * to hand over its responsibilities to its replacement.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public deduplicatedWith(replacement: ExecutableStep): void {}
 
   /**
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize(_options: PlanOptimizeOptions): ExecutableStep {
+  public optimize(_options: StepOptimizeOptions): ExecutableStep {
     return this;
   }
 
@@ -417,11 +384,10 @@ export function isExecutableStep<TData = any>(
 
 export function assertExecutableStep<TData>(
   plan: BaseStep | null | undefined | void,
-  pathIdentity: string,
 ): asserts plan is ExecutableStep<TData> {
   if (!isExecutableStep(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be an executable plan, but it does not implement the 'execute' method.`,
+      `The plan returned should be an executable plan, but it does not implement the 'execute' method.`,
     );
   }
 }
@@ -466,8 +432,16 @@ export function isStreamableStep<TData>(
 }
 
 export type PolymorphicStep = ExecutableStep & {
+  // TODO: rename me to stepForType
   planForType(objectType: GraphQLObjectType): ExecutableStep;
 };
+
+export function isPolymorphicStep(s: ExecutableStep): s is PolymorphicStep {
+  return (
+    "planForType" in s &&
+    typeof (s as PolymorphicStep).planForType === "function"
+  );
+}
 
 /**
  * Modifier plans modify their parent plan (which may be another ModifierStep
@@ -486,7 +460,7 @@ export abstract class ModifierStep<
   public readonly id: string;
   constructor(protected readonly $parent: TParentStep) {
     super();
-    this.id = this.opPlan._addModifierStep(this);
+    this.id = this.layerPlan._addModifierStep(this);
   }
 
   /**
@@ -505,11 +479,11 @@ export function assertModifierStep<
   TParentStep extends ExecutableStep | ModifierStep<any>,
 >(
   plan: BaseStep,
-  pathIdentity: string,
+  pathDescription: string,
 ): asserts plan is ModifierStep<TParentStep> {
   if (!isModifierStep(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be a modifier plan, but it does not implement the 'apply' method.`,
+      `The plan returned from '${pathDescription}' should be a modifier plan, but it does not implement the 'apply' method.`,
     );
   }
 }
@@ -535,11 +509,11 @@ export function assertListCapableStep<
   TItemStep extends ExecutableStep<TData>,
 >(
   plan: ExecutableStep<ReadonlyArray<TData>>,
-  pathIdentity: string,
+  pathDescription: string,
 ): asserts plan is ListCapableStep<TData, TItemStep> {
   if (!isListCapableStep(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
+      `The plan returned from '${pathDescription}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
     );
   }
 }

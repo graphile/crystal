@@ -4,7 +4,8 @@ select
     select
       __messages__."body" as "0",
       __users__."username" as "1",
-      __users__."gravatar_url" as "2"
+      __users__."gravatar_url" as "2",
+      __messages__."author_id" as "3"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -13,7 +14,8 @@ select
     )
     order by __messages__."id" asc
     limit 2
-  ) _) as "1"
+  ) _) as "1",
+  __forums__."id" as "2"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

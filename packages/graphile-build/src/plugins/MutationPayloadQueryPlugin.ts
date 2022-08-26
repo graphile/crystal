@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { opPlan } from "dataplanner";
+import { operationPlan } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
@@ -38,11 +38,11 @@ export const MutationPayloadQueryPlugin: GraphileConfig.Plugin = {
                   "Our root query field type. Allows us to run any query from our mutation payload.",
                 type: Query,
                 plan: EXPORTABLE(
-                  (opPlan) =>
+                  (operationPlan) =>
                     function plan() {
-                      return opPlan().rootValueStep;
+                      return operationPlan().rootValueStep;
                     },
-                  [opPlan],
+                  [operationPlan],
                 ),
               },
             },

@@ -2,7 +2,7 @@ import "graphile-config";
 
 import type { PgInsertStep, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
-import type { ObjectStep } from "dataplanner";
+import type { FieldArgs, ObjectStep } from "dataplanner";
 import { constant, ExecutableStep, object } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
@@ -260,7 +260,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     type: payloadType,
                     plan: EXPORTABLE(
                       (object, pgInsert, source) =>
-                        function plan(_: any, args) {
+                        function plan(_: any, args: FieldArgs) {
                           const plan = object({
                             result: pgInsert(source, {}),
                           });

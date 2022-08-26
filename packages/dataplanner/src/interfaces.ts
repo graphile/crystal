@@ -1,6 +1,6 @@
 import type EventEmitter from "events";
 import type {
-  FieldNode,
+  ASTNode,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLField,
@@ -15,14 +15,11 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
-  SelectionNode,
 } from "graphql";
 
-import type { Deferred } from "./deferred.js";
+import type { Bucket, RequestContext } from "./bucket.js";
 import type { CrystalError } from "./error.js";
 import type { InputStep } from "./input.js";
-import type { OpPlan } from "./opPlan.js";
-import type { PlanResults, PlanResultsBucket } from "./planResults.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -130,7 +127,6 @@ export const $$verbatim = Symbol("verbatim");
  */
 export const $$bypassGraphQL = Symbol("bypassGraphQL");
 export const $$data = Symbol("data");
-export const $$pathIdentity = Symbol("pathIdentity");
 /**
  * For attaching additional metadata to the GraphQL execution result, for
  * example details of the plan or SQL queries or similar that were executed.
@@ -155,6 +151,11 @@ export const $$idempotent = Symbol("idempotent");
  */
 export const $$eventEmitter = Symbol("executionEventEmitter");
 
+/**
+ * Used to indicate that an array has more results available via a stream.
+ */
+export const $$streamMore = Symbol("streamMore");
+
 // TODO: remove <TData>
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
@@ -165,76 +166,7 @@ export interface PolymorphicData<TType extends string = string, _TData = any> {
 }
 
 export interface IndexByListItemStepId {
-  [listItemStepId: string]: number;
-}
-
-/**
- * This is part of execution-v1 which is deprecated; we're moving to execution
- * v2 which uses buckets instead of crystal objects and has a significantly
- * reduced garbage collection cost.
- */
-export interface CrystalObject {
-  toString(): string;
-  [$$data]: {
-    [fieldAlias: string]: any;
-  };
-  [$$pathIdentity]: string;
-  [$$concreteType]: string;
-  [$$crystalContext]: CrystalContext;
-
-  /**
-   * This is the plan result cache accessible from this CrystalObject - it
-   * should contain all the previously executed plans that plans below this
-   * CrystalObject in the operation depend on. See `PlanResults` for more
-   * information on the specifics of how the plan results are stored/accessed.
-   *
-   * When evaluating a particular CrystalObject you can be certain that all the
-   * list indexes have already been factored into the cache, so you just need
-   * to supply a plan's `commonAncestorPathIdentity` and `id` to read/write the
-   * data.
-   *
-   * When a new level of CrystalObject is created it will inherit a _copy_ of
-   * $$planResults from its parent - that way any shared `pathIdentity`
-   * "buckets" will share changes between them (since the values are references
-   * to the same objects), but any new pathIdentities will diverge - again, see
-   * `PlanResults` for more information on this.
-   *
-   * Plans can be executed more than once due to parts of the tree being
-   * delayed (possibly due to `@stream`/`@defer`, possibly just due to the
-   * resolvers for one "layer" not all completing at the same time), so we
-   * cannot rely on writing the results all at once.
-   */
-  [$$planResults]: PlanResults;
-}
-
-/** Execution-v1 batching; soon to be replaced. */
-export interface Batch {
-  pathIdentity: string;
-  crystalContext: CrystalContext;
-  sideEffectPlans: ReadonlyArray<ExecutableStep>;
-  plan: ExecutableStep;
-  itemPlan: ExecutableStep;
-  entries: Array<[CrystalObject, Deferred<any>]>;
-}
-
-/**
- * Details about a specific batch being executed. Execution-v1; soon to be
- * replaced.
- */
-export interface CrystalContext {
-  opPlan: OpPlan;
-
-  metaByStepId: {
-    [planId: string]: Record<string, unknown> | undefined;
-  };
-
-  inProgressPlanResolutions: {
-    [planId: string]: Map<PlanResultsBucket, Deferred<any>>;
-  };
-
-  rootCrystalObject: CrystalObject;
-
-  eventEmitter: ExecutionEventEmitter | undefined;
+  [listItemStepId: number]: number;
 }
 
 // These values are just to make reading the code a little clearer
@@ -262,6 +194,11 @@ export interface FieldArgs {
   apply($target: ExecutableStep | ModifierStep, path?: string | string[]): void;
 }
 
+export interface FieldInfo {
+  field: GraphQLField<any, any, any>;
+  schema: GraphQLSchema;
+}
+
 /**
  * Step resolvers are like regular resolvers except they're called beforehand,
  * they return plans rather than values, and they only run once for lists
@@ -286,10 +223,7 @@ export type FieldPlanResolver<
 > = (
   $parentPlan: TParentStep,
   args: FieldArgs,
-  info: {
-    field: GraphQLField<any, any, any>;
-    schema: GraphQLSchema;
-  },
+  info: FieldInfo,
 ) => TResultStep | null;
 
 // TODO: review _TContext
@@ -603,44 +537,27 @@ export type TrackedArguments<
 };
 
 /**
- * Represents the selections that happen within a particular group within a
- * particular point in the GraphQL document.
- */
-export interface GroupedSelections {
-  groupId: number;
-  selections: ReadonlyArray<SelectionNode>;
-}
-
-/**
- * Represents an individual field and it's group.
- */
-export interface FieldAndGroup {
-  groupId: number;
-  field: FieldNode;
-}
-
-/**
  * `@stream` directive meta.
  */
-export interface PlanStreamOptions {
+export interface StepStreamOptions {
   initialCount: number;
 }
 /**
  * Additional details about the planning for a field; currently only relates to
  * the `@stream` directive.
  */
-export interface PlanOptions {
+export interface StepOptions {
   /**
    * Details for the `@stream` directive.
    */
-  stream: PlanStreamOptions | null;
+  stream: StepStreamOptions | null;
 }
 
 /**
  * Options passed to the `optimize` method of a plan to give more context.
  */
-export interface PlanOptimizeOptions {
-  stream: PlanStreamOptions | null;
+export interface StepOptimizeOptions {
+  stream: StepStreamOptions | null;
 }
 
 /**
@@ -769,4 +686,31 @@ export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 export interface ExecutionExtra {
   meta: Record<string, unknown>;
   eventEmitter: ExecutionEventEmitter | undefined;
+
+  // These are only needed for subroutine plans, don't use them as we may
+  // remove them later.
+  /** @internal */
+  _bucket: Bucket;
+  /** @internal */
+  _requestContext: RequestContext;
 }
+
+export interface LocationDetails {
+  node: ASTNode | readonly ASTNode[];
+  /** This should only be null for the root selection */
+  parentTypeName: string | null;
+  /** This should only be null for the root selection */
+  fieldName: string | null;
+}
+
+export type JSONValue =
+  | boolean
+  | number
+  | string
+  | null
+  | JSONObject
+  | JSONArray;
+export interface JSONObject {
+  [key: string]: JSONValue;
+}
+export interface JSONArray extends Array<JSONValue> {}

@@ -8,8 +8,8 @@ import type {
   ExecutionExtra,
   InputStep,
   LambdaStep,
-  PlanOptimizeOptions,
-  PlanStreamOptions,
+  StepOptimizeOptions,
+  StepStreamOptions,
   StreamableStep,
 } from "dataplanner";
 import {
@@ -29,9 +29,10 @@ import {
   lambda,
   list,
   map,
-  planGroupsOverlap,
   reverse,
   reverseArray,
+  stepAMayDependOnStepB,
+  stepsAreInSamePhase,
 } from "dataplanner";
 import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -177,6 +178,7 @@ export type PgSelectIdentifierSpec =
 
 export type PgSelectArgumentSpec =
   | {
+      // TODO: Rename to step
       plan: ExecutableStep<any>;
       pgCodec: PgTypeCodec<any, any, any, any>;
       name?: string;
@@ -456,7 +458,7 @@ export class PgSelectStep<
    * initialCount). Set during the `optimize` call - do not trust it before
    * then. If null then the plan is not expected to stream.
    */
-  private streamOptions: PlanStreamOptions | null = null;
+  private streamOptions: StepStreamOptions | null = null;
 
   /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
@@ -780,7 +782,11 @@ export class PgSelectStep<
   }
 
   public toStringMeta(): string {
-    return this.name;
+    return (
+      this.name +
+      (this.fetchOneExtra ? "+1" : "") +
+      (this.mode === "normal" ? "" : `(${this.mode})`)
+    );
   }
 
   public lock(): void {
@@ -1861,11 +1867,6 @@ export class PgSelectStep<
     return { sql: query, extraSelectIndexes };
   }
 
-  public finalizeArguments(): void {
-    this._lockAllParameters();
-    return super.finalizeArguments();
-  }
-
   public finalize(): void {
     // In case we have any lock actions in future:
     this.lock();
@@ -2004,6 +2005,60 @@ from json_array_elements(${sql.value(
           )}::json) with ordinality as ids`)}) as ${alias},
 lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           return { query, identifierIndex };
+        } else if (
+          (limit != null && limit >= 0) ||
+          (offset != null && offset > 0)
+        ) {
+          // TODO: make this nicer; combine with the `if` branch above?
+
+          const extraSelects: SQL[] = [];
+          const rowNumberIndexOffset =
+            forceOrder || limit != null || offset != null
+              ? extraSelects.push(
+                  sql`row_number() over (${sql.indent(
+                    this.buildOrderBy({ reverse: false }).sql,
+                  )})`,
+                ) - 1
+              : -1;
+
+          const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
+            extraSelects,
+          });
+          const rowNumberIndex =
+            rowNumberIndexOffset >= 0
+              ? extraSelectIndexes[rowNumberIndexOffset]
+              : null;
+          const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
+          /*
+           * This wrapper around the inner query is for @stream:
+           *
+           * - stream must be in the correct order, so if we have
+           *   `this.shouldReverseOrder()` then we must reverse the order
+           *   ourselves here;
+           * - stream can have an `initialCount` - we want to satisfy all
+           *   `initialCount` records from _each identifier group_ before we then
+           *   resolve the remaining records.
+           *
+           * NOTE: if neither of the above cases apply then we can skip this,
+           * even for @stream.
+           */
+          const wrappedInnerQuery =
+            rowNumberIndex != null ||
+            limit != null ||
+            (offset != null && offset > 0)
+              ? sql`select *\nfrom (${sql.indent(
+                  baseQuery,
+                )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
+                  String(rowNumberIndex),
+                )}${
+                  limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
+                }${
+                  offset != null && offset > 0
+                    ? sql`\noffset ${sql.literal(offset)}`
+                    : sql.blank
+                }`
+              : baseQuery;
+          return { query: wrappedInnerQuery, identifierIndex: null };
         } else {
           const { sql: query } = this.buildQuery();
           return { query, identifierIndex: null };
@@ -2103,8 +2158,12 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
   deduplicate(
     peers: PgSelectStep<any, any, any, any>[],
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
-    const identical = peers.find((p) => {
+  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters>[] {
+    this._lockAllParameters();
+    return peers.filter((p) => {
+      if (p === this) {
+        return true;
+      }
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2259,34 +2318,25 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
       return true;
     });
-    if (identical) {
-      if (
-        typeof this.symbol === "symbol" &&
-        typeof identical.symbol === "symbol"
-      ) {
-        if (this.symbol !== identical.symbol) {
-          identical._symbolSubstitutes.set(this.symbol, identical.symbol);
-        } else {
-          // Fine :)
-        }
+  }
+
+  public deduplicatedWith(
+    replacement: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
+  ): void {
+    if (
+      typeof this.symbol === "symbol" &&
+      typeof replacement.symbol === "symbol"
+    ) {
+      if (this.symbol !== replacement.symbol) {
+        replacement._symbolSubstitutes.set(this.symbol, replacement.symbol);
+      } else {
+        // Fine :)
       }
-
-      if (this.fetchOneExtra) {
-        identical.fetchOneExtra = true;
-      }
-
-      return identical;
-      /* The following is now forbidden.
-
-        // Move the selects across and then replace ourself with a transform that
-        // maps the expected attribute ids from the `identical` plan.
-        const actualKeyByDesiredKey = this.mergeSelectsWith(identical);
-        const mapper = makeMapper(actualKeyByDesiredKey);
-        return each(identical, mapper);
-
-      */
     }
-    return this;
+
+    if (this.fetchOneExtra) {
+      replacement.fetchOneExtra = true;
+    }
   }
 
   private mergeSelectsWith<TOtherStep extends PgSelectStep<any, any, any, any>>(
@@ -2319,12 +2369,21 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec } = placeholder;
       const dep = this.getStep(this.dependencies[dependencyIndex]);
-      if (
-        // I am uncertain on this code.
-        isStaticInputStep(dep) ||
-        (otherPlan.parentPathIdentity.length > dep.parentPathIdentity.length &&
-          otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity))
-      ) {
+      /*
+       * We have dependency `dep`. We're attempting to merge ourself into
+       * `otherPlan`. We have two situations we need to handle:
+       *
+       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
+       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
+       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
+       *    result of selecting an expression in the `otherPlan`), in which
+       *    case we should turn it into an SQL expression and inline that.
+       */
+
+      // TODO:perf: we know dep can't depend on otherPlan if
+      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
+      // `otherPlan`'s layerPlan.
+      if (stepAMayDependOnStepB(otherPlan, dep)) {
         // Either dep is a static input plan (which isn't dependent on anything
         // else) or otherPlan is deeper than dep; either way we can use the dep
         // directly within otherPlan.
@@ -2359,7 +2418,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     }
   }
 
-  optimize({ stream }: PlanOptimizeOptions): ExecutableStep {
+  optimize({ stream }: StepOptimizeOptions): ExecutableStep {
     // TODO: should this be in 'beforeLock'?
     this.limitAndOffsetSQL = this.planLimitAndOffset();
 
@@ -2422,11 +2481,18 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             continue;
           }
 
+          // Don't allow merging across a stream/defer/subscription boundary
+          if (!stepsAreInSamePhase(t2, this)) {
+            continue;
+          }
+
+          /*
           if (!planGroupsOverlap(this, t2)) {
             // We're not in the same group (i.e. there's probably a @defer or
             // @stream between us) - do not merge.
             continue;
           }
+          */
 
           if (t === undefined && p === undefined) {
             p = p2;

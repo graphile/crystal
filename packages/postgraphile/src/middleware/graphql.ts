@@ -84,7 +84,6 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const { exposePlan = false } = config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const dataplannerOptions: DataPlannerExecuteOptions = {
-    experimentalGraphQLBypass: true,
     // TODO: revisit 'exposePlan'
     explain: exposePlan ? ["mermaid-js", "sql"] : null,
   };
@@ -130,7 +129,11 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
     try {
       const result = await dataplannerExecute(args, dataplannerOptions);
       if (isAsyncIterable(result)) {
-        throw new Error("We don't yet support async iterables");
+        return {
+          type: "graphqlIncremental",
+          statusCode: 200,
+          iterator: result,
+        };
       }
       return { type: "graphql", statusCode: 200, payload: result };
     } catch (e) {

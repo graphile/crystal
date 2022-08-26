@@ -155,12 +155,9 @@ export class ObjectStep<
       ) => DataFromPlans<TPlans>)
     | null = null;
 
-  deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans> {
+  deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);
-    const peersWithSameKeys = peers.filter(
-      (p) => JSON.stringify(p.keys) === myKeys,
-    );
-    return peersWithSameKeys.length > 0 ? peersWithSameKeys[0] : this;
+    return peers.filter((p) => JSON.stringify(p.keys) === myKeys);
   }
 
   /**

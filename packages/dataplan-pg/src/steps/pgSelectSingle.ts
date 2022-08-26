@@ -84,7 +84,7 @@ export class PgSelectSingleStep<
   public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
   public readonly itemStepId: number;
   public readonly mode: PgSelectMode;
-  private classStepId: string;
+  private classStepId: number;
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
   private _coalesceToEmptyObject = false;
@@ -116,7 +116,7 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    if (this.opPlan.isOptimized(this)) {
+    if (this.isOptimized) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
     const plan = this.getStep(this.classStepId);
@@ -481,8 +481,10 @@ export class PgSelectSingleStep<
 
   deduplicate(
     peers: PgSelectSingleStep<any, any, any, any>[],
-  ): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters> {
-    const identicalPeer = peers.find((peer) => {
+  ): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>[] {
+    // We've been careful to not store anything locally so we shouldn't
+    // need to move anything across to the peer.
+    return peers.filter((peer) => {
       if (peer.source !== this.source) {
         return false;
       }
@@ -494,13 +496,6 @@ export class PgSelectSingleStep<
       }
       return true;
     });
-    if (identicalPeer) {
-      // We've been careful to not store anything locally so we shouldn't
-      // need to move anything across to the peer.
-      return identicalPeer;
-    } else {
-      return this;
-    }
   }
 
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;

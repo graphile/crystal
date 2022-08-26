@@ -10,10 +10,24 @@ lateral (
     __forums__."name" as "0",
     (select json_agg(_) from (
       select
+        (count(*))::text as "0"
+      from app_public.messages as __messages__
+      where
+        (
+          __messages__.featured = __forums_identifiers__."id0"
+        ) and (
+          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        ) and (
+          __forums__."id"::"uuid" = __messages__."forum_id"
+        )
+    ) _) as "1",
+    (select json_agg(_) from (
+      select
         __messages__."body" as "0",
         __users__."username" as "1",
         __users__."gravatar_url" as "2",
-        __messages__."id" as "3"
+        __messages__."author_id" as "3",
+        __messages__."id" as "4"
       from app_public.messages as __messages__
       left outer join app_public.users as __users__
       on (__messages__."author_id"::"uuid" = __users__."id")
@@ -27,21 +41,10 @@ lateral (
         )
       order by __messages__."id" asc
       limit 6
-    ) _) as "1",
-    (select json_agg(_) from (
-      select
-        (count(*))::text as "0"
-      from app_public.messages as __messages__
-      where
-        (
-          __messages__.featured = __forums_identifiers__."id0"
-        ) and (
-          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-        ) and (
-          __forums__."id"::"uuid" = __messages__."forum_id"
-        )
     ) _) as "2",
-    __forums_identifiers__.idx as "3"
+    __forums__."id" as "3",
+    to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",
+    __forums_identifiers__.idx as "5"
   from app_public.forums as __forums__
   where
     (

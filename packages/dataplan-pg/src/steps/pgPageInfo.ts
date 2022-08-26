@@ -42,7 +42,7 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
 
   isSyncAndSafe = true;
 
-  private connectionStepId: string;
+  private connectionStepId: number;
 
   constructor(
     connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>,

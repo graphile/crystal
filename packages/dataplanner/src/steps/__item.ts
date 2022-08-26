@@ -1,6 +1,5 @@
 import chalk from "chalk";
 
-import { getCurrentParentPathIdentity } from "../global.js";
 import { ExecutableStep } from "../step.js";
 
 /**
@@ -18,14 +17,13 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
   /**
    * @internal
    */
-  public transformStepId?: string;
+  public transformStepId?: number;
 
   constructor(
     parentPlan: ExecutableStep<TData> | ExecutableStep<TData[]>,
     public readonly depth = 0,
   ) {
     super();
-    this.parentPathIdentity = getCurrentParentPathIdentity();
     this.addDependency(parentPlan);
   }
 
@@ -37,5 +35,14 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
 
   execute(): never {
     throw new Error("__ItemStep must never execute");
+  }
+
+  public finalize(): void {
+    super.finalize();
+    if (this.transformStepId != null) {
+      this.transformStepId = this.opPlan.dangerouslyGetStep(
+        this.transformStepId,
+      ).id;
+    }
   }
 }

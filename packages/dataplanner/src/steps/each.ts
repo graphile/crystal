@@ -1,7 +1,5 @@
 import chalk from "chalk";
-import { getNamedType } from "graphql";
 
-import { getCurrentGraphQLType } from "../global.js";
 import type { ExecutableStep, ListCapableStep } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
@@ -48,11 +46,6 @@ export function each<
       : __ItemStep<any>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
-  const currentGraphQLType = getCurrentGraphQLType();
-  if (!currentGraphQLType) {
-    throw new Error("partitionByIndex cannot be used in this position");
-  }
-  const namedType = getNamedType(currentGraphQLType);
   return listTransform<any, any, any, any>({
     listPlan,
     itemPlanCallback: eachItemPlanCallback,
@@ -61,7 +54,6 @@ export function each<
     listItem: isListCapableStep(listPlan)
       ? eachCallbackForListPlan(listPlan, mapper)
       : mapper,
-    namedType,
     meta: `each:${chalk.yellow(listPlan.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,

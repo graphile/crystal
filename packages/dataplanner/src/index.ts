@@ -1,7 +1,6 @@
-import chalk from "chalk";
 import debugFactory from "debug";
 
-import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
+import { crystalPrint } from "./crystalPrint.js";
 import { exportAsMany } from "./exportAs.js";
 import {
   CrystalPlans,
@@ -17,17 +16,15 @@ import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // TODO: doing this here feels "naughty".
 debugFactory.formatters.c = crystalPrint;
-debugFactory.formatters.p = (pathIdentity) =>
-  chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { ROOT_PATH } from "./constants.js";
 import { dataplannerEnforce } from "./dataplannerEnforce.js";
+import { dataplannerGraphql } from "./dataplannerGraphql.js";
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { OperationPlan } from "./engine/OperationPlan.js";
 import { CrystalError, isCrystalError } from "./error.js";
 import { DataPlannerExecuteOptions, execute } from "./execute.js";
-import { getCurrentParentPathIdentity } from "./global.js";
 import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
@@ -59,6 +56,7 @@ import {
   ExecutionEventMap,
   ExecutionExtra,
   FieldArgs,
+  FieldInfo,
   FieldPlanResolver,
   GraphileArgumentConfig,
   GraphileFieldConfig,
@@ -70,14 +68,13 @@ import {
   NodeIdCodec,
   NodeIdHandler,
   OutputPlanForType,
-  PlanOptimizeOptions,
-  PlanStreamOptions,
   PolymorphicData,
   PromiseOrDirect,
   ScalarPlanResolver,
+  StepOptimizeOptions,
+  StepStreamOptions,
   TypedEventEmitter,
 } from "./interfaces.js";
-import { OpPlan } from "./opPlan.js";
 import { polymorphicWrap, resolveType } from "./polymorphic.js";
 import {
   $$crystalWrapped,
@@ -149,7 +146,7 @@ import {
   object,
   ObjectPlanMeta,
   ObjectStep,
-  opPlan,
+  operationPlan,
   PageInfoCapableStep,
   partitionByIndex,
   reverse,
@@ -179,7 +176,9 @@ import {
   objectSpec,
   ObjectTypeFields,
   ObjectTypeSpec,
-  planGroupsOverlap,
+  stepADependsOnStepB,
+  stepAMayDependOnStepB,
+  stepsAreInSamePhase,
 } from "./utils.js";
 
 export { isAsyncIterable } from "iterall";
@@ -221,7 +220,6 @@ export {
   CrystalError,
   CrystalPlans,
   crystalPrint,
-  crystalPrintPathIdentity,
   crystalResolve,
   CrystalResultsList,
   CrystalResultStreamList,
@@ -233,6 +231,7 @@ export {
   DataPlannerEnumValueExtensions,
   DataPlannerExecuteOptions,
   DataPlannerFieldExtensions,
+  dataplannerGraphql,
   DataPlannerInputFieldExtensions,
   DataPlannerObjectTypeExtensions,
   dataplannerResolver,
@@ -253,13 +252,13 @@ export {
   ExecutionEventMap,
   ExecutionExtra,
   FieldArgs,
+  FieldInfo,
   FieldPlanResolver,
   FieldPlans,
   filter,
   FilterPlanMemo,
   first,
   FirstStep,
-  getCurrentParentPathIdentity,
   getEnumValueConfig,
   GraphileArgumentConfig,
   GraphileFieldConfig,
@@ -322,14 +321,11 @@ export {
   ObjectStep,
   ObjectTypeFields,
   ObjectTypeSpec,
-  OpPlan,
-  opPlan,
+  OperationPlan,
+  operationPlan,
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
-  planGroupsOverlap,
-  PlanOptimizeOptions,
-  PlanStreamOptions,
   PolymorphicData,
   PolymorphicStep,
   polymorphicWrap,
@@ -339,13 +335,17 @@ export {
   reverse,
   reverseArray,
   ReverseStep,
-  ROOT_PATH,
   ScalarPlanResolver,
   ScalarPlans,
   setter,
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  stepADependsOnStepB,
+  stepAMayDependOnStepB,
+  StepOptimizeOptions,
+  stepsAreInSamePhase,
+  StepStreamOptions,
   StreamableStep,
   stripAnsi,
   subscribe,
@@ -354,13 +354,12 @@ export {
 
 exportAsMany({
   crystalPrint,
-  crystalPrintPathIdentity,
   makeCrystalSchema,
-  OpPlan,
-  ROOT_PATH,
+  OperationPlan,
   defer,
   dataplannerEnforce,
   execute,
+  dataplannerGraphql,
   subscribe,
   __InputListStep,
   __InputObjectStep,
@@ -377,7 +376,7 @@ exportAsMany({
   __ValueStep,
   access,
   AccessStep,
-  opPlan,
+  operationPlan,
   connection,
   ConnectionStep,
   constant,
@@ -429,10 +428,11 @@ exportAsMany({
   objectFieldSpec,
   objectSpec,
   arrayOfLength,
-  planGroupsOverlap,
+  stepADependsOnStepB,
+  stepAMayDependOnStepB,
+  stepsAreInSamePhase,
   isPromiseLike,
   isDev,
   noop,
-  getCurrentParentPathIdentity,
   getEnumValueConfig,
 });

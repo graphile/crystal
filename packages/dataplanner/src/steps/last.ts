@@ -25,8 +25,8 @@ export class LastStep<TData> extends ExecutableStep<TData> {
     return list?.[list?.length - 1];
   };
 
-  deduplicate(peers: LastStep<TData>[]): LastStep<TData> {
-    return peers.length > 0 ? peers[0] : this;
+  deduplicate(peers: LastStep<TData>[]): LastStep<TData>[] {
+    return peers;
   }
 
   optimize() {

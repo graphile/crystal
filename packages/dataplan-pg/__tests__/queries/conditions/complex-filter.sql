@@ -24,7 +24,9 @@ lateral (
         )
       order by __messages__."id" asc
     ) _) as "1",
-    __forums_identifiers__.idx as "2"
+    __forums__."id" as "2",
+    to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3",
+    __forums_identifiers__.idx as "4"
   from app_public.forums as __forums__
   where
     (

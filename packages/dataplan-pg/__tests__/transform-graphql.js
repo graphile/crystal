@@ -22,7 +22,7 @@
 const JSON5 = require("json5");
 
 exports.makeProcess =
-  (options = { includeDeoptimize: true }) =>
+  (options = { includeDeoptimize: true, includeUnprepared: true }) =>
   (src, path) => {
     const lines = src.split("\n");
     const config = Object.create(null);
@@ -108,11 +108,15 @@ beforeAll(() => {
       : `result1.then(() => {}, () => {})`
   }
   // Always run result3 after result2 finishes
-  result3 = result2.then(() => {}, () => {}).then(() =>
+  result3 = ${
+    options.includeUnprepared
+      ? `result2.then(() => {}, () => {}).then(() =>
     runTestQuery(document, config, { callback, path, ${
       options.includeDeoptimize ? `deoptimize: true, ` : ``
     }prepare: false })
-  );
+  )`
+      : `result2.then(() => {}, () => {})`
+  };
   // Wait for these promises to resolve, even if it's with errors.
   return Promise.all([result1.catch(e => {}), result2.catch(e => {}), result3.catch(e => {})]);
 }, 30000);
@@ -169,12 +173,18 @@ it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(r
 `
     : ``
 }
+${
+  options.includeUnprepared
+    ? `
 it('returns same data for optimized vs unprepared${
         options.includeDeoptimize ? ` deoptimized` : ``
       }', () => assertResultsMatch(result1, result3, { config }));
 it('returns same errors for optimized vs unprepared${
         options.includeDeoptimize ? ` deoptimized` : ``
       }', () => assertErrorsMatch(result1, result3, { config }));
+      `
+    : ``
+}
 
 ${
   options.includeDeoptimize
@@ -201,4 +211,10 @@ it('matches plan (mermaid) snapshots with inlining disabled', () => assertSnapsh
     };
   };
 
-exports.process = exports.makeProcess();
+exports.process = exports.makeProcess(
+  // TODO: delete this argument
+  {
+    includeDeoptimize: false,
+    includeUnprepared: false,
+  },
+);

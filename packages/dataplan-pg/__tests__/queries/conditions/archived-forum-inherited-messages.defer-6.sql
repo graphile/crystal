@@ -3,8 +3,8 @@ select
   (select json_agg(_) from (
     select
       __messages__."body" as "0",
-      __messages__."author_id" as "1",
-      __messages__."id" as "2"
+      __messages__."id" as "1",
+      __messages__."author_id" as "2"
     from app_public.messages as __messages__
     where
       (
@@ -13,7 +13,9 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) _) as "1"
+  ) _) as "1",
+  __forums__."id" as "2",
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3"
 from app_public.forums as __forums__
 where
   (

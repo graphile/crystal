@@ -3,14 +3,10 @@ import "graphile-config";
 
 import type { PgClassSingleStep, PgSourceUnique } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
-import type { ObjectStep } from "dataplanner";
+import type { FieldArgs, FieldInfo, ObjectStep } from "dataplanner";
 import { connection, constant, EdgeStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type {
-  GraphQLEnumType,
-  GraphQLObjectType,
-  GraphQLSchema,
-} from "graphql";
+import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -181,8 +177,8 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep<any, any, any, any>;
                       }>,
-                      args,
-                      info: { schema: GraphQLSchema },
+                      args: FieldArgs,
+                      info: FieldInfo,
                     ) {
                       const $result = $mutation.getStepForKey("result", true);
                       if (!$result) {

@@ -1,7 +1,5 @@
 import chalk from "chalk";
-import { getNamedType } from "graphql";
 
-import { getCurrentGraphQLType } from "../global.js";
 import type { ExecutableStep } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
@@ -88,11 +86,6 @@ export function partitionByIndex<
       `partitionByIndex only supports 0- and 1-indexed lists currently; please use 'lambda' to convert your index`,
     );
   }
-  const currentGraphQLType = getCurrentGraphQLType();
-  if (!currentGraphQLType) {
-    throw new Error("partitionByIndex cannot be used in this position");
-  }
-  const namedType = getNamedType(currentGraphQLType);
   return listTransform<TListStep, TItemStep, unknown[][], any>({
     listPlan,
     itemPlanCallback: mapper,
@@ -105,7 +98,6 @@ export function partitionByIndex<
           );
         }
       : undefined,
-    namedType,
     meta: `partitionByIndex${startIndex}:${chalk.yellow(listPlan.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,

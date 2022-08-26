@@ -24,13 +24,8 @@ export class ToPgStep extends ExecutableStep<any> {
     super();
     this.addDependency($value);
   }
-  deduplicate(peers: ToPgStep[]): ToPgStep {
-    for (const peer of peers) {
-      if (peer.codec === this.codec) {
-        return peer;
-      }
-    }
-    return this;
+  deduplicate(peers: ToPgStep[]): ToPgStep[] {
+    return peers.filter((peer) => peer.codec === this.codec);
   }
 
   execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {

@@ -14,8 +14,8 @@ lateral (
     to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",
     __relational_items__."is_explicitly_archived"::text as "5",
     to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "6",
-    __relational_topics__."id"::text as "7",
-    __relational_topics__."title" as "8",
+    __relational_topics__."title" as "7",
+    __relational_topics__."id"::text as "8",
     __relational_topics_identifiers__.idx as "9"
   from interfaces_and_unions.relational_topics as __relational_topics__
   left outer join interfaces_and_unions.relational_items as __relational_items__

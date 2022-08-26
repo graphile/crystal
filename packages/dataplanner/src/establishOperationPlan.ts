@@ -8,14 +8,14 @@ import type {
 
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
+import { OperationPlan } from "./index.js";
 import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
-import { OpPlan } from "./opPlan.js";
 
-const debug = debugFactory("dataplanner:establishOpPlan");
+const debug = debugFactory("dataplanner:establishOperationPlan");
 
 type Fragments = {
   [key: string]: FragmentDefinitionNode;
@@ -40,12 +40,12 @@ interface Cache {
    * list, and if the list grows beyond a maximum size we can drop the last
    * element.
    */
-  possibleOpPlans: LinkedList<OpPlan>;
+  possibleOpPlans: LinkedList<OperationPlan>;
   fragments: Fragments;
 }
 
 /**
- * The starting point for finding/storing the relevant OpPlan for a request.
+ * The starting point for finding/storing the relevant OperationPlan for a request.
  */
 type CacheByOperation = LRU<OperationDefinitionNode, Cache>;
 
@@ -87,7 +87,7 @@ const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
 /**
  * Implements the `IsOpPlanCompatible` algorithm.
  *
- * @remarks Due to the optimisation in `establishOpPlan`, the schema, document
+ * @remarks Due to the optimisation in `establishOperationPlan`, the schema, document
  * and operationName checks have already been performed.
  */
 export function isOpPlanCompatible<
@@ -95,11 +95,11 @@ export function isOpPlanCompatible<
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
-  opPlan: OpPlan<any, any, any>,
+  opPlan: OperationPlan,
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-): opPlan is OpPlan<TVariables, TContext, TRootValue> {
+): opPlan is OperationPlan {
   const {
     variableValuesConstraints,
     contextConstraints,
@@ -132,7 +132,7 @@ const $$cacheByOperation = Symbol("cacheByOperation");
  * in GraphQL.js.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function establishOpPlan<
+export function establishOperationPlan<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
@@ -143,7 +143,7 @@ export function establishOpPlan<
   variableValues: TVariables;
   context: TContext;
   rootValue: TRootValue;
-}): OpPlan<TVariables, TContext, TRootValue> {
+}): OperationPlan {
   const { schema, operation, fragments, variableValues, context, rootValue } =
     details;
   let cacheByOperation: CacheByOperation | undefined =
@@ -153,14 +153,14 @@ export function establishOpPlan<
 
   // These two variables to make it easy to trim the linked list later.
   let count = 0;
-  let lastButOneItem: LinkedList<OpPlan> | null = null;
+  let lastButOneItem: LinkedList<OperationPlan> | null = null;
 
   if (cache) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
 
-    let previousItem: LinkedList<OpPlan> | null = null;
-    let linkedItem: LinkedList<OpPlan> | null = cache.possibleOpPlans;
+    let previousItem: LinkedList<OperationPlan> | null = null;
+    let linkedItem: LinkedList<OperationPlan> | null = cache.possibleOpPlans;
     while (linkedItem) {
       if (
         isOpPlanCompatible(linkedItem.value, variableValues, context, rootValue)
@@ -175,7 +175,7 @@ export function establishOpPlan<
           cache.possibleOpPlans = linkedItem;
         }
 
-        // We found a suitable OpPlan - use that!
+        // We found a suitable OperationPlan - use that!
         return linkedItem.value;
       }
 
@@ -186,8 +186,8 @@ export function establishOpPlan<
     }
   }
 
-  // No suitable OpPlan found, time to make one.
-  const opPlan = new OpPlan(
+  // No suitable OperationPlan found, time to make one.
+  const opPlan = new OperationPlan(
     schema,
     operation,
     fragments,
