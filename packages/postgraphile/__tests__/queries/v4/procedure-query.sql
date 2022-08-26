@@ -330,16 +330,16 @@ lateral (
 ) as __compound_type_query_result__
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __compound_type_set_query__."a"::text as "1",
-  __compound_type_set_query__."b" as "2",
-  __compound_type_set_query__."c"::text as "3",
-  __compound_type_set_query__."d" as "4",
-  __compound_type_set_query__."e"::text as "5",
-  __compound_type_set_query__."f"::text as "6",
-  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "7",
-  __compound_type_set_query__."foo_bar"::text as "8",
-  (not (__compound_type_set_query__ is null))::text as "9"
+  (not (__compound_type_set_query__ is null))::text as "0",
+  (row_number() over (partition by 1))::text as "1",
+  __compound_type_set_query__."a"::text as "2",
+  __compound_type_set_query__."b" as "3",
+  __compound_type_set_query__."c"::text as "4",
+  __compound_type_set_query__."d" as "5",
+  __compound_type_set_query__."e"::text as "6",
+  __compound_type_set_query__."f"::text as "7",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "8",
+  __compound_type_set_query__."foo_bar"::text as "9"
 from "c"."compound_type_set_query"() as __compound_type_set_query__
 limit 6
 
@@ -382,14 +382,14 @@ lateral (
 ) as __table_query_result__
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."id"::text as "0",
+  (row_number() over (partition by 1))::text as "1",
+  __table_set_query__."person_full_name" as "2"
 from "c"."table_set_query"() as __table_set_query__
 
 select
-  __table_set_query__."person_full_name" as "0",
-  __table_set_query__."id"::text as "1"
+  __table_set_query__."id"::text as "0",
+  __table_set_query__."person_full_name" as "1"
 from "c"."table_set_query"() as __table_set_query__
 order by __table_set_query__."person_full_name" asc
 
@@ -402,9 +402,9 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."person_full_name" as "1",
-    __table_set_query__."id"::text as "2",
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
     __table_set_query_identifiers__.idx as "3"
   from "c"."table_set_query"() as __table_set_query__
   where (
@@ -422,9 +422,9 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."person_full_name" as "1",
-    __table_set_query__."id"::text as "2",
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
     __table_set_query_identifiers__.idx as "3"
   from "c"."table_set_query"() as __table_set_query__
   limit __table_set_query_identifiers__."id0"
@@ -598,9 +598,9 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."person_full_name" as "1",
-    __table_set_query__."id"::text as "2",
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
     __table_set_query_identifiers__.idx as "3"
   from "c"."table_set_query"() as __table_set_query__
   limit __table_set_query_identifiers__."id0"
@@ -636,9 +636,9 @@ from (
 ) as __table_set_query_identifiers__,
 lateral (
   select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."person_full_name" as "1",
-    __table_set_query__."id"::text as "2",
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
     __table_set_query_identifiers__.idx as "3"
   from "c"."table_set_query"() as __table_set_query__
   limit __table_set_query_identifiers__."id0"

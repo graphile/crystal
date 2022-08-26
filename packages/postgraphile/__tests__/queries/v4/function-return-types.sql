@@ -117,13 +117,14 @@ from (
 ) as __func_out_complex_setof_identifiers__,
 lateral (
   select
-    __func_out_complex_setof__."x"::text as "0",
-    __compound_type__."a"::text as "1",
-    __compound_type__."b" as "2",
-    __compound_type__."c"::text as "3",
-    (not (__compound_type__ is null))::text as "4",
-    __func_out_complex_setof__."y"::text as "5",
-    __person__."person_full_name" as "6",
+    (not (__func_out_complex_setof__ is null))::text as "0",
+    __func_out_complex_setof__."x"::text as "1",
+    __compound_type__."a"::text as "2",
+    __compound_type__."b" as "3",
+    __compound_type__."c"::text as "4",
+    (not (__compound_type__ is null))::text as "5",
+    __func_out_complex_setof__."y"::text as "6",
+    __person__."person_full_name" as "7",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
@@ -132,10 +133,9 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "7",
-    __person__."id"::text as "8",
-    __func_out_complex_setof__."z"::text as "9",
-    (not (__func_out_complex_setof__ is null))::text as "10",
+    ) _) as "8",
+    __person__."id"::text as "9",
+    __func_out_complex_setof__."z"::text as "10",
     __func_out_complex_setof_identifiers__.idx as "11"
   from "c"."func_out_complex_setof"(
     __func_out_complex_setof_identifiers__."id0",
@@ -188,9 +188,9 @@ lateral (
 ) as __func_out_out_compound_type_result__
 
 select
-  __func_out_out_setof__."o1"::text as "0",
-  __func_out_out_setof__."o2" as "1",
-  (not (__func_out_out_setof__ is null))::text as "2"
+  (not (__func_out_out_setof__ is null))::text as "0",
+  __func_out_out_setof__."o1"::text as "1",
+  __func_out_out_setof__."o2" as "2"
 from "c"."func_out_out_setof"() as __func_out_out_setof__
 
 select
@@ -222,9 +222,9 @@ from (
 ) as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
-    __func_returns_table_multi_col__."col1"::text as "0",
-    __func_returns_table_multi_col__."col2" as "1",
-    (not (__func_returns_table_multi_col__ is null))::text as "2",
+    (not (__func_returns_table_multi_col__ is null))::text as "0",
+    __func_returns_table_multi_col__."col1"::text as "1",
+    __func_returns_table_multi_col__."col2" as "2",
     __func_returns_table_multi_col_identifiers__.idx as "3"
   from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
 ) as __func_returns_table_multi_col_result__

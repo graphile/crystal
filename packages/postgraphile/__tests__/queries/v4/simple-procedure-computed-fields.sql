@@ -12,16 +12,18 @@ lateral (
     "c"."person_first_name"(__person__) as "1",
     (select json_agg(_) from (
       select
-        __person_friends__."person_full_name" as "0",
-        "c"."person_first_name"(__person_friends__) as "1",
+        __person_friends__."id"::text as "0",
+        __person_friends__."person_full_name" as "1",
+        "c"."person_first_name"(__person_friends__) as "2",
         (select json_agg(_) from (
           select
-            __person_friends_2."person_full_name" as "0",
-            "c"."person_first_name"(__person_friends_2) as "1"
+            __person_friends_2."id"::text as "0",
+            __person_friends_2."person_full_name" as "1",
+            "c"."person_first_name"(__person_friends_2) as "2"
           from "c"."person_friends"(__person_friends__) as __person_friends_2
           limit 1
-        ) _) as "2",
-        __person_friends__::text as "3"
+        ) _) as "3",
+        __person_friends__::text as "4"
       from "c"."person_friends"(__person__) as __person_friends__
     ) _) as "2",
     __person__::text as "3",

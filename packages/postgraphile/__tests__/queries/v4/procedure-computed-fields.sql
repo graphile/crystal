@@ -123,13 +123,15 @@ select
       (select json_agg(_) from (
         select
           "c"."person_first_name"(__person_friends__) as "0",
-          __person_friends__."person_full_name" as "1"
+          __person_friends__."person_full_name" as "1",
+          __person_friends__."id"::text as "2"
         from "c"."person_friends"(__person_friends_2) as __person_friends__
         limit 1
       ) _) as "0",
       __person_friends_2::text as "1",
       "c"."person_first_name"(__person_friends_2) as "2",
-      __person_friends_2."person_full_name" as "3"
+      __person_friends_2."person_full_name" as "3",
+      __person_friends_2."id"::text as "4"
     from "c"."person_friends"(__person__) as __person_friends_2
   ) _) as "2",
   __person__::text as "3",
