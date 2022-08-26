@@ -6,7 +6,7 @@ import type {
   ExecutionResult,
 } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
-import { isAsyncIterable } from "iterall";
+import { isAsyncIterable, isIterable } from "iterall";
 
 import type { Bucket, RequestContext } from "./bucket.js";
 import type { Deferred } from "./deferred.js";
@@ -217,9 +217,20 @@ export function executePreemptive(
     }
   };
 
+  const subscriptionBucket = rootBucket.layerPlan.children.find(
+    (c) => c.reason.type === "subscription",
+  );
+
+  const executeStreamPayload = (
+    payload: any,
+  ): PromiseOrDirect<ExecutionResult | AsyncExecutionResult> => {
+    throw new Error("TODO<eb7ab10a-7729-42dc-b5f1-bfb997fe9686>");
+  };
+
   const output = () => {
     // Later we'll need to loop
 
+    // If it's a subscription we need to use the stream
     const rootValueList = rootBucket.layerPlan.rootStepId
       ? rootBucket.store[rootBucket.layerPlan.rootStepId]
       : null;
@@ -244,6 +255,52 @@ export function executePreemptive(
         label: undefined,
       });
     }
+
+    if (
+      bucketRootValue &&
+      isAsyncIterable(bucketRootValue) &&
+      !isIterable(bucketRootValue) &&
+      subscriptionBucket
+    ) {
+      const stream = bucketRootValue[Symbol.asyncIterator]();
+      // Do the async iterable
+      let stopped = false;
+      const abort = defer<undefined>();
+      const iterator = newIterator((e) => {
+        stopped = true;
+        abort.resolve(undefined);
+        if (e) {
+          stream.throw?.(e);
+        } else {
+          stream.return?.();
+        }
+      });
+      (async () => {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const next = await Promise.race([abort, stream.next()]);
+          if (stopped || !next) {
+            break;
+          }
+          const { done, value } = next;
+          if (done) {
+            break;
+          }
+          const payload = await Promise.race([
+            abort,
+            executeStreamPayload(value),
+          ]);
+          if (payload === undefined) {
+            break;
+          }
+          iterator.push(payload);
+        }
+      })().catch((e) => {
+        iterator.throw(e);
+      });
+      return iterator;
+    }
+
     const [ctx, result] = outputBucket(
       operationPlan.rootOutputPlan,
       rootBucket,
@@ -357,17 +414,35 @@ function newIterator<T = any>(
       }
       const cbs = pullQueue.shift();
       if (cbs) {
-        cbs[0]({ done, value: v });
+        if (isPromiseLike(v)) {
+          v.then(
+            (v) => cbs[0]({ done, value: v }),
+            (e) => {
+              try {
+                const r = cbs[1](e);
+                if (isPromiseLike(r)) {
+                  r.then(null, noop);
+                }
+              } catch (e) {
+                // ignore
+              }
+              // TODO: does an error here imply we should cancel the iterator?
+              this.throw(e);
+            },
+          );
+        } else {
+          cbs[0]({ done, value: v });
+        }
       } else {
         valueQueue.push(v);
       }
     },
     next() {
       if (valueQueue.length > 0) {
-        return Promise.resolve({
+        return Promise.resolve(valueQueue.shift()).then((value) => ({
           done: false,
-          value: valueQueue.shift(),
-        });
+          value,
+        }));
       } else if (done) {
         return Promise.resolve({
           done: true,

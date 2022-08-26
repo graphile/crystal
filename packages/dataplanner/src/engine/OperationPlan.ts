@@ -193,13 +193,6 @@ export class OperationPlan {
   public makeMetaByStepId: () => MetaByStepId;
 
   /**
-   * The plan id for the plan that represents the subscription (if any).
-   *
-   * @internal
-   */
-  public subscriptionStepId: number | undefined;
-
-  /**
    * The plan id for the plan that represents a single payload in the subscription stream (if any)
    *
    * @internal
@@ -593,7 +586,13 @@ export class OperationPlan {
       if (haltTree) {
         throw new Error("Failed to setup subscription");
       }
-      this.subscriptionStepId = subscribeStep.id;
+      const stepOptions: StepOptions = {
+        stream: isStreamableStep(subscribeStep as ExecutableStep<any>)
+          ? { initialCount: 0 }
+          : null,
+      };
+      subscribeStep._stepOptions = stepOptions;
+      this.rootLayerPlan.rootStepId = subscribeStep.id;
 
       const subscriptionEventLayerPlan = new LayerPlan(
         this,
@@ -643,7 +642,7 @@ export class OperationPlan {
     } else {
       // TODO: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
       const subscribeStep = this.trackedRootValueStep;
-      this.subscriptionStepId = subscribeStep.id;
+      this.rootLayerPlan.rootStepId = subscribeStep.id;
       this.deduplicateSteps();
       const subscriptionEventLayerPlan = new LayerPlan(
         this,

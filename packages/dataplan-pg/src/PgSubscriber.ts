@@ -42,6 +42,12 @@ export class PgSubscriber<
     const stack: any[] = [];
 
     function doFinally() {
+      if (waiting) {
+        const p = waiting;
+        waiting = null;
+        // TODO: Is this right?!
+        p.reject(new Error("Terminated"));
+      }
       eventEmitter.removeListener(topic as string, recv);
       // Every code path above this has to go through a `yield` and thus
       // `asyncIterableIterator` will definitely be defined.
@@ -61,10 +67,18 @@ export class PgSubscriber<
       },
       async next() {
         if (stack.length) {
-          return { done: false, value: stack.shift() };
+          return Promise.resolve(stack.shift()).then((value) => ({
+            done: false,
+            value,
+          }));
         } else {
-          waiting = defer();
-          return { done: false, value: waiting };
+          if (waiting) {
+            return waiting.then(() => this.next());
+          } else {
+            waiting = defer();
+            const value = await waiting;
+            return { done: false, value };
+          }
         }
       },
       async return(value) {
@@ -79,8 +93,9 @@ export class PgSubscriber<
 
     function recv(payload: any) {
       if (waiting) {
-        waiting.resolve(payload);
+        const p = waiting;
         waiting = null;
+        p.resolve(payload);
       } else {
         stack.push(payload);
       }
