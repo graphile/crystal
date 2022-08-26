@@ -153,7 +153,7 @@ export function executeBucket(
                     return false;
                   }
                 }
-              : (depId) => Array.isArray(store[depId]),
+              : (depId) => store[depId] !== undefined,
           )
         : false;
       if (isSuitable) {
