@@ -52,13 +52,13 @@ graph TD
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf11,Access13,Access14,Object15,__InputStaticLeaf23,__InputStaticLeaf34,__InputStaticLeaf35 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 15, 11"):::bucket
+    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 15, 11<br /><br />1: PgInsert{1}[12]<br />2: Object{1}ᐸ{result}ᐳ[16],PgClassExpression{1}ᐸ__always_a...ity__.”id”ᐳ[17],PgClassExpression{1}ᐸ__always_a...tity__.”t”ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert12,Object16,PgClassExpression17,PgClassExpression18 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 15, 23"):::bucket
+    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 15, 23<br /><br />1: PgInsert{2}[24]<br />2: Object{2}ᐸ{result}ᐳ[28],PgClassExpression{2}ᐸ__by_defau...ity__.”id”ᐳ[29],PgClassExpression{2}ᐸ__by_defau...tity__.”t”ᐳ[30]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgInsert24,Object28,PgClassExpression29,PgClassExpression30 bucket2
-    Bucket3("Bucket 3<br />(mutationField)<br />Deps: 15, 34, 35"):::bucket
+    Bucket3("Bucket 3<br />(mutationField)<br />Deps: 15, 34, 35<br /><br />1: PgInsert{3}[36]<br />2: Object{3}ᐸ{result}ᐳ[40],PgClassExpression{3}ᐸ__by_defau...ity__.”id”ᐳ[41],PgClassExpression{3}ᐸ__by_defau...tity__.”t”ᐳ[42]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgInsert36,Object40,PgClassExpression41,PgClassExpression42 bucket3
     Bucket0 --> Bucket1 & Bucket2 & Bucket3
