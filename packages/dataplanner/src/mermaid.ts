@@ -410,8 +410,8 @@ function pp(polymorphicPaths: ReadonlySet<string>) {
   return [...polymorphicPaths].map((p) => `${p}`).join("\n");
 }
 
-function startSteps(_layerPlan: LayerPlan) {
-  return ``;
-  /*return `
-${layerPlan.startSteps.map((s, i) => `${i + 1}: ${s}`).join("\n")}`;*/
+function startSteps(layerPlan: LayerPlan) {
+  return layerPlan.startSteps.length === 1
+    ? ``
+    : `\n${layerPlan.startSteps.map((s, i) => `${i + 1}: ${s}`).join("\n")}`;
 }
