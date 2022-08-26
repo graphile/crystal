@@ -201,8 +201,8 @@ export function executeOutputPlan(
         outputPlan.objectCreator,
         `GraphileInternalError<2c75b7a7-e78d-47bb-936c-b6e030452d30>: ${outputPlan}.objectCreator was not constructed yet`,
       );
-      const data = outputPlan.objectCreator(typeName);
-      for (const [key, spec] of Object.entries(outputPlan.keys[typeName])) {
+      const data = outputPlan.objectCreator();
+      for (const [key, spec] of Object.entries(outputPlan.keys)) {
         if (spec.type === "__typename") {
           // __typename already handled
           continue;

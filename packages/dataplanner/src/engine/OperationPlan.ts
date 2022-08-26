@@ -2498,11 +2498,9 @@ export class OperationPlan {
         this.walkOutputPlans(childOutputPlan, callback);
       });
     }
-    for (const key of Object.values(outputPlan.keys).flatMap((o) =>
-      Object.values(o),
-    )) {
-      if (key.type === "outputPlan") {
-        this.walkOutputPlans(key.outputPlan, callback);
+    for (const spec of Object.values(outputPlan.keys)) {
+      if (spec.type === "outputPlan") {
+        this.walkOutputPlans(spec.outputPlan, callback);
       }
     }
     for (const defer of outputPlan.deferredOutputPlans) {
@@ -2528,14 +2526,10 @@ export class OperationPlan {
     const process = (lp: LayerPlan, known: LayerPlan[]) => {
       for (const step of this.steps) {
         if (step.layerPlan === lp) {
-          console.log(`finishSubroutine: ${step}`);
           for (const depId of step.dependencies) {
             const dep = this.steps[depId];
             if (!known.includes(dep.layerPlan)) {
               // Naughty naughty
-              console.log(
-                `finishSubroutine: ${dep} added as dependency of ${subroutineStep}`,
-              );
               (subroutineStep as any).addDependency(dep);
             }
           }

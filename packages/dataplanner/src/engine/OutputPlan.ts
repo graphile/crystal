@@ -138,9 +138,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * order in the request otherwise we break GraphQL spec compliance!
    */
   public keys: {
-    [typeName: string]: {
-      [key: string]: OutputPlanKeyValue;
-    };
+    [key: string]: OutputPlanKeyValue;
   } = Object.create(null);
 
   /**
@@ -184,14 +182,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   ) {
     this.locationDetails = locationDetails;
     this.rootStepId = rootStep.id;
-    if (type.mode === "polymorphic") {
-      const typeNames = type.typeNames;
-      for (const typeName of typeNames) {
-        this.keys[typeName] = Object.create(null);
-      }
-    } else if (type.mode === "object" || type.mode === "root") {
-      this.keys[type.typeName] = Object.create(null);
-    }
   }
 
   public print(): string {
@@ -199,7 +189,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     switch (type.mode) {
       case "root":
       case "object": {
-        return `${this.toString()}\n${Object.entries(this.keys[type.typeName])
+        return `${this.toString()}\n${Object.entries(this.keys)
           .map(([fieldName, val]) => {
             return `.${fieldName}: ${
               val.type === "__typename"
@@ -260,18 +250,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           ["root", "object"].includes(this.type.mode),
           "Can only addChild on root/object output plans",
         );
-        if (!this.keys[type.name]) {
+        if (this.keys[key]) {
           throw new Error(
-            `GraphileInternalError<58c311df-8bbc-4dad-bd1f-562cc38f9a06>: type '${type.name}' not known to this OutputPlan (${this.type.typeName})`,
-          );
-        }
-        if (this.keys[type.name][key]) {
-          throw new Error(
-            `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set for type '${type.name}' key '${key}'`,
+            `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set for key '${key}'`,
           );
         }
       }
-      this.keys[type!.name][key!] = child;
+      this.keys[key!] = child;
     } else if (this.type.mode === "array") {
       if (isDev) {
         if (key != null) {
@@ -322,10 +307,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   /** @internal */
-  public objectCreator: ((typeName: string) => JSONObject) | null = null;
+  public objectCreator: (() => JSONObject) | null = null;
   finalize() {
-    if (["root", "object"].includes(this.type.mode)) {
-      this.objectCreator = this.makeObjectCreator();
+    if (this.type.mode === "root" || this.type.mode === "object") {
+      this.objectCreator = this.makeObjectCreator(this.type.typeName);
     }
 
     this.rootStepId = this.layerPlan.operationPlan.dangerouslyGetStep(
@@ -345,14 +330,12 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
       }
     }
-    for (const typeName in this.keys) {
-      for (const key in this.keys[typeName]) {
-        const spec = this.keys[typeName][key];
-        if (spec.type === "outputPlan") {
-          if (spec.outputPlan.layerPlan !== this.layerPlan) {
-            spec.outputPlan.getLayerPlans(layerPlans);
-            layerPlans.add(spec.outputPlan.layerPlan);
-          }
+    for (const key in this.keys) {
+      const spec = this.keys[key];
+      if (spec.type === "outputPlan") {
+        if (spec.outputPlan.layerPlan !== this.layerPlan) {
+          spec.outputPlan.getLayerPlans(layerPlans);
+          layerPlans.add(spec.outputPlan.layerPlan);
         }
       }
     }
@@ -371,40 +354,35 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * Returns a function that, given a type name, creates an object with the
    * fields in the given order.
    */
-  makeObjectCreator(): (typeName: string | null) => JSONObject {
-    const supportedTypeNames = Object.keys(this.keys);
-    const possibilities: string[] = [];
-    for (const typeName of supportedTypeNames) {
-      const fields = this.keys[typeName];
-      const keys = Object.keys(fields);
-      /*
-       * NOTE: because we use `Object.create(verbatimPrototype)` (and
-       * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
-       * set keys such as `__proto__`. This would not be safe if we were to use
-       * `{}` instead.
-       */
-      const unsafeKeys = keys.filter(
-        (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
+  makeObjectCreator(typeName: string): () => JSONObject {
+    const fields = this.keys;
+    const keys = Object.keys(fields);
+    /*
+     * NOTE: because we use `Object.create(verbatimPrototype)` (and
+     * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
+     * set keys such as `__proto__`. This would not be safe if we were to use
+     * `{}` instead.
+     */
+    const unsafeKeys = keys.filter(
+      (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
+    );
+    if (unsafeKeys.length > 0) {
+      throw new Error(
+        `Unsafe keys: ${unsafeKeys.join(
+          ",",
+        )}; these don't conform to 'Name' in the GraphQL spec`,
       );
-      if (unsafeKeys.length > 0) {
-        throw new Error(
-          `Unsafe keys: ${unsafeKeys.join(
-            ",",
-          )}; these don't conform to 'Name' in the GraphQL spec`,
-        );
-      }
+    }
 
-      const handler = `\
-if (typeName === ${JSON.stringify(typeName)}) {
-  return Object.assign(Object.create(verbatimPrototype), {
+    const handler = `Object.assign(Object.create(verbatimPrototype), {
   [$$concreteType]: typeName,
 ${Object.entries(fields)
   .map(([fieldName, keyValue]) => {
     switch (keyValue.type) {
       case "outputPlan":
-        return `    ${JSON.stringify(fieldName)}: undefined,\n`;
+        return `  ${JSON.stringify(fieldName)}: undefined,\n`;
       case "__typename":
-        return `    ${JSON.stringify(fieldName)}: typeName,\n`;
+        return `  ${JSON.stringify(fieldName)}: typeName,\n`;
       default: {
         const never: never = keyValue;
         throw new Error(
@@ -415,19 +393,15 @@ ${Object.entries(fields)
       }
     }
   })
-  .join("")}
-  });
-}`;
-      possibilities.push(handler);
-    }
-    const functionBody = `\
-return typeName => {
-${possibilities.join("\n")}
-throw new Error(\`GraphileInternalError<03e5d669-5029-41d6-bfbe-5ec563d3fc5b>: Unhandled typeName '\${typeName}'\`);
-}
-`;
-    const f = new Function("verbatimPrototype", "$$concreteType", functionBody);
-    return f(verbatimPrototype, $$concreteType) as any;
+  .join("")}})`;
+    const functionBody = `return () => ${handler};`;
+    const f = new Function(
+      "verbatimPrototype",
+      "$$concreteType",
+      "typeName",
+      functionBody,
+    );
+    return f(verbatimPrototype, $$concreteType, typeName) as any;
   }
 }
 
