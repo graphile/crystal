@@ -39,6 +39,7 @@ import {
   __TrackedObjectStep,
   __ValueStep,
   ExecutableStep,
+  object,
 } from "../index.js";
 import { inputPlan } from "../input.js";
 import type {
@@ -62,6 +63,7 @@ import {
 } from "../step.js";
 import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
+import { graphqlResolver } from "../steps/graphqlResolver.js";
 import {
   arraysMatch,
   defaultValueToValueNode,
@@ -873,13 +875,16 @@ export class OperationPlan {
          * This will never be the crystal resolver - only ever the user-supplied
          * resolver or nothing
          */
-        const graphqlResolver =
+        const resolvedResolver =
           rawResolver && isCrystalWrapped(rawResolver)
             ? rawResolver[$$crystalWrapped].original
             : rawResolver;
 
         const usesDefaultResolver =
-          !graphqlResolver || graphqlResolver === defaultFieldResolver;
+          !resolvedResolver || resolvedResolver === defaultFieldResolver;
+
+        const resolver =
+          resolvedResolver && !usesDefaultResolver ? resolvedResolver : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -942,7 +947,7 @@ export class OperationPlan {
 
         const typePlan = objectType.extensions?.graphile?.Step;
 
-        if (graphqlResolver) {
+        if (resolver) {
           this.pure = false;
         }
 
@@ -969,7 +974,7 @@ export class OperationPlan {
           );
         }
 
-        if (resultIsPlanned && graphqlResolver) {
+        if (resultIsPlanned && resolver) {
           throw new Error(
             `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; this means that ${objectType.name}.${fieldName} is forbidden from defining a GraphQL resolver.`,
           );
@@ -1015,6 +1020,18 @@ export class OperationPlan {
           // There's no step resolver; use the parent step
           step = parentStep;
           // TODO: this.isUnplannedByPathIdentity[pathIdentity] = true;
+        }
+
+        if (resolver) {
+          step = withGlobalLayerPlan(fieldLayerPlan, polymorphicPaths, () => {
+            const $args = object(
+              field.arguments?.reduce((memo, arg) => {
+                memo[arg.name.value] = trackedArguments.get(arg.name.value);
+                return memo;
+              }, Object.create(null)) ?? Object.create(null),
+            );
+            return graphqlResolver(resolver, step, $args);
+          });
         }
 
         // this.planIdByPathIdentity[pathIdentity] = step.id;
