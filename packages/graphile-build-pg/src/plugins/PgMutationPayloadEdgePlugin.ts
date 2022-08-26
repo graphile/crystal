@@ -6,11 +6,7 @@ import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "dataplanner";
 import { connection, constant, EdgeStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type {
-  GraphQLEnumType,
-  GraphQLObjectType,
-  GraphQLSchema,
-} from "graphql";
+import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";

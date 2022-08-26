@@ -19,7 +19,6 @@ import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { assertPolymorphicData } from "../polymorphic.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
-import type { LayerPlan } from "./LayerPlan.js";
 
 // An error that indicates this entry was skipped because it didn't match
 // polymorphicPath.

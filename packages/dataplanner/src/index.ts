@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import debugFactory from "debug";
 
 import { crystalPrint } from "./crystalPrint.js";

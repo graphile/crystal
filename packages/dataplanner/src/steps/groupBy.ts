@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { getNamedType } from "graphql";
 
 import type { ExecutableStep } from "../step.js";
 import { isListCapableStep } from "../step.js";

@@ -4,15 +4,10 @@ import type {
   ExecutionArgs,
   ExecutionResult,
 } from "graphql";
-import { execute as graphqlExecute } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { inspect } from "util";
 
-import type {
-  ExecutionEventEmitter,
-  ExecutionEventMap,
-  PromiseOrDirect,
-} from "./interfaces.js";
+import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import type { CrystalPrepareOptions } from "./prepare.js";
 import { dataplannerPrepare } from "./prepare.js";

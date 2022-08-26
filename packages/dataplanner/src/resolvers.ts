@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
+import type { GraphQLFieldResolver } from "graphql";
 import { defaultFieldResolver } from "graphql";
 
 import { isCrystalError } from "./error.js";
-import { establishOperationPlan } from "./establishOperationPlan.js";
 import { $$verbatim } from "./interfaces.js";
 import { __ValueStep } from "./steps/index.js";
 

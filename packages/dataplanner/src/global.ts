@@ -1,5 +1,3 @@
-import type { GraphQLOutputType } from "graphql";
-
 let debug = false;
 export function setDebug(newDebug: boolean): void {
   debug = newDebug;

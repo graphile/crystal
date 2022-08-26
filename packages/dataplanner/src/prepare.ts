@@ -21,13 +21,13 @@ import type {
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
-import type { OutputPlan, OutputPlanTypeObject } from "./engine/OutputPlan.js";
+import type { OutputPlan } from "./engine/OutputPlan.js";
 import { isCrystalError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import { arrayOfLength, isPromiseLike } from "./utils.js";
+import { isPromiseLike } from "./utils.js";
 
 const isTest = process.env.NODE_ENV === "test";
 const $$contextPlanCache = Symbol("contextPlanCache");
@@ -93,10 +93,10 @@ const finalize = (
   } else {
     if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
       // Return an async iterator
-      let alive = true;
+      let _alive = true;
       const iterator: ResultIterator = newIterator(() => {
         // TODO: ABORT code
-        alive = false;
+        _alive = false;
       });
       iterator.push({
         data,
@@ -319,8 +319,8 @@ export function executePreemptive(
         }
       });
       (async () => {
-        // eslint-disable-next-line no-constant-condition
         let i = 0;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const next = await Promise.race([abort, stream.next()]);
           if (stopped || !next) {
@@ -712,7 +712,7 @@ function processSingleDeferred(
   }
 
   let bucketIndex = 0;
-  for (const [iterator, spec] of specs) {
+  for (const [, spec] of specs) {
     polymorphicPathList[bucketIndex] =
       spec.bucket.polymorphicPathList[spec.bucketIndex];
     for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
