@@ -33,7 +33,7 @@ import { Pool } from "pg";
 import prettier from "prettier";
 
 import { makeExampleSchema } from "../src/examples/exampleSchema.js";
-import type { WithPgClient } from "../src/index.js";
+import { PgSubscriber, WithPgClient } from "../src/index.js";
 
 const schema = makeExampleSchema();
 
@@ -143,9 +143,11 @@ async function main() {
 
   async function test(source: string, variableValues = Object.create(null)) {
     const withPgClient = makeNodePostgresWithPgClient(testPool);
+    const pgSubscriber = new PgSubscriber(testPool);
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},
       withPgClient,
+      pgSubscriber,
     };
     console.log();
     console.log();
