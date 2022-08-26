@@ -18,7 +18,6 @@ import {
   getNullableType,
   isEnumType,
   isInterfaceType,
-  isLeafType,
   isListType,
   isNonNullType,
   isObjectType,
@@ -43,6 +42,7 @@ import {
 } from "../index.js";
 import { inputPlan } from "../input.js";
 import type {
+  FieldArgs,
   FieldPlanResolver,
   LocationDetails,
   StepOptions,
@@ -571,15 +571,22 @@ export class OperationPlan {
       node: this.operation.selectionSet.selections,
     };
     if (subscriptionPlanResolver) {
+      // TODO: optimize this
+      const trackedArguments = withGlobalLayerPlan(
+        this.rootLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
+        () => this.getTrackedArguments(rootType, field),
+      );
       const { haltTree, step: subscribeStep } = this.planField(
         this.rootLayerPlan,
         path,
-        POLYMORPHIC_ROOT_PATH,
+        POLYMORPHIC_ROOT_PATHS,
         rootType,
         fields,
         subscriptionPlanResolver,
         this.trackedRootValueStep,
         fieldSpec,
+        trackedArguments,
       );
       if (haltTree) {
         throw new Error("Failed to setup subscription");
@@ -595,10 +602,24 @@ export class OperationPlan {
         this.rootLayerPlan.polymorphicPaths,
       );
 
+      // TODO: move this somewhere else
+      const hasItemPlan = (
+        step: ExecutableStep,
+      ): step is ExecutableStep & {
+        itemPlan: ($item: ExecutableStep) => ExecutableStep;
+      } => {
+        return (
+          "itemPlan" in (subscribeStep as any).itemPlan &&
+          typeof (subscribeStep as any).itemPlan === "function"
+        );
+      };
+
       const streamItemPlan = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
-        () => subscribeStep.itemPlan(new __ItemStep(subscribeStep)),
+        hasItemPlan(subscribeStep)
+          ? () => subscribeStep.itemPlan(new __ItemStep(subscribeStep))
+          : () => new __ItemStep(subscribeStep),
       );
       this.subscriptionItemStepId = streamItemPlan.id;
       this.deduplicateSteps();
@@ -841,7 +862,6 @@ export class OperationPlan {
         const fieldType = objectTypeFields[fieldName].type;
         const rawPlanResolver = objectField.extensions?.graphile?.plan;
         const namedReturnType = getNamedType(fieldType);
-        const namedResultTypeIsLeaf = isLeafType(namedReturnType);
 
         /**
          * This could be the crystal resolver or a user-supplied resolver or
@@ -933,9 +953,6 @@ export class OperationPlan {
         const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
         const fieldHasPlan = !!planResolver;
 
-        // Return raw data if either the user has their own resolver _or_ it's a leaf field.
-        const returnRaw = graphqlResolver != null || namedResultTypeIsLeaf;
-
         if (typePlan && !fieldHasPlan) {
           throw new Error(
             `Every field within a planned type must have a plan; object type ${
@@ -963,6 +980,9 @@ export class OperationPlan {
         let step: ExecutableStep | PolymorphicStep;
         // this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
         let haltTree = false;
+        const polymorphicPaths: ReadonlySet<string> = new Set([
+          polymorphicPath,
+        ]);
         const fieldLayerPlan = isMutation
           ? new LayerPlan(
               this,
@@ -973,16 +993,22 @@ export class OperationPlan {
               outputPlan.layerPlan.polymorphicPaths,
             )
           : outputPlan.layerPlan;
+        const trackedArguments = withGlobalLayerPlan(
+          fieldLayerPlan,
+          polymorphicPaths,
+          () => this.getTrackedArguments(objectType, fieldNodes[0]),
+        );
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
             fieldLayerPlan,
             path,
-            polymorphicPath,
+            polymorphicPaths,
             objectType,
             fieldNodes,
             planResolver,
             parentStep,
             objectField,
+            trackedArguments,
           ));
         } else {
           // TODO: should this use the default plan resolver?
@@ -1381,21 +1407,18 @@ export class OperationPlan {
   private planField(
     layerPlan: LayerPlan,
     path: readonly string[],
-    polymorphicPath: string,
+    polymorphicPaths: ReadonlySet<string>,
     objectType: GraphQLObjectType,
     fieldNodes: FieldNode[],
-    planResolver: FieldPlanResolver<any, any, any>,
+    planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
     parentStep: ExecutableStep,
     field: GraphQLField<any, any>,
+    trackedArguments: TrackedArguments,
     deduplicate = true,
-  ) {
+  ): { haltTree: boolean; step: ExecutableStep<any>; fieldArgs: FieldArgs } {
     this.loc.push(`planField(${path.join(".")})`);
-    const polymorphicPaths = new Set([polymorphicPath]);
-    const trackedArguments = withGlobalLayerPlan(
-      layerPlan,
-      polymorphicPaths,
-      () => this.getTrackedArguments(objectType, fieldNodes[0]),
-    );
+
+    let _fieldArgs!: FieldArgs;
 
     let step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
       withFieldArgsForArguments(
@@ -1403,11 +1426,13 @@ export class OperationPlan {
         parentStep,
         trackedArguments,
         field,
-        (fieldArgs) =>
-          planResolver(parentStep, fieldArgs, {
+        (fieldArgs) => {
+          _fieldArgs = fieldArgs;
+          return planResolver(parentStep, fieldArgs, {
             field,
             schema: this.schema,
-          }),
+          });
+        },
       ),
     );
     let haltTree = false;
@@ -1470,7 +1495,7 @@ export class OperationPlan {
     }
 
     this.loc.pop();
-    return { step, haltTree };
+    return { step, haltTree, fieldArgs: _fieldArgs };
   }
 
   /**

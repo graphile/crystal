@@ -36,7 +36,7 @@ export function withFieldArgsForArguments<
   parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
-  callback: (fieldArgs: FieldArgs) => T,
+  callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
   operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
