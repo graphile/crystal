@@ -1854,6 +1854,14 @@ export class OperationPlan {
       }
     }
 
+    // Finally, we can't throw away mutation steps!
+    for (let i = 0, l = this.steps.length; i < l; i++) {
+      const step = this.steps[i];
+      if (step && step.id === i && step.hasSideEffects) {
+        this.markStepActive(step, activeSteps);
+      }
+    }
+
     for (let i = 0, l = this.steps.length; i < l; i++) {
       const step = this.steps[i];
       if (step && !activeSteps.has(step)) {
