@@ -149,17 +149,19 @@ export function executeOutputPlan(
   bucket: Bucket,
   bucketIndex: number,
 ): JSONValue {
-  assert.strictEqual(
-    bucket.isComplete,
-    true,
-    "Can only process an output plan for a completed bucket",
-  );
   const entry = bucket.store[outputPlan.rootStepId];
-  if (!entry) {
-    console.dir(bucket.store);
-    throw new Error(
-      `GraphileInternalError<aa9cde16-67da-4f30-9f63-3b3cbb7cb0b9>: No store entry for bucket(${bucket.layerPlan.id}/${bucket.layerPlan.reason.type})'s outputPlan.rootStepId ${outputPlan.rootStepId} (layer rootStepId: ${bucket.layerPlan.rootStepId})`,
+  if (isDev) {
+    assert.strictEqual(
+      bucket.isComplete,
+      true,
+      "Can only process an output plan for a completed bucket",
     );
+    if (!entry) {
+      console.dir(bucket.store);
+      throw new Error(
+        `GraphileInternalError<aa9cde16-67da-4f30-9f63-3b3cbb7cb0b9>: No store entry for bucket(${bucket.layerPlan.id}/${bucket.layerPlan.reason.type})'s outputPlan.rootStepId ${outputPlan.rootStepId} (layer rootStepId: ${bucket.layerPlan.rootStepId})`,
+      );
+    }
   }
   const bucketRootValue = entry[bucketIndex];
 
@@ -179,11 +181,18 @@ export function executeOutputPlan(
       null, // extensions
     );
   }
-  switch (outputPlan.type.mode) {
+
+  const outputPlanMode = outputPlan.type.mode;
+  if (
+    outputPlanMode !== "root" &&
+    outputPlanMode !== "introspection" &&
+    bucketRootValue == null
+  ) {
+    return null;
+  }
+
+  switch (outputPlanMode) {
     case "leaf": {
-      if (bucketRootValue == null) {
-        return null;
-      }
       if (ctx.requestContext.insideGraphQL) {
         // Don't serialize to avoid the double serialization problem
         return bucketRootValue;
@@ -193,14 +202,13 @@ export function executeOutputPlan(
     }
     case "root":
     case "object": {
-      if (outputPlan.type.mode !== "root" && bucketRootValue == null) {
-        return null;
+      if (isDev) {
+        assert.ok(
+          outputPlan.objectCreator,
+          `GraphileInternalError<2c75b7a7-e78d-47bb-936c-b6e030452d30>: ${outputPlan}.objectCreator was not constructed yet`,
+        );
       }
-      assert.ok(
-        outputPlan.objectCreator,
-        `GraphileInternalError<2c75b7a7-e78d-47bb-936c-b6e030452d30>: ${outputPlan}.objectCreator was not constructed yet`,
-      );
-      const data = outputPlan.objectCreator((key, spec) => {
+      const data = outputPlan.objectCreator!((key, spec) => {
         const newPath = [...ctx.path, key];
         const childOutputPlan = spec.outputPlan;
         const childCtx: OutputPlanContext = {
@@ -287,13 +295,11 @@ export function executeOutputPlan(
     }
     case "array": {
       if (!Array.isArray(bucketRootValue)) {
-        if (bucketRootValue != null) {
-          console.warn(
-            `Hit fallback for value ${inspect(
-              bucketRootValue,
-            )} coercion to mode ${outputPlan.type.mode}`,
-          );
-        }
+        console.warn(
+          `Hit fallback for value ${inspect(
+            bucketRootValue,
+          )} coercion to mode ${outputPlan.type.mode}`,
+        );
         return null;
       }
 
@@ -374,23 +380,23 @@ export function executeOutputPlan(
       return data;
     }
     case "polymorphic": {
-      if (bucketRootValue == null) {
-        return null;
+      if (!isPolymorphicData(bucketRootValue)) {
+        throw new Error(
+          "GraphileInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
+        );
       }
-      assert.ok(
-        isPolymorphicData(bucketRootValue),
-        "Expected polymorphic data",
-      );
       const typeName = bucketRootValue[$$concreteType];
-      assert.ok(
-        typeName,
-        "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
-      );
       const childOutputPlan = outputPlan.childByTypeName[typeName];
-      assert.ok(
-        childOutputPlan,
-        `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
-      );
+      if (isDev) {
+        assert.ok(
+          typeName,
+          "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
+        );
+        assert.ok(
+          childOutputPlan,
+          `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
+        );
+      }
       const [childBucket, childBucketIndex] = getChildBucketAndIndex(
         childOutputPlan,
         outputPlan,
