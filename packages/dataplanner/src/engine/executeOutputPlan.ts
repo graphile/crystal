@@ -195,13 +195,11 @@ export function executeOutputPlan(
           // __typename already handled
           continue;
         }
-        if (isDev) {
-          assert.strictEqual(spec.type, "outputPlan");
-        }
         const newPath = [...ctx.path, key];
         const childOutputPlan = spec.outputPlan;
         const childCtx: OutputPlanContext = {
-          ...ctx,
+          requestContext: ctx.requestContext,
+          root: ctx.root,
           path: newPath,
           nullRoot: spec.isNonNull
             ? ctx.nullRoot
