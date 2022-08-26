@@ -269,7 +269,7 @@ export function executeOutputPlan(
           spec.isNonNull,
           doIt,
           childCtx,
-          outputPlan.locationDetails,
+          spec.locationDetails,
         );
       }
 
