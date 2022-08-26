@@ -212,16 +212,6 @@ export class ExecutableStep<TData = any> extends BaseStep {
   public readonly id: number;
 
   /**
-   * This identifies the deepest pathIdentity that is a common ancestor to all
-   * the places this plan is used. This value is then used to influence where
-   * the result of executing the plan is stored.
-   *
-   * @internal
-   *
-   * @deprecated Please use layerPlan instead
-   */
-  public commonAncestorPathIdentity = "";
-
   /**
    * True when `optimize` has been called at least once.
    */
@@ -292,26 +282,6 @@ export class ExecutableStep<TData = any> extends BaseStep {
         );
       }
     }
-
-    /*
-    
-    / *
-     * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all
-     * of our dependencies; this effectively means that we only care about list
-     * boundaries (since `__ItemStep` opts out of this) which allows us to
-     * optimise more plans.
-     * /
-    if (step.parentPathIdentity.length > this.parentPathIdentity.length) {
-      this.parentPathIdentity = step.parentPathIdentity;
-      if (
-        !this.createdWithParentPathIdentity.startsWith(this.parentPathIdentity)
-      ) {
-        throw new Error(
-          `${this} was created in '${this.createdWithParentPathIdentity}' but we have a dependency on '${this.parentPathIdentity}' which is outside of this path.`,
-        );
-      }
-    }
-    */
 
     const existingIndex = this._dependencies.indexOf(step.id);
     if (existingIndex >= 0) {
@@ -509,11 +479,11 @@ export function assertModifierStep<
   TParentStep extends ExecutableStep | ModifierStep<any>,
 >(
   plan: BaseStep,
-  pathIdentity: string,
+  pathDescription: string,
 ): asserts plan is ModifierStep<TParentStep> {
   if (!isModifierStep(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be a modifier plan, but it does not implement the 'apply' method.`,
+      `The plan returned from '${pathDescription}' should be a modifier plan, but it does not implement the 'apply' method.`,
     );
   }
 }
@@ -539,11 +509,11 @@ export function assertListCapableStep<
   TItemStep extends ExecutableStep<TData>,
 >(
   plan: ExecutableStep<ReadonlyArray<TData>>,
-  pathIdentity: string,
+  pathDescription: string,
 ): asserts plan is ListCapableStep<TData, TItemStep> {
   if (!isListCapableStep(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
+      `The plan returned from '${pathDescription}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
     );
   }
 }

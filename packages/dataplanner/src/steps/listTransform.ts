@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
@@ -15,7 +14,6 @@ import type {
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
-import { isPromiseLike } from "../utils.js";
 import { __ItemStep } from "./__item.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
@@ -49,7 +47,6 @@ export interface ListTransformOptions<
   >;
   listItem?(itemPlan: ExecutableStep<any>): TItemStep;
   finalizeCallback?(data: TMemo): TMemo;
-  namedType: GraphQLNamedType & GraphQLOutputType;
   meta?: string;
 }
 
@@ -84,7 +81,6 @@ export class __ListTransformStep<
   >;
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemStep<this>) => TItemStep;
-  public namedType: GraphQLNamedType & GraphQLOutputType;
   private meta: string | null;
 
   /** Set during query planning.  */
@@ -103,7 +99,6 @@ export class __ListTransformStep<
       reduceCallback,
       finalizeCallback,
       listItem,
-      namedType,
       meta,
     } = options;
     this.listPlanDepId = this.addDependency(listPlan);
@@ -112,7 +107,6 @@ export class __ListTransformStep<
     this.reduceCallback = reduceCallback;
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
-    this.namedType = namedType;
     this.meta = meta ?? null;
 
     // Plan this subroutine
@@ -180,67 +174,11 @@ export class __ListTransformStep<
         peer.finalizeCallback === this.finalizeCallback &&
         peer.listItem === this.listItem,
     );
-    // TODO: We shouldn't return `peer` until we alias the replacement id in
-    // opPlan.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
-    // Also `itemPlanIdByListTransformStepId`.
-    //
-    // return peer;
   }
 
   // ListTransform plans must _NOT_ optimize away. They must persist.
   optimize() {
     return this;
-  }
-
-  finalize() {
-    // TODO: the commented code below needs to be factored into the new planner.
-    /*
-    // __ListTransformStep must list all their child chain's external
-    // dependencies as their own so that pluarility is correct for the
-    // buckets.
-    const transformDependencyStepId =
-      this.opPlan.transformDependencyPlanIdByTransformStepId[this.id];
-    const transformDependencyPlan = this.opPlan.dangerouslyGetStep(
-      transformDependencyStepId,
-    );
-
-    const externalDependencies = new Set<ExecutableStep>();
-    const listPlan = this.opPlan.dangerouslyGetStep(this.dependencies[0]);
-
-    const recurse = (innerPlan: ExecutableStep): boolean => {
-      if (innerPlan === listPlan) {
-        return true;
-      }
-      let hasInternal = false;
-      const externals = [];
-      for (const depId of innerPlan.dependencies) {
-        const dep = this.opPlan.dangerouslyGetStep(depId);
-        const internal = recurse(dep);
-        if (internal) {
-          hasInternal = true;
-        } else {
-          externals.push(dep);
-        }
-      }
-      if (hasInternal && externals.length > 0) {
-        externals.forEach((external) => {
-          externalDependencies.add(external);
-        });
-      }
-      return hasInternal;
-    };
-
-    recurse(transformDependencyPlan);
-    if (externalDependencies.size > 0) {
-      const itemStepId = this.opPlan.itemPlanIdByListTransformStepId[this.id]!;
-      const itemPlan = this.opPlan.dangerouslyGetStep(itemStepId);
-      for (const dep of externalDependencies) {
-        this.addDependency(dep);
-        (itemPlan.dependencies as Array<string>).push(dep.id);
-      }
-    }
-    */
-    return super.finalize();
   }
 
   async execute(

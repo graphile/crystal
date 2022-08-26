@@ -1,10 +1,6 @@
 import chalk from "chalk";
 import { inspect } from "util";
 
-import { isDev } from "./dev.js";
-import type { CrystalObject } from "./interfaces.js";
-import { PlanResults } from "./planResults.js";
-import { isCrystalObject } from "./resolvers.js";
 import { ExecutableStep } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {
@@ -49,14 +45,7 @@ const BG_COLORS = [
 ] as const;
 
 export function _crystalPrint(
-  symbol:
-    | string
-    | symbol
-    | symbol[]
-    | Record<symbol, any>
-    | Map<any, any>
-    | CrystalObject
-    | PlanResults,
+  symbol: string | symbol | symbol[] | Record<symbol, any> | Map<any, any>,
   seen: Set<any>,
 ): string {
   if (isDeferred(symbol)) {
@@ -68,13 +57,7 @@ export function _crystalPrint(
   if (symbol === ROOT_VALUE_OBJECT) {
     return chalk.gray`(blank)`;
   }
-  if (isCrystalObject(symbol)) {
-    return String(symbol);
-  }
   if (symbol instanceof ExecutableStep) {
-    return String(symbol);
-  }
-  if (symbol instanceof PlanResults) {
     return String(symbol);
   }
   if (Array.isArray(symbol)) {
@@ -200,14 +183,7 @@ function crystalPrintSymbol(symbol: symbol): string {
  * Prints something crystal-style (i.e. concise, coloured, with helpful detail)
  */
 export function crystalPrint(
-  symbol:
-    | symbol
-    | symbol[]
-    | Record<symbol, any>
-    | Map<any, any>
-    | CrystalObject
-    | PlanResults
-    | any,
+  symbol: symbol | symbol[] | Record<symbol, any> | Map<any, any> | any,
 ): string {
   return _crystalPrint(symbol, new Set());
 }
@@ -235,36 +211,4 @@ export function ansiPad(
   } else {
     return ansiString;
   }
-}
-
-/**
- * Prints a _lossy_ representation of a path identity. Path identities can get
- * really long really fast, which makes working with them a challenge; this
- * utility can help shrink them down so that they're useful for humans, though
- * they can be potentially misleading due to their deliberate data loss.
- */
-export function crystalPrintPathIdentity(
-  pathIdentity: string,
-  l = 1,
-  r = 1,
-): string {
-  let short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
-  if (!short) return pathIdentity || "¤";
-  if (isDev) {
-    const segments = short.split(">");
-    const shortenedSegments = segments.map((s, i) => {
-      if (i >= segments.length - 1) {
-        // Don't compress last one
-        return s;
-      }
-      if (s.length < 3 + l + r) {
-        // Don't compress short ones
-        return s;
-      }
-      return `${s.slice(0, l)}…${s.slice(s.length - r)}`;
-    });
-
-    short = shortenedSegments.join(">");
-  }
-  return short.replace(/\./g, chalk.gray("."));
 }

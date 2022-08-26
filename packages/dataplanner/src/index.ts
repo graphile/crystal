@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import debugFactory from "debug";
 
-import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
+import { crystalPrint } from "./crystalPrint.js";
 import { exportAsMany } from "./exportAs.js";
 import {
   CrystalPlans,
@@ -17,10 +17,7 @@ import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // TODO: doing this here feels "naughty".
 debugFactory.formatters.c = crystalPrint;
-debugFactory.formatters.p = (pathIdentity) =>
-  chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { ROOT_PATH } from "./constants.js";
 import { dataplannerEnforce } from "./dataplannerEnforce.js";
 import { dataplannerGraphql } from "./dataplannerGraphql.js";
 import { defer, Deferred } from "./deferred.js";
@@ -224,7 +221,6 @@ export {
   CrystalError,
   CrystalPlans,
   crystalPrint,
-  crystalPrintPathIdentity,
   crystalResolve,
   CrystalResultsList,
   CrystalResultStreamList,
@@ -340,7 +336,6 @@ export {
   reverse,
   reverseArray,
   ReverseStep,
-  ROOT_PATH,
   ScalarPlanResolver,
   ScalarPlans,
   setter,
@@ -360,10 +355,8 @@ export {
 
 exportAsMany({
   crystalPrint,
-  crystalPrintPathIdentity,
   makeCrystalSchema,
   OperationPlan,
-  ROOT_PATH,
   defer,
   dataplannerEnforce,
   execute,

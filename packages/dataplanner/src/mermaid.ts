@@ -83,7 +83,6 @@ export function printPlanGraph(
   operationPlan: OperationPlan,
   {
     // printPathRelations = false,
-    includePaths = true,
     concise = false,
   }: PrintPlanGraphOptions,
   {
@@ -149,55 +148,6 @@ export function printPlanGraph(
     }
     return planIdMap[plan.id];
   };
-
-  /*
-  const pathIdMap = Object.create(null);
-  const pathCounter = 0;
-  const pathId = (pathIdentity: string, isItemStep = false): string => {
-    if (!pathIdMap[pathIdentity]) {
-      pathIdMap[pathIdentity] = `P${++pathCounter}`;
-      const [lBrace, rBrace] = isItemStep
-        ? [">", "]"]
-        : operationPlan.fieldDigestByPathIdentity[pathIdentity]?.listDepth > 0
-        ? ["[/", "\\]"]
-        : operationPlan.fieldDigestByPathIdentity[pathIdentity]?.isLeaf
-        ? ["([", "])"]
-        : ["{{", "}}"];
-      graph.push(
-        `    ${pathIdMap[pathIdentity]}${lBrace}${mermaidEscape(
-          crystalPrintPathIdentity(pathIdentity, 2, 3),
-        )}${rBrace}:::path`,
-      );
-    }
-    return pathIdMap[pathIdentity];
-  };
-    graph.push("    %% subgraph fields");
-    {
-      const recurse = (parent: FieldDigest) => {
-        let parentId = pathId(parent.pathIdentity);
-        if (parent.itemPathIdentity !== parent.pathIdentity) {
-          const newParentId = pathId(parent.itemPathIdentity, true);
-          graph.push(`    ${parentId} -.- ${newParentId}`);
-          parentId = newParentId;
-        }
-        if (parent.childFieldDigests) {
-          for (const child of parent.childFieldDigests) {
-            recurse(child);
-            const childId = pathId(child.pathIdentity);
-            if (printPathRelations) {
-              graph.push(
-                `    ${
-                  printPathRelations ? "" : "%% "
-                }${parentId} -.-> ${childId}`,
-              );
-            }
-          }
-        }
-      };
-      recurse(operationPlan.rootFieldDigest!);
-    }
-    graph.push("    %% end");
-    */
 
   graph.push("");
   graph.push("    %% define steps");
@@ -266,60 +216,6 @@ export function printPlanGraph(
     },
   );
 
-  if (includePaths) {
-    graph.push("");
-    graph.push("    %% plan-to-path relationships");
-    // TODO: what should this be now?
-    /*
-    {
-      for (const [pathStepId, pathIdentities] of Object.entries(
-        pathIdentitiesByStepId,
-      )) {
-        const crystalPathIdentities = pathIdentities.reduce(
-          (memo, pathIdentity) => {
-            const crystalPathIdentity = crystalPrintPathIdentity(pathIdentity);
-            if (!memo[crystalPathIdentity]) {
-              memo[crystalPathIdentity] = 0;
-            }
-            memo[crystalPathIdentity]++;
-            return memo;
-          },
-          Object.create(null) as {
-            [crystalPrintPathIdentity: string]: number;
-          },
-        );
-        const text = Object.entries(crystalPathIdentities)
-          .sort((a, z) => z[1] - a[1])
-          .map(([id, count]) => `${id}${count > 1 ? ` x${count}` : ""}`)
-          .join("\n");
-        const pathNode = `P${pathStepId}`;
-        graph.push(`    ${pathNode}[${mermaidEscape(text)}]`);
-        graph.push(`    ${planId(steps[pathStepId])} -.-> ${pathNode}`);
-      }
-    }
-    */
-  }
-  /*
-    {
-      const recurse = (parent: FieldDigest) => {
-        const parentId = pathId(parent.pathIdentity);
-        graph.push(`    ${planId(steps[parent.planId])} -.-> ${parentId}`);
-        if (parent.pathIdentity !== parent.itemPathIdentity) {
-          const itemId = pathId(parent.itemPathIdentity);
-          graph.push(
-            `    ${planId(steps[parent.itemStepId])} -.-> ${itemId}`,
-          );
-        }
-        if (parent.childFieldDigests) {
-          for (const child of parent.childFieldDigests) {
-            recurse(child);
-          }
-        }
-      };
-      recurse(operationPlan.rootFieldDigest!);
-    }
-    */
-
   graph.push("");
   graph.push("    subgraph Buckets");
   for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
@@ -337,31 +233,6 @@ export function printPlanGraph(
         ? `(${layerPlan.reason.typeNames})`
         : ``);
     const outputMapStuff: string[] = [];
-    /*
-    const processObject = (
-      obj: { [fieldName: string]: BucketDefinitionFieldOutputMap },
-      path = "⠀⠀",
-    ): void => {
-      for (const fieldName in obj) {
-        const def = obj[fieldName];
-        const planIds = Object.values(def.planIdByRootPathIdentity);
-        const allIdsSame = planIds.every((id) => id === planIds[0]);
-        const planSource = allIdsSame
-          ? planIds[0].replace(/^_/, "")
-          : JSON.stringify(def.planIdByRootPathIdentity);
-        outputMapStuff.push(
-          `${path}${fieldName} <-${def.modeType}- ${planSource}`,
-        );
-        if (def.children) {
-          processObject(
-            def.children,
-            `⠀${concise ? path.replace(/[^⠀]/g, "") : path + fieldName}.`,
-          );
-        }
-      }
-    };
-    processObject(layerPlan.outputMap);
-    */
     graph.push(
       `    Bucket${layerPlan.id}(${mermaidEscape(
         `Bucket ${layerPlan.id}\n(${raisonDEtre})${

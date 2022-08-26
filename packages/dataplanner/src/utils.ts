@@ -17,7 +17,6 @@ import type {
   SelectionNode,
   ValueNode,
 } from "graphql";
-import { GraphQLInterfaceType, GraphQLUnionType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -25,11 +24,13 @@ import {
   GraphQLID,
   GraphQLInputObjectType,
   GraphQLInt,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLString,
+  GraphQLUnionType,
   Kind,
 } from "graphql";
 import { inspect } from "util";

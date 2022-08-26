@@ -2,7 +2,7 @@
 
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByStepId } from "./engine/OperationPlan";
-import type { ExecutionEventEmitter, PromiseOrDirect } from "./interfaces.js";
+import type { ExecutionEventEmitter } from "./interfaces.js";
 
 /**
  * @internal

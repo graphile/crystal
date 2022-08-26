@@ -18,11 +18,8 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestContext } from "./bucket.js";
-import type { Deferred } from "./deferred.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { CrystalError } from "./error.js";
 import type { InputStep } from "./input.js";
-import type { PlanResults, PlanResultsBucket } from "./planResults.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -130,7 +127,6 @@ export const $$verbatim = Symbol("verbatim");
  */
 export const $$bypassGraphQL = Symbol("bypassGraphQL");
 export const $$data = Symbol("data");
-export const $$pathIdentity = Symbol("pathIdentity");
 /**
  * For attaching additional metadata to the GraphQL execution result, for
  * example details of the plan or SQL queries or similar that were executed.
@@ -171,75 +167,6 @@ export interface PolymorphicData<TType extends string = string, _TData = any> {
 
 export interface IndexByListItemStepId {
   [listItemStepId: number]: number;
-}
-
-/**
- * This is part of execution-v1 which is deprecated; we're moving to execution
- * v2 which uses buckets instead of crystal objects and has a significantly
- * reduced garbage collection cost.
- */
-export interface CrystalObject {
-  toString(): string;
-  [$$data]: {
-    [fieldAlias: string]: any;
-  };
-  [$$pathIdentity]: string;
-  [$$concreteType]: string;
-  [$$crystalContext]: CrystalContext;
-
-  /**
-   * This is the plan result cache accessible from this CrystalObject - it
-   * should contain all the previously executed plans that plans below this
-   * CrystalObject in the operation depend on. See `PlanResults` for more
-   * information on the specifics of how the plan results are stored/accessed.
-   *
-   * When evaluating a particular CrystalObject you can be certain that all the
-   * list indexes have already been factored into the cache, so you just need
-   * to supply a plan's `commonAncestorPathIdentity` and `id` to read/write the
-   * data.
-   *
-   * When a new level of CrystalObject is created it will inherit a _copy_ of
-   * $$planResults from its parent - that way any shared `pathIdentity`
-   * "buckets" will share changes between them (since the values are references
-   * to the same objects), but any new pathIdentities will diverge - again, see
-   * `PlanResults` for more information on this.
-   *
-   * Plans can be executed more than once due to parts of the tree being
-   * delayed (possibly due to `@stream`/`@defer`, possibly just due to the
-   * resolvers for one "layer" not all completing at the same time), so we
-   * cannot rely on writing the results all at once.
-   */
-  [$$planResults]: PlanResults;
-}
-
-/** Execution-v1 batching; soon to be replaced. */
-export interface Batch {
-  pathIdentity: string;
-  crystalContext: CrystalContext;
-  sideEffectPlans: ReadonlyArray<ExecutableStep>;
-  plan: ExecutableStep;
-  itemPlan: ExecutableStep;
-  entries: Array<[CrystalObject, Deferred<any>]>;
-}
-
-/**
- * Details about a specific batch being executed. Execution-v1; soon to be
- * replaced.
- */
-export interface CrystalContext {
-  operationPlan: OperationPlan;
-
-  metaByStepId: {
-    [planId: number]: Record<string, unknown> | undefined;
-  };
-
-  inProgressPlanResolutions: {
-    [planId: number]: Map<PlanResultsBucket, Deferred<any>>;
-  };
-
-  rootCrystalObject: CrystalObject;
-
-  eventEmitter: ExecutionEventEmitter | undefined;
 }
 
 // These values are just to make reading the code a little clearer

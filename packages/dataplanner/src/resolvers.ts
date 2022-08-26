@@ -1,24 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import chalk from "chalk";
 import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 
-import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint.js";
 import { isCrystalError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type { CrystalContext, CrystalObject } from "./interfaces.js";
-import {
-  $$concreteType,
-  $$crystalContext,
-  $$data,
-  $$id,
-  $$pathIdentity,
-  $$planResults,
-  $$verbatim,
-} from "./interfaces.js";
-import type { PlanResults } from "./planResults.js";
+import { $$verbatim } from "./interfaces.js";
 import { __ValueStep } from "./steps/index.js";
-import { sharedNull } from "./utils.js";
 
 /*
  * **IMPORTANT**: This whole file is part of execution-v1 and is being phased out.
@@ -41,33 +28,6 @@ export function isCrystalWrapped<T>(
 ): t is T & { [$$crystalWrapped]: CrystalWrapDetails } {
   return typeof t === "function" && $$crystalWrapped in t;
 }
-
-const getOperationPlanFromResolver = <TContext extends object>(
-  context: TContext,
-  info: GraphQLResolveInfo,
-) => {
-  // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
-  // `operationName`; however all it really needs is the `operation` and
-  // `fragments`, so that's what we extract here.
-  const {
-    schema,
-    // fieldName,
-    operation,
-    fragments,
-    variableValues,
-    rootValue,
-  } = info;
-  // const alias = getAliasFromResolveInfo(info);
-  const operationPlan = establishOperationPlan({
-    schema,
-    operation,
-    fragments,
-    variableValues,
-    context,
-    rootValue,
-  });
-  return operationPlan;
-};
 
 /**
  * Wraps the given resolver function (or the default resolver) in a
@@ -117,7 +77,6 @@ function dataplannerResolverOrSubscriber<
           }
         }
       }
-      let possiblyParentCrystalObject: CrystalObject | null = null;
 
       // Note: for the most optimal execution, `rootValue` passed to graphql
       // should be a crystal object, this allows using {crystalContext} across
@@ -127,37 +86,10 @@ function dataplannerResolverOrSubscriber<
       // operationPlan) - e.g. as a result of multiple identical subscription
       // operations.
 
-      /**
-       * Sometimes we're able to precompute _some_ data for the parent, if so
-       * we store it in $$data. Note: in some cases we still need to pass this
-       * data through the original resolver.
-       */
-      const precomputedData = source?.[$$data];
-      if (precomputedData != null) {
-        const fieldAlias = info.path.key;
-        if (fieldAlias in precomputedData) {
-          // Short-circuit execution - we already have results
-          const result = precomputedData[fieldAlias];
-          if (userSpecifiedResolver !== undefined) {
-            return userSpecifiedResolver(result, argumentValues, context, info);
-            // NOTE: this cannot occur if the field is unplanned, so no need to handle that
-          } else {
-            return result;
-          }
-        }
-      }
-
-      // At this point, we know the data has not been predetermined, so we need
-      // to calculate it via a batch.
-
-      if (isCrystalObject(source)) {
-        possiblyParentCrystalObject = source;
-      }
-
-      const _operationPlan = possiblyParentCrystalObject
-        ? possiblyParentCrystalObject[$$crystalContext].operationPlan
-        : getOperationPlanFromResolver(context, info);
-      throw new Error("TODO<b85a2e03-2cd2-4b31-8360-525ca0630e80>");
+      // TODO: support execution inside GraphQL
+      throw new Error(
+        "TODO<b85a2e03-2cd2-4b31-8360-525ca0630e80>: In-GraphQL resolution is not currently supported, please use the 'execute' or 'dataplannerGraphql' functions from 'dataplanner'.",
+      );
     };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,
@@ -201,40 +133,4 @@ export function dataplannerSubscriber<
   TArgs = { [argName: string]: any },
 >(): GraphQLFieldResolver<TSource, TContext, TArgs> {
   return dataplannerResolverOrSubscriber(undefined, true);
-}
-
-/**
- * For debugging.
- */
-export function crystalObjectToString(this: CrystalObject) {
-  return chalk.bold.blue(
-    `CO(${chalk.bold.yellow(
-      crystalPrintPathIdentity(this[$$pathIdentity]),
-    )}/${crystalPrint(this[$$id])})`,
-  );
-}
-
-/**
- * Implements `NewCrystalObject`
- */
-export function newCrystalObject(
-  pathIdentity: string,
-  typeName: string,
-  crystalContext: CrystalContext,
-  planResults: PlanResults,
-): CrystalObject {
-  return {
-    toString: crystalObjectToString,
-    [$$crystalContext]: crystalContext,
-    [$$pathIdentity]: pathIdentity,
-    [$$concreteType]: typeName,
-    [$$planResults]: planResults,
-    [$$data]: Object.create(sharedNull),
-  };
-}
-
-export function isCrystalObject(input: any): input is CrystalObject {
-  return (
-    typeof input === "object" && input !== null && input[$$planResults] != null
-  );
 }

@@ -23,7 +23,7 @@ import type { __TrackedObjectStep } from "./steps/index.js";
  *
  * TODO: inline.
  */
-export function getDirective(
+function getDirective(
   selection: SelectionNode,
   directiveName: string,
 ): DirectiveNode | undefined {

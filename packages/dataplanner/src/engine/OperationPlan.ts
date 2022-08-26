@@ -798,8 +798,6 @@ export class OperationPlan {
           locationDetails,
         );
       }
-
-      // TODO: this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
     };
 
     assertObjectType(objectType);
@@ -987,10 +985,7 @@ export class OperationPlan {
           );
         }
 
-        // this.returnRawValueByPathIdentity[pathIdentity] = returnRaw;
-
         let step: ExecutableStep | PolymorphicStep;
-        // this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
         let haltTree = false;
         const polymorphicPaths: ReadonlySet<string> = new Set([
           polymorphicPath,
@@ -1026,7 +1021,6 @@ export class OperationPlan {
           // TODO: should this use the default plan resolver?
           // There's no step resolver; use the parent step
           step = parentStep;
-          // TODO: this.isUnplannedByPathIdentity[pathIdentity] = true;
         }
 
         if (resolver) {
@@ -1041,7 +1035,6 @@ export class OperationPlan {
           });
         }
 
-        // this.planIdByPathIdentity[pathIdentity] = step.id;
         next({
           haltTree,
           stepId: step.id,
@@ -1263,48 +1256,6 @@ export class OperationPlan {
       const allPossibleObjectTypes = isUnion
         ? nullableFieldType.getTypes()
         : this.schema.getImplementations(nullableFieldType).objects;
-
-      /*
-       * THIS IS OLD CODE, AND IT'S WRONG.
-       *
-       * The reason it's wrong is it can't process a query like the following,
-       * where there's only a `__typename` field in the selection set for a
-       * polymorphic selection set (not sure if the parent polymorphic
-       * selection set is required to reproduce the issue too...).
-       *
-       * ```
-       * {
-       *   singleTableItemById(id: 15) {
-       *     __typename
-       *     parent {
-       *       __typename
-       *     }
-       *   }
-       * }
-       * ```
-       * ---
-       *
-       * This is just the ones that select non-introspection fields - they need
-       * proper planning.
-      const relevantObjectTypes = isUnion
-        ? typesUsedInSelections(this, nullableFieldType.getTypes(), selections)
-        : (() => {
-            const interfaceType = nullableFieldType;
-            const implementations =
-              this.schema.getImplementations(interfaceType).objects;
-            if (
-              interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-                this,
-                interfaceType,
-                selections,
-              )
-            ) {
-              return implementations;
-            } else {
-              return typesUsedInSelections(this, implementations, selections);
-            }
-          })();
-       */
 
       /*
        * An output plan for it (knows how to branch the different object

@@ -15,7 +15,7 @@ import type { OperationPlan } from "./index.js";
  * types that may be queried in that selection (e.g. because there's a type
  * fragment on them or on one of the interfaces they implement).
  */
-export function typesUsedInSelections(
+function _typesUsedInSelections(
   operationPlan: OperationPlan,
   types: ReadonlyArray<GraphQLObjectType>,
   selections: ReadonlyArray<SelectionNode>,
@@ -141,7 +141,7 @@ export function fieldSelectionsForType(
  * non-introspection fields are queried on the interface (or any of the
  * interfaces it implements), false otherwise.
  */
-export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+function _interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
   operationPlan: OperationPlan,
   interfaceType: GraphQLInterfaceType,
   selections: readonly SelectionNode[],
@@ -159,7 +159,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
         );
         if (matchingInterfaceType && fragment.selectionSet.selections) {
           const result =
-            interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+            _interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
               operationPlan,
               matchingInterfaceType,
               fragment.selectionSet.selections,
@@ -178,7 +178,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
           );
           if (matchingInterfaceType && selection.selectionSet.selections) {
             const result =
-              interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+              _interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
                 operationPlan,
                 matchingInterfaceType,
                 selection.selectionSet.selections,
