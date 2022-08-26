@@ -180,6 +180,17 @@ export function executeOutputPlan(
     );
   }
   switch (outputPlan.type.mode) {
+    case "leaf": {
+      if (bucketRootValue == null) {
+        return null;
+      }
+      if (ctx.requestContext.insideGraphQL) {
+        // Don't serialize to avoid the double serialization problem
+        return bucketRootValue;
+      } else {
+        return outputPlan.type.serialize(bucketRootValue) as JSONValue;
+      }
+    }
     case "root":
     case "object": {
       if (outputPlan.type.mode !== "root" && bucketRootValue == null) {
@@ -274,47 +285,6 @@ export function executeOutputPlan(
 
       return data;
     }
-    case "polymorphic": {
-      if (bucketRootValue == null) {
-        return null;
-      }
-      assert.ok(
-        isPolymorphicData(bucketRootValue),
-        "Expected polymorphic data",
-      );
-      const typeName = bucketRootValue[$$concreteType];
-      assert.ok(
-        typeName,
-        "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
-      );
-      const childOutputPlan = outputPlan.childByTypeName[typeName];
-      assert.ok(
-        childOutputPlan,
-        `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
-      );
-      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-        childOutputPlan,
-        outputPlan,
-        bucket,
-        bucketIndex,
-      );
-      const newPath = [...ctx.path];
-      const childCtx: OutputPlanContext = {
-        requestContext: ctx.requestContext,
-        root: ctx.root,
-        path: newPath,
-        nullRoot: ctx.nullRoot,
-      };
-
-      const result =
-        executeOutputPlan(
-          childCtx,
-          childOutputPlan,
-          childBucket,
-          childBucketIndex,
-        ) ?? null;
-      return result;
-    }
     case "array": {
       if (!Array.isArray(bucketRootValue)) {
         if (bucketRootValue != null) {
@@ -403,19 +373,49 @@ export function executeOutputPlan(
 
       return data;
     }
-    case "null": {
-      return null;
-    }
-    case "leaf": {
+    case "polymorphic": {
       if (bucketRootValue == null) {
         return null;
       }
-      if (ctx.requestContext.insideGraphQL) {
-        // Don't serialize to avoid the double serialization problem
-        return bucketRootValue;
-      } else {
-        return outputPlan.type.serialize(bucketRootValue) as JSONValue;
-      }
+      assert.ok(
+        isPolymorphicData(bucketRootValue),
+        "Expected polymorphic data",
+      );
+      const typeName = bucketRootValue[$$concreteType];
+      assert.ok(
+        typeName,
+        "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
+      );
+      const childOutputPlan = outputPlan.childByTypeName[typeName];
+      assert.ok(
+        childOutputPlan,
+        `GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
+      );
+      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+        childOutputPlan,
+        outputPlan,
+        bucket,
+        bucketIndex,
+      );
+      const newPath = [...ctx.path];
+      const childCtx: OutputPlanContext = {
+        requestContext: ctx.requestContext,
+        root: ctx.root,
+        path: newPath,
+        nullRoot: ctx.nullRoot,
+      };
+
+      const result =
+        executeOutputPlan(
+          childCtx,
+          childOutputPlan,
+          childBucket,
+          childBucketIndex,
+        ) ?? null;
+      return result;
+    }
+    case "null": {
+      return null;
     }
     case "introspection": {
       const {
