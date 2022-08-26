@@ -611,7 +611,7 @@ export class OperationPlan {
         itemPlan: ($item: ExecutableStep) => ExecutableStep;
       } => {
         return (
-          "itemPlan" in (subscribeStep as any).itemPlan &&
+          "itemPlan" in (subscribeStep as any) &&
           typeof (subscribeStep as any).itemPlan === "function"
         );
       };
