@@ -76,6 +76,64 @@ function processRoot(
   }
 }
 
+const finalize = (
+  data: JSONValue | null | undefined | AsyncIterable<any>,
+  ctx: OutputPlanContext,
+  extensions: any,
+): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
+  if (isAsyncIterable(data)) {
+    // It's a subscription! Batch execute the child bucket for
+    // each entry in the stream, and then the output plan for that.
+    assert.strictEqual(
+      ctx.root.queue.length,
+      0,
+      "Subscription cannot also queue",
+    );
+    throw new Error("TODO<172acb34-c9d4-48f5-a26f-1b37260ecc14>: subscription");
+  } else {
+    if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
+      // Return an async iterator
+      let alive = true;
+      const iterator: ResultIterator = newIterator(() => {
+        // TODO: ABORT code
+        alive = false;
+      });
+      iterator.push({
+        data,
+        errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
+        extensions,
+        hasNext: true,
+        label: undefined,
+      });
+
+      const promise = processRoot(ctx, iterator);
+      if (isPromiseLike(promise)) {
+        promise.then(
+          () => {
+            iterator.push({ hasNext: false });
+            iterator.return(undefined);
+          },
+          (e) => {
+            iterator.throw(e);
+          },
+        );
+      } else {
+        iterator.push({ hasNext: false });
+        iterator.return(undefined);
+      }
+
+      return iterator;
+    } else {
+      return {
+        data: data as any,
+        errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
+        extensions,
+        hasNext: undefined,
+      };
+    }
+  }
+};
+
 function outputBucket(
   outputPlan: OutputPlan,
   rootBucket: Bucket,
@@ -158,73 +216,53 @@ export function executePreemptive(
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
 
-  const finalize = (
-    data: JSONValue | null | undefined | AsyncIterable<any>,
-    ctx: OutputPlanContext,
-  ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
-    if (isAsyncIterable(data)) {
-      // It's a subscription! Batch execute the child bucket for
-      // each entry in the stream, and then the output plan for that.
-      assert.strictEqual(
-        ctx.root.queue.length,
-        0,
-        "Subscription cannot also queue",
-      );
-      throw new Error(
-        "TODO<172acb34-c9d4-48f5-a26f-1b37260ecc14>: subscription",
-      );
-    } else {
-      if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
-        // Return an async iterator
-        let alive = true;
-        const iterator: ResultIterator = newIterator(() => {
-          // TODO: ABORT code
-          alive = false;
-        });
-        iterator.push({
-          data,
-          errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
-          extensions: rootValue[$$extensions] ?? undefined,
-          hasNext: true,
-          label: undefined,
-        });
-
-        const promise = processRoot(ctx, iterator);
-        if (isPromiseLike(promise)) {
-          promise.then(
-            () => {
-              iterator.push({ hasNext: false });
-              iterator.return(undefined);
-            },
-            (e) => {
-              iterator.throw(e);
-            },
-          );
-        } else {
-          iterator.push({ hasNext: false });
-          iterator.return(undefined);
-        }
-
-        return iterator;
-      } else {
-        return {
-          data: data as any,
-          errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
-          extensions: rootValue[$$extensions] ?? undefined,
-          hasNext: undefined,
-        };
-      }
-    }
-  };
-
-  const subscriptionBucket = rootBucket.layerPlan.children.find(
+  const subscriptionLayerPlan = rootBucket.layerPlan.children.find(
     (c) => c.reason.type === "subscription",
   );
 
   const executeStreamPayload = (
     payload: any,
-  ): PromiseOrDirect<ExecutionResult | AsyncExecutionResult> => {
-    throw new Error("TODO<eb7ab10a-7729-42dc-b5f1-bfb997fe9686>");
+  ): PromiseOrDirect<
+    ExecutionResult | AsyncGenerator<AsyncExecutionResult>
+  > => {
+    const layerPlan = subscriptionLayerPlan!;
+    // TODO: we could consider batching this.
+    const store: Bucket["store"] = Object.create(null);
+    const newBucketIndex = 0;
+
+    for (const depId of layerPlan.copyPlanIds) {
+      store[depId] = [];
+    }
+
+    store[layerPlan.rootStepId!] = [payload];
+    for (const depId of layerPlan.copyPlanIds) {
+      store[depId][newBucketIndex] = rootBucket.store[depId][bucketIndex];
+    }
+
+    const subscriptionBucket = newBucket({
+      layerPlan,
+      store,
+      hasErrors: rootBucket.hasErrors,
+      polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
+      size: 1,
+    });
+    const bucketPromise = executeBucket(subscriptionBucket, requestContext);
+    const output = () => {
+      const [ctx, result] = outputBucket(
+        operationPlan.rootOutputPlan,
+        subscriptionBucket,
+        newBucketIndex,
+        requestContext,
+        [],
+        rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+      );
+      return finalize(result, ctx, undefined);
+    };
+    if (isPromiseLike(bucketPromise)) {
+      return bucketPromise.then(output);
+    } else {
+      return output();
+    }
   };
 
   const output = () => {
@@ -260,7 +298,7 @@ export function executePreemptive(
       bucketRootValue &&
       isAsyncIterable(bucketRootValue) &&
       !isIterable(bucketRootValue) &&
-      subscriptionBucket
+      subscriptionLayerPlan
     ) {
       const stream = bucketRootValue[Symbol.asyncIterator]();
       // Do the async iterable
@@ -282,6 +320,10 @@ export function executePreemptive(
           if (stopped || !next) {
             break;
           }
+          if (!next) {
+            iterator.throw(new Error("Invalid iteration"));
+            break;
+          }
           const { done, value } = next;
           if (done) {
             break;
@@ -293,7 +335,14 @@ export function executePreemptive(
           if (payload === undefined) {
             break;
           }
-          iterator.push(payload);
+          if (isAsyncIterable(payload)) {
+            // TODO: avoid 'for await'
+            for await (const entry of payload) {
+              iterator.push(entry);
+            }
+          } else {
+            iterator.push(payload);
+          }
         }
       })().catch((e) => {
         iterator.throw(e);
@@ -309,7 +358,7 @@ export function executePreemptive(
       [],
       rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
     );
-    return finalize(result, ctx);
+    return finalize(result, ctx, rootValue[$$extensions] ?? undefined);
   };
 
   if (isPromiseLike(bucketPromise)) {

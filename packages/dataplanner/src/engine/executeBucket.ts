@@ -136,7 +136,13 @@ export function executeBucket(
   function reallyCompletedStep(
     finishedStep: ExecutableStep,
   ): void | Promise<void> {
-    inProgressSteps.delete(finishedStep);
+    if (!inProgressSteps.delete(finishedStep)) {
+      console.error(
+        `GraphileInternalError<c3d1276b-df0f-4f88-aabf-15fa0f7d8515>: Double complete of '${finishedStep}' detected; ignoring (but this indicates a bug in DataPlanner)`,
+      );
+      // DOUBLE COMPLETE?
+      return;
+    }
     pendingSteps.delete(finishedStep);
     if (pendingSteps.size === 0) {
       // Finished!
@@ -304,6 +310,9 @@ export function executeBucket(
         })
         .then(null, (e) => {
           // THIS SHOULD NEVER HAPPEN!
+          console.error(
+            `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+          );
           const crystalError = newCrystalError(
             new Error(
               `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,

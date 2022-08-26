@@ -193,13 +193,6 @@ export class OperationPlan {
   public makeMetaByStepId: () => MetaByStepId;
 
   /**
-   * The plan id for the plan that represents a single payload in the subscription stream (if any)
-   *
-   * @internal
-   */
-  public subscriptionItemStepId: number | undefined;
-
-  /**
    * @internal
    */
   public readonly itemStepIdByListStepId: {
@@ -615,14 +608,19 @@ export class OperationPlan {
         );
       };
 
-      const streamItemPlan = withGlobalLayerPlan(
+      const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
-        hasItemPlan(subscribeStep)
-          ? () => subscribeStep.itemPlan(new __ItemStep(subscribeStep))
-          : () => new __ItemStep(subscribeStep),
+        () => new __ItemStep(subscribeStep),
       );
-      this.subscriptionItemStepId = streamItemPlan.id;
+      subscriptionEventLayerPlan.rootStepId = $__item.id;
+      const streamItemPlan = hasItemPlan(subscribeStep)
+        ? withGlobalLayerPlan(
+            subscriptionEventLayerPlan,
+            POLYMORPHIC_ROOT_PATHS,
+            () => subscribeStep.itemPlan($__item),
+          )
+        : $__item;
       this.deduplicateSteps();
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
@@ -652,6 +650,12 @@ export class OperationPlan {
         },
         this.rootLayerPlan.polymorphicPaths,
       );
+      subscriptionEventLayerPlan.rootStepId = withGlobalLayerPlan(
+        subscriptionEventLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
+        // TODO: is this right?
+        () => new __ItemStep(this.rootValueStep),
+      ).id;
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
         this.rootValueStep,
@@ -666,6 +670,10 @@ export class OperationPlan {
         subscribeStep,
         rootType,
         selectionSet.selections,
+      );
+      // This is untested, so abort.
+      throw new Error(
+        "GraphileInternalError<2335c655-c656-4e5d-b8f4-d649340bfaea>: using a GraphQL subscribe isn't yet supported",
       );
     }
     this.loc.pop();
@@ -1812,12 +1820,6 @@ export class OperationPlan {
 
   private treeShakeSteps() {
     const activeSteps = new Set<ExecutableStep>();
-
-    // The root subscription step, if any, should be marked as active
-    if (this.subscriptionItemStepId) {
-      const step = this.steps[this.subscriptionItemStepId];
-      this.markStepActive(step, activeSteps);
-    }
 
     // TODO: ensure side-effect plans are handled nicely
 

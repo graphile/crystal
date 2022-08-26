@@ -228,13 +228,14 @@ export function executeOutputPlan(
         const doIt = (): JSONValue => {
           const t = spec.outputPlan.layerPlan.reason.type;
           if (isDev) {
-            if (t === "subroutine" || t === "subscription") {
+            if (t === "subroutine") {
               throw new Error(
                 `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
               );
             }
 
             if (
+              t !== "subscription" &&
               t !== "defer" &&
               t !== "root" &&
               t !== "polymorphic" &&
