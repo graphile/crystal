@@ -300,7 +300,8 @@ export function executeOutputPlan(
       );
       const newPath = [...ctx.path];
       const childCtx: OutputPlanContext = {
-        ...ctx,
+        requestContext: ctx.requestContext,
+        root: ctx.root,
         path: newPath,
         nullRoot: ctx.nullRoot,
       };
@@ -346,8 +347,9 @@ export function executeOutputPlan(
           i,
         );
         const newPath = [...ctx.path, i];
-        const childCtx = {
-          ...ctx,
+        const childCtx: OutputPlanContext = {
+          requestContext: ctx.requestContext,
+          root: ctx.root,
           path: newPath,
           nullRoot: childIsNonNull
             ? ctx.nullRoot
