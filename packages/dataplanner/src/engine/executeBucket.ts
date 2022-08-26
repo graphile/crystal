@@ -134,37 +134,39 @@ export function executeBucket(
       return;
     }
     const promises: PromiseLike<void>[] = [];
-    for (const potentialNextStep of finishedStep.dependentPlans) {
+    outerLoop: for (const potentialNextStep of finishedStep.dependentPlans) {
       const isPending = pendingSteps.has(potentialNextStep);
-      const isSuitable = isPending
-        ? potentialNextStep.dependencies.every(
-            isDev
-              ? (depId) => {
-                  if (Array.isArray(store[depId])) {
-                    return true;
-                  } else {
-                    const dep =
-                      bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
-                    assert.strictEqual(
-                      dep.layerPlan,
-                      bucket.layerPlan,
-                      `GraphileInternalError<4ca7f9f9-0a00-415f-b6f7-46858fde17c3>: Waiting on ${dep} but it'll never complete because it's not in this bucket (${bucket.layerPlan.id}); this is most likely a bug in copyPlanIds`,
-                    );
-                    return false;
-                  }
-                }
-              : (depId) => store[depId] !== undefined,
-          )
-        : false;
-      if (isSuitable) {
-        try {
-          const r = executeStep(potentialNextStep);
-          if (isPromiseLike(r)) {
-            promises.push(r);
+      if (!isPending) {
+        // We've already ran it, skip
+        continue;
+      }
+
+      // Check if it's suitable
+      const sld = potentialNextStep._sameLayerDependencies;
+      for (let i = 0, l = sld.length; i < l; i++) {
+        const depId = sld[i];
+        if (store[depId] === undefined) {
+          if (isDev) {
+            const dep =
+              bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
+            assert.strictEqual(
+              dep.layerPlan,
+              bucket.layerPlan,
+              `GraphileInternalError<4ca7f9f9-0a00-415f-b6f7-46858fde17c3>: Waiting on ${dep} but it'll never complete because it's not in this bucket (${bucket.layerPlan.id}); this is most likely a bug in copyPlanIds`,
+            );
           }
-        } catch (e) {
-          promises.push(Promise.reject(e));
+          continue outerLoop;
         }
+      }
+
+      // It's suitable; let's run it
+      try {
+        const r = executeStep(potentialNextStep);
+        if (isPromiseLike(r)) {
+          promises.push(r);
+        }
+      } catch (e) {
+        promises.push(Promise.reject(e));
       }
     }
     if (promises.length > 0) {

@@ -189,6 +189,15 @@ export class ExecutableStep<TData = any> extends BaseStep {
   public readonly dependencies: ReadonlyArray<number> = this._dependencies;
 
   /**
+   * The ids of the dependencies of this step that are in the same layer as it
+   * (optimization for executeBucket). Populated when finilizing the
+   * OperationPlan.
+   *
+   * @internal
+   */
+  public _sameLayerDependencies: Array<number> = [];
+
+  /**
    * The plans that depend on this plan. Not populated until the 'finalize'
    * phase; so don't rely on it until the OperationPlan is 'ready'.
    *
