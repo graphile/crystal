@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import type { ExecutionArgs } from "graphql";
+import { GraphQLError } from "graphql";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
@@ -21,6 +22,7 @@ import type {
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan, OutputPlanTypeObject } from "./engine/OutputPlan.js";
+import { isCrystalError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
@@ -217,6 +219,31 @@ export function executePreemptive(
 
   const output = () => {
     // Later we'll need to loop
+
+    const rootValueList = rootBucket.layerPlan.rootStepId
+      ? rootBucket.store[rootBucket.layerPlan.rootStepId]
+      : null;
+    const bucketRootValue = rootValueList?.[0];
+    if (isCrystalError(bucketRootValue)) {
+      // Something major went wrong!
+      const errors = [
+        new GraphQLError(
+          bucketRootValue.originalError.message,
+          operationPlan.rootOutputPlan.locationDetails.node, // node
+          undefined, // source
+          null, // positions
+          null, // path
+          bucketRootValue.originalError, // originalError
+          null, // extensions
+        ),
+      ];
+      return Object.assign(Object.create(null), {
+        errors,
+        extensions: bucketRootValue[$$extensions] ?? undefined,
+        hasNext: undefined,
+        label: undefined,
+      });
+    }
     const [ctx, result] = outputBucket(
       operationPlan.rootOutputPlan,
       rootBucket,
