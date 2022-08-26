@@ -45,6 +45,8 @@ graph TD
     Connection106["Connection[106∈0]<br />ᐸ102ᐳ"]:::plan
     Access133["Access[133∈1]<br />ᐸ49.11ᐳ"]:::plan
     __ListTransform108[["__ListTransform[108∈1]<br />ᐸeach:107ᐳ"]]:::plan
+    __Item109>"__Item[109∈2]<br />ᐸ133ᐳ"]:::itemplan
+    PgSelectSingle110["PgSelectSingle[110∈2]<br />ᐸperson_friendsᐳ"]:::plan
     __Item111>"__Item[111∈3]<br />ᐸ108ᐳ"]:::itemplan
     PgSelectSingle112["PgSelectSingle[112∈3]<br />ᐸperson_friendsᐳ"]:::plan
     PgClassExpression113["PgClassExpression[113∈3]<br />ᐸ__person_friends__.”id”ᐳ"]:::plan
@@ -96,6 +98,8 @@ graph TD
     PgSelectSingle74 --> PgClassExpression78
     First49 --> Access133
     Access133 --> __ListTransform108
+    Access133 -.-> __Item109
+    __Item109 --> PgSelectSingle110
     __ListTransform108 ==> __Item111
     __Item111 --> PgSelectSingle112
     PgSelectSingle112 --> PgClassExpression113
@@ -120,9 +124,9 @@ graph TD
     Bucket1("Bucket 1<br />(listItem)<br />Deps: 106, 121<br /><br />ROOT __Item{1}ᐸ32ᐳ[33]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,First49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,First60,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression67,First73,PgSelectSingle74,PgClassExpression75,PgClassExpression76,PgClassExpression78,__ListTransform108,First118,PgSelectSingle119,PgClassExpression120,First123,PgSelectSingle124,PgCursor125,PgClassExpression126,List127,Map128,List129,Access130,Map131,List132,Access133,Map134,List135 bucket1
-    Bucket2("Bucket 2<br />(subroutine)<br />ROOT null"):::bucket
+    Bucket2("Bucket 2<br />(subroutine)<br />ROOT PgSelectSingle{2}ᐸperson_friendsᐳ[110]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
+    class Bucket2,__Item109,PgSelectSingle110 bucket2
     Bucket3("Bucket 3<br />(listItem)<br />ROOT __Item{3}ᐸ108ᐳ[111]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item111,PgSelectSingle112,PgClassExpression113,PgClassExpression114,PgClassExpression116 bucket3

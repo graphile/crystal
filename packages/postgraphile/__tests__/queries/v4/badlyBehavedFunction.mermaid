@@ -15,6 +15,8 @@ graph TD
     Connection33["Connection[33∈0]<br />ᐸ29ᐳ"]:::plan
     PgSelect34[["PgSelect[34∈0]<br />ᐸbadly_behaved_functionᐳ"]]:::plan
     __ListTransform35[["__ListTransform[35∈0]<br />ᐸeach:34ᐳ"]]:::plan
+    __Item36>"__Item[36∈1]<br />ᐸ34ᐳ"]:::itemplan
+    PgSelectSingle37["PgSelectSingle[37∈1]<br />ᐸbadly_behaved_functionᐳ"]:::plan
     __Item38>"__Item[38∈2]<br />ᐸ35ᐳ"]:::itemplan
     PgSelectSingle39["PgSelectSingle[39∈2]<br />ᐸbadly_behaved_functionᐳ"]:::plan
     Constant40["Constant[40∈0]"]:::plan
@@ -23,6 +25,8 @@ graph TD
     Lambda43["Lambda[43∈2]<br />ᐸencodeᐳ"]:::plan
     PgClassExpression46["PgClassExpression[46∈2]<br />ᐸ”c”.”perso...unction__)ᐳ"]:::plan
     __ListTransform48[["__ListTransform[48∈0]<br />ᐸeach:47ᐳ"]]:::plan
+    __Item49>"__Item[49∈3]<br />ᐸ34ᐳ"]:::itemplan
+    PgSelectSingle50["PgSelectSingle[50∈3]<br />ᐸbadly_behaved_functionᐳ"]:::plan
     __Item51>"__Item[51∈4]<br />ᐸ48ᐳ"]:::itemplan
     PgSelectSingle52["PgSelectSingle[52∈4]<br />ᐸbadly_behaved_functionᐳ"]:::plan
     PgClassExpression55["PgClassExpression[55∈4]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
@@ -41,6 +45,8 @@ graph TD
     Access30 & Access31 --> Object32
     Object32 & Connection33 --> PgSelect34
     PgSelect34 --> __ListTransform35
+    PgSelect34 -.-> __Item36
+    __Item36 --> PgSelectSingle37
     __ListTransform35 ==> __Item38
     __Item38 --> PgSelectSingle39
     PgSelectSingle39 --> PgClassExpression41
@@ -48,6 +54,8 @@ graph TD
     List42 --> Lambda43
     PgSelectSingle39 --> PgClassExpression46
     PgSelect34 --> __ListTransform48
+    PgSelect34 -.-> __Item49
+    __Item49 --> PgSelectSingle50
     __ListTransform48 ==> __Item51
     __Item51 --> PgSelectSingle52
     PgSelectSingle52 --> PgClassExpression55
@@ -65,15 +73,15 @@ graph TD
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Access30,Access31,Object32,Connection33,PgSelect34,__ListTransform35,Constant40,__ListTransform48,Constant57 bucket0
-    Bucket1("Bucket 1<br />(subroutine)<br />ROOT null"):::bucket
+    Bucket1("Bucket 1<br />(subroutine)<br />ROOT PgSelectSingle{1}ᐸbadly_behaved_functionᐳ[37]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1 bucket1
+    class Bucket1,__Item36,PgSelectSingle37 bucket1
     Bucket2("Bucket 2<br />(listItem)<br />Deps: 40<br /><br />ROOT __Item{2}ᐸ35ᐳ[38]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item38,PgSelectSingle39,PgClassExpression41,List42,Lambda43,PgClassExpression46 bucket2
-    Bucket3("Bucket 3<br />(subroutine)<br />ROOT null"):::bucket
+    Bucket3("Bucket 3<br />(subroutine)<br />ROOT PgSelectSingle{3}ᐸbadly_behaved_functionᐳ[50]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3 bucket3
+    class Bucket3,__Item49,PgSelectSingle50 bucket3
     Bucket4("Bucket 4<br />(listItem)<br />Deps: 57<br /><br />ROOT __Item{4}ᐸ48ᐳ[51]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item51,PgSelectSingle52,Edge53,PgCursor54,PgClassExpression55,List56,PgClassExpression58,List59,Lambda60,PgClassExpression63 bucket4
