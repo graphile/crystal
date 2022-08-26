@@ -129,6 +129,12 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    */
   public rootStepId: number;
 
+  // TODO: set this default to 'true'
+  /**
+   * If true, we'll create null prototype objects for safety.
+   */
+  public dontTrustObject = false;
+
   // TODO: since polymorphic handles branching, we can remove the `typeName` layer from this.
   /**
    * For root/object output plans, the keys to set on the resulting object
@@ -374,7 +380,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       );
     }
 
-    const handler = `Object.assign(Object.create(verbatimPrototype), {
+    const start = this.dontTrustObject
+      ? `Object.assign(Object.create(verbatimPrototype), {`
+      : `({`;
+    const handler = `${start}
   [$$concreteType]: typeName,
 ${Object.entries(fields)
   .map(([fieldName, keyValue]) => {
