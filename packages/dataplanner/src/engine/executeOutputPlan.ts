@@ -189,12 +189,7 @@ export function executeOutputPlan(
         outputPlan.objectCreator,
         `GraphileInternalError<2c75b7a7-e78d-47bb-936c-b6e030452d30>: ${outputPlan}.objectCreator was not constructed yet`,
       );
-      const data = outputPlan.objectCreator();
-      for (const [key, spec] of Object.entries(outputPlan.keys)) {
-        if (spec.type === "__typename") {
-          // __typename already handled
-          continue;
-        }
+      const data = outputPlan.objectCreator((key, spec) => {
         const newPath = [...ctx.path, key];
         const childOutputPlan = spec.outputPlan;
         const childCtx: OutputPlanContext = {
@@ -252,13 +247,13 @@ export function executeOutputPlan(
           return result;
         };
 
-        data[key] = doItHandleNull(
+        return doItHandleNull(
           spec.isNonNull,
           doIt,
           childCtx,
           spec.locationDetails,
         );
-      }
+      });
 
       // Everything seems okay; queue any deferred payloads
       for (const defer of outputPlan.deferredOutputPlans) {

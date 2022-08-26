@@ -6,9 +6,12 @@ import { inspect } from "util";
 
 import { isDev } from "../dev.js";
 import type { JSONObject, JSONValue, LocationDetails } from "../interfaces.js";
-import { $$concreteType, $$verbatim } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import type { LayerPlan } from "./LayerPlan.js";
+
+export type ObjectCreator = (
+  callback: (key: string, spec: OutputPlanKeyValueOutputPlan) => JSONValue,
+) => JSONObject;
 
 export type OutputPlanTypeIntrospection = {
   mode: "introspection";
@@ -98,17 +101,19 @@ export type OutputPlanType =
   | OutputPlanTypeArray
   | OutputPlanTypeIntrospection;
 
+export type OutputPlanKeyValueOutputPlan = {
+  type: "outputPlan";
+  outputPlan: OutputPlan;
+  isNonNull: boolean;
+  locationDetails: LocationDetails;
+};
+export type OutputPlanKeyValueTypeName = {
+  type: "__typename";
+  locationDetails: LocationDetails;
+};
 export type OutputPlanKeyValue =
-  | {
-      type: "outputPlan";
-      outputPlan: OutputPlan;
-      isNonNull: boolean;
-      locationDetails: LocationDetails;
-    }
-  | {
-      type: "__typename";
-      locationDetails: LocationDetails;
-    };
+  | OutputPlanKeyValueOutputPlan
+  | OutputPlanKeyValueTypeName;
 
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
@@ -128,12 +133,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * OutputPlanMode.
    */
   public rootStepId: number;
-
-  // TODO: set this default to 'true'
-  /**
-   * If true, we'll create null prototype objects for safety.
-   */
-  public dontTrustObject = false;
 
   // TODO: since polymorphic handles branching, we can remove the `typeName` layer from this.
   /**
@@ -313,7 +312,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   /** @internal */
-  public objectCreator: (() => JSONObject) | null = null;
+  public objectCreator: ObjectCreator | null = null;
   finalize() {
     if (this.type.mode === "root" || this.type.mode === "object") {
       this.objectCreator = this.makeObjectCreator(this.type.typeName);
@@ -360,7 +359,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * Returns a function that, given a type name, creates an object with the
    * fields in the given order.
    */
-  makeObjectCreator(typeName: string): () => JSONObject {
+  makeObjectCreator(typeName: string): ObjectCreator {
     const fields = this.keys;
     const keys = Object.keys(fields);
     /*
@@ -380,16 +379,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       );
     }
 
-    const start = this.dontTrustObject
-      ? `Object.assign(Object.create(verbatimPrototype), {`
-      : `({`;
-    const handler = `${start}
-  [$$concreteType]: typeName,
+    const handler = `Object.assign(Object.create(null), {
 ${Object.entries(fields)
   .map(([fieldName, keyValue]) => {
     switch (keyValue.type) {
       case "outputPlan":
-        return `  ${JSON.stringify(fieldName)}: undefined,\n`;
+        return `  ${JSON.stringify(fieldName)}: callback(${JSON.stringify(
+          fieldName,
+        )}, keys.${fieldName}),\n`;
       case "__typename":
         return `  ${JSON.stringify(fieldName)}: typeName,\n`;
       default: {
@@ -403,22 +400,8 @@ ${Object.entries(fields)
     }
   })
   .join("")}})`;
-    const functionBody = `return () => ${handler};`;
-    const f = new Function(
-      "verbatimPrototype",
-      "$$concreteType",
-      "typeName",
-      functionBody,
-    );
-    return f(verbatimPrototype, $$concreteType, typeName) as any;
+    const functionBody = `return (callback) => ${handler};`;
+    const f = new Function("typeName", "keys", functionBody);
+    return f(typeName, this.keys) as any;
   }
 }
-
-/**
- * Use this via `Object.create(verbatimPrototype)` to mark an object as being
- * allowed to be used verbatim (i.e. it can be returned directly to the user
- * without having to go through GraphQL.js).
- */
-const verbatimPrototype = Object.freeze(
-  Object.assign(Object.create(null), { [$$verbatim]: true }),
-);
