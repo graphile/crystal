@@ -662,6 +662,9 @@ function makePayloadSnapshotSafe(
   payload: any,
   replacements: { uuid: Map<string, number>; uuidCounter: number },
 ) {
+  if (payload == null) {
+    return payload;
+  }
   const p = { ...payload };
   delete p.extensions;
   return makeResultSnapshotSafe(p, replacements);
