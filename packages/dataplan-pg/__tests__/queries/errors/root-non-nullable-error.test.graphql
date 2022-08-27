@@ -1,0 +1,6 @@
+# TODO: move this test to the dataplanner package
+## expect(data).toBe(null);
+## expect(errors).toHaveLength(1);
+{
+  nonNullableError
+}
