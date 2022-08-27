@@ -379,16 +379,26 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       );
     }
 
-    const handler = `Object.assign(Object.create(null), {
+    // We can't initialize the object if it contains `__proto__`, `constructor`, or similar.
+    const objectPrototypeKeys = Object.keys(
+      Object.getOwnPropertyDescriptors(Object.prototype),
+    );
+    const unsafeToInitialize = keys.some((key) =>
+      objectPrototypeKeys.includes(key),
+    );
+
+    const functionBody = `return (callback) => {
+  const obj = ${
+    unsafeToInitialize
+      ? `Object.create(null)`
+      : `Object.assign(Object.create(null), {
 ${Object.entries(fields)
   .map(([fieldName, keyValue]) => {
     switch (keyValue.type) {
-      case "outputPlan":
-        return `  ${JSON.stringify(fieldName)}: callback(${JSON.stringify(
-          fieldName,
-        )}, keys.${fieldName}),\n`;
       case "__typename":
-        return `  ${JSON.stringify(fieldName)}: typeName,\n`;
+        return `    ${JSON.stringify(fieldName)}: typeName,\n`;
+      case "outputPlan":
+        return `    ${JSON.stringify(fieldName)}: undefined,\n`;
       default: {
         const never: never = keyValue;
         throw new Error(
@@ -399,8 +409,37 @@ ${Object.entries(fields)
       }
     }
   })
-  .join("")}})`;
-    const functionBody = `return (callback) => ${handler};`;
+  .join("")}  })`
+  };
+${Object.entries(fields)
+  .map(([fieldName, keyValue]) => {
+    switch (keyValue.type) {
+      case "__typename": {
+        if (unsafeToInitialize) {
+          return `  obj.${fieldName} = typeName;`;
+        } else {
+          // Already handled (during initialize)
+          return ``;
+        }
+      }
+      case "outputPlan": {
+        return `  obj.${fieldName} = callback(${JSON.stringify(
+          fieldName,
+        )}, keys.${fieldName});`;
+      }
+      default: {
+        const never: never = keyValue;
+        throw new Error(
+          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${inspect(
+            never,
+          )}`,
+        );
+      }
+    }
+  })
+  .join("\n")}
+  return obj;
+}`;
     const f = new Function("typeName", "keys", functionBody);
     return f(typeName, this.keys) as any;
   }
