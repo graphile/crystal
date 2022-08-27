@@ -122,6 +122,9 @@ export interface OutputPlanContext {
 }
 
 export interface SubsequentPayloadSpec {
+  // TODO: add path here, then abort this stream if an error occurred in this path
+  // See: https://github.com/robrichard/defer-stream-wg/discussions/45#discussioncomment-3486994
+
   ctx: OutputPlanContext;
   bucket: Bucket;
   bucketIndex: number;
@@ -130,6 +133,9 @@ export interface SubsequentPayloadSpec {
 }
 
 export interface SubsequentStreamSpec {
+  // TODO: add path here, then abort this stream if an error occurred in this path
+  // See: https://github.com/robrichard/defer-stream-wg/discussions/45#discussioncomment-3486994
+
   stream: AsyncIterableIterator<any>;
   startIndex: number;
   ctx: OutputPlanContext;
