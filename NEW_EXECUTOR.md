@@ -1,5 +1,7 @@
 NEXT UP:
 
+- [ ] Add tests for `__proto__`, `constructor`, etc aliases to ensure no issues
+      (AND THAT ORDER IS MAINTAINED!)
 - [ ] Must remember to add error and non-null tests at the root level in both
       @stream and @defer - should result in `data: null` or equivalent
 - [ ] `packages/dataplan-pg/__tests__/mutations/basics/create-relational-post-no-query.mermaid`
