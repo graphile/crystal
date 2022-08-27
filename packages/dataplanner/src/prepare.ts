@@ -157,21 +157,28 @@ function outputBucket(
     node: operationPlan.operation.selectionSet.selections,
   });
   nullRoot.root = root;
-  let setRootNull = false;
-  nullRoot.onAbort(() => {
-    setRootNull = true;
-  });
   const ctx: OutputPlanContext = {
     requestContext,
     root,
     path,
     nullRoot,
   };
-  const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
-  if (setRootNull) {
+  try {
+    const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
+    return [ctx, result ?? null];
+  } catch (e) {
+    ctx.root.errors.push(
+      new GraphQLError(
+        e.message,
+        operationPlan.rootOutputPlan.locationDetails.node, // node
+        undefined, // source
+        null, // positions
+        null, // path
+        e, // originalError
+        null, // extensions
+      ),
+    );
     return [ctx, null];
-  } else {
-    return [ctx, result];
   }
 }
 
