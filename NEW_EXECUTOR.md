@@ -1,5 +1,7 @@
 NEXT UP:
 
+- [ ] Must remember to add error and non-null tests at the root level in both
+      @stream and @defer - should result in `data: null` or equivalent
 - [ ] `packages/dataplan-pg/__tests__/mutations/basics/create-relational-post-no-query.mermaid`
       does a join against all tables even though it really only needs items and
       posts. There's an explanation in the description of commit
