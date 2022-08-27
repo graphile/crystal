@@ -22,6 +22,7 @@ import type {
 import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
+import { coerceError } from "./engine/OutputPlan.js";
 import { isCrystalError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
@@ -167,17 +168,12 @@ function outputBucket(
     const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
     return [ctx, result ?? null];
   } catch (e) {
-    ctx.root.errors.push(
-      new GraphQLError(
-        e.message,
-        operationPlan.rootOutputPlan.locationDetails.node, // node
-        undefined, // source
-        null, // positions
-        null, // path
-        e, // originalError
-        null, // extensions
-      ),
+    const error = coerceError(
+      e,
+      operationPlan.rootOutputPlan.locationDetails,
+      [],
     );
+    ctx.root.errors.push(error);
     return [ctx, null];
   }
 }

@@ -46,32 +46,6 @@ export function newCrystalError(error: Error, planId: number | null) {
   return new _CrystalError(error, planId);
 }
 
-// TODO: delete this?
-/**
- * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
- *
- * @internal
- */
-export function newNonNullError(planId: number | null) {
-  const message = "";
-  const nodes = null;
-  const source = null;
-  const positions = null;
-  const path = null;
-  const originalError = null;
-  const extensions = null;
-  const error = new GraphQLError(
-    message,
-    nodes,
-    source,
-    positions,
-    path,
-    originalError,
-    extensions,
-  );
-  return new _CrystalError(error, planId);
-}
-
 /**
  * Is the given value a CrystalError? This is the only public API that people
  * should use for looking at CrystalErrors.

@@ -11,6 +11,7 @@ import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { LayerPlan } from "./LayerPlan.js";
 import type { OutputPlan } from "./OutputPlan.js";
+import { nonNullError } from "./OutputPlan.js";
 
 export type OutputPath = Array<string | number>;
 export interface OutputStream {
@@ -213,8 +214,7 @@ export function executeOutputPlan(
       const data = outputPlan.objectCreator!(
         ctx.root,
         ctx.path,
-        (key, spec) => {
-          const newPath = [...ctx.path, key];
+        (key, spec, newPath) => {
           const childOutputPlan = spec.outputPlan;
           const childCtx: OutputPlanContext = {
             requestContext: ctx.requestContext,
@@ -230,53 +230,44 @@ export function executeOutputPlan(
                 ),
           };
 
-          const doIt = (): JSONValue => {
-            const t = spec.outputPlan.layerPlan.reason.type;
-            if (isDev) {
-              if (t === "subroutine") {
-                throw new Error(
-                  `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
-                );
-              }
-
-              if (
-                t !== "subscription" &&
-                t !== "defer" &&
-                t !== "root" &&
-                t !== "polymorphic" &&
-                t !== "listItem" &&
-                t !== "mutationField"
-              ) {
-                const never: never = t;
-                throw new Error(
-                  `GraphileInternalError<992ffd55-dc1a-46e5-9df8-cc6a62901386>: unexpected layerplan reason '${never}'`,
-                );
-              }
+          const t = spec.outputPlan.layerPlan.reason.type;
+          if (isDev) {
+            if (t === "subroutine") {
+              throw new Error(
+                `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
+              );
             }
 
-            const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-              childOutputPlan,
-              outputPlan,
-              bucket,
-              bucketIndex,
-            );
+            if (
+              t !== "subscription" &&
+              t !== "defer" &&
+              t !== "root" &&
+              t !== "polymorphic" &&
+              t !== "listItem" &&
+              t !== "mutationField"
+            ) {
+              const never: never = t;
+              throw new Error(
+                `GraphileInternalError<992ffd55-dc1a-46e5-9df8-cc6a62901386>: unexpected layerplan reason '${never}'`,
+              );
+            }
+          }
 
-            const result =
-              executeOutputPlan(
-                childCtx,
-                childOutputPlan,
-                childBucket,
-                childBucketIndex,
-              ) ?? null;
-            return result;
-          };
-
-          return doItHandleNull(
-            spec.isNonNull,
-            doIt,
-            childCtx,
-            spec.locationDetails,
+          const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+            childOutputPlan,
+            outputPlan,
+            bucket,
+            bucketIndex,
           );
+
+          const result =
+            executeOutputPlan(
+              childCtx,
+              childOutputPlan,
+              childBucket,
+              childBucketIndex,
+            ) ?? null;
+          return result;
         },
       );
 
@@ -527,34 +518,6 @@ function doItHandleNull<TVal extends JSONValue>(
       return ctx.nullRoot.handle(error);
     }
   }
-}
-
-function nonNullError(
-  locationDetails: LocationDetails,
-  path: readonly (string | number)[],
-) {
-  const { parentTypeName, fieldName, node } = locationDetails;
-  if (!parentTypeName || !fieldName) {
-    return new GraphQLError(
-      // TODO: rename. Also this shouldn't happen?
-      `GraphileInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
-      node,
-      null,
-      null,
-      path,
-      null,
-      null,
-    );
-  }
-  return new GraphQLError(
-    `Cannot return null for non-nullable field ${parentTypeName}.${fieldName}.`,
-    node,
-    null,
-    null,
-    path,
-    null,
-    null,
-  );
 }
 
 function getChildBucketAndIndex(

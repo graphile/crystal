@@ -1,11 +1,10 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
 import type { FieldNode, GraphQLObjectType, GraphQLScalarType } from "graphql";
-import { isObjectType } from "graphql";
+import { GraphQLError, isObjectType } from "graphql";
 import { inspect } from "util";
 
 import { isDev } from "../dev.js";
-import { newNonNullError } from "../error.js";
 import type { JSONObject, JSONValue, LocationDetails } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
@@ -14,7 +13,11 @@ import type { LayerPlan } from "./LayerPlan.js";
 export type ObjectCreator = (
   root: PayloadRoot,
   path: ReadonlyArray<string | number>,
-  callback: (key: string, spec: OutputPlanKeyValueOutputPlan) => JSONValue,
+  callback: (
+    key: string,
+    spec: OutputPlanKeyValueOutputPlan,
+    path: ReadonlyArray<string | number>,
+  ) => JSONValue,
 ) => JSONObject;
 
 export type OutputPlanTypeIntrospection = {
@@ -431,31 +434,33 @@ ${Object.entries(fields)
           // We cannot be null
           return `\
   {
+    const newPath = [...path, ${JSON.stringify(fieldName)}];
     const fieldResult = callback(${JSON.stringify(
       fieldName,
-    )}, keys.${fieldName});
+    )}, keys.${fieldName}, newPath);
     if (fieldResult == null) {
-      throw nonNullError(keys.${fieldName}.locationDetails, [...path, ${JSON.stringify(
-            fieldName,
-          )}]);
+      throw nonNullError(keys.${fieldName}.locationDetails, newPath);
     }
     obj.${fieldName} = fieldResult;
   }`;
         } else {
           // We're the null handler; we should catch errors from children
           return `\
-  try {
-    const fieldResult = callback(${JSON.stringify(
-      fieldName,
-    )}, keys.${fieldName});
-    if (fieldResult == null) {
+  {
+    const newPath = [...path, ${JSON.stringify(fieldName)}];
+    try {
+      const fieldResult = callback(${JSON.stringify(
+        fieldName,
+      )}, keys.${fieldName}, newPath);
+      if (fieldResult == null) {
+        obj.${fieldName} = null;
+      } else {
+        obj.${fieldName} = fieldResult;
+      }
+    } catch (e) {
       obj.${fieldName} = null;
-    } else {
-      obj.${fieldName} = fieldResult;
+      root.errors.push(coerceError(e, keys.${fieldName}.locationDetails, newPath));
     }
-  } catch (e) {
-    obj.${fieldName} = null;
-    root.errors.push(e);
   }`;
         }
       }
@@ -473,7 +478,74 @@ ${Object.entries(fields)
   return obj;
 }`;
 
-    const f = new Function("typeName", "keys", "newNonNullError", functionBody);
-    return f(typeName, this.keys, newNonNullError) as any;
+    const f = new Function(
+      "typeName",
+      "keys",
+      "nonNullError",
+      "coerceError",
+      functionBody,
+    );
+    return f(typeName, this.keys, nonNullError, coerceError) as any;
   }
+}
+
+export function coerceError(
+  error: Error,
+  locationDetails: LocationDetails,
+  path: ReadonlyArray<string | number>,
+): GraphQLError {
+  // Ensure it's a GraphQL error
+  if (error instanceof GraphQLError) {
+    if (error.path) {
+      return error;
+    } else {
+      return new GraphQLError(
+        error.message,
+        locationDetails.node,
+        null,
+        null,
+        path,
+        error.originalError,
+        null,
+      );
+    }
+  } else {
+    return new GraphQLError(
+      error.message,
+      locationDetails.node,
+      null,
+      null,
+      path,
+      error,
+      null,
+    );
+  }
+}
+
+export function nonNullError(
+  locationDetails: LocationDetails,
+  path: readonly (string | number)[],
+) {
+  const { parentTypeName, fieldName, node } = locationDetails;
+  if (!parentTypeName || !fieldName) {
+    return new GraphQLError(
+      // TODO: rename. Also this shouldn't happen?
+      `GraphileInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
+      node,
+      null,
+      null,
+      path,
+      null,
+      null,
+    );
+  }
+  return new GraphQLError(
+    `Cannot return null for non-nullable field ${parentTypeName}.${fieldName}.`,
+    node,
+    null,
+    null,
+    path,
+    null,
+    null,
+  );
 }
