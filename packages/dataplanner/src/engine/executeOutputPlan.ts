@@ -210,71 +210,75 @@ export function executeOutputPlan(
           `GraphileInternalError<2c75b7a7-e78d-47bb-936c-b6e030452d30>: ${outputPlan}.objectCreator was not constructed yet`,
         );
       }
-      const data = outputPlan.objectCreator!((key, spec) => {
-        const newPath = [...ctx.path, key];
-        const childOutputPlan = spec.outputPlan;
-        const childCtx: OutputPlanContext = {
-          requestContext: ctx.requestContext,
-          root: ctx.root,
-          path: newPath,
-          nullRoot: spec.isNonNull
-            ? ctx.nullRoot
-            : new NullHandler(
-                ctx.nullRoot,
-                spec.isNonNull,
-                newPath,
-                spec.locationDetails,
-              ),
-        };
+      const data = outputPlan.objectCreator!(
+        ctx.root,
+        ctx.path,
+        (key, spec) => {
+          const newPath = [...ctx.path, key];
+          const childOutputPlan = spec.outputPlan;
+          const childCtx: OutputPlanContext = {
+            requestContext: ctx.requestContext,
+            root: ctx.root,
+            path: newPath,
+            nullRoot: spec.isNonNull
+              ? ctx.nullRoot
+              : new NullHandler(
+                  ctx.nullRoot,
+                  spec.isNonNull,
+                  newPath,
+                  spec.locationDetails,
+                ),
+          };
 
-        const doIt = (): JSONValue => {
-          const t = spec.outputPlan.layerPlan.reason.type;
-          if (isDev) {
-            if (t === "subroutine") {
-              throw new Error(
-                `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
-              );
+          const doIt = (): JSONValue => {
+            const t = spec.outputPlan.layerPlan.reason.type;
+            if (isDev) {
+              if (t === "subroutine") {
+                throw new Error(
+                  `GraphileInternalError<d6b9555c-f173-4b18-96e5-8abe56760fb3>: should never see a ${t} here`,
+                );
+              }
+
+              if (
+                t !== "subscription" &&
+                t !== "defer" &&
+                t !== "root" &&
+                t !== "polymorphic" &&
+                t !== "listItem" &&
+                t !== "mutationField"
+              ) {
+                const never: never = t;
+                throw new Error(
+                  `GraphileInternalError<992ffd55-dc1a-46e5-9df8-cc6a62901386>: unexpected layerplan reason '${never}'`,
+                );
+              }
             }
 
-            if (
-              t !== "subscription" &&
-              t !== "defer" &&
-              t !== "root" &&
-              t !== "polymorphic" &&
-              t !== "listItem" &&
-              t !== "mutationField"
-            ) {
-              const never: never = t;
-              throw new Error(
-                `GraphileInternalError<992ffd55-dc1a-46e5-9df8-cc6a62901386>: unexpected layerplan reason '${never}'`,
-              );
-            }
-          }
-
-          const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-            childOutputPlan,
-            outputPlan,
-            bucket,
-            bucketIndex,
-          );
-
-          const result =
-            executeOutputPlan(
-              childCtx,
+            const [childBucket, childBucketIndex] = getChildBucketAndIndex(
               childOutputPlan,
-              childBucket,
-              childBucketIndex,
-            ) ?? null;
-          return result;
-        };
+              outputPlan,
+              bucket,
+              bucketIndex,
+            );
 
-        return doItHandleNull(
-          spec.isNonNull,
-          doIt,
-          childCtx,
-          spec.locationDetails,
-        );
-      });
+            const result =
+              executeOutputPlan(
+                childCtx,
+                childOutputPlan,
+                childBucket,
+                childBucketIndex,
+              ) ?? null;
+            return result;
+          };
+
+          return doItHandleNull(
+            spec.isNonNull,
+            doIt,
+            childCtx,
+            spec.locationDetails,
+          );
+        },
+      );
 
       // Everything seems okay; queue any deferred payloads
       for (const defer of outputPlan.deferredOutputPlans) {

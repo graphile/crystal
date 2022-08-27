@@ -5,11 +5,15 @@ import { isObjectType } from "graphql";
 import { inspect } from "util";
 
 import { isDev } from "../dev.js";
+import { newNonNullError } from "../error.js";
 import type { JSONObject, JSONValue, LocationDetails } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
+import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
 export type ObjectCreator = (
+  root: PayloadRoot,
+  path: ReadonlyArray<string | number>,
   callback: (key: string, spec: OutputPlanKeyValueOutputPlan) => JSONValue,
 ) => JSONObject;
 
@@ -387,7 +391,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       objectPrototypeKeys.includes(key),
     );
 
-    const functionBody = `return (callback) => {
+    const functionBody = `return (root, path, callback) => {
   const obj = ${
     unsafeToInitialize
       ? `Object.create(null)`
@@ -423,9 +427,37 @@ ${Object.entries(fields)
         }
       }
       case "outputPlan": {
-        return `  obj.${fieldName} = callback(${JSON.stringify(
-          fieldName,
-        )}, keys.${fieldName});`;
+        if (keyValue.isNonNull) {
+          // We cannot be null
+          return `\
+  {
+    const fieldResult = callback(${JSON.stringify(
+      fieldName,
+    )}, keys.${fieldName});
+    if (fieldResult == null) {
+      throw nonNullError(keys.${fieldName}.locationDetails, [...path, ${JSON.stringify(
+            fieldName,
+          )}]);
+    }
+    obj.${fieldName} = fieldResult;
+  }`;
+        } else {
+          // We're the null handler; we should catch errors from children
+          return `\
+  try {
+    const fieldResult = callback(${JSON.stringify(
+      fieldName,
+    )}, keys.${fieldName});
+    if (fieldResult == null) {
+      obj.${fieldName} = null;
+    } else {
+      obj.${fieldName} = fieldResult;
+    }
+  } catch (e) {
+    obj.${fieldName} = null;
+    root.errors.push(e);
+  }`;
+        }
       }
       default: {
         const never: never = keyValue;
@@ -440,7 +472,8 @@ ${Object.entries(fields)
   .join("\n")}
   return obj;
 }`;
-    const f = new Function("typeName", "keys", functionBody);
-    return f(typeName, this.keys) as any;
+
+    const f = new Function("typeName", "keys", "newNonNullError", functionBody);
+    return f(typeName, this.keys, newNonNullError) as any;
   }
 }
