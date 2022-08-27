@@ -37,6 +37,7 @@ export {
 } from "./connection.js";
 export { constant, ConstantStep } from "./constant.js";
 export { each } from "./each.js";
+export { error, ErrorStep } from "./error.js";
 export { filter, FilterPlanMemo } from "./filter.js";
 export { first, FirstStep } from "./first.js";
 export { groupBy, GroupByPlanMemo } from "./groupBy.js";
