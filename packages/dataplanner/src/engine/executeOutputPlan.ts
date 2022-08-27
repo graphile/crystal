@@ -67,7 +67,7 @@ export class NullHandler {
   children: NullHandler[] = [];
   callbacks: Array<() => void> = [];
   constructor(
-    public parentNullHandler: NullHandler | null,
+    parentNullHandler: NullHandler | null,
     private isNonNull: boolean,
     private path: readonly (string | number)[],
     private locationDetails: LocationDetails,
@@ -78,9 +78,17 @@ export class NullHandler {
     }
   }
   abort() {
-    this.stopEverything();
-    for (const child of this.children) {
-      child.abort();
+    const l = this.callbacks.length;
+    if (l > 0) {
+      const callbacks = this.callbacks.splice(0, this.callbacks.length);
+      for (const cb of callbacks) {
+        cb();
+      }
+    }
+    if (this.children.length > 0) {
+      for (const child of this.children) {
+        child.abort();
+      }
     }
   }
   /**
@@ -102,12 +110,6 @@ export class NullHandler {
   }
   onAbort(cb: () => void) {
     this.callbacks.push(cb);
-  }
-  stopEverything() {
-    const callbacks = this.callbacks.splice(0, this.callbacks.length);
-    for (const cb of callbacks) {
-      cb();
-    }
   }
 }
 
