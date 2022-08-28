@@ -19,7 +19,7 @@ import type {
   SubsequentPayloadSpec,
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
-import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
+import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import { coerceError } from "./engine/OutputPlan.js";
@@ -147,22 +147,16 @@ function outputBucket(
 >*/ {
   const operationPlan = rootBucket.layerPlan.operationPlan;
   const root: PayloadRoot = {
+    insideGraphQL: false,
     errors: [],
     queue: [],
     streams: [],
     variables,
   };
-  const nullRoot = new NullHandler(null, true, path, {
-    parentTypeName: null,
-    fieldName: null,
-    node: operationPlan.operation.selectionSet.selections,
-  });
-  nullRoot.root = root;
   const ctx: OutputPlanContext = {
     requestContext,
     root,
     path,
-    nullRoot,
   };
   try {
     const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
@@ -606,8 +600,8 @@ async function processStream(
           rootBucket,
           bucketIndex,
           requestContext,
-          [...spec.ctx.path, actualIndex],
-          spec.ctx.root.variables,
+          [...spec.path, actualIndex],
+          spec.root.variables,
         );
         iterator.push({
           data: result,
@@ -749,8 +743,8 @@ function processSingleDeferred(
         rootBucket,
         bucketIndex,
         requestContext,
-        spec.ctx.path,
-        spec.ctx.root.variables,
+        spec.path,
+        spec.root.variables,
       );
       iterator.push({
         data: result,
