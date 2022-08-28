@@ -33,6 +33,7 @@ import {
   context,
   dataplannerEnforce,
   each,
+  error,
   filter,
   getEnumValueConfig,
   groupBy,
@@ -4017,6 +4018,7 @@ export function makeExampleSchema(
           [deoptimizeIfAppropriate, featuredMessages, pgSelect],
         ),
       },
+
       people: {
         type: new GraphQLList(Person),
         plan: EXPORTABLE(
@@ -4260,6 +4262,36 @@ export function makeExampleSchema(
               return personSource.get({ person_id: args.get("personId") });
             },
           [personSource],
+        ),
+      },
+
+      nonNullableNull: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description:
+          "Claims to be non-nullable, but always returns null. Used to test root-level null handling.",
+        plan: EXPORTABLE(
+          (constant) =>
+            function plan() {
+              return constant(null);
+            },
+          [constant],
+        ),
+      },
+
+      nonNullableError: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description:
+          "Non-nullable, always throws. Used to test root-level null handling.",
+        plan: EXPORTABLE(
+          (error) =>
+            function plan() {
+              return error(
+                new Error(
+                  "Generic error from nonNullableError field in example schema",
+                ),
+              );
+            },
+          [error],
         ),
       },
     },

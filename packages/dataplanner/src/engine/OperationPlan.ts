@@ -694,6 +694,7 @@ export class OperationPlan {
       {
         type: "listItem",
         parentPlanId: listStep.id,
+        stream: listStep._stepOptions.stream ?? undefined,
       },
       listStep.polymorphicPaths,
     );
@@ -2289,12 +2290,16 @@ export class OperationPlan {
             `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
           );
         }
+        step._sameLayerDependencies = [];
         for (let i = 0, l = step.dependencies.length; i < l; i++) {
           const dep = this.steps[step.dependencies[i]];
           // Overwrite the dependency id with its resolved ID so we don't need
           // to look it up in executeBucket
           (step.dependencies as number[])[i] = dep.id;
           dep.dependentPlans.push(step);
+          if (dep.layerPlan === step.layerPlan) {
+            step._sameLayerDependencies.push(dep.id);
+          }
         }
       }
     }

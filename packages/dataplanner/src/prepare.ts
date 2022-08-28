@@ -19,9 +19,10 @@ import type {
   SubsequentPayloadSpec,
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
-import { executeOutputPlan, NullHandler } from "./engine/executeOutputPlan.js";
+import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
+import { coerceError } from "./engine/OutputPlan.js";
 import { isCrystalError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
@@ -146,32 +147,28 @@ function outputBucket(
 >*/ {
   const operationPlan = rootBucket.layerPlan.operationPlan;
   const root: PayloadRoot = {
+    insideGraphQL: false,
     errors: [],
     queue: [],
     streams: [],
     variables,
   };
-  const nullRoot = new NullHandler(null, true, path, {
-    parentTypeName: null,
-    fieldName: null,
-    node: operationPlan.operation.selectionSet.selections,
-  });
-  nullRoot.root = root;
-  let setRootNull = false;
-  nullRoot.onAbort(() => {
-    setRootNull = true;
-  });
   const ctx: OutputPlanContext = {
     requestContext,
     root,
     path,
-    nullRoot,
   };
-  const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
-  if (setRootNull) {
+  try {
+    const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
+    return [ctx, result ?? null];
+  } catch (e) {
+    const error = coerceError(
+      e,
+      operationPlan.rootOutputPlan.locationDetails,
+      [],
+    );
+    ctx.root.errors.push(error);
     return [ctx, null];
-  } else {
-    return [ctx, result];
   }
 }
 
@@ -603,8 +600,8 @@ async function processStream(
           rootBucket,
           bucketIndex,
           requestContext,
-          [...spec.ctx.path, actualIndex],
-          spec.ctx.root.variables,
+          [...spec.path, actualIndex],
+          spec.root.variables,
         );
         iterator.push({
           data: result,
@@ -746,8 +743,8 @@ function processSingleDeferred(
         rootBucket,
         bucketIndex,
         requestContext,
-        spec.ctx.path,
-        spec.ctx.root.variables,
+        spec.path,
+        spec.root.variables,
       );
       iterator.push({
         data: result,

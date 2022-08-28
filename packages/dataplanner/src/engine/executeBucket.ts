@@ -32,28 +32,6 @@ function noop() {
 }
 
 /**
- * Calls the callback, catching any errors and turning them into rejected
- * promises.
- *
- * @remarks
- *
- * When we're calling functions in loops and they may or may not be async
- * functions, there's a risk that they may throw and previous promises that may
- * have been added to an array to be handled later never get handled, causing
- * an unhandled promise rejection error which crashes the entire Node process.
- * This is not ideal. Thus we use this method to try to call the function, but
- * if it throws we turn it into a promise rejection which will not interrupt
- * the flow of these loops.
- */
-function rejectOnThrow<T>(cb: () => T): T | Promise<never> {
-  try {
-    return cb();
-  } catch (e) {
-    return Promise.reject(e);
-  }
-}
-
-/**
  * Takes a list of `results` (shorter than `resultCount`) and an object with
  * errors and indexes; returns a list of length `resultCount` with the results
  * from `results` but with errors injected at the indexes specified in
@@ -110,9 +88,13 @@ export function executeBucket(
     const steps = startSteps[i];
     const starterPromises: PromiseLike<void>[] = [];
     for (const step of steps) {
-      const r = rejectOnThrow(() => executeStep(step));
-      if (isPromiseLike(r)) {
-        starterPromises.push(r);
+      try {
+        const r = executeStep(step);
+        if (isPromiseLike(r)) {
+          starterPromises.push(r);
+        }
+      } catch (e) {
+        starterPromises.push(Promise.reject(e));
       }
     }
     if (starterPromises.length > 0) {
@@ -152,33 +134,39 @@ export function executeBucket(
       return;
     }
     const promises: PromiseLike<void>[] = [];
-    for (const potentialNextStep of finishedStep.dependentPlans) {
+    outerLoop: for (const potentialNextStep of finishedStep.dependentPlans) {
       const isPending = pendingSteps.has(potentialNextStep);
-      const isSuitable = isPending
-        ? potentialNextStep.dependencies.every(
-            isDev
-              ? (depId) => {
-                  if (Array.isArray(store[depId])) {
-                    return true;
-                  } else {
-                    const dep =
-                      bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
-                    assert.strictEqual(
-                      dep.layerPlan,
-                      bucket.layerPlan,
-                      `GraphileInternalError<4ca7f9f9-0a00-415f-b6f7-46858fde17c3>: Waiting on ${dep} but it'll never complete because it's not in this bucket (${bucket.layerPlan.id}); this is most likely a bug in copyPlanIds`,
-                    );
-                    return false;
-                  }
-                }
-              : (depId) => Array.isArray(store[depId]),
-          )
-        : false;
-      if (isSuitable) {
-        const r = rejectOnThrow(() => executeStep(potentialNextStep));
+      if (!isPending) {
+        // We've already ran it, skip
+        continue;
+      }
+
+      // Check if it's suitable
+      const sld = potentialNextStep._sameLayerDependencies;
+      for (let i = 0, l = sld.length; i < l; i++) {
+        const depId = sld[i];
+        if (store[depId] === undefined) {
+          if (isDev) {
+            const dep =
+              bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
+            assert.strictEqual(
+              dep.layerPlan,
+              bucket.layerPlan,
+              `GraphileInternalError<4ca7f9f9-0a00-415f-b6f7-46858fde17c3>: Waiting on ${dep} but it'll never complete because it's not in this bucket (${bucket.layerPlan.id}); this is most likely a bug in copyPlanIds`,
+            );
+          }
+          continue outerLoop;
+        }
+      }
+
+      // It's suitable; let's run it
+      try {
+        const r = executeStep(potentialNextStep);
         if (isPromiseLike(r)) {
           promises.push(r);
         }
+      } catch (e) {
+        promises.push(Promise.reject(e));
       }
     }
     if (promises.length > 0) {

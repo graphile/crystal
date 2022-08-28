@@ -283,9 +283,7 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
 export function isPromiseLike<T>(
   t: T | Promise<T> | PromiseLike<T>,
 ): t is PromiseLike<T> {
-  return (
-    typeof t === "object" && t !== null && typeof (t as any).then === "function"
-  );
+  return t != null && typeof (t as any).then === "function";
 }
 
 /**
@@ -886,21 +884,6 @@ export function stepAMayDependOnStepB(
 }
 
 /**
- * Indicates if `layerPlan` represents a layer that will be deferred somehow,
- * e.g. a subscription, `@stream` or `@defer` root layer plan.
- */
-function isBoundaryLayerPlan(layerPlan: LayerPlan): boolean {
-  const t = layerPlan.reason.type;
-  return (
-    // These indicate boundaries over which plans shouldn't be optimized
-    // together (generally).
-    t === "subscription" ||
-    t === "defer" ||
-    (t === "listItem" && Boolean(layerPlan.reason.stream))
-  );
-}
-
-/**
  * For a regular GraphQL query with no `@stream`/`@defer`, the entire result is
  * calculated and then the output is generated and sent to the client at once.
  * Thus you can think of this as every plan is in the same "phase".
@@ -936,14 +919,18 @@ export function stepsAreInSamePhase(
     if (currentLayerPlan === ancestor.layerPlan) {
       return true;
     }
-    if (currentLayerPlan.reason.type === "polymorphic") {
+    const t = currentLayerPlan.reason.type;
+    if (t === "polymorphic") {
       // TODO: can optimize this so that if all polymorphicPaths match then it
       // passes
       return false;
-    }
-    if (isBoundaryLayerPlan(currentLayerPlan)) {
+    } else if (t === "subscription" || t === "defer") {
+      // These indicate boundaries over which plans shouldn't be optimized
+      // together (generally).
       return false;
     }
+    // TODO: what about streams?
+    // `t === "listItem" && currentLayerPlan.reason.stream`
   } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
   throw new Error(
     `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,

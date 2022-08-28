@@ -1,0 +1,14 @@
+[
+  {
+    message: 'Generic error from nonNullableError field in example schema',
+    locations: [
+      {
+        line: 3,
+        column: 3,
+      },
+    ],
+    path: [
+      'nonNullableError',
+    ],
+  },
+]

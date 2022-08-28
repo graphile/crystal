@@ -95,6 +95,7 @@ export function getWithPgClientFromPgSource(
     }
   } else {
     const promise = (async () => {
+      // TODO: We should cache imports
       const adaptor = await import(source.adaptor);
       const factory =
         adaptor?.createWithPgClient ?? adaptor?.default?.createWithPgClient;
@@ -103,6 +104,7 @@ export function getWithPgClientFromPgSource(
           `'${source.adaptor}' does not look like a withPgClient adaptor - please ensure it exports a method called 'createWithPgClient'`,
         );
       }
+
       const originalWithPgClient = await factory(source.adaptorSettings);
       const withPgClient: WithPgClient = (...args) =>
         originalWithPgClient.apply(null, args);
@@ -115,13 +117,19 @@ export function getWithPgClientFromPgSource(
         cachedValue.retainers--;
 
         // To allow for other promises to resolve and add/remove from the retaininers, check after a tick
-        setTimeout(() => {
-          if (cachedValue.retainers === 0 && !released) {
-            released = true;
-            pgClientBySourceCache.delete(source);
-            return originalWithPgClient.release();
-          }
-        }, 0);
+        setTimeout(
+          () => {
+            if (cachedValue.retainers === 0 && !released) {
+              released = true;
+              pgClientBySourceCache.delete(source);
+              return originalWithPgClient.release();
+            }
+            // TODO: this used to be zero, but that seems really inefficient...
+            // Figure out why I did that?
+            // }, 0);
+          },
+          process.env.NODE_ENV === "test" ? 500 : 5000,
+        );
       };
       pgClientBySourceCache.set(source, cachedValue);
       return cachedValue;
