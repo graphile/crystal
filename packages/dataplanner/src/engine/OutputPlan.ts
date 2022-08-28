@@ -128,6 +128,10 @@ export type OutputPlanKeyValueTypeName = {
 export type OutputPlanKeyValue =
   | OutputPlanKeyValueOutputPlan
   | OutputPlanKeyValueTypeName;
+export type OutputPlanKeyValueOutputPlanWithCachedBits =
+  OutputPlanKeyValueOutputPlan & {
+    layerPlanId: number;
+  };
 
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
@@ -157,7 +161,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * order in the request otherwise we break GraphQL spec compliance!
    */
   public keys: {
-    [key: string]: OutputPlanKeyValue;
+    [key: string]:
+      | OutputPlanKeyValueTypeName
+      | OutputPlanKeyValueOutputPlanWithCachedBits;
   } = Object.create(null);
 
   /**
@@ -275,7 +281,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
       }
-      this.keys[key!] = child;
+      this.keys[key!] =
+        child.type === "outputPlan"
+          ? {
+              ...child,
+              layerPlanId: child.outputPlan.layerPlan.id,
+            }
+          : child;
     } else if (this.type.mode === "array") {
       if (isDev) {
         if (key != null) {
@@ -912,7 +924,7 @@ ${Object.entries(fieldTypes)
       mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
       const spec = this.keys.${fieldName};
 
-      const directChild = bucket.children[spec.outputPlan.layerPlan.id];
+      const directChild = bucket.children[spec.layerPlanId];
       let childBucket, childBucketIndex;
       if (directChild) {
         childBucket = directChild.bucket;
