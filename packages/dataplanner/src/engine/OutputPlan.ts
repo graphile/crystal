@@ -584,61 +584,7 @@ ${
   }
 
   private makeIntrospectionExecutor() {
-    const {
-      field: rawField,
-      introspectionCacheByVariableValues,
-      variableNames,
-    } = this.type as OutputPlanTypeIntrospection;
-    const field: FieldNode = {
-      ...rawField,
-      alias: { kind: Kind.NAME, value: "a" },
-    };
-    const document: DocumentNode = {
-      definitions: [
-        {
-          kind: Kind.OPERATION_DEFINITION,
-          operation: OperationTypeNode.QUERY,
-          selectionSet: {
-            kind: Kind.SELECTION_SET,
-            selections: [field],
-          },
-        },
-        ...Object.values(this.layerPlan.operationPlan.fragments),
-      ],
-
-      kind: Kind.DOCUMENT,
-    };
-    const introspect = (root: PayloadRoot) => {
-      const variableValues: Record<string, any> = {};
-      for (const variableName of variableNames) {
-        variableValues[variableName] = root.variables[variableName];
-      }
-      // TODO: make this canonical
-      const canonical = JSON.stringify(variableValues);
-      const cached = introspectionCacheByVariableValues.get(canonical);
-      if (cached) {
-        return cached;
-      }
-      const graphqlResult = executeSync({
-        schema: this.layerPlan.operationPlan.schema,
-        document,
-        variableValues,
-      });
-      if (graphqlResult.errors) {
-        console.error("INTROSPECTION FAILED!");
-        console.error(graphqlResult);
-        throw new GraphQLError("INTROSPECTION FAILED!");
-      }
-      const result = graphqlResult.data!.a as JSONValue;
-      introspectionCacheByVariableValues.set(canonical, result);
-      return result;
-    };
-    return makeExecutor(
-      `return introspect(root)`,
-      "introspection",
-      { introspect },
-      true,
-    );
+    return introspectionExecutor;
   }
 
   private makePolymorphicExecutor() {
@@ -984,3 +930,63 @@ const arrayExecutor_nullable = makeArrayExecutor(false, false);
 const arrayExecutor_nullable_streaming = makeArrayExecutor(false, true);
 const arrayExecutor_nonNullable = makeArrayExecutor(true, false);
 const arrayExecutor_nonNullable_streaming = makeArrayExecutor(true, true);
+
+const introspect = (
+  root: PayloadRoot,
+  outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
+) => {
+  const {
+    field: rawField,
+    introspectionCacheByVariableValues,
+    variableNames,
+  } = outputPlan.type as OutputPlanTypeIntrospection;
+  const field: FieldNode = {
+    ...rawField,
+    alias: { kind: Kind.NAME, value: "a" },
+  };
+  const document: DocumentNode = {
+    definitions: [
+      {
+        kind: Kind.OPERATION_DEFINITION,
+        operation: OperationTypeNode.QUERY,
+        selectionSet: {
+          kind: Kind.SELECTION_SET,
+          selections: [field],
+        },
+      },
+      ...Object.values(outputPlan.layerPlan.operationPlan.fragments),
+    ],
+
+    kind: Kind.DOCUMENT,
+  };
+  const variableValues: Record<string, any> = {};
+  for (const variableName of variableNames) {
+    variableValues[variableName] = root.variables[variableName];
+  }
+  // TODO: make this canonical
+  const canonical = JSON.stringify(variableValues);
+  const cached = introspectionCacheByVariableValues.get(canonical);
+  if (cached) {
+    return cached;
+  }
+  const graphqlResult = executeSync({
+    schema: outputPlan.layerPlan.operationPlan.schema,
+    document,
+    variableValues,
+  });
+  if (graphqlResult.errors) {
+    console.error("INTROSPECTION FAILED!");
+    console.error(graphqlResult);
+    throw new GraphQLError("INTROSPECTION FAILED!");
+  }
+  const result = graphqlResult.data!.a as JSONValue;
+  introspectionCacheByVariableValues.set(canonical, result);
+  return result;
+};
+
+const introspectionExecutor = makeExecutor(
+  `return introspect(root, this)`,
+  "introspection",
+  { introspect },
+  true,
+);
