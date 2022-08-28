@@ -378,29 +378,68 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
 
     // Build the executor
     switch (this.type.mode) {
-      case "root":
-      case "object": {
-        this.execute = this.makeObjectExecutor(this.type.typeName);
-        break;
-      }
       case "null": {
-        this.execute = this.makeNullExecutor();
+        this.execute = nullExecutor;
         break;
       }
       case "leaf": {
-        this.execute = this.makeLeafExecutor();
-        break;
-      }
-      case "array": {
-        this.execute = this.makeArrayExecutor();
+        this.execute = leafExecutor;
         break;
       }
       case "introspection": {
-        this.execute = this.makeIntrospectionExecutor();
+        this.execute = introspectionExecutor;
         break;
       }
       case "polymorphic": {
-        this.execute = this.makePolymorphicExecutor();
+        this.execute = polymorphicExecutor;
+        break;
+      }
+      case "array": {
+        if (!this.child) {
+          throw new Error(
+            "GraphileInternalError<48fabdc8-ce84-45ec-ac20-35a2af9098e0>: No child output plan for list bucket?",
+          );
+        }
+        const childIsNonNull = this.childIsNonNull;
+        const canStream =
+          this.child.layerPlan.reason.type === "listItem" &&
+          !!this.child.layerPlan.reason.stream;
+
+        if (childIsNonNull) {
+          if (canStream) {
+            this.execute = arrayExecutor_nonNullable_streaming;
+          } else {
+            this.execute = arrayExecutor_nonNullable;
+          }
+        } else {
+          if (canStream) {
+            this.execute = arrayExecutor_nullable_streaming;
+          } else {
+            this.execute = arrayExecutor_nullable;
+          }
+        }
+        break;
+      }
+      case "root":
+      case "object": {
+        const type = this.type as OutputPlanTypeRoot | OutputPlanTypeObject;
+        const digestFieldTypes: {
+          [responseKey: string]: "__typename" | "outputPlan!" | "outputPlan?";
+        } = Object.create(null);
+        for (const [responseKey, spec] of Object.entries(this.keys)) {
+          digestFieldTypes[responseKey] =
+            spec.type === "__typename"
+              ? "__typename"
+              : spec.isNonNull
+              ? "outputPlan!"
+              : "outputPlan?";
+        }
+        this.execute = makeObjectExecutor(
+          type.typeName,
+          digestFieldTypes,
+          this.deferredOutputPlans.length > 0,
+          type.mode === "root",
+        );
         break;
       }
       default: {
@@ -412,183 +451,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
       }
     }
-  }
-
-  /**
-   * Returns a function that, given a type name, creates an object with the
-   * fields in the given order.
-   */
-  private makeObjectExecutor(
-    typeName: string,
-  ): typeof OutputPlan.prototype.execute {
-    const fields = this.keys;
-    const keys = Object.keys(fields);
-    /*
-     * NOTE: because we use `Object.create(verbatimPrototype)` (and
-     * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
-     * set keys such as `__proto__`. This would not be safe if we were to use
-     * `{}` instead.
-     */
-    const unsafeKeys = keys.filter(
-      (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
-    );
-    if (unsafeKeys.length > 0) {
-      throw new Error(
-        `Unsafe keys: ${unsafeKeys.join(
-          ",",
-        )}; these don't conform to 'Name' in the GraphQL spec`,
-      );
-    }
-
-    // We can't initialize the object if it contains `__proto__`, `constructor`, or similar.
-    const objectPrototypeKeys = Object.keys(
-      Object.getOwnPropertyDescriptors(Object.prototype),
-    );
-    const unsafeToInitialize = keys.some((key) =>
-      objectPrototypeKeys.includes(key),
-    );
-
-    const inner = `\
-  const obj = ${
-    unsafeToInitialize
-      ? `Object.create(null)`
-      : `Object.assign(Object.create(null), {
-${Object.entries(fields)
-  .map(([fieldName, keyValue]) => {
-    switch (keyValue.type) {
-      case "__typename":
-        return `    ${JSON.stringify(fieldName)}: typeName,\n`;
-      case "outputPlan":
-        return `    ${JSON.stringify(fieldName)}: undefined,\n`;
-      default: {
-        const never: never = keyValue;
-        throw new Error(
-          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${inspect(
-            never,
-          )}`,
-        );
-      }
-    }
-  })
-  .join("")}  })`
-  };
-  try {
-    const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
-${Object.entries(fields)
-  .map(([fieldName, keyValue]) => {
-    switch (keyValue.type) {
-      case "__typename": {
-        if (unsafeToInitialize) {
-          return `    obj.${fieldName} = typeName;`;
-        } else {
-          // Already handled (during initialize)
-          return ``;
-        }
-      }
-      case "outputPlan": {
-        return `\
-    {
-      mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
-      const spec = keys.${fieldName};
-      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-        spec.outputPlan,
-        this,
-        bucket,
-        bucketIndex,
-      );
-${makeExecuteChildPlanCode(
-  `obj.${fieldName} =`,
-  "spec.locationDetails",
-  "spec.outputPlan",
-  keyValue.isNonNull,
-)}
-    }`;
-      }
-      default: {
-        const never: never = keyValue;
-        throw new Error(
-          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${inspect(
-            never,
-          )}`,
-        );
-      }
-    }
-  })
-  .join("\n")}
-  } finally {
-    mutablePath.pop();
-  }
-${
-  this.deferredOutputPlans.length > 0
-    ? `
-  // Everything seems okay; queue any deferred payloads
-  for (const defer of this.deferredOutputPlans) {
-    root.queue.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: defer,
-      label: defer.type.deferLabel,
-    });
-  }`
-    : ``
-}
-
-  return obj;
-`;
-
-    return makeExecutor(
-      inner,
-      `object`,
-      {
-        typeName: typeName,
-        keys: this.keys,
-        coerceError: coerceError,
-        getChildBucketAndIndex,
-      },
-      this.type.mode === "root",
-    );
-  }
-
-  private makeNullExecutor() {
-    return nullExecutor;
-  }
-  private makeLeafExecutor() {
-    return leafExecutor;
-  }
-  private makeArrayExecutor() {
-    if (!this.child) {
-      throw new Error(
-        "GraphileInternalError<48fabdc8-ce84-45ec-ac20-35a2af9098e0>: No child output plan for list bucket?",
-      );
-    }
-    const childIsNonNull = this.childIsNonNull;
-    const canStream =
-      this.child.layerPlan.reason.type === "listItem" &&
-      !!this.child.layerPlan.reason.stream;
-
-    if (childIsNonNull) {
-      if (canStream) {
-        return arrayExecutor_nonNullable_streaming;
-      } else {
-        return arrayExecutor_nonNullable;
-      }
-    } else {
-      if (canStream) {
-        return arrayExecutor_nullable_streaming;
-      } else {
-        return arrayExecutor_nullable;
-      }
-    }
-  }
-
-  private makeIntrospectionExecutor() {
-    return introspectionExecutor;
-  }
-
-  private makePolymorphicExecutor() {
-    return polymorphicExecutor;
   }
 }
 
@@ -990,3 +852,143 @@ const introspectionExecutor = makeExecutor(
   { introspect },
   true,
 );
+
+function makeObjectExecutor(
+  typeName: string,
+  fieldTypes: {
+    [key: string]: "__typename" | "outputPlan!" | "outputPlan?";
+  },
+  hasDeferredOutputPlans: boolean,
+  // this.type.mode === "root",
+  isRoot: boolean,
+): typeof OutputPlan.prototype.execute {
+  // TODO: figure out how to memoize this (without introducing memory leaks)
+
+  const keys = Object.keys(fieldTypes);
+  /*
+   * NOTE: because we use `Object.create(verbatimPrototype)` (and
+   * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
+   * set keys such as `__proto__`. This would not be safe if we were to use
+   * `{}` instead.
+   */
+  const unsafeKeys = keys.filter(
+    (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
+  );
+  if (unsafeKeys.length > 0) {
+    throw new Error(
+      `Unsafe keys: ${unsafeKeys.join(
+        ",",
+      )}; these don't conform to 'Name' in the GraphQL spec`,
+    );
+  }
+
+  // We can't initialize the object if it contains `__proto__`, `constructor`, or similar.
+  const objectPrototypeKeys = Object.keys(
+    Object.getOwnPropertyDescriptors(Object.prototype),
+  );
+  const unsafeToInitialize = keys.some((key) =>
+    objectPrototypeKeys.includes(key),
+  );
+
+  const inner = `\
+  const obj = ${
+    unsafeToInitialize
+      ? `Object.create(null)`
+      : `Object.assign(Object.create(null), {
+${Object.entries(fieldTypes)
+  .map(([fieldName, fieldType]) => {
+    switch (fieldType) {
+      case "__typename":
+        return `    ${JSON.stringify(fieldName)}: typeName,\n`;
+      case "outputPlan?":
+      case "outputPlan!":
+        return `    ${JSON.stringify(fieldName)}: undefined,\n`;
+      default: {
+        const never: never = fieldType;
+        throw new Error(
+          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+        );
+      }
+    }
+  })
+  .join("")}  })`
+  };
+  try {
+    const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+${Object.entries(fieldTypes)
+  .map(([fieldName, fieldType]) => {
+    switch (fieldType) {
+      case "__typename": {
+        if (unsafeToInitialize) {
+          return `    obj.${fieldName} = typeName;`;
+        } else {
+          // Already handled (during initialize)
+          return ``;
+        }
+      }
+      case "outputPlan!":
+      case "outputPlan?": {
+        return `\
+    {
+      mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
+      const spec = this.keys.${fieldName};
+      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+        spec.outputPlan,
+        this,
+        bucket,
+        bucketIndex,
+      );
+${makeExecuteChildPlanCode(
+  `obj.${fieldName} =`,
+  "spec.locationDetails",
+  "spec.outputPlan",
+  fieldType === "outputPlan!",
+)}
+    }`;
+      }
+      default: {
+        const never: never = fieldType;
+        throw new Error(
+          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+        );
+      }
+    }
+  })
+  .join("\n")}
+  } finally {
+    mutablePath.pop();
+  }
+${
+  hasDeferredOutputPlans
+    ? `
+  // Everything seems okay; queue any deferred payloads
+  for (const defer of this.deferredOutputPlans) {
+    root.queue.push({
+      root,
+      path: mutablePath.slice(1),
+      bucket,
+      bucketIndex,
+      outputPlan: defer,
+      label: defer.type.deferLabel,
+    });
+  }`
+    : ``
+}
+
+  return obj;
+`;
+
+  // TODO: figure out how to memoize this. Should be able to key it on:
+  // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
+  // - existence of deferredOutputPlans
+  return makeExecutor(
+    inner,
+    `object`,
+    {
+      typeName: typeName,
+      coerceError: coerceError,
+      getChildBucketAndIndex,
+    },
+    isRoot,
+  );
+}
