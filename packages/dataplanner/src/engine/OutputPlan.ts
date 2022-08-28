@@ -424,31 +424,30 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     const resultHandling = isNonNull
       ? // We cannot be null
         `
-    if (error) {
-      throw error;
-    } else if (fieldResult == null) {
-      throw nonNullError(${locationDetails}, mutablePath.slice(1));
-    } else {
-      ${setTargetOrReturn} fieldResult;
-    }`
+      if (error) {
+        throw error;
+      } else if (fieldResult == null) {
+        throw nonNullError(${locationDetails}, mutablePath.slice(1));
+      } else {
+        ${setTargetOrReturn} fieldResult;
+      }`
       : // Were the null handler; we should catch errors from children
         `
-    if (error) {
-      root.errors.push(error);
-      ${setTargetOrReturn} null;
-    } else if (fieldResult == null) {
-      ${setTargetOrReturn} null;
-    } else {
-      ${setTargetOrReturn} fieldResult;
-    }
-`;
+      if (error) {
+        root.errors.push(error);
+        ${setTargetOrReturn} null;
+      } else if (fieldResult == null) {
+        ${setTargetOrReturn} null;
+      } else {
+        ${setTargetOrReturn} fieldResult;
+      }`;
     return `\
-    let fieldResult, error;
-    try {
-      fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
-    } catch (e) {
-      error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
-    }${resultHandling}`;
+      let fieldResult, error;
+      try {
+        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+      } catch (e) {
+        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
+      }${resultHandling}`;
   }
 
   private makeExecutor(
@@ -458,29 +457,29 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     args.isCrystalError = isCrystalError;
     args.coerceError = coerceError;
     args.nonNullError = nonNullError;
-    const functionBody = `return function compiledOutputPlan_${
-      this.type.mode
-    }(root, mutablePath, bucket, bucketIndex) {
-  const entry = bucket.store[this.rootStepId];
-  const bucketRootValue = entry[bucketIndex];
+    let nameExtra = this.type.mode;
+    if (this.locationDetails.parentTypeName) {
+      nameExtra += `_${this.locationDetails.parentTypeName}`;
+    }
+    if (this.locationDetails.fieldName) {
+      nameExtra += `_${this.locationDetails.fieldName}`;
+    }
+    const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
+  const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
   if (isCrystalError(bucketRootValue)) {
-    throw coerceError(
-      bucketRootValue.originalError,
-      this.locationDetails,
-      mutablePath.slice(1),
-    );
+    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 
-  ${
-    this.type.mode === "introspection" || this.type.mode === "root"
-      ? `` // No null-handling for root/introspection!
-      : `\
+${
+  this.type.mode === "introspection" || this.type.mode === "root"
+    ? `` // No null-handling for root/introspection!
+    : `\
   if (bucketRootValue == null) {
     return null;
   }
 `
-  }
-  ${inner}
+}
+${inner}
 }`;
     // console.log(functionBody);
     const f = new Function(...[...Object.keys(args), functionBody]);
@@ -546,13 +545,13 @@ ${Object.entries(fields)
   .join("")}  })`
   };
   try {
-  const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+    const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 ${Object.entries(fields)
   .map(([fieldName, keyValue]) => {
     switch (keyValue.type) {
       case "__typename": {
         if (unsafeToInitialize) {
-          return `  obj.${fieldName} = typeName;`;
+          return `    obj.${fieldName} = typeName;`;
         } else {
           // Already handled (during initialize)
           return ``;
@@ -560,22 +559,22 @@ ${Object.entries(fields)
       }
       case "outputPlan": {
         return `\
-  {
-    mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
-    const spec = keys.${fieldName};
-    const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-      spec.outputPlan,
-      this,
-      bucket,
-      bucketIndex,
-    );
-    ${this.makeExecuteChildPlanCode(
-      `obj.${fieldName} =`,
-      "spec.locationDetails",
-      "spec.outputPlan",
-      keyValue.isNonNull,
-    )}
-  }`;
+    {
+      mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
+      const spec = keys.${fieldName};
+      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+        spec.outputPlan,
+        this,
+        bucket,
+        bucketIndex,
+      );
+${this.makeExecuteChildPlanCode(
+  `obj.${fieldName} =`,
+  "spec.locationDetails",
+  "spec.outputPlan",
+  keyValue.isNonNull,
+)}
+    }`;
       }
       default: {
         const never: never = keyValue;
@@ -591,7 +590,9 @@ ${Object.entries(fields)
   } finally {
     mutablePath.pop();
   }
-
+${
+  this.deferredOutputPlans.length > 0
+    ? `
   // Everything seems okay; queue any deferred payloads
   for (const defer of this.deferredOutputPlans) {
     root.queue.push({
@@ -602,7 +603,9 @@ ${Object.entries(fields)
       outputPlan: defer,
       label: defer.type.deferLabel,
     });
-  }
+  }`
+    : ``
+}
 
   return obj;
 `;
@@ -641,9 +644,7 @@ ${Object.entries(fields)
     return this.makeExecutor(
       `\
   if (!Array.isArray(bucketRootValue)) {
-    console.warn(
-      \`Hit fallback for value \${inspect(bucketRootValue)} coercion to mode 'array'\`,
-    );
+    console.warn(\`Hit fallback for value \${inspect(bucketRootValue)} coercion to mode 'array'\`);
     return null;
   }
 
@@ -653,31 +654,31 @@ ${Object.entries(fields)
 
   const mutablePathIndex = mutablePath.push(-1) - 1;
   try {
-  // Now to populate the children...
-  for (let i = 0; i < l; i++) {
-    const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-      childOutputPlan,
-      this,
-      bucket,
-      bucketIndex,
-      i,
-    );
-    mutablePath[mutablePathIndex] = i;
-    ${this.makeExecuteChildPlanCode(
-      "data[i] =",
-      "this.locationDetails",
-      "childOutputPlan",
-      this.childIsNonNull,
-    )}
-  }
+    // Now to populate the children...
+    for (let i = 0; i < l; i++) {
+      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+        childOutputPlan,
+        this,
+        bucket,
+        bucketIndex,
+        i,
+      );
+      mutablePath[mutablePathIndex] = i;
+${this.makeExecuteChildPlanCode(
+  "data[i] =",
+  "this.locationDetails",
+  "childOutputPlan",
+  this.childIsNonNull,
+)}
+    }
   } finally {
     mutablePath.pop();
   }
 
-  ${
-    /* TODO: assert stream exists here */
-    this.child.layerPlan.reason.type === "listItem"
-      ? `
+${
+  this.child.layerPlan.reason.type === "listItem" &&
+  this.child.layerPlan.reason.stream
+    ? `\
   const stream = bucketRootValue[$$streamMore] /* as | AsyncIterableIterator<any> | undefined*/;
   if (stream) {
     root.streams.push({
@@ -691,10 +692,9 @@ ${Object.entries(fields)
       startIndex: bucketRootValue.length,
       listItemStepId: childOutputPlan.layerPlan.rootStepId,
     });
-  }
-  `
-      : ``
-  }
+  }`
+    : ``
+}
 
   return data;
 `,
