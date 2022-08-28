@@ -117,16 +117,19 @@ export function getWithPgClientFromPgSource(
         cachedValue.retainers--;
 
         // To allow for other promises to resolve and add/remove from the retaininers, check after a tick
-        setTimeout(() => {
-          if (cachedValue.retainers === 0 && !released) {
-            released = true;
-            pgClientBySourceCache.delete(source);
-            return originalWithPgClient.release();
-          }
-          // TODO: this used to be zero, but that seems really inefficient...
-          // Figure out why I did that?
-          // }, 0);
-        }, 5000);
+        setTimeout(
+          () => {
+            if (cachedValue.retainers === 0 && !released) {
+              released = true;
+              pgClientBySourceCache.delete(source);
+              return originalWithPgClient.release();
+            }
+            // TODO: this used to be zero, but that seems really inefficient...
+            // Figure out why I did that?
+            // }, 0);
+          },
+          process.env.NODE_ENV === "test" ? 500 : 5000,
+        );
       };
       pgClientBySourceCache.set(source, cachedValue);
       return cachedValue;
