@@ -113,5 +113,6 @@ export function executeOutputPlan(
       "Can only process an output plan for a completed bucket",
     );
   }
-  return outputPlan.execute(ctx.root, ctx.path, bucket, bucketIndex);
+  const mutablePath = ["SOMEONE_FORGOT_TO_SLICE_THE_PATH!", ...ctx.path];
+  return outputPlan.execute(ctx.root, mutablePath, bucket, bucketIndex);
 }

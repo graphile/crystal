@@ -359,7 +359,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   execute(
     this: OutputPlan,
     _root: PayloadRoot,
-    _path: ReadonlyArray<string | number>,
+    // By just reusing the same path over and over we don't need to allocate
+    // more memory for more arrays; but we must be _incredibly_ careful to
+    // ensure any changes to it are reversed.
+    _mutablePath: Array<string | number>,
     _bucket: Bucket,
     _bucketIndex: number,
   ): any {
@@ -424,7 +427,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     if (error) {
       throw error;
     } else if (fieldResult == null) {
-      throw nonNullError(${locationDetails}, newPath);
+      throw nonNullError(${locationDetails}, mutablePath.slice(1));
     } else {
       ${setTargetOrReturn} fieldResult;
     }`
@@ -442,9 +445,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     return `\
     let fieldResult, error;
     try {
-      fieldResult = ${childOutputPlan}.execute(root, newPath, childBucket, childBucketIndex);
+      fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
     } catch (e) {
-      error = coerceError(e, ${locationDetails}, newPath);
+      error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
     }${resultHandling}`;
   }
 
@@ -454,16 +457,17 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   ): typeof OutputPlan.prototype.execute {
     args.isCrystalError = isCrystalError;
     args.coerceError = coerceError;
+    args.nonNullError = nonNullError;
     const functionBody = `return function compiledOutputPlan_${
       this.type.mode
-    }(root, path, bucket, bucketIndex) {
+    }(root, mutablePath, bucket, bucketIndex) {
   const entry = bucket.store[this.rootStepId];
   const bucketRootValue = entry[bucketIndex];
   if (isCrystalError(bucketRootValue)) {
     throw coerceError(
       bucketRootValue.originalError,
       this.locationDetails,
-      path,
+      mutablePath.slice(1),
     );
   }
 
@@ -541,6 +545,8 @@ ${Object.entries(fields)
   })
   .join("")}  })`
   };
+  try {
+  const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 ${Object.entries(fields)
   .map(([fieldName, keyValue]) => {
     switch (keyValue.type) {
@@ -555,7 +561,7 @@ ${Object.entries(fields)
       case "outputPlan": {
         return `\
   {
-    const newPath = [...path, ${JSON.stringify(fieldName)}];
+    mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
     const spec = keys.${fieldName};
     const [childBucket, childBucketIndex] = getChildBucketAndIndex(
       spec.outputPlan,
@@ -582,12 +588,15 @@ ${Object.entries(fields)
     }
   })
   .join("\n")}
+  } finally {
+    mutablePath.pop();
+  }
 
   // Everything seems okay; queue any deferred payloads
   for (const defer of this.deferredOutputPlans) {
     root.queue.push({
       root,
-      path: [...path],
+      path: mutablePath.slice(1),
       bucket,
       bucketIndex,
       outputPlan: defer,
@@ -601,7 +610,6 @@ ${Object.entries(fields)
     return this.makeExecutor(inner, {
       typeName: typeName,
       keys: this.keys,
-      nonNullError: nonNullError,
       coerceError: coerceError,
       getChildBucketAndIndex,
     });
@@ -643,6 +651,8 @@ ${Object.entries(fields)
   const l = bucketRootValue.length;
   const childOutputPlan = this.child;
 
+  const mutablePathIndex = mutablePath.push(-1) - 1;
+  try {
   // Now to populate the children...
   for (let i = 0; i < l; i++) {
     const [childBucket, childBucketIndex] = getChildBucketAndIndex(
@@ -652,13 +662,16 @@ ${Object.entries(fields)
       bucketIndex,
       i,
     );
-    const newPath = [...path, i];
+    mutablePath[mutablePathIndex] = i;
     ${this.makeExecuteChildPlanCode(
       "data[i] =",
       "this.locationDetails",
       "childOutputPlan",
       this.childIsNonNull,
     )}
+  }
+  } finally {
+    mutablePath.pop();
   }
 
   ${
@@ -669,7 +682,7 @@ ${Object.entries(fields)
   if (stream) {
     root.streams.push({
       root,
-      path: [...path],
+      path: mutablePath.slice(1),
       bucket,
       bucketIndex,
       outputPlan: childOutputPlan,
@@ -756,7 +769,7 @@ ${Object.entries(fields)
         "GraphileInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
       ),
       this.locationDetails,
-      path,
+      mutablePath.slice(1),
     );
   }
   const typeName = bucketRootValue[$$concreteType];
@@ -781,8 +794,7 @@ ${Object.entries(fields)
     bucket,
     bucketIndex,
   );
-  const newPath = [...path];
-  return childOutputPlan.execute(root, newPath, childBucket, childBucketIndex);
+  return childOutputPlan.execute(root, mutablePath, childBucket, childBucketIndex);
 `,
       {
         isPolymorphicData,
