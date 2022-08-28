@@ -601,17 +601,14 @@ function makeExecutor(
   const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
   if (isCrystalError(bucketRootValue)) {
     throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
-  }
-
-${
-  skipNullHandling
-    ? `` // No null-handling for root/introspection!
-    : `\
-  if (bucketRootValue == null) {
+  }${
+    skipNullHandling
+      ? `` // No null-handling for root/introspection!
+      : ` else if (bucketRootValue == null) {
     return null;
   }
 `
-}
+  }
 ${inner}
 }`;
   // console.log(functionBody);
@@ -847,7 +844,7 @@ const introspect = (
 };
 
 const introspectionExecutor = makeExecutor(
-  `return introspect(root, this)`,
+  `  return introspect(root, this)`,
   "introspection",
   { introspect },
   true,
@@ -971,12 +968,11 @@ ${
       outputPlan: defer,
       label: defer.type.deferLabel,
     });
-  }`
+  }
+`
     : ``
 }
-
-  return obj;
-`;
+  return obj;`;
 
   // TODO: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
