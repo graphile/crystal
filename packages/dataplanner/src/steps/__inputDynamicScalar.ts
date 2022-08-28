@@ -120,11 +120,6 @@ export class __InputDynamicScalarStep<
     return values[0].map((_, i) => {
       const variableValues = this.variableNames.map((_, j) => values[i][j]);
       const converted = this.valueFromValues(variableValues);
-      console.dir({
-        variableNames: this.variableNames,
-        variableValues,
-        converted,
-      });
       return converted;
     });
   }
