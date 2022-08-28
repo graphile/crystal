@@ -694,6 +694,7 @@ export class OperationPlan {
       {
         type: "listItem",
         parentPlanId: listStep.id,
+        stream: listStep._stepOptions.stream ?? undefined,
       },
       listStep.polymorphicPaths,
     );
