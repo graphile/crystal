@@ -435,9 +435,14 @@ ${Object.entries(fields)
           return `\
   {
     const newPath = [...path, ${JSON.stringify(fieldName)}];
-    const fieldResult = callback(${JSON.stringify(
-      fieldName,
-    )}, keys.${fieldName}, newPath);
+    let fieldResult;
+    try {
+      fieldResult = callback(${JSON.stringify(
+        fieldName,
+      )}, keys.${fieldName}, newPath);
+    } catch (e) {
+      throw coerceError(e, keys.${fieldName}.locationDetails, newPath);
+    }
     if (fieldResult == null) {
       throw nonNullError(keys.${fieldName}.locationDetails, newPath);
     }
@@ -525,7 +530,7 @@ export function coerceError(
 export function nonNullError(
   locationDetails: LocationDetails,
   path: readonly (string | number)[],
-) {
+): GraphQLError {
   const { parentTypeName, fieldName, node } = locationDetails;
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(
