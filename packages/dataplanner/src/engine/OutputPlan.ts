@@ -895,49 +895,15 @@ function makeObjectExecutor(
     );
   }
 
-  // We can't initialize the object if it contains `__proto__`, `constructor`, or similar.
-  const objectPrototypeKeys = Object.keys(
-    Object.getOwnPropertyDescriptors(Object.prototype),
-  );
-  const unsafeToInitialize = keys.some((key) =>
-    objectPrototypeKeys.includes(key),
-  );
-
   const inner = `\
-  const obj = ${
-    unsafeToInitialize
-      ? `Object.create(null)`
-      : `Object.assign(Object.create(null), {
-${Object.entries(fieldTypes)
-  .map(([fieldName, fieldType]) => {
-    switch (fieldType) {
-      case "__typename":
-        return `    ${JSON.stringify(fieldName)}: typeName,\n`;
-      case "outputPlan?":
-      case "outputPlan!":
-        return `    ${JSON.stringify(fieldName)}: undefined,\n`;
-      default: {
-        const never: never = fieldType;
-        throw new Error(
-          `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
-        );
-      }
-    }
-  })
-  .join("")}  })`
-  };
+  const obj = Object.create(null);
   try {
     const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 ${Object.entries(fieldTypes)
   .map(([fieldName, fieldType]) => {
     switch (fieldType) {
       case "__typename": {
-        if (unsafeToInitialize) {
-          return `    obj.${fieldName} = typeName;`;
-        } else {
-          // Already handled (during initialize)
-          return ``;
-        }
+        return `    obj.${fieldName} = typeName;`;
       }
       case "outputPlan!":
       case "outputPlan?": {
