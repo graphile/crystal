@@ -1,5 +1,3 @@
-import { GraphQLError } from "graphql";
-
 /**
  * Internally we wrap errors that occur in a CrystalError; this allows us to do
  * simple `instanceof` checks to see if a value is an actual value or an error.
