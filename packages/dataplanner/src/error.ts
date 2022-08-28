@@ -20,7 +20,7 @@ export interface CrystalError extends Error {
  *
  * @internal
  */
-class _CrystalError extends Error implements CrystalError {
+export class _CrystalError extends Error implements CrystalError {
   public readonly originalError: Error;
   extensions: Record<string, any>;
   constructor(originalError: Error, planId: number | null) {
