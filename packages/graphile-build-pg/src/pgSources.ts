@@ -95,6 +95,7 @@ export function getWithPgClientFromPgSource(
     }
   } else {
     const promise = (async () => {
+      // TODO: We should cache imports
       const adaptor = await import(source.adaptor);
       const factory =
         adaptor?.createWithPgClient ?? adaptor?.default?.createWithPgClient;
@@ -103,6 +104,7 @@ export function getWithPgClientFromPgSource(
           `'${source.adaptor}' does not look like a withPgClient adaptor - please ensure it exports a method called 'createWithPgClient'`,
         );
       }
+
       const originalWithPgClient = await factory(source.adaptorSettings);
       const withPgClient: WithPgClient = (...args) =>
         originalWithPgClient.apply(null, args);
@@ -121,7 +123,10 @@ export function getWithPgClientFromPgSource(
             pgClientBySourceCache.delete(source);
             return originalWithPgClient.release();
           }
-        }, 0);
+          // TODO: this used to be zero, but that seems really inefficient...
+          // Figure out why I did that?
+          // }, 0);
+        }, 5000);
       };
       pgClientBySourceCache.set(source, cachedValue);
       return cachedValue;
