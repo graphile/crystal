@@ -701,13 +701,19 @@ const polymorphicExecutor = makeExecutor(
   }`
       : ``
   }
-  const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-    childOutputPlan,
-    this,
-    bucket,
-    bucketIndex,
-  );
-  return childOutputPlan.execute(root, mutablePath, childBucket, childBucketIndex);
+
+  const directChild = bucket.children[childOutputPlan.layerPlan.id];
+  if (directChild) {
+    return childOutputPlan.execute(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
+  } else {
+    const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+      childOutputPlan,
+      this,
+      bucket,
+      bucketIndex,
+    );
+    return childOutputPlan.execute(root, mutablePath, childBucket, childBucketIndex);
+  }
 `,
   "polymorphic",
   {
@@ -735,13 +741,21 @@ const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
   try {
     // Now to populate the children...
     for (let i = 0; i < l; i++) {
-      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-        childOutputPlan,
-        this,
-        bucket,
-        bucketIndex,
-        i,
-      );
+      const directChild = bucket.children[childOutputPlan.layerPlan.id];
+      let childBucket, childBucketIndex;
+      if (directChild) {
+        childBucket = directChild.bucket;
+        childBucketIndex = directChild.map.get(bucketIndex)[i];
+      } else {
+        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+          childOutputPlan,
+          this,
+          bucket,
+          bucketIndex,
+          i,
+        ));
+      }
+
       mutablePath[mutablePathIndex] = i;
 ${makeExecuteChildPlanCode(
   "data[i] =",
@@ -929,12 +943,21 @@ ${Object.entries(fieldTypes)
     {
       mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
       const spec = this.keys.${fieldName};
-      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-        spec.outputPlan,
-        this,
-        bucket,
-        bucketIndex,
-      );
+
+      const directChild = bucket.children[spec.outputPlan.layerPlan.id];
+      let childBucket, childBucketIndex;
+      if (directChild) {
+        childBucket = directChild.bucket;
+        childBucketIndex = directChild.map.get(bucketIndex);
+      } else {
+        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+          spec.outputPlan,
+          this,
+          bucket,
+          bucketIndex,
+        ));
+      }
+
 ${makeExecuteChildPlanCode(
   `obj.${fieldName} =`,
   "spec.locationDetails",
