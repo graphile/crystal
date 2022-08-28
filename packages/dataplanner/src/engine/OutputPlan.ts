@@ -25,6 +25,8 @@ import type { ExecutableStep } from "../step.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+
 export type OutputPlanTypeIntrospection = {
   mode: "introspection";
   /**
@@ -412,80 +414,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     }
   }
 
-  private makeExecuteChildPlanCode(
-    setTargetOrReturn: string,
-    locationDetails: string,
-    childOutputPlan: string,
-    isNonNull: boolean,
-  ) {
-    // This is the code that changes based on if the field is nullable or not
-
-    // Shared code
-    const resultHandling = isNonNull
-      ? // We cannot be null
-        `
-      if (error) {
-        throw error;
-      } else if (fieldResult == null) {
-        throw nonNullError(${locationDetails}, mutablePath.slice(1));
-      } else {
-        ${setTargetOrReturn} fieldResult;
-      }`
-      : // Were the null handler; we should catch errors from children
-        `
-      if (error) {
-        root.errors.push(error);
-        ${setTargetOrReturn} null;
-      } else if (fieldResult == null) {
-        ${setTargetOrReturn} null;
-      } else {
-        ${setTargetOrReturn} fieldResult;
-      }`;
-    return `\
-      let fieldResult, error;
-      try {
-        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
-      } catch (e) {
-        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
-      }${resultHandling}`;
-  }
-
-  private makeExecutor(
-    inner: string,
-    args: { [key: string]: any },
-  ): typeof OutputPlan.prototype.execute {
-    args.isCrystalError = isCrystalError;
-    args.coerceError = coerceError;
-    args.nonNullError = nonNullError;
-    let nameExtra = this.type.mode;
-    if (this.locationDetails.parentTypeName) {
-      nameExtra += `_${this.locationDetails.parentTypeName}`;
-    }
-    if (this.locationDetails.fieldName) {
-      nameExtra += `_${this.locationDetails.fieldName}`;
-    }
-    const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
-  const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
-  if (isCrystalError(bucketRootValue)) {
-    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
-  }
-
-${
-  this.type.mode === "introspection" || this.type.mode === "root"
-    ? `` // No null-handling for root/introspection!
-    : `\
-  if (bucketRootValue == null) {
-    return null;
-  }
-`
-}
-${inner}
-}`;
-    // console.log(functionBody);
-    const f = new Function(...[...Object.keys(args), functionBody]);
-    return f(...Object.values(args)) as any;
-  }
-
   /**
    * Returns a function that, given a type name, creates an object with the
    * fields in the given order.
@@ -568,7 +496,7 @@ ${Object.entries(fields)
         bucket,
         bucketIndex,
       );
-${this.makeExecuteChildPlanCode(
+${makeExecuteChildPlanCode(
   `obj.${fieldName} =`,
   "spec.locationDetails",
   "spec.outputPlan",
@@ -610,29 +538,24 @@ ${
   return obj;
 `;
 
-    return this.makeExecutor(inner, {
-      typeName: typeName,
-      keys: this.keys,
-      coerceError: coerceError,
-      getChildBucketAndIndex,
-    });
+    return makeExecutor(
+      inner,
+      `object`,
+      {
+        typeName: typeName,
+        keys: this.keys,
+        coerceError: coerceError,
+        getChildBucketAndIndex,
+      },
+      this.type.mode === "root",
+    );
   }
 
   private makeNullExecutor() {
-    return this.makeExecutor(`return null;`, {});
+    return nullExecutor;
   }
   private makeLeafExecutor() {
-    return this.makeExecutor(
-      `\
-  if (root.insideGraphQL) {
-    // Don't serialize to avoid the double serialization problem
-    return bucketRootValue;
-  } else {
-    return this.type.serialize(bucketRootValue);
-  }
-`,
-      {},
-    );
+    return leafExecutor;
   }
   private makeArrayExecutor() {
     if (!this.child) {
@@ -640,71 +563,24 @@ ${
         "GraphileInternalError<48fabdc8-ce84-45ec-ac20-35a2af9098e0>: No child output plan for list bucket?",
       );
     }
+    const childIsNonNull = this.childIsNonNull;
+    const canStream =
+      this.child.layerPlan.reason.type === "listItem" &&
+      !!this.child.layerPlan.reason.stream;
 
-    return this.makeExecutor(
-      `\
-  if (!Array.isArray(bucketRootValue)) {
-    console.warn(\`Hit fallback for value \${inspect(bucketRootValue)} coercion to mode 'array'\`);
-    return null;
-  }
-
-  const data = [];
-  const l = bucketRootValue.length;
-  const childOutputPlan = this.child;
-
-  const mutablePathIndex = mutablePath.push(-1) - 1;
-  try {
-    // Now to populate the children...
-    for (let i = 0; i < l; i++) {
-      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-        childOutputPlan,
-        this,
-        bucket,
-        bucketIndex,
-        i,
-      );
-      mutablePath[mutablePathIndex] = i;
-${this.makeExecuteChildPlanCode(
-  "data[i] =",
-  "this.locationDetails",
-  "childOutputPlan",
-  this.childIsNonNull,
-)}
+    if (childIsNonNull) {
+      if (canStream) {
+        return arrayExecutor_nonNullable_streaming;
+      } else {
+        return arrayExecutor_nonNullable;
+      }
+    } else {
+      if (canStream) {
+        return arrayExecutor_nullable_streaming;
+      } else {
+        return arrayExecutor_nullable;
+      }
     }
-  } finally {
-    mutablePath.pop();
-  }
-
-${
-  this.child.layerPlan.reason.type === "listItem" &&
-  this.child.layerPlan.reason.stream
-    ? `\
-  const stream = bucketRootValue[$$streamMore] /* as | AsyncIterableIterator<any> | undefined*/;
-  if (stream) {
-    root.streams.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: childOutputPlan,
-      label: childOutputPlan.layerPlan.reason.stream?.label,
-      stream,
-      startIndex: bucketRootValue.length,
-      listItemStepId: childOutputPlan.layerPlan.rootStepId,
-    });
-  }`
-    : ``
-}
-
-  return data;
-`,
-      {
-        inspect,
-        getChildBucketAndIndex,
-        assert,
-        $$streamMore,
-      },
-    );
   }
 
   private makeIntrospectionExecutor() {
@@ -757,53 +633,16 @@ ${
       introspectionCacheByVariableValues.set(canonical, result);
       return result;
     };
-    return this.makeExecutor(`return introspect(root)`, { introspect });
+    return makeExecutor(
+      `return introspect(root)`,
+      "introspection",
+      { introspect },
+      true,
+    );
   }
 
   private makePolymorphicExecutor() {
-    return this.makeExecutor(
-      `\
-  if (!isPolymorphicData(bucketRootValue)) {
-    throw coerceError(
-      new Error(
-        "GraphileInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
-      ),
-      this.locationDetails,
-      mutablePath.slice(1),
-    );
-  }
-  const typeName = bucketRootValue[$$concreteType];
-  const childOutputPlan = this.childByTypeName[typeName];
-  ${
-    isDev
-      ? `{
-    assert.ok(
-      typeName,
-      "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
-    );
-    assert.ok(
-      childOutputPlan,
-      \`GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
-    );
-  }`
-      : ``
-  }
-  const [childBucket, childBucketIndex] = getChildBucketAndIndex(
-    childOutputPlan,
-    this,
-    bucket,
-    bucketIndex,
-  );
-  return childOutputPlan.execute(root, mutablePath, childBucket, childBucketIndex);
-`,
-      {
-        isPolymorphicData,
-        coerceError,
-        assert,
-        $$concreteType,
-        getChildBucketAndIndex,
-      },
-    );
+    return polymorphicExecutor;
   }
 }
 
@@ -936,3 +775,212 @@ function getChildBucketAndIndex(
   }
   return [currentBucket, currentIndex];
 }
+
+function makeExecutor(
+  inner: string,
+  nameExtra: string,
+  args: { [key: string]: any } = EMPTY_OBJECT,
+  // this.type.mode === "introspection" || this.type.mode === "root"
+  skipNullHandling = false,
+): typeof OutputPlan.prototype.execute {
+  const realArgs = {
+    ...args,
+    isCrystalError,
+    coerceError,
+    nonNullError,
+  };
+  const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
+  const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
+  if (isCrystalError(bucketRootValue)) {
+    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
+  }
+
+${
+  skipNullHandling
+    ? `` // No null-handling for root/introspection!
+    : `\
+  if (bucketRootValue == null) {
+    return null;
+  }
+`
+}
+${inner}
+}`;
+  // console.log(functionBody);
+  const f = new Function(...[...Object.keys(realArgs), functionBody]);
+  return f(...Object.values(realArgs)) as any;
+}
+
+function makeExecuteChildPlanCode(
+  setTargetOrReturn: string,
+  locationDetails: string,
+  childOutputPlan: string,
+  isNonNull: boolean,
+) {
+  // This is the code that changes based on if the field is nullable or not
+
+  // Shared code
+  const resultHandling = isNonNull
+    ? // We cannot be null
+      `
+      if (error) {
+        throw error;
+      } else if (fieldResult == null) {
+        throw nonNullError(${locationDetails}, mutablePath.slice(1));
+      } else {
+        ${setTargetOrReturn} fieldResult;
+      }`
+    : // Were the null handler; we should catch errors from children
+      `
+      if (error) {
+        root.errors.push(error);
+        ${setTargetOrReturn} null;
+      } else if (fieldResult == null) {
+        ${setTargetOrReturn} null;
+      } else {
+        ${setTargetOrReturn} fieldResult;
+      }`;
+  return `\
+      let fieldResult, error;
+      try {
+        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+      } catch (e) {
+        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
+      }${resultHandling}`;
+}
+
+/*
+ * Below here we create the executors that can be shared across many different
+ * OutputPlans without having to be recreated (thus saving significant memory,
+ * and increasing the probability of optimization).
+ */
+
+const nullExecutor = makeExecutor("  return null;", "null");
+
+const leafExecutor = makeExecutor(
+  `\
+  if (root.insideGraphQL) {
+    // Don't serialize to avoid the double serialization problem
+    return bucketRootValue;
+  } else {
+    return this.type.serialize(bucketRootValue);
+  }
+`,
+  "leaf",
+);
+
+const polymorphicExecutor = makeExecutor(
+  `\
+  if (!isPolymorphicData(bucketRootValue)) {
+    throw coerceError(
+      new Error(
+        "GraphileInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
+      ),
+      this.locationDetails,
+      mutablePath.slice(1),
+    );
+  }
+  const typeName = bucketRootValue[$$concreteType];
+  const childOutputPlan = this.childByTypeName[typeName];
+  ${
+    isDev
+      ? `{
+    assert.ok(
+      typeName,
+      "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
+    );
+    assert.ok(
+      childOutputPlan,
+      \`GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
+    );
+  }`
+      : ``
+  }
+  const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+    childOutputPlan,
+    this,
+    bucket,
+    bucketIndex,
+  );
+  return childOutputPlan.execute(root, mutablePath, childBucket, childBucketIndex);
+`,
+  "polymorphic",
+  {
+    isPolymorphicData,
+    coerceError,
+    assert,
+    $$concreteType,
+    getChildBucketAndIndex,
+  },
+);
+
+const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
+  return makeExecutor(
+    `\
+  if (!Array.isArray(bucketRootValue)) {
+    console.warn(\`Hit fallback for value \${inspect(bucketRootValue)} coercion to mode 'array'\`);
+    return null;
+  }
+
+  const data = [];
+  const l = bucketRootValue.length;
+  const childOutputPlan = this.child;
+
+  const mutablePathIndex = mutablePath.push(-1) - 1;
+  try {
+    // Now to populate the children...
+    for (let i = 0; i < l; i++) {
+      const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+        childOutputPlan,
+        this,
+        bucket,
+        bucketIndex,
+        i,
+      );
+      mutablePath[mutablePathIndex] = i;
+${makeExecuteChildPlanCode(
+  "data[i] =",
+  "this.locationDetails",
+  "childOutputPlan",
+  childIsNonNull,
+)}
+    }
+  } finally {
+    mutablePath.pop();
+  }
+
+${
+  canStream
+    ? `\
+  const stream = bucketRootValue[$$streamMore] /* as | AsyncIterableIterator<any> | undefined*/;
+  if (stream) {
+    root.streams.push({
+      root,
+      path: mutablePath.slice(1),
+      bucket,
+      bucketIndex,
+      outputPlan: childOutputPlan,
+      label: childOutputPlan.layerPlan.reason.stream?.label,
+      stream,
+      startIndex: bucketRootValue.length,
+      listItemStepId: childOutputPlan.layerPlan.rootStepId,
+    });
+  }`
+    : ``
+}
+
+  return data;
+`,
+    "array",
+    {
+      inspect,
+      getChildBucketAndIndex,
+      assert,
+      $$streamMore,
+    },
+  );
+};
+const arrayExecutor_nullable = makeArrayExecutor(false, false);
+const arrayExecutor_nullable_streaming = makeArrayExecutor(false, true);
+const arrayExecutor_nonNullable = makeArrayExecutor(true, false);
+const arrayExecutor_nonNullable_streaming = makeArrayExecutor(true, true);
