@@ -496,6 +496,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               uniques: [],
               isMutation,
               extensions,
+              description,
             };
             await info.process("pgProcedures_PgSource_options", {
               databaseName,
