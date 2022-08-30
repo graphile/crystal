@@ -275,7 +275,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         return this.coerceToGraphQLName(value);
       },
       rangeBoundType(options, { underlyingTypeName }) {
-        return `${underlyingTypeName}Bound`;
+        return `${underlyingTypeName}RangeBound`;
       },
       rangeType(options, { underlyingTypeName }) {
         return `${underlyingTypeName}Range`;

@@ -395,6 +395,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           fieldWithHooks,
         } = context;
         const codec = pgTypeSource?.codec ?? pgCodec;
+        // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
         if (!(isPgTableType || isMutationPayload) || !codec) {
           return fields;
         }
@@ -634,6 +635,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       pgRelationDetails: relationDetails,
                     },
                     {
+                      description: `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
+                        codec,
+                      )}\`.`,
                       // TODO: handle nullability
                       type: OtherType as GraphQLObjectType,
                       plan: singleRecordPlan,
