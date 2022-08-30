@@ -382,10 +382,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             source: codec.sqlType,
             codec,
             uniques,
+            isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             extensions: {
-              isNotSelectable: !["r", "v", "m", "f", "p"].includes(
-                pgClass.relkind,
-              ),
               tags: {
                 originalName: pgClass.relname,
               },
@@ -442,7 +440,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             continue;
           }
           const source = await info.helpers.pgTables.getSource(sourceBuilder);
-          if (source) {
+          if (source && !source.isVirtual) {
             output.pgSources!.push(source);
           }
         }

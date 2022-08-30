@@ -215,6 +215,12 @@ export interface PgSourceOptions<
    * affect planning.
    */
   isList?: boolean;
+
+  /**
+   * "Virtual" sources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other sources that are _not_ virtual.
+   */
+  isVirtual?: boolean;
 }
 
 export interface PgFunctionSourceOptions<
@@ -257,6 +263,7 @@ export class PgSourceBuilder<
   public uniques: TUniques | undefined;
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
   private readonly name: string;
+  public readonly isVirtual: boolean;
   constructor(
     private options: Omit<
       PgSourceOptions<TColumns, TUniques, any, TParameters>,
@@ -267,6 +274,7 @@ export class PgSourceBuilder<
     this.uniques = options.uniques;
     this.extensions = options.extensions;
     this.name = options.name;
+    this.isVirtual = options.isVirtual ?? false;
   }
 
   public toString(): string {
@@ -389,6 +397,12 @@ export class PgSource<
    */
   public readonly isList: boolean;
 
+  /**
+   * "Virtual" sources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other sources that are _not_ virtual.
+   */
+  public readonly isVirtual: boolean;
+
   public extensions: Partial<PgSourceExtensions> | undefined;
 
   static fromCodec<TColumns extends PgTypeColumns>(
@@ -446,6 +460,7 @@ export class PgSource<
       isMutation,
       selectAuth,
       isList,
+      isVirtual,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -467,6 +482,7 @@ export class PgSource<
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
     this.isMutation = !!isMutation;
     this.isList = !!isList;
+    this.isVirtual = isVirtual ?? false;
     this.selectAuth = selectAuth;
 
     // parameters is null iff source is not a function
