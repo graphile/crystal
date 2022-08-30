@@ -515,6 +515,27 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
     hooks: {
       async pgIntrospection_proc({ helpers }, event) {
         const { entity: pgProc, databaseName } = event;
+
+        // Do not select procedures that create range types. These are utility
+        // functions that really don’t need to be exposed in an API.
+        const introspection = (
+          await helpers.pgIntrospection.getIntrospection()
+        ).find((n) => n.database.name === databaseName)!.introspection;
+        const rangeType = introspection.types.find(
+          (t) =>
+            t.typnamespace === pgProc.pronamespace &&
+            t.typname === pgProc.proname &&
+            t.typtype === "r",
+        );
+        if (rangeType) {
+          return;
+        }
+
+        // Do not expose trigger functions (type trigger has oid 2279)
+        if (pgProc.prorettype === "2279") {
+          return;
+        }
+
         helpers.pgProcedures.getSource(databaseName, pgProc);
       },
     },
