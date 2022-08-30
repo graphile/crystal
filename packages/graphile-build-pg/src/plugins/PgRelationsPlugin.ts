@@ -15,10 +15,10 @@ import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
-import { tagToString } from "../utils.js";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -677,7 +677,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               )
             ) {
               const connectionTypeName =
-                build.inflection.connectionType(typeName);
+                build.inflection.tableConnectionType(otherCodec);
               const ConnectionType =
                 build.getOutputTypeByName(connectionTypeName);
               if (ConnectionType) {

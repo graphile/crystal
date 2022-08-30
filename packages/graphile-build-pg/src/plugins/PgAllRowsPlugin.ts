@@ -125,9 +125,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           ) {
             const fieldName = build.inflection.allRowsConnection(source);
             const connectionType = build.getTypeByName(
-              build.inflection.connectionType(
-                build.inflection.tableType(source.codec),
-              ),
+              build.inflection.tableConnectionType(source.codec),
             ) as GraphQLObjectType | undefined;
             if (connectionType) {
               fields = build.extend(

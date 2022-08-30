@@ -881,6 +881,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     ? source.codec.columns
                       ? inflection.recordFunctionConnectionType({ source })
                       : inflection.scalarFunctionConnectionType({ source })
+                    : source.codec.columns
+                    ? inflection.tableConnectionType(source.codec)
                     : namedType
                     ? inflection.connectionType(namedType.name)
                     : null;

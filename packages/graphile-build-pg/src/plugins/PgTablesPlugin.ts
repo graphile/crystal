@@ -132,6 +132,16 @@ declare global {
         codec: PgTypeCodec<any, any, any>,
       ): string;
 
+      tableConnectionType(
+        this: GraphileBuild.Inflection,
+        codec: PgTypeCodec<any, any, any>,
+      ): string;
+
+      tableEdgeType(
+        this: GraphileBuild.Inflection,
+        codec: PgTypeCodec<any, any, any>,
+      ): string;
+
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
     }
 
@@ -286,6 +296,14 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
       tableType(options, codec) {
         return this.upperCamelCase(this._singularizedCodecName(codec));
+      },
+
+      tableConnectionType(options, codec) {
+        return this.connectionType(this.tableType(codec));
+      },
+
+      tableEdgeType(options, codec) {
+        return this.edgeType(this.tableType(codec));
       },
 
       patchType(options, typeName) {
@@ -647,6 +665,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               // Register edges
               build.registerCursorConnection({
                 typeName: tableTypeName,
+                connectionTypeName: inflection.tableConnectionType(codec),
+                edgeTypeName: inflection.tableEdgeType(codec),
                 scope: {
                   isPgConnectionRelated: true,
                   pgCodec: codec,

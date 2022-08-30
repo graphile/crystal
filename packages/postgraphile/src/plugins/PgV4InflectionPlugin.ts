@@ -70,6 +70,12 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
       orderByType(previous, options, typeName) {
         return this.upperCamelCase(`${this.pluralize(typeName)}-order-by`);
       },
+      tableConnectionType(previous, options, codec) {
+        return this.connectionType(this.pluralize(this.tableType(codec)));
+      },
+      tableEdgeType(previous, options, codec) {
+        return this.edgeType(this.pluralize(this.tableType(codec)));
+      },
     },
   },
 };

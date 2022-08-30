@@ -44,13 +44,19 @@ export const makeInitialInflection = () => ({
    *
    * Other plugins may add their own builtins too; try and avoid conflicts!
    */
-  builtin: (name: string): string => name,
+  builtin(this: GraphileBuild.Inflection, name: string): string {
+    return name;
+  },
 
   /** Take a type name and return the edge type name */
-  edgeType: (typeName: string): string => typeName + `Edge`,
+  edgeType(this: GraphileBuild.Inflection, typeName: string): string {
+    return typeName + `Edge`;
+  },
 
   /** Take a type name and return the connection type name */
-  connectionType: (typeName: string): string => typeName + `Connection`,
+  connectionType(this: GraphileBuild.Inflection, typeName: string): string {
+    return typeName + `Connection`;
+  },
 
   /**
    * Try and make something a valid GraphQL 'Name'.
@@ -61,7 +67,7 @@ export const makeInitialInflection = () => ({
    *
    * See: https://graphql.github.io/graphql-spec/June2018/#sec-Appendix-Grammar-Summary.Lexical-Tokens
    */
-  coerceToGraphQLName: (name: string) => {
+  coerceToGraphQLName(this: GraphileBuild.Inflection, name: string) {
     let resultingName = name;
 
     /*
@@ -85,7 +91,7 @@ export const makeInitialInflection = () => ({
    * Given the name of a GraphQL output type, what name should we use for the
    * equivalent input type?
    */
-  inputType: (typeName: string) => {
+  inputType(this: GraphileBuild.Inflection, typeName: string) {
     return typeName + `Input`;
   },
 });
