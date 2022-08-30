@@ -1,8 +1,9 @@
 import "graphile-config";
 
-import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
-import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
+import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
+import { PgV4NonNullableEdgesPlugin } from "../plugins/PgV4NonNullableEdgesPlugin.js";
+import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
 export interface V4Options {
   simpleCollections?: "both" | "only" | "omit";
@@ -100,6 +101,7 @@ export const makeV4Preset = (
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,
+      PgV4NonNullableEdgesPlugin,
       makeV4Plugin(options),
     ].filter(isNotNullish),
     schema: {
