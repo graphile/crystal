@@ -340,13 +340,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               columns[columnAttribute.attname] = {
                 description: columnAttribute.getDescription(),
                 codec: columnCodec,
-                notNull: columnAttribute.attnotnull === true,
+                notNull:
+                  columnAttribute.attnotnull === true ||
+                  columnAttribute.getType()?.typnotnull === true,
                 hasDefault:
                   (columnAttribute.atthasdef ?? undefined) ||
                   (columnAttribute.attgenerated != null &&
                     columnAttribute.attgenerated !== "") ||
                   (columnAttribute.attidentity != null &&
-                    columnAttribute.attidentity !== ""),
+                    columnAttribute.attidentity !== "") ||
+                  columnAttribute.getType()?.typdefault != null,
                 // TODO: identicalVia,
               };
               await info.process("pgCodecs_column", {
