@@ -140,6 +140,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     },
                     () => ({
                       type: connectionType,
+                      description: `Reads and enables pagination through a set of \`${build.inflection.tableType(
+                        source.codec,
+                      )}\`.`,
                       plan: EXPORTABLE(
                         (connection, source) =>
                           function plan() {
