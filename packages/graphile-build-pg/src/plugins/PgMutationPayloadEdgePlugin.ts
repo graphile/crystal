@@ -1,7 +1,11 @@
 import "graphile-build";
 import "graphile-config";
 
-import type { PgClassSingleStep, PgSourceUnique } from "@dataplan/pg";
+import type {
+  PgClassSingleStep,
+  PgSourceUnique,
+  PgTypeCodec,
+} from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "dataplanner";
 import { connection, constant, EdgeStep } from "dataplanner";
@@ -10,14 +14,17 @@ import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 import { tagToString } from "../utils.js";
+import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 
 declare global {
   namespace GraphileBuild {
     interface Inflection {
       // TODO: move this somewhere more shared
-      edgeField(this: Inflection, typeName: string): string;
+      tableEdgeField(
+        this: Inflection,
+        codec: PgTypeCodec<any, any, any, any>,
+      ): string;
     }
 
     interface ScopeObjectFieldsField {
@@ -34,8 +41,8 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      edgeField(options, typeName) {
-        return this.camelCase(this.edgeType(typeName));
+      tableEdgeField(options, codec) {
+        return this.camelCase(this.tableEdgeType(codec));
       },
     },
   },
@@ -119,13 +126,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
         const TableEdgeType = getTypeByName(
-          inflection.edgeType(tableTypeName),
+          inflection.tableEdgeType(source.codec),
         ) as GraphQLObjectType | undefined;
         if (!TableEdgeType) {
           return fields;
         }
 
-        const fieldName = inflection.edgeField(tableTypeName);
+        const fieldName = inflection.tableEdgeField(source.codec);
         const primaryKeyAsc = inflection.builtin("PRIMARY_KEY_ASC");
         const defaultValueEnum =
           TableOrderByType.getValues().find((v) => v.name === primaryKeyAsc) ||
