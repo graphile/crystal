@@ -286,6 +286,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
             fields,
             {
               [columnFieldName]: {
+                description: column.description,
                 type,
                 plan: makePlan(),
               },
