@@ -45,6 +45,7 @@ import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -803,6 +804,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   { fieldName, fieldBehaviorScope: "mutation_field" },
                   {
                     description: source.extensions?.description,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
                     type: payloadType,
                     args: {
                       input: {
@@ -840,6 +844,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   },
                   {
                     description: source.description,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
                     type: type!,
                     args,
                     plan: getSelectPlanFromParentAndArgs as any,
@@ -905,6 +912,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             },
                             {
                               description: source.description,
+                              deprecationReason: tagToString(
+                                source.extensions?.tags?.deprecated,
+                              ),
                               type: ConnectionType,
                               args,
                               plan: EXPORTABLE(
@@ -965,6 +975,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           },
                           {
                             description: source.description,
+                            deprecationReason: tagToString(
+                              source.extensions?.tags?.deprecated,
+                            ),
                             // TODO: nullability
                             type: new GraphQLList(type!),
                             args,
