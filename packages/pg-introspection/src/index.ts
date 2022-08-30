@@ -55,6 +55,15 @@ export function parseIntrospectionResults(
 export { PgSmartTagsAndDescription, PgSmartTagsDict };
 
 declare module "./introspection" {
+  interface PgProcArgument {
+    isIn: boolean;
+    isOut: boolean;
+    isVariadic: boolean;
+    hasDefault: boolean;
+    type: PgType;
+    name: string | null;
+  }
+
   interface PgDatabase {
     getDba(): PgRoles | undefined;
   }
@@ -95,6 +104,7 @@ declare module "./introspection" {
     getReturnType(): PgType | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    getArguments(): PgProcArgument[];
   }
   interface PgType {
     getNamespace(): PgNamespace | undefined;

@@ -6,6 +6,7 @@ import type {
   PgEnum,
   PgIndex,
   PgNamespace,
+  PgProcArgument,
   PgRange,
   PgRoles,
   PgType,
@@ -186,6 +187,74 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_PROC, entity._id),
     );
+    entity.getArguments = memo(() => {
+      const args: PgProcArgument[] = [];
+      const {
+        // Null if everything 'in'. i: IN, o: OUT, b: INOUT, v: VARIADIC, t: TABLE
+        proargmodes,
+        // Null if no names
+        proargnames,
+        // Only input types
+        proargtypes,
+        // Null if no arg defaults, length = pronargdefaults
+        // proargdefaults,
+        // Number of inpart args
+        // pronargs,
+        // All args, null if all args are input
+        proallargtypes,
+        // Number of arguments with defaults
+        pronargdefaults,
+      } = entity;
+      if (proallargtypes) {
+        for (let i = 0, l = proallargtypes.length; i < l; i++) {
+          const typeId = proallargtypes[i];
+          const type = introspection.types.find((t) => t._id === typeId);
+          if (!type) {
+            throw new Error("Corrupted introspection data");
+          }
+          const mode = proargmodes?.[i] ?? "i";
+          const isIn = mode === "i" || mode === "b" || mode === "v";
+          const isOut = mode === "o" || mode === "b" || mode === "t";
+          const isVariadic = mode === "v";
+          const hasDefault = pronargdefaults ? i >= l - pronargdefaults : false;
+          const name = proargnames?.[i] ?? null;
+
+          args.push({
+            isIn,
+            isOut,
+            isVariadic,
+            hasDefault,
+            type,
+            name,
+          });
+        }
+      } else if (proargtypes) {
+        for (let i = 0, l = proargtypes.length; i < l; i++) {
+          const typeId = proargtypes[i];
+          const type = introspection.types.find((t) => t._id === typeId);
+          if (!type) {
+            throw new Error("Corrupted introspection data");
+          }
+          const mode = proargmodes?.[i] ?? "i";
+          const isIn = mode === "i" || mode === "b" || mode === "v";
+          const isOut = mode === "o" || mode === "b" || mode === "t";
+          const isVariadic = mode === "v";
+          const hasDefault = pronargdefaults ? i >= l - pronargdefaults : false;
+          const name = proargnames?.[i] ?? null;
+
+          args.push({
+            isIn,
+            isOut,
+            isVariadic,
+            hasDefault,
+            type,
+            name,
+          });
+        }
+      }
+
+      return args;
+    });
   });
   introspection.types.forEach((entity) => {
     entity.getNamespace = memo(() => getNamespace(entity.typnamespace));
