@@ -3,22 +3,23 @@ import type { GraphQLSchema } from "graphql";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import type { PoolClient } from "pg";
 
-import { createPostGraphileSchema } from "../../..";
-import { withPgClient } from "../../helpers";
-import { snapshot } from "../../helpers-v5";
+import { makeSchema } from "../../../dist/schema.js";
+import AmberPreset from "../../../src/presets/amber.js";
+import { makeV4Preset } from "../../../src/presets/v4.js";
+import { connectionString, snapshot, withPoolClient } from "../../helpers.js";
 
 let countByPath = Object.create(null);
 
 export const test =
   (
     testPath: string,
-    schemas: string | string[],
-    options?: object,
+    schemata: string | string[],
+    options: Record<string, any> = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
     finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
   ) =>
   () =>
-    withPgClient(async (client) => {
+    withPoolClient(async (client) => {
       if (setup) {
         if (typeof setup === "function") {
           await setup(client);
@@ -26,7 +27,45 @@ export const test =
           await client.query(setup);
         }
       }
-      const schema = await createPostGraphileSchema(client, schemas, options);
+      const v4Preset = makeV4Preset(options);
+      const schemas = Array.isArray(schemata) ? schemata : [schemata];
+      const graphileBuildOptions = {};
+      const preset: GraphileConfig.Preset = {
+        extends: [AmberPreset, v4Preset],
+        pgSources: [
+          {
+            adaptor: "@dataplan/pg/adaptors/node-postgres",
+            name: "main",
+            withPgClientKey: "withPgClient",
+            pgSettingsKey: "pgSettings",
+            pgSettingsForIntrospection:
+              options.ignoreRBAC == false
+                ? {
+                    role: "postgraphile_test_authenticator",
+                  }
+                : null,
+            pgSettings:
+              options.ignoreRBAC === false
+                ? () => ({
+                    role: "postgraphile_test_visitor",
+                    "jwt.claims.user_id": "3",
+                  })
+                : undefined,
+            schemas: schemas,
+            adaptorSettings: {
+              connectionString,
+            },
+          } as any, //GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
+        ],
+        schema: {
+          ...graphileBuildOptions,
+        },
+      };
+      const {
+        schema,
+        config: _config,
+        contextCallback,
+      } = await makeSchema(preset);
       const i = testPath in countByPath ? countByPath[testPath] + 1 : 1;
       countByPath[testPath] = i;
       const sorted = lexicographicSortSchema(schema);
