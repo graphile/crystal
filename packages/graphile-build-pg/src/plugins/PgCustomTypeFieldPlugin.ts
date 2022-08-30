@@ -338,9 +338,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               source,
             });
 
+            const fieldName = inflection.customMutationField({ source });
             build.registerInputObjectType(
               inputTypeName,
-              {},
+              { isMutationInput: true },
               () => {
                 const argDetails = getArgDetailsFromParameters(
                   build,
@@ -374,6 +375,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 );
 
                 return {
+                  description: `All input for the \`${fieldName}\` mutation.`,
                   fields,
                 };
               },
@@ -408,6 +410,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               },
               ObjectStep,
               () => ({
+                description: `The output of our \`${fieldName}\` mutation.`,
                 fields: () => {
                   const fields = {
                     clientMutationId: {
