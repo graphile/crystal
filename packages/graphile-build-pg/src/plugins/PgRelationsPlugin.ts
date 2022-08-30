@@ -411,6 +411,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         } = source.getRelations();
         return Object.entries(relations).reduce(
           (memo, [identifier, relation]) => {
+            if (isMutationPayload && relation.isBackwards) {
+              // Don't add backwards relations to mutation payloads
+              return memo;
+            }
             const {
               isUnique,
               localColumns,

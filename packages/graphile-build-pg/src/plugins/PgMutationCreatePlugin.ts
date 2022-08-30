@@ -145,6 +145,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
               payloadTypeName,
               {
                 isMutationPayload: true,
+                // TODO: isPgCreatePayloadType: true,
                 pgTypeSource: source,
               },
               ExecutableStep as any,
