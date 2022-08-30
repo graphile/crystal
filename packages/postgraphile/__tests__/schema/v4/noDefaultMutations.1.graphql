@@ -1,0 +1,2915 @@
+enum AnEnum {
+  ASTERISK
+  ASTERISK_ASTERISK
+  ASTERISK_ASTERISK_ASTERISK
+  ASTERISK_BAR
+  ASTERISK_BAR_
+  ASTERISK_BAZ_ASTERISK
+  AWAITING
+  DOLLAR
+  FOO_ASTERISK
+  FOO_ASTERISK_
+  GREATER_THAN_OR_EQUAL
+  LIKE
+  PERCENT
+  PUBLISHED
+  REJECTED
+  _ASTERISK_BAR_
+  _ASTERISK_BAZ_ASTERISK_
+  _FOO_ASTERISK
+}
+
+scalar AnInt
+
+"""A range of `AnInt`."""
+type AnIntRange {
+  """The ending bound of our range."""
+  end: AnIntRangeBound
+
+  """The starting bound of our range."""
+  start: AnIntRangeBound
+}
+
+"""
+The value at one end of a range. A range can either include this value, or not.
+"""
+type AnIntRangeBound {
+  """Whether or not the value of this bound is included in the range."""
+  inclusive: Boolean!
+
+  """The value at one end of our range."""
+  value: AnInt!
+}
+
+scalar AnotherInt
+
+"""
+A floating point number that requires more precision than IEEE 754 binary 64
+"""
+scalar BigFloat
+
+"""A range of `BigFloat`."""
+type BigFloatRange {
+  """The ending bound of our range."""
+  end: BigFloatRangeBound
+
+  """The starting bound of our range."""
+  start: BigFloatRangeBound
+}
+
+"""
+The value at one end of a range. A range can either include this value, or not.
+"""
+type BigFloatRangeBound {
+  """Whether or not the value of this bound is included in the range."""
+  inclusive: Boolean!
+
+  """The value at one end of our range."""
+  value: BigFloat!
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
+type CompoundKey implements Node {
+  extra: Boolean
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId1: Person
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
+  personId1: Int!
+  personId2: Int!
+}
+
+"""
+A condition to be used against `CompoundKey` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input CompoundKeyCondition {
+  """Checks for equality with the object’s `extra` field."""
+  extra: Boolean
+
+  """Checks for equality with the object’s `personId1` field."""
+  personId1: Int
+
+  """Checks for equality with the object’s `personId2` field."""
+  personId2: Int
+}
+
+"""A connection to a list of `CompoundKey` values."""
+type CompoundKeysConnection {
+  """
+  A list of edges which contains the `CompoundKey` and cursor to aid in pagination.
+  """
+  edges: [CompoundKeysEdge!]!
+
+  """A list of `CompoundKey` objects."""
+  nodes: [CompoundKey!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `CompoundKey` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `CompoundKey` edge in the connection."""
+type CompoundKeysEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `CompoundKey` at the end of the edge."""
+  node: CompoundKey!
+}
+
+"""Methods to use when ordering `CompoundKey`."""
+enum CompoundKeysOrderBy {
+  EXTRA_ASC
+  EXTRA_DESC
+  NATURAL
+  PERSON_ID_1_ASC
+  PERSON_ID_1_DESC
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""Awesome feature!"""
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  computedField: Int
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: Interval
+}
+
+"""A connection to a list of `CompoundType` values."""
+type CompoundTypesConnection {
+  """
+  A list of edges which contains the `CompoundType` and cursor to aid in pagination.
+  """
+  edges: [CompoundTypesEdge!]!
+
+  """A list of `CompoundType` objects."""
+  nodes: [CompoundType!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `CompoundType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `CompoundType` edge in the connection."""
+type CompoundTypesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `CompoundType` at the end of the edge."""
+  node: CompoundType!
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""The day, does not include a time."""
+scalar Date
+
+"""A range of `Date`."""
+type DateRange {
+  """The ending bound of our range."""
+  end: DateRangeBound
+
+  """The starting bound of our range."""
+  start: DateRangeBound
+}
+
+"""
+The value at one end of a range. A range can either include this value, or not.
+"""
+type DateRangeBound {
+  """Whether or not the value of this bound is included in the range."""
+  inclusive: Boolean!
+
+  """The value at one end of our range."""
+  value: Date!
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
+
+type EdgeCase {
+  computed: String
+  notNullHasDefault: Boolean!
+  rowId: Int
+  wontCastEasy: Int
+}
+
+"""
+A condition to be used against `EdgeCase` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input EdgeCaseCondition {
+  """Checks for equality with the object’s `notNullHasDefault` field."""
+  notNullHasDefault: Boolean
+
+  """Checks for equality with the object’s `rowId` field."""
+  rowId: Int
+
+  """Checks for equality with the object’s `wontCastEasy` field."""
+  wontCastEasy: Int
+}
+
+"""A connection to a list of `EdgeCase` values."""
+type EdgeCasesConnection {
+  """
+  A list of edges which contains the `EdgeCase` and cursor to aid in pagination.
+  """
+  edges: [EdgeCasesEdge!]!
+
+  """A list of `EdgeCase` objects."""
+  nodes: [EdgeCase!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `EdgeCase` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `EdgeCase` edge in the connection."""
+type EdgeCasesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `EdgeCase` at the end of the edge."""
+  node: EdgeCase!
+}
+
+"""Methods to use when ordering `EdgeCase`."""
+enum EdgeCasesOrderBy {
+  NATURAL
+  NOT_NULL_HAS_DEFAULT_ASC
+  NOT_NULL_HAS_DEFAULT_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
+  WONT_CAST_EASY_ASC
+  WONT_CAST_EASY_DESC
+}
+
+scalar Email
+
+enum EnumCaps {
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+  _0_BAR
+}
+
+enum EnumWithEmptyString {
+  ONE
+  TWO
+  _EMPTY_
+}
+
+"""
+The value at one end of a range. A range can either include this value, or not.
+"""
+input FloatRangeBoundInput {
+  """Whether or not the value of this bound is included in the range."""
+  inclusive: Boolean!
+
+  """The value at one end of our range."""
+  value: Float!
+}
+
+"""A range of `Float`."""
+input FloatRangeInput {
+  """The ending bound of our range."""
+  end: FloatRangeBoundInput
+
+  """The starting bound of our range."""
+  start: FloatRangeBoundInput
+}
+
+"""The return type of our `funcOutComplex` query."""
+type FuncOutComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""A connection to a list of `FuncOutComplexSetofRecord` values."""
+type FuncOutComplexSetofConnection {
+  """
+  A list of edges which contains the `FuncOutComplexSetofRecord` and cursor to aid in pagination.
+  """
+  edges: [FuncOutComplexSetofEdge!]!
+
+  """A list of `FuncOutComplexSetofRecord` objects."""
+  nodes: [FuncOutComplexSetofRecord!]!
+
+  """
+  The count of *all* `FuncOutComplexSetofRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `FuncOutComplexSetofRecord` edge in the connection."""
+type FuncOutComplexSetofEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FuncOutComplexSetofRecord` at the end of the edge."""
+  node: FuncOutComplexSetofRecord!
+}
+
+"""The return type of our `funcOutComplexSetof` query."""
+type FuncOutComplexSetofRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""The return type of our `funcOutOutCompoundType` query."""
+type FuncOutOutCompoundTypeRecord {
+  o1: Int
+  o2: CompoundType
+}
+
+"""The return type of our `funcOutOut` query."""
+type FuncOutOutRecord {
+  firstOut: Int
+  secondOut: String
+}
+
+"""A connection to a list of `FuncOutOutSetofRecord` values."""
+type FuncOutOutSetofConnection {
+  """
+  A list of edges which contains the `FuncOutOutSetofRecord` and cursor to aid in pagination.
+  """
+  edges: [FuncOutOutSetofEdge!]!
+
+  """A list of `FuncOutOutSetofRecord` objects."""
+  nodes: [FuncOutOutSetofRecord!]!
+
+  """
+  The count of *all* `FuncOutOutSetofRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `FuncOutOutSetofRecord` edge in the connection."""
+type FuncOutOutSetofEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FuncOutOutSetofRecord` at the end of the edge."""
+  node: FuncOutOutSetofRecord!
+}
+
+"""The return type of our `funcOutOutSetof` query."""
+type FuncOutOutSetofRecord {
+  o1: Int
+  o2: String
+}
+
+"""The return type of our `funcOutOutUnnamed` query."""
+type FuncOutOutUnnamedRecord {
+  arg1: Int
+  arg2: String
+}
+
+"""A connection to a list of `Int` values."""
+type FuncOutSetofConnection {
+  """
+  A list of edges which contains the `Int` and cursor to aid in pagination.
+  """
+  edges: [FuncOutSetofEdge!]!
+
+  """A list of `Int` objects."""
+  nodes: [Int]!
+
+  """The count of *all* `Int` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Int` edge in the connection."""
+type FuncOutSetofEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Int` at the end of the edge."""
+  node: Int
+}
+
+"""The return type of our `funcOutUnnamedOutOutUnnamed` query."""
+type FuncOutUnnamedOutOutUnnamedRecord {
+  arg1: Int
+  arg3: Int
+  o2: String
+}
+
+"""A connection to a list of `FuncReturnsTableMultiColRecord` values."""
+type FuncReturnsTableMultiColConnection {
+  """
+  A list of edges which contains the `FuncReturnsTableMultiColRecord` and cursor to aid in pagination.
+  """
+  edges: [FuncReturnsTableMultiColEdge!]!
+
+  """A list of `FuncReturnsTableMultiColRecord` objects."""
+  nodes: [FuncReturnsTableMultiColRecord!]!
+
+  """
+  The count of *all* `FuncReturnsTableMultiColRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `FuncReturnsTableMultiColRecord` edge in the connection."""
+type FuncReturnsTableMultiColEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FuncReturnsTableMultiColRecord` at the end of the edge."""
+  node: FuncReturnsTableMultiColRecord!
+}
+
+"""The return type of our `funcReturnsTableMultiCol` query."""
+type FuncReturnsTableMultiColRecord {
+  col1: Int
+  col2: String
+}
+
+"""A connection to a list of `Int` values."""
+type FuncReturnsTableOneColConnection {
+  """
+  A list of edges which contains the `Int` and cursor to aid in pagination.
+  """
+  edges: [FuncReturnsTableOneColEdge!]!
+
+  """A list of `Int` objects."""
+  nodes: [Int]!
+
+  """The count of *all* `Int` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Int` edge in the connection."""
+type FuncReturnsTableOneColEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Int` at the end of the edge."""
+  node: Int
+}
+
+"""All input for the `intSetMutation` mutation."""
+input IntSetMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+"""The output of our `intSetMutation` mutation."""
+type IntSetMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integers: [Int]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A connection to a list of `Int` values."""
+type IntSetQueryConnection {
+  """
+  A list of edges which contains the `Int` and cursor to aid in pagination.
+  """
+  edges: [IntSetQueryEdge!]!
+
+  """A list of `Int` objects."""
+  nodes: [Int]!
+
+  """The count of *all* `Int` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Int` edge in the connection."""
+type IntSetQueryEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Int` at the end of the edge."""
+  node: Int
+}
+
+"""An IPv4 or IPv6 host address, and optionally its subnet."""
+scalar InternetAddress
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+type Issue756 implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  ts: NotNullTimestamp!
+}
+
+"""
+A condition to be used against `Issue756` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input Issue756Condition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `ts` field."""
+  ts: NotNullTimestamp
+}
+
+"""All input for the `issue756Mutation` mutation."""
+input Issue756MutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `issue756Mutation` mutation."""
+type Issue756MutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  issue756: Issue756
+
+  """An edge for our `Issue756`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering `Issue756`."""
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A connection to a list of `Issue756` values."""
+type Issue756SConnection {
+  """
+  A list of edges which contains the `Issue756` and cursor to aid in pagination.
+  """
+  edges: [Issue756SEdge!]!
+
+  """A list of `Issue756` objects."""
+  nodes: [Issue756!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Issue756` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Issue756` edge in the connection."""
+type Issue756SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Issue756` at the end of the edge."""
+  node: Issue756!
+}
+
+"""Methods to use when ordering `Issue756`."""
+enum Issue756SOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TS_ASC
+  TS_DESC
+}
+
+"""All input for the `issue756SetMutation` mutation."""
+input Issue756SetMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `issue756SetMutation` mutation."""
+type Issue756SetMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  issue756S: [Issue756!]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""All input for the `jsonIdentityMutation` mutation."""
+input JsonIdentityMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  json: JSON
+}
+
+"""The output of our `jsonIdentityMutation` mutation."""
+type JsonIdentityMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  json: JSON
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `jsonbIdentityMutation` mutation."""
+input JsonbIdentityMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  json: JSON
+}
+
+"""The output of our `jsonbIdentityMutation` mutation."""
+type JsonbIdentityMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  json: JSON
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `jsonbIdentityMutationPlpgsql` mutation."""
+input JsonbIdentityMutationPlpgsqlInput {
+  _theJson: JSON!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `jsonbIdentityMutationPlpgsql` mutation."""
+type JsonbIdentityMutationPlpgsqlPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  json: JSON
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `jsonbIdentityMutationPlpgsqlWithDefault` mutation."""
+input JsonbIdentityMutationPlpgsqlWithDefaultInput {
+  _theJson: JSON
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `jsonbIdentityMutationPlpgsqlWithDefault` mutation."""
+type JsonbIdentityMutationPlpgsqlWithDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  json: JSON
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
+"""
+scalar KeyValueHash
+
+"""Tracks metadata about the left arms of various people"""
+type LeftArm implements Node {
+  id: Int!
+  lengthInMetres: Float
+  mood: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+  personId: Int!
+}
+
+"""An input representation of `LeftArm` with nullable fields."""
+input LeftArmBaseInput {
+  id: Int
+  lengthInMetres: Float
+  mood: String
+  personId: Int
+}
+
+"""
+A condition to be used against `LeftArm` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input LeftArmCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lengthInMetres` field."""
+  lengthInMetres: Float
+
+  """Checks for equality with the object’s `mood` field."""
+  mood: String
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""All input for the `leftArmIdentity` mutation."""
+input LeftArmIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  leftArm: LeftArmBaseInput
+}
+
+"""The output of our `leftArmIdentity` mutation."""
+type LeftArmIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  leftArm: LeftArm
+
+  """An edge for our `LeftArm`. May be used by Relay 1."""
+  leftArmEdge(
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A connection to a list of `LeftArm` values."""
+type LeftArmsConnection {
+  """
+  A list of edges which contains the `LeftArm` and cursor to aid in pagination.
+  """
+  edges: [LeftArmsEdge!]!
+
+  """A list of `LeftArm` objects."""
+  nodes: [LeftArm!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LeftArm` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LeftArm` edge in the connection."""
+type LeftArmsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LeftArm` at the end of the edge."""
+  node: LeftArm!
+}
+
+"""Methods to use when ordering `LeftArm`."""
+enum LeftArmsOrderBy {
+  ID_ASC
+  ID_DESC
+  LENGTH_IN_METRES_ASC
+  LENGTH_IN_METRES_DESC
+  MOOD_ASC
+  MOOD_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  intSetMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: IntSetMutationInput!
+  ): IntSetMutationPayload
+  issue756Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Issue756MutationInput!
+  ): Issue756MutationPayload
+  issue756SetMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Issue756SetMutationInput!
+  ): Issue756SetMutationPayload
+  jsonIdentityMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: JsonIdentityMutationInput!
+  ): JsonIdentityMutationPayload
+  jsonbIdentityMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: JsonbIdentityMutationInput!
+  ): JsonbIdentityMutationPayload
+  jsonbIdentityMutationPlpgsql(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: JsonbIdentityMutationPlpgsqlInput!
+  ): JsonbIdentityMutationPlpgsqlPayload
+  jsonbIdentityMutationPlpgsqlWithDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: JsonbIdentityMutationPlpgsqlWithDefaultInput!
+  ): JsonbIdentityMutationPlpgsqlWithDefaultPayload
+  leftArmIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: LeftArmIdentityInput!
+  ): LeftArmIdentityPayload
+  mutationInInout(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationInInoutInput!
+  ): MutationInInoutPayload
+  mutationInOut(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationInOutInput!
+  ): MutationInOutPayload
+  mutationOut(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutInput!
+  ): MutationOutPayload
+  mutationOutComplex(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutComplexInput!
+  ): MutationOutComplexPayload
+  mutationOutComplexSetof(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutComplexSetofInput!
+  ): MutationOutComplexSetofPayload
+  mutationOutOut(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutOutInput!
+  ): MutationOutOutPayload
+  mutationOutOutCompoundType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutOutCompoundTypeInput!
+  ): MutationOutOutCompoundTypePayload
+  mutationOutOutSetof(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutOutSetofInput!
+  ): MutationOutOutSetofPayload
+  mutationOutOutUnnamed(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutOutUnnamedInput!
+  ): MutationOutOutUnnamedPayload
+  mutationOutSetof(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutSetofInput!
+  ): MutationOutSetofPayload
+  mutationOutTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutTableInput!
+  ): MutationOutTablePayload
+  mutationOutTableSetof(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutTableSetofInput!
+  ): MutationOutTableSetofPayload
+  mutationOutUnnamed(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutUnnamedInput!
+  ): MutationOutUnnamedPayload
+  mutationOutUnnamedOutOutUnnamed(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationOutUnnamedOutOutUnnamedInput!
+  ): MutationOutUnnamedOutOutUnnamedPayload
+  mutationReturnsTableMultiCol(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationReturnsTableMultiColInput!
+  ): MutationReturnsTableMultiColPayload
+  mutationReturnsTableOneCol(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationReturnsTableOneColInput!
+  ): MutationReturnsTableOneColPayload
+  noArgsMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: NoArgsMutationInput!
+  ): NoArgsMutationPayload
+  tableMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TableMutationInput!
+  ): TableMutationPayload
+  tableSetMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TableSetMutationInput!
+  ): TableSetMutationPayload
+  typesMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TypesMutationInput!
+  ): TypesMutationPayload
+}
+
+"""All input for the `mutationInInout` mutation."""
+input MutationInInoutInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  i: Int
+  ino: Int
+}
+
+"""The output of our `mutationInInout` mutation."""
+type MutationInInoutPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  ino: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationInOut` mutation."""
+input MutationInOutInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  i: Int
+}
+
+"""The output of our `mutationInOut` mutation."""
+type MutationInOutPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  o: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationOutComplex` mutation."""
+input MutationOutComplexInput {
+  a: Int
+  b: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutComplex` mutation."""
+type MutationOutComplexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: MutationOutComplexRecord
+}
+
+"""The return type of our `mutationOutComplex` mutation."""
+type MutationOutComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""All input for the `mutationOutComplexSetof` mutation."""
+input MutationOutComplexSetofInput {
+  a: Int
+  b: String
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutComplexSetof` mutation."""
+type MutationOutComplexSetofPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  results: [MutationOutComplexSetofRecord]
+}
+
+"""The return type of our `mutationOutComplexSetof` mutation."""
+type MutationOutComplexSetofRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""All input for the `mutationOut` mutation."""
+input MutationOutInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""All input for the `mutationOutOutCompoundType` mutation."""
+input MutationOutOutCompoundTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  i1: Int
+}
+
+"""The output of our `mutationOutOutCompoundType` mutation."""
+type MutationOutOutCompoundTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: MutationOutOutCompoundTypeRecord
+}
+
+"""The return type of our `mutationOutOutCompoundType` mutation."""
+type MutationOutOutCompoundTypeRecord {
+  o1: Int
+  o2: CompoundType
+}
+
+"""All input for the `mutationOutOut` mutation."""
+input MutationOutOutInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutOut` mutation."""
+type MutationOutOutPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: MutationOutOutRecord
+}
+
+"""The return type of our `mutationOutOut` mutation."""
+type MutationOutOutRecord {
+  firstOut: Int
+  secondOut: String
+}
+
+"""All input for the `mutationOutOutSetof` mutation."""
+input MutationOutOutSetofInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutOutSetof` mutation."""
+type MutationOutOutSetofPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  results: [MutationOutOutSetofRecord]
+}
+
+"""The return type of our `mutationOutOutSetof` mutation."""
+type MutationOutOutSetofRecord {
+  o1: Int
+  o2: String
+}
+
+"""All input for the `mutationOutOutUnnamed` mutation."""
+input MutationOutOutUnnamedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutOutUnnamed` mutation."""
+type MutationOutOutUnnamedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: MutationOutOutUnnamedRecord
+}
+
+"""The return type of our `mutationOutOutUnnamed` mutation."""
+type MutationOutOutUnnamedRecord {
+  arg1: Int
+  arg2: String
+}
+
+"""The output of our `mutationOut` mutation."""
+type MutationOutPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  o: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationOutSetof` mutation."""
+input MutationOutSetofInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutSetof` mutation."""
+type MutationOutSetofPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  os: [Int]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationOutTable` mutation."""
+input MutationOutTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutTable` mutation."""
+type MutationOutTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationOutTableSetof` mutation."""
+input MutationOutTableSetofInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutTableSetof` mutation."""
+type MutationOutTableSetofPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  people: [Person!]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationOutUnnamed` mutation."""
+input MutationOutUnnamedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""All input for the `mutationOutUnnamedOutOutUnnamed` mutation."""
+input MutationOutUnnamedOutOutUnnamedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationOutUnnamedOutOutUnnamed` mutation."""
+type MutationOutUnnamedOutOutUnnamedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: MutationOutUnnamedOutOutUnnamedRecord
+}
+
+"""The return type of our `mutationOutUnnamedOutOutUnnamed` mutation."""
+type MutationOutUnnamedOutOutUnnamedRecord {
+  arg1: Int
+  arg3: Int
+  o2: String
+}
+
+"""The output of our `mutationOutUnnamed` mutation."""
+type MutationOutUnnamedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationReturnsTableMultiCol` mutation."""
+input MutationReturnsTableMultiColInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  i: Int
+}
+
+"""The output of our `mutationReturnsTableMultiCol` mutation."""
+type MutationReturnsTableMultiColPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  results: [MutationReturnsTableMultiColRecord]
+}
+
+"""The return type of our `mutationReturnsTableMultiCol` mutation."""
+type MutationReturnsTableMultiColRecord {
+  col1: Int
+  col2: String
+}
+
+"""All input for the `mutationReturnsTableOneCol` mutation."""
+input MutationReturnsTableOneColInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  i: Int
+}
+
+"""The output of our `mutationReturnsTableOneCol` mutation."""
+type MutationReturnsTableOneColPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  col1S: [Int]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type MyTable implements Node {
+  id: Int!
+  jsonData: JSON
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `MyTable` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MyTableCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `jsonData` field."""
+  jsonData: JSON
+}
+
+"""A connection to a list of `MyTable` values."""
+type MyTablesConnection {
+  """
+  A list of edges which contains the `MyTable` and cursor to aid in pagination.
+  """
+  edges: [MyTablesEdge!]!
+
+  """A list of `MyTable` objects."""
+  nodes: [MyTable!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MyTable` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `MyTable` edge in the connection."""
+type MyTablesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MyTable` at the end of the edge."""
+  node: MyTable!
+}
+
+"""Methods to use when ordering `MyTable`."""
+enum MyTablesOrderBy {
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type NestedCompoundType {
+  a: CompoundType
+  b: CompoundType
+  bazBuz: Int
+}
+
+"""All input for the `noArgsMutation` mutation."""
+input NoArgsMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `noArgsMutation` mutation."""
+type NoArgsMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+scalar NotNullTimestamp
+
+scalar NotNullUrl
+
+type NullTestRecord implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  nonNullText: String!
+  nullableInt: Int
+  nullableText: String
+}
+
+"""
+A condition to be used against `NullTestRecord` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NullTestRecordCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `nonNullText` field."""
+  nonNullText: String
+
+  """Checks for equality with the object’s `nullableInt` field."""
+  nullableInt: Int
+
+  """Checks for equality with the object’s `nullableText` field."""
+  nullableText: String
+}
+
+"""A connection to a list of `NullTestRecord` values."""
+type NullTestRecordsConnection {
+  """
+  A list of edges which contains the `NullTestRecord` and cursor to aid in pagination.
+  """
+  edges: [NullTestRecordsEdge!]!
+
+  """A list of `NullTestRecord` objects."""
+  nodes: [NullTestRecord!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `NullTestRecord` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `NullTestRecord` edge in the connection."""
+type NullTestRecordsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NullTestRecord` at the end of the edge."""
+  node: NullTestRecord!
+}
+
+"""Methods to use when ordering `NullTestRecord`."""
+enum NullTestRecordsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  NON_NULL_TEXT_ASC
+  NON_NULL_TEXT_DESC
+  NULLABLE_INT_ASC
+  NULLABLE_INT_DESC
+  NULLABLE_TEXT_ASC
+  NULLABLE_TEXT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A connection to a list of `Person` values."""
+type PeopleConnection {
+  """
+  A list of edges which contains the `Person` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge!]!
+
+  """A list of `Person` objects."""
+  nodes: [Person!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Person` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Person` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Person` at the end of the edge."""
+  node: Person!
+}
+
+"""Methods to use when ordering `Person`."""
+enum PeopleOrderBy {
+  ABOUT_ASC
+  ABOUT_DESC
+  ALIASES_ASC
+  ALIASES_DESC
+  COMPUTED_OUT_ASC
+  COMPUTED_OUT_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  FIRST_NAME_ASC
+  FIRST_NAME_DESC
+  ID_ASC
+  ID_DESC
+  LAST_LOGIN_FROM_IP_ASC
+  LAST_LOGIN_FROM_IP_DESC
+  LAST_LOGIN_FROM_SUBNET_ASC
+  LAST_LOGIN_FROM_SUBNET_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ASC
+  SITE_DESC
+  USER_MAC_ASC
+  USER_MAC_DESC
+}
+
+"""Person test comment"""
+type Person implements Node {
+  about: String
+  aliases: [String]!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
+  compoundKeysByPersonId1(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompoundKeyCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CompoundKey`."""
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CompoundKeysConnection!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
+  compoundKeysByPersonId2(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompoundKeyCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CompoundKey`."""
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CompoundKeysConnection!
+  computedComplex(a: Int, b: String): PersonComputedComplexRecord
+  computedFirstArgInout: Person
+  computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
+  computedInout(ino: String): String
+  computedInoutOut(ino: String): PersonComputedInoutOutRecord
+  computedOut: String!
+  computedOutOut: PersonComputedOutOutRecord
+  config: KeyValueHash
+  createdAt: Datetime
+  email: Email!
+  exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
+  firstName: String
+  firstPost: Post
+
+  """Reads and enables pagination through a set of `Person`."""
+  friends(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]
+  ): PeopleConnection!
+
+  """The primary unique identifier for the person"""
+  id: Int!
+  lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+
+  """Reads a single `LeftArm` that is related to this `Person`."""
+  leftArmByPersonId: LeftArm
+
+  """Reads and enables pagination through a set of `LeftArm`."""
+  leftArmsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LeftArmCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsConnection! @deprecated(reason: "Please use leftArmByPersonId instead")
+
+  """The person’s name"""
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """This `Person`'s `PersonSecret`."""
+  personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """This `Person`'s `PersonSecret`."""
+  personSecretsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonSecretCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsConnection! @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+  site: WrappedUrl @deprecated(reason: "Don’t use me")
+  typeFunction(id: Int): Type
+
+  """Reads and enables pagination through a set of `Type`."""
+  typeFunctionConnection(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): TypesConnection!
+  typeFunctionList: [Type]
+  userMac: String
+}
+
+"""The return type of our `computedComplex` query."""
+type PersonComputedComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""The return type of our `computedFirstArgInoutOut` query."""
+type PersonComputedFirstArgInoutOutRecord {
+  o: Int
+  person: Person
+}
+
+"""The return type of our `computedInoutOut` query."""
+type PersonComputedInoutOutRecord {
+  ino: String
+  o: String
+}
+
+"""The return type of our `computedOutOut` query."""
+type PersonComputedOutOutRecord {
+  o1: String
+  o2: String
+}
+
+"""
+A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s `about` field."""
+  about: String
+
+  """Checks for equality with the object’s `aliases` field."""
+  aliases: [String]
+
+  """Checks for equality with the object’s `computedOut` field."""
+  computedOut: String
+
+  """Checks for equality with the object’s `config` field."""
+  config: KeyValueHash
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `email` field."""
+  email: Email
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastLoginFromIp` field."""
+  lastLoginFromIp: InternetAddress
+
+  """Checks for equality with the object’s `lastLoginFromSubnet` field."""
+  lastLoginFromSubnet: String
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `site` field."""
+  site: WrappedUrlInput
+
+  """Checks for equality with the object’s `userMac` field."""
+  userMac: String
+}
+
+"""Tracks the person's secret"""
+type PersonSecret implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """The `Person` this `PersonSecret` belongs to."""
+  personByPersonId: Person
+  personId: Int!
+
+  """A secret held by the associated Person"""
+  secret: String
+}
+
+"""
+A condition to be used against `PersonSecret` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input PersonSecretCondition {
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `secret` field."""
+  secret: String
+}
+
+"""A connection to a list of `PersonSecret` values."""
+type PersonSecretsConnection {
+  """
+  A list of edges which contains the `PersonSecret` and cursor to aid in pagination.
+  """
+  edges: [PersonSecretsEdge!]!
+
+  """A list of `PersonSecret` objects."""
+  nodes: [PersonSecret!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PersonSecret` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PersonSecret` edge in the connection."""
+type PersonSecretsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonSecret` at the end of the edge."""
+  node: PersonSecret!
+}
+
+"""Methods to use when ordering `PersonSecret`."""
+enum PersonSecretsOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SECRET_ASC
+  SECRET_DESC
+}
+
+type Point {
+  x: Float!
+  y: Float!
+}
+
+type Post {
+  authorId: Int
+  body: String
+  comptypes: [Comptype]
+  enums: [AnEnum]
+  headline: String!
+  id: Int!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `CompoundKey`."""
+  allCompoundKeys(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompoundKeyCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CompoundKey`."""
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CompoundKeysConnection
+
+  """Reads and enables pagination through a set of `EdgeCase`."""
+  allEdgeCases(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: EdgeCaseCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `EdgeCase`."""
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
+  ): EdgeCasesConnection
+
+  """Reads and enables pagination through a set of `Issue756`."""
+  allIssue756S(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: Issue756Condition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Issue756`."""
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SConnection
+
+  """Reads and enables pagination through a set of `LeftArm`."""
+  allLeftArms(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LeftArmCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsConnection
+
+  """Reads and enables pagination through a set of `MyTable`."""
+  allMyTables(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MyTableCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `MyTable`."""
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesConnection
+
+  """Reads and enables pagination through a set of `NullTestRecord`."""
+  allNullTestRecords(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NullTestRecordCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `NullTestRecord`."""
+    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NullTestRecordsConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  allPeople(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `PersonSecret`."""
+  allPersonSecrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonSecretCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads and enables pagination through a set of `Person`."""
+  badlyBehavedFunction(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+
+  """Reads a single `CompoundKey` using its globally unique `ID`."""
+  compoundKey(
+    """
+    The globally unique `ID` to be used in selecting a single `CompoundKey`.
+    """
+    nodeId: ID!
+  ): CompoundKey
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  """Reads and enables pagination through a set of `CompoundType`."""
+  compoundTypeSetQuery(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): CompoundTypesConnection
+  currentUserId: Int
+  funcInInout(i: Int, ino: Int): Int
+  funcInOut(i: Int): Int
+  funcOut: Int
+  funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+  funcOutComplexSetof(
+    a: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+    b: String
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): FuncOutComplexSetofConnection
+  funcOutOut: FuncOutOutRecord
+  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+  funcOutOutSetof(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): FuncOutOutSetofConnection
+  funcOutOutUnnamed: FuncOutOutUnnamedRecord
+  funcOutSetof(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): FuncOutSetofConnection
+  funcOutTable: Person
+
+  """Reads and enables pagination through a set of `Person`."""
+  funcOutTableSetof(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PeopleConnection
+  funcOutUnnamed: Int
+  funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+  funcReturnsTableMultiCol(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+    i: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): FuncReturnsTableMultiColConnection
+  funcReturnsTableOneCol(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+    i: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): FuncReturnsTableOneColConnection
+  intSetQuery(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+    x: Int
+    y: Int
+    z: Int
+  ): IntSetQueryConnection
+
+  """Reads a single `Issue756` using its globally unique `ID`."""
+  issue756(
+    """The globally unique `ID` to be used in selecting a single `Issue756`."""
+    nodeId: ID!
+  ): Issue756
+  issue756ById(id: Int!): Issue756
+  jsonIdentity(json: JSON): JSON
+  jsonbIdentity(json: JSON): JSON
+
+  """Reads a single `LeftArm` using its globally unique `ID`."""
+  leftArm(
+    """The globally unique `ID` to be used in selecting a single `LeftArm`."""
+    nodeId: ID!
+  ): LeftArm
+  leftArmById(id: Int!): LeftArm
+  leftArmByPersonId(personId: Int!): LeftArm
+
+  """Reads a single `MyTable` using its globally unique `ID`."""
+  myTable(
+    """The globally unique `ID` to be used in selecting a single `MyTable`."""
+    nodeId: ID!
+  ): MyTable
+  myTableById(id: Int!): MyTable
+  noArgsQuery: Int
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Reads a single `NullTestRecord` using its globally unique `ID`."""
+  nullTestRecord(
+    """
+    The globally unique `ID` to be used in selecting a single `NullTestRecord`.
+    """
+    nodeId: ID!
+  ): NullTestRecord
+  nullTestRecordById(id: Int!): NullTestRecord
+
+  """Reads a single `Person` using its globally unique `ID`."""
+  person(
+    """The globally unique `ID` to be used in selecting a single `Person`."""
+    nodeId: ID!
+  ): Person
+  personByEmail(email: Email!): Person
+  personById(id: Int!): Person
+
+  """Reads a single `PersonSecret` using its globally unique `ID`."""
+  personSecret(
+    """
+    The globally unique `ID` to be used in selecting a single `PersonSecret`.
+    """
+    nodeId: ID!
+  ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  returnTableWithoutGrants: CompoundKey
+  searchTestSummariesList(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
+  tableQuery(id: Int): Post
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQuery(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQueryPlpgsql(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PeopleConnection
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+}
+
+"""The return type of our `queryOutputTwoRows` query."""
+type QueryOutputTwoRowsRecord {
+  leftArm: LeftArm
+  post: Post
+  txt: String
+}
+
+"""A builtin object identifier type for a relation name"""
+scalar RegClass
+
+"""A builtin object identifier type for a text search configuration"""
+scalar RegConfig
+
+"""A builtin object identifier type for a text search dictionary"""
+scalar RegDictionary
+
+"""A builtin object identifier type for an operator"""
+scalar RegOper
+
+"""A builtin object identifier type for an operator with argument types"""
+scalar RegOperator
+
+"""A builtin object identifier type for a function name"""
+scalar RegProc
+
+"""A builtin object identifier type for a function with argument types"""
+scalar RegProcedure
+
+"""A builtin object identifier type for a data type name"""
+scalar RegType
+
+"""The return type of our `searchTestSummaries` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: Interval
+}
+
+"""All input for the `tableMutation` mutation."""
+input TableMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int
+}
+
+"""The output of our `tableMutation` mutation."""
+type TableMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `tableSetMutation` mutation."""
+input TableSetMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `tableSetMutation` mutation."""
+type TableSetMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  people: [Person!]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+The exact time of day, does not include the date. May or may not have a timezone offset.
+"""
+scalar Time
+
+type Type {
+  anIntRange: AnIntRange!
+  bigint: BigInt!
+  boolean: Boolean!
+  cidr: String
+  compoundType: CompoundType!
+  date: Date!
+  daterange: DateRange!
+  decimal: BigFloat!
+  domain: AnInt!
+  domain2: AnotherInt!
+  enum: Color!
+  enumArray: [Color]!
+  id: Int!
+  inet: InternetAddress
+  int8ArrayDomain: [BigInt]
+  interval: Interval!
+  intervalArray: [Interval]!
+  json: JSON!
+  jsonb: JSON!
+  macaddr: String
+  money: Float!
+  nestedCompoundType: NestedCompoundType!
+  nullableCompoundType: CompoundType
+  nullableNestedCompoundType: NestedCompoundType
+  nullablePoint: Point
+  nullableRange: BigFloatRange
+  numeric: BigFloat!
+  numrange: BigFloatRange!
+  point: Point!
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
+  smallint: Int!
+  textArray: [String]!
+  textArrayDomain: [String]
+  time: Time!
+  timestamp: Datetime!
+  timestamptz: Datetime!
+  timetz: Time!
+  varchar: String!
+}
+
+"""A connection to a list of `Type` values."""
+type TypesConnection {
+  """
+  A list of edges which contains the `Type` and cursor to aid in pagination.
+  """
+  edges: [TypesEdge!]!
+
+  """A list of `Type` objects."""
+  nodes: [Type!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Type` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Type` edge in the connection."""
+type TypesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Type` at the end of the edge."""
+  node: Type!
+}
+
+"""All input for the `typesMutation` mutation."""
+input TypesMutationInput {
+  a: BigInt!
+  b: Boolean!
+  c: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  d: [Int]!
+  e: JSON!
+  f: FloatRangeInput!
+}
+
+"""The output of our `typesMutation` mutation."""
+type TypesMutationPayload {
+  boolean: Boolean
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+type WrappedUrl {
+  url: NotNullUrl!
+}
+
+"""An input for mutations affecting `WrappedUrl`"""
+input WrappedUrlInput {
+  url: NotNullUrl!
+}

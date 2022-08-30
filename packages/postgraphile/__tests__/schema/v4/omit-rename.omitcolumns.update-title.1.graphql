@@ -1,0 +1,2179 @@
+"""All input for the create `Film` mutation."""
+input CreateFilmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Film` to be created by this mutation."""
+  film: FilmInput!
+}
+
+"""The output of our create `Film` mutation."""
+type CreateFilmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Film` that was created by this mutation."""
+  film: Film
+
+  """An edge for our `Film`. May be used by Relay 1."""
+  filmEdge(
+    """The method to use when ordering `Film`."""
+    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilmsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Person` mutation."""
+input CreatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Person` to be created by this mutation."""
+  person: PersonInput!
+}
+
+"""The output of our create `Person` mutation."""
+type CreatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was created by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Post` mutation."""
+input CreatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Post` to be created by this mutation."""
+  post: PostInput!
+}
+
+"""The output of our create `Post` mutation."""
+type CreatePostPayload {
+  """Reads a single `Person` that is related to this `Post`."""
+  author: Person
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Post` that was created by this mutation."""
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `RenamedTable` mutation."""
+input CreateRenamedTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RenamedTable` to be created by this mutation."""
+  renamedTable: RenamedTableInput!
+}
+
+"""The output of our create `RenamedTable` mutation."""
+type CreateRenamedTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RenamedTable` that was created by this mutation."""
+  renamedTable: RenamedTable
+
+  """An edge for our `RenamedTable`. May be used by Relay 1."""
+  renamedTableEdge(
+    """The method to use when ordering `RenamedTable`."""
+    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
+  ): RenamedTablesEdge
+}
+
+"""All input for the create `Studio` mutation."""
+input CreateStudioInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Studio` to be created by this mutation."""
+  studio: StudioInput!
+}
+
+"""The output of our create `Studio` mutation."""
+type CreateStudioPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Studio` that was created by this mutation."""
+  studio: Studio
+
+  """An edge for our `Studio`. May be used by Relay 1."""
+  studioEdge(
+    """The method to use when ordering `Studio`."""
+    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StudiosEdge
+}
+
+"""All input for the create `TvEpisode` mutation."""
+input CreateTvEpisodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `TvEpisode` to be created by this mutation."""
+  tvEpisode: TvEpisodeInput!
+}
+
+"""The output of our create `TvEpisode` mutation."""
+type CreateTvEpisodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `TvEpisode` that was created by this mutation."""
+  tvEpisode: TvEpisode
+
+  """An edge for our `TvEpisode`. May be used by Relay 1."""
+  tvEpisodeEdge(
+    """The method to use when ordering `TvEpisode`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvEpisodesEdge
+
+  """Reads a single `TvShow` that is related to this `TvEpisode`."""
+  tvShowByShowId: TvShow
+}
+
+"""All input for the create `TvShow` mutation."""
+input CreateTvShowInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `TvShow` to be created by this mutation."""
+  tvShow: TvShowInput!
+}
+
+"""The output of our create `TvShow` mutation."""
+type CreateTvShowPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Studio` that is related to this `TvShow`."""
+  studioByStudioId: Studio
+
+  """The `TvShow` that was created by this mutation."""
+  tvShow: TvShow
+
+  """An edge for our `TvShow`. May be used by Relay 1."""
+  tvShowEdge(
+    """The method to use when ordering `TvShow`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvShowsEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteFilmByCode` mutation."""
+input DeleteFilmByCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: Int!
+}
+
+"""All input for the `deleteFilm` mutation."""
+input DeleteFilmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Film` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Film` mutation."""
+type DeleteFilmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedFilmId: ID
+
+  """The `Film` that was deleted by this mutation."""
+  film: Film
+
+  """An edge for our `Film`. May be used by Relay 1."""
+  filmEdge(
+    """The method to use when ordering `Film`."""
+    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilmsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePersonById` mutation."""
+input DeletePersonByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deletePerson` mutation."""
+input DeletePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Person` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Person` mutation."""
+type DeletePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPersonId: ID
+
+  """The `Person` that was deleted by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePostById` mutation."""
+input DeletePostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deletePost` mutation."""
+input DeletePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Post` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Post` mutation."""
+type DeletePostPayload {
+  """Reads a single `Person` that is related to this `Post`."""
+  author: Person
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPostId: ID
+
+  """The `Post` that was deleted by this mutation."""
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteStudioById` mutation."""
+input DeleteStudioByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteStudio` mutation."""
+input DeleteStudioInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Studio` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Studio` mutation."""
+type DeleteStudioPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedStudioId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Studio` that was deleted by this mutation."""
+  studio: Studio
+
+  """An edge for our `Studio`. May be used by Relay 1."""
+  studioEdge(
+    """The method to use when ordering `Studio`."""
+    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StudiosEdge
+}
+
+"""All input for the `deleteTvEpisodeByCode` mutation."""
+input DeleteTvEpisodeByCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: Int!
+}
+
+"""All input for the `deleteTvEpisode` mutation."""
+input DeleteTvEpisodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `TvEpisode` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `TvEpisode` mutation."""
+type DeleteTvEpisodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedTvEpisodeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `TvEpisode` that was deleted by this mutation."""
+  tvEpisode: TvEpisode
+
+  """An edge for our `TvEpisode`. May be used by Relay 1."""
+  tvEpisodeEdge(
+    """The method to use when ordering `TvEpisode`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvEpisodesEdge
+
+  """Reads a single `TvShow` that is related to this `TvEpisode`."""
+  tvShowByShowId: TvShow
+}
+
+"""All input for the `deleteTvShowByCode` mutation."""
+input DeleteTvShowByCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: Int!
+}
+
+"""All input for the `deleteTvShow` mutation."""
+input DeleteTvShowInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `TvShow` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `TvShow` mutation."""
+type DeleteTvShowPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedTvShowId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Studio` that is related to this `TvShow`."""
+  studioByStudioId: Studio
+
+  """The `TvShow` that was deleted by this mutation."""
+  tvShow: TvShow
+
+  """An edge for our `TvShow`. May be used by Relay 1."""
+  tvShowEdge(
+    """The method to use when ordering `TvShow`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvShowsEdge
+}
+
+type Film implements Node {
+  code: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  title: String
+}
+
+"""
+A condition to be used against `Film` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input FilmCondition {
+  """Checks for equality with the object’s `code` field."""
+  code: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+}
+
+"""An input for mutations affecting `Film`"""
+input FilmInput {
+  code: Int!
+  title: String
+}
+
+"""Represents an update to a `Film`. Fields that are set will be updated."""
+input FilmPatch {
+  code: Int
+  title: String
+}
+
+"""A connection to a list of `Film` values."""
+type FilmsConnection {
+  """
+  A list of edges which contains the `Film` and cursor to aid in pagination.
+  """
+  edges: [FilmsEdge!]!
+
+  """A list of `Film` objects."""
+  nodes: [Film]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Film` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Film` edge in the connection."""
+type FilmsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Film` at the end of the edge."""
+  node: Film
+}
+
+"""Methods to use when ordering `Film`."""
+enum FilmsOrderBy {
+  CODE_ASC
+  CODE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+}
+
+type Flamble {
+  f: String
+}
+
+"""All input for the `getflamble` mutation."""
+input GetflambleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `getflamble` mutation."""
+type GetflamblePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  flambles: [Flamble]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type JwtToken {
+  a: Int
+  exp: Int
+  role: String
+}
+
+"""All input for the `login` mutation."""
+input LoginInput {
+  a: Int
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `login` mutation."""
+type LoginPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  token: JwtToken
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Film`."""
+  createFilm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFilmInput!
+  ): CreateFilmPayload
+
+  """Creates a single `Person`."""
+  createPerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  """Creates a single `Post`."""
+  createPost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePostInput!
+  ): CreatePostPayload
+
+  """Creates a single `RenamedTable`."""
+  createRenamedTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRenamedTableInput!
+  ): CreateRenamedTablePayload
+
+  """Creates a single `Studio`."""
+  createStudio(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateStudioInput!
+  ): CreateStudioPayload
+
+  """Creates a single `TvEpisode`."""
+  createTvEpisode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTvEpisodeInput!
+  ): CreateTvEpisodePayload
+
+  """Creates a single `TvShow`."""
+  createTvShow(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTvShowInput!
+  ): CreateTvShowPayload
+
+  """Deletes a single `Film` using its globally unique id."""
+  deleteFilm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFilmInput!
+  ): DeleteFilmPayload
+
+  """Deletes a single `Film` using a unique key."""
+  deleteFilmByCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFilmByCodeInput!
+  ): DeleteFilmPayload
+
+  """Deletes a single `Person` using its globally unique id."""
+  deletePerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `Person` using a unique key."""
+  deletePersonById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonByIdInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `Post` using its globally unique id."""
+  deletePost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePostInput!
+  ): DeletePostPayload
+
+  """Deletes a single `Post` using a unique key."""
+  deletePostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePostByIdInput!
+  ): DeletePostPayload
+
+  """Deletes a single `Studio` using its globally unique id."""
+  deleteStudio(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStudioInput!
+  ): DeleteStudioPayload
+
+  """Deletes a single `Studio` using a unique key."""
+  deleteStudioById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStudioByIdInput!
+  ): DeleteStudioPayload
+
+  """Deletes a single `TvEpisode` using its globally unique id."""
+  deleteTvEpisode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTvEpisodeInput!
+  ): DeleteTvEpisodePayload
+
+  """Deletes a single `TvEpisode` using a unique key."""
+  deleteTvEpisodeByCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTvEpisodeByCodeInput!
+  ): DeleteTvEpisodePayload
+
+  """Deletes a single `TvShow` using its globally unique id."""
+  deleteTvShow(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTvShowInput!
+  ): DeleteTvShowPayload
+
+  """Deletes a single `TvShow` using a unique key."""
+  deleteTvShowByCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTvShowByCodeInput!
+  ): DeleteTvShowPayload
+  getflamble(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: GetflambleInput!
+  ): GetflamblePayload
+  login(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: LoginInput!
+  ): LoginPayload
+
+  """Updates a single `Film` using its globally unique id and a patch."""
+  updateFilm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFilmInput!
+  ): UpdateFilmPayload
+
+  """Updates a single `Film` using a unique key and a patch."""
+  updateFilmByCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFilmByCodeInput!
+  ): UpdateFilmPayload
+
+  """Updates a single `Person` using its globally unique id and a patch."""
+  updatePerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Post` using its globally unique id and a patch."""
+  updatePost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  """Updates a single `Post` using a unique key and a patch."""
+  updatePostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
+
+  """Updates a single `Studio` using its globally unique id and a patch."""
+  updateStudio(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateStudioInput!
+  ): UpdateStudioPayload
+
+  """Updates a single `Studio` using a unique key and a patch."""
+  updateStudioById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateStudioByIdInput!
+  ): UpdateStudioPayload
+
+  """Updates a single `TvEpisode` using its globally unique id and a patch."""
+  updateTvEpisode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTvEpisodeInput!
+  ): UpdateTvEpisodePayload
+
+  """Updates a single `TvEpisode` using a unique key and a patch."""
+  updateTvEpisodeByCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTvEpisodeByCodeInput!
+  ): UpdateTvEpisodePayload
+
+  """Updates a single `TvShow` using its globally unique id and a patch."""
+  updateTvShow(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTvShowInput!
+  ): UpdateTvShowPayload
+
+  """Updates a single `TvShow` using a unique key and a patch."""
+  updateTvShowByCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTvShowByCodeInput!
+  ): UpdateTvShowPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A connection to a list of `Person` values."""
+type PeopleConnection {
+  """
+  A list of edges which contains the `Person` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge!]!
+
+  """A list of `Person` objects."""
+  nodes: [Person]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Person` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Person` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Person` at the end of the edge."""
+  node: Person
+}
+
+"""Methods to use when ordering `Person`."""
+enum PeopleOrderBy {
+  COL_NO_CREATE_ASC
+  COL_NO_CREATE_DESC
+  COL_NO_CREATE_UPDATE_ASC
+  COL_NO_CREATE_UPDATE_DESC
+  COL_NO_FILTER_ASC
+  COL_NO_FILTER_DESC
+  COL_NO_UPDATE_ASC
+  COL_NO_UPDATE_DESC
+  FIRST_NAME_ASC
+  FIRST_NAME_DESC
+  ID_ASC
+  ID_DESC
+  LAST_NAME_ASC
+  LAST_NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Person implements Node {
+  colNoCreate: String
+  colNoCreateUpdate: String
+  colNoCreateUpdateOrderFilter: String
+  colNoFilter: String
+  colNoOrder: String
+  colNoUpdate: String
+  firstName: String
+  id: Int!
+  lastName: String
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `Post`."""
+  posts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection!
+}
+
+"""
+A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s `colNoCreate` field."""
+  colNoCreate: String
+
+  """Checks for equality with the object’s `colNoCreateUpdate` field."""
+  colNoCreateUpdate: String
+
+  """Checks for equality with the object’s `colNoOrder` field."""
+  colNoOrder: String
+
+  """Checks for equality with the object’s `colNoUpdate` field."""
+  colNoUpdate: String
+
+  """Checks for equality with the object’s `firstName` field."""
+  firstName: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastName` field."""
+  lastName: String
+}
+
+"""An input for mutations affecting `Person`"""
+input PersonInput {
+  colNoFilter: String
+  colNoOrder: String
+  colNoUpdate: String
+  firstName: String
+  id: Int
+  lastName: String
+}
+
+"""
+Represents an update to a `Person`. Fields that are set will be updated.
+"""
+input PersonPatch {
+  colNoCreate: String
+  colNoFilter: String
+  colNoOrder: String
+  firstName: String
+  id: Int
+  lastName: String
+}
+
+type Post implements Node {
+  """Reads a single `Person` that is related to this `Post`."""
+  author: Person
+  authorId: Int
+  body: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Post` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PostCondition {
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `body` field."""
+  body: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Post`"""
+input PostInput {
+  authorId: Int
+  body: String
+  id: Int
+}
+
+"""Represents an update to a `Post`. Fields that are set will be updated."""
+input PostPatch {
+  authorId: Int
+  body: String
+  id: Int
+}
+
+"""A connection to a list of `Post` values."""
+type PostsConnection {
+  """
+  A list of edges which contains the `Post` and cursor to aid in pagination.
+  """
+  edges: [PostsEdge!]!
+
+  """A list of `Post` objects."""
+  nodes: [Post]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Post` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Post` edge in the connection."""
+type PostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Post` at the end of the edge."""
+  node: Post
+}
+
+"""Methods to use when ordering `Post`."""
+enum PostsOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  BODY_ASC
+  BODY_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `Film`."""
+  allFilms(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: FilmCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Film`."""
+    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilmsConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  allPeople(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Post`."""
+  allPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection
+
+  """Reads and enables pagination through a set of `RenamedTable`."""
+  allRenamedTables(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RenamedTableCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RenamedTable`."""
+    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
+  ): RenamedTablesConnection
+
+  """Reads and enables pagination through a set of `Studio`."""
+  allStudios(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StudioCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Studio`."""
+    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StudiosConnection
+
+  """Reads and enables pagination through a set of `TvEpisode`."""
+  allTvEpisodes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TvEpisodeCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `TvEpisode`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvEpisodesConnection
+
+  """Reads and enables pagination through a set of `TvShow`."""
+  allTvShows(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TvShowCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `TvShow`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvShowsConnection
+
+  """Reads a single `Film` using its globally unique `ID`."""
+  film(
+    """The globally unique `ID` to be used in selecting a single `Film`."""
+    nodeId: ID!
+  ): Film
+  filmByCode(code: Int!): Film
+  findPersonById(id: Int!): Person
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` using its globally unique `ID`."""
+  person(
+    """The globally unique `ID` to be used in selecting a single `Person`."""
+    nodeId: ID!
+  ): Person
+
+  """Reads a single `Post` using its globally unique `ID`."""
+  post(
+    """The globally unique `ID` to be used in selecting a single `Post`."""
+    nodeId: ID!
+  ): Post
+  postById(id: Int!): Post
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+  renamedFunction: Int
+
+  """Reads and enables pagination through a set of `Post`."""
+  returnPostsMatching(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+    search: String
+  ): PostsConnection
+
+  """Reads a single `Studio` using its globally unique `ID`."""
+  studio(
+    """The globally unique `ID` to be used in selecting a single `Studio`."""
+    nodeId: ID!
+  ): Studio
+  studioById(id: Int!): Studio
+
+  """Reads a single `TvEpisode` using its globally unique `ID`."""
+  tvEpisode(
+    """The globally unique `ID` to be used in selecting a single `TvEpisode`."""
+    nodeId: ID!
+  ): TvEpisode
+  tvEpisodeByCode(code: Int!): TvEpisode
+
+  """Reads a single `TvShow` using its globally unique `ID`."""
+  tvShow(
+    """The globally unique `ID` to be used in selecting a single `TvShow`."""
+    nodeId: ID!
+  ): TvShow
+  tvShowByCode(code: Int!): TvShow
+}
+
+type RenamedTable {
+  colA: Int
+}
+
+"""
+A condition to be used against `RenamedTable` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RenamedTableCondition {
+  """Checks for equality with the object’s `colA` field."""
+  colA: Int
+}
+
+"""An input for mutations affecting `RenamedTable`"""
+input RenamedTableInput {
+  colA: Int
+}
+
+"""A connection to a list of `RenamedTable` values."""
+type RenamedTablesConnection {
+  """
+  A list of edges which contains the `RenamedTable` and cursor to aid in pagination.
+  """
+  edges: [RenamedTablesEdge!]!
+
+  """A list of `RenamedTable` objects."""
+  nodes: [RenamedTable]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RenamedTable` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RenamedTable` edge in the connection."""
+type RenamedTablesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RenamedTable` at the end of the edge."""
+  node: RenamedTable
+}
+
+"""Methods to use when ordering `RenamedTable`."""
+enum RenamedTablesOrderBy {
+  COL_A_ASC
+  COL_A_DESC
+  NATURAL
+}
+
+type Studio implements Node {
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `TvShow`."""
+  tvShowsByStudioId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TvShowCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `TvShow`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvShowsConnection!
+}
+
+"""
+A condition to be used against `Studio` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input StudioCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `Studio`"""
+input StudioInput {
+  id: Int!
+  name: String
+}
+
+"""
+Represents an update to a `Studio`. Fields that are set will be updated.
+"""
+input StudioPatch {
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `Studio` values."""
+type StudiosConnection {
+  """
+  A list of edges which contains the `Studio` and cursor to aid in pagination.
+  """
+  edges: [StudiosEdge!]!
+
+  """A list of `Studio` objects."""
+  nodes: [Studio]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Studio` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Studio` edge in the connection."""
+type StudiosEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Studio` at the end of the edge."""
+  node: Studio
+}
+
+"""Methods to use when ordering `Studio`."""
+enum StudiosOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type TvEpisode implements Node {
+  code: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  showId: Int
+  title: String
+
+  """Reads a single `TvShow` that is related to this `TvEpisode`."""
+  tvShowByShowId: TvShow
+}
+
+"""
+A condition to be used against `TvEpisode` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input TvEpisodeCondition {
+  """Checks for equality with the object’s `code` field."""
+  code: Int
+
+  """Checks for equality with the object’s `showId` field."""
+  showId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+}
+
+"""An input for mutations affecting `TvEpisode`"""
+input TvEpisodeInput {
+  code: Int!
+  showId: Int
+  title: String
+}
+
+"""
+Represents an update to a `TvEpisode`. Fields that are set will be updated.
+"""
+input TvEpisodePatch {
+  code: Int
+  showId: Int
+  title: String
+}
+
+"""A connection to a list of `TvEpisode` values."""
+type TvEpisodesConnection {
+  """
+  A list of edges which contains the `TvEpisode` and cursor to aid in pagination.
+  """
+  edges: [TvEpisodesEdge!]!
+
+  """A list of `TvEpisode` objects."""
+  nodes: [TvEpisode]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `TvEpisode` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `TvEpisode` edge in the connection."""
+type TvEpisodesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `TvEpisode` at the end of the edge."""
+  node: TvEpisode
+}
+
+"""Methods to use when ordering `TvEpisode`."""
+enum TvEpisodesOrderBy {
+  CODE_ASC
+  CODE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SHOW_ID_ASC
+  SHOW_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+}
+
+type TvShow implements Node {
+  code: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Studio` that is related to this `TvShow`."""
+  studioByStudioId: Studio
+  studioId: Int
+  title: String
+
+  """Reads and enables pagination through a set of `TvEpisode`."""
+  tvEpisodesByShowId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TvEpisodeCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `TvEpisode`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvEpisodesConnection!
+}
+
+"""
+A condition to be used against `TvShow` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input TvShowCondition {
+  """Checks for equality with the object’s `code` field."""
+  code: Int
+
+  """Checks for equality with the object’s `studioId` field."""
+  studioId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+}
+
+"""An input for mutations affecting `TvShow`"""
+input TvShowInput {
+  code: Int!
+  studioId: Int
+  title: String
+}
+
+"""
+Represents an update to a `TvShow`. Fields that are set will be updated.
+"""
+input TvShowPatch {
+  code: Int
+  studioId: Int
+}
+
+"""A connection to a list of `TvShow` values."""
+type TvShowsConnection {
+  """
+  A list of edges which contains the `TvShow` and cursor to aid in pagination.
+  """
+  edges: [TvShowsEdge!]!
+
+  """A list of `TvShow` objects."""
+  nodes: [TvShow]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `TvShow` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `TvShow` edge in the connection."""
+type TvShowsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `TvShow` at the end of the edge."""
+  node: TvShow
+}
+
+"""Methods to use when ordering `TvShow`."""
+enum TvShowsOrderBy {
+  CODE_ASC
+  CODE_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STUDIO_ID_ASC
+  STUDIO_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+}
+
+"""All input for the `updateFilmByCode` mutation."""
+input UpdateFilmByCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: Int!
+
+  """
+  An object where the defined keys will be set on the `Film` being updated.
+  """
+  filmPatch: FilmPatch!
+}
+
+"""All input for the `updateFilm` mutation."""
+input UpdateFilmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Film` being updated.
+  """
+  filmPatch: FilmPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Film` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Film` mutation."""
+type UpdateFilmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Film` that was updated by this mutation."""
+  film: Film
+
+  """An edge for our `Film`. May be used by Relay 1."""
+  filmEdge(
+    """The method to use when ordering `Film`."""
+    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilmsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePersonById` mutation."""
+input UpdatePersonByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""All input for the `updatePerson` mutation."""
+input UpdatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Person` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""The output of our update `Person` mutation."""
+type UpdatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was updated by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePostById` mutation."""
+input UpdatePostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Post` being updated.
+  """
+  postPatch: PostPatch!
+}
+
+"""All input for the `updatePost` mutation."""
+input UpdatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Post` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Post` being updated.
+  """
+  postPatch: PostPatch!
+}
+
+"""The output of our update `Post` mutation."""
+type UpdatePostPayload {
+  """Reads a single `Person` that is related to this `Post`."""
+  author: Person
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Post` that was updated by this mutation."""
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateStudioById` mutation."""
+input UpdateStudioByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Studio` being updated.
+  """
+  studioPatch: StudioPatch!
+}
+
+"""All input for the `updateStudio` mutation."""
+input UpdateStudioInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Studio` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Studio` being updated.
+  """
+  studioPatch: StudioPatch!
+}
+
+"""The output of our update `Studio` mutation."""
+type UpdateStudioPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Studio` that was updated by this mutation."""
+  studio: Studio
+
+  """An edge for our `Studio`. May be used by Relay 1."""
+  studioEdge(
+    """The method to use when ordering `Studio`."""
+    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StudiosEdge
+}
+
+"""All input for the `updateTvEpisodeByCode` mutation."""
+input UpdateTvEpisodeByCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: Int!
+
+  """
+  An object where the defined keys will be set on the `TvEpisode` being updated.
+  """
+  tvEpisodePatch: TvEpisodePatch!
+}
+
+"""All input for the `updateTvEpisode` mutation."""
+input UpdateTvEpisodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `TvEpisode` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `TvEpisode` being updated.
+  """
+  tvEpisodePatch: TvEpisodePatch!
+}
+
+"""The output of our update `TvEpisode` mutation."""
+type UpdateTvEpisodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `TvEpisode` that was updated by this mutation."""
+  tvEpisode: TvEpisode
+
+  """An edge for our `TvEpisode`. May be used by Relay 1."""
+  tvEpisodeEdge(
+    """The method to use when ordering `TvEpisode`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvEpisodesEdge
+
+  """Reads a single `TvShow` that is related to this `TvEpisode`."""
+  tvShowByShowId: TvShow
+}
+
+"""All input for the `updateTvShowByCode` mutation."""
+input UpdateTvShowByCodeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: Int!
+
+  """
+  An object where the defined keys will be set on the `TvShow` being updated.
+  """
+  tvShowPatch: TvShowPatch!
+}
+
+"""All input for the `updateTvShow` mutation."""
+input UpdateTvShowInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `TvShow` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `TvShow` being updated.
+  """
+  tvShowPatch: TvShowPatch!
+}
+
+"""The output of our update `TvShow` mutation."""
+type UpdateTvShowPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Studio` that is related to this `TvShow`."""
+  studioByStudioId: Studio
+
+  """The `TvShow` that was updated by this mutation."""
+  tvShow: TvShow
+
+  """An edge for our `TvShow`. May be used by Relay 1."""
+  tvShowEdge(
+    """The method to use when ordering `TvShow`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TvShowsEdge
+}

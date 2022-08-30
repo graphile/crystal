@@ -1,0 +1,1382 @@
+"""A connection to a list of `AlwaysAsIdentity` values."""
+type AlwaysAsIdentitiesConnection {
+  """
+  A list of edges which contains the `AlwaysAsIdentity` and cursor to aid in pagination.
+  """
+  edges: [AlwaysAsIdentitiesEdge!]!
+
+  """A list of `AlwaysAsIdentity` objects."""
+  nodes: [AlwaysAsIdentity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AlwaysAsIdentity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `AlwaysAsIdentity` edge in the connection."""
+type AlwaysAsIdentitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AlwaysAsIdentity` at the end of the edge."""
+  node: AlwaysAsIdentity
+}
+
+"""Methods to use when ordering `AlwaysAsIdentity`."""
+enum AlwaysAsIdentitiesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  T_ASC
+  T_DESC
+}
+
+type AlwaysAsIdentity implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  t: String
+}
+
+"""
+A condition to be used against `AlwaysAsIdentity` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input AlwaysAsIdentityCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `t` field."""
+  t: String
+}
+
+"""An input for mutations affecting `AlwaysAsIdentity`"""
+input AlwaysAsIdentityInput {
+  t: String
+}
+
+"""
+Represents an update to a `AlwaysAsIdentity`. Fields that are set will be updated.
+"""
+input AlwaysAsIdentityPatch {
+  t: String
+}
+
+scalar BigintDomain
+
+"""A connection to a list of `ByDefaultAsIdentity` values."""
+type ByDefaultAsIdentitiesConnection {
+  """
+  A list of edges which contains the `ByDefaultAsIdentity` and cursor to aid in pagination.
+  """
+  edges: [ByDefaultAsIdentitiesEdge!]!
+
+  """A list of `ByDefaultAsIdentity` objects."""
+  nodes: [ByDefaultAsIdentity]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ByDefaultAsIdentity` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ByDefaultAsIdentity` edge in the connection."""
+type ByDefaultAsIdentitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ByDefaultAsIdentity` at the end of the edge."""
+  node: ByDefaultAsIdentity
+}
+
+"""Methods to use when ordering `ByDefaultAsIdentity`."""
+enum ByDefaultAsIdentitiesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  T_ASC
+  T_DESC
+}
+
+type ByDefaultAsIdentity implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  t: String
+}
+
+"""
+A condition to be used against `ByDefaultAsIdentity` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input ByDefaultAsIdentityCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `t` field."""
+  t: String
+}
+
+"""An input for mutations affecting `ByDefaultAsIdentity`"""
+input ByDefaultAsIdentityInput {
+  id: Int
+  t: String
+}
+
+"""
+Represents an update to a `ByDefaultAsIdentity`. Fields that are set will be updated.
+"""
+input ByDefaultAsIdentityPatch {
+  id: Int
+  t: String
+}
+
+"""An IPv4 or IPv6 CIDR address."""
+scalar CidrAddress
+
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
+"""All input for the create `AlwaysAsIdentity` mutation."""
+input CreateAlwaysAsIdentityInput {
+  """The `AlwaysAsIdentity` to be created by this mutation."""
+  alwaysAsIdentity: AlwaysAsIdentityInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `AlwaysAsIdentity` mutation."""
+type CreateAlwaysAsIdentityPayload {
+  """The `AlwaysAsIdentity` that was created by this mutation."""
+  alwaysAsIdentity: AlwaysAsIdentity
+
+  """An edge for our `AlwaysAsIdentity`. May be used by Relay 1."""
+  alwaysAsIdentityEdge(
+    """The method to use when ordering `AlwaysAsIdentity`."""
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `ByDefaultAsIdentity` mutation."""
+input CreateByDefaultAsIdentityInput {
+  """The `ByDefaultAsIdentity` to be created by this mutation."""
+  byDefaultAsIdentity: ByDefaultAsIdentityInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `ByDefaultAsIdentity` mutation."""
+type CreateByDefaultAsIdentityPayload {
+  """The `ByDefaultAsIdentity` that was created by this mutation."""
+  byDefaultAsIdentity: ByDefaultAsIdentity
+
+  """An edge for our `ByDefaultAsIdentity`. May be used by Relay 1."""
+  byDefaultAsIdentityEdge(
+    """The method to use when ordering `ByDefaultAsIdentity`."""
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Network` mutation."""
+input CreateNetworkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Network` to be created by this mutation."""
+  network: NetworkInput!
+}
+
+"""The output of our create `Network` mutation."""
+type CreateNetworkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Network` that was created by this mutation."""
+  network: Network
+
+  """An edge for our `Network`. May be used by Relay 1."""
+  networkEdge(
+    """The method to use when ordering `Network`."""
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Type` mutation."""
+input CreateTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Type` to be created by this mutation."""
+  type: TypeInput!
+}
+
+"""The output of our create `Type` mutation."""
+type CreateTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Type` that was created by this mutation."""
+  type: Type
+
+  """An edge for our `Type`. May be used by Relay 1."""
+  typeEdge(
+    """The method to use when ordering `Type`."""
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteAlwaysAsIdentityById` mutation."""
+input DeleteAlwaysAsIdentityByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteAlwaysAsIdentity` mutation."""
+input DeleteAlwaysAsIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `AlwaysAsIdentity` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `AlwaysAsIdentity` mutation."""
+type DeleteAlwaysAsIdentityPayload {
+  """The `AlwaysAsIdentity` that was deleted by this mutation."""
+  alwaysAsIdentity: AlwaysAsIdentity
+
+  """An edge for our `AlwaysAsIdentity`. May be used by Relay 1."""
+  alwaysAsIdentityEdge(
+    """The method to use when ordering `AlwaysAsIdentity`."""
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedAlwaysAsIdentityId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteByDefaultAsIdentityById` mutation."""
+input DeleteByDefaultAsIdentityByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteByDefaultAsIdentity` mutation."""
+input DeleteByDefaultAsIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ByDefaultAsIdentity` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `ByDefaultAsIdentity` mutation."""
+type DeleteByDefaultAsIdentityPayload {
+  """The `ByDefaultAsIdentity` that was deleted by this mutation."""
+  byDefaultAsIdentity: ByDefaultAsIdentity
+
+  """An edge for our `ByDefaultAsIdentity`. May be used by Relay 1."""
+  byDefaultAsIdentityEdge(
+    """The method to use when ordering `ByDefaultAsIdentity`."""
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedByDefaultAsIdentityId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteNetworkById` mutation."""
+input DeleteNetworkByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteNetwork` mutation."""
+input DeleteNetworkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Network` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Network` mutation."""
+type DeleteNetworkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedNetworkId: ID
+
+  """The `Network` that was deleted by this mutation."""
+  network: Network
+
+  """An edge for our `Network`. May be used by Relay 1."""
+  networkEdge(
+    """The method to use when ordering `Network`."""
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteTypeById` mutation."""
+input DeleteTypeByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteType` mutation."""
+input DeleteTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Type` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Type` mutation."""
+type DeleteTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedTypeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Type` that was deleted by this mutation."""
+  type: Type
+
+  """An edge for our `Type`. May be used by Relay 1."""
+  typeEdge(
+    """The method to use when ordering `Type`."""
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+}
+
+type DomainConstrainedCompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: Interval
+}
+
+input DomainConstrainedCompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: IntervalInput
+}
+
+enum EnumCaps {
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+  _0_BAR
+}
+
+enum EnumWithEmptyString {
+  ONE
+  TWO
+  _EMPTY_
+}
+
+"""An IPv4 or IPv6 host address, and optionally its subnet."""
+scalar InternetAddress
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""A 6-byte MAC address."""
+scalar MacAddress
+
+"""An 8-byte MAC address."""
+scalar MacAddress8
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `AlwaysAsIdentity`."""
+  createAlwaysAsIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAlwaysAsIdentityInput!
+  ): CreateAlwaysAsIdentityPayload
+
+  """Creates a single `ByDefaultAsIdentity`."""
+  createByDefaultAsIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateByDefaultAsIdentityInput!
+  ): CreateByDefaultAsIdentityPayload
+
+  """Creates a single `Network`."""
+  createNetwork(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNetworkInput!
+  ): CreateNetworkPayload
+
+  """Creates a single `Type`."""
+  createType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTypeInput!
+  ): CreateTypePayload
+
+  """Deletes a single `AlwaysAsIdentity` using its globally unique id."""
+  deleteAlwaysAsIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAlwaysAsIdentityInput!
+  ): DeleteAlwaysAsIdentityPayload
+
+  """Deletes a single `AlwaysAsIdentity` using a unique key."""
+  deleteAlwaysAsIdentityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAlwaysAsIdentityByIdInput!
+  ): DeleteAlwaysAsIdentityPayload
+
+  """Deletes a single `ByDefaultAsIdentity` using its globally unique id."""
+  deleteByDefaultAsIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteByDefaultAsIdentityInput!
+  ): DeleteByDefaultAsIdentityPayload
+
+  """Deletes a single `ByDefaultAsIdentity` using a unique key."""
+  deleteByDefaultAsIdentityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteByDefaultAsIdentityByIdInput!
+  ): DeleteByDefaultAsIdentityPayload
+
+  """Deletes a single `Network` using its globally unique id."""
+  deleteNetwork(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNetworkInput!
+  ): DeleteNetworkPayload
+
+  """Deletes a single `Network` using a unique key."""
+  deleteNetworkById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNetworkByIdInput!
+  ): DeleteNetworkPayload
+
+  """Deletes a single `Type` using its globally unique id."""
+  deleteType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTypeInput!
+  ): DeleteTypePayload
+
+  """Deletes a single `Type` using a unique key."""
+  deleteTypeById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTypeByIdInput!
+  ): DeleteTypePayload
+
+  """
+  Updates a single `AlwaysAsIdentity` using its globally unique id and a patch.
+  """
+  updateAlwaysAsIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAlwaysAsIdentityInput!
+  ): UpdateAlwaysAsIdentityPayload
+
+  """Updates a single `AlwaysAsIdentity` using a unique key and a patch."""
+  updateAlwaysAsIdentityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAlwaysAsIdentityByIdInput!
+  ): UpdateAlwaysAsIdentityPayload
+
+  """
+  Updates a single `ByDefaultAsIdentity` using its globally unique id and a patch.
+  """
+  updateByDefaultAsIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateByDefaultAsIdentityInput!
+  ): UpdateByDefaultAsIdentityPayload
+
+  """Updates a single `ByDefaultAsIdentity` using a unique key and a patch."""
+  updateByDefaultAsIdentityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateByDefaultAsIdentityByIdInput!
+  ): UpdateByDefaultAsIdentityPayload
+
+  """Updates a single `Network` using its globally unique id and a patch."""
+  updateNetwork(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNetworkInput!
+  ): UpdateNetworkPayload
+
+  """Updates a single `Network` using a unique key and a patch."""
+  updateNetworkById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNetworkByIdInput!
+  ): UpdateNetworkPayload
+
+  """Updates a single `Type` using its globally unique id and a patch."""
+  updateType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTypeInput!
+  ): UpdateTypePayload
+
+  """Updates a single `Type` using a unique key and a patch."""
+  updateTypeById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTypeByIdInput!
+  ): UpdateTypePayload
+}
+
+type Network implements Node {
+  cidr: CidrAddress
+  id: Int!
+  inet: InternetAddress
+  macaddr: MacAddress
+  macaddr8: MacAddress8
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Network` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input NetworkCondition {
+  """Checks for equality with the object’s `cidr` field."""
+  cidr: CidrAddress
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `inet` field."""
+  inet: InternetAddress
+
+  """Checks for equality with the object’s `macaddr` field."""
+  macaddr: MacAddress
+
+  """Checks for equality with the object’s `macaddr8` field."""
+  macaddr8: MacAddress8
+}
+
+"""An input for mutations affecting `Network`"""
+input NetworkInput {
+  cidr: CidrAddress
+  id: Int
+  inet: InternetAddress
+  macaddr: MacAddress
+  macaddr8: MacAddress8
+}
+
+"""
+Represents an update to a `Network`. Fields that are set will be updated.
+"""
+input NetworkPatch {
+  cidr: CidrAddress
+  id: Int
+  inet: InternetAddress
+  macaddr: MacAddress
+  macaddr8: MacAddress8
+}
+
+"""A connection to a list of `Network` values."""
+type NetworksConnection {
+  """
+  A list of edges which contains the `Network` and cursor to aid in pagination.
+  """
+  edges: [NetworksEdge!]!
+
+  """A list of `Network` objects."""
+  nodes: [Network]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Network` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Network` edge in the connection."""
+type NetworksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Network` at the end of the edge."""
+  node: Network
+}
+
+"""Methods to use when ordering `Network`."""
+enum NetworksOrderBy {
+  CIDR_ASC
+  CIDR_DESC
+  ID_ASC
+  ID_DESC
+  INET_ASC
+  INET_DESC
+  MACADDR8_ASC
+  MACADDR8_DESC
+  MACADDR_ASC
+  MACADDR_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `AlwaysAsIdentity`."""
+  allAlwaysAsIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AlwaysAsIdentityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AlwaysAsIdentity`."""
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesConnection
+
+  """Reads and enables pagination through a set of `ByDefaultAsIdentity`."""
+  allByDefaultAsIdentities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ByDefaultAsIdentityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ByDefaultAsIdentity`."""
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesConnection
+
+  """Reads and enables pagination through a set of `Network`."""
+  allNetworks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NetworkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Network`."""
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksConnection
+
+  """Reads and enables pagination through a set of `Type`."""
+  allTypes(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TypeCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Type`."""
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesConnection
+
+  """Reads a single `AlwaysAsIdentity` using its globally unique `ID`."""
+  alwaysAsIdentity(
+    """
+    The globally unique `ID` to be used in selecting a single `AlwaysAsIdentity`.
+    """
+    nodeId: ID!
+  ): AlwaysAsIdentity
+  alwaysAsIdentityById(id: Int!): AlwaysAsIdentity
+
+  """Reads a single `ByDefaultAsIdentity` using its globally unique `ID`."""
+  byDefaultAsIdentity(
+    """
+    The globally unique `ID` to be used in selecting a single `ByDefaultAsIdentity`.
+    """
+    nodeId: ID!
+  ): ByDefaultAsIdentity
+  byDefaultAsIdentityById(id: Int!): ByDefaultAsIdentity
+
+  """Reads a single `Network` using its globally unique `ID`."""
+  network(
+    """The globally unique `ID` to be used in selecting a single `Network`."""
+    nodeId: ID!
+  ): Network
+  networkById(id: Int!): Network
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `Type` using its globally unique `ID`."""
+  type(
+    """The globally unique `ID` to be used in selecting a single `Type`."""
+    nodeId: ID!
+  ): Type
+  typeById(id: Int!): Type
+}
+
+"""A builtin object identifier type for a namespace name"""
+scalar RegNamespace
+
+"""A builtin object identifier type for a role name"""
+scalar RegRole
+
+type Type implements Node {
+  bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundType
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  regnamespace: RegNamespace
+  regrole: RegRole
+}
+
+"""
+A condition to be used against `Type` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input TypeCondition {
+  """Checks for equality with the object’s `bigintDomainArrayDomain` field."""
+  bigintDomainArrayDomain: [BigintDomain]
+
+  """
+  Checks for equality with the object’s `domainConstrainedCompoundType` field.
+  """
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `regnamespace` field."""
+  regnamespace: RegNamespace
+
+  """Checks for equality with the object’s `regrole` field."""
+  regrole: RegRole
+}
+
+"""An input for mutations affecting `Type`"""
+input TypeInput {
+  bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
+  id: Int
+  regnamespace: RegNamespace
+  regrole: RegRole
+}
+
+"""Represents an update to a `Type`. Fields that are set will be updated."""
+input TypePatch {
+  bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
+  id: Int
+  regnamespace: RegNamespace
+  regrole: RegRole
+}
+
+"""A connection to a list of `Type` values."""
+type TypesConnection {
+  """
+  A list of edges which contains the `Type` and cursor to aid in pagination.
+  """
+  edges: [TypesEdge!]!
+
+  """A list of `Type` objects."""
+  nodes: [Type]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Type` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Type` edge in the connection."""
+type TypesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Type` at the end of the edge."""
+  node: Type
+}
+
+"""Methods to use when ordering `Type`."""
+enum TypesOrderBy {
+  BIGINT_DOMAIN_ARRAY_DOMAIN_ASC
+  BIGINT_DOMAIN_ARRAY_DOMAIN_DESC
+  DOMAIN_CONSTRAINED_COMPOUND_TYPE_ASC
+  DOMAIN_CONSTRAINED_COMPOUND_TYPE_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  REGNAMESPACE_ASC
+  REGNAMESPACE_DESC
+  REGROLE_ASC
+  REGROLE_DESC
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""All input for the `updateAlwaysAsIdentityById` mutation."""
+input UpdateAlwaysAsIdentityByIdInput {
+  """
+  An object where the defined keys will be set on the `AlwaysAsIdentity` being updated.
+  """
+  alwaysAsIdentityPatch: AlwaysAsIdentityPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `updateAlwaysAsIdentity` mutation."""
+input UpdateAlwaysAsIdentityInput {
+  """
+  An object where the defined keys will be set on the `AlwaysAsIdentity` being updated.
+  """
+  alwaysAsIdentityPatch: AlwaysAsIdentityPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `AlwaysAsIdentity` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `AlwaysAsIdentity` mutation."""
+type UpdateAlwaysAsIdentityPayload {
+  """The `AlwaysAsIdentity` that was updated by this mutation."""
+  alwaysAsIdentity: AlwaysAsIdentity
+
+  """An edge for our `AlwaysAsIdentity`. May be used by Relay 1."""
+  alwaysAsIdentityEdge(
+    """The method to use when ordering `AlwaysAsIdentity`."""
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateByDefaultAsIdentityById` mutation."""
+input UpdateByDefaultAsIdentityByIdInput {
+  """
+  An object where the defined keys will be set on the `ByDefaultAsIdentity` being updated.
+  """
+  byDefaultAsIdentityPatch: ByDefaultAsIdentityPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `updateByDefaultAsIdentity` mutation."""
+input UpdateByDefaultAsIdentityInput {
+  """
+  An object where the defined keys will be set on the `ByDefaultAsIdentity` being updated.
+  """
+  byDefaultAsIdentityPatch: ByDefaultAsIdentityPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ByDefaultAsIdentity` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `ByDefaultAsIdentity` mutation."""
+type UpdateByDefaultAsIdentityPayload {
+  """The `ByDefaultAsIdentity` that was updated by this mutation."""
+  byDefaultAsIdentity: ByDefaultAsIdentity
+
+  """An edge for our `ByDefaultAsIdentity`. May be used by Relay 1."""
+  byDefaultAsIdentityEdge(
+    """The method to use when ordering `ByDefaultAsIdentity`."""
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNetworkById` mutation."""
+input UpdateNetworkByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Network` being updated.
+  """
+  networkPatch: NetworkPatch!
+}
+
+"""All input for the `updateNetwork` mutation."""
+input UpdateNetworkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Network` being updated.
+  """
+  networkPatch: NetworkPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Network` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Network` mutation."""
+type UpdateNetworkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Network` that was updated by this mutation."""
+  network: Network
+
+  """An edge for our `Network`. May be used by Relay 1."""
+  networkEdge(
+    """The method to use when ordering `Network`."""
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateTypeById` mutation."""
+input UpdateTypeByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Type` being updated.
+  """
+  typePatch: TypePatch!
+}
+
+"""All input for the `updateType` mutation."""
+input UpdateTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Type` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Type` being updated.
+  """
+  typePatch: TypePatch!
+}
+
+"""The output of our update `Type` mutation."""
+type UpdateTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Type` that was updated by this mutation."""
+  type: Type
+
+  """An edge for our `Type`. May be used by Relay 1."""
+  typeEdge(
+    """The method to use when ordering `Type`."""
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+}

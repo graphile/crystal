@@ -1,0 +1,470 @@
+"""A rectangular box defined by two opposite corners 'a' and 'b'"""
+type Box {
+  a: Point
+  b: Point
+}
+
+"""A rectangular box defined by two opposite corners 'a' and 'b'"""
+input BoxInput {
+  a: PointInput
+  b: PointInput
+}
+
+type Circle {
+  center: Point
+  radius: Float
+}
+
+input CircleInput {
+  center: PointInput
+  radius: Float
+}
+
+"""All input for the create `Geom` mutation."""
+input CreateGeomInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Geom` to be created by this mutation."""
+  geom: GeomInput!
+}
+
+"""The output of our create `Geom` mutation."""
+type CreateGeomPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Geom` that was created by this mutation."""
+  geom: Geom
+
+  """An edge for our `Geom`. May be used by Relay 1."""
+  geomEdge(
+    """The method to use when ordering `Geom`."""
+    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GeomsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteGeomById` mutation."""
+input DeleteGeomByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteGeom` mutation."""
+input DeleteGeomInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Geom` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Geom` mutation."""
+type DeleteGeomPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedGeomId: ID
+
+  """The `Geom` that was deleted by this mutation."""
+  geom: Geom
+
+  """An edge for our `Geom`. May be used by Relay 1."""
+  geomEdge(
+    """The method to use when ordering `Geom`."""
+    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GeomsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type Geom implements Node {
+  box: Box
+  circle: Circle
+  closedPath: Path
+  id: Int!
+  line: Line
+  lseg: LineSegment
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  openPath: Path
+  point: Point
+  polygon: Polygon
+}
+
+"""
+A condition to be used against `Geom` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input GeomCondition {
+  """Checks for equality with the object’s `box` field."""
+  box: BoxInput
+
+  """Checks for equality with the object’s `circle` field."""
+  circle: CircleInput
+
+  """Checks for equality with the object’s `closedPath` field."""
+  closedPath: PathInput
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `line` field."""
+  line: LineInput
+
+  """Checks for equality with the object’s `lseg` field."""
+  lseg: LineSegmentInput
+
+  """Checks for equality with the object’s `openPath` field."""
+  openPath: PathInput
+
+  """Checks for equality with the object’s `point` field."""
+  point: PointInput
+
+  """Checks for equality with the object’s `polygon` field."""
+  polygon: PolygonInput
+}
+
+"""An input for mutations affecting `Geom`"""
+input GeomInput {
+  box: BoxInput
+  circle: CircleInput
+  closedPath: PathInput
+  id: Int
+  line: LineInput
+  lseg: LineSegmentInput
+  openPath: PathInput
+  point: PointInput
+  polygon: PolygonInput
+}
+
+"""Represents an update to a `Geom`. Fields that are set will be updated."""
+input GeomPatch {
+  box: BoxInput
+  circle: CircleInput
+  closedPath: PathInput
+  id: Int
+  line: LineInput
+  lseg: LineSegmentInput
+  openPath: PathInput
+  point: PointInput
+  polygon: PolygonInput
+}
+
+"""A connection to a list of `Geom` values."""
+type GeomsConnection {
+  """
+  A list of edges which contains the `Geom` and cursor to aid in pagination.
+  """
+  edges: [GeomsEdge!]!
+
+  """A list of `Geom` objects."""
+  nodes: [Geom]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Geom` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Geom` edge in the connection."""
+type GeomsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Geom` at the end of the edge."""
+  node: Geom
+}
+
+"""Methods to use when ordering `Geom`."""
+enum GeomsOrderBy {
+  BOX_ASC
+  BOX_DESC
+  CIRCLE_ASC
+  CIRCLE_DESC
+  CLOSED_PATH_ASC
+  CLOSED_PATH_DESC
+  ID_ASC
+  ID_DESC
+  LINE_ASC
+  LINE_DESC
+  LSEG_ASC
+  LSEG_DESC
+  NATURAL
+  OPEN_PATH_ASC
+  OPEN_PATH_DESC
+  POINT_ASC
+  POINT_DESC
+  POLYGON_ASC
+  POLYGON_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""An infinite line that passes through points 'a' and 'b'."""
+type Line {
+  a: Point
+  b: Point
+}
+
+"""An infinite line that passes through points 'a' and 'b'."""
+input LineInput {
+  a: PointInput
+  b: PointInput
+}
+
+"""An finite line between points 'a' and 'b'."""
+type LineSegment {
+  a: Point
+  b: Point
+}
+
+"""An finite line between points 'a' and 'b'."""
+input LineSegmentInput {
+  a: PointInput
+  b: PointInput
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Geom`."""
+  createGeom(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateGeomInput!
+  ): CreateGeomPayload
+
+  """Deletes a single `Geom` using its globally unique id."""
+  deleteGeom(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGeomInput!
+  ): DeleteGeomPayload
+
+  """Deletes a single `Geom` using a unique key."""
+  deleteGeomById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGeomByIdInput!
+  ): DeleteGeomPayload
+
+  """Updates a single `Geom` using its globally unique id and a patch."""
+  updateGeom(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGeomInput!
+  ): UpdateGeomPayload
+
+  """Updates a single `Geom` using a unique key and a patch."""
+  updateGeomById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGeomByIdInput!
+  ): UpdateGeomPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A path (open or closed) made up of points"""
+type Path {
+  """True if this is a closed path (similar to a polygon), false otherwise."""
+  isOpen: Boolean
+  points: [Point]
+}
+
+"""A path (open or closed) made up of points"""
+input PathInput {
+  """True if this is a closed path (similar to a polygon), false otherwise."""
+  isOpen: Boolean
+  points: [PointInput]
+}
+
+type Point {
+  x: Float!
+  y: Float!
+}
+
+input PointInput {
+  x: Float!
+  y: Float!
+}
+
+type Polygon {
+  points: [Point]
+}
+
+input PolygonInput {
+  points: [PointInput]
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `Geom`."""
+  allGeoms(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GeomCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Geom`."""
+    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GeomsConnection
+
+  """Reads a single `Geom` using its globally unique `ID`."""
+  geom(
+    """The globally unique `ID` to be used in selecting a single `Geom`."""
+    nodeId: ID!
+  ): Geom
+  geomById(id: Int!): Geom
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+}
+
+"""All input for the `updateGeomById` mutation."""
+input UpdateGeomByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Geom` being updated.
+  """
+  geomPatch: GeomPatch!
+  id: Int!
+}
+
+"""All input for the `updateGeom` mutation."""
+input UpdateGeomInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Geom` being updated.
+  """
+  geomPatch: GeomPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Geom` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Geom` mutation."""
+type UpdateGeomPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Geom` that was updated by this mutation."""
+  geom: Geom
+
+  """An edge for our `Geom`. May be used by Relay 1."""
+  geomEdge(
+    """The method to use when ordering `Geom`."""
+    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GeomsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}

@@ -1,0 +1,857 @@
+"""All input for the create `LetterDescription` mutation."""
+input CreateLetterDescriptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `LetterDescription` to be created by this mutation."""
+  letterDescription: LetterDescriptionInput!
+}
+
+"""The output of our create `LetterDescription` mutation."""
+type CreateLetterDescriptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LetterDescription` that was created by this mutation."""
+  letterDescription: LetterDescription
+
+  """An edge for our `LetterDescription`. May be used by Relay 1."""
+  letterDescriptionEdge(
+    """The method to use when ordering `LetterDescription`."""
+    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LetterDescriptionsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `ReferencingTable` mutation."""
+input CreateReferencingTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ReferencingTable` to be created by this mutation."""
+  referencingTable: ReferencingTableInput!
+}
+
+"""The output of our create `ReferencingTable` mutation."""
+type CreateReferencingTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReferencingTable` that was created by this mutation."""
+  referencingTable: ReferencingTable
+
+  """An edge for our `ReferencingTable`. May be used by Relay 1."""
+  referencingTableEdge(
+    """The method to use when ordering `ReferencingTable`."""
+    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReferencingTablesEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteLetterDescriptionById` mutation."""
+input DeleteLetterDescriptionByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteLetterDescriptionByLetter` mutation."""
+input DeleteLetterDescriptionByLetterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  letter: LetterAToD!
+}
+
+"""All input for the `deleteLetterDescriptionByLetterViaView` mutation."""
+input DeleteLetterDescriptionByLetterViaViewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  letterViaView: LetterAToDViaView!
+}
+
+"""All input for the `deleteLetterDescription` mutation."""
+input DeleteLetterDescriptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `LetterDescription` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `LetterDescription` mutation."""
+type DeleteLetterDescriptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedLetterDescriptionId: ID
+
+  """The `LetterDescription` that was deleted by this mutation."""
+  letterDescription: LetterDescription
+
+  """An edge for our `LetterDescription`. May be used by Relay 1."""
+  letterDescriptionEdge(
+    """The method to use when ordering `LetterDescription`."""
+    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LetterDescriptionsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteReferencingTableById` mutation."""
+input DeleteReferencingTableByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteReferencingTable` mutation."""
+input DeleteReferencingTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReferencingTable` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `ReferencingTable` mutation."""
+type DeleteReferencingTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedReferencingTableId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReferencingTable` that was deleted by this mutation."""
+  referencingTable: ReferencingTable
+
+  """An edge for our `ReferencingTable`. May be used by Relay 1."""
+  referencingTableEdge(
+    """The method to use when ordering `ReferencingTable`."""
+    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReferencingTablesEdge
+}
+
+enum EnumTheFirst {
+  """Desc A1"""
+  A1
+
+  """Desc A2"""
+  A2
+
+  """Desc A3"""
+  A3
+
+  """Desc A4"""
+  A4
+}
+
+enum EnumTheSecond {
+  """Desc B1"""
+  B1
+
+  """Desc B2"""
+  B2
+
+  """Desc B3"""
+  B3
+
+  """Desc B4"""
+  B4
+}
+
+enum LetterAToD {
+  """The letter A"""
+  A
+
+  """The letter B"""
+  B
+
+  """The letter C"""
+  C
+
+  """The letter D"""
+  D
+}
+
+enum LetterAToDViaView {
+  """The letter A"""
+  A
+
+  """The letter B"""
+  B
+
+  """The letter C"""
+  C
+
+  """The letter D"""
+  D
+}
+
+type LetterDescription implements Node {
+  description: String
+  id: Int!
+  letter: LetterAToD!
+  letterViaView: LetterAToDViaView!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `LetterDescription` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input LetterDescriptionCondition {
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `letter` field."""
+  letter: LetterAToD
+
+  """Checks for equality with the object’s `letterViaView` field."""
+  letterViaView: LetterAToDViaView
+}
+
+"""An input for mutations affecting `LetterDescription`"""
+input LetterDescriptionInput {
+  description: String
+  id: Int
+  letter: LetterAToD!
+  letterViaView: LetterAToDViaView!
+}
+
+"""
+Represents an update to a `LetterDescription`. Fields that are set will be updated.
+"""
+input LetterDescriptionPatch {
+  description: String
+  id: Int
+  letter: LetterAToD
+  letterViaView: LetterAToDViaView
+}
+
+"""A connection to a list of `LetterDescription` values."""
+type LetterDescriptionsConnection {
+  """
+  A list of edges which contains the `LetterDescription` and cursor to aid in pagination.
+  """
+  edges: [LetterDescriptionsEdge!]!
+
+  """A list of `LetterDescription` objects."""
+  nodes: [LetterDescription]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `LetterDescription` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `LetterDescription` edge in the connection."""
+type LetterDescriptionsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LetterDescription` at the end of the edge."""
+  node: LetterDescription
+}
+
+"""Methods to use when ordering `LetterDescription`."""
+enum LetterDescriptionsOrderBy {
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  LETTER_ASC
+  LETTER_DESC
+  LETTER_VIA_VIEW_ASC
+  LETTER_VIA_VIEW_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+enum LotsOfEnumsEnum3 {
+  """Desc C1"""
+  C1
+
+  """Desc C2"""
+  C2
+
+  """Desc C3"""
+  C3
+
+  """Desc C4"""
+  C4
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `LetterDescription`."""
+  createLetterDescription(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateLetterDescriptionInput!
+  ): CreateLetterDescriptionPayload
+
+  """Creates a single `ReferencingTable`."""
+  createReferencingTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateReferencingTableInput!
+  ): CreateReferencingTablePayload
+
+  """Deletes a single `LetterDescription` using its globally unique id."""
+  deleteLetterDescription(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLetterDescriptionInput!
+  ): DeleteLetterDescriptionPayload
+
+  """Deletes a single `LetterDescription` using a unique key."""
+  deleteLetterDescriptionById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLetterDescriptionByIdInput!
+  ): DeleteLetterDescriptionPayload
+
+  """Deletes a single `LetterDescription` using a unique key."""
+  deleteLetterDescriptionByLetter(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLetterDescriptionByLetterInput!
+  ): DeleteLetterDescriptionPayload
+
+  """Deletes a single `LetterDescription` using a unique key."""
+  deleteLetterDescriptionByLetterViaView(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLetterDescriptionByLetterViaViewInput!
+  ): DeleteLetterDescriptionPayload
+
+  """Deletes a single `ReferencingTable` using its globally unique id."""
+  deleteReferencingTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReferencingTableInput!
+  ): DeleteReferencingTablePayload
+
+  """Deletes a single `ReferencingTable` using a unique key."""
+  deleteReferencingTableById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReferencingTableByIdInput!
+  ): DeleteReferencingTablePayload
+  referencingTableMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ReferencingTableMutationInput!
+  ): ReferencingTableMutationPayload
+
+  """
+  Updates a single `LetterDescription` using its globally unique id and a patch.
+  """
+  updateLetterDescription(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLetterDescriptionInput!
+  ): UpdateLetterDescriptionPayload
+
+  """Updates a single `LetterDescription` using a unique key and a patch."""
+  updateLetterDescriptionById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLetterDescriptionByIdInput!
+  ): UpdateLetterDescriptionPayload
+
+  """Updates a single `LetterDescription` using a unique key and a patch."""
+  updateLetterDescriptionByLetter(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLetterDescriptionByLetterInput!
+  ): UpdateLetterDescriptionPayload
+
+  """Updates a single `LetterDescription` using a unique key and a patch."""
+  updateLetterDescriptionByLetterViaView(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLetterDescriptionByLetterViaViewInput!
+  ): UpdateLetterDescriptionPayload
+
+  """
+  Updates a single `ReferencingTable` using its globally unique id and a patch.
+  """
+  updateReferencingTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReferencingTableInput!
+  ): UpdateReferencingTablePayload
+
+  """Updates a single `ReferencingTable` using a unique key and a patch."""
+  updateReferencingTableById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReferencingTableByIdInput!
+  ): UpdateReferencingTablePayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `LetterDescription`."""
+  allLetterDescriptions(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LetterDescriptionCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LetterDescription`."""
+    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LetterDescriptionsConnection
+
+  """Reads and enables pagination through a set of `ReferencingTable`."""
+  allReferencingTables(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ReferencingTableCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ReferencingTable`."""
+    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReferencingTablesConnection
+
+  """Reads a single `LetterDescription` using its globally unique `ID`."""
+  letterDescription(
+    """
+    The globally unique `ID` to be used in selecting a single `LetterDescription`.
+    """
+    nodeId: ID!
+  ): LetterDescription
+  letterDescriptionById(id: Int!): LetterDescription
+  letterDescriptionByLetter(letter: LetterAToD!): LetterDescription
+  letterDescriptionByLetterViaView(letterViaView: LetterAToDViaView!): LetterDescription
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `ReferencingTable` using its globally unique `ID`."""
+  referencingTable(
+    """
+    The globally unique `ID` to be used in selecting a single `ReferencingTable`.
+    """
+    nodeId: ID!
+  ): ReferencingTable
+  referencingTableById(id: Int!): ReferencingTable
+}
+
+type ReferencingTable implements Node {
+  enum1: EnumTheFirst
+  enum2: EnumTheSecond
+  enum3: LotsOfEnumsEnum3
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `ReferencingTable` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ReferencingTableCondition {
+  """Checks for equality with the object’s `enum1` field."""
+  enum1: EnumTheFirst
+
+  """Checks for equality with the object’s `enum2` field."""
+  enum2: EnumTheSecond
+
+  """Checks for equality with the object’s `enum3` field."""
+  enum3: LotsOfEnumsEnum3
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `ReferencingTable`"""
+input ReferencingTableInput {
+  enum1: EnumTheFirst
+  enum2: EnumTheSecond
+  enum3: LotsOfEnumsEnum3
+  id: Int
+}
+
+"""All input for the `referencingTableMutation` mutation."""
+input ReferencingTableMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  t: ReferencingTableInput
+}
+
+"""The output of our `referencingTableMutation` mutation."""
+type ReferencingTableMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+Represents an update to a `ReferencingTable`. Fields that are set will be updated.
+"""
+input ReferencingTablePatch {
+  enum1: EnumTheFirst
+  enum2: EnumTheSecond
+  enum3: LotsOfEnumsEnum3
+  id: Int
+}
+
+"""A connection to a list of `ReferencingTable` values."""
+type ReferencingTablesConnection {
+  """
+  A list of edges which contains the `ReferencingTable` and cursor to aid in pagination.
+  """
+  edges: [ReferencingTablesEdge!]!
+
+  """A list of `ReferencingTable` objects."""
+  nodes: [ReferencingTable]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ReferencingTable` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ReferencingTable` edge in the connection."""
+type ReferencingTablesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ReferencingTable` at the end of the edge."""
+  node: ReferencingTable
+}
+
+"""Methods to use when ordering `ReferencingTable`."""
+enum ReferencingTablesOrderBy {
+  ENUM_1_ASC
+  ENUM_1_DESC
+  ENUM_2_ASC
+  ENUM_2_DESC
+  ENUM_3_ASC
+  ENUM_3_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the `updateLetterDescriptionById` mutation."""
+input UpdateLetterDescriptionByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `LetterDescription` being updated.
+  """
+  letterDescriptionPatch: LetterDescriptionPatch!
+}
+
+"""All input for the `updateLetterDescriptionByLetter` mutation."""
+input UpdateLetterDescriptionByLetterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  letter: LetterAToD!
+
+  """
+  An object where the defined keys will be set on the `LetterDescription` being updated.
+  """
+  letterDescriptionPatch: LetterDescriptionPatch!
+}
+
+"""All input for the `updateLetterDescriptionByLetterViaView` mutation."""
+input UpdateLetterDescriptionByLetterViaViewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `LetterDescription` being updated.
+  """
+  letterDescriptionPatch: LetterDescriptionPatch!
+  letterViaView: LetterAToDViaView!
+}
+
+"""All input for the `updateLetterDescription` mutation."""
+input UpdateLetterDescriptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `LetterDescription` being updated.
+  """
+  letterDescriptionPatch: LetterDescriptionPatch!
+
+  """
+  The globally unique `ID` which will identify a single `LetterDescription` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `LetterDescription` mutation."""
+type UpdateLetterDescriptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LetterDescription` that was updated by this mutation."""
+  letterDescription: LetterDescription
+
+  """An edge for our `LetterDescription`. May be used by Relay 1."""
+  letterDescriptionEdge(
+    """The method to use when ordering `LetterDescription`."""
+    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LetterDescriptionsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateReferencingTableById` mutation."""
+input UpdateReferencingTableByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ReferencingTable` being updated.
+  """
+  referencingTablePatch: ReferencingTablePatch!
+}
+
+"""All input for the `updateReferencingTable` mutation."""
+input UpdateReferencingTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReferencingTable` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ReferencingTable` being updated.
+  """
+  referencingTablePatch: ReferencingTablePatch!
+}
+
+"""The output of our update `ReferencingTable` mutation."""
+type UpdateReferencingTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReferencingTable` that was updated by this mutation."""
+  referencingTable: ReferencingTable
+
+  """An edge for our `ReferencingTable`. May be used by Relay 1."""
+  referencingTableEdge(
+    """The method to use when ordering `ReferencingTable`."""
+    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReferencingTablesEdge
+}
