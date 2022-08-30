@@ -265,6 +265,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                         ),
                       },
                     },
+                    description: `Creates a single \`${inflection.tableType(
+                      source.codec,
+                    )}\`.`,
                     type: payloadType,
                     plan: EXPORTABLE(
                       (object, pgInsert, source) =>
