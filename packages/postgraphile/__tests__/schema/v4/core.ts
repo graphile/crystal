@@ -71,7 +71,7 @@ export const test =
       const sorted = lexicographicSortSchema(schema);
       const printed = printSchema(sorted);
       const filePath = `${testPath.replace(/\.test\.[jt]s$/, "")}.${i}.graphql`;
-      await snapshot(printed, filePath);
+      await snapshot(printed + "\n", filePath);
       if (finalCheck) {
         await finalCheck(schema);
       }
