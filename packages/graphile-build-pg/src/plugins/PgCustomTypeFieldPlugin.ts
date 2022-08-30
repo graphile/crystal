@@ -802,7 +802,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 memo[fieldName] = fieldWithHooks(
                   { fieldName, fieldBehaviorScope: "mutation_field" },
                   {
-                    description: source.description,
+                    description: source.extensions?.description,
                     type: payloadType,
                     args: {
                       input: {

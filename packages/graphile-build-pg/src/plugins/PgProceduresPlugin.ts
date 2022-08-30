@@ -274,7 +274,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, info, name, recordCodecName, recordType, sql) => recordType(
+              (columns, info, name, recordCodecName, recordType, sql) =>
+                recordType(
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
@@ -409,7 +410,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               ...tags,
               behavior,
             },
-            description,
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {
@@ -471,6 +471,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               returnsSetof,
               isMutation,
               extensions,
+              description,
             };
 
             await info.process("pgProcedures_functionSource_options", {

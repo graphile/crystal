@@ -240,6 +240,7 @@ export interface PgFunctionSourceOptions<
   extensions?: PgSourceExtensions;
   isMutation?: boolean;
   selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
+  description?: string;
 }
 // TODO: is there a better way?
 /**
@@ -575,6 +576,7 @@ export class PgSource<
       extensions,
       isMutation,
       selectAuth: overrideSelectAuth,
+      description,
     } = overrideOptions;
     const { codec, executor, relations, selectAuth } = this._options;
     if (!returnsArray) {
@@ -592,6 +594,7 @@ export class PgSource<
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
+        description,
       });
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
@@ -615,6 +618,7 @@ export class PgSource<
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
         isList: true,
+        description,
       });
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
@@ -642,6 +646,7 @@ export class PgSource<
         sqlPartitionByIndex,
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
+        description,
       });
     }
   }
