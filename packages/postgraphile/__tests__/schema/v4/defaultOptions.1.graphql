@@ -1440,7 +1440,7 @@ type CreateViewTablePayload {
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-"""The day, does not include a time."""
+"""A calendar date in YYYY-MM-DD format."""
 scalar Date
 
 """A range of `Date`."""
