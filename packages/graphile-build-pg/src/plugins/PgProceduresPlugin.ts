@@ -282,7 +282,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   {
                     description: `The return type of our \`${info.inflection.camelCase(
                       name,
-                    )}\` query.`,
+                    )}\` ${pgProc.provolatile === "v" ? "mutation" : "query"}.`,
                   },
                   true,
                 ),
