@@ -338,7 +338,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (columnCodec) {
               hasAtLeastOneColumn = true;
               columns[columnAttribute.attname] = {
-                description: columnAttribute.getDescription(),
+                description:
+                  columnAttribute.getTagsAndDescription().description,
                 codec: columnCodec,
                 notNull:
                   columnAttribute.attnotnull === true ||
