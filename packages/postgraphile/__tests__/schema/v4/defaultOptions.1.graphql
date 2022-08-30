@@ -426,27 +426,6 @@ type CompoundKey implements Node {
   Reads a single `UniqueForeignKey` that is related to this `CompoundKey`.
   """
   uniqueForeignKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey
-
-  """Reads and enables pagination through a set of `UniqueForeignKey`."""
-  uniqueForeignKeysByCompoundKey1AndCompoundKey2(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-  ): UniqueForeignKeysConnection! @deprecated(reason: "Please use uniqueForeignKeyByCompoundKey1AndCompoundKey2 instead")
 }
 
 """
