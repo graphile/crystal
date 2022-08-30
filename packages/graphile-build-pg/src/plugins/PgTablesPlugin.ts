@@ -383,6 +383,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             codec,
             uniques,
             extensions: {
+              isNotSelectable: !["r", "v", "m", "f", "p"].includes(
+                pgClass.relkind,
+              ),
               tags: {
                 originalName: pgClass.relname,
               },

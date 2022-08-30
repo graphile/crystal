@@ -293,7 +293,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           databaseName,
           foreignClass,
         );
-        if (!foreignSource) {
+        if (!foreignSource || foreignSource.extensions?.isNotSelectable) {
           return;
         }
         const relationName = info.inflection.sourceRelationName({

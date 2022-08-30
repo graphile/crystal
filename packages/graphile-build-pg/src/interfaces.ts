@@ -49,6 +49,12 @@ export type KeysOfType<TObject, TValueType> = {
  */
 declare module "@dataplan/pg" {
   interface PgSourceExtensions {
+    /**
+     * If true then we can't select from this source directly, it's just here
+     * to make other sources. (Typically this relates to composite types which
+     * aren't directly selectable, but can be selected from functions/etc.)
+     */
+    isNotSelectable?: boolean;
     tags: Partial<PgSourceTags>;
     description?: string;
     singleOutputParameterName?: string;

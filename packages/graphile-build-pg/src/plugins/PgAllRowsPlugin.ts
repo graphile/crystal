@@ -107,7 +107,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             // Skip functions
             continue;
           }
-          if (!source.find) {
+          if (!source.find || source.extensions?.isNotSelectable) {
             continue;
           }
           const type = build.getTypeByName(
