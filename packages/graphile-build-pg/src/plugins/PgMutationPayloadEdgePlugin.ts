@@ -94,13 +94,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
         const source = sources[0];
 
-        const unique =
-          (source.uniques as PgSourceUnique[])?.find((u) => u.isPrimary) ??
-          (source.uniques[0] as PgSourceUnique);
-        if (!unique) {
+        const pk = (source.uniques as PgSourceUnique[])?.find(
+          (u) => u.isPrimary,
+        );
+        if (!pk) {
           return fields;
         }
-        const uniqueColumns = unique.columns;
+        const pkColumns = pk.columns;
 
         const TableType = build.getGraphQLTypeByPgCodec(pgCodec, "output") as
           | GraphQLObjectType<any, any>
@@ -162,7 +162,18 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 },
                 // TODO: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
-                  (EdgeStep, PgDeleteStep, applyOrderToPlan, connection, constant, pgSelectFromRecord, source, tableOrderByTypeName, uniqueColumns) => function plan(
+                  (
+                    EdgeStep,
+                    PgDeleteStep,
+                    applyOrderToPlan,
+                    connection,
+                    constant,
+                    pgSelectFromRecord,
+                    pkColumns,
+                    source,
+                    tableOrderByTypeName,
+                  ) =>
+                    function plan(
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep<any, any, any, any>;
                       }>,
@@ -181,13 +192,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                             $result.record(),
                           );
                         } else {
-                          const spec = uniqueColumns.reduce(
-                            (memo, columnName) => {
-                              memo[columnName] = $result.get(columnName);
-                              return memo;
-                            },
-                            {},
-                          );
+                          const spec = pkColumns.reduce((memo, columnName) => {
+                            memo[columnName] = $result.get(columnName);
+                            return memo;
+                          }, {});
                           return source.find(spec);
                         }
                       })();
@@ -206,7 +214,17 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       const $single = $select.single();
                       return new EdgeStep($connection, $single);
                     },
-                  [EdgeStep, PgDeleteStep, applyOrderToPlan, connection, constant, pgSelectFromRecord, source, tableOrderByTypeName, uniqueColumns],
+                  [
+                    EdgeStep,
+                    PgDeleteStep,
+                    applyOrderToPlan,
+                    connection,
+                    constant,
+                    pgSelectFromRecord,
+                    pkColumns,
+                    source,
+                    tableOrderByTypeName,
+                  ],
                 ),
               }),
             ),
