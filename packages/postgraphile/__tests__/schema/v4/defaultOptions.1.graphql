@@ -941,7 +941,6 @@ type CreateNoPrimaryKeyPayload {
   """The `NoPrimaryKey` that was created by this mutation."""
   noPrimaryKey: NoPrimaryKey
 
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
