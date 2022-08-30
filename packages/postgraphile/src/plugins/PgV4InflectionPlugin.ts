@@ -67,6 +67,9 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
           `deleted-${this._singularizedSourceName(source)}-id`,
         );
       },
+      orderByType(previous, options, typeName) {
+        return this.upperCamelCase(`${this.pluralize(typeName)}-order-by`);
+      },
     },
   },
 };
