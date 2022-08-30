@@ -47,7 +47,9 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
 /**
  * Custom metadata for a codec
  */
-export interface PgTypeCodecExtensions {}
+export interface PgTypeCodecExtensions {
+  description?: string;
+}
 
 /**
  * A codec for a Postgres type, tells us how to convert to-and-from Postgres

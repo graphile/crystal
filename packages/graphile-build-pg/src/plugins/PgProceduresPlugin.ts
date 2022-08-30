@@ -274,15 +274,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, recordCodecName, recordType, sql) =>
-                recordType(
+              (columns, info, name, recordCodecName, recordType, sql) => recordType(
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
-                  {},
+                  {
+                    description: `The return type of our \`${info.inflection.camelCase(
+                      name,
+                    )}\` query.`,
+                  },
                   true,
                 ),
-              [columns, recordCodecName, recordType, sql],
+              [columns, info, name, recordCodecName, recordType, sql],
             );
           };
 
