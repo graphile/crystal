@@ -1,7 +1,12 @@
 import "graphile-build";
 import "graphile-config";
 
-import type { PgSelectSingleStep, PgSource, PgTypeCodec } from "@dataplan/pg";
+import type {
+  PgSelectSingleStep,
+  PgSource,
+  PgSourceUnique,
+  PgTypeCodec,
+} from "@dataplan/pg";
 import type { ListStep } from "dataplanner";
 import { access, constant, list } from "dataplanner";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
@@ -57,7 +62,13 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             continue;
           }
           const pgSource = sources[0];
-          const pk = pgSource.uniques[0].columns as string[];
+          const primaryKey = (pgSource.uniques as PgSourceUnique[]).find(
+            (u) => u.isPrimary === true,
+          );
+          if (!primaryKey) {
+            continue;
+          }
+          const pk = primaryKey.columns;
 
           const identifier =
             // Yes, this behaviour in V4 was ridiculous. Alas.
