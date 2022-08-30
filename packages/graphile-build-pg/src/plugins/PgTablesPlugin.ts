@@ -502,7 +502,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 },
                 // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
                 ExecutableStep, // PgClassSingleStep<any, any, any, any>
-                () => ({}),
+                () => ({
+                  description: codec.extensions?.description,
+                }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );
               setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
@@ -522,6 +524,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgCompoundType: !selectable,
                 },
                 () => ({
+                  description: `An input for mutations affecting \`${tableTypeName}\``,
                   extensions: {
                     graphile: {
                       inputPlan() {
@@ -549,6 +552,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgCompoundType: !selectable,
                 },
                 () => ({
+                  description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
                   extensions: {
                     graphile: {
                       inputPlan() {
