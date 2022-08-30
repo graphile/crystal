@@ -64,7 +64,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
       },
       deletedNodeId(previous, options, { source }) {
         return this.camelCase(
-          `deleted-${this._singularizedSourceName(source)}-id`,
+          `deleted-${this.singularize(this._sourceName(source))}-id`,
         );
       },
       orderByType(previous, options, typeName) {
