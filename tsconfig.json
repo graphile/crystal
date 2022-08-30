@@ -44,6 +44,7 @@
     { "path": "packages/dataplanner" },
     { "path": "packages/graphile-export" },
     { "path": "packages/graphile-config" },
+    { "path": "packages/graphile-utils" },
     { "path": "packages/dataplan-pg" },
     { "path": "packages/pg-introspection" },
     { "path": "packages/graphile-inspect" },
