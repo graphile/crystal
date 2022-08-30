@@ -911,7 +911,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               pgSource: source,
                             },
                             {
-                              description: source.description,
+                              description:
+                                source.description ??
+                                `Reads and enables pagination through a set of \`${inflection.tableType(
+                                  source.codec,
+                                )}\`.`,
                               deprecationReason: tagToString(
                                 source.extensions?.tags?.deprecated,
                               ),
