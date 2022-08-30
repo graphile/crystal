@@ -307,12 +307,18 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isBackwards,
         });
         const existingRelation = relations[relationName];
+        const { tags } = pgConstraint.getTagsAndDescription();
+        const description = isBackwards
+          ? tags.backwardDescription
+          : tags.forwardDescription;
         const newRelation: PgSourceRelation<any, any> = {
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
           source: foreignSource,
           isUnique,
           isBackwards,
+          description:
+            typeof description === "string" ? description : undefined,
         };
         await info.process("pgRelations_relation", {
           databaseName,
@@ -639,9 +645,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       pgRelationDetails: relationDetails,
                     },
                     {
-                      description: `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
-                        codec,
-                      )}\`.`,
+                      description:
+                        relation.description ??
+                        `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
+                          codec,
+                        )}\`.`,
                       // TODO: handle nullability
                       type: OtherType as GraphQLObjectType,
                       plan: singleRecordPlan,

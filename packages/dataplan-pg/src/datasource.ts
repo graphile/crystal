@@ -111,6 +111,8 @@ export interface PgSourceRelation<
    * Space for you to add your own metadata.
    */
   extensions?: PgSourceRelationExtensions;
+
+  description?: string;
 }
 
 /**
