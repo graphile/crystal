@@ -2687,6 +2687,9 @@ type FuncOutComplexSetofConnection {
   """A list of `FuncOutComplexSetofRecord` objects."""
   nodes: [FuncOutComplexSetofRecord]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """
   The count of *all* `FuncOutComplexSetofRecord` you could get from the connection.
   """
@@ -2731,6 +2734,9 @@ type FuncOutOutSetofConnection {
   """A list of `FuncOutOutSetofRecord` objects."""
   nodes: [FuncOutOutSetofRecord]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """
   The count of *all* `FuncOutOutSetofRecord` you could get from the connection.
   """
@@ -2768,6 +2774,9 @@ type FuncOutSetofConnection {
   """A list of `Int` objects."""
   nodes: [Int]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
 }
@@ -2797,6 +2806,9 @@ type FuncReturnsTableMultiColConnection {
 
   """A list of `FuncReturnsTableMultiColRecord` objects."""
   nodes: [FuncReturnsTableMultiColRecord]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """
   The count of *all* `FuncReturnsTableMultiColRecord` you could get from the connection.
@@ -2828,6 +2840,9 @@ type FuncReturnsTableOneColConnection {
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -2970,6 +2985,9 @@ type IntSetQueryConnection {
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -3160,6 +3178,12 @@ type Issue756SetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+
+  """An edge for our `Issue756`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering `Issue756`."""
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
   issue756S: [Issue756]
 
   """
@@ -3351,7 +3375,7 @@ type LeftArmIdentityPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
