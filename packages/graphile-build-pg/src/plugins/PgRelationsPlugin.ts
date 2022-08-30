@@ -676,6 +676,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                         pgRelationDetails: relationDetails,
                       },
                       {
+                        description: `Reads and enables pagination through a set of \`${typeName}\`.`,
                         // TODO: handle nullability
                         type: ConnectionType as GraphQLObjectType,
                         plan: connectionPlan,
