@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "prints a schema without parsing tags and with legacy relations omitted",
@@ -6,5 +6,5 @@ test(
     enableTags: false,
     legacyRelations: "omit",
     setofFunctionsContainNulls: false,
-  })
+  }),
 );

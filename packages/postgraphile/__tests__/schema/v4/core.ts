@@ -1,14 +1,24 @@
-const { lexicographicSortSchema, printSchema } = require("graphql");
-const { withPgClient } = require("../../helpers");
-const { createPostGraphileSchema } = require("../../..");
-const { snapshot } = require("../../helpers-v5");
+import type { PromiseOrDirect } from "dataplanner";
+import type { GraphQLSchema } from "graphql";
+import { lexicographicSortSchema, printSchema } from "graphql";
+import type { PoolClient } from "pg";
+
+import { createPostGraphileSchema } from "../../..";
+import { withPgClient } from "../../helpers";
+import { snapshot } from "../../helpers-v5";
 
 let countByPath = Object.create(null);
 
-exports.test =
-  (testPath, schemas, options, setup, finalCheck = async () => {}) =>
+export const test =
+  (
+    testPath: string,
+    schemas: string | string[],
+    options?: object,
+    setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
+    finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
+  ) =>
   () =>
-    withPgClient(async client => {
+    withPgClient(async (client) => {
       if (setup) {
         if (typeof setup === "function") {
           await setup(client);
@@ -23,5 +33,7 @@ exports.test =
       const printed = printSchema(sorted);
       const filePath = `${testPath.replace(/\.test\.[jt]s$/, "")}.${i}.graphql`;
       await snapshot(printed, filePath);
-      await finalCheck(schema);
+      if (finalCheck) {
+        await finalCheck(schema);
+      }
     });

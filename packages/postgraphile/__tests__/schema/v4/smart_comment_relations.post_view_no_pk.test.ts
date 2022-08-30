@@ -1,4 +1,6 @@
-const core = require("./core");
+import { isObjectType } from "graphql";
+
+import * as core from "./core.js";
 
 test(
   "referencing other view (specifying columns, no PK)",
@@ -6,7 +8,7 @@ test(
     __filename,
     ["smart_comment_relations"],
     {},
-    pgClient =>
+    (pgClient) =>
       pgClient.query(
         `
 comment on view smart_comment_relations.post_view is E'@name posts
@@ -14,17 +16,23 @@ comment on view smart_comment_relations.post_view is E'@name posts
 
 comment on view smart_comment_relations.offer_view is E'@name offers
 @primaryKey id
-@foreignKey (post_id) references post_view(id)';`
+@foreignKey (post_id) references post_view(id)';`,
       ),
-    schema => {
+    (schema) => {
       const Offer = schema.getType("Offer");
+      if (!isObjectType(Offer)) {
+        throw new Error("Expected Offer to be an object type");
+      }
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postByPostId).toBeTruthy();
       const Query = schema.getType("Query");
+      if (!isObjectType(Query)) {
+        throw new Error("Expected Query to be an object type");
+      }
       const queryFields = Query.getFields();
       // `@uniqueKey` does not add root level fields; use `@unique` for that.
       expect(queryFields.postById).toBeFalsy();
-    }
-  )
+    },
+  ),
 );

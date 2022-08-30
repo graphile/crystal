@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "omit and omit everything on table",
@@ -9,6 +9,6 @@ test(
     `
 comment on table d.films is E'@omit *';
 comment on table d.tv_shows is E'@omit';
-`
-  )
+`,
+  ),
 );

@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "simple collection for relation",
@@ -9,9 +9,9 @@ test(
       simpleCollections: "omit",
       setofFunctionsContainNulls: false,
     },
-    pgClient =>
+    (pgClient) =>
       pgClient.query(`
         comment on constraint pets_owner_id_fkey on simple_collections.pets is E'@simpleCollections only';
-      `)
-  )
+      `),
+  ),
 );

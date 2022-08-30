@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "omit execute on computed column",
@@ -8,6 +8,6 @@ test(
     {},
     `
 comment on function d.person_full_name(d.person) is E'@omit execute';
-`
-  )
+`,
+  ),
 );

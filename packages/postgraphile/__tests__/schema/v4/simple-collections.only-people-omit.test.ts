@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "schema with simple collections by default, but relay for people",
@@ -9,9 +9,9 @@ test(
       simpleCollections: "only",
       setofFunctionsContainNulls: false,
     },
-    pgClient =>
+    (pgClient) =>
       pgClient.query(`
         comment on table simple_collections.people is E'@simpleCollections omit';
-      `)
-  )
+      `),
+  ),
 );

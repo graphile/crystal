@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "omit update on table",
@@ -8,6 +8,6 @@ test(
     {},
     `
 comment on table d.films is E'@omit update';
-`
-  )
+`,
+  ),
 );

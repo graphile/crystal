@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "omit order on table",
@@ -8,6 +8,6 @@ test(
     {},
     `
 comment on table d.tv_shows is E'@omit order';
-`
-  )
+`,
+  ),
 );

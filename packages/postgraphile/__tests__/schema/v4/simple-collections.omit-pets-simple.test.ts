@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "simple collection for computed column",
@@ -9,9 +9,9 @@ test(
       simpleCollections: "omit",
       setofFunctionsContainNulls: false,
     },
-    pgClient =>
+    (pgClient) =>
       pgClient.query(`
         comment on function simple_collections.people_odd_pets(simple_collections.people) is E'@simpleCollections only';
-      `)
-  )
+      `),
+  ),
 );

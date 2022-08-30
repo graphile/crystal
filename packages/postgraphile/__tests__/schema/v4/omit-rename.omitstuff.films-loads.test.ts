@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "omit read on table",
@@ -8,6 +8,6 @@ test(
     {},
     `
 comment on table d.films is E'@omit read,all,update,create,delete,many';
-`
-  )
+`,
+  ),
 );

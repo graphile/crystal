@@ -1,6 +1,6 @@
-const core = require("./core");
+import * as core from "./core.js";
 
-let consoleWarnSpy;
+let consoleWarnSpy: any;
 beforeAll(() => {
   consoleWarnSpy = jest.spyOn(global.console, "warn");
 });
@@ -16,13 +16,13 @@ test(
     __filename,
     ["a", "b", "c"],
     {},
-    pgClient => {
+    (pgClient) => {
       return pgClient.query(
-        "create function a.create_post(t text) returns a.post as $$ select null::a.post; $$ language sql volatile;"
+        "create function a.create_post(t text) returns a.post as $$ select null::a.post; $$ language sql volatile;",
       );
     },
     () => {
       expect(consoleWarnSpy).toHaveBeenCalled();
-    }
-  )
+    },
+  ),
 );

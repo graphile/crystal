@@ -1,10 +1,10 @@
-const { withPgClient } = require("../../helpers");
-const { createPostGraphileSchema } = require("../../..");
+import { createPostGraphileSchema } from "../../..";
+import { withPgClient } from "../../helpers.js";
 
 const PluginThatWouldNotHaveLoadedAnyway = () => {};
 
 test("throws error when skipPlugins is passed a plugin that would not have loaded", () =>
-  withPgClient(async client => {
+  withPgClient(async (client) => {
     let err;
     try {
       await createPostGraphileSchema(client, "a", {

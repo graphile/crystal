@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "view with fake unique constraint",
@@ -6,7 +6,7 @@ test(
     __filename,
     ["smart_comment_relations"],
     {},
-    pgClient =>
+    (pgClient) =>
       pgClient.query(
         `
 comment on view smart_comment_relations.post_view is E'@name posts
@@ -14,9 +14,9 @@ comment on view smart_comment_relations.post_view is E'@name posts
 
 comment on view smart_comment_relations.offer_view is E'@name offers
 @primaryKey id
-@foreignKey (post_id) references post_view(id)';`
+@foreignKey (post_id) references post_view(id)';`,
       ),
-    schema => {
+    (schema) => {
       const Offer = schema.getType("Offer");
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
@@ -24,6 +24,6 @@ comment on view smart_comment_relations.offer_view is E'@name offers
       const Query = schema.getType("Query");
       const queryFields = Query.getFields();
       expect(queryFields.postById).toBeTruthy();
-    }
-  )
+    },
+  ),
 );

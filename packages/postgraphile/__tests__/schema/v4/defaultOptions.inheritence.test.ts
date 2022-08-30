@@ -1,6 +1,6 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "prints a schema with the default options against inheritence schema",
-  core.test(__filename, ["inheritence"])
+  core.test(__filename, ["inheritence"]),
 );

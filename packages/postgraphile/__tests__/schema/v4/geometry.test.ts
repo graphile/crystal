@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "prints a schema for geometry",
@@ -6,5 +6,5 @@ test(
     graphileBuildOptions: {
       pgGeometricTypes: true,
     },
-  })
+  }),
 );

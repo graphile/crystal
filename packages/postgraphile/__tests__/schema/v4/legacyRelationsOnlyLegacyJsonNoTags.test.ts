@@ -1,4 +1,4 @@
-const core = require("./core");
+import * as core from "./core.js";
 
 test(
   "prints a schema without new relations and with legacy type names",
@@ -7,5 +7,5 @@ test(
     enableTags: false,
     legacyJsonUuid: true,
     setofFunctionsContainNulls: false,
-  })
+  }),
 );
