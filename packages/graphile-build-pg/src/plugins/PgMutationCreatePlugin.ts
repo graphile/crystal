@@ -265,10 +265,13 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                         ),
                       },
                     },
+                    type: payloadType,
                     description: `Creates a single \`${inflection.tableType(
                       source.codec,
                     )}\`.`,
-                    type: payloadType,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
                     plan: EXPORTABLE(
                       (object, pgInsert, source) =>
                         function plan(_: any, args: FieldArgs) {
