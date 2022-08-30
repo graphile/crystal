@@ -37,6 +37,33 @@ declare global {
 
     interface Inflection {
       /**
+       * A PgSource represents a single way of getting a number of values of
+       * `source.codec` type. It doesn't necessarily represent a table directly
+       * (although it can) - e.g. it might be a function that returns records
+       * from a table, or it could be a "sub-selection" of a table, e.g.
+       * "admin_users" might be "users where admin is true".  This inflector
+       * gives a name to this source, it's primarily used when naming _fields_
+       * in the GraphQL schema (as opposed to `_codecName` which typically
+       * names _types_.
+       *
+       * @remarks The method beginning with `_` implies it's not ment to
+       * be called directly, instead it's called from other inflectors to give
+       * them common behavior.
+       */
+      _sourceName(
+        this: Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+
+      /**
+       * Takes a `_sourceName` and singularizes it.
+       */
+      _singularizedSourceName(
+        this: Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+
+      /**
        * When you're using multiple databases and/or schemas, you may want to
        * prefix various type names/field names with an identifier for these
        * DBs/schemas.
@@ -87,6 +114,12 @@ declare global {
         this: Inflection,
         codec: PgTypeCodec<any, any, any>,
       ): string;
+
+      /**
+       * Appends '_record' to a name that ends in `_input`, `_patch`, `Input`
+       * or `Patch` to avoid naming conflicts.
+       */
+      dontEndInInputOrPatch(this: Inflection, text: string): string;
 
       /**
        * The name of the GraphQL Object Type that's generated to represent a
@@ -225,9 +258,27 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       },
 
       _singularizedCodecName(options, codec) {
-        return this.singularize(this._codecName(codec)).replace(
+        return this.dontEndInInputOrPatch(
+          this.singularize(this._codecName(codec)),
+        );
+      },
+
+      dontEndInInputOrPatch(options, text) {
+        return text.replace(
           /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
           "$&_record",
+        );
+      },
+
+      _sourceName(options, source) {
+        return this.coerceToGraphQLName(
+          source.extensions?.tags?.name ?? source.name,
+        );
+      },
+
+      _singularizedSourceName(options, source) {
+        return this.dontEndInInputOrPatch(
+          this.singularize(this._sourceName(source)),
         );
       },
 
