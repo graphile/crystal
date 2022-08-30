@@ -11,6 +11,7 @@ import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -160,6 +161,9 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       : null,
                   },
                 },
+                deprecationReason: tagToString(
+                  source.extensions?.tags?.deprecated,
+                ),
                 // TODO: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
                   (

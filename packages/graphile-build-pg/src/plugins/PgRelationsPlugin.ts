@@ -15,6 +15,7 @@ import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
+import { tagToString } from "../utils.js";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -319,6 +320,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isBackwards,
           description:
             typeof description === "string" ? description : undefined,
+          extensions: {
+            tags,
+          },
         };
         await info.process("pgRelations_relation", {
           databaseName,
@@ -634,6 +638,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               const fieldName = relationDetails.relation.isBackwards
                 ? build.inflection.singleRelationBackwards(relationDetails)
                 : build.inflection.singleRelation(relationDetails);
+              const deprecationReason =
+                tagToString(relation.extensions?.tags?.deprecated) ??
+                tagToString(relation.source.extensions?.tags?.deprecated);
               fields = extend(
                 fields,
                 {
@@ -653,6 +660,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       // TODO: handle nullability
                       type: OtherType as GraphQLObjectType,
                       plan: singleRecordPlan,
+                      deprecationReason,
                     },
                   ),
                 },

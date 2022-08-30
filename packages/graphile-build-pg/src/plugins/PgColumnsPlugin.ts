@@ -16,7 +16,7 @@ import {
 } from "@dataplan/pg";
 import type { SetterStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLNonNull, GraphQLType } from "graphql";
+import type { GraphQLNonNull, GraphQLOutputType, GraphQLType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -285,11 +285,17 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           fields = extend(
             fields,
             {
-              [columnFieldName]: {
-                description: column.description,
-                type,
-                plan: makePlan(),
-              },
+              [columnFieldName]: context.fieldWithHooks(
+                {
+                  fieldName: columnFieldName,
+                  pgColumn: column,
+                },
+                {
+                  description: column.description,
+                  type: type as GraphQLOutputType,
+                  plan: makePlan() as any,
+                },
+              ),
             },
             `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
           );

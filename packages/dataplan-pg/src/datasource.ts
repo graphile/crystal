@@ -264,7 +264,7 @@ export class PgSourceBuilder<
   public codec: PgTypeCodec<TColumns, any, any>;
   public uniques: TUniques | undefined;
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
-  private readonly name: string;
+  public readonly name: string;
   public readonly isVirtual: boolean;
   constructor(
     private options: Omit<

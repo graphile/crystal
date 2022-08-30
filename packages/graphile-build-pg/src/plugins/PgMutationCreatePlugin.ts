@@ -9,6 +9,7 @@ import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -197,6 +198,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                     return $object.get("result");
                                   },
                                 [],
+                              ),
+                              deprecationReason: tagToString(
+                                source.extensions?.tags?.deprecated,
                               ),
                             },
                           ),

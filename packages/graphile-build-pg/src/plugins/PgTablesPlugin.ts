@@ -6,6 +6,7 @@ import type {
   PgSourceRelation,
   PgSourceUnique,
   PgTypeCodec,
+  PgTypeColumn,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutableStep, object } from "dataplanner";
@@ -142,6 +143,7 @@ declare global {
     }
     interface ScopeObjectFieldsField {
       pgSource?: PgSource<any, any, any, any>;
+      pgColumn?: PgTypeColumn<any, any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -426,7 +428,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
-          const behavior: string[] = [];
+          const { tags } = pgClass.getTagsAndDescription();
+
+          const behavior: string[] = Array.isArray(tags.behavior)
+            ? [...(tags.behavior as string[])]
+            : typeof tags.behavior === "string"
+            ? [tags.behavior]
+            : [];
           const mask = pgClass.updatable_mask ?? 2 ** 8 - 1;
           const isInsertable = mask & (1 << 3);
           const isUpdatable = mask & (1 << 2);
@@ -451,6 +459,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             extensions: {
               tags: {
+                ...tags,
                 ...(behavior.length > 0 ? { behavior } : {}),
                 originalName: pgClass.relname,
               },
