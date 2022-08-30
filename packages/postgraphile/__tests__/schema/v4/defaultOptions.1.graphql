@@ -661,7 +661,7 @@ type CreateCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
@@ -702,7 +702,7 @@ type CreateDefaultValuePayload {
   """An edge for our `DefaultValue`. May be used by Relay 1."""
   defaultValueEdge(
     """The method to use when ordering `DefaultValue`."""
-    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [DefaultValuesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DefaultValuesEdge
 
   """
@@ -733,12 +733,6 @@ type CreateEdgeCasePayload {
 
   """The `EdgeCase` that was created by this mutation."""
   edgeCase: EdgeCase
-
-  """An edge for our `EdgeCase`. May be used by Relay 1."""
-  edgeCaseEdge(
-    """The method to use when ordering `EdgeCase`."""
-    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
-  ): EdgeCasesEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -771,12 +765,6 @@ type CreateForeignKeyPayload {
 
   """The `ForeignKey` that was created by this mutation."""
   foreignKey: ForeignKey
-
-  """An edge for our `ForeignKey`. May be used by Relay 1."""
-  foreignKeyEdge(
-    """The method to use when ordering `ForeignKey`."""
-    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
-  ): ForeignKeysEdge
 
   """Reads a single `Person` that is related to this `ForeignKey`."""
   personByPersonId: Person
@@ -813,7 +801,7 @@ type CreateInputPayload {
   """An edge for our `Input`. May be used by Relay 1."""
   inputEdge(
     """The method to use when ordering `Input`."""
-    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [InputsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): InputsEdge
 
   """
@@ -848,7 +836,7 @@ type CreateIssue756Payload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -883,7 +871,7 @@ type CreateLeftArmPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -921,7 +909,7 @@ type CreateMyTablePayload {
   """An edge for our `MyTable`. May be used by Relay 1."""
   myTableEdge(
     """The method to use when ordering `MyTable`."""
-    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): MyTablesEdge
 
   """
@@ -953,11 +941,6 @@ type CreateNoPrimaryKeyPayload {
   """The `NoPrimaryKey` that was created by this mutation."""
   noPrimaryKey: NoPrimaryKey
 
-  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
-  noPrimaryKeyEdge(
-    """The method to use when ordering `NoPrimaryKey`."""
-    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
-  ): NoPrimaryKeysEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -991,7 +974,7 @@ type CreateNullTestRecordPayload {
   """An edge for our `NullTestRecord`. May be used by Relay 1."""
   nullTestRecordEdge(
     """The method to use when ordering `NullTestRecord`."""
-    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NullTestRecordsEdge
 
   """
@@ -1026,7 +1009,7 @@ type CreatePatchPayload {
   """An edge for our `Patch`. May be used by Relay 1."""
   patchEdge(
     """The method to use when ordering `Patch`."""
-    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PatchesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PatchesEdge
 
   """
@@ -1061,7 +1044,7 @@ type CreatePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -1099,7 +1082,7 @@ type CreatePersonSecretPayload {
   """An edge for our `PersonSecret`. May be used by Relay 1."""
   personSecretEdge(
     """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
@@ -1137,7 +1120,7 @@ type CreatePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -1189,7 +1172,7 @@ type CreateReservedInputRecordPayload {
   """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
   reservedInputRecordEdge(
     """The method to use when ordering `ReservedInputRecord`."""
-    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedInputRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedInputRecordsEdge
 }
 
@@ -1224,7 +1207,7 @@ type CreateReservedPatchRecordPayload {
   """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
   reservedPatchRecordEdge(
     """The method to use when ordering `ReservedPatchRecord`."""
-    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedPatchRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedPatchRecordsEdge
 }
 
@@ -1247,7 +1230,7 @@ type CreateReservedPayload {
   """An edge for our `Reserved`. May be used by Relay 1."""
   reservedEdge(
     """The method to use when ordering `Reserved`."""
-    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedsEdge
 }
 
@@ -1282,7 +1265,7 @@ type CreateSimilarTable1Payload {
   """An edge for our `SimilarTable1`. May be used by Relay 1."""
   similarTable1Edge(
     """The method to use when ordering `SimilarTable1`."""
-    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SimilarTable1SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -1317,7 +1300,7 @@ type CreateSimilarTable2Payload {
   """An edge for our `SimilarTable2`. May be used by Relay 1."""
   similarTable2Edge(
     """The method to use when ordering `SimilarTable2`."""
-    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SimilarTable2SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -1348,12 +1331,6 @@ type CreateTestviewPayload {
 
   """The `Testview` that was created by this mutation."""
   testview: Testview
-
-  """An edge for our `Testview`. May be used by Relay 1."""
-  testviewEdge(
-    """The method to use when ordering `Testview`."""
-    orderBy: [TestviewsOrderBy!] = [NATURAL]
-  ): TestviewsEdge
 }
 
 """All input for the create `Type` mutation."""
@@ -1393,7 +1370,7 @@ type CreateTypePayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -1424,12 +1401,6 @@ type CreateUpdatableViewPayload {
 
   """The `UpdatableView` that was created by this mutation."""
   updatableView: UpdatableView
-
-  """An edge for our `UpdatableView`. May be used by Relay 1."""
-  updatableViewEdge(
-    """The method to use when ordering `UpdatableView`."""
-    orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
-  ): UpdatableViewsEdge
 }
 
 """All input for the create `ViewTable` mutation."""
@@ -1463,7 +1434,7 @@ type CreateViewTablePayload {
   """An edge for our `ViewTable`. May be used by Relay 1."""
   viewTableEdge(
     """The method to use when ordering `ViewTable`."""
-    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ViewTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ViewTablesEdge
 }
 
@@ -1631,7 +1602,7 @@ type DeleteCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
   deletedCompoundKeyId: ID
 
@@ -1685,7 +1656,7 @@ type DeleteDefaultValuePayload {
   """An edge for our `DefaultValue`. May be used by Relay 1."""
   defaultValueEdge(
     """The method to use when ordering `DefaultValue`."""
-    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [DefaultValuesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DefaultValuesEdge
   deletedDefaultValueId: ID
 
@@ -1734,7 +1705,7 @@ type DeleteInputPayload {
   """An edge for our `Input`. May be used by Relay 1."""
   inputEdge(
     """The method to use when ordering `Input`."""
-    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [InputsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): InputsEdge
 
   """
@@ -1782,7 +1753,7 @@ type DeleteIssue756Payload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -1840,7 +1811,7 @@ type DeleteLeftArmPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -1891,7 +1862,7 @@ type DeleteMyTablePayload {
   """An edge for our `MyTable`. May be used by Relay 1."""
   myTableEdge(
     """The method to use when ordering `MyTable`."""
-    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): MyTablesEdge
 
   """
@@ -1921,12 +1892,6 @@ type DeleteNoPrimaryKeyPayload {
 
   """The `NoPrimaryKey` that was deleted by this mutation."""
   noPrimaryKey: NoPrimaryKey
-
-  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
-  noPrimaryKeyEdge(
-    """The method to use when ordering `NoPrimaryKey`."""
-    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
-  ): NoPrimaryKeysEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1973,7 +1938,7 @@ type DeleteNullTestRecordPayload {
   """An edge for our `NullTestRecord`. May be used by Relay 1."""
   nullTestRecordEdge(
     """The method to use when ordering `NullTestRecord`."""
-    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NullTestRecordsEdge
 
   """
@@ -2021,7 +1986,7 @@ type DeletePatchPayload {
   """An edge for our `Patch`. May be used by Relay 1."""
   patchEdge(
     """The method to use when ordering `Patch`."""
-    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PatchesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PatchesEdge
 
   """
@@ -2081,7 +2046,7 @@ type DeletePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -2132,7 +2097,7 @@ type DeletePersonSecretPayload {
   """An edge for our `PersonSecret`. May be used by Relay 1."""
   personSecretEdge(
     """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
@@ -2183,7 +2148,7 @@ type DeletePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -2260,7 +2225,7 @@ type DeleteReservedInputRecordPayload {
   """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
   reservedInputRecordEdge(
     """The method to use when ordering `ReservedInputRecord`."""
-    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedInputRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedInputRecordsEdge
 }
 
@@ -2308,7 +2273,7 @@ type DeleteReservedPatchRecordPayload {
   """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
   reservedPatchRecordEdge(
     """The method to use when ordering `ReservedPatchRecord`."""
-    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedPatchRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedPatchRecordsEdge
 }
 
@@ -2332,7 +2297,7 @@ type DeleteReservedPayload {
   """An edge for our `Reserved`. May be used by Relay 1."""
   reservedEdge(
     """The method to use when ordering `Reserved`."""
-    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedsEdge
 }
 
@@ -2380,7 +2345,7 @@ type DeleteSimilarTable1Payload {
   """An edge for our `SimilarTable1`. May be used by Relay 1."""
   similarTable1Edge(
     """The method to use when ordering `SimilarTable1`."""
-    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SimilarTable1SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -2428,7 +2393,7 @@ type DeleteSimilarTable2Payload {
   """An edge for our `SimilarTable2`. May be used by Relay 1."""
   similarTable2Edge(
     """The method to use when ordering `SimilarTable2`."""
-    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SimilarTable2SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -2482,7 +2447,7 @@ type DeleteTypePayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -2530,7 +2495,7 @@ type DeleteViewTablePayload {
   """An edge for our `ViewTable`. May be used by Relay 1."""
   viewTableEdge(
     """The method to use when ordering `ViewTable`."""
-    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ViewTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ViewTablesEdge
 }
 
