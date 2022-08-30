@@ -375,6 +375,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
+          const behavior: string[] = [];
+          const mask = pgClass.updatable_mask ?? 2 ** 8 - 1;
+          const isInsertable = mask & (1 << 3);
+          const isUpdatable = mask & (1 << 2);
+          const isDeletable = mask & (1 << 4);
+          if (!isInsertable) {
+            behavior.push("-insert");
+          }
+          if (!isUpdatable) {
+            behavior.push("-update");
+          }
+          if (!isDeletable) {
+            behavior.push("-delete");
+          }
+
           const options: PgSourceBuilderOptions = {
             executor,
             name,
@@ -385,6 +400,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             extensions: {
               tags: {
+                ...(behavior.length > 0 ? { behavior } : {}),
                 originalName: pgClass.relname,
               },
             },
