@@ -2,6 +2,7 @@ import "graphile-config";
 
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
+import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 
 export interface V4Options {
   simpleCollections?: "both" | "only" | "omit";
@@ -98,6 +99,7 @@ export const makeV4Preset = (
     plugins: [
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
+      PgV4BehaviorPlugin,
       makeV4Plugin(options),
     ].filter(isNotNullish),
     schema: {

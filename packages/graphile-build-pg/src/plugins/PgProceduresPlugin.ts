@@ -81,7 +81,7 @@ declare global {
           source: PgSource<any, any, any, any>;
           pgProc: PgProc;
           databaseName: string;
-        }) => Promise<void>
+        }) => void | Promise<void>
       >;
 
       // TODO: should pgProcedures_functionSource_options and pgProcedures_PgSource_options be the same hook?

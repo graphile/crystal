@@ -386,7 +386,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,
-          graphql: { GraphQLList, GraphQLObjectType },
+          graphql: { GraphQLList, GraphQLObjectType, GraphQLNonNull },
           options: { simpleCollections },
         } = build;
         const {
@@ -678,7 +678,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       {
                         description: `Reads and enables pagination through a set of \`${typeName}\`.`,
                         // TODO: handle nullability
-                        type: ConnectionType as GraphQLObjectType,
+                        type: new GraphQLNonNull(
+                          ConnectionType as GraphQLObjectType,
+                        ),
                         plan: connectionPlan,
                       },
                     ),

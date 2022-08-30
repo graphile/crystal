@@ -389,7 +389,7 @@ export class PgSource<
    */
   public readonly isList: boolean;
 
-  public readonly extensions: Partial<PgSourceExtensions> | undefined;
+  public extensions: Partial<PgSourceExtensions> | undefined;
 
   static fromCodec<TColumns extends PgTypeColumns>(
     executor: PgExecutor,
