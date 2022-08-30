@@ -84,8 +84,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             const tableFieldName = inflection.tableFieldName(source);
             build.registerInputObjectType(
               inputTypeName,
-              {},
+              { isMutationInput: true },
               () => ({
+                description: `All input for the create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableInput = build.getGraphQLTypeByPgCodec(
                     source.codec,
@@ -148,6 +149,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
               },
               ExecutableStep as any,
               () => ({
+                description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableType = build.getGraphQLTypeByPgCodec(
                     source.codec,
@@ -182,6 +184,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                               fieldBehaviorScope: `insert:payload:record`,
                             },
                             {
+                              description: `The \`${tableTypeName}\` that was created by this mutation.`,
                               type: TableType,
                               plan: EXPORTABLE(
                                 () =>
