@@ -394,7 +394,20 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const { tags, description } = pgProc.getTagsAndDescription();
 
-          const extensions: PgSourceExtensions = { tags, description };
+          const behavior = Array.isArray(tags.behavior)
+            ? [...(tags.behavior as string[])]
+            : typeof tags.behavior === "string"
+            ? [tags.behavior]
+            : [];
+          behavior.push("-filter -order");
+
+          const extensions: PgSourceExtensions = {
+            tags: {
+              ...tags,
+              behavior,
+            },
+            description,
+          };
 
           if (outOrInoutOrTableArgModes.length === 1) {
             const outOrInoutArg = (() => {
