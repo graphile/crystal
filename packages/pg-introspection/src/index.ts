@@ -48,8 +48,9 @@ export {
 
 export function parseIntrospectionResults(
   introspectionResults: string,
+  includeExtensionResources = false,
 ): Introspection {
-  return augmentIntrospection(JSON.parse(introspectionResults));
+  return augmentIntrospection(introspectionResults, includeExtensionResources);
 }
 
 export { PgSmartTagsAndDescription, PgSmartTagsDict };
