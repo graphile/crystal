@@ -74,6 +74,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
+        if (pgTypeSource?.parameters && !pgTypeSource.isUnique) {
+          return fields;
+        }
+
         const behavior = getBehavior(pgCodec.extensions);
         const defaultBehavior =
           simpleCollections === "both"

@@ -3169,12 +3169,6 @@ type Issue756SetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-
-  """An edge for our `Issue756`. May be used by Relay 1."""
-  issue756Edge(
-    """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): Issue756SEdge
   issue756S: [Issue756]
 
   """
@@ -5114,12 +5108,6 @@ type MutationOutTableSetofPayload {
   """
   clientMutationId: String
   people: [Person]
-
-  """An edge for our `Person`. May be used by Relay 1."""
-  personEdge(
-    """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

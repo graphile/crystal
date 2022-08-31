@@ -416,6 +416,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (!source) {
           return fields;
         }
+        if (pgTypeSource?.parameters && !pgTypeSource.isUnique) {
+          return fields;
+        }
         const relations: {
           [identifier: string]: PgSourceRelation<any, any>;
         } = source.getRelations();
