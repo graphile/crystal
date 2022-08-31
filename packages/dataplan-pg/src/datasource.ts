@@ -120,6 +120,10 @@ export interface PgSourceRelation<
  */
 export interface PgSourceExtensions {}
 
+export interface PgSourceParameterExtensions {
+  variant?: string;
+}
+
 /**
  * If this is a functional (rather than static) source, this describes one of
  * the parameters it accepts.
@@ -143,6 +147,7 @@ export interface PgSourceParameter {
    * null.
    */
   notNull?: boolean;
+  extensions?: PgSourceParameterExtensions;
 }
 
 /**

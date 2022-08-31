@@ -324,12 +324,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const isStrict = pgProc.proisstrict ?? false;
           const isStrictish =
             isStrict || info.options.pgStrictFunctions === true;
+          const { tags, description } = pgProc.getTagsAndDescription();
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
             // TODO: smart tag should allow changing the modifier
-            const typeModifier = undefined;
+            const tag = tags[`arg${i}variant`];
+            const variant = typeof tag === "string" ? tag : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
             // v for VARIADIC arguments, t for TABLE arguments
@@ -350,7 +352,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               const argCodec = await info.helpers.pgCodecs.getCodecFromType(
                 databaseName,
                 argType,
-                typeModifier,
+                undefined,
               );
               if (!argCodec) {
                 console.warn(
@@ -378,6 +380,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 required,
                 notNull,
                 codec: argCodec,
+                extensions: {
+                  variant,
+                },
               });
             }
           }
@@ -395,8 +400,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 )}(${sqlFromArgDigests(args)})`,
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
-
-          const { tags, description } = pgProc.getTagsAndDescription();
 
           const behavior = Array.isArray(tags.behavior)
             ? [...(tags.behavior as string[])]

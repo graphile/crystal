@@ -87,7 +87,7 @@ declare global {
         getCodecFromType(
           databaseName: string,
           pgTypeId: string,
-          pgTypeModifier?: number | null,
+          pgTypeModifier?: string | number | null,
         ): Promise<PgTypeCodec<any, any, any, any> | null>;
       };
     }

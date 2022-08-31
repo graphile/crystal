@@ -143,6 +143,7 @@ declare global {
       ): string;
 
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
+      baseInputType(this: GraphileBuild.Inflection, typeName: string): string;
     }
 
     interface ScopeObject {
@@ -308,6 +309,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
       patchType(options, typeName) {
         return this.upperCamelCase(`${typeName}-patch`);
+      },
+      baseInputType(options, typeName) {
+        return this.upperCamelCase(`${typeName}-base-input`);
       },
     },
   },
@@ -656,6 +660,31 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 `PgTablesPlugin patch table type for ${codec.name}`,
               );
               setGraphQLTypeForPgCodec(codec, ["patch"], patchTypeName);
+            }
+
+            if (!codec.isAnonymous) {
+              const baseTypeName = inflection.baseInputType(tableTypeName);
+              build.registerInputObjectType(
+                baseTypeName,
+                {
+                  pgCodec: codec,
+                  isPgBaseInput: true,
+                  isPgRowType: selectable,
+                  isPgCompoundType: !selectable,
+                },
+                () => ({
+                  description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
+                  extensions: {
+                    graphile: {
+                      inputPlan() {
+                        return object({});
+                      },
+                    },
+                  },
+                }),
+                `PgTablesPlugin base table type for ${codec.name}`,
+              );
+              setGraphQLTypeForPgCodec(codec, ["base"], baseTypeName);
             }
 
             if (
