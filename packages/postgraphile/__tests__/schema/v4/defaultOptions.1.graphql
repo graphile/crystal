@@ -2669,7 +2669,6 @@ enum ForeignKeysOrderBy {
   PERSON_ID_DESC
 }
 
-"""The return type of our `funcOutComplex` query."""
 type FuncOutComplexRecord {
   x: Int
   y: CompoundType
@@ -2704,20 +2703,17 @@ type FuncOutComplexSetofEdge {
   node: FuncOutComplexSetofRecord
 }
 
-"""The return type of our `funcOutComplexSetof` query."""
 type FuncOutComplexSetofRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `funcOutOutCompoundType` query."""
 type FuncOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
 }
 
-"""The return type of our `funcOutOut` query."""
 type FuncOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -2751,13 +2747,11 @@ type FuncOutOutSetofEdge {
   node: FuncOutOutSetofRecord
 }
 
-"""The return type of our `funcOutOutSetof` query."""
 type FuncOutOutSetofRecord {
   o1: Int
   o2: String
 }
 
-"""The return type of our `funcOutOutUnnamed` query."""
 type FuncOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -2789,7 +2783,6 @@ type FuncOutSetofEdge {
   node: Int
 }
 
-"""The return type of our `funcOutUnnamedOutOutUnnamed` query."""
 type FuncOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -2824,7 +2817,6 @@ type FuncReturnsTableMultiColEdge {
   node: FuncReturnsTableMultiColRecord
 }
 
-"""The return type of our `funcReturnsTableMultiCol` query."""
 type FuncReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -4871,7 +4863,6 @@ type MutationOutComplexPayload {
   result: MutationOutComplexRecord
 }
 
-"""The return type of our `mutationOutComplex` mutation."""
 type MutationOutComplexRecord {
   x: Int
   y: CompoundType
@@ -4905,7 +4896,6 @@ type MutationOutComplexSetofPayload {
   results: [MutationOutComplexSetofRecord]
 }
 
-"""The return type of our `mutationOutComplexSetof` mutation."""
 type MutationOutComplexSetofRecord {
   x: Int
   y: CompoundType
@@ -4946,7 +4936,6 @@ type MutationOutOutCompoundTypePayload {
   result: MutationOutOutCompoundTypeRecord
 }
 
-"""The return type of our `mutationOutOutCompoundType` mutation."""
 type MutationOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
@@ -4976,7 +4965,6 @@ type MutationOutOutPayload {
   result: MutationOutOutRecord
 }
 
-"""The return type of our `mutationOutOut` mutation."""
 type MutationOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -5006,7 +4994,6 @@ type MutationOutOutSetofPayload {
   results: [MutationOutOutSetofRecord]
 }
 
-"""The return type of our `mutationOutOutSetof` mutation."""
 type MutationOutOutSetofRecord {
   o1: Int
   o2: String
@@ -5036,7 +5023,6 @@ type MutationOutOutUnnamedPayload {
   result: MutationOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutOutUnnamed` mutation."""
 type MutationOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -5168,7 +5154,6 @@ type MutationOutUnnamedOutOutUnnamedPayload {
   result: MutationOutUnnamedOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutUnnamedOutOutUnnamed` mutation."""
 type MutationOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -5215,7 +5200,6 @@ type MutationReturnsTableMultiColPayload {
   results: [MutationReturnsTableMultiColRecord]
 }
 
-"""The return type of our `mutationReturnsTableMultiCol` mutation."""
 type MutationReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -5934,26 +5918,22 @@ type Person implements Node {
   userMac: String
 }
 
-"""The return type of our `computedComplex` query."""
 type PersonComputedComplexRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `computedFirstArgInoutOut` query."""
 type PersonComputedFirstArgInoutOutRecord {
   o: Int
   person: Person
 }
 
-"""The return type of our `computedInoutOut` query."""
 type PersonComputedInoutOutRecord {
   ino: String
   o: String
 }
 
-"""The return type of our `computedOutOut` query."""
 type PersonComputedOutOutRecord {
   o1: String
   o2: String

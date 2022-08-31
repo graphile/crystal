@@ -280,9 +280,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
                   {
-                    description: `The return type of our \`${info.inflection.camelCase(
-                      name,
-                    )}\` ${pgProc.provolatile === "v" ? "mutation" : "query"}.`,
+                    description: undefined,
+                    // TODO: we should figure out what field this is going to use, and reference that
+                    /* `The return type of our \`${name}\` ${
+                      pgProc.provolatile === "v" ? "mutation" : "query"
+                    }.`, */
                   },
                   true,
                 ),
