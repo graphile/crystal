@@ -1,8 +1,10 @@
 import "graphile-config";
 import "graphile-build-pg";
-import { PgSource, PgSourceParameter, PgTypeCodec } from "@dataplan/pg";
+
+import type { PgSource, PgSourceParameter } from "@dataplan/pg";
+import { PgTypeCodec } from "@dataplan/pg";
+import type { PgProc } from "pg-introspection";
 import { inspect } from "util";
-import { PgProc } from "pg-introspection";
 
 declare global {
   namespace GraphileConfig {
@@ -20,12 +22,12 @@ const v4ComputedColumnChecks = (
   const firstArg = args[0];
 
   // Has to be in same schema
-  if (args[0].type.typnamespace !== pgProc.pronamespace) {
+  if (firstArg.type.typnamespace !== pgProc.pronamespace) {
     return false;
   }
 
   // Has to start with the name prefix
-  if (!pgProc.proname.startsWith(args[0].name + "_")) {
+  if (!pgProc.proname.startsWith(firstArg.type.typname + "_")) {
     return false;
   }
 
