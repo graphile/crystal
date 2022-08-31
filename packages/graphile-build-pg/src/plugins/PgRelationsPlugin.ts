@@ -412,11 +412,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         // TODO: change the default so that we don't do this on
         // isMutationPayload; only do that for V4 compat. (It's redundant vs
         // just using the object type directly)
-        const source = build.input.pgSources.find((s) => s.codec === codec);
+        const source =
+          pgTypeSource ?? build.input.pgSources.find((s) => s.codec === codec);
         if (!source) {
           return fields;
         }
-        if (pgTypeSource?.parameters && !pgTypeSource.isUnique) {
+        if (source.parameters && !source.isUnique) {
           return fields;
         }
         const relations: {
