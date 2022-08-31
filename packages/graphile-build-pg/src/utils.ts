@@ -1,12 +1,12 @@
 import { GraphQLNonNull, GraphQLType } from "graphql";
 
 export function tagToString(
-  str: undefined | string | string[],
+  str: undefined | null | boolean | string | (string | boolean)[],
 ): string | undefined {
-  if (!str || str.length === 0) {
+  if (!str || (Array.isArray(str) && str.length === 0)) {
     return undefined;
   }
-  return Array.isArray(str) ? str.join("\n") : str;
+  return Array.isArray(str) ? str.join("\n") : str === true ? " " : str;
 }
 
 export function nullableIf<T extends GraphQLType>(

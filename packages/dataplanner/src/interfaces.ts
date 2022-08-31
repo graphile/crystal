@@ -633,6 +633,8 @@ export type NodeIdHandler<
    * original node.
    */
   get(spec: TSpec): TNodeStep;
+
+  deprecationReason?: string;
 };
 
 export type BaseEventMap = Record<string, any>;

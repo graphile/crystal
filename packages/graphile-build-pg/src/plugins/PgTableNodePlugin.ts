@@ -13,6 +13,7 @@ import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -83,8 +84,14 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             isSafeIdentifier(identifier) &&
             pk.every((columnName) => isSafeIdentifier(columnName));
 
+          const firstSource = sources.find((s) => !s.parameters);
+
           build.registerNodeIdHandler(tableTypeName, {
             codecName: "base64JSON",
+            deprecationReason: tagToString(
+              codec.extensions?.tags?.deprecation ??
+                firstSource?.extensions?.tags?.deprecated,
+            ),
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(

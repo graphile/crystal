@@ -86,6 +86,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 },
                 type: build.getOutputTypeByName(typeName),
                 description: `Reads a single \`${typeName}\` using its globally unique \`ID\`.`,
+                deprecationReason: handler.deprecationReason,
                 plan: EXPORTABLE(
                   (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
                     function plan(
