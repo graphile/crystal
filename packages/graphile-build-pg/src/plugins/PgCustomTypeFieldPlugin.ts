@@ -933,7 +933,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               ),
                               type: nullableIf(
                                 GraphQLNonNull,
-                                false, //!source.extensions?.tags?.notNull,
+                                source.extensions?.tags?.notNull !== true,
                                 ConnectionType,
                               ),
                               args,
