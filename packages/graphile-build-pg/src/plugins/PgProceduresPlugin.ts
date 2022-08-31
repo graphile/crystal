@@ -518,8 +518,22 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       sourceByPgProcByDatabase: new Map(),
     }),
     hooks: {
-      async pgIntrospection_proc({ helpers }, event) {
+      async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
         const { entity: pgProc, databaseName } = event;
+
+        const database = resolvedPreset.pgSources?.find(
+          (db) => db.name === databaseName,
+        );
+        if (!database) {
+          throw new Error(`Could not find '${databaseName}' in 'pgSources'`);
+        }
+        const schemas = database.schemas ?? ["public"];
+
+        // Only process procedures from one of the published namespaces
+        const namespace = pgProc.getNamespace();
+        if (!namespace || !schemas.includes(namespace.nspname)) {
+          return null;
+        }
 
         // Do not select procedures that create range types. These are utility
         // functions that really don’t need to be exposed in an API.
@@ -538,6 +552,25 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
         // Do not expose trigger functions (type trigger has oid 2279)
         if (pgProc.prorettype === "2279") {
+          return;
+        }
+
+        // We don't want functions that will clash with GraphQL (treat them as private)
+        if (pgProc.proname.startsWith("__")) {
+          return;
+        }
+
+        // We also don’t want procedures that have been defined in our namespace
+        // twice. This leads to duplicate fields in the API which throws an
+        // error. In the future we may support this case. For now though, it is
+        // too complex.
+        const overload = introspection.procs.find(
+          (p) =>
+            p.pronamespace === pgProc.pronamespace &&
+            p.proname === pgProc.proname &&
+            p._id !== pgProc._id,
+        );
+        if (overload) {
           return;
         }
 
