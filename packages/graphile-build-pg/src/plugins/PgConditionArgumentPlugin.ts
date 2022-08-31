@@ -204,7 +204,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           !build.behavior.matches(
             behavior,
             fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-            "filter",
+            pgSource.parameters ? "" : "filter",
           )
         ) {
           return args;
