@@ -20,18 +20,7 @@ import type { GraphQLNonNull, GraphQLOutputType, GraphQLType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-
-function nullableIf<T extends GraphQLType>(
-  GraphQLNonNull: { new <T extends GraphQLType>(t: T): GraphQLNonNull<T> },
-  condition: boolean,
-  type: T,
-): T | GraphQLNonNull<T> {
-  if (condition) {
-    return type;
-  } else {
-    return new GraphQLNonNull(type);
-  }
-}
+import { nullableIf } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {

@@ -45,7 +45,7 @@ import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { tagToString } from "../utils.js";
+import { tagToString, nullableIf } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -411,6 +411,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               {
                 isMutationPayload: true,
                 pgCodec: source.codec,
+                pgTypeSource: source,
               },
               ObjectStep,
               () => ({
@@ -810,7 +811,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     deprecationReason: tagToString(
                       source.extensions?.tags?.deprecated,
                     ),
-                    type: payloadType,
+                    type: nullableIf(
+                      GraphQLNonNull,
+                      !source.extensions?.tags?.notNull,
+                      payloadType,
+                    ),
                     args: {
                       input: {
                         type: new GraphQLNonNull(inputType),
@@ -850,7 +855,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     deprecationReason: tagToString(
                       source.extensions?.tags?.deprecated,
                     ),
-                    type: type!,
+                    type: nullableIf(
+                      GraphQLNonNull,
+                      !source.extensions?.tags?.notNull,
+                      type!,
+                    ),
                     args,
                     plan: getSelectPlanFromParentAndArgs as any,
                   },
@@ -924,7 +933,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               deprecationReason: tagToString(
                                 source.extensions?.tags?.deprecated,
                               ),
-                              type: ConnectionType,
+                              type: nullableIf(
+                                GraphQLNonNull,
+                                !source.extensions?.tags?.notNull,
+                                ConnectionType,
+                              ),
                               args,
                               plan: EXPORTABLE(
                                 (connection, getSelectPlanFromParentAndArgs) =>
@@ -988,7 +1001,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               source.extensions?.tags?.deprecated,
                             ),
                             // TODO: nullability
-                            type: new GraphQLList(type!),
+                            type: nullableIf(
+                              GraphQLNonNull,
+                              !source.extensions?.tags?.notNull,
+                              new GraphQLList(type!),
+                            ),
                             args,
                             plan: getSelectPlanFromParentAndArgs as any,
                           },
