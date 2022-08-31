@@ -9,6 +9,7 @@ import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -143,6 +144,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                       description: `Reads and enables pagination through a set of \`${build.inflection.tableType(
                         source.codec,
                       )}\`.`,
+                      deprecationReason: tagToString(
+                        source.extensions?.tags?.deprecated,
+                      ),
                       plan: EXPORTABLE(
                         (connection, source) =>
                           function plan() {
