@@ -6108,11 +6108,13 @@ enum PersonSecretsOrderBy {
   SECRET_DESC
 }
 
+"""A cartesian point."""
 type Point {
   x: Float!
   y: Float!
 }
 
+"""A cartesian point."""
 input PointInput {
   x: Float!
   y: Float!
@@ -6124,6 +6126,8 @@ type Post implements Node {
   comptypes: [Comptype]
   computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   computedIntervalArray: [Interval]
+
+  """Reads and enables pagination through a set of `Interval`."""
   computedIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6232,6 +6236,9 @@ type PostComputedIntervalSetConnection {
 
   """A list of `Interval` objects."""
   nodes: [Interval]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Interval` you could get from the connection."""
   totalCount: Int!
@@ -6384,12 +6391,8 @@ enum PostsOrderBy {
   AUTHOR_ID_DESC
   BODY_ASC
   BODY_DESC
-  COMPTYPES_ASC
-  COMPTYPES_DESC
   COMPUTED_WITH_OPTIONAL_ARG_ASC
   COMPUTED_WITH_OPTIONAL_ARG_DESC
-  ENUMS_ASC
-  ENUMS_DESC
   HEADLINE_ASC
   HEADLINE_DESC
   ID_ASC
@@ -7137,6 +7140,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): CompoundKey
+
+  """Get a single `CompoundKey`."""
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
@@ -7170,11 +7175,17 @@ type Query implements Node {
     """
     nodeId: ID!
   ): DefaultValue
+
+  """Get a single `DefaultValue`."""
   defaultValueById(id: Int!): DefaultValue
   funcInInout(i: Int, ino: Int): Int
   funcInOut(i: Int): Int
   funcOut: Int
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+
+  """
+  Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
+  """
   funcOutComplexSetof(
     a: Int
 
@@ -7199,6 +7210,8 @@ type Query implements Node {
   ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+
+  """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
   funcOutOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7219,6 +7232,8 @@ type Query implements Node {
     offset: Int
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7262,6 +7277,10 @@ type Query implements Node {
   ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+
+  """
+  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
+  """
   funcReturnsTableMultiCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7308,7 +7327,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Input`."""
     nodeId: ID!
   ): Input
+
+  """Get a single `Input`."""
   inputById(id: Int!): Input
+
+  """Reads and enables pagination through a set of `Int4`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7330,13 +7353,15 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection
+  ): IntSetQueryConnection!
 
   """Reads a single `Issue756` using its globally unique `ID`."""
   issue756(
     """The globally unique `ID` to be used in selecting a single `Issue756`."""
     nodeId: ID!
   ): Issue756
+
+  """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
@@ -7346,7 +7371,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `LeftArm`."""
     nodeId: ID!
   ): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmByPersonId(personId: Int!): LeftArm
 
   """Reads a single `MyTable` using its globally unique `ID`."""
@@ -7354,8 +7383,12 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `MyTable`."""
     nodeId: ID!
   ): MyTable
+
+  """Get a single `MyTable`."""
   myTableById(id: Int!): MyTable
   noArgsQuery: Int
+
+  """Get a single `NoPrimaryKey`."""
   noPrimaryKeyById(id: Int!): NoPrimaryKey
 
   """Fetches an object given its globally unique `ID`."""
@@ -7376,6 +7409,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): NullTestRecord
+
+  """Get a single `NullTestRecord`."""
   nullTestRecordById(id: Int!): NullTestRecord
   optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
   optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
@@ -7388,6 +7423,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Patch`."""
     nodeId: ID!
   ): Patch
+
+  """Get a single `Patch`."""
   patchById(id: Int!): Patch
 
   """Reads a single `Person` using its globally unique `ID`."""
@@ -7395,7 +7432,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Person`."""
     nodeId: ID!
   ): Person
+
+  """Get a single `Person`."""
   personByEmail(email: Email!): Person
+
+  """Get a single `Person`."""
   personById(id: Int!): Person
 
   """Reads a single `PersonSecret` using its globally unique `ID`."""
@@ -7412,6 +7453,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Post`."""
     nodeId: ID!
   ): Post
+
+  """Get a single `Post`."""
   postById(id: Int!): Post
 
   """
@@ -7421,6 +7464,8 @@ type Query implements Node {
   query: Query!
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [Interval]
+
+  """Reads and enables pagination through a set of `Interval`."""
   queryIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7448,6 +7493,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Reserved`."""
     nodeId: ID!
   ): Reserved
+
+  """Get a single `Reserved`."""
   reservedById(id: Int!): Reserved
 
   """Reads a single `ReservedInputRecord` using its globally unique `ID`."""
@@ -7457,6 +7504,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): ReservedInputRecord
+
+  """Get a single `ReservedInputRecord`."""
   reservedInputRecordById(id: Int!): ReservedInputRecord
 
   """Reads a single `ReservedPatchRecord` using its globally unique `ID`."""
@@ -7483,6 +7532,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): SimilarTable1
+
+  """Get a single `SimilarTable1`."""
   similarTable1ById(id: Int!): SimilarTable1
 
   """Reads a single `SimilarTable2` using its globally unique `ID`."""
@@ -7492,7 +7543,11 @@ type Query implements Node {
     """
     nodeId: ID!
   ): SimilarTable2
+
+  """Get a single `SimilarTable2`."""
   similarTable2ById(id: Int!): SimilarTable2
+
+  """Reads and enables pagination through a set of `Int8`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7569,6 +7624,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Type`."""
     nodeId: ID!
   ): Type
+
+  """Get a single `Type`."""
   typeById(id: Int!): Type
   typeFunction(id: Int): Type
 
@@ -7594,6 +7651,8 @@ type Query implements Node {
   ): TypesConnection
   typeFunctionList: [Type]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+
+  """Get a single `UniqueForeignKey`."""
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
 
   """Reads a single `ViewTable` using its globally unique `ID`."""
@@ -7601,6 +7660,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `ViewTable`."""
     nodeId: ID!
   ): ViewTable
+
+  """Get a single `ViewTable`."""
   viewTableById(id: Int!): ViewTable
 }
 
@@ -7613,6 +7674,9 @@ type QueryIntervalSetConnection {
 
   """A list of `Interval` objects."""
   nodes: [Interval]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Interval` you could get from the connection."""
   totalCount: Int!
@@ -7627,7 +7691,6 @@ type QueryIntervalSetEdge {
   node: Interval
 }
 
-"""The return type of our `queryOutputTwoRows` query."""
 type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
@@ -7886,7 +7949,6 @@ type ReturnVoidMutationPayload {
   query: Query
 }
 
-"""The return type of our `searchTestSummaries` query."""
 type SearchTestSummariesRecord {
   id: Int
   totalDuration: Interval
@@ -8080,6 +8142,9 @@ type StaticBigIntegerConnection {
   """A list of `BigInt` objects."""
   nodes: [BigInt]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """The count of *all* `BigInt` you could get from the connection."""
   totalCount: Int!
 }
@@ -8144,6 +8209,12 @@ type TableSetMutationPayload {
   """
   clientMutationId: String
   people: [Person]
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8665,8 +8736,6 @@ type TypesMutationPayload {
 
 """Methods to use when ordering `Type`."""
 enum TypesOrderBy {
-  AN_INT_RANGE_ASC
-  AN_INT_RANGE_DESC
   BIGINT_ASC
   BIGINT_DESC
   BOOLEAN_ASC
@@ -8675,8 +8744,6 @@ enum TypesOrderBy {
   CIDR_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
-  DATERANGE_ASC
-  DATERANGE_DESC
   DATE_ASC
   DATE_DESC
   DECIMAL_ASC
@@ -8685,18 +8752,12 @@ enum TypesOrderBy {
   DOMAIN2_DESC
   DOMAIN_ASC
   DOMAIN_DESC
-  ENUM_ARRAY_ASC
-  ENUM_ARRAY_DESC
   ENUM_ASC
   ENUM_DESC
   ID_ASC
   ID_DESC
   INET_ASC
   INET_DESC
-  INT8_ARRAY_DOMAIN_ASC
-  INT8_ARRAY_DOMAIN_DESC
-  INTERVAL_ARRAY_ASC
-  INTERVAL_ARRAY_DESC
   INTERVAL_ASC
   INTERVAL_DESC
   JSONB_ASC
@@ -8716,12 +8777,8 @@ enum TypesOrderBy {
   NULLABLE_NESTED_COMPOUND_TYPE_DESC
   NULLABLE_POINT_ASC
   NULLABLE_POINT_DESC
-  NULLABLE_RANGE_ASC
-  NULLABLE_RANGE_DESC
   NUMERIC_ASC
   NUMERIC_DESC
-  NUMRANGE_ASC
-  NUMRANGE_DESC
   POINT_ASC
   POINT_DESC
   PRIMARY_KEY_ASC
@@ -8744,10 +8801,6 @@ enum TypesOrderBy {
   REGTYPE_DESC
   SMALLINT_ASC
   SMALLINT_DESC
-  TEXT_ARRAY_ASC
-  TEXT_ARRAY_DESC
-  TEXT_ARRAY_DOMAIN_ASC
-  TEXT_ARRAY_DOMAIN_DESC
   TIMESTAMPTZ_ASC
   TIMESTAMPTZ_DESC
   TIMESTAMP_ASC
