@@ -1145,6 +1145,36 @@ export interface PgIndex {
 }
 
 /**
+ * The catalog pg_inherits records information about table and index inheritance hierarchies. There is one entry for
+ * each direct parent-child table or index relationship in the database. (Indirect inheritance can be determined by
+ * following chains of entries.)
+ */
+export interface PgInherits {
+  /* COMMON FIELDS */
+
+  /** The OID of the child table or index */
+  inhrelid: PgOid;
+
+  /** The OID of the parent table or index */
+  inhparent: PgOid;
+
+  /**
+   * If there is more than one direct parent for a child table (multiple inheritance), this number tells the order in
+   * which the inherited columns are to be arranged. The count starts at 1.
+   */
+  inhseqno: number | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * true for a partition that is in the process of being detached; false otherwise.
+   *
+   * @remarks Only in 14.x
+   */
+  inhdetachpending?: boolean | null | undefined;
+}
+
+/**
  * The catalog pg_language registers languages in which you can write functions or stored procedures. See
  * [sql-createlanguage] and [xplang] for more information about language handlers.
  */
@@ -1296,6 +1326,7 @@ export interface Introspection {
   enums: Array<PgEnum>;
   extensions: Array<PgExtension>;
   indexes: Array<PgIndex>;
+  inherits: Array<PgInherits>;
   languages: Array<PgLanguage>;
   ranges: Array<PgRange>;
   depends: Array<PgDepend>;
@@ -1335,6 +1366,7 @@ export type PgEntity =
   | PgEnum
   | PgExtension
   | PgIndex
+  | PgInherits
   | PgLanguage
   | PgRange
   | PgDepend
@@ -1419,6 +1451,12 @@ with
     where indrelid in (select classes._id from classes)
   ),
 
+  inherits as (
+    select *
+    from pg_catalog.pg_inherits
+    where inhrelid in (select classes._id from classes)
+  ),
+
   languages as (
     select pg_language.oid as _id, *
     from pg_catalog.pg_language
@@ -1495,6 +1533,9 @@ select json_build_object(
 
   'indexes',
   (select coalesce((select json_agg(row_to_json(indexes) order by indrelid, indexrelid) from indexes), '[]'::json)),
+
+  'inherits',
+  (select coalesce((select json_agg(row_to_json(inherits) order by inhrelid, inhseqno) from inherits), '[]'::json)),
 
   'languages',
   (select coalesce((select json_agg(row_to_json(languages) order by lanname) from languages), '[]'::json)),
