@@ -274,7 +274,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, info, name, recordCodecName, recordType, sql) =>
+              (columns, recordCodecName, recordType, sql) =>
                 recordType(
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -288,7 +288,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   },
                   true,
                 ),
-              [columns, info, name, recordCodecName, recordType, sql],
+              [columns, recordCodecName, recordType, sql],
             );
           };
 
@@ -312,7 +312,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const parameters: PgSourceParameter[] = [];
 
-          let processedFirstInputArg = false;
+          // const processedFirstInputArg = false;
 
           // "v" is for "volatile"; but let's just say anything that's not
           // _i_mmutable or _s_table is volatile
@@ -321,11 +321,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const numberOfArguments = allArgTypes.length ?? 0;
           const numberOfArgumentsWithDefaults = pgProc.pronargdefaults ?? 0;
-          const numberOfRequiredArguments =
-            numberOfArguments - numberOfArgumentsWithDefaults;
           const isStrict = pgProc.proisstrict ?? false;
           const isStrictish =
             isStrict || info.options.pgStrictFunctions === true;
+          const numberOfRequiredArguments = isStrictish
+            ? numberOfArguments - numberOfArgumentsWithDefaults
+            : 0;
           const { tags, description } = pgProc.getTagsAndDescription();
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
@@ -367,8 +368,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 );
                 return null;
               }
-              let required = i < numberOfRequiredArguments;
-              let notNull = isStrictish;
+              const required = i < numberOfRequiredArguments;
+              const notNull =
+                isStrict || (isStrictish && i < numberOfRequiredArguments);
+              /*
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
                 if (argCodec.columns && !isMutation) {
@@ -377,6 +380,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   notNull = true;
                 }
               }
+              */
               parameters.push({
                 name: argName,
                 required,
