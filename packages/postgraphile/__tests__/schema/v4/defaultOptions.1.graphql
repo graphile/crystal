@@ -8175,12 +8175,6 @@ type TableSetMutationPayload {
   clientMutationId: String
   people: [Person]
 
-  """An edge for our `Person`. May be used by Relay 1."""
-  personEdge(
-    """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
@@ -8220,7 +8214,7 @@ type TestviewsConnection {
   """
   A list of edges which contains the `Testview` and cursor to aid in pagination.
   """
-  edges: [TestviewsEdge!]!
+  edges: [TestviewsEdge]!
 
   """A list of `Testview` objects."""
   nodes: [Testview]!
@@ -8646,7 +8640,7 @@ type TypesConnection {
   """
   A list of edges which contains the `Type` and cursor to aid in pagination.
   """
-  edges: [TypesEdge!]!
+  edges: [TypesEdge]!
 
   """A list of `Type` objects."""
   nodes: [Type]!
