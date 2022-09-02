@@ -8787,34 +8787,6 @@ type UniqueForeignKey {
   compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
 }
 
-"""A connection to a list of `UniqueForeignKey` values."""
-type UniqueForeignKeysConnection {
-  """
-  A list of edges which contains the `UniqueForeignKey` and cursor to aid in pagination.
-  """
-  edges: [UniqueForeignKeysEdge!]!
-
-  """A list of `UniqueForeignKey` objects."""
-  nodes: [UniqueForeignKey]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `UniqueForeignKey` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `UniqueForeignKey` edge in the connection."""
-type UniqueForeignKeysEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `UniqueForeignKey` at the end of the edge."""
-  node: UniqueForeignKey
-}
-
 """YOYOYO!!"""
 type UpdatableView {
   """This is constantly 2"""
@@ -8856,7 +8828,7 @@ type UpdatableViewsConnection {
   """
   A list of edges which contains the `UpdatableView` and cursor to aid in pagination.
   """
-  edges: [UpdatableViewsEdge!]!
+  edges: [UpdatableViewsEdge]!
 
   """A list of `UpdatableView` objects."""
   nodes: [UpdatableView]!
@@ -10055,7 +10027,7 @@ type ViewTablesConnection {
   """
   A list of edges which contains the `ViewTable` and cursor to aid in pagination.
   """
-  edges: [ViewTablesEdge!]!
+  edges: [ViewTablesEdge]!
 
   """A list of `ViewTable` objects."""
   nodes: [ViewTable]!
