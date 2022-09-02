@@ -989,6 +989,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           {
                             fieldName,
                             fieldBehaviorScope: listFieldBehaviorScope,
+                            isPgFieldSimpleCollection: source.isList
+                              ? false // No pagination if it returns an array - just return it.
+                              : true,
+                            pgSource: source,
                           },
                           {
                             description: source.description,
