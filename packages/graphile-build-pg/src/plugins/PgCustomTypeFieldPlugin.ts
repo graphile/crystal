@@ -216,7 +216,8 @@ function defaultProcSourceBehavior(
   }
 
   if (s.parameters && !s.isUnique) {
-    const canUseConnection = !s.sqlPartitionByIndex && !s.isList;
+    const canUseConnection =
+      !s.sqlPartitionByIndex && !s.isList && !s.codec.arrayOfCodec;
     const defaultBehavior = canUseConnection
       ? simpleCollections === "both"
         ? "connection list"
@@ -472,7 +473,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           // Add connection type for functions that need it
           const functionSourcesRequiringConnections =
             build.input.pgSources.filter(
-              (s) => s.parameters && shouldUseCustomConnection(s),
+              (s) =>
+                s.parameters &&
+                !s.isMutation &&
+                !s.codec.arrayOfCodec &&
+                shouldUseCustomConnection(s),
             );
 
           for (const pgSource of functionSourcesRequiringConnections) {
