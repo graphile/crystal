@@ -7635,7 +7635,7 @@ type QueryIntervalSetConnection {
   """
   A list of edges which contains the `Interval` and cursor to aid in pagination.
   """
-  edges: [QueryIntervalSetEdge!]!
+  edges: [QueryIntervalSetEdge]!
 
   """A list of `Interval` objects."""
   nodes: [Interval]!
@@ -7747,7 +7747,7 @@ type ReservedInputRecordsConnection {
   """
   A list of edges which contains the `ReservedInputRecord` and cursor to aid in pagination.
   """
-  edges: [ReservedInputRecordsEdge!]!
+  edges: [ReservedInputRecordsEdge]!
 
   """A list of `ReservedInputRecord` objects."""
   nodes: [ReservedInputRecord]!
@@ -7824,7 +7824,7 @@ type ReservedPatchRecordsConnection {
   """
   A list of edges which contains the `ReservedPatchRecord` and cursor to aid in pagination.
   """
-  edges: [ReservedPatchRecordsEdge!]!
+  edges: [ReservedPatchRecordsEdge]!
 
   """A list of `ReservedPatchRecord` objects."""
   nodes: [ReservedPatchRecord]!
@@ -7861,7 +7861,7 @@ type ReservedsConnection {
   """
   A list of edges which contains the `Reserved` and cursor to aid in pagination.
   """
-  edges: [ReservedsEdge!]!
+  edges: [ReservedsEdge]!
 
   """A list of `Reserved` objects."""
   nodes: [Reserved]!
@@ -7972,7 +7972,7 @@ type SimilarTable1SConnection {
   """
   A list of edges which contains the `SimilarTable1` and cursor to aid in pagination.
   """
-  edges: [SimilarTable1SEdge!]!
+  edges: [SimilarTable1SEdge]!
 
   """A list of `SimilarTable1` objects."""
   nodes: [SimilarTable1]!
@@ -8061,7 +8061,7 @@ type SimilarTable2SConnection {
   """
   A list of edges which contains the `SimilarTable2` and cursor to aid in pagination.
   """
-  edges: [SimilarTable2SEdge!]!
+  edges: [SimilarTable2SEdge]!
 
   """A list of `SimilarTable2` objects."""
   nodes: [SimilarTable2]!
@@ -8102,7 +8102,7 @@ type StaticBigIntegerConnection {
   """
   A list of edges which contains the `BigInt` and cursor to aid in pagination.
   """
-  edges: [StaticBigIntegerEdge!]!
+  edges: [StaticBigIntegerEdge]!
 
   """A list of `BigInt` objects."""
   nodes: [BigInt]!
