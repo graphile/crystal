@@ -9255,12 +9255,6 @@ type UpdateNoPrimaryKeyPayload {
   """The `NoPrimaryKey` that was updated by this mutation."""
   noPrimaryKey: NoPrimaryKey
 
-  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
-  noPrimaryKeyEdge(
-    """The method to use when ordering `NoPrimaryKey`."""
-    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
-  ): NoPrimaryKeysEdge
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
