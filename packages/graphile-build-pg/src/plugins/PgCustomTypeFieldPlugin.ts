@@ -45,6 +45,7 @@ import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -146,7 +147,10 @@ function getArgDetailsFromParameters(
       index,
     });
     const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
-    const baseInputType = getGraphQLTypeByPgCodec(paramBaseCodec, "input");
+    const baseInputType = getGraphQLTypeByPgCodec(
+      paramBaseCodec,
+      param.extensions?.variant ?? "input",
+    );
     if (!baseInputType) {
       throw new Error(
         `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
@@ -338,9 +342,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               source,
             });
 
+            const fieldName = inflection.customMutationField({ source });
             build.registerInputObjectType(
               inputTypeName,
-              {},
+              { isMutationInput: true },
               () => {
                 const argDetails = getArgDetailsFromParameters(
                   build,
@@ -374,6 +379,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 );
 
                 return {
+                  description: `All input for the \`${fieldName}\` mutation.`,
                   fields,
                 };
               },
@@ -405,9 +411,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               {
                 isMutationPayload: true,
                 pgCodec: source.codec,
+                pgTypeSource: source,
               },
               ObjectStep,
               () => ({
+                description: `The output of our \`${fieldName}\` mutation.`,
                 fields: () => {
                   const fields = {
                     clientMutationId: {
@@ -586,16 +594,16 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 remainingParameters,
               );
 
-              // Not used for isMutation; that's handled elsewhere
-              const args = argDetails.reduce(
-                (memo, { inputType, graphqlArgName }) => {
+              // Not used for isMutation; that's handled elsewhere.
+              // This is a factory because we don't want mutations to one set
+              // of args to affect the others!
+              const makeFieldArgs = () =>
+                argDetails.reduce((memo, { inputType, graphqlArgName }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
                   };
                   return memo;
-                },
-                {} as GraphileFieldConfigArgumentMap<any, any, any, any>,
-              );
+                }, {} as GraphileFieldConfigArgumentMap<any, any, any, any>);
 
               const argDetailsSimple = argDetails.map(
                 ({ graphqlArgName, pgCodec, required, postgresArgName }) => ({
@@ -799,8 +807,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 memo[fieldName] = fieldWithHooks(
                   { fieldName, fieldBehaviorScope: "mutation_field" },
                   {
-                    description: source.description,
-                    type: payloadType,
+                    description: source.extensions?.description,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
+                    type: build.nullableIf(
+                      !source.extensions?.tags?.notNull,
+                      payloadType,
+                    ),
                     args: {
                       input: {
                         type: new GraphQLNonNull(inputType),
@@ -837,8 +851,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   },
                   {
                     description: source.description,
-                    type: type!,
-                    args,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
+                    type: build.nullableIf(
+                      !source.extensions?.tags?.notNull,
+                      type!,
+                    ),
+                    args: makeFieldArgs(),
                     plan: getSelectPlanFromParentAndArgs as any,
                   },
                 );
@@ -878,6 +898,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     ? source.codec.columns
                       ? inflection.recordFunctionConnectionType({ source })
                       : inflection.scalarFunctionConnectionType({ source })
+                    : source.codec.columns
+                    ? inflection.tableConnectionType(source.codec)
                     : namedType
                     ? inflection.connectionType(namedType.name)
                     : null;
@@ -899,9 +921,19 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               pgSource: source,
                             },
                             {
-                              description: source.description,
-                              type: ConnectionType,
-                              args,
+                              description:
+                                source.description ??
+                                `Reads and enables pagination through a set of \`${inflection.tableType(
+                                  source.codec,
+                                )}\`.`,
+                              deprecationReason: tagToString(
+                                source.extensions?.tags?.deprecated,
+                              ),
+                              type: build.nullableIf(
+                                isRootQuery ?? false,
+                                ConnectionType,
+                              ),
+                              args: makeFieldArgs(),
                               plan: EXPORTABLE(
                                 (connection, getSelectPlanFromParentAndArgs) =>
                                   function plan(
@@ -957,12 +989,22 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           {
                             fieldName,
                             fieldBehaviorScope: listFieldBehaviorScope,
+                            isPgFieldSimpleCollection: source.isList
+                              ? false // No pagination if it returns an array - just return it.
+                              : true,
+                            pgSource: source,
                           },
                           {
                             description: source.description,
+                            deprecationReason: tagToString(
+                              source.extensions?.tags?.deprecated,
+                            ),
                             // TODO: nullability
-                            type: new GraphQLList(type!),
-                            args,
+                            type: build.nullableIf(
+                              !source.extensions?.tags?.notNull,
+                              new GraphQLList(type!),
+                            ),
+                            args: makeFieldArgs(),
                             plan: getSelectPlanFromParentAndArgs as any,
                           },
                         ),

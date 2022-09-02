@@ -23,6 +23,7 @@ import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -739,6 +740,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                           },
                         },
                         type: payloadType,
+                        description: `${
+                          mode === "update" ? "Updates" : "Deletes"
+                        } a single \`${inflection.tableType(source.codec)}\` ${
+                          uniqueMode === "keys"
+                            ? "using a unique key"
+                            : "using its globally unique id"
+                        }${mode === "update" ? " and a patch" : ""}.`,
+                        deprecationReason: tagToString(
+                          source.extensions?.tags?.deprecated,
+                        ),
                         plan:
                           mode === "update"
                             ? specFromArgsString

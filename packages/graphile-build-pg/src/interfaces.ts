@@ -12,6 +12,7 @@ export interface PgSourceTags extends PgSmartTagsDict {
   primaryKey: string;
   foreignKey: string | string[];
   unique: string | string[];
+  deprecated: string | string[];
 }
 
 export interface PgSourceUniqueTags extends PgSmartTagsDict {
@@ -22,6 +23,7 @@ export interface PgSourceUniqueTags extends PgSmartTagsDict {
 
 export interface PgSourceRelationTags extends PgSmartTagsDict {
   behavior: string | string[];
+  deprecated: string | string[];
 }
 
 export interface PgTypeColumnTags extends PgSmartTagsDict {

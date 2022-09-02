@@ -78,10 +78,10 @@ from (
 lateral (
   select
     __func_out_complex__."x"::text as "0",
-    __compound_type__."a"::text as "1",
-    __compound_type__."b" as "2",
-    __compound_type__."c"::text as "3",
-    (not (__compound_type__ is null))::text as "4",
+    __frmcdc_compound_type_1__."a"::text as "1",
+    __frmcdc_compound_type_1__."b" as "2",
+    __frmcdc_compound_type_1__."c"::text as "3",
+    (not (__frmcdc_compound_type_1__ is null))::text as "4",
     __func_out_complex__."y"::text as "5",
     __person__."person_full_name" as "6",
     (select json_agg(_) from (
@@ -101,7 +101,7 @@ lateral (
     __func_out_complex_identifiers__."id0",
     __func_out_complex_identifiers__."id1"
   ) as __func_out_complex__
-  left outer join lateral (select (__func_out_complex__."y").*) as __compound_type__
+  left outer join lateral (select (__func_out_complex__."y").*) as __frmcdc_compound_type_1__
   on TRUE
   left outer join lateral (select (__func_out_complex__."z").*) as __person__
   on TRUE
@@ -119,10 +119,10 @@ lateral (
   select
     (not (__func_out_complex_setof__ is null))::text as "0",
     __func_out_complex_setof__."x"::text as "1",
-    __compound_type__."a"::text as "2",
-    __compound_type__."b" as "3",
-    __compound_type__."c"::text as "4",
-    (not (__compound_type__ is null))::text as "5",
+    __frmcdc_compound_type_1__."a"::text as "2",
+    __frmcdc_compound_type_1__."b" as "3",
+    __frmcdc_compound_type_1__."c"::text as "4",
+    (not (__frmcdc_compound_type_1__ is null))::text as "5",
     __func_out_complex_setof__."y"::text as "6",
     __person__."person_full_name" as "7",
     (select json_agg(_) from (
@@ -141,7 +141,7 @@ lateral (
     __func_out_complex_setof_identifiers__."id0",
     __func_out_complex_setof_identifiers__."id1"
   ) as __func_out_complex_setof__
-  left outer join lateral (select (__func_out_complex_setof__."y").*) as __compound_type__
+  left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type_1__
   on TRUE
   left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
   on TRUE
@@ -175,15 +175,15 @@ from (
 lateral (
   select
     __func_out_out_compound_type__."o1"::text as "0",
-    __compound_type__."a"::text as "1",
-    __compound_type__."b" as "2",
-    __compound_type__."c"::text as "3",
-    (not (__compound_type__ is null))::text as "4",
+    __frmcdc_compound_type_1__."a"::text as "1",
+    __frmcdc_compound_type_1__."b" as "2",
+    __frmcdc_compound_type_1__."c"::text as "3",
+    (not (__frmcdc_compound_type_1__ is null))::text as "4",
     __func_out_out_compound_type__."o2"::text as "5",
     (not (__func_out_out_compound_type__ is null))::text as "6",
     __func_out_out_compound_type_identifiers__.idx as "7"
   from "c"."func_out_out_compound_type"(__func_out_out_compound_type_identifiers__."id0") as __func_out_out_compound_type__
-  left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __compound_type__
+  left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __frmcdc_compound_type_1__
   on TRUE
 ) as __func_out_out_compound_type_result__
 
@@ -287,10 +287,10 @@ lateral (
     __person__."id"::text as "0",
     __person__."person_full_name" as "1",
     __person_computed_complex__."x"::text as "2",
-    __compound_type__."a"::text as "3",
-    __compound_type__."b" as "4",
-    __compound_type__."c"::text as "5",
-    (not (__compound_type__ is null))::text as "6",
+    __frmcdc_compound_type_1__."a"::text as "3",
+    __frmcdc_compound_type_1__."b" as "4",
+    __frmcdc_compound_type_1__."c"::text as "5",
+    (not (__frmcdc_compound_type_1__ is null))::text as "6",
     __person_computed_complex__."y"::text as "7",
     __person_2."person_full_name" as "8",
     (select json_agg(_) from (
@@ -332,7 +332,7 @@ lateral (
     __person_identifiers__."id3"
   ) as __person_computed_complex__
   on TRUE
-  left outer join lateral (select (__person_computed_complex__."y").*) as __compound_type__
+  left outer join lateral (select (__person_computed_complex__."y").*) as __frmcdc_compound_type_1__
   on TRUE
   left outer join lateral (select (__person_computed_complex__."z").*) as __person_2
   on TRUE

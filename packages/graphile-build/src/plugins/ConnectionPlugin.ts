@@ -3,7 +3,6 @@ import "graphile-config";
 import type { EdgeCapableStep, PageInfoCapableStep } from "dataplanner";
 import { ConnectionStep, ExecutableStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
 
@@ -39,8 +38,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const nullableIf = (condition: boolean, Type: GraphQLOutputType) =>
-          condition ? Type : new build.graphql.GraphQLNonNull(Type);
+        const { nullableIf } = build;
         return build.extend(
           build,
           {
@@ -197,7 +195,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                             `A list of edges which contains the \`${typeName}\` and cursor to aid in pagination.`,
                             "field",
                           ),
-                          type: new build.graphql.GraphQLNonNull(
+                          type: nullableIf(
+                            false,
                             new build.graphql.GraphQLList(
                               nullableIf(!nonNullNode, EdgeType),
                             ),

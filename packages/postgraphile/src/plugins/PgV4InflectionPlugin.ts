@@ -56,16 +56,30 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         const plural = !source.isUnique || !!source.codec.arrayOfCodec;
         return plural ? this.pluralize(name) : name;
       },
-      edgeType(previous, options, typeName) {
-        return this.upperCamelCase(`${this.pluralize(typeName)}-edge`);
-      },
-      edgeField(previous, options, typeName) {
-        return this.camelCase(`${typeName}-edge`);
-      },
       deletedNodeId(previous, options, { source }) {
         return this.camelCase(
-          `deleted-${this._singularizedSourceName(source)}-id`,
+          `deleted-${this.singularize(this._sourceName(source))}-id`,
         );
+      },
+      orderByType(previous, options, typeName) {
+        return this.upperCamelCase(`${this.pluralize(typeName)}-order-by`);
+      },
+      tableConnectionType(previous, options, codec) {
+        if (codec.isAnonymous) {
+          return this.connectionType(this.tableType(codec));
+        } else {
+          return this.connectionType(this.pluralize(this.tableType(codec)));
+        }
+      },
+      tableEdgeField(previous, options, codec) {
+        return this.camelCase(`${this.tableType(codec)}-edge`);
+      },
+      tableEdgeType(previous, options, codec) {
+        if (codec.isAnonymous) {
+          return this.edgeType(this.tableType(codec));
+        } else {
+          return this.edgeType(this.pluralize(this.tableType(codec)));
+        }
       },
     },
   },

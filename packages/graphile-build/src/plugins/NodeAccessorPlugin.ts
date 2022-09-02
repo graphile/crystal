@@ -80,10 +80,13 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               [build.inflection.nodeById(typeName)]: {
                 args: {
                   [nodeIdFieldName]: {
+                    description: `The globally unique \`ID\` to be used in selecting a single \`${typeName}\`.`,
                     type: new GraphQLNonNull(GraphQLID),
                   },
                 },
                 type: build.getOutputTypeByName(typeName),
+                description: `Reads a single \`${typeName}\` using its globally unique \`ID\`.`,
+                deprecationReason: handler.deprecationReason,
                 plan: EXPORTABLE(
                   (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
                     function plan(

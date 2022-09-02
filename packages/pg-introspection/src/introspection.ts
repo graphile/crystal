@@ -268,21 +268,25 @@ export interface PgClass {
    *
    * @remarks Only in 14.x, 13.x, 12.x, 11.x
    */
-  relrewrite: PgOid | null | undefined;
+  relrewrite?: PgOid | null | undefined;
 
   /**
    * True if we generate an OID for each row of the relation
    *
    * @remarks Only in 11.x, 10.x
    */
-  relhasoids: boolean | null | undefined;
+  relhasoids?: boolean | null | undefined;
 
   /**
    * True if the table has (or once had) a primary key
    *
    * @remarks Only in 10.x
    */
-  relhaspkey: boolean | null | undefined;
+  relhaspkey?: boolean | null | undefined;
+
+  /* EXTRA FIELDS */
+
+  updatable_mask?: number | null;
 }
 
 /**
@@ -402,7 +406,7 @@ export interface PgAttribute {
    *
    * @remarks Only in 14.x
    */
-  attcompression: string | null | undefined;
+  attcompression?: string | null | undefined;
 
   /**
    * This column has a value which is used where the column is entirely missing from the row, as happens when a column is
@@ -411,7 +415,7 @@ export interface PgAttribute {
    *
    * @remarks Only in 14.x, 13.x, 12.x, 11.x
    */
-  atthasmissing: boolean | null | undefined;
+  atthasmissing?: boolean | null | undefined;
 
   /**
    * If a zero byte (''), then not a generated column. Otherwise, s = stored. (Other values might be added in the
@@ -419,7 +423,7 @@ export interface PgAttribute {
    *
    * @remarks Only in 14.x, 13.x, 12.x
    */
-  attgenerated: string | null | undefined;
+  attgenerated?: string | null | undefined;
 }
 
 /**
@@ -696,14 +700,14 @@ export interface PgProc {
    *
    * @remarks Only in 14.x, 13.x, 12.x
    */
-  prosupport: PgOid | null | undefined;
+  prosupport?: PgOid | null | undefined;
 
   /**
    * f for a normal function, p for a procedure, a for an aggregate function, or w for a window function
    *
    * @remarks Only in 14.x, 13.x, 12.x, 11.x
    */
-  prokind: string | null | undefined;
+  prokind?: string | null | undefined;
 
   /**
    * Pre-parsed SQL function body. This is used for SQL-language functions when the body is given in SQL-standard
@@ -711,28 +715,28 @@ export interface PgProc {
    *
    * @remarks Only in 14.x
    */
-  prosqlbody: string | null | undefined;
+  prosqlbody?: string | null | undefined;
 
   /**
    * Calls to this function can be simplified by this other function (see [xfunc-transform-functions])
    *
    * @remarks Only in 11.x, 10.x
    */
-  protransform: PgOid | null | undefined;
+  protransform?: PgOid | null | undefined;
 
   /**
    * Function is an aggregate function
    *
    * @remarks Only in 10.x
    */
-  proisagg: boolean | null | undefined;
+  proisagg?: boolean | null | undefined;
 
   /**
    * Function is a window function
    *
    * @remarks Only in 10.x
    */
-  proiswindow: boolean | null | undefined;
+  proiswindow?: boolean | null | undefined;
 }
 
 /**
@@ -984,7 +988,7 @@ export interface PgType {
    *
    * @remarks Only in 14.x
    */
-  typsubscript: PgOid | null | undefined;
+  typsubscript?: PgOid | null | undefined;
 }
 
 /**
@@ -1137,7 +1141,37 @@ export interface PgIndex {
    *
    * @remarks Only in 14.x, 13.x, 12.x, 11.x
    */
-  indnkeyatts: number | null | undefined;
+  indnkeyatts?: number | null | undefined;
+}
+
+/**
+ * The catalog pg_inherits records information about table and index inheritance hierarchies. There is one entry for
+ * each direct parent-child table or index relationship in the database. (Indirect inheritance can be determined by
+ * following chains of entries.)
+ */
+export interface PgInherits {
+  /* COMMON FIELDS */
+
+  /** The OID of the child table or index */
+  inhrelid: PgOid;
+
+  /** The OID of the parent table or index */
+  inhparent: PgOid;
+
+  /**
+   * If there is more than one direct parent for a child table (multiple inheritance), this number tells the order in
+   * which the inherited columns are to be arranged. The count starts at 1.
+   */
+  inhseqno: number | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * true for a partition that is in the process of being detached; false otherwise.
+   *
+   * @remarks Only in 14.x
+   */
+  inhdetachpending?: boolean | null | undefined;
 }
 
 /**
@@ -1218,7 +1252,7 @@ export interface PgRange {
    *
    * @remarks Only in 14.x
    */
-  rngmultitypid: PgOid | null | undefined;
+  rngmultitypid?: PgOid | null | undefined;
 }
 
 /**
@@ -1292,6 +1326,7 @@ export interface Introspection {
   enums: Array<PgEnum>;
   extensions: Array<PgExtension>;
   indexes: Array<PgIndex>;
+  inherits: Array<PgInherits>;
   languages: Array<PgLanguage>;
   ranges: Array<PgRange>;
   depends: Array<PgDepend>;
@@ -1331,6 +1366,7 @@ export type PgEntity =
   | PgEnum
   | PgExtension
   | PgIndex
+  | PgInherits
   | PgLanguage
   | PgRange
   | PgDepend
@@ -1355,7 +1391,8 @@ with
   ),
 
   classes as (
-    select pg_class.oid as _id, *
+    select pg_class.oid as _id, *,
+      pg_catalog.pg_relation_is_updatable(oid, true)::bit(8)::int4 as "updatable_mask"
     from pg_catalog.pg_class
     where relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
   ),
@@ -1412,6 +1449,12 @@ with
     select *
     from pg_catalog.pg_index
     where indrelid in (select classes._id from classes)
+  ),
+
+  inherits as (
+    select *
+    from pg_catalog.pg_inherits
+    where inhrelid in (select classes._id from classes)
   ),
 
   languages as (
@@ -1490,6 +1533,9 @@ select json_build_object(
 
   'indexes',
   (select coalesce((select json_agg(row_to_json(indexes) order by indrelid, indexrelid) from indexes), '[]'::json)),
+
+  'inherits',
+  (select coalesce((select json_agg(row_to_json(inherits) order by inhrelid, inhseqno) from inherits), '[]'::json)),
 
   'languages',
   (select coalesce((select json_agg(row_to_json(languages) order by lanname) from languages), '[]'::json)),

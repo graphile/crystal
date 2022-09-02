@@ -36,8 +36,10 @@ export const ClientMutationIdDescriptionPlugin: GraphileConfig.Plugin = {
           return extend(
             field,
             {
-              description:
+              description: build.wrapDescription(
                 "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
+                "field",
+              ),
             },
             `Tweaking '${fieldName}' field in '${Self.name}'`,
           );
@@ -64,8 +66,10 @@ export const ClientMutationIdDescriptionPlugin: GraphileConfig.Plugin = {
           return extend(
             field,
             {
-              description:
+              description: build.wrapDescription(
                 "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
+                "field",
+              ),
             },
             `Tweaking '${fieldName}' field in '${Self.name}'`,
           );

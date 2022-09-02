@@ -81,7 +81,7 @@ declare global {
           source: PgSource<any, any, any, any>;
           pgProc: PgProc;
           databaseName: string;
-        }) => Promise<void>
+        }) => void | Promise<void>
       >;
 
       // TODO: should pgProcedures_functionSource_options and pgProcedures_PgSource_options be the same hook?
@@ -279,7 +279,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
-                  {},
+                  {
+                    description: undefined,
+                    // TODO: we should figure out what field this is going to use, and reference that
+                    /* `The return type of our \`${name}\` ${
+                      pgProc.provolatile === "v" ? "mutation" : "query"
+                    }.`, */
+                  },
                   true,
                 ),
               [columns, recordCodecName, recordType, sql],
@@ -306,7 +312,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const parameters: PgSourceParameter[] = [];
 
-          let processedFirstInputArg = false;
+          // const processedFirstInputArg = false;
 
           // "v" is for "volatile"; but let's just say anything that's not
           // _i_mmutable or _s_table is volatile
@@ -315,17 +321,19 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const numberOfArguments = allArgTypes.length ?? 0;
           const numberOfArgumentsWithDefaults = pgProc.pronargdefaults ?? 0;
-          const numberOfRequiredArguments =
-            numberOfArguments - numberOfArgumentsWithDefaults;
           const isStrict = pgProc.proisstrict ?? false;
           const isStrictish =
             isStrict || info.options.pgStrictFunctions === true;
+          const numberOfRequiredArguments =
+            numberOfArguments - numberOfArgumentsWithDefaults;
+          const { tags, description } = pgProc.getTagsAndDescription();
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
             // TODO: smart tag should allow changing the modifier
-            const typeModifier = undefined;
+            const tag = tags[`arg${i}variant`];
+            const variant = typeof tag === "string" ? tag : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
             // v for VARIADIC arguments, t for TABLE arguments
@@ -346,7 +354,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               const argCodec = await info.helpers.pgCodecs.getCodecFromType(
                 databaseName,
                 argType,
-                typeModifier,
+                undefined,
               );
               if (!argCodec) {
                 console.warn(
@@ -359,8 +367,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 );
                 return null;
               }
-              let required = i < numberOfRequiredArguments;
-              let notNull = isStrictish;
+              const required = i < numberOfRequiredArguments;
+              const notNull =
+                isStrict || (isStrictish && i < numberOfRequiredArguments);
+              /*
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
                 if (argCodec.columns && !isMutation) {
@@ -369,11 +379,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   notNull = true;
                 }
               }
+              */
               parameters.push({
                 name: argName,
                 required,
                 notNull,
                 codec: argCodec,
+                extensions: {
+                  variant,
+                },
               });
             }
           }
@@ -392,9 +406,19 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
-          const { tags, description } = pgProc.getTagsAndDescription();
+          const behavior = Array.isArray(tags.behavior)
+            ? [...(tags.behavior as string[])]
+            : typeof tags.behavior === "string"
+            ? [tags.behavior]
+            : [];
+          behavior.push("-filter -order");
 
-          const extensions: PgSourceExtensions = { tags, description };
+          const extensions: PgSourceExtensions = {
+            tags: {
+              ...tags,
+              behavior,
+            },
+          };
 
           if (outOrInoutOrTableArgModes.length === 1) {
             const outOrInoutArg = (() => {
@@ -455,6 +479,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               returnsSetof,
               isMutation,
               extensions,
+              description,
             };
 
             await info.process("pgProcedures_functionSource_options", {
@@ -479,6 +504,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               uniques: [],
               isMutation,
               extensions,
+              description,
             };
             await info.process("pgProcedures_PgSource_options", {
               databaseName,
@@ -500,8 +526,62 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       sourceByPgProcByDatabase: new Map(),
     }),
     hooks: {
-      async pgIntrospection_proc({ helpers }, event) {
+      async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
         const { entity: pgProc, databaseName } = event;
+
+        const database = resolvedPreset.pgSources?.find(
+          (db) => db.name === databaseName,
+        );
+        if (!database) {
+          throw new Error(`Could not find '${databaseName}' in 'pgSources'`);
+        }
+        const schemas = database.schemas ?? ["public"];
+
+        // Only process procedures from one of the published namespaces
+        const namespace = pgProc.getNamespace();
+        if (!namespace || !schemas.includes(namespace.nspname)) {
+          return null;
+        }
+
+        // Do not select procedures that create range types. These are utility
+        // functions that really don’t need to be exposed in an API.
+        const introspection = (
+          await helpers.pgIntrospection.getIntrospection()
+        ).find((n) => n.database.name === databaseName)!.introspection;
+        const rangeType = introspection.types.find(
+          (t) =>
+            t.typnamespace === pgProc.pronamespace &&
+            t.typname === pgProc.proname &&
+            t.typtype === "r",
+        );
+        if (rangeType) {
+          return;
+        }
+
+        // Do not expose trigger functions (type trigger has oid 2279)
+        if (pgProc.prorettype === "2279") {
+          return;
+        }
+
+        // We don't want functions that will clash with GraphQL (treat them as private)
+        if (pgProc.proname.startsWith("__")) {
+          return;
+        }
+
+        // We also don’t want procedures that have been defined in our namespace
+        // twice. This leads to duplicate fields in the API which throws an
+        // error. In the future we may support this case. For now though, it is
+        // too complex.
+        const overload = introspection.procs.find(
+          (p) =>
+            p.pronamespace === pgProc.pronamespace &&
+            p.proname === pgProc.proname &&
+            p._id !== pgProc._id,
+        );
+        if (overload) {
+          return;
+        }
+
         helpers.pgProcedures.getSource(databaseName, pgProc);
       },
     },

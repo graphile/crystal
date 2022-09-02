@@ -18,6 +18,7 @@ import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -293,7 +294,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           databaseName,
           foreignClass,
         );
-        if (!foreignSource) {
+        if (!foreignSource || foreignSource.isVirtual) {
           return;
         }
         const relationName = info.inflection.sourceRelationName({
@@ -307,12 +308,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isBackwards,
         });
         const existingRelation = relations[relationName];
+        const { tags } = pgConstraint.getTagsAndDescription();
+        const description = isBackwards
+          ? tags.backwardDescription
+          : tags.forwardDescription;
         const newRelation: PgSourceRelation<any, any> = {
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
           source: foreignSource,
           isUnique,
           isBackwards,
+          description:
+            typeof description === "string" ? description : undefined,
+          extensions: {
+            tags,
+          },
         };
         await info.process("pgRelations_relation", {
           databaseName,
@@ -386,7 +396,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,
-          graphql: { GraphQLList, GraphQLObjectType },
+          graphql: { GraphQLList, GraphQLObjectType, GraphQLNonNull },
           options: { simpleCollections },
         } = build;
         const {
@@ -395,14 +405,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           fieldWithHooks,
         } = context;
         const codec = pgTypeSource?.codec ?? pgCodec;
+        // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
         if (!(isPgTableType || isMutationPayload) || !codec) {
           return fields;
         }
         // TODO: change the default so that we don't do this on
         // isMutationPayload; only do that for V4 compat. (It's redundant vs
         // just using the object type directly)
-        const source = build.input.pgSources.find((s) => s.codec === codec);
+        const source =
+          pgTypeSource ?? build.input.pgSources.find((s) => s.codec === codec);
         if (!source) {
+          return fields;
+        }
+        if (source.parameters && !source.isUnique) {
           return fields;
         }
         const relations: {
@@ -410,6 +425,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         } = source.getRelations();
         return Object.entries(relations).reduce(
           (memo, [identifier, relation]) => {
+            if (isMutationPayload && relation.isBackwards) {
+              // Don't add backwards relations to mutation payloads
+              return memo;
+            }
             const {
               isUnique,
               localColumns,
@@ -623,6 +642,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               const fieldName = relationDetails.relation.isBackwards
                 ? build.inflection.singleRelationBackwards(relationDetails)
                 : build.inflection.singleRelation(relationDetails);
+              const deprecationReason =
+                tagToString(relation.extensions?.tags?.deprecated) ??
+                tagToString(relation.source.extensions?.tags?.deprecated);
               fields = extend(
                 fields,
                 {
@@ -634,9 +656,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       pgRelationDetails: relationDetails,
                     },
                     {
+                      description:
+                        relation.description ??
+                        `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
+                          codec,
+                        )}\`.`,
                       // TODO: handle nullability
                       type: OtherType as GraphQLObjectType,
                       plan: singleRecordPlan,
+                      deprecationReason,
                     },
                   ),
                 },
@@ -653,7 +681,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               )
             ) {
               const connectionTypeName =
-                build.inflection.connectionType(typeName);
+                build.inflection.tableConnectionType(otherCodec);
               const ConnectionType =
                 build.getOutputTypeByName(connectionTypeName);
               if (ConnectionType) {
@@ -672,8 +700,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                         pgRelationDetails: relationDetails,
                       },
                       {
+                        description: `Reads and enables pagination through a set of \`${typeName}\`.`,
                         // TODO: handle nullability
-                        type: ConnectionType as GraphQLObjectType,
+                        type: new GraphQLNonNull(
+                          ConnectionType as GraphQLObjectType,
+                        ),
                         plan: connectionPlan,
                       },
                     ),

@@ -6,6 +6,7 @@ import type {
   PgSourceRelation,
   PgSourceUnique,
   PgTypeCodec,
+  PgTypeColumn,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { ExecutableStep, object } from "dataplanner";
@@ -36,6 +37,33 @@ declare global {
     }
 
     interface Inflection {
+      /**
+       * A PgSource represents a single way of getting a number of values of
+       * `source.codec` type. It doesn't necessarily represent a table directly
+       * (although it can) - e.g. it might be a function that returns records
+       * from a table, or it could be a "sub-selection" of a table, e.g.
+       * "admin_users" might be "users where admin is true".  This inflector
+       * gives a name to this source, it's primarily used when naming _fields_
+       * in the GraphQL schema (as opposed to `_codecName` which typically
+       * names _types_.
+       *
+       * @remarks The method beginning with `_` implies it's not ment to
+       * be called directly, instead it's called from other inflectors to give
+       * them common behavior.
+       */
+      _sourceName(
+        this: Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+
+      /**
+       * Takes a `_sourceName` and singularizes it.
+       */
+      _singularizedSourceName(
+        this: Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+
       /**
        * When you're using multiple databases and/or schemas, you may want to
        * prefix various type names/field names with an identifier for these
@@ -89,6 +117,12 @@ declare global {
       ): string;
 
       /**
+       * Appends '_record' to a name that ends in `_input`, `_patch`, `Input`
+       * or `Patch` to avoid naming conflicts.
+       */
+      dontEndInInputOrPatch(this: Inflection, text: string): string;
+
+      /**
        * The name of the GraphQL Object Type that's generated to represent a
        * specific table (more specifically a PostgreSQL "pg_class" which is
        * represented as a certain PgTypeCodec)
@@ -98,7 +132,18 @@ declare global {
         codec: PgTypeCodec<any, any, any>,
       ): string;
 
+      tableConnectionType(
+        this: GraphileBuild.Inflection,
+        codec: PgTypeCodec<any, any, any>,
+      ): string;
+
+      tableEdgeType(
+        this: GraphileBuild.Inflection,
+        codec: PgTypeCodec<any, any, any>,
+      ): string;
+
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
+      baseInputType(this: GraphileBuild.Inflection, typeName: string): string;
     }
 
     interface ScopeObject {
@@ -109,6 +154,7 @@ declare global {
     }
     interface ScopeObjectFieldsField {
       pgSource?: PgSource<any, any, any, any>;
+      pgColumn?: PgTypeColumn<any, any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -225,9 +271,27 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       },
 
       _singularizedCodecName(options, codec) {
-        return this.singularize(this._codecName(codec)).replace(
+        return this.dontEndInInputOrPatch(
+          this.singularize(this._codecName(codec)),
+        );
+      },
+
+      dontEndInInputOrPatch(options, text) {
+        return text.replace(
           /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
           "$&_record",
+        );
+      },
+
+      _sourceName(options, source) {
+        return this.coerceToGraphQLName(
+          source.extensions?.tags?.name ?? source.name,
+        );
+      },
+
+      _singularizedSourceName(options, source) {
+        return this.dontEndInInputOrPatch(
+          this.singularize(this._sourceName(source)),
         );
       },
 
@@ -235,8 +299,19 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         return this.upperCamelCase(this._singularizedCodecName(codec));
       },
 
+      tableConnectionType(options, codec) {
+        return this.connectionType(this.tableType(codec));
+      },
+
+      tableEdgeType(options, codec) {
+        return this.edgeType(this.tableType(codec));
+      },
+
       patchType(options, typeName) {
         return this.upperCamelCase(`${typeName}-patch`);
+      },
+      baseInputType(options, typeName) {
+        return this.upperCamelCase(`${typeName}-base-input`);
       },
     },
   },
@@ -328,11 +403,31 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          const constraints =
+          const directConstraints =
             await info.helpers.pgIntrospection.getConstraintsForClass(
               databaseName,
               pgClass._id,
             );
+
+          const inheritance =
+            await info.helpers.pgIntrospection.getInheritedForClass(
+              databaseName,
+              pgClass._id,
+            );
+
+          const inheritedConstraints = await Promise.all(
+            inheritance.map((inh) => {
+              return info.helpers.pgIntrospection.getConstraintsForClass(
+                databaseName,
+                inh.inhparent,
+              );
+            }),
+          );
+          const constraints = [
+            // TODO: handle multiple inheritance
+            ...inheritedConstraints.flatMap((list) => list),
+            ...directConstraints,
+          ];
           const uniqueColumnOnlyConstraints = constraints.filter(
             (c) =>
               ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
@@ -375,6 +470,27 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
+          const { tags } = pgClass.getTagsAndDescription();
+
+          const behavior: string[] = Array.isArray(tags.behavior)
+            ? [...(tags.behavior as string[])]
+            : typeof tags.behavior === "string"
+            ? [tags.behavior]
+            : [];
+          const mask = pgClass.updatable_mask ?? 2 ** 8 - 1;
+          const isInsertable = mask & (1 << 3);
+          const isUpdatable = mask & (1 << 2);
+          const isDeletable = mask & (1 << 4);
+          if (!isInsertable) {
+            behavior.push("-insert");
+          }
+          if (!isUpdatable) {
+            behavior.push("-update");
+          }
+          if (!isDeletable) {
+            behavior.push("-delete");
+          }
+
           const options: PgSourceBuilderOptions = {
             executor,
             name,
@@ -382,8 +498,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             source: codec.sqlType,
             codec,
             uniques,
+            isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             extensions: {
               tags: {
+                ...tags,
+                ...(behavior.length > 0 ? { behavior } : {}),
                 originalName: pgClass.relname,
               },
             },
@@ -439,7 +558,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             continue;
           }
           const source = await info.helpers.pgTables.getSource(sourceBuilder);
-          if (source) {
+          if (source && !source.isVirtual) {
             output.pgSources!.push(source);
           }
         }
@@ -499,7 +618,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 },
                 // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
                 ExecutableStep, // PgClassSingleStep<any, any, any, any>
-                () => ({}),
+                () => ({
+                  description: codec.extensions?.description,
+                }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );
               setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
@@ -519,6 +640,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgCompoundType: !selectable,
                 },
                 () => ({
+                  description: `An input for mutations affecting \`${tableTypeName}\``,
                   extensions: {
                     graphile: {
                       inputPlan() {
@@ -546,6 +668,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   isPgCompoundType: !selectable,
                 },
                 () => ({
+                  description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
                   extensions: {
                     graphile: {
                       inputPlan() {
@@ -559,6 +682,31 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               setGraphQLTypeForPgCodec(codec, ["patch"], patchTypeName);
             }
 
+            if (!codec.isAnonymous) {
+              const baseTypeName = inflection.baseInputType(tableTypeName);
+              build.registerInputObjectType(
+                baseTypeName,
+                {
+                  pgCodec: codec,
+                  isPgBaseInput: true,
+                  isPgRowType: selectable,
+                  isPgCompoundType: !selectable,
+                },
+                () => ({
+                  description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
+                  extensions: {
+                    graphile: {
+                      inputPlan() {
+                        return object({});
+                      },
+                    },
+                  },
+                }),
+                `PgTablesPlugin base table type for ${codec.name}`,
+              );
+              setGraphQLTypeForPgCodec(codec, ["base"], baseTypeName);
+            }
+
             if (
               !codec.isAnonymous &&
               build.behavior.matches(behavior, "*:connection", defaultBehavior)
@@ -566,6 +714,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               // Register edges
               build.registerCursorConnection({
                 typeName: tableTypeName,
+                connectionTypeName: inflection.tableConnectionType(codec),
+                edgeTypeName: inflection.tableEdgeType(codec),
                 scope: {
                   isPgConnectionRelated: true,
                   pgCodec: codec,

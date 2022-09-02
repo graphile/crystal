@@ -6,6 +6,7 @@ import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -170,6 +171,9 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                       },
                       () => ({
                         description: `Get a single \`${type.name}\`.`,
+                        deprecationReason: tagToString(
+                          source.extensions?.tags?.deprecated,
+                        ),
                         type,
                         args: uniqueKeys.reduce((args, columnName) => {
                           const details = detailsByColumnName[columnName];

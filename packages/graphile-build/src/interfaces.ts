@@ -119,7 +119,7 @@ declare global {
       /**
        * A unique namespace for this plugin to use.
        */
-      namespace: TNamespace;
+      namespace?: TNamespace;
 
       /**
        * If this plugin supports a persistant internal state (aka a cache, this
@@ -138,7 +138,7 @@ declare global {
        * The plugin must register helpers to allow other plugins to access its
        * internal state. (Just use an empty object if you don't need any.)
        */
-      helpers: {
+      helpers?: {
         [key in keyof GatherHelpers[TNamespace]]: GatherHelpers[TNamespace][key] extends (
           ...args: infer UArgs
         ) => infer UReturnType

@@ -24,6 +24,7 @@ import {
   subscribe as dataplannerSubscribe,
 } from "dataplanner";
 import { promises as fsp } from "fs";
+import { StreamDeferPlugin } from "graphile-build";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -110,7 +111,7 @@ const pathCompare = (
 /** Postgres pool */
 let testPool: Pool | null = null;
 
-const connectionString = process.env.TEST_DATABASE_URL || "pggql_test";
+export const connectionString = process.env.TEST_DATABASE_URL || "pggql_test";
 
 beforeAll(() => {
   testPool = new Pool({
@@ -134,6 +135,17 @@ afterAll(async () => {
   }
   testPool = null;
 });
+
+export async function withPoolClient<T>(
+  callback: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  const poolClient = await testPool.connect();
+  try {
+    return await callback(poolClient);
+  } finally {
+    poolClient.release();
+  }
+}
 
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
@@ -363,6 +375,9 @@ export async function runTestQuery(
     schema?: string | string[];
     graphileBuildOptions?: any;
     ignoreRBAC?: boolean;
+    setofFunctionsContainNulls?: boolean;
+    viewUniqueKey?: string;
+    subscriptions?: boolean;
   },
   options: {
     callback?: (
@@ -398,6 +413,7 @@ export async function runTestQuery(
     : ["a", "b", "c"];
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset],
+    plugins: [StreamDeferPlugin],
     pgSources: [
       {
         adaptor: "@dataplan/pg/adaptors/node-postgres",
@@ -424,6 +440,8 @@ export async function runTestQuery(
       } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
     ],
     schema: {
+      pgForbidSetofFunctionsToReturnNull:
+        config.setofFunctionsContainNulls === false,
       ...graphileBuildOptions,
     },
   };
@@ -646,7 +664,7 @@ export async function runTestQuery(
  * filePath, otherwise it asserts that the snapshot matches the previous
  * snapshot.
  */
-async function snapshot(actual: string, filePath: string) {
+export async function snapshot(actual: string, filePath: string) {
   let expected: string | null = null;
   try {
     expected = await fsp.readFile(filePath, "utf8");

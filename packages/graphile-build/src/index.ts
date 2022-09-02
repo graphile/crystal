@@ -45,6 +45,8 @@ export { GraphileBuild, GraphileConfig };
 
 export { NewWithHooksFunction, SchemaBuilder };
 
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+
 const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
 
 /**
@@ -134,14 +136,22 @@ const gatherBase = (
   // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
   for (const plugin of gatherPlugins) {
     const spec = plugin.gather!;
-    if (spec.namespace in globalState) {
-      // TODO: track who registers which namespace, output more helpful error.
-      throw new Error(
-        `Namespace '${spec.namespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique.`,
-      );
+    if (spec.namespace != null) {
+      if (spec.namespace in globalState) {
+        // TODO: track who registers which namespace, output more helpful error.
+        throw new Error(
+          `Namespace '${spec.namespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique.`,
+        );
+      }
     }
-    const cache = (globalState[spec.namespace] = spec.initialCache?.() ?? {});
-    const state = (gatherState[spec.namespace] = spec.initialState?.() ?? {});
+    const cache =
+      spec.namespace != null
+        ? (globalState[spec.namespace] = spec.initialCache?.() ?? {})
+        : EMPTY_OBJECT;
+    const state =
+      spec.namespace != null
+        ? (gatherState[spec.namespace] = spec.initialState?.() ?? {})
+        : EMPTY_OBJECT;
     const context: GatherPluginContext<any, any> = {
       helpers: helpers as GraphileConfig.GatherHelpers,
       options,
@@ -152,11 +162,16 @@ const gatherBase = (
       resolvedPreset,
     };
     pluginContext.set(plugin, context);
-    helpers[spec.namespace] = {};
-    for (const helperName of Object.keys(spec.helpers)) {
-      helpers[spec.namespace][helperName] = (...args: any[]): any => {
-        return spec.helpers[helperName](context, ...args);
-      };
+    if (spec.namespace != null) {
+      helpers[spec.namespace] = {};
+      if (spec.helpers != null) {
+        const specHelpers = spec.helpers;
+        for (const helperName of Object.keys(specHelpers)) {
+          helpers[spec.namespace][helperName] = (...args: any[]): any => {
+            return specHelpers[helperName](context, ...args);
+          };
+        }
+      }
     }
   }
 
@@ -180,7 +195,10 @@ const gatherBase = (
     for (const plugin of gatherPlugins) {
       const spec = plugin.gather!;
       const context = pluginContext.get(plugin)!;
-      context.state = gatherState[spec.namespace] = spec.initialState?.() ?? {};
+      if (spec.namespace != null) {
+        context.state = gatherState[spec.namespace] =
+          spec.initialState?.() ?? {};
+      }
     }
 
     // Now call the main functions

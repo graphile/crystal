@@ -48,8 +48,8 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (source.codec.arrayOfCodec) return false;
           if (source.codec.rangeOfCodec) return false;
           const parameters: PgSourceParameter[] | undefined = source.parameters;
-          if (!parameters) return false;
-          if (parameters.filter((p) => p.required).length !== 1) return false;
+          if (!parameters || parameters.length < 1) return false;
+          if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
           if (!source.isUnique) return false;
           const behavior = getBehavior([source.extensions]);

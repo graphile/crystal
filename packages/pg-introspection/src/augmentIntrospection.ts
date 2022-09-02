@@ -6,6 +6,7 @@ import type {
   PgEnum,
   PgIndex,
   PgNamespace,
+  PgProcArgument,
   PgRange,
   PgRoles,
   PgType,
@@ -28,13 +29,61 @@ function memo<T>(fn: () => T): () => T {
   };
 }
 
+function del<T extends Record<string, any>, TKey extends keyof T>(
+  toDelete: Set<string>,
+  collection: T[],
+  attr: TKey,
+) {
+  for (let i = collection.length - 1; i >= 0; i--) {
+    const entry = collection[i];
+    if (toDelete.has(entry[attr])) {
+      collection.splice(i, 1);
+    }
+  }
+}
+
 /**
  * Adds helpers to the introspection results.
  */
 export function augmentIntrospection(
-  introspectionResults: unknown,
+  introspectionResultsString: string,
+  includeExtensionResources = false,
 ): Introspection {
+  const introspectionResults = JSON.parse(introspectionResultsString);
   const introspection = introspectionResults as Introspection;
+
+  const oidByCatalog: { [catalog: string]: string } = {};
+  for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
+    oidByCatalog[catalog] = oid;
+  }
+
+  if (!includeExtensionResources) {
+    // Go through and delete things from the extensions
+    const extensionProcOids = new Set<string>();
+    const extensionClassOids = new Set<string>();
+    for (const pg_depend of introspection.depends) {
+      if (
+        pg_depend.refclassid === oidByCatalog["pg_extension"] &&
+        pg_depend.deptype === "e" &&
+        pg_depend.classid === oidByCatalog["pg_proc"]
+      ) {
+        extensionProcOids.add(pg_depend.objid);
+      }
+
+      if (
+        pg_depend.refclassid === oidByCatalog["pg_extension"] &&
+        pg_depend.deptype === "e" &&
+        pg_depend.classid === oidByCatalog["pg_class"]
+      ) {
+        extensionClassOids.add(pg_depend.objid);
+      }
+    }
+
+    del(extensionProcOids, introspection.procs, "_id");
+    del(extensionClassOids, introspection.classes, "_id");
+    del(extensionClassOids, introspection.attributes, "attrelid");
+    del(extensionClassOids, introspection.types, "typrelid");
+  }
 
   const getRole = (id: string | null): PgRoles | undefined =>
     introspection.roles.find((entity) => entity._id === id);
@@ -64,10 +113,6 @@ export function augmentIntrospection(
   const getIndexes = (id: string | null): PgIndex[] =>
     introspection.indexes.filter((entity) => entity.indrelid === id);
 
-  const oidByCatalog: { [catalog: string]: string } = {};
-  for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
-    oidByCatalog[catalog] = oid;
-  }
   const PG_NAMESPACE = oidByCatalog["pg_namespace"];
   const PG_CLASS = oidByCatalog["pg_class"];
   const PG_PROC = oidByCatalog["pg_proc"];
@@ -186,6 +231,74 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_PROC, entity._id),
     );
+    entity.getArguments = memo(() => {
+      const args: PgProcArgument[] = [];
+      const {
+        // Null if everything 'in'. i: IN, o: OUT, b: INOUT, v: VARIADIC, t: TABLE
+        proargmodes,
+        // Null if no names
+        proargnames,
+        // Only input types
+        proargtypes,
+        // Null if no arg defaults, length = pronargdefaults
+        // proargdefaults,
+        // Number of inpart args
+        // pronargs,
+        // All args, null if all args are input
+        proallargtypes,
+        // Number of arguments with defaults
+        pronargdefaults,
+      } = entity;
+      if (proallargtypes) {
+        for (let i = 0, l = proallargtypes.length; i < l; i++) {
+          const typeId = proallargtypes[i];
+          const type = introspection.types.find((t) => t._id === typeId);
+          if (!type) {
+            throw new Error("Corrupted introspection data");
+          }
+          const mode = proargmodes?.[i] ?? "i";
+          const isIn = mode === "i" || mode === "b" || mode === "v";
+          const isOut = mode === "o" || mode === "b" || mode === "t";
+          const isVariadic = mode === "v";
+          const hasDefault = pronargdefaults ? i >= l - pronargdefaults : false;
+          const name = proargnames?.[i] ?? null;
+
+          args.push({
+            isIn,
+            isOut,
+            isVariadic,
+            hasDefault,
+            type,
+            name,
+          });
+        }
+      } else if (proargtypes) {
+        for (let i = 0, l = proargtypes.length; i < l; i++) {
+          const typeId = proargtypes[i];
+          const type = introspection.types.find((t) => t._id === typeId);
+          if (!type) {
+            throw new Error("Corrupted introspection data");
+          }
+          const mode = proargmodes?.[i] ?? "i";
+          const isIn = mode === "i" || mode === "b" || mode === "v";
+          const isOut = mode === "o" || mode === "b" || mode === "t";
+          const isVariadic = mode === "v";
+          const hasDefault = pronargdefaults ? i >= l - pronargdefaults : false;
+          const name = proargnames?.[i] ?? null;
+
+          args.push({
+            isIn,
+            isOut,
+            isVariadic,
+            hasDefault,
+            type,
+            name,
+          });
+        }
+      }
+
+      return args;
+    });
   });
   introspection.types.forEach((entity) => {
     entity.getNamespace = memo(() => getNamespace(entity.typnamespace));

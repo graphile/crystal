@@ -16,22 +16,10 @@ import {
 } from "@dataplan/pg";
 import type { SetterStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLNonNull, GraphQLType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-
-function nullableIf<T extends GraphQLType>(
-  GraphQLNonNull: { new <T extends GraphQLType>(t: T): GraphQLNonNull<T> },
-  condition: boolean,
-  type: T,
-): T | GraphQLNonNull<T> {
-  if (condition) {
-    return type;
-  } else {
-    return new GraphQLNonNull(type);
-  }
-}
 
 declare global {
   namespace GraphileBuild {
@@ -285,10 +273,17 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           fields = extend(
             fields,
             {
-              [columnFieldName]: {
-                type,
-                plan: makePlan(),
-              },
+              [columnFieldName]: context.fieldWithHooks(
+                {
+                  fieldName: columnFieldName,
+                  pgColumn: column,
+                },
+                {
+                  description: column.description,
+                  type: type as GraphQLOutputType,
+                  plan: makePlan() as any,
+                },
+              ),
             },
             `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
           );
@@ -296,11 +291,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLInputObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          graphql: { GraphQLNonNull },
-          inflection,
-        } = build;
+        const { extend, inflection } = build;
         const {
           scope: {
             isPgRowType,
@@ -367,8 +358,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                     },
                     {
                       description: column.description,
-                      type: nullableIf(
-                        GraphQLNonNull,
+                      type: build.nullableIf(
                         isPgBaseInput ||
                           isPgPatch ||
                           (!column.notNull &&

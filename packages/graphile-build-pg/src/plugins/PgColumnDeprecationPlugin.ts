@@ -10,11 +10,14 @@ export const PgColumnDeprecationPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields_field(field, build, context) {
         const {
-          scope: { pgCodec, fieldName },
+          scope: { fieldName, pgColumn },
           Self,
         } = context;
-        const deprecated = pgCodec?.extensions?.tags?.deprecated;
-        if (!deprecated) {
+        if (!pgColumn) {
+          return field;
+        }
+        const deprecated = pgColumn?.extensions?.tags?.deprecated;
+        if (!deprecated || field.deprecationReason != null) {
           return field;
         }
         return build.extend(

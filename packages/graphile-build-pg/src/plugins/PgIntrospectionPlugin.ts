@@ -18,6 +18,7 @@ import type {
   PgEnum,
   PgExtension,
   PgIndex,
+  PgInherits,
   PgLanguage,
   PgNamespace,
   PgProc,
@@ -139,6 +140,10 @@ declare global {
           databaseName: string,
           classId: string,
         ): Promise<PgConstraint[]>;
+        getInheritedForClass(
+          databaseName: string,
+          classId: string,
+        ): Promise<PgInherits[]>;
         getNamespaceByName(
           databaseName: string,
           namespaceName: string,
@@ -457,6 +462,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         const list = relevant.introspection.constraints;
         // TODO: cache
         return list.filter((entity) => entity.confrelid === classId);
+      },
+
+      async getInheritedForClass(info, databaseName, classId) {
+        // const pgClass = this.getClass(info, databaseName, classId);
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.inherits;
+        // TODO: cache
+        return list.filter((entity) => entity.inhrelid === classId);
       },
 
       async getNamespaceByName(info, databaseName, name) {

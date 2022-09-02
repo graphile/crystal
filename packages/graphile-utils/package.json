@@ -1,0 +1,65 @@
+{
+  "name": "graphile-utils",
+  "version": "4.12.3",
+  "description": "Utilities to help with building graphile-build plugins",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "test": "jest -i",
+    "prepack": "tsc -b",
+    "watch": "mkdir -p node8plus && tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-engine.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "engine",
+    "plugin",
+    "build",
+    "extension",
+    "utils",
+    "utilities"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/crystal/issues"
+  },
+  "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-pg",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "graphile-config": "workspace:^",
+    "tslib": "^2.4.0"
+  },
+  "engines": {
+    "node": ">=14.17"
+  },
+  "peerDependencies": {
+    "graphile-build": "workspace:^",
+    "graphile-build-pg": "workspace:^",
+    "graphql": "*"
+  },
+  "devDependencies": {
+    "graphile-build": "workspace:^",
+    "graphile-build-pg": "workspace:^",
+    "jest": "^28.1.0",
+    "jest-serializer-graphql-schema": "workspace:^",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.1-rc"
+  },
+  "files": [
+    "dist",
+    "index.js"
+  ]
+}

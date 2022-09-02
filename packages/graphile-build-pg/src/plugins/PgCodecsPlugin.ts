@@ -87,7 +87,7 @@ declare global {
         getCodecFromType(
           databaseName: string,
           pgTypeId: string,
-          pgTypeModifier?: number | null,
+          pgTypeModifier?: string | number | null,
         ): Promise<PgTypeCodec<any, any, any, any> | null>;
       };
     }
@@ -275,7 +275,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         return this.coerceToGraphQLName(value);
       },
       rangeBoundType(options, { underlyingTypeName }) {
-        return `${underlyingTypeName}Bound`;
+        return `${underlyingTypeName}RangeBound`;
       },
       rangeType(options, { underlyingTypeName }) {
         return `${underlyingTypeName}Range`;
@@ -338,14 +338,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (columnCodec) {
               hasAtLeastOneColumn = true;
               columns[columnAttribute.attname] = {
+                description:
+                  columnAttribute.getTagsAndDescription().description,
                 codec: columnCodec,
-                notNull: columnAttribute.attnotnull === true,
+                notNull:
+                  columnAttribute.attnotnull === true ||
+                  columnAttribute.getType()?.typnotnull === true,
                 hasDefault:
                   (columnAttribute.atthasdef ?? undefined) ||
                   (columnAttribute.attgenerated != null &&
                     columnAttribute.attgenerated !== "") ||
                   (columnAttribute.attidentity != null &&
-                    columnAttribute.attidentity !== ""),
+                    columnAttribute.attidentity !== "") ||
+                  columnAttribute.getType()?.typdefault != null,
                 // TODO: identicalVia,
               };
               await info.process("pgCodecs_column", {

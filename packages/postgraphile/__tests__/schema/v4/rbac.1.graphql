@@ -1,0 +1,1323 @@
+type CompoundKey implements Node {
+  extra: Boolean
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId1: Person
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
+  personId1: Int!
+  personId2: Int!
+}
+
+"""All input for the create `LeftArm` mutation."""
+input CreateLeftArmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `LeftArm` to be created by this mutation."""
+  leftArm: LeftArmInput!
+}
+
+"""The output of our create `LeftArm` mutation."""
+type CreateLeftArmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LeftArm` that was created by this mutation."""
+  leftArm: LeftArm
+
+  """An edge for our `LeftArm`. May be used by Relay 1."""
+  leftArmEdge(
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Person` mutation."""
+input CreatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Person` to be created by this mutation."""
+  person: PersonInput!
+}
+
+"""The output of our create `Person` mutation."""
+type CreatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was created by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PersonSecret` mutation."""
+input CreatePersonSecretInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PersonSecret` to be created by this mutation."""
+  personSecret: PersonSecretInput!
+}
+
+"""The output of our create `PersonSecret` mutation."""
+type CreatePersonSecretPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` this `PersonSecret` belongs to."""
+  personByPersonId: Person
+
+  """The `PersonSecret` that was created by this mutation."""
+  personSecret: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """An edge for our `PersonSecret`. May be used by Relay 1."""
+  personSecretEdge(
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
+
+"""All input for the `deleteLeftArmById` mutation."""
+input DeleteLeftArmByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteLeftArmByPersonId` mutation."""
+input DeleteLeftArmByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId: Int!
+}
+
+"""All input for the `deleteLeftArm` mutation."""
+input DeleteLeftArmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `LeftArm` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `LeftArm` mutation."""
+type DeleteLeftArmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedLeftArmId: ID
+
+  """The `LeftArm` that was deleted by this mutation."""
+  leftArm: LeftArm
+
+  """An edge for our `LeftArm`. May be used by Relay 1."""
+  leftArmEdge(
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePersonByEmail` mutation."""
+input DeletePersonByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: Email!
+}
+
+"""All input for the `deletePersonById` mutation."""
+input DeletePersonByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The primary unique identifier for the person"""
+  id: Int!
+}
+
+"""All input for the `deletePerson` mutation."""
+input DeletePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Person` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Person` mutation."""
+type DeletePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPersonId: ID
+
+  """The `Person` that was deleted by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePersonSecretByPersonId` mutation."""
+input DeletePersonSecretByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId: Int!
+}
+
+"""All input for the `deletePersonSecret` mutation."""
+input DeletePersonSecretInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `PersonSecret` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `PersonSecret` mutation."""
+type DeletePersonSecretPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPersonSecretId: ID
+
+  """The `Person` this `PersonSecret` belongs to."""
+  personByPersonId: Person
+
+  """The `PersonSecret` that was deleted by this mutation."""
+  personSecret: PersonSecret
+
+  """An edge for our `PersonSecret`. May be used by Relay 1."""
+  personSecretEdge(
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+scalar Email
+
+"""An IPv4 or IPv6 host address, and optionally its subnet."""
+scalar InternetAddress
+
+"""
+A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
+"""
+scalar KeyValueHash
+
+"""Tracks metadata about the left arms of various people"""
+type LeftArm implements Node {
+  id: Int!
+  lengthInMetres: Float
+  mood: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+  personId: Int!
+}
+
+"""An input representation of `LeftArm` with nullable fields."""
+input LeftArmBaseInput {
+  id: Int
+  lengthInMetres: Float
+  mood: String
+  personId: Int
+}
+
+"""
+A condition to be used against `LeftArm` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input LeftArmCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lengthInMetres` field."""
+  lengthInMetres: Float
+
+  """Checks for equality with the object’s `mood` field."""
+  mood: String
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""All input for the `leftArmIdentity` mutation."""
+input LeftArmIdentityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  leftArm: LeftArmBaseInput
+}
+
+"""The output of our `leftArmIdentity` mutation."""
+type LeftArmIdentityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  leftArm: LeftArm
+
+  """An edge for our `LeftArm`. May be used by Relay 1."""
+  leftArmEdge(
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""An input for mutations affecting `LeftArm`"""
+input LeftArmInput {
+  lengthInMetres: Float
+}
+
+"""
+Represents an update to a `LeftArm`. Fields that are set will be updated.
+"""
+input LeftArmPatch {
+  mood: String
+}
+
+"""A connection to a list of `LeftArm` values."""
+type LeftArmsConnection {
+  """
+  A list of edges which contains the `LeftArm` and cursor to aid in pagination.
+  """
+  edges: [LeftArmsEdge!]!
+
+  """A list of `LeftArm` objects."""
+  nodes: [LeftArm]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LeftArm` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LeftArm` edge in the connection."""
+type LeftArmsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LeftArm` at the end of the edge."""
+  node: LeftArm
+}
+
+"""Methods to use when ordering `LeftArm`."""
+enum LeftArmsOrderBy {
+  ID_ASC
+  ID_DESC
+  LENGTH_IN_METRES_ASC
+  LENGTH_IN_METRES_DESC
+  MOOD_ASC
+  MOOD_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `LeftArm`."""
+  createLeftArm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateLeftArmInput!
+  ): CreateLeftArmPayload
+
+  """Creates a single `Person`."""
+  createPerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  """Creates a single `PersonSecret`."""
+  createPersonSecret(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePersonSecretInput!
+  ): CreatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Deletes a single `LeftArm` using its globally unique id."""
+  deleteLeftArm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLeftArmInput!
+  ): DeleteLeftArmPayload
+
+  """Deletes a single `LeftArm` using a unique key."""
+  deleteLeftArmById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLeftArmByIdInput!
+  ): DeleteLeftArmPayload
+
+  """Deletes a single `LeftArm` using a unique key."""
+  deleteLeftArmByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLeftArmByPersonIdInput!
+  ): DeleteLeftArmPayload
+
+  """Deletes a single `Person` using its globally unique id."""
+  deletePerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `Person` using a unique key."""
+  deletePersonByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonByEmailInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `Person` using a unique key."""
+  deletePersonById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonByIdInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `PersonSecret` using its globally unique id."""
+  deletePersonSecret(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonSecretInput!
+  ): DeletePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Deletes a single `PersonSecret` using a unique key."""
+  deletePersonSecretByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonSecretByPersonIdInput!
+  ): DeletePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+  leftArmIdentity(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: LeftArmIdentityInput!
+  ): LeftArmIdentityPayload
+
+  """Updates a single `LeftArm` using its globally unique id and a patch."""
+  updateLeftArm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLeftArmInput!
+  ): UpdateLeftArmPayload
+
+  """Updates a single `LeftArm` using a unique key and a patch."""
+  updateLeftArmById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLeftArmByIdInput!
+  ): UpdateLeftArmPayload
+
+  """Updates a single `LeftArm` using a unique key and a patch."""
+  updateLeftArmByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLeftArmByPersonIdInput!
+  ): UpdateLeftArmPayload
+
+  """Updates a single `Person` using its globally unique id and a patch."""
+  updatePerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByEmailInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+scalar NotNullUrl
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A connection to a list of `Person` values."""
+type PeopleConnection {
+  """
+  A list of edges which contains the `Person` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge!]!
+
+  """A list of `Person` objects."""
+  nodes: [Person]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Person` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Person` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Person` at the end of the edge."""
+  node: Person
+}
+
+"""Methods to use when ordering `Person`."""
+enum PeopleOrderBy {
+  ABOUT_ASC
+  ABOUT_DESC
+  ALIASES_ASC
+  ALIASES_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  ID_ASC
+  ID_DESC
+  LAST_LOGIN_FROM_IP_ASC
+  LAST_LOGIN_FROM_IP_DESC
+  LAST_LOGIN_FROM_SUBNET_ASC
+  LAST_LOGIN_FROM_SUBNET_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ASC
+  SITE_DESC
+  USER_MAC_ASC
+  USER_MAC_DESC
+}
+
+"""Person test comment"""
+type Person implements Node {
+  about: String
+  aliases: [String]!
+  config: KeyValueHash
+  createdAt: Datetime
+  email: Email!
+
+  """The primary unique identifier for the person"""
+  id: Int!
+  lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+
+  """Reads a single `LeftArm` that is related to this `Person`."""
+  leftArmByPersonId: LeftArm
+
+  """Reads and enables pagination through a set of `LeftArm`."""
+  leftArmsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LeftArmCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsConnection! @deprecated(reason: "Please use leftArmByPersonId instead")
+
+  """The person’s name"""
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """This `Person`'s `PersonSecret`."""
+  personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """This `Person`'s `PersonSecret`."""
+  personSecretsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonSecretCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsConnection! @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads and enables pagination through a set of `Post`."""
+  postsByAuthorId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection!
+  site: WrappedUrl @deprecated(reason: "Don’t use me")
+  userMac: String
+}
+
+"""
+A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s `about` field."""
+  about: String
+
+  """Checks for equality with the object’s `aliases` field."""
+  aliases: [String]
+
+  """Checks for equality with the object’s `config` field."""
+  config: KeyValueHash
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `email` field."""
+  email: Email
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastLoginFromIp` field."""
+  lastLoginFromIp: InternetAddress
+
+  """Checks for equality with the object’s `lastLoginFromSubnet` field."""
+  lastLoginFromSubnet: String
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `site` field."""
+  site: WrappedUrlInput
+
+  """Checks for equality with the object’s `userMac` field."""
+  userMac: String
+}
+
+"""An input for mutations affecting `Person`"""
+input PersonInput {
+  about: String
+  aliases: [String]
+  email: Email!
+
+  """The person’s name"""
+  name: String!
+  site: WrappedUrlInput
+}
+
+"""
+Represents an update to a `Person`. Fields that are set will be updated.
+"""
+input PersonPatch {
+  about: String
+  aliases: [String]
+  email: Email
+
+  """The person’s name"""
+  name: String
+  site: WrappedUrlInput
+}
+
+"""Tracks the person's secret"""
+type PersonSecret implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """The `Person` this `PersonSecret` belongs to."""
+  personByPersonId: Person
+  personId: Int!
+
+  """A secret held by the associated Person"""
+  secret: String
+}
+
+"""
+A condition to be used against `PersonSecret` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input PersonSecretCondition {
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `secret` field."""
+  secret: String
+}
+
+"""An input for mutations affecting `PersonSecret`"""
+input PersonSecretInput {
+  """A secret held by the associated Person"""
+  secret: String
+}
+
+"""A connection to a list of `PersonSecret` values."""
+type PersonSecretsConnection {
+  """
+  A list of edges which contains the `PersonSecret` and cursor to aid in pagination.
+  """
+  edges: [PersonSecretsEdge!]!
+
+  """A list of `PersonSecret` objects."""
+  nodes: [PersonSecret]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PersonSecret` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PersonSecret` edge in the connection."""
+type PersonSecretsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonSecret` at the end of the edge."""
+  node: PersonSecret
+}
+
+"""Methods to use when ordering `PersonSecret`."""
+enum PersonSecretsOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SECRET_ASC
+  SECRET_DESC
+}
+
+type Post implements Node {
+  authorId: Int
+  body: String
+  headline: String!
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` that is related to this `Post`."""
+  personByAuthorId: Person
+}
+
+"""
+A condition to be used against `Post` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PostCondition {
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `body` field."""
+  body: String
+
+  """Checks for equality with the object’s `headline` field."""
+  headline: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""A connection to a list of `Post` values."""
+type PostsConnection {
+  """
+  A list of edges which contains the `Post` and cursor to aid in pagination.
+  """
+  edges: [PostsEdge!]!
+
+  """A list of `Post` objects."""
+  nodes: [Post]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Post` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Post` edge in the connection."""
+type PostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Post` at the end of the edge."""
+  node: Post
+}
+
+"""Methods to use when ordering `Post`."""
+enum PostsOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  BODY_ASC
+  BODY_DESC
+  HEADLINE_ASC
+  HEADLINE_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `LeftArm`."""
+  allLeftArms(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LeftArmCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  allPeople(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `PersonSecret`."""
+  allPersonSecrets(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonSecretCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads and enables pagination through a set of `Post`."""
+  allPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection
+  currentUserId: Int
+
+  """Reads a single `LeftArm` using its globally unique `ID`."""
+  leftArm(
+    """The globally unique `ID` to be used in selecting a single `LeftArm`."""
+    nodeId: ID!
+  ): LeftArm
+  leftArmById(id: Int!): LeftArm
+  leftArmByPersonId(personId: Int!): LeftArm
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` using its globally unique `ID`."""
+  person(
+    """The globally unique `ID` to be used in selecting a single `Person`."""
+    nodeId: ID!
+  ): Person
+  personByEmail(email: Email!): Person
+  personById(id: Int!): Person
+
+  """Reads a single `PersonSecret` using its globally unique `ID`."""
+  personSecret(
+    """
+    The globally unique `ID` to be used in selecting a single `PersonSecret`.
+    """
+    nodeId: ID!
+  ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Reads a single `Post` using its globally unique `ID`."""
+  post(
+    """The globally unique `ID` to be used in selecting a single `Post`."""
+    nodeId: ID!
+  ): Post
+  postById(id: Int!): Post
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+  returnTableWithoutGrants: CompoundKey
+}
+
+"""All input for the `updateLeftArmById` mutation."""
+input UpdateLeftArmByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `LeftArm` being updated.
+  """
+  leftArmPatch: LeftArmPatch!
+}
+
+"""All input for the `updateLeftArmByPersonId` mutation."""
+input UpdateLeftArmByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `LeftArm` being updated.
+  """
+  leftArmPatch: LeftArmPatch!
+  personId: Int!
+}
+
+"""All input for the `updateLeftArm` mutation."""
+input UpdateLeftArmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `LeftArm` being updated.
+  """
+  leftArmPatch: LeftArmPatch!
+
+  """
+  The globally unique `ID` which will identify a single `LeftArm` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `LeftArm` mutation."""
+type UpdateLeftArmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LeftArm` that was updated by this mutation."""
+  leftArm: LeftArm
+
+  """An edge for our `LeftArm`. May be used by Relay 1."""
+  leftArmEdge(
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePersonByEmail` mutation."""
+input UpdatePersonByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: Email!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""All input for the `updatePersonById` mutation."""
+input UpdatePersonByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The primary unique identifier for the person"""
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""All input for the `updatePerson` mutation."""
+input UpdatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Person` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""The output of our update `Person` mutation."""
+type UpdatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was updated by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type WrappedUrl {
+  url: NotNullUrl!
+}
+
+"""An input for mutations affecting `WrappedUrl`"""
+input WrappedUrlInput {
+  url: NotNullUrl!
+}

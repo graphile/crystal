@@ -122,7 +122,13 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           return args;
         }
         const behavior = getBehavior(pgSource.extensions);
-        if (!build.behavior.matches(behavior, "order", "order")) {
+        if (
+          !build.behavior.matches(
+            behavior,
+            "order",
+            pgSource.parameters ? "" : "order",
+          )
+        ) {
           return args;
         }
 

@@ -111,12 +111,18 @@ export interface PgSourceRelation<
    * Space for you to add your own metadata.
    */
   extensions?: PgSourceRelationExtensions;
+
+  description?: string;
 }
 
 /**
  * Space for extra metadata about this source
  */
 export interface PgSourceExtensions {}
+
+export interface PgSourceParameterExtensions {
+  variant?: string;
+}
 
 /**
  * If this is a functional (rather than static) source, this describes one of
@@ -141,6 +147,7 @@ export interface PgSourceParameter {
    * null.
    */
   notNull?: boolean;
+  extensions?: PgSourceParameterExtensions;
 }
 
 /**
@@ -215,6 +222,12 @@ export interface PgSourceOptions<
    * affect planning.
    */
   isList?: boolean;
+
+  /**
+   * "Virtual" sources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other sources that are _not_ virtual.
+   */
+  isVirtual?: boolean;
 }
 
 export interface PgFunctionSourceOptions<
@@ -232,6 +245,7 @@ export interface PgFunctionSourceOptions<
   extensions?: PgSourceExtensions;
   isMutation?: boolean;
   selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
+  description?: string;
 }
 // TODO: is there a better way?
 /**
@@ -256,7 +270,8 @@ export class PgSourceBuilder<
   public codec: PgTypeCodec<TColumns, any, any>;
   public uniques: TUniques | undefined;
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
-  private readonly name: string;
+  public readonly name: string;
+  public readonly isVirtual: boolean;
   constructor(
     private options: Omit<
       PgSourceOptions<TColumns, TUniques, any, TParameters>,
@@ -267,6 +282,7 @@ export class PgSourceBuilder<
     this.uniques = options.uniques;
     this.extensions = options.extensions;
     this.name = options.name;
+    this.isVirtual = options.isVirtual ?? false;
   }
 
   public toString(): string {
@@ -326,7 +342,7 @@ export class PgSourceBuilder<
 exportAs(PgSourceBuilder, "PgSourceBuilder");
 
 const $$codecSource = Symbol("codecSource");
-let temporarySourceCounter = 0;
+const $$codecCounter = Symbol("codecCounter");
 
 /**
  * PgSource represents any source of SELECT-able data in Postgres: tables,
@@ -389,7 +405,13 @@ export class PgSource<
    */
   public readonly isList: boolean;
 
-  public readonly extensions: Partial<PgSourceExtensions> | undefined;
+  /**
+   * "Virtual" sources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other sources that are _not_ virtual.
+   */
+  public readonly isVirtual: boolean;
+
+  public extensions: Partial<PgSourceExtensions> | undefined;
 
   static fromCodec<TColumns extends PgTypeColumns>(
     executor: PgExecutor,
@@ -402,7 +424,16 @@ export class PgSource<
       return codec[$$codecSource].get(executor);
     }
 
-    const name = `TemporarySource${++temporarySourceCounter}`;
+    let counter = codec[$$codecCounter];
+    if (counter) {
+      counter++;
+    } else {
+      counter = 1;
+    }
+    codec[$$codecCounter] = counter;
+
+    // "From Codec"
+    const name = `frmcdc_${codec.name}_${counter}`;
     const source = EXPORTABLE(
       (PgSource, codec, executor, name, sql) =>
         new PgSource({
@@ -446,6 +477,7 @@ export class PgSource<
       isMutation,
       selectAuth,
       isList,
+      isVirtual,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -467,6 +499,7 @@ export class PgSource<
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
     this.isMutation = !!isMutation;
     this.isList = !!isList;
+    this.isVirtual = isVirtual ?? false;
     this.selectAuth = selectAuth;
 
     // parameters is null iff source is not a function
@@ -557,6 +590,7 @@ export class PgSource<
       extensions,
       isMutation,
       selectAuth: overrideSelectAuth,
+      description,
     } = overrideOptions;
     const { codec, executor, relations, selectAuth } = this._options;
     if (!returnsArray) {
@@ -574,6 +608,7 @@ export class PgSource<
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
+        description,
       });
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
@@ -597,6 +632,7 @@ export class PgSource<
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
         isList: true,
+        description,
       });
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
@@ -624,6 +660,7 @@ export class PgSource<
         sqlPartitionByIndex,
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
+        description,
       });
     }
   }

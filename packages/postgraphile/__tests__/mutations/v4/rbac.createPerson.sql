@@ -7,17 +7,16 @@ insert into "c"."person" as __person__ ("person_full_name", "aliases", "about", 
   __person__."site"::text as "5"
 
 
-select __wrapped_url_result__.*
+select __frmcdc_wrapped_url_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"b"."wrapped_url" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __wrapped_url_identifiers__,
+) as __frmcdc_wrapped_url_1_identifiers__,
 lateral (
   select
-    __wrapped_url__."url" as "0",
-    (not (__wrapped_url__ is null))::text as "1",
-    __wrapped_url_identifiers__.idx as "2"
-  from (select (__wrapped_url_identifiers__."id0").*) as __wrapped_url__
-) as __wrapped_url_result__
+    __frmcdc_wrapped_url_1__."url" as "0",
+    __frmcdc_wrapped_url_1_identifiers__.idx as "1"
+  from (select (__frmcdc_wrapped_url_1_identifiers__."id0").*) as __frmcdc_wrapped_url_1__
+) as __frmcdc_wrapped_url_1_result__

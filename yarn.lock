@@ -7544,7 +7544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphile-build-pg@workspace:*, graphile-build-pg@workspace:packages/graphile-build-pg":
+"graphile-build-pg@workspace:*, graphile-build-pg@workspace:^, graphile-build-pg@workspace:packages/graphile-build-pg":
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
   dependencies:
@@ -7579,7 +7579,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-build@workspace:*, graphile-build@workspace:packages/graphile-build":
+"graphile-build@workspace:*, graphile-build@workspace:^, graphile-build@workspace:packages/graphile-build":
   version: 0.0.0-use.local
   resolution: "graphile-build@workspace:packages/graphile-build"
   dependencies:
@@ -7685,6 +7685,27 @@ __metadata:
   bin:
     graphile-inspect: ./dist/cli-run.js
     grin: ./dist/cli-run.js
+  languageName: unknown
+  linkType: soft
+
+"graphile-utils@workspace:packages/graphile-utils":
+  version: 0.0.0-use.local
+  resolution: "graphile-utils@workspace:packages/graphile-utils"
+  dependencies:
+    debug: "npm:^4.1.1"
+    graphile-build: "workspace:^"
+    graphile-build-pg: "workspace:^"
+    graphile-config: "workspace:^"
+    jest: "npm:^28.1.0"
+    jest-serializer-graphql-schema: "workspace:^"
+    nodemon: "npm:^2.0.15"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  peerDependencies:
+    graphile-build: "workspace:^"
+    graphile-build-pg: "workspace:^"
+    graphql: "*"
   languageName: unknown
   linkType: soft
 
@@ -8904,7 +8925,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema":
+"jest-serializer-graphql-schema@workspace:^, jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema":
   version: 0.0.0-use.local
   resolution: "jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema"
   dependencies:

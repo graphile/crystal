@@ -20,6 +20,7 @@ import {
 } from "graphql";
 import * as graphql from "graphql";
 import * as semver from "semver";
+import { inspect } from "util";
 
 import { Behavior } from "./behavior.js";
 import extend, { indent } from "./extend.js";
@@ -304,12 +305,22 @@ export default function makeNewBuild(
       const type = this.getTypeByName(typeName);
       if (!type || !isOutputType(type)) {
         throw new Error(
-          `Expected an output type named '${typeName}', instead found ${String(
+          `Expected an output type named '${typeName}', instead found ${inspect(
             type,
           )}`,
         );
       }
       return type;
+    },
+    nullableIf<T extends graphql.GraphQLType>(
+      condition: boolean,
+      type: T,
+    ): T | graphql.GraphQLNonNull<T> {
+      if (condition) {
+        return type;
+      } else {
+        return new graphql.GraphQLNonNull(type);
+      }
     },
   };
   return build;

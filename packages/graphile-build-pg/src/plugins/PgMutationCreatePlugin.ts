@@ -9,6 +9,7 @@ import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -84,8 +85,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             const tableFieldName = inflection.tableFieldName(source);
             build.registerInputObjectType(
               inputTypeName,
-              {},
+              { isMutationInput: true },
               () => ({
+                description: `All input for the create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableInput = build.getGraphQLTypeByPgCodec(
                     source.codec,
@@ -144,10 +146,12 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
               payloadTypeName,
               {
                 isMutationPayload: true,
+                // TODO: isPgCreatePayloadType: true,
                 pgTypeSource: source,
               },
               ExecutableStep as any,
               () => ({
+                description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableType = build.getGraphQLTypeByPgCodec(
                     source.codec,
@@ -182,6 +186,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                               fieldBehaviorScope: `insert:payload:record`,
                             },
                             {
+                              description: `The \`${tableTypeName}\` that was created by this mutation.`,
                               type: TableType,
                               plan: EXPORTABLE(
                                 () =>
@@ -193,6 +198,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                     return $object.get("result");
                                   },
                                 [],
+                              ),
+                              deprecationReason: tagToString(
+                                source.extensions?.tags?.deprecated,
                               ),
                             },
                           ),
@@ -258,6 +266,12 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       },
                     },
                     type: payloadType,
+                    description: `Creates a single \`${inflection.tableType(
+                      source.codec,
+                    )}\`.`,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
                     plan: EXPORTABLE(
                       (object, pgInsert, source) =>
                         function plan(_: any, args: FieldArgs) {

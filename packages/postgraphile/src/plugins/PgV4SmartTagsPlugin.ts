@@ -151,47 +151,47 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
       switch (part) {
         case "create": {
           behavior.push("-insert");
-          return;
+          break;
         }
         case "read": {
           behavior.push("-select");
-          return;
+          break;
         }
         case "update": {
           behavior.push("-update");
-          return;
+          break;
         }
         case "delete": {
           behavior.push("-delete");
-          return;
+          break;
         }
         case "execute": {
           behavior.push("-query_field -mutation_field -type_field");
-          return;
+          break;
         }
         case "filter": {
           // TODO: we should figure out which of these to use depending on the circumstance
           behavior.push("-filter -filterBy");
-          return;
+          break;
         }
         case "order": {
           // TODO: we should figure out which of these to use depending on the circumstance
           behavior.push("-order -orderBy");
-          return;
+          break;
         }
         case "all": {
           behavior.push("-query:list -query:connection");
-          return;
+          break;
         }
         case "many": {
           behavior.push(
             "-singularRelation:list -singularRelation:connection -manyRelation:list -manyRelation:connection",
           );
-          return;
+          break;
         }
         case "": {
           // ignore
-          return;
+          break;
         }
         default: {
           // TODO: we should give plugin authors the option of adding other
@@ -199,7 +199,7 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           console.warn(
             `Option '${part}' in '@omit' string '${omit}' not recognized.`,
           );
-          return;
+          break;
         }
       }
     }
@@ -217,9 +217,9 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
 function addBehaviors(tags: Partial<PgSmartTagsDict>, behavior: string[]) {
   if (behavior.length > 0) {
     if (Array.isArray(tags.behavior)) {
-      tags.behavior.push(...behavior);
+      tags.behavior.unshift(...behavior);
     } else if (typeof tags.behavior === "string") {
-      tags.behavior = [tags.behavior, ...behavior];
+      tags.behavior = [...behavior, tags.behavior];
     } else {
       tags.behavior = behavior;
     }

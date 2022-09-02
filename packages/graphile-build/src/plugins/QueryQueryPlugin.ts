@@ -33,8 +33,10 @@ export const QueryQueryPlugin: GraphileConfig.Plugin = {
             fields,
             {
               query: {
-                description:
+                description: build.wrapDescription(
                   "Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.",
+                  "field",
+                ),
                 type: new GraphQLNonNull(Self),
                 plan: EXPORTABLE(
                   (operationPlan) =>

@@ -14,6 +14,7 @@
     "version": "yarn run changelog && git add CHANGELOG.md",
     "docs:gen": "yarn typedoc .",
     "w": "yarn workspace",
+    "postgraphile": "cd packages/postgraphile && node dist/cli-run.js",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --ignore-path ./.eslintignore",

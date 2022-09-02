@@ -9,37 +9,11 @@ import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      /**
-       * A PgSource represents a single way of getting a number of values of
-       * `source.codec` type. It doesn't necessarily represent a table directly
-       * (although it can) - e.g. it might be a function that returns records
-       * from a table, or it could be a "sub-selection" of a table, e.g.
-       * "admin_users" might be "users where admin is true".  This inflector
-       * gives a name to this source, it's primarily used when naming _fields_
-       * in the GraphQL schema (as opposed to `_codecName` which typically
-       * names _types_.
-       *
-       * @remarks The method beginning with `_` implies it's not ment to
-       * be called directly, instead it's called from other inflectors to give
-       * them common behavior.
-       */
-      _sourceName(
-        this: Inflection,
-        source: PgSource<any, any, any, any>,
-      ): string;
-
-      /**
-       * Takes a `_sourceName` and singularizes it.
-       */
-      _singularizedSourceName(
-        this: Inflection,
-        source: PgSource<any, any, any, any>,
-      ): string;
-
       /**
        * The field name for a Cursor Connection field that returns all rows
        * from the given source.
@@ -69,16 +43,6 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      _sourceName(options, source) {
-        return this.coerceToGraphQLName(
-          source.extensions?.tags?.name || source.name,
-        );
-      },
-
-      _singularizedSourceName(options, source) {
-        return this.singularize(this._sourceName(source));
-      },
-
       allRowsConnection(options, source) {
         return this.camelCase(
           `all-${this.pluralize(this._singularizedSourceName(source))}`,
@@ -107,7 +71,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             // Skip functions
             continue;
           }
-          if (!source.find) {
+          if (!source.find || source.isVirtual) {
             continue;
           }
           const type = build.getTypeByName(
@@ -162,9 +126,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           ) {
             const fieldName = build.inflection.allRowsConnection(source);
             const connectionType = build.getTypeByName(
-              build.inflection.connectionType(
-                build.inflection.tableType(source.codec),
-              ),
+              build.inflection.tableConnectionType(source.codec),
             ) as GraphQLObjectType | undefined;
             if (connectionType) {
               fields = build.extend(
@@ -179,6 +141,12 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     },
                     () => ({
                       type: connectionType,
+                      description: `Reads and enables pagination through a set of \`${build.inflection.tableType(
+                        source.codec,
+                      )}\`.`,
+                      deprecationReason: tagToString(
+                        source.extensions?.tags?.deprecated,
+                      ),
                       plan: EXPORTABLE(
                         (connection, source) =>
                           function plan() {

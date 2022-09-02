@@ -10,6 +10,7 @@ import type {
   PgEnum,
   PgExtension,
   PgIndex,
+  PgInherits,
   PgLanguage,
   PgNamespace,
   PgProc,
@@ -38,6 +39,7 @@ export {
   PgEnum,
   PgExtension,
   PgIndex,
+  PgInherits,
   PgLanguage,
   PgNamespace,
   PgProc,
@@ -48,13 +50,23 @@ export {
 
 export function parseIntrospectionResults(
   introspectionResults: string,
+  includeExtensionResources = false,
 ): Introspection {
-  return augmentIntrospection(JSON.parse(introspectionResults));
+  return augmentIntrospection(introspectionResults, includeExtensionResources);
 }
 
 export { PgSmartTagsAndDescription, PgSmartTagsDict };
 
 declare module "./introspection" {
+  interface PgProcArgument {
+    isIn: boolean;
+    isOut: boolean;
+    isVariadic: boolean;
+    hasDefault: boolean;
+    type: PgType;
+    name: string | null;
+  }
+
   interface PgDatabase {
     getDba(): PgRoles | undefined;
   }
@@ -95,6 +107,7 @@ declare module "./introspection" {
     getReturnType(): PgType | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    getArguments(): PgProcArgument[];
   }
   interface PgType {
     getNamespace(): PgNamespace | undefined;

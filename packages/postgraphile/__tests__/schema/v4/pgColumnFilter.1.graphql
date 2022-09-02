@@ -1,0 +1,4273 @@
+"""All input for the `add1Mutation` mutation."""
+input Add1MutationInput {
+  arg0: Int!
+  arg1: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `add1Mutation` mutation."""
+type Add1MutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `add2Mutation` mutation."""
+input Add2MutationInput {
+  a: Int!
+  b: Int
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `add2Mutation` mutation."""
+type Add2MutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `add3Mutation` mutation."""
+input Add3MutationInput {
+  a: Int
+  arg1: Int
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `add3Mutation` mutation."""
+type Add3MutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `add4MutationError` mutation."""
+input Add4MutationErrorInput {
+  arg0: Int
+  b: Int
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `add4MutationError` mutation."""
+type Add4MutationErrorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `add4Mutation` mutation."""
+input Add4MutationInput {
+  arg0: Int
+  b: Int
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `add4Mutation` mutation."""
+type Add4MutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+enum AnEnum {
+  ASTERISK
+  ASTERISK_ASTERISK
+  ASTERISK_ASTERISK_ASTERISK
+  ASTERISK_BAR
+  ASTERISK_BAR_
+  ASTERISK_BAZ_ASTERISK
+  AWAITING
+  DOLLAR
+  FOO_ASTERISK
+  FOO_ASTERISK_
+  GREATER_THAN_OR_EQUAL
+  LIKE
+  PERCENT
+  PUBLISHED
+  REJECTED
+  _ASTERISK_BAR_
+  _ASTERISK_BAZ_ASTERISK_
+  _FOO_ASTERISK
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
+"""Awesome feature!"""
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: Interval
+}
+
+"""An input for mutations affecting `CompoundType`"""
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: IntervalInput
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+"""An input for mutations affecting `Comptype`"""
+input ComptypeInput {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+"""All input for the create `DefaultValue` mutation."""
+input CreateDefaultValueInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DefaultValue` to be created by this mutation."""
+  defaultValue: DefaultValueInput!
+}
+
+"""The output of our create `DefaultValue` mutation."""
+type CreateDefaultValuePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DefaultValue` that was created by this mutation."""
+  defaultValue: DefaultValue
+
+  """An edge for our `DefaultValue`. May be used by Relay 1."""
+  defaultValueEdge(
+    """The method to use when ordering `DefaultValue`."""
+    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DefaultValuesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `ForeignKey` mutation."""
+input CreateForeignKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ForeignKey` to be created by this mutation."""
+  foreignKey: ForeignKeyInput!
+}
+
+"""The output of our create `ForeignKey` mutation."""
+type CreateForeignKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ForeignKey` that was created by this mutation."""
+  foreignKey: ForeignKey
+
+  """An edge for our `ForeignKey`. May be used by Relay 1."""
+  foreignKeyEdge(
+    """The method to use when ordering `ForeignKey`."""
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
+  ): ForeignKeysEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Input` mutation."""
+input CreateInputInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Input` to be created by this mutation."""
+  input: InputInput!
+}
+
+"""The output of our create `Input` mutation."""
+type CreateInputPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Input` that was created by this mutation."""
+  input: Input
+
+  """An edge for our `Input`. May be used by Relay 1."""
+  inputEdge(
+    """The method to use when ordering `Input`."""
+    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InputsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `NoPrimaryKey` mutation."""
+input CreateNoPrimaryKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `NoPrimaryKey` to be created by this mutation."""
+  noPrimaryKey: NoPrimaryKeyInput!
+}
+
+"""The output of our create `NoPrimaryKey` mutation."""
+type CreateNoPrimaryKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NoPrimaryKey` that was created by this mutation."""
+  noPrimaryKey: NoPrimaryKey
+
+  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
+  noPrimaryKeyEdge(
+    """The method to use when ordering `NoPrimaryKey`."""
+    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
+  ): NoPrimaryKeysEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Patch` mutation."""
+input CreatePatchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Patch` to be created by this mutation."""
+  patch: PatchInput!
+}
+
+"""The output of our create `Patch` mutation."""
+type CreatePatchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Patch` that was created by this mutation."""
+  patch: Patch
+
+  """An edge for our `Patch`. May be used by Relay 1."""
+  patchEdge(
+    """The method to use when ordering `Patch`."""
+    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PatchesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Post` mutation."""
+input CreatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Post` to be created by this mutation."""
+  post: PostInput!
+}
+
+"""The output of our create `Post` mutation."""
+type CreatePostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Post` that was created by this mutation."""
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Reserved` mutation."""
+input CreateReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Reserved` to be created by this mutation."""
+  reserved: ReservedInput!
+}
+
+"""All input for the create `ReservedInputRecord` mutation."""
+input CreateReservedInputRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ReservedInputRecord` to be created by this mutation."""
+  reservedInputRecord: ReservedInputRecordInput!
+}
+
+"""The output of our create `ReservedInputRecord` mutation."""
+type CreateReservedInputRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReservedInputRecord` that was created by this mutation."""
+  reservedInputRecord: ReservedInputRecord
+
+  """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
+  reservedInputRecordEdge(
+    """The method to use when ordering `ReservedInputRecord`."""
+    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedInputRecordsEdge
+}
+
+"""All input for the create `ReservedPatchRecord` mutation."""
+input CreateReservedPatchRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ReservedPatchRecord` to be created by this mutation."""
+  reservedPatchRecord: ReservedPatchRecordInput!
+}
+
+"""The output of our create `ReservedPatchRecord` mutation."""
+type CreateReservedPatchRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReservedPatchRecord` that was created by this mutation."""
+  reservedPatchRecord: ReservedPatchRecord
+
+  """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
+  reservedPatchRecordEdge(
+    """The method to use when ordering `ReservedPatchRecord`."""
+    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedPatchRecordsEdge
+}
+
+"""The output of our create `Reserved` mutation."""
+type CreateReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Reserved` that was created by this mutation."""
+  reserved: Reserved
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the create `SimilarTable1` mutation."""
+input CreateSimilarTable1Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SimilarTable1` to be created by this mutation."""
+  similarTable1: SimilarTable1Input!
+}
+
+"""The output of our create `SimilarTable1` mutation."""
+type CreateSimilarTable1Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SimilarTable1` that was created by this mutation."""
+  similarTable1: SimilarTable1
+
+  """An edge for our `SimilarTable1`. May be used by Relay 1."""
+  similarTable1Edge(
+    """The method to use when ordering `SimilarTable1`."""
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable1SEdge
+}
+
+"""All input for the create `SimilarTable2` mutation."""
+input CreateSimilarTable2Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SimilarTable2` to be created by this mutation."""
+  similarTable2: SimilarTable2Input!
+}
+
+"""The output of our create `SimilarTable2` mutation."""
+type CreateSimilarTable2Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SimilarTable2` that was created by this mutation."""
+  similarTable2: SimilarTable2
+
+  """An edge for our `SimilarTable2`. May be used by Relay 1."""
+  similarTable2Edge(
+    """The method to use when ordering `SimilarTable2`."""
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable2SEdge
+}
+
+"""All input for the create `Testview` mutation."""
+input CreateTestviewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Testview` to be created by this mutation."""
+  testview: TestviewInput!
+}
+
+"""The output of our create `Testview` mutation."""
+type CreateTestviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Testview` that was created by this mutation."""
+  testview: Testview
+
+  """An edge for our `Testview`. May be used by Relay 1."""
+  testviewEdge(
+    """The method to use when ordering `Testview`."""
+    orderBy: [TestviewsOrderBy!] = [NATURAL]
+  ): TestviewsEdge
+}
+
+"""All input for the create `ViewTable` mutation."""
+input CreateViewTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ViewTable` to be created by this mutation."""
+  viewTable: ViewTableInput!
+}
+
+"""The output of our create `ViewTable` mutation."""
+type CreateViewTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ViewTable` that was created by this mutation."""
+  viewTable: ViewTable
+
+  """An edge for our `ViewTable`. May be used by Relay 1."""
+  viewTableEdge(
+    """The method to use when ordering `ViewTable`."""
+    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ViewTablesEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
+
+type DefaultValue implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  nullValue: String
+}
+
+"""
+A condition to be used against `DefaultValue` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input DefaultValueCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `nullValue` field."""
+  nullValue: String
+}
+
+"""An input for mutations affecting `DefaultValue`"""
+input DefaultValueInput {
+  id: Int
+  nullValue: String
+}
+
+"""
+Represents an update to a `DefaultValue`. Fields that are set will be updated.
+"""
+input DefaultValuePatch {
+  id: Int
+  nullValue: String
+}
+
+"""A connection to a list of `DefaultValue` values."""
+type DefaultValuesConnection {
+  """
+  A list of edges which contains the `DefaultValue` and cursor to aid in pagination.
+  """
+  edges: [DefaultValuesEdge!]!
+
+  """A list of `DefaultValue` objects."""
+  nodes: [DefaultValue!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `DefaultValue` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `DefaultValue` edge in the connection."""
+type DefaultValuesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DefaultValue` at the end of the edge."""
+  node: DefaultValue!
+}
+
+"""Methods to use when ordering `DefaultValue`."""
+enum DefaultValuesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  NULL_VALUE_ASC
+  NULL_VALUE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the `deleteDefaultValueById` mutation."""
+input DeleteDefaultValueByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteDefaultValue` mutation."""
+input DeleteDefaultValueInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `DefaultValue` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `DefaultValue` mutation."""
+type DeleteDefaultValuePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DefaultValue` that was deleted by this mutation."""
+  defaultValue: DefaultValue
+
+  """An edge for our `DefaultValue`. May be used by Relay 1."""
+  defaultValueEdge(
+    """The method to use when ordering `DefaultValue`."""
+    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DefaultValuesEdge
+  deletedDefaultValueId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteInputById` mutation."""
+input DeleteInputByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteInput` mutation."""
+input DeleteInputInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Input` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Input` mutation."""
+type DeleteInputPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedInputId: ID
+
+  """The `Input` that was deleted by this mutation."""
+  input: Input
+
+  """An edge for our `Input`. May be used by Relay 1."""
+  inputEdge(
+    """The method to use when ordering `Input`."""
+    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InputsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteNoPrimaryKeyById` mutation."""
+input DeleteNoPrimaryKeyByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `NoPrimaryKey` mutation."""
+type DeleteNoPrimaryKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedNoPrimaryKeyId: ID
+
+  """The `NoPrimaryKey` that was deleted by this mutation."""
+  noPrimaryKey: NoPrimaryKey
+
+  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
+  noPrimaryKeyEdge(
+    """The method to use when ordering `NoPrimaryKey`."""
+    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
+  ): NoPrimaryKeysEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePatchById` mutation."""
+input DeletePatchByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deletePatch` mutation."""
+input DeletePatchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Patch` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Patch` mutation."""
+type DeletePatchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPatchId: ID
+
+  """The `Patch` that was deleted by this mutation."""
+  patch: Patch
+
+  """An edge for our `Patch`. May be used by Relay 1."""
+  patchEdge(
+    """The method to use when ordering `Patch`."""
+    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PatchesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePostById` mutation."""
+input DeletePostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deletePost` mutation."""
+input DeletePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Post` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Post` mutation."""
+type DeletePostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPostId: ID
+
+  """The `Post` that was deleted by this mutation."""
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteReservedById` mutation."""
+input DeleteReservedByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteReserved` mutation."""
+input DeleteReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Reserved` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the `deleteReservedInputRecordById` mutation."""
+input DeleteReservedInputRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteReservedInputRecord` mutation."""
+input DeleteReservedInputRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReservedInputRecord` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `ReservedInputRecord` mutation."""
+type DeleteReservedInputRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedReservedInputId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReservedInputRecord` that was deleted by this mutation."""
+  reservedInputRecord: ReservedInputRecord
+
+  """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
+  reservedInputRecordEdge(
+    """The method to use when ordering `ReservedInputRecord`."""
+    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedInputRecordsEdge
+}
+
+"""All input for the `deleteReservedPatchRecordById` mutation."""
+input DeleteReservedPatchRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteReservedPatchRecord` mutation."""
+input DeleteReservedPatchRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReservedPatchRecord` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `ReservedPatchRecord` mutation."""
+type DeleteReservedPatchRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedReservedPatchId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReservedPatchRecord` that was deleted by this mutation."""
+  reservedPatchRecord: ReservedPatchRecord
+
+  """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
+  reservedPatchRecordEdge(
+    """The method to use when ordering `ReservedPatchRecord`."""
+    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedPatchRecordsEdge
+}
+
+"""The output of our delete `Reserved` mutation."""
+type DeleteReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedReservedId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Reserved` that was deleted by this mutation."""
+  reserved: Reserved
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the `deleteSimilarTable1ById` mutation."""
+input DeleteSimilarTable1ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteSimilarTable1` mutation."""
+input DeleteSimilarTable1Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `SimilarTable1` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `SimilarTable1` mutation."""
+type DeleteSimilarTable1Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedSimilarTable1Id: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SimilarTable1` that was deleted by this mutation."""
+  similarTable1: SimilarTable1
+
+  """An edge for our `SimilarTable1`. May be used by Relay 1."""
+  similarTable1Edge(
+    """The method to use when ordering `SimilarTable1`."""
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable1SEdge
+}
+
+"""All input for the `deleteSimilarTable2ById` mutation."""
+input DeleteSimilarTable2ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteSimilarTable2` mutation."""
+input DeleteSimilarTable2Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `SimilarTable2` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `SimilarTable2` mutation."""
+type DeleteSimilarTable2Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedSimilarTable2Id: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SimilarTable2` that was deleted by this mutation."""
+  similarTable2: SimilarTable2
+
+  """An edge for our `SimilarTable2`. May be used by Relay 1."""
+  similarTable2Edge(
+    """The method to use when ordering `SimilarTable2`."""
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable2SEdge
+}
+
+"""All input for the `deleteViewTableById` mutation."""
+input DeleteViewTableByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteViewTable` mutation."""
+input DeleteViewTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ViewTable` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `ViewTable` mutation."""
+type DeleteViewTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedViewTableId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ViewTable` that was deleted by this mutation."""
+  viewTable: ViewTable
+
+  """An edge for our `ViewTable`. May be used by Relay 1."""
+  viewTableEdge(
+    """The method to use when ordering `ViewTable`."""
+    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ViewTablesEdge
+}
+
+enum EnumCaps {
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+  _0_BAR
+}
+
+enum EnumWithEmptyString {
+  ONE
+  TWO
+  _EMPTY_
+}
+
+type ForeignKey {
+  compoundKey1: Int
+  compoundKey2: Int
+  personId: Int
+}
+
+"""
+A condition to be used against `ForeignKey` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ForeignKeyCondition {
+  """Checks for equality with the object’s `compoundKey1` field."""
+  compoundKey1: Int
+
+  """Checks for equality with the object’s `compoundKey2` field."""
+  compoundKey2: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""An input for mutations affecting `ForeignKey`"""
+input ForeignKeyInput {
+  compoundKey1: Int
+  compoundKey2: Int
+  personId: Int
+}
+
+"""A connection to a list of `ForeignKey` values."""
+type ForeignKeysConnection {
+  """
+  A list of edges which contains the `ForeignKey` and cursor to aid in pagination.
+  """
+  edges: [ForeignKeysEdge!]!
+
+  """A list of `ForeignKey` objects."""
+  nodes: [ForeignKey!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ForeignKey` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `ForeignKey` edge in the connection."""
+type ForeignKeysEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ForeignKey` at the end of the edge."""
+  node: ForeignKey!
+}
+
+"""Methods to use when ordering `ForeignKey`."""
+enum ForeignKeysOrderBy {
+  COMPOUND_KEY_1_ASC
+  COMPOUND_KEY_1_DESC
+  COMPOUND_KEY_2_ASC
+  COMPOUND_KEY_2_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+}
+
+"""Should output as Input"""
+type Input implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Input` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input InputCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Input`"""
+input InputInput {
+  id: Int
+}
+
+"""
+Represents an update to a `Input`. Fields that are set will be updated.
+"""
+input InputPatch {
+  id: Int
+}
+
+"""A connection to a list of `Input` values."""
+type InputsConnection {
+  """
+  A list of edges which contains the `Input` and cursor to aid in pagination.
+  """
+  edges: [InputsEdge!]!
+
+  """A list of `Input` objects."""
+  nodes: [Input!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Input` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Input` edge in the connection."""
+type InputsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Input` at the end of the edge."""
+  node: Input!
+}
+
+"""Methods to use when ordering `Input`."""
+enum InputsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """lol, add some stuff 1 mutation"""
+  add1Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Add1MutationInput!
+  ): Add1MutationPayload
+
+  """lol, add some stuff 2 mutation"""
+  add2Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Add2MutationInput!
+  ): Add2MutationPayload
+
+  """lol, add some stuff 3 mutation"""
+  add3Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Add3MutationInput!
+  ): Add3MutationPayload
+
+  """lol, add some stuff 4 mutation"""
+  add4Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Add4MutationInput!
+  ): Add4MutationPayload
+  add4MutationError(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Add4MutationErrorInput!
+  ): Add4MutationErrorPayload
+
+  """Creates a single `DefaultValue`."""
+  createDefaultValue(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDefaultValueInput!
+  ): CreateDefaultValuePayload
+
+  """Creates a single `ForeignKey`."""
+  createForeignKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateForeignKeyInput!
+  ): CreateForeignKeyPayload
+
+  """Creates a single `Input`."""
+  createInput(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateInputInput!
+  ): CreateInputPayload
+
+  """Creates a single `NoPrimaryKey`."""
+  createNoPrimaryKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNoPrimaryKeyInput!
+  ): CreateNoPrimaryKeyPayload
+
+  """Creates a single `Patch`."""
+  createPatch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePatchInput!
+  ): CreatePatchPayload
+
+  """Creates a single `Post`."""
+  createPost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePostInput!
+  ): CreatePostPayload
+
+  """Creates a single `Reserved`."""
+  createReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateReservedInput!
+  ): CreateReservedPayload
+
+  """Creates a single `ReservedInputRecord`."""
+  createReservedInputRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateReservedInputRecordInput!
+  ): CreateReservedInputRecordPayload
+
+  """Creates a single `ReservedPatchRecord`."""
+  createReservedPatchRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateReservedPatchRecordInput!
+  ): CreateReservedPatchRecordPayload
+
+  """Creates a single `SimilarTable1`."""
+  createSimilarTable1(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSimilarTable1Input!
+  ): CreateSimilarTable1Payload
+
+  """Creates a single `SimilarTable2`."""
+  createSimilarTable2(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSimilarTable2Input!
+  ): CreateSimilarTable2Payload
+
+  """Creates a single `Testview`."""
+  createTestview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTestviewInput!
+  ): CreateTestviewPayload
+
+  """Creates a single `ViewTable`."""
+  createViewTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateViewTableInput!
+  ): CreateViewTablePayload
+
+  """Deletes a single `DefaultValue` using its globally unique id."""
+  deleteDefaultValue(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDefaultValueInput!
+  ): DeleteDefaultValuePayload
+
+  """Deletes a single `DefaultValue` using a unique key."""
+  deleteDefaultValueById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDefaultValueByIdInput!
+  ): DeleteDefaultValuePayload
+
+  """Deletes a single `Input` using its globally unique id."""
+  deleteInput(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteInputInput!
+  ): DeleteInputPayload
+
+  """Deletes a single `Input` using a unique key."""
+  deleteInputById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteInputByIdInput!
+  ): DeleteInputPayload
+
+  """Deletes a single `NoPrimaryKey` using a unique key."""
+  deleteNoPrimaryKeyById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNoPrimaryKeyByIdInput!
+  ): DeleteNoPrimaryKeyPayload
+
+  """Deletes a single `Patch` using its globally unique id."""
+  deletePatch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePatchInput!
+  ): DeletePatchPayload
+
+  """Deletes a single `Patch` using a unique key."""
+  deletePatchById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePatchByIdInput!
+  ): DeletePatchPayload
+
+  """Deletes a single `Post` using its globally unique id."""
+  deletePost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePostInput!
+  ): DeletePostPayload
+
+  """Deletes a single `Post` using a unique key."""
+  deletePostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePostByIdInput!
+  ): DeletePostPayload
+
+  """Deletes a single `Reserved` using its globally unique id."""
+  deleteReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `Reserved` using a unique key."""
+  deleteReservedById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedByIdInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `ReservedInputRecord` using its globally unique id."""
+  deleteReservedInputRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedInputRecordInput!
+  ): DeleteReservedInputRecordPayload
+
+  """Deletes a single `ReservedInputRecord` using a unique key."""
+  deleteReservedInputRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedInputRecordByIdInput!
+  ): DeleteReservedInputRecordPayload
+
+  """Deletes a single `ReservedPatchRecord` using its globally unique id."""
+  deleteReservedPatchRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedPatchRecordInput!
+  ): DeleteReservedPatchRecordPayload
+
+  """Deletes a single `ReservedPatchRecord` using a unique key."""
+  deleteReservedPatchRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedPatchRecordByIdInput!
+  ): DeleteReservedPatchRecordPayload
+
+  """Deletes a single `SimilarTable1` using its globally unique id."""
+  deleteSimilarTable1(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSimilarTable1Input!
+  ): DeleteSimilarTable1Payload
+
+  """Deletes a single `SimilarTable1` using a unique key."""
+  deleteSimilarTable1ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSimilarTable1ByIdInput!
+  ): DeleteSimilarTable1Payload
+
+  """Deletes a single `SimilarTable2` using its globally unique id."""
+  deleteSimilarTable2(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSimilarTable2Input!
+  ): DeleteSimilarTable2Payload
+
+  """Deletes a single `SimilarTable2` using a unique key."""
+  deleteSimilarTable2ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSimilarTable2ByIdInput!
+  ): DeleteSimilarTable2Payload
+
+  """Deletes a single `ViewTable` using its globally unique id."""
+  deleteViewTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteViewTableInput!
+  ): DeleteViewTablePayload
+
+  """Deletes a single `ViewTable` using a unique key."""
+  deleteViewTableById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteViewTableByIdInput!
+  ): DeleteViewTablePayload
+  mutationCompoundTypeArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationCompoundTypeArrayInput!
+  ): MutationCompoundTypeArrayPayload
+  mutationIntervalArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationIntervalArrayInput!
+  ): MutationIntervalArrayPayload
+  mutationIntervalSet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationIntervalSetInput!
+  ): MutationIntervalSetPayload
+  mutationTextArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationTextArrayInput!
+  ): MutationTextArrayPayload
+  postMany(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostManyInput!
+  ): PostManyPayload
+  postWithSuffix(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostWithSuffixInput!
+  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
+  returnVoidMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ReturnVoidMutationInput!
+  ): ReturnVoidMutationPayload
+
+  """
+  Updates a single `DefaultValue` using its globally unique id and a patch.
+  """
+  updateDefaultValue(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDefaultValueInput!
+  ): UpdateDefaultValuePayload
+
+  """Updates a single `DefaultValue` using a unique key and a patch."""
+  updateDefaultValueById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDefaultValueByIdInput!
+  ): UpdateDefaultValuePayload
+
+  """Updates a single `Input` using its globally unique id and a patch."""
+  updateInput(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInputInput!
+  ): UpdateInputPayload
+
+  """Updates a single `Input` using a unique key and a patch."""
+  updateInputById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInputByIdInput!
+  ): UpdateInputPayload
+
+  """Updates a single `NoPrimaryKey` using a unique key and a patch."""
+  updateNoPrimaryKeyById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNoPrimaryKeyByIdInput!
+  ): UpdateNoPrimaryKeyPayload
+
+  """Updates a single `Patch` using its globally unique id and a patch."""
+  updatePatch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePatchInput!
+  ): UpdatePatchPayload
+
+  """Updates a single `Patch` using a unique key and a patch."""
+  updatePatchById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePatchByIdInput!
+  ): UpdatePatchPayload
+
+  """Updates a single `Post` using its globally unique id and a patch."""
+  updatePost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  """Updates a single `Post` using a unique key and a patch."""
+  updatePostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
+
+  """Updates a single `Reserved` using its globally unique id and a patch."""
+  updateReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Reserved` using a unique key and a patch."""
+  updateReservedById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedByIdInput!
+  ): UpdateReservedPayload
+
+  """
+  Updates a single `ReservedInputRecord` using its globally unique id and a patch.
+  """
+  updateReservedInputRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInputRecordInput!
+  ): UpdateReservedInputRecordPayload
+
+  """Updates a single `ReservedInputRecord` using a unique key and a patch."""
+  updateReservedInputRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInputRecordByIdInput!
+  ): UpdateReservedInputRecordPayload
+
+  """
+  Updates a single `ReservedPatchRecord` using its globally unique id and a patch.
+  """
+  updateReservedPatchRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedPatchRecordInput!
+  ): UpdateReservedPatchRecordPayload
+
+  """Updates a single `ReservedPatchRecord` using a unique key and a patch."""
+  updateReservedPatchRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedPatchRecordByIdInput!
+  ): UpdateReservedPatchRecordPayload
+
+  """
+  Updates a single `SimilarTable1` using its globally unique id and a patch.
+  """
+  updateSimilarTable1(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable1Input!
+  ): UpdateSimilarTable1Payload
+
+  """Updates a single `SimilarTable1` using a unique key and a patch."""
+  updateSimilarTable1ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable1ByIdInput!
+  ): UpdateSimilarTable1Payload
+
+  """
+  Updates a single `SimilarTable2` using its globally unique id and a patch.
+  """
+  updateSimilarTable2(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable2Input!
+  ): UpdateSimilarTable2Payload
+
+  """Updates a single `SimilarTable2` using a unique key and a patch."""
+  updateSimilarTable2ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable2ByIdInput!
+  ): UpdateSimilarTable2Payload
+
+  """Updates a single `ViewTable` using its globally unique id and a patch."""
+  updateViewTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateViewTableInput!
+  ): UpdateViewTablePayload
+
+  """Updates a single `ViewTable` using a unique key and a patch."""
+  updateViewTableById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateViewTableByIdInput!
+  ): UpdateViewTablePayload
+}
+
+"""All input for the `mutationCompoundTypeArray` mutation."""
+input MutationCompoundTypeArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+"""The output of our `mutationCompoundTypeArray` mutation."""
+type MutationCompoundTypeArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationIntervalArray` mutation."""
+input MutationIntervalArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationIntervalArray` mutation."""
+type MutationIntervalArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  intervals: [Interval]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationIntervalSet` mutation."""
+input MutationIntervalSetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationIntervalSet` mutation."""
+type MutationIntervalSetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  intervals: [Interval]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationTextArray` mutation."""
+input MutationTextArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationTextArray` mutation."""
+type MutationTextArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  strings: [String]
+}
+
+type NoPrimaryKey {
+  id: Int!
+  str: String!
+}
+
+"""
+A condition to be used against `NoPrimaryKey` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NoPrimaryKeyCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `str` field."""
+  str: String
+}
+
+"""An input for mutations affecting `NoPrimaryKey`"""
+input NoPrimaryKeyInput {
+  id: Int!
+  str: String!
+}
+
+"""
+Represents an update to a `NoPrimaryKey`. Fields that are set will be updated.
+"""
+input NoPrimaryKeyPatch {
+  id: Int
+  str: String
+}
+
+"""A connection to a list of `NoPrimaryKey` values."""
+type NoPrimaryKeysConnection {
+  """
+  A list of edges which contains the `NoPrimaryKey` and cursor to aid in pagination.
+  """
+  edges: [NoPrimaryKeysEdge!]!
+
+  """A list of `NoPrimaryKey` objects."""
+  nodes: [NoPrimaryKey!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `NoPrimaryKey` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `NoPrimaryKey` edge in the connection."""
+type NoPrimaryKeysEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NoPrimaryKey` at the end of the edge."""
+  node: NoPrimaryKey!
+}
+
+"""Methods to use when ordering `NoPrimaryKey`."""
+enum NoPrimaryKeysOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  STR_ASC
+  STR_DESC
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+type NonUpdatableView {
+  column: Int
+}
+
+"""
+A condition to be used against `NonUpdatableView` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NonUpdatableViewCondition {
+  """Checks for equality with the object’s `column` field."""
+  column: Int
+}
+
+"""A connection to a list of `NonUpdatableView` values."""
+type NonUpdatableViewsConnection {
+  """
+  A list of edges which contains the `NonUpdatableView` and cursor to aid in pagination.
+  """
+  edges: [NonUpdatableViewsEdge!]!
+
+  """A list of `NonUpdatableView` objects."""
+  nodes: [NonUpdatableView!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `NonUpdatableView` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `NonUpdatableView` edge in the connection."""
+type NonUpdatableViewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NonUpdatableView` at the end of the edge."""
+  node: NonUpdatableView!
+}
+
+"""Methods to use when ordering `NonUpdatableView`."""
+enum NonUpdatableViewsOrderBy {
+  COLUMN_ASC
+  COLUMN_DESC
+  NATURAL
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""Should output as Patch"""
+type Patch implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Patch` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PatchCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Patch`"""
+input PatchInput {
+  id: Int
+}
+
+"""
+Represents an update to a `Patch`. Fields that are set will be updated.
+"""
+input PatchPatch {
+  id: Int
+}
+
+"""A connection to a list of `Patch` values."""
+type PatchesConnection {
+  """
+  A list of edges which contains the `Patch` and cursor to aid in pagination.
+  """
+  edges: [PatchesEdge!]!
+
+  """A list of `Patch` objects."""
+  nodes: [Patch!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Patch` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Patch` edge in the connection."""
+type PatchesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Patch` at the end of the edge."""
+  node: Patch!
+}
+
+"""Methods to use when ordering `Patch`."""
+enum PatchesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Post implements Node {
+  authorId: Int
+  body: String
+  comptypes: [Comptype]
+  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  computedIntervalArray: [Interval]
+  computedIntervalSet(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PostComputedIntervalSetConnection!
+  computedTextArray: [String]
+  computedWithOptionalArg(i: Int): Int
+  computedWithRequiredArg(i: Int!): Int
+  enums: [AnEnum]
+  headlineTrimmed(length: Int, omission: String): String
+  headlineTrimmedNoDefaults(length: Int, omission: String): String
+  headlineTrimmedStrict(length: Int, omission: String): String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""A connection to a list of `Interval` values."""
+type PostComputedIntervalSetConnection {
+  """
+  A list of edges which contains the `Interval` and cursor to aid in pagination.
+  """
+  edges: [PostComputedIntervalSetEdge!]!
+
+  """A list of `Interval` objects."""
+  nodes: [Interval]!
+
+  """The count of *all* `Interval` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Interval` edge in the connection."""
+type PostComputedIntervalSetEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Interval` at the end of the edge."""
+  node: Interval
+}
+
+"""
+A condition to be used against `Post` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PostCondition {
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `body` field."""
+  body: String
+
+  """Checks for equality with the object’s `comptypes` field."""
+  comptypes: [ComptypeInput]
+
+  """Checks for equality with the object’s `computedWithOptionalArg` field."""
+  computedWithOptionalArg: Int
+
+  """Checks for equality with the object’s `enums` field."""
+  enums: [AnEnum]
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Post`"""
+input PostInput {
+  authorId: Int
+  body: String
+  comptypes: [ComptypeInput]
+  enums: [AnEnum]
+  id: Int
+}
+
+"""All input for the `postMany` mutation."""
+input PostManyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  posts: [PostInput]
+}
+
+"""The output of our `postMany` mutation."""
+type PostManyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  posts: [Post!]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""Represents an update to a `Post`. Fields that are set will be updated."""
+input PostPatch {
+  authorId: Int
+  body: String
+  comptypes: [ComptypeInput]
+  enums: [AnEnum]
+  id: Int
+}
+
+"""All input for the `postWithSuffix` mutation."""
+input PostWithSuffixInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  post: PostInput
+  suffix: String
+}
+
+"""The output of our `postWithSuffix` mutation."""
+type PostWithSuffixPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A connection to a list of `Post` values."""
+type PostsConnection {
+  """
+  A list of edges which contains the `Post` and cursor to aid in pagination.
+  """
+  edges: [PostsEdge!]!
+
+  """A list of `Post` objects."""
+  nodes: [Post!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Post` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Post` edge in the connection."""
+type PostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Post` at the end of the edge."""
+  node: Post!
+}
+
+"""Methods to use when ordering `Post`."""
+enum PostsOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  BODY_ASC
+  BODY_DESC
+  COMPTYPES_ASC
+  COMPTYPES_DESC
+  COMPUTED_WITH_OPTIONAL_ARG_ASC
+  COMPUTED_WITH_OPTIONAL_ARG_DESC
+  ENUMS_ASC
+  ENUMS_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """lol, add some stuff 1 query"""
+  add1Query(arg0: Int!, arg1: Int!): Int
+
+  """lol, add some stuff 2 query"""
+  add2Query(a: Int!, b: Int): Int
+
+  """lol, add some stuff 3 query"""
+  add3Query(a: Int, arg1: Int): Int
+
+  """lol, add some stuff 4 query"""
+  add4Query(arg0: Int, b: Int): Int
+
+  """Reads and enables pagination through a set of `DefaultValue`."""
+  allDefaultValues(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: DefaultValueCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `DefaultValue`."""
+    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DefaultValuesConnection
+
+  """Reads and enables pagination through a set of `ForeignKey`."""
+  allForeignKeys(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ForeignKeyCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ForeignKey`."""
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
+  ): ForeignKeysConnection
+
+  """Reads and enables pagination through a set of `Input`."""
+  allInputs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: InputCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Input`."""
+    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InputsConnection
+
+  """Reads and enables pagination through a set of `NoPrimaryKey`."""
+  allNoPrimaryKeys(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NoPrimaryKeyCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `NoPrimaryKey`."""
+    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
+  ): NoPrimaryKeysConnection
+
+  """Reads and enables pagination through a set of `NonUpdatableView`."""
+  allNonUpdatableViews(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NonUpdatableViewCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `NonUpdatableView`."""
+    orderBy: [NonUpdatableViewsOrderBy!] = [NATURAL]
+  ): NonUpdatableViewsConnection
+
+  """Reads and enables pagination through a set of `Patch`."""
+  allPatches(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PatchCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Patch`."""
+    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PatchesConnection
+
+  """Reads and enables pagination through a set of `Post`."""
+  allPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection
+
+  """Reads and enables pagination through a set of `ReservedInputRecord`."""
+  allReservedInputRecords(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ReservedInputRecordCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ReservedInputRecord`."""
+    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedInputRecordsConnection
+
+  """Reads and enables pagination through a set of `ReservedPatchRecord`."""
+  allReservedPatchRecords(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ReservedPatchRecordCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ReservedPatchRecord`."""
+    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedPatchRecordsConnection
+
+  """Reads and enables pagination through a set of `Reserved`."""
+  allReserveds(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ReservedCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedsConnection
+
+  """Reads and enables pagination through a set of `SimilarTable1`."""
+  allSimilarTable1S(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SimilarTable1Condition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SimilarTable1`."""
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable1SConnection
+
+  """Reads and enables pagination through a set of `SimilarTable2`."""
+  allSimilarTable2S(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SimilarTable2Condition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SimilarTable2`."""
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable2SConnection
+
+  """Reads and enables pagination through a set of `Testview`."""
+  allTestviews(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TestviewCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Testview`."""
+    orderBy: [TestviewsOrderBy!] = [NATURAL]
+  ): TestviewsConnection
+
+  """Reads and enables pagination through a set of `ViewTable`."""
+  allViewTables(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ViewTableCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ViewTable`."""
+    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ViewTablesConnection
+
+  """Reads a single `DefaultValue` using its globally unique `ID`."""
+  defaultValue(
+    """
+    The globally unique `ID` to be used in selecting a single `DefaultValue`.
+    """
+    nodeId: ID!
+  ): DefaultValue
+  defaultValueById(id: Int!): DefaultValue
+
+  """Reads a single `Input` using its globally unique `ID`."""
+  input(
+    """The globally unique `ID` to be used in selecting a single `Input`."""
+    nodeId: ID!
+  ): Input
+  inputById(id: Int!): Input
+  noPrimaryKeyById(id: Int!): NoPrimaryKey
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, arg2: Int, b: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
+
+  """Reads a single `Patch` using its globally unique `ID`."""
+  patch(
+    """The globally unique `ID` to be used in selecting a single `Patch`."""
+    nodeId: ID!
+  ): Patch
+  patchById(id: Int!): Patch
+
+  """Reads a single `Post` using its globally unique `ID`."""
+  post(
+    """The globally unique `ID` to be used in selecting a single `Post`."""
+    nodeId: ID!
+  ): Post
+  postById(id: Int!): Post
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  queryIntervalArray: [Interval]
+  queryIntervalSet(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): QueryIntervalSetConnection
+  queryTextArray: [String]
+
+  """Reads a single `Reserved` using its globally unique `ID`."""
+  reserved(
+    """The globally unique `ID` to be used in selecting a single `Reserved`."""
+    nodeId: ID!
+  ): Reserved
+  reservedById(id: Int!): Reserved
+
+  """Reads a single `ReservedInputRecord` using its globally unique `ID`."""
+  reservedInputRecord(
+    """
+    The globally unique `ID` to be used in selecting a single `ReservedInputRecord`.
+    """
+    nodeId: ID!
+  ): ReservedInputRecord
+  reservedInputRecordById(id: Int!): ReservedInputRecord
+
+  """Reads a single `ReservedPatchRecord` using its globally unique `ID`."""
+  reservedPatchRecord(
+    """
+    The globally unique `ID` to be used in selecting a single `ReservedPatchRecord`.
+    """
+    nodeId: ID!
+  ): ReservedPatchRecord
+  reservedPatchRecordById(id: Int!): ReservedPatchRecord
+
+  """Reads a single `SimilarTable1` using its globally unique `ID`."""
+  similarTable1(
+    """
+    The globally unique `ID` to be used in selecting a single `SimilarTable1`.
+    """
+    nodeId: ID!
+  ): SimilarTable1
+  similarTable1ById(id: Int!): SimilarTable1
+
+  """Reads a single `SimilarTable2` using its globally unique `ID`."""
+  similarTable2(
+    """
+    The globally unique `ID` to be used in selecting a single `SimilarTable2`.
+    """
+    nodeId: ID!
+  ): SimilarTable2
+  similarTable2ById(id: Int!): SimilarTable2
+  staticBigInteger(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): StaticBigIntegerConnection
+  uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
+
+  """Reads a single `ViewTable` using its globally unique `ID`."""
+  viewTable(
+    """The globally unique `ID` to be used in selecting a single `ViewTable`."""
+    nodeId: ID!
+  ): ViewTable
+  viewTableById(id: Int!): ViewTable
+}
+
+"""A connection to a list of `Interval` values."""
+type QueryIntervalSetConnection {
+  """
+  A list of edges which contains the `Interval` and cursor to aid in pagination.
+  """
+  edges: [QueryIntervalSetEdge!]!
+
+  """A list of `Interval` objects."""
+  nodes: [Interval]!
+
+  """The count of *all* `Interval` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Interval` edge in the connection."""
+type QueryIntervalSetEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Interval` at the end of the edge."""
+  node: Interval
+}
+
+type Reserved implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Reserved` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ReservedCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Reserved`"""
+input ReservedInput {
+  id: Int
+}
+
+"""
+`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table
+"""
+type ReservedInputRecord implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `ReservedInputRecord` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input ReservedInputRecordCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `ReservedInputRecord`"""
+input ReservedInputRecordInput {
+  id: Int
+}
+
+"""
+Represents an update to a `ReservedInputRecord`. Fields that are set will be updated.
+"""
+input ReservedInputRecordPatch {
+  id: Int
+}
+
+"""A connection to a list of `ReservedInputRecord` values."""
+type ReservedInputRecordsConnection {
+  """
+  A list of edges which contains the `ReservedInputRecord` and cursor to aid in pagination.
+  """
+  edges: [ReservedInputRecordsEdge!]!
+
+  """A list of `ReservedInputRecord` objects."""
+  nodes: [ReservedInputRecord!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ReservedInputRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ReservedInputRecord` edge in the connection."""
+type ReservedInputRecordsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ReservedInputRecord` at the end of the edge."""
+  node: ReservedInputRecord!
+}
+
+"""Methods to use when ordering `ReservedInputRecord`."""
+enum ReservedInputRecordsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `Reserved`. Fields that are set will be updated.
+"""
+input ReservedPatch {
+  id: Int
+}
+
+"""
+`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table
+"""
+type ReservedPatchRecord implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `ReservedPatchRecord` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input ReservedPatchRecordCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `ReservedPatchRecord`"""
+input ReservedPatchRecordInput {
+  id: Int
+}
+
+"""
+Represents an update to a `ReservedPatchRecord`. Fields that are set will be updated.
+"""
+input ReservedPatchRecordPatch {
+  id: Int
+}
+
+"""A connection to a list of `ReservedPatchRecord` values."""
+type ReservedPatchRecordsConnection {
+  """
+  A list of edges which contains the `ReservedPatchRecord` and cursor to aid in pagination.
+  """
+  edges: [ReservedPatchRecordsEdge!]!
+
+  """A list of `ReservedPatchRecord` objects."""
+  nodes: [ReservedPatchRecord!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ReservedPatchRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ReservedPatchRecord` edge in the connection."""
+type ReservedPatchRecordsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ReservedPatchRecord` at the end of the edge."""
+  node: ReservedPatchRecord!
+}
+
+"""Methods to use when ordering `ReservedPatchRecord`."""
+enum ReservedPatchRecordsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""A connection to a list of `Reserved` values."""
+type ReservedsConnection {
+  """
+  A list of edges which contains the `Reserved` and cursor to aid in pagination.
+  """
+  edges: [ReservedsEdge!]!
+
+  """A list of `Reserved` objects."""
+  nodes: [Reserved!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Reserved` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Reserved` edge in the connection."""
+type ReservedsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Reserved` at the end of the edge."""
+  node: Reserved!
+}
+
+"""Methods to use when ordering `Reserved`."""
+enum ReservedsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the `returnVoidMutation` mutation."""
+input ReturnVoidMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `returnVoidMutation` mutation."""
+type ReturnVoidMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SimilarTable1 implements Node {
+  col1: Int
+  col2: Int
+  col3: Int!
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `SimilarTable1` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input SimilarTable1Condition {
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+
+  """Checks for equality with the object’s `col3` field."""
+  col3: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `SimilarTable1`"""
+input SimilarTable1Input {
+  col1: Int
+  col2: Int
+  col3: Int!
+  id: Int
+}
+
+"""
+Represents an update to a `SimilarTable1`. Fields that are set will be updated.
+"""
+input SimilarTable1Patch {
+  col1: Int
+  col2: Int
+  col3: Int
+  id: Int
+}
+
+"""A connection to a list of `SimilarTable1` values."""
+type SimilarTable1SConnection {
+  """
+  A list of edges which contains the `SimilarTable1` and cursor to aid in pagination.
+  """
+  edges: [SimilarTable1SEdge!]!
+
+  """A list of `SimilarTable1` objects."""
+  nodes: [SimilarTable1!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SimilarTable1` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SimilarTable1` edge in the connection."""
+type SimilarTable1SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SimilarTable1` at the end of the edge."""
+  node: SimilarTable1!
+}
+
+"""Methods to use when ordering `SimilarTable1`."""
+enum SimilarTable1SOrderBy {
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+  COL3_ASC
+  COL3_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type SimilarTable2 implements Node {
+  col3: Int!
+  col4: Int
+  col5: Int
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `SimilarTable2` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input SimilarTable2Condition {
+  """Checks for equality with the object’s `col3` field."""
+  col3: Int
+
+  """Checks for equality with the object’s `col4` field."""
+  col4: Int
+
+  """Checks for equality with the object’s `col5` field."""
+  col5: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `SimilarTable2`"""
+input SimilarTable2Input {
+  col3: Int!
+  col4: Int
+  col5: Int
+  id: Int
+}
+
+"""
+Represents an update to a `SimilarTable2`. Fields that are set will be updated.
+"""
+input SimilarTable2Patch {
+  col3: Int
+  col4: Int
+  col5: Int
+  id: Int
+}
+
+"""A connection to a list of `SimilarTable2` values."""
+type SimilarTable2SConnection {
+  """
+  A list of edges which contains the `SimilarTable2` and cursor to aid in pagination.
+  """
+  edges: [SimilarTable2SEdge!]!
+
+  """A list of `SimilarTable2` objects."""
+  nodes: [SimilarTable2!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SimilarTable2` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SimilarTable2` edge in the connection."""
+type SimilarTable2SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SimilarTable2` at the end of the edge."""
+  node: SimilarTable2!
+}
+
+"""Methods to use when ordering `SimilarTable2`."""
+enum SimilarTable2SOrderBy {
+  COL3_ASC
+  COL3_DESC
+  COL4_ASC
+  COL4_DESC
+  COL5_ASC
+  COL5_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""A connection to a list of `BigInt` values."""
+type StaticBigIntegerConnection {
+  """
+  A list of edges which contains the `BigInt` and cursor to aid in pagination.
+  """
+  edges: [StaticBigIntegerEdge!]!
+
+  """A list of `BigInt` objects."""
+  nodes: [BigInt]!
+
+  """The count of *all* `BigInt` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `BigInt` edge in the connection."""
+type StaticBigIntegerEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `BigInt` at the end of the edge."""
+  node: BigInt
+}
+
+type Testview {
+  col1: Int
+  col2: Int
+  testviewid: Int
+}
+
+"""
+A condition to be used against `Testview` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input TestviewCondition {
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+
+  """Checks for equality with the object’s `testviewid` field."""
+  testviewid: Int
+}
+
+"""An input for mutations affecting `Testview`"""
+input TestviewInput {
+  col1: Int
+  col2: Int
+  testviewid: Int
+}
+
+"""A connection to a list of `Testview` values."""
+type TestviewsConnection {
+  """
+  A list of edges which contains the `Testview` and cursor to aid in pagination.
+  """
+  edges: [TestviewsEdge!]!
+
+  """A list of `Testview` objects."""
+  nodes: [Testview!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Testview` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Testview` edge in the connection."""
+type TestviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Testview` at the end of the edge."""
+  node: Testview!
+}
+
+"""Methods to use when ordering `Testview`."""
+enum TestviewsOrderBy {
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+  NATURAL
+  TESTVIEWID_ASC
+  TESTVIEWID_DESC
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+type UniqueForeignKey {
+  compoundKey1: Int
+  compoundKey2: Int
+}
+
+"""All input for the `updateDefaultValueById` mutation."""
+input UpdateDefaultValueByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DefaultValue` being updated.
+  """
+  defaultValuePatch: DefaultValuePatch!
+  id: Int!
+}
+
+"""All input for the `updateDefaultValue` mutation."""
+input UpdateDefaultValueInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `DefaultValue` being updated.
+  """
+  defaultValuePatch: DefaultValuePatch!
+
+  """
+  The globally unique `ID` which will identify a single `DefaultValue` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `DefaultValue` mutation."""
+type UpdateDefaultValuePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DefaultValue` that was updated by this mutation."""
+  defaultValue: DefaultValue
+
+  """An edge for our `DefaultValue`. May be used by Relay 1."""
+  defaultValueEdge(
+    """The method to use when ordering `DefaultValue`."""
+    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DefaultValuesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateInputById` mutation."""
+input UpdateInputByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Input` being updated.
+  """
+  inputPatch: InputPatch!
+}
+
+"""All input for the `updateInput` mutation."""
+input UpdateInputInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Input` being updated.
+  """
+  inputPatch: InputPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Input` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Input` mutation."""
+type UpdateInputPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Input` that was updated by this mutation."""
+  input: Input
+
+  """An edge for our `Input`. May be used by Relay 1."""
+  inputEdge(
+    """The method to use when ordering `Input`."""
+    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InputsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNoPrimaryKeyById` mutation."""
+input UpdateNoPrimaryKeyByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `NoPrimaryKey` being updated.
+  """
+  noPrimaryKeyPatch: NoPrimaryKeyPatch!
+}
+
+"""The output of our update `NoPrimaryKey` mutation."""
+type UpdateNoPrimaryKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NoPrimaryKey` that was updated by this mutation."""
+  noPrimaryKey: NoPrimaryKey
+
+  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
+  noPrimaryKeyEdge(
+    """The method to use when ordering `NoPrimaryKey`."""
+    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
+  ): NoPrimaryKeysEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePatchById` mutation."""
+input UpdatePatchByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Patch` being updated.
+  """
+  patchPatch: PatchPatch!
+}
+
+"""All input for the `updatePatch` mutation."""
+input UpdatePatchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Patch` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Patch` being updated.
+  """
+  patchPatch: PatchPatch!
+}
+
+"""The output of our update `Patch` mutation."""
+type UpdatePatchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Patch` that was updated by this mutation."""
+  patch: Patch
+
+  """An edge for our `Patch`. May be used by Relay 1."""
+  patchEdge(
+    """The method to use when ordering `Patch`."""
+    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PatchesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePostById` mutation."""
+input UpdatePostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Post` being updated.
+  """
+  postPatch: PostPatch!
+}
+
+"""All input for the `updatePost` mutation."""
+input UpdatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Post` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Post` being updated.
+  """
+  postPatch: PostPatch!
+}
+
+"""The output of our update `Post` mutation."""
+type UpdatePostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Post` that was updated by this mutation."""
+  post: Post
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateReservedById` mutation."""
+input UpdateReservedByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""All input for the `updateReserved` mutation."""
+input UpdateReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Reserved` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""All input for the `updateReservedInputRecordById` mutation."""
+input UpdateReservedInputRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ReservedInputRecord` being updated.
+  """
+  reservedInputRecordPatch: ReservedInputRecordPatch!
+}
+
+"""All input for the `updateReservedInputRecord` mutation."""
+input UpdateReservedInputRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReservedInputRecord` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ReservedInputRecord` being updated.
+  """
+  reservedInputRecordPatch: ReservedInputRecordPatch!
+}
+
+"""The output of our update `ReservedInputRecord` mutation."""
+type UpdateReservedInputRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReservedInputRecord` that was updated by this mutation."""
+  reservedInputRecord: ReservedInputRecord
+
+  """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
+  reservedInputRecordEdge(
+    """The method to use when ordering `ReservedInputRecord`."""
+    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedInputRecordsEdge
+}
+
+"""All input for the `updateReservedPatchRecordById` mutation."""
+input UpdateReservedPatchRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ReservedPatchRecord` being updated.
+  """
+  reservedPatchRecordPatch: ReservedPatchRecordPatch!
+}
+
+"""All input for the `updateReservedPatchRecord` mutation."""
+input UpdateReservedPatchRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReservedPatchRecord` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ReservedPatchRecord` being updated.
+  """
+  reservedPatchRecordPatch: ReservedPatchRecordPatch!
+}
+
+"""The output of our update `ReservedPatchRecord` mutation."""
+type UpdateReservedPatchRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ReservedPatchRecord` that was updated by this mutation."""
+  reservedPatchRecord: ReservedPatchRecord
+
+  """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
+  reservedPatchRecordEdge(
+    """The method to use when ordering `ReservedPatchRecord`."""
+    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedPatchRecordsEdge
+}
+
+"""The output of our update `Reserved` mutation."""
+type UpdateReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Reserved` that was updated by this mutation."""
+  reserved: Reserved
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the `updateSimilarTable1ById` mutation."""
+input UpdateSimilarTable1ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable1` being updated.
+  """
+  similarTable1Patch: SimilarTable1Patch!
+}
+
+"""All input for the `updateSimilarTable1` mutation."""
+input UpdateSimilarTable1Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `SimilarTable1` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable1` being updated.
+  """
+  similarTable1Patch: SimilarTable1Patch!
+}
+
+"""The output of our update `SimilarTable1` mutation."""
+type UpdateSimilarTable1Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SimilarTable1` that was updated by this mutation."""
+  similarTable1: SimilarTable1
+
+  """An edge for our `SimilarTable1`. May be used by Relay 1."""
+  similarTable1Edge(
+    """The method to use when ordering `SimilarTable1`."""
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable1SEdge
+}
+
+"""All input for the `updateSimilarTable2ById` mutation."""
+input UpdateSimilarTable2ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable2` being updated.
+  """
+  similarTable2Patch: SimilarTable2Patch!
+}
+
+"""All input for the `updateSimilarTable2` mutation."""
+input UpdateSimilarTable2Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `SimilarTable2` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable2` being updated.
+  """
+  similarTable2Patch: SimilarTable2Patch!
+}
+
+"""The output of our update `SimilarTable2` mutation."""
+type UpdateSimilarTable2Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `SimilarTable2` that was updated by this mutation."""
+  similarTable2: SimilarTable2
+
+  """An edge for our `SimilarTable2`. May be used by Relay 1."""
+  similarTable2Edge(
+    """The method to use when ordering `SimilarTable2`."""
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SimilarTable2SEdge
+}
+
+"""All input for the `updateViewTableById` mutation."""
+input UpdateViewTableByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ViewTable` being updated.
+  """
+  viewTablePatch: ViewTablePatch!
+}
+
+"""All input for the `updateViewTable` mutation."""
+input UpdateViewTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ViewTable` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ViewTable` being updated.
+  """
+  viewTablePatch: ViewTablePatch!
+}
+
+"""The output of our update `ViewTable` mutation."""
+type UpdateViewTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ViewTable` that was updated by this mutation."""
+  viewTable: ViewTable
+
+  """An edge for our `ViewTable`. May be used by Relay 1."""
+  viewTableEdge(
+    """The method to use when ordering `ViewTable`."""
+    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ViewTablesEdge
+}
+
+type ViewTable implements Node {
+  col1: Int
+  col2: Int
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `ViewTable` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ViewTableCondition {
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `ViewTable`"""
+input ViewTableInput {
+  col1: Int
+  col2: Int
+  id: Int
+}
+
+"""
+Represents an update to a `ViewTable`. Fields that are set will be updated.
+"""
+input ViewTablePatch {
+  col1: Int
+  col2: Int
+  id: Int
+}
+
+"""A connection to a list of `ViewTable` values."""
+type ViewTablesConnection {
+  """
+  A list of edges which contains the `ViewTable` and cursor to aid in pagination.
+  """
+  edges: [ViewTablesEdge!]!
+
+  """A list of `ViewTable` objects."""
+  nodes: [ViewTable!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ViewTable` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `ViewTable` edge in the connection."""
+type ViewTablesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ViewTable` at the end of the edge."""
+  node: ViewTable!
+}
+
+"""Methods to use when ordering `ViewTable`."""
+enum ViewTablesOrderBy {
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}

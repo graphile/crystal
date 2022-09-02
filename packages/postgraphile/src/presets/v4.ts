@@ -1,6 +1,8 @@
 import "graphile-config";
 
+import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
+import { PgV4NonNullableEdgesPlugin } from "../plugins/PgV4NonNullableEdgesPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
 export interface V4Options {
@@ -23,9 +25,6 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     version: "0.0.0",
     inflection: {
       replace: {
-        connectionType(previous, preset, typeName) {
-          return this.pluralize(typeName) + `Connection`;
-        },
         ...(classicIds
           ? null
           : {
@@ -98,9 +97,12 @@ export const makeV4Preset = (
     plugins: [
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
+      PgV4BehaviorPlugin,
+      PgV4NonNullableEdgesPlugin,
       makeV4Plugin(options),
     ].filter(isNotNullish),
     schema: {
+      pgUseCustomNetworkScalars: false,
       pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
         options.pgForbidSetofFunctionsToReturnNull ?? false,
