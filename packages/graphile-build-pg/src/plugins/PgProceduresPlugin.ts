@@ -324,9 +324,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const isStrict = pgProc.proisstrict ?? false;
           const isStrictish =
             isStrict || info.options.pgStrictFunctions === true;
-          const numberOfRequiredArguments = isStrictish
-            ? numberOfArguments - numberOfArgumentsWithDefaults
-            : 0;
+          const numberOfRequiredArguments =
+            numberOfArguments - numberOfArgumentsWithDefaults;
           const { tags, description } = pgProc.getTagsAndDescription();
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
