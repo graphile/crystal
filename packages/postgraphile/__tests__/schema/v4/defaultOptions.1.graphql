@@ -7314,7 +7314,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
 
   """Reads a single `Issue756` using its globally unique `ID`."""
   issue756(
@@ -7407,7 +7407,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """Reads a single `Post` using its globally unique `ID`."""
   post(
