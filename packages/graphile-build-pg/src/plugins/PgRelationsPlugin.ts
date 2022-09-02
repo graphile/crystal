@@ -435,6 +435,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               remoteColumns,
               source: otherSourceOrBuilder,
               extensions,
+              isBackwards,
             } = relation;
             const relationTypeScope = isUnique
               ? `singularRelation`
@@ -452,7 +453,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             let fields = memo;
             const behavior = getBehavior(extensions);
             const defaultBehavior = isUnique
-              ? "single -singleRelation:list -singleRelation:connection"
+              ? "single -singularRelation:list -singularRelation:connection"
               : simpleCollections === "both"
               ? "connection list"
               : simpleCollections === "only"
@@ -674,6 +675,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             }
 
             if (
+              isBackwards &&
               build.behavior.matches(
                 behavior,
                 `${relationTypeScope}:connection`,
@@ -716,6 +718,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             }
 
             if (
+              isBackwards &&
               build.behavior.matches(
                 behavior,
                 `${relationTypeScope}:list`,
