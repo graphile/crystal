@@ -342,7 +342,7 @@ export class PgSourceBuilder<
 exportAs(PgSourceBuilder, "PgSourceBuilder");
 
 const $$codecSource = Symbol("codecSource");
-let temporarySourceCounter = 0;
+const $$codecCounter = Symbol("codecCounter");
 
 /**
  * PgSource represents any source of SELECT-able data in Postgres: tables,
@@ -424,7 +424,15 @@ export class PgSource<
       return codec[$$codecSource].get(executor);
     }
 
-    const name = `TemporarySource${++temporarySourceCounter}`;
+    let counter = codec[$$codecCounter];
+    if (counter) {
+      counter++;
+    } else {
+      counter = 1;
+    }
+    codec[$$codecCounter] = counter;
+
+    const name = `${codec.name}_tmp${counter === 1 ? "" : counter}`;
     const source = EXPORTABLE(
       (PgSource, codec, executor, name, sql) =>
         new PgSource({
