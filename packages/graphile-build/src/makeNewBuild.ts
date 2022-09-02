@@ -312,6 +312,16 @@ export default function makeNewBuild(
       }
       return type;
     },
+    nullableIf<T extends graphql.GraphQLType>(
+      condition: boolean,
+      type: T,
+    ): T | graphql.GraphQLNonNull<T> {
+      if (condition) {
+        return type;
+      } else {
+        return new graphql.GraphQLNonNull(type);
+      }
+    },
   };
   return build;
 }

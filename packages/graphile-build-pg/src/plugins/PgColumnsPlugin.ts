@@ -16,11 +16,10 @@ import {
 } from "@dataplan/pg";
 import type { SetterStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLNonNull, GraphQLOutputType, GraphQLType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { nullableIf } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -363,8 +362,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                     },
                     {
                       description: column.description,
-                      type: nullableIf(
-                        GraphQLNonNull,
+                      type: build.nullableIf(
                         isPgBaseInput ||
                           isPgPatch ||
                           (!column.notNull &&

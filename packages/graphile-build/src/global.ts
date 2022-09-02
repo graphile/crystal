@@ -23,6 +23,7 @@ import type {
   GraphQLInterfaceType,
   GraphQLInterfaceTypeConfig,
   GraphQLNamedType,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
@@ -387,6 +388,14 @@ declare global {
        * `handleRecoverableError` and then returns the fallback.
        */
       recoverable<T>(fallback: T, callback: () => T): T;
+
+      /**
+       * If condition is true, returns `type`, otherwise `new GraphQLNonNull(type)`
+       */
+      nullableIf<T extends GraphQLType>(
+        condition: boolean,
+        type: T,
+      ): T | GraphQLNonNull<T>;
     }
 
     /**

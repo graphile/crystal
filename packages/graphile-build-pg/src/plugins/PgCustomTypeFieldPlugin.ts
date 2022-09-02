@@ -45,7 +45,7 @@ import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { tagToString, nullableIf } from "../utils.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -811,8 +811,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     deprecationReason: tagToString(
                       source.extensions?.tags?.deprecated,
                     ),
-                    type: nullableIf(
-                      GraphQLNonNull,
+                    type: build.nullableIf(
                       !source.extensions?.tags?.notNull,
                       payloadType,
                     ),
@@ -855,8 +854,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     deprecationReason: tagToString(
                       source.extensions?.tags?.deprecated,
                     ),
-                    type: nullableIf(
-                      GraphQLNonNull,
+                    type: build.nullableIf(
                       !source.extensions?.tags?.notNull,
                       type!,
                     ),
@@ -931,8 +929,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               deprecationReason: tagToString(
                                 source.extensions?.tags?.deprecated,
                               ),
-                              type: nullableIf(
-                                GraphQLNonNull,
+                              type: build.nullableIf(
                                 source.extensions?.tags?.notNull !== true,
                                 ConnectionType,
                               ),
@@ -999,8 +996,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               source.extensions?.tags?.deprecated,
                             ),
                             // TODO: nullability
-                            type: nullableIf(
-                              GraphQLNonNull,
+                            type: build.nullableIf(
                               !source.extensions?.tags?.notNull,
                               new GraphQLList(type!),
                             ),
