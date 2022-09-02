@@ -524,21 +524,21 @@ lateral (
   from "a"."post_many"(__post_many_identifiers__."id0") as __post_many__
 ) as __post_many_result__
 
-select __comptype_result__.*
+select __frmcdc_comptype_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"a"."comptype"[] as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __comptype_identifiers__,
+) as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
-    to_char(__comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
-    __comptype__."is_optimised"::text as "1",
-    (not (__comptype__ is null))::text as "2",
-    __comptype_identifiers__.idx as "3"
-  from unnest(__comptype_identifiers__."id0") as __comptype__
-) as __comptype_result__
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    __frmcdc_comptype_1__."is_optimised"::text as "1",
+    (not (__frmcdc_comptype_1__ is null))::text as "2",
+    __frmcdc_comptype_1_identifiers__.idx as "3"
+  from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
+) as __frmcdc_comptype_1_result__
 
 select __post_with_suffix_result__.*
 from (

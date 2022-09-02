@@ -55,22 +55,22 @@ lateral (
   ) as __mutation_out_complex__
 ) as __mutation_out_complex_result__
 
-select __compound_type_result__.*
+select __frmcdc_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"c"."compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_identifiers__,
+) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __compound_type__."a"::text as "0",
-    __compound_type__."b" as "1",
-    __compound_type__."c"::text as "2",
-    (not (__compound_type__ is null))::text as "3",
-    __compound_type_identifiers__.idx as "4"
-  from (select (__compound_type_identifiers__."id0").*) as __compound_type__
-) as __compound_type_result__
+    __frmcdc_compound_type_1__."a"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."c"::text as "2",
+    (not (__frmcdc_compound_type_1__ is null))::text as "3",
+    __frmcdc_compound_type_1_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
+) as __frmcdc_compound_type_1_result__
 
 select __person_result__.*
 from (
@@ -118,22 +118,22 @@ lateral (
   ) as __mutation_out_complex_setof__
 ) as __mutation_out_complex_setof_result__
 
-select __compound_type_result__.*
+select __frmcdc_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"c"."compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_identifiers__,
+) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __compound_type__."a"::text as "0",
-    __compound_type__."b" as "1",
-    __compound_type__."c"::text as "2",
-    (not (__compound_type__ is null))::text as "3",
-    __compound_type_identifiers__.idx as "4"
-  from (select (__compound_type_identifiers__."id0").*) as __compound_type__
-) as __compound_type_result__
+    __frmcdc_compound_type_1__."a"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."c"::text as "2",
+    (not (__frmcdc_compound_type_1__ is null))::text as "3",
+    __frmcdc_compound_type_1_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
+) as __frmcdc_compound_type_1_result__
 
 select __person_result__.*
 from (
@@ -182,22 +182,22 @@ lateral (
   from "c"."mutation_out_out_compound_type"(__mutation_out_out_compound_type_identifiers__."id0") as __mutation_out_out_compound_type__
 ) as __mutation_out_out_compound_type_result__
 
-select __compound_type_result__.*
+select __frmcdc_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"c"."compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_identifiers__,
+) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __compound_type__."c"::text as "0",
-    __compound_type__."b" as "1",
-    __compound_type__."a"::text as "2",
-    (not (__compound_type__ is null))::text as "3",
-    __compound_type_identifiers__.idx as "4"
-  from (select (__compound_type_identifiers__."id0").*) as __compound_type__
-) as __compound_type_result__
+    __frmcdc_compound_type_1__."c"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."a"::text as "2",
+    (not (__frmcdc_compound_type_1__ is null))::text as "3",
+    __frmcdc_compound_type_1_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
+) as __frmcdc_compound_type_1_result__
 
 select
   __mutation_out_out_setof__."o2" as "0",

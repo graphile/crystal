@@ -6,26 +6,26 @@ update "pg11"."types" as __types__ set "regrole" = $1::"regrole", "regnamespace"
   __types__."domain_constrained_compound_type"::text as "4"
 
 
-select __temporary_source1_result__.*
+select __frmcdc_domain_constrained_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"pg11"."domain_constrained_compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __temporary_source1_identifiers__,
+) as __frmcdc_domain_constrained_compound_type_1_identifi__,
 lateral (
   select
-    __temporary_source1__."a"::text as "0",
-    __temporary_source1__."b" as "1",
-    __temporary_source1__."c"::text as "2",
-    __temporary_source1__."d" as "3",
-    __temporary_source1__."e"::text as "4",
-    __temporary_source1__."f"::text as "5",
-    __temporary_source1__."foo_bar"::text as "6",
-    (not (__temporary_source1__ is null))::text as "7",
-    __temporary_source1_identifiers__.idx as "8"
-  from (select (__temporary_source1_identifiers__."id0").*) as __temporary_source1__
-) as __temporary_source1_result__
+    __frmcdc_domain_constrained_compound_type_1__."a"::text as "0",
+    __frmcdc_domain_constrained_compound_type_1__."b" as "1",
+    __frmcdc_domain_constrained_compound_type_1__."c"::text as "2",
+    __frmcdc_domain_constrained_compound_type_1__."d" as "3",
+    __frmcdc_domain_constrained_compound_type_1__."e"::text as "4",
+    __frmcdc_domain_constrained_compound_type_1__."f"::text as "5",
+    __frmcdc_domain_constrained_compound_type_1__."foo_bar"::text as "6",
+    (not (__frmcdc_domain_constrained_compound_type_1__ is null))::text as "7",
+    __frmcdc_domain_constrained_compound_type_1_identifi__.idx as "8"
+  from (select (__frmcdc_domain_constrained_compound_type_1_identifi__."id0").*) as __frmcdc_domain_constrained_compound_type_1__
+) as __frmcdc_domain_constrained_compound_type_1_result__
 
 insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_domain_array_domain", "domain_constrained_compound_type") values ($1::"regrole", $2::"regnamespace", $3::"c"."bigint_domain_array_domain", $4::"pg11"."domain_constrained_compound_type") returning
   __types__."id"::text as "0",
@@ -35,23 +35,23 @@ insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_doma
   __types__."domain_constrained_compound_type"::text as "4"
 
 
-select __temporary_source1_result__.*
+select __frmcdc_domain_constrained_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"pg11"."domain_constrained_compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __temporary_source1_identifiers__,
+) as __frmcdc_domain_constrained_compound_type_1_identifi__,
 lateral (
   select
-    __temporary_source1__."a"::text as "0",
-    __temporary_source1__."b" as "1",
-    __temporary_source1__."c"::text as "2",
-    __temporary_source1__."d" as "3",
-    __temporary_source1__."e"::text as "4",
-    __temporary_source1__."f"::text as "5",
-    __temporary_source1__."foo_bar"::text as "6",
-    (not (__temporary_source1__ is null))::text as "7",
-    __temporary_source1_identifiers__.idx as "8"
-  from (select (__temporary_source1_identifiers__."id0").*) as __temporary_source1__
-) as __temporary_source1_result__
+    __frmcdc_domain_constrained_compound_type_1__."a"::text as "0",
+    __frmcdc_domain_constrained_compound_type_1__."b" as "1",
+    __frmcdc_domain_constrained_compound_type_1__."c"::text as "2",
+    __frmcdc_domain_constrained_compound_type_1__."d" as "3",
+    __frmcdc_domain_constrained_compound_type_1__."e"::text as "4",
+    __frmcdc_domain_constrained_compound_type_1__."f"::text as "5",
+    __frmcdc_domain_constrained_compound_type_1__."foo_bar"::text as "6",
+    (not (__frmcdc_domain_constrained_compound_type_1__ is null))::text as "7",
+    __frmcdc_domain_constrained_compound_type_1_identifi__.idx as "8"
+  from (select (__frmcdc_domain_constrained_compound_type_1_identifi__."id0").*) as __frmcdc_domain_constrained_compound_type_1__
+) as __frmcdc_domain_constrained_compound_type_1_result__

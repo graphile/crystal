@@ -43,63 +43,63 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   __types__."int8_array_domain"::text as "33"
 
 
-select __compound_type_result__.*
+select __frmcdc_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"c"."compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_identifiers__,
+) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __compound_type__."a"::text as "0",
-    __compound_type__."b" as "1",
-    __compound_type__."c"::text as "2",
-    __compound_type__."d" as "3",
-    __compound_type__."e"::text as "4",
-    __compound_type__."f"::text as "5",
-    __compound_type__."foo_bar"::text as "6",
-    (not (__compound_type__ is null))::text as "7",
-    __compound_type_identifiers__.idx as "8"
-  from (select (__compound_type_identifiers__."id0").*) as __compound_type__
-) as __compound_type_result__
+    __frmcdc_compound_type_1__."a"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."c"::text as "2",
+    __frmcdc_compound_type_1__."d" as "3",
+    __frmcdc_compound_type_1__."e"::text as "4",
+    __frmcdc_compound_type_1__."f"::text as "5",
+    __frmcdc_compound_type_1__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type_1__ is null))::text as "7",
+    __frmcdc_compound_type_1_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
+) as __frmcdc_compound_type_1_result__
 
-select __nested_compound_type_result__.*
+select __frmcdc_nested_compound_type_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"b"."nested_compound_type" as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __nested_compound_type_identifiers__,
+) as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
-    __compound_type__."a"::text as "0",
-    __compound_type__."b" as "1",
-    __compound_type__."c"::text as "2",
-    __compound_type__."d" as "3",
-    __compound_type__."e"::text as "4",
-    __compound_type__."f"::text as "5",
-    __compound_type__."foo_bar"::text as "6",
-    (not (__compound_type__ is null))::text as "7",
-    __nested_compound_type__."a"::text as "8",
-    __compound_type_2."a"::text as "9",
-    __compound_type_2."b" as "10",
-    __compound_type_2."c"::text as "11",
-    __compound_type_2."d" as "12",
-    __compound_type_2."e"::text as "13",
-    __compound_type_2."f"::text as "14",
-    __compound_type_2."foo_bar"::text as "15",
-    (not (__compound_type_2 is null))::text as "16",
-    __nested_compound_type__."b"::text as "17",
-    __nested_compound_type__."baz_buz"::text as "18",
-    (not (__nested_compound_type__ is null))::text as "19",
-    __nested_compound_type_identifiers__.idx as "20"
-  from (select (__nested_compound_type_identifiers__."id0").*) as __nested_compound_type__
-  left outer join lateral (select (__nested_compound_type__."a").*) as __compound_type__
+    __frmcdc_compound_type_1__."a"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."c"::text as "2",
+    __frmcdc_compound_type_1__."d" as "3",
+    __frmcdc_compound_type_1__."e"::text as "4",
+    __frmcdc_compound_type_1__."f"::text as "5",
+    __frmcdc_compound_type_1__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type_1__ is null))::text as "7",
+    __frmcdc_nested_compound_type_1__."a"::text as "8",
+    __frmcdc_compound_type_1_2."a"::text as "9",
+    __frmcdc_compound_type_1_2."b" as "10",
+    __frmcdc_compound_type_1_2."c"::text as "11",
+    __frmcdc_compound_type_1_2."d" as "12",
+    __frmcdc_compound_type_1_2."e"::text as "13",
+    __frmcdc_compound_type_1_2."f"::text as "14",
+    __frmcdc_compound_type_1_2."foo_bar"::text as "15",
+    (not (__frmcdc_compound_type_1_2 is null))::text as "16",
+    __frmcdc_nested_compound_type_1__."b"::text as "17",
+    __frmcdc_nested_compound_type_1__."baz_buz"::text as "18",
+    (not (__frmcdc_nested_compound_type_1__ is null))::text as "19",
+    __frmcdc_nested_compound_type_1_identifiers__.idx as "20"
+  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
+  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
   on TRUE
-  left outer join lateral (select (__nested_compound_type__."b").*) as __compound_type_2
+  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __nested_compound_type_result__
+) as __frmcdc_nested_compound_type_1_result__
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -578,21 +578,21 @@ insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text",
   __post__."comptypes"::text as "2"
 
 
-select __comptype_result__.*
+select __frmcdc_comptype_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"a"."comptype"[] as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __comptype_identifiers__,
+) as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
-    to_char(__comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
-    __comptype__."is_optimised"::text as "1",
-    (not (__comptype__ is null))::text as "2",
-    __comptype_identifiers__.idx as "3"
-  from unnest(__comptype_identifiers__."id0") as __comptype__
-) as __comptype_result__
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    __frmcdc_comptype_1__."is_optimised"::text as "1",
+    (not (__frmcdc_comptype_1__ is null))::text as "2",
+    __frmcdc_comptype_1_identifiers__.idx as "3"
+  from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
+) as __frmcdc_comptype_1_result__
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
   __post__."headline" as "0",
@@ -614,10 +614,10 @@ lateral (
     __post__."author_id"::text as "1",
     (select json_agg(_) from (
       select
-        __comptype__."is_optimised"::text as "0",
-        to_char(__comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
-        (not (__comptype__ is null))::text as "2"
-      from unnest(__post__."comptypes") as __comptype__
+        __frmcdc_comptype_1__."is_optimised"::text as "0",
+        to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
+        (not (__frmcdc_comptype_1__ is null))::text as "2"
+      from unnest(__post__."comptypes") as __frmcdc_comptype_1__
     ) _) as "2",
     __post__."id"::text as "3",
     __post__."headline" as "4",
@@ -632,21 +632,21 @@ lateral (
   order by __post__."id" asc
 ) as __post_result__
 
-select __comptype_result__.*
+select __frmcdc_comptype_1_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"a"."comptype"[] as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __comptype_identifiers__,
+) as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
-    to_char(__comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
-    __comptype__."is_optimised"::text as "1",
-    (not (__comptype__ is null))::text as "2",
-    __comptype_identifiers__.idx as "3"
-  from unnest(__comptype_identifiers__."id0") as __comptype__
-) as __comptype_result__
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    __frmcdc_comptype_1__."is_optimised"::text as "1",
+    (not (__frmcdc_comptype_1__ is null))::text as "2",
+    __frmcdc_comptype_1_identifiers__.idx as "3"
+  from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
+) as __frmcdc_comptype_1_result__
 
 select __person_result__.*
 from (
