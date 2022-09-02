@@ -24,7 +24,7 @@ type CreateFilePayload {
   """An edge for our `File`. May be used by Relay 1."""
   fileEdge(
     """The method to use when ordering `File`."""
-    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [FilesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): FilesEdge
 
   """
@@ -67,7 +67,7 @@ type CreateUserFilePayload {
   """An edge for our `UserFile`. May be used by Relay 1."""
   userFileEdge(
     """The method to use when ordering `UserFile`."""
-    orderBy: [UserFilesOrderBy!] = [NATURAL]
+    orderBy: [UserFilesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UserFilesEdge
 }
 
@@ -102,7 +102,7 @@ type CreateUserPayload {
   """An edge for our `User`. May be used by Relay 1."""
   userEdge(
     """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UsersEdge
 }
 
@@ -148,7 +148,7 @@ type DeleteFilePayload {
   """An edge for our `File`. May be used by Relay 1."""
   fileEdge(
     """The method to use when ordering `File`."""
-    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [FilesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): FilesEdge
 
   """
@@ -201,7 +201,7 @@ type DeleteUserPayload {
   """An edge for our `User`. May be used by Relay 1."""
   userEdge(
     """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UsersEdge
 }
 
@@ -243,7 +243,7 @@ type FilesConnection {
   """
   A list of edges which contains the `File` and cursor to aid in pagination.
   """
-  edges: [FilesEdge!]!
+  edges: [FilesEdge]!
 
   """A list of `File` objects."""
   nodes: [File]!
@@ -560,7 +560,7 @@ type UpdateFilePayload {
   """An edge for our `File`. May be used by Relay 1."""
   fileEdge(
     """The method to use when ordering `File`."""
-    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [FilesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): FilesEdge
 
   """
@@ -622,7 +622,7 @@ type UpdateUserPayload {
   """An edge for our `User`. May be used by Relay 1."""
   userEdge(
     """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UsersEdge
 }
 
@@ -661,7 +661,7 @@ type User implements Node {
     offset: Int
 
     """The method to use when ordering `UserFile`."""
-    orderBy: [UserFilesOrderBy!] = [NATURAL]
+    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserFilesConnection!
 }
 
