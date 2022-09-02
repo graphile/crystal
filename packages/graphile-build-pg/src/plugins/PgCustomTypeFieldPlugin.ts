@@ -594,16 +594,16 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 remainingParameters,
               );
 
-              // Not used for isMutation; that's handled elsewhere
-              const args = argDetails.reduce(
-                (memo, { inputType, graphqlArgName }) => {
+              // Not used for isMutation; that's handled elsewhere.
+              // This is a factory because we don't want mutations to one set
+              // of args to affect the others!
+              const makeFieldArgs = () =>
+                argDetails.reduce((memo, { inputType, graphqlArgName }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
                   };
                   return memo;
-                },
-                {} as GraphileFieldConfigArgumentMap<any, any, any, any>,
-              );
+                }, {} as GraphileFieldConfigArgumentMap<any, any, any, any>);
 
               const argDetailsSimple = argDetails.map(
                 ({ graphqlArgName, pgCodec, required, postgresArgName }) => ({
@@ -858,7 +858,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       !source.extensions?.tags?.notNull,
                       type!,
                     ),
-                    args,
+                    args: makeFieldArgs(),
                     plan: getSelectPlanFromParentAndArgs as any,
                   },
                 );
@@ -933,7 +933,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                 isRootQuery ?? false,
                                 ConnectionType,
                               ),
-                              args,
+                              args: makeFieldArgs(),
                               plan: EXPORTABLE(
                                 (connection, getSelectPlanFromParentAndArgs) =>
                                   function plan(
@@ -1004,7 +1004,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               !source.extensions?.tags?.notNull,
                               new GraphQLList(type!),
                             ),
-                            args,
+                            args: makeFieldArgs(),
                             plan: getSelectPlanFromParentAndArgs as any,
                           },
                         ),
