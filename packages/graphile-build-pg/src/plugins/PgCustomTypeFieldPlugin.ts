@@ -930,7 +930,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                 source.extensions?.tags?.deprecated,
                               ),
                               type: build.nullableIf(
-                                source.extensions?.tags?.notNull !== true,
+                                isRootQuery ?? false,
                                 ConnectionType,
                               ),
                               args,
