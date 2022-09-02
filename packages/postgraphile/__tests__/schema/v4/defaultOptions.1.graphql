@@ -6064,7 +6064,7 @@ type PersonSecretsConnection {
   """
   A list of edges which contains the `PersonSecret` and cursor to aid in pagination.
   """
-  edges: [PersonSecretsEdge!]!
+  edges: [PersonSecretsEdge]!
 
   """A list of `PersonSecret` objects."""
   nodes: [PersonSecret]!
@@ -6191,7 +6191,7 @@ type PostComputedIntervalSetConnection {
   """
   A list of edges which contains the `Interval` and cursor to aid in pagination.
   """
-  edges: [PostComputedIntervalSetEdge!]!
+  edges: [PostComputedIntervalSetEdge]!
 
   """A list of `Interval` objects."""
   nodes: [Interval]!
@@ -6323,7 +6323,7 @@ type PostsConnection {
   """
   A list of edges which contains the `Post` and cursor to aid in pagination.
   """
-  edges: [PostsEdge!]!
+  edges: [PostsEdge]!
 
   """A list of `Post` objects."""
   nodes: [Post]!
