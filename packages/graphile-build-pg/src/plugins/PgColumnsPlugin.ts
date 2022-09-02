@@ -291,11 +291,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLInputObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          graphql: { GraphQLNonNull },
-          inflection,
-        } = build;
+        const { extend, inflection } = build;
         const {
           scope: {
             isPgRowType,

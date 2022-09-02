@@ -3,7 +3,6 @@ import "graphile-config";
 import type { EdgeCapableStep, PageInfoCapableStep } from "dataplanner";
 import { ConnectionStep, ExecutableStep } from "dataplanner";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
 

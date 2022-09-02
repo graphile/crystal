@@ -18,6 +18,7 @@ import type {
   PgEnum,
   PgExtension,
   PgIndex,
+  PgInherits,
   PgLanguage,
   PgNamespace,
   PgProc,
@@ -37,7 +38,6 @@ import {
   withPgClientFromPgSource,
 } from "../pgSources.js";
 import { watchFixtures } from "../watchFixtures.js";
-import { PgInherits } from "pg-introspection";
 
 export type PgEntityWithId =
   | PgNamespace

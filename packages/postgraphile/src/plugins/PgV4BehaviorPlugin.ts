@@ -2,7 +2,6 @@ import "graphile-config";
 import "graphile-build-pg";
 
 import type { PgSource, PgSourceParameter } from "@dataplan/pg";
-import { PgTypeCodec } from "@dataplan/pg";
 import type { PgProc } from "pg-introspection";
 import { inspect } from "util";
 
