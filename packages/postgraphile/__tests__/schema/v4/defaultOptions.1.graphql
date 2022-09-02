@@ -464,7 +464,7 @@ type CompoundKeysConnection {
   """
   A list of edges which contains the `CompoundKey` and cursor to aid in pagination.
   """
-  edges: [CompoundKeysEdge!]!
+  edges: [CompoundKeysEdge]!
 
   """A list of `CompoundKey` objects."""
   nodes: [CompoundKey]!
@@ -603,7 +603,7 @@ type CompoundTypesConnection {
   """
   A list of edges which contains the `CompoundType` and cursor to aid in pagination.
   """
-  edges: [CompoundTypesEdge!]!
+  edges: [CompoundTypesEdge]!
 
   """A list of `CompoundType` objects."""
   nodes: [CompoundType]!
@@ -1530,7 +1530,7 @@ type DefaultValuesConnection {
   """
   A list of edges which contains the `DefaultValue` and cursor to aid in pagination.
   """
-  edges: [DefaultValuesEdge!]!
+  edges: [DefaultValuesEdge]!
 
   """A list of `DefaultValue` objects."""
   nodes: [DefaultValue]!
@@ -2531,7 +2531,7 @@ type EdgeCasesConnection {
   """
   A list of edges which contains the `EdgeCase` and cursor to aid in pagination.
   """
-  edges: [EdgeCasesEdge!]!
+  edges: [EdgeCasesEdge]!
 
   """A list of `EdgeCase` objects."""
   nodes: [EdgeCase]!
@@ -2637,7 +2637,7 @@ type ForeignKeysConnection {
   """
   A list of edges which contains the `ForeignKey` and cursor to aid in pagination.
   """
-  edges: [ForeignKeysEdge!]!
+  edges: [ForeignKeysEdge]!
 
   """A list of `ForeignKey` objects."""
   nodes: [ForeignKey]!
@@ -2680,7 +2680,7 @@ type FuncOutComplexSetofConnection {
   """
   A list of edges which contains the `FuncOutComplexSetofRecord` and cursor to aid in pagination.
   """
-  edges: [FuncOutComplexSetofEdge!]!
+  edges: [FuncOutComplexSetofEdge]!
 
   """A list of `FuncOutComplexSetofRecord` objects."""
   nodes: [FuncOutComplexSetofRecord]!
@@ -2724,7 +2724,7 @@ type FuncOutOutSetofConnection {
   """
   A list of edges which contains the `FuncOutOutSetofRecord` and cursor to aid in pagination.
   """
-  edges: [FuncOutOutSetofEdge!]!
+  edges: [FuncOutOutSetofEdge]!
 
   """A list of `FuncOutOutSetofRecord` objects."""
   nodes: [FuncOutOutSetofRecord]!
@@ -2762,7 +2762,7 @@ type FuncOutSetofConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [FuncOutSetofEdge!]!
+  edges: [FuncOutSetofEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
@@ -2794,7 +2794,7 @@ type FuncReturnsTableMultiColConnection {
   """
   A list of edges which contains the `FuncReturnsTableMultiColRecord` and cursor to aid in pagination.
   """
-  edges: [FuncReturnsTableMultiColEdge!]!
+  edges: [FuncReturnsTableMultiColEdge]!
 
   """A list of `FuncReturnsTableMultiColRecord` objects."""
   nodes: [FuncReturnsTableMultiColRecord]!
@@ -2827,7 +2827,7 @@ type FuncReturnsTableOneColConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [FuncReturnsTableOneColEdge!]!
+  edges: [FuncReturnsTableOneColEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
@@ -2910,7 +2910,7 @@ type InputsConnection {
   """
   A list of edges which contains the `Input` and cursor to aid in pagination.
   """
-  edges: [InputsEdge!]!
+  edges: [InputsEdge]!
 
   """A list of `Input` objects."""
   nodes: [Input]!
@@ -2972,7 +2972,7 @@ type IntSetQueryConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [IntSetQueryEdge!]!
+  edges: [IntSetQueryEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
@@ -3121,7 +3121,7 @@ type Issue756SConnection {
   """
   A list of edges which contains the `Issue756` and cursor to aid in pagination.
   """
-  edges: [Issue756SEdge!]!
+  edges: [Issue756SEdge]!
 
   """A list of `Issue756` objects."""
   nodes: [Issue756]!
@@ -3395,7 +3395,7 @@ type LeftArmsConnection {
   """
   A list of edges which contains the `LeftArm` and cursor to aid in pagination.
   """
-  edges: [LeftArmsEdge!]!
+  edges: [LeftArmsEdge]!
 
   """A list of `LeftArm` objects."""
   nodes: [LeftArm]!
@@ -5288,7 +5288,7 @@ type MyTablesConnection {
   """
   A list of edges which contains the `MyTable` and cursor to aid in pagination.
   """
-  edges: [MyTablesEdge!]!
+  edges: [MyTablesEdge]!
 
   """A list of `MyTable` objects."""
   nodes: [MyTable]!
@@ -5393,7 +5393,7 @@ type NoPrimaryKeysConnection {
   """
   A list of edges which contains the `NoPrimaryKey` and cursor to aid in pagination.
   """
-  edges: [NoPrimaryKeysEdge!]!
+  edges: [NoPrimaryKeysEdge]!
 
   """A list of `NoPrimaryKey` objects."""
   nodes: [NoPrimaryKey]!
@@ -5449,7 +5449,7 @@ type NonUpdatableViewsConnection {
   """
   A list of edges which contains the `NonUpdatableView` and cursor to aid in pagination.
   """
-  edges: [NonUpdatableViewsEdge!]!
+  edges: [NonUpdatableViewsEdge]!
 
   """A list of `NonUpdatableView` objects."""
   nodes: [NonUpdatableView]!
@@ -5536,7 +5536,7 @@ type NullTestRecordsConnection {
   """
   A list of edges which contains the `NullTestRecord` and cursor to aid in pagination.
   """
-  edges: [NullTestRecordsEdge!]!
+  edges: [NullTestRecordsEdge]!
 
   """A list of `NullTestRecord` objects."""
   nodes: [NullTestRecord]!
@@ -5622,7 +5622,7 @@ type PatchesConnection {
   """
   A list of edges which contains the `Patch` and cursor to aid in pagination.
   """
-  edges: [PatchesEdge!]!
+  edges: [PatchesEdge]!
 
   """A list of `Patch` objects."""
   nodes: [Patch]!
@@ -5657,7 +5657,7 @@ type PeopleConnection {
   """
   A list of edges which contains the `Person` and cursor to aid in pagination.
   """
-  edges: [PeopleEdge!]!
+  edges: [PeopleEdge]!
 
   """A list of `Person` objects."""
   nodes: [Person]!
