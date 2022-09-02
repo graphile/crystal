@@ -7478,6 +7478,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): ReservedPatchRecord
+
+  """Get a single `ReservedPatchRecord`."""
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
   returnTableWithoutGrants: CompoundKey
   searchTestSummariesList(
