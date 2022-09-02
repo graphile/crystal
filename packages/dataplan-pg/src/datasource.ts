@@ -432,7 +432,8 @@ export class PgSource<
     }
     codec[$$codecCounter] = counter;
 
-    const name = `${codec.name}_tmp${counter === 1 ? "" : counter}`;
+    // "From Codec"
+    const name = `frmcdc_${codec.name}_${counter}`;
     const source = EXPORTABLE(
       (PgSource, codec, executor, name, sql) =>
         new PgSource({
