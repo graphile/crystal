@@ -167,6 +167,57 @@ input DeleteUserByIdInput {
   id: Int!
 }
 
+"""All input for the `deleteUserFileById` mutation."""
+input DeleteUserFileByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteUserFile` mutation."""
+input DeleteUserFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `UserFile` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `UserFile` mutation."""
+type DeleteUserFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedUserFileId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `User` that is related to this `UserFile`."""
+  userByUserId: User
+
+  """The `UserFile` that was deleted by this mutation."""
+  userFile: UserFile
+
+  """An edge for our `UserFile`. May be used by Relay 1."""
+  userFileEdge(
+    """The method to use when ordering `UserFile`."""
+    orderBy: [UserFilesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserFilesEdge
+}
+
 """All input for the `deleteUser` mutation."""
 input DeleteUserInput {
   """
@@ -335,6 +386,22 @@ type Mutation {
     input: DeleteUserByIdInput!
   ): DeleteUserPayload
 
+  """Deletes a single `UserFile` using its globally unique id."""
+  deleteUserFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserFileInput!
+  ): DeleteUserFilePayload
+
+  """Deletes a single `UserFile` using a unique key."""
+  deleteUserFileById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserFileByIdInput!
+  ): DeleteUserFilePayload
+
   """Updates a single `File` using its globally unique id and a patch."""
   updateFile(
     """
@@ -366,6 +433,22 @@ type Mutation {
     """
     input: UpdateUserByIdInput!
   ): UpdateUserPayload
+
+  """Updates a single `UserFile` using its globally unique id and a patch."""
+  updateUserFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserFileInput!
+  ): UpdateUserFilePayload
+
+  """Updates a single `UserFile` using a unique key and a patch."""
+  updateUserFileById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserFileByIdInput!
+  ): UpdateUserFilePayload
 }
 
 """An object with a globally unique `ID`."""
@@ -448,7 +531,7 @@ type Query implements Node {
     offset: Int
 
     """The method to use when ordering `UserFile`."""
-    orderBy: [UserFilesOrderBy!] = [NATURAL]
+    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserFilesConnection
 
   """Reads and enables pagination through a set of `User`."""
@@ -485,6 +568,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `File`."""
     nodeId: ID!
   ): File
+
+  """Get a single `File`."""
   fileById(id: Int!): File
 
   """Fetches an object given its globally unique `ID`."""
@@ -509,7 +594,18 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `User`."""
     nodeId: ID!
   ): User
+
+  """Get a single `User`."""
   userById(id: Int!): User
+
+  """Reads a single `UserFile` using its globally unique `ID`."""
+  userFile(
+    """The globally unique `ID` to be used in selecting a single `UserFile`."""
+    nodeId: ID!
+  ): UserFile
+
+  """Get a single `UserFile`."""
+  userFileById(id: Int!): UserFile
 }
 
 """All input for the `updateFileById` mutation."""
@@ -582,6 +678,66 @@ input UpdateUserByIdInput {
   An object where the defined keys will be set on the `User` being updated.
   """
   userPatch: UserPatch!
+}
+
+"""All input for the `updateUserFileById` mutation."""
+input UpdateUserFileByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `UserFile` being updated.
+  """
+  userFilePatch: UserFilePatch!
+}
+
+"""All input for the `updateUserFile` mutation."""
+input UpdateUserFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `UserFile` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `UserFile` being updated.
+  """
+  userFilePatch: UserFilePatch!
+}
+
+"""The output of our update `UserFile` mutation."""
+type UpdateUserFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `User` that is related to this `UserFile`."""
+  userByUserId: User
+
+  """The `UserFile` that was updated by this mutation."""
+  userFile: UserFile
+
+  """An edge for our `UserFile`. May be used by Relay 1."""
+  userFileEdge(
+    """The method to use when ordering `UserFile`."""
+    orderBy: [UserFilesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserFilesEdge
 }
 
 """All input for the `updateUser` mutation."""
@@ -676,9 +832,14 @@ input UserCondition {
   name: String
 }
 
-type UserFile {
+type UserFile implements Node {
   filename: String!
   id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
 
   """Reads a single `User` that is related to this `UserFile`."""
   userByUserId: User
@@ -707,12 +868,21 @@ input UserFileInput {
   userId: Int!
 }
 
+"""
+Represents an update to a `UserFile`. Fields that are set will be updated.
+"""
+input UserFilePatch {
+  filename: String
+  id: Int
+  userId: Int
+}
+
 """A connection to a list of `UserFile` values."""
 type UserFilesConnection {
   """
   A list of edges which contains the `UserFile` and cursor to aid in pagination.
   """
-  edges: [UserFilesEdge!]!
+  edges: [UserFilesEdge]!
 
   """A list of `UserFile` objects."""
   nodes: [UserFile]!
@@ -740,6 +910,8 @@ enum UserFilesOrderBy {
   ID_ASC
   ID_DESC
   NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
   USER_ID_ASC
   USER_ID_DESC
 }
@@ -761,7 +933,7 @@ type UsersConnection {
   """
   A list of edges which contains the `User` and cursor to aid in pagination.
   """
-  edges: [UsersEdge!]!
+  edges: [UsersEdge]!
 
   """A list of `User` objects."""
   nodes: [User]!
