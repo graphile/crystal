@@ -627,8 +627,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              !codec.isAnonymous &&
-              build.behavior.matches(behavior, "insert", defaultBehavior)
+              !codec.isAnonymous
+              // Even without the 'insert' behavior we may still need the input type
+              // && build.behavior.matches(behavior, "insert", defaultBehavior)
             ) {
               const inputTypeName = inflection.inputType(tableTypeName);
               build.registerInputObjectType(
@@ -655,8 +656,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              !codec.isAnonymous &&
-              build.behavior.matches(behavior, "update", defaultBehavior)
+              !codec.isAnonymous
+              // Even without the 'update' behavior we may still need the input type
+              // && build.behavior.matches(behavior, "update", defaultBehavior)
             ) {
               const patchTypeName = inflection.patchType(tableTypeName);
               build.registerInputObjectType(
@@ -708,8 +710,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              !codec.isAnonymous &&
-              build.behavior.matches(behavior, "*:connection", defaultBehavior)
+              !codec.isAnonymous
+              // Even without the 'connection' behavior we may still need the connection type in specific circumstances
+              // && build.behavior.matches(behavior, "*:connection", defaultBehavior)
             ) {
               // Register edges
               build.registerCursorConnection({
