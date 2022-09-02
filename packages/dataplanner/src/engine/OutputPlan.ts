@@ -219,7 +219,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
             return `.${fieldName}: ${
               val.type === "__typename"
                 ? `__typename(${type.typeName})`
-                : val.outputPlan.print().replace(/\n/g, "\n  ")
+                : val.outputPlan.print().replace(/\n/g, "\n  ") +
+                  (val.isNonNull ? "!" : "?")
             }`;
           })
           .join("\n")}`;
@@ -237,7 +238,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         return `${this.toString()}\n  ${this.child!.print().replace(
           /\n/g,
           "\n  ",
-        )}`;
+        )}${this.childIsNonNull ? "!" : "?"}`;
       }
       default: {
         return this.toString();
@@ -804,7 +805,7 @@ ${
 
   return data;
 `,
-    "array",
+    `array${childIsNonNull ? "_nonNull" : ""}${canStream ? "_stream" : ""}`,
     {
       inspect,
       getChildBucketAndIndex,
