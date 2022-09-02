@@ -197,7 +197,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                             "field",
                           ),
                           type: nullableIf(
-                            !nonNullNode,
+                            false,
                             new build.graphql.GraphQLList(
                               nullableIf(!nonNullNode, EdgeType),
                             ),
