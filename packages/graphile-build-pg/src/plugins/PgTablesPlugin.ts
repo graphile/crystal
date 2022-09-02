@@ -403,11 +403,31 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          const constraints =
+          const directConstraints =
             await info.helpers.pgIntrospection.getConstraintsForClass(
               databaseName,
               pgClass._id,
             );
+
+          const inheritance =
+            await info.helpers.pgIntrospection.getInheritedForClass(
+              databaseName,
+              pgClass._id,
+            );
+
+          const inheritedConstraints = await Promise.all(
+            inheritance.map((inh) => {
+              return info.helpers.pgIntrospection.getConstraintsForClass(
+                databaseName,
+                inh.inhparent,
+              );
+            }),
+          );
+          const constraints = [
+            // TODO: handle multiple inheritance
+            ...inheritedConstraints.flatMap((list) => list),
+            ...directConstraints,
+          ];
           const uniqueColumnOnlyConstraints = constraints.filter(
             (c) =>
               ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
