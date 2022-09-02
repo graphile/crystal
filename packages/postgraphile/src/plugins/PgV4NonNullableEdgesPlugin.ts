@@ -12,6 +12,10 @@ export const PgV4NonNullableEdgesPlugin: GraphileConfig.Plugin = {
           isListType,
           isNonNullType,
         } = build.graphql;
+        const { pgForbidSetofFunctionsToReturnNull } = build.options;
+        if (pgForbidSetofFunctionsToReturnNull === false) {
+          return field;
+        }
         const {
           scope: { isConnectionType, fieldName },
         } = context;

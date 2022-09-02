@@ -375,6 +375,9 @@ export async function runTestQuery(
     schema?: string | string[];
     graphileBuildOptions?: any;
     ignoreRBAC?: boolean;
+    setofFunctionsContainNulls?: boolean;
+    viewUniqueKey?: string;
+    subscriptions?: boolean;
   },
   options: {
     callback?: (
@@ -437,6 +440,8 @@ export async function runTestQuery(
       } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
     ],
     schema: {
+      pgForbidSetofFunctionsToReturnNull:
+        config.setofFunctionsContainNulls === false,
       ...graphileBuildOptions,
     },
   };
