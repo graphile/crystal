@@ -147,10 +147,8 @@ function getArgDetailsFromParameters(
       index,
     });
     const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
-    const baseInputType = getGraphQLTypeByPgCodec(
-      paramBaseCodec,
-      param.extensions?.variant ?? "input",
-    );
+    const variant = param.extensions?.variant ?? "input";
+    const baseInputType = getGraphQLTypeByPgCodec(paramBaseCodec, variant);
     if (!baseInputType) {
       throw new Error(
         `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
