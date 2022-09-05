@@ -12,7 +12,8 @@ declare global {
     interface Preset {
       extends?: ReadonlyArray<Preset>;
       plugins?: Plugin[];
-      // IMPORTANT: if a key gets added here, make sure it's also added to the
+      disablePlugins?: ReadonlyArray<string>;
+      // **IMPORTANT**: if a key gets added here, make sure it's also added to the
       // isScopeKeyForPreset check.
     }
 
@@ -20,6 +21,7 @@ declare global {
       // As Preset, except extends is an empty array and plugins is definitely set.
       extends: ReadonlyArray<never>;
       plugins: Plugin[];
+      disablePlugins: ReadonlyArray<never>;
     }
   }
 }

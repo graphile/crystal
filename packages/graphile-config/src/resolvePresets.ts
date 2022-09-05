@@ -60,12 +60,28 @@ function mergePreset(
     targetPreset.extends == null || targetPreset.extends.length === 0,
     "First argument to mergePreset must be a resolved preset",
   );
-  targetPreset.plugins = [
-    ...new Set([
-      ...(targetPreset.plugins || []),
-      ...(sourcePreset.plugins || []),
-    ]),
-  ];
+  const plugins = new Set([
+    ...(targetPreset.plugins || []),
+    ...(sourcePreset.plugins || []),
+  ]);
+  const disabled = sourcePreset.disablePlugins;
+  if (disabled) {
+    const remaining = new Set([...disabled]);
+    for (const plugin of plugins) {
+      if (remaining.has(plugin.name)) {
+        remaining.delete(plugin.name);
+        plugins.delete(plugin);
+      }
+    }
+    if (remaining.size > 0) {
+      console.warn(
+        `Attempted to 'disablePlugins', but the following plugin(s) weren't found: '${[
+          ...remaining,
+        ].join("', '")}'`,
+      );
+    }
+  }
+  targetPreset.plugins = [...plugins];
   const targetScopes = Object.keys(targetPreset).filter(isScopeKeyForPreset);
   const sourceScopes = Object.keys(sourcePreset).filter(isScopeKeyForPreset);
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
@@ -84,6 +100,7 @@ function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
   return {
     extends: [],
     plugins: [],
+    disablePlugins: [],
   };
 }
 
@@ -92,5 +109,5 @@ function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
  * Preset type (before declaration merging).
  */
 function isScopeKeyForPreset(key: string) {
-  return key !== "extends" && key !== "plugins";
+  return key !== "extends" && key !== "plugins" && key !== "disablePlugins";
 }
