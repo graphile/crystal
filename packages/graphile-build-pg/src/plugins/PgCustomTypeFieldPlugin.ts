@@ -350,6 +350,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             options,
           } = build;
 
+          // Loop through all the sources and add them to the relevant
+          // collection(s) on build. Note that if we have an error creating a
+          // payload type for a mutation (for example) then that mutation
+          // should not be added - it would not make sense to add the mutation
+          // anyway but using the previously declared mutation payload for a
+          // different field - this is why we later use this information in the
+          // fields hook to determine which fields to add.
           for (const source of build.input.pgSources) {
             build.recoverable(null, () => {
               // Add connection type for functions that need it
