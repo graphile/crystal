@@ -10,6 +10,11 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
       pgRelations_relation(info, event) {
         const { relation, pgConstraint, pgClass } = event;
 
+        if (pgConstraint._id.startsWith("FAKE_")) {
+          // Pretend fake constraints are indexed.
+          return;
+        }
+
         // If it's not indexed, remove the list/connection behaviors
         if (relation.isBackwards) {
           const referencedColumns = pgConstraint
