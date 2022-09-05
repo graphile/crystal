@@ -12,6 +12,7 @@ export interface V4Options {
   dynamicJson?: boolean;
   jwtPgTypeIdentifier?: string;
   jwtSecret?: string;
+  disableDefaultMutations?: boolean;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -101,6 +102,11 @@ export const makeV4Preset = (
       PgV4NonNullableEdgesPlugin,
       makeV4Plugin(options),
     ].filter(isNotNullish),
+    disablePlugins: [
+      ...(options.disableDefaultMutations
+        ? ["PgMutationCreatePlugin", "PgMutationUpdateDeletePlugin"]
+        : []),
+    ],
     schema: {
       pgUseCustomNetworkScalars: false,
       pgV4UseTableNameForNodeIdentifier: true,
