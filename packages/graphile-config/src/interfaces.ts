@@ -21,7 +21,7 @@ declare global {
       // As Preset, except extends is an empty array and plugins is definitely set.
       extends: ReadonlyArray<never>;
       plugins: Plugin[];
-      disablePlugins: ReadonlyArray<never>;
+      disablePlugins: ReadonlyArray<string>;
     }
   }
 }

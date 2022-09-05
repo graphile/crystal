@@ -41,6 +41,34 @@ function resolvePreset(
   const { extends: presets = [] } = preset;
   const basePreset = resolvePresets(presets);
   mergePreset(basePreset, preset);
+
+  const disabled = basePreset.disablePlugins;
+  if (disabled) {
+    const plugins = new Set(basePreset.plugins);
+    const remaining = new Set(disabled);
+    for (const plugin of plugins) {
+      if (remaining.has(plugin.name)) {
+        remaining.delete(plugin.name);
+        plugins.delete(plugin);
+      }
+    }
+    /*
+
+    TODO: we need an alert like this, but only at the very top level.
+    The easiest way to check is to just see if `disablePlugins` has length.
+
+    if (remaining.size > 0) {
+      console.warn(
+        `Attempted to 'disablePlugins', but the following plugin(s) weren't found: '${[
+          ...remaining,
+        ].join("', '")}' (known: ${[...plugins].map((p) => p.name)})`,
+      );
+    }
+    */
+    basePreset.plugins = [...plugins];
+    basePreset.disablePlugins = [...remaining];
+  }
+
   return basePreset;
 }
 
@@ -64,24 +92,15 @@ function mergePreset(
     ...(targetPreset.plugins || []),
     ...(sourcePreset.plugins || []),
   ]);
-  const disabled = sourcePreset.disablePlugins;
-  if (disabled) {
-    const remaining = new Set([...disabled]);
-    for (const plugin of plugins) {
-      if (remaining.has(plugin.name)) {
-        remaining.delete(plugin.name);
-        plugins.delete(plugin);
-      }
-    }
-    if (remaining.size > 0) {
-      console.warn(
-        `Attempted to 'disablePlugins', but the following plugin(s) weren't found: '${[
-          ...remaining,
-        ].join("', '")}'`,
-      );
-    }
-  }
   targetPreset.plugins = [...plugins];
+  if (sourcePreset.disablePlugins) {
+    targetPreset.disablePlugins = [
+      ...new Set([
+        ...targetPreset.disablePlugins,
+        ...sourcePreset.disablePlugins,
+      ]),
+    ];
+  }
   const targetScopes = Object.keys(targetPreset).filter(isScopeKeyForPreset);
   const sourceScopes = Object.keys(sourcePreset).filter(isScopeKeyForPreset);
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
