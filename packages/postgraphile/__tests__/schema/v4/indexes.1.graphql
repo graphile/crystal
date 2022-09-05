@@ -394,27 +394,6 @@ type CompoundKey implements Node {
   Reads a single `UniqueForeignKey` that is related to this `CompoundKey`.
   """
   uniqueForeignKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey
-
-  """Reads and enables pagination through a set of `UniqueForeignKey`."""
-  uniqueForeignKeysByCompoundKey1AndCompoundKey2(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-  ): UniqueForeignKeysConnection! @deprecated(reason: "Please use uniqueForeignKeyByCompoundKey1AndCompoundKey2 instead")
 }
 
 """
@@ -447,7 +426,7 @@ type CompoundKeysConnection {
   """
   A list of edges which contains the `CompoundKey` and cursor to aid in pagination.
   """
-  edges: [CompoundKeysEdge!]!
+  edges: [CompoundKeysEdge]!
 
   """A list of `CompoundKey` objects."""
   nodes: [CompoundKey]!
@@ -582,7 +561,7 @@ type CompoundTypesConnection {
   """
   A list of edges which contains the `CompoundType` and cursor to aid in pagination.
   """
-  edges: [CompoundTypesEdge!]!
+  edges: [CompoundTypesEdge]!
 
   """A list of `CompoundType` objects."""
   nodes: [CompoundType]!
@@ -640,7 +619,7 @@ type CreateCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
@@ -678,7 +657,7 @@ type CreateDefaultValuePayload {
   """An edge for our `DefaultValue`. May be used by Relay 1."""
   defaultValueEdge(
     """The method to use when ordering `DefaultValue`."""
-    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [DefaultValuesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DefaultValuesEdge
 
   """
@@ -709,12 +688,6 @@ type CreateEdgeCasePayload {
 
   """The `EdgeCase` that was created by this mutation."""
   edgeCase: EdgeCase
-
-  """An edge for our `EdgeCase`. May be used by Relay 1."""
-  edgeCaseEdge(
-    """The method to use when ordering `EdgeCase`."""
-    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
-  ): EdgeCasesEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
