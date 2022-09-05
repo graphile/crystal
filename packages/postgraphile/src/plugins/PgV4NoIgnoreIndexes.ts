@@ -20,7 +20,10 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
           const referencedColumns = pgConstraint
             .getAttributes()!
             .map((att) => att.attname);
-          const remoteIndexes = pgConstraint.getClass()!.getIndexes();
+          const remoteIndexes = pgConstraint
+            .getClass()!
+            .getIndexes()
+            .filter((idx) => !idx.indpred);
 
           const isIndexed = remoteIndexes.some((idx) => {
             const cols = idx.getKeys();
@@ -57,6 +60,9 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
           .getClass()!
           .getIndexes()
           .some((idx) => {
+            if (idx.indpred) {
+              return false;
+            }
             const keys = idx.getKeys();
             return keys[0]?.attname === pgAttribute.attname;
           });
