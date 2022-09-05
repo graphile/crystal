@@ -327,13 +327,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             isStrict || info.options.pgStrictFunctions === true;
           const numberOfRequiredArguments =
             numberOfArguments - numberOfArgumentsWithDefaults;
-          const { tags, description } = pgProc.getTagsAndDescription();
+          const { tags: rawTags, description } = pgProc.getTagsAndDescription();
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
             // TODO: smart tag should allow changing the modifier
-            const tag = tags[`arg${i}variant`];
+            const tag = rawTags[`arg${i}variant`];
             const variant = typeof tag === "string" ? tag : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
@@ -407,10 +407,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
+          const tags = { ...rawTags };
+
           addBehaviorToTags(tags, "-filter -order");
 
           const extensions: PgSourceExtensions = {
-            tags,
+            tags: {
+              ...tags,
+            },
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {

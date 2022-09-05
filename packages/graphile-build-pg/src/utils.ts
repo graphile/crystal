@@ -16,15 +16,15 @@ export function addBehaviorToTags(
 ): void {
   if (Array.isArray(tags.behavior)) {
     if (prepend) {
-      tags.behavior.unshift(behavior);
+      tags.behavior = [behavior, ...tags.behavior];
     } else {
-      tags.behavior.push(behavior);
+      tags.behavior = [...tags.behavior, behavior];
     }
   } else if (typeof tags.behavior === "string") {
     tags.behavior = prepend
       ? [behavior, tags.behavior]
       : [tags.behavior, behavior];
   } else {
-    tags.behavior = behavior;
+    tags.behavior = [behavior];
   }
 }
