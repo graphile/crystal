@@ -9,7 +9,7 @@ import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 export interface V4Options {
   simpleCollections?: "both" | "only" | "omit";
   classicIds?: boolean;
-  pgForbidSetofFunctionsToReturnNull?: boolean;
+  setofFunctionsContainNulls?: boolean;
   dynamicJson?: boolean;
   jwtPgTypeIdentifier?: string;
   jwtSecret?: string;
@@ -120,7 +120,7 @@ export const makeV4Preset = (
         options.graphileBuildOptions?.pgUseCustomNetworkScalars ?? false,
       pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
-        options.pgForbidSetofFunctionsToReturnNull ?? false,
+        options.setofFunctionsContainNulls === false,
       jsonScalarAsString: options.dynamicJson !== true,
       ...(options.jwtSecret != null
         ? {

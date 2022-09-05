@@ -1155,7 +1155,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       build.registerCursorConnection?.({
                         typeName,
                         nonNullNode:
-                          !build.options.pgForbidSetofFunctionsToReturnNull,
+                          build.options.pgForbidSetofFunctionsToReturnNull,
                         scope: {
                           isPgConnectionRelated: true,
                         },
