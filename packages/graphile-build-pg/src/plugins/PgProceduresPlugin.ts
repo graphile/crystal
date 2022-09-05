@@ -461,8 +461,27 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               databaseName,
               pgClass,
             );
-            if (!sourceBuilder) return null;
-            const source = await info.helpers.pgTables.getSource(sourceBuilder);
+
+            const source = await (async () => {
+              if (sourceBuilder) {
+                return await info.helpers.pgTables.getSource(sourceBuilder);
+              } else {
+                // No sourceBuilder for this; presumably the table is not exposed. Create one for the codec instead.
+                const codec = await info.helpers.pgCodecs.getCodecFromClass(
+                  databaseName,
+                  pgClass._id,
+                );
+                if (!codec) {
+                  return null;
+                }
+                const executor =
+                  info.helpers.pgIntrospection.getExecutorForDatabase(
+                    databaseName,
+                  );
+                return PgSource.fromCodec(executor, codec);
+              }
+            })();
+
             if (!source) {
               return null;
             }
