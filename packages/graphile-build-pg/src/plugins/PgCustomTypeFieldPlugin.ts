@@ -540,7 +540,12 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         }
                         const type = source.isUnique
                           ? baseType
-                          : new GraphQLList(baseType);
+                          : new GraphQLList(
+                              build.nullableIf(
+                                !options.pgForbidSetofFunctionsToReturnNull,
+                                baseType,
+                              ),
+                            );
                         fields[resultFieldName] = {
                           type,
                           plan: EXPORTABLE(
