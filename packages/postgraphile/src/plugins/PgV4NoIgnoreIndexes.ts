@@ -36,7 +36,10 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
             if (!relation.extensions.tags) {
               relation.extensions.tags = Object.create(null);
             }
-            addBehaviorToTags(relation.extensions.tags, "-list -connection");
+            addBehaviorToTags(
+              relation.extensions.tags,
+              "-list -connection -single",
+            );
           }
         }
       },
