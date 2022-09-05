@@ -12,16 +12,22 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
 
         // If it's not indexed, remove the list/connection behaviors
         if (relation.isBackwards) {
-          const localColumns = relation.localColumns as string[];
-          const isIndexed = pgClass.getIndexes().some((idx) => {
+          const referencedColumns = pgConstraint
+            .getAttributes()!
+            .map((att) => att.attname);
+          const remoteIndexes = pgConstraint.getClass()!.getIndexes();
+
+          const isIndexed = remoteIndexes.some((idx) => {
             const cols = idx.getKeys();
-            if (cols.length < localColumns.length) {
+            if (cols.length < referencedColumns.length) {
               return false;
             }
             const firstColNames = cols
-              .slice(0, localColumns.length)
+              .slice(0, referencedColumns.length)
               .map((k) => k?.attname);
-            return localColumns.every((key) => firstColNames.includes(key));
+            return referencedColumns.every((key) =>
+              firstColNames.includes(key),
+            );
           });
           if (!isIndexed) {
             if (!relation.extensions) {
