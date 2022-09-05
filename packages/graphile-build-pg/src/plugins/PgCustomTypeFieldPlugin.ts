@@ -389,7 +389,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       isPgConnectionRelated: true,
                       pgCodec: source.codec,
                     },
-                    nonNullNode: options.pgForbidSetofFunctionsToReturnNull,
+                    // When dealing with scalars, nulls are allowed in setof
+                    nonNullNode: source.codec.columns
+                      ? options.pgForbidSetofFunctionsToReturnNull
+                      : false,
                   });
                 } else {
                   // Skip this entirely
@@ -542,7 +545,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           ? baseType
                           : new GraphQLList(
                               build.nullableIf(
-                                !options.pgForbidSetofFunctionsToReturnNull,
+                                // When dealing with scalars, nulls are allowed in setof
+                                build.graphql.isLeafType(
+                                  build.graphql.getNamedType(baseType),
+                                ) ||
+                                  !options.pgForbidSetofFunctionsToReturnNull,
                                 baseType,
                               ),
                             );
