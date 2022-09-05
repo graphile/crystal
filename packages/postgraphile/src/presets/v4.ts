@@ -15,6 +15,7 @@ export interface V4Options {
   jwtSecret?: string;
   disableDefaultMutations?: boolean;
   ignoreIndexes?: boolean;
+  appendPlugins?: GraphileConfig.Plugin[];
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -104,6 +105,7 @@ export const makeV4Preset = (
       PgV4NonNullableEdgesPlugin,
       ...(options.ignoreIndexes === false ? [PgV4NoIgnoreIndexesPlugin] : []),
       makeV4Plugin(options),
+      ...(options.appendPlugins ? options.appendPlugins : []),
     ].filter(isNotNullish),
     disablePlugins: [
       ...(options.disableDefaultMutations
