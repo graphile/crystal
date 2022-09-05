@@ -1,6 +1,8 @@
+import { stripAnsi } from "dataplanner";
+
 import * as core from "./core.js";
 
-let consoleWarnSpy: any;
+let consoleWarnSpy: ReturnType<typeof jest.spyOn>;
 beforeAll(() => {
   consoleWarnSpy = jest.spyOn(global.console, "warn");
 });
@@ -23,6 +25,13 @@ test(
     },
     () => {
       expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(
+        consoleWarnSpy.mock.calls.some(
+          (args: [string]) =>
+            /Recoverable/.test(args[0]) &&
+            /same type 'CreatePostInput'/.test(stripAnsi(args[0])),
+        ),
+      ).toBeTruthy();
     },
   ),
 );
