@@ -16,6 +16,9 @@ export interface V4Options {
   disableDefaultMutations?: boolean;
   ignoreIndexes?: boolean;
   appendPlugins?: GraphileConfig.Plugin[];
+  graphileBuildOptions?: {
+    pgUseCustomNetworkScalars?: boolean;
+  };
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -113,7 +116,8 @@ export const makeV4Preset = (
         : []),
     ],
     schema: {
-      pgUseCustomNetworkScalars: false,
+      pgUseCustomNetworkScalars:
+        options.graphileBuildOptions?.pgUseCustomNetworkScalars ?? false,
       pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
         options.pgForbidSetofFunctionsToReturnNull ?? false,
