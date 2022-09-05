@@ -111,8 +111,10 @@ declare module "./introspection" {
   interface PgConstraint {
     getNamespace(): PgNamespace | undefined;
     getClass(): PgClass | undefined;
+    getAttributes(): PgAttribute[] | undefined;
     getType(): PgType | undefined;
     getForeignClass(): PgClass | undefined;
+    getForeignAttributes(): PgAttribute[] | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
   }

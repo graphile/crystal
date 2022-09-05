@@ -185,9 +185,11 @@ async function processUnique(
     conexclop: null,
     conbin: null,
     getClass: () => pgClass,
+    getAttributes: () => attrs,
     getDescription: () => extraDescription,
     getTagsAndDescription: () => tagsAndDescription,
     getForeignClass: () => undefined,
+    getForeignAttributes: () => undefined,
     getNamespace: () => pgClass.getNamespace(),
     getType: () => undefined,
   };
@@ -318,9 +320,11 @@ async function processFk(
     conexclop: null,
     conbin: null,
     getClass: () => pgClass,
+    getAttributes: () => keyAttibutes,
     getDescription: () => extraDescription,
     getTagsAndDescription: () => tagsAndDescription,
     getForeignClass: () => foreignPgClass,
+    getForeignAttributes: () => foreignKeyAttibutes,
     getNamespace: () => pgClass.getNamespace(),
     getType: () => undefined,
   };

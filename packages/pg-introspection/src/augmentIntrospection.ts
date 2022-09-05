@@ -226,8 +226,28 @@ export function augmentIntrospection(
   introspection.constraints.forEach((entity) => {
     entity.getNamespace = memo(() => getNamespace(entity.connamespace));
     entity.getClass = memo(() => getClass(entity.conrelid));
+    entity.getAttributes = memo(() => {
+      const klass = getClass(entity.conrelid);
+      if (!klass || !entity.conkey) {
+        return;
+      }
+      const attrs = klass.getAttributes();
+      return entity.conkey!.map(
+        (key) => attrs.find((att) => att.attnum === key)!,
+      );
+    });
     entity.getType = memo(() => getType(entity.contypid));
     entity.getForeignClass = memo(() => getClass(entity.confrelid));
+    entity.getForeignAttributes = memo(() => {
+      const klass = getClass(entity.confrelid);
+      if (!klass || !entity.confkey) {
+        return;
+      }
+      const attrs = klass.getAttributes();
+      return entity.confkey!.map(
+        (key) => attrs.find((att) => att.attnum === key)!,
+      );
+    });
     entity.getDescription = memo(() =>
       getDescription(PG_CONSTRAINT, entity._id),
     );
