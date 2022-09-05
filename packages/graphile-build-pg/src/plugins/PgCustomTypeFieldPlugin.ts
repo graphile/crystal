@@ -47,6 +47,10 @@ import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
 
+const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
+const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
+const $$computed = Symbol("PgCustomTypeFieldPluginComputedSources");
+
 declare global {
   namespace GraphileBuild {
     interface InflectionCustomFieldProcedureDetails {
@@ -239,6 +243,19 @@ function hasRecord(
   return "record" in $row && typeof ($row as any).record === "function";
 }
 
+declare global {
+  namespace GraphileBuild {
+    interface Build {
+      [$$rootQuery]: Array<PgSource<any, any, any, any>>;
+      [$$rootMutation]: Array<PgSource<any, any, any, any>>;
+      [$$computed]: Map<
+        PgTypeCodec<any, any, any, any>,
+        Array<PgSource<any, any, any, any>>
+      >;
+    }
+  }
+}
+
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
@@ -316,6 +333,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
+      build: {
+        callback(build) {
+          build[$$rootQuery] = [];
+          build[$$rootMutation] = [];
+          build[$$computed] = new Map();
+          return build;
+        },
+      },
       init: {
         after: ["PgCodecs"],
         callback(_, build) {
@@ -324,191 +349,236 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             inflection,
             options,
           } = build;
-          // Add payload type for mutation functions
-          const mutationProcSources = build.input.pgSources.filter(
-            (s) =>
-              s.isMutation &&
-              s.parameters &&
-              build.behavior.matches(
-                getBehavior(s.extensions),
-                "mutation_field",
-                "mutation_field",
-              ),
-          );
 
-          for (const source of mutationProcSources) {
+          for (const source of build.input.pgSources) {
             build.recoverable(null, () => {
-              const inputTypeName = inflection.customMutationInput({
-                source,
-              });
+              // Add connection type for functions that need it
+              const isFunctionSourceRequiringConnection =
+                source.parameters &&
+                !source.isMutation &&
+                !source.codec.arrayOfCodec &&
+                shouldUseCustomConnection(source);
 
-              const fieldName = inflection.customMutationField({ source });
-              build.registerInputObjectType(
-                inputTypeName,
-                { isMutationInput: true },
-                () => {
-                  const argDetails = getArgDetailsFromParameters(
-                    build,
-                    source,
-                    source.parameters,
-                  );
-
-                  // Not used for isMutation; that's handled elsewhere
-                  const fields = argDetails.reduce(
-                    (memo, { inputType, graphqlArgName }) => {
-                      memo[graphqlArgName] = {
-                        type: inputType,
-                      };
-                      return memo;
-                    },
-                    {
-                      clientMutationId: {
-                        type: GraphQLString,
-                        applyPlan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              $input: ObjectStep<any>,
-                              val: FieldArgs,
-                            ) {
-                              $input.set("clientMutationId", val.get());
-                            },
-                          [],
-                        ),
-                      },
-                    },
-                  );
-
-                  return {
-                    description: `All input for the \`${fieldName}\` mutation.`,
-                    fields,
-                  };
-                },
-                "PgCustomTypeFieldPlugin mutation function input type",
-              );
-
-              ////////////////////////////////////////
-
-              const payloadTypeName = inflection.customMutationPayload({
-                source,
-              });
-
-              const isVoid = source.codec === TYPES.void;
-
-              const returnGraphQLTypeName = build.getGraphQLTypeNameByPgCodec(
-                source.codec.arrayOfCodec ?? source.codec,
-                "output",
-              );
-              const resultFieldName =
-                isVoid || !returnGraphQLTypeName
-                  ? null
-                  : inflection.functionMutationResultFieldName({
-                      source,
-                      returnGraphQLTypeName,
+              if (isFunctionSourceRequiringConnection) {
+                const connectionTypeName = source.codec.columns
+                  ? inflection.recordFunctionConnectionType({
+                      source: source,
+                    })
+                  : inflection.scalarFunctionConnectionType({
+                      source: source,
                     });
-
-              build.registerObjectType(
-                payloadTypeName,
-                {
-                  isMutationPayload: true,
-                  pgCodec: source.codec,
-                  pgTypeSource: source,
-                },
-                ObjectStep,
-                () => ({
-                  description: `The output of our \`${fieldName}\` mutation.`,
-                  fields: () => {
-                    const fields = {
-                      clientMutationId: {
-                        type: GraphQLString,
-                        plan: EXPORTABLE(
-                          (constant) =>
-                            function plan($object: ObjectStep<any>) {
-                              return (
-                                $object.getStepForKey(
-                                  "clientMutationId",
-                                  true,
-                                ) ?? constant(undefined)
-                              );
-                            },
-                          [constant],
-                        ),
-                      },
-                    };
-                    if (isVoid) {
-                      return fields;
-                    }
-                    const baseType = getFunctionSourceReturnGraphQLType(
-                      build,
-                      source,
-                    );
-                    if (!baseType || !resultFieldName) {
-                      console.warn(
-                        `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
-                      );
-                      return {};
-                    }
-                    const type = source.isUnique
-                      ? baseType
-                      : new GraphQLList(baseType);
-                    fields[resultFieldName] = {
-                      type,
-                      plan: EXPORTABLE(
-                        () =>
-                          (
-                            $object: ObjectStep<{
-                              result: PgClassSingleStep<any, any, any, any>;
-                            }>,
-                          ) => {
-                            return $object.get("result");
-                          },
-                        [],
-                      ),
-                    };
-                    return fields;
-                  },
-                }),
-                "PgCustomTypeFieldPlugin mutation function payload type",
-              );
-            });
-          }
-
-          // Add connection type for functions that need it
-          const functionSourcesRequiringConnections =
-            build.input.pgSources.filter(
-              (s) =>
-                s.parameters &&
-                !s.isMutation &&
-                !s.codec.arrayOfCodec &&
-                shouldUseCustomConnection(s),
-            );
-
-          for (const pgSource of functionSourcesRequiringConnections) {
-            build.recoverable(null, () => {
-              const connectionTypeName = pgSource.codec.columns
-                ? inflection.recordFunctionConnectionType({ source: pgSource })
-                : inflection.scalarFunctionConnectionType({ source: pgSource });
-              const edgeTypeName = pgSource.codec.columns
-                ? inflection.recordFunctionEdgeType({ source: pgSource })
-                : inflection.scalarFunctionEdgeType({ source: pgSource });
-              const typeName = pgSource.codec.columns
-                ? inflection.tableType(pgSource.codec)
-                : build.getGraphQLTypeNameByPgCodec(pgSource.codec, "output");
-              if (typeName) {
-                build.registerCursorConnection({
-                  connectionTypeName,
-                  edgeTypeName,
-                  typeName,
-                  scope: {
-                    isPgConnectionRelated: true,
-                    pgCodec: pgSource.codec,
-                  },
-                  nonNullNode: options.pgForbidSetofFunctionsToReturnNull,
-                });
-              } else {
-                console.warn(
-                  `Could not find a type for codec ${pgSource}'s codec`,
-                );
+                const edgeTypeName = source.codec.columns
+                  ? inflection.recordFunctionEdgeType({ source: source })
+                  : inflection.scalarFunctionEdgeType({ source: source });
+                const typeName = source.codec.columns
+                  ? inflection.tableType(source.codec)
+                  : build.getGraphQLTypeNameByPgCodec(source.codec, "output");
+                if (typeName) {
+                  build.registerCursorConnection({
+                    connectionTypeName,
+                    edgeTypeName,
+                    typeName,
+                    scope: {
+                      isPgConnectionRelated: true,
+                      pgCodec: source.codec,
+                    },
+                    nonNullNode: options.pgForbidSetofFunctionsToReturnNull,
+                  });
+                } else {
+                  // Skip this entirely
+                  throw new Error(
+                    `Could not find a type for codec ${source}'s codec`,
+                  );
+                }
               }
+
+              // "custom query"
+              // Find non-mutation function sources that don't accept a row type
+              // as the first argument
+              const isQuerySource =
+                source.parameters &&
+                build.behavior.matches(
+                  getBehavior(source.extensions),
+                  "query_field",
+                  defaultProcSourceBehavior(source, options),
+                );
+              if (isQuerySource) {
+                build.recoverable(null, () => {
+                  build[$$rootQuery].push(source);
+                });
+              }
+
+              // "custom mutation"
+              // Find mutation function sources
+              const isMutationProcSource =
+                // source.isMutation &&
+                source.parameters &&
+                build.behavior.matches(
+                  getBehavior(source.extensions),
+                  "mutation_field",
+                  defaultProcSourceBehavior(source, options),
+                );
+              // Add payload type for mutation functions
+              if (isMutationProcSource) {
+                build.recoverable(null, () => {
+                  const inputTypeName = inflection.customMutationInput({
+                    source,
+                  });
+
+                  const fieldName = inflection.customMutationField({ source });
+                  build.registerInputObjectType(
+                    inputTypeName,
+                    { isMutationInput: true },
+                    () => {
+                      const argDetails = getArgDetailsFromParameters(
+                        build,
+                        source,
+                        source.parameters,
+                      );
+
+                      // Not used for isMutation; that's handled elsewhere
+                      const fields = argDetails.reduce(
+                        (memo, { inputType, graphqlArgName }) => {
+                          memo[graphqlArgName] = {
+                            type: inputType,
+                          };
+                          return memo;
+                        },
+                        {
+                          clientMutationId: {
+                            type: GraphQLString,
+                            applyPlan: EXPORTABLE(
+                              () =>
+                                function plan(
+                                  $input: ObjectStep<any>,
+                                  val: FieldArgs,
+                                ) {
+                                  $input.set("clientMutationId", val.get());
+                                },
+                              [],
+                            ),
+                          },
+                        },
+                      );
+
+                      return {
+                        description: `All input for the \`${fieldName}\` mutation.`,
+                        fields,
+                      };
+                    },
+                    "PgCustomTypeFieldPlugin mutation function input type",
+                  );
+
+                  ////////////////////////////////////////
+
+                  const payloadTypeName = inflection.customMutationPayload({
+                    source,
+                  });
+
+                  const isVoid = source.codec === TYPES.void;
+
+                  const returnGraphQLTypeName =
+                    build.getGraphQLTypeNameByPgCodec(
+                      source.codec.arrayOfCodec ?? source.codec,
+                      "output",
+                    );
+                  const resultFieldName =
+                    isVoid || !returnGraphQLTypeName
+                      ? null
+                      : inflection.functionMutationResultFieldName({
+                          source,
+                          returnGraphQLTypeName,
+                        });
+
+                  build.registerObjectType(
+                    payloadTypeName,
+                    {
+                      isMutationPayload: true,
+                      pgCodec: source.codec,
+                      pgTypeSource: source,
+                    },
+                    ObjectStep,
+                    () => ({
+                      description: `The output of our \`${fieldName}\` mutation.`,
+                      fields: () => {
+                        const fields = {
+                          clientMutationId: {
+                            type: GraphQLString,
+                            plan: EXPORTABLE(
+                              (constant) =>
+                                function plan($object: ObjectStep<any>) {
+                                  return (
+                                    $object.getStepForKey(
+                                      "clientMutationId",
+                                      true,
+                                    ) ?? constant(undefined)
+                                  );
+                                },
+                              [constant],
+                            ),
+                          },
+                        };
+                        if (isVoid) {
+                          return fields;
+                        }
+                        const baseType = getFunctionSourceReturnGraphQLType(
+                          build,
+                          source,
+                        );
+                        if (!baseType || !resultFieldName) {
+                          console.warn(
+                            `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
+                          );
+                          return {};
+                        }
+                        const type = source.isUnique
+                          ? baseType
+                          : new GraphQLList(baseType);
+                        fields[resultFieldName] = {
+                          type,
+                          plan: EXPORTABLE(
+                            () =>
+                              (
+                                $object: ObjectStep<{
+                                  result: PgClassSingleStep<any, any, any, any>;
+                                }>,
+                              ) => {
+                                return $object.get("result");
+                              },
+                            [],
+                          ),
+                        };
+                        return fields;
+                      },
+                    }),
+                    "PgCustomTypeFieldPlugin mutation function payload type",
+                  );
+                  build[$$rootMutation].push(source);
+                });
+              }
+
+              // "computed column"
+              // Find non-mutation function sources that accept a row type of the
+              // matching codec as the first argument
+              const isComputedSource =
+                source.parameters &&
+                build.behavior.matches(
+                  getBehavior(source.extensions),
+                  "type_field",
+                  defaultProcSourceBehavior(source, options),
+                );
+              if (isComputedSource) {
+                // TODO: should we allow other forms of computed columns here,
+                // e.g. accepting the row id rather than the row itself.
+                const pgCodec = source.parameters?.[0]?.codec;
+                if (pgCodec) {
+                  const list = build[$$computed].get(pgCodec) ?? [];
+                  list.push(source);
+                  build[$$computed].set(pgCodec, list);
+                }
+              }
+
+              return;
             });
           }
 
@@ -536,51 +606,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         if (!(isPgTableType && pgCodec) && !isRootQuery && !isRootMutation) {
           return fields;
         }
-        const procSources = (() => {
-          // TODO: should we use query:field, mutation:field, type:field rather than underscores for the behaviors?
-          if (isRootQuery) {
-            // "custom query"
-            // Find non-mutation function sources that don't accept a row type
-            // as the first argument
-            return build.input.pgSources.filter(
-              (s) =>
-                s.parameters &&
-                build.behavior.matches(
-                  getBehavior(s.extensions),
-                  "query_field",
-                  defaultProcSourceBehavior(s, options),
-                ),
-            );
-          } else if (isRootMutation) {
-            // "custom mutation"
-            // Find mutation function sources
-            return build.input.pgSources.filter(
-              (s) =>
-                s.parameters &&
-                build.behavior.matches(
-                  getBehavior(s.extensions),
-                  "mutation_field",
-                  defaultProcSourceBehavior(s, options),
-                ),
-            );
-          } else {
-            // "computed column"
-            // Find non-mutation function sources that accept a row type of the
-            // matching codec as the first argument
-            return build.input.pgSources.filter(
-              (s) =>
-                s.parameters &&
-                // TODO: should we allow other forms of computed columns here,
-                // e.g. accepting the row id rather than the row itself.
-                s.parameters?.[0]?.codec === pgCodec &&
-                build.behavior.matches(
-                  getBehavior(s.extensions),
-                  "type_field",
-                  defaultProcSourceBehavior(s, options),
-                ),
-            );
-          }
-        })();
+        const procSources = isRootQuery
+          ? build[$$rootQuery]
+          : isRootMutation
+          ? build[$$rootMutation]
+          : pgCodec
+          ? build[$$computed].get(pgCodec) ?? []
+          : [];
         if (procSources.length === 0) {
           return fields;
         }
