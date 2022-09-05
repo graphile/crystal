@@ -7099,13 +7099,17 @@ type Query implements Node {
     """
     nodeId: ID!
   ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """Reads a single `Post` using its globally unique `ID`."""
   post(
     """The globally unique `ID` to be used in selecting a single `Post`."""
     nodeId: ID!
   ): Post
+
+  """Get a single `Post`."""
   postById(id: Int!): Post
 
   """
@@ -7115,6 +7119,8 @@ type Query implements Node {
   query: Query!
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [Interval]
+
+  """Reads and enables pagination through a set of `Interval`."""
   queryIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7142,6 +7148,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Reserved`."""
     nodeId: ID!
   ): Reserved
+
+  """Get a single `Reserved`."""
   reservedById(id: Int!): Reserved
 
   """Reads a single `ReservedInputRecord` using its globally unique `ID`."""
@@ -7151,6 +7159,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): ReservedInputRecord
+
+  """Get a single `ReservedInputRecord`."""
   reservedInputRecordById(id: Int!): ReservedInputRecord
 
   """Reads a single `ReservedPatchRecord` using its globally unique `ID`."""
@@ -7160,6 +7170,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): ReservedPatchRecord
+
+  """Get a single `ReservedPatchRecord`."""
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
   returnTableWithoutGrants: CompoundKey
   searchTestSummariesList(
@@ -7177,6 +7189,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): SimilarTable1
+
+  """Get a single `SimilarTable1`."""
   similarTable1ById(id: Int!): SimilarTable1
 
   """Reads a single `SimilarTable2` using its globally unique `ID`."""
@@ -7186,7 +7200,11 @@ type Query implements Node {
     """
     nodeId: ID!
   ): SimilarTable2
+
+  """Get a single `SimilarTable2`."""
   similarTable2ById(id: Int!): SimilarTable2
+
+  """Reads and enables pagination through a set of `Int8`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7263,6 +7281,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Type`."""
     nodeId: ID!
   ): Type
+
+  """Get a single `Type`."""
   typeById(id: Int!): Type
   typeFunction(id: Int): Type
 
@@ -7288,6 +7308,8 @@ type Query implements Node {
   ): TypesConnection
   typeFunctionList: [Type]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+
+  """Get a single `UniqueForeignKey`."""
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
 
   """Reads a single `ViewTable` using its globally unique `ID`."""
@@ -7295,6 +7317,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `ViewTable`."""
     nodeId: ID!
   ): ViewTable
+
+  """Get a single `ViewTable`."""
   viewTableById(id: Int!): ViewTable
 }
 
@@ -7303,10 +7327,13 @@ type QueryIntervalSetConnection {
   """
   A list of edges which contains the `Interval` and cursor to aid in pagination.
   """
-  edges: [QueryIntervalSetEdge!]!
+  edges: [QueryIntervalSetEdge]!
 
   """A list of `Interval` objects."""
   nodes: [Interval]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Interval` you could get from the connection."""
   totalCount: Int!
@@ -7321,7 +7348,6 @@ type QueryIntervalSetEdge {
   node: Interval
 }
 
-"""The return type of our `queryOutputTwoRows` query."""
 type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
@@ -7413,7 +7439,7 @@ type ReservedInputRecordsConnection {
   """
   A list of edges which contains the `ReservedInputRecord` and cursor to aid in pagination.
   """
-  edges: [ReservedInputRecordsEdge!]!
+  edges: [ReservedInputRecordsEdge]!
 
   """A list of `ReservedInputRecord` objects."""
   nodes: [ReservedInputRecord]!
@@ -7490,7 +7516,7 @@ type ReservedPatchRecordsConnection {
   """
   A list of edges which contains the `ReservedPatchRecord` and cursor to aid in pagination.
   """
-  edges: [ReservedPatchRecordsEdge!]!
+  edges: [ReservedPatchRecordsEdge]!
 
   """A list of `ReservedPatchRecord` objects."""
   nodes: [ReservedPatchRecord]!
@@ -7527,7 +7553,7 @@ type ReservedsConnection {
   """
   A list of edges which contains the `Reserved` and cursor to aid in pagination.
   """
-  edges: [ReservedsEdge!]!
+  edges: [ReservedsEdge]!
 
   """A list of `Reserved` objects."""
   nodes: [Reserved]!
@@ -7580,7 +7606,6 @@ type ReturnVoidMutationPayload {
   query: Query
 }
 
-"""The return type of our `searchTestSummaries` query."""
 type SearchTestSummariesRecord {
   id: Int
   totalDuration: Interval
@@ -7630,7 +7655,7 @@ type SimilarTable1SConnection {
   """
   A list of edges which contains the `SimilarTable1` and cursor to aid in pagination.
   """
-  edges: [SimilarTable1SEdge!]!
+  edges: [SimilarTable1SEdge]!
 
   """A list of `SimilarTable1` objects."""
   nodes: [SimilarTable1]!
@@ -7704,7 +7729,7 @@ type SimilarTable2SConnection {
   """
   A list of edges which contains the `SimilarTable2` and cursor to aid in pagination.
   """
-  edges: [SimilarTable2SEdge!]!
+  edges: [SimilarTable2SEdge]!
 
   """A list of `SimilarTable2` objects."""
   nodes: [SimilarTable2]!
@@ -7739,10 +7764,13 @@ type StaticBigIntegerConnection {
   """
   A list of edges which contains the `BigInt` and cursor to aid in pagination.
   """
-  edges: [StaticBigIntegerEdge!]!
+  edges: [StaticBigIntegerEdge]!
 
   """A list of `BigInt` objects."""
   nodes: [BigInt]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `BigInt` you could get from the connection."""
   totalCount: Int!
@@ -7782,7 +7810,7 @@ type TableMutationPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -7833,7 +7861,7 @@ type TestviewsConnection {
   """
   A list of edges which contains the `Testview` and cursor to aid in pagination.
   """
-  edges: [TestviewsEdge!]!
+  edges: [TestviewsEdge]!
 
   """A list of `Testview` objects."""
   nodes: [Testview]!
@@ -8012,7 +8040,7 @@ type TypeFunctionMutationPayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -8119,7 +8147,7 @@ type TypesConnection {
   """
   A list of edges which contains the `Type` and cursor to aid in pagination.
   """
-  edges: [TypesEdge!]!
+  edges: [TypesEdge]!
 
   """A list of `Type` objects."""
   nodes: [Type]!
@@ -8247,7 +8275,7 @@ type UpdatableViewsConnection {
   """
   A list of edges which contains the `UpdatableView` and cursor to aid in pagination.
   """
-  edges: [UpdatableViewsEdge!]!
+  edges: [UpdatableViewsEdge]!
 
   """A list of `UpdatableView` objects."""
   nodes: [UpdatableView]!
@@ -8322,7 +8350,7 @@ type UpdateCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
@@ -8382,7 +8410,7 @@ type UpdateDefaultValuePayload {
   """An edge for our `DefaultValue`. May be used by Relay 1."""
   defaultValueEdge(
     """The method to use when ordering `DefaultValue`."""
-    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [DefaultValuesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DefaultValuesEdge
 
   """
@@ -8439,7 +8467,7 @@ type UpdateInputPayload {
   """An edge for our `Input`. May be used by Relay 1."""
   inputEdge(
     """The method to use when ordering `Input`."""
-    orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [InputsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): InputsEdge
 
   """
@@ -8496,7 +8524,7 @@ type UpdateIssue756Payload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -8568,7 +8596,7 @@ type UpdateLeftArmPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -8628,7 +8656,7 @@ type UpdateMyTablePayload {
   """An edge for our `MyTable`. May be used by Relay 1."""
   myTableEdge(
     """The method to use when ordering `MyTable`."""
-    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): MyTablesEdge
 
   """
@@ -8662,12 +8690,6 @@ type UpdateNoPrimaryKeyPayload {
 
   """The `NoPrimaryKey` that was updated by this mutation."""
   noPrimaryKey: NoPrimaryKey
-
-  """An edge for our `NoPrimaryKey`. May be used by Relay 1."""
-  noPrimaryKeyEdge(
-    """The method to use when ordering `NoPrimaryKey`."""
-    orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
-  ): NoPrimaryKeysEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8723,7 +8745,7 @@ type UpdateNullTestRecordPayload {
   """An edge for our `NullTestRecord`. May be used by Relay 1."""
   nullTestRecordEdge(
     """The method to use when ordering `NullTestRecord`."""
-    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NullTestRecordsEdge
 
   """
@@ -8780,7 +8802,7 @@ type UpdatePatchPayload {
   """An edge for our `Patch`. May be used by Relay 1."""
   patchEdge(
     """The method to use when ordering `Patch`."""
-    orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PatchesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PatchesEdge
 
   """
@@ -8854,7 +8876,7 @@ type UpdatePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -8914,7 +8936,7 @@ type UpdatePersonSecretPayload {
   """An edge for our `PersonSecret`. May be used by Relay 1."""
   personSecretEdge(
     """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
@@ -8974,7 +8996,7 @@ type UpdatePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -9070,7 +9092,7 @@ type UpdateReservedInputRecordPayload {
   """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
   reservedInputRecordEdge(
     """The method to use when ordering `ReservedInputRecord`."""
-    orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedInputRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedInputRecordsEdge
 }
 
@@ -9127,7 +9149,7 @@ type UpdateReservedPatchRecordPayload {
   """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
   reservedPatchRecordEdge(
     """The method to use when ordering `ReservedPatchRecord`."""
-    orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedPatchRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedPatchRecordsEdge
 }
 
@@ -9150,7 +9172,7 @@ type UpdateReservedPayload {
   """An edge for our `Reserved`. May be used by Relay 1."""
   reservedEdge(
     """The method to use when ordering `Reserved`."""
-    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReservedsEdge
 }
 
@@ -9207,7 +9229,7 @@ type UpdateSimilarTable1Payload {
   """An edge for our `SimilarTable1`. May be used by Relay 1."""
   similarTable1Edge(
     """The method to use when ordering `SimilarTable1`."""
-    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SimilarTable1SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -9264,7 +9286,7 @@ type UpdateSimilarTable2Payload {
   """An edge for our `SimilarTable2`. May be used by Relay 1."""
   similarTable2Edge(
     """The method to use when ordering `SimilarTable2`."""
-    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [SimilarTable2SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -9327,7 +9349,7 @@ type UpdateTypePayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -9384,7 +9406,7 @@ type UpdateViewTablePayload {
   """An edge for our `ViewTable`. May be used by Relay 1."""
   viewTableEdge(
     """The method to use when ordering `ViewTable`."""
-    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ViewTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ViewTablesEdge
 }
 
@@ -9429,7 +9451,7 @@ type ViewTablesConnection {
   """
   A list of edges which contains the `ViewTable` and cursor to aid in pagination.
   """
-  edges: [ViewTablesEdge!]!
+  edges: [ViewTablesEdge]!
 
   """A list of `ViewTable` objects."""
   nodes: [ViewTable]!
