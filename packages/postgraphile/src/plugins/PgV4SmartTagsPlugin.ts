@@ -1,5 +1,4 @@
 import "graphile-config";
-import "graphile-build-pg";
 
 import type { PgSmartTagsDict } from "graphile-build-pg";
 import { addBehaviorToTags } from "graphile-build-pg";

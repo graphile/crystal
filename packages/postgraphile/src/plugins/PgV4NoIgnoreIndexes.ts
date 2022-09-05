@@ -1,4 +1,3 @@
-import { PgSourceUnique } from "@dataplan/pg";
 import { addBehaviorToTags } from "graphile-build-pg";
 
 export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
@@ -8,7 +7,7 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
   gather: {
     hooks: {
       pgRelations_relation(info, event) {
-        const { relation, pgConstraint, pgClass } = event;
+        const { relation, pgConstraint } = event;
 
         if (pgConstraint._id.startsWith("FAKE_")) {
           // Pretend fake constraints are indexed.
