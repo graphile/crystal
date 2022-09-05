@@ -1,8 +1,7 @@
 import "graphile-config";
 
-import type { PgSmartTagsDict } from "pg-introspection";
-
 import { version } from "../index.js";
+import { addBehaviorToTags } from "../utils.js";
 
 declare global {
   namespace GraphileConfig {
@@ -80,13 +79,3 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
     Cache
   >,
 };
-
-function addBehaviorToTags(tags: PgSmartTagsDict, behavior: string): void {
-  if (Array.isArray(tags.behavior)) {
-    tags.behavior.push(behavior);
-  } else if (typeof tags.behavior === "string") {
-    tags.behavior = [tags.behavior, behavior];
-  } else {
-    tags.behavior = behavior;
-  }
-}

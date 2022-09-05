@@ -10,6 +10,7 @@ import { sql } from "pg-sql2";
 
 import { version } from "../index.js";
 import { withPgClientFromPgSource } from "../pgSources.js";
+import { addBehaviorToTags } from "../utils.js";
 
 declare global {
   namespace GraphileConfig {
@@ -162,15 +163,8 @@ Original error: ${e.message}
             tags.enum === true || typeof tags.enum === "string";
 
           if (isEnumTable) {
-            if (Array.isArray(tags.behavior)) {
-              // no action
-            } else if (typeof tags.behavior === "string") {
-              tags.behavior = [tags.behavior];
-            } else {
-              tags.behavior = [];
-            }
             // Prevent the table being recognised as a table
-            tags.behavior.unshift("-*");
+            addBehaviorToTags(tags, "-*", true);
           }
 
           // By this point, even views should have "fake" constraints we can use

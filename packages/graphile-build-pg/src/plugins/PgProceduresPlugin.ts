@@ -18,6 +18,7 @@ import type { PgProc } from "pg-introspection";
 import sql from "pg-sql2";
 
 import { version } from "../index.js";
+import { addBehaviorToTags } from "../utils.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
@@ -406,18 +407,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
-          const behavior = Array.isArray(tags.behavior)
-            ? [...(tags.behavior as string[])]
-            : typeof tags.behavior === "string"
-            ? [tags.behavior]
-            : [];
-          behavior.push("-filter -order");
+          addBehaviorToTags(tags, "-filter -order");
 
           const extensions: PgSourceExtensions = {
-            tags: {
-              ...tags,
-              behavior,
-            },
+            tags,
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {

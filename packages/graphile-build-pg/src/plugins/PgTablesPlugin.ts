@@ -16,6 +16,7 @@ import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { addBehaviorToTags } from "../utils.js";
 
 type PgSourceBuilderOptions = Omit<
   PgSourceOptions<any, any, any, any>,
@@ -472,23 +473,18 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           const { tags } = pgClass.getTagsAndDescription();
 
-          const behavior: string[] = Array.isArray(tags.behavior)
-            ? [...(tags.behavior as string[])]
-            : typeof tags.behavior === "string"
-            ? [tags.behavior]
-            : [];
           const mask = pgClass.updatable_mask ?? 2 ** 8 - 1;
           const isInsertable = mask & (1 << 3);
           const isUpdatable = mask & (1 << 2);
           const isDeletable = mask & (1 << 4);
           if (!isInsertable) {
-            behavior.push("-insert");
+            addBehaviorToTags(tags, "-insert");
           }
           if (!isUpdatable) {
-            behavior.push("-update");
+            addBehaviorToTags(tags, "-update");
           }
           if (!isDeletable) {
-            behavior.push("-delete");
+            addBehaviorToTags(tags, "-delete");
           }
 
           const options: PgSourceBuilderOptions = {
@@ -502,7 +498,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             extensions: {
               tags: {
                 ...tags,
-                ...(behavior.length > 0 ? { behavior } : {}),
                 originalName: pgClass.relname,
               },
             },
