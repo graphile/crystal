@@ -907,9 +907,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (isEnumCodec(codec)) {
               const typeName = inflection.enumType(codec);
               const values = codec.values.reduce((memo, value) => {
-                memo[inflection.enumValue(value, codec)] = {
-                  // TODO: description
-                  value: value,
+                memo[inflection.enumValue(value.value, codec)] = {
+                  value: value.value,
+                  description: value.description,
                 };
                 return memo;
               }, {});

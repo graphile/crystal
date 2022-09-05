@@ -1,4 +1,4 @@
-import type { PgTypeCodec } from "@dataplan/pg";
+import type { PgEnumValue, PgTypeCodec } from "@dataplan/pg";
 import { enumType } from "@dataplan/pg";
 import type {
   Introspection,
@@ -32,7 +32,11 @@ declare global {
     interface Inflection {
       enumTableCodec(
         this: Inflection,
-        details: { databaseName: string; pgConstraint: PgConstraint },
+        details: {
+          databaseName: string;
+          pgClass: PgClass;
+          pgConstraint: PgConstraint;
+        },
       ): string;
     }
   }
@@ -64,7 +68,15 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     add: {
       enumTableCodec(preset, { databaseName, pgConstraint }) {
         const pgClass = pgConstraint.getClass()!;
+        const constraintTags = pgConstraint.getTagsAndDescription().tags;
+        if (typeof constraintTags.enumName === "string") {
+          return constraintTags.enumName;
+        }
         if (pgConstraint.contype === "p") {
+          const classTags = pgClass.getTagsAndDescription().tags;
+          if (typeof classTags.enumName === "string") {
+            return classTags.enumName;
+          }
           return this.tableSourceName({ databaseName, pgClass });
         } else {
           const tableName = this.tableSourceName({ databaseName, pgClass });
@@ -232,11 +244,22 @@ Original error: ${e.message}
               }
 
               // TODO: values should be an object array to leave space for description, etc?
-              const values: string[] = data.map((r) => r[pgAttribute.attname]);
+              const values: Array<PgEnumValue> = data.map(
+                (r): PgEnumValue => ({
+                  value: r[pgAttribute.attname],
+                  description: descriptionColumn
+                    ? r[descriptionColumn.attname]
+                    : undefined,
+                }),
+              );
 
               // Build the codec
               const codec = enumType(
-                info.inflection.enumTableCodec({ databaseName, pgConstraint }),
+                info.inflection.enumTableCodec({
+                  databaseName,
+                  pgClass,
+                  pgConstraint,
+                }),
                 originalCodec.sqlType,
                 values,
                 // TODO: extensions?
