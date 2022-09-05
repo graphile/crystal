@@ -5890,35 +5890,6 @@ type Post implements Node {
   typeById: Type
 
   """Reads and enables pagination through a set of `Type`."""
-  typesById(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: TypeCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TypesConnection! @deprecated(reason: "Please use typeById instead")
-
-  """Reads and enables pagination through a set of `Type`."""
   typesBySmallint(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6059,7 +6030,7 @@ type PostWithSuffixPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -6073,7 +6044,7 @@ type PostsConnection {
   """
   A list of edges which contains the `Post` and cursor to aid in pagination.
   """
-  edges: [PostsEdge!]!
+  edges: [PostsEdge]!
 
   """A list of `Post` objects."""
   nodes: [Post]!
@@ -6820,6 +6791,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): CompoundKey
+
+  """Get a single `CompoundKey`."""
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
@@ -6853,11 +6826,17 @@ type Query implements Node {
     """
     nodeId: ID!
   ): DefaultValue
+
+  """Get a single `DefaultValue`."""
   defaultValueById(id: Int!): DefaultValue
   funcInInout(i: Int, ino: Int): Int
   funcInOut(i: Int): Int
   funcOut: Int
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+
+  """
+  Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
+  """
   funcOutComplexSetof(
     a: Int
 
@@ -6882,6 +6861,8 @@ type Query implements Node {
   ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+
+  """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
   funcOutOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6902,6 +6883,8 @@ type Query implements Node {
     offset: Int
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6945,6 +6928,10 @@ type Query implements Node {
   ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+
+  """
+  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
+  """
   funcReturnsTableMultiCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6965,6 +6952,8 @@ type Query implements Node {
     """
     offset: Int
   ): FuncReturnsTableMultiColConnection
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6991,7 +6980,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Input`."""
     nodeId: ID!
   ): Input
+
+  """Get a single `Input`."""
   inputById(id: Int!): Input
+
+  """Reads and enables pagination through a set of `Int4`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7020,6 +7013,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Issue756`."""
     nodeId: ID!
   ): Issue756
+
+  """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
@@ -7029,7 +7024,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `LeftArm`."""
     nodeId: ID!
   ): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmByPersonId(personId: Int!): LeftArm
 
   """Reads a single `MyTable` using its globally unique `ID`."""
@@ -7037,8 +7036,12 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `MyTable`."""
     nodeId: ID!
   ): MyTable
+
+  """Get a single `MyTable`."""
   myTableById(id: Int!): MyTable
   noArgsQuery: Int
+
+  """Get a single `NoPrimaryKey`."""
   noPrimaryKeyById(id: Int!): NoPrimaryKey
 
   """Fetches an object given its globally unique `ID`."""
@@ -7059,6 +7062,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): NullTestRecord
+
+  """Get a single `NullTestRecord`."""
   nullTestRecordById(id: Int!): NullTestRecord
   optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
   optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
@@ -7071,6 +7076,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Patch`."""
     nodeId: ID!
   ): Patch
+
+  """Get a single `Patch`."""
   patchById(id: Int!): Patch
 
   """Reads a single `Person` using its globally unique `ID`."""
@@ -7078,7 +7085,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Person`."""
     nodeId: ID!
   ): Person
+
+  """Get a single `Person`."""
   personByEmail(email: Email!): Person
+
+  """Get a single `Person`."""
   personById(id: Int!): Person
 
   """Reads a single `PersonSecret` using its globally unique `ID`."""
