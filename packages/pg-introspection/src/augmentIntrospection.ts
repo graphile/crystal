@@ -201,6 +201,18 @@ export function augmentIntrospection(
       }),
     );
   });
+  introspection.indexes.forEach((entity) => {
+    entity.getIndexClass = memo(() => getClass(entity.indexrelid));
+    entity.getClass = memo(() => getClass(entity.indrelid));
+    entity.getKeys = memo(() => {
+      const owner = getClass(entity.indrelid);
+      const attrs = owner!.getAttributes();
+      const keys = entity.indkey;
+      return keys.map((key) =>
+        key === 0 ? null : attrs.find((a) => a.attnum === key)!,
+      );
+    });
+  });
   introspection.attributes.forEach((entity) => {
     entity.getClass = memo(() => getClass(entity.attrelid));
     entity.getType = memo(() => getType(entity.atttypid));

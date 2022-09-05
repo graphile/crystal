@@ -87,6 +87,21 @@ declare module "./introspection" {
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
   }
+  interface PgIndex {
+    /**
+     * Get the class that represents this index.
+     */
+    getIndexClass(): PgClass | undefined;
+    /**
+     * Get the class (typically table) this index is for.
+     */
+    getClass(): PgClass | undefined;
+    /**
+     * The PgAttributes that are in this index; a null indicates that the entry
+     * is an expression rather than a column.
+     */
+    getKeys(): Array<PgAttribute | null>;
+  }
   interface PgAttribute {
     getClass(): PgClass | undefined;
     getType(): PgType | undefined;
