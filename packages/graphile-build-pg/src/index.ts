@@ -1,5 +1,6 @@
 export { defaultPreset } from "./preset.js";
 export const version = require("../package.json").version;
+export { addBehaviorToTags } from "./utils.js";
 
 export {
   PgSmartTagsDict,

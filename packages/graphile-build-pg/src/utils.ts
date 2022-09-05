@@ -10,7 +10,7 @@ export function tagToString(
 }
 
 export function addBehaviorToTags(
-  tags: PgSmartTagsDict,
+  tags: Partial<PgSmartTagsDict>,
   behavior: string,
   prepend = false,
 ): void {
