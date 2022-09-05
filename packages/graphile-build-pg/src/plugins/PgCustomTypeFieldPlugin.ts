@@ -337,135 +337,139 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           );
 
           for (const source of mutationProcSources) {
-            const inputTypeName = inflection.customMutationInput({
-              source,
-            });
+            build.recoverable(null, () => {
+              const inputTypeName = inflection.customMutationInput({
+                source,
+              });
 
-            const fieldName = inflection.customMutationField({ source });
-            build.registerInputObjectType(
-              inputTypeName,
-              { isMutationInput: true },
-              () => {
-                const argDetails = getArgDetailsFromParameters(
-                  build,
-                  source,
-                  source.parameters,
-                );
+              const fieldName = inflection.customMutationField({ source });
+              build.registerInputObjectType(
+                inputTypeName,
+                { isMutationInput: true },
+                () => {
+                  const argDetails = getArgDetailsFromParameters(
+                    build,
+                    source,
+                    source.parameters,
+                  );
 
-                // Not used for isMutation; that's handled elsewhere
-                const fields = argDetails.reduce(
-                  (memo, { inputType, graphqlArgName }) => {
-                    memo[graphqlArgName] = {
-                      type: inputType,
+                  // Not used for isMutation; that's handled elsewhere
+                  const fields = argDetails.reduce(
+                    (memo, { inputType, graphqlArgName }) => {
+                      memo[graphqlArgName] = {
+                        type: inputType,
+                      };
+                      return memo;
+                    },
+                    {
+                      clientMutationId: {
+                        type: GraphQLString,
+                        applyPlan: EXPORTABLE(
+                          () =>
+                            function plan(
+                              $input: ObjectStep<any>,
+                              val: FieldArgs,
+                            ) {
+                              $input.set("clientMutationId", val.get());
+                            },
+                          [],
+                        ),
+                      },
+                    },
+                  );
+
+                  return {
+                    description: `All input for the \`${fieldName}\` mutation.`,
+                    fields,
+                  };
+                },
+                "PgCustomTypeFieldPlugin mutation function input type",
+              );
+
+              ////////////////////////////////////////
+
+              const payloadTypeName = inflection.customMutationPayload({
+                source,
+              });
+
+              const isVoid = source.codec === TYPES.void;
+
+              const returnGraphQLTypeName = build.getGraphQLTypeNameByPgCodec(
+                source.codec.arrayOfCodec ?? source.codec,
+                "output",
+              );
+              const resultFieldName =
+                isVoid || !returnGraphQLTypeName
+                  ? null
+                  : inflection.functionMutationResultFieldName({
+                      source,
+                      returnGraphQLTypeName,
+                    });
+
+              build.registerObjectType(
+                payloadTypeName,
+                {
+                  isMutationPayload: true,
+                  pgCodec: source.codec,
+                  pgTypeSource: source,
+                },
+                ObjectStep,
+                () => ({
+                  description: `The output of our \`${fieldName}\` mutation.`,
+                  fields: () => {
+                    const fields = {
+                      clientMutationId: {
+                        type: GraphQLString,
+                        plan: EXPORTABLE(
+                          (constant) =>
+                            function plan($object: ObjectStep<any>) {
+                              return (
+                                $object.getStepForKey(
+                                  "clientMutationId",
+                                  true,
+                                ) ?? constant(undefined)
+                              );
+                            },
+                          [constant],
+                        ),
+                      },
                     };
-                    return memo;
-                  },
-                  {
-                    clientMutationId: {
-                      type: GraphQLString,
-                      applyPlan: EXPORTABLE(
+                    if (isVoid) {
+                      return fields;
+                    }
+                    const baseType = getFunctionSourceReturnGraphQLType(
+                      build,
+                      source,
+                    );
+                    if (!baseType || !resultFieldName) {
+                      console.warn(
+                        `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
+                      );
+                      return {};
+                    }
+                    const type = source.isUnique
+                      ? baseType
+                      : new GraphQLList(baseType);
+                    fields[resultFieldName] = {
+                      type,
+                      plan: EXPORTABLE(
                         () =>
-                          function plan(
-                            $input: ObjectStep<any>,
-                            val: FieldArgs,
-                          ) {
-                            $input.set("clientMutationId", val.get());
+                          (
+                            $object: ObjectStep<{
+                              result: PgClassSingleStep<any, any, any, any>;
+                            }>,
+                          ) => {
+                            return $object.get("result");
                           },
                         [],
                       ),
-                    },
-                  },
-                );
-
-                return {
-                  description: `All input for the \`${fieldName}\` mutation.`,
-                  fields,
-                };
-              },
-              "PgCustomTypeFieldPlugin mutation function input type",
-            );
-
-            ////////////////////////////////////////
-
-            const payloadTypeName = inflection.customMutationPayload({
-              source,
-            });
-
-            const isVoid = source.codec === TYPES.void;
-
-            const returnGraphQLTypeName = build.getGraphQLTypeNameByPgCodec(
-              source.codec.arrayOfCodec ?? source.codec,
-              "output",
-            );
-            const resultFieldName =
-              isVoid || !returnGraphQLTypeName
-                ? null
-                : inflection.functionMutationResultFieldName({
-                    source,
-                    returnGraphQLTypeName,
-                  });
-
-            build.registerObjectType(
-              payloadTypeName,
-              {
-                isMutationPayload: true,
-                pgCodec: source.codec,
-                pgTypeSource: source,
-              },
-              ObjectStep,
-              () => ({
-                description: `The output of our \`${fieldName}\` mutation.`,
-                fields: () => {
-                  const fields = {
-                    clientMutationId: {
-                      type: GraphQLString,
-                      plan: EXPORTABLE(
-                        (constant) =>
-                          function plan($object: ObjectStep<any>) {
-                            return (
-                              $object.getStepForKey("clientMutationId", true) ??
-                              constant(undefined)
-                            );
-                          },
-                        [constant],
-                      ),
-                    },
-                  };
-                  if (isVoid) {
+                    };
                     return fields;
-                  }
-                  const baseType = getFunctionSourceReturnGraphQLType(
-                    build,
-                    source,
-                  );
-                  if (!baseType || !resultFieldName) {
-                    console.warn(
-                      `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
-                    );
-                    return {};
-                  }
-                  const type = source.isUnique
-                    ? baseType
-                    : new GraphQLList(baseType);
-                  fields[resultFieldName] = {
-                    type,
-                    plan: EXPORTABLE(
-                      () =>
-                        (
-                          $object: ObjectStep<{
-                            result: PgClassSingleStep<any, any, any, any>;
-                          }>,
-                        ) => {
-                          return $object.get("result");
-                        },
-                      [],
-                    ),
-                  };
-                  return fields;
-                },
-              }),
-              "PgCustomTypeFieldPlugin mutation function payload type",
-            );
+                  },
+                }),
+                "PgCustomTypeFieldPlugin mutation function payload type",
+              );
+            });
           }
 
           // Add connection type for functions that need it
