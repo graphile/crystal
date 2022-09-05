@@ -89,7 +89,8 @@ export const buildInflection = (
     (plugin) => plugin.inflection?.replace,
     (inflectorName, replacementFunction, plugin) => {
       const previous = inflectors[inflectorName];
-      if (!previous) {
+      const ignore = plugin.inflection?.ignoreReplaceIfNotExists ?? [];
+      if (!previous && !ignore?.includes(inflectorName)) {
         console.warn(
           `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
         );

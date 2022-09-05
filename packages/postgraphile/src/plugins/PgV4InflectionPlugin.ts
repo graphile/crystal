@@ -16,6 +16,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
 
   inflection: {
+    ignoreReplaceIfNotExists: ["deletedNodeId"],
     replace: {
       _schemaPrefix() {
         return ``;

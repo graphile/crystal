@@ -32,7 +32,7 @@ type EmployeesConnection {
   """
   A list of edges which contains the `Employee` and cursor to aid in pagination.
   """
-  edges: [EmployeesEdge!]!
+  edges: [EmployeesEdge]!
 
   """A list of `Employee` objects."""
   nodes: [Employee]!
@@ -125,6 +125,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Employee`."""
     nodeId: ID!
   ): Employee
+
+  """Get a single `Employee`."""
   employeeById(id: Int!): Employee
 
   """Fetches an object given its globally unique `ID`."""
