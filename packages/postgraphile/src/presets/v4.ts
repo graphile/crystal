@@ -105,7 +105,6 @@ export const makeV4Preset = (
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,
-      PgV4NonNullableEdgesPlugin,
       ...(options.ignoreIndexes === false ? [PgV4NoIgnoreIndexesPlugin] : []),
       makeV4Plugin(options),
       ...(options.appendPlugins ? options.appendPlugins : []),
