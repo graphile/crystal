@@ -3726,6 +3726,8 @@ type Mutation {
     """
     input: CreatePersonSecretInput!
   ): CreatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Creates a single `Post`."""
   createPost(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
