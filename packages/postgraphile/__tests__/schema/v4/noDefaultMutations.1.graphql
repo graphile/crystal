@@ -199,7 +199,7 @@ type Comptype {
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-"""The day, does not include a time."""
+"""A calendar date in YYYY-MM-DD format."""
 scalar Date
 
 """A range of `Date`."""
@@ -322,7 +322,6 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
-"""The return type of our `funcOutComplex` query."""
 type FuncOutComplexRecord {
   x: Int
   y: CompoundType
@@ -339,6 +338,9 @@ type FuncOutComplexSetofConnection {
   """A list of `FuncOutComplexSetofRecord` objects."""
   nodes: [FuncOutComplexSetofRecord!]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """
   The count of *all* `FuncOutComplexSetofRecord` you could get from the connection.
   """
@@ -354,20 +356,17 @@ type FuncOutComplexSetofEdge {
   node: FuncOutComplexSetofRecord!
 }
 
-"""The return type of our `funcOutComplexSetof` query."""
 type FuncOutComplexSetofRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `funcOutOutCompoundType` query."""
 type FuncOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
 }
 
-"""The return type of our `funcOutOut` query."""
 type FuncOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -382,6 +381,9 @@ type FuncOutOutSetofConnection {
 
   """A list of `FuncOutOutSetofRecord` objects."""
   nodes: [FuncOutOutSetofRecord!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """
   The count of *all* `FuncOutOutSetofRecord` you could get from the connection.
@@ -398,13 +400,11 @@ type FuncOutOutSetofEdge {
   node: FuncOutOutSetofRecord!
 }
 
-"""The return type of our `funcOutOutSetof` query."""
 type FuncOutOutSetofRecord {
   o1: Int
   o2: String
 }
 
-"""The return type of our `funcOutOutUnnamed` query."""
 type FuncOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -415,10 +415,13 @@ type FuncOutSetofConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [FuncOutSetofEdge!]!
+  edges: [FuncOutSetofEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -433,7 +436,6 @@ type FuncOutSetofEdge {
   node: Int
 }
 
-"""The return type of our `funcOutUnnamedOutOutUnnamed` query."""
 type FuncOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -450,6 +452,9 @@ type FuncReturnsTableMultiColConnection {
   """A list of `FuncReturnsTableMultiColRecord` objects."""
   nodes: [FuncReturnsTableMultiColRecord!]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """
   The count of *all* `FuncReturnsTableMultiColRecord` you could get from the connection.
   """
@@ -465,7 +470,6 @@ type FuncReturnsTableMultiColEdge {
   node: FuncReturnsTableMultiColRecord!
 }
 
-"""The return type of our `funcReturnsTableMultiCol` query."""
 type FuncReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -476,10 +480,13 @@ type FuncReturnsTableOneColConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [FuncReturnsTableOneColEdge!]!
+  edges: [FuncReturnsTableOneColEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -526,10 +533,13 @@ type IntSetQueryConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [IntSetQueryEdge!]!
+  edges: [IntSetQueryEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -617,7 +627,7 @@ type Issue756MutationPayload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -862,7 +872,7 @@ type LeftArmIdentityPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -1167,7 +1177,6 @@ type MutationOutComplexPayload {
   result: MutationOutComplexRecord
 }
 
-"""The return type of our `mutationOutComplex` mutation."""
 type MutationOutComplexRecord {
   x: Int
   y: CompoundType
@@ -1201,7 +1210,6 @@ type MutationOutComplexSetofPayload {
   results: [MutationOutComplexSetofRecord]
 }
 
-"""The return type of our `mutationOutComplexSetof` mutation."""
 type MutationOutComplexSetofRecord {
   x: Int
   y: CompoundType
@@ -1242,7 +1250,6 @@ type MutationOutOutCompoundTypePayload {
   result: MutationOutOutCompoundTypeRecord
 }
 
-"""The return type of our `mutationOutOutCompoundType` mutation."""
 type MutationOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
@@ -1272,7 +1279,6 @@ type MutationOutOutPayload {
   result: MutationOutOutRecord
 }
 
-"""The return type of our `mutationOutOut` mutation."""
 type MutationOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -1302,7 +1308,6 @@ type MutationOutOutSetofPayload {
   results: [MutationOutOutSetofRecord]
 }
 
-"""The return type of our `mutationOutOutSetof` mutation."""
 type MutationOutOutSetofRecord {
   o1: Int
   o2: String
@@ -1332,7 +1337,6 @@ type MutationOutOutUnnamedPayload {
   result: MutationOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutOutUnnamed` mutation."""
 type MutationOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -1398,7 +1402,7 @@ type MutationOutTablePayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -1464,7 +1468,6 @@ type MutationOutUnnamedOutOutUnnamedPayload {
   result: MutationOutUnnamedOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutUnnamedOutOutUnnamed` mutation."""
 type MutationOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -1511,7 +1514,6 @@ type MutationReturnsTableMultiColPayload {
   results: [MutationReturnsTableMultiColRecord]
 }
 
-"""The return type of our `mutationReturnsTableMultiCol` mutation."""
 type MutationReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -1758,8 +1760,6 @@ type PeopleEdge {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
-  ALIASES_ASC
-  ALIASES_DESC
   COMPUTED_OUT_ASC
   COMPUTED_OUT_DESC
   CONFIG_ASC
@@ -1895,35 +1895,6 @@ type Person implements Node {
   """Reads a single `LeftArm` that is related to this `Person`."""
   leftArmByPersonId: LeftArm
 
-  """Reads and enables pagination through a set of `LeftArm`."""
-  leftArmsByPersonId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: LeftArmCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): LeftArmsConnection! @deprecated(reason: "Please use leftArmByPersonId instead")
-
   """The person’s name"""
   name: String!
 
@@ -1934,35 +1905,6 @@ type Person implements Node {
 
   """This `Person`'s `PersonSecret`."""
   personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """This `Person`'s `PersonSecret`."""
-  personSecretsByPersonId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PersonSecretCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection! @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
   site: WrappedUrl @deprecated(reason: "Don’t use me")
   typeFunction(id: Int): Type
 
@@ -1990,26 +1932,22 @@ type Person implements Node {
   userMac: String
 }
 
-"""The return type of our `computedComplex` query."""
 type PersonComputedComplexRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `computedFirstArgInoutOut` query."""
 type PersonComputedFirstArgInoutOutRecord {
   o: Int
   person: Person
 }
 
-"""The return type of our `computedInoutOut` query."""
 type PersonComputedInoutOutRecord {
   ino: String
   o: String
 }
 
-"""The return type of our `computedOutOut` query."""
 type PersonComputedOutOutRecord {
   o1: String
   o2: String
@@ -2120,6 +2058,7 @@ enum PersonSecretsOrderBy {
   SECRET_DESC
 }
 
+"""A cartesian point."""
 type Point {
   x: Float!
   y: Float!
@@ -2396,6 +2335,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): CompoundKey
+
+  """Get a single `CompoundKey`."""
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
   """Reads and enables pagination through a set of `CompoundType`."""
@@ -2423,6 +2364,10 @@ type Query implements Node {
   funcInOut(i: Int): Int
   funcOut: Int
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+
+  """
+  Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
+  """
   funcOutComplexSetof(
     a: Int
 
@@ -2447,6 +2392,8 @@ type Query implements Node {
   ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+
+  """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
   funcOutOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -2467,6 +2414,8 @@ type Query implements Node {
     offset: Int
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -2510,6 +2459,10 @@ type Query implements Node {
   ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+
+  """
+  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
+  """
   funcReturnsTableMultiCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -2530,6 +2483,8 @@ type Query implements Node {
     """
     offset: Int
   ): FuncReturnsTableMultiColConnection
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -2550,6 +2505,8 @@ type Query implements Node {
     """
     offset: Int
   ): FuncReturnsTableOneColConnection
+
+  """Reads and enables pagination through a set of `Int4`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -2578,6 +2535,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Issue756`."""
     nodeId: ID!
   ): Issue756
+
+  """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
@@ -2587,7 +2546,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `LeftArm`."""
     nodeId: ID!
   ): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmByPersonId(personId: Int!): LeftArm
 
   """Reads a single `MyTable` using its globally unique `ID`."""
@@ -2595,6 +2558,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `MyTable`."""
     nodeId: ID!
   ): MyTable
+
+  """Get a single `MyTable`."""
   myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
@@ -2616,6 +2581,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): NullTestRecord
+
+  """Get a single `NullTestRecord`."""
   nullTestRecordById(id: Int!): NullTestRecord
 
   """Reads a single `Person` using its globally unique `ID`."""
@@ -2623,7 +2590,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Person`."""
     nodeId: ID!
   ): Person
+
+  """Get a single `Person`."""
   personByEmail(email: Email!): Person
+
+  """Get a single `Person`."""
   personById(id: Int!): Person
 
   """Reads a single `PersonSecret` using its globally unique `ID`."""
@@ -2633,7 +2604,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
   Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -2703,7 +2676,6 @@ type Query implements Node {
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
-"""The return type of our `queryOutputTwoRows` query."""
 type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
@@ -2734,7 +2706,6 @@ scalar RegProcedure
 """A builtin object identifier type for a data type name"""
 scalar RegType
 
-"""The return type of our `searchTestSummaries` query."""
 type SearchTestSummariesRecord {
   id: Int
   totalDuration: Interval
