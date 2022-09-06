@@ -1,5 +1,4 @@
 import type { PromiseOrDirect } from "dataplanner";
-import { readFile } from "fs/promises";
 import type { GraphQLSchema } from "graphql";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import type { PoolClient } from "pg";
@@ -7,27 +6,24 @@ import type { PoolClient } from "pg";
 import { makeSchema } from "../../../dist/schema.js";
 import AmberPreset from "../../../src/presets/amber.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
-import { connectionString, snapshot, withPoolClient } from "../../helpers.js";
+import {
+  connectionString,
+  snapshot,
+  withPoolClientTransaction,
+} from "../../helpers.js";
 
 let countByPath = Object.create(null);
-
-const dSchemaComments = () =>
-  readFile(`${__dirname}/../../kitchen-sink-d-schema-comments.sql`, "utf8");
 
 export const test =
   (
     testPath: string,
     schemata: string | string[],
-    options: Record<string, any> = {},
+    options: { ignoreRBAC?: boolean } = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
     finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
   ) =>
   () =>
-    withPoolClient(async (client) => {
-      await client.query(`\
-drop function if exists a.create_post;
-${await dSchemaComments()}
-`);
+    withPoolClientTransaction(async (client) => {
       if (setup) {
         if (typeof setup === "function") {
           await setup(client);

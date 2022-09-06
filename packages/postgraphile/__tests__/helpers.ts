@@ -147,6 +147,19 @@ export async function withPoolClient<T>(
   }
 }
 
+export async function withPoolClientTransaction<T>(
+  callback: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  return withPoolClient(async (poolClient) => {
+    await poolClient.query("begin;");
+    try {
+      return await callback(poolClient);
+    } finally {
+      await poolClient.query("rollback");
+    }
+  });
+}
+
 /**
  * Make a test "withPgClient" that writes queries issued into the passed
  * 'queries' array.
