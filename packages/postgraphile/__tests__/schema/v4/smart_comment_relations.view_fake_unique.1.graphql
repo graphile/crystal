@@ -477,7 +477,6 @@ type DeletePostPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedPostViewId: ID
 
   """The `Post` that was deleted by this mutation."""
   post: Post
