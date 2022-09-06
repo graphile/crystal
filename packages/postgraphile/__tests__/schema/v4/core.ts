@@ -57,7 +57,7 @@ export const test =
                 : undefined,
             schemas: schemas,
             adaptorSettings: {
-              connectionString,
+              poolClient: client,
             },
           } as any, //GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
         ],
