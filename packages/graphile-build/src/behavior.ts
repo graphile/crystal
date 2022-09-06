@@ -16,6 +16,7 @@ export class Behavior {
     }
   }
 
+  // TODO: would be great if this could return `{deprecationReason: string}` too...
   /**
    * @param localBehaviorSpecsString - the behavior of the entity as determined by details on the entity itself and any applicable ancestors
    * @param filter - the behavior the plugin specifies

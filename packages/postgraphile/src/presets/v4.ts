@@ -69,6 +69,11 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
               }
             }
 
+            // We could base this on the legacy relations setting; but how to set deprecated?
+            build.behavior.addDefaultBehavior(
+              "-singularRelation:connection -singularRelation:list",
+            );
+
             return build;
           },
         },
