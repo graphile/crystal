@@ -15,6 +15,7 @@ export interface V4Options {
   disableDefaultMutations?: boolean;
   ignoreIndexes?: boolean;
   appendPlugins?: GraphileConfig.Plugin[];
+  ignoreRBAC?: boolean;
   graphileBuildOptions?: {
     pgUseCustomNetworkScalars?: boolean;
   };
@@ -99,6 +100,9 @@ function parseJWTType(type: string): [string, string] {
 export const makeV4Preset = (
   options: V4Options = {},
 ): GraphileConfig.Preset => {
+  if (options.ignoreRBAC === false) {
+    throw new Error("Haven't implemented ignoreRBAC: false yet");
+  }
   return {
     plugins: [
       PgV4InflectionPlugin,
