@@ -242,7 +242,7 @@ type CreateTvShowPayload {
   """An edge for our `TvShow`. May be used by Relay 1."""
   tvShowEdge(
     """The method to use when ordering `TvShow`."""
-    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvShowsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvShowsEdge
 }
 
