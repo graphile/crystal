@@ -238,9 +238,6 @@ type CreateTvShowPayload {
 
   """The `TvShow` that was created by this mutation."""
   tvShow: TvShow
-
-  """An edge for our `TvShow`. May be used by Relay 1."""
-  tvShowEdge: TvShowsEdge
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -535,9 +532,6 @@ type DeleteTvShowPayload {
 
   """The `TvShow` that was deleted by this mutation."""
   tvShow: TvShow
-
-  """An edge for our `TvShow`. May be used by Relay 1."""
-  tvShowEdge: TvShowsEdge
 }
 
 type Film implements Node {
@@ -2152,7 +2146,4 @@ type UpdateTvShowPayload {
 
   """The `TvShow` that was updated by this mutation."""
   tvShow: TvShow
-
-  """An edge for our `TvShow`. May be used by Relay 1."""
-  tvShowEdge: TvShowsEdge
 }
