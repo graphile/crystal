@@ -27,6 +27,6 @@ test("referencing non-existent table (throws error)", async () => {
   }
   expect(error).toBeTruthy();
   expect(error).toMatchInlineSnapshot(
-    `[Error: @foreignKey smart comment referenced non-existant table/view 'smart_comment_relations'.'posts'. Note that this reference must use *database names* (i.e. it does not respect @name). ((post_id) references posts)]`,
+    `[Error: Invalid @foreignKey on 'smart_comment_relations.offer_view'; referenced non-existent table/view 'smart_comment_relations.posts'. Note that this reference must use *database names* (i.e. it does not respect @name). ((post_id) references posts)]`,
   );
 });
