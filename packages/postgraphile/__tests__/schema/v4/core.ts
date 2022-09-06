@@ -5,6 +5,7 @@ import type { PoolClient } from "pg";
 
 import { makeSchema } from "../../../dist/schema.js";
 import AmberPreset from "../../../src/presets/amber.js";
+import type { V4Options } from "../../../src/presets/v4.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
 import {
   connectionString,
@@ -18,7 +19,7 @@ export const test =
   (
     testPath: string,
     schemata: string | string[],
-    options: { ignoreRBAC?: boolean } = {},
+    options: V4Options = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
     finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
   ) =>
