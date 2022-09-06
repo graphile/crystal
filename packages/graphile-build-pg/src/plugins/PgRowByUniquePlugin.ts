@@ -40,7 +40,10 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         const uniqueKeys = unique.columns;
         return this.camelCase(
           // TODO: should this use the _source_ rather than the _codec_ in case the same codec is used across multiple sources?
-          `${this.tableType(source.codec)}-by-${uniqueKeys.join("-and-")}`,
+          `${this.tableType(source.codec)}-by-${this._joinColumnNames(
+            source.codec,
+            uniqueKeys,
+          )}`,
         );
       },
     },

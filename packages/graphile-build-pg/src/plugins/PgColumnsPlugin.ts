@@ -42,6 +42,16 @@ declare global {
       ): string;
 
       /**
+       * Takes a codec and the list of column names from that codec and turns
+       * it into a joined list.
+       */
+      _joinColumnNames(
+        this: GraphileBuild.Inflection,
+        codec: PgTypeCodec<any, any, any, any>,
+        names: readonly string[],
+      ): string;
+
+      /**
        * The field name for a given column on that pg_class' table type. May
        * also be used in other places (e.g. the Input or Patch type associated
        * with the table).
@@ -107,6 +117,16 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           column.extensions?.tags?.name || columnName,
         );
       },
+
+      _joinColumnNames(options, codec, names) {
+        return names
+          .map((columnName) => {
+            const column = codec.columns[columnName];
+            return this.column({ columnName, column, codec });
+          })
+          .join("-and-");
+      },
+
       column(options, details) {
         const columnFieldName = this.camelCase(this._columnName(details));
         // Avoid conflict with 'id' field used for Relay.

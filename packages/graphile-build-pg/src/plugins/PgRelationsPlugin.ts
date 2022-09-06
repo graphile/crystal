@@ -165,8 +165,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(details.relation.source.codec);
-        const localColumns = details.relation.localColumns;
-        return this.camelCase(`${remoteType}-by-${localColumns.join("-and-")}`);
+        const localColumns = details.relation.localColumns as string[];
+        return this.camelCase(
+          `${remoteType}-by-${this._joinColumnNames(
+            details.codec,
+            localColumns,
+          )}`,
+        );
       },
       singleRelationBackwards(options, details) {
         if (
@@ -182,9 +187,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns;
+        const remoteColumns = details.relation.remoteColumns as string[];
         return this.camelCase(
-          `${remoteType}-by-${remoteColumns.join("-and-")}`,
+          `${remoteType}-by-${this._joinColumnNames(
+            details.relation.source.codec,
+            remoteColumns,
+          )}`,
         );
       },
       manyRelationConnection(options, details) {
@@ -197,9 +205,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns;
+        const remoteColumns = details.relation.remoteColumns as string[];
         return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${remoteColumns.join("-and-")}`,
+          `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
+            details.relation.source.codec,
+            remoteColumns,
+          )}`,
         );
       },
       manyRelationList(options, details) {
@@ -217,10 +228,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           );
         }
         const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns;
+        const remoteColumns = details.relation.remoteColumns as string[];
         return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${remoteColumns.join(
-            "-and-",
+          `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
+            details.relation.source.codec,
+            remoteColumns,
           )}-list`,
         );
       },
