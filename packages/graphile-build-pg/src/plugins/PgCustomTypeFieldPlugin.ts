@@ -1057,10 +1057,16 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             deprecationReason: tagToString(
                               source.extensions?.tags?.deprecated,
                             ),
-                            // TODO: nullability
                             type: build.nullableIf(
                               !source.extensions?.tags?.notNull,
-                              new GraphQLList(type!),
+                              new GraphQLList(
+                                build.nullableIf(
+                                  !source.extensions?.tags?.notNull &&
+                                    (source.isList ||
+                                      !options.pgForbidSetofFunctionsToReturnNull),
+                                  type!,
+                                ),
+                              ),
                             ),
                             args: makeFieldArgs(),
                             plan: getSelectPlanFromParentAndArgs as any,
