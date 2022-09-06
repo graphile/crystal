@@ -2621,7 +2621,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [SearchTestSummariesRecord]
+  ): [SearchTestSummariesRecord!]
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of `Person`."""
