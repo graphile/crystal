@@ -154,7 +154,7 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           break;
         }
         case "read": {
-          behavior.push("-select");
+          behavior.push("-select -node");
           break;
         }
         case "update": {
