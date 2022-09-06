@@ -38,7 +38,11 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           if (!source.uniques) return false;
           if (!source.uniques[0]) return false;
           const behavior = getBehavior(source.extensions);
-          return !!build.behavior.matches(behavior, "node", "node");
+          // Needs the 'select' and 'node' behaviours for compatibility
+          return (
+            !!build.behavior.matches(behavior, "node", "node") &&
+            !!build.behavior.matches(behavior, "select", "select")
+          );
         });
 
         const sourcesByCodec = new Map<
