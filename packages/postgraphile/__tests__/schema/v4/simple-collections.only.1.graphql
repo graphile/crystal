@@ -1831,7 +1831,6 @@ type MutationOutComplexPayload {
   result: MutationOutComplexRecord
 }
 
-"""The return type of our `mutationOutComplex` mutation."""
 type MutationOutComplexRecord {
   x: Int
   y: CompoundType
@@ -1862,10 +1861,9 @@ type MutationOutComplexSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutComplexSetofRecord]
+  results: [MutationOutComplexSetofRecord!]
 }
 
-"""The return type of our `mutationOutComplexSetof` mutation."""
 type MutationOutComplexSetofRecord {
   x: Int
   y: CompoundType
@@ -1906,7 +1904,6 @@ type MutationOutOutCompoundTypePayload {
   result: MutationOutOutCompoundTypeRecord
 }
 
-"""The return type of our `mutationOutOutCompoundType` mutation."""
 type MutationOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
@@ -1936,7 +1933,6 @@ type MutationOutOutPayload {
   result: MutationOutOutRecord
 }
 
-"""The return type of our `mutationOutOut` mutation."""
 type MutationOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -1963,10 +1959,9 @@ type MutationOutOutSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutOutSetofRecord]
+  results: [MutationOutOutSetofRecord!]
 }
 
-"""The return type of our `mutationOutOutSetof` mutation."""
 type MutationOutOutSetofRecord {
   o1: Int
   o2: String
@@ -1996,7 +1991,6 @@ type MutationOutOutUnnamedPayload {
   result: MutationOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutOutUnnamed` mutation."""
 type MutationOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -2122,7 +2116,6 @@ type MutationOutUnnamedOutOutUnnamedPayload {
   result: MutationOutUnnamedOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutUnnamedOutOutUnnamed` mutation."""
 type MutationOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -2166,10 +2159,9 @@ type MutationReturnsTableMultiColPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationReturnsTableMultiColRecord]
+  results: [MutationReturnsTableMultiColRecord!]
 }
 
-"""The return type of our `mutationReturnsTableMultiCol` mutation."""
 type MutationReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -2355,8 +2347,6 @@ enum NullTestRecordsOrderBy {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
-  ALIASES_ASC
-  ALIASES_DESC
   COMPUTED_OUT_ASC
   COMPUTED_OUT_DESC
   CONFIG_ASC
@@ -2481,26 +2471,22 @@ type Person implements Node {
   userMac: String
 }
 
-"""The return type of our `computedComplex` query."""
 type PersonComputedComplexRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `computedFirstArgInoutOut` query."""
 type PersonComputedFirstArgInoutOutRecord {
   o: Int
   person: Person
 }
 
-"""The return type of our `computedInoutOut` query."""
 type PersonComputedInoutOutRecord {
   ino: String
   o: String
 }
 
-"""The return type of our `computedOutOut` query."""
 type PersonComputedOutOutRecord {
   o1: String
   o2: String
@@ -2643,6 +2629,7 @@ enum PersonSecretsOrderBy {
   SECRET_DESC
 }
 
+"""A cartesian point."""
 type Point {
   x: Float!
   y: Float!
@@ -2890,13 +2877,15 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): [Int]
+  ): [Int!]
 
   """Reads a single `Issue756` using its globally unique `ID`."""
   issue756(
     """The globally unique `ID` to be used in selecting a single `Issue756`."""
     nodeId: ID!
   ): Issue756
+
+  """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
@@ -2906,7 +2895,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `LeftArm`."""
     nodeId: ID!
   ): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmByPersonId(personId: Int!): LeftArm
 
   """Reads a single `MyTable` using its globally unique `ID`."""
@@ -2914,6 +2907,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `MyTable`."""
     nodeId: ID!
   ): MyTable
+
+  """Get a single `MyTable`."""
   myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
@@ -2935,6 +2930,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): NullTestRecord
+
+  """Get a single `NullTestRecord`."""
   nullTestRecordById(id: Int!): NullTestRecord
 
   """Reads a single `Person` using its globally unique `ID`."""
@@ -2942,7 +2939,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Person`."""
     nodeId: ID!
   ): Person
+
+  """Get a single `Person`."""
   personByEmail(email: Email!): Person
+
+  """Get a single `Person`."""
   personById(id: Int!): Person
 
   """Reads a single `PersonSecret` using its globally unique `ID`."""
@@ -2952,7 +2953,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
   Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -2998,7 +3001,6 @@ type Query implements Node {
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
-"""The return type of our `queryOutputTwoRows` query."""
 type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
@@ -3029,7 +3031,6 @@ scalar RegProcedure
 """A builtin object identifier type for a data type name"""
 scalar RegType
 
-"""The return type of our `searchTestSummaries` query."""
 type SearchTestSummariesRecord {
   id: Int
   totalDuration: Interval
