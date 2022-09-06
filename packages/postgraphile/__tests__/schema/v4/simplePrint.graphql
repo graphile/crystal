@@ -4274,6 +4274,334 @@ type Mutation {
     input: CreatePersonSecretInput!
   ): CreatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
+  """
+  Updates a single `DefaultValue` using its globally unique id and a patch.
+  """
+  updateDefaultValue(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDefaultValueInput!
+  ): UpdateDefaultValuePayload
+
+  """Updates a single `DefaultValue` using a unique key and a patch."""
+  updateDefaultValueById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDefaultValueByIdInput!
+  ): UpdateDefaultValuePayload
+
+  """Updates a single `Input` using its globally unique id and a patch."""
+  updateInput(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInputInput!
+  ): UpdateInputPayload
+
+  """Updates a single `Input` using a unique key and a patch."""
+  updateInputById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInputByIdInput!
+  ): UpdateInputPayload
+
+  """Updates a single `NoPrimaryKey` using a unique key and a patch."""
+  updateNoPrimaryKeyById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNoPrimaryKeyByIdInput!
+  ): UpdateNoPrimaryKeyPayload
+
+  """Updates a single `Patch` using its globally unique id and a patch."""
+  updatePatch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePatchInput!
+  ): UpdatePatchPayload
+
+  """Updates a single `Patch` using a unique key and a patch."""
+  updatePatchById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePatchByIdInput!
+  ): UpdatePatchPayload
+
+  """Updates a single `Post` using its globally unique id and a patch."""
+  updatePost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  """Updates a single `Post` using a unique key and a patch."""
+  updatePostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
+
+  """Updates a single `Reserved` using its globally unique id and a patch."""
+  updateReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Reserved` using a unique key and a patch."""
+  updateReservedById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedByIdInput!
+  ): UpdateReservedPayload
+
+  """
+  Updates a single `ReservedPatchRecord` using its globally unique id and a patch.
+  """
+  updateReservedPatchRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedPatchRecordInput!
+  ): UpdateReservedPatchRecordPayload
+
+  """Updates a single `ReservedPatchRecord` using a unique key and a patch."""
+  updateReservedPatchRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedPatchRecordByIdInput!
+  ): UpdateReservedPatchRecordPayload
+
+  """
+  Updates a single `ReservedInputRecord` using its globally unique id and a patch.
+  """
+  updateReservedInputRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInputRecordInput!
+  ): UpdateReservedInputRecordPayload
+
+  """Updates a single `ReservedInputRecord` using a unique key and a patch."""
+  updateReservedInputRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInputRecordByIdInput!
+  ): UpdateReservedInputRecordPayload
+
+  """
+  Updates a single `SimilarTable1` using its globally unique id and a patch.
+  """
+  updateSimilarTable1(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable1Input!
+  ): UpdateSimilarTable1Payload
+
+  """Updates a single `SimilarTable1` using a unique key and a patch."""
+  updateSimilarTable1ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable1ByIdInput!
+  ): UpdateSimilarTable1Payload
+
+  """
+  Updates a single `SimilarTable2` using its globally unique id and a patch.
+  """
+  updateSimilarTable2(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable2Input!
+  ): UpdateSimilarTable2Payload
+
+  """Updates a single `SimilarTable2` using a unique key and a patch."""
+  updateSimilarTable2ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSimilarTable2ByIdInput!
+  ): UpdateSimilarTable2Payload
+
+  """Updates a single `ViewTable` using its globally unique id and a patch."""
+  updateViewTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateViewTableInput!
+  ): UpdateViewTablePayload
+
+  """Updates a single `ViewTable` using a unique key and a patch."""
+  updateViewTableById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateViewTableByIdInput!
+  ): UpdateViewTablePayload
+
+  """Updates a single `Type` using its globally unique id and a patch."""
+  updateType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTypeInput!
+  ): UpdateTypePayload
+
+  """Updates a single `Type` using a unique key and a patch."""
+  updateTypeById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTypeByIdInput!
+  ): UpdateTypePayload
+
+  """
+  Updates a single `CompoundKey` using its globally unique id and a patch.
+  """
+  updateCompoundKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCompoundKeyInput!
+  ): UpdateCompoundKeyPayload
+
+  """Updates a single `CompoundKey` using a unique key and a patch."""
+  updateCompoundKeyByPersonId1AndPersonId2(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCompoundKeyByPersonId1AndPersonId2Input!
+  ): UpdateCompoundKeyPayload
+
+  """Updates a single `Issue756` using its globally unique id and a patch."""
+  updateIssue756(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateIssue756Input!
+  ): UpdateIssue756Payload
+
+  """Updates a single `Issue756` using a unique key and a patch."""
+  updateIssue756ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateIssue756ByIdInput!
+  ): UpdateIssue756Payload
+
+  """Updates a single `LeftArm` using its globally unique id and a patch."""
+  updateLeftArm(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLeftArmInput!
+  ): UpdateLeftArmPayload
+
+  """Updates a single `LeftArm` using a unique key and a patch."""
+  updateLeftArmById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLeftArmByIdInput!
+  ): UpdateLeftArmPayload
+
+  """Updates a single `LeftArm` using a unique key and a patch."""
+  updateLeftArmByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLeftArmByPersonIdInput!
+  ): UpdateLeftArmPayload
+
+  """Updates a single `MyTable` using its globally unique id and a patch."""
+  updateMyTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMyTableInput!
+  ): UpdateMyTablePayload
+
+  """Updates a single `MyTable` using a unique key and a patch."""
+  updateMyTableById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMyTableByIdInput!
+  ): UpdateMyTablePayload
+
+  """
+  Updates a single `NullTestRecord` using its globally unique id and a patch.
+  """
+  updateNullTestRecord(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNullTestRecordInput!
+  ): UpdateNullTestRecordPayload
+
+  """Updates a single `NullTestRecord` using a unique key and a patch."""
+  updateNullTestRecordById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNullTestRecordByIdInput!
+  ): UpdateNullTestRecordPayload
+
+  """Updates a single `Person` using its globally unique id and a patch."""
+  updatePerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByEmailInput!
+  ): UpdatePersonPayload
+
+  """
+  Updates a single `PersonSecret` using its globally unique id and a patch.
+  """
+  updatePersonSecret(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonSecretInput!
+  ): UpdatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Updates a single `PersonSecret` using a unique key and a patch."""
+  updatePersonSecretByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonSecretByPersonIdInput!
+  ): UpdatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
   """Deletes a single `DefaultValue` using its globally unique id."""
   deleteDefaultValue(
     """
@@ -5936,6 +6264,1332 @@ input PersonSecretInput {
 
   """A secret held by the associated Person"""
   secret: String
+}
+
+"""The output of our update `DefaultValue` mutation."""
+type UpdateDefaultValuePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DefaultValue` that was updated by this mutation."""
+  defaultValue: DefaultValue
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DefaultValue`. May be used by Relay 1."""
+  defaultValueEdge(
+    """The method to use when ordering `DefaultValue`."""
+    orderBy: [DefaultValuesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DefaultValuesEdge
+}
+
+"""All input for the `updateDefaultValue` mutation."""
+input UpdateDefaultValueInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `DefaultValue` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `DefaultValue` being updated.
+  """
+  defaultValuePatch: DefaultValuePatch!
+}
+
+"""
+Represents an update to a `DefaultValue`. Fields that are set will be updated.
+"""
+input DefaultValuePatch {
+  id: Int
+  nullValue: String
+}
+
+"""All input for the `updateDefaultValueById` mutation."""
+input UpdateDefaultValueByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `DefaultValue` being updated.
+  """
+  defaultValuePatch: DefaultValuePatch!
+}
+
+"""The output of our update `Input` mutation."""
+type UpdateInputPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Input` that was updated by this mutation."""
+  input: Input
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Input`. May be used by Relay 1."""
+  inputEdge(
+    """The method to use when ordering `Input`."""
+    orderBy: [InputsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InputsEdge
+}
+
+"""All input for the `updateInput` mutation."""
+input UpdateInputInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Input` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Input` being updated.
+  """
+  inputPatch: InputPatch!
+}
+
+"""
+Represents an update to a `Input`. Fields that are set will be updated.
+"""
+input InputPatch {
+  id: Int
+}
+
+"""All input for the `updateInputById` mutation."""
+input UpdateInputByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Input` being updated.
+  """
+  inputPatch: InputPatch!
+}
+
+"""The output of our update `NoPrimaryKey` mutation."""
+type UpdateNoPrimaryKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NoPrimaryKey` that was updated by this mutation."""
+  noPrimaryKey: NoPrimaryKey
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNoPrimaryKeyById` mutation."""
+input UpdateNoPrimaryKeyByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `NoPrimaryKey` being updated.
+  """
+  noPrimaryKeyPatch: NoPrimaryKeyPatch!
+}
+
+"""
+Represents an update to a `NoPrimaryKey`. Fields that are set will be updated.
+"""
+input NoPrimaryKeyPatch {
+  id: Int
+  str: String
+}
+
+"""The output of our update `Patch` mutation."""
+type UpdatePatchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Patch` that was updated by this mutation."""
+  patch: Patch
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Patch`. May be used by Relay 1."""
+  patchEdge(
+    """The method to use when ordering `Patch`."""
+    orderBy: [PatchesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PatchesEdge
+}
+
+"""All input for the `updatePatch` mutation."""
+input UpdatePatchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Patch` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Patch` being updated.
+  """
+  patchPatch: PatchPatch!
+}
+
+"""
+Represents an update to a `Patch`. Fields that are set will be updated.
+"""
+input PatchPatch {
+  id: Int
+}
+
+"""All input for the `updatePatchById` mutation."""
+input UpdatePatchByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Patch` being updated.
+  """
+  patchPatch: PatchPatch!
+}
+
+"""The output of our update `Post` mutation."""
+type UpdatePostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Post` that was updated by this mutation."""
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Person` that is related to this `Post`."""
+  personByAuthorId: Person
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+}
+
+"""All input for the `updatePost` mutation."""
+input UpdatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Post` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Post` being updated.
+  """
+  postPatch: PostPatch!
+}
+
+"""Represents an update to a `Post`. Fields that are set will be updated."""
+input PostPatch {
+  id: Int
+  headline: String
+  body: String
+  authorId: Int
+  enums: [AnEnum]
+  comptypes: [ComptypeInput]
+}
+
+"""All input for the `updatePostById` mutation."""
+input UpdatePostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Post` being updated.
+  """
+  postPatch: PostPatch!
+}
+
+"""The output of our update `Reserved` mutation."""
+type UpdateReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Reserved` that was updated by this mutation."""
+  reserved: Reserved
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the `updateReserved` mutation."""
+input UpdateReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Reserved` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""
+Represents an update to a `Reserved`. Fields that are set will be updated.
+"""
+input ReservedPatch {
+  id: Int
+}
+
+"""All input for the `updateReservedById` mutation."""
+input UpdateReservedByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""The output of our update `ReservedPatchRecord` mutation."""
+type UpdateReservedPatchRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ReservedPatchRecord` that was updated by this mutation."""
+  reservedPatchRecord: ReservedPatchRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ReservedPatchRecord`. May be used by Relay 1."""
+  reservedPatchRecordEdge(
+    """The method to use when ordering `ReservedPatchRecord`."""
+    orderBy: [ReservedPatchRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ReservedPatchRecordsEdge
+}
+
+"""All input for the `updateReservedPatchRecord` mutation."""
+input UpdateReservedPatchRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReservedPatchRecord` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ReservedPatchRecord` being updated.
+  """
+  reservedPatchRecordPatch: ReservedPatchRecordPatch!
+}
+
+"""
+Represents an update to a `ReservedPatchRecord`. Fields that are set will be updated.
+"""
+input ReservedPatchRecordPatch {
+  id: Int
+}
+
+"""All input for the `updateReservedPatchRecordById` mutation."""
+input UpdateReservedPatchRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ReservedPatchRecord` being updated.
+  """
+  reservedPatchRecordPatch: ReservedPatchRecordPatch!
+}
+
+"""The output of our update `ReservedInputRecord` mutation."""
+type UpdateReservedInputRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ReservedInputRecord` that was updated by this mutation."""
+  reservedInputRecord: ReservedInputRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ReservedInputRecord`. May be used by Relay 1."""
+  reservedInputRecordEdge(
+    """The method to use when ordering `ReservedInputRecord`."""
+    orderBy: [ReservedInputRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ReservedInputRecordsEdge
+}
+
+"""All input for the `updateReservedInputRecord` mutation."""
+input UpdateReservedInputRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ReservedInputRecord` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ReservedInputRecord` being updated.
+  """
+  reservedInputRecordPatch: ReservedInputRecordPatch!
+}
+
+"""
+Represents an update to a `ReservedInputRecord`. Fields that are set will be updated.
+"""
+input ReservedInputRecordPatch {
+  id: Int
+}
+
+"""All input for the `updateReservedInputRecordById` mutation."""
+input UpdateReservedInputRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ReservedInputRecord` being updated.
+  """
+  reservedInputRecordPatch: ReservedInputRecordPatch!
+}
+
+"""The output of our update `SimilarTable1` mutation."""
+type UpdateSimilarTable1Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SimilarTable1` that was updated by this mutation."""
+  similarTable1: SimilarTable1
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SimilarTable1`. May be used by Relay 1."""
+  similarTable1Edge(
+    """The method to use when ordering `SimilarTable1`."""
+    orderBy: [SimilarTable1SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SimilarTable1SEdge
+}
+
+"""All input for the `updateSimilarTable1` mutation."""
+input UpdateSimilarTable1Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `SimilarTable1` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable1` being updated.
+  """
+  similarTable1Patch: SimilarTable1Patch!
+}
+
+"""
+Represents an update to a `SimilarTable1`. Fields that are set will be updated.
+"""
+input SimilarTable1Patch {
+  id: Int
+  col1: Int
+  col2: Int
+  col3: Int
+}
+
+"""All input for the `updateSimilarTable1ById` mutation."""
+input UpdateSimilarTable1ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable1` being updated.
+  """
+  similarTable1Patch: SimilarTable1Patch!
+}
+
+"""The output of our update `SimilarTable2` mutation."""
+type UpdateSimilarTable2Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SimilarTable2` that was updated by this mutation."""
+  similarTable2: SimilarTable2
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SimilarTable2`. May be used by Relay 1."""
+  similarTable2Edge(
+    """The method to use when ordering `SimilarTable2`."""
+    orderBy: [SimilarTable2SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SimilarTable2SEdge
+}
+
+"""All input for the `updateSimilarTable2` mutation."""
+input UpdateSimilarTable2Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `SimilarTable2` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable2` being updated.
+  """
+  similarTable2Patch: SimilarTable2Patch!
+}
+
+"""
+Represents an update to a `SimilarTable2`. Fields that are set will be updated.
+"""
+input SimilarTable2Patch {
+  id: Int
+  col3: Int
+  col4: Int
+  col5: Int
+}
+
+"""All input for the `updateSimilarTable2ById` mutation."""
+input UpdateSimilarTable2ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `SimilarTable2` being updated.
+  """
+  similarTable2Patch: SimilarTable2Patch!
+}
+
+"""The output of our update `ViewTable` mutation."""
+type UpdateViewTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ViewTable` that was updated by this mutation."""
+  viewTable: ViewTable
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ViewTable`. May be used by Relay 1."""
+  viewTableEdge(
+    """The method to use when ordering `ViewTable`."""
+    orderBy: [ViewTablesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ViewTablesEdge
+}
+
+"""All input for the `updateViewTable` mutation."""
+input UpdateViewTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ViewTable` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ViewTable` being updated.
+  """
+  viewTablePatch: ViewTablePatch!
+}
+
+"""
+Represents an update to a `ViewTable`. Fields that are set will be updated.
+"""
+input ViewTablePatch {
+  id: Int
+  col1: Int
+  col2: Int
+}
+
+"""All input for the `updateViewTableById` mutation."""
+input UpdateViewTableByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ViewTable` being updated.
+  """
+  viewTablePatch: ViewTablePatch!
+}
+
+"""The output of our update `Type` mutation."""
+type UpdateTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Type` that was updated by this mutation."""
+  type: Type
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Post` that is related to this `Type`."""
+  postBySmallint: Post
+
+  """Reads a single `Post` that is related to this `Type`."""
+  postById: Post
+
+  """An edge for our `Type`. May be used by Relay 1."""
+  typeEdge(
+    """The method to use when ordering `Type`."""
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+}
+
+"""All input for the `updateType` mutation."""
+input UpdateTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Type` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Type` being updated.
+  """
+  typePatch: TypePatch!
+}
+
+"""Represents an update to a `Type`. Fields that are set will be updated."""
+input TypePatch {
+  id: Int
+  smallint: Int
+  bigint: BigInt
+  numeric: BigFloat
+  decimal: BigFloat
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  enumArray: [Color]
+  domain: AnInt
+  domain2: AnotherInt
+  textArray: [String]
+  json: JSON
+  jsonb: JSON
+  nullableRange: BigFloatRangeInput
+  numrange: BigFloatRangeInput
+  daterange: DateRangeInput
+  anIntRange: AnIntRangeInput
+  timestamp: Datetime
+  timestamptz: Datetime
+  date: Date
+  time: Time
+  timetz: Time
+  interval: IntervalInput
+  intervalArray: [IntervalInput]
+  money: Float
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+  nullableCompoundType: CompoundTypeInput
+  nullableNestedCompoundType: NestedCompoundTypeInput
+  point: PointInput
+  nullablePoint: PointInput
+  inet: InternetAddress
+  cidr: String
+  macaddr: String
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regoper: RegOper
+  regoperator: RegOperator
+  regclass: RegClass
+  regtype: RegType
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  textArrayDomain: [String]
+  int8ArrayDomain: [BigInt]
+}
+
+"""All input for the `updateTypeById` mutation."""
+input UpdateTypeByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Type` being updated.
+  """
+  typePatch: TypePatch!
+}
+
+"""The output of our update `CompoundKey` mutation."""
+type UpdateCompoundKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `CompoundKey` that was updated by this mutation."""
+  compoundKey: CompoundKey
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId1: Person
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
+
+  """An edge for our `CompoundKey`. May be used by Relay 1."""
+  compoundKeyEdge(
+    """The method to use when ordering `CompoundKey`."""
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CompoundKeysEdge
+}
+
+"""All input for the `updateCompoundKey` mutation."""
+input UpdateCompoundKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `CompoundKey` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `CompoundKey` being updated.
+  """
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+"""
+Represents an update to a `CompoundKey`. Fields that are set will be updated.
+"""
+input CompoundKeyPatch {
+  personId2: Int
+  personId1: Int
+  extra: Boolean
+}
+
+"""All input for the `updateCompoundKeyByPersonId1AndPersonId2` mutation."""
+input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+
+  """
+  An object where the defined keys will be set on the `CompoundKey` being updated.
+  """
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+"""The output of our update `Issue756` mutation."""
+type UpdateIssue756Payload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Issue756` that was updated by this mutation."""
+  issue756: Issue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Issue756`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering `Issue756`."""
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+}
+
+"""All input for the `updateIssue756` mutation."""
+input UpdateIssue756Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Issue756` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Issue756` being updated.
+  """
+  issue756Patch: Issue756Patch!
+}
+
+"""
+Represents an update to a `Issue756`. Fields that are set will be updated.
+"""
+input Issue756Patch {
+  id: Int
+  ts: NotNullTimestamp
+}
+
+"""All input for the `updateIssue756ById` mutation."""
+input UpdateIssue756ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Issue756` being updated.
+  """
+  issue756Patch: Issue756Patch!
+}
+
+"""The output of our update `LeftArm` mutation."""
+type UpdateLeftArmPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LeftArm` that was updated by this mutation."""
+  leftArm: LeftArm
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Person` that is related to this `LeftArm`."""
+  personByPersonId: Person
+
+  """An edge for our `LeftArm`. May be used by Relay 1."""
+  leftArmEdge(
+    """The method to use when ordering `LeftArm`."""
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+}
+
+"""All input for the `updateLeftArm` mutation."""
+input UpdateLeftArmInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `LeftArm` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `LeftArm` being updated.
+  """
+  leftArmPatch: LeftArmPatch!
+}
+
+"""
+Represents an update to a `LeftArm`. Fields that are set will be updated.
+"""
+input LeftArmPatch {
+  id: Int
+  personId: Int
+  lengthInMetres: Float
+  mood: String
+}
+
+"""All input for the `updateLeftArmById` mutation."""
+input UpdateLeftArmByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `LeftArm` being updated.
+  """
+  leftArmPatch: LeftArmPatch!
+}
+
+"""All input for the `updateLeftArmByPersonId` mutation."""
+input UpdateLeftArmByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId: Int!
+
+  """
+  An object where the defined keys will be set on the `LeftArm` being updated.
+  """
+  leftArmPatch: LeftArmPatch!
+}
+
+"""The output of our update `MyTable` mutation."""
+type UpdateMyTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MyTable` that was updated by this mutation."""
+  myTable: MyTable
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MyTable`. May be used by Relay 1."""
+  myTableEdge(
+    """The method to use when ordering `MyTable`."""
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
+}
+
+"""All input for the `updateMyTable` mutation."""
+input UpdateMyTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `MyTable` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `MyTable` being updated.
+  """
+  myTablePatch: MyTablePatch!
+}
+
+"""
+Represents an update to a `MyTable`. Fields that are set will be updated.
+"""
+input MyTablePatch {
+  id: Int
+  jsonData: JSON
+}
+
+"""All input for the `updateMyTableById` mutation."""
+input UpdateMyTableByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `MyTable` being updated.
+  """
+  myTablePatch: MyTablePatch!
+}
+
+"""The output of our update `NullTestRecord` mutation."""
+type UpdateNullTestRecordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NullTestRecord` that was updated by this mutation."""
+  nullTestRecord: NullTestRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NullTestRecord`. May be used by Relay 1."""
+  nullTestRecordEdge(
+    """The method to use when ordering `NullTestRecord`."""
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NullTestRecordsEdge
+}
+
+"""All input for the `updateNullTestRecord` mutation."""
+input UpdateNullTestRecordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `NullTestRecord` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `NullTestRecord` being updated.
+  """
+  nullTestRecordPatch: NullTestRecordPatch!
+}
+
+"""
+Represents an update to a `NullTestRecord`. Fields that are set will be updated.
+"""
+input NullTestRecordPatch {
+  id: Int
+  nullableText: String
+  nullableInt: Int
+  nonNullText: String
+}
+
+"""All input for the `updateNullTestRecordById` mutation."""
+input UpdateNullTestRecordByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `NullTestRecord` being updated.
+  """
+  nullTestRecordPatch: NullTestRecordPatch!
+}
+
+"""The output of our update `Person` mutation."""
+type UpdatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was updated by this mutation."""
+  person: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+}
+
+"""All input for the `updatePerson` mutation."""
+input UpdatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Person` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""
+Represents an update to a `Person`. Fields that are set will be updated.
+"""
+input PersonPatch {
+  """The primary unique identifier for the person"""
+  id: Int
+
+  """The person’s name"""
+  name: String
+  aliases: [String]
+  about: String
+  email: Email
+  site: WrappedUrlInput
+  config: KeyValueHash
+  lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+  userMac: String
+  createdAt: Datetime
+}
+
+"""All input for the `updatePersonById` mutation."""
+input UpdatePersonByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The primary unique identifier for the person"""
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""All input for the `updatePersonByEmail` mutation."""
+input UpdatePersonByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: Email!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""The output of our update `PersonSecret` mutation."""
+type UpdatePersonSecretPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PersonSecret` that was updated by this mutation."""
+  personSecret: PersonSecret
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Person` this `PersonSecret` belongs to."""
+  personByPersonId: Person
+
+  """An edge for our `PersonSecret`. May be used by Relay 1."""
+  personSecretEdge(
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+}
+
+"""All input for the `updatePersonSecret` mutation."""
+input UpdatePersonSecretInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `PersonSecret` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `PersonSecret` being updated.
+  """
+  personSecretPatch: PersonSecretPatch!
+}
+
+"""
+Represents an update to a `PersonSecret`. Fields that are set will be updated.
+"""
+input PersonSecretPatch {
+  personId: Int
+
+  """A secret held by the associated Person"""
+  secret: String
+}
+
+"""All input for the `updatePersonSecretByPersonId` mutation."""
+input UpdatePersonSecretByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId: Int!
+
+  """
+  An object where the defined keys will be set on the `PersonSecret` being updated.
+  """
+  personSecretPatch: PersonSecretPatch!
 }
 
 """The output of our delete `DefaultValue` mutation."""
