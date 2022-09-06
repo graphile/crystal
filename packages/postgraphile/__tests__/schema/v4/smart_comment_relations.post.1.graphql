@@ -92,7 +92,7 @@ type BuildingsConnection {
   """
   A list of edges which contains the `Building` and cursor to aid in pagination.
   """
-  edges: [BuildingsEdge!]!
+  edges: [BuildingsEdge]!
 
   """A list of `Building` objects."""
   nodes: [Building]!
@@ -150,7 +150,7 @@ type CreateBuildingPayload {
   """An edge for our `Building`. May be used by Relay 1."""
   buildingEdge(
     """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BuildingsEdge
 
   """
@@ -197,7 +197,7 @@ type CreateOfferPayload {
   """An edge for our `Offer`. May be used by Relay 1."""
   offerEdge(
     """The method to use when ordering `Offer`."""
-    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [OffersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): OffersEdge
 
   """
@@ -232,7 +232,7 @@ type CreatePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -267,7 +267,7 @@ type CreatePropertyPayload {
   """An edge for our `Property`. May be used by Relay 1."""
   propertyEdge(
     """The method to use when ordering `Property`."""
-    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PropertiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PropertiesEdge
 
   """
@@ -310,7 +310,7 @@ type CreateStreetPayload {
   """An edge for our `Street`. May be used by Relay 1."""
   streetEdge(
     """The method to use when ordering `Street`."""
-    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StreetsEdge
 }
 
@@ -351,7 +351,7 @@ type CreateStreetPropertyPayload {
   """An edge for our `StreetProperty`. May be used by Relay 1."""
   streetPropertyEdge(
     """The method to use when ordering `StreetProperty`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StreetPropertiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StreetPropertiesEdge
 }
 
@@ -390,7 +390,7 @@ type DeleteBuildingPayload {
   """An edge for our `Building`. May be used by Relay 1."""
   buildingEdge(
     """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BuildingsEdge
 
   """
@@ -451,7 +451,7 @@ type DeleteOfferPayload {
   """An edge for our `Offer`. May be used by Relay 1."""
   offerEdge(
     """The method to use when ordering `Offer`."""
-    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [OffersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): OffersEdge
 
   """
@@ -499,7 +499,7 @@ type DeletePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -547,7 +547,7 @@ type DeletePropertyPayload {
   """An edge for our `Property`. May be used by Relay 1."""
   propertyEdge(
     """The method to use when ordering `Property`."""
-    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PropertiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PropertiesEdge
 
   """
@@ -613,7 +613,7 @@ type DeleteStreetPayload {
   """An edge for our `Street`. May be used by Relay 1."""
   streetEdge(
     """The method to use when ordering `Street`."""
-    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StreetsEdge
 }
 
@@ -668,7 +668,7 @@ type DeleteStreetPropertyPayload {
   """An edge for our `StreetProperty`. May be used by Relay 1."""
   streetPropertyEdge(
     """The method to use when ordering `StreetProperty`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StreetPropertiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StreetPropertiesEdge
 }
 
@@ -729,7 +729,7 @@ type HousesConnection {
   """
   A list of edges which contains the `House` and cursor to aid in pagination.
   """
-  edges: [HousesEdge!]!
+  edges: [HousesEdge]!
 
   """A list of `House` objects."""
   nodes: [House]!
@@ -1082,7 +1082,7 @@ type OffersConnection {
   """
   A list of edges which contains the `Offer` and cursor to aid in pagination.
   """
-  edges: [OffersEdge!]!
+  edges: [OffersEdge]!
 
   """A list of `Offer` objects."""
   nodes: [Offer]!
@@ -1161,7 +1161,7 @@ type PostsConnection {
   """
   A list of edges which contains the `Post` and cursor to aid in pagination.
   """
-  edges: [PostsEdge!]!
+  edges: [PostsEdge]!
 
   """A list of `Post` objects."""
   nodes: [Post]!
@@ -1196,7 +1196,7 @@ type PropertiesConnection {
   """
   A list of edges which contains the `Property` and cursor to aid in pagination.
   """
-  edges: [PropertiesEdge!]!
+  edges: [PropertiesEdge]!
 
   """A list of `Property` objects."""
   nodes: [Property]!
@@ -1571,6 +1571,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Building`."""
     nodeId: ID!
   ): Building
+
+  """Get a single `Building`."""
   buildingById(id: Int!): Building
 
   """Reads a single `House` using its globally unique `ID`."""
@@ -1578,6 +1580,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `House`."""
     nodeId: ID!
   ): House
+
+  """Get a single `House`."""
   houseByStreetIdAndPropertyId(propertyId: Int!, streetId: Int!): House
 
   """Fetches an object given its globally unique `ID`."""
@@ -1596,6 +1600,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Offer`."""
     nodeId: ID!
   ): Offer
+
+  """Get a single `Offer`."""
   offerById(id: Int!): Offer
 
   """Reads a single `Post` using its globally unique `ID`."""
@@ -1603,6 +1609,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Post`."""
     nodeId: ID!
   ): Post
+
+  """Get a single `Post`."""
   postById(id: String!): Post
 
   """Reads a single `Property` using its globally unique `ID`."""
@@ -1610,6 +1618,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Property`."""
     nodeId: ID!
   ): Property
+
+  """Get a single `Property`."""
   propertyById(id: Int!): Property
 
   """
@@ -1623,7 +1633,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Street`."""
     nodeId: ID!
   ): Street
+
+  """Get a single `Street`."""
   streetById(id: Int!): Street
+
+  """Get a single `Street`."""
   streetByName(name: String!): Street
 
   """Reads a single `StreetProperty` using its globally unique `ID`."""
@@ -1633,6 +1647,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): StreetProperty
+
+  """Get a single `StreetProperty`."""
   streetPropertyByStrIdAndPropId(propId: Int!, strId: Int!): StreetProperty
 }
 
@@ -1791,7 +1807,7 @@ type StreetPropertiesConnection {
   """
   A list of edges which contains the `StreetProperty` and cursor to aid in pagination.
   """
-  edges: [StreetPropertiesEdge!]!
+  edges: [StreetPropertiesEdge]!
 
   """A list of `StreetProperty` objects."""
   nodes: [StreetProperty]!
@@ -1830,35 +1846,6 @@ type StreetProperty implements Node {
 
   """Reads a single `House` that is related to this `StreetProperty`."""
   houseByStreetIdAndPropertyId: House
-
-  """Reads and enables pagination through a set of `House`."""
-  housesByStreetIdAndPropertyId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: HouseCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `House`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): HousesConnection! @deprecated(reason: "Please use houseByStreetIdAndPropertyId instead")
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -1910,7 +1897,7 @@ type StreetsConnection {
   """
   A list of edges which contains the `Street` and cursor to aid in pagination.
   """
-  edges: [StreetsEdge!]!
+  edges: [StreetsEdge]!
 
   """A list of `Street` objects."""
   nodes: [Street]!
@@ -1984,7 +1971,7 @@ type UpdateBuildingPayload {
   """An edge for our `Building`. May be used by Relay 1."""
   buildingEdge(
     """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BuildingsEdge
 
   """
@@ -2053,7 +2040,7 @@ type UpdateOfferPayload {
   """An edge for our `Offer`. May be used by Relay 1."""
   offerEdge(
     """The method to use when ordering `Offer`."""
-    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [OffersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): OffersEdge
 
   """
@@ -2110,7 +2097,7 @@ type UpdatePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -2167,7 +2154,7 @@ type UpdatePropertyPayload {
   """An edge for our `Property`. May be used by Relay 1."""
   propertyEdge(
     """The method to use when ordering `Property`."""
-    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PropertiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PropertiesEdge
 
   """
@@ -2247,7 +2234,7 @@ type UpdateStreetPayload {
   """An edge for our `Street`. May be used by Relay 1."""
   streetEdge(
     """The method to use when ordering `Street`."""
-    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StreetsEdge
 }
 
@@ -2311,6 +2298,6 @@ type UpdateStreetPropertyPayload {
   """An edge for our `StreetProperty`. May be used by Relay 1."""
   streetPropertyEdge(
     """The method to use when ordering `StreetProperty`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StreetPropertiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StreetPropertiesEdge
 }

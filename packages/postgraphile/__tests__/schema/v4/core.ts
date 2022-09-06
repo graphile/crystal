@@ -6,7 +6,11 @@ import type { PoolClient } from "pg";
 import { makeSchema } from "../../../dist/schema.js";
 import AmberPreset from "../../../src/presets/amber.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
-import { connectionString, snapshot, withPoolClient } from "../../helpers.js";
+import {
+  connectionString,
+  snapshot,
+  withPoolClientTransaction,
+} from "../../helpers.js";
 
 let countByPath = Object.create(null);
 
@@ -14,15 +18,12 @@ export const test =
   (
     testPath: string,
     schemata: string | string[],
-    options: Record<string, any> = {},
+    options: { ignoreRBAC?: boolean } = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
     finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
   ) =>
   () =>
-    withPoolClient(async (client) => {
-      await client.query(`\
-drop function if exists a.create_post;
-`);
+    withPoolClientTransaction(async (client) => {
       if (setup) {
         if (typeof setup === "function") {
           await setup(client);
@@ -56,7 +57,7 @@ drop function if exists a.create_post;
                 : undefined,
             schemas: schemas,
             adaptorSettings: {
-              connectionString,
+              poolClient: client,
             },
           } as any, //GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
         ],

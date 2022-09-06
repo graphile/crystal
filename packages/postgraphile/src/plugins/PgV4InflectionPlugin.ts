@@ -58,8 +58,11 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         return plural ? this.pluralize(name) : name;
       },
       deletedNodeId(previous, options, { source }) {
+        // Silly V4 behavior
         return this.camelCase(
-          `deleted-${this.singularize(this._sourceName(source))}-id`,
+          `deleted-${this.singularize(
+            source.extensions?.tags?.originalName ?? this._sourceName(source),
+          )}-id`,
         );
       },
       orderByType(previous, options, typeName) {

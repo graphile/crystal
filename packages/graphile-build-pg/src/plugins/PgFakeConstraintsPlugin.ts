@@ -60,6 +60,12 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
               await processUnique(info, event, pgClass, tags.unique);
             }
           }
+        }
+
+        // For us to reference fake primary keys, we need to complete adding
+        // primary keys/uniques before we try adding foreign keys.
+        for (const pgClass of introspection.classes) {
+          const { tags } = pgClass.getTagsAndDescription();
 
           if (tags.foreignKey) {
             if (Array.isArray(tags.foreignKey)) {
@@ -152,6 +158,14 @@ async function processUnique(
     columns,
     () => `'@${tag}' smart tag on ${identity()}`,
   );
+
+  if (primaryKey) {
+    // All primary key columns are non-null
+    for (const attr of attrs) {
+      attr.attnotnull = true;
+    }
+  }
+
   const tagsAndDescription = parseSmartComment(extraDescription);
 
   const id = `FAKE_${pgClass.getNamespace()!.nspname}_${
