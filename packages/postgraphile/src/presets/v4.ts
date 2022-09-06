@@ -56,15 +56,15 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
           callback(build) {
             switch (options.simpleCollections) {
               case "both": {
-                build.behavior.addDefaultBehavior("+collection +list");
+                build.behavior.addDefaultBehavior("+connection +list");
                 break;
               }
               case "only": {
-                build.behavior.addDefaultBehavior("-collection +list");
+                build.behavior.addDefaultBehavior("-connection +list");
                 break;
               }
               case "omit": {
-                build.behavior.addDefaultBehavior("+collection -list");
+                build.behavior.addDefaultBehavior("+connection -list");
                 break;
               }
             }
