@@ -238,7 +238,7 @@ type CreateCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
@@ -276,12 +276,6 @@ type CreateEdgeCasePayload {
   """The `EdgeCase` that was created by this mutation."""
   edgeCase: EdgeCase
 
-  """An edge for our `EdgeCase`. May be used by Relay 1."""
-  edgeCaseEdge(
-    """The method to use when ordering `EdgeCase`."""
-    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
-  ): EdgeCasesEdge
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
@@ -314,7 +308,7 @@ type CreateIssue756Payload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -349,7 +343,7 @@ type CreateLeftArmPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -387,7 +381,7 @@ type CreateMyTablePayload {
   """An edge for our `MyTable`. May be used by Relay 1."""
   myTableEdge(
     """The method to use when ordering `MyTable`."""
-    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): MyTablesEdge
 
   """
@@ -422,7 +416,7 @@ type CreateNullTestRecordPayload {
   """An edge for our `NullTestRecord`. May be used by Relay 1."""
   nullTestRecordEdge(
     """The method to use when ordering `NullTestRecord`."""
-    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NullTestRecordsEdge
 
   """
@@ -457,7 +451,7 @@ type CreatePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -495,7 +489,7 @@ type CreatePersonSecretPayload {
   """An edge for our `PersonSecret`. May be used by Relay 1."""
   personSecretEdge(
     """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
@@ -507,7 +501,7 @@ type CreatePersonSecretPayload {
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-"""The day, does not include a time."""
+"""A calendar date in YYYY-MM-DD format."""
 scalar Date
 
 """A range of `Date`."""
@@ -575,7 +569,7 @@ type DeleteCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
   deletedCompoundKeyId: ID
 
@@ -630,7 +624,7 @@ type DeleteIssue756Payload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -688,7 +682,7 @@ type DeleteLeftArmPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -739,7 +733,7 @@ type DeleteMyTablePayload {
   """An edge for our `MyTable`. May be used by Relay 1."""
   myTableEdge(
     """The method to use when ordering `MyTable`."""
-    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): MyTablesEdge
 
   """
@@ -787,7 +781,7 @@ type DeleteNullTestRecordPayload {
   """An edge for our `NullTestRecord`. May be used by Relay 1."""
   nullTestRecordEdge(
     """The method to use when ordering `NullTestRecord`."""
-    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NullTestRecordsEdge
 
   """
@@ -847,7 +841,7 @@ type DeletePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -898,7 +892,7 @@ type DeletePersonSecretPayload {
   """An edge for our `PersonSecret`. May be used by Relay 1."""
   personSecretEdge(
     """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
@@ -1008,7 +1002,6 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
-"""The return type of our `funcOutComplex` query."""
 type FuncOutComplexRecord {
   x: Int
   y: CompoundType
@@ -1025,6 +1018,9 @@ type FuncOutComplexSetofConnection {
   """A list of `FuncOutComplexSetofRecord` objects."""
   nodes: [FuncOutComplexSetofRecord!]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """
   The count of *all* `FuncOutComplexSetofRecord` you could get from the connection.
   """
@@ -1040,20 +1036,17 @@ type FuncOutComplexSetofEdge {
   node: FuncOutComplexSetofRecord!
 }
 
-"""The return type of our `funcOutComplexSetof` query."""
 type FuncOutComplexSetofRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `funcOutOutCompoundType` query."""
 type FuncOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
 }
 
-"""The return type of our `funcOutOut` query."""
 type FuncOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -1068,6 +1061,9 @@ type FuncOutOutSetofConnection {
 
   """A list of `FuncOutOutSetofRecord` objects."""
   nodes: [FuncOutOutSetofRecord!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """
   The count of *all* `FuncOutOutSetofRecord` you could get from the connection.
@@ -1084,13 +1080,11 @@ type FuncOutOutSetofEdge {
   node: FuncOutOutSetofRecord!
 }
 
-"""The return type of our `funcOutOutSetof` query."""
 type FuncOutOutSetofRecord {
   o1: Int
   o2: String
 }
 
-"""The return type of our `funcOutOutUnnamed` query."""
 type FuncOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -1101,10 +1095,13 @@ type FuncOutSetofConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [FuncOutSetofEdge!]!
+  edges: [FuncOutSetofEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -1119,7 +1116,6 @@ type FuncOutSetofEdge {
   node: Int
 }
 
-"""The return type of our `funcOutUnnamedOutOutUnnamed` query."""
 type FuncOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -1136,6 +1132,9 @@ type FuncReturnsTableMultiColConnection {
   """A list of `FuncReturnsTableMultiColRecord` objects."""
   nodes: [FuncReturnsTableMultiColRecord!]!
 
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
   """
   The count of *all* `FuncReturnsTableMultiColRecord` you could get from the connection.
   """
@@ -1151,7 +1150,6 @@ type FuncReturnsTableMultiColEdge {
   node: FuncReturnsTableMultiColRecord!
 }
 
-"""The return type of our `funcReturnsTableMultiCol` query."""
 type FuncReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -1162,10 +1160,13 @@ type FuncReturnsTableOneColConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [FuncReturnsTableOneColEdge!]!
+  edges: [FuncReturnsTableOneColEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -1212,10 +1213,13 @@ type IntSetQueryConnection {
   """
   A list of edges which contains the `Int` and cursor to aid in pagination.
   """
-  edges: [IntSetQueryEdge!]!
+  edges: [IntSetQueryEdge]!
 
   """A list of `Int` objects."""
   nodes: [Int]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """The count of *all* `Int` you could get from the connection."""
   totalCount: Int!
@@ -1309,7 +1313,7 @@ type Issue756MutationPayload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -1562,7 +1566,7 @@ type LeftArmIdentityPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -2210,7 +2214,6 @@ type MutationOutComplexPayload {
   result: MutationOutComplexRecord
 }
 
-"""The return type of our `mutationOutComplex` mutation."""
 type MutationOutComplexRecord {
   x: Int
   y: CompoundType
@@ -2241,10 +2244,9 @@ type MutationOutComplexSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutComplexSetofRecord]
+  results: [MutationOutComplexSetofRecord!]
 }
 
-"""The return type of our `mutationOutComplexSetof` mutation."""
 type MutationOutComplexSetofRecord {
   x: Int
   y: CompoundType
@@ -2285,7 +2287,6 @@ type MutationOutOutCompoundTypePayload {
   result: MutationOutOutCompoundTypeRecord
 }
 
-"""The return type of our `mutationOutOutCompoundType` mutation."""
 type MutationOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
@@ -2315,7 +2316,6 @@ type MutationOutOutPayload {
   result: MutationOutOutRecord
 }
 
-"""The return type of our `mutationOutOut` mutation."""
 type MutationOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -2342,10 +2342,9 @@ type MutationOutOutSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutOutSetofRecord]
+  results: [MutationOutOutSetofRecord!]
 }
 
-"""The return type of our `mutationOutOutSetof` mutation."""
 type MutationOutOutSetofRecord {
   o1: Int
   o2: String
@@ -2375,7 +2374,6 @@ type MutationOutOutUnnamedPayload {
   result: MutationOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutOutUnnamed` mutation."""
 type MutationOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -2441,7 +2439,7 @@ type MutationOutTablePayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -2507,7 +2505,6 @@ type MutationOutUnnamedOutOutUnnamedPayload {
   result: MutationOutUnnamedOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutUnnamedOutOutUnnamed` mutation."""
 type MutationOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -2551,10 +2548,9 @@ type MutationReturnsTableMultiColPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationReturnsTableMultiColRecord]
+  results: [MutationReturnsTableMultiColRecord!]
 }
 
-"""The return type of our `mutationReturnsTableMultiCol` mutation."""
 type MutationReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -2833,8 +2829,6 @@ type PeopleEdge {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
-  ALIASES_ASC
-  ALIASES_DESC
   COMPUTED_OUT_ASC
   COMPUTED_OUT_DESC
   CONFIG_ASC
@@ -2895,8 +2889,6 @@ type Person implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
-
-  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId1List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2941,8 +2933,6 @@ type Person implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
-
-  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId2List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2995,8 +2985,6 @@ type Person implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!]
   ): PeopleConnection!
-
-  """Reads and enables pagination through a set of `Person`."""
   friendsList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -3107,8 +3095,6 @@ type Person implements Node {
     """
     offset: Int
   ): TypesConnection!
-
-  """Reads and enables pagination through a set of `Type`."""
   typeFunctionConnectionList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -3120,26 +3106,22 @@ type Person implements Node {
   userMac: String
 }
 
-"""The return type of our `computedComplex` query."""
 type PersonComputedComplexRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `computedFirstArgInoutOut` query."""
 type PersonComputedFirstArgInoutOutRecord {
   o: Int
   person: Person
 }
 
-"""The return type of our `computedInoutOut` query."""
 type PersonComputedInoutOutRecord {
   ino: String
   o: String
 }
 
-"""The return type of our `computedOutOut` query."""
 type PersonComputedOutOutRecord {
   o1: String
   o2: String
@@ -3308,6 +3290,7 @@ enum PersonSecretsOrderBy {
   SECRET_DESC
 }
 
+"""A cartesian point."""
 type Point {
   x: Float!
   y: Float!
@@ -3352,8 +3335,6 @@ type Query implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
-
-  """Reads a set of `CompoundKey`."""
   allCompoundKeysList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3398,8 +3379,6 @@ type Query implements Node {
     """The method to use when ordering `EdgeCase`."""
     orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
-
-  """Reads a set of `EdgeCase`."""
   allEdgeCasesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3444,8 +3423,6 @@ type Query implements Node {
     """The method to use when ordering `Issue756`."""
     orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
   ): Issue756SConnection
-
-  """Reads a set of `Issue756`."""
   allIssue756SList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3490,8 +3467,6 @@ type Query implements Node {
     """The method to use when ordering `LeftArm`."""
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
-
-  """Reads a set of `LeftArm`."""
   allLeftArmsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3536,8 +3511,6 @@ type Query implements Node {
     """The method to use when ordering `MyTable`."""
     orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): MyTablesConnection
-
-  """Reads a set of `MyTable`."""
   allMyTablesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3582,8 +3555,6 @@ type Query implements Node {
     """The method to use when ordering `NullTestRecord`."""
     orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
   ): NullTestRecordsConnection
-
-  """Reads a set of `NullTestRecord`."""
   allNullTestRecordsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3628,8 +3599,6 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
-
-  """Reads a set of `Person`."""
   allPeopleList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3674,8 +3643,6 @@ type Query implements Node {
     """The method to use when ordering `PersonSecret`."""
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """Reads a set of `PersonSecret`."""
   allPersonSecretsList(
     """
     A condition to be used in determining which values should be returned by the collection.
