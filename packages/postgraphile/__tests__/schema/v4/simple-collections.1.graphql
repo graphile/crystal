@@ -3004,35 +3004,6 @@ type Person implements Node {
   """Reads a single `LeftArm` that is related to this `Person`."""
   leftArmByPersonId: LeftArm
 
-  """Reads and enables pagination through a set of `LeftArm`."""
-  leftArmsByPersonId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: LeftArmCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): LeftArmsConnection! @deprecated(reason: "Please use leftArmByPersonId instead")
-
   """The person’s name"""
   name: String!
 
@@ -3043,35 +3014,6 @@ type Person implements Node {
 
   """This `Person`'s `PersonSecret`."""
   personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """This `Person`'s `PersonSecret`."""
-  personSecretsByPersonId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PersonSecretCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection! @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
   site: WrappedUrl @deprecated(reason: "Don’t use me")
   typeFunction(id: Int): Type
 
@@ -3679,8 +3621,6 @@ type Query implements Node {
     """
     offset: Int
   ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
-
-  """Reads and enables pagination through a set of `Person`."""
   badlyBehavedFunctionList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -3696,6 +3636,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): CompoundKey
+
+  """Get a single `CompoundKey`."""
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
   """Reads and enables pagination through a set of `CompoundType`."""
@@ -3718,8 +3660,6 @@ type Query implements Node {
     """
     offset: Int
   ): CompoundTypesConnection
-
-  """Reads and enables pagination through a set of `CompoundType`."""
   compoundTypeSetQueryList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -3732,6 +3672,10 @@ type Query implements Node {
   funcInOut(i: Int): Int
   funcOut: Int
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+
+  """
+  Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
+  """
   funcOutComplexSetof(
     a: Int
 
@@ -3763,9 +3707,11 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [FuncOutComplexSetofRecord]
+  ): [FuncOutComplexSetofRecord!]
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+
+  """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
   funcOutOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3791,8 +3737,10 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [FuncOutOutSetofRecord]
+  ): [FuncOutOutSetofRecord!]
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3818,7 +3766,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [Int]
+  ): [Int!]
   funcOutTable: Person
 
   """Reads and enables pagination through a set of `Person`."""
@@ -3841,8 +3789,6 @@ type Query implements Node {
     """
     offset: Int
   ): PeopleConnection
-
-  """Reads and enables pagination through a set of `Person`."""
   funcOutTableSetofList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -3852,6 +3798,10 @@ type Query implements Node {
   ): [Person!]
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+
+  """
+  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
+  """
   funcReturnsTableMultiCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3879,7 +3829,9 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [FuncReturnsTableMultiColRecord]
+  ): [FuncReturnsTableMultiColRecord!]
+
+  """Reads and enables pagination through a set of `Int4`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3907,7 +3859,9 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [Int]
+  ): [Int!]
+
+  """Reads and enables pagination through a set of `Int4`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3939,13 +3893,15 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): [Int]
+  ): [Int!]
 
   """Reads a single `Issue756` using its globally unique `ID`."""
   issue756(
     """The globally unique `ID` to be used in selecting a single `Issue756`."""
     nodeId: ID!
   ): Issue756
+
+  """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
@@ -3955,7 +3911,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `LeftArm`."""
     nodeId: ID!
   ): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmByPersonId(personId: Int!): LeftArm
 
   """Reads a single `MyTable` using its globally unique `ID`."""
@@ -3963,6 +3923,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `MyTable`."""
     nodeId: ID!
   ): MyTable
+
+  """Get a single `MyTable`."""
   myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
@@ -3984,6 +3946,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): NullTestRecord
+
+  """Get a single `NullTestRecord`."""
   nullTestRecordById(id: Int!): NullTestRecord
 
   """Reads a single `Person` using its globally unique `ID`."""
@@ -3991,7 +3955,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Person`."""
     nodeId: ID!
   ): Person
+
+  """Get a single `Person`."""
   personByEmail(email: Email!): Person
+
+  """Get a single `Person`."""
   personById(id: Int!): Person
 
   """Reads a single `PersonSecret` using its globally unique `ID`."""
@@ -4001,7 +3969,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
   Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -4016,7 +3986,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [SearchTestSummariesRecord]
+  ): [SearchTestSummariesRecord!]
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of `Person`."""
@@ -4047,8 +4017,6 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!]
   ): PeopleConnection
-
-  """Reads and enables pagination through a set of `Person`."""
   tableSetQueryList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -4085,8 +4053,6 @@ type Query implements Node {
     """
     offset: Int
   ): PeopleConnection
-
-  """Reads and enables pagination through a set of `Person`."""
   tableSetQueryPlpgsqlList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -4097,7 +4063,6 @@ type Query implements Node {
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
-"""The return type of our `queryOutputTwoRows` query."""
 type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
@@ -4128,7 +4093,6 @@ scalar RegProcedure
 """A builtin object identifier type for a data type name"""
 scalar RegType
 
-"""The return type of our `searchTestSummaries` query."""
 type SearchTestSummariesRecord {
   id: Int
   totalDuration: Interval
@@ -4348,7 +4312,7 @@ type UpdateCompoundKeyPayload {
   """An edge for our `CompoundKey`. May be used by Relay 1."""
   compoundKeyEdge(
     """The method to use when ordering `CompoundKey`."""
-    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
@@ -4411,7 +4375,7 @@ type UpdateIssue756Payload {
   """An edge for our `Issue756`. May be used by Relay 1."""
   issue756Edge(
     """The method to use when ordering `Issue756`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
 
   """
@@ -4483,7 +4447,7 @@ type UpdateLeftArmPayload {
   """An edge for our `LeftArm`. May be used by Relay 1."""
   leftArmEdge(
     """The method to use when ordering `LeftArm`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LeftArmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LeftArmsEdge
 
   """Reads a single `Person` that is related to this `LeftArm`."""
@@ -4543,7 +4507,7 @@ type UpdateMyTablePayload {
   """An edge for our `MyTable`. May be used by Relay 1."""
   myTableEdge(
     """The method to use when ordering `MyTable`."""
-    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [MyTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): MyTablesEdge
 
   """
@@ -4600,7 +4564,7 @@ type UpdateNullTestRecordPayload {
   """An edge for our `NullTestRecord`. May be used by Relay 1."""
   nullTestRecordEdge(
     """The method to use when ordering `NullTestRecord`."""
-    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NullTestRecordsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NullTestRecordsEdge
 
   """
@@ -4674,7 +4638,7 @@ type UpdatePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -4734,7 +4698,7 @@ type UpdatePersonSecretPayload {
   """An edge for our `PersonSecret`. May be used by Relay 1."""
   personSecretEdge(
     """The method to use when ordering `PersonSecret`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
