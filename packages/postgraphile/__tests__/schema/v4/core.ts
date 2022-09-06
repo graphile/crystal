@@ -1,4 +1,5 @@
 import type { PromiseOrDirect } from "dataplanner";
+import { readFile } from "fs/promises";
 import type { GraphQLSchema } from "graphql";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import type { PoolClient } from "pg";
@@ -9,6 +10,9 @@ import { makeV4Preset } from "../../../src/presets/v4.js";
 import { connectionString, snapshot, withPoolClient } from "../../helpers.js";
 
 let countByPath = Object.create(null);
+
+const dSchemaComments = () =>
+  readFile(`${__dirname}/../../kitchen-sink-d-schema-comments.sql`, "utf8");
 
 export const test =
   (
@@ -22,6 +26,7 @@ export const test =
     withPoolClient(async (client) => {
       await client.query(`\
 drop function if exists a.create_post;
+${await dSchemaComments()}
 `);
       if (setup) {
         if (typeof setup === "function") {
