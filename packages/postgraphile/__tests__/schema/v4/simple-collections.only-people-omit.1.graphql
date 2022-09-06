@@ -314,8 +314,6 @@ type Person implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-
-  """Reads and enables pagination through a set of `Pet`."""
   oddPetsList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -323,8 +321,6 @@ type Person implements Node {
     """Skip the first `n` values."""
     offset: Int
   ): [Pet!]
-
-  """Reads and enables pagination through a set of `Pet`."""
   petsByOwnerIdList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -452,8 +448,6 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
-
-  """Reads a set of `Pet`."""
   allPetsList(
     """
     A condition to be used in determining which values should be returned by the collection.
