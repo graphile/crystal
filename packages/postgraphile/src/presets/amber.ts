@@ -12,8 +12,11 @@ import {
 import {
   defaultPreset as graphileBuildPgPreset,
   PgAllRowsPlugin,
+  PgBasicsPlugin,
+  PgCodecsPlugin,
   PgColumnsPlugin,
   PgCustomTypeFieldPlugin,
+  PgIntrospectionPlugin,
   PgMutationCreatePlugin,
   PgMutationPayloadEdgePlugin,
   PgMutationUpdateDeletePlugin,
@@ -22,12 +25,19 @@ import {
   PgOrderCustomFieldsPlugin,
   PgRelationsPlugin,
   PgRowByUniquePlugin,
+  PgTablesPlugin,
+  PgTypesPlugin,
 } from "graphile-build-pg";
 
 // Shunts the plugins into an order that's more compatible with PostGraphile V4.
 export const orderedPlugins: GraphileConfig.Preset = {
   plugins: [
     QueryQueryPlugin,
+    PgBasicsPlugin,
+    PgCodecsPlugin,
+    PgTypesPlugin,
+    PgIntrospectionPlugin,
+    PgTablesPlugin,
     AddNodeInterfaceToSuitableTypesPlugin,
     NodePlugin,
     PgAllRowsPlugin,

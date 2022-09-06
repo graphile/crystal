@@ -237,6 +237,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   description:
     "Spots pg_class entries that looks like tables/views/materialized views (but not partitions!) and registers them as sources",
   version: version,
+  after: ["PgIntrospectionPlugin"],
 
   inflection: {
     add: {
