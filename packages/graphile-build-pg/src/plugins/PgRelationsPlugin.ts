@@ -451,7 +451,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               return memo;
             }
             let fields = memo;
-            const behavior = getBehavior(extensions);
+            // The behavior is the relation behavior PLUS the remote table
+            // behavior. But the relation settings win.
+            const behavior =
+              getBehavior(extensions) +
+              " " +
+              getBehavior(otherSource.extensions);
             const defaultBehavior = isUnique
               ? "single -singularRelation:list -singularRelation:connection"
               : simpleCollections === "both"
