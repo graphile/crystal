@@ -103,6 +103,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     type: new GraphQLList(
                       new GraphQLNonNull(type),
                     ) as GraphQLOutputType,
+                    deprecationReason: tagToString(
+                      source.extensions?.tags?.deprecated,
+                    ),
                     plan: EXPORTABLE(
                       (source) =>
                         function plan() {
