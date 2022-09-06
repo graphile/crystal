@@ -907,9 +907,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (isEnumCodec(codec)) {
               const typeName = inflection.enumType(codec);
               const values = codec.values.reduce((memo, value) => {
-                memo[inflection.enumValue(value, codec)] = {
-                  // TODO: description
-                  value: value,
+                memo[inflection.enumValue(value.value, codec)] = {
+                  value: value.value,
+                  description: value.description,
                 };
                 return memo;
               }, {});
@@ -1154,8 +1154,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       );
                       build.registerCursorConnection?.({
                         typeName,
-                        nonNullNode:
-                          !build.options.pgForbidSetofFunctionsToReturnNull,
+                        // When dealing with scalars, nulls are allowed in setof
+                        nonNullNode: false,
+                        // build.options.pgForbidSetofFunctionsToReturnNull,
                         scope: {
                           isPgConnectionRelated: true,
                         },

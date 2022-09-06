@@ -76,6 +76,7 @@ export {
   PgDecode,
   PgEncode,
   PgEnumTypeCodec,
+  PgEnumValue,
   PgGroupSpec,
   PgOrderSpec,
   PgTypeCodec,

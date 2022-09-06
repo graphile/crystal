@@ -18,6 +18,7 @@ import type { PgProc } from "pg-introspection";
 import sql from "pg-sql2";
 
 import { version } from "../index.js";
+import { addBehaviorToTags } from "../utils.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
@@ -326,13 +327,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             isStrict || info.options.pgStrictFunctions === true;
           const numberOfRequiredArguments =
             numberOfArguments - numberOfArgumentsWithDefaults;
-          const { tags, description } = pgProc.getTagsAndDescription();
+          const { tags: rawTags, description } = pgProc.getTagsAndDescription();
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
             // TODO: smart tag should allow changing the modifier
-            const tag = tags[`arg${i}variant`];
+            const tag = rawTags[`arg${i}variant`];
             const variant = typeof tag === "string" ? tag : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
@@ -406,17 +407,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
-          const behavior = Array.isArray(tags.behavior)
-            ? [...(tags.behavior as string[])]
-            : typeof tags.behavior === "string"
-            ? [tags.behavior]
-            : [];
-          behavior.push("-filter -order");
+          const tags = { ...rawTags };
+
+          addBehaviorToTags(tags, "-filter -order");
 
           const extensions: PgSourceExtensions = {
             tags: {
               ...tags,
-              behavior,
             },
           };
 
@@ -464,8 +461,27 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               databaseName,
               pgClass,
             );
-            if (!sourceBuilder) return null;
-            const source = await info.helpers.pgTables.getSource(sourceBuilder);
+
+            const source = await (async () => {
+              if (sourceBuilder) {
+                return await info.helpers.pgTables.getSource(sourceBuilder);
+              } else {
+                // No sourceBuilder for this; presumably the table is not exposed. Create one for the codec instead.
+                const codec = await info.helpers.pgCodecs.getCodecFromClass(
+                  databaseName,
+                  pgClass._id,
+                );
+                if (!codec) {
+                  return null;
+                }
+                const executor =
+                  info.helpers.pgIntrospection.getExecutorForDatabase(
+                    databaseName,
+                  );
+                return PgSource.fromCodec(executor, codec);
+              }
+            })();
+
             if (!source) {
               return null;
             }

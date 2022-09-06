@@ -20,6 +20,9 @@ export const test =
   ) =>
   () =>
     withPoolClient(async (client) => {
+      await client.query(`\
+drop function if exists a.create_post;
+`);
       if (setup) {
         if (typeof setup === "function") {
           await setup(client);

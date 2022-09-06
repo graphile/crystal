@@ -101,6 +101,12 @@ declare global {
           ...args: Parameters<GraphileBuild.Inflection[key]>
         ) => ReturnType<GraphileBuild.Inflection[key]>;
       };
+
+      /**
+       * If set and you attempt to replace a non-existent inflector of one of
+       * the given names, we won't warn you.
+       */
+      ignoreReplaceIfNotExists?: Array<keyof GraphileBuild.Inflection>;
     }
 
     interface GatherHelpers {

@@ -1,7 +1,7 @@
 import "graphile-config";
-import "graphile-build-pg";
 
 import type { PgSmartTagsDict } from "graphile-build-pg";
+import { addBehaviorToTags } from "graphile-build-pg";
 import { inspect } from "util";
 
 declare global {
@@ -64,15 +64,15 @@ function processSimpleCollections(tags: Partial<PgSmartTagsDict> | undefined) {
   if (tags?.simpleCollections) {
     switch (tags.simpleCollections) {
       case "omit": {
-        addBehaviors(tags, ["-list +connection"]);
+        addBehaviorToTags(tags, "-list +connection", true);
         break;
       }
       case "both": {
-        addBehaviors(tags, ["+list +connection"]);
+        addBehaviorToTags(tags, "+list +connection", true);
         break;
       }
       case "only": {
-        addBehaviors(tags, ["+list -connection"]);
+        addBehaviorToTags(tags, "+list -connection", true);
         break;
       }
       default: {
@@ -90,7 +90,7 @@ function convertBoolean(
   behavior: string,
 ): void {
   if (tags && tags[key]) {
-    addBehaviors(tags, [behavior]);
+    addBehaviorToTags(tags, behavior, true);
   }
 }
 
@@ -210,18 +210,5 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
     processOmit(omit);
   }
 
-  addBehaviors(tags, behavior);
-}
-
-// Merge the behaviors into the existing ones.
-function addBehaviors(tags: Partial<PgSmartTagsDict>, behavior: string[]) {
-  if (behavior.length > 0) {
-    if (Array.isArray(tags.behavior)) {
-      tags.behavior.unshift(...behavior);
-    } else if (typeof tags.behavior === "string") {
-      tags.behavior = [...behavior, tags.behavior];
-    } else {
-      tags.behavior = behavior;
-    }
-  }
+  addBehaviorToTags(tags, behavior.join(" "), true);
 }

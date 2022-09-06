@@ -59,7 +59,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           const doConnection = (name: string) => {
             build.registerCursorConnection?.({
               typeName: inflection.builtin(name),
-              nonNullNode: !build.options.pgForbidSetofFunctionsToReturnNull,
+              // When dealing with scalars, nulls are allowed in setof
+              nonNullNode: false,
               scope: {
                 isPgConnectionRelated: true,
               },

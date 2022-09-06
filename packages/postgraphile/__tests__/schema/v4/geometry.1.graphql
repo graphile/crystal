@@ -1,23 +1,25 @@
 """A rectangular box defined by two opposite corners 'a' and 'b'"""
 type Box {
-  a: Point
-  b: Point
+  a: Point!
+  b: Point!
 }
 
 """A rectangular box defined by two opposite corners 'a' and 'b'"""
 input BoxInput {
-  a: PointInput
-  b: PointInput
+  a: PointInput!
+  b: PointInput!
 }
 
+"""A circle about the given center point with the given radius"""
 type Circle {
-  center: Point
-  radius: Float
+  center: Point!
+  radius: Float!
 }
 
+"""A circle about the given center point with the given radius"""
 input CircleInput {
-  center: PointInput
-  radius: Float
+  center: PointInput!
+  radius: Float!
 }
 
 """All input for the create `Geom` mutation."""
@@ -46,7 +48,7 @@ type CreateGeomPayload {
   """An edge for our `Geom`. May be used by Relay 1."""
   geomEdge(
     """The method to use when ordering `Geom`."""
-    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [GeomsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): GeomsEdge
 
   """
@@ -97,7 +99,7 @@ type DeleteGeomPayload {
   """An edge for our `Geom`. May be used by Relay 1."""
   geomEdge(
     """The method to use when ordering `Geom`."""
-    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [GeomsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): GeomsEdge
 
   """
@@ -186,7 +188,7 @@ type GeomsConnection {
   """
   A list of edges which contains the `Geom` and cursor to aid in pagination.
   """
-  edges: [GeomsEdge!]!
+  edges: [GeomsEdge]!
 
   """A list of `Geom` objects."""
   nodes: [Geom]!
@@ -234,26 +236,26 @@ enum GeomsOrderBy {
 
 """An infinite line that passes through points 'a' and 'b'."""
 type Line {
-  a: Point
-  b: Point
+  a: Point!
+  b: Point!
 }
 
 """An infinite line that passes through points 'a' and 'b'."""
 input LineInput {
-  a: PointInput
-  b: PointInput
+  a: PointInput!
+  b: PointInput!
 }
 
 """An finite line between points 'a' and 'b'."""
 type LineSegment {
-  a: Point
-  b: Point
+  a: Point!
+  b: Point!
 }
 
 """An finite line between points 'a' and 'b'."""
 input LineSegmentInput {
-  a: PointInput
-  b: PointInput
+  a: PointInput!
+  b: PointInput!
 }
 
 """
@@ -327,33 +329,37 @@ type PageInfo {
 """A path (open or closed) made up of points"""
 type Path {
   """True if this is a closed path (similar to a polygon), false otherwise."""
-  isOpen: Boolean
-  points: [Point]
+  isOpen: Boolean!
+  points: [Point!]!
 }
 
 """A path (open or closed) made up of points"""
 input PathInput {
   """True if this is a closed path (similar to a polygon), false otherwise."""
   isOpen: Boolean
-  points: [PointInput]
+  points: [PointInput!]!
 }
 
+"""A cartesian point."""
 type Point {
   x: Float!
   y: Float!
 }
 
+"""A cartesian point."""
 input PointInput {
   x: Float!
   y: Float!
 }
 
+"""A polygon made up of points"""
 type Polygon {
-  points: [Point]
+  points: [Point!]!
 }
 
+"""A polygon made up of points"""
 input PolygonInput {
-  points: [PointInput]
+  points: [PointInput!]!
 }
 
 """The root query type which gives access points into the data universe."""
@@ -392,6 +398,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Geom`."""
     nodeId: ID!
   ): Geom
+
+  """Get a single `Geom`."""
   geomById(id: Int!): Geom
 
   """Fetches an object given its globally unique `ID`."""
@@ -460,7 +468,7 @@ type UpdateGeomPayload {
   """An edge for our `Geom`. May be used by Relay 1."""
   geomEdge(
     """The method to use when ordering `Geom`."""
-    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [GeomsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): GeomsEdge
 
   """

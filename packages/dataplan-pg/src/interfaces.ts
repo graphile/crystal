@@ -162,12 +162,17 @@ export interface PgTypeCodec<
   extensions?: Partial<PgTypeCodecExtensions>;
 }
 
+export type PgEnumValue<TValue extends string = string> = {
+  value: TValue;
+  description?: string;
+};
+
 /**
  * A PgTypeCodec specifically for enums
  */
 export interface PgEnumTypeCodec<TValue extends string>
   extends PgTypeCodec<undefined, string, TValue> {
-  values: TValue[];
+  values: PgEnumValue<TValue>[];
 }
 
 /**

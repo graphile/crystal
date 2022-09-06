@@ -24,7 +24,7 @@ type CreateLetterDescriptionPayload {
   """An edge for our `LetterDescription`. May be used by Relay 1."""
   letterDescriptionEdge(
     """The method to use when ordering `LetterDescription`."""
-    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LetterDescriptionsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LetterDescriptionsEdge
 
   """
@@ -64,7 +64,7 @@ type CreateReferencingTablePayload {
   """An edge for our `ReferencingTable`. May be used by Relay 1."""
   referencingTableEdge(
     """The method to use when ordering `ReferencingTable`."""
-    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReferencingTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReferencingTablesEdge
 }
 
@@ -130,7 +130,7 @@ type DeleteLetterDescriptionPayload {
   """An edge for our `LetterDescription`. May be used by Relay 1."""
   letterDescriptionEdge(
     """The method to use when ordering `LetterDescription`."""
-    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LetterDescriptionsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LetterDescriptionsEdge
 
   """
@@ -183,7 +183,7 @@ type DeleteReferencingTablePayload {
   """An edge for our `ReferencingTable`. May be used by Relay 1."""
   referencingTableEdge(
     """The method to use when ordering `ReferencingTable`."""
-    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReferencingTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReferencingTablesEdge
 }
 
@@ -296,7 +296,7 @@ type LetterDescriptionsConnection {
   """
   A list of edges which contains the `LetterDescription` and cursor to aid in pagination.
   """
-  edges: [LetterDescriptionsEdge!]!
+  edges: [LetterDescriptionsEdge]!
 
   """A list of `LetterDescription` objects."""
   nodes: [LetterDescription]!
@@ -565,8 +565,14 @@ type Query implements Node {
     """
     nodeId: ID!
   ): LetterDescription
+
+  """Get a single `LetterDescription`."""
   letterDescriptionById(id: Int!): LetterDescription
+
+  """Get a single `LetterDescription`."""
   letterDescriptionByLetter(letter: LetterAToD!): LetterDescription
+
+  """Get a single `LetterDescription`."""
   letterDescriptionByLetterViaView(letterViaView: LetterAToDViaView!): LetterDescription
 
   """Fetches an object given its globally unique `ID`."""
@@ -593,6 +599,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): ReferencingTable
+
+  """Get a single `ReferencingTable`."""
   referencingTableById(id: Int!): ReferencingTable
 }
 
@@ -674,7 +682,7 @@ type ReferencingTablesConnection {
   """
   A list of edges which contains the `ReferencingTable` and cursor to aid in pagination.
   """
-  edges: [ReferencingTablesEdge!]!
+  edges: [ReferencingTablesEdge]!
 
   """A list of `ReferencingTable` objects."""
   nodes: [ReferencingTable]!
@@ -790,7 +798,7 @@ type UpdateLetterDescriptionPayload {
   """An edge for our `LetterDescription`. May be used by Relay 1."""
   letterDescriptionEdge(
     """The method to use when ordering `LetterDescription`."""
-    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [LetterDescriptionsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): LetterDescriptionsEdge
 
   """
@@ -852,6 +860,6 @@ type UpdateReferencingTablePayload {
   """An edge for our `ReferencingTable`. May be used by Relay 1."""
   referencingTableEdge(
     """The method to use when ordering `ReferencingTable`."""
-    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ReferencingTablesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ReferencingTablesEdge
 }

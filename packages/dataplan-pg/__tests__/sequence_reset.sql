@@ -9,3 +9,4 @@ alter sequence interfaces_and_unions.person_bookmarks_id_seq restart with 100000
 alter sequence interfaces_and_unions.person_likes_id_seq restart with 1000000;
 
 delete from app_public.messages where substring(id::text from 14 for 11) <> '-0000-0000-';
+drop function if exists a.create_post;

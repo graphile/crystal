@@ -28,6 +28,6 @@ const OverrideInflectionPlugin: GraphileConfig.Plugin = {
 test(
   "prints a schema with the core types inflected",
   core.test(__filename, ["a", "b", "c"], {
-    appendPlugins: [],
+    appendPlugins: [OverrideInflectionPlugin],
   }),
 );

@@ -39,6 +39,7 @@ import type {
   PgDecode,
   PgEncode,
   PgEnumTypeCodec,
+  PgEnumValue,
   PgTypeCodec,
   PgTypeCodecExtensions,
 } from "./interfaces.js";
@@ -385,7 +386,7 @@ exportAs(recordType, "recordType");
 export function enumType<TValue extends string>(
   name: string,
   identifier: SQL,
-  values: TValue[],
+  values: Array<PgEnumValue<TValue> | TValue>,
   extensions?: Partial<PgTypeCodecExtensions>,
 ): PgEnumTypeCodec<TValue> {
   return {
@@ -393,7 +394,9 @@ export function enumType<TValue extends string>(
     sqlType: identifier,
     fromPg: identity as (val: string) => TValue,
     toPg: identity,
-    values,
+    values: values.map((value) =>
+      typeof value === "string" ? { value } : value,
+    ),
     columns: undefined,
     extensions,
   };
