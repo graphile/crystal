@@ -24,7 +24,7 @@ type CreatePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -62,7 +62,7 @@ type CreatePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -98,12 +98,6 @@ type CreateRenamedTablePayload {
 
   """The `RenamedTable` that was created by this mutation."""
   renamedTable: RenamedTable
-
-  """An edge for our `RenamedTable`. May be used by Relay 1."""
-  renamedTableEdge(
-    """The method to use when ordering `RenamedTable`."""
-    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
-  ): RenamedTablesEdge
 }
 
 """All input for the create `Studio` mutation."""
@@ -137,7 +131,7 @@ type CreateStudioPayload {
   """An edge for our `Studio`. May be used by Relay 1."""
   studioEdge(
     """The method to use when ordering `Studio`."""
-    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StudiosEdge
 }
 
@@ -172,7 +166,7 @@ type CreateTvEpisodePayload {
   """An edge for our `TvEpisode`. May be used by Relay 1."""
   tvEpisodeEdge(
     """The method to use when ordering `TvEpisode`."""
-    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvEpisodesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvEpisodesEdge
 
   """Reads a single `TvShow` that is related to this `TvEpisode`."""
@@ -213,7 +207,7 @@ type CreateTvShowPayload {
   """An edge for our `TvShow`. May be used by Relay 1."""
   tvShowEdge(
     """The method to use when ordering `TvShow`."""
-    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvShowsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvShowsEdge
 }
 
@@ -259,7 +253,7 @@ type DeleteFilmPayload {
   """An edge for our `Film`. May be used by Relay 1."""
   filmEdge(
     """The method to use when ordering `Film`."""
-    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [FilmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): FilmsEdge
 
   """
@@ -307,7 +301,7 @@ type DeletePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -358,7 +352,7 @@ type DeletePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -411,7 +405,7 @@ type DeleteStudioPayload {
   """An edge for our `Studio`. May be used by Relay 1."""
   studioEdge(
     """The method to use when ordering `Studio`."""
-    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StudiosEdge
 }
 
@@ -459,7 +453,7 @@ type DeleteTvEpisodePayload {
   """An edge for our `TvEpisode`. May be used by Relay 1."""
   tvEpisodeEdge(
     """The method to use when ordering `TvEpisode`."""
-    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvEpisodesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvEpisodesEdge
 
   """Reads a single `TvShow` that is related to this `TvEpisode`."""
@@ -513,7 +507,7 @@ type DeleteTvShowPayload {
   """An edge for our `TvShow`. May be used by Relay 1."""
   tvShowEdge(
     """The method to use when ordering `TvShow`."""
-    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvShowsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvShowsEdge
 }
 
@@ -549,7 +543,7 @@ type FilmsConnection {
   """
   A list of edges which contains the `Film` and cursor to aid in pagination.
   """
-  edges: [FilmsEdge!]!
+  edges: [FilmsEdge]!
 
   """A list of `Film` objects."""
   nodes: [Film]!
@@ -926,7 +920,7 @@ type PeopleConnection {
   """
   A list of edges which contains the `Person` and cursor to aid in pagination.
   """
-  edges: [PeopleEdge!]!
+  edges: [PeopleEdge]!
 
   """A list of `Person` objects."""
   nodes: [Person]!
@@ -1109,7 +1103,7 @@ type PostsConnection {
   """
   A list of edges which contains the `Post` and cursor to aid in pagination.
   """
-  edges: [PostsEdge!]!
+  edges: [PostsEdge]!
 
   """A list of `Post` objects."""
   nodes: [Post]!
@@ -1353,7 +1347,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Film`."""
     nodeId: ID!
   ): Film
+
+  """Get a single `Film`."""
   filmByCode(code: Int!): Film
+
+  """Get a single `Person`."""
   findPersonById(id: Int!): Person
 
   """Fetches an object given its globally unique `ID`."""
@@ -1378,6 +1376,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Post`."""
     nodeId: ID!
   ): Post
+
+  """Get a single `Post`."""
   postById(id: Int!): Post
 
   """
@@ -1414,6 +1414,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Studio`."""
     nodeId: ID!
   ): Studio
+
+  """Get a single `Studio`."""
   studioById(id: Int!): Studio
 
   """Reads a single `TvEpisode` using its globally unique `ID`."""
@@ -1421,6 +1423,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `TvEpisode`."""
     nodeId: ID!
   ): TvEpisode
+
+  """Get a single `TvEpisode`."""
   tvEpisodeByCode(code: Int!): TvEpisode
 
   """Reads a single `TvShow` using its globally unique `ID`."""
@@ -1428,6 +1432,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `TvShow`."""
     nodeId: ID!
   ): TvShow
+
+  """Get a single `TvShow`."""
   tvShowByCode(code: Int!): TvShow
 }
 
@@ -1454,7 +1460,7 @@ type RenamedTablesConnection {
   """
   A list of edges which contains the `RenamedTable` and cursor to aid in pagination.
   """
-  edges: [RenamedTablesEdge!]!
+  edges: [RenamedTablesEdge]!
 
   """A list of `RenamedTable` objects."""
   nodes: [RenamedTable]!
@@ -1551,7 +1557,7 @@ type StudiosConnection {
   """
   A list of edges which contains the `Studio` and cursor to aid in pagination.
   """
-  edges: [StudiosEdge!]!
+  edges: [StudiosEdge]!
 
   """A list of `Studio` objects."""
   nodes: [Studio]!
@@ -1633,7 +1639,7 @@ type TvEpisodesConnection {
   """
   A list of edges which contains the `TvEpisode` and cursor to aid in pagination.
   """
-  edges: [TvEpisodesEdge!]!
+  edges: [TvEpisodesEdge]!
 
   """A list of `TvEpisode` objects."""
   nodes: [TvEpisode]!
@@ -1745,7 +1751,7 @@ type TvShowsConnection {
   """
   A list of edges which contains the `TvShow` and cursor to aid in pagination.
   """
-  edges: [TvShowsEdge!]!
+  edges: [TvShowsEdge]!
 
   """A list of `TvShow` objects."""
   nodes: [TvShow]!
@@ -1827,7 +1833,7 @@ type UpdateFilmPayload {
   """An edge for our `Film`. May be used by Relay 1."""
   filmEdge(
     """The method to use when ordering `Film`."""
-    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [FilmsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): FilmsEdge
 
   """
@@ -1884,7 +1890,7 @@ type UpdatePersonPayload {
   """An edge for our `Person`. May be used by Relay 1."""
   personEdge(
     """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   """
@@ -1944,7 +1950,7 @@ type UpdatePostPayload {
   """An edge for our `Post`. May be used by Relay 1."""
   postEdge(
     """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   """
@@ -2006,7 +2012,7 @@ type UpdateStudioPayload {
   """An edge for our `Studio`. May be used by Relay 1."""
   studioEdge(
     """The method to use when ordering `Studio`."""
-    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
   ): StudiosEdge
 }
 
@@ -2063,7 +2069,7 @@ type UpdateTvEpisodePayload {
   """An edge for our `TvEpisode`. May be used by Relay 1."""
   tvEpisodeEdge(
     """The method to use when ordering `TvEpisode`."""
-    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvEpisodesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvEpisodesEdge
 
   """Reads a single `TvShow` that is related to this `TvEpisode`."""
@@ -2126,6 +2132,6 @@ type UpdateTvShowPayload {
   """An edge for our `TvShow`. May be used by Relay 1."""
   tvShowEdge(
     """The method to use when ordering `TvShow`."""
-    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TvShowsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvShowsEdge
 }
