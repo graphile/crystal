@@ -158,6 +158,14 @@ async function processUnique(
     columns,
     () => `'@${tag}' smart tag on ${identity()}`,
   );
+
+  if (primaryKey) {
+    // All primary key columns are non-null
+    for (const attr of attrs) {
+      attr.attnotnull = true;
+    }
+  }
+
   const tagsAndDescription = parseSmartComment(extraDescription);
 
   const id = `FAKE_${pgClass.getNamespace()!.nspname}_${
