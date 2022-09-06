@@ -745,8 +745,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                       pgRelationDetails: relationDetails,
                     },
                     {
-                      // TODO: handle nullability x2
-                      type: new GraphQLList(OtherType),
+                      type: new GraphQLNonNull(
+                        new GraphQLList(new GraphQLNonNull(OtherType)),
+                      ),
                       plan: listPlan,
                     },
                   ),
