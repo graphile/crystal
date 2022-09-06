@@ -15,7 +15,11 @@ export interface V4Options {
   disableDefaultMutations?: boolean;
   ignoreIndexes?: boolean;
   appendPlugins?: GraphileConfig.Plugin[];
+
+  // TODO:
+  subscriptions?: boolean;
   ignoreRBAC?: boolean;
+
   graphileBuildOptions?: {
     pgUseCustomNetworkScalars?: boolean;
   };
