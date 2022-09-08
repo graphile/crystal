@@ -352,6 +352,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     columnAttribute.attidentity !== "") ||
                   columnAttribute.getType()?.typdefault != null,
                 // TODO: identicalVia,
+                extensions: {
+                  tags: {
+                    behavior:
+                      // Generated ALWAYS so no insert/update
+                      columnAttribute.attidentity === "a"
+                        ? ["-insert -update"]
+                        : [],
+                  },
+                },
               };
               await info.process("pgCodecs_column", {
                 databaseName,
