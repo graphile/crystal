@@ -1579,7 +1579,6 @@ type DeleteCompoundKeyPayload {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
-  deletedCompoundKeyId: ID
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
   personByPersonId1: Person
@@ -1619,7 +1618,6 @@ type DeleteDefaultValuePayload {
     """The method to use when ordering `DefaultValue`."""
     orderBy: [DefaultValuesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): DefaultValuesEdge
-  deletedDefaultValueId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1644,7 +1642,6 @@ type DeleteInputPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedInputId: ID
 
   """The `Input` that was deleted by this mutation."""
   input: Input
@@ -1678,7 +1675,6 @@ type DeleteIssue756Payload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedIssue756Id: ID
 
   """The `Issue756` that was deleted by this mutation."""
   issue756: Issue756
@@ -1722,7 +1718,6 @@ type DeleteLeftArmPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedLeftArmId: ID
 
   """The `LeftArm` that was deleted by this mutation."""
   leftArm: LeftArm
@@ -1759,7 +1754,6 @@ type DeleteMyTablePayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedMyTableId: ID
 
   """The `MyTable` that was deleted by this mutation."""
   myTable: MyTable
@@ -1793,7 +1787,6 @@ type DeleteNoPrimaryKeyPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedNoPrimaryKeyId: ID
 
   """The `NoPrimaryKey` that was deleted by this mutation."""
   noPrimaryKey: NoPrimaryKey
@@ -1821,7 +1814,6 @@ type DeleteNullTestRecordPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedNullTestRecordId: ID
 
   """The `NullTestRecord` that was deleted by this mutation."""
   nullTestRecord: NullTestRecord
@@ -1855,7 +1847,6 @@ type DeletePatchPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedPatchId: ID
 
   """The `Patch` that was deleted by this mutation."""
   patch: Patch
@@ -1901,7 +1892,6 @@ type DeletePersonPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedPersonId: ID
 
   """The `Person` that was deleted by this mutation."""
   person: Person
@@ -1935,7 +1925,6 @@ type DeletePersonSecretPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedPersonSecretId: ID
 
   """The `Person` this `PersonSecret` belongs to."""
   personByPersonId: Person
@@ -1972,7 +1961,6 @@ type DeletePostPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedPostId: ID
 
   """Reads a single `Person` that is related to this `Post`."""
   personByAuthorId: Person
@@ -2019,7 +2007,6 @@ type DeleteReservedInputRecordPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedReservedInputId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2053,7 +2040,6 @@ type DeleteReservedPatchRecordPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedReservedPatchId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2077,7 +2063,6 @@ type DeleteReservedPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedReservedId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2111,7 +2096,6 @@ type DeleteSimilarTable1Payload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedSimilarTable1Id: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2145,7 +2129,6 @@ type DeleteSimilarTable2Payload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedSimilarTable2Id: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2179,7 +2162,6 @@ type DeleteTypePayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedTypeId: ID
 
   """Reads a single `Post` that is related to this `Type`."""
   postById: Post
@@ -2219,7 +2201,6 @@ type DeleteViewTablePayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  deletedViewTableId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

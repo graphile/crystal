@@ -2242,7 +2242,7 @@ type MutationOutComplexSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutComplexSetofRecord]
+  results: [MutationOutComplexSetofRecord!]
 }
 
 type MutationOutComplexSetofRecord {
@@ -2340,7 +2340,7 @@ type MutationOutOutSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutOutSetofRecord]
+  results: [MutationOutOutSetofRecord!]
 }
 
 type MutationOutOutSetofRecord {
@@ -2546,7 +2546,7 @@ type MutationReturnsTableMultiColPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationReturnsTableMultiColRecord]
+  results: [MutationReturnsTableMultiColRecord!]
 }
 
 type MutationReturnsTableMultiColRecord {
@@ -3744,7 +3744,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [SearchTestSummariesRecord]
+  ): [SearchTestSummariesRecord!]
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of `Person`."""
