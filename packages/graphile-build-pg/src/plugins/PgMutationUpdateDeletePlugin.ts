@@ -200,15 +200,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
       updateByKeysField(options, { source, unique }) {
         return this.camelCase(
-          `update-${this._singularizedSourceName(source)}-by-${unique.columns
-            .map((columnName) =>
-              this.column({
-                columnName,
-                codec: source.codec,
-                column: source.codec.columns[columnName],
-              }),
-            )
-            .join("-and-")}`,
+          `update-${this._singularizedSourceName(
+            source,
+          )}-by-${this._joinColumnNames(source.codec, unique.columns)}`,
         );
       },
       updateByKeysInputType(options, details) {
@@ -217,15 +211,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
       deleteByKeysField(options, { source, unique }) {
         return this.camelCase(
-          `delete-${this._singularizedSourceName(source)}-by-${unique.columns
-            .map((columnName) =>
-              this.column({
-                columnName,
-                codec: source.codec,
-                column: source.codec.columns[columnName],
-              }),
-            )
-            .join("-and-")}`,
+          `delete-${this._singularizedSourceName(
+            source,
+          )}-by-${this._joinColumnNames(source.codec, unique.columns)}`,
         );
       },
       deleteByKeysInputType(options, details) {

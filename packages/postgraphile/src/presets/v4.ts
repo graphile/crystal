@@ -15,7 +15,11 @@ export interface V4Options {
   disableDefaultMutations?: boolean;
   ignoreIndexes?: boolean;
   appendPlugins?: GraphileConfig.Plugin[];
+
+  // TODO:
+  subscriptions?: boolean;
   ignoreRBAC?: boolean;
+
   graphileBuildOptions?: {
     pgUseCustomNetworkScalars?: boolean;
   };
@@ -56,18 +60,23 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
           callback(build) {
             switch (options.simpleCollections) {
               case "both": {
-                build.behavior.addDefaultBehavior("+collection +list");
+                build.behavior.addDefaultBehavior("+connection +list");
                 break;
               }
               case "only": {
-                build.behavior.addDefaultBehavior("-collection +list");
+                build.behavior.addDefaultBehavior("-connection +list");
                 break;
               }
               case "omit": {
-                build.behavior.addDefaultBehavior("+collection -list");
+                build.behavior.addDefaultBehavior("+connection -list");
                 break;
               }
             }
+
+            // We could base this on the legacy relations setting; but how to set deprecated?
+            build.behavior.addDefaultBehavior(
+              "-singularRelation:connection -singularRelation:list",
+            );
 
             return build;
           },

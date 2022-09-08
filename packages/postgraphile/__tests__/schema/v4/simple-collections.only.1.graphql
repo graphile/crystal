@@ -404,7 +404,7 @@ type CreatePersonSecretPayload {
   query: Query
 }
 
-"""The day, does not include a time."""
+"""A calendar date in YYYY-MM-DD format."""
 scalar Date
 
 """A range of `Date`."""
@@ -837,52 +837,44 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
-"""The return type of our `funcOutComplex` query."""
 type FuncOutComplexRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `funcOutComplexSetof` query."""
 type FuncOutComplexSetofRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `funcOutOutCompoundType` query."""
 type FuncOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
 }
 
-"""The return type of our `funcOutOut` query."""
 type FuncOutOutRecord {
   firstOut: Int
   secondOut: String
 }
 
-"""The return type of our `funcOutOutSetof` query."""
 type FuncOutOutSetofRecord {
   o1: Int
   o2: String
 }
 
-"""The return type of our `funcOutOutUnnamed` query."""
 type FuncOutOutUnnamedRecord {
   arg1: Int
   arg2: String
 }
 
-"""The return type of our `funcOutUnnamedOutOutUnnamed` query."""
 type FuncOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
   o2: String
 }
 
-"""The return type of our `funcReturnsTableMultiCol` query."""
 type FuncReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -1831,7 +1823,6 @@ type MutationOutComplexPayload {
   result: MutationOutComplexRecord
 }
 
-"""The return type of our `mutationOutComplex` mutation."""
 type MutationOutComplexRecord {
   x: Int
   y: CompoundType
@@ -1862,10 +1853,9 @@ type MutationOutComplexSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutComplexSetofRecord]
+  results: [MutationOutComplexSetofRecord!]
 }
 
-"""The return type of our `mutationOutComplexSetof` mutation."""
 type MutationOutComplexSetofRecord {
   x: Int
   y: CompoundType
@@ -1906,7 +1896,6 @@ type MutationOutOutCompoundTypePayload {
   result: MutationOutOutCompoundTypeRecord
 }
 
-"""The return type of our `mutationOutOutCompoundType` mutation."""
 type MutationOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
@@ -1936,7 +1925,6 @@ type MutationOutOutPayload {
   result: MutationOutOutRecord
 }
 
-"""The return type of our `mutationOutOut` mutation."""
 type MutationOutOutRecord {
   firstOut: Int
   secondOut: String
@@ -1963,10 +1951,9 @@ type MutationOutOutSetofPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationOutOutSetofRecord]
+  results: [MutationOutOutSetofRecord!]
 }
 
-"""The return type of our `mutationOutOutSetof` mutation."""
 type MutationOutOutSetofRecord {
   o1: Int
   o2: String
@@ -1996,7 +1983,6 @@ type MutationOutOutUnnamedPayload {
   result: MutationOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutOutUnnamed` mutation."""
 type MutationOutOutUnnamedRecord {
   arg1: Int
   arg2: String
@@ -2122,7 +2108,6 @@ type MutationOutUnnamedOutOutUnnamedPayload {
   result: MutationOutUnnamedOutOutUnnamedRecord
 }
 
-"""The return type of our `mutationOutUnnamedOutOutUnnamed` mutation."""
 type MutationOutUnnamedOutOutUnnamedRecord {
   arg1: Int
   arg3: Int
@@ -2166,10 +2151,9 @@ type MutationReturnsTableMultiColPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  results: [MutationReturnsTableMultiColRecord]
+  results: [MutationReturnsTableMultiColRecord!]
 }
 
-"""The return type of our `mutationReturnsTableMultiCol` mutation."""
 type MutationReturnsTableMultiColRecord {
   col1: Int
   col2: String
@@ -2355,8 +2339,6 @@ enum NullTestRecordsOrderBy {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
-  ALIASES_ASC
-  ALIASES_DESC
   COMPUTED_OUT_ASC
   COMPUTED_OUT_DESC
   CONFIG_ASC
@@ -2388,8 +2370,6 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
   aliases: [String]!
-
-  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId1List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2405,8 +2385,6 @@ type Person implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!]
   ): [CompoundKey!]!
-
-  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId2List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2435,8 +2413,6 @@ type Person implements Node {
   exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
   firstName: String
   firstPost: Post
-
-  """Reads and enables pagination through a set of `Person`."""
   friendsList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2468,8 +2444,6 @@ type Person implements Node {
   personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
   site: WrappedUrl @deprecated(reason: "Don’t use me")
   typeFunction(id: Int): Type
-
-  """Reads and enables pagination through a set of `Type`."""
   typeFunctionConnectionList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2481,26 +2455,22 @@ type Person implements Node {
   userMac: String
 }
 
-"""The return type of our `computedComplex` query."""
 type PersonComputedComplexRecord {
   x: Int
   y: CompoundType
   z: Person
 }
 
-"""The return type of our `computedFirstArgInoutOut` query."""
 type PersonComputedFirstArgInoutOutRecord {
   o: Int
   person: Person
 }
 
-"""The return type of our `computedInoutOut` query."""
 type PersonComputedInoutOutRecord {
   ino: String
   o: String
 }
 
-"""The return type of our `computedOutOut` query."""
 type PersonComputedOutOutRecord {
   o1: String
   o2: String
@@ -2643,6 +2613,7 @@ enum PersonSecretsOrderBy {
   SECRET_DESC
 }
 
+"""A cartesian point."""
 type Point {
   x: Float!
   y: Float!
@@ -2659,7 +2630,6 @@ type Post {
 
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
-  """Reads a set of `CompoundKey`."""
   allCompoundKeysList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2675,8 +2645,6 @@ type Query implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!]
   ): [CompoundKey!]
-
-  """Reads a set of `EdgeCase`."""
   allEdgeCasesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2692,8 +2660,6 @@ type Query implements Node {
     """The method to use when ordering `EdgeCase`."""
     orderBy: [EdgeCasesOrderBy!]
   ): [EdgeCase!]
-
-  """Reads a set of `Issue756`."""
   allIssue756SList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2709,8 +2675,6 @@ type Query implements Node {
     """The method to use when ordering `Issue756`."""
     orderBy: [Issue756SOrderBy!]
   ): [Issue756!]
-
-  """Reads a set of `LeftArm`."""
   allLeftArmsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2726,8 +2690,6 @@ type Query implements Node {
     """The method to use when ordering `LeftArm`."""
     orderBy: [LeftArmsOrderBy!]
   ): [LeftArm!]
-
-  """Reads a set of `MyTable`."""
   allMyTablesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2743,8 +2705,6 @@ type Query implements Node {
     """The method to use when ordering `MyTable`."""
     orderBy: [MyTablesOrderBy!]
   ): [MyTable!]
-
-  """Reads a set of `NullTestRecord`."""
   allNullTestRecordsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2760,8 +2720,6 @@ type Query implements Node {
     """The method to use when ordering `NullTestRecord`."""
     orderBy: [NullTestRecordsOrderBy!]
   ): [NullTestRecord!]
-
-  """Reads a set of `Person`."""
   allPeopleList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2777,8 +2735,6 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!]
   ): [Person!]
-
-  """Reads a set of `PersonSecret`."""
   allPersonSecretsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2794,8 +2750,6 @@ type Query implements Node {
     """The method to use when ordering `PersonSecret`."""
     orderBy: [PersonSecretsOrderBy!]
   ): [PersonSecret!] @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """Reads and enables pagination through a set of `Person`."""
   badlyBehavedFunctionList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2811,9 +2765,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): CompoundKey
-  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
-  """Reads and enables pagination through a set of `CompoundType`."""
+  """Get a single `CompoundKey`."""
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeSetQueryList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2835,7 +2789,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [FuncOutComplexSetofRecord]
+  ): [FuncOutComplexSetofRecord!]
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
   funcOutOutSetofList(
@@ -2844,7 +2798,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [FuncOutOutSetofRecord]
+  ): [FuncOutOutSetofRecord!]
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
   funcOutSetofList(
     """Only read the first `n` values of the set."""
@@ -2852,10 +2806,8 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [Int]
+  ): [Int!]
   funcOutTable: Person
-
-  """Reads and enables pagination through a set of `Person`."""
   funcOutTableSetofList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2872,7 +2824,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [FuncReturnsTableMultiColRecord]
+  ): [FuncReturnsTableMultiColRecord!]
   funcReturnsTableOneColList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2880,7 +2832,7 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [Int]
+  ): [Int!]
   intSetQueryList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2890,13 +2842,15 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): [Int]
+  ): [Int!]
 
   """Reads a single `Issue756` using its globally unique `ID`."""
   issue756(
     """The globally unique `ID` to be used in selecting a single `Issue756`."""
     nodeId: ID!
   ): Issue756
+
+  """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
@@ -2906,7 +2860,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `LeftArm`."""
     nodeId: ID!
   ): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
   leftArmByPersonId(personId: Int!): LeftArm
 
   """Reads a single `MyTable` using its globally unique `ID`."""
@@ -2914,6 +2872,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `MyTable`."""
     nodeId: ID!
   ): MyTable
+
+  """Get a single `MyTable`."""
   myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
@@ -2935,6 +2895,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): NullTestRecord
+
+  """Get a single `NullTestRecord`."""
   nullTestRecordById(id: Int!): NullTestRecord
 
   """Reads a single `Person` using its globally unique `ID`."""
@@ -2942,7 +2904,11 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Person`."""
     nodeId: ID!
   ): Person
+
+  """Get a single `Person`."""
   personByEmail(email: Email!): Person
+
+  """Get a single `Person`."""
   personById(id: Int!): Person
 
   """Reads a single `PersonSecret` using its globally unique `ID`."""
@@ -2952,7 +2918,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  personSecretByPersonId(personId: Int!): PersonSecret
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """
   Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -2967,10 +2935,8 @@ type Query implements Node {
 
     """Skip the first `n` values."""
     offset: Int
-  ): [SearchTestSummariesRecord]
+  ): [SearchTestSummariesRecord!]
   tableQuery(id: Int): Post
-
-  """Reads and enables pagination through a set of `Person`."""
   tableSetQueryList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2986,8 +2952,6 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!]
   ): [Person!]
-
-  """Reads and enables pagination through a set of `Person`."""
   tableSetQueryPlpgsqlList(
     """Only read the first `n` values of the set."""
     first: Int
@@ -2998,7 +2962,6 @@ type Query implements Node {
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
-"""The return type of our `queryOutputTwoRows` query."""
 type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
@@ -3029,7 +2992,6 @@ scalar RegProcedure
 """A builtin object identifier type for a data type name"""
 scalar RegType
 
-"""The return type of our `searchTestSummaries` query."""
 type SearchTestSummariesRecord {
   id: Int
   totalDuration: Interval

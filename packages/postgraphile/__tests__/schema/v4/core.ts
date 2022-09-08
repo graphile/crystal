@@ -5,6 +5,7 @@ import type { PoolClient } from "pg";
 
 import { makeSchema } from "../../../dist/schema.js";
 import AmberPreset from "../../../src/presets/amber.js";
+import type { V4Options } from "../../../src/presets/v4.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
 import {
   connectionString,
@@ -18,9 +19,10 @@ export const test =
   (
     testPath: string,
     schemata: string | string[],
-    options: { ignoreRBAC?: boolean } = {},
+    options: V4Options = {},
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
     finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
+    sort = true,
   ) =>
   () =>
     withPoolClientTransaction(async (client) => {
@@ -72,9 +74,11 @@ export const test =
       } = await makeSchema(preset);
       const i = testPath in countByPath ? countByPath[testPath] + 1 : 1;
       countByPath[testPath] = i;
-      const sorted = lexicographicSortSchema(schema);
+      const sorted = sort ? lexicographicSortSchema(schema) : schema;
       const printed = printSchema(sorted);
-      const filePath = `${testPath.replace(/\.test\.[jt]s$/, "")}.${i}.graphql`;
+      const filePath = `${testPath.replace(/\.test\.[jt]s$/, "")}${
+        sort || i > 1 ? `.${i}` : ""
+      }.graphql`;
       await snapshot(printed + "\n", filePath);
       if (finalCheck) {
         await finalCheck(schema);
