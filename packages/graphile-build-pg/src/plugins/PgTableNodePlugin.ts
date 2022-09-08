@@ -31,6 +31,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       init(_, build) {
+        if (!build.registerNodeIdHandler) {
+          return _;
+        }
         const tableSources = build.input.pgSources.filter((source) => {
           if (source.codec.isAnonymous) return false;
           if (!source.codec.columns) return false;

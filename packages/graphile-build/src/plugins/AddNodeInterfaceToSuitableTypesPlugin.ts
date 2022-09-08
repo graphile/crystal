@@ -20,6 +20,9 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
           inflection,
           [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
         } = build;
+        if (!nodeIdHandlerByTypeName) {
+          return interfaces;
+        }
         const { Self } = context;
         const handler = nodeIdHandlerByTypeName[Self.name];
         if (handler == null) {
@@ -44,6 +47,9 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
           [NODE_ID_CODECS]: nodeIdCodecs,
           graphql: { GraphQLNonNull, GraphQLID },
         } = build;
+        if (!nodeIdHandlerByTypeName) {
+          return fields;
+        }
         const {
           Self,
           scope: { isRootQuery },

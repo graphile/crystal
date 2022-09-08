@@ -54,6 +54,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
+        if (!build.getNodeTypeNames) {
+          return fields;
+        }
         const {
           graphql: { GraphQLNonNull, GraphQLID },
         } = build;
