@@ -1,5 +1,7 @@
 import "graphile-config";
 
+import { PgRBACPlugin } from "graphile-build-pg";
+
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexes.js";
@@ -17,7 +19,6 @@ export interface V4Options {
   appendPlugins?: GraphileConfig.Plugin[];
   skipPlugins?: GraphileConfig.Plugin[];
 
-  // TODO:
   subscriptions?: boolean;
   ignoreRBAC?: boolean;
 
@@ -110,11 +111,9 @@ function parseJWTType(type: string): [string, string] {
 export const makeV4Preset = (
   options: V4Options = {},
 ): GraphileConfig.Preset => {
-  if (options.ignoreRBAC === false) {
-    throw new Error("Haven't implemented ignoreRBAC: false yet");
-  }
   return {
     plugins: [
+      ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,

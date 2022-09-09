@@ -74,6 +74,10 @@ declare global {
             database: GraphileConfig.PgDatabaseConfiguration;
           }>
         >;
+        getDatabase(databaseName: string): Promise<{
+          introspection: Introspection;
+          database: GraphileConfig.PgDatabaseConfiguration;
+        }>;
         getExecutorForDatabase(databaseName: string): PgExecutor;
 
         getNamespace(
@@ -555,6 +559,16 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         })();
 
         return info.state.introspectionResultsPromise;
+      },
+      async getDatabase(info, databaseName) {
+        const all = await info.helpers.pgIntrospection.getIntrospection();
+        const match = all.find((n) => n.database.name === databaseName);
+        if (!match) {
+          throw new Error(
+            `Could not find results for database '${databaseName}'`,
+          );
+        }
+        return match;
       },
     },
 

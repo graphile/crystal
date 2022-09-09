@@ -3,6 +3,7 @@ declare global {
     interface Plugin {
       name: string;
       version: string;
+      experimental?: boolean;
       description?: string;
       provides?: string[];
       after?: string[];
