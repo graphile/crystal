@@ -163,6 +163,7 @@ export const $$streamMore = Symbol("streamMore");
  */
 export interface PolymorphicData<TType extends string = string, _TData = any> {
   [$$concreteType]: TType;
+  [$$data]?: _TData;
 }
 
 export interface IndexByListItemStepId {

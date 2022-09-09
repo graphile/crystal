@@ -1024,7 +1024,7 @@ export class OperationPlan {
                 return memo;
               }, Object.create(null)) ?? Object.create(null),
             );
-            return graphqlResolver(resolver, step, $args);
+            return graphqlResolver(resolver, step, $args, fieldType);
           });
         }
 
