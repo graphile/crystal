@@ -1,5 +1,6 @@
 import "graphile-config";
-import { aclContainsRole, resolvePermissions } from "pg-introspection";
+
+import { resolvePermissions } from "pg-introspection";
 
 import { version } from "../index.js";
 import { addBehaviorToTags } from "../utils.js";
@@ -47,9 +48,9 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           introspectionRole,
           true,
         );
-        let canSelect = columnPermissions.select || tablePermissions.select;
-        let canInsert = columnPermissions.insert || tablePermissions.insert;
-        let canUpdate = columnPermissions.update || tablePermissions.update;
+        const canSelect = columnPermissions.select || tablePermissions.select;
+        const canInsert = columnPermissions.insert || tablePermissions.insert;
+        const canUpdate = columnPermissions.update || tablePermissions.update;
         const parts: string[] = [];
         if (!canSelect) {
           // Only remove `select` privileges if at least one sibling column has
@@ -141,7 +142,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         let canSelect = tablePermissions.select;
         let canInsert = tablePermissions.insert;
         let canUpdate = tablePermissions.update;
-        let canDelete = tablePermissions.delete;
+        const canDelete = tablePermissions.delete;
         if (!canInsert || !canUpdate || !canSelect) {
           // TODO: this is computationally expensive; we should really make this more efficient.
           // Need to check the attributes
