@@ -99,13 +99,19 @@ const finalize = (
         // TODO: ABORT code
         _alive = false;
       });
-      iterator.push({
-        data,
-        errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
-        extensions,
-        hasNext: true,
-        label: undefined,
-      });
+      const payload = Object.create(null);
+      if (data !== undefined) {
+        payload.data = data;
+      }
+      if (ctx.root.errors.length > 0) {
+        payload.errors = ctx.root.errors;
+      }
+      if (extensions) {
+        payload.extensions = extensions;
+      }
+      payload.hasNext = true;
+      // TODO: payload.label
+      iterator.push(payload);
 
       const promise = processRoot(ctx, iterator);
       if (isPromiseLike(promise)) {
@@ -125,12 +131,17 @@ const finalize = (
 
       return iterator;
     } else {
-      return {
-        data: data as any,
-        errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
-        extensions,
-        hasNext: undefined,
-      };
+      const result = Object.create(null);
+      if (data !== undefined) {
+        result.data = data;
+      }
+      if (ctx.root.errors.length > 0) {
+        result.errors = ctx.root.errors;
+      }
+      if (extensions !== undefined) {
+        result.extensions = extensions;
+      }
+      return result;
     }
   }
 };
