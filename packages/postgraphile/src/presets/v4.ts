@@ -15,6 +15,7 @@ export interface V4Options {
   disableDefaultMutations?: boolean;
   ignoreIndexes?: boolean;
   appendPlugins?: GraphileConfig.Plugin[];
+  skipPlugins?: GraphileConfig.Plugin[];
 
   // TODO:
   subscriptions?: boolean;
@@ -125,6 +126,7 @@ export const makeV4Preset = (
       ...(options.disableDefaultMutations
         ? ["PgMutationCreatePlugin", "PgMutationUpdateDeletePlugin"]
         : []),
+      ...(options.skipPlugins ? options.skipPlugins.map((p) => p.name) : []),
     ],
     schema: {
       pgUseCustomNetworkScalars:

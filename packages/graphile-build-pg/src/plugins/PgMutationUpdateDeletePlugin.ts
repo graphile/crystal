@@ -274,9 +274,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     source.codec,
                     "output",
                   ) as GraphQLObjectType | undefined;
-                  const handler = TableType
-                    ? build.getNodeIdHandler(TableType.name)
-                    : null;
+                  const handler =
+                    TableType && build.getNodeIdHandler
+                      ? build.getNodeIdHandler(TableType.name)
+                      : null;
                   const nodeIdCodec = handler
                     ? build.getNodeIdCodec(handler.codecName)
                     : null;
@@ -661,15 +662,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   : null;
 
                 const tableTypeName = inflection.tableType(source.codec);
-                const handler = build.getNodeIdHandler(tableTypeName);
+                const handler = build.getNodeIdHandler
+                  ? build.getNodeIdHandler(tableTypeName)
+                  : null;
                 const codec = handler
                   ? build.getNodeIdCodec(handler.codecName)
                   : null;
 
                 if (uniqueMode !== "keys" && (!codec || !handler)) {
-                  throw new Error(
-                    `Failed to get node handler/codec for '${tableTypeName}'`,
-                  );
+                  return fields;
                 }
 
                 /**

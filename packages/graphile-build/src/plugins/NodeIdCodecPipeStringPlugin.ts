@@ -8,6 +8,9 @@ export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       init(_, build) {
+        if (!build.registerNodeIdCodec) {
+          return _;
+        }
         build.registerNodeIdCodec("pipeString", {
           encode(value) {
             return Array.isArray(value) ? value.join("|") : null;

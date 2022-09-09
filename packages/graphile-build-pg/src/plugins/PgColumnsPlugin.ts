@@ -130,7 +130,9 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
       column(options, details) {
         const columnFieldName = this.camelCase(this._columnName(details));
         // Avoid conflict with 'id' field used for Relay.
-        return columnFieldName === "id" ? "rowId" : columnFieldName;
+        return columnFieldName === "id" && !details.codec.isAnonymous
+          ? "rowId"
+          : columnFieldName;
       },
     },
   },

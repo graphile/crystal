@@ -8,6 +8,9 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       init(_, build) {
+        if (!build.registerNodeIdCodec) {
+          return _;
+        }
         build.registerNodeIdCodec("base64JSON", {
           encode(value) {
             return Buffer.from(JSON.stringify(value), "utf8").toString(

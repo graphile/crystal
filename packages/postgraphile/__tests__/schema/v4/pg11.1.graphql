@@ -3,7 +3,7 @@ type AlwaysAsIdentitiesConnection {
   """
   A list of edges which contains the `AlwaysAsIdentity` and cursor to aid in pagination.
   """
-  edges: [AlwaysAsIdentitiesEdge!]!
+  edges: [AlwaysAsIdentitiesEdge]!
 
   """A list of `AlwaysAsIdentity` objects."""
   nodes: [AlwaysAsIdentity]!
@@ -78,7 +78,7 @@ type ByDefaultAsIdentitiesConnection {
   """
   A list of edges which contains the `ByDefaultAsIdentity` and cursor to aid in pagination.
   """
-  edges: [ByDefaultAsIdentitiesEdge!]!
+  edges: [ByDefaultAsIdentitiesEdge]!
 
   """A list of `ByDefaultAsIdentity` objects."""
   nodes: [ByDefaultAsIdentity]!
@@ -174,7 +174,7 @@ type CreateAlwaysAsIdentityPayload {
   """An edge for our `AlwaysAsIdentity`. May be used by Relay 1."""
   alwaysAsIdentityEdge(
     """The method to use when ordering `AlwaysAsIdentity`."""
-    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [AlwaysAsIdentitiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): AlwaysAsIdentitiesEdge
 
   """
@@ -209,7 +209,7 @@ type CreateByDefaultAsIdentityPayload {
   """An edge for our `ByDefaultAsIdentity`. May be used by Relay 1."""
   byDefaultAsIdentityEdge(
     """The method to use when ordering `ByDefaultAsIdentity`."""
-    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ByDefaultAsIdentitiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ByDefaultAsIdentitiesEdge
 
   """
@@ -250,7 +250,7 @@ type CreateNetworkPayload {
   """An edge for our `Network`. May be used by Relay 1."""
   networkEdge(
     """The method to use when ordering `Network`."""
-    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NetworksOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NetworksEdge
 
   """
@@ -290,7 +290,7 @@ type CreateTypePayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -329,7 +329,7 @@ type DeleteAlwaysAsIdentityPayload {
   """An edge for our `AlwaysAsIdentity`. May be used by Relay 1."""
   alwaysAsIdentityEdge(
     """The method to use when ordering `AlwaysAsIdentity`."""
-    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [AlwaysAsIdentitiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): AlwaysAsIdentitiesEdge
 
   """
@@ -377,7 +377,7 @@ type DeleteByDefaultAsIdentityPayload {
   """An edge for our `ByDefaultAsIdentity`. May be used by Relay 1."""
   byDefaultAsIdentityEdge(
     """The method to use when ordering `ByDefaultAsIdentity`."""
-    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ByDefaultAsIdentitiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ByDefaultAsIdentitiesEdge
 
   """
@@ -432,7 +432,7 @@ type DeleteNetworkPayload {
   """An edge for our `Network`. May be used by Relay 1."""
   networkEdge(
     """The method to use when ordering `Network`."""
-    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NetworksOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NetworksEdge
 
   """
@@ -485,7 +485,7 @@ type DeleteTypePayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -500,6 +500,7 @@ type DomainConstrainedCompoundType {
   g: Interval
 }
 
+"""An input for mutations affecting `DomainConstrainedCompoundType`"""
 input DomainConstrainedCompoundTypeInput {
   a: Int
   b: String
@@ -808,7 +809,7 @@ type NetworksConnection {
   """
   A list of edges which contains the `Network` and cursor to aid in pagination.
   """
-  edges: [NetworksEdge!]!
+  edges: [NetworksEdge]!
 
   """A list of `Network` objects."""
   nodes: [Network]!
@@ -994,6 +995,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): AlwaysAsIdentity
+
+  """Get a single `AlwaysAsIdentity`."""
   alwaysAsIdentityById(id: Int!): AlwaysAsIdentity
 
   """Reads a single `ByDefaultAsIdentity` using its globally unique `ID`."""
@@ -1003,6 +1006,8 @@ type Query implements Node {
     """
     nodeId: ID!
   ): ByDefaultAsIdentity
+
+  """Get a single `ByDefaultAsIdentity`."""
   byDefaultAsIdentityById(id: Int!): ByDefaultAsIdentity
 
   """Reads a single `Network` using its globally unique `ID`."""
@@ -1010,6 +1015,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Network`."""
     nodeId: ID!
   ): Network
+
+  """Get a single `Network`."""
   networkById(id: Int!): Network
 
   """Fetches an object given its globally unique `ID`."""
@@ -1034,6 +1041,8 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Type`."""
     nodeId: ID!
   ): Type
+
+  """Get a single `Type`."""
   typeById(id: Int!): Type
 }
 
@@ -1101,7 +1110,7 @@ type TypesConnection {
   """
   A list of edges which contains the `Type` and cursor to aid in pagination.
   """
-  edges: [TypesEdge!]!
+  edges: [TypesEdge]!
 
   """A list of `Type` objects."""
   nodes: [Type]!
@@ -1124,8 +1133,6 @@ type TypesEdge {
 
 """Methods to use when ordering `Type`."""
 enum TypesOrderBy {
-  BIGINT_DOMAIN_ARRAY_DOMAIN_ASC
-  BIGINT_DOMAIN_ARRAY_DOMAIN_DESC
   DOMAIN_CONSTRAINED_COMPOUND_TYPE_ASC
   DOMAIN_CONSTRAINED_COMPOUND_TYPE_DESC
   ID_ASC
@@ -1186,7 +1193,7 @@ type UpdateAlwaysAsIdentityPayload {
   """An edge for our `AlwaysAsIdentity`. May be used by Relay 1."""
   alwaysAsIdentityEdge(
     """The method to use when ordering `AlwaysAsIdentity`."""
-    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [AlwaysAsIdentitiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): AlwaysAsIdentitiesEdge
 
   """
@@ -1243,7 +1250,7 @@ type UpdateByDefaultAsIdentityPayload {
   """An edge for our `ByDefaultAsIdentity`. May be used by Relay 1."""
   byDefaultAsIdentityEdge(
     """The method to use when ordering `ByDefaultAsIdentity`."""
-    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [ByDefaultAsIdentitiesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ByDefaultAsIdentitiesEdge
 
   """
@@ -1306,7 +1313,7 @@ type UpdateNetworkPayload {
   """An edge for our `Network`. May be used by Relay 1."""
   networkEdge(
     """The method to use when ordering `Network`."""
-    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [NetworksOrderBy!]! = [PRIMARY_KEY_ASC]
   ): NetworksEdge
 
   """
@@ -1368,6 +1375,6 @@ type UpdateTypePayload {
   """An edge for our `Type`. May be used by Relay 1."""
   typeEdge(
     """The method to use when ordering `Type`."""
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [TypesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
