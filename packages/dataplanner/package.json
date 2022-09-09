@@ -58,13 +58,17 @@
     "index.js"
   ],
   "devDependencies": {
+    "@types/chai": "^4",
     "@types/jest": "^27.5.1",
     "@types/lodash": "^4.14.178",
     "@types/mermaid": "^8",
+    "@types/mocha": "^9.1.1",
     "@types/nodemon": "1.19.1",
+    "chai": "^4.3.6",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^28.1.0",
     "mermaid": "^8.14.0",
+    "mocha": "^10.0.0",
     "nodemon": "^2.0.15",
     "pg-sql2": "workspace:^",
     "spec-md": "^3.0.2",
