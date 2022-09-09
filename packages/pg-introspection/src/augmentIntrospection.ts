@@ -1,3 +1,11 @@
+import {
+  aclsForTable,
+  OBJECT_COLUMN,
+  OBJECT_DATABASE,
+  OBJECT_FUNCTION,
+  OBJECT_SCHEMA,
+  parseAcls,
+} from "./acl.js";
 import type {
   Introspection,
   PgAttribute,
@@ -173,6 +181,14 @@ export function augmentIntrospection(
   introspection.database.getDba = memo(() =>
     getRole(introspection.database.datdba),
   );
+  introspection.database.getACL = memo(() =>
+    parseAcls(
+      introspection,
+      introspection.database.datacl,
+      introspection.database.datdba,
+      OBJECT_DATABASE,
+    ),
+  );
   introspection.namespaces.forEach((entity) => {
     entity.getOwner = memo(() => getRole(entity.nspowner));
     entity.getDescription = memo(() =>
@@ -180,6 +196,9 @@ export function augmentIntrospection(
     );
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_NAMESPACE, entity._id),
+    );
+    entity.getACL = memo(() =>
+      parseAcls(introspection, entity.nspacl, entity.nspowner, OBJECT_SCHEMA),
     );
   });
   introspection.classes.forEach((entity) => {
@@ -200,6 +219,7 @@ export function augmentIntrospection(
         objoid: entity.reltype,
       }),
     );
+    entity.getACL = memo(() => aclsForTable(introspection, entity));
   });
   introspection.indexes.forEach((entity) => {
     entity.getIndexClass = memo(() => getClass(entity.indexrelid));
@@ -221,6 +241,14 @@ export function augmentIntrospection(
     );
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_CLASS, entity.attrelid, entity.attnum),
+    );
+    entity.getACL = memo(() =>
+      parseAcls(
+        introspection,
+        entity.attacl,
+        entity.getClass()!.relowner,
+        OBJECT_COLUMN,
+      ),
     );
   });
   introspection.constraints.forEach((entity) => {
@@ -331,6 +359,9 @@ export function augmentIntrospection(
 
       return args;
     });
+    entity.getACL = memo(() =>
+      parseAcls(introspection, entity.proacl, entity.proowner, OBJECT_FUNCTION),
+    );
   });
   introspection.types.forEach((entity) => {
     entity.getNamespace = memo(() => getNamespace(entity.typnamespace));

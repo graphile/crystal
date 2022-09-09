@@ -19,6 +19,8 @@ import type {
   PgType,
 } from "./introspection.js";
 export { makeIntrospectionQuery } from "./introspection.js";
+import type { AclObject } from "./acl.js";
+import { aclContainsRole, expandRoles } from "./acl.js";
 import { augmentIntrospection } from "./augmentIntrospection.js";
 import type {
   PgSmartTagsAndDescription,
@@ -48,6 +50,8 @@ export {
   PgType,
 };
 
+export { aclContainsRole, AclObject, expandRoles };
+
 export function parseIntrospectionResults(
   introspectionResults: string,
   includeExtensionResources = false,
@@ -69,11 +73,13 @@ declare module "./introspection" {
 
   interface PgDatabase {
     getDba(): PgRoles | undefined;
+    getACL(): AclObject[];
   }
   interface PgNamespace {
     getOwner(): PgRoles | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    getACL(): AclObject[];
   }
   interface PgClass {
     getNamespace(): PgNamespace | undefined;
@@ -86,6 +92,7 @@ declare module "./introspection" {
     getIndexes(): PgIndex[];
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    getACL(): AclObject[];
   }
   interface PgIndex {
     /**
@@ -107,6 +114,7 @@ declare module "./introspection" {
     getType(): PgType | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    getACL(): AclObject[];
   }
   interface PgConstraint {
     getNamespace(): PgNamespace | undefined;
@@ -125,6 +133,7 @@ declare module "./introspection" {
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
     getArguments(): PgProcArgument[];
+    getACL(): AclObject[];
   }
   interface PgType {
     getNamespace(): PgNamespace | undefined;
