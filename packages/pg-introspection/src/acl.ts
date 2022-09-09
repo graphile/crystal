@@ -118,6 +118,8 @@ export interface AclObject {
   temporaryGrant?: boolean;
 }
 
+export type ResolvedPermissions = Omit<AclObject, "role" | "granter">;
+
 /**
  * Parses a role identifier from an ACL string.
  *
@@ -393,19 +395,24 @@ export function aclsForTable(
 }
 
 /**
- * Returns all the roles role has been granted (including PUBLIC)
+ * Returns all the roles role has been granted (including PUBLIC),
+ * respecting `NOINHERIT`
  */
 export function expandRoles(
   introspection: Introspection,
   roles: PgRoles[],
+  includeNoInherit = false,
 ): PgRoles[] {
   const allRoles = [PUBLIC_ROLE];
 
   const addRole = (member: PgRoles) => {
     if (!allRoles.includes(member)) {
       allRoles.push(member);
-      if (member.rolinherit !== false) {
+      if (includeNoInherit || member.rolinherit !== false) {
         introspection.auth_members.forEach((am) => {
+          // auth_members - role `am.member` gains the privileges of
+          // `am.roleid`
+
           if (am.member === member._id) {
             const rol = getRole(introspection, am.roleid);
             addRole(rol);
@@ -433,8 +440,88 @@ export function aclContainsRole(
   introspection: Introspection,
   acl: AclObject,
   role: PgRoles,
+  includeNoInherit = false,
 ): boolean {
   const aclRole = getRoleByName(introspection, acl.role);
-  const expandedRoles = expandRoles(introspection, [role]);
+  const expandedRoles = expandRoles(introspection, [role], includeNoInherit);
   return expandedRoles.includes(aclRole);
+}
+
+/**
+ * Filters the ACL objects to only those that apply to `role`, then calculates
+ * the `OR` of all the permissions to see what permissions the role has.
+ */
+export function resolvePermissions(
+  introspection: Introspection,
+  acls: AclObject[],
+  role: PgRoles,
+  includeNoInherit = false,
+): ResolvedPermissions {
+  // Just as in life, you start with nothing...
+  const permissions: ResolvedPermissions = {
+    select: false,
+    selectGrant: false,
+    update: false,
+    updateGrant: false,
+    insert: false,
+    insertGrant: false,
+    delete: false,
+    deleteGrant: false,
+    truncate: false,
+    truncateGrant: false,
+    references: false,
+    referencesGrant: false,
+    trigger: false,
+    triggerGrant: false,
+    execute: false,
+    executeGrant: false,
+    usage: false,
+    usageGrant: false,
+    create: false,
+    createGrant: false,
+    connect: false,
+    connectGrant: false,
+    temporary: false,
+    temporaryGrant: false,
+  };
+
+  for (const acl of acls) {
+    const appliesToRole = aclContainsRole(
+      introspection,
+      acl,
+      role,
+      includeNoInherit,
+    );
+    if (appliesToRole) {
+      permissions.select = permissions.select || acl.select;
+      permissions.selectGrant = permissions.selectGrant || acl.selectGrant;
+      permissions.update = permissions.update || acl.update;
+      permissions.updateGrant = permissions.updateGrant || acl.updateGrant;
+      permissions.insert = permissions.insert || acl.insert;
+      permissions.insertGrant = permissions.insertGrant || acl.insertGrant;
+      permissions.delete = permissions.delete || acl.delete;
+      permissions.deleteGrant = permissions.deleteGrant || acl.deleteGrant;
+      permissions.truncate = permissions.truncate || acl.truncate;
+      permissions.truncateGrant =
+        permissions.truncateGrant || acl.truncateGrant;
+      permissions.references = permissions.references || acl.references;
+      permissions.referencesGrant =
+        permissions.referencesGrant || acl.referencesGrant;
+      permissions.trigger = permissions.trigger || acl.trigger;
+      permissions.triggerGrant = permissions.triggerGrant || acl.triggerGrant;
+      permissions.execute = permissions.execute || acl.execute;
+      permissions.executeGrant = permissions.executeGrant || acl.executeGrant;
+      permissions.usage = permissions.usage || acl.usage;
+      permissions.usageGrant = permissions.usageGrant || acl.usageGrant;
+      permissions.create = permissions.create || acl.create;
+      permissions.createGrant = permissions.createGrant || acl.createGrant;
+      permissions.connect = permissions.connect || acl.connect;
+      permissions.connectGrant = permissions.connectGrant || acl.connectGrant;
+      permissions.temporary = permissions.temporary || acl.temporary;
+      permissions.temporaryGrant =
+        permissions.temporaryGrant || acl.temporaryGrant;
+    }
+  }
+
+  return permissions;
 }

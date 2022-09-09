@@ -30,6 +30,7 @@ export { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin.js";
 export { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 export { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
 export { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
+export { PgRBACPlugin } from "./plugins/PgRBACPlugin.js";
 export { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
 export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";

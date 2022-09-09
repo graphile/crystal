@@ -178,6 +178,37 @@ export function augmentIntrospection(
     return parseSmartComment(description);
   };
 
+  introspection.getCurrentUser = memo(() =>
+    introspection.roles.find((r) => r.rolname === introspection.current_user),
+  );
+
+  introspection.getNamespace = (by) => {
+    if ("id" in by && by.id) {
+      return getNamespace(by.id);
+    } else if ("name" in by && by.name) {
+      return introspection.namespaces.find(
+        (entity) => entity.nspname === by.name,
+      );
+    }
+  };
+  introspection.getClass = (by) => getClass(by.id);
+  introspection.getConstraint = (by) =>
+    introspection.constraints.find((c) => c._id === by.id);
+  introspection.getProc = (by) =>
+    introspection.procs.find((c) => c._id === by.id);
+  introspection.getRoles = (by) =>
+    introspection.roles.find((c) => c._id === by.id);
+  introspection.getType = (by) =>
+    introspection.types.find((c) => c._id === by.id);
+  introspection.getEnum = (by) =>
+    introspection.enums.find((c) => c._id === by.id);
+  introspection.getExtension = (by) =>
+    introspection.extensions.find((c) => c._id === by.id);
+  introspection.getIndex = (by) =>
+    introspection.indexes.find((c) => c.indexrelid === by.id);
+  introspection.getLanguage = (by) =>
+    introspection.languages.find((c) => c._id === by.id);
+
   introspection.database.getDba = memo(() =>
     getRole(introspection.database.datdba),
   );
@@ -189,6 +220,7 @@ export function augmentIntrospection(
       OBJECT_DATABASE,
     ),
   );
+
   introspection.namespaces.forEach((entity) => {
     entity.getOwner = memo(() => getRole(entity.nspowner));
     entity.getDescription = memo(() =>
@@ -200,7 +232,25 @@ export function augmentIntrospection(
     entity.getACL = memo(() =>
       parseAcls(introspection, entity.nspacl, entity.nspowner, OBJECT_SCHEMA),
     );
+
+    entity.getClass = (by) =>
+      introspection.classes.find(
+        (child) =>
+          child.relnamespace === entity._id && child.relname === by.name,
+      );
+    entity.getConstraint = (by) =>
+      introspection.constraints.find(
+        (child) =>
+          child.connamespace === entity._id && child.conname === by.name,
+      );
+    entity.getProcs = (by) => {
+      return introspection.procs.filter(
+        (child) =>
+          child.pronamespace === entity._id && child.proname === by.name,
+      );
+    };
   });
+
   introspection.classes.forEach((entity) => {
     entity.getNamespace = memo(() => getNamespace(entity.relnamespace));
     entity.getType = memo(() => getType(entity.reltype));
@@ -220,6 +270,20 @@ export function augmentIntrospection(
       }),
     );
     entity.getACL = memo(() => aclsForTable(introspection, entity));
+
+    entity.getAttribute = (by) => {
+      const attributes = entity.getAttributes();
+      return attributes.find((att) =>
+        "number" in by && by.number
+          ? att.attnum === by.number
+          : "name" in by && by.name
+          ? att.attname === by.name
+          : false,
+      );
+    };
+    entity.getInherited = memo(() =>
+      introspection.inherits.filter((inh) => inh.inhrelid === entity._id),
+    );
   });
   introspection.indexes.forEach((entity) => {
     entity.getIndexClass = memo(() => getClass(entity.indexrelid));

@@ -20,7 +20,7 @@ import type {
 } from "./introspection.js";
 export { makeIntrospectionQuery } from "./introspection.js";
 import type { AclObject } from "./acl.js";
-import { aclContainsRole, expandRoles } from "./acl.js";
+import { aclContainsRole, expandRoles, resolvePermissions } from "./acl.js";
 import { augmentIntrospection } from "./augmentIntrospection.js";
 import type {
   PgSmartTagsAndDescription,
@@ -50,7 +50,7 @@ export {
   PgType,
 };
 
-export { aclContainsRole, AclObject, expandRoles };
+export { aclContainsRole, AclObject, expandRoles, resolvePermissions };
 
 export function parseIntrospectionResults(
   introspectionResults: string,
@@ -62,6 +62,23 @@ export function parseIntrospectionResults(
 export { PgSmartTagsAndDescription, PgSmartTagsDict };
 
 declare module "./introspection" {
+  interface Introspection {
+    getCurrentUser(): PgRoles | undefined;
+
+    getNamespace(
+      by: { id: string } | { name: string },
+    ): PgNamespace | undefined;
+    getClass(by: { id: string }): PgClass | undefined;
+    getConstraint(by: { id: string }): PgConstraint | undefined;
+    getProc(by: { id: string }): PgProc | undefined;
+    getRoles(by: { id: string }): PgRoles | undefined;
+    getType(by: { id: string }): PgType | undefined;
+    getEnum(by: { id: string }): PgEnum | undefined;
+    getExtension(by: { id: string }): PgExtension | undefined;
+    getIndex(by: { id: string }): PgIndex | undefined;
+    getLanguage(by: { id: string }): PgLanguage | undefined;
+  }
+
   interface PgProcArgument {
     isIn: boolean;
     isOut: boolean;
@@ -80,6 +97,10 @@ declare module "./introspection" {
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
     getACL(): AclObject[];
+
+    getClass(by: { name: string }): PgClass | undefined;
+    getConstraint(by: { name: string }): PgConstraint | undefined;
+    getProcs(by: { name: string }): PgProc[] | undefined;
   }
   interface PgClass {
     getNamespace(): PgNamespace | undefined;
@@ -87,12 +108,16 @@ declare module "./introspection" {
     getOfType(): PgType | undefined;
     getOwner(): PgRoles | undefined;
     getAttributes(): PgAttribute[];
+    getAttribute(
+      by: { number: number } | { name: string },
+    ): PgAttribute | undefined;
     getConstraints(): PgConstraint[];
     getForeignConstraints(): PgConstraint[];
     getIndexes(): PgIndex[];
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
     getACL(): AclObject[];
+    getInherited(): PgInherits[];
   }
   interface PgIndex {
     /**
