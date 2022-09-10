@@ -17,7 +17,7 @@ import { inspect } from "util";
 
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { _CrystalError } from "../error.js";
+import { $$error } from "../error.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
 import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
@@ -608,14 +608,14 @@ function makeExecutor(
     ...args,
     coerceError,
     nonNullError,
-    _CrystalError,
+    $$error,
   };
   const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
   const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
   if (bucketRootValue == null) {
     ${skipNullHandling ? `// root/introspection, null is fine` : `return null;`}
   }
-  if (bucketRootValue.constructor === _CrystalError) {
+  if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
     throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
