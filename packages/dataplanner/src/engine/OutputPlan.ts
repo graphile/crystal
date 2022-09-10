@@ -667,14 +667,19 @@ function makeExecuteChildPlanCode(
 
 const nullExecutor = makeExecutor("  return null;", "null");
 
+const canBeInsideGraphQL = false;
 const leafExecutor = makeExecutor(
-  `\
+  canBeInsideGraphQL
+    ? `\
   if (root.insideGraphQL) {
     // Don't serialize to avoid the double serialization problem
     return bucketRootValue;
   } else {
     return this.type.serialize(bucketRootValue);
   }
+`
+    : `\
+  return this.type.serialize(bucketRootValue);
 `,
   "leaf",
 );
