@@ -650,14 +650,14 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return `
       let fieldResult, error;
-      let pathLength = mutablePath.length;
       try {
         fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
       } catch (e) {
         error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
-        const overSize = mutablePath.length - pathLength;
+        const pathLengthTarget = mutablePathIndex + 1;
+        const overSize = mutablePath.length - pathLengthTarget;
         if (overSize > 0) {
-          mutablePath.splice(pathLength, overSize);
+          mutablePath.splice(pathLengthTarget, overSize);
         }
       }
       if (error) {
