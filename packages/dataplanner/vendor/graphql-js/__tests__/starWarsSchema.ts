@@ -4,9 +4,9 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-} from '../type/definition.js';
-import { GraphQLString } from '../type/scalars.js';
-import { GraphQLSchema } from '../type/schema.js';
+  GraphQLSchema,
+  GraphQLString,
+} from 'graphql';
 
 import { getDroid, getFriends, getHero, getHuman } from './starWarsData.js';
 

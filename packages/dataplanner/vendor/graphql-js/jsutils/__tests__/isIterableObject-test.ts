@@ -13,6 +13,7 @@ describe('isIterableObject', () => {
     expect(isIterableObject(new String('ABC'))).to.equal(true);
 
     function getArguments() {
+      // eslint-disable-next-line prefer-rest-params
       return arguments;
     }
     expect(isIterableObject(getArguments())).to.equal(true);

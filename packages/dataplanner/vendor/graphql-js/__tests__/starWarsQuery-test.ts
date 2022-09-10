@@ -1,10 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
+import { dataplannerGraphql as graphql } from '../../../src/index.js';
 import { expectJSON } from '../__testUtils__/expectJSON.js';
-
-import { graphql } from '../graphql.js';
-
 import { StarWarsSchema as schema } from './starWarsSchema.js';
 
 describe('Star Wars Query Tests', () => {

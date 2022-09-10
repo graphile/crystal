@@ -1,10 +1,6 @@
 import { expect } from 'chai';
+import { parse, Source, validate } from 'graphql';
 import { describe, it } from 'mocha';
-
-import { parse } from '../language/parser.js';
-import { Source } from '../language/source.js';
-
-import { validate } from '../validation/validate.js';
 
 import { StarWarsSchema } from './starWarsSchema.js';
 

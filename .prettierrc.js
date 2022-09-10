@@ -8,5 +8,11 @@ module.exports = {
         printWidth: 120,
       },
     },
+    {
+      files: "packages/dataplanner/vendor/graphql-js/**",
+      options: {
+        singleQuote: true,
+      },
+    },
   ],
 };

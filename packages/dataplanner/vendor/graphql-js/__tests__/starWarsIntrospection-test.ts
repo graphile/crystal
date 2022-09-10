@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { graphqlSync } from '../graphql.js';
-
+import { dataplannerGraphqlSync as graphqlSync } from '../../../src/index.js';
 import { StarWarsSchema } from './starWarsSchema.js';
 
 function queryStarWars(source: string) {
