@@ -611,7 +611,7 @@ function makeExecutor(
     _CrystalError,
   };
   const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
-  const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
+  const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
   if (bucketRootValue == null) {
     ${skipNullHandling ? `// root/introspection, null is fine` : `return null;`}
   }

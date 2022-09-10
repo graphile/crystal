@@ -145,7 +145,7 @@ export function executeBucket(
       const sld = potentialNextStep._sameLayerDependencies;
       for (let i = 0, l = sld.length; i < l; i++) {
         const depId = sld[i];
-        if (store[depId] === undefined) {
+        if (!store.has(depId)) {
           if (isDev) {
             const dep =
               bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
@@ -196,7 +196,7 @@ export function executeBucket(
     }
     if (finishedStep.isSyncAndSafe && noNewErrors) {
       // It promises not to add new errors, and not to include promises in the result array
-      store[finishedStep.id] = result;
+      store.set(finishedStep.id, result);
       return reallyCompletedStep(finishedStep);
     } else {
       // Need to complete promises, check for errors, etc.
@@ -287,11 +287,11 @@ export function executeBucket(
           if (promises.length > 0) {
             // This _should not_ throw.
             return Promise.all(promises).then(() => {
-              store[finishedStep.id] = result;
+              store.set(finishedStep.id, result);
               return reallyCompletedStep(finishedStep);
             });
           } else {
-            store[finishedStep.id] = result;
+            store.set(finishedStep.id, result);
             return reallyCompletedStep(finishedStep);
           }
         })
@@ -307,7 +307,10 @@ export function executeBucket(
             finishedStep.id,
           );
           console.error(`${crystalError.originalError}\n  ${e}`);
-          store[finishedStep.id] = result.map(() => crystalError);
+          store.set(
+            finishedStep.id,
+            result.map(() => crystalError),
+          );
           return reallyCompletedStep(finishedStep);
         });
     }
@@ -433,7 +436,7 @@ export function executeBucket(
       if (depCount > 0) {
         for (let i = 0, l = depCount; i < l; i++) {
           const depId = step.dependencies[i];
-          dependencies[i] = store[depId];
+          dependencies[i] = store.get(depId)!;
         }
       } else {
         dependencies.push(noDepsList);
@@ -503,13 +506,13 @@ export function executeBucket(
       const copyStepIds = childLayerPlan.copyPlanIds;
       switch (childLayerPlan.reason.type) {
         case "listItem": {
-          const store: Bucket["store"] = Object.create(null);
+          const store: Bucket["store"] = new Map();
           const polymorphicPathList: string[] = [];
           const map: Map<number, number[]> = new Map();
           let size = 0;
 
           const listStepId = childLayerPlan.reason.parentPlanId;
-          const listStepStore = bucket.store[listStepId];
+          const listStepStore = bucket.store.get(listStepId);
           assert.ok(
             listStepStore,
             `GraphileInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not found entry '${listStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
@@ -522,11 +525,11 @@ export function executeBucket(
             itemStepId != null,
             "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
           );
-          store[itemStepId] = [];
+          store.set(itemStepId, []);
 
           // Prepare store with an empty list for each copyPlanId
           for (const planId of copyStepIds) {
-            store[planId] = [];
+            store.set(planId, []);
           }
 
           // We'll typically be creating more listItem bucket entries than we
@@ -544,12 +547,13 @@ export function executeBucket(
               for (let j = 0, l = list.length; j < l; j++) {
                 const newIndex = size++;
                 newIndexes.push(newIndex);
-                store[itemStepId][newIndex] = list[j];
+                store.get(itemStepId)![newIndex] = list[j];
 
                 polymorphicPathList[newIndex] =
                   bucket.polymorphicPathList[originalIndex];
                 for (const planId of copyStepIds) {
-                  store[planId][newIndex] = bucket.store[planId][originalIndex];
+                  store.get(planId)![newIndex] =
+                    bucket.store.get(planId)![originalIndex];
                 }
               }
             }
@@ -579,7 +583,7 @@ export function executeBucket(
           break;
         }
         case "mutationField": {
-          const store: Bucket["store"] = Object.create(null);
+          const store: Bucket["store"] = new Map();
           const polymorphicPathList = bucket.polymorphicPathList;
           const map: Map<number, number> = new Map();
           // This is a 1-to-1 map, so we can mostly just copy from parent bucket
@@ -588,7 +592,7 @@ export function executeBucket(
             map.set(i, i);
           }
           for (const planId of copyStepIds) {
-            store[planId] = bucket.store[planId];
+            store.set(planId, bucket.store.get(planId)!);
           }
 
           // Reference
@@ -614,7 +618,7 @@ export function executeBucket(
         }
         case "polymorphic": {
           const polymorphicPlanId = childLayerPlan.reason.parentPlanId;
-          const polymorphicPlanStore = bucket.store[polymorphicPlanId];
+          const polymorphicPlanStore = bucket.store.get(polymorphicPlanId);
           if (!polymorphicPlanStore) {
             throw new Error(
               `GraphileInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${bucket.layerPlan.operationPlan.dangerouslyGetStep(
@@ -622,7 +626,7 @@ export function executeBucket(
               )}' not found in bucket for '${bucket.layerPlan}'`,
             );
           }
-          const store: Bucket["store"] = Object.create(null);
+          const store: Bucket["store"] = new Map();
           const polymorphicPathList: string[] = [];
           const map: Map<number, number> = new Map();
           let size = 0;
@@ -632,8 +636,8 @@ export function executeBucket(
           const targetTypeNames = childLayerPlan.reason.typeNames;
 
           for (const planId of copyStepIds) {
-            store[planId] = [];
-            if (!bucket.store[planId]) {
+            store.set(planId, []);
+            if (!bucket.store.has(planId)) {
               throw new Error(
                 `GraphileInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${childLayerPlan} wants to copy ${childLayerPlan.operationPlan.dangerouslyGetStep(
                   planId,
@@ -670,7 +674,8 @@ export function executeBucket(
 
             polymorphicPathList[newIndex] = newPolymorphicPath;
             for (const planId of copyStepIds) {
-              store[planId][newIndex] = bucket.store[planId][originalIndex];
+              store.get(planId)![newIndex] =
+                bucket.store.get(planId)![originalIndex];
             }
           }
 
@@ -753,7 +758,7 @@ export function newBucket(
         `Entry ${i} in polymorphicPathList for bucket for ${spec.layerPlan} was not a string`,
       );
     }
-    for (const [key, list] of Object.entries(spec.store)) {
+    for (const [key, list] of spec.store.entries()) {
       assert.ok(
         Array.isArray(list),
         `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should be a list`,

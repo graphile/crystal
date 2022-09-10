@@ -202,16 +202,18 @@ export function executePreemptive(
   const ctxs = [context];
   const rvs = [rootValue];
   const polymorphicPathList = [POLYMORPHIC_ROOT_PATH];
+
+  const store: Bucket["store"] = new Map();
+  store.set(-1, requestIndex);
+  store.set(operationPlan.rootLayerPlan.rootStepId!, requestIndex);
+  store.set(operationPlan.variableValuesStep.id, vars);
+  store.set(operationPlan.contextStep.id, ctxs);
+  store.set(operationPlan.rootValueStep.id, rvs);
+
   const rootBucket = newBucket({
     layerPlan: operationPlan.rootLayerPlan,
     size,
-    store: Object.assign(Object.create(null), {
-      "-1": requestIndex,
-      [operationPlan.rootLayerPlan.rootStepId!]: requestIndex,
-      [operationPlan.variableValuesStep.id]: vars,
-      [operationPlan.contextStep.id]: ctxs,
-      [operationPlan.rootValueStep.id]: rvs,
-    }),
+    store,
     hasErrors: false,
     polymorphicPathList,
   });
@@ -236,16 +238,17 @@ export function executePreemptive(
   > => {
     const layerPlan = subscriptionLayerPlan!;
     // TODO: we could consider batching this.
-    const store: Bucket["store"] = Object.create(null);
+    const store: Bucket["store"] = new Map();
     const newBucketIndex = 0;
 
     for (const depId of layerPlan.copyPlanIds) {
-      store[depId] = [];
+      store.set(depId, []);
     }
 
-    store[layerPlan.rootStepId!] = [payload];
+    store.set(layerPlan.rootStepId!, [payload]);
     for (const depId of layerPlan.copyPlanIds) {
-      store[depId][newBucketIndex] = rootBucket.store[depId][bucketIndex];
+      store.get(depId)![newBucketIndex] =
+        rootBucket.store.get(depId)![bucketIndex];
     }
 
     const subscriptionBucket = newBucket({
@@ -263,7 +266,7 @@ export function executePreemptive(
         newBucketIndex,
         requestContext,
         [],
-        rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+        rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
       );
       return finalize(
         result,
@@ -283,7 +286,7 @@ export function executePreemptive(
 
     // If it's a subscription we need to use the stream
     const rootValueList = rootBucket.layerPlan.rootStepId
-      ? rootBucket.store[rootBucket.layerPlan.rootStepId]
+      ? rootBucket.store.get(rootBucket.layerPlan.rootStepId)
       : null;
     const bucketRootValue = rootValueList?.[0];
     if (isCrystalError(bucketRootValue)) {
@@ -371,7 +374,7 @@ export function executePreemptive(
       bucketIndex,
       requestContext,
       [],
-      rootBucket.store[operationPlan.variableValuesStep.id][bucketIndex],
+      rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
     );
     return finalize(result, ctx, rootValue[$$extensions] ?? undefined);
   };
@@ -565,24 +568,24 @@ async function processStream(
 
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
-    const store = Object.create(null);
+    const store: Bucket["store"] = new Map();
     const polymorphicPathList: string[] = [];
-    store[spec.listItemStepId] = [];
+    store.set(spec.listItemStepId, []);
 
     for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
-      store[copyPlanId] = [];
+      store.set(copyPlanId, []);
     }
 
     let bucketIndex = 0;
     for (const entry of entries) {
       const [result] = entry;
-      store[spec.listItemStepId][bucketIndex] = result;
+      store.get(spec.listItemStepId)![bucketIndex] = result;
 
       polymorphicPathList[bucketIndex] =
         spec.bucket.polymorphicPathList[spec.bucketIndex];
       for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
-        store[copyPlanId][bucketIndex] =
-          spec.bucket.store[copyPlanId][spec.bucketIndex];
+        store.get(copyPlanId)![bucketIndex] =
+          spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
       }
       // TODO: we should be able to optimize this
       bucketIndex++;
@@ -712,11 +715,11 @@ function processSingleDeferred(
   specs: Array<[ResultIterator, SubsequentPayloadSpec]>,
 ) {
   const size = specs.length;
-  const store = Object.create(null);
+  const store: Bucket["store"] = new Map();
   const polymorphicPathList: string[] = [];
 
   for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
-    store[copyPlanId] = [];
+    store.set(copyPlanId, []);
   }
 
   let bucketIndex = 0;
@@ -724,8 +727,8 @@ function processSingleDeferred(
     polymorphicPathList[bucketIndex] =
       spec.bucket.polymorphicPathList[spec.bucketIndex];
     for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
-      store[copyPlanId][bucketIndex] =
-        spec.bucket.store[copyPlanId][spec.bucketIndex];
+      store.get(copyPlanId)![bucketIndex] =
+        spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
     }
     // TODO: we should be able to optimize this
     bucketIndex++;
