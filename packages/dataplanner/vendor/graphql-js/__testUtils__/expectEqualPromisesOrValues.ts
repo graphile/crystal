@@ -2,7 +2,6 @@ import { assert } from 'chai';
 
 import { isPromise } from '../jsutils/isPromise.js';
 import type { PromiseOrValue } from '../jsutils/PromiseOrValue.js';
-
 import { expectMatchingValues } from './expectMatchingValues.js';
 
 export function expectEqualPromisesOrValues<T>(
