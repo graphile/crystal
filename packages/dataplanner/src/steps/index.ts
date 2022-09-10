@@ -66,4 +66,9 @@ export { __InputStaticLeafStep } from "./__inputStaticLeaf.js";
 export { __ItemStep } from "./__item.js";
 export { __TrackedObjectStep } from "./__trackedObject.js";
 export { __ValueStep } from "./__value.js";
-export { graphqlResolver } from "./graphqlResolver.js";
+export {
+  GraphQLItemHandler,
+  GraphQLPolymorphicUnwrap,
+  graphqlResolver,
+  GraphQLResolverStep,
+} from "./graphqlResolver.js";

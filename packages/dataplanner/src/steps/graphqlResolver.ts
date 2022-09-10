@@ -1,28 +1,29 @@
+import type {
+  GraphQLAbstractType,
+  GraphQLFieldResolver,
+  GraphQLNullableType,
+  GraphQLOutputType,
+  GraphQLResolveInfo,
+} from "graphql";
 import {
   defaultTypeResolver,
   getNamedType,
   getNullableType,
-  GraphQLAbstractType,
-  GraphQLFieldResolver,
-  GraphQLNamedType,
-  GraphQLNullableType,
-  GraphQLObjectType,
-  GraphQLOutputType,
-  GraphQLResolveInfo,
   isAbstractType,
   isListType,
 } from "graphql";
 
-import type { ObjectStep, __ItemStep } from "../index.js";
+import type { __ItemStep, ObjectStep } from "../index.js";
 import { context } from "../index.js";
-import {
-  $$data,
+import type {
   CrystalResultsList,
   CrystalValuesList,
   PolymorphicData,
 } from "../interfaces.js";
-import { ExecutableStep, PolymorphicStep } from "../step.js";
+import { $$data } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
+import type { PolymorphicStep } from "../step.js";
+import { ExecutableStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
 function dcr(
@@ -42,7 +43,7 @@ function dcr(
  *
  * @internal
  */
-class GraphQLResolverStep extends ExecutableStep {
+export class GraphQLResolverStep extends ExecutableStep {
   static $$export = {
     moduleName: "dataplanner",
     exportName: "GraphQLResolverStep",
@@ -109,7 +110,12 @@ function makeResolveInfo(): GraphQLResolveInfo {
   });
 }
 
-class PolymorphicUnwrap extends ExecutableStep {
+/** @internal */
+export class GraphQLPolymorphicUnwrap extends ExecutableStep {
+  static $$export = {
+    moduleName: "dataplanner",
+    exportName: "GraphQLPolymorphicUnwrap",
+  };
   public isSyncAndSafe = true;
   constructor($parent: ExecutableStep) {
     super();
@@ -120,11 +126,19 @@ class PolymorphicUnwrap extends ExecutableStep {
   }
 }
 
-function polymorphicUnwrap($parent: ExecutableStep) {
-  return new PolymorphicUnwrap($parent);
+function graphqlPolymorphicUnwrap($parent: ExecutableStep) {
+  return new GraphQLPolymorphicUnwrap($parent);
 }
 
-class GraphQLItemHandler extends ExecutableStep implements PolymorphicStep {
+/** @internal */
+export class GraphQLItemHandler
+  extends ExecutableStep
+  implements PolymorphicStep
+{
+  static $$export = {
+    moduleName: "dataplanner",
+    exportName: "GraphQLItemHandler",
+  };
   private abstractType?: GraphQLAbstractType;
   private abstractDepth = 0;
   private nullableInnerType: (GraphQLNullableType & GraphQLOutputType) | null =
@@ -148,8 +162,8 @@ class GraphQLItemHandler extends ExecutableStep implements PolymorphicStep {
     }
   }
 
-  planForType(objectType: GraphQLObjectType) {
-    return polymorphicUnwrap(this);
+  planForType() {
+    return graphqlPolymorphicUnwrap(this);
   }
 
   listItem($item: __ItemStep<any>) {
