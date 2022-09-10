@@ -97,7 +97,7 @@ export class GraphQLResolverStep extends ExecutableStep {
   }
 }
 
-function makeResolveInfo(): GraphQLResolveInfo {
+export function makeResolveInfo(): GraphQLResolveInfo {
   // TODO: at least fake _some_ of ResolveInfo!
   return new Proxy(Object.create(null), {
     get(target, p) {
@@ -126,7 +126,7 @@ export class GraphQLPolymorphicUnwrap extends ExecutableStep {
   }
 }
 
-function graphqlPolymorphicUnwrap($parent: ExecutableStep) {
+export function graphqlPolymorphicUnwrap($parent: ExecutableStep) {
   return new GraphQLPolymorphicUnwrap($parent);
 }
 
@@ -280,7 +280,7 @@ export class GraphQLItemHandler
   }
 }
 
-function graphqlItemHandler(
+export function graphqlItemHandler(
   $item: ExecutableStep,
   nullableType: GraphQLNullableType & GraphQLOutputType,
 ) {

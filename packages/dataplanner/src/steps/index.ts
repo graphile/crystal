@@ -71,4 +71,7 @@ export {
   GraphQLPolymorphicUnwrap,
   graphqlResolver,
   GraphQLResolverStep,
+  graphqlItemHandler,
+  graphqlPolymorphicUnwrap,
+  makeResolveInfo,
 } from "./graphqlResolver.js";
