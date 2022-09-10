@@ -942,18 +942,23 @@ ${Object.entries(fieldTypes)
       mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
       const spec = keys.${fieldName};
 
-      const directChild = children[spec.layerPlanId];
       let childBucket, childBucketIndex;
-      if (directChild) {
-        childBucket = directChild.bucket;
-        childBucketIndex = directChild.map.get(bucketIndex);
+      if (spec.layerPlanId === this.layerPlan.id) {
+        childBucket = bucket;
+        childBucketIndex = bucketIndex;
       } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
-          spec.outputPlan,
-          this,
-          bucket,
-          bucketIndex,
-        ));
+        const directChild = children[spec.layerPlanId];
+        if (directChild) {
+          childBucket = directChild.bucket;
+          childBucketIndex = directChild.map.get(bucketIndex);
+        } else {
+          ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+            spec.outputPlan,
+            this,
+            bucket,
+            bucketIndex,
+          ));
+        }
       }
 ${makeExecuteChildPlanCode(
   `obj.${fieldName} =`,
