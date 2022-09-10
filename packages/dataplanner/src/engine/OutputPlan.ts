@@ -755,10 +755,12 @@ const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
   const childOutputPlan = this.child;
 
   const mutablePathIndex = mutablePath.push(-1) - 1;
+  const childLayerPlanId = childOutputPlan.layerPlan.id;
+  const { children } = bucket;
 
   // Now to populate the children...
   for (let i = 0; i < l; i++) {
-    const directChild = bucket.children[childOutputPlan.layerPlan.id];
+    const directChild = children[childOutputPlanId];
     let childBucket, childBucketIndex;
     if (directChild) {
       childBucket = directChild.bucket;
@@ -925,8 +927,8 @@ function makeObjectExecutor(
   const obj = Object.create(null);
   const { keys } = this;
   const { children } = bucket;
-  try {
-    const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+  const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+
 ${Object.entries(fieldTypes)
   .map(([fieldName, fieldType]) => {
     switch (fieldType) {
@@ -970,9 +972,8 @@ ${makeExecuteChildPlanCode(
     }
   })
   .join("\n")}
-  } finally {
-    mutablePath.pop();
-  }
+
+  mutablePath.pop();
 ${
   hasDeferredOutputPlans
     ? `
