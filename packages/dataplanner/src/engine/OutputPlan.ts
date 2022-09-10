@@ -687,6 +687,9 @@ const leafExecutor = makeExecutor(
 
 const polymorphicExecutor = makeExecutor(
   `\
+${
+  isDev
+    ? `\
   if (!isPolymorphicData(bucketRootValue)) {
     throw coerceError(
       new Error(
@@ -696,6 +699,9 @@ const polymorphicExecutor = makeExecutor(
       mutablePath.slice(1),
     );
   }
+`
+    : ``
+}\
   const typeName = bucketRootValue[$$concreteType];
   const childOutputPlan = this.childByTypeName[typeName];
   ${
