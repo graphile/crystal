@@ -458,7 +458,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       default: {
         const never: never = this.type;
         throw new Error(
-          `GraphileInternalError<>: Could not build executor for OutputPlan with type ${inspect(
+          `GraphileInternalError<e88531b2-d9af-4d3a-8cd5-e9f034324341>: Could not build executor for OutputPlan with type ${inspect(
             never,
           )}}`,
         );
@@ -638,20 +638,23 @@ function makeExecuteChildPlanCode(
   isNonNull: boolean,
 ) {
   // This is the code that changes based on if the field is nullable or not
-
-  // Shared code
-  const resultHandling = isNonNull
-    ? // We cannot be null
-      `
-      if (error) {
-        throw error;
-      } else if (fieldResult == null) {
+  if (isNonNull) {
+    // No need to catch error
+    return `
+      const fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+      if (fieldResult == null) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
-      } else {
-        ${setTargetOrReturn} fieldResult;
-      }`
-    : // Were the null handler; we should catch errors from children
-      `
+      }
+      ${setTargetOrReturn} fieldResult;`;
+  } else {
+    // Need to catch error and set null
+    return `
+      let fieldResult, error;
+      try {
+        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+      } catch (e) {
+        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
+      }
       if (error) {
         root.errors.push(error);
         ${setTargetOrReturn} null;
@@ -660,13 +663,7 @@ function makeExecuteChildPlanCode(
       } else {
         ${setTargetOrReturn} fieldResult;
       }`;
-  return `\
-      let fieldResult, error;
-      try {
-        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
-      } catch (e) {
-        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
-      }${resultHandling}`;
+  }
 }
 
 /*
@@ -822,7 +819,9 @@ const arrayExecutor_nonNullable_streaming = makeArrayExecutor(true, true);
 const introspect = (
   root: PayloadRoot,
   outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
+  mutablePath: ReadonlyArray<string | number>,
 ) => {
+  const { locationDetails } = outputPlan;
   const {
     field: rawField,
     introspectionCacheByVariableValues,
@@ -863,9 +862,19 @@ const introspect = (
     variableValues,
   });
   if (graphqlResult.errors) {
+    // TODO: we should map the introspection path
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
-    throw new GraphQLError("INTROSPECTION FAILED!");
+    const { node } = locationDetails;
+    throw new GraphQLError(
+      "INTROSPECTION FAILED!",
+      node,
+      null,
+      null,
+      mutablePath.slice(1),
+      null,
+      null,
+    );
   }
   const result = graphqlResult.data!.a as JSONValue;
   introspectionCacheByVariableValues.set(canonical, result);
@@ -873,7 +882,7 @@ const introspect = (
 };
 
 const introspectionExecutor = makeExecutor(
-  `  return introspect(root, this)`,
+  `  return introspect(root, this, mutablePath)`,
   "introspection",
   { introspect },
   true,
