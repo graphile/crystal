@@ -650,10 +650,15 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return `
       let fieldResult, error;
+      let pathLength = mutablePath.length;
       try {
         fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
       } catch (e) {
         error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
+        const overSize = mutablePath.length - pathLength;
+        if (overSize > 0) {
+          mutablePath.splice(pathLength, overSize);
+        }
       }
       if (error) {
         root.errors.push(error);
@@ -750,35 +755,34 @@ const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
   const childOutputPlan = this.child;
 
   const mutablePathIndex = mutablePath.push(-1) - 1;
-  try {
-    // Now to populate the children...
-    for (let i = 0; i < l; i++) {
-      const directChild = bucket.children[childOutputPlan.layerPlan.id];
-      let childBucket, childBucketIndex;
-      if (directChild) {
-        childBucket = directChild.bucket;
-        childBucketIndex = directChild.map.get(bucketIndex)[i];
-      } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
-          childOutputPlan,
-          this,
-          bucket,
-          bucketIndex,
-          i,
-        ));
-      }
 
-      mutablePath[mutablePathIndex] = i;
+  // Now to populate the children...
+  for (let i = 0; i < l; i++) {
+    const directChild = bucket.children[childOutputPlan.layerPlan.id];
+    let childBucket, childBucketIndex;
+    if (directChild) {
+      childBucket = directChild.bucket;
+      childBucketIndex = directChild.map.get(bucketIndex)[i];
+    } else {
+      ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+        childOutputPlan,
+        this,
+        bucket,
+        bucketIndex,
+        i,
+      ));
+    }
+
+    mutablePath[mutablePathIndex] = i;
 ${makeExecuteChildPlanCode(
   "data[i] =",
   "this.locationDetails",
   "childOutputPlan",
   childIsNonNull,
 )}
-    }
-  } finally {
-    mutablePath.pop();
   }
+
+  mutablePath.pop();
 
 ${
   canStream
@@ -947,7 +951,6 @@ ${Object.entries(fieldTypes)
           bucketIndex,
         ));
       }
-
 ${makeExecuteChildPlanCode(
   `obj.${fieldName} =`,
   "spec.locationDetails",
