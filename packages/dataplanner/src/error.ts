@@ -9,6 +9,8 @@ export interface CrystalError extends Error {
   originalError: Error;
 }
 
+export const $$error = Symbol("isCrystalError");
+
 // IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
 // native class support.
 /**
@@ -21,6 +23,7 @@ export interface CrystalError extends Error {
 export class _CrystalError extends Error implements CrystalError {
   public readonly originalError: Error;
   extensions: Record<string, any>;
+  [$$error] = true;
   constructor(originalError: Error, planId: number | null) {
     if (originalError instanceof _CrystalError) {
       throw new Error(
@@ -49,7 +52,7 @@ export function newCrystalError(error: Error, planId: number | null) {
  * should use for looking at CrystalErrors.
  */
 export function isCrystalError(value: any): value is CrystalError {
-  return value != null && value.constructor === _CrystalError;
+  return typeof value === "object" && value !== null && $$error in value;
 }
 
 class FieldError {

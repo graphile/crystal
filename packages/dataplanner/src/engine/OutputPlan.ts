@@ -17,7 +17,7 @@ import { inspect } from "util";
 
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { _CrystalError } from "../error.js";
+import { $$error } from "../error.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
 import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
@@ -437,15 +437,23 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       case "object": {
         const type = this.type as OutputPlanTypeRoot | OutputPlanTypeObject;
         const digestFieldTypes: {
-          [responseKey: string]: "__typename" | "outputPlan!" | "outputPlan?";
+          [responseKey: string]: {
+            fieldType: "__typename" | "outputPlan!" | "outputPlan?";
+            sameBucket: boolean;
+          };
         } = Object.create(null);
         for (const [responseKey, spec] of Object.entries(this.keys)) {
-          digestFieldTypes[responseKey] =
-            spec.type === "__typename"
-              ? "__typename"
-              : spec.isNonNull
-              ? "outputPlan!"
-              : "outputPlan?";
+          digestFieldTypes[responseKey] = {
+            fieldType:
+              spec.type === "__typename"
+                ? "__typename"
+                : spec.isNonNull
+                ? "outputPlan!"
+                : "outputPlan?",
+            sameBucket:
+              spec.type === "__typename" ||
+              spec.layerPlanId === this.layerPlan.id,
+          };
         }
         this.execute = makeObjectExecutor(
           type.typeName,
@@ -458,7 +466,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       default: {
         const never: never = this.type;
         throw new Error(
-          `GraphileInternalError<>: Could not build executor for OutputPlan with type ${inspect(
+          `GraphileInternalError<e88531b2-d9af-4d3a-8cd5-e9f034324341>: Could not build executor for OutputPlan with type ${inspect(
             never,
           )}}`,
         );
@@ -608,21 +616,15 @@ function makeExecutor(
     ...args,
     coerceError,
     nonNullError,
-    _CrystalError,
+    $$error,
   };
   const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
-  const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
+  const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
   if (bucketRootValue == null) {
     ${skipNullHandling ? `// root/introspection, null is fine` : `return null;`}
-  } else if (bucketRootValue.constructor === _CrystalError) {
-    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
-  }${
-    skipNullHandling
-      ? `` // No null-handling for root/introspection!
-      : ` else if (bucketRootValue == null) {
-    return null;
   }
-`
+  if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
+    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
 }`;
@@ -636,37 +638,35 @@ function makeExecuteChildPlanCode(
   locationDetails: string,
   childOutputPlan: string,
   isNonNull: boolean,
+  childBucket = "childBucket",
+  childBucketIndex = "childBucketIndex",
 ) {
   // This is the code that changes based on if the field is nullable or not
-
-  // Shared code
-  const resultHandling = isNonNull
-    ? // We cannot be null
-      `
-      if (error) {
-        throw error;
-      } else if (fieldResult == null) {
+  if (isNonNull) {
+    // No need to catch error
+    return `
+      const fieldResult = ${childOutputPlan}.execute(root, mutablePath, ${childBucket}, ${childBucketIndex});
+      if (fieldResult == null) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
-      } else {
-        ${setTargetOrReturn} fieldResult;
-      }`
-    : // Were the null handler; we should catch errors from children
-      `
-      if (error) {
+      }
+      ${setTargetOrReturn} fieldResult;`;
+  } else {
+    // Need to catch error and set null
+    return `
+      try {
+        const fieldResult = ${childOutputPlan}.execute(root, mutablePath, ${childBucket}, ${childBucketIndex});
+        ${setTargetOrReturn} fieldResult === undefined ? null : fieldResult;
+      } catch (e) {
+        const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
+        const pathLengthTarget = mutablePathIndex + 1;
+        const overSize = mutablePath.length - pathLengthTarget;
+        if (overSize > 0) {
+          mutablePath.splice(pathLengthTarget, overSize);
+        }
         root.errors.push(error);
         ${setTargetOrReturn} null;
-      } else if (fieldResult == null) {
-        ${setTargetOrReturn} null;
-      } else {
-        ${setTargetOrReturn} fieldResult;
       }`;
-  return `\
-      let fieldResult, error;
-      try {
-        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
-      } catch (e) {
-        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
-      }${resultHandling}`;
+  }
 }
 
 /*
@@ -677,20 +677,28 @@ function makeExecuteChildPlanCode(
 
 const nullExecutor = makeExecutor("  return null;", "null");
 
+const canBeInsideGraphQL = false;
 const leafExecutor = makeExecutor(
-  `\
+  canBeInsideGraphQL
+    ? `\
   if (root.insideGraphQL) {
     // Don't serialize to avoid the double serialization problem
     return bucketRootValue;
   } else {
     return this.type.serialize(bucketRootValue);
   }
+`
+    : `\
+  return this.type.serialize(bucketRootValue);
 `,
   "leaf",
 );
 
 const polymorphicExecutor = makeExecutor(
   `\
+${
+  isDev
+    ? `\
   if (!isPolymorphicData(bucketRootValue)) {
     throw coerceError(
       new Error(
@@ -700,6 +708,9 @@ const polymorphicExecutor = makeExecutor(
       mutablePath.slice(1),
     );
   }
+`
+    : ``
+}\
   const typeName = bucketRootValue[$$concreteType];
   const childOutputPlan = this.childByTypeName[typeName];
   ${
@@ -753,35 +764,36 @@ const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
   const childOutputPlan = this.child;
 
   const mutablePathIndex = mutablePath.push(-1) - 1;
-  try {
-    // Now to populate the children...
-    for (let i = 0; i < l; i++) {
-      const directChild = bucket.children[childOutputPlan.layerPlan.id];
-      let childBucket, childBucketIndex;
-      if (directChild) {
-        childBucket = directChild.bucket;
-        childBucketIndex = directChild.map.get(bucketIndex)[i];
-      } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
-          childOutputPlan,
-          this,
-          bucket,
-          bucketIndex,
-          i,
-        ));
-      }
+  const childLayerPlanId = childOutputPlan.layerPlan.id;
+  const { children } = bucket;
 
-      mutablePath[mutablePathIndex] = i;
+  // Now to populate the children...
+  for (let i = 0; i < l; i++) {
+    const directChild = children[childLayerPlanId];
+    let childBucket, childBucketIndex;
+    if (directChild) {
+      childBucket = directChild.bucket;
+      childBucketIndex = directChild.map.get(bucketIndex)[i];
+    } else {
+      ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+        childOutputPlan,
+        this,
+        bucket,
+        bucketIndex,
+        i,
+      ));
+    }
+
+    mutablePath[mutablePathIndex] = i;
 ${makeExecuteChildPlanCode(
   "data[i] =",
   "this.locationDetails",
   "childOutputPlan",
   childIsNonNull,
 )}
-    }
-  } finally {
-    mutablePath.pop();
   }
+
+  mutablePath.pop();
 
 ${
   canStream
@@ -822,7 +834,9 @@ const arrayExecutor_nonNullable_streaming = makeArrayExecutor(true, true);
 const introspect = (
   root: PayloadRoot,
   outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
+  mutablePath: ReadonlyArray<string | number>,
 ) => {
+  const { locationDetails } = outputPlan;
   const {
     field: rawField,
     introspectionCacheByVariableValues,
@@ -863,9 +877,19 @@ const introspect = (
     variableValues,
   });
   if (graphqlResult.errors) {
+    // TODO: we should map the introspection path
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
-    throw new GraphQLError("INTROSPECTION FAILED!");
+    const { node } = locationDetails;
+    throw new GraphQLError(
+      "INTROSPECTION FAILED!",
+      node,
+      null,
+      null,
+      mutablePath.slice(1),
+      null,
+      null,
+    );
   }
   const result = graphqlResult.data!.a as JSONValue;
   introspectionCacheByVariableValues.set(canonical, result);
@@ -873,7 +897,7 @@ const introspect = (
 };
 
 const introspectionExecutor = makeExecutor(
-  `  return introspect(root, this)`,
+  `  return introspect(root, this, mutablePath)`,
   "introspection",
   { introspect },
   true,
@@ -882,7 +906,10 @@ const introspectionExecutor = makeExecutor(
 function makeObjectExecutor(
   typeName: string,
   fieldTypes: {
-    [key: string]: "__typename" | "outputPlan!" | "outputPlan?";
+    [key: string]: {
+      fieldType: "__typename" | "outputPlan!" | "outputPlan?";
+      sameBucket: boolean;
+    };
   },
   hasDeferredOutputPlans: boolean,
   // this.type.mode === "root",
@@ -910,10 +937,12 @@ function makeObjectExecutor(
 
   const inner = `\
   const obj = Object.create(null);
-  try {
-    const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+  const { keys } = this;
+  const { children } = bucket;
+  const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+
 ${Object.entries(fieldTypes)
-  .map(([fieldName, fieldType]) => {
+  .map(([fieldName, { fieldType, sameBucket }]) => {
     switch (fieldType) {
       case "__typename": {
         return `    obj.${fieldName} = typeName;`;
@@ -923,10 +952,21 @@ ${Object.entries(fieldTypes)
         return `\
     {
       mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
-      const spec = this.keys.${fieldName};
-
-      const directChild = bucket.children[spec.layerPlanId];
+      const spec = keys.${fieldName};
+${
+  sameBucket
+    ? `\
+${makeExecuteChildPlanCode(
+  `obj.${fieldName} =`,
+  "spec.locationDetails",
+  "spec.outputPlan",
+  fieldType === "outputPlan!",
+  "bucket",
+  "bucketIndex",
+)}`
+    : `\
       let childBucket, childBucketIndex;
+      const directChild = children[spec.layerPlanId];
       if (directChild) {
         childBucket = directChild.bucket;
         childBucketIndex = directChild.map.get(bucketIndex);
@@ -938,13 +978,13 @@ ${Object.entries(fieldTypes)
           bucketIndex,
         ));
       }
-
 ${makeExecuteChildPlanCode(
   `obj.${fieldName} =`,
   "spec.locationDetails",
   "spec.outputPlan",
   fieldType === "outputPlan!",
-)}
+)}`
+}
     }`;
       }
       default: {
@@ -956,9 +996,8 @@ ${makeExecuteChildPlanCode(
     }
   })
   .join("\n")}
-  } finally {
-    mutablePath.pop();
-  }
+
+  mutablePath.pop();
 ${
   hasDeferredOutputPlans
     ? `

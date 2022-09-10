@@ -68,15 +68,11 @@ export interface Bucket {
   /**
    * Every entry in the store is a list with the same length as the bucket has
    * `size`.
+   *
+   * The entry for '-1' is the request indexes, so we can associate the results
+   * back to the request that triggered them.
    */
-  store: {
-    /**
-     * -1 is the request indexes, so we can associate the results back to the
-     * request that triggered them.
-     */
-    "-1": number[];
-    [planId: number]: any[];
-  };
+  store: Map<number, any[]>;
 
   /**
    * If true, we can trigger the next layer of steps when a step completes, if

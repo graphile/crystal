@@ -67,7 +67,8 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
               }
             : null),
         });
-        res.end(JSON.stringify(payload));
+        const payloadString = JSON.stringify(payload);
+        res.end(payloadString);
         break;
       }
       case "graphqlIncremental": {

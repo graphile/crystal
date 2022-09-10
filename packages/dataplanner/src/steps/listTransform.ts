@@ -190,7 +190,7 @@ export class __ListTransformStep<
     const childLayerPlan = this.subroutineLayer;
     const copyStepIds = childLayerPlan.copyPlanIds;
 
-    const store: Bucket["store"] = Object.create(null);
+    const store: Bucket["store"] = new Map();
     const polymorphicPathList: string[] = [];
     const map: Map<number, number[]> = new Map();
     let size = 0;
@@ -201,12 +201,12 @@ export class __ListTransformStep<
       itemStepId != null,
       "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
     );
-    store[itemStepId] = [];
+    store.set(itemStepId, []);
 
     // Prepare store with an empty list for each copyPlanId
     for (const planId of copyStepIds) {
-      store[planId] = [];
-      if (!bucket.store[planId]) {
+      store.set(planId, []);
+      if (!bucket.store.has(planId)) {
         throw new Error(
           `GraphileInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
             planId,
@@ -233,9 +233,10 @@ export class __ListTransformStep<
           newIndexes.push(newIndex);
           polymorphicPathList[newIndex] =
             bucket.polymorphicPathList[originalIndex];
-          store[itemStepId][newIndex] = list[j];
+          store.get(itemStepId)![newIndex] = list[j];
           for (const planId of copyStepIds) {
-            store[planId][newIndex] = bucket.store[planId][originalIndex];
+            store.get(planId)![newIndex] =
+              bucket.store.get(planId)![originalIndex];
           }
         }
       }
@@ -252,7 +253,7 @@ export class __ListTransformStep<
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const depResults = store[childLayerPlan.rootStepId!];
+    const depResults = store.get(childLayerPlan.rootStepId!)!;
 
     return listValues.map((list: any, originalIndex: number) => {
       if (list == null) {
