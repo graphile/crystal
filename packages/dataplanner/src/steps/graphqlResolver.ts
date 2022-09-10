@@ -42,7 +42,7 @@ function dcr(
  *
  * @internal
  */
-export class GraphQLResolverStep extends ExecutableStep {
+class GraphQLResolverStep extends ExecutableStep {
   static $$export = {
     moduleName: "dataplanner",
     exportName: "GraphQLResolverStep",
