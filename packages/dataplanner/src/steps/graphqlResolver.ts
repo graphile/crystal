@@ -1,15 +1,17 @@
 import {
   defaultTypeResolver,
   getNamedType,
+  getNullableType,
   GraphQLAbstractType,
   GraphQLFieldResolver,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLResolveInfo,
   isAbstractType,
+  isListType,
 } from "graphql";
 
-import type { ObjectStep } from "../index.js";
+import type { ObjectStep, __ItemStep } from "../index.js";
 import { context } from "../index.js";
 import {
   $$data,
@@ -20,6 +22,23 @@ import {
 import { ExecutableStep, PolymorphicStep } from "../step.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import { isPromiseLike } from "../utils.js";
+
+export class Poly extends ExecutableStep implements PolymorphicStep {
+  isSyncAndSafe = false;
+  constructor(
+    $parent: ExecutableStep,
+    private abstractType: GraphQLAbstractType,
+  ) {
+    super();
+    this.addDependency($parent);
+  }
+  planForType(objectType: GraphQLObjectType) {
+    return polymorphicUnwrap(this);
+  }
+  execute(values: CrystalValuesList<any>) {
+    return values[0];
+  }
+}
 
 /**
  * Calls the given GraphQL resolver for each input - emulates GraphQL
@@ -42,6 +61,7 @@ export class GraphQLResolverStep
   private argsDep: number;
   private contextDep: number;
   private abstractType?: GraphQLAbstractType;
+  private abstractDepth = 0;
   constructor(
     private resolver: GraphQLFieldResolver<any, any> & { displayName?: string },
     $plan: ExecutableStep,
@@ -55,6 +75,16 @@ export class GraphQLResolverStep
     const namedType = getNamedType(fieldType);
     if (isAbstractType(namedType)) {
       this.abstractType = namedType;
+      let t: GraphQLOutputType = fieldType;
+      while ((t = getNullableType(t)) && isListType(t)) {
+        this.abstractDepth++;
+        t = t.ofType;
+      }
+      if (this.abstractDepth > 1) {
+        throw new Error(
+          "We don't support lists of lists of abstract types (or deeper)",
+        );
+      }
     }
   }
 
@@ -67,7 +97,15 @@ export class GraphQLResolverStep
   }
 
   planForType(objectType: GraphQLObjectType) {
-    return polymorphicUnwrap(this, objectType.name);
+    return polymorphicUnwrap(this);
+  }
+
+  listItem($item: __ItemStep<any>) {
+    if (this.abstractType) {
+      return new Poly($item, this.abstractType);
+    } else {
+      return $item;
+    }
   }
 
   /**
@@ -105,11 +143,29 @@ export class GraphQLResolverStep
     context: unknown,
     resolveInfo: GraphQLResolveInfo,
   ) {
+    if (data == null) {
+      return null;
+    }
     const typeName = this.figureOutTheTypeOf(data, context, resolveInfo);
     if (isPromiseLike(typeName)) {
       return typeName.then((name) => this.actuallyWrapData(name, data));
     } else {
       return this.actuallyWrapData(typeName, data);
+    }
+  }
+
+  private foo(
+    data: unknown, // but not a promise
+    context: unknown,
+    resolveInfo: GraphQLResolveInfo,
+  ) {
+    // Need to polymorphicWrap the data
+    if (isPromiseLike(data)) {
+      return data.then((data) =>
+        this.polymorphicWrapData(data, context, resolveInfo),
+      );
+    } else {
+      return this.polymorphicWrapData(data, context, resolveInfo);
     }
   }
 
@@ -121,13 +177,20 @@ export class GraphQLResolverStep
         const resolveInfo = makeResolveInfo();
         const data = this.resolver(source, args, context, resolveInfo);
         if (this.abstractType) {
-          // Need to polymorphicWrap the data
-          if (isPromiseLike(data)) {
-            return data.then((data) =>
-              this.polymorphicWrapData(data, context, resolveInfo),
-            );
+          if (this.abstractDepth > 0) {
+            if (isPromiseLike(data)) {
+              return data.then((list) =>
+                Array.isArray(list)
+                  ? list.map((data) => this.foo(data, context, resolveInfo))
+                  : null,
+              );
+            } else {
+              return Array.isArray(data)
+                ? data.map((data) => this.foo(data, context, resolveInfo))
+                : null;
+            }
           } else {
-            return this.polymorphicWrapData(data, context, resolveInfo);
+            return this.foo(data, context, resolveInfo);
           }
         } else {
           return data;
@@ -168,7 +231,7 @@ export function graphqlResolver(
 
 class PolymorphicUnwrap extends ExecutableStep {
   public isSyncAndSafe = true;
-  constructor($parent: GraphQLResolverStep, private typeName: string) {
+  constructor($parent: ExecutableStep) {
     super();
     this.addDependency($parent);
   }
@@ -177,6 +240,6 @@ class PolymorphicUnwrap extends ExecutableStep {
   }
 }
 
-function polymorphicUnwrap($parent: GraphQLResolverStep, typeName: string) {
-  return new PolymorphicUnwrap($parent, typeName);
+function polymorphicUnwrap($parent: ExecutableStep) {
+  return new PolymorphicUnwrap($parent);
 }
