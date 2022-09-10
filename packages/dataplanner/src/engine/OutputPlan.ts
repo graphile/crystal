@@ -643,24 +643,18 @@ function makeExecuteChildPlanCode(
   } else {
     // Need to catch error and set null
     return `
-      let fieldResult, error;
       try {
-        fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+        const fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+        ${setTargetOrReturn} fieldResult === undefined ? null : fieldResult;
       } catch (e) {
-        error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
+        const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
         const pathLengthTarget = mutablePathIndex + 1;
         const overSize = mutablePath.length - pathLengthTarget;
         if (overSize > 0) {
           mutablePath.splice(pathLengthTarget, overSize);
         }
-      }
-      if (error) {
         root.errors.push(error);
         ${setTargetOrReturn} null;
-      } else if (fieldResult == null) {
-        ${setTargetOrReturn} null;
-      } else {
-        ${setTargetOrReturn} fieldResult;
       }`;
   }
 }
