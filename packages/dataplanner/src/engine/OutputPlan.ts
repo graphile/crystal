@@ -614,15 +614,9 @@ function makeExecutor(
   const bucketRootValue = bucket.store[this.rootStepId][bucketIndex];
   if (bucketRootValue == null) {
     ${skipNullHandling ? `// root/introspection, null is fine` : `return null;`}
-  } else if (bucketRootValue.constructor === _CrystalError) {
-    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
-  }${
-    skipNullHandling
-      ? `` // No null-handling for root/introspection!
-      : ` else if (bucketRootValue == null) {
-    return null;
   }
-`
+  if (bucketRootValue.constructor === _CrystalError) {
+    throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
 }`;
