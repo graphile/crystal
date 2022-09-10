@@ -8,6 +8,7 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import type { DataPlannerExecuteOptions } from "./execute.js";
 import { execute } from "./execute.js";
+import { isPromiseLike } from "./utils.js";
 
 /**
  * A replacement for GraphQL.js' `graphql` method that calls DataPlanner's
@@ -64,4 +65,15 @@ export function dataplannerGraphql(
     },
     options,
   );
+}
+
+export function dataplannerGraphqlSync(
+  args: GraphQLArgs,
+  options: DataPlannerExecuteOptions = {},
+): ExecutionResult {
+  const result = dataplannerGraphql(args, options);
+  if (isPromiseLike(result)) {
+    throw new Error("DataPlanner execution failed to complete synchronously.");
+  }
+  return result as ExecutionResult;
 }

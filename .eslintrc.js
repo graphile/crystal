@@ -173,5 +173,21 @@ module.exports = {
         ],
       },
     },
+
+    {
+      files: [
+        "packages/**/vendor/**/__tests__/**/*.ts",
+        "packages/**/vendor/**/__tests__/**/*.tsx",
+        "packages/**/vendor/**/__testUtils__/**/*.ts",
+        "packages/**/vendor/**/__testUtils__/**/*.tsx",
+      ],
+      rules: {
+        "graphile-export/exhaustive-deps": 0,
+        "graphile-export/export-methods": 0,
+        "graphile-export/export-instances": 0,
+        "graphile-export/export-subclasses": 0,
+        "graphile-export/no-nested": 0,
+      },
+    },
   ],
 };

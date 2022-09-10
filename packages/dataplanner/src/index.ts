@@ -18,7 +18,10 @@ import { PrintPlanGraphOptions } from "./mermaid.js";
 debugFactory.formatters.c = crystalPrint;
 
 import { dataplannerEnforce } from "./dataplannerEnforce.js";
-import { dataplannerGraphql } from "./dataplannerGraphql.js";
+import {
+  dataplannerGraphql,
+  dataplannerGraphqlSync,
+} from "./dataplannerGraphql.js";
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
@@ -234,6 +237,7 @@ export {
   DataPlannerExecuteOptions,
   DataPlannerFieldExtensions,
   dataplannerGraphql,
+  dataplannerGraphqlSync,
   DataPlannerInputFieldExtensions,
   DataPlannerObjectTypeExtensions,
   dataplannerResolver,
@@ -364,6 +368,7 @@ exportAsMany({
   dataplannerEnforce,
   execute,
   dataplannerGraphql,
+  dataplannerGraphqlSync,
   subscribe,
   __InputListStep,
   __InputObjectStep,
