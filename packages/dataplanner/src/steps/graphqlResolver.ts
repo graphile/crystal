@@ -122,7 +122,7 @@ export class GraphQLPolymorphicUnwrap extends ExecutableStep {
     this.addDependency($parent);
   }
   execute(values: [CrystalValuesList<PolymorphicData>]) {
-    return values[0].map((v) => v[$$data]);
+    return values[0].map((v) => (v ? v[$$data] : null));
   }
 }
 
@@ -140,7 +140,6 @@ export class GraphQLItemHandler
     exportName: "GraphQLItemHandler",
   };
   private abstractType?: GraphQLAbstractType;
-  private abstractDepth = 0;
   private nullableInnerType: (GraphQLNullableType & GraphQLOutputType) | null =
     null;
   public isSyncAndSafe = false;
