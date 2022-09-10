@@ -68,10 +68,10 @@ export { __TrackedObjectStep } from "./__trackedObject.js";
 export { __ValueStep } from "./__value.js";
 export {
   GraphQLItemHandler,
+  graphqlItemHandler,
   GraphQLPolymorphicUnwrap,
+  graphqlPolymorphicUnwrap,
   graphqlResolver,
   GraphQLResolverStep,
-  graphqlItemHandler,
-  graphqlPolymorphicUnwrap,
   makeResolveInfo,
 } from "./graphqlResolver.js";
