@@ -1085,6 +1085,7 @@ export class OperationPlan {
     parentOutputPlan: OutputPlan,
     // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
     parentLayerPlan: LayerPlan,
+    // This is the LAYER-RELATIVE path, not the absolute path! It resets!
     path: readonly string[],
     polymorphicPath: string,
     selections: readonly SelectionNode[] | undefined,
@@ -1275,6 +1276,7 @@ export class OperationPlan {
        * Now a polymorphic layer plan for all the plans to live in
        */
       const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
+        parentLayerPlan,
         path,
         $step,
         allPossibleObjectTypes,
@@ -1328,17 +1330,30 @@ export class OperationPlan {
     }
   }
 
-  private polymorphicLayerPlanByPath = new Map<
-    string,
-    { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
+  private polymorphicLayerPlanByPathByLayerPlan = new Map<
+    LayerPlan,
+    Map<
+      string,
+      { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
+    >
   >();
   private getPolymorphicLayerPlan(
+    parentLayerPlan: LayerPlan,
     path: readonly string[],
     $step: ExecutableStep,
     allPossibleObjectTypes: readonly GraphQLObjectType[],
   ): LayerPlan<LayerPlanReasonPolymorphic> {
     const pathString = path.join("|");
-    const prev = this.polymorphicLayerPlanByPath.get(pathString);
+    const polymorphicLayerPlanByPath =
+      this.polymorphicLayerPlanByPathByLayerPlan.get(parentLayerPlan) ??
+      new Map();
+    if (polymorphicLayerPlanByPath.size === 0) {
+      this.polymorphicLayerPlanByPathByLayerPlan.set(
+        parentLayerPlan,
+        polymorphicLayerPlanByPath,
+      );
+    }
+    const prev = polymorphicLayerPlanByPath.get(pathString);
     if (prev) {
       const { stepId, layerPlan } = prev;
       if (this.steps[stepId] !== this.steps[$step.id]) {
@@ -1364,7 +1379,7 @@ export class OperationPlan {
         },
         new Set(),
       );
-      this.polymorphicLayerPlanByPath.set(pathString, {
+      polymorphicLayerPlanByPath.set(pathString, {
         stepId: $step.id,
         layerPlan,
       });

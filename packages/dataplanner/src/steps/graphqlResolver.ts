@@ -25,6 +25,14 @@ import { ExecutableStep, PolymorphicStep } from "../step.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import { isPromiseLike } from "../utils.js";
 
+function dcr(
+  data: unknown, // but not a promise
+  context: unknown,
+  resolveInfo: GraphQLResolveInfo,
+) {
+  return { data, context, resolveInfo };
+}
+
 /**
  * Calls the given GraphQL resolver for each input - emulates GraphQL
  * resolution.
@@ -62,6 +70,17 @@ export class GraphQLResolverStep extends ExecutableStep {
     return peers.filter((peer) => peer.resolver === this.resolver);
   }
 
+  wrap(
+    data: unknown, // but not a promise
+    context: unknown,
+    resolveInfo: GraphQLResolveInfo,
+  ) {
+    if (data == null) {
+      return null;
+    }
+    return dcr(data, context, resolveInfo);
+  }
+
   execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
     return values[this.planDep].map((source, i) => {
       try {
@@ -71,9 +90,9 @@ export class GraphQLResolverStep extends ExecutableStep {
         const data = this.resolver(source, args, context, resolveInfo);
         if (this.returnContextAndResolveInfo) {
           if (isPromiseLike(data)) {
-            return data.then((data) => ({ data, context, resolveInfo }));
+            return data.then((data) => this.wrap(data, context, resolveInfo));
           } else {
-            return { data, context, resolveInfo };
+            return this.wrap(data, context, resolveInfo);
           }
         } else {
           return data;
@@ -105,7 +124,7 @@ class PolymorphicUnwrap extends ExecutableStep {
     this.addDependency($parent);
   }
   execute(values: [CrystalValuesList<PolymorphicData>]) {
-    return values.map(([v]) => v[$$data]);
+    return values[0].map((v) => v[$$data]);
   }
 }
 
@@ -196,20 +215,61 @@ class GraphQLItemHandler extends ExecutableStep implements PolymorphicStep {
     }
   }
 
+  wrapListData(
+    data: unknown,
+    context: unknown,
+    resolveInfo: GraphQLResolveInfo,
+  ) {
+    if (data == null) {
+      return null;
+    }
+    if (!Array.isArray(data)) {
+      console.warn(`${this}: data wasn't an array, so we're returning null`);
+      return null;
+    }
+    return data.map((data) => dcr(data, context, resolveInfo));
+  }
+
   execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
     if (this.abstractType) {
       return values[0].map((data) => {
         if (data == null) {
           return data;
         }
-        return this.polymorphicWrapData(
-          data.data,
-          data.context,
-          data.resolveInfo,
-        );
+        if (isPromiseLike(data.data)) {
+          return data.data.then((resolvedData: unknown) =>
+            this.polymorphicWrapData(
+              resolvedData,
+              data.context,
+              data.resolveInfo,
+            ),
+          );
+        } else {
+          return this.polymorphicWrapData(
+            data.data,
+            data.context,
+            data.resolveInfo,
+          );
+        }
+      });
+    } else if (this.nullableInnerType) {
+      return values[0].map((d) => {
+        if (d == null) {
+          return null;
+        }
+        const { data, context, resolveInfo } = d;
+        if (isPromiseLike(data)) {
+          return data.then((data) =>
+            this.wrapListData(data, context, resolveInfo),
+          );
+        } else {
+          return this.wrapListData(data, context, resolveInfo);
+        }
       });
     } else {
-      return values[0];
+      throw new Error(
+        `GraphileInternalError<6a3ed701-6b53-41e6-9a64-fbea57c76ae7>: has to be abstract or list`,
+      );
     }
   }
 }
@@ -235,6 +295,7 @@ export function graphqlResolver(
 ): ExecutableStep {
   const namedType = getNamedType(fieldType);
   const isAbstract = isAbstractType(namedType);
+  const nullableType = getNullableType(fieldType);
   const $resolverResult = new GraphQLResolverStep(
     resolver,
     $plan,
@@ -242,7 +303,7 @@ export function graphqlResolver(
     isAbstract,
   );
   if (isAbstract) {
-    return graphqlItemHandler($resolverResult, getNullableType(fieldType));
+    return graphqlItemHandler($resolverResult, nullableType);
   } else {
     return $resolverResult;
   }
