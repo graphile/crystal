@@ -923,6 +923,8 @@ function makeObjectExecutor(
 
   const inner = `\
   const obj = Object.create(null);
+  const { keys } = this;
+  const { children } = bucket;
   try {
     const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 ${Object.entries(fieldTypes)
@@ -936,9 +938,9 @@ ${Object.entries(fieldTypes)
         return `\
     {
       mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
-      const spec = this.keys.${fieldName};
+      const spec = keys.${fieldName};
 
-      const directChild = bucket.children[spec.layerPlanId];
+      const directChild = children[spec.layerPlanId];
       let childBucket, childBucketIndex;
       if (directChild) {
         childBucket = directChild.bucket;
