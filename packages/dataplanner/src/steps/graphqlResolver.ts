@@ -30,6 +30,9 @@ function dcr(
   context: unknown,
   resolveInfo: GraphQLResolveInfo,
 ) {
+  if (data == null) {
+    return data;
+  }
   return { data, context, resolveInfo };
 }
 
@@ -70,17 +73,6 @@ export class GraphQLResolverStep extends ExecutableStep {
     return peers.filter((peer) => peer.resolver === this.resolver);
   }
 
-  wrap(
-    data: unknown, // but not a promise
-    context: unknown,
-    resolveInfo: GraphQLResolveInfo,
-  ) {
-    if (data == null) {
-      return null;
-    }
-    return dcr(data, context, resolveInfo);
-  }
-
   execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
     return values[this.planDep].map((source, i) => {
       try {
@@ -90,9 +82,9 @@ export class GraphQLResolverStep extends ExecutableStep {
         const data = this.resolver(source, args, context, resolveInfo);
         if (this.returnContextAndResolveInfo) {
           if (isPromiseLike(data)) {
-            return data.then((data) => this.wrap(data, context, resolveInfo));
+            return data.then((data) => dcr(data, context, resolveInfo));
           } else {
-            return this.wrap(data, context, resolveInfo);
+            return dcr(data, context, resolveInfo);
           }
         } else {
           return data;
