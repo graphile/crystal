@@ -760,7 +760,7 @@ const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
 
   // Now to populate the children...
   for (let i = 0; i < l; i++) {
-    const directChild = children[childOutputPlanId];
+    const directChild = children[childLayerPlanId];
     let childBucket, childBucketIndex;
     if (directChild) {
       childBucket = directChild.bucket;
