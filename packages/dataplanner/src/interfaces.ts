@@ -156,14 +156,13 @@ export const $$eventEmitter = Symbol("executionEventEmitter");
  */
 export const $$streamMore = Symbol("streamMore");
 
-// TODO: remove <TData>
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.
  */
-export interface PolymorphicData<TType extends string = string, _TData = any> {
+export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteType]: TType;
-  [$$data]?: _TData;
+  [$$data]?: TData;
 }
 
 export interface IndexByListItemStepId {

@@ -21,9 +21,9 @@ export function assertPolymorphicData(
   }
 }
 
-// TODO: this doesn't really wrap any more... rename it.
 /**
- * Returns an object with the given concrete type.
+ * Returns an object with the given concrete type (and, optionally, associated
+ * data)
  */
 export function polymorphicWrap<TType extends string>(
   type: TType,
