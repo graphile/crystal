@@ -437,15 +437,23 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       case "object": {
         const type = this.type as OutputPlanTypeRoot | OutputPlanTypeObject;
         const digestFieldTypes: {
-          [responseKey: string]: "__typename" | "outputPlan!" | "outputPlan?";
+          [responseKey: string]: {
+            fieldType: "__typename" | "outputPlan!" | "outputPlan?";
+            sameBucket: boolean;
+          };
         } = Object.create(null);
         for (const [responseKey, spec] of Object.entries(this.keys)) {
-          digestFieldTypes[responseKey] =
-            spec.type === "__typename"
-              ? "__typename"
-              : spec.isNonNull
-              ? "outputPlan!"
-              : "outputPlan?";
+          digestFieldTypes[responseKey] = {
+            fieldType:
+              spec.type === "__typename"
+                ? "__typename"
+                : spec.isNonNull
+                ? "outputPlan!"
+                : "outputPlan?",
+            sameBucket:
+              spec.type === "__typename" ||
+              spec.layerPlanId === this.layerPlan.id,
+          };
         }
         this.execute = makeObjectExecutor(
           type.typeName,
@@ -630,12 +638,14 @@ function makeExecuteChildPlanCode(
   locationDetails: string,
   childOutputPlan: string,
   isNonNull: boolean,
+  childBucket = "childBucket",
+  childBucketIndex = "childBucketIndex",
 ) {
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
     return `
-      const fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+      const fieldResult = ${childOutputPlan}.execute(root, mutablePath, ${childBucket}, ${childBucketIndex});
       if (fieldResult == null) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
@@ -644,7 +654,7 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return `
       try {
-        const fieldResult = ${childOutputPlan}.execute(root, mutablePath, childBucket, childBucketIndex);
+        const fieldResult = ${childOutputPlan}.execute(root, mutablePath, ${childBucket}, ${childBucketIndex});
         ${setTargetOrReturn} fieldResult === undefined ? null : fieldResult;
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
@@ -896,7 +906,10 @@ const introspectionExecutor = makeExecutor(
 function makeObjectExecutor(
   typeName: string,
   fieldTypes: {
-    [key: string]: "__typename" | "outputPlan!" | "outputPlan?";
+    [key: string]: {
+      fieldType: "__typename" | "outputPlan!" | "outputPlan?";
+      sameBucket: boolean;
+    };
   },
   hasDeferredOutputPlans: boolean,
   // this.type.mode === "root",
@@ -929,7 +942,7 @@ function makeObjectExecutor(
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 
 ${Object.entries(fieldTypes)
-  .map(([fieldName, fieldType]) => {
+  .map(([fieldName, { fieldType, sameBucket }]) => {
     switch (fieldType) {
       case "__typename": {
         return `    obj.${fieldName} = typeName;`;
@@ -940,31 +953,38 @@ ${Object.entries(fieldTypes)
     {
       mutablePath[mutablePathIndex] = ${JSON.stringify(fieldName)};
       const spec = keys.${fieldName};
-
+${
+  sameBucket
+    ? `\
+${makeExecuteChildPlanCode(
+  `obj.${fieldName} =`,
+  "spec.locationDetails",
+  "spec.outputPlan",
+  fieldType === "outputPlan!",
+  "bucket",
+  "bucketIndex",
+)}`
+    : `\
       let childBucket, childBucketIndex;
-      if (spec.layerPlanId === this.layerPlan.id) {
-        childBucket = bucket;
-        childBucketIndex = bucketIndex;
+      const directChild = children[spec.layerPlanId];
+      if (directChild) {
+        childBucket = directChild.bucket;
+        childBucketIndex = directChild.map.get(bucketIndex);
       } else {
-        const directChild = children[spec.layerPlanId];
-        if (directChild) {
-          childBucket = directChild.bucket;
-          childBucketIndex = directChild.map.get(bucketIndex);
-        } else {
-          ([childBucket, childBucketIndex] = getChildBucketAndIndex(
-            spec.outputPlan,
-            this,
-            bucket,
-            bucketIndex,
-          ));
-        }
+        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+          spec.outputPlan,
+          this,
+          bucket,
+          bucketIndex,
+        ));
       }
 ${makeExecuteChildPlanCode(
   `obj.${fieldName} =`,
   "spec.locationDetails",
   "spec.outputPlan",
   fieldType === "outputPlan!",
-)}
+)}`
+}
     }`;
       }
       default: {
