@@ -1,10 +1,15 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
-import type {
+import {
   DocumentNode,
   FieldNode,
+  GraphQLBoolean,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
   GraphQLObjectType,
   GraphQLScalarType,
+  GraphQLString,
 } from "graphql";
 import {
   executeSync,
@@ -412,7 +417,24 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       }
       case "leaf": {
         this.execute = leafExecutor;
-        this.executeString = leafExecutorString;
+        if (
+          this.type.serialize === GraphQLID.serialize ||
+          this.type.serialize === GraphQLString.serialize
+        ) {
+          // String types
+          this.executeString = stringLeafExecutorString;
+        } else if (
+          this.type.serialize === GraphQLInt.serialize ||
+          this.type.serialize === GraphQLFloat.serialize
+        ) {
+          // Number types
+          this.executeString = numberLeafExecutorString;
+        } else if (this.type.serialize === GraphQLBoolean.serialize) {
+          // Boolean type
+          this.executeString = booleanLeafExecutorString;
+        } else {
+          this.executeString = leafExecutorString;
+        }
         break;
       }
       case "introspection": {
@@ -642,6 +664,7 @@ function makeExecutor<TAsString extends boolean>(
   args: { [key: string]: any } = EMPTY_OBJECT,
   // this.type.mode === "introspection" || this.type.mode === "root"
   skipNullHandling = false,
+  preamble = "",
 ): TAsString extends true
   ? typeof OutputPlan.prototype.executeString
   : typeof OutputPlan.prototype.execute {
@@ -655,13 +678,15 @@ function makeExecutor<TAsString extends boolean>(
     asString ? "String" : ""
   }_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
   const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
-  if (bucketRootValue == null) {
+${preamble}  if (bucketRootValue == null) {
     ${
       skipNullHandling
         ? `// root/introspection, null is fine`
         : `return ${asString ? '"null"' : "null"};`
     }
-  } else if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
+  }${
+    skipNullHandling ? " else " : "\n  "
+  }if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
     throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
@@ -759,7 +784,18 @@ const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
  * the forbiddenCharacters. To prevent the forbiddenCharacters regexp running
  * for a long time, we cap the length of string we test.
  */
-const MAX_SHORT_STRING_LENGTH = 5000; // TODO: what should this be?
+const MAX_SHORT_STRING_LENGTH = 500; // TODO: what should this be?
+
+function stringifyString(value: string): string {
+  if (
+    value.length > MAX_SHORT_STRING_LENGTH ||
+    forbiddenCharacters.test(value)
+  ) {
+    return JSON.stringify(value);
+  } else {
+    return `"${value}"`;
+  }
+}
 
 // TODO: more optimal stringifier
 const toJSON = (value: unknown): string => {
@@ -769,14 +805,7 @@ const toJSON = (value: unknown): string => {
   const t = typeof value;
   if (t === "number") return String(value);
   if (t === "string") {
-    if (
-      (value as string).length > MAX_SHORT_STRING_LENGTH ||
-      forbiddenCharacters.test(value as string)
-    ) {
-      return JSON.stringify(value);
-    } else {
-      return `"${value}"`;
-    }
+    return stringifyString(value as string);
   }
   return JSON.stringify(value);
 };
@@ -788,6 +817,51 @@ const leafExecutorString = makeExecutor(
   "leaf",
   true,
   { toJSON },
+);
+
+const booleanLeafExecutorString = makeExecutor(
+  `\
+  const val = this.type.serialize(bucketRootValue);
+  return val === true ? 'true' : 'false';
+`,
+  "booleanLeaf",
+  true,
+  EMPTY_OBJECT,
+  false,
+  `\
+  if (bucketRootValue === true) return 'true';
+  if (bucketRootValue === false) return 'false';
+`,
+);
+
+const numberLeafExecutorString = makeExecutor(
+  `\
+  return String(this.type.serialize(bucketRootValue));
+`,
+  "numberLeaf",
+  true,
+  EMPTY_OBJECT,
+  false,
+  `\
+  if (typeof bucketRootValue === 'number') {
+    return String(bucketRootValue);
+  }
+`,
+);
+
+const stringLeafExecutorString = makeExecutor(
+  `\
+  return stringifyString(this.type.serialize(bucketRootValue));
+`,
+  "stringLeaf",
+  true,
+  { stringifyString },
+  false,
+  `\
+  if (typeof bucketRootValue === 'string') {
+    return stringifyString(bucketRootValue);
+  }
+`,
 );
 
 function makePolymorphicExecutor<TAsString extends boolean>(
