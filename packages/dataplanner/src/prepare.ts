@@ -42,6 +42,13 @@ export interface CrystalPrepareOptions {
    * - other values are dependent on the plugins in play
    */
   explain?: string[] | null;
+
+  /**
+   * If true, the result will be returned as a string rather than an object -
+   * this is an optimization for returning the data over a network socket or
+   * similar.
+   */
+  asString?: boolean;
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -53,6 +60,7 @@ function noop() {}
 function processRoot(
   ctx: OutputPlanContext,
   iterator: ResultIterator,
+  asString: boolean,
 ): PromiseOrDirect<void> {
   const { streams, queue } = ctx.root;
 
@@ -65,10 +73,14 @@ function processRoot(
 
   const promises: PromiseLike<void>[] = [];
   for (const stream of streams) {
-    promises.push(processStream(ctx.requestContext, iterator, stream));
+    promises.push(
+      processStream(ctx.requestContext, iterator, stream, asString),
+    );
   }
   for (const deferred of queue) {
-    promises.push(processDeferred(ctx.requestContext, iterator, deferred));
+    promises.push(
+      processDeferred(ctx.requestContext, iterator, deferred, asString),
+    );
   }
 
   // Terminate the iterator when we're done
@@ -81,6 +93,7 @@ const finalize = (
   data: JSONValue | null | undefined | AsyncIterable<any>,
   ctx: OutputPlanContext,
   extensions: any,
+  asString: boolean,
 ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
   if (isAsyncIterable(data)) {
     // It's a subscription! Batch execute the child bucket for
@@ -99,21 +112,47 @@ const finalize = (
         // TODO: ABORT code
         _alive = false;
       });
-      const payload = Object.create(null);
+      let payload = asString ? "{" : Object.create(null);
+      let first = false;
       if (data !== undefined) {
-        payload.data = data;
+        if (asString) {
+          payload += (first ? "" : ",") + '"data":' + data;
+          first = false;
+        } else {
+          payload.data = data;
+        }
       }
-      if (ctx.root.errors.length > 0) {
-        payload.errors = ctx.root.errors;
+      const errors = ctx.root.errors;
+      if (errors.length > 0) {
+        if (asString) {
+          payload += (first ? "" : ",") + '"errors":' + JSON.stringify(errors);
+          first = false;
+        } else {
+          payload.errors = errors;
+        }
       }
       if (extensions) {
-        payload.extensions = extensions;
+        if (asString) {
+          payload +=
+            (first ? "" : ",") + '"extensions":' + JSON.stringify(extensions);
+          first = false;
+        } else {
+          payload.extensions = extensions;
+        }
       }
-      payload.hasNext = true;
+      if (asString) {
+        payload += (first ? "" : ",") + '"hasNext": true';
+        first = false;
+      } else {
+        payload.hasNext = true;
+      }
+      if (asString) {
+        payload += "}";
+      }
       // TODO: payload.label
       iterator.push(payload);
 
-      const promise = processRoot(ctx, iterator);
+      const promise = processRoot(ctx, iterator, asString);
       if (isPromiseLike(promise)) {
         promise.then(
           () => {
@@ -125,21 +164,44 @@ const finalize = (
           },
         );
       } else {
-        iterator.push({ hasNext: false });
+        iterator.push(
+          asString ? ('{"hasNext":false}' as any) : { hasNext: false },
+        );
         iterator.return(undefined);
       }
 
       return iterator;
     } else {
-      const result = Object.create(null);
+      let result = asString ? "{" : Object.create(null);
+      let first = true;
       if (data !== undefined) {
-        result.data = data;
+        if (asString) {
+          result += (first ? "" : ",") + '"data":' + data;
+          first = false;
+        } else {
+          result.data = data;
+        }
       }
-      if (ctx.root.errors.length > 0) {
-        result.errors = ctx.root.errors;
+      const errors = ctx.root.errors;
+      if (errors.length > 0) {
+        if (asString) {
+          result += (first ? "" : ",") + '"errors":' + JSON.stringify(errors);
+          first = false;
+        } else {
+          result.errors = errors;
+        }
       }
       if (extensions !== undefined) {
-        result.extensions = extensions;
+        if (asString) {
+          result +=
+            (first ? "" : ",") + '"extensions":' + JSON.stringify(extensions);
+          first = false;
+        } else {
+          result.extensions = extensions;
+        }
+      }
+      if (asString) {
+        result += "}";
       }
       return result;
     }
@@ -153,6 +215,7 @@ function outputBucket(
   requestContext: RequestContext,
   path: readonly (string | number)[],
   variables: { [key: string]: any },
+  asString: boolean,
 ): [ctx: OutputPlanContext, result: JSONValue | null] /*PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 >*/ {
@@ -170,7 +233,13 @@ function outputBucket(
     path,
   };
   try {
-    const result = executeOutputPlan(ctx, outputPlan, rootBucket, bucketIndex);
+    const result = executeOutputPlan(
+      ctx,
+      outputPlan,
+      rootBucket,
+      bucketIndex,
+      asString,
+    );
     return [ctx, result ?? null];
   } catch (e) {
     const error = coerceError(
@@ -188,6 +257,7 @@ export function executePreemptive(
   variableValues: any,
   context: any,
   rootValue: any,
+  asString: boolean,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -267,11 +337,13 @@ export function executePreemptive(
         requestContext,
         [],
         rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
+        asString,
       );
       return finalize(
         result,
         ctx,
         index === 0 ? rootValue[$$extensions] ?? undefined : undefined,
+        asString,
       );
     };
     if (isPromiseLike(bucketPromise)) {
@@ -375,8 +447,14 @@ export function executePreemptive(
       requestContext,
       [],
       rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
+      asString,
     );
-    return finalize(result, ctx, rootValue[$$extensions] ?? undefined);
+    return finalize(
+      result,
+      ctx,
+      rootValue[$$extensions] ?? undefined,
+      asString,
+    );
   };
 
   if (isPromiseLike(bucketPromise)) {
@@ -445,7 +523,13 @@ export function dataplannerPrepare(
     });
   }
 
-  return executePreemptive(operationPlan, variableValues, context, rootValue);
+  return executePreemptive(
+    operationPlan,
+    variableValues,
+    context,
+    rootValue,
+    options.asString ?? false,
+  );
 }
 
 interface PushableAsyncGenerator<T> extends AsyncGenerator<T, void, undefined> {
@@ -556,6 +640,7 @@ async function processStream(
   requestContext: RequestContext,
   iterator: ResultIterator,
   spec: SubsequentStreamSpec,
+  asString: boolean,
 ): Promise<void> {
   /** Resolve this when finished */
   const whenDone = defer();
@@ -616,6 +701,7 @@ async function processStream(
           requestContext,
           [...spec.path, actualIndex],
           spec.root.variables,
+          asString,
         );
         iterator.push({
           data: result,
@@ -625,7 +711,7 @@ async function processStream(
           extensions: undefined,
           path: ctx.path,
         });
-        const promise = processRoot(ctx, iterator);
+        const promise = processRoot(ctx, iterator, asString);
         if (isPromiseLike(promise)) {
           promises.push(promise);
         }
@@ -713,6 +799,7 @@ function processSingleDeferred(
   requestContext: RequestContext,
   outputPlan: OutputPlan,
   specs: Array<[ResultIterator, SubsequentPayloadSpec]>,
+  asString: boolean,
 ) {
   const size = specs.length;
   const store: Bucket["store"] = new Map();
@@ -759,6 +846,7 @@ function processSingleDeferred(
         requestContext,
         spec.path,
         spec.root.variables,
+        asString,
       );
       iterator.push({
         data: result,
@@ -768,7 +856,7 @@ function processSingleDeferred(
         extensions: undefined,
         path: ctx.path,
       });
-      const promise = processRoot(ctx, iterator);
+      const promise = processRoot(ctx, iterator, asString);
       if (isPromiseLike(promise)) {
         promises.push(promise);
       }
@@ -791,12 +879,18 @@ function processBatches(
     Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
   >,
   whenDone: Deferred<void>,
+  asString: boolean,
 ) {
   // Key is only used for batching
   const promises: PromiseLike<void>[] = [];
   for (const [requestContext, batches] of batchesByRequestContext.entries()) {
     for (const [outputPlan, specs] of batches.entries()) {
-      const promise = processSingleDeferred(requestContext, outputPlan, specs);
+      const promise = processSingleDeferred(
+        requestContext,
+        outputPlan,
+        specs,
+        asString,
+      );
       if (isPromiseLike(promise)) {
         promises.push(promise);
       }
@@ -812,13 +906,13 @@ function processBatches(
   }
 }
 
-function processBatch() {
+function processBatch(asString: boolean) {
   const batchesByRequestContext = deferredBatchesByRequestContext;
   deferredBatchesByRequestContext = new Map();
   const whenDone = nextBatch!;
   nextBatch = null;
 
-  processBatches(batchesByRequestContext, whenDone);
+  processBatches(batchesByRequestContext, whenDone, asString);
 }
 
 let deferredBatchesByRequestContext: Map<
@@ -831,6 +925,7 @@ function processDeferred(
   requestContext: RequestContext,
   iterator: ResultIterator,
   spec: SubsequentPayloadSpec,
+  asString: boolean,
 ): PromiseLike<void> {
   let deferredBatches = deferredBatchesByRequestContext.get(requestContext);
   if (!deferredBatches) {
@@ -845,7 +940,7 @@ function processDeferred(
   }
   if (!nextBatch) {
     nextBatch = defer();
-    setTimeout(processBatch, 1);
+    setTimeout(() => processBatch(asString), 1);
   }
 
   return nextBatch;

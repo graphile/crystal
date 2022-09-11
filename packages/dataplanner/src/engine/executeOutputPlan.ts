@@ -105,6 +105,7 @@ export function executeOutputPlan(
   outputPlan: OutputPlan,
   bucket: Bucket,
   bucketIndex: number,
+  asString: boolean,
 ): JSONValue {
   if (isDev) {
     assert.strictEqual(
@@ -114,5 +115,7 @@ export function executeOutputPlan(
     );
   }
   const mutablePath = ["SOMEONE_FORGOT_TO_SLICE_THE_PATH!", ...ctx.path];
-  return outputPlan.execute(ctx.root, mutablePath, bucket, bucketIndex);
+  return asString
+    ? outputPlan.executeString(ctx.root, mutablePath, bucket, bucketIndex)
+    : outputPlan.execute(ctx.root, mutablePath, bucket, bucketIndex);
 }

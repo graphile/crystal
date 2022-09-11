@@ -15,6 +15,7 @@ import { isPromiseLike } from "./utils.js";
 
 export interface DataPlannerExecuteOptions {
   explain?: CrystalPrepareOptions["explain"];
+  asString?: boolean;
 }
 
 /**
@@ -83,6 +84,7 @@ export function withDataPlannerArgs(
 
   const rootValue = dataplannerPrepare(args, {
     explain: options.explain,
+    asString: options.asString,
   });
   if (unlisten) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
