@@ -1,6 +1,4 @@
 import { JSONObject, JSONValue } from "./interfaces";
-// @ts-ignore
-import flatstr from "flatstr";
 
 export function stringifyPayload(
   payload: JSONObject,
@@ -41,6 +39,5 @@ export function stringifyPayload(
     str += `"hasNext":${JSON.stringify(payload.hasNext)}`;
   }
   str += "}";
-  // Flatten the string for maximum optimisation!
-  return flatstr(str);
+  return str;
 }
