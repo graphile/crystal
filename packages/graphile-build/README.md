@@ -15,11 +15,11 @@ because you're changing your schema in broad ways it helps to guarantee
 consistency.
 
 Graphile Build has strong built-in support for
-[DataPlanner](../dataplanner/README.md) so you can make an exceptionally
+[Grafast](../grafast/README.md) so you can make an exceptionally
 performant auto-generated (or generator-assisted) GraphQL API.
 
 [PostGraphile](https://github.com/graphile/postgraphile) uses Graphile Build and
-DataPlanner to produce an extremely high performance standards-compliant GraphQL
+Grafast to produce an extremely high performance standards-compliant GraphQL
 API with minimal fuss. The separate
 [`graphile-build-pg` module](../graphile-build-pg/README.md) contains the
 plugins that are specific to PostgreSQL support (`graphile-build` itself does

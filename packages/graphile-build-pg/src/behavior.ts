@@ -5,7 +5,7 @@ import type {
   PgSourceRelationExtensions,
   PgTypeCodecExtensions,
 } from "@dataplan/pg";
-import { isDev } from "dataplanner";
+import { isDev } from "grafast";
 import { inspect } from "util";
 
 // NOTE: 'behaviour' is the correct spelling in UK English; we try and stick to

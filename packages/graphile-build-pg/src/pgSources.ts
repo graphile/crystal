@@ -1,13 +1,13 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
-import type { PromiseOrDirect } from "dataplanner";
-import { defer, isPromiseLike } from "dataplanner";
+import type { PromiseOrDirect } from "grafast";
+import { defer, isPromiseLike } from "grafast";
 import type { IncomingMessage } from "node:http";
 import type { Socket } from "node:net";
 
 import type { KeysOfType } from "./interfaces.js";
 
 declare global {
-  namespace DataPlanner {
+  namespace Grafast {
     interface PgDatabaseAdaptorOptions {
       /* This will be filled out via declaration merging */
     }
@@ -29,13 +29,13 @@ declare global {
 
     // TODO: rename
     interface PgDatabaseConfiguration<
-      TAdaptor extends keyof DataPlanner.PgDatabaseAdaptorOptions = keyof DataPlanner.PgDatabaseAdaptorOptions,
+      TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
     > {
       name: string;
       schemas?: string[];
 
       adaptor: TAdaptor;
-      adaptorSettings?: DataPlanner.PgDatabaseAdaptorOptions[TAdaptor];
+      adaptorSettings?: Grafast.PgDatabaseAdaptorOptions[TAdaptor];
 
       /** The key on 'context' where the withPgClient function will be sourced */
       withPgClientKey: KeysOfType<

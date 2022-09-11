@@ -11,8 +11,8 @@ import type {
   ConnectionStep,
   GraphileFieldConfigArgumentMap,
   InputStep,
-} from "dataplanner";
-import { getEnumValueConfig } from "dataplanner";
+} from "grafast";
+import { getEnumValueConfig } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";

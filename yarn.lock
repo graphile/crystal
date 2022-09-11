@@ -1714,7 +1714,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     graphql: "*"
   languageName: unknown
   linkType: soft
@@ -1730,7 +1730,7 @@ __metadata:
     "@types/json5": "npm:^2.2.0"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
@@ -5900,9 +5900,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dataplanner@workspace:^, dataplanner@workspace:packages/dataplanner":
+"grafast@workspace:^, grafast@workspace:packages/grafast":
   version: 0.0.0-use.local
-  resolution: "dataplanner@workspace:packages/dataplanner"
+  resolution: "grafast@workspace:packages/grafast"
   dependencies:
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/chai": "npm:^4"
@@ -7694,7 +7694,7 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/jsonwebtoken": "npm:^8"
     "@types/node": "npm:^16.11.15"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     debug: "npm:^4.3.3"
     express: "npm:^4.17.2"
     express-graphql: "npm:^0.12.0"
@@ -7726,7 +7726,7 @@ __metadata:
     "@types/pluralize": "npm:^0.0.29"
     "@types/semver": "npm:^7.3.9"
     chalk: "npm:^4.1.2"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     debug: "npm:^4.3.3"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
@@ -7774,7 +7774,7 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
     "@types/prettier": "npm:^2"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
     prettier: "npm:^2.5.1"
@@ -11050,7 +11050,7 @@ __metadata:
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
     "@types/pg": "npm:^8.6.2"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     debug: "npm:^4.3.3"
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"

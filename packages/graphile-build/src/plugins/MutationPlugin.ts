@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { __ValueStep } from "dataplanner";
+import { __ValueStep } from "grafast";
 
 import { version } from "../index.js";
 import { isValidObjectType } from "../utils.js";

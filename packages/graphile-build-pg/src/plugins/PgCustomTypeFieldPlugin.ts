@@ -31,7 +31,7 @@ import type {
   FieldInfo,
   FieldPlanResolver,
   GraphileFieldConfigArgumentMap,
-} from "dataplanner";
+} from "grafast";
 import {
   __ListTransformStep,
   connection,
@@ -39,7 +39,7 @@ import {
   object,
   ObjectStep,
   stepAMayDependOnStepB,
-} from "dataplanner";
+} from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 

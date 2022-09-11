@@ -9,8 +9,8 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { ObjectStep } from "dataplanner";
-import { arraysMatch, connection } from "dataplanner";
+import type { ObjectStep } from "grafast";
+import { arraysMatch, connection } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";

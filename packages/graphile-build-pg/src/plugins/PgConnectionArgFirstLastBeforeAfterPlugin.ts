@@ -9,7 +9,7 @@ import type {
 import type {
   ConnectionStep,
   GraphileFieldConfigArgumentMap,
-} from "dataplanner";
+} from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";

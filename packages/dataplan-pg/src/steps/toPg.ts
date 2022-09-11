@@ -1,5 +1,5 @@
-import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
-import { ExecutableStep } from "dataplanner";
+import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import { ExecutableStep } from "grafast";
 
 import type { PgTypeCodec } from "../interfaces.js";
 
@@ -13,7 +13,7 @@ import type { PgTypeCodec } from "../interfaces.js";
  */
 export class ToPgStep extends ExecutableStep<any> {
   static $$export = {
-    moduleName: "dataplanner",
+    moduleName: "grafast",
     exportName: "ToPgStep",
   };
   isSyncAndSafe = true;

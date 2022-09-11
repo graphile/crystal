@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PageInfoCapableStep } from "dataplanner";
+import type { PageInfoCapableStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";

@@ -7,7 +7,7 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../dataplanner" },
+    { "path": "../grafast" },
     { "path": "../jest-serializer-simple" }
   ]
 }

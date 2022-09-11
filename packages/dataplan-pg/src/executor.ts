@@ -10,8 +10,8 @@ import type {
   ExecutionEventEmitter,
   ObjectStep,
   PromiseOrDirect,
-} from "dataplanner";
-import { defer, isAsyncIterable, isDev } from "dataplanner";
+} from "grafast";
+import { defer, isAsyncIterable, isDev } from "grafast";
 import debugFactory from "debug";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";

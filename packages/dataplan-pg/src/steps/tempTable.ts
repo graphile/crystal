@@ -1,5 +1,5 @@
-import type { ExecutableStep } from "dataplanner";
-import { BaseStep } from "dataplanner";
+import type { ExecutableStep } from "grafast";
+import { BaseStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 

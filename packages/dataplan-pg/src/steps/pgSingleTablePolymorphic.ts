@@ -3,8 +3,8 @@ import type {
   CrystalValuesList,
   PolymorphicData,
   PolymorphicStep,
-} from "dataplanner";
-import { ExecutableStep, polymorphicWrap } from "dataplanner";
+} from "grafast";
+import { ExecutableStep, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 
 import type { PgTypeColumns } from "../codecs.js";

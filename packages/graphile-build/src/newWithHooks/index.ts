@@ -4,13 +4,13 @@ import type {
   ExecutableStep,
   GraphileFieldConfig,
   OutputPlanForType,
-} from "dataplanner";
+} from "grafast";
 import {
-  dataplannerResolver,
-  dataplannerSubscriber,
+  grafastResolver,
+  grafastSubscriber,
   inputObjectFieldSpec,
   objectSpec,
-} from "dataplanner";
+} from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -321,9 +321,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               // Perform the Graphile Crystal magic
               for (const fieldSpec of Object.values(fieldsSpec)) {
                 const { subscribe, resolve } = fieldSpec;
-                fieldSpec.resolve = dataplannerResolver(resolve);
+                fieldSpec.resolve = grafastResolver(resolve);
                 if (!subscribe && scope.isRootSubscription) {
-                  fieldSpec.subscribe = dataplannerSubscriber();
+                  fieldSpec.subscribe = grafastSubscriber();
                 }
 
                 // IMPORTANT: **nothing** can modify the resolver from here - i.e.

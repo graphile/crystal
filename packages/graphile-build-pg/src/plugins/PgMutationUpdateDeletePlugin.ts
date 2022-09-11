@@ -9,7 +9,7 @@ import type {
   PgUpdateStep,
 } from "@dataplan/pg";
 import { pgDelete, pgUpdate } from "@dataplan/pg";
-import type { ExecutableStep, FieldArgs } from "dataplanner";
+import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
@@ -17,7 +17,7 @@ import {
   object,
   ObjectStep,
   specFromNodeId,
-} from "dataplanner";
+} from "grafast";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 

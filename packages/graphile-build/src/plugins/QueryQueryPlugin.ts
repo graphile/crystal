@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { operationPlan } from "dataplanner";
+import { operationPlan } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";

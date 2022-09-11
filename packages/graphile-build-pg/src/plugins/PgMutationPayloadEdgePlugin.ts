@@ -7,8 +7,8 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
-import type { FieldArgs, FieldInfo, ObjectStep } from "dataplanner";
-import { connection, constant, EdgeStep } from "dataplanner";
+import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
+import { connection, constant, EdgeStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 

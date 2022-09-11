@@ -1,4 +1,4 @@
-import { $$idempotent } from "dataplanner";
+import { $$idempotent } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";

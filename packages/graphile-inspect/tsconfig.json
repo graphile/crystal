@@ -15,7 +15,7 @@
   "include": ["src"],
   "references": [
     { "path": "../lru" },
-    { "path": "../dataplanner" },
+    { "path": "../grafast" },
     { "path": "../graphile-export" },
     { "path": "../graphile-config" }
   ]

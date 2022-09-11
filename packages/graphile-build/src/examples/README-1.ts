@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { lambda } from "dataplanner";
+import { lambda } from "grafast";
 import { readFile } from "fs/promises";
 import { resolvePresets } from "graphile-config";
 import { EXPORTABLE, exportSchema } from "graphile-export";

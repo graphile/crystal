@@ -1,5 +1,5 @@
-import type { CrystalResultsList, CrystalValuesList } from "dataplanner";
-import { ExecutableStep, isDev } from "dataplanner";
+import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import { ExecutableStep, isDev } from "grafast";
 
 /**
  * Lightweight plan to validate cursor. We couldn't do this with a lambda

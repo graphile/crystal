@@ -3,8 +3,8 @@ import type {
   CrystalValuesList,
   SetterCapableStep,
   SetterStep,
-} from "dataplanner";
-import { ExecutableStep, isDev, setter } from "dataplanner";
+} from "grafast";
+import { ExecutableStep, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";

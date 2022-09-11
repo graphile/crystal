@@ -6,13 +6,13 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
-import type { BaseGraphQLContext } from "dataplanner";
+import type { BaseGraphQLContext } from "grafast";
 import {
   $$bypassGraphQL,
-  execute as dataplannerExecute,
+  execute as grafastExecute,
   stringifyPayload,
-  subscribe as dataplannerSubscribe,
-} from "dataplanner";
+  subscribe as grafastSubscribe,
+} from "grafast";
 import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
@@ -417,8 +417,8 @@ export async function runTestQuery(
       );
     }
 
-    const execute = dataplannerExecute;
-    const subscribe = dataplannerSubscribe;
+    const execute = grafastExecute;
+    const subscribe = grafastSubscribe;
 
     const result =
       operationType === "subscription"

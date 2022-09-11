@@ -1,4 +1,4 @@
-import { ModifierStep } from "dataplanner";
+import { ModifierStep } from "grafast";
 import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource.js";

@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { constant, operationPlan } from "dataplanner";
+import { constant, operationPlan } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {

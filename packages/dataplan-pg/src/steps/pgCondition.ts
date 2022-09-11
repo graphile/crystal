@@ -1,6 +1,6 @@
 import assert from "assert";
-import type { BaseStep, ExecutableStep } from "dataplanner";
-import { ModifierStep } from "dataplanner";
+import type { BaseStep, ExecutableStep } from "grafast";
+import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 
 import type { PgTypeCodec } from "../interfaces.js";

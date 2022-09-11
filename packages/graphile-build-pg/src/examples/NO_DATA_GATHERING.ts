@@ -16,7 +16,7 @@ import {
 } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
-import { context, object } from "dataplanner";
+import { context, object } from "grafast";
 import { readFile } from "fs/promises";
 import {
   buildSchema,

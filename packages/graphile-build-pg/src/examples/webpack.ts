@@ -96,7 +96,7 @@ async function main() {
         // Node.js
         target: "node",
 
-        // We want the schema bundled up, but also DataPlanner's execute
+        // We want the schema bundled up, but also Grafast's execute
         // method, etc, so we use an entry file that pulls both in.
         entry: `${__dirname}/webpack-entry-file.js`,
 

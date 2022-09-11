@@ -4,7 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
-import { access, ExecutableStep } from "dataplanner";
+import { access, ExecutableStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 

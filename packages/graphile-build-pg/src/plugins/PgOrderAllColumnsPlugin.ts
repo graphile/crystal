@@ -8,7 +8,7 @@ import type {
   PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSelectStep } from "@dataplan/pg";
-import type { ExecutableStep, ModifierStep } from "dataplanner";
+import type { ExecutableStep, ModifierStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumValueConfigMap } from "graphql";
 

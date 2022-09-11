@@ -9,7 +9,7 @@ import type {
   PgTypeColumn,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { ExecutableStep, object } from "dataplanner";
+import { ExecutableStep, object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";

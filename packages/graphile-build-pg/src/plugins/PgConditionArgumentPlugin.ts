@@ -8,7 +8,7 @@ import type {
   PgSelectStep,
   PgTypeColumns,
 } from "@dataplan/pg";
-import type { ConnectionStep } from "dataplanner";
+import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 

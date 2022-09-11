@@ -8,7 +8,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
-import type { ConnectionStep } from "dataplanner";
+import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";

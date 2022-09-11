@@ -1,5 +1,5 @@
-import type { ExecutableStep } from "dataplanner";
-import { ModifierStep } from "dataplanner";
+import type { ExecutableStep } from "grafast";
+import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 
 import type { PgTypeCodec } from "../interfaces.js";

@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import type { EdgeCapableStep, PageInfoCapableStep } from "dataplanner";
-import { ConnectionStep, ExecutableStep } from "dataplanner";
+import type { EdgeCapableStep, PageInfoCapableStep } from "grafast";
+import { ConnectionStep, ExecutableStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";
