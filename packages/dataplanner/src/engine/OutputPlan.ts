@@ -661,8 +661,7 @@ function makeExecutor<TAsString extends boolean>(
         ? `// root/introspection, null is fine`
         : `return ${asString ? '"null"' : "null"};`
     }
-  }
-  if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
+  } else if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
     throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
