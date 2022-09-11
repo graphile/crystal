@@ -1,9 +1,11 @@
 import { JSONObject, JSONValue } from "./interfaces";
+// @ts-ignore
+import flatstr from "flatstr";
 
 export function stringifyPayload(
   payload: JSONObject,
   asString: boolean | undefined,
-) {
+): string {
   if (!asString || typeof payload.data !== "string") {
     return JSON.stringify(payload);
   }
@@ -39,5 +41,6 @@ export function stringifyPayload(
     str += `"hasNext":${JSON.stringify(payload.hasNext)}`;
   }
   str += "}";
-  return str;
+  // Flatten the string for maximum optimisation!
+  return flatstr(str);
 }
