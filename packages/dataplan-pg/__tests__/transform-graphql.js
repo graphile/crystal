@@ -22,7 +22,7 @@
 const JSON5 = require("json5");
 
 exports.makeProcess =
-  (options = { includeDeoptimize: true, includeUnprepared: true }) =>
+  (options = { includeDeoptimize: true, includeStringified: true }) =>
   (src, path) => {
     const lines = src.split("\n");
     const config = Object.create(null);
@@ -109,11 +109,11 @@ beforeAll(() => {
   }
   // Always run result3 after result2 finishes
   result3 = ${
-    options.includeUnprepared
+    options.includeStringified
       ? `result2.then(() => {}, () => {}).then(() =>
     runTestQuery(document, config, { callback, path, ${
       options.includeDeoptimize ? `deoptimize: true, ` : ``
-    }prepare: false })
+    }asString: true })
   )`
       : `result2.then(() => {}, () => {})`
   };
@@ -174,12 +174,12 @@ it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(r
     : ``
 }
 ${
-  options.includeUnprepared
+  options.includeStringified
     ? `
-it('returns same data for optimized vs unprepared${
+it('returns same data for optimized vs stringified${
         options.includeDeoptimize ? ` deoptimized` : ``
       }', () => assertResultsMatch(result1, result3, { config }));
-it('returns same errors for optimized vs unprepared${
+it('returns same errors for optimized vs stringified${
         options.includeDeoptimize ? ` deoptimized` : ``
       }', () => assertErrorsMatch(result1, result3, { config }));
       `
@@ -215,6 +215,6 @@ exports.process = exports.makeProcess(
   // TODO: delete this argument
   {
     includeDeoptimize: false,
-    includeUnprepared: false,
+    includeStringified: true,
   },
 );

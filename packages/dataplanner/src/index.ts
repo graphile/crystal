@@ -169,6 +169,7 @@ import {
   SetterStep,
   specFromNodeId,
 } from "./steps/index.js";
+import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
 import { subscribe } from "./subscribe.js";
 import {
@@ -369,6 +370,7 @@ export {
   stepsAreInSamePhase,
   StepStreamOptions,
   StreamableStep,
+  stringifyPayload,
   stripAnsi,
   subscribe,
   TypedEventEmitter,
@@ -385,6 +387,7 @@ exportAsMany({
   dataplannerGraphqlSync,
   subscribe,
   __InputListStep,
+  stringifyPayload,
   __InputObjectStep,
   __InputStaticLeafStep,
   assertListCapableStep,

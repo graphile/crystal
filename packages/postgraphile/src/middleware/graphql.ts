@@ -83,9 +83,11 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const { schema, config } = schemaResult;
   const { exposePlan = false } = config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
+  const asString = true;
   const dataplannerOptions: DataPlannerExecuteOptions = {
     // TODO: revisit 'exposePlan'
     explain: exposePlan ? ["mermaid-js", "sql"] : null,
+    asString,
   };
 
   return async (
@@ -133,9 +135,10 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
           type: "graphqlIncremental",
           statusCode: 200,
           iterator: result,
+          asString,
         };
       }
-      return { type: "graphql", statusCode: 200, payload: result };
+      return { type: "graphql", statusCode: 200, payload: result, asString };
     } catch (e) {
       console.error(e);
       return {

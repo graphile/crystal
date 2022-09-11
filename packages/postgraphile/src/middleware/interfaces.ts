@@ -15,11 +15,13 @@ export interface TextHandlerResult extends IHandlerResult {
 export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";
   payload: ExecutionResult;
+  asString?: boolean;
 }
 /** @see {@link https://github.com/glasser/graphql-over-http/blob/dac9638459bb17dd3ade889334fc2fadee9d11e5/rfcs/IncrementalDelivery.md} */
 export interface GraphQLIncrementalHandlerResult extends IHandlerResult {
   type: "graphqlIncremental";
   iterator: AsyncGenerator<AsyncExecutionResult, void, undefined>;
+  asString?: boolean;
 }
 export interface EventStreamEvent {
   /** The name of the event. Use simple names. Don't put newlines in it! */

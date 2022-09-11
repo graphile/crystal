@@ -10,6 +10,7 @@ import type { BaseGraphQLContext } from "dataplanner";
 import {
   $$bypassGraphQL,
   execute as dataplannerExecute,
+  stringifyPayload,
   subscribe as dataplannerSubscribe,
 } from "dataplanner";
 import { promises as fsp } from "fs";
@@ -352,7 +353,7 @@ export async function runTestQuery(
     ) => Promise<void>;
     path: string;
     deoptimize?: boolean;
-    prepare?: boolean;
+    asString?: boolean;
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
@@ -366,7 +367,7 @@ export async function runTestQuery(
   extensions?: any;
 }> {
   const { variableValues } = config;
-  const { path } = options;
+  const { path, asString, deoptimize } = options;
   // Do not allow queries to run in parallel during these tests, we need
   // reproducibility (and we don't want to mess with the transactions, see
   // releaseClients below).
@@ -374,7 +375,7 @@ export async function runTestQuery(
   await resetSequences();
 
   const queries: PgClientQuery[] = [];
-  const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
+  const schema = deoptimize ? deoptimizedSchema : optimizedSchema;
   const withPgClient: WithPgClient = config.directPg
     ? makeWithTestPgClient(queries)
     : async (pgSettings, callback) => {
@@ -416,14 +417,8 @@ export async function runTestQuery(
       );
     }
 
-    const execute =
-      options.prepare ?? true
-        ? dataplannerExecute
-        : (args: ExecutionArgs) => graphqlExecute(args);
-    const subscribe =
-      options.prepare ?? true
-        ? dataplannerSubscribe
-        : (args: SubscriptionArgs) => graphqlSubscribe(args);
+    const execute = dataplannerExecute;
+    const subscribe = dataplannerSubscribe;
 
     const result =
       operationType === "subscription"
@@ -436,6 +431,7 @@ export async function runTestQuery(
             },
             {
               explain: ["mermaid-js"],
+              asString,
             },
           )
         : await execute(
@@ -447,6 +443,7 @@ export async function runTestQuery(
             },
             {
               explain: ["mermaid-js"],
+              asString,
             },
           );
 
@@ -457,7 +454,10 @@ export async function runTestQuery(
 
       // Start collecting the payloads
       const promise = (async () => {
-        for await (const entry of result) {
+        for await (const rawEntry of result) {
+          const entry = asString
+            ? JSON.parse(stringifyPayload(rawEntry as any, asString))
+            : rawEntry;
           const { hasNext, ...rest } = entry;
           if (Object.keys(rest).length > 0 || hasNext) {
             // Do not add the trailing `{hasNext: false}` entry to the snapshot
@@ -553,7 +553,9 @@ export async function runTestQuery(
       return { payloads, errors, queries, extensions: payloads[0].extensions };
     } else {
       // Throw away symbol keys/etc
-      const { data, errors, extensions } = JSON.parse(JSON.stringify(result));
+      const { data, errors, extensions } = JSON.parse(
+        stringifyPayload(result as any, asString),
+      );
       if (errors) {
         console.error(errors[0].originalError || errors[0]);
       }

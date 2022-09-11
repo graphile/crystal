@@ -3,12 +3,18 @@ import * as assert from "assert";
 import type {
   DocumentNode,
   FieldNode,
+  GraphQLEnumType,
   GraphQLObjectType,
   GraphQLScalarType,
 } from "graphql";
 import {
   executeSync,
+  GraphQLBoolean,
   GraphQLError,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLString,
   isObjectType,
   Kind,
   OperationTypeNode,
@@ -84,6 +90,7 @@ export type OutputPlanTypeLeaf = {
   mode: "leaf";
   // stepId: number;
   serialize: GraphQLScalarType["serialize"];
+  graphqlType: GraphQLScalarType | GraphQLEnumType;
 };
 export type OutputPlanTypeNull = {
   mode: "null";
@@ -380,8 +387,22 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     _mutablePath: Array<string | number>,
     _bucket: Bucket,
     _bucketIndex: number,
-  ): any {
+  ): JSONValue {
     throw new Error(`OutputPlan.execute has yet to be built!`);
+  }
+
+  // This gets replaced with a mode-specific executor
+  executeString(
+    this: OutputPlan,
+    _root: PayloadRoot,
+    // By just reusing the same path over and over we don't need to allocate
+    // more memory for more arrays; but we must be _incredibly_ careful to
+    // ensure any changes to it are reversed.
+    _mutablePath: Array<string | number>,
+    _bucket: Bucket,
+    _bucketIndex: number,
+  ): string {
+    throw new Error(`OutputPlan.executeString has yet to be built!`);
   }
 
   finalize() {
@@ -393,18 +414,42 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     switch (this.type.mode) {
       case "null": {
         this.execute = nullExecutor;
+        this.executeString = nullExecutorString;
         break;
       }
       case "leaf": {
         this.execute = leafExecutor;
+        if (
+          this.type.graphqlType.serialize === GraphQLID.serialize ||
+          this.type.graphqlType.serialize === GraphQLString.serialize
+        ) {
+          // String types
+          this.executeString = stringLeafExecutorString;
+        } else if (
+          this.type.graphqlType.serialize === GraphQLInt.serialize ||
+          this.type.graphqlType.serialize === GraphQLFloat.serialize
+        ) {
+          // Number types
+          this.executeString = numberLeafExecutorString;
+        } else if (
+          this.type.graphqlType.serialize === GraphQLBoolean.serialize
+        ) {
+          // Boolean type
+          this.executeString = booleanLeafExecutorString;
+        } else {
+          // TODO: we could probably optimize enums too
+          this.executeString = leafExecutorString;
+        }
         break;
       }
       case "introspection": {
         this.execute = introspectionExecutor;
+        this.executeString = introspectionExecutorString;
         break;
       }
       case "polymorphic": {
         this.execute = polymorphicExecutor;
+        this.executeString = polymorphicExecutorString;
         break;
       }
       case "array": {
@@ -421,14 +466,18 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         if (childIsNonNull) {
           if (canStream) {
             this.execute = arrayExecutor_nonNullable_streaming;
+            this.executeString = arrayExecutorString_nonNullable_streaming;
           } else {
             this.execute = arrayExecutor_nonNullable;
+            this.executeString = arrayExecutorString_nonNullable;
           }
         } else {
           if (canStream) {
             this.execute = arrayExecutor_nullable_streaming;
+            this.executeString = arrayExecutorString_nullable_streaming;
           } else {
             this.execute = arrayExecutor_nullable;
+            this.executeString = arrayExecutorString_nullable;
           }
         }
         break;
@@ -460,6 +509,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
+          false,
+        );
+        this.executeString = makeObjectExecutor(
+          type.typeName,
+          digestFieldTypes,
+          this.deferredOutputPlans.length > 0,
+          type.mode === "root",
+          true,
         );
         break;
       }
@@ -605,25 +662,36 @@ function getChildBucketAndIndex(
   return [currentBucket, currentIndex];
 }
 
-function makeExecutor(
+function makeExecutor<TAsString extends boolean>(
   inner: string,
   nameExtra: string,
+  asString: TAsString,
   args: { [key: string]: any } = EMPTY_OBJECT,
   // this.type.mode === "introspection" || this.type.mode === "root"
   skipNullHandling = false,
-): typeof OutputPlan.prototype.execute {
+  preamble = "",
+): TAsString extends true
+  ? typeof OutputPlan.prototype.executeString
+  : typeof OutputPlan.prototype.execute {
   const realArgs = {
     ...args,
     coerceError,
     nonNullError,
     $$error,
   };
-  const functionBody = `return function compiledOutputPlan_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
+  const functionBody = `return function compiledOutputPlan${
+    asString ? "String" : ""
+  }_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
   const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
-  if (bucketRootValue == null) {
-    ${skipNullHandling ? `// root/introspection, null is fine` : `return null;`}
-  }
-  if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
+${preamble}  if (bucketRootValue == null) {
+    ${
+      skipNullHandling
+        ? `// root/introspection, null is fine`
+        : `return ${asString ? '"null"' : "null"};`
+    }
+  }${
+    skipNullHandling ? " else " : "\n  "
+  }if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
     throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
@@ -638,6 +706,7 @@ function makeExecuteChildPlanCode(
   locationDetails: string,
   childOutputPlan: string,
   isNonNull: boolean,
+  asString: boolean,
   childBucket = "childBucket",
   childBucketIndex = "childBucketIndex",
 ) {
@@ -645,8 +714,10 @@ function makeExecuteChildPlanCode(
   if (isNonNull) {
     // No need to catch error
     return `
-      const fieldResult = ${childOutputPlan}.execute(root, mutablePath, ${childBucket}, ${childBucketIndex});
-      if (fieldResult == null) {
+      const fieldResult = ${childOutputPlan}.${
+      asString ? "executeString" : "execute"
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex});
+      if (fieldResult == ${asString ? '"null"' : "null"}) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
       ${setTargetOrReturn} fieldResult;`;
@@ -654,8 +725,10 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return `
       try {
-        const fieldResult = ${childOutputPlan}.execute(root, mutablePath, ${childBucket}, ${childBucketIndex});
-        ${setTargetOrReturn} fieldResult === undefined ? null : fieldResult;
+        const fieldResult = ${childOutputPlan}.${
+      asString ? "executeString" : "execute"
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex});
+        ${setTargetOrReturn} fieldResult;
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
         const pathLengthTarget = mutablePathIndex + 1;
@@ -664,7 +737,7 @@ function makeExecuteChildPlanCode(
           mutablePath.splice(pathLengthTarget, overSize);
         }
         root.errors.push(error);
-        ${setTargetOrReturn} null;
+        ${setTargetOrReturn} ${asString ? '"null"' : "null"};
       }`;
   }
 }
@@ -675,27 +748,155 @@ function makeExecuteChildPlanCode(
  * and increasing the probability of optimization).
  */
 
-const nullExecutor = makeExecutor("  return null;", "null");
+const nullExecutor = makeExecutor("  return null;", "null", false);
+const nullExecutorString = makeExecutor('  return "null";', "null", true);
 
-const canBeInsideGraphQL = false;
-const leafExecutor = makeExecutor(
-  canBeInsideGraphQL
-    ? `\
+/* This is what leafExecutor should use if insideGraphQL (which isn't currently
+ * supported)
+`\
   if (root.insideGraphQL) {
     // Don't serialize to avoid the double serialization problem
     return bucketRootValue;
   } else {
     return this.type.serialize(bucketRootValue);
   }
-`
-    : `\
+` */
+const leafExecutor = makeExecutor(
+  `\
   return this.type.serialize(bucketRootValue);
 `,
   "leaf",
+  false,
 );
 
-const polymorphicExecutor = makeExecutor(
+/**
+ * A regexp that matches the first character that might need escaping in a JSON
+ * string. ("Might" because we'd rather be safe.)
+ *
+ * Unsafe:
+ * - `\\`
+ * - `"`
+ * - control characters
+ * - surrogates
+ */
+// eslint-disable-next-line no-control-regex
+const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
+
+/**
+ * A 'short string' has a length less than or equal to this, and can
+ * potentially have JSON.stringify skipped on it if it doesn't contain any of
+ * the forbiddenCharacters. To prevent the forbiddenCharacters regexp running
+ * for a long time, we cap the length of string we test.
+ */
+const MAX_SHORT_STRING_LENGTH = 200; // TODO: what should this be?
+
+function _stringifyString_old(value: string): string {
+  if (
+    value.length > MAX_SHORT_STRING_LENGTH ||
+    forbiddenCharacters.test(value)
+  ) {
+    return JSON.stringify(value);
+  } else {
+    return `"${value}"`;
+  }
+}
+const BACKSLASH_CODE = "\\".charCodeAt(0);
+const QUOTE_CODE = '"'.charCodeAt(0);
+
+// Bizarrely this seems to be faster than the regexp approach
+function stringifyString(value: string): string {
+  const l = value.length;
+  if (l > MAX_SHORT_STRING_LENGTH) {
+    return JSON.stringify(value);
+  }
+  // Scan through for disallowed charcodes
+  for (let i = 0; i < l; i++) {
+    const code = value.charCodeAt(i);
+    if (
+      code === BACKSLASH_CODE ||
+      code === QUOTE_CODE ||
+      (code & 0xffe0) === 0 || // equivalent to `code <= 0x001f`
+      (code & 0xc000) !== 0 // Not quite equivalent to `code >= 0xd800`, but good enough for our purposes
+    ) {
+      // Backslash, quote, control character or surrogate
+      return JSON.stringify(value);
+    }
+  }
+  return `"${value}"`;
+}
+
+// TODO: more optimal stringifier
+const toJSON = (value: unknown): string => {
+  if (value == null) return "null";
+  if (value === true) return "true";
+  if (value === false) return "false";
+  const t = typeof value;
+  if (t === "number") return String(value);
+  if (t === "string") {
+    return stringifyString(value as string);
+  }
+  return JSON.stringify(value);
+};
+
+const leafExecutorString = makeExecutor(
   `\
+  return toJSON(this.type.serialize(bucketRootValue));
+`,
+  "leaf",
+  true,
+  { toJSON },
+);
+
+const booleanLeafExecutorString = makeExecutor(
+  `\
+  const val = this.type.serialize(bucketRootValue);
+  return val === true ? 'true' : 'false';
+`,
+  "booleanLeaf",
+  true,
+  EMPTY_OBJECT,
+  false,
+  `\
+  if (bucketRootValue === true) return 'true';
+  if (bucketRootValue === false) return 'false';
+`,
+);
+
+const numberLeafExecutorString = makeExecutor(
+  `\
+  return String(this.type.serialize(bucketRootValue));
+`,
+  "numberLeaf",
+  true,
+  EMPTY_OBJECT,
+  false,
+  `\
+  if (typeof bucketRootValue === 'number') {
+    return String(bucketRootValue);
+  }
+`,
+);
+
+const stringLeafExecutorString = makeExecutor(
+  `\
+  return stringifyString(this.type.serialize(bucketRootValue));
+`,
+  "stringLeaf",
+  true,
+  { stringifyString },
+  false,
+  `\
+  if (typeof bucketRootValue === 'string') {
+    return stringifyString(bucketRootValue);
+  }
+`,
+);
+
+function makePolymorphicExecutor<TAsString extends boolean>(
+  asString: TAsString,
+) {
+  return makeExecutor(
+    `\
 ${
   isDev
     ? `\
@@ -730,7 +931,9 @@ ${
 
   const directChild = bucket.children[childOutputPlan.layerPlan.id];
   if (directChild) {
-    return childOutputPlan.execute(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
+    return childOutputPlan.${
+      asString ? "executeString" : "execute"
+    }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
     const [childBucket, childBucketIndex] = getChildBucketAndIndex(
       childOutputPlan,
@@ -738,63 +941,82 @@ ${
       bucket,
       bucketIndex,
     );
-    return childOutputPlan.execute(root, mutablePath, childBucket, childBucketIndex);
+    return childOutputPlan.${
+      asString ? "executeString" : "execute"
+    }(root, mutablePath, childBucket, childBucketIndex);
   }
 `,
-  "polymorphic",
-  {
-    isPolymorphicData,
-    coerceError,
-    assert,
-    $$concreteType,
-    getChildBucketAndIndex,
-  },
-);
+    "polymorphic",
+    asString,
+    {
+      isPolymorphicData,
+      coerceError,
+      assert,
+      $$concreteType,
+      getChildBucketAndIndex,
+    },
+  );
+}
 
-const makeArrayExecutor = (childIsNonNull: boolean, canStream: boolean) => {
+const polymorphicExecutor = makePolymorphicExecutor(false);
+const polymorphicExecutorString = makePolymorphicExecutor(true);
+
+function makeArrayExecutor<TAsString extends boolean>(
+  childIsNonNull: boolean,
+  canStream: boolean,
+  asString: TAsString,
+) {
   return makeExecutor(
     `\
   if (!Array.isArray(bucketRootValue)) {
     console.warn(\`Hit fallback for value \${inspect(bucketRootValue)} coercion to mode 'array'\`);
-    return null;
+    return ${asString ? '"null"' : "null"};
   }
 
-  const data = [];
-  const l = bucketRootValue.length;
   const childOutputPlan = this.child;
+  const l = bucketRootValue.length;
+  ${asString ? "let string;" : "const data = [];"}
+  if (l === 0) {
+${asString ? '    string = "[]";' : "    /* noop */"}
+  } else {
+    string = "["
 
-  const mutablePathIndex = mutablePath.push(-1) - 1;
-  const childLayerPlanId = childOutputPlan.layerPlan.id;
-  const { children } = bucket;
+    const mutablePathIndex = mutablePath.push(-1) - 1;
 
-  // Now to populate the children...
-  for (let i = 0; i < l; i++) {
-    const directChild = children[childLayerPlanId];
-    let childBucket, childBucketIndex;
+    // Now to populate the children...
+    const directChild = bucket.children[childOutputPlan.layerPlan.id];
+    let childBucket, childBucketIndex, lookup;
     if (directChild) {
       childBucket = directChild.bucket;
-      childBucketIndex = directChild.map.get(bucketIndex)[i];
-    } else {
-      ([childBucket, childBucketIndex] = getChildBucketAndIndex(
-        childOutputPlan,
-        this,
-        bucket,
-        bucketIndex,
-        i,
-      ));
+      lookup = directChild.map.get(bucketIndex)
     }
+    for (let i = 0; i < l; i++) {
+      if (directChild) {
+        childBucketIndex = lookup[i];
+      } else {
+        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+          childOutputPlan,
+          this,
+          bucket,
+          bucketIndex,
+          i,
+        ));
+      }
 
-    mutablePath[mutablePathIndex] = i;
+      mutablePath[mutablePathIndex] = i;
+${asString ? `\n      if (i > 0) { string += ","; }` : ""}
 ${makeExecuteChildPlanCode(
-  "data[i] =",
+  asString ? "string +=" : "data[i] =",
   "this.locationDetails",
   "childOutputPlan",
   childIsNonNull,
+  asString,
 )}
+    }
+
+    mutablePath.pop();
+${asString ? '    string += "]";\n' : ""}
   }
-
-  mutablePath.pop();
-
 ${
   canStream
     ? `\
@@ -815,9 +1037,10 @@ ${
     : ``
 }
 
-  return data;
+  return ${asString ? "string" : "data"};
 `,
     `array${childIsNonNull ? "_nonNull" : ""}${canStream ? "_stream" : ""}`,
+    asString,
     {
       inspect,
       getChildBucketAndIndex,
@@ -825,16 +1048,33 @@ ${
       $$streamMore,
     },
   );
-};
-const arrayExecutor_nullable = makeArrayExecutor(false, false);
-const arrayExecutor_nullable_streaming = makeArrayExecutor(false, true);
-const arrayExecutor_nonNullable = makeArrayExecutor(true, false);
-const arrayExecutor_nonNullable_streaming = makeArrayExecutor(true, true);
+}
+const arrayExecutor_nullable = makeArrayExecutor(false, false, false);
+const arrayExecutor_nullable_streaming = makeArrayExecutor(false, true, false);
+const arrayExecutor_nonNullable = makeArrayExecutor(true, false, false);
+const arrayExecutor_nonNullable_streaming = makeArrayExecutor(
+  true,
+  true,
+  false,
+);
+const arrayExecutorString_nullable = makeArrayExecutor(false, false, true);
+const arrayExecutorString_nullable_streaming = makeArrayExecutor(
+  false,
+  true,
+  true,
+);
+const arrayExecutorString_nonNullable = makeArrayExecutor(true, false, true);
+const arrayExecutorString_nonNullable_streaming = makeArrayExecutor(
+  true,
+  true,
+  true,
+);
 
 const introspect = (
   root: PayloadRoot,
   outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
   mutablePath: ReadonlyArray<string | number>,
+  asString: boolean,
 ) => {
   const { locationDetails } = outputPlan;
   const {
@@ -869,7 +1109,7 @@ const introspect = (
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
   if (cached) {
-    return cached;
+    return asString ? JSON.stringify(cached) : cached;
   }
   const graphqlResult = executeSync({
     schema: outputPlan.layerPlan.operationPlan.schema,
@@ -893,17 +1133,25 @@ const introspect = (
   }
   const result = graphqlResult.data!.a as JSONValue;
   introspectionCacheByVariableValues.set(canonical, result);
-  return result;
+  return asString ? JSON.stringify(result) : result;
 };
 
 const introspectionExecutor = makeExecutor(
-  `  return introspect(root, this, mutablePath)`,
+  `  return introspect(root, this, mutablePath, false)`,
   "introspection",
+  false,
+  { introspect },
+  true,
+);
+const introspectionExecutorString = makeExecutor(
+  `  return introspect(root, this, mutablePath, true)`,
+  "introspection",
+  true,
   { introspect },
   true,
 );
 
-function makeObjectExecutor(
+function makeObjectExecutor<TAsString extends boolean>(
   typeName: string,
   fieldTypes: {
     [key: string]: {
@@ -914,7 +1162,10 @@ function makeObjectExecutor(
   hasDeferredOutputPlans: boolean,
   // this.type.mode === "root",
   isRoot: boolean,
-): typeof OutputPlan.prototype.execute {
+  asString: TAsString,
+): TAsString extends true
+  ? typeof OutputPlan.prototype.executeString
+  : typeof OutputPlan.prototype.execute {
   // TODO: figure out how to memoize this (without introducing memory leaks)
 
   const keys = Object.keys(fieldTypes);
@@ -936,16 +1187,25 @@ function makeObjectExecutor(
   }
 
   const inner = `\
-  const obj = Object.create(null);
+  ${asString ? 'let string = "{";' : "const obj = Object.create(null);"}
   const { keys } = this;
   const { children } = bucket;
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 
 ${Object.entries(fieldTypes)
-  .map(([fieldName, { fieldType, sameBucket }]) => {
+  .map(([fieldName, { fieldType, sameBucket }], i) => {
     switch (fieldType) {
       case "__typename": {
-        return `    obj.${fieldName} = typeName;`;
+        if (asString) {
+          // NOTE: this code relies on the fact that fieldName and typeName do
+          // not require any quoting in JSON/JS - they must conform to GraphQL
+          // `Name`.
+          return `    string += \`${
+            i === 0 ? "" : ","
+          }"${fieldName}":"\${typeName}"\`;`;
+        } else {
+          return `    obj.${fieldName} = typeName;`;
+        }
       }
       case "outputPlan!":
       case "outputPlan?": {
@@ -957,10 +1217,13 @@ ${
   sameBucket
     ? `\
 ${makeExecuteChildPlanCode(
-  `obj.${fieldName} =`,
+  asString
+    ? `string += \`${i === 0 ? "" : ","}"${fieldName}":\` +`
+    : `obj.${fieldName} =`,
   "spec.locationDetails",
   "spec.outputPlan",
   fieldType === "outputPlan!",
+  asString,
   "bucket",
   "bucketIndex",
 )}`
@@ -979,10 +1242,13 @@ ${makeExecuteChildPlanCode(
         ));
       }
 ${makeExecuteChildPlanCode(
-  `obj.${fieldName} =`,
+  asString
+    ? `string += \`${i === 0 ? "" : ","}"${fieldName}":\` +`
+    : `obj.${fieldName} =`,
   "spec.locationDetails",
   "spec.outputPlan",
   fieldType === "outputPlan!",
+  asString,
 )}`
 }
     }`;
@@ -998,6 +1264,7 @@ ${makeExecuteChildPlanCode(
   .join("\n")}
 
   mutablePath.pop();
+${asString ? '  string += "}";\n' : ""}\
 ${
   hasDeferredOutputPlans
     ? `
@@ -1015,7 +1282,7 @@ ${
 `
     : ``
 }
-  return obj;`;
+  return ${asString ? "string" : "obj"};`;
 
   // TODO: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
@@ -1023,6 +1290,7 @@ ${
   return makeExecutor(
     inner,
     `object`,
+    asString,
     {
       typeName: typeName,
       coerceError: coerceError,
