@@ -717,7 +717,7 @@ function makeExecuteChildPlanCode(
       const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex});
-      if (fieldResult == null) {
+      if (fieldResult == ${asString ? '"null"' : "null"}) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
       ${setTargetOrReturn} fieldResult;`;
