@@ -6,10 +6,11 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
-import { BaseGraphQLContext, stringifyPayload } from "dataplanner";
+import type { BaseGraphQLContext } from "dataplanner";
 import {
   $$bypassGraphQL,
   execute as dataplannerExecute,
+  stringifyPayload,
   subscribe as dataplannerSubscribe,
 } from "dataplanner";
 import { promises as fsp } from "fs";

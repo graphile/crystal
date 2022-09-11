@@ -1,20 +1,20 @@
 import type LRU from "@graphile/lru";
 import * as assert from "assert";
-import {
+import type {
   DocumentNode,
   FieldNode,
-  GraphQLBoolean,
   GraphQLEnumType,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
   GraphQLObjectType,
   GraphQLScalarType,
-  GraphQLString,
 } from "graphql";
 import {
   executeSync,
+  GraphQLBoolean,
   GraphQLError,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLString,
   isObjectType,
   Kind,
   OperationTypeNode,
@@ -774,11 +774,12 @@ const leafExecutor = makeExecutor(
  * string. ("Might" because we'd rather be safe.)
  *
  * Unsafe:
- * - \
- * - "
+ * - `\\`
+ * - `"`
  * - control characters
  * - surrogates
  */
+// eslint-disable-next-line no-control-regex
 const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
 
 /**
@@ -787,7 +788,7 @@ const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
  * the forbiddenCharacters. To prevent the forbiddenCharacters regexp running
  * for a long time, we cap the length of string we test.
  */
-const MAX_SHORT_STRING_LENGTH = 500; // TODO: what should this be?
+const MAX_SHORT_STRING_LENGTH = 200; // TODO: what should this be?
 
 function _stringifyString_old(value: string): string {
   if (

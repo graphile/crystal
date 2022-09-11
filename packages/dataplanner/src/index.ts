@@ -169,6 +169,7 @@ import {
   SetterStep,
   specFromNodeId,
 } from "./steps/index.js";
+import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
 import { subscribe } from "./subscribe.js";
 import {
@@ -192,12 +193,10 @@ import {
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
 } from "./utils.js";
-import { stringifyPayload } from "./stringifyPayload.js";
 
 export { isAsyncIterable } from "iterall";
 export {
   __InputListStep,
-  stringifyPayload,
   __InputObjectStep,
   __InputStaticLeafStep,
   __ItemStep,
@@ -371,6 +370,7 @@ export {
   stepsAreInSamePhase,
   StepStreamOptions,
   StreamableStep,
+  stringifyPayload,
   stripAnsi,
   subscribe,
   TypedEventEmitter,

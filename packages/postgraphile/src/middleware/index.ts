@@ -1,5 +1,5 @@
-import { Deferred, stringifyPayload, TypedEventEmitter } from "dataplanner";
-import { defer, isPromiseLike, stripAnsi } from "dataplanner";
+import type { Deferred, TypedEventEmitter } from "dataplanner";
+import { defer, isPromiseLike, stringifyPayload, stripAnsi } from "dataplanner";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 import { GraphQLError } from "graphql";

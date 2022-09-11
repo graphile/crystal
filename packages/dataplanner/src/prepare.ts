@@ -112,7 +112,7 @@ const finalize = (
         // TODO: ABORT code
         _alive = false;
       });
-      let payload = Object.create(null);
+      const payload = Object.create(null);
       if (data !== undefined) {
         payload.data = data;
       }
@@ -147,7 +147,7 @@ const finalize = (
 
       return iterator;
     } else {
-      let result = Object.create(null);
+      const result = Object.create(null);
       if (data !== undefined) {
         result.data = data;
       }
