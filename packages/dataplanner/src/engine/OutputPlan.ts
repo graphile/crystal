@@ -728,9 +728,7 @@ function makeExecuteChildPlanCode(
         const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex});
-        ${setTargetOrReturn} (fieldResult === undefined ? ${
-      asString ? '"null"' : "null"
-    } : fieldResult);
+        ${setTargetOrReturn} fieldResult;
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
         const pathLengthTarget = mutablePathIndex + 1;
@@ -974,36 +972,38 @@ function makeArrayExecutor<TAsString extends boolean>(
     return ${asString ? '"null"' : "null"};
   }
 
-  const l = bucketRootValue.length;
-  if (l === 0) return ${asString ? '"[]"' : "[]"};
-
-  ${asString ? 'let string = "[";' : "const data = [];"}
   const childOutputPlan = this.child;
+  const l = bucketRootValue.length;
+  ${asString ? "let string;" : "const data = [];"}
+  if (l === 0) {
+${asString ? '    string = "[]";' : "    /* noop */"}
+  } else {
+    string = "["
 
-  const mutablePathIndex = mutablePath.push(-1) - 1;
+    const mutablePathIndex = mutablePath.push(-1) - 1;
 
-  // Now to populate the children...
-  const directChild = bucket.children[childOutputPlan.layerPlan.id];
-  let childBucket, childBucketIndex, lookup;
-  if (directChild) {
-    childBucket = directChild.bucket;
-    lookup = directChild.map.get(bucketIndex)
-  }
-  for (let i = 0; i < l; i++) {
+    // Now to populate the children...
+    const directChild = bucket.children[childOutputPlan.layerPlan.id];
+    let childBucket, childBucketIndex, lookup;
     if (directChild) {
-      childBucketIndex = lookup[i];
-    } else {
-      ([childBucket, childBucketIndex] = getChildBucketAndIndex(
-        childOutputPlan,
-        this,
-        bucket,
-        bucketIndex,
-        i,
-      ));
+      childBucket = directChild.bucket;
+      lookup = directChild.map.get(bucketIndex)
     }
+    for (let i = 0; i < l; i++) {
+      if (directChild) {
+        childBucketIndex = lookup[i];
+      } else {
+        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+          childOutputPlan,
+          this,
+          bucket,
+          bucketIndex,
+          i,
+        ));
+      }
 
-    mutablePath[mutablePathIndex] = i;
-${asString ? `\n    if (i > 0) { string += ","; }` : ""}
+      mutablePath[mutablePathIndex] = i;
+${asString ? `\n      if (i > 0) { string += ","; }` : ""}
 ${makeExecuteChildPlanCode(
   asString ? "string +=" : "data[i] =",
   "this.locationDetails",
@@ -1011,10 +1011,11 @@ ${makeExecuteChildPlanCode(
   childIsNonNull,
   asString,
 )}
-  }
+    }
 
-  mutablePath.pop();
-${asString ? '  string += "]";\n' : ""}
+    mutablePath.pop();
+${asString ? '    string += "]";\n' : ""}
+  }
 ${
   canStream
     ? `\
