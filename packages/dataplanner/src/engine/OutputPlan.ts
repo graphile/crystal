@@ -786,7 +786,7 @@ const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
  */
 const MAX_SHORT_STRING_LENGTH = 500; // TODO: what should this be?
 
-function stringifyString(value: string): string {
+function _stringifyString_old(value: string): string {
   if (
     value.length > MAX_SHORT_STRING_LENGTH ||
     forbiddenCharacters.test(value)
@@ -795,6 +795,30 @@ function stringifyString(value: string): string {
   } else {
     return `"${value}"`;
   }
+}
+const BACKSLASH_CODE = "\\".charCodeAt(0);
+const QUOTE_CODE = '"'.charCodeAt(0);
+
+// Bizarrely this seems to be faster than the regexp approach
+function stringifyString(value: string): string {
+  const l = value.length;
+  if (l > MAX_SHORT_STRING_LENGTH) {
+    return JSON.stringify(value);
+  }
+  // Scan through for disallowed charcodes
+  for (let i = 0; i < l; i++) {
+    const code = value.charCodeAt(i);
+    if (
+      code === BACKSLASH_CODE ||
+      code === QUOTE_CODE ||
+      (code & 0xffe0) === 0 || // equivalent to `code <= 0x001f`
+      code >= 0xd800
+    ) {
+      // Backslash, quote, control character or surrogate
+      return JSON.stringify(value);
+    }
+  }
+  return `"${value}"`;
 }
 
 // TODO: more optimal stringifier
