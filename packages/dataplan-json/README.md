@@ -7,10 +7,10 @@
 
 _**A cutting-edge planning and execution engine for GraphQL**_
 
-[Grafast][grafast] understands GraphQL and (with your help) it
-understands your business logic; this allows it to orchestrate a GraphQL
-request's data requirements in an extremely efficient manner, leading to
-excellent performance, reduced server load, and happier customers.
+[Grafast][grafast] understands GraphQL and (with your help) it understands your
+business logic; this allows it to orchestrate a GraphQL request's data
+requirements in an extremely efficient manner, leading to excellent performance,
+reduced server load, and happier customers.
 
 _@dataplan/json is plan classes for encoding/decoding JSON_
 

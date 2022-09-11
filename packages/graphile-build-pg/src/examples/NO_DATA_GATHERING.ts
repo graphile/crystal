@@ -16,8 +16,8 @@ import {
 } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
-import { context, object } from "grafast";
 import { readFile } from "fs/promises";
+import { context, object } from "grafast";
 import {
   buildSchema,
   defaultPreset as graphileBuildPreset,

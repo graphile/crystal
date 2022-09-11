@@ -17,13 +17,13 @@ import type {
   WithPgClient,
 } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg";
+import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "grafast";
 import {
   $$bypassGraphQL,
   execute as grafastExecute,
   subscribe as grafastSubscribe,
 } from "grafast";
-import { promises as fsp } from "fs";
 import { StreamDeferPlugin } from "graphile-build";
 import type {
   AsyncExecutionResult,

@@ -14,13 +14,13 @@ enable you to make broad changes to your GraphQL schema with minimal code, and
 because you're changing your schema in broad ways it helps to guarantee
 consistency.
 
-Graphile Build has strong built-in support for
-[Grafast](../grafast/README.md) so you can make an exceptionally
-performant auto-generated (or generator-assisted) GraphQL API.
+Graphile Build has strong built-in support for [Grafast](../grafast/README.md)
+so you can make an exceptionally performant auto-generated (or
+generator-assisted) GraphQL API.
 
 [PostGraphile](https://github.com/graphile/postgraphile) uses Graphile Build and
-Grafast to produce an extremely high performance standards-compliant GraphQL
-API with minimal fuss. The separate
+Grafast to produce an extremely high performance standards-compliant GraphQL API
+with minimal fuss. The separate
 [`graphile-build-pg` module](../graphile-build-pg/README.md) contains the
 plugins that are specific to PostgreSQL support (`graphile-build` itself does
 not know nor care about databases).

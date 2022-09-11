@@ -36,8 +36,8 @@ yarn postgraphile -e -c postgres:///your_db_here
 This should run PostGraphile [at http://localhost:5678](http://localhost:5678).
 It may take a good few seconds to load GraphiQL the first time... I should look
 into that. If you go to `Panels > Explain` then when you run queries you'll be
-able to see the Grafast query plan (and the SQL queries) in the resizeable
-panel at the bottom.
+able to see the Grafast query plan (and the SQL queries) in the resizeable panel
+at the bottom.
 
 Should you wish to get your feet a little wetter, have a look at
 [packages/graphile-build-pg/src/examples/README.md](packages/graphile-build-pg/src/examples/README.md)
@@ -67,9 +67,9 @@ need your feedback!
 
 At Graphile we love GraphQL so much we named ourself for our love of it! This
 repository houses many of the Graphile packages that relate to GraphQL; the two
-headline projects are **Grafast** and **PostGraphile** but there's many
-other packages, a fair few of which can be used independently - see below for
-more details.
+headline projects are **Grafast** and **PostGraphile** but there's many other
+packages, a fair few of which can be used independently - see below for more
+details.
 
 **[Grafast][grafast]**: A cutting-edge planning and execution engine for
 GraphQL.js ─ write your GraphQL schema with "plans" rather than "resolvers" and
@@ -91,8 +91,8 @@ you then manage yourself.
 
 Here's a rough breakdown of the main packages:
 
-- **[grafast][]** - standalone cutting-edge planning and execution engine
-  for GraphQL; see above for full description.
+- **[grafast][]** - standalone cutting-edge planning and execution engine for
+  GraphQL; see above for full description.
   - **[@dataplan/pg][]** - plan classes for interacting with PostgreSQL
   - **[@dataplan/json][]** - plan classes for encoding/decoding JSON
 - **[graphile-export][]** - a package that can (under the right circumstances)

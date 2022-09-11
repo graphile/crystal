@@ -14,8 +14,8 @@ import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
 import chalk from "chalk";
-import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import fastify from "fastify";
+import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import {

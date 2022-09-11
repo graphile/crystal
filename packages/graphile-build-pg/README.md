@@ -12,8 +12,8 @@ other resources in your PostgreSQL database.
 This is achieved by introspecting your database with [pg-introspection][] and
 then building [@dataplan/pg][] data sources for these entities. Then our plugins
 inspect these data sources and create the relevant GraphQL types, fields, and
-[grafast][] plan resolver functions. The result is a high-performance,
-powerful, auto-generated but highly flexible GraphQL schema.
+[grafast][] plan resolver functions. The result is a high-performance, powerful,
+auto-generated but highly flexible GraphQL schema.
 
 If you don't want to use your database introspection results to generate the
 schema, you can instead build the data sources yourself giving you full control
@@ -52,8 +52,8 @@ And please give some love to our featured sponsors 🤩:
 
 ## About
 
-Thanks to Grafast's query planning capabilities, the plugins in this package
-do not exhibit the N+1 query problem common in many database-based GraphQL APIs;
+Thanks to Grafast's query planning capabilities, the plugins in this package do
+not exhibit the N+1 query problem common in many database-based GraphQL APIs;
 for all but the flattest GraphQL queries these plugins typically significantly
 outperform `DataLoader`-based solutions - and the more complex your GraphQL
 query becomes the greater the benefit.

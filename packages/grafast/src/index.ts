@@ -17,17 +17,14 @@ import { PrintPlanGraphOptions } from "./mermaid.js";
 // TODO: doing this here feels "naughty".
 debugFactory.formatters.c = crystalPrint;
 
-import { grafastEnforce } from "./grafastEnforce.js";
-import {
-  grafastGraphql,
-  grafastGraphqlSync,
-} from "./grafastGraphql.js";
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { CrystalError, isCrystalError } from "./error.js";
-import { GrafastExecuteOptions, execute } from "./execute.js";
+import { execute, GrafastExecuteOptions } from "./execute.js";
+import { grafastEnforce } from "./grafastEnforce.js";
+import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
@@ -47,11 +44,6 @@ import {
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
-  GrafastArgumentExtensions,
-  GrafastEnumValueExtensions,
-  GrafastFieldExtensions,
-  GrafastInputFieldExtensions,
-  GrafastObjectTypeExtensions,
   EnumValueApplyPlanResolver,
   EventCallback,
   EventMapKey,
@@ -61,6 +53,11 @@ import {
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
+  GrafastArgumentExtensions,
+  GrafastEnumValueExtensions,
+  GrafastFieldExtensions,
+  GrafastInputFieldExtensions,
+  GrafastObjectTypeExtensions,
   GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -239,17 +236,6 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   CrystalWrapDetails,
-  GrafastArgumentExtensions,
-  grafastEnforce,
-  GrafastEnumValueExtensions,
-  GrafastExecuteOptions,
-  GrafastFieldExtensions,
-  grafastGraphql,
-  grafastGraphqlSync,
-  GrafastInputFieldExtensions,
-  GrafastObjectTypeExtensions,
-  grafastResolver,
-  grafastSubscriber,
   debugPlans,
   defer,
   Deferred,
@@ -276,6 +262,17 @@ export {
   first,
   FirstStep,
   getEnumValueConfig,
+  GrafastArgumentExtensions,
+  grafastEnforce,
+  GrafastEnumValueExtensions,
+  GrafastExecuteOptions,
+  GrafastFieldExtensions,
+  grafastGraphql,
+  grafastGraphqlSync,
+  GrafastInputFieldExtensions,
+  GrafastObjectTypeExtensions,
+  grafastResolver,
+  grafastSubscriber,
   GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,

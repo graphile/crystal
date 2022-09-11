@@ -1,5 +1,6 @@
 import assert from "assert";
 import { createHash } from "crypto";
+import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   CrystalResultsList,
@@ -34,7 +35,6 @@ import {
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
 } from "grafast";
-import debugFactory from "debug";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 

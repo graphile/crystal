@@ -20,9 +20,9 @@ Grafast is a planning and execution engine for GraphQL:
 
 The act of parsing and validating the GraphQL query is currently out of scope of
 Grafast, you should use graphql-js to provide these facilities. Passing a
-GraphQL document into Grafast that has not been validated may lead to
-unexpected results, infinite recursion, and various other issues - please ensure
-all documents are validated!
+GraphQL document into Grafast that has not been validated may lead to unexpected
+results, infinite recursion, and various other issues - please ensure all
+documents are validated!
 
 ## Planning
 
@@ -84,9 +84,8 @@ many times.
 
 ### Planning the request
 
-Now we have an Aether we must build the plan. Grafast will walk the document
-and call the relevant code for each field, argument, directive, fragment, etc
-that it finds. For fields, Grafast will call the field's plan resolver,
-which...
+Now we have an Aether we must build the plan. Grafast will walk the document and
+call the relevant code for each field, argument, directive, fragment, etc that
+it finds. For fields, Grafast will call the field's plan resolver, which...
 
 TBC

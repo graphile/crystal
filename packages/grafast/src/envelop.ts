@@ -43,9 +43,7 @@ function processExplain(
  * An Envelop plugin that uses Grafast to prepare and execute the GraphQL
  * query.
  */
-export const useGrafast = (
-  options: UseGrafastOptions = {},
-): EnvelopPlugin => {
+export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
   const { explainAllowed = true } = options;
   return {
     async onExecute(opts) {
@@ -61,9 +59,7 @@ export const useGrafast = (
         ctx?.request?.headers ||
         ctx?.connectionParams)?.["x-graphql-explain"];
       const explain = processExplain(explainAllowed, explainHeaders);
-      opts.setSubscribeFn(async (args) =>
-        grafastSubscribe(args, { explain }),
-      );
+      opts.setSubscribeFn(async (args) => grafastSubscribe(args, { explain }));
     },
   };
 };

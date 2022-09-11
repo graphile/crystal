@@ -6,6 +6,7 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
+import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "grafast";
 import {
   $$bypassGraphQL,
@@ -13,7 +14,6 @@ import {
   stringifyPayload,
   subscribe as grafastSubscribe,
 } from "grafast";
-import { promises as fsp } from "fs";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,

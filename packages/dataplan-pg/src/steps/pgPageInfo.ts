@@ -3,13 +3,7 @@ import type {
   CrystalValuesList,
   PageInfoCapableStep,
 } from "grafast";
-import {
-  ConnectionStep,
-  constant,
-  ExecutableStep,
-  first,
-  last,
-} from "grafast";
+import { ConnectionStep, constant, ExecutableStep, first, last } from "grafast";
 
 import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";

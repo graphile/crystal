@@ -3,8 +3,8 @@ import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
-import { $$crystalWrapped, isCrystalWrapped } from "grafast";
 import { writeFile } from "fs/promises";
+import { $$crystalWrapped, isCrystalWrapped } from "grafast";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
@@ -1115,10 +1115,7 @@ function func(
       return t.callExpression(iMakeCrystalSubscriber, []);
     } else {
       if (crystalSpec.original) {
-        const iCrystalWrapResolve = file.import(
-          "grafast",
-          "grafastResolver",
-        );
+        const iCrystalWrapResolve = file.import("grafast", "grafastResolver");
 
         return t.callExpression(iCrystalWrapResolve, [
           func(

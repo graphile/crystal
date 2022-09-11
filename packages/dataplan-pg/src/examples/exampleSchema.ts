@@ -12,6 +12,7 @@
 
 import { jsonParse, JSONParseStep } from "@dataplan/json";
 import * as crypto from "crypto";
+import { writeFileSync } from "fs";
 import type {
   __InputObjectStep,
   __InputStaticLeafStep,
@@ -31,11 +32,11 @@ import {
   ConnectionStep,
   constant,
   context,
-  grafastEnforce,
   each,
   error,
   filter,
   getEnumValueConfig,
+  grafastEnforce,
   groupBy,
   lambda,
   list,
@@ -47,7 +48,6 @@ import {
   operationPlan,
   resolveType,
 } from "grafast";
-import { writeFileSync } from "fs";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 import {

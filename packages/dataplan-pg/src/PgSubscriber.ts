@@ -1,6 +1,6 @@
+import EventEmitter from "events";
 import type { CrystalSubscriber, Deferred } from "grafast";
 import { defer } from "grafast";
-import EventEmitter from "events";
 import type { Notification, Pool, PoolClient } from "pg";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

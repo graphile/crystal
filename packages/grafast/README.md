@@ -7,10 +7,10 @@
 
 _**A cutting-edge planning and execution engine for GraphQL**_
 
-Grafast understands GraphQL and (with your help) it understands your
-business logic; this allows it to orchestrate a GraphQL request's data
-requirements in an extremely efficient manner, leading to excellent performance,
-reduced server load, and happier customers.
+Grafast understands GraphQL and (with your help) it understands your business
+logic; this allows it to orchestrate a GraphQL request's data requirements in an
+extremely efficient manner, leading to excellent performance, reduced server
+load, and happier customers.
 
 <!-- SPONSORS_BEGIN -->
 
@@ -44,8 +44,8 @@ And please give some love to our featured sponsors 🤩:
 
 ## About
 
-Grafast can be used as an alternative to the "execute" method of GraphQL.js
-for the very best performance results, or can be used from within the "execute"
+Grafast can be used as an alternative to the "execute" method of GraphQL.js for
+the very best performance results, or can be used from within the "execute"
 method via our automatic resolver-planner bridging (you can install this into an
 existing schema with the `grafastEnforce` method below).
 
@@ -65,8 +65,7 @@ requirements:
 
 - GraphQL.js v16+
 - every resolver in the schema must[1] be wrapped with Grafast's resolver
-  wrapper; this can be achieved manually, or by calling
-  `grafastEnforce(schema)`
+  wrapper; this can be achieved manually, or by calling `grafastEnforce(schema)`
 - you must not override the default GraphQL field resolver
 - for every request:
   - `context` must be an object (anything suitable to be used as the key to a

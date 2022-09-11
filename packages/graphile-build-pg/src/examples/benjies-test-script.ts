@@ -13,9 +13,9 @@ import type { WithPgClient } from "@dataplan/pg";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
+import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import {
   buildInflection,
   buildSchema,
