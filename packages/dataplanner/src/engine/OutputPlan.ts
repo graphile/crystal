@@ -698,9 +698,9 @@ function makeExecuteChildPlanCode(
         const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex});
-        ${setTargetOrReturn} fieldResult === undefined ? ${
+        ${setTargetOrReturn} (fieldResult === undefined ? ${
       asString ? '"null"' : "null"
-    } : fieldResult;
+    } : fieldResult);
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
         const pathLengthTarget = mutablePathIndex + 1;
