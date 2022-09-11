@@ -1,7 +1,5 @@
 import { JSONObject, JSONValue } from "./interfaces";
 
-const KEYS = ["errors", "data", "extensions", "label", "hasNext"] as const;
-
 export function stringifyPayload(
   payload: JSONObject,
   asString: boolean | undefined,
@@ -14,20 +12,31 @@ export function stringifyPayload(
   if (payload.incremental) {
     throw new Error("Haven't implemented incremental yet");
   }
-  for (const key of KEYS) {
-    const value = payload[key];
-    if (value === undefined) {
-      continue;
-    }
-    if (!first) {
-      str += ",";
-    }
+  if (payload.errors !== undefined) {
+    if (!first) str += ",";
     first = false;
-    if (key === "data") {
-      str += `"${key}":${value}`;
-    } else {
-      str += `"${key}":${JSON.stringify(value)}`;
-    }
+    str += `"errors":${JSON.stringify(payload.errors)}`;
+  }
+  if (payload.data !== undefined) {
+    if (!first) str += ",";
+    first = false;
+    // TODO: assert that data is a string
+    str += `"data":${payload.data ?? "null"}`;
+  }
+  if (payload.extensions !== undefined) {
+    if (!first) str += ",";
+    first = false;
+    str += `"extensions":${JSON.stringify(payload.extensions)}`;
+  }
+  if (payload.label !== undefined) {
+    if (!first) str += ",";
+    first = false;
+    str += `"label":${JSON.stringify(payload.label)}`;
+  }
+  if (payload.hasNext !== undefined) {
+    if (!first) str += ",";
+    first = false;
+    str += `"hasNext":${JSON.stringify(payload.hasNext)}`;
   }
   str += "}";
   return str;
