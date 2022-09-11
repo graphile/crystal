@@ -741,8 +741,45 @@ const leafExecutor = makeExecutor(
   false,
 );
 
+/**
+ * A regexp that matches the first character that might need escaping in a JSON
+ * string. ("Might" because we'd rather be safe.)
+ *
+ * Unsafe:
+ * - \
+ * - "
+ * - control characters
+ * - surrogates
+ */
+const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
+
+/**
+ * A 'short string' has a length less than or equal to this, and can
+ * potentially have JSON.stringify skipped on it if it doesn't contain any of
+ * the forbiddenCharacters. To prevent the forbiddenCharacters regexp running
+ * for a long time, we cap the length of string we test.
+ */
+const MAX_SHORT_STRING_LENGTH = 5000; // TODO: what should this be?
+
 // TODO: more optimal stringifier
-const toJSON = JSON.stringify.bind(JSON);
+const toJSON = (value: unknown): string => {
+  if (value == null) return "null";
+  if (value === true) return "true";
+  if (value === false) return "false";
+  const t = typeof value;
+  if (t === "number") return String(value);
+  if (t === "string") {
+    if (
+      (value as string).length > MAX_SHORT_STRING_LENGTH ||
+      forbiddenCharacters.test(value as string)
+    ) {
+      return JSON.stringify(value);
+    } else {
+      return `"${value}"`;
+    }
+  }
+  return JSON.stringify(value);
+};
 
 const leafExecutorString = makeExecutor(
   `\

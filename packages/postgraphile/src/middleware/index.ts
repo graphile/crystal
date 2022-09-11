@@ -1,4 +1,4 @@
-import type { Deferred, TypedEventEmitter } from "dataplanner";
+import { Deferred, stringifyPayload, TypedEventEmitter } from "dataplanner";
 import { defer, isPromiseLike, stripAnsi } from "dataplanner";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
@@ -45,7 +45,7 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
   ): void => {
     switch (handlerResult.type) {
       case "graphql": {
-        const { payload, statusCode = 200 } = handlerResult;
+        const { payload, statusCode = 200, asString } = handlerResult;
 
         if ("errors" in payload && payload.errors) {
           (payload.errors as any[]) = payload.errors.map((e) => {
@@ -67,12 +67,12 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
               }
             : null),
         });
-        const payloadString = JSON.stringify(payload);
+        const payloadString = stringifyPayload(payload as any, asString);
         res.end(payloadString);
         break;
       }
       case "graphqlIncremental": {
-        const { iterator, statusCode = 200 } = handlerResult;
+        const { iterator, statusCode = 200, asString } = handlerResult;
         res.writeHead(statusCode, {
           "Content-Type": 'multipart/mixed; boundary="-"',
           "Transfer-Encoding": "chunked",
@@ -88,8 +88,9 @@ export function postgraphile(preset: GraphileConfig.Preset): RequestListener & {
           try {
             for await (const payload of iterator) {
               res.write(
-                `\r\n---\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(
-                  payload,
+                `\r\n---\r\nContent-Type: application/json\r\n\r\n${stringifyPayload(
+                  payload as any,
+                  asString,
                 )}`,
               );
             }

@@ -192,10 +192,12 @@ import {
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
 } from "./utils.js";
+import { stringifyPayload } from "./stringifyPayload.js";
 
 export { isAsyncIterable } from "iterall";
 export {
   __InputListStep,
+  stringifyPayload,
   __InputObjectStep,
   __InputStaticLeafStep,
   __ItemStep,
@@ -385,6 +387,7 @@ exportAsMany({
   dataplannerGraphqlSync,
   subscribe,
   __InputListStep,
+  stringifyPayload,
   __InputObjectStep,
   __InputStaticLeafStep,
   assertListCapableStep,

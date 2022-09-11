@@ -112,43 +112,18 @@ const finalize = (
         // TODO: ABORT code
         _alive = false;
       });
-      let payload = asString ? "{" : Object.create(null);
-      let first = false;
+      let payload = Object.create(null);
       if (data !== undefined) {
-        if (asString) {
-          payload += (first ? "" : ",") + '"data":' + data;
-          first = false;
-        } else {
-          payload.data = data;
-        }
+        payload.data = data;
       }
       const errors = ctx.root.errors;
       if (errors.length > 0) {
-        if (asString) {
-          payload += (first ? "" : ",") + '"errors":' + JSON.stringify(errors);
-          first = false;
-        } else {
-          payload.errors = errors;
-        }
+        payload.errors = errors;
       }
       if (extensions) {
-        if (asString) {
-          payload +=
-            (first ? "" : ",") + '"extensions":' + JSON.stringify(extensions);
-          first = false;
-        } else {
-          payload.extensions = extensions;
-        }
+        payload.extensions = extensions;
       }
-      if (asString) {
-        payload += (first ? "" : ",") + '"hasNext": true';
-        first = false;
-      } else {
-        payload.hasNext = true;
-      }
-      if (asString) {
-        payload += "}";
-      }
+      payload.hasNext = true;
       // TODO: payload.label
       iterator.push(payload);
 
@@ -172,36 +147,16 @@ const finalize = (
 
       return iterator;
     } else {
-      let result = asString ? "{" : Object.create(null);
-      let first = true;
+      let result = Object.create(null);
       if (data !== undefined) {
-        if (asString) {
-          result += (first ? "" : ",") + '"data":' + data;
-          first = false;
-        } else {
-          result.data = data;
-        }
+        result.data = data;
       }
       const errors = ctx.root.errors;
       if (errors.length > 0) {
-        if (asString) {
-          result += (first ? "" : ",") + '"errors":' + JSON.stringify(errors);
-          first = false;
-        } else {
-          result.errors = errors;
-        }
+        result.errors = errors;
       }
       if (extensions !== undefined) {
-        if (asString) {
-          result +=
-            (first ? "" : ",") + '"extensions":' + JSON.stringify(extensions);
-          first = false;
-        } else {
-          result.extensions = extensions;
-        }
-      }
-      if (asString) {
-        result += "}";
+        result.extensions = extensions;
       }
       return result;
     }
