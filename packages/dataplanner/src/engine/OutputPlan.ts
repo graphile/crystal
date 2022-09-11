@@ -974,21 +974,24 @@ function makeArrayExecutor<TAsString extends boolean>(
     return ${asString ? '"null"' : "null"};
   }
 
-  ${asString ? 'let string = "[";' : "const data = [];"}
   const l = bucketRootValue.length;
+  if (l === 0) return ${asString ? '"[]"' : "[]"};
+
+  ${asString ? 'let string = "[";' : "const data = [];"}
   const childOutputPlan = this.child;
 
   const mutablePathIndex = mutablePath.push(-1) - 1;
-  const childLayerPlanId = childOutputPlan.layerPlan.id;
-  const { children } = bucket;
 
   // Now to populate the children...
+  const directChild = bucket.children[childOutputPlan.layerPlan.id];
+  let childBucket, childBucketIndex, lookup;
+  if (directChild) {
+    childBucket = directChild.bucket;
+    lookup = directChild.map.get(bucketIndex)
+  }
   for (let i = 0; i < l; i++) {
-    const directChild = children[childLayerPlanId];
-    let childBucket, childBucketIndex;
     if (directChild) {
-      childBucket = directChild.bucket;
-      childBucketIndex = directChild.map.get(bucketIndex)[i];
+      childBucketIndex = lookup[i];
     } else {
       ([childBucket, childBucketIndex] = getChildBucketAndIndex(
         childOutputPlan,
