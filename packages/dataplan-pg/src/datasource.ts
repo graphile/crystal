@@ -4,14 +4,14 @@ import type {
   CrystalResultStreamList,
   CrystalValuesList,
   ObjectStep,
-} from "dataplanner";
+} from "grafast";
 import {
   __ValueStep,
   arraysMatch,
   constant,
   ExecutableStep,
   partitionByIndex,
-} from "dataplanner";
+} from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";

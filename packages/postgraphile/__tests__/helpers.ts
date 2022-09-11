@@ -17,13 +17,13 @@ import type {
   WithPgClient,
 } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg";
-import type { BaseGraphQLContext } from "dataplanner";
+import { promises as fsp } from "fs";
+import type { BaseGraphQLContext } from "grafast";
 import {
   $$bypassGraphQL,
-  execute as dataplannerExecute,
-  subscribe as dataplannerSubscribe,
-} from "dataplanner";
-import { promises as fsp } from "fs";
+  execute as grafastExecute,
+  subscribe as grafastSubscribe,
+} from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
 import type {
   AsyncExecutionResult,
@@ -520,11 +520,11 @@ export async function runTestQuery(
 
     const execute =
       options.prepare ?? true
-        ? dataplannerExecute
+        ? grafastExecute
         : (args: ExecutionArgs) => graphqlExecute(args);
     const subscribe =
       options.prepare ?? true
-        ? dataplannerSubscribe
+        ? grafastSubscribe
         : (args: SubscriptionArgs) => graphqlSubscribe(args);
 
     const result =

@@ -14,8 +14,8 @@ import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
 import chalk from "chalk";
-import { useDataPlanner, useMoreDetailedErrors } from "dataplanner/envelop";
 import fastify from "fastify";
+import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import { buildInflection, buildSchema, gather } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import {
@@ -76,7 +76,7 @@ async function main() {
       // Use our executable schema
       useSchema(schema),
 
-      // Caching the parser results is critical for DataPlanner, otherwise it
+      // Caching the parser results is critical for Grafast, otherwise it
       // must re-plan every GraphQL request!
       useParserCache(),
       useValidationCache(),
@@ -84,8 +84,8 @@ async function main() {
       // Our context says how to communicate with Postgres
       useExtendContext(() => contextValue),
 
-      // This replaces graphql-js' `execute` with DataPlanner's own
-      useDataPlanner(),
+      // This replaces graphql-js' `execute` with Grafast's own
+      useGrafast(),
 
       // Useful for debugging; DO NOT USE IN PRODUCTION!
       useMoreDetailedErrors(),

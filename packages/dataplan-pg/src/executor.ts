@@ -1,6 +1,7 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import chalk from "chalk";
+import debugFactory from "debug";
 import type {
   CrystalError,
   CrystalResultStreamList,
@@ -10,9 +11,8 @@ import type {
   ExecutionEventEmitter,
   ObjectStep,
   PromiseOrDirect,
-} from "dataplanner";
-import { defer, isAsyncIterable, isDev } from "dataplanner";
-import debugFactory from "debug";
+} from "grafast";
+import { defer, isAsyncIterable, isDev } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 

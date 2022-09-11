@@ -44,7 +44,7 @@ NEXT UP:
 - LayerPlan should take charge of deduplication
 - LayerPlan should take charge of tree shaking (via OutputPlan too)
 
-- Consider splitting OperationPlan into GraphQLOperationPlan and DataPlannerCore
+- Consider splitting OperationPlan into GraphQLOperationPlan and GrafastCore
   (where core contains the steps/deduplication/etc and GraphQLOperationPlan
   deals with GraphQL selection sets/etc)
   - If we do this, consider renaming OutputPlan to GraphQLOutputPlan

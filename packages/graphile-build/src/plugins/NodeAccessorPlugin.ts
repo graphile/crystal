@@ -5,8 +5,8 @@ import type {
   FieldArgs,
   NodeIdCodec,
   NodeIdHandler,
-} from "dataplanner";
-import { lambda } from "dataplanner";
+} from "grafast";
+import { lambda } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../index.js";

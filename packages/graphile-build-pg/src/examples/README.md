@@ -16,9 +16,9 @@ change the schema configuration or whatever.
 ## fastify-helix-envelop
 
 This file contains an example of a Fastify server running GraphQL Helix with
-Envelop bindings to DataPlanner. It's a great place to start as it gives you
+Envelop bindings to Grafast. It's a great place to start as it gives you
 GraphiQL at the root URL that you can use to explore the GraphQL schema, and
-even has a URL for viewing the DataPlanner plan graph for the query.
+even has a URL for viewing the Grafast plan graph for the query.
 
 ## schema-export
 

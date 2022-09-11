@@ -9,7 +9,7 @@ module.exports = {
       },
     },
     {
-      files: "packages/dataplanner/vendor/graphql-js/**",
+      files: "packages/grafast/vendor/graphql-js/**",
       options: {
         singleQuote: true,
       },

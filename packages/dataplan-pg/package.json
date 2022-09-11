@@ -45,7 +45,7 @@
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.15",
-    "dataplanner": "workspace:^",
+    "grafast": "workspace:^",
     "pg-sql2": "workspace:^",
     "postgres-range": "^1.1.1",
     "tslib": "^2.4.0"

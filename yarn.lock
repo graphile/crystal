@@ -1714,7 +1714,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     graphql: "*"
   languageName: unknown
   linkType: soft
@@ -1730,7 +1730,7 @@ __metadata:
     "@types/json5": "npm:^2.2.0"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
@@ -5900,37 +5900,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dataplanner@workspace:^, dataplanner@workspace:packages/dataplanner":
-  version: 0.0.0-use.local
-  resolution: "dataplanner@workspace:packages/dataplanner"
-  dependencies:
-    "@graphile/lru": "npm:4.6.0-alpha.0"
-    "@types/chai": "npm:^4"
-    "@types/jest": "npm:^27.5.1"
-    "@types/lodash": "npm:^4.14.178"
-    "@types/mermaid": "npm:^8"
-    "@types/mocha": "npm:^9.1.1"
-    "@types/node": "npm:^16.11.15"
-    "@types/nodemon": "npm:1.19.1"
-    chai: "npm:^4.3.6"
-    chalk: "npm:^4.1.2"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
-    iterall: "npm:^1.3.0"
-    jest: "npm:^28.1.0"
-    lodash: "npm:^4.17.21"
-    mermaid: "npm:^8.14.0"
-    mocha: "npm:^10.0.0"
-    nodemon: "npm:^2.0.15"
-    pg-sql2: "workspace:^"
-    spec-md: "npm:^3.0.2"
-    ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^4.8.1-rc"
-  peerDependencies:
-    graphql: "*"
-  languageName: unknown
-  linkType: soft
-
 "date-fns@npm:^2.16.1":
   version: 2.27.0
   resolution: "date-fns@npm:2.27.0"
@@ -7680,6 +7649,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"grafast@workspace:^, grafast@workspace:packages/grafast":
+  version: 0.0.0-use.local
+  resolution: "grafast@workspace:packages/grafast"
+  dependencies:
+    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@types/chai": "npm:^4"
+    "@types/jest": "npm:^27.5.1"
+    "@types/lodash": "npm:^4.14.178"
+    "@types/mermaid": "npm:^8"
+    "@types/mocha": "npm:^9.1.1"
+    "@types/node": "npm:^16.11.15"
+    "@types/nodemon": "npm:1.19.1"
+    chai: "npm:^4.3.6"
+    chalk: "npm:^4.1.2"
+    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    iterall: "npm:^1.3.0"
+    jest: "npm:^28.1.0"
+    lodash: "npm:^4.17.21"
+    mermaid: "npm:^8.14.0"
+    mocha: "npm:^10.0.0"
+    nodemon: "npm:^2.0.15"
+    pg-sql2: "workspace:^"
+    spec-md: "npm:^3.0.2"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  peerDependencies:
+    graphql: "*"
+  languageName: unknown
+  linkType: soft
+
 "graphile-build-pg@workspace:*, graphile-build-pg@workspace:^, graphile-build-pg@workspace:packages/graphile-build-pg":
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
@@ -7694,12 +7694,12 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/jsonwebtoken": "npm:^8"
     "@types/node": "npm:^16.11.15"
-    dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
     express: "npm:^4.17.2"
     express-graphql: "npm:^0.12.0"
     fastify: "npm:^3.27.2"
     fastify-static: "npm:^4.5.0"
+    grafast: "workspace:^"
     graphile-build: "workspace:*"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
@@ -7726,8 +7726,8 @@ __metadata:
     "@types/pluralize": "npm:^0.0.29"
     "@types/semver": "npm:^7.3.9"
     chalk: "npm:^4.1.2"
-    dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
+    grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -7774,7 +7774,7 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
     "@types/prettier": "npm:^2"
-    dataplanner: "workspace:^"
+    grafast: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
     prettier: "npm:^2.5.1"
@@ -11050,8 +11050,8 @@ __metadata:
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
     "@types/pg": "npm:^8.6.2"
-    dataplanner: "workspace:^"
     debug: "npm:^4.3.3"
+    grafast: "workspace:^"
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"

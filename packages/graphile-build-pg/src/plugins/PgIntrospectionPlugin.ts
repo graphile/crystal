@@ -2,8 +2,8 @@ import "graphile-build";
 
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
-import type { ExecutableStep, PromiseOrDirect } from "dataplanner";
-import { constant, context, object } from "dataplanner";
+import type { ExecutableStep, PromiseOrDirect } from "grafast";
+import { constant, context, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";

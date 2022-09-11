@@ -13,7 +13,7 @@
   "references": [
     { "path": "../dataplan-pg" },
     { "path": "../graphile-build" },
-    { "path": "../dataplanner" },
+    { "path": "../grafast" },
     { "path": "../graphile-export" },
     { "path": "../graphile-inspect" },
     { "path": "../graphile-config" },

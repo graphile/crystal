@@ -3,14 +3,14 @@
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Follow](https://img.shields.io/badge/twitter-@DataPlannerHQ-blueviolet.svg)](https://twitter.com/DataPlannerHQ)
+[![Follow](https://img.shields.io/badge/twitter-@GrafastHQ-blueviolet.svg)](https://twitter.com/GrafastHQ)
 
 _**A cutting-edge planning and execution engine for GraphQL**_
 
-[DataPlanner][dataplanner] understands GraphQL and (with your help) it
-understands your business logic; this allows it to orchestrate a GraphQL
-request's data requirements in an extremely efficient manner, leading to
-excellent performance, reduced server load, and happier customers.
+[Grafast][grafast] understands GraphQL and (with your help) it understands your
+business logic; this allows it to orchestrate a GraphQL request's data
+requirements in an extremely efficient manner, leading to excellent performance,
+reduced server load, and happier customers.
 
 _@dataplan/pg is plan classes for interacting with PostgreSQL_
 
@@ -44,4 +44,4 @@ And please give some love to our featured sponsors 🤩:
 
 <!-- SPONSORS_END -->
 
-[dataplanner]: packages/dataplanner/
+[grafast]: packages/grafast/

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 export GRAPHILE_ENV="development"
-export DEFAULT_DEBUG="dataplanner:*,-*:verbose"
+export DEFAULT_DEBUG="grafast:*,-*:verbose"
 export DEBUG="${DEBUG:-$DEFAULT_DEBUG}"
-yarn nodemon --ext ts,js,json --watch __tests__ --watch dist --watch ../dataplanner/dist --watch __tests__ -x 'node -r ts-node/register --inspect --enable-source-maps __tests__/example.ts'
+yarn nodemon --ext ts,js,json --watch __tests__ --watch dist --watch ../grafast/dist --watch __tests__ -x 'node -r ts-node/register --inspect --enable-source-maps __tests__/example.ts'

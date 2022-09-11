@@ -2,14 +2,8 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
   PageInfoCapableStep,
-} from "dataplanner";
-import {
-  ConnectionStep,
-  constant,
-  ExecutableStep,
-  first,
-  last,
-} from "dataplanner";
+} from "grafast";
+import { ConnectionStep, constant, ExecutableStep, first, last } from "grafast";
 
 import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";

@@ -6,8 +6,8 @@
 // TODO: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
 import LRU from "@graphile/lru";
-import type { PromiseOrDirect } from "dataplanner";
-import { defer } from "dataplanner";
+import type { PromiseOrDirect } from "grafast";
+import { defer } from "grafast";
 import type { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
 import * as pg from "pg";
 
@@ -19,7 +19,7 @@ function escapeIdentifier(str: string): string {
 }
 
 declare global {
-  namespace DataPlanner {
+  namespace Grafast {
     interface PgDatabaseAdaptorOptions {
       "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
     }

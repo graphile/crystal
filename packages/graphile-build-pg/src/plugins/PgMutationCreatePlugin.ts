@@ -2,8 +2,8 @@ import "graphile-config";
 
 import type { PgInsertStep, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
-import type { FieldArgs, ObjectStep } from "dataplanner";
-import { constant, ExecutableStep, object } from "dataplanner";
+import type { FieldArgs, ObjectStep } from "grafast";
+import { constant, ExecutableStep, object } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 

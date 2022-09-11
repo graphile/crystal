@@ -1,11 +1,11 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { DataPlannerExecuteOptions } from "dataplanner";
+import type { GrafastExecuteOptions } from "grafast";
 import {
   $$extensions,
-  execute as dataplannerExecute,
+  execute as grafastExecute,
   isAsyncIterable,
-} from "dataplanner";
+} from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
@@ -84,7 +84,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const { exposePlan = false } = config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const asString = true;
-  const dataplannerOptions: DataPlannerExecuteOptions = {
+  const grafastOptions: GrafastExecuteOptions = {
     // TODO: revisit 'exposePlan'
     explain: exposePlan ? ["mermaid-js", "sql"] : null,
     asString,
@@ -129,7 +129,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
     };
 
     try {
-      const result = await dataplannerExecute(args, dataplannerOptions);
+      const result = await grafastExecute(args, grafastOptions);
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",

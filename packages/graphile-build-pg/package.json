@@ -41,8 +41,8 @@
   "dependencies": {
     "@dataplan/pg": "workspace:^",
     "@types/node": "^16.11.15",
-    "dataplanner": "workspace:^",
     "debug": "^4.3.3",
+    "grafast": "workspace:^",
     "graphile-build": "workspace:*",
     "graphile-config": "workspace:^",
     "graphile-export": "workspace:^",

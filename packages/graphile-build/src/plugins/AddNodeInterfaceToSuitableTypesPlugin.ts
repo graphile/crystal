@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import type { ExecutableStep } from "dataplanner";
-import { lambda } from "dataplanner";
+import type { ExecutableStep } from "grafast";
+import { lambda } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInterfaceType } from "graphql";
 

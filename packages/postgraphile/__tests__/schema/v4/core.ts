@@ -1,4 +1,4 @@
-import type { PromiseOrDirect } from "dataplanner";
+import type { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "graphql";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import type { PoolClient } from "pg";

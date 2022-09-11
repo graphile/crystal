@@ -4,7 +4,7 @@
  * This is more a test script than an example, I've used it heavily whilst
  * developing so it has grown in scope and is a bit of a mess. Nonetheless it
  * demonstrates how to build a Graphile Build schema that leverages
- * dataplanner, @dataplan/pg, graphile-build-pg, envelop, fastify, helix, and
+ * grafast, @dataplan/pg, graphile-build-pg, envelop, fastify, helix, and
  * graphile-inspect for viewing the execution and output plan of the latest
  * query.
  */
@@ -13,9 +13,9 @@ import type { WithPgClient } from "@dataplan/pg";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
-import { useDataPlanner, useMoreDetailedErrors } from "dataplanner/envelop";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
+import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import {
   buildInflection,
   buildSchema,
@@ -190,7 +190,7 @@ pool.on("error", (e) => {
       useParserCache(),
       useValidationCache(),
       useExtendContext(contextCallback),
-      useDataPlanner(),
+      useGrafast(),
       useMoreDetailedErrors(),
     ],
   });

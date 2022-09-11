@@ -1,4 +1,4 @@
-import { stripAnsi } from "dataplanner";
+import { stripAnsi } from "grafast";
 
 import * as core from "./core.js";
 

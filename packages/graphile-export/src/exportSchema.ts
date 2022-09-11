@@ -3,8 +3,8 @@ import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
-import { $$crystalWrapped, isCrystalWrapped } from "dataplanner";
 import { writeFile } from "fs/promises";
+import { $$crystalWrapped, isCrystalWrapped } from "grafast";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
@@ -1109,16 +1109,13 @@ function func(
   if (crystalSpec) {
     if (crystalSpec.isSubscribe) {
       const iMakeCrystalSubscriber = file.import(
-        "dataplanner",
-        "dataplannerSubscriber",
+        "grafast",
+        "grafastSubscriber",
       );
       return t.callExpression(iMakeCrystalSubscriber, []);
     } else {
       if (crystalSpec.original) {
-        const iCrystalWrapResolve = file.import(
-          "dataplanner",
-          "dataplannerResolver",
-        );
+        const iCrystalWrapResolve = file.import("grafast", "grafastResolver");
 
         return t.callExpression(iCrystalWrapResolve, [
           func(
@@ -1129,7 +1126,7 @@ function func(
           ),
         ]);
       } else {
-        const iCrystalResolve = file.import("dataplanner", "crystalResolve");
+        const iCrystalResolve = file.import("grafast", "crystalResolve");
         return iCrystalResolve;
       }
     }
@@ -1675,7 +1672,7 @@ function exportSchemaTypeDefs({
 
   file.addStatements(typeDefs);
   file.addStatements(plans);
-  const makeCrystalSchemaAST = file.import("dataplanner", "makeCrystalSchema");
+  const makeCrystalSchemaAST = file.import("grafast", "makeCrystalSchema");
 
   const schemaAST = t.callExpression(makeCrystalSchemaAST, [
     t.objectExpression(

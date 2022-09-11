@@ -7,8 +7,8 @@ import type {
   PgSourceUnique,
   PgTypeCodec,
 } from "@dataplan/pg";
-import type { ListStep } from "dataplanner";
-import { access, constant, list } from "dataplanner";
+import type { ListStep } from "grafast";
+import { access, constant, list } from "grafast";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";

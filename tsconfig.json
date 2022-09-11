@@ -41,7 +41,7 @@
     { "path": "packages/pg-sql2" },
     { "path": "packages/graphile-build" },
     { "path": "packages/graphile-build-pg" },
-    { "path": "packages/dataplanner" },
+    { "path": "packages/grafast" },
     { "path": "packages/graphile-export" },
     { "path": "packages/graphile-config" },
     { "path": "packages/graphile-utils" },

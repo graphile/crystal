@@ -2,7 +2,7 @@
 
 /*
  * This is a hand-rolled GraphQL schema that we used throughout the development
- * of DataPlanner; it's used for the @dataplan/pg tests and demonstrates common
+ * of Grafast; it's used for the @dataplan/pg tests and demonstrates common
  * patterns as well as edge cases. This is NOT meant to be an example of how
  * _you_ should write a schema, in particular it's (deliberately) quite
  * inconsistent and has many ways of achieving the same goals. I would not
@@ -12,6 +12,7 @@
 
 import { jsonParse, JSONParseStep } from "@dataplan/json";
 import * as crypto from "crypto";
+import { writeFileSync } from "fs";
 import type {
   __InputObjectStep,
   __InputStaticLeafStep,
@@ -23,7 +24,7 @@ import type {
   ExecutableStep,
   GraphileArgumentConfig,
   ListStep,
-} from "dataplanner";
+} from "grafast";
 import {
   __ListTransformStep,
   __ValueStep,
@@ -31,11 +32,11 @@ import {
   ConnectionStep,
   constant,
   context,
-  dataplannerEnforce,
   each,
   error,
   filter,
   getEnumValueConfig,
+  grafastEnforce,
   groupBy,
   lambda,
   list,
@@ -46,8 +47,7 @@ import {
   object,
   operationPlan,
   resolveType,
-} from "dataplanner";
-import { writeFileSync } from "fs";
+} from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -4723,7 +4723,7 @@ export function makeExampleSchema(
     },
   });
 
-  return dataplannerEnforce(
+  return grafastEnforce(
     new GraphQLSchema({
       query: Query,
       mutation: Mutation,

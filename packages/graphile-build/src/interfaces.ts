@@ -1,7 +1,7 @@
 import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
-} from "dataplanner";
+} from "grafast";
 import type { AsyncHooks, PluginHook } from "graphile-config";
 import type {
   GraphQLEnumTypeConfig,

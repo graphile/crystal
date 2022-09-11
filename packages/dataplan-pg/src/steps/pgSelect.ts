@@ -1,5 +1,6 @@
 import assert from "assert";
 import { createHash } from "crypto";
+import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   CrystalResultsList,
@@ -11,7 +12,7 @@ import type {
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
-} from "dataplanner";
+} from "grafast";
 import {
   __InputListStep,
   __InputObjectStep,
@@ -33,8 +34,7 @@ import {
   reverseArray,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
-} from "dataplanner";
-import debugFactory from "debug";
+} from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 

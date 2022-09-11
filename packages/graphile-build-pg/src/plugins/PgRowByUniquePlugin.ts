@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
-import type { FieldArgs } from "dataplanner";
+import type { FieldArgs } from "grafast";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";

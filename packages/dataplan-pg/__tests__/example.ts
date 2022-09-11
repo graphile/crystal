@@ -19,14 +19,14 @@
  */
 
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
-import type { BaseGraphQLContext } from "dataplanner";
+import type { BaseGraphQLContext } from "grafast";
 import {
   __TrackedObjectStep,
   __ValueStep,
-  dataplannerGraphql,
+  grafastGraphql,
   isAsyncIterable,
   stripAnsi,
-} from "dataplanner";
+} from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
@@ -160,7 +160,7 @@ async function main() {
     console.log();
     console.log();
     console.log();
-    const result = await dataplannerGraphql(
+    const result = await grafastGraphql(
       {
         schema,
         source,

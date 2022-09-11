@@ -33,7 +33,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
-    "dataplanner": "workspace:^",
+    "grafast": "workspace:^",
     "graphql": "*"
   },
   "files": [

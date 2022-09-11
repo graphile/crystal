@@ -1,7 +1,7 @@
 import "./global.js";
 
 import chalk from "chalk";
-import type { ExecutableStep } from "dataplanner";
+import type { ExecutableStep } from "grafast";
 import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLBoolean,
