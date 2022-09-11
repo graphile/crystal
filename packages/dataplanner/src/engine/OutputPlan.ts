@@ -812,7 +812,7 @@ function stringifyString(value: string): string {
       code === BACKSLASH_CODE ||
       code === QUOTE_CODE ||
       (code & 0xffe0) === 0 || // equivalent to `code <= 0x001f`
-      code >= 0xd800
+      (code & 0xc000) !== 0 // Not quite equivalent to `code >= 0xd800`, but good enough for our purposes
     ) {
       // Backslash, quote, control character or surrogate
       return JSON.stringify(value);
