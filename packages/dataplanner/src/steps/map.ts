@@ -8,8 +8,9 @@ import { ExecutableStep } from "../step.js";
 
 // Do **NOT** allow variables that start with `__`!
 export const isSafeIdentifier = (key: string) =>
-  /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
+  /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
+const STARTS_WITH_NUMBER = /^[0-9]/;
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
 export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
@@ -23,7 +24,14 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     return new Function(
       "obj",
       `return { ${entries
-        .map(([key, val]) => `${key}: obj.${val}`)
+        .map(
+          ([key, val]) =>
+            `${STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key}: obj${
+              STARTS_WITH_NUMBER.test(val)
+                ? `[${JSON.stringify(val)}]`
+                : `.${val}`
+            }`,
+        )
         .join(", ")} }`,
     ) as any;
   }
