@@ -1153,6 +1153,7 @@ export class OperationPlan {
             mode: "leaf",
             // stepId: $leaf.id,
             serialize: nullableFieldType.serialize.bind(nullableFieldType),
+            graphqlType: nullableFieldType,
           },
           locationDetails,
         ),
@@ -1168,6 +1169,7 @@ export class OperationPlan {
           {
             mode: "leaf",
             serialize: nullableFieldType.serialize.bind(nullableFieldType),
+            graphqlType: nullableFieldType,
           },
           locationDetails,
         ),

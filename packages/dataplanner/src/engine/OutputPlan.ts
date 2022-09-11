@@ -4,6 +4,7 @@ import {
   DocumentNode,
   FieldNode,
   GraphQLBoolean,
+  GraphQLEnumType,
   GraphQLFloat,
   GraphQLID,
   GraphQLInt,
@@ -89,6 +90,7 @@ export type OutputPlanTypeLeaf = {
   mode: "leaf";
   // stepId: number;
   serialize: GraphQLScalarType["serialize"];
+  graphqlType: GraphQLScalarType | GraphQLEnumType;
 };
 export type OutputPlanTypeNull = {
   mode: "null";
@@ -418,21 +420,24 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       case "leaf": {
         this.execute = leafExecutor;
         if (
-          this.type.serialize === GraphQLID.serialize ||
-          this.type.serialize === GraphQLString.serialize
+          this.type.graphqlType.serialize === GraphQLID.serialize ||
+          this.type.graphqlType.serialize === GraphQLString.serialize
         ) {
           // String types
           this.executeString = stringLeafExecutorString;
         } else if (
-          this.type.serialize === GraphQLInt.serialize ||
-          this.type.serialize === GraphQLFloat.serialize
+          this.type.graphqlType.serialize === GraphQLInt.serialize ||
+          this.type.graphqlType.serialize === GraphQLFloat.serialize
         ) {
           // Number types
           this.executeString = numberLeafExecutorString;
-        } else if (this.type.serialize === GraphQLBoolean.serialize) {
+        } else if (
+          this.type.graphqlType.serialize === GraphQLBoolean.serialize
+        ) {
           // Boolean type
           this.executeString = booleanLeafExecutorString;
         } else {
+          // TODO: we could probably optimize enums too
           this.executeString = leafExecutorString;
         }
         break;
