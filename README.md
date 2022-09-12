@@ -27,7 +27,7 @@ This'll keep the compiled code up to date.
 First step is probably to run PostGraphile, to do so:
 
 ```
-cd packages/postgraphile
+cd postgraphile/postgraphile
 # This next line is optional, among other things it adds indentation to the SQL
 export GRAPHILE_ENV=development
 yarn postgraphile -e -c postgres:///your_db_here
@@ -40,7 +40,7 @@ able to see the Grafast query plan (and the SQL queries) in the resizeable panel
 at the bottom.
 
 Should you wish to get your feet a little wetter, have a look at
-[packages/graphile-build-pg/src/examples/README.md](packages/graphile-build-pg/src/examples/README.md)
+[graphile-build/graphile-build-pg/src/examples/README.md](graphile-build/graphile-build-pg/src/examples/README.md)
 and follow the guidance there, try out a couple examples, etc.
 
 **DOCS**: I've put a fair amount of effort into documenting various of the
@@ -204,16 +204,16 @@ If the above succeeds, you're good to go! If not, please try again after running
 If you want to work in a Docker environment you can follow
 [the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
 
-[grafast]: packages/grafast/
-[@dataplan/pg]: packages/dataplan-pg/
-[@dataplan/json]: packages/dataplan-json/
-[graphile-export]: packages/graphile-export/
-[eslint-plugin-graphile-export]: packages/eslint-plugin-graphile-export/
-[jest-serializer-graphql-schema]: packages/jest-serializer-graphql-schema/
-[graphile-config]: packages/graphile-config/
-[postgraphile]: packages/postgraphile/
-[graphile-build]: packages/graphile-build/
-[graphile-build-pg]: packages/graphile-build-pg/
-[@graphile/lru]: packages/lru/
-[pg-sql2]: packages/pg-sql2/
-[pg-introspection]: packages/pg-introspection/
+[grafast]: grafast/grafast/
+[@dataplan/pg]: grafast/dataplan-pg/
+[@dataplan/json]: grafast/dataplan-json/
+[graphile-export]: graphile-build/graphile-export/
+[eslint-plugin-graphile-export]: graphile-build/eslint-plugin-graphile-export/
+[jest-serializer-graphql-schema]: utils/jest-serializer-graphql-schema/
+[graphile-config]: utils/graphile-config/
+[postgraphile]: postgraphile/postgraphile/
+[graphile-build]: graphile-build/graphile-build/
+[graphile-build-pg]: graphile-build/graphile-build-pg/
+[@graphile/lru]: utils/lru/
+[pg-sql2]: utils/pg-sql2/
+[pg-introspection]: utils/pg-introspection/

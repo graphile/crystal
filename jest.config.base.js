@@ -14,8 +14,8 @@ module.exports = (dir) => {
     moduleFileExtensions: ["js", "json", "jsx", "ts", "tsx", "node"],
     roots: [`<rootDir>`],
     snapshotSerializers: [
-      `${__dirname}/packages/jest-serializer-graphql-schema`,
-      `${__dirname}/packages/jest-serializer-simple`,
+      `${__dirname}/utils/jest-serializer-graphql-schema`,
+      `${__dirname}/utils/jest-serializer-simple`,
     ],
     extensionsToTreatAsEsm: [".ts"],
     moduleNameMapper: {

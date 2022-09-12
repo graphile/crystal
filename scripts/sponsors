@@ -23,16 +23,16 @@ And please give some love to our featured sponsors 🤩:
 const readmes = [
   "README.md",
   "postgraphile/README.md",
-  ...glob.sync("packages/*/README.md"),
+  ...glob.sync("{utils,grafast,graphile-build,postgraphile}/*/README.md"),
 ];
 if (readmes.length < 5) {
   throw new Error("Too few READMEs");
 }
-readmes.forEach(readme => {
+readmes.forEach((readme) => {
   const contents = fs.readFileSync(readme, "utf8");
   const output = contents.replace(
     /(<!-- SPONSORS_BEGIN -->)[\s\S]*(<!-- SPONSORS_END -->)/,
-    `$1\n${sponsorsMessage}\n$2`
+    `$1\n${sponsorsMessage}\n$2`,
   );
   fs.writeFileSync(readme, output);
 });
