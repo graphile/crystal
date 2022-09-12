@@ -198,15 +198,9 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 `Represents JSON values as specified by ` +
                 "[ECMA-404](http://www.ecma-international.org/" +
                 "publications/files/ECMA-ST/ECMA-404.pdf).",
-              serialize: EXPORTABLE(
-                () => (value) =>
-                  value == null ? value : JSON.parse(String(value)),
-                [],
-              ),
-              parseValue: EXPORTABLE(
-                () => (value) => JSON.stringify(value),
-                [],
-              ),
+              serialize: (value) =>
+                value == null ? value : JSON.parse("" + value),
+              parseValue: (value) => JSON.stringify(value),
               parseLiteral,
             }),
             "graphile-build built-in (JSON type; extended)",

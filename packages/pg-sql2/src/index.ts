@@ -676,7 +676,7 @@ export function literal(val: string | number | boolean | null): SQL {
     return makeRawNode(`'${val}'`);
   } else if (typeof val === "number" && Number.isFinite(val)) {
     if (Number.isInteger(val)) {
-      return makeRawNode(String(val));
+      return makeRawNode("" + val);
     } else {
       return makeRawNode(`'${0 + val}'::float`);
     }

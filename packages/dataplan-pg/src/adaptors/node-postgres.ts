@@ -81,7 +81,7 @@ export function makeNodePostgresWithPgClient(
     /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
     let txLevel = 0;
     const pgSettingsEntries = pgSettings
-      ? Object.entries(pgSettings).map(([k, v]) => [k, String(v)])
+      ? Object.entries(pgSettings).map(([k, v]) => [k, "" + v])
       : [];
     /** If transactions become unpaired, prevent any further usage */
     let catastrophicFailure: Error | null = null;
@@ -310,7 +310,7 @@ export function makeWithPgClientViaNodePostgresClientAlreadyInTransaction(
       // Because we're reusing a client that's already in a transaction we start at 1.
       let txLevel = 1;
       const pgSettingsEntries = pgSettings
-        ? Object.entries(pgSettings).map(([k, v]) => [k, String(v)])
+        ? Object.entries(pgSettings).map(([k, v]) => [k, "" + v])
         : [];
       /** If transactions become unpaired, prevent any further usage */
       let catastrophicFailure: Error | null = null;
