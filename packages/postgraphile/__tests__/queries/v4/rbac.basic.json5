@@ -198,7 +198,6 @@
     },
   },
   returnTableWithoutGrants: {
-    nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
     personId1: 1,
     personId2: 2,
   },
