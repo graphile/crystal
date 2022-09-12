@@ -207,8 +207,8 @@ If you want to work in a Docker environment you can follow
 [grafast]: grafast/grafast/
 [@dataplan/pg]: grafast/dataplan-pg/
 [@dataplan/json]: grafast/dataplan-json/
-[graphile-export]: graphile-build/graphile-export/
-[eslint-plugin-graphile-export]: graphile-build/eslint-plugin-graphile-export/
+[graphile-export]: utils/graphile-export/
+[eslint-plugin-graphile-export]: utils/eslint-plugin-graphile-export/
 [jest-serializer-graphql-schema]: utils/jest-serializer-graphql-schema/
 [graphile-config]: utils/graphile-config/
 [postgraphile]: postgraphile/postgraphile/

@@ -33,7 +33,7 @@
   "exclude": ["node_modules", "dist", ".yarn"],
   "include": [],
   "references": [
-    { "path": "graphile-build/eslint-plugin-graphile-export" },
+    { "path": "utils/eslint-plugin-graphile-export" },
     { "path": "utils/jest-serializer-graphql-schema" },
     { "path": "utils/jest-serializer-simple" },
     { "path": "graphile-build/lds" },
@@ -42,7 +42,7 @@
     { "path": "graphile-build/graphile-build" },
     { "path": "graphile-build/graphile-build-pg" },
     { "path": "grafast/grafast" },
-    { "path": "graphile-build/graphile-export" },
+    { "path": "utils/graphile-export" },
     { "path": "utils/graphile-config" },
     { "path": "graphile-build/graphile-utils" },
     { "path": "grafast/dataplan-pg" },
