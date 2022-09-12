@@ -8,8 +8,7 @@ export type ContextCallback = (
   graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
 ) => object;
 
-// TODO: rename this!
-export interface SchemaResult {
+export interface ServerParams {
   schema: GraphQLSchema;
   config: GraphileConfig.ResolvedPreset;
   contextCallback: ContextCallback;

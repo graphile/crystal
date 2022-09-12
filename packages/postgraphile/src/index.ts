@@ -1,6 +1,6 @@
 import type { Deferred } from "grafast";
 import { defer } from "grafast";
-import type { SchemaResult } from "grafserv";
+import type { ServerParams } from "grafserv";
 import { grafserv } from "grafserv";
 import { resolvePresets } from "graphile-config";
 
@@ -12,33 +12,33 @@ export { GraphileBuild, GraphileConfig };
 
 export function postgraphile(preset: GraphileConfig.Preset) {
   const config = resolvePresets([preset]);
-  let schemaResult:
-    | PromiseLike<SchemaResult>
-    | Deferred<SchemaResult>
-    | SchemaResult;
+  let serverParams:
+    | PromiseLike<ServerParams>
+    | Deferred<ServerParams>
+    | ServerParams;
   let stopWatchingPromise: Promise<() => void> | null = null;
   if (config.server?.watch) {
-    schemaResult = defer<SchemaResult>();
-    stopWatchingPromise = watchSchema(preset, (error, result) => {
-      if (error || !result) {
+    serverParams = defer<ServerParams>();
+    stopWatchingPromise = watchSchema(preset, (error, newParams) => {
+      if (error || !newParams) {
         console.error("Watch error: ", error);
         return;
       }
-      const oldSchemaResult = schemaResult;
-      schemaResult = result;
+      const oldServerParams = serverParams;
+      serverParams = newParams;
       if (
-        oldSchemaResult !== null &&
-        "resolve" in oldSchemaResult &&
-        typeof oldSchemaResult.resolve === "function"
+        oldServerParams !== null &&
+        "resolve" in oldServerParams &&
+        typeof oldServerParams.resolve === "function"
       ) {
-        oldSchemaResult.resolve(schemaResult);
+        oldServerParams.resolve(serverParams);
       }
-      server.setSchema(schemaResult);
+      server.setParams(serverParams);
     });
   } else {
-    schemaResult = makeSchema(preset);
+    serverParams = makeSchema(preset);
   }
-  const server = grafserv(config, schemaResult);
+  const server = grafserv(config, serverParams);
   if (stopWatchingPromise) {
     const p = stopWatchingPromise;
     server.onRelease(async () => {

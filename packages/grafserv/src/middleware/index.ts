@@ -10,7 +10,7 @@ import { GraphQLError } from "graphql";
 import type { IncomingMessage, RequestListener, ServerResponse } from "http";
 import EventEmitter from "node:events";
 
-import type { SchemaResult } from "../interfaces.js";
+import type { ServerParams } from "../interfaces.js";
 import { makeGraphiQLHandler } from "./graphiql.js";
 import { makeGraphQLHandler } from "./graphql.js";
 import type { EventStreamEvent, HandlerResult } from "./interfaces.js";
@@ -56,16 +56,7 @@ function handleErrors(payload: ExecutionResult | AsyncExecutionResult): void {
   }
 }
 
-export function grafserv(
-  preset: GraphileConfig.Preset,
-  initialSchemaResult?: SchemaResult | PromiseLike<SchemaResult>,
-): {
-  handler: RequestListener;
-  release(): Promise<void>;
-  onRelease(cb: () => PromiseOrDirect<void>): void;
-  setSchema(result: SchemaResult): void;
-} {
-  const config = resolvePresets([preset]);
+function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   const {
     graphqlPath = "/graphql",
     graphiql = true,
@@ -75,6 +66,31 @@ export function grafserv(
     eventStreamRoute = "/graphql/stream",
     maxRequestLength = 100_000,
   } = config.server ?? {};
+  return {
+    graphqlPath,
+    graphiql,
+    graphiqlOnGraphQLGET,
+    graphiqlPath,
+    watch,
+    eventStreamRoute,
+    maxRequestLength,
+  };
+}
+
+export function grafserv(
+  preset: GraphileConfig.Preset,
+  initialParams?: PromiseOrDirect<ServerParams>,
+): {
+  handler: RequestListener;
+  release(): Promise<void>;
+  onRelease(cb: () => PromiseOrDirect<void>): void;
+  setParams(result: ServerParams): void;
+} {
+  /**
+   * Mutable options, change them by calling `setParams`. Don't dereference
+   * properties as they should be dynamic.
+   */
+  let dynamicOptions = optionsFromConfig(resolvePresets([preset]));
 
   const sendResult = (
     res: ServerResponse,
@@ -87,9 +103,9 @@ export function grafserv(
         handleErrors(payload);
         res.writeHead(statusCode, {
           "Content-Type": "application/json",
-          ...(watch
+          ...(dynamicOptions.watch
             ? {
-                "X-GraphQL-Event-Stream": eventStreamRoute,
+                "X-GraphQL-Event-Stream": dynamicOptions.eventStreamRoute,
               }
             : null),
         });
@@ -102,9 +118,9 @@ export function grafserv(
         res.writeHead(statusCode, {
           "Content-Type": 'multipart/mixed; boundary="-"',
           "Transfer-Encoding": "chunked",
-          ...(watch
+          ...(dynamicOptions.watch
             ? {
-                "X-GraphQL-Event-Stream": eventStreamRoute,
+                "X-GraphQL-Event-Stream": dynamicOptions.eventStreamRoute,
               }
             : null),
         });
@@ -290,7 +306,7 @@ export function grafserv(
     };
   };
 
-  type SchemaResultAndHandlers = SchemaResult & {
+  type ServerResultAndHandlers = ServerParams & {
     graphqlHandler: Awaited<ReturnType<typeof makeGraphQLHandler>>;
     graphiqlHandler: Awaited<ReturnType<typeof makeGraphiQLHandler>>;
   };
@@ -358,7 +374,7 @@ export function grafserv(
       },
     };
   }
-  function addHandlers(r: SchemaResult): SchemaResultAndHandlers {
+  function addHandlers(r: ServerParams): ServerResultAndHandlers {
     eventEmitter.emit("newSchema", r.schema);
     return {
       ...r,
@@ -367,31 +383,34 @@ export function grafserv(
     };
   }
 
-  let schemaResult:
-    | PromiseLike<SchemaResultAndHandlers>
-    | Deferred<SchemaResultAndHandlers>
-    | SchemaResultAndHandlers =
-    initialSchemaResult == null
-      ? defer<SchemaResultAndHandlers>()
-      : isPromiseLike(initialSchemaResult)
-      ? initialSchemaResult.then(addHandlers)
-      : addHandlers(initialSchemaResult);
+  let serverParams:
+    | PromiseLike<ServerResultAndHandlers>
+    | Deferred<ServerResultAndHandlers>
+    | ServerResultAndHandlers =
+    initialParams == null
+      ? defer<ServerResultAndHandlers>()
+      : isPromiseLike(initialParams)
+      ? initialParams.then(addHandlers)
+      : addHandlers(initialParams);
 
   const middleware: RequestListener = (req, res, next?: any): void => {
     const handleError = makeErrorHandler(req, res, next);
 
     // TODO: consider allowing GraphQL queries over 'GET'
-    if (req.url === graphqlPath && req.method === "POST") {
+    if (req.url === dynamicOptions.graphqlPath && req.method === "POST") {
       (async () => {
-        const bodyRaw = await getBodyFromRequest(req, maxRequestLength);
+        const bodyRaw = await getBodyFromRequest(
+          req,
+          dynamicOptions.maxRequestLength,
+        );
         // TODO: this parsing is unsafe (it doesn't even check the
         // content-type!) - replace it with V4's behaviour
         const body = JSON.parse(bodyRaw);
-        const sR = isPromiseLike(schemaResult)
-          ? await schemaResult
-          : schemaResult;
-        const contextValue = sR.contextCallback(req);
-        const result = await sR.graphqlHandler(contextValue, body);
+        const sP = isPromiseLike(serverParams)
+          ? await serverParams
+          : serverParams;
+        const contextValue = sP.contextCallback(req);
+        const result = await sP.graphqlHandler(contextValue, body);
         sendResult(res, result);
       })().catch((e) => {
         // Special error handling for GraphQL route
@@ -417,22 +436,27 @@ export function grafserv(
 
     // TODO: handle 'HEAD' requests
     if (
-      graphiql &&
-      (req.url === graphiqlPath ||
-        (graphiqlOnGraphQLGET && req.url === graphqlPath)) &&
+      dynamicOptions.graphiql &&
+      (req.url === dynamicOptions.graphiqlPath ||
+        (dynamicOptions.graphiqlOnGraphQLGET &&
+          req.url === dynamicOptions.graphqlPath)) &&
       req.method === "GET"
     ) {
       (async () => {
-        const sR = isPromiseLike(schemaResult)
-          ? await schemaResult
-          : schemaResult;
-        const result = await sR.graphiqlHandler();
+        const sP = isPromiseLike(serverParams)
+          ? await serverParams
+          : serverParams;
+        const result = await sP.graphiqlHandler();
         sendResult(res, result);
       })().catch(handleError);
       return;
     }
 
-    if (watch && req.url === eventStreamRoute && req.method === "GET") {
+    if (
+      dynamicOptions.watch &&
+      req.url === dynamicOptions.eventStreamRoute &&
+      req.method === "GET"
+    ) {
       (async () => {
         const stream = makeStream();
         sendResult(res, {
@@ -451,7 +475,7 @@ export function grafserv(
       console.log(`Unhandled ${req.method} to ${req.url}`);
       sendResult(res, {
         type: "text",
-        payload: `Could not process ${req.method} request to ${req.url} ─ please POST requests to ${graphqlPath}`,
+        payload: `Could not process ${req.method} request to ${req.url} ─ please POST requests to ${dynamicOptions.graphqlPath}`,
         statusCode: 404,
       });
       return;
@@ -474,17 +498,18 @@ export function grafserv(
     onRelease(cb) {
       releaseHandlers.push(cb);
     },
-    setSchema(newResult) {
-      const newResultWithHandlers = addHandlers(newResult!);
+    setParams(newParams) {
+      const newParamsWithHandlers = addHandlers(newParams!);
       if (
-        // If schemaResult was deferred, resolve it
-        schemaResult !== null &&
-        "resolve" in schemaResult &&
-        typeof schemaResult.resolve === "function"
+        // If serverParams was deferred, resolve it
+        serverParams !== null &&
+        "resolve" in serverParams &&
+        typeof serverParams.resolve === "function"
       ) {
-        schemaResult.resolve(newResultWithHandlers);
+        serverParams.resolve(newParamsWithHandlers);
       }
-      schemaResult = newResultWithHandlers;
+      dynamicOptions = optionsFromConfig(newParams.config);
+      serverParams = newParamsWithHandlers;
     },
   };
 }
