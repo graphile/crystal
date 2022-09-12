@@ -27,8 +27,8 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   ) {
     // We can do a fast custom conversion
     return new Function(
-      "obj",
-      `return { ${entries
+      "isCrystalError",
+      `return obj => (obj == null || isCrystalError(obj) ? obj : { ${entries
         .map(
           ([key, val]) =>
             `${STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key}: obj${
@@ -37,8 +37,8 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
                 : `.${val}`
             }`,
         )
-        .join(", ")} }`,
-    ) as any;
+        .join(", ")} })`,
+    )(isCrystalError) as any;
   }
   // Fallback to slow conversion
   return (obj: object | null | CrystalError): object | null | CrystalError => {
