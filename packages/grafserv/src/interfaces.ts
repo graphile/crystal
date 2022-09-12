@@ -1,13 +1,14 @@
 import "graphile-config";
 
 import type { GraphQLSchema } from "graphql";
+import type { IncomingMessage } from "node:http";
+import type { Socket } from "node:net";
 
 export type ContextCallback = (
   graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
 ) => object;
 
-// TODO: rename this!
-export interface SchemaResult {
+export interface ServerParams {
   schema: GraphQLSchema;
   config: GraphileConfig.ResolvedPreset;
   contextCallback: ContextCallback;
@@ -34,10 +35,25 @@ export interface ServerOptions {
 
   /** Set true to enable watch mode */
   watch?: boolean;
+
+  /** The length, in bytes, for the largest request body that the server will accept */
+  maxRequestLength?: number;
 }
 
 declare global {
   namespace GraphileConfig {
+    /**
+     * Details about the incoming GraphQL request - e.g. if it was sent over an
+     * HTTP request, the request itself so headers can be interrogated.
+     *
+     * It's anticipated this will be expanded via declaration merging, e.g. if
+     * your server is Koa then a `koaCtx` might be added.
+     */
+    interface GraphQLRequestContext {
+      // TODO: add things like operationName, operation, etc?
+      httpRequest?: IncomingMessage;
+      socket?: Socket;
+    }
     interface Preset {
       server?: ServerOptions;
     }

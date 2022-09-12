@@ -14,6 +14,7 @@
     { "path": "../graphile-build" },
     { "path": "../graphile-build-pg" },
     { "path": "../grafast" },
+    { "path": "../grafserv" },
     { "path": "../graphile-export" },
     { "path": "../graphile-inspect" },
     { "path": "../graphile-config" }

@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+    "moduleResolution": "nodenext"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../lru" },
+    { "path": "../graphile-config" },
+    { "path": "../grafast" },
+    { "path": "../graphile-inspect" }
+  ]
+}

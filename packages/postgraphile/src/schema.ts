@@ -13,7 +13,7 @@ import * as pg from "pg";
 
 const Pool = pg.Pool || (pg as any).default?.Pool;
 
-import type { SchemaResult } from "./interfaces.js";
+import type { ServerParams } from "grafserv";
 
 declare global {
   namespace GraphileBuild {
@@ -104,7 +104,7 @@ function makeContextCallback(config: GraphileConfig.ResolvedPreset) {
  */
 export async function makeSchema(
   preset: GraphileConfig.Preset,
-): Promise<SchemaResult> {
+): Promise<ServerParams> {
   const config = resolvePresets([preset]);
   const shared = { inflection: buildInflection(config) };
   const input = await gather(config, shared);
@@ -115,7 +115,7 @@ export async function makeSchema(
 
 /**
  * Runs the "gather" phase in watch mode and calls 'callback' with the
- * generated SchemaResult each time a new schema is generated.
+ * generated ServerParams each time a new schema is generated.
  *
  * It is guaranteed that `callback` will be called at least once before the
  * promise resolves.
@@ -126,7 +126,7 @@ export async function makeSchema(
  */
 export async function watchSchema(
   preset: GraphileConfig.Preset,
-  callback: (error: Error | null, schema?: SchemaResult) => void,
+  callback: (error: Error | null, params?: ServerParams) => void,
 ): Promise<() => void> {
   const config = resolvePresets([preset]);
   const shared = { inflection: buildInflection(config) };

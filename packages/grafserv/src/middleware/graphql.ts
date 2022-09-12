@@ -9,7 +9,7 @@ import {
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type { SchemaResult } from "../interfaces.js";
+import type { ServerParams } from "../interfaces.js";
 import type { HandlerResult } from "./interfaces.js";
 
 let lastString: string;
@@ -79,13 +79,13 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
-export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
-  const { schema, config } = schemaResult;
+export const makeGraphQLHandler = (params: ServerParams) => {
+  const { schema, config } = params;
   const { exposePlan = false } = config.server ?? {};
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const asString = true;
   const grafastOptions: GrafastExecuteOptions = {
-    // TODO: revisit 'exposePlan'
+    // TODO: revisit 'exposePlan'; also should be more generic ('sql' shouldn't be referenced in grafserv)
     explain: exposePlan ? ["mermaid-js", "sql"] : null,
     asString,
   };

@@ -2,7 +2,7 @@ import { loadConfig, resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { createServer } from "node:http";
 
-import { postgraphile } from "./middleware/index.js";
+import { postgraphile } from "./index.js";
 // TODO: there should be no default preset
 import defaultPreset from "./presets/amber.js";
 import { makePgSourcesFromConnectionString } from "./schema.js";
@@ -100,9 +100,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     );
   }
 
-  const middleware = postgraphile(config);
+  const serv = postgraphile(config);
 
-  const server = createServer(middleware);
+  const server = createServer(serv.handler);
   let started = false;
   server.on("error", (e) => {
     console.error("Server raised an error:", e);
