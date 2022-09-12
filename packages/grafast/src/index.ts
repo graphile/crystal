@@ -23,7 +23,6 @@ import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { CrystalError, isCrystalError } from "./error.js";
 import { execute, GrafastExecuteOptions } from "./execute.js";
-import { grafastEnforce } from "./grafastEnforce.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
 import {
@@ -76,14 +75,6 @@ import {
   TypedEventEmitter,
 } from "./interfaces.js";
 import { polymorphicWrap, resolveType } from "./polymorphic.js";
-import {
-  $$crystalWrapped,
-  crystalResolve,
-  CrystalWrapDetails,
-  grafastResolver,
-  grafastSubscriber,
-  isCrystalWrapped,
-} from "./resolvers.js";
 import {
   assertListCapableStep,
   BaseStep,
@@ -201,7 +192,6 @@ export {
   __TrackedObjectStep,
   __ValueStep,
   $$bypassGraphQL,
-  $$crystalWrapped,
   $$data,
   $$eventEmitter,
   $$extensions,
@@ -230,12 +220,10 @@ export {
   CrystalError,
   CrystalPlans,
   crystalPrint,
-  crystalResolve,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalSubscriber,
   CrystalValuesList,
-  CrystalWrapDetails,
   debugPlans,
   defer,
   Deferred,
@@ -263,7 +251,6 @@ export {
   FirstStep,
   getEnumValueConfig,
   GrafastArgumentExtensions,
-  grafastEnforce,
   GrafastEnumValueExtensions,
   GrafastExecuteOptions,
   GrafastFieldExtensions,
@@ -271,8 +258,6 @@ export {
   grafastGraphqlSync,
   GrafastInputFieldExtensions,
   GrafastObjectTypeExtensions,
-  grafastResolver,
-  grafastSubscriber,
   GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -297,7 +282,6 @@ export {
   InputStep,
   InterfaceOrUnionPlans,
   isCrystalError,
-  isCrystalWrapped,
   isDev,
   isExecutableStep,
   isListCapableStep,
@@ -378,7 +362,6 @@ exportAsMany({
   makeCrystalSchema,
   OperationPlan,
   defer,
-  grafastEnforce,
   execute,
   grafastGraphql,
   grafastGraphqlSync,
@@ -446,11 +429,6 @@ exportAsMany({
   ListenStep,
   polymorphicWrap,
   resolveType,
-  $$crystalWrapped,
-  isCrystalWrapped,
-  grafastResolver,
-  crystalResolve,
-  grafastSubscriber,
   stripAnsi,
   arraysMatch,
   inputObjectFieldSpec,

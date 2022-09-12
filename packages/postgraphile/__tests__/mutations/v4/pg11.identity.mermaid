@@ -9,55 +9,55 @@ graph TD
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf11["__InputStaticLeaf[11∈0]"]:::plan
-    Access13["Access[13∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access14["Access[14∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object15["Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgInsert12[["PgInsert[12∈1]"]]:::sideeffectplan
-    Object16["Object[16∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression17["PgClassExpression[17∈1]<br />ᐸ__always_a...ity__.”id”ᐳ"]:::plan
-    PgClassExpression18["PgClassExpression[18∈1]<br />ᐸ__always_a...tity__.”t”ᐳ"]:::plan
-    __InputStaticLeaf23["__InputStaticLeaf[23∈0]"]:::plan
-    PgInsert24[["PgInsert[24∈2]"]]:::sideeffectplan
-    Object28["Object[28∈2]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression29["PgClassExpression[29∈2]<br />ᐸ__by_defau...ity__.”id”ᐳ"]:::plan
-    PgClassExpression30["PgClassExpression[30∈2]<br />ᐸ__by_defau...tity__.”t”ᐳ"]:::plan
+    __InputStaticLeaf10["__InputStaticLeaf[10∈0]"]:::plan
+    Access12["Access[12∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
+    Access13["Access[13∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
+    Object14["Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    PgInsert11[["PgInsert[11∈1]"]]:::sideeffectplan
+    Object15["Object[15∈1]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression16["PgClassExpression[16∈1]<br />ᐸ__always_a...ity__.”id”ᐳ"]:::plan
+    PgClassExpression17["PgClassExpression[17∈1]<br />ᐸ__always_a...tity__.”t”ᐳ"]:::plan
+    __InputStaticLeaf22["__InputStaticLeaf[22∈0]"]:::plan
+    PgInsert23[["PgInsert[23∈2]"]]:::sideeffectplan
+    Object27["Object[27∈2]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression28["PgClassExpression[28∈2]<br />ᐸ__by_defau...ity__.”id”ᐳ"]:::plan
+    PgClassExpression29["PgClassExpression[29∈2]<br />ᐸ__by_defau...tity__.”t”ᐳ"]:::plan
+    __InputStaticLeaf33["__InputStaticLeaf[33∈0]"]:::plan
     __InputStaticLeaf34["__InputStaticLeaf[34∈0]"]:::plan
-    __InputStaticLeaf35["__InputStaticLeaf[35∈0]"]:::plan
-    PgInsert36[["PgInsert[36∈3]"]]:::sideeffectplan
-    Object40["Object[40∈3]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression41["PgClassExpression[41∈3]<br />ᐸ__by_defau...ity__.”id”ᐳ"]:::plan
-    PgClassExpression42["PgClassExpression[42∈3]<br />ᐸ__by_defau...tity__.”t”ᐳ"]:::plan
+    PgInsert35[["PgInsert[35∈3]"]]:::sideeffectplan
+    Object39["Object[39∈3]<br />ᐸ{result}ᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈3]<br />ᐸ__by_defau...ity__.”id”ᐳ"]:::plan
+    PgClassExpression41["PgClassExpression[41∈3]<br />ᐸ__by_defau...tity__.”t”ᐳ"]:::plan
 
     %% plan dependencies
+    __Value3 --> Access12
     __Value3 --> Access13
-    __Value3 --> Access14
-    Access13 & Access14 --> Object15
-    Object15 & __InputStaticLeaf11 --> PgInsert12
-    PgInsert12 --> Object16
-    PgInsert12 --> PgClassExpression17
-    PgInsert12 --> PgClassExpression18
-    Object15 & __InputStaticLeaf23 --> PgInsert24
-    PgInsert24 --> Object28
-    PgInsert24 --> PgClassExpression29
-    PgInsert24 --> PgClassExpression30
-    Object15 & __InputStaticLeaf34 & __InputStaticLeaf35 --> PgInsert36
-    PgInsert36 --> Object40
-    PgInsert36 --> PgClassExpression41
-    PgInsert36 --> PgClassExpression42
+    Access12 & Access13 --> Object14
+    Object14 & __InputStaticLeaf10 --> PgInsert11
+    PgInsert11 --> Object15
+    PgInsert11 --> PgClassExpression16
+    PgInsert11 --> PgClassExpression17
+    Object14 & __InputStaticLeaf22 --> PgInsert23
+    PgInsert23 --> Object27
+    PgInsert23 --> PgClassExpression28
+    PgInsert23 --> PgClassExpression29
+    Object14 & __InputStaticLeaf33 & __InputStaticLeaf34 --> PgInsert35
+    PgInsert35 --> Object39
+    PgInsert35 --> PgClassExpression40
+    PgInsert35 --> PgClassExpression41
 
     subgraph "Buckets for mutations/v4/pg11.identity"
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf11,Access13,Access14,Object15,__InputStaticLeaf23,__InputStaticLeaf34,__InputStaticLeaf35 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 15, 11<br /><br />1: PgInsert{1}[12]<br />2: Object{1}ᐸ{result}ᐳ[16],PgClassExpression{1}ᐸ__always_a...ity__.”id”ᐳ[17],PgClassExpression{1}ᐸ__always_a...tity__.”t”ᐳ[18]"):::bucket
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf10,Access12,Access13,Object14,__InputStaticLeaf22,__InputStaticLeaf33,__InputStaticLeaf34 bucket0
+    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 14, 10<br /><br />1: PgInsert{1}[11]<br />2: Object{1}ᐸ{result}ᐳ[15],PgClassExpression{1}ᐸ__always_a...ity__.”id”ᐳ[16],PgClassExpression{1}ᐸ__always_a...tity__.”t”ᐳ[17]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert12,Object16,PgClassExpression17,PgClassExpression18 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 15, 23<br /><br />1: PgInsert{2}[24]<br />2: Object{2}ᐸ{result}ᐳ[28],PgClassExpression{2}ᐸ__by_defau...ity__.”id”ᐳ[29],PgClassExpression{2}ᐸ__by_defau...tity__.”t”ᐳ[30]"):::bucket
+    class Bucket1,PgInsert11,Object15,PgClassExpression16,PgClassExpression17 bucket1
+    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 14, 22<br /><br />1: PgInsert{2}[23]<br />2: Object{2}ᐸ{result}ᐳ[27],PgClassExpression{2}ᐸ__by_defau...ity__.”id”ᐳ[28],PgClassExpression{2}ᐸ__by_defau...tity__.”t”ᐳ[29]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgInsert24,Object28,PgClassExpression29,PgClassExpression30 bucket2
-    Bucket3("Bucket 3<br />(mutationField)<br />Deps: 15, 34, 35<br /><br />1: PgInsert{3}[36]<br />2: Object{3}ᐸ{result}ᐳ[40],PgClassExpression{3}ᐸ__by_defau...ity__.”id”ᐳ[41],PgClassExpression{3}ᐸ__by_defau...tity__.”t”ᐳ[42]"):::bucket
+    class Bucket2,PgInsert23,Object27,PgClassExpression28,PgClassExpression29 bucket2
+    Bucket3("Bucket 3<br />(mutationField)<br />Deps: 14, 33, 34<br /><br />1: PgInsert{3}[35]<br />2: Object{3}ᐸ{result}ᐳ[39],PgClassExpression{3}ᐸ__by_defau...ity__.”id”ᐳ[40],PgClassExpression{3}ᐸ__by_defau...tity__.”t”ᐳ[41]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgInsert36,Object40,PgClassExpression41,PgClassExpression42 bucket3
+    class Bucket3,PgInsert35,Object39,PgClassExpression40,PgClassExpression41 bucket3
     Bucket0 --> Bucket1 & Bucket2 & Bucket3
     end

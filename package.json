@@ -4,7 +4,7 @@
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint:fix": "yarn run eslint --fix . && yarn prettier:fix",
     "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --topological run pretest",
-    "test": "jest -i",
+    "test": "yarn workspaces foreach --topological run test",
     "posttest": "yarn workspaces foreach --topological run posttest",
     "prepack:all": "scripts/prepack-all",
     "build": "tsc -b && yarn && yarn workspace graphile-inspect prepack",

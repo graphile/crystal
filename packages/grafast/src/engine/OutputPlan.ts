@@ -979,8 +979,7 @@ function makeArrayExecutor<TAsString extends boolean>(
   if (l === 0) {
 ${asString ? '    string = "[]";' : "    /* noop */"}
   } else {
-    string = "["
-
+${asString ? '    string = "[";\n' : ""}\
     const mutablePathIndex = mutablePath.push(-1) - 1;
 
     // Now to populate the children...

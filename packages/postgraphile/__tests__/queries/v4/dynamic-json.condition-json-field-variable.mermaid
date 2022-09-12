@@ -10,9 +10,9 @@ graph TD
     __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access15["Access[15∈0]<br />ᐸ1.myValᐳ"]:::plan
-    __TrackedObject16["__TrackedObject[16∈0]"]:::plan
-    __InputDynamicScalar14["__InputDynamicScalar[14∈0]"]:::plan
+    Access18["Access[18∈0]<br />ᐸ1.myValᐳ"]:::plan
+    __TrackedObject19["__TrackedObject[19∈0]"]:::plan
+    __InputDynamicScalar17["__InputDynamicScalar[17∈0]"]:::plan
     Access21["Access[21∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
     Access22["Access[22∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object23["Object[23∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
@@ -22,15 +22,15 @@ graph TD
     PgSelectSingle27["PgSelectSingle[27∈1]<br />ᐸmyTableᐳ"]:::plan
     PgClassExpression28["PgClassExpression[28∈1]<br />ᐸ__my_table__.”id”ᐳ"]:::plan
     PgClassExpression29["PgClassExpression[29∈1]<br />ᐸ__my_table...json_data”ᐳ"]:::plan
-    __InputDynamicScalar37["__InputDynamicScalar[37∈0]"]:::plan
+    __InputDynamicScalar40["__InputDynamicScalar[40∈0]"]:::plan
     Connection45["Connection[45∈0]<br />ᐸ41ᐳ"]:::plan
     PgSelect46[["PgSelect[46∈0]<br />ᐸmyTableᐳ"]]:::plan
     __Item47>"__Item[47∈2]<br />ᐸ46ᐳ"]:::itemplan
     PgSelectSingle48["PgSelectSingle[48∈2]<br />ᐸmyTableᐳ"]:::plan
     PgClassExpression49["PgClassExpression[49∈2]<br />ᐸ__my_table__.”id”ᐳ"]:::plan
     PgClassExpression50["PgClassExpression[50∈2]<br />ᐸ__my_table...json_data”ᐳ"]:::plan
-    Access58["Access[58∈0]<br />ᐸ1.myVal2ᐳ"]:::plan
-    __TrackedObject59["__TrackedObject[59∈0]"]:::plan
+    Access61["Access[61∈0]<br />ᐸ1.myVal2ᐳ"]:::plan
+    __TrackedObject62["__TrackedObject[62∈0]"]:::plan
     Connection67["Connection[67∈0]<br />ᐸ63ᐳ"]:::plan
     PgSelect68[["PgSelect[68∈0]<br />ᐸmyTableᐳ"]]:::plan
     __Item69>"__Item[69∈3]<br />ᐸ68ᐳ"]:::itemplan
@@ -39,25 +39,25 @@ graph TD
     PgClassExpression72["PgClassExpression[72∈3]<br />ᐸ__my_table...json_data”ᐳ"]:::plan
 
     %% plan dependencies
-    __Value1 --> Access15
-    Access15 --> __TrackedObject16
-    __TrackedObject16 --> __InputDynamicScalar14
+    __Value1 --> Access18
+    Access18 --> __TrackedObject19
+    __TrackedObject19 --> __InputDynamicScalar17
     __Value3 --> Access21
     __Value3 --> Access22
     Access21 & Access22 --> Object23
-    Object23 & __InputDynamicScalar14 & Connection24 --> PgSelect25
+    Object23 & __InputDynamicScalar17 & Connection24 --> PgSelect25
     PgSelect25 ==> __Item26
     __Item26 --> PgSelectSingle27
     PgSelectSingle27 --> PgClassExpression28
     PgSelectSingle27 --> PgClassExpression29
-    Object23 & __InputDynamicScalar37 & Connection45 --> PgSelect46
+    Object23 & __InputDynamicScalar40 & Connection45 --> PgSelect46
     PgSelect46 ==> __Item47
     __Item47 --> PgSelectSingle48
     PgSelectSingle48 --> PgClassExpression49
     PgSelectSingle48 --> PgClassExpression50
-    __Value1 --> Access58
-    Access58 --> __TrackedObject59
-    Object23 & __TrackedObject59 & Connection67 --> PgSelect68
+    __Value1 --> Access61
+    Access61 --> __TrackedObject62
+    Object23 & __TrackedObject62 & Connection67 --> PgSelect68
     PgSelect68 ==> __Item69
     __Item69 --> PgSelectSingle70
     PgSelectSingle70 --> PgClassExpression71
@@ -66,7 +66,7 @@ graph TD
     subgraph "Buckets for queries/v4/dynamic-json.condition-json-field-variable"
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value1,__Value3,__Value5,__InputDynamicScalar14,Access15,__TrackedObject16,Access21,Access22,Object23,Connection24,PgSelect25,__InputDynamicScalar37,Connection45,PgSelect46,Access58,__TrackedObject59,Connection67,PgSelect68 bucket0
+    class Bucket0,__Value1,__Value3,__Value5,__InputDynamicScalar17,Access18,__TrackedObject19,Access21,Access22,Object23,Connection24,PgSelect25,__InputDynamicScalar40,Connection45,PgSelect46,Access61,__TrackedObject62,Connection67,PgSelect68 bucket0
     Bucket1("Bucket 1<br />(listItem)<br />ROOT __Item{1}ᐸ25ᐳ[26]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item26,PgSelectSingle27,PgClassExpression28,PgClassExpression29 bucket1

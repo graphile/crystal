@@ -52,7 +52,6 @@ import type {
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
-import { $$crystalWrapped, isCrystalWrapped } from "../resolvers.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   assertExecutableStep,
@@ -877,10 +876,7 @@ export class OperationPlan {
          * This will never be the crystal resolver - only ever the user-supplied
          * resolver or nothing
          */
-        const resolvedResolver =
-          rawResolver && isCrystalWrapped(rawResolver)
-            ? rawResolver[$$crystalWrapped].original
-            : rawResolver;
+        const resolvedResolver = rawResolver;
 
         const usesDefaultResolver =
           !resolvedResolver || resolvedResolver === defaultFieldResolver;

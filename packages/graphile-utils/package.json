@@ -12,7 +12,6 @@
     }
   },
   "scripts": {
-    "test": "jest -i",
     "prepack": "tsc -b",
     "watch": "mkdir -p node8plus && tsc --watch"
   },
