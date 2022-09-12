@@ -2,7 +2,6 @@
 import chalk from "chalk";
 
 import type { CrystalError } from "../error.js";
-import { isCrystalError } from "../error.js";
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 
@@ -27,8 +26,8 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   ) {
     // We can do a fast custom conversion
     return new Function(
-      "isCrystalError",
-      `return obj => (obj == null || isCrystalError(obj) ? obj : { ${entries
+      "obj",
+      `return (obj == null ? obj : { ${entries
         .map(
           ([key, val]) =>
             `${STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key}: obj${
@@ -38,11 +37,11 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
             }`,
         )
         .join(", ")} })`,
-    )(isCrystalError) as any;
+    ) as any;
   }
   // Fallback to slow conversion
   return (obj: object | null | CrystalError): object | null | CrystalError => {
-    if (obj == null || isCrystalError(obj)) {
+    if (obj == null) {
       return obj;
     }
     return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
