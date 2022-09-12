@@ -425,12 +425,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         ) {
           // String types
           this.executeString = stringLeafExecutorString;
-        } else if (
-          this.type.graphqlType.serialize === GraphQLInt.serialize ||
-          this.type.graphqlType.serialize === GraphQLFloat.serialize
-        ) {
-          // Number types
-          this.executeString = numberLeafExecutorString;
+        } else if (this.type.graphqlType.serialize === GraphQLInt.serialize) {
+          this.executeString = intLeafExecutorString;
+        } else if (this.type.graphqlType.serialize === GraphQLFloat.serialize) {
+          this.executeString = floatLeafExecutorString;
         } else if (
           this.type.graphqlType.serialize === GraphQLBoolean.serialize
         ) {
@@ -862,16 +860,31 @@ const booleanLeafExecutorString = makeExecutor(
 `,
 );
 
-const numberLeafExecutorString = makeExecutor(
+const intLeafExecutorString = makeExecutor(
   `\
   return '' + this.type.serialize(bucketRootValue);
 `,
-  "numberLeaf",
+  "intLeaf",
   true,
   EMPTY_OBJECT,
   false,
   `\
-  if (typeof bucketRootValue === 'number') {
+  if (Number.isInteger(bucketRootValue)) {
+    return '' + bucketRootValue;
+  }
+`,
+);
+
+const floatLeafExecutorString = makeExecutor(
+  `\
+  return String(this.type.serialize(bucketRootValue));
+`,
+  "floatLeaf",
+  true,
+  EMPTY_OBJECT,
+  false,
+  `\
+  if (Number.isFinite(bucketRootValue)) {
     return '' + bucketRootValue;
   }
 `,

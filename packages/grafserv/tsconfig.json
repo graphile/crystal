@@ -7,5 +7,10 @@
     "moduleResolution": "nodenext"
   },
   "include": ["src"],
-  "references": [{ "path": "../graphile-config" }, { "path": "../grafast" }]
+  "references": [
+    { "path": "../lru" },
+    { "path": "../graphile-config" },
+    { "path": "../grafast" },
+    { "path": "../graphile-inspect" }
+  ]
 }

@@ -1880,7 +1880,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphile/lru@npm:4.6.0-alpha.0, @graphile/lru@workspace:packages/lru":
+"@graphile/lru@npm:4.6.0-alpha.0, @graphile/lru@workspace:^, @graphile/lru@workspace:packages/lru":
   version: 0.0.0-use.local
   resolution: "@graphile/lru@workspace:packages/lru"
   dependencies:
@@ -7680,13 +7680,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"grafserv@workspace:packages/grafserv":
+"grafserv@workspace:^, grafserv@workspace:packages/grafserv":
   version: 0.0.0-use.local
   resolution: "grafserv@workspace:packages/grafserv"
   dependencies:
+    "@graphile/lru": "workspace:^"
     debug: "npm:^4.1.1"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
+    graphile-inspect: "workspace:^"
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
     nodemon: "npm:^2.0.15"
@@ -11070,6 +11072,7 @@ __metadata:
     "@types/pg": "npm:^8.6.2"
     debug: "npm:^4.3.3"
     grafast: "workspace:^"
+    grafserv: "workspace:^"
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"

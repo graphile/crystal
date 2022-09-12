@@ -85,7 +85,7 @@ export const makeGraphQLHandler = (schemaResult: SchemaResult) => {
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const asString = true;
   const grafastOptions: GrafastExecuteOptions = {
-    // TODO: revisit 'exposePlan'
+    // TODO: revisit 'exposePlan'; also should be more generic ('sql' shouldn't be referenced in grafserv)
     explain: exposePlan ? ["mermaid-js", "sql"] : null,
     asString,
   };

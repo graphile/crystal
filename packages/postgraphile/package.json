@@ -58,6 +58,7 @@
     "@types/pg": "^8.6.2",
     "debug": "^4.3.3",
     "grafast": "workspace:^",
+    "grafserv": "workspace:^",
     "graphile-build": "workspace:*",
     "graphile-build-pg": "workspace:*",
     "graphile-config": "workspace:^",

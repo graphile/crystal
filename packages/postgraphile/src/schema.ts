@@ -13,7 +13,7 @@ import * as pg from "pg";
 
 const Pool = pg.Pool || (pg as any).default?.Pool;
 
-import type { SchemaResult } from "./interfaces.js";
+import type { SchemaResult } from "grafserv";
 
 declare global {
   namespace GraphileBuild {

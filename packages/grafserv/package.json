@@ -32,8 +32,10 @@
   },
   "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-pg",
   "dependencies": {
+    "@graphile/lru": "workspace:^",
     "debug": "^4.1.1",
     "graphile-config": "workspace:^",
+    "graphile-inspect": "workspace:^",
     "tslib": "^2.4.0"
   },
   "engines": {
