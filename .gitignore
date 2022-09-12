@@ -31,3 +31,5 @@ graphile-build/graphile-build-pg/webpacked
 graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
 graphile-build/graphile-build-pg/schema-export-output.mjs
 grafast/graphile-inspect/bundle
+
+.docusaurus
