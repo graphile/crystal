@@ -313,15 +313,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 }
               }
 
-              // Perform the Graphile Crystal magic
-              for (const fieldSpec of Object.values(fieldsSpec)) {
-                const { subscribe, resolve } = fieldSpec;
-                fieldSpec.resolve = resolve;
-
-                // IMPORTANT: **nothing** can modify the resolver from here - i.e.
-                // graphql-shield and friends may cause problems
-              }
-
               return fieldsSpec;
             },
           };

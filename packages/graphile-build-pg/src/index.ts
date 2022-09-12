@@ -7,6 +7,10 @@ export {
   PgTypeCodecTags,
   PgTypeColumnTags,
 } from "./interfaces.js";
+export {
+  getWithPgClientFromPgSource,
+  withPgClientFromPgSource,
+} from "./pgSources.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
@@ -37,8 +41,3 @@ export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 export { addBehaviorToTags } from "./utils.js";
-
-export {
-  getWithPgClientFromPgSource,
-  withPgClientFromPgSource,
-} from "./pgSources.js";
