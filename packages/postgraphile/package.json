@@ -25,7 +25,7 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "jest -i",
+    "test": "jest -i __tests__/queries && jest -i __tests__/mutations && jest -i __tests__/schema",
     "prepack": "tsc -b"
   },
   "repository": {
