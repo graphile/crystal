@@ -16,5 +16,6 @@ CHANGELOG.md
 _LOCAL
 .yarn
 .pnp.*
+/grafast/grafast/vendor
 
 .docusaurus
