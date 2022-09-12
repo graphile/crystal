@@ -7680,6 +7680,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"grafserv@workspace:packages/grafserv":
+  version: 0.0.0-use.local
+  resolution: "grafserv@workspace:packages/grafserv"
+  dependencies:
+    debug: "npm:^4.1.1"
+    grafast: "workspace:^"
+    graphile-config: "workspace:^"
+    jest: "npm:^28.1.0"
+    jest-serializer-graphql-schema: "workspace:^"
+    nodemon: "npm:^2.0.15"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  peerDependencies:
+    grafast: "workspace:^"
+  languageName: unknown
+  linkType: soft
+
 "graphile-build-pg@workspace:*, graphile-build-pg@workspace:^, graphile-build-pg@workspace:packages/graphile-build-pg":
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
