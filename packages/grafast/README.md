@@ -44,10 +44,9 @@ And please give some love to our featured sponsors 🤩:
 
 ## About
 
-Grafast can be used as an alternative to the "execute" method of GraphQL.js for
-the very best performance results, or can be used from within the "execute"
-method via our automatic resolver-planner bridging (you can install this into an
-existing schema with the `grafastEnforce` method below).
+Grafast is an alternative planning and execution engine for JavaScript; you can
+use it as a drop-in replacement for the "execute" method of GraphQL.js for the
+very best performance results - especially when combined with Grafast Server.
 
 When Grafast sees a GraphQL request for the first time it will "plan" the
 request: figuring out the data requirements, the steps that need to be taken,
@@ -64,16 +63,11 @@ Grafast can be used with any GraphQL.js schema that matches the following
 requirements:
 
 - GraphQL.js v16+
-- every resolver in the schema must[1] be wrapped with Grafast's resolver
-  wrapper; this can be achieved manually, or by calling `grafastEnforce(schema)`
-- you must not override the default GraphQL field resolver
+- you must not override the default GraphQL field resolver (TODO: support this)
 - for every request:
   - `context` must be an object (anything suitable to be used as the key to a
     `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
   - `rootValue` must be an object or `null`/`undefined`
-
-[1]: this isn't strictly true, but not doing this comes with some lengthy
-caveats I have not yet documented.
 
 ## Advice
 
@@ -89,13 +83,9 @@ between executions as possible. In particular, this means you should:
   `canonicalJSONStringify(variables)`) so the same variables results in the same
   object in memory
 
-## API
+## Usage
 
-### `grafastEnforce(schema)`
+Use the `grafastExecute` and `grafastGraphql` methods from `grafast` as your
+would use the `execute` and `graphql` methods from the `graphql` module.
 
-Ensures every resolver in `schema` is wrapped in crystal. BEWARE - do not do
-this if resolvers may already be wrapped, dual-wrapping resolvers will result in
-hard-to-find bugs. This is particularly relevant if you're using other libraries
-that modify a schema after it was created, such as `graphql-shield`.
-
-TODO: mutate or return derivative?
+TODO: document the options object.

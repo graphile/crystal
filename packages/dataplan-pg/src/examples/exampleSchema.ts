@@ -36,7 +36,6 @@ import {
   error,
   filter,
   getEnumValueConfig,
-  grafastEnforce,
   groupBy,
   lambda,
   list,
@@ -4723,39 +4722,37 @@ export function makeExampleSchema(
     },
   });
 
-  return grafastEnforce(
-    new GraphQLSchema({
-      query: Query,
-      mutation: Mutation,
-      subscription: Subscription,
-      types: [
-        // Don't forget to add all types that implement interfaces here
-        // otherwise they _might_ not show up in the schema.
+  return new GraphQLSchema({
+    query: Query,
+    mutation: Mutation,
+    subscription: Subscription,
+    types: [
+      // Don't forget to add all types that implement interfaces here
+      // otherwise they _might_ not show up in the schema.
 
-        SingleTableTopic,
-        SingleTablePost,
-        SingleTableDivider,
-        SingleTableChecklist,
-        SingleTableChecklistItem,
+      SingleTableTopic,
+      SingleTablePost,
+      SingleTableDivider,
+      SingleTableChecklist,
+      SingleTableChecklistItem,
 
-        RelationalTopic,
-        RelationalPost,
-        RelationalDivider,
-        RelationalChecklist,
-        RelationalChecklistItem,
-      ],
-      extensions: {
-        graphileExporter: {
-          deps: [
-            relationalDividersSource,
-            relationalChecklistsSource,
-            relationalChecklistItemsSource,
-          ],
-        },
+      RelationalTopic,
+      RelationalPost,
+      RelationalDivider,
+      RelationalChecklist,
+      RelationalChecklistItem,
+    ],
+    extensions: {
+      graphileExporter: {
+        deps: [
+          relationalDividersSource,
+          relationalChecklistsSource,
+          relationalChecklistItemsSource,
+        ],
       },
-      enableDeferStream: true,
-    }),
-  );
+    },
+    enableDeferStream: true,
+  });
 }
 
 async function main() {

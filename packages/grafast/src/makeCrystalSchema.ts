@@ -26,7 +26,6 @@ import type {
   InputObjectFieldInputPlanResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
-import { crystalResolve, grafastResolver } from "./resolvers.js";
 import type { ExecutableStep } from "./step.js";
 
 // TODO:TS: improve the types here!
@@ -161,7 +160,6 @@ export function makeCrystalSchema(details: {
 
         if (typeof fieldSpec === "function") {
           // it's a plan
-          field.resolve = crystalResolve;
           (field.extensions as any).graphile = {
             plan: fieldSpec,
           };
@@ -172,15 +170,11 @@ export function makeCrystalSchema(details: {
             any
           >["graphile"] = {};
           (field.extensions as any).graphile = graphileExtensions;
-          if (fieldSpec.resolve || fieldSpec.plan) {
-            field.resolve = fieldSpec.resolve
-              ? grafastResolver(fieldSpec.resolve)
-              : crystalResolve;
+          if (fieldSpec.resolve) {
+            field.resolve = fieldSpec.resolve;
           }
-          if (fieldSpec.subscribe || fieldSpec.subscribePlan) {
-            field.subscribe = fieldSpec.subscribe
-              ? grafastResolver(fieldSpec.subscribe)
-              : crystalResolve;
+          if (fieldSpec.subscribe) {
+            field.subscribe = fieldSpec.subscribe;
           }
           if (fieldSpec.plan) {
             graphileExtensions.plan = fieldSpec.plan;

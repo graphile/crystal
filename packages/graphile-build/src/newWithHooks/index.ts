@@ -5,12 +5,7 @@ import type {
   GraphileFieldConfig,
   OutputPlanForType,
 } from "grafast";
-import {
-  grafastResolver,
-  grafastSubscriber,
-  inputObjectFieldSpec,
-  objectSpec,
-} from "grafast";
+import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -321,10 +316,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               // Perform the Graphile Crystal magic
               for (const fieldSpec of Object.values(fieldsSpec)) {
                 const { subscribe, resolve } = fieldSpec;
-                fieldSpec.resolve = grafastResolver(resolve);
-                if (!subscribe && scope.isRootSubscription) {
-                  fieldSpec.subscribe = grafastSubscriber();
-                }
+                fieldSpec.resolve = resolve;
 
                 // IMPORTANT: **nothing** can modify the resolver from here - i.e.
                 // graphql-shield and friends may cause problems

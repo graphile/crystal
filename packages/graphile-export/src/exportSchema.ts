@@ -4,7 +4,6 @@ import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
 import { writeFile } from "fs/promises";
-import { $$crystalWrapped, isCrystalWrapped } from "grafast";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
@@ -1102,35 +1101,6 @@ function func(
   if (fn == null) {
     return t.identifier("undefined");
   }
-  const crystalSpec = fn[$$crystalWrapped] as {
-    original: AnyFunction | undefined;
-    isSubscribe: boolean;
-  };
-  if (crystalSpec) {
-    if (crystalSpec.isSubscribe) {
-      const iMakeCrystalSubscriber = file.import(
-        "grafast",
-        "grafastSubscriber",
-      );
-      return t.callExpression(iMakeCrystalSubscriber, []);
-    } else {
-      if (crystalSpec.original) {
-        const iCrystalWrapResolve = file.import("grafast", "grafastResolver");
-
-        return t.callExpression(iCrystalWrapResolve, [
-          func(
-            file,
-            crystalSpec.original,
-            locationHint + `[$$crystalWrapped]`,
-            nameHint + `__original`,
-          ),
-        ]);
-      } else {
-        const iCrystalResolve = file.import("grafast", "crystalResolve");
-        return iCrystalResolve;
-      }
-    }
-  }
 
   // Determine if we should wrap it in an IIFE to put the variables into
   // scope; e.g.:
@@ -1407,14 +1377,8 @@ function exportSchemaTypeDefs({
               `${type.name}.fields[${fieldName}].extensions.graphile.subscribePlan`,
             )
           : null;
-        const originalResolver =
-          field.resolve && isCrystalWrapped(field.resolve)
-            ? field.resolve[$$crystalWrapped].original
-            : field.resolve;
-        const originalSubscribe =
-          field.subscribe && isCrystalWrapped(field.subscribe)
-            ? field.subscribe[$$crystalWrapped].original
-            : field.subscribe;
+        const originalResolver = field.resolve;
+        const originalSubscribe = field.subscribe;
         const resolveAST = originalResolver
           ? convertToIdentifierViaAST(
               file,
