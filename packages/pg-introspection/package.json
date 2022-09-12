@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "pretest": "node dist/index.js",
-    "test": "jest -i",
+    "test": "node dist/index.js",
     "prepack": "tsc -b"
   },
   "repository": {

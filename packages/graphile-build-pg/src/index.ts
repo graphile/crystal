@@ -38,8 +38,6 @@ export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 export { addBehaviorToTags } from "./utils.js";
 
-export { GraphileBuild, GraphileConfig };
-
 export {
   getWithPgClientFromPgSource,
   withPgClientFromPgSource,
