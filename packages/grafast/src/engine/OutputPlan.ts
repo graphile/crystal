@@ -868,8 +868,9 @@ const intLeafExecutorString = makeExecutor(
   true,
   EMPTY_OBJECT,
   false,
+  // Fast check to see if number is 32 bit integer
   `\
-  if (Number.isInteger(bucketRootValue)) {
+  if ((bucketRootValue | 0) === bucketRootValue) {
     return '' + bucketRootValue;
   }
 `,
