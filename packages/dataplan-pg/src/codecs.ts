@@ -175,7 +175,7 @@ function toRecordString(val: SQLRawValue): string {
   } else if (typeof val === "boolean") {
     return val ? "t" : "f";
   } else if (typeof val === "number") {
-    return String(val);
+    return "" + val;
   } else if (Array.isArray(val)) {
     const parts = val.map((v) => toListString(v));
     return `{${parts.join(",")}}`;
@@ -197,7 +197,7 @@ function toRecordString(val: SQLRawValue): string {
      */
     return pgWrapQuotesInCompositeValue(val);
   } else {
-    return String(val);
+    return "" + val;
   }
 }
 
@@ -211,7 +211,7 @@ function toListString(val: SQLRawValue): string {
   } else if (typeof val === "boolean") {
     return val ? "t" : "f";
   } else if (typeof val === "number") {
-    return String(val);
+    return "" + val;
   } else if (Array.isArray(val)) {
     const parts = val.map((v) => toListString(v));
     return `{${parts.join(",")}}`;
@@ -553,7 +553,7 @@ function escapeRangeValue(
   if (value == null) {
     return "";
   }
-  const encoded = String(innerCodec.toPg(value));
+  const encoded = "" + innerCodec.toPg(value);
   // TODO: we don't always need to do this
   return `"${encoded.replace(/"/g, '""')}"`;
 }

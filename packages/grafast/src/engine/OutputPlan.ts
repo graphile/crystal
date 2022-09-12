@@ -831,7 +831,7 @@ const toJSON = (value: unknown): string => {
   if (value === true) return "true";
   if (value === false) return "false";
   const t = typeof value;
-  if (t === "number") return String(value);
+  if (t === "number") return "" + value;
   if (t === "string") {
     return stringifyString(value as string);
   }
@@ -864,7 +864,7 @@ const booleanLeafExecutorString = makeExecutor(
 
 const numberLeafExecutorString = makeExecutor(
   `\
-  return String(this.type.serialize(bucketRootValue));
+  return '' + this.type.serialize(bucketRootValue);
 `,
   "numberLeaf",
   true,
@@ -872,7 +872,7 @@ const numberLeafExecutorString = makeExecutor(
   false,
   `\
   if (typeof bucketRootValue === 'number') {
-    return String(bucketRootValue);
+    return '' + bucketRootValue;
   }
 `,
 );

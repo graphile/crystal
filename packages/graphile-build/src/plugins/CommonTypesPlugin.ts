@@ -199,8 +199,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 "[ECMA-404](http://www.ecma-international.org/" +
                 "publications/files/ECMA-ST/ECMA-404.pdf).",
               serialize: EXPORTABLE(
-                () => (value) =>
-                  value == null ? value : JSON.parse(String(value)),
+                () => (value) => value == null ? value : JSON.parse("" + value),
                 [],
               ),
               parseValue: EXPORTABLE(

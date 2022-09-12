@@ -78,14 +78,18 @@ export function isValidObjectType(
   );
 }
 
+function toString(value: any) {
+  return "" + value;
+}
+
 /**
  * A GraphQL scalar spec for a scalar that'll be treated as a verbatim string
  * in and out (i.e. the type name is really just a hint to the user); purely a
  * convenience.
  */
 export const stringScalarSpec = Object.freeze({
-  serialize: EXPORTABLE(() => (value) => String(value), []),
-  parseValue: EXPORTABLE(() => (value) => String(value), []),
+  serialize: toString,
+  parseValue: toString,
   parseLiteral: EXPORTABLE(
     (Kind) => (ast) => {
       if (ast.kind !== Kind.STRING) {
@@ -164,10 +168,10 @@ export const stringTypeSpec = (
   coerce?: (input: string) => string,
 ): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
   description,
-  serialize: EXPORTABLE(() => (value) => String(value), []),
+  serialize: toString,
   parseValue: coerce
-    ? EXPORTABLE((coerce) => (value) => coerce(String(value)), [coerce])
-    : EXPORTABLE(() => (value) => String(value), []),
+    ? EXPORTABLE((coerce) => (value) => coerce("" + value), [coerce])
+    : toString,
   parseLiteral: coerce
     ? EXPORTABLE(
         (Kind, coerce) => (ast) => {
