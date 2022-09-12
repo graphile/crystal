@@ -8,8 +8,8 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../lru" },
-    { "path": "../graphile-config" },
+    { "path": "../../utils/lru" },
+    { "path": "../../utils/graphile-config" },
     { "path": "../grafast" },
     { "path": "../graphile-inspect" }
   ]

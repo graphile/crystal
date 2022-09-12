@@ -1703,9 +1703,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dataplan/json@workspace:^, @dataplan/json@workspace:packages/dataplan-json":
+"@dataplan/json@workspace:^, @dataplan/json@workspace:grafast/dataplan-json":
   version: 0.0.0-use.local
-  resolution: "@dataplan/json@workspace:packages/dataplan-json"
+  resolution: "@dataplan/json@workspace:grafast/dataplan-json"
   dependencies:
     "@types/jest": "npm:^27.5.1"
     chalk: "npm:^4.1.2"
@@ -1719,9 +1719,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dataplan/pg@workspace:*, @dataplan/pg@workspace:^, @dataplan/pg@workspace:packages/dataplan-pg":
+"@dataplan/pg@workspace:*, @dataplan/pg@workspace:^, @dataplan/pg@workspace:grafast/dataplan-pg":
   version: 0.0.0-use.local
-  resolution: "@dataplan/pg@workspace:packages/dataplan-pg"
+  resolution: "@dataplan/pg@workspace:grafast/dataplan-pg"
   dependencies:
     "@dataplan/json": "workspace:^"
     "@graphile/lru": "npm:4.6.0-alpha.0"
@@ -1731,7 +1731,6 @@ __metadata:
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
     grafast: "workspace:^"
-    graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
     jest-serializer-simple: "workspace:^"
@@ -1862,9 +1861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphile/lds@workspace:packages/lds":
+"@graphile/lds@workspace:graphile-build/lds":
   version: 0.0.0-use.local
-  resolution: "@graphile/lds@workspace:packages/lds"
+  resolution: "@graphile/lds@workspace:graphile-build/lds"
   dependencies:
     "@types/jest": "npm:^27.5.1"
     "@types/pg": "npm:^8.6.2"
@@ -1880,9 +1879,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphile/lru@npm:4.6.0-alpha.0, @graphile/lru@workspace:^, @graphile/lru@workspace:packages/lru":
+"@graphile/lru@npm:4.6.0-alpha.0, @graphile/lru@workspace:^, @graphile/lru@workspace:utils/lru":
   version: 0.0.0-use.local
-  resolution: "@graphile/lru@workspace:packages/lru"
+  resolution: "@graphile/lru@workspace:utils/lru"
   dependencies:
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
@@ -6449,9 +6448,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-graphile-export@workspace:packages/eslint-plugin-graphile-export":
+"eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export":
   version: 0.0.0-use.local
-  resolution: "eslint-plugin-graphile-export@workspace:packages/eslint-plugin-graphile-export"
+  resolution: "eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export"
   dependencies:
     "@babel/types": "npm:^7.16.0"
     "@types/eslint": "npm:^7.29.0"
@@ -7649,9 +7648,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"grafast@workspace:^, grafast@workspace:packages/grafast":
+"grafast@workspace:^, grafast@workspace:grafast/grafast":
   version: 0.0.0-use.local
-  resolution: "grafast@workspace:packages/grafast"
+  resolution: "grafast@workspace:grafast/grafast"
   dependencies:
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/chai": "npm:^4"
@@ -7680,9 +7679,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"grafserv@workspace:^, grafserv@workspace:packages/grafserv":
+"grafserv@workspace:^, grafserv@workspace:grafast/grafserv":
   version: 0.0.0-use.local
-  resolution: "grafserv@workspace:packages/grafserv"
+  resolution: "grafserv@workspace:grafast/grafserv"
   dependencies:
     "@graphile/lru": "workspace:^"
     debug: "npm:^4.1.1"
@@ -7700,9 +7699,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-build-pg@workspace:*, graphile-build-pg@workspace:^, graphile-build-pg@workspace:packages/graphile-build-pg":
+"graphile-build-pg@workspace:*, graphile-build-pg@workspace:^, graphile-build-pg@workspace:graphile-build/graphile-build-pg":
   version: 0.0.0-use.local
-  resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
+  resolution: "graphile-build-pg@workspace:graphile-build/graphile-build-pg"
   dependencies:
     "@dataplan/pg": "workspace:^"
     "@envelop/core": "npm:^2.0.0"
@@ -7735,9 +7734,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-build@workspace:*, graphile-build@workspace:^, graphile-build@workspace:packages/graphile-build":
+"graphile-build@workspace:*, graphile-build@workspace:^, graphile-build@workspace:graphile-build/graphile-build":
   version: 0.0.0-use.local
-  resolution: "graphile-build@workspace:packages/graphile-build"
+  resolution: "graphile-build@workspace:graphile-build/graphile-build"
   dependencies:
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/debug": "npm:^4.1.7"
@@ -7762,9 +7761,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-config@workspace:^, graphile-config@workspace:packages/graphile-config":
+"graphile-config@workspace:^, graphile-config@workspace:utils/graphile-config":
   version: 0.0.0-use.local
-  resolution: "graphile-config@workspace:packages/graphile-config"
+  resolution: "graphile-config@workspace:utils/graphile-config"
   dependencies:
     "@types/debug": "npm:^4.1.7"
     "@types/interpret": "npm:^1.1.1"
@@ -7782,9 +7781,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-export@workspace:^, graphile-export@workspace:packages/graphile-export":
+"graphile-export@workspace:^, graphile-export@workspace:utils/graphile-export":
   version: 0.0.0-use.local
-  resolution: "graphile-export@workspace:packages/graphile-export"
+  resolution: "graphile-export@workspace:utils/graphile-export"
   dependencies:
     "@babel/generator": "npm:^7.16.5"
     "@babel/parser": "npm:^7.16.6"
@@ -7807,9 +7806,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-inspect@workspace:^, graphile-inspect@workspace:packages/graphile-inspect":
+"graphile-inspect@workspace:^, graphile-inspect@workspace:grafast/graphile-inspect":
   version: 0.0.0-use.local
-  resolution: "graphile-inspect@workspace:packages/graphile-inspect"
+  resolution: "graphile-inspect@workspace:grafast/graphile-inspect"
   dependencies:
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
@@ -7844,9 +7843,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-utils@workspace:packages/graphile-utils":
+"graphile-utils@workspace:graphile-build/graphile-utils":
   version: 0.0.0-use.local
-  resolution: "graphile-utils@workspace:packages/graphile-utils"
+  resolution: "graphile-utils@workspace:graphile-build/graphile-utils"
   dependencies:
     debug: "npm:^4.1.1"
     graphile-build: "workspace:^"
@@ -9104,9 +9103,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-serializer-graphql-schema@workspace:^, jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema":
+"jest-serializer-graphql-schema@workspace:^, jest-serializer-graphql-schema@workspace:utils/jest-serializer-graphql-schema":
   version: 0.0.0-use.local
-  resolution: "jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema"
+  resolution: "jest-serializer-graphql-schema@workspace:utils/jest-serializer-graphql-schema"
   dependencies:
     "@types/jest": "npm:^27.5.1"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -9120,9 +9119,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"jest-serializer-simple@workspace:^, jest-serializer-simple@workspace:packages/jest-serializer-simple":
+"jest-serializer-simple@workspace:^, jest-serializer-simple@workspace:utils/jest-serializer-simple":
   version: 0.0.0-use.local
-  resolution: "jest-serializer-simple@workspace:packages/jest-serializer-simple"
+  resolution: "jest-serializer-simple@workspace:utils/jest-serializer-simple"
   dependencies:
     "@types/jest": "npm:^27.5.1"
     "@types/json5": "npm:^2.2.0"
@@ -10862,9 +10861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-introspection@workspace:^, pg-introspection@workspace:packages/pg-introspection":
+"pg-introspection@workspace:^, pg-introspection@workspace:utils/pg-introspection":
   version: 0.0.0-use.local
-  resolution: "pg-introspection@workspace:packages/pg-introspection"
+  resolution: "pg-introspection@workspace:utils/pg-introspection"
   dependencies:
     "@types/debug": "npm:4.1.7"
     "@types/jest": "npm:^27.5.1"
@@ -10892,9 +10891,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-sql2@workspace:^, pg-sql2@workspace:packages/pg-sql2":
+"pg-sql2@workspace:^, pg-sql2@workspace:utils/pg-sql2":
   version: 0.0.0-use.local
-  resolution: "pg-sql2@workspace:packages/pg-sql2"
+  resolution: "pg-sql2@workspace:utils/pg-sql2"
   dependencies:
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/debug": "npm:4.1.7"
@@ -11057,9 +11056,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postgraphile@workspace:packages/postgraphile":
+"postgraphile@workspace:postgraphile/postgraphile":
   version: 0.0.0-use.local
-  resolution: "postgraphile@workspace:packages/postgraphile"
+  resolution: "postgraphile@workspace:postgraphile/postgraphile"
   dependencies:
     "@dataplan/pg": "workspace:*"
     "@graphile/lru": "npm:4.6.0-alpha.0"

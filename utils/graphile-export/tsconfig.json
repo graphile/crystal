@@ -10,5 +10,5 @@
     "module": "nodenext"
   },
   "include": ["src"],
-  "references": [{ "path": "../grafast" }, { "path": "../pg-sql2" }]
+  "references": [{ "path": "../../grafast/grafast" }, { "path": "../pg-sql2" }]
 }

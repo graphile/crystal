@@ -13,10 +13,5 @@
     "module": "nodenext"
   },
   "include": ["src"],
-  "references": [
-    { "path": "../lru" },
-    { "path": "../grafast" },
-    { "path": "../graphile-export" },
-    { "path": "../graphile-config" }
-  ]
+  "references": [{ "path": "../../utils/graphile-config" }]
 }

@@ -11,12 +11,12 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../graphile-build" },
-    { "path": "../graphile-build-pg" },
-    { "path": "../grafast" },
-    { "path": "../grafserv" },
-    { "path": "../graphile-export" },
-    { "path": "../graphile-inspect" },
-    { "path": "../graphile-config" }
+    { "path": "../../graphile-build/graphile-build" },
+    { "path": "../../graphile-build/graphile-build-pg" },
+    { "path": "../../grafast/grafast" },
+    { "path": "../../grafast/grafserv" },
+    { "path": "../../utils/graphile-export" },
+    { "path": "../../grafast/graphile-inspect" },
+    { "path": "../../utils/graphile-config" }
   ]
 }

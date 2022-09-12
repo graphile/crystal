@@ -47,7 +47,6 @@ import {
   operationPlan,
   resolveType,
 } from "grafast";
-import { EXPORTABLE } from "graphile-export";
 import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
@@ -107,6 +106,20 @@ import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
+
+export function EXPORTABLE<T, TScope extends any[]>(
+  factory: (...args: TScope) => T,
+  args: [...TScope],
+): T {
+  const fn: T = factory(...args);
+  if (!("$exporter$factory" in fn)) {
+    Object.defineProperties(fn, {
+      $exporter$args: { value: args },
+      $exporter$factory: { value: factory },
+    });
+  }
+  return fn;
+}
 
 declare module ".." {
   interface PgEnumSourceExtensions {
