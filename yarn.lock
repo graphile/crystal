@@ -1861,9 +1861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphile/lds@workspace:graphile-build/lds":
+"@graphile/lds@workspace:utils/lds":
   version: 0.0.0-use.local
-  resolution: "@graphile/lds@workspace:graphile-build/lds"
+  resolution: "@graphile/lds@workspace:utils/lds"
   dependencies:
     "@types/jest": "npm:^27.5.1"
     "@types/pg": "npm:^8.6.2"

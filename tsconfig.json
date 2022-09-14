@@ -36,7 +36,7 @@
     { "path": "utils/eslint-plugin-graphile-export" },
     { "path": "utils/jest-serializer-graphql-schema" },
     { "path": "utils/jest-serializer-simple" },
-    { "path": "graphile-build/lds" },
+    { "path": "utils/lds" },
     { "path": "utils/lru" },
     { "path": "utils/pg-sql2" },
     { "path": "graphile-build/graphile-build" },
