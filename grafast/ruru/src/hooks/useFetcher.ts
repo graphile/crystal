@@ -5,7 +5,7 @@ import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
-import type { GraphileInspectProps } from "../interfaces.js";
+import type { RuruProps } from "../interfaces.js";
 
 export interface IExplainedOperation {
   type: string;
@@ -77,10 +77,7 @@ function makeWsUrl(url: string): string {
   }
 }
 
-export const useFetcher = (
-  props: GraphileInspectProps,
-  options: { explain: boolean },
-) => {
+export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
   const [streamEndpoint, setStreamEndpoint] = useState<string | null>(null);
   const url =
     props.endpoint ??

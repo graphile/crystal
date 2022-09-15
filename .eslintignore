@@ -6,7 +6,8 @@ node_modules
 /postgraphile/postgraphile/postgraphiql
 /postgraphile/postgraphile/assets
 /postgraphile/postgraphile/src/assets
-/grafast/graphile-inspect/bundle
+/grafast/ruru/bundle/ruru.min.js
+/grafast/ruru/bundle/ruru.min.js.LICENSE.txt
 /graphile-build/graphile-build-pg/webpacked
 /graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
 /graphile-build/graphile-build-pg/schema-export-output.mjs

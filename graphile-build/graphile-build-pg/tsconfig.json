@@ -15,7 +15,7 @@
     { "path": "../graphile-build" },
     { "path": "../../grafast/grafast" },
     { "path": "../../utils/graphile-export" },
-    { "path": "../../grafast/graphile-inspect" },
+    { "path": "../../grafast/ruru" },
     { "path": "../../utils/graphile-config" },
     { "path": "../../utils/pg-introspection" }
   ]

@@ -47,7 +47,7 @@
     { "path": "graphile-build/graphile-utils" },
     { "path": "grafast/dataplan-pg" },
     { "path": "utils/pg-introspection" },
-    { "path": "grafast/graphile-inspect" },
+    { "path": "grafast/ruru" },
     { "path": "postgraphile/postgraphile" }
   ]
 }

@@ -4,12 +4,12 @@ import { buildClientSchema, getIntrospectionQuery } from "graphql";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { GraphileInspectProps } from "../interfaces.js";
+import type { RuruProps } from "../interfaces.js";
 import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
 
 export const useSchema = (
-  props: GraphileInspectProps,
+  props: RuruProps,
   fetcher: GraphiQLProps["fetcher"],
   setError: Dispatch<SetStateAction<Error | null>>,
   streamEndpoint: string | null,
@@ -65,7 +65,7 @@ export const useSchema = (
         updateGraphiQLDocExplorerNavStack(schema, graphiqlRef.current);
       }
 
-      console.log("Graphile Inspect: Schema updated");
+      console.log("Ruru: Schema updated");
     })()
       .catch((error) => {
         console.error("Error occurred when updating the schema:");

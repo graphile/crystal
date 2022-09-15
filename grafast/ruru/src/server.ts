@@ -7,7 +7,7 @@ import * as path from "path";
 const graphiQLContent = readFileSync(
   path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
-    "../bundle/graphile-inspect.min.js",
+    "../bundle/ruru.min.js",
   ),
   "utf8",
 );
@@ -25,21 +25,21 @@ const graphiQLHeader = `\
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Graphile Inspect</title>
+<title>Ruru</title>
 <script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
 <script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>
 </head>
 <body style="margin: 0;">
-<div style="height: 100vh;" id="graphile-inspect-root"></div>
+<div style="height: 100vh;" id="ruru-root"></div>
 <link href="https://unpkg.com/graphiql@1.8.7/graphiql.min.css" rel="stylesheet" />
 <script>${escapeJS(graphiQLContent)}</script>
 <script>
-  const { React, createRoot, GraphileInspect } = GraphileInspectBundle;
-  const tree = React.createElement(GraphileInspect, `;
+  const { React, createRoot, Ruru } = RuruBundle;
+  const tree = React.createElement(Ruru, `;
 
 const graphiQLFooter = `\
 );
-  const container = document.getElementById("graphile-inspect-root");
+  const container = document.getElementById("ruru-root");
   const root = createRoot(container);
   root.render(tree);
 </script>
@@ -47,7 +47,7 @@ const graphiQLFooter = `\
 </html>
 `;
 
-export interface GraphileInspectServerConfig {
+export interface RuruServerConfig {
   /**
    * The URL to the GraphQL endpoint.
    */
@@ -68,7 +68,7 @@ export interface GraphileInspectServerConfig {
   debugTools?: Array<"explain" | "plan">;
 }
 
-export function graphileInspectHTML(config: GraphileInspectServerConfig) {
+export function ruruHTML(config: RuruServerConfig) {
   return `${graphiQLHeader}${escapeJS(
     JSON.stringify(config),
   )}${graphiQLFooter}`;

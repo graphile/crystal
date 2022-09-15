@@ -1,14 +1,11 @@
 {
-  "name": "graphile-inspect",
+  "name": "ruru",
   "version": "0.0.0",
-  "description": "Graphile-flavoured GraphiQL distribution",
+  "description": "Grafast-flavoured GraphiQL distribution",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "graphile-inspect": "./dist/cli-run.js",
-    "grin": "./dist/cli-run.js"
-  },
+  "bin": "./dist/cli-run.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -42,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/graphile/postgraphile/issues"
   },
-  "homepage": "https://graphile.org/inspect/",
+  "homepage": "https://grafast.org/ruru/",
   "dependencies": {
     "@types/node": "^16.11.15",
     "@types/yargs": "^17.0.10",

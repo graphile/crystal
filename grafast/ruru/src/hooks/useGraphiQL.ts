@@ -1,13 +1,13 @@
 import type { GraphiQL } from "graphiql";
 import { useCallback, useRef, useState } from "react";
 
-import type { GraphileInspectProps } from "../interfaces.js";
+import type { RuruProps } from "../interfaces.js";
 
 function up(i: number) {
   return i + 1;
 }
 
-export const useGraphiQL = (_props: GraphileInspectProps) => {
+export const useGraphiQL = (_props: RuruProps) => {
   const graphiqlRef = useRef<GraphiQL | null>(null);
   const graphiql = graphiqlRef.current;
   const [, bump] = useState(0);

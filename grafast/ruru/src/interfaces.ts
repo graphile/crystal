@@ -1,6 +1,6 @@
 import type { GraphiQLProps } from "graphiql";
 
-export interface GraphileInspectProps {
+export interface RuruProps {
   /**
    * The URL to the GraphQL endpoint. (http:// or https://)
    */

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-import type { GraphileInspectProps } from "../interfaces.js";
+import type { RuruProps } from "../interfaces.js";
 
 export const useGraphQLChangeStream = (
-  props: GraphileInspectProps,
+  props: RuruProps,
   refetch: () => void,
   streamEndpoint: string | null,
 ) => {
@@ -38,15 +38,12 @@ export const useGraphQLChangeStream = (
       }
 
       const onOpen = () => {
-        console.log("Graphile Inspect: Listening for server sent events");
+        console.log("Ruru: Listening for server sent events");
         setError(null);
         refetch();
       };
       const onError = (error: Event) => {
-        console.error(
-          "Graphile Inspect: Failed to connect to event stream",
-          error,
-        );
+        console.error("Ruru: Failed to connect to event stream", error);
         setError(new Error("Failed to connect to event stream"));
       };
 

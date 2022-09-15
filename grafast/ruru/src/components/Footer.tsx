@@ -1,6 +1,6 @@
 import type { FC } from "react";
 
-export const GraphileInspectFooter: FC = () => (
+export const RuruFooter: FC = () => (
   <div style={{ padding: 7 }}>
     <a title="graphile.org" href="https://graphile.org/" target="new">
       graphile.org
@@ -15,7 +15,7 @@ export const GraphileInspectFooter: FC = () => (
     </a>{" "}
     |{" "}
     <a
-      title="Get support from the team behind PostGraphile"
+      title="Get support from the Graphile team"
       href="https://graphile.org/support/"
       target="new"
     >

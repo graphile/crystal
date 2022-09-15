@@ -1,22 +1,20 @@
 import type { ServerParams } from "../interfaces.js";
 import type { HandlerResult } from "./interfaces.js";
 
-const graphileInspectServer = import("graphile-inspect/server");
-let graphileInspectHTML:
-  | Awaited<typeof graphileInspectServer>["graphileInspectHTML"]
-  | undefined = undefined;
+const ruruServer = import("ruru/server");
+let ruruHTML: Awaited<typeof ruruServer>["ruruHTML"] | undefined = undefined;
 
 // TODO: use a specific version of mermaid
 export function makeGraphiQLHandler(_params: ServerParams) {
   return async (): Promise<HandlerResult> => {
-    if (!graphileInspectHTML) {
-      graphileInspectHTML = (await graphileInspectServer).graphileInspectHTML;
+    if (!ruruHTML) {
+      ruruHTML = (await ruruServer).ruruHTML;
     }
     const config = {};
     return {
       statusCode: 200,
       type: "html",
-      payload: graphileInspectHTML(config),
+      payload: ruruHTML(config),
     };
   };
 }
