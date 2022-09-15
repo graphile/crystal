@@ -15,7 +15,7 @@ export const RuruFooter: FC = () => (
     </a>{" "}
     |{" "}
     <a
-      title="Get support from the team behind PostGraphile"
+      title="Get support from the Graphile team"
       href="https://graphile.org/support/"
       target="new"
     >
