@@ -7,7 +7,7 @@ import { useCallback, useState } from "react";
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { Explain } from "./components/Explain.js";
 import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
-import { GraphileInspectFooter } from "./components/Footer.js";
+import { RuruFooter } from "./components/Footer.js";
 import { useExplain } from "./hooks/useExplain.js";
 import { useExplorer } from "./hooks/useExplorer.js";
 import { useExtraKeys } from "./hooks/useExtraKeys.js";
@@ -17,7 +17,7 @@ import { usePrettify } from "./hooks/usePrettify.js";
 import { useQuery } from "./hooks/useQuery.js";
 import { useSchema } from "./hooks/useSchema.js";
 import { useStorage } from "./hooks/useStorage.js";
-import type { GraphileInspectProps } from "./interfaces.js";
+import type { RuruProps } from "./interfaces.js";
 
 const GraphiQLAny = GraphiQL as any;
 const GraphiQLMenuAny = GraphiQL.Menu as any;
@@ -27,7 +27,7 @@ const nocheck = <span style={checkCss}></span>;
 
 function noop() {}
 
-export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
+export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
   const setExplain = useCallback(
@@ -101,7 +101,7 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
           onEditQuery={setQuery}
           editorTheme={props.editorTheme ?? "dracula"}
         >
-          <GraphiQL.Logo>Graphile Inspect</GraphiQL.Logo>
+          <GraphiQL.Logo>Ruru</GraphiQL.Logo>
           <GraphiQL.Toolbar>
             <GraphiQLMenuAny title="Utils" label="Utilities">
               <GraphiQL.MenuItem
@@ -190,7 +190,7 @@ export const GraphileInspect: FC<GraphileInspectProps> = (props) => {
             </GraphiQLMenuAny>
           </GraphiQL.Toolbar>
           <GraphiQL.Footer>
-            <GraphileInspectFooter />
+            <RuruFooter />
           </GraphiQL.Footer>
         </GraphiQLAny>
       </div>

@@ -63,7 +63,7 @@
     "graphile-build-pg": "workspace:*",
     "graphile-config": "workspace:^",
     "graphile-export": "workspace:^",
-    "graphile-inspect": "workspace:^",
+    "ruru": "workspace:^",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",

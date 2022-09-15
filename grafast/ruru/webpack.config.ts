@@ -54,8 +54,8 @@ export default {
   output: {
     // @ts-ignore
     path: `${path.dirname(fileURLToPath(import.meta.url))}/bundle`,
-    filename: "graphile-inspect.min.js",
-    library: "GraphileInspectBundle",
+    filename: "ruru.min.js",
+    library: "RuruBundle",
   },
   module: {
     rules: [

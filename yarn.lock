@@ -7687,7 +7687,7 @@ __metadata:
     debug: "npm:^4.1.1"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphile-inspect: "workspace:^"
+    ruru: "workspace:^"
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
     nodemon: "npm:^2.0.15"
@@ -7722,7 +7722,7 @@ __metadata:
     graphile-build: "workspace:*"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
-    graphile-inspect: "workspace:^"
+    ruru: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-helix: "npm:^1.11.0"
     jest: "npm:^28.1.0"
@@ -7806,9 +7806,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile-inspect@workspace:^, graphile-inspect@workspace:grafast/graphile-inspect":
+"ruru@workspace:^, ruru@workspace:grafast/ruru":
   version: 0.0.0-use.local
-  resolution: "graphile-inspect@workspace:grafast/graphile-inspect"
+  resolution: "ruru@workspace:grafast/ruru"
   dependencies:
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
@@ -7838,7 +7838,7 @@ __metadata:
   peerDependencies:
     graphql: "*"
   bin:
-    graphile-inspect: ./dist/cli-run.js
+    ruru: ./dist/cli-run.js
     grin: ./dist/cli-run.js
   languageName: unknown
   linkType: soft
@@ -11076,7 +11076,7 @@ __metadata:
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
-    graphile-inspect: "workspace:^"
+    ruru: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
     jsonwebtoken: "npm:^8.5.1"

@@ -5,7 +5,7 @@
  * developing so it has grown in scope and is a bit of a mess. Nonetheless it
  * demonstrates how to build a Graphile Build schema that leverages
  * grafast, @dataplan/pg, graphile-build-pg, envelop, fastify, helix, and
- * graphile-inspect for viewing the execution and output plan of the latest
+ * ruru for viewing the execution and output plan of the latest
  * query.
  */
 
@@ -198,7 +198,7 @@ pool.on("error", (e) => {
   // Create our fastify (server) app
   const app = fastify();
 
-  const { graphileInspectHTML } = await import("graphile-inspect/server");
+  const { ruruHTML } = await import("ruru/server");
 
   // The root URL ('/') serves GraphiQL
   app.route({
@@ -206,7 +206,7 @@ pool.on("error", (e) => {
     url: "/",
     async handler(req, res) {
       res.type("text/html").send(
-        graphileInspectHTML({
+        ruruHTML({
           endpoint: "/graphql",
         }),
       );

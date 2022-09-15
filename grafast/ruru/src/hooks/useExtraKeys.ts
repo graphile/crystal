@@ -3,10 +3,10 @@ import type { GraphiQL } from "graphiql";
 import { parse } from "graphql";
 import { useCallback, useEffect } from "react";
 
-import type { GraphileInspectProps } from "../interfaces.js";
+import type { RuruProps } from "../interfaces.js";
 
 export const useExtraKeys = (
-  props: GraphileInspectProps,
+  props: RuruProps,
   graphiql: GraphiQL | null,
   query: string | null,
 ) => {

@@ -1,5 +1,5 @@
 export const defaultQuery = `\
-# Welcome to Graphile Inspect, our distribution of GraphiQL and related
+# Welcome to Ruru, our distribution of GraphiQL and related
 # tooling to inspect your GraphQL API.
 #
 # GraphiQL is an in-browser tool for writing, validating, and

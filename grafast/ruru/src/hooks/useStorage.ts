@@ -12,25 +12,25 @@ export interface StoredKeys {
 }
 
 const KEYS: { [key in keyof StoredKeys]: string } = {
-  saveHeaders: "GraphileInspect:saveHeadersText",
-  headers: "GraphileInspect:headersText",
-  explain: "GraphileInspect:explain",
-  explainSize: "GraphileInspect:explainSize",
-  explainIsOpen: "GraphileInspect:explainIsOpen",
-  explainAtBottom: "GraphileInspect:explainAtBottom",
+  saveHeaders: "Ruru:saveHeadersText",
+  headers: "Ruru:headersText",
+  explain: "Ruru:explain",
+  explainSize: "Ruru:explainSize",
+  explainIsOpen: "Ruru:explainIsOpen",
+  explainAtBottom: "Ruru:explainAtBottom",
   explorerIsOpen: "graphiql:explorerIsOpen",
   query: "graphiql:query",
 };
 
 const up = (v: number) => v + 1;
 
-export interface GraphileInspectStorage {
+export interface RuruStorage {
   get<TKey extends keyof StoredKeys>(key: TKey): StoredKeys[TKey] | null;
   set<TKey extends keyof StoredKeys>(key: TKey, value: StoredKeys[TKey]): void;
   toggle<TKey extends keyof StoredKeys>(key: TKey): void;
 }
 
-export const useStorage = (): GraphileInspectStorage => {
+export const useStorage = (): RuruStorage => {
   const storage = typeof window !== "undefined" ? window.localStorage : null;
   // Trigger re-render every time we set
   const [revision, bump] = useState(0);

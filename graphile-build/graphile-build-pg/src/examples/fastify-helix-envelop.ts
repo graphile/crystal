@@ -6,7 +6,7 @@
  *
  * We serve:
  *
- * / - Graphile Inspect (GraphiQL)
+ * / - Ruru (GraphiQL)
  * /graphql - the GraphQL API
  */
 
@@ -95,15 +95,15 @@ async function main() {
   /** Our fastify (server) app */
   const app = fastify();
 
-  const { graphileInspectHTML } = await import("graphile-inspect/server");
+  const { ruruHTML } = await import("ruru/server");
 
-  // The root URL ('/') serves Graphile Inspect (GraphiQL)
+  // The root URL ('/') serves Ruru (GraphiQL)
   app.route({
     method: ["GET"],
     url: "/",
     async handler(req, res) {
       res.type("text/html").send(
-        graphileInspectHTML({
+        ruruHTML({
           endpoint: "/graphql",
         }),
       );
@@ -155,7 +155,7 @@ async function main() {
 
 
 Running a GraphQL API server.
-For Graphile Inspect (GraphQL IDE), see     ${chalk.blue.underline(
+For Ruru (GraphQL IDE), see     ${chalk.blue.underline(
     "http://localhost:4000/",
   )}
 Issue GraphQL queries via HTTP POST to  ${chalk.blue.underline(

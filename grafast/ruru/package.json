@@ -1,12 +1,12 @@
 {
-  "name": "graphile-inspect",
+  "name": "ruru",
   "version": "0.0.0",
   "description": "Graphile-flavoured GraphiQL distribution",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "graphile-inspect": "./dist/cli-run.js",
+    "ruru": "./dist/cli-run.js",
     "grin": "./dist/cli-run.js"
   },
   "exports": {

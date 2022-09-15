@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import type { GraphileInspectStorage } from "./useStorage.js";
+import type { RuruStorage } from "./useStorage.js";
 
 export interface ExplainHelpers {
   showExplain: boolean;
@@ -11,7 +11,7 @@ export interface ExplainHelpers {
   setShowExplain: (newShow: boolean) => void;
 }
 
-export const useExplain = (storage: GraphileInspectStorage): ExplainHelpers => {
+export const useExplain = (storage: RuruStorage): ExplainHelpers => {
   const [showExplain, _setShowExplain] = useState(
     storage.get("explainIsOpen") === "true",
   );

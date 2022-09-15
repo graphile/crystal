@@ -1,4 +1,4 @@
-# graphile-inspect
+# ruru
 
 Graphile-flavoured GraphiQL.
 
@@ -11,22 +11,22 @@ ultimately released. This also explains the shocking lack of documentation.
 We recommend that you install this alongside `http-proxy`:
 
 ```
-yarn add http-proxy graphile-inspect
+yarn add http-proxy ruru
 ```
 
 Then you can run something like the following to automatically proxy requests
 (bypassing CORS issues):
 
 ```
-yarn graphile-inspect -SPe http://localhost:5678/graphql
+yarn ruru -SPe http://localhost:5678/graphql
 ```
 
 Usage:
 
 ```
-graphile-inspect
+ruru
 
-Run a Graphile Inspect server
+Run a Ruru server
 
 Options:
       --help                   Show help                                                                      [boolean]
@@ -46,18 +46,18 @@ Options:
 <script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
 <script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>
 <!-- Required below here -->
-<div id="graphile-inspect-root"></div>
+<div id="ruru-root"></div>
 <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
 <script
   crossorigin
-  src="https://unpkg.com/graphile-inspect/bundle/graphile-inspect.min.js"
+  src="https://unpkg.com/ruru/bundle/ruru.min.js"
 ></script>
 <script>
-  const { React, createRoot, GraphileInspect } = GraphileInspectBundle;
-  const tree = React.createElement(GraphileInspect, {
+  const { React, createRoot, Ruru } = RuruBundle;
+  const tree = React.createElement(Ruru, {
     endpoint: "/graphql",
   });
-  const container = document.getElementById("graphile-inspect-root");
+  const container = document.getElementById("ruru-root");
   const root = createRoot(container);
   root.render(tree);
 </script>
@@ -66,22 +66,22 @@ Options:
 ## Usage - library
 
 ```js
-import { GraphileInspect } from "graphile-inspect";
+import { Ruru } from "ruru";
 
-React.render(<GraphileInspect endpoint="/graphql" />);
+React.render(<Ruru endpoint="/graphql" />);
 ```
 
 ## Usage - middleware
 
 ```js
-import { graphileInspectHTML } from "graphile-inspect/server";
+import { ruruHTML } from "ruru/server";
 
 // ...
 
 app.get("/", (req, res, next) => {
   res.writeHead(200, { "Content-Type": "application/html" });
   return res.end(
-    graphileInspectHTML({
+    ruruHTML({
       endpoint: "/graphql",
     }),
   );

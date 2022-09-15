@@ -2,14 +2,14 @@ import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import type { createProxyServer } from "http-proxy";
 import { createServer } from "node:http";
 
-import { graphileInspectHTML } from "./server.js";
+import { ruruHTML } from "./server.js";
 
 export function options(yargs: Argv) {
   return yargs
-    .usage("$0", "Run a Graphile Inspect server")
+    .usage("$0", "Run a Ruru server")
     .example(
       "$0 [-SP] [--endpoint http://localhost:5678/graphql]",
-      "Runs a Graphile Inspect server accessing the given GraphQL API, with subscriptions support and automatic proxying (to bypass CORS issues)",
+      "Runs a Ruru server accessing the given GraphQL API, with subscriptions support and automatic proxying (to bypass CORS issues)",
     )
     .option("endpoint", {
       alias: "e",
@@ -67,7 +67,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const proxy = createProxyServer?.({ target: endpoint, ws: true });
   if (enableProxy && !proxy) {
     throw new Error(
-      "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'graphile-inspect'",
+      "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'ruru'",
     );
   }
   proxy?.on("error", (e, req, res) => {
@@ -102,7 +102,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   if (!proxy) {
     console.log(
-      `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'graphile-inspect' and we'll proxy to the API for you`,
+      `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'ruru' and we'll proxy to the API for you`,
     );
   }
   const server = createServer((req, res) => {
@@ -111,7 +111,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
         "Content-Type": "text/html; charset=utf-8",
       });
       res.end(
-        graphileInspectHTML({
+        ruruHTML({
           endpoint: proxy
             ? endpointUrl.pathname + endpointUrl.search
             : endpoint,
@@ -144,7 +144,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   server.listen(port, () => {
     console.log(
-      `Serving Graphile Inspect at http://localhost:${port} for GraphQL API at '${args.endpoint}'`,
+      `Serving Ruru at http://localhost:${port} for GraphQL API at '${args.endpoint}'`,
     );
   });
 }

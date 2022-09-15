@@ -1,13 +1,13 @@
 import type { GraphiQL } from "graphiql";
 import { useCallback, useState } from "react";
 
-import type { GraphileInspectStorage } from "./useStorage.js";
+import type { RuruStorage } from "./useStorage.js";
 
 function noop() {}
 
 export const useExplorer = (
   graphiql: GraphiQL | null,
-  storage: GraphileInspectStorage,
+  storage: RuruStorage,
 ) => {
   const onRunOperation = graphiql?.handleRunQuery ?? noop;
   const [explorerIsOpen, setExplorerIsOpen] = useState(
