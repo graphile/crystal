@@ -18,11 +18,8 @@ function HomepageHeader() {
         </h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/grafast/quickstart"
-          >
-            Quickstart - 5min ⏱️
+          <Link className="button button--secondary button--lg" to="/grafast/">
+            Overview - 5min ⏱️
           </Link>
         </div>
       </div>
