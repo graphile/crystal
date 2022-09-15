@@ -67,6 +67,16 @@ const config = {
         editUrl,
       },
     ],
+    [
+      "@docusaurus/plugin-content-docs",
+      {
+        id: "ruru",
+        path: "ruru",
+        routeBasePath: "ruru",
+        sidebarPath: require.resolve("./sidebars.js"),
+        editUrl,
+      },
+    ],
   ],
 
   themeConfig:
@@ -94,6 +104,13 @@ const config = {
             label: "Grafserv",
           },
           {
+            type: "doc",
+            docId: "index",
+            docsPluginId: "ruru",
+            position: "left",
+            label: "Ruru",
+          },
+          {
             href: `https://github.com/${organizationName}/${projectName}`,
             label: "GitHub",
             position: "right",
@@ -113,6 +130,10 @@ const config = {
               {
                 label: "Grafserv",
                 to: "/grafserv/",
+              },
+              {
+                label: "Ruru",
+                to: "/ruru/",
               },
             ],
           },
