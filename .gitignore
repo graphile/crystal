@@ -22,7 +22,6 @@ grafast/dataplan-pg/__tests__/**/*.mermaid.png
 .pnp.*
 
 # Generated documentation
-docs/
 .docusaurus
 
 # Generated code
