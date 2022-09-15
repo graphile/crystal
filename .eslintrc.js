@@ -91,12 +91,10 @@ module.exports = {
     // Rules for plugins
     {
       files: [
-        "packages/graphile-build/src/plugins/**/*.ts",
-        "packages/graphile-build-pg/src/**/*.ts",
-        "packages/graphile-utils/src/**/*.ts",
-        "packages/pg-pubsub/src/**/*.ts",
-        "packages/postgraphile-core/src/**/*.ts",
-        "packages/subscriptions-lds/src/**/*.ts",
+        "graphile-build/graphile-build/src/plugins/**/*.ts",
+        "graphile-build/graphile-build-pg/src/**/*.ts",
+        "graphile-build/graphile-utils/src/**/*.ts",
+        "graphile-build/pg-pubsub/src/**/*.ts",
       ],
       rules: {
         "no-restricted-syntax": [
@@ -134,10 +132,10 @@ module.exports = {
 
     // Stricter rules for source code
     {
-      files: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+      files: ["*/*/src/**/*.ts", "*/*/src/**/*.tsx"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
-        project: ["tsconfig.json", "packages/*/tsconfig.json"],
+        project: ["tsconfig.json", "*/*/tsconfig.json"],
       },
       rules: {},
     },
@@ -159,10 +157,7 @@ module.exports = {
 
     // React rules
     {
-      files: [
-        "packages/graphile-inspect/src/**/*.ts",
-        "packages/graphile-inspect/src/**/*.tsx",
-      ],
+      files: ["grafast/ruru/src/**/*.ts", "grafast/ruru/src/**/*.tsx"],
       rules: {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": [
@@ -176,10 +171,10 @@ module.exports = {
 
     {
       files: [
-        "packages/**/vendor/**/__tests__/**/*.ts",
-        "packages/**/vendor/**/__tests__/**/*.tsx",
-        "packages/**/vendor/**/__testUtils__/**/*.ts",
-        "packages/**/vendor/**/__testUtils__/**/*.tsx",
+        "**/vendor/**/__tests__/**/*.ts",
+        "**/vendor/**/__tests__/**/*.tsx",
+        "**/vendor/**/__testUtils__/**/*.ts",
+        "**/vendor/**/__testUtils__/**/*.tsx",
       ],
       rules: {
         "graphile-export/exhaustive-deps": 0,
