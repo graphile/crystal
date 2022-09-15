@@ -5,10 +5,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "ruru": "./dist/cli-run.js",
-    "grin": "./dist/cli-run.js"
-  },
+  "bin": "./dist/cli-run.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
