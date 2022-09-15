@@ -1,43 +1,83 @@
-import React from 'react';
-import clsx from 'clsx';
-import styles from './styles.module.css';
+import React from "react";
+import clsx from "clsx";
+import styles from "./styles.module.css";
+import Grafast from "../Grafast/index.js";
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: "General purpose",
+    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        <Grafast /> can implement any shape of GraphQL schema and is designed to
+        integrate with your existing Node.js or remote business logic.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: "Holistic approach",
+    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Fine-tune your plans to only fetch the data you need from your business
+        logic layer, reducing stress across your stack and increasing
+        scalability.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: "Everything is batched",
+    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        By writing plans instead of resolvers you ensure every substep your
+        schema executes is automatically batched for optimal efficiency.
+      </>
+    ),
+  },
+  {
+    title: "Spec compliant",
+    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    description: (
+      <>
+        <Grafast /> is carefully designed to ensure it remains fully compliant
+        with the GraphQL specification (to which the author is a major
+        contributor).
+      </>
+    ),
+  },
+  {
+    title: "Ludicrous speed",
+    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    description: (
+      <>
+        <Grafast /> was designed to maximize performance throughout the entire
+        request lifecycle without placing undue burden on application
+        developers.
+      </>
+    ),
+  },
+  {
+    title: "Compatible with GraphQL.js",
+    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    description: (
+      <>
+        Regular{" "}
+        <sup>
+          <abbr title="those that don't use the advanced 'resolveInfo' feature">
+            *
+          </abbr>
+        </sup>{" "}
+        GraphQL.js schemas and resolvers can be executed directly by <Grafast />
+        , allowing you to migrate to plans bit by bit.
       </>
     ),
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({ Svg, title, description }) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={clsx("col col--4")}>
       <div className="text--center">
         <Svg className={styles.featureSvg} role="img" />
       </div>
@@ -51,14 +91,30 @@ function Feature({Svg, title, description}) {
 
 export default function HomepageFeatures() {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
+    <>
+      <section className={styles.lead}>
+        <div className="container">
+          <div className="row">
+            <p>
+              <strong>
+                <Grafast />
+              </strong>{" "}
+              is an alternative execution engine for GraphQL; its plan-based
+              approach helps developers avoid common pitfalls and achieve
+              incredible performance.
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <section className={styles.features}>
+        <div className="container">
+          <div className="row">
+            {FeatureList.map((props, idx) => (
+              <Feature key={idx} {...props} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
