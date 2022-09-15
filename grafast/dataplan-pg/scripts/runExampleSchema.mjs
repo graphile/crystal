@@ -71,7 +71,7 @@ async function runTestQuery(basePath) {
   );
   const expectErrors = errorMatches ? parseInt(errorMatches[1], 10) : 0;
 
-  // Very much taken from packages/dataplan-pg/__tests__/helpers.ts
+  // Very much taken from grafast/dataplan-pg/__tests__/helpers.ts
   if (isAsyncIterable(result)) {
     let errors = undefined;
     // hasNext changes based on payload order; remove it.

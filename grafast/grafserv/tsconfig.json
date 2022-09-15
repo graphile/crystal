@@ -8,10 +8,9 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../dataplan-json" },
+    { "path": "../../utils/lru" },
+    { "path": "../../utils/graphile-config" },
     { "path": "../grafast" },
-    { "path": "../graphile-export" },
-    { "path": "../pg-sql2" },
-    { "path": "../jest-serializer-simple" }
+    { "path": "../graphile-inspect" }
   ]
 }

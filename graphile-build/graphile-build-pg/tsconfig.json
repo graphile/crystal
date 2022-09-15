@@ -11,12 +11,12 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../dataplan-pg" },
+    { "path": "../../grafast/dataplan-pg" },
     { "path": "../graphile-build" },
-    { "path": "../grafast" },
-    { "path": "../graphile-export" },
-    { "path": "../graphile-inspect" },
-    { "path": "../graphile-config" },
-    { "path": "../pg-introspection" }
+    { "path": "../../grafast/grafast" },
+    { "path": "../../utils/graphile-export" },
+    { "path": "../../grafast/graphile-inspect" },
+    { "path": "../../utils/graphile-config" },
+    { "path": "../../utils/pg-introspection" }
   ]
 }

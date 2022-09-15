@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+
+    "noUncheckedIndexedAccess": false,
+    "moduleResolution": "nodenext",
+    "module": "nodenext"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../graphile-build/graphile-build" },
+    { "path": "../../graphile-build/graphile-build-pg" },
+    { "path": "../../grafast/grafast" },
+    { "path": "../../grafast/grafserv" },
+    { "path": "../../utils/graphile-export" },
+    { "path": "../../grafast/graphile-inspect" },
+    { "path": "../../utils/graphile-config" }
+  ]
+}

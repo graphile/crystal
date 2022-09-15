@@ -8,6 +8,6 @@
   "include": ["src"],
   "references": [
     { "path": "../grafast" },
-    { "path": "../jest-serializer-simple" }
+    { "path": "../../utils/jest-serializer-simple" }
   ]
 }

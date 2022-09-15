@@ -12,7 +12,6 @@ import {
   ExecutableStep,
   partitionByIndex,
 } from "grafast";
-import { EXPORTABLE } from "graphile-export";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -48,6 +47,20 @@ import type {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
+
+export function EXPORTABLE<T, TScope extends any[]>(
+  factory: (...args: TScope) => T,
+  args: [...TScope],
+): T {
+  const fn: T = factory(...args);
+  if (!("$exporter$factory" in fn)) {
+    Object.defineProperties(fn, {
+      $exporter$args: { value: args },
+      $exporter$factory: { value: factory },
+    });
+  }
+  return fn;
+}
 
 // TODO: PgSourceRow and PgSourceRowAttribute are lies; we don't use them even
 // though we claim to. Everything that references them needs to be typed in a

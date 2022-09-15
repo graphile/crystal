@@ -13,7 +13,7 @@ _LOCAL
 .DS_Store
 
 # mermaid pngs
-packages/dataplan-pg/__tests__/**/*.mermaid.png
+grafast/dataplan-pg/__tests__/**/*.mermaid.png
 
 # yarn2 stuff
 .yarn/*
@@ -27,7 +27,9 @@ docs/
 # Benjie's stuff
 Session.vim
 WHAT_ARE_YOU_DOING.md
-packages/graphile-build-pg/webpacked
-packages/graphile-build-pg/exported-schema-for-webpack.mjs
-packages/graphile-build-pg/schema-export-output.mjs
-packages/graphile-inspect/bundle
+graphile-build/graphile-build-pg/webpacked
+graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
+graphile-build/graphile-build-pg/schema-export-output.mjs
+grafast/graphile-inspect/bundle
+
+.docusaurus

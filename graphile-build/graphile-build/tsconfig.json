@@ -4,9 +4,6 @@
     "rootDir": "src",
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "jsx": "react-jsx",
-    "target": "es2021",
-    "lib": ["dom", "es2021"],
 
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "Nodenext",
@@ -14,9 +11,9 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../lru" },
-    { "path": "../grafast" },
-    { "path": "../graphile-export" },
-    { "path": "../graphile-config" }
+    { "path": "../../utils/lru" },
+    { "path": "../../grafast/grafast" },
+    { "path": "../../utils/graphile-export" },
+    { "path": "../../utils/graphile-config" }
   ]
 }

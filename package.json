@@ -9,12 +9,12 @@
     "prepack:all": "scripts/prepack-all",
     "build": "tsc -b && yarn && yarn workspace graphile-inspect prepack",
     "watch": "yarn build && tsc -b --watch",
-    "clean": "jest --clearCache && rm -Rf packages/*/dist packages/*/bundle packages/*/tsconfig.tsbuildinfo",
+    "clean": "jest --clearCache && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo}",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md",
     "docs:gen": "yarn typedoc .",
     "w": "yarn workspace",
-    "postgraphile": "cd packages/postgraphile && node dist/cli-run.js",
+    "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --ignore-path ./.eslintignore",
@@ -66,7 +66,10 @@
     "webpack": "^5.65.0"
   },
   "workspaces": [
-    "packages/*"
+    "grafast/*",
+    "graphile-build/*",
+    "postgraphile/*",
+    "utils/*"
   ],
   "engines": {
     "node": ">=14.17",
