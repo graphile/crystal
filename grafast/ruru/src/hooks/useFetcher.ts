@@ -77,10 +77,7 @@ function makeWsUrl(url: string): string {
   }
 }
 
-export const useFetcher = (
-  props: RuruProps,
-  options: { explain: boolean },
-) => {
+export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
   const [streamEndpoint, setStreamEndpoint] = useState<string | null>(null);
   const url =
     props.endpoint ??

@@ -43,10 +43,7 @@ export const useGraphQLChangeStream = (
         refetch();
       };
       const onError = (error: Event) => {
-        console.error(
-          "Ruru: Failed to connect to event stream",
-          error,
-        );
+        console.error("Ruru: Failed to connect to event stream", error);
         setError(new Error("Failed to connect to event stream"));
       };
 
