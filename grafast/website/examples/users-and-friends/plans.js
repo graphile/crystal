@@ -75,22 +75,7 @@ class Record extends ExecutableStep {
     return access(this, attr);
   }
   optimize() {
-    let $source = this.getDep(0);
-    // Walk up the tree, looking for the source of this record. We know that
-    // __ItemStep and __ListTransformStep are safe to walk through, but other
-    // classes may not be.
-    while (
-      $source instanceof __ItemStep ||
-      $source instanceof __ListTransformStep
-    ) {
-      if ($source instanceof __ItemStep) {
-        $source = $source.getParentStep();
-      } else {
-        // $source instanceof __ListTransformStep
-        $source = $source.getListStep();
-      }
-    }
-
+    const $source = this.getDepDeep(0);
     if ($source instanceof GetMany || $source instanceof GetOne) {
       // Tell our parent we only need certain columns
       $source.addColumns([...this.columns]);

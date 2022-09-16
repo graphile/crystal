@@ -20,6 +20,22 @@ import type {
   StepOptions,
 } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
+import { __ListTransformStep } from "./steps/index.js";
+
+/**
+ * @internal
+ */
+export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
+
+type DeepDepSkippable<T> = ExecutableStep<T> & {
+  [$$deepDepSkip](): ExecutableStep;
+};
+
+function isDeepDepSkippable<T>(
+  $dep: ExecutableStep,
+): $dep is DeepDepSkippable<T> {
+  return $$deepDepSkip in $dep && typeof $dep[$$deepDepSkip] === "function";
+}
 
 function reallyAssertFinalized(plan: BaseStep): void {
   if (!plan.isFinalized) {
@@ -251,6 +267,23 @@ export class ExecutableStep<TData = any> extends BaseStep {
 
   protected getDep(depId: number): ExecutableStep {
     return this.getStep(this.dependencies[depId]);
+  }
+
+  /**
+   * Like getDep, except it skips over __ItemStep and similar steps to get to
+   * where the parent really is.
+   *
+   * @experimental
+   */
+  protected getDepDeep(depId: number): ExecutableStep {
+    let $dep = this.getDep(depId);
+    // Walk up the tree, looking for the source of this record. We know that
+    // __ItemStep and __ListTransformStep are safe to walk through, but other
+    // classes may not be.
+    while (isDeepDepSkippable($dep)) {
+      $dep = $dep[$$deepDepSkip]();
+    }
+    return $dep;
   }
 
   public toString(): string {

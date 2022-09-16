@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import { ExecutableStep } from "../step.js";
+import { $$deepDepSkip, ExecutableStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
@@ -33,7 +33,7 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
     );
   }
 
-  getParentStep(): ExecutableStep {
+  [$$deepDepSkip](): ExecutableStep {
     return this.getDep(0);
   }
 
