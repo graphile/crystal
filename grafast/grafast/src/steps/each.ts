@@ -2,7 +2,7 @@ import chalk from "chalk";
 
 import type { ExecutableStep, ListCapableStep } from "../step.js";
 import { isListCapableStep } from "../step.js";
-import type { __ItemStep } from "./__item.js";
+import { __ItemStep } from "./__item.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
 
@@ -57,5 +57,18 @@ export function each<
     meta: `each:${chalk.yellow(listPlan.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
+    optimize(this) {
+      const layerPlan = this.subroutineLayer;
+      const rootStep = this.opPlan.dangerouslyGetStep(layerPlan.rootStepId!);
+      if (
+        rootStep instanceof __ItemStep &&
+        this.opPlan.dangerouslyGetStep(rootStep.dependencies[0]).layerPlan !==
+          layerPlan
+      ) {
+        // We don't do anything; replace ourself with our parent
+        return this.getListStep();
+      }
+      return this;
+    },
   });
 }
