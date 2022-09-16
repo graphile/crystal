@@ -1717,10 +1717,15 @@ export class OperationPlan {
         );
       } catch (e) {
         console.error(
-          `Error occurred whilst processing ${step} in ${order} mode`,
+          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
           e,
         );
         throw e;
+      }
+      if (!replacementStep) {
+        throw new Error(
+          `The callback did not return a step during ${actionDescription}`,
+        );
       }
 
       if (replacementStep != step) {
@@ -2240,6 +2245,11 @@ export class OperationPlan {
     // We know if it's streaming or not based on the LayerPlan it's contained within.
     const stepOptions = this.getStepOptionsForStep(step);
     const replacementStep = step.optimize(stepOptions);
+    if (!replacementStep) {
+      throw new Error(
+        `Bug in ${step}'s class: the 'optimize' method must return a step. Hint: did you forget 'return this;'?`,
+      );
+    }
     step.isOptimized = true;
     return replacementStep;
   }
