@@ -20,10 +20,13 @@ class GetOne extends ExecutableStep {
   toStringMeta() {
     return this.getter.displayName || this.getter.name;
   }
-  async execute([ids]) {
-    return this.getter(ids, {
+  finalize() {
+    this.getterOptions = {
       columns: this.columns.size ? [...this.columns] : null,
-    });
+    };
+  }
+  async execute([ids]) {
+    return this.getter(ids, this.getterOptions);
   }
   addColumns(columns) {
     for (const column of columns) this.columns.add(column);
@@ -41,10 +44,13 @@ class GetMany extends ExecutableStep {
   toStringMeta() {
     return this.getter.displayName || this.getter.name;
   }
-  async execute([ids]) {
-    return this.getter(ids, {
+  finalize() {
+    this.getterOptions = {
       columns: this.columns.size ? [...this.columns] : null,
-    });
+    };
+  }
+  async execute([ids]) {
+    return this.getter(ids, this.getterOptions);
   }
   listItem($item) {
     return new Record($item, this.type);
