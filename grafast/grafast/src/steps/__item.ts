@@ -33,7 +33,7 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
     );
   }
 
-  getListStep(): ExecutableStep {
+  getParentStep(): ExecutableStep {
     return this.getDep(0);
   }
 

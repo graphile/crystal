@@ -83,7 +83,12 @@ class Record extends ExecutableStep {
       $source instanceof __ItemStep ||
       $source instanceof __ListTransformStep
     ) {
-      $source = $source.getListStep();
+      if ($source instanceof __ItemStep) {
+        $source = $source.getParentStep();
+      } else {
+        // $source instanceof __ListTransformStep
+        $source = $source.getListStep();
+      }
     }
 
     if ($source instanceof GetMany || $source instanceof GetOne) {
