@@ -1636,9 +1636,9 @@ function exportSchemaTypeDefs({
 
   file.addStatements(typeDefs);
   file.addStatements(plans);
-  const makeCrystalSchemaAST = file.import("grafast", "makeCrystalSchema");
+  const makeGrafastSchemaAST = file.import("grafast", "makeGrafastSchema");
 
-  const schemaAST = t.callExpression(makeCrystalSchemaAST, [
+  const schemaAST = t.callExpression(makeGrafastSchemaAST, [
     t.objectExpression(
       objectToObjectProperties({
         typeDefs: typeDefsExportName,

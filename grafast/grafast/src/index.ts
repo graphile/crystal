@@ -8,10 +8,10 @@ import {
   FieldPlans,
   InputObjectPlans,
   InterfaceOrUnionPlans,
-  makeCrystalSchema,
+  makeGrafastSchema,
   ObjectPlans,
   ScalarPlans,
-} from "./makeCrystalSchema.js";
+} from "./makeGrafastSchema.js";
 import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // TODO: doing this here feels "naughty".
@@ -302,7 +302,7 @@ export {
   ListTransformItemPlanCallback,
   ListTransformOptions,
   ListTransformReduce,
-  makeCrystalSchema,
+  makeGrafastSchema,
   makeMapper,
   makeResolveInfo,
   map,
@@ -359,7 +359,7 @@ export {
 
 exportAsMany({
   crystalPrint,
-  makeCrystalSchema,
+  makeGrafastSchema,
   OperationPlan,
   defer,
   execute,
