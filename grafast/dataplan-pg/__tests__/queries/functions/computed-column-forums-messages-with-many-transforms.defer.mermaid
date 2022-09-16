@@ -29,12 +29,8 @@ graph TD
     PgSelectSingle37["PgSelectSingle[37∈4]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression38["PgClassExpression[38∈4]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
     Lambda39["Lambda[39∈2]"]:::plan
-    __ListTransform40[["__ListTransform[40∈2]<br />ᐸeach:39ᐳ"]]:::plan
-    __Item41>"__Item[41∈5]<br />ᐸ39ᐳ"]:::itemplan
-    __Item42>"__Item[42∈6]<br />ᐸ40ᐳ"]:::itemplan
-    __ListTransform43[["__ListTransform[43∈6]<br />ᐸeach:42ᐳ"]]:::plan
-    __Item44>"__Item[44∈7]<br />ᐸ42ᐳ"]:::itemplan
-    __Item45>"__Item[45∈8]<br />ᐸ43ᐳ"]:::itemplan
+    __Item42>"__Item[42∈6]<br />ᐸ39ᐳ"]:::itemplan
+    __Item45>"__Item[45∈8]<br />ᐸ42ᐳ"]:::itemplan
     PgSelectSingle46["PgSelectSingle[46∈8]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression47["PgClassExpression[47∈8]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     PgClassExpression48["PgClassExpression[48∈8]<br />ᐸ__messages__.”featured”ᐳ"]:::plan
@@ -60,12 +56,8 @@ graph TD
     __Item36 --> PgSelectSingle37
     PgSelectSingle37 --> PgClassExpression38
     __ListTransform35 --> Lambda39
-    Lambda39 --> __ListTransform40
-    Lambda39 -.-> __Item41
-    __ListTransform40 ==> __Item42
-    __Item42 --> __ListTransform43
-    __Item42 -.-> __Item44
-    __ListTransform43 ==> __Item45
+    Lambda39 ==> __Item42
+    __Item42 ==> __Item45
     __Item45 --> PgSelectSingle46
     PgSelectSingle46 --> PgClassExpression47
     PgSelectSingle46 --> PgClassExpression48
@@ -79,23 +71,17 @@ graph TD
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression32 bucket1
     Bucket2("Bucket 2<br />(defer)<br />Deps: 20, 22, 32"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect24,__ListTransform28,__ListTransform35,Lambda39,__ListTransform40 bucket2
+    class Bucket2,PgSelect24,__ListTransform28,__ListTransform35,Lambda39 bucket2
     Bucket3("Bucket 3<br />(subroutine)<br />Deps: 32<br /><br />ROOT Lambda{3}[34]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item29,PgSelectSingle30,PgClassExpression31,List33,Lambda34 bucket3
     Bucket4("Bucket 4<br />(subroutine)<br />ROOT PgClassExpression{4}ᐸ__messages__.”featured”ᐳ[38]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item36,PgSelectSingle37,PgClassExpression38 bucket4
-    Bucket5("Bucket 5<br />(subroutine)<br />ROOT __Item{5}ᐸ39ᐳ[41]"):::bucket
-    classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item41 bucket5
-    Bucket6("Bucket 6<br />(listItem)<br />ROOT __Item{6}ᐸ40ᐳ[42]"):::bucket
+    Bucket6("Bucket 6<br />(listItem)<br />ROOT __Item{6}ᐸ39ᐳ[42]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item42,__ListTransform43 bucket6
-    Bucket7("Bucket 7<br />(subroutine)<br />ROOT __Item{7}ᐸ42ᐳ[44]"):::bucket
-    classDef bucket7 stroke:#808000
-    class Bucket7,__Item44 bucket7
-    Bucket8("Bucket 8<br />(listItem)<br />ROOT __Item{8}ᐸ43ᐳ[45]"):::bucket
+    class Bucket6,__Item42 bucket6
+    Bucket8("Bucket 8<br />(listItem)<br />ROOT __Item{8}ᐸ42ᐳ[45]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,__Item45,PgSelectSingle46,PgClassExpression47,PgClassExpression48 bucket8
     Bucket0 --> Bucket1
