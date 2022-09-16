@@ -17,6 +17,9 @@ class GetOne extends ExecutableStep {
     this.addDependency($id);
     this.getter = getter;
   }
+  toStringMeta() {
+    return this.getter.displayName || this.getter.name;
+  }
   async execute([ids]) {
     return this.getter(ids, {
       columns: this.columns.size ? [...this.columns] : null,
@@ -29,10 +32,14 @@ class GetOne extends ExecutableStep {
 
 class GetMany extends ExecutableStep {
   columns = new Set();
-  constructor($id, getter) {
+  constructor($id, getter, type) {
     super();
     this.addDependency($id);
     this.getter = getter;
+    this.type = type;
+  }
+  toStringMeta() {
+    return this.getter.displayName || this.getter.name;
   }
   async execute([ids]) {
     return this.getter(ids, {
@@ -40,21 +47,25 @@ class GetMany extends ExecutableStep {
     });
   }
   listItem($item) {
-    return new Record($item);
+    return new Record($item, this.type);
   }
   addColumns(columns) {
     for (const column of columns) this.columns.add(column);
   }
 }
 
-exports.userById = ($id) => new Record(new GetOne($id, getUsersByIds));
+exports.userById = ($id) => new Record(new GetOne($id, getUsersByIds), "user");
 
 class Record extends ExecutableStep {
   isSyncAndSafe = true;
   columns = new Set();
-  constructor($data) {
+  constructor($data, type) {
     super();
+    this.type = type;
     this.addDependency($data);
+  }
+  toStringMeta() {
+    return this.type;
   }
   execute([records]) {
     return records;
@@ -89,4 +100,4 @@ class Record extends ExecutableStep {
 }
 
 exports.friendshipsByUserId = ($id) =>
-  new GetMany($id, getFriendshipsByUserIds);
+  new GetMany($id, getFriendshipsByUserIds, "friendship");

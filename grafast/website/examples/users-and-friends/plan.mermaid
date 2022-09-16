@@ -10,30 +10,30 @@ flowchart TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access7["Access[7∈0]<br />ᐸ3.currentUserIdᐳ"]:::plan
-    GetOne8[["GetOne[8∈0]"]]:::plan
-    Record9["Record[9∈0]"]:::plan
+    GetOne8[["GetOne[8∈0]<br />ᐸgetUsersByIdsᐳ"]]:::plan
+    Record9["Record[9∈0]<br />ᐸuserᐳ"]:::plan
     Access10["Access[10∈0]<br />ᐸ9.full_nameᐳ"]:::plan
     Access11["Access[11∈0]<br />ᐸ9.idᐳ"]:::plan
-    GetMany12[["GetMany[12∈0]"]]:::plan
+    GetMany12[["GetMany[12∈0]<br />ᐸgetFrien...yUserIdsᐳ"]]:::plan
     __ListTransform13[["__ListTransform[13∈0]<br />ᐸeach:12ᐳ"]]:::plan
     __Item14>"__Item[14∈1]<br />ᐸ12ᐳ"]:::itemplan
-    Record15["Record[15∈1]"]:::plan
+    Record15["Record[15∈1]<br />ᐸfriendshipᐳ"]:::plan
     __Item16>"__Item[16∈2]<br />ᐸ13ᐳ"]:::itemplan
-    Record17["Record[17∈2]"]:::plan
+    Record17["Record[17∈2]<br />ᐸfriendshipᐳ"]:::plan
     Access18["Access[18∈2]<br />ᐸ17.friend_idᐳ"]:::plan
-    GetOne19[["GetOne[19∈2]"]]:::plan
-    Record20["Record[20∈2]"]:::plan
+    GetOne19[["GetOne[19∈2]<br />ᐸgetUsersByIdsᐳ"]]:::plan
+    Record20["Record[20∈2]<br />ᐸuserᐳ"]:::plan
     Access21["Access[21∈2]<br />ᐸ20.full_nameᐳ"]:::plan
     Access22["Access[22∈2]<br />ᐸ20.idᐳ"]:::plan
-    GetMany23[["GetMany[23∈2]"]]:::plan
+    GetMany23[["GetMany[23∈2]<br />ᐸgetFrien...yUserIdsᐳ"]]:::plan
     __ListTransform24[["__ListTransform[24∈2]<br />ᐸeach:23ᐳ"]]:::plan
     __Item25>"__Item[25∈3]<br />ᐸ23ᐳ"]:::itemplan
-    Record26["Record[26∈3]"]:::plan
+    Record26["Record[26∈3]<br />ᐸfriendshipᐳ"]:::plan
     __Item27>"__Item[27∈4]<br />ᐸ24ᐳ"]:::itemplan
-    Record28["Record[28∈4]"]:::plan
+    Record28["Record[28∈4]<br />ᐸfriendshipᐳ"]:::plan
     Access29["Access[29∈4]<br />ᐸ28.friend_idᐳ"]:::plan
-    GetOne30[["GetOne[30∈4]"]]:::plan
-    Record31["Record[31∈4]"]:::plan
+    GetOne30[["GetOne[30∈4]<br />ᐸgetUsersByIdsᐳ"]]:::plan
+    Record31["Record[31∈4]<br />ᐸuserᐳ"]:::plan
     Access32["Access[32∈4]<br />ᐸ31.full_nameᐳ"]:::plan
 
     %% plan dependencies
@@ -68,13 +68,13 @@ flowchart TD
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Access7,GetOne8,Record9,Access10,Access11,GetMany12,__ListTransform13 bucket0
-    Bucket1("Bucket 1<br />(subroutine)<br />ROOT Record{1}[15]"):::bucket
+    Bucket1("Bucket 1<br />(subroutine)<br />ROOT Record{1}ᐸfriendshipᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,Record15 bucket1
     Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ13ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,Record17,Access18,GetOne19,Record20,Access21,Access22,GetMany23,__ListTransform24 bucket2
-    Bucket3("Bucket 3<br />(subroutine)<br />ROOT Record{3}[26]"):::bucket
+    Bucket3("Bucket 3<br />(subroutine)<br />ROOT Record{3}ᐸfriendshipᐳ[26]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item25,Record26 bucket3
     Bucket4("Bucket 4<br />(listItem)<br />ROOT __Item{4}ᐸ24ᐳ[27]"):::bucket
