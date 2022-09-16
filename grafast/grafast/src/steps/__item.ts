@@ -33,6 +33,10 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
     );
   }
 
+  getListStep(): ExecutableStep {
+    return this.getDep(0);
+  }
+
   execute(): never {
     throw new Error("__ItemStep must never execute");
   }
