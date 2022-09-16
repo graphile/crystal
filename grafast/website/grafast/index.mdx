@@ -3,6 +3,7 @@ sidebar_position: 1
 ---
 
 import Mermaid from '@theme/Mermaid';
+import mermaidPlan from '../examples/users-and-friends/plan.mermaid?raw';
 
 
 # Grafast Introduction
@@ -118,72 +119,4 @@ const planResolvers = {
 As you can see, the shape of the logic is quite similar, but the Grafast
 resolvers build a plan, like this:
 
-<Mermaid chart={`
-flowchart TD
-    classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
-    %% define steps
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access7["Access[7∈0]<br />ᐸ3.currentUserIdᐳ"]:::plan
-    UserById8[["UserById[8∈0]"]]:::plan
-    Access9["Access[9∈0]<br />ᐸ8.full_nameᐳ"]:::plan
-    Access10["Access[10∈0]<br />ᐸ8.idᐳ"]:::plan
-    FriendshipsByUserId11[["FriendshipsByUserId[11∈0]"]]:::plan
-    __ListTransform12[["__ListTransform[12∈0]<br />ᐸeach:11ᐳ"]]:::plan
-    __Item13>"__Item[13∈1]<br />ᐸ11ᐳ"]:::itemplan
-    __Item14>"__Item[14∈2]<br />ᐸ12ᐳ"]:::itemplan
-    Access15["Access[15∈2]<br />ᐸ14.friend_idᐳ"]:::plan
-    UserById16[["UserById[16∈2]"]]:::plan
-    Access17["Access[17∈2]<br />ᐸ16.full_nameᐳ"]:::plan
-    Access18["Access[18∈2]<br />ᐸ16.idᐳ"]:::plan
-    FriendshipsByUserId19[["FriendshipsByUserId[19∈2]"]]:::plan
-    __ListTransform20[["__ListTransform[20∈2]<br />ᐸeach:19ᐳ"]]:::plan
-    __Item21>"__Item[21∈3]<br />ᐸ19ᐳ"]:::itemplan
-    __Item22>"__Item[22∈4]<br />ᐸ20ᐳ"]:::itemplan
-    Access23["Access[23∈4]<br />ᐸ22.friend_idᐳ"]:::plan
-    UserById24[["UserById[24∈4]"]]:::plan
-    Access25["Access[25∈4]<br />ᐸ24.full_nameᐳ"]:::plan
-    %% plan dependencies
-    __Value3 --> Access7
-    Access7 --> UserById8
-    UserById8 --> Access9
-    UserById8 --> Access10
-    Access10 --> FriendshipsByUserId11
-    FriendshipsByUserId11 --> __ListTransform12
-    FriendshipsByUserId11 -.-> __Item13
-    __ListTransform12 ==> __Item14
-    __Item14 --> Access15
-    Access15 --> UserById16
-    UserById16 --> Access17
-    UserById16 --> Access18
-    Access18 --> FriendshipsByUserId19
-    FriendshipsByUserId19 --> __ListTransform20
-    FriendshipsByUserId19 -.-> __Item21
-    __ListTransform20 ==> __Item22
-    __Item22 --> Access23
-    Access23 --> UserById24
-    UserById24 --> Access25
-    subgraph Buckets
-    Bucket0("Bucket 0<br />(root)"):::bucket
-    classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access7,UserById8,Access9,Access10,FriendshipsByUserId11,__ListTransform12 bucket0
-    Bucket1("Bucket 1<br />(subroutine)<br />ROOT __Item{1}ᐸ11ᐳ[13]"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item13 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ12ᐳ[14]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item14,Access15,UserById16,Access17,Access18,FriendshipsByUserId19,__ListTransform20 bucket2
-    Bucket3("Bucket 3<br />(subroutine)<br />ROOT __Item{3}ᐸ19ᐳ[21]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21 bucket3
-    Bucket4("Bucket 4<br />(listItem)<br />ROOT __Item{4}ᐸ20ᐳ[22]"):::bucket
-    classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item22,Access23,UserById24,Access25 bucket4
-    Bucket0 --> Bucket1 & Bucket2
-    Bucket2 --> Bucket3 & Bucket4
-    end
-`}/>
+<Mermaid chart={mermaidPlan}/>

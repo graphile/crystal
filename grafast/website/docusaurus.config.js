@@ -77,6 +77,22 @@ const config = {
         editUrl,
       },
     ],
+
+    // Allow us to import `.mermaid` files
+    () => ({
+      configureWebpack() {
+        return {
+          module: {
+            rules: [
+              {
+                resourceQuery: /raw/,
+                type: "asset/source",
+              },
+            ],
+          },
+        };
+      },
+    }),
   ],
 
   themeConfig:
