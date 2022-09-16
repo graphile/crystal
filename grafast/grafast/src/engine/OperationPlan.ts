@@ -2598,6 +2598,13 @@ export class OperationPlan {
       });
     }
     this.layerPlans[layerPlan.id] = null;
+    // Remove layerPlan from its parent
+    if (layerPlan.parentLayerPlan) {
+      const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
+      if (idx >= 0) {
+        layerPlan.parentLayerPlan.children.splice(idx, 1);
+      }
+    }
     // Remove all plans in this layer
     for (let id = 0, l = this.steps.length; id < l; id++) {
       const step = this.steps[id];
