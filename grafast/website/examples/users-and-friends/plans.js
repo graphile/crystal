@@ -95,7 +95,10 @@ class Record extends ExecutableStep {
         `RecordStep could not find the parent GetOne/GetMany; instead found ${$source}`,
       );
     }
-    return this;
+
+    // Record has no run-time behaviour (it's just a plan-time helper), so we
+    // can replace ourself with our dependency:
+    return this.getDep(0);
   }
 }
 
