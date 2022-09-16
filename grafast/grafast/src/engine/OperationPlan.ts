@@ -135,7 +135,7 @@ export class OperationPlan {
   public loc: string[] = [];
 
   /** @internal */
-  public layerPlans: LayerPlan[] = [];
+  public layerPlans: Array<LayerPlan | null> = [];
   /** @internal */
   public rootLayerPlan: LayerPlan;
   // Assigned during OperationPlan.planOperation(), guaranteed to exist after
@@ -1801,6 +1801,9 @@ export class OperationPlan {
 
     // Ensure all the layer plan parents exist
     for (const layerPlan of this.layerPlans) {
+      if (!layerPlan) {
+        continue;
+      }
       if ("parentPlanId" in layerPlan.reason) {
         this.markStepActive(
           this.steps[layerPlan.reason.parentPlanId],
@@ -2354,6 +2357,9 @@ export class OperationPlan {
     };
 
     for (const layerPlan of this.layerPlans) {
+      if (!layerPlan) {
+        continue;
+      }
       layerPlan.steps = this.steps.filter(
         (s) => s !== null && s.layerPlan === layerPlan,
       );
@@ -2568,6 +2574,37 @@ export class OperationPlan {
       }
     };
     process(layerPlan, [layerPlan]);
+  }
+
+  /**
+   * HIGHLY EXPERIMENTAL!
+   *
+   * @internal
+   */
+  deleteLayerPlan(layerPlan: LayerPlan) {
+    if (isDev) {
+      // TODO: validate assertions
+      if (layerPlan.children.length > 0) {
+        throw new Error(
+          "This layer plan has children... should we really be deleting it?!",
+        );
+      }
+      this.walkOutputPlans(this.rootOutputPlan, (o) => {
+        if (o.layerPlan === layerPlan) {
+          throw new Error(
+            "An output plan depends on this layer plan... should we really be deleting it?!",
+          );
+        }
+      });
+    }
+    this.layerPlans[layerPlan.id] = null;
+    // Remove all plans in this layer
+    for (let id = 0, l = this.steps.length; id < l; id++) {
+      const step = this.steps[id];
+      if (step && step.layerPlan === layerPlan) {
+        this.steps[id] = null as any;
+      }
+    }
   }
 }
 

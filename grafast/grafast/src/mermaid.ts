@@ -220,7 +220,7 @@ export function printPlanGraph(
   graph.push("    subgraph Buckets");
   for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
     const layerPlan = operationPlan.layerPlans[i];
-    if (layerPlan.id !== i) {
+    if (!layerPlan || layerPlan.id !== i) {
       continue;
     }
     const plansAndIds = Object.entries(steps).filter(
@@ -260,7 +260,7 @@ export function printPlanGraph(
   }
   for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
     const layerPlan = operationPlan.layerPlans[i];
-    if (layerPlan.id !== i) {
+    if (!layerPlan || layerPlan.id !== i) {
       continue;
     }
     const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);

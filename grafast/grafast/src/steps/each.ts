@@ -66,6 +66,7 @@ export function each<
           layerPlan
       ) {
         // We don't do anything; replace ourself with our parent
+        this.opPlan.deleteLayerPlan(layerPlan);
         return this.getListStep();
       }
       return this;
