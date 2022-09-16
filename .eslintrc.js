@@ -175,6 +175,7 @@ module.exports = {
         "**/vendor/**/__tests__/**/*.tsx",
         "**/vendor/**/__testUtils__/**/*.ts",
         "**/vendor/**/__testUtils__/**/*.tsx",
+        "**/website/examples/**",
       ],
       rules: {
         "graphile-export/exhaustive-deps": 0,

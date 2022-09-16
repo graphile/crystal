@@ -250,6 +250,7 @@ export {
   first,
   FirstStep,
   getEnumValueConfig,
+  grafastGraphql as grafast, // TODO: rename grafastGraphql to just grafast
   GrafastArgumentExtensions,
   GrafastEnumValueExtensions,
   GrafastExecuteOptions,

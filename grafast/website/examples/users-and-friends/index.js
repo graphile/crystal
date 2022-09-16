@@ -1,10 +1,14 @@
-const DataLoader = require("dataloader");
 const { buildSchema, printSchema, graphql } = require("graphql");
-const { makeGrafastSchema, context, each, grafastGraphql } = require("grafast");
 const {
-  getUsersByIds,
-  getFriendshipsByUserIds,
-} = require("./businessLogic.js");
+  makeGrafastSchema,
+  context,
+  access,
+  each,
+  grafast,
+} = require("grafast");
+const { makeDataLoaders } = require("./dataloaders");
+const { userById, friendshipsByUserId } = require("./plans");
+const fsp = require("node:fs/promises");
 
 const typeDefs = /* GraphQL */ `
   type Query {
@@ -15,13 +19,6 @@ const typeDefs = /* GraphQL */ `
     friends: [User]!
   }
 `;
-const makeContextValue = () => ({
-  currentUserId: 1,
-  userLoader: new DataLoader((ids) => getUsersByIds(ids)),
-  friendshipsByUserIdLoader: new DataLoader((userIds) =>
-    getFriendshipsByUserIds(userIds),
-  ),
-});
 const resolvers = {
   Query: {
     async currentUser(_, args, context) {
@@ -44,26 +41,20 @@ const resolvers = {
   },
 };
 
-const User = {
-  get($id) {
-    return;
-  },
-};
-
 const planResolvers = {
   Query: {
     currentUser() {
-      return User.get(context().get("currentUserId"));
+      return userById(context().get("currentUserId"));
     },
   },
   User: {
     name($user) {
-      return $user.get("full_name");
+      return access($user, "full_name");
     },
     friends($user) {
-      const $friendships = Friendship.allByUserId($user.get("id"));
+      const $friendships = friendshipsByUserId(access($user, "id"));
       return each($friendships, ($friendship) =>
-        User.get($friendship.get("friendId")),
+        userById(access($friendship, "friend_id")),
       );
     },
   },
@@ -110,9 +101,37 @@ async function main() {
   const graphqlResult = await graphql({
     schema: graphqlSchema,
     source,
-    contextValue: makeContextValue(),
+    contextValue: {
+      currentUserId: 1,
+      ...makeDataLoaders(),
+    },
   });
   console.dir(graphqlResult, { depth: Infinity });
+
+  const grafastResult = await grafast({
+    schema: grafastSchema,
+    source,
+    contextValue: { currentUserId: 1 },
+  });
+  console.dir(grafastResult, { depth: Infinity });
+
+  console.log(
+    "Same?",
+    JSON.stringify(graphqlResult) === JSON.stringify(grafastResult),
+  );
+
+  const grafastResultWithPlan = await grafast(
+    {
+      schema: grafastSchema,
+      source,
+      contextValue: { currentUserId: 1 },
+    },
+    { explain: ["mermaid-js"] },
+  );
+  await fsp.writeFile(
+    `${__dirname}/plan.mermaid`,
+    grafastResultWithPlan.extensions.explain.operations[0].diagram,
+  );
 }
 
 main().catch((e) => {
