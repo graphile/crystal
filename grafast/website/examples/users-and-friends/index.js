@@ -1,11 +1,5 @@
 const { buildSchema, printSchema, graphql } = require("graphql");
-const {
-  makeGrafastSchema,
-  context,
-  access,
-  each,
-  grafast,
-} = require("grafast");
+const { makeGrafastSchema, context, each, grafast } = require("grafast");
 const { makeDataLoaders } = require("./dataloaders");
 const { userById, friendshipsByUserId } = require("./plans");
 const fsp = require("node:fs/promises");
