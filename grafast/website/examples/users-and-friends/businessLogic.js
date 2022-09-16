@@ -4,18 +4,24 @@
 
 const { db } = require("./database");
 
+const queryAll = (query, parameters) =>
+  new Promise((resolve, reject) => {
+    console.log({ query, parameters });
+    return db.all(query, parameters, (err, result) =>
+      err ? reject(err) : resolve(result),
+    );
+  });
+
 exports.getUsersByIds = async function getUsersByIds(ids, options = {}) {
   const columns = options.columns
     ? [...new Set(["id", ...options.columns])]
     : ["*"];
-  const users = await new Promise((resolve, reject) =>
-    db.all(
-      `select ${columns.join(", ")} from users where id in (${ids
-        .map(() => `?`)
-        .join(", ")})`,
-      ids,
-      (err, result) => (err ? reject(err) : resolve(result)),
-    ),
+  const uniqueIds = [...new Set(ids)];
+  const users = await queryAll(
+    `select ${columns.join(", ")} from users where id in (${uniqueIds
+      .map(() => `?`)
+      .join(", ")})`,
+    uniqueIds,
   );
   return ids.map((id) => users.find((u) => u.id === id));
 };
@@ -27,14 +33,12 @@ exports.getFriendshipsByUserIds = async function getFriendshipsByUserIds(
   const columns = options.columns
     ? [...new Set(["user_id", ...options.columns])]
     : ["*"];
-  const friendships = await new Promise((resolve, reject) =>
-    db.all(
-      `select ${columns.join(", ")} from friendships where user_id in (${userIds
-        .map(() => `?`)
-        .join(", ")})`,
-      userIds,
-      (err, result) => (err ? reject(err) : resolve(result)),
-    ),
+  const uniqueIds = [...new Set(userIds)];
+  const friendships = await queryAll(
+    `select ${columns.join(", ")} from friendships where user_id in (${uniqueIds
+      .map(() => `?`)
+      .join(", ")})`,
+    uniqueIds,
   );
   return userIds.map((userId) =>
     friendships.filter((f) => f.user_id === userId),

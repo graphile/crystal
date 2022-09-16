@@ -92,6 +92,7 @@ const source = /* GraphQL */ `
 `;
 
 async function main() {
+  console.log("GRAPHQL");
   const graphqlResult = await graphql({
     schema: graphqlSchema,
     source,
@@ -102,6 +103,7 @@ async function main() {
   });
   console.dir(graphqlResult, { depth: Infinity });
 
+  console.log("GRAFAST");
   const grafastResult = await grafast({
     schema: grafastSchema,
     source,
@@ -114,6 +116,7 @@ async function main() {
     JSON.stringify(graphqlResult) === JSON.stringify(grafastResult),
   );
 
+  console.log("GRAFAST AGAIN");
   const grafastResultWithPlan = await grafast(
     {
       schema: grafastSchema,
