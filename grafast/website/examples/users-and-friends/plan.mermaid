@@ -10,62 +10,76 @@ flowchart TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access7["Access[7∈0]<br />ᐸ3.currentUserIdᐳ"]:::plan
-    UserById8[["UserById[8∈0]"]]:::plan
-    Access9["Access[9∈0]<br />ᐸ8.full_nameᐳ"]:::plan
-    Access10["Access[10∈0]<br />ᐸ8.idᐳ"]:::plan
-    FriendshipsByUserId11[["FriendshipsByUserId[11∈0]"]]:::plan
-    __ListTransform12[["__ListTransform[12∈0]<br />ᐸeach:11ᐳ"]]:::plan
-    __Item13>"__Item[13∈1]<br />ᐸ11ᐳ"]:::itemplan
-    __Item14>"__Item[14∈2]<br />ᐸ12ᐳ"]:::itemplan
-    Access15["Access[15∈2]<br />ᐸ14.friend_idᐳ"]:::plan
-    UserById16[["UserById[16∈2]"]]:::plan
-    Access17["Access[17∈2]<br />ᐸ16.full_nameᐳ"]:::plan
-    Access18["Access[18∈2]<br />ᐸ16.idᐳ"]:::plan
-    FriendshipsByUserId19[["FriendshipsByUserId[19∈2]"]]:::plan
-    __ListTransform20[["__ListTransform[20∈2]<br />ᐸeach:19ᐳ"]]:::plan
-    __Item21>"__Item[21∈3]<br />ᐸ19ᐳ"]:::itemplan
-    __Item22>"__Item[22∈4]<br />ᐸ20ᐳ"]:::itemplan
-    Access23["Access[23∈4]<br />ᐸ22.friend_idᐳ"]:::plan
-    UserById24[["UserById[24∈4]"]]:::plan
-    Access25["Access[25∈4]<br />ᐸ24.full_nameᐳ"]:::plan
+    GetOne8[["GetOne[8∈0]"]]:::plan
+    Record9["Record[9∈0]"]:::plan
+    Access10["Access[10∈0]<br />ᐸ9.full_nameᐳ"]:::plan
+    Access11["Access[11∈0]<br />ᐸ9.idᐳ"]:::plan
+    GetMany12[["GetMany[12∈0]"]]:::plan
+    __ListTransform13[["__ListTransform[13∈0]<br />ᐸeach:12ᐳ"]]:::plan
+    __Item14>"__Item[14∈1]<br />ᐸ12ᐳ"]:::itemplan
+    Record15["Record[15∈1]"]:::plan
+    __Item16>"__Item[16∈2]<br />ᐸ13ᐳ"]:::itemplan
+    Record17["Record[17∈2]"]:::plan
+    Access18["Access[18∈2]<br />ᐸ17.friend_idᐳ"]:::plan
+    GetOne19[["GetOne[19∈2]"]]:::plan
+    Record20["Record[20∈2]"]:::plan
+    Access21["Access[21∈2]<br />ᐸ20.full_nameᐳ"]:::plan
+    Access22["Access[22∈2]<br />ᐸ20.idᐳ"]:::plan
+    GetMany23[["GetMany[23∈2]"]]:::plan
+    __ListTransform24[["__ListTransform[24∈2]<br />ᐸeach:23ᐳ"]]:::plan
+    __Item25>"__Item[25∈3]<br />ᐸ23ᐳ"]:::itemplan
+    Record26["Record[26∈3]"]:::plan
+    __Item27>"__Item[27∈4]<br />ᐸ24ᐳ"]:::itemplan
+    Record28["Record[28∈4]"]:::plan
+    Access29["Access[29∈4]<br />ᐸ28.friend_idᐳ"]:::plan
+    GetOne30[["GetOne[30∈4]"]]:::plan
+    Record31["Record[31∈4]"]:::plan
+    Access32["Access[32∈4]<br />ᐸ31.full_nameᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access7
-    Access7 --> UserById8
-    UserById8 --> Access9
-    UserById8 --> Access10
-    Access10 --> FriendshipsByUserId11
-    FriendshipsByUserId11 --> __ListTransform12
-    FriendshipsByUserId11 -.-> __Item13
-    __ListTransform12 ==> __Item14
-    __Item14 --> Access15
-    Access15 --> UserById16
-    UserById16 --> Access17
-    UserById16 --> Access18
-    Access18 --> FriendshipsByUserId19
-    FriendshipsByUserId19 --> __ListTransform20
-    FriendshipsByUserId19 -.-> __Item21
-    __ListTransform20 ==> __Item22
-    __Item22 --> Access23
-    Access23 --> UserById24
-    UserById24 --> Access25
+    Access7 --> GetOne8
+    GetOne8 --> Record9
+    Record9 --> Access10
+    Record9 --> Access11
+    Access11 --> GetMany12
+    GetMany12 --> __ListTransform13
+    GetMany12 -.-> __Item14
+    __Item14 --> Record15
+    __ListTransform13 ==> __Item16
+    __Item16 --> Record17
+    Record17 --> Access18
+    Access18 --> GetOne19
+    GetOne19 --> Record20
+    Record20 --> Access21
+    Record20 --> Access22
+    Access22 --> GetMany23
+    GetMany23 --> __ListTransform24
+    GetMany23 -.-> __Item25
+    __Item25 --> Record26
+    __ListTransform24 ==> __Item27
+    __Item27 --> Record28
+    Record28 --> Access29
+    Access29 --> GetOne30
+    GetOne30 --> Record31
+    Record31 --> Access32
 
     subgraph Buckets
     Bucket0("Bucket 0<br />(root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access7,UserById8,Access9,Access10,FriendshipsByUserId11,__ListTransform12 bucket0
-    Bucket1("Bucket 1<br />(subroutine)<br />ROOT __Item{1}ᐸ11ᐳ[13]"):::bucket
+    class Bucket0,__Value3,__Value5,Access7,GetOne8,Record9,Access10,Access11,GetMany12,__ListTransform13 bucket0
+    Bucket1("Bucket 1<br />(subroutine)<br />ROOT Record{1}[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item13 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ12ᐳ[14]"):::bucket
+    class Bucket1,__Item14,Record15 bucket1
+    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ13ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item14,Access15,UserById16,Access17,Access18,FriendshipsByUserId19,__ListTransform20 bucket2
-    Bucket3("Bucket 3<br />(subroutine)<br />ROOT __Item{3}ᐸ19ᐳ[21]"):::bucket
+    class Bucket2,__Item16,Record17,Access18,GetOne19,Record20,Access21,Access22,GetMany23,__ListTransform24 bucket2
+    Bucket3("Bucket 3<br />(subroutine)<br />ROOT Record{3}[26]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21 bucket3
-    Bucket4("Bucket 4<br />(listItem)<br />ROOT __Item{4}ᐸ20ᐳ[22]"):::bucket
+    class Bucket3,__Item25,Record26 bucket3
+    Bucket4("Bucket 4<br />(listItem)<br />ROOT __Item{4}ᐸ24ᐳ[27]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item22,Access23,UserById24,Access25 bucket4
+    class Bucket4,__Item27,Record28,Access29,GetOne30,Record31,Access32 bucket4
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3 & Bucket4
     end

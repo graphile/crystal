@@ -49,12 +49,12 @@ const planResolvers = {
   },
   User: {
     name($user) {
-      return access($user, "full_name");
+      return $user.get("full_name");
     },
     friends($user) {
-      const $friendships = friendshipsByUserId(access($user, "id"));
+      const $friendships = friendshipsByUserId($user.get("id"));
       return each($friendships, ($friendship) =>
-        userById(access($friendship, "friend_id")),
+        userById($friendship.get("friend_id")),
       );
     },
   },
