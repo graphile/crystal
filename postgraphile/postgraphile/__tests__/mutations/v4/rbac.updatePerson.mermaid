@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -56,13 +57,13 @@ graph TD
     PgSelectSingle39 --> PgClassExpression40
 
     subgraph "Buckets for mutations/v4/rbac.updatePerson"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf11,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,Access21,Access22,Object23,List25,Object26 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 23, 9, 11, 25, 16, 17, 26<br /><br />1: PgUpdate{1}[20]<br />2: Object{1}ᐸ{result}ᐳ[24],PgClassExpression{1}ᐸ__person__.”id”ᐳ[27],PgClassExpression{1}ᐸ__person__...full_name”ᐳ[28],PgClassExpression{1}ᐸ__person__.”aliases”ᐳ[29],PgClassExpression{1}ᐸ__person__.”about”ᐳ[31],PgClassExpression{1}ᐸ__person__.”email”ᐳ[32],PgClassExpression{1}ᐸ__person__.”site”ᐳ[33]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 23, 9, 11, 25, 16, 17, 26<br /><br />1: PgUpdate{1}[20]<br />2: Object{1}ᐸ{result}ᐳ[24],PgClassExpression{1}ᐸ__person__.”id”ᐳ[27],PgClassExpression{1}ᐸ__person__...full_name”ᐳ[28],PgClassExpression{1}ᐸ__person__.”aliases”ᐳ[29],PgClassExpression{1}ᐸ__person__.”about”ᐳ[31],PgClassExpression{1}ᐸ__person__.”email”ᐳ[32],PgClassExpression{1}ᐸ__person__.”site”ᐳ[33]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdate20,Object24,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgSelect34,First38,PgSelectSingle39,PgClassExpression40 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ29ᐳ[30]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ29ᐳ[30]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item30 bucket2
     Bucket0 --> Bucket1

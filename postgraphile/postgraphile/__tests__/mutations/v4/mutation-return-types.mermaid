@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -315,79 +316,79 @@ graph TD
     PgSelectSingle313 --> PgClassExpression314
 
     subgraph "Buckets for mutations/v4/mutation-return-types"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf10,Access12,Access13,Object14,__InputStaticLeaf21,__InputStaticLeaf42,__InputStaticLeaf43,Constant69,Connection100,Constant104,__InputStaticLeaf111,__InputStaticLeaf112,Constant138,Connection169,Constant173,__InputStaticLeaf191,Constant251,Constant265,__InputStaticLeaf294,__InputStaticLeaf306 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 14, 9, 10<br /><br />1: PgSelect{1}ᐸmutation_in_inout(mutation)ᐳ[11]<br />2: First{1}[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 9, 10<br /><br />1: PgSelect{1}ᐸmutation_in_inout(mutation)ᐳ[11]<br />2: First{1}[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First15,PgSelectSingle16,PgClassExpression17,Object18 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 14, 21<br /><br />1: PgSelect{2}ᐸmutation_in_out(mutation)ᐳ[22]<br />2: First{2}[26]"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 14, 21<br /><br />1: PgSelect{2}ᐸmutation_in_out(mutation)ᐳ[22]<br />2: First{2}[26]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,Object29 bucket2
-    Bucket3("Bucket 3<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{3}ᐸmutation_out(mutation)ᐳ[32]<br />2: First{3}[36]"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{3}ᐸmutation_out(mutation)ᐳ[32]<br />2: First{3}[36]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,Object39 bucket3
-    Bucket4("Bucket 4<br />(mutationField)<br />Deps: 14, 42, 43, 69, 104, 100<br /><br />1: PgSelect{4}ᐸmutation_out_complex(mutation)ᐳ[44]<br />2: First{4}[48]"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 14, 42, 43, 69, 104, 100<br /><br />1: PgSelect{4}ᐸmutation_out_complex(mutation)ᐳ[44]<br />2: First{4}[48]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect44,First48,PgSelectSingle49,Object50,PgClassExpression51,PgClassExpression52,PgSelect53,First57,PgSelectSingle58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgClassExpression62,PgSelect63,First67,PgSelectSingle68,PgClassExpression70,List71,Lambda72,PgClassExpression74,Access315 bucket4
-    Bucket5("Bucket 5<br />(listItem)<br />Deps: 104<br /><br />ROOT __Item{5}ᐸ315ᐳ[102]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 104<br /><br />ROOT __Item{5}ᐸ315ᐳ[102]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item102,PgSelectSingle103,PgClassExpression105,List106,Lambda107 bucket5
-    Bucket6("Bucket 6<br />(mutationField)<br />Deps: 14, 111, 112, 138, 173, 169<br /><br />1: PgSelect{6}ᐸmutation_out_complex_setof(mutation)ᐳ[113]<br />2: Object{6}ᐸ{result}ᐳ[117]"):::bucket
+    Bucket6("Bucket 6 (mutationField)<br />Deps: 14, 111, 112, 138, 173, 169<br /><br />1: PgSelect{6}ᐸmutation_out_complex_setof(mutation)ᐳ[113]<br />2: Object{6}ᐸ{result}ᐳ[117]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgSelect113,Object117 bucket6
-    Bucket7("Bucket 7<br />(listItem)<br />Deps: 14, 138, 173, 169<br /><br />ROOT __Item{7}ᐸ113ᐳ[118]"):::bucket
+    Bucket7("Bucket 7 (listItem)<br />Deps: 14, 138, 173, 169<br /><br />ROOT __Item{7}ᐸ113ᐳ[118]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item118,PgSelectSingle119,PgClassExpression120,PgClassExpression121,PgSelect122,First126,PgSelectSingle127,PgClassExpression128,PgClassExpression129,PgClassExpression130,PgClassExpression131,PgSelect132,First136,PgSelectSingle137,PgClassExpression139,List140,Lambda141,PgClassExpression143,Access316 bucket7
-    Bucket8("Bucket 8<br />(listItem)<br />Deps: 173<br /><br />ROOT __Item{8}ᐸ316ᐳ[171]"):::bucket
+    Bucket8("Bucket 8 (listItem)<br />Deps: 173<br /><br />ROOT __Item{8}ᐸ316ᐳ[171]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,__Item171,PgSelectSingle172,PgClassExpression174,List175,Lambda176 bucket8
-    Bucket9("Bucket 9<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{9}ᐸmutation_out_out(mutation)ᐳ[180]<br />2: First{9}[184]"):::bucket
+    Bucket9("Bucket 9 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{9}ᐸmutation_out_out(mutation)ᐳ[180]<br />2: First{9}[184]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgSelect180,First184,PgSelectSingle185,Object186,PgClassExpression187,PgClassExpression188 bucket9
-    Bucket10("Bucket 10<br />(mutationField)<br />Deps: 14, 191<br /><br />1: PgSelect{10}ᐸmutation_out_out_compound_type(mutation)ᐳ[192]<br />2: First{10}[196]"):::bucket
+    Bucket10("Bucket 10 (mutationField)<br />Deps: 14, 191<br /><br />1: PgSelect{10}ᐸmutation_out_out_compound_type(mutation)ᐳ[192]<br />2: First{10}[196]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,PgSelect192,First196,PgSelectSingle197,Object198,PgClassExpression199,PgClassExpression200,PgSelect201,First205,PgSelectSingle206,PgClassExpression207,PgClassExpression208,PgClassExpression209 bucket10
-    Bucket11("Bucket 11<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{11}ᐸmutation_out_out_setof(mutation)ᐳ[212]<br />2: Object{11}ᐸ{result}ᐳ[216]"):::bucket
+    Bucket11("Bucket 11 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{11}ᐸmutation_out_out_setof(mutation)ᐳ[212]<br />2: Object{11}ᐸ{result}ᐳ[216]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgSelect212,Object216 bucket11
-    Bucket12("Bucket 12<br />(listItem)<br />ROOT __Item{12}ᐸ212ᐳ[217]"):::bucket
+    Bucket12("Bucket 12 (listItem)<br />ROOT __Item{12}ᐸ212ᐳ[217]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,__Item217,PgSelectSingle218,PgClassExpression219,PgClassExpression220 bucket12
-    Bucket13("Bucket 13<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{13}ᐸmutation_out_out_unnamed(mutation)ᐳ[223]<br />2: First{13}[227]"):::bucket
+    Bucket13("Bucket 13 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{13}ᐸmutation_out_out_unnamed(mutation)ᐳ[223]<br />2: First{13}[227]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgSelect223,First227,PgSelectSingle228,Object229,PgClassExpression230,PgClassExpression231 bucket13
-    Bucket14("Bucket 14<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{14}ᐸmutation_out_setof(mutation)ᐳ[234]<br />2: Object{14}ᐸ{result}ᐳ[238]"):::bucket
+    Bucket14("Bucket 14 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{14}ᐸmutation_out_setof(mutation)ᐳ[234]<br />2: Object{14}ᐸ{result}ᐳ[238]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14,PgSelect234,Object238 bucket14
-    Bucket15("Bucket 15<br />(listItem)<br />ROOT __Item{15}ᐸ234ᐳ[239]"):::bucket
+    Bucket15("Bucket 15 (listItem)<br />ROOT __Item{15}ᐸ234ᐳ[239]"):::bucket
     classDef bucket15 stroke:#ff00ff
     class Bucket15,__Item239,PgSelectSingle240,PgClassExpression241 bucket15
-    Bucket16("Bucket 16<br />(mutationField)<br />Deps: 14, 251<br /><br />1: PgSelect{16}ᐸmutation_out_table(mutation)ᐳ[244]<br />2: First{16}[248]"):::bucket
+    Bucket16("Bucket 16 (mutationField)<br />Deps: 14, 251<br /><br />1: PgSelect{16}ᐸmutation_out_table(mutation)ᐳ[244]<br />2: First{16}[248]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,PgSelect244,First248,PgSelectSingle249,Object250,PgClassExpression252,List253,Lambda254 bucket16
-    Bucket17("Bucket 17<br />(mutationField)<br />Deps: 14, 265<br /><br />1: PgSelect{17}ᐸmutation_out_table_setof(mutation)ᐳ[258]<br />2: Object{17}ᐸ{result}ᐳ[262]"):::bucket
+    Bucket17("Bucket 17 (mutationField)<br />Deps: 14, 265<br /><br />1: PgSelect{17}ᐸmutation_out_table_setof(mutation)ᐳ[258]<br />2: Object{17}ᐸ{result}ᐳ[262]"):::bucket
     classDef bucket17 stroke:#696969
     class Bucket17,PgSelect258,Object262 bucket17
-    Bucket18("Bucket 18<br />(listItem)<br />Deps: 265<br /><br />ROOT __Item{18}ᐸ258ᐳ[263]"):::bucket
+    Bucket18("Bucket 18 (listItem)<br />Deps: 265<br /><br />ROOT __Item{18}ᐸ258ᐳ[263]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,__Item263,PgSelectSingle264,PgClassExpression266,List267,Lambda268 bucket18
-    Bucket19("Bucket 19<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{19}ᐸmutation_out_unnamed(mutation)ᐳ[272]<br />2: First{19}[276]"):::bucket
+    Bucket19("Bucket 19 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{19}ᐸmutation_out_unnamed(mutation)ᐳ[272]<br />2: First{19}[276]"):::bucket
     classDef bucket19 stroke:#7f007f
     class Bucket19,PgSelect272,First276,PgSelectSingle277,PgClassExpression278,Object279 bucket19
-    Bucket20("Bucket 20<br />(mutationField)<br />Deps: 14<br /><br />1: PgSelect{20}ᐸmutation_out_unnamed_out_out_unnamed(mutation)ᐳ[282]<br />2: First{20}[286]"):::bucket
+    Bucket20("Bucket 20 (mutationField)<br />Deps: 14<br /><br />1: PgSelect{20}ᐸmutation_out_unnamed_out_out_unnamed(mutation)ᐳ[282]<br />2: First{20}[286]"):::bucket
     classDef bucket20 stroke:#ffa500
     class Bucket20,PgSelect282,First286,PgSelectSingle287,Object288,PgClassExpression289,PgClassExpression290,PgClassExpression291 bucket20
-    Bucket21("Bucket 21<br />(mutationField)<br />Deps: 14, 294<br /><br />1: PgSelect{21}ᐸmutation_returns_table_multi_col(mutation)ᐳ[295]<br />2: Object{21}ᐸ{result}ᐳ[299]"):::bucket
+    Bucket21("Bucket 21 (mutationField)<br />Deps: 14, 294<br /><br />1: PgSelect{21}ᐸmutation_returns_table_multi_col(mutation)ᐳ[295]<br />2: Object{21}ᐸ{result}ᐳ[299]"):::bucket
     classDef bucket21 stroke:#0000ff
     class Bucket21,PgSelect295,Object299 bucket21
-    Bucket22("Bucket 22<br />(listItem)<br />ROOT __Item{22}ᐸ295ᐳ[300]"):::bucket
+    Bucket22("Bucket 22 (listItem)<br />ROOT __Item{22}ᐸ295ᐳ[300]"):::bucket
     classDef bucket22 stroke:#7fff00
     class Bucket22,__Item300,PgSelectSingle301,PgClassExpression302,PgClassExpression303 bucket22
-    Bucket23("Bucket 23<br />(mutationField)<br />Deps: 14, 306<br /><br />1: PgSelect{23}ᐸmutation_returns_table_one_col(mutation)ᐳ[307]<br />2: Object{23}ᐸ{result}ᐳ[311]"):::bucket
+    Bucket23("Bucket 23 (mutationField)<br />Deps: 14, 306<br /><br />1: PgSelect{23}ᐸmutation_returns_table_one_col(mutation)ᐳ[307]<br />2: Object{23}ᐸ{result}ᐳ[311]"):::bucket
     classDef bucket23 stroke:#ff1493
     class Bucket23,PgSelect307,Object311 bucket23
-    Bucket24("Bucket 24<br />(listItem)<br />ROOT __Item{24}ᐸ307ᐳ[312]"):::bucket
+    Bucket24("Bucket 24 (listItem)<br />ROOT __Item{24}ᐸ307ᐳ[312]"):::bucket
     classDef bucket24 stroke:#808000
     class Bucket24,__Item312,PgSelectSingle313,PgClassExpression314 bucket24
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket6 & Bucket9 & Bucket10 & Bucket11 & Bucket13 & Bucket14 & Bucket16 & Bucket17 & Bucket19 & Bucket20 & Bucket21 & Bucket23
