@@ -65,7 +65,7 @@ export function executeBucket(
   bucket: Bucket,
   requestContext: RequestContext,
 ): PromiseOrDirect<void> {
-  const { metaByStepId } = requestContext;
+  const { metaByMetaKey } = requestContext;
   const inProgressSteps = new Set();
   const pendingSteps = new Set(bucket.layerPlan.steps);
   const {
@@ -424,7 +424,7 @@ export function executeBucket(
       return reallyCompletedStep(step);
     }
     try {
-      const meta = metaByStepId[step.id]!;
+      const meta = metaByMetaKey[step.metaKey];
       const extra: ExecutionExtra = {
         meta,
         eventEmitter: requestContext.eventEmitter,

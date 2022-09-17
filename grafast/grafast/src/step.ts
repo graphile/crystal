@@ -255,10 +255,20 @@ export class ExecutableStep<TData = any> extends BaseStep {
   /** @internal */
   public polymorphicPaths: ReadonlySet<string>;
 
+  /**
+   * Override the metaKey to be able to share execution meta between multiple
+   * steps of the same class (or even a family of step classes).
+   */
+  public metaKey: number | string | symbol;
+
   constructor() {
     super();
     this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
+    // @ts-ignore
+    if (this.metaKey === undefined) {
+      this.metaKey = this.id;
+    }
   }
 
   protected getStep(id: number): ExecutableStep {

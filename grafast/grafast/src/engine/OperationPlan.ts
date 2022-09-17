@@ -102,8 +102,10 @@ type OperationPlanPhase =
   | "finalize"
   | "ready";
 
-export interface MetaByStepId {
-  [planId: number]: Record<string, any>;
+// TODO: overhaul the TypeScript for this, allow steps to declaration merge
+// their own shapes into it.
+export interface MetaByMetaKey {
+  [metaKey: string | number | symbol]: Record<string, any>;
 }
 
 export class OperationPlan {
@@ -186,7 +188,7 @@ export class OperationPlan {
   public readonly trackedRootValueStep: __TrackedObjectStep<any>;
 
   /** @internal */
-  public makeMetaByStepId: () => MetaByStepId;
+  public makeMetaByMetaKey: () => MetaByMetaKey;
 
   /**
    * @internal
@@ -300,17 +302,22 @@ export class OperationPlan {
     // this.walkFinalizedPlans();
     // this.preparePrefetches();
 
+    const allMetaKeys = new Set<string | number | symbol>();
+    for (let i = 0, l = this.steps.length; i < l; i++) {
+      const step = this.steps[i];
+      if (step && step.id === i) {
+        allMetaKeys.add(step.metaKey);
+      }
+    }
+    const allMetaKeysList = [...allMetaKeys];
+
     // A JIT'd object constructor
-    this.makeMetaByStepId = new Function(
-      `return { ${Object.entries(this.steps)
-        .map(([planId, plan]) =>
-          plan && plan.id === Number(planId)
-            ? `${JSON.stringify(plan.id)}: Object.create(null)`
-            : null,
-        )
-        .filter(isNotNullish)
-        .join(", ")} }`,
-    ) as any;
+    this.makeMetaByMetaKey = new Function(
+      "keys",
+      `return () => ({${allMetaKeysList
+        .map((key, idx) => `\n  [keys[${idx}]]: Object.create(null)`)
+        .join(",")}\n})`,
+    )(allMetaKeysList) as any;
   }
 
   /**

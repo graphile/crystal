@@ -245,7 +245,7 @@ export function executePreemptive(
   const requestContext: RequestContext = {
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
-    metaByStepId: operationPlan.makeMetaByStepId(),
+    metaByMetaKey: operationPlan.makeMetaByMetaKey(),
     insideGraphQL: false,
   };
 
