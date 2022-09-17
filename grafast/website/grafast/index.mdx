@@ -120,7 +120,9 @@ const planResolvers = {
 };
 ```
 
-As you can see, the shape of the logic is quite similar, but the Grafast
-resolvers build a plan, like this:
+As you can see, the shape of the logic is quite similar, but the Grafast plan resolvers
+are not asynchronous and do not return or deal with promises because their job isn't to
+get the data to use, but instead to build an operation plan that can be executed to get
+the data. The operation plan for the operation above looks like this:
 
 <Mermaid chart={mermaidPlan}/>
