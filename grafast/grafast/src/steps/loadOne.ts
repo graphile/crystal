@@ -8,10 +8,8 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
+import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
-
-// TODO: implement this!
-const canonicalJSONStringify = (o: object) => JSON.stringify(o);
 
 export interface LoadOneOptions<TData, TParams extends Record<string, any>> {
   attributes: ReadonlyArray<keyof TData> | null;

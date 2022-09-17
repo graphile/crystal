@@ -936,3 +936,6 @@ export function stepsAreInSamePhase(
     `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
   );
 }
+
+// TODO: implement this!
+export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
