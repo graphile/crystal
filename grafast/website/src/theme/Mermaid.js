@@ -3,7 +3,6 @@ import mermaid from "mermaid";
 
 mermaid.initialize({
   startOnLoad: true,
-  themeVariables: { fontSize: "12px" },
   flowchart: {
     diagramPadding: 8,
     nodeSpacing: 20, // 50
