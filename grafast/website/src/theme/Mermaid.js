@@ -5,7 +5,7 @@ mermaid.initialize({
   startOnLoad: true,
   themeVariables: { fontSize: "12px" },
   flowchart: {
-    diagramPadding: 0,
+    diagramPadding: 8,
     nodeSpacing: 20, // 50
     rankSpacing: 40, // 50
     htmlLabels: true,
