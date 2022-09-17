@@ -24,6 +24,20 @@ export type LoadOneCallback<
   displayName?: string;
 };
 
+/**
+ * A TypeScript Identity Function to help you strongly type your
+ * LoadManyCallback.
+ */
+export function loadOneCallback<
+  TSpec,
+  TData,
+  TParams extends Record<string, any>,
+>(
+  callback: LoadOneCallback<TSpec, TData, TParams>,
+): LoadOneCallback<TSpec, TData, TParams> {
+  return callback;
+}
+
 export class LoadOneStep<
   TSpec,
   TData,
@@ -48,6 +62,12 @@ export class LoadOneStep<
   get(attr: keyof TData & (string | number)) {
     this.attributes.add(attr);
     return access(this, attr);
+  }
+  setParam<TParamKey extends keyof TParams>(
+    paramKey: TParamKey,
+    value: TParams[TParamKey],
+  ): void {
+    this.params[paramKey] = value;
   }
   finalize() {
     this.loadOptions = {

@@ -25,6 +25,20 @@ export type LoadManyCallback<
 };
 
 /**
+ * A TypeScript Identity Function to help you strongly type your
+ * LoadManyCallback.
+ */
+export function loadManyCallback<
+  TSpec,
+  TData,
+  TParams extends Record<string, any>,
+>(
+  callback: LoadManyCallback<TSpec, TData, TParams>,
+): LoadManyCallback<TSpec, TData, TParams> {
+  return callback;
+}
+
+/**
  * You shouldn't create instances of this yourself - use `loadMany` or `loadOne`.
  *
  * @internal
@@ -95,7 +109,13 @@ export class LoadManyStep<
     return this.load.displayName || this.load.name;
   }
   listItem($item: __ItemStep<TData>) {
-    return new LoadManySingleRecordStep($item);
+    return new LoadManySingleRecordStep($item, this.toStringMeta());
+  }
+  setParam<TParamKey extends keyof TParams>(
+    paramKey: TParamKey,
+    value: TParams[TParamKey],
+  ): void {
+    this.params[paramKey] = value;
   }
   addAttributes(attributes: Set<keyof TData>): void {
     for (const column of attributes) {

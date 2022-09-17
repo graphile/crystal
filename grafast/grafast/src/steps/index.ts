@@ -75,3 +75,18 @@ export {
   GraphQLResolverStep,
   makeResolveInfo,
 } from "./graphqlResolver.js";
+export {
+  loadMany,
+  LoadManyCallback,
+  loadManyCallback,
+  LoadManyOptions,
+  LoadManySingleRecordStep,
+  LoadManyStep,
+} from "./loadMany.js";
+export {
+  loadOne,
+  LoadOneCallback,
+  loadOneCallback,
+  LoadOneOptions,
+  LoadOneStep,
+} from "./loadOne.js";
