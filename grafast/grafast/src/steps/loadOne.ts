@@ -10,6 +10,9 @@ import type {
 import { ExecutableStep } from "../step.js";
 import { access } from "./access.js";
 
+// TODO: implement this!
+const canonicalJSONStringify = (o: object) => JSON.stringify(o);
+
 export interface LoadOneOptions<TData, TParams extends Record<string, any>> {
   attributes: ReadonlyArray<keyof TData> | null;
   params: Partial<TParams>;
@@ -42,7 +45,10 @@ export function loadOneCallback<
 }
 
 interface LoadOneMeta {
-  cacheByOptions?: Map<string, Map<any, PromiseLike<any>>>;
+  cacheByOptionsByCallback?: Map<
+    LoadOneCallback<any, any, any>,
+    Map<string, Map<any, PromiseLike<any>>>
+  >;
 }
 
 export class LoadOneStep<
@@ -80,10 +86,10 @@ export class LoadOneStep<
   }
   finalize() {
     this.loadOptions = {
-      attributes: this.attributes.size ? [...this.attributes] : null,
+      attributes: this.attributes.size ? [...this.attributes].sort() : null,
       params: this.params,
     };
-    this.loadOptionsKey = JSON.stringify(this.loadOptions);
+    this.loadOptionsKey = canonicalJSONStringify(this.loadOptions);
   }
   execute(
     [specs]: [CrystalValuesList<TSpec>],
@@ -91,10 +97,15 @@ export class LoadOneStep<
   ): PromiseOrDirect<CrystalResultsList<TData>> {
     const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadOneMeta;
-    let cacheByOptions = meta.cacheByOptions;
+    let cacheByOptionsByCallback = meta.cacheByOptionsByCallback;
+    if (!cacheByOptionsByCallback) {
+      cacheByOptionsByCallback = new Map();
+      meta.cacheByOptionsByCallback = cacheByOptionsByCallback;
+    }
+    let cacheByOptions = cacheByOptionsByCallback.get(this.load);
     if (!cacheByOptions) {
       cacheByOptions = new Map();
-      meta.cacheByOptions = cacheByOptions;
+      cacheByOptionsByCallback.set(this.load, cacheByOptions);
     }
     let cache = cacheByOptions.get(this.loadOptionsKey);
     if (!cache) {
