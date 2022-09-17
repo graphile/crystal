@@ -2620,6 +2620,17 @@ export class OperationPlan {
       }
     }
   }
+
+  getStepsByMetaKey(metaKey: string | number | symbol): ExecutableStep[] {
+    const matches: ExecutableStep[] = [];
+    for (let id = 0, l = this.steps.length; id < l; id++) {
+      const step = this.steps[id];
+      if (step && step.id === id && step.metaKey === metaKey) {
+        matches.push(step);
+      }
+    }
+    return matches;
+  }
 }
 
 function makeDefaultPlan(fieldName: string) {

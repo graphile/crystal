@@ -85,10 +85,34 @@ export class LoadOneStep<
     this.params[paramKey] = value;
   }
   finalize() {
+    // Find all steps of this type that use the same callback and have
+    // equivalent params and then match their list of attributes together.
+    const stringifiedParams = canonicalJSONStringify(this.params);
+    const kin = (
+      this.opPlan.getStepsByMetaKey(this.metaKey) as LoadOneStep<
+        any,
+        any,
+        any
+      >[]
+    ).filter((step) => {
+      if (step.id === this.id) return false;
+      if (step.load !== this.load) return false;
+      if (canonicalJSONStringify(step.params) !== stringifiedParams)
+        return false;
+      return true;
+    });
+    for (const otherStep of kin) {
+      for (const attr of otherStep.attributes) {
+        this.attributes.add(attr as any);
+      }
+    }
+
+    // Build the loadOptions
     this.loadOptions = {
       attributes: this.attributes.size ? [...this.attributes].sort() : null,
       params: this.params,
     };
+    // If the canonicalJSONStringify is the same, then we deem that the options are the same
     this.loadOptionsKey = canonicalJSONStringify(this.loadOptions);
   }
   execute(
