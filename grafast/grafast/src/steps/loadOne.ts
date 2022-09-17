@@ -5,7 +5,7 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
-import { RecordStep } from "./record.js";
+import { access } from "./access.js";
 
 export interface LoadOneOptions<TData, TParams extends Record<string, any>> {
   attributes: ReadonlyArray<keyof TData> | null;
@@ -45,10 +45,9 @@ export class LoadOneStep<
   toStringMeta() {
     return this.load.displayName || this.load.name;
   }
-  addAttributes(attributes: Set<keyof TData>): void {
-    for (const column of attributes) {
-      this.attributes.add(column);
-    }
+  get(attr: keyof TData & (string | number)) {
+    this.attributes.add(attr);
+    return access(this, attr);
   }
   finalize() {
     this.loadOptions = {
@@ -67,5 +66,5 @@ export function loadOne<TSpec, TData, TParams extends Record<string, any>>(
   $spec: ExecutableStep<TSpec>,
   load: LoadOneCallback<TSpec, TData, TParams>,
 ) {
-  return new RecordStep(new LoadOneStep($spec, load));
+  return new LoadOneStep($spec, load);
 }

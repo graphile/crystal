@@ -5,7 +5,7 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
-import { RecordStep } from "./record.js";
+import { access } from "./access.js";
 
 export interface LoadManyOptions<TData, TParams extends Record<string, any>> {
   attributes: ReadonlyArray<keyof TData> | null;
@@ -23,6 +23,55 @@ export type LoadManyCallback<
   ): PromiseOrDirect<ReadonlyArray<ReadonlyArray<TData>>>;
   displayName?: string;
 };
+
+/**
+ * You shouldn't create instances of this yourself - use `loadMany` or `loadOne`.
+ *
+ * @internal
+ */
+export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "LoadManySingleRecordStep",
+  };
+
+  isSyncAndSafe = true;
+
+  attributes = new Set<keyof TData>();
+  constructor(
+    $data: ExecutableStep<TData>,
+    private sourceDescription?: string,
+  ) {
+    super();
+    this.addDependency($data);
+  }
+  toStringMeta() {
+    return this.sourceDescription ?? null;
+  }
+  get(attr: keyof TData & (string | number)) {
+    this.attributes.add(attr);
+    return access(this, attr);
+  }
+  optimize() {
+    const $source = this.getDepDeep(0);
+    if ($source instanceof LoadManyStep) {
+      // Tell our parent we only need certain attributes
+      $source.addAttributes(this.attributes);
+    } else {
+      // This should never happen
+      console.warn(
+        `LoadManySingleRecordStep could not find the parent LoadManyStep; instead found ${$source}`,
+      );
+    }
+
+    // Record has no run-time behaviour (it's just a plan-time helper), so we
+    // can replace ourself with our dependency:
+    return this.getDep(0);
+  }
+  execute([records]: [CrystalValuesList<TData>]): CrystalResultsList<TData> {
+    return records;
+  }
+}
 
 export class LoadManyStep<
   TSpec,
@@ -46,7 +95,7 @@ export class LoadManyStep<
     return this.load.displayName || this.load.name;
   }
   listItem($item: __ItemStep<TData>) {
-    return new RecordStep($item);
+    return new LoadManySingleRecordStep($item);
   }
   addAttributes(attributes: Set<keyof TData>): void {
     for (const column of attributes) {
