@@ -16,12 +16,11 @@ exports.getUsersByIds = async function getUsersByIds(ids, options = {}) {
   const columns = options.columns
     ? [...new Set(["id", ...options.columns])]
     : ["*"];
-  const uniqueIds = [...new Set(ids)];
   const users = await queryAll(
-    `select ${columns.join(", ")} from users where id in (${uniqueIds
+    `select ${columns.join(", ")} from users where id in (${ids
       .map(() => `?`)
       .join(", ")})`,
-    uniqueIds,
+    ids,
   );
   return ids.map((id) => users.find((u) => u.id === id));
 };
@@ -33,12 +32,11 @@ exports.getFriendshipsByUserIds = async function getFriendshipsByUserIds(
   const columns = options.columns
     ? [...new Set(["user_id", ...options.columns])]
     : ["*"];
-  const uniqueIds = [...new Set(userIds)];
   const friendships = await queryAll(
-    `select ${columns.join(", ")} from friendships where user_id in (${uniqueIds
+    `select ${columns.join(", ")} from friendships where user_id in (${userIds
       .map(() => `?`)
       .join(", ")})`,
-    uniqueIds,
+    userIds,
   );
   return userIds.map((userId) =>
     friendships.filter((f) => f.user_id === userId),
