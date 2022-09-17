@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -121,13 +122,13 @@ graph TD
     PgSelectSingle88 --> PgClassExpression90
 
     subgraph "Buckets for mutations/basics/delete-relational-post"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf8,Access10,Access11,Object12,__InputStaticLeaf50 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 12, 8<br /><br />1: PgDelete{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...sts__.”id”ᐳ[13],PgClassExpression{1}ᐸ__relational_posts__ᐳ[14]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8<br /><br />1: PgDelete{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...sts__.”id”ᐳ[13],PgClassExpression{1}ᐸ__relational_posts__ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9,PgClassExpression13,PgClassExpression14,PgSelect15,First19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,First30,PgSelectSingle31,PgClassExpression32,First38,PgSelectSingle39,First45,PgSelectSingle46,PgClassExpression47,PgClassExpression48,Map91,List92,Map95,List96,Map99,List100 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 12, 50<br /><br />1: PgDelete{2}[51]<br />2: PgClassExpression{2}ᐸ__relation...sts__.”id”ᐳ[55],PgClassExpression{2}ᐸ__relational_posts__ᐳ[56]"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 12, 50<br /><br />1: PgDelete{2}[51]<br />2: PgClassExpression{2}ᐸ__relation...sts__.”id”ᐳ[55],PgClassExpression{2}ᐸ__relational_posts__ᐳ[56]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgDelete51,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,First72,PgSelectSingle73,PgClassExpression74,First80,PgSelectSingle81,First87,PgSelectSingle88,PgClassExpression89,PgClassExpression90,Map93,List94,Map97,List98,Map101,List102 bucket2
     Bucket0 --> Bucket1 & Bucket2

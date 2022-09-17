@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -201,19 +202,19 @@ graph TD
     First203 --> PgSelectSingle204
 
     subgraph "Buckets for mutations/basics/create-three-relational-posts"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant14,Constant15,Constant16,Constant21,Constant22,Constant28,Constant29,Constant30,Constant35,Constant36,Constant42,Constant43,Constant44,__InputStaticLeaf50,__InputStaticLeaf102,__InputStaticLeaf154 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 12, 7, 8, 14, 15, 16, 21, 22, 28, 29, 30, 35, 36, 42, 43, 44, 50, 102, 154, 5<br /><br />1: PgInsert{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[13]<br />3: PgInsert{1}[17]<br />4: PgInsert{1}[23]<br />5: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[27]<br />6: PgInsert{1}[31]<br />7: PgInsert{1}[37]<br />8: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[41]<br />9: PgInsert{1}[45]<br />10: PgClassExpression{1}ᐸ__relational_posts__ᐳ[49],PgSelect{1}ᐸrelational_itemsᐳ[51],PgSelect{1}ᐸrelational_itemsᐳ[103],PgSelect{1}ᐸrelational_itemsᐳ[155]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 14, 15, 16, 21, 22, 28, 29, 30, 35, 36, 42, 43, 44, 50, 102, 154, 5<br /><br />1: PgInsert{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[13]<br />3: PgInsert{1}[17]<br />4: PgInsert{1}[23]<br />5: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[27]<br />6: PgInsert{1}[31]<br />7: PgInsert{1}[37]<br />8: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[41]<br />9: PgInsert{1}[45]<br />10: PgClassExpression{1}ᐸ__relational_posts__ᐳ[49],PgSelect{1}ᐸrelational_itemsᐳ[51],PgSelect{1}ᐸrelational_itemsᐳ[103],PgSelect{1}ᐸrelational_itemsᐳ[155]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert9,PgClassExpression13,PgInsert17,PgInsert23,PgClassExpression27,PgInsert31,PgInsert37,PgClassExpression41,PgInsert45,PgClassExpression49,PgSelect51,First55,PgSelectSingle56,PgClassExpression57,PgPolymorphic58,PgClassExpression59,PgSelect103,First107,PgSelectSingle108,PgClassExpression109,PgPolymorphic110,PgClassExpression111,PgSelect155,First159,PgSelectSingle160,PgClassExpression161,PgPolymorphic162,PgClassExpression163 bucket1
-    Bucket2("Bucket 2<br />(polymorphic(RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem))<br />Deps: 12, 59, 58<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 12, 59, 58<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect60,First64,PgSelectSingle65,PgSelect68,First72,PgSelectSingle73,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgSelect79,First83,PgSelectSingle84,PgSelect87,First91,PgSelectSingle92,PgSelect95,First99,PgSelectSingle100 bucket2
-    Bucket3("Bucket 3<br />(polymorphic(RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem))<br />Deps: 12, 111, 110<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 12, 111, 110<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect112,First116,PgSelectSingle117,PgSelect120,First124,PgSelectSingle125,PgClassExpression127,PgClassExpression128,PgClassExpression129,PgSelect131,First135,PgSelectSingle136,PgSelect139,First143,PgSelectSingle144,PgSelect147,First151,PgSelectSingle152 bucket3
-    Bucket4("Bucket 4<br />(polymorphic(RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem))<br />Deps: 12, 163, 162<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 12, 163, 162<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect164,First168,PgSelectSingle169,PgSelect172,First176,PgSelectSingle177,PgClassExpression179,PgClassExpression180,PgClassExpression181,PgSelect183,First187,PgSelectSingle188,PgSelect191,First195,PgSelectSingle196,PgSelect199,First203,PgSelectSingle204 bucket4
     Bucket0 --> Bucket1

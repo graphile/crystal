@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -29,13 +30,13 @@ graph TD
     PgDelete16 --> PgClassExpression20
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf8,Access10,Access11,Object12,__InputStaticLeaf15 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 12, 8<br /><br />1: PgDelete{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...sts__.”id”ᐳ[13]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8<br /><br />1: PgDelete{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...sts__.”id”ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9,PgClassExpression13 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 12, 15<br /><br />1: PgDelete{2}[16]<br />2: PgClassExpression{2}ᐸ__relation...sts__.”id”ᐳ[20]"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 12, 15<br /><br />1: PgDelete{2}[16]<br />2: PgClassExpression{2}ᐸ__relation...sts__.”id”ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgDelete16,PgClassExpression20 bucket2
     Bucket0 --> Bucket1 & Bucket2
