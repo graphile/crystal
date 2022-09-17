@@ -1,7 +1,10 @@
+import type { Deferred } from "../deferred.js";
+import { defer } from "../deferred.js";
 import type { __ItemStep } from "../index.js";
 import type {
   CrystalResultsList,
   CrystalValuesList,
+  ExecutionExtra,
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
@@ -38,14 +41,20 @@ export function loadOneCallback<
   return callback;
 }
 
+interface LoadOneMeta {
+  cacheByOptions?: Map<string, Map<any, PromiseLike<any>>>;
+}
+
 export class LoadOneStep<
   TSpec,
   TData,
   TParams extends Record<string, any>,
 > extends ExecutableStep {
   static $$export = { moduleName: "grafast", exportName: "LoadOneStep" };
+  metaKey = "LoadOneStep";
 
   loadOptions: LoadOneOptions<TData, TParams> | null = null;
+  loadOptionsKey = "";
 
   attributes = new Set<keyof TData>();
   params: Partial<TParams> = Object.create(null);
@@ -74,11 +83,54 @@ export class LoadOneStep<
       attributes: this.attributes.size ? [...this.attributes] : null,
       params: this.params,
     };
+    this.loadOptionsKey = JSON.stringify(this.loadOptions);
   }
-  execute([specs]: [CrystalValuesList<TSpec>]): PromiseOrDirect<
-    CrystalResultsList<TData>
-  > {
-    return this.load(specs, this.loadOptions!);
+  execute(
+    [specs]: [CrystalValuesList<TSpec>],
+    extra: ExecutionExtra,
+  ): PromiseOrDirect<CrystalResultsList<TData>> {
+    const loadOptions = this.loadOptions!;
+    const meta = extra.meta as LoadOneMeta;
+    let cacheByOptions = meta.cacheByOptions;
+    if (!cacheByOptions) {
+      cacheByOptions = new Map();
+      meta.cacheByOptions = cacheByOptions;
+    }
+    let cache = cacheByOptions.get(this.loadOptionsKey);
+    if (!cache) {
+      cache = new Map();
+      cacheByOptions.set(this.loadOptionsKey, cache);
+    }
+    const batchSpecs: Array<TSpec> = [];
+    const batchDeferreds: Array<Deferred<TData>> = [];
+
+    const results: Array<PromiseOrDirect<TData>> = [];
+    for (let i = 0, l = specs.length; i < l; i++) {
+      const spec = specs[i];
+      const cachedResult = cache.get(spec);
+      if (cachedResult) {
+        results.push(cachedResult);
+      } else {
+        const result = defer<TData>();
+        results.push(result);
+        cache.set(spec, result);
+        batchSpecs.push(spec);
+        batchDeferreds.push(result);
+      }
+    }
+    if (batchSpecs.length > 0) {
+      (async () => {
+        try {
+          const results = await this.load(batchSpecs, loadOptions);
+          for (let i = 0, l = batchDeferreds.length; i < l; i++) {
+            batchDeferreds[i].resolve(results[i]);
+          }
+        } catch (e) {
+          batchDeferreds.forEach((deferred) => deferred.reject(e));
+        }
+      })();
+    }
+    return results;
   }
 }
 
