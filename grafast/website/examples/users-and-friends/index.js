@@ -47,9 +47,10 @@ const planResolvers = {
     },
     friends($user) {
       const $friendships = friendshipsByUserId($user.get("id"));
-      return each($friendships, ($friendship) =>
+      const $friends = each($friendships, ($friendship) =>
         userById($friendship.get("friend_id")),
       );
+      return $friends;
     },
   },
 };

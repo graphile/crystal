@@ -85,9 +85,12 @@ const resolvers = {
     },
     async friends(user, args, context) {
       const friendships = await context.friendshipsByUserIdLoader.load(user.id);
-      return Promise.all(
-        friendships.map((id) => context.userLoader.load(friendship.friendId)),
+      const friends = await Promise.all(
+        friendships.map((friendship) =>
+          context.userLoader.load(friendship.friend_id),
+        ),
       );
+      return friends;
     },
   },
 };
@@ -104,13 +107,14 @@ const planResolvers = {
   },
   User: {
     name($user) {
-      return access($user, "full_name");
+      return $user.get("full_name");
     },
     friends($user) {
-      const $friendships = friendshipsByUserId(access($user, "id"));
-      return each($friendships, ($friendship) =>
-        userById(access($friendship, "friend_id")),
+      const $friendships = friendshipsByUserId($user.get("id"));
+      const $friends = each($friendships, ($friendship) =>
+        userById($friendship.get("friend_id")),
       );
+      return $friends;
     },
   },
 };
