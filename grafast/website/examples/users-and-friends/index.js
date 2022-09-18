@@ -164,7 +164,6 @@ async function benchmark(callback) {
   for (let i = 0; i < 500; i++) {
     await callback();
   }
-  debugger;
   await sleep(5000);
 
   // Benchmark
