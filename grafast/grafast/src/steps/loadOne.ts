@@ -134,8 +134,7 @@ export class LoadOneStep<
       cache = new Map();
       cacheByOptions.set(this.loadOptionsKey, cache);
     }
-    const batchSpecs: Array<TSpec> = [];
-    const batchIndexes: Array<number[]> = [];
+    const batch = new Map<TSpec, number[]>();
 
     const results: Array<PromiseOrDirect<TData> | null> = [];
     for (let i = 0, l = specs.length; i < l; i++) {
@@ -146,18 +145,18 @@ export class LoadOneStep<
       } else {
         // We'll fill this in in a minute
         const index = results.push(null) - 1;
-        const existingIdx = batchSpecs.indexOf(spec);
-        if (existingIdx >= 0) {
-          batchIndexes[existingIdx].push(index);
+        const existingIdx = batch.get(spec);
+        if (existingIdx !== undefined) {
+          existingIdx.push(index);
         } else {
-          batchSpecs.push(spec);
-          batchIndexes.push([index]);
+          batch.set(spec, [index]);
         }
       }
     }
-    const pendingCount = batchSpecs.length;
+    const pendingCount = batch.size;
     if (pendingCount > 0) {
       return (async () => {
+        const batchSpecs = [...batch.keys()];
         const loadResults = await this.load(batchSpecs, loadOptions);
         for (
           let pendingIndex = 0;
@@ -165,7 +164,7 @@ export class LoadOneStep<
           pendingIndex++
         ) {
           const spec = batchSpecs[pendingIndex];
-          const targetIndexes = batchIndexes[pendingIndex];
+          const targetIndexes = batch.get(spec)!;
           const loadResult = loadResults[pendingIndex];
           cache.set(spec, loadResult);
           for (const targetIndex of targetIndexes) {

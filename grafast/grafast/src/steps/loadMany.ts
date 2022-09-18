@@ -94,7 +94,7 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
 interface LoadManyMeta {
   cacheByOptionsByCallback?: Map<
     LoadManyCallback<any, any, any>,
-    Map<string, Map<any, PromiseLike<any>>>
+    Map<string, Map<any, readonly any[]>>
   >;
 }
 
@@ -187,36 +187,47 @@ export class LoadManyStep<
       cache = new Map();
       cacheByOptions.set(this.loadOptionsKey, cache);
     }
-    const batchSpecs: Array<TSpec> = [];
-    const batchDeferreds: Array<Deferred<ReadonlyArray<TData>>> = [];
+    const batch = new Map<TSpec, number[]>();
 
-    const results: Array<PromiseOrDirect<ReadonlyArray<TData>>> = [];
+    const results: Array<PromiseOrDirect<readonly TData[]> | null> = [];
     for (let i = 0, l = specs.length; i < l; i++) {
       const spec = specs[i];
       const cachedResult = cache.get(spec);
       if (cachedResult) {
         results.push(cachedResult);
       } else {
-        const result = defer<ReadonlyArray<TData>>();
-        results.push(result);
-        cache.set(spec, result);
-        batchSpecs.push(spec);
-        batchDeferreds.push(result);
+        // We'll fill this in in a minute
+        const index = results.push(null) - 1;
+        const existingIdx = batch.get(spec);
+        if (existingIdx !== undefined) {
+          existingIdx.push(index);
+        } else {
+          batch.set(spec, [index]);
+        }
       }
     }
-    if (batchSpecs.length > 0) {
-      (async () => {
-        try {
-          const results = await this.load(batchSpecs, loadOptions);
-          for (let i = 0, l = batchDeferreds.length; i < l; i++) {
-            batchDeferreds[i].resolve(results[i]);
+    const pendingCount = batch.size;
+    if (pendingCount > 0) {
+      return (async () => {
+        const batchSpecs = [...batch.keys()];
+        const loadResults = await this.load(batchSpecs, loadOptions);
+        for (
+          let pendingIndex = 0;
+          pendingIndex < pendingCount;
+          pendingIndex++
+        ) {
+          const spec = batchSpecs[pendingIndex];
+          const targetIndexes = batch.get(spec)!;
+          const loadResult = loadResults[pendingIndex];
+          cache.set(spec, loadResult);
+          for (const targetIndex of targetIndexes) {
+            results[targetIndex] = loadResult;
           }
-        } catch (e) {
-          batchDeferreds.forEach((deferred) => deferred.reject(e));
         }
+        return results as Array<PromiseOrDirect<readonly TData[]>>;
       })();
     }
-    return results;
+    return results as Array<PromiseOrDirect<readonly TData[]>>;
   }
 }
 
