@@ -15,14 +15,6 @@ critical to note is this sentence from the beginning of the specification:
 > the perceived result is equivalent._  
 > ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
 
-Before Gra*fast*, there was one main GraphQL execution engine available in
-JavaScript: the GraphQL reference implementation, which we will refer to as
-[graphql-js][] from now on. A design goal of graphql-js is to follow the
-specification as much as possible, it therefore follows the advice to use
-resolvers. Other projects built on this, for example [graphql-jit][], which
-aimed to reduce some of the graphql-js overheads via precompilation, but
-ultimately still relied on the "resolvers" approach.
-
 Resolvers are relatively straightforward to understand, but when implemented
 naively can very quickly result in serious performance issues. [DataLoader][] is
 one of the approaches suggested to solve the "N+1 problem," but this is only the
@@ -31,15 +23,11 @@ are others such as server-side over-fetching and under-fetching and related
 issues.
 
 Gra*fast* was designed from the ground up to eliminate these issues and more
-whilst maintaining pleasant APIs for developers to use. To do this, it eschews
-opaque resolvers[^1], favoring instead a planning strategy that unlocks the
-potential for significant optimizations not previously achievable without a
-herculean effort.
-
-[^1]:
-    Grafast still supports resolvers, but it's recommended that users only use
-    them as a way of supporting legacy schemas - new functionality should be
-    added via plan resolvers.
+whilst maintaining pleasant APIs for developers to use. To do this, in addition
+to supporting resolvers for legacy fields, Grafast favors a planning strategy
+that takes a holistic approach to understanding the incoming operation, and
+unlocks the potential for significant optimizations not previously achievable
+without a herculean effort.
 
 ## Plans
 
@@ -60,7 +48,7 @@ type User {
 }
 ```
 
-In graphql-js, you might have these resolvers:
+In [graphql-js][], you might have these resolvers:
 
 ```ts
 const resolvers = {
@@ -207,13 +195,12 @@ your result as a string (e.g. over a network socket/HTTP).
 
 ## Convinced?
 
-If you're not convinced, please do reach out to Benjie on the [Graphile Discord][]
-with your queries, he'd love to make improvements to both this page, and Grafast itself!
+If you're not convinced, please do reach out to Benjie on the [Graphile
+Discord][] with your queries, he'd love to make improvements to both this page,
+and Grafast itself!
 
 If you are convinced, why not continue on to getting started...
 
-
 [graphql-js]: https://github.com/graphql/graphql-js
-[graphql-jit]: https://github.com/zalando-incubator/graphql-jit
 [dataloader]: https://github.com/graphql/dataloader
 [graphile discord]: https://discord.gg/graphile
