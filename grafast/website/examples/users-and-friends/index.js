@@ -18,6 +18,11 @@ const { makeDataLoaders } = require("./dataloaders");
 const { userById, friendshipsByUserId } = require("./plans");
 const fsp = require("node:fs/promises");
 
+// Benchmark settings
+const NUMBER_OF_REQUESTS = 10000;
+const CONCURRENCY = 3;
+const asString = true; /* Should we use the grafast string optimization */
+
 const typeDefs = /* GraphQL */ `
   type Query {
     currentUser: User
@@ -131,7 +136,6 @@ async function runGraphQL() {
   return JSON.stringify(result);
 }
 
-const asString = false;
 const baseContext = { currentUserId: 1 };
 async function runGraphastWithGraphQLSchema() {
   const result = await grafastExecute(
@@ -167,8 +171,6 @@ async function benchmark(callback) {
   await sleep(5000);
 
   // Setup
-  const NUMBER_OF_REQUESTS = 10000;
-  const CONCURRENCY = 2;
   let result;
   function run() {
     function pass(res) {
