@@ -73,7 +73,6 @@ export {
   graphqlPolymorphicUnwrap,
   graphqlResolver,
   GraphQLResolverStep,
-  makeResolveInfo,
 } from "./graphqlResolver.js";
 export {
   loadMany,
