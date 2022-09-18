@@ -4,9 +4,13 @@
 
 const { db } = require("./database");
 
+const logSql = process.env.LOG_SQL === "1";
+
 const queryAll = (query, parameters) =>
   new Promise((resolve, reject) => {
-    console.log({ query, parameters });
+    if (logSql) {
+      console.log({ query, parameters });
+    }
     return db.all(query, parameters, (err, result) =>
       err ? reject(err) : resolve(result),
     );
