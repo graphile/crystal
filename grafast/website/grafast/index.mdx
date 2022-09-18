@@ -20,7 +20,7 @@ naively can very quickly result in serious performance issues. [DataLoader][] is
 one of the approaches suggested to solve the "N+1 problem," but this is only the
 most egregious performance issue that a naive GraphQL schema may face - there
 are others such as server-side over-fetching and under-fetching and related
-issues.
+issues that can really build up as your schemas and operations get more complex.
 
 Gra*fast* was designed from the ground up to eliminate these issues and more
 whilst maintaining pleasant APIs for developers to use. To do this, in addition
@@ -29,15 +29,22 @@ that takes a holistic approach to understanding the incoming operation, and
 unlocks the potential for significant optimizations not previously achievable
 without a herculean effort.
 
-## Plans
+Please note that Grafast is not tied to any particular storage or business logic
+layer - any valid GraphQL schema could be implemented with Grafast, and a
+Grafast schema can query any data source or business logic that Node.js can
+query.
+
+## Planning
 
 _This is just an overview, for full documentation see
 [Plan Resolvers](./plan-resolvers)._
 
-Grafast plan resolvers are generally small functions, like regular resolvers
-should be, but instead of being called many times and dealing with concrete
-runtime values, they are called only once at planning time and they deal with
-"steps" which are the building blocks of an execution plan.
+Where in a traditional schema you would add a "resolver," in a Grafast schema
+you would instead add a "plan resolver." These plan resolvers are generally
+small functions, like regular resolvers should be, but instead of being called
+many times and dealing with concrete runtime values, they are called only once
+at planning time and they build and manipulate "steps" which are the building
+blocks of an execution plan.
 
 Imagine that we have this GraphQL schema:
 
@@ -102,11 +109,11 @@ const planResolvers = {
 ```
 
 As you can see, the shape of the logic is quite similar, but the Grafast plan
-resolvers are not asynchronous and do not return or deal with promises. Their
-job isn't to get the data to use, but instead to outline the steps required to
-get the data; since the Grafast plan resolver cannot loop through the data (as
-it does not exist yet), it uses an `each` helper to detail which steps to take
-for each item available later.
+resolvers are synchronous since their job isn't to get the data to use, but
+instead to outline the steps required to get the data. As the `friends` Grafast
+plan resolver cannot explicitly loop through the data (it hasn't been fetched
+yet!), it uses an `each` helper to detail which steps to take for each item made
+available later.
 
 :::tip
 
