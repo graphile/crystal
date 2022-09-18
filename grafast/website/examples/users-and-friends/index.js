@@ -166,14 +166,39 @@ async function benchmark(callback) {
   }
   await sleep(5000);
 
+  // Setup
+  const NUMBER_OF_REQUESTS = 10000;
+  const CONCURRENCY = 2;
+  let result;
+  function run() {
+    function pass(res) {
+      result = res;
+      return runner();
+    }
+    function fail(e) {
+      console.error(e);
+      process.exit(1);
+    }
+    let remaining = NUMBER_OF_REQUESTS;
+    async function runner() {
+      if (remaining > 0) {
+        --remaining;
+        return callback().then(pass, fail);
+      }
+    }
+    const promises = [];
+    for (let i = 0; i < CONCURRENCY; i++) {
+      promises.push(runner());
+    }
+    return Promise.all(promises);
+  }
+
   // Benchmark
   const start = process.hrtime.bigint();
-  let result;
-  const NUMBER_OF_REQUESTS = 10000;
-  for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
-    result = await callback();
-  }
+  await run();
   const stop = process.hrtime.bigint();
+
+  // Output
   console.log(result);
   console.log(
     `Served ${NUMBER_OF_REQUESTS} requests, each producing the above. Took ${
