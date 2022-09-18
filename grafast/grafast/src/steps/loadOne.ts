@@ -45,7 +45,7 @@ export function loadOneCallback<
 interface LoadOneMeta {
   cacheByOptionsByCallback?: Map<
     LoadOneCallback<any, any, any>,
-    Map<string, Map<any, PromiseOrDirect<any>>>
+    Map<string, Map<any, any>>
   >;
 }
 
@@ -157,19 +157,23 @@ export class LoadOneStep<
     }
     const pendingCount = batchSpecs.length;
     if (pendingCount > 0) {
-      const loadResults = this.load(batchSpecs, loadOptions);
-      const loadResultsWasPromise = isPromiseLike(loadResults);
-      for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {
-        const spec = batchSpecs[pendingIndex];
-        const targetIndexes = batchIndexes[pendingIndex];
-        const promise = loadResultsWasPromise
-          ? loadResults.then((r) => r[pendingIndex])
-          : loadResults[pendingIndex];
-        cache.set(spec, promise);
-        for (const targetIndex of targetIndexes) {
-          results[targetIndex] = promise;
+      return (async () => {
+        const loadResults = await this.load(batchSpecs, loadOptions);
+        for (
+          let pendingIndex = 0;
+          pendingIndex < pendingCount;
+          pendingIndex++
+        ) {
+          const spec = batchSpecs[pendingIndex];
+          const targetIndexes = batchIndexes[pendingIndex];
+          const loadResult = loadResults[pendingIndex];
+          cache.set(spec, loadResult);
+          for (const targetIndex of targetIndexes) {
+            results[targetIndex] = loadResult;
+          }
         }
-      }
+        return results as Array<PromiseOrDirect<TData>>;
+      })();
     }
     return results as Array<PromiseOrDirect<TData>>;
   }
