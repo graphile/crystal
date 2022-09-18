@@ -31,6 +31,8 @@ without a herculean effort.
 
 ## Plans
 
+_This is just an overview, for full documentation see [Plan Resolvers](./plan-resolvers)._
+
 Grafast plan resolvers are generally small functions, like regular resolvers
 should be, but instead of being called many times and dealing with concrete
 runtime values, they are called only once at planning time and they deal with
@@ -107,7 +109,8 @@ steps to take for each item available later.
 
 :::tip
 
-By convention, when a variable represents a Grafast step, the variable will be named starting with a `$`.
+By convention, when a variable represents a Grafast step, the variable will be
+named starting with a `$`.
 
 :::
 
@@ -143,12 +146,17 @@ this most optimal form, made possible by Graphast's plan lifecycle.
 
 ## Plan Lifecycle
 
-All plan lifecycle methods are optional, and you can get good performance with
-Grafast without using any of them. However, if you leverage them, your
-performance can go from "good" to amazing. One of the great things about
-Grafast's design is that you don't need to build these optimizations from the
-start, you can implement them at a later stage and your schema will get faster
-even though the plan resolvers themselves don't have to change!
+_This is just an overview, for full documentation see [lifecycle](./lifecycle)._
+
+All plan lifecycle methods are optional, and due to the always-batched nature of
+Grafast plans you can get good performance without using any of them. However,
+if you leverage them, your performance can go from "good" to :sparkles: amazing
+:rocket:.
+
+One of the great things about Grafast's design is that you don't need to build
+these optimizations from the start; you can implement them at a later stage,
+making your schema faster without requiring changes to your business logic _or_
+your plan resolvers!
 
 As a very approximate overview:
 
