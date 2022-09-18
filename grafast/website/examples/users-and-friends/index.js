@@ -88,14 +88,14 @@ const makeGraphQLSchema = () => {
   return schema;
 };
 
-const graphqlSchema = makeGraphQLSchema();
-const grafastSchema = makeGrafastSchema({
+const schemaDL = makeGraphQLSchema();
+const schemaGF = makeGrafastSchema({
   typeDefs,
   plans: planResolvers,
   enableDeferStream: false,
 });
-// console.log(printSchema(graphqlSchema));
-// console.log(printSchema(grafastSchema));
+// console.log(printSchema(schemaDL));
+// console.log(printSchema(schemaGF));
 
 const source = /* GraphQL */ `
   {
@@ -115,8 +115,8 @@ const source = /* GraphQL */ `
 // execution (because grafast caches parse results).
 
 const document = parse(source);
-const errors1 = validate(graphqlSchema, document);
-const errors2 = validate(grafastSchema, document);
+const errors1 = validate(schemaDL, document);
+const errors2 = validate(schemaGF, document);
 if (errors1.length) {
   throw errors1[0];
 }
@@ -126,7 +126,7 @@ if (errors2.length) {
 
 async function runGraphQL() {
   const result = await graphqlExecute({
-    schema: graphqlSchema,
+    schema: schemaDL,
     document,
     contextValue: {
       ...baseContext,
@@ -140,7 +140,7 @@ const baseContext = { currentUserId: 1 };
 async function runGraphastWithGraphQLSchema() {
   const result = await grafastExecute(
     {
-      schema: graphqlSchema,
+      schema: schemaDL,
       document,
       contextValue: { ...baseContext, ...makeDataLoaders() },
     },
@@ -152,7 +152,7 @@ async function runGraphastWithGraphQLSchema() {
 async function runGraphast() {
   const result = await grafastExecute(
     {
-      schema: grafastSchema,
+      schema: schemaGF,
       document,
       contextValue: baseContext,
     },
@@ -214,7 +214,7 @@ async function benchmark(callback) {
 async function runCompare() {
   console.log("GRAPHQL");
   const graphqlResult = await graphql({
-    schema: graphqlSchema,
+    schema: schemaDL,
     source,
     contextValue: {
       ...baseContext,
@@ -225,7 +225,7 @@ async function runCompare() {
 
   console.log("GRAFAST");
   const grafastResult = await grafast({
-    schema: grafastSchema,
+    schema: schemaGF,
     source,
     contextValue: baseContext,
   });
@@ -239,7 +239,7 @@ async function runCompare() {
   console.log("GRAFAST AGAIN");
   const grafastResultWithPlan = await grafast(
     {
-      schema: grafastSchema,
+      schema: schemaGF,
       source,
       contextValue: baseContext,
     },
