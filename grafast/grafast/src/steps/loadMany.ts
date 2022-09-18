@@ -42,6 +42,9 @@ export function loadManyCallback<
   return callback;
 }
 
+const idByLoad = new WeakMap<LoadManyCallback<any, any, any>, string>();
+let loadCounter = 0;
+
 /**
  * You shouldn't create instances of this yourself - use `loadMany` or `loadOne`.
  *
@@ -92,10 +95,7 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
 }
 
 interface LoadManyMeta {
-  cacheByOptionsByCallback?: Map<
-    LoadManyCallback<any, any, any>,
-    Map<string, Map<any, readonly any[]>>
-  >;
+  cache?: Map<any, readonly any[]>;
 }
 
 export class LoadManyStep<
@@ -165,6 +165,12 @@ export class LoadManyStep<
     };
     // If the canonicalJSONStringify is the same, then we deem that the options are the same
     this.loadOptionsKey = canonicalJSONStringify(this.loadOptions);
+    let loadId = idByLoad.get(this.load);
+    if (!loadId) {
+      loadId = String(++loadCounter);
+      idByLoad.set(this.load, loadId);
+    }
+    this.metaKey = `LoadManyStep|${loadId}|${this.loadOptionsKey}`;
   }
   execute(
     [specs]: [CrystalValuesList<TSpec>],
@@ -172,20 +178,10 @@ export class LoadManyStep<
   ): PromiseOrDirect<CrystalResultsList<ReadonlyArray<TData>>> {
     const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadManyMeta;
-    let cacheByOptionsByCallback = meta.cacheByOptionsByCallback;
-    if (!cacheByOptionsByCallback) {
-      cacheByOptionsByCallback = new Map();
-      meta.cacheByOptionsByCallback = cacheByOptionsByCallback;
-    }
-    let cacheByOptions = cacheByOptionsByCallback.get(this.load);
-    if (!cacheByOptions) {
-      cacheByOptions = new Map();
-      cacheByOptionsByCallback.set(this.load, cacheByOptions);
-    }
-    let cache = cacheByOptions.get(this.loadOptionsKey);
+    let cache = meta.cache;
     if (!cache) {
       cache = new Map();
-      cacheByOptions.set(this.loadOptionsKey, cache);
+      meta.cache = cache;
     }
     const batch = new Map<TSpec, number[]>();
 

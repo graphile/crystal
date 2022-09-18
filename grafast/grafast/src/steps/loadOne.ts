@@ -43,11 +43,11 @@ export function loadOneCallback<
 }
 
 interface LoadOneMeta {
-  cacheByOptionsByCallback?: Map<
-    LoadOneCallback<any, any, any>,
-    Map<string, Map<any, any>>
-  >;
+  cache?: Map<any, any>;
 }
+
+const idByLoad = new WeakMap<LoadOneCallback<any, any, any>, string>();
+let loadCounter = 0;
 
 export class LoadOneStep<
   TSpec,
@@ -55,7 +55,6 @@ export class LoadOneStep<
   TParams extends Record<string, any>,
 > extends ExecutableStep {
   static $$export = { moduleName: "grafast", exportName: "LoadOneStep" };
-  metaKey = "LoadOneStep";
 
   loadOptions: LoadOneOptions<TData, TParams> | null = null;
   loadOptionsKey = "";
@@ -112,6 +111,12 @@ export class LoadOneStep<
     };
     // If the canonicalJSONStringify is the same, then we deem that the options are the same
     this.loadOptionsKey = canonicalJSONStringify(this.loadOptions);
+    let loadId = idByLoad.get(this.load);
+    if (!loadId) {
+      loadId = String(++loadCounter);
+      idByLoad.set(this.load, loadId);
+    }
+    this.metaKey = `LoadOneStep|${loadId}|${this.loadOptionsKey}`;
   }
   execute(
     [specs]: [CrystalValuesList<TSpec>],
@@ -119,20 +124,10 @@ export class LoadOneStep<
   ): PromiseOrDirect<CrystalResultsList<TData>> {
     const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadOneMeta;
-    let cacheByOptionsByCallback = meta.cacheByOptionsByCallback;
-    if (!cacheByOptionsByCallback) {
-      cacheByOptionsByCallback = new Map();
-      meta.cacheByOptionsByCallback = cacheByOptionsByCallback;
-    }
-    let cacheByOptions = cacheByOptionsByCallback.get(this.load);
-    if (!cacheByOptions) {
-      cacheByOptions = new Map();
-      cacheByOptionsByCallback.set(this.load, cacheByOptions);
-    }
-    let cache = cacheByOptions.get(this.loadOptionsKey);
+    let cache = meta.cache;
     if (!cache) {
       cache = new Map();
-      cacheByOptions.set(this.loadOptionsKey, cache);
+      meta.cache = cache;
     }
     const batch = new Map<TSpec, number[]>();
 
