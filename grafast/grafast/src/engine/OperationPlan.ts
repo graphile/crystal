@@ -2631,6 +2631,19 @@ export class OperationPlan {
     }
     return matches;
   }
+
+  getStepsByStepClass<TClass extends ExecutableStep>(klass: {
+    new (...args: any[]): TClass;
+  }): TClass[] {
+    const matches: TClass[] = [];
+    for (let id = 0, l = this.steps.length; id < l; id++) {
+      const step = this.steps[id];
+      if (step && step.id === id && step instanceof klass) {
+        matches.push(step);
+      }
+    }
+    return matches;
+  }
 }
 
 function makeDefaultPlan(fieldName: string) {

@@ -85,13 +85,7 @@ export class LoadOneStep<
     // Find all steps of this type that use the same callback and have
     // equivalent params and then match their list of attributes together.
     const stringifiedParams = canonicalJSONStringify(this.params);
-    const kin = (
-      this.opPlan.getStepsByMetaKey(this.metaKey) as LoadOneStep<
-        any,
-        any,
-        any
-      >[]
-    ).filter((step) => {
+    const kin = this.opPlan.getStepsByStepClass(LoadOneStep).filter((step) => {
       if (step.id === this.id) return false;
       if (step.load !== this.load) return false;
       if (canonicalJSONStringify(step.params) !== stringifiedParams)
