@@ -1,5 +1,19 @@
-const { buildSchema, printSchema, graphql } = require("graphql");
-const { makeGrafastSchema, context, each, grafast } = require("grafast");
+const {
+  buildSchema,
+  // printSchema,
+  graphql,
+  execute: graphqlExecute,
+  parse,
+  validate,
+} = require("graphql");
+const {
+  makeGrafastSchema,
+  context,
+  each,
+  grafast,
+  stringifyPayload,
+  execute: grafastExecute,
+} = require("grafast");
 const { makeDataLoaders } = require("./dataloaders");
 const { userById, friendshipsByUserId } = require("./plans");
 const fsp = require("node:fs/promises");
@@ -92,13 +106,92 @@ const source = /* GraphQL */ `
   }
 `;
 
-async function main() {
+// To make it fair, we parse and validate the query ahead of time and just time
+// execution (because grafast caches parse results).
+
+const document = parse(source);
+const errors1 = validate(graphqlSchema, document);
+const errors2 = validate(grafastSchema, document);
+if (errors1.length) {
+  throw errors1[0];
+}
+if (errors2.length) {
+  throw errors2[0];
+}
+
+async function runGraphQL() {
+  const result = await graphqlExecute({
+    schema: graphqlSchema,
+    document,
+    contextValue: {
+      ...baseContext,
+      ...makeDataLoaders(),
+    },
+  });
+  return JSON.stringify(result);
+}
+
+const asString = false;
+const baseContext = { currentUserId: 1 };
+async function runGraphastWithGraphQLSchema() {
+  const result = await grafastExecute(
+    {
+      schema: graphqlSchema,
+      document,
+      contextValue: { ...baseContext, ...makeDataLoaders() },
+    },
+    { asString },
+  );
+  return stringifyPayload(result, asString);
+}
+
+async function runGraphast() {
+  const result = await grafastExecute(
+    {
+      schema: grafastSchema,
+      document,
+      contextValue: baseContext,
+    },
+    { asString },
+  );
+  return stringifyPayload(result, asString);
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function benchmark(callback) {
+  // Warmup
+  for (let i = 0; i < 500; i++) {
+    await callback();
+  }
+  debugger;
+  await sleep(5000);
+
+  // Benchmark
+  const start = process.hrtime.bigint();
+  let result;
+  const NUMBER_OF_REQUESTS = 10000;
+  for (let i = 0; i < NUMBER_OF_REQUESTS; i++) {
+    result = await callback();
+  }
+  const stop = process.hrtime.bigint();
+  console.log(result);
+  console.log(
+    `Served ${NUMBER_OF_REQUESTS} requests, each producing the above. Took ${
+      (stop - start) / 1000000n
+    }ms`,
+  );
+
+  return result;
+}
+
+async function runCompare() {
   console.log("GRAPHQL");
   const graphqlResult = await graphql({
     schema: graphqlSchema,
     source,
     contextValue: {
-      currentUserId: 1,
+      ...baseContext,
       ...makeDataLoaders(),
     },
   });
@@ -108,7 +201,7 @@ async function main() {
   const grafastResult = await grafast({
     schema: grafastSchema,
     source,
-    contextValue: { currentUserId: 1 },
+    contextValue: baseContext,
   });
   console.dir(grafastResult, { depth: Infinity });
 
@@ -122,7 +215,7 @@ async function main() {
     {
       schema: grafastSchema,
       source,
-      contextValue: { currentUserId: 1 },
+      contextValue: baseContext,
     },
     { explain: ["mermaid-js"] },
   );
@@ -130,6 +223,20 @@ async function main() {
     `${__dirname}/plan.mermaid`,
     grafastResultWithPlan.extensions.explain.operations[0].diagram,
   );
+}
+
+async function main() {
+  switch (process.argv[2]) {
+    case "graphql":
+      return benchmark(runGraphQL);
+    case "grafast":
+      return benchmark(runGraphast);
+    case "grafast-resolvers":
+      return benchmark(runGraphastWithGraphQLSchema);
+    default: {
+      return runCompare();
+    }
+  }
 }
 
 main().catch((e) => {
