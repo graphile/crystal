@@ -4,9 +4,9 @@ To run an existing GraphQL schema with `grafast` you must ensure that the
 following hold:
 
 - Your resolvers are built into your schema, not passed via `rootValue`
-- None of your resolvers use the 4th argument (commonly called `resolveInfo` or
-  just `info`) (NOTE: if you need this, reach out - we can add support for
-  resolveInfo, we just haven't invested time here yet)
+- If any of your resolvers use `GraphQLResolveInfo` (the 4th argument to the
+  resolver) then they must not rely on `path` since we don't currently populate
+  that correctly.
 - `context` must be an object (anything suitable to be used as the key to a
   `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
 - `rootValue`, if specified, must be an object or `null`/`undefined`
