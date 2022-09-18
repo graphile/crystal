@@ -134,9 +134,8 @@ export class LoadOneStep<
     const results: Array<PromiseOrDirect<TData> | null> = [];
     for (let i = 0, l = specs.length; i < l; i++) {
       const spec = specs[i];
-      const cachedResult = cache.get(spec);
-      if (cachedResult) {
-        results.push(cachedResult);
+      if (cache.has(spec)) {
+        results.push(cache.get(spec)!);
       } else {
         // We'll fill this in in a minute
         const index = results.push(null) - 1;
