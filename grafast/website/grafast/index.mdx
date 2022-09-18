@@ -31,7 +31,8 @@ without a herculean effort.
 
 ## Plans
 
-_This is just an overview, for full documentation see [Plan Resolvers](./plan-resolvers)._
+_This is just an overview, for full documentation see
+[Plan Resolvers](./plan-resolvers)._
 
 Grafast plan resolvers are generally small functions, like regular resolvers
 should be, but instead of being called many times and dealing with concrete
@@ -103,9 +104,9 @@ const planResolvers = {
 As you can see, the shape of the logic is quite similar, but the Grafast plan
 resolvers are not asynchronous and do not return or deal with promises. Their
 job isn't to get the data to use, but instead to outline the steps required to
-get the data; hence the Grafast plan resolver cannot loop through the data
-(since the data does not exist yet), it uses an `each` helper to detail which
-steps to take for each item available later.
+get the data; since the Grafast plan resolver cannot loop through the data (as
+it does not exist yet), it uses an `each` helper to detail which steps to take
+for each item available later.
 
 :::tip
 
@@ -168,35 +169,29 @@ As a very approximate overview:
 
 **Deduplicate** lets a step indicate which of its siblings (defined by Grafast)
 are equivalent to it. One of these siblings can then, if possible, replace the
-new step, thereby reducing the complexity of the plan.
+new step, thereby reducing the number of steps in the plan.
 
 ### Optimize
 
 **Optimize** lets a step "talk" to its ancestors, typically to tell them about
-data that they will need. This should not change the observed behavior of the
+data that will be needed. This should not change the observed behavior of the
 ancestor (e.g. you should not use it to apply filters to an ancestor!) but it
 can be used to ask the ancestor to fetch additional data. This method can also
 be used to replace the step with an alternative (presumably more-optimal) step.
 
 In the "friends" example above, this was used to change the DataLoader-style
 `select * from ...` query to a more optimal `select id, full_name from ...`
-query; the explicit listing of the columns saved around 15% of the execution
-time, even though there was only roughly another 160 bytes per row in these
-examples. Were these tables much wider with larger columns (perhaps things like
-JSON objects, or avatar blobs) the savings would have been much more pronounced.
-
-In more advanced plans (for example those made available through
-[@dataplan/pg][], our Postgres step collection), optimize can go much further
-and even do things like inlining a query into its parent and replacing itself
-with a simple "mapper" function.
+query. In more advanced plans (for example those made available through
+[@dataplan/pg][]), optimize can go much further, for example inlining its data
+requirements into a parent and replacing itself with a simple "mapper" function.
 
 ### Finalize
 
 **Finalize** is the final method called on a step, it gives the step a chance to
 do anything that it would generally only need to do once; for example a step
 that issues a GraphQL query might take this opportunity to build the GraphQL
-query once. A step that converts a tuple into an object might build an optimized
-function to do so.
+query string once. A step that converts a tuple into an object might build an
+optimized function to do so.
 
 ## Further optimizations
 
@@ -218,3 +213,4 @@ If you are convinced, why not continue on to getting started...
 [graphql-js]: https://github.com/graphql/graphql-js
 [dataloader]: https://github.com/graphql/dataloader
 [graphile discord]: https://discord.gg/graphile
+[@dataplan/pg]: ./dataplan-pg
