@@ -100,8 +100,9 @@ export default function HomepageFeatures() {
                 <Grafast />
               </strong>{" "}
               is an alternative execution engine for GraphQL; its plan-based
-              approach helps developers avoid common pitfalls and achieve
-              incredible performance.
+              approach helps developers avoid common pitfalls and achieve better
+              backend efficiency, leading to increased scalability and
+              incredible performance your customers will love.
             </p>
           </div>
         </div>
