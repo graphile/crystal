@@ -95,6 +95,10 @@ module.exports = {
     "no-duplicate-imports": "off",
     "import/no-duplicates": "off",
     "@typescript-eslint/no-duplicate-imports": ["error"],
+
+    // Stuff I don't care about
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
   },
   overrides: [
     // Rules for plugins
@@ -192,6 +196,13 @@ module.exports = {
         "graphile-export/export-instances": 0,
         "graphile-export/export-subclasses": 0,
         "graphile-export/no-nested": 0,
+      },
+    },
+
+    {
+      files: ["**/website/**"],
+      rules: {
+        "import/no-unresolved": "off",
       },
     },
   ],
