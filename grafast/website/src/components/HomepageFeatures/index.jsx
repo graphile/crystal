@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
-import Grafast from "../Grafast/index.js";
+import Grafast from "../Grafast/index.jsx";
 
 const FeatureList = [
   {
