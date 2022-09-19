@@ -1,3 +1,9 @@
+---
+sidebar_position: 9
+---
+
+# Lifecycle
+
 1. Start at the root selection set.
 1. For each field in the current selection set:
    1. Call field plan resolver

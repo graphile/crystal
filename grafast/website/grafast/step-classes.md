@@ -1,3 +1,9 @@
+---
+sidebar_position: 8
+---
+
+# Step classes
+
 ```ts
 class AddStep extends ExecutableStep {
   constructor($a, $b) {

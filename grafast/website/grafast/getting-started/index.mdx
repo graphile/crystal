@@ -1,0 +1,212 @@
+---
+sidebar_position: 2
+---
+
+# Getting started
+
+## Installation
+
+Grafast is an alternative execution layer for GraphQL; we still need GraphQL.js
+for building the schema, and parsing and validating requests. So the first thing
+you need to do to get started is to install `grafast` and `graphql`:
+
+```
+yarn install grafast graphql
+```
+
+or with `npm`:
+
+```
+npm install --save grafast graphql
+```
+
+Other package managers are available :wink:
+
+:::note
+
+We intend to write up a specification so that other languages may implement the
+Grafast execution strategy, but for now Grafast is JavaScript/TypeScript only.
+
+:::
+
+If you have an existing GraphQL.js schema, you can run it through Grafast ─ see
+[using with an existing schema](./existing-schema).
+
+## My first plan
+
+Let's build a simple GraphQL schema powered by Grafast plans and query it.
+
+:::info
+
+There are many ways to build a GraphQL schema, we're going to use the "schema
+first" approach in this example, but there's no reason that a Grafast schema
+couldn't be produced "code first" or "database first" or any other approach.
+
+:::
+
+First, lets define our GraphQL schema. We're going to go with an incredibly
+simple schema with a single field that adds together its two arguments:
+
+```ts
+const typeDefs = /* GraphQL */ `
+  type Query {
+    addTwoNumbers(a: Int!, b: Int!): Int
+  }
+`;
+```
+
+Now we need to define the `plans` for the schema. The plan for our
+`Query.addTwoNumbers` field is to [read the arguments](./field-args), then use
+the [lambda][] step to add them together. The lambda step takes a list of other
+steps, and then determines the result by calling the given callback for each set
+of resulting values.
+
+```ts
+const { lambda } = require("grafast");
+
+const plans = {
+  Query: {
+    addTwoNumbers(_, args) {
+      const $a = args.get("a");
+      const $b = args.get("b");
+      return lambda([$a, $b], ([a, b]) => a + b);
+    },
+  },
+};
+```
+
+:::tip
+
+`lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
+values rather than the batched processing that Grafast prefers for efficiency.
+It can be handy as a utility function, but in general you should pick a
+[more suitable step](./standard-steps).
+
+:::
+
+To turn this into a schema, we can use the `makeGrafastSchema` helper which will
+stitch the `typeDefs` and the `plans` together:
+
+```ts
+const { makeGrafastSchema } = require("grafast");
+
+const schema = makeGrafastSchema({
+  typeDefs,
+  plans,
+});
+```
+
+Finally, we can run our query:
+
+```ts
+const { grafastSync } = require("grafast");
+
+const result = grafastSync({
+  schema,
+  source: /* GraphQL */ `
+    {
+      addTwoNumbers(a: 40, b: 2)
+    }
+  `,
+});
+```
+
+The result is what we'd expect:
+
+```json
+{
+  "data": {
+    "addTwoNumbers": 42
+  }
+}
+```
+
+:::info
+
+Our schema is so simple the query could be ran synchronously with `grafastSync`,
+but most queries in the real world should be executed through `grafast` and will
+return a promise, or even an async iterable!
+
+:::
+
+We could then [serve this schema over HTTP][servers] using a server such as
+[grafserv][] or any [envelop-capable server][envelop].
+
+## My first step class
+
+The building blocks of an operation plan are "steps." Steps are instances of
+"step classes," and Grafast makes available a modest range of [standard steps][]
+that you can use; but when these aren't enough you can write your own. Full
+details for doing so can be found in [Step classes][], but let's build ourselves
+a simple one now to replace the `lambda` usage above.
+
+Step classes extend the `ExecutableStep` class, the only required method to
+define is `execute`.
+
+```ts
+const { ExecutableStep } = require("grafast");
+
+class AddStep extends ExecutableStep {
+  constructor($a, $b) {
+    super();
+    this.addDependency($a);
+    this.addDependency($b);
+  }
+
+  execute([allA, allB]) {
+    const result = [];
+
+    // allA and allB are guaranteed to have the same length
+    const count = allA.length;
+
+    // We loop through the pairs of values, pushing the result onto the
+    // `result` list:
+    for (let i = 0; i < l; i++) {
+      const a = allA[i];
+      const b = allB[i];
+      result.push(a + b);
+    }
+
+    // We must return a list with the same length as allA and allB:
+    return result;
+  }
+}
+```
+
+By convention, we always define a function that calls our class so we don't see
+the `new` calls in our plan resolver functions. This makes them easier to read,
+but the layer of abstraction often allows us to do some minor manipulations
+before handing off to the class constructor.
+
+```ts
+function add($a, $b) {
+  return new AddStep($a, $b);
+}
+```
+
+Now we can use this method to add our numbers, rather than the lambda plan:
+
+```diff
+ const plans = {
+   Query: {
+     addTwoNumbers(_, args) {
+       const $a = args.get("a");
+       const $b = args.get("b");
+-      return lambda([$a, $b], ([a, b]) => a + b);
++      return add($a, $b);
+     },
+   },
+ };
+```
+
+You may well be able to write an entire Grafast schema using off-the-shelf step
+classes, but it's worth being aware of how step classes work in case you want to
+push your optimizations further. [Read more about step classes][step classes],
+or continue through the documentation.
+
+[lambda]: ./standard-steps#lambda
+[servers]: ./servers
+[grafast]: ./servers#grafast
+[envelop]: ./servers#envelop
+[standard steps]: ./standard-steps
+[step classes]: ./step-classes
