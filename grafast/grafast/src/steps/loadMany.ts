@@ -1,5 +1,3 @@
-import type { Deferred } from "../deferred.js";
-import { defer } from "../deferred.js";
 import type { __ItemStep } from "../index.js";
 import type {
   CrystalResultsList,

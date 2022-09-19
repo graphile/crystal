@@ -13,8 +13,7 @@ import type {
   ExecutionExtra,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { $$deepDepSkip } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { $$deepDepSkip, ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (

@@ -7,9 +7,7 @@ import type {
   GraphQLArgs,
   GraphQLSchema,
 } from "graphql";
-import { GraphQLError } from "graphql";
-import { Source } from "graphql";
-import { parse, validate, validateSchema } from "graphql";
+import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import type { GrafastExecuteOptions } from "./execute.js";

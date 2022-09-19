@@ -1,5 +1,3 @@
-import type { Deferred } from "../deferred.js";
-import { defer } from "../deferred.js";
 import type { __ItemStep } from "../index.js";
 import type {
   CrystalResultsList,
@@ -8,7 +6,7 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
-import { canonicalJSONStringify, isPromiseLike } from "../utils.js";
+import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOneOptions<TData, TParams extends Record<string, any>> {

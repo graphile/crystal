@@ -18,7 +18,6 @@ import { context } from "../index.js";
 import type {
   CrystalResultsList,
   CrystalValuesList,
-  ExecutionExtra,
   PolymorphicData,
 } from "../interfaces.js";
 import { $$data } from "../interfaces.js";

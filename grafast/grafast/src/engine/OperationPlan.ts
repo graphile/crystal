@@ -83,10 +83,6 @@ const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
 ]);
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
 
-function isNotNullish<T>(v: T | undefined | null): v is T {
-  return v != null;
-}
-
 /** In development we might run additional checks */
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
