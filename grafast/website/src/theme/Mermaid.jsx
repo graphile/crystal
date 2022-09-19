@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
 import mermaid from "mermaid";
+import React, { useEffect } from "react";
 
 mermaid.initialize({
   startOnLoad: true,

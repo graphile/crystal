@@ -33,7 +33,10 @@ export const Explain: FC<{
         {!results ? (
           !explain ? (
             <>
-              <p>WARNING: you've not enabled the 'explain' functionality</p>
+              <p>
+                WARNING: you&apos;ve not enabled the &apos;explain&apos;
+                functionality
+              </p>
               <button onClick={() => setExplain(true)}>Enable explain</button>
             </>
           ) : (
@@ -100,8 +103,8 @@ export const ExplainMain: FC<{
       case undefined: {
         return (
           <div>
-            Explain result type '${(selectedResult as any).type}' not yet
-            supported.
+            Explain result type &apos;${(selectedResult as any).type}&apos; not
+            yet supported.
           </div>
         );
       }
