@@ -2,12 +2,21 @@ module.exports = {
   parser: "@babel/eslint-parser",
   parserOptions: {
     sourceType: "module",
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
   },
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     //'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    "plugin:react/recommended",
     "plugin:import/errors",
     "plugin:import/typescript",
     "plugin:graphile-export/recommended",

@@ -7389,24 +7389,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001370, caniuse-lite@npm:^1.0.30001399":
-  version: 1.0.30001400
-  resolution: "caniuse-lite@npm:1.0.30001400"
-  checksum: ffefc7744b3d8e2983639605443c4af75f09add4370957625e420207112037a1d16a047d85963fd8a1db1d80e76d162f49c33364ce867798ef15905e47dee30a
-  languageName: node
-  linkType: hard
-
-"caniuse-lite@npm:^1.0.30001286":
-  version: 1.0.30001291
-  resolution: "caniuse-lite@npm:1.0.30001291"
-  checksum: 24b495827f5208a9a5c3a1c430bcd824db1e0f5aa6bf4350753227c5147d525913f8143b0fb83bf28816003c54a39fd42217217f7aa8315a3086d4ffd5d85ff3
-  languageName: node
-  linkType: hard
-
-"caniuse-lite@npm:^1.0.30001332":
-  version: 1.0.30001343
-  resolution: "caniuse-lite@npm:1.0.30001343"
-  checksum: f3ee2d391d7e94d7d6fdfc537f3676daaf737e5c73fbd4354671be4108b4b396c2e560ad6023cc8d4ab5149e4984581ee67a7f48b50f9d558425761febbb8448
+"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001286, caniuse-lite@npm:^1.0.30001332, caniuse-lite@npm:^1.0.30001370, caniuse-lite@npm:^1.0.30001399":
+  version: 1.0.30001406
+  resolution: "caniuse-lite@npm:1.0.30001406"
+  checksum: 88c477ddf880b81ea92200d72c566028823a8eb63a9e90fec4ff6686975c7260edf9b8db4be1bcf59d42c4ea5965799c85e52189e476c6fb2ed886996f57c308
   languageName: node
   linkType: hard
 
@@ -17735,6 +17721,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": "npm:^7.16.5"
     "@babel/plugin-transform-runtime": "npm:^7.16.5"
     "@babel/preset-env": "npm:^7.16.5"
+    "@babel/preset-react": "npm:^7.18.6"
     "@babel/preset-typescript": "npm:^7.16.5"
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.22.5"
     "@knodes/typedoc-plugin-pages": "npm:^0.22.5"
