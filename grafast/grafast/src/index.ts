@@ -269,6 +269,7 @@ export {
   grafastGraphqlSync,
   GrafastInputFieldExtensions,
   GrafastObjectTypeExtensions,
+  grafastGraphqlSync as grafastSync, // TODO: rename grafastGraphqlSync to just grafastSync
   GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,

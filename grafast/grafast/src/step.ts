@@ -316,15 +316,14 @@ export class ExecutableStep<TData = any> extends BaseStep {
         "You cannot add a dependency after the step is finalized.",
       );
     }
+    if (!(step instanceof ExecutableStep)) {
+      throw new Error(
+        `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
+          step,
+        )}'`,
+      );
+    }
     if (isDev) {
-      if (!(step instanceof ExecutableStep)) {
-        throw new Error(
-          `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
-            step,
-          )}'`,
-        );
-      }
-
       // Check that we can actually add this as a dependency
       if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
         throw new Error(
