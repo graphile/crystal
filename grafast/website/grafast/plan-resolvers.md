@@ -4,14 +4,29 @@ sidebar_position: 5
 
 # Plan Resolvers
 
-A plan resolver can be used instead of, or in addition to, a traditional
-resolver. Plan resolvers are small synchronous functions that return a step
-whose value should be used to represent the field to which they are attached.
-Though they only return a single step, they may produce as many intermediate
-steps as they need.
+Each field in the schema may implement a synchronous `plan` method, called a
+"plan resolver." At operation planning time, each time this field is referenced
+the plan resolver may be called with Grafast passing the resulting step of the
+parent plan[^1] and a "field args" object. The plan resolver may create as many
+intermediate steps as it likes, but it must return exactly one step that its
+children may use (or, in the case of a leaf, that may be used by the output
+plan). Plan resolvers
 
-Plan resolvers run only when the operation is being planned, not when it is
-being executed, so they do not have access to any data - only other steps.
+[^1]:
+    The resulting step will be the returned step from the parent field when that
+    field has an object type, but when the field has a list or polymorphic type
+    the resulting step will likely differ.
+
+In the case of a field that has a polymorphic type, the step that is returned
+must be a polymorphic-capable plan. (TODO: document polymorphism.)
+
+In the case of a field that has a list type, the step that is returned must
+produce lists when executed. (TODO: document listItem step class method.)
+
+A plan resolver can be used instead of, or in addition to, a traditional
+resolver. Since plan resolvers run only when the operation is being planned, not
+when it is being executed, they do not have access to any data ─ only other
+steps.
 
 Like regular resolvers, the first two arguments to a plan resolver represent the
 parent data and the arguments respectively. However, since we're dealing in

@@ -4,10 +4,15 @@ sidebar_position: 7
 
 # Step classes
 
-The building blocks of an operation plan are "steps." Steps are instances of
-"step classes," and Grafast makes available a modest range of [standard steps][]
-that you can use; but when these aren't enough you can write your own (or pull
-down third party step classes from npm or similar).
+The building blocks of an operation plan are "steps." A step is an instance of a
+specific _step class_, produced during the planning of an operation. Each step
+may depend on 0 or more other steps, and through these dependencies ultimately
+form a directed acyclic graph which we refer to as the _operation plan_.
+
+Grafast makes available a modest range of [standard step
+classes][standard steps] that you can use; but when these aren't enough you are
+encouraged to write your own (or pull down third party step classes from npm or
+similar).
 
 Step classes extend the `ExecutableStep` class, the only required method to
 define is `execute`, but you may also implement the various lifecycle methods,
