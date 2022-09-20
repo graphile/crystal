@@ -107,7 +107,7 @@ const config = {
         isCloseable: false,
       },
       navbar: {
-        title: "Grafast",
+        title: "Home",
         logo: {
           alt: "Grafast Logo",
           src: "img/logo.svg",
