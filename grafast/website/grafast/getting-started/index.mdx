@@ -154,21 +154,12 @@ class AddStep extends ExecutableStep {
   }
 
   execute([allA, allB]) {
-    const result = [];
-
-    // allA and allB are guaranteed to have the same length
-    const count = allA.length;
-
-    // We loop through the pairs of values, pushing the result onto the
-    // `result` list:
-    for (let i = 0; i < l; i++) {
-      const a = allA[i];
-      const b = allB[i];
-      result.push(a + b);
-    }
-
-    // We must return a list with the same length as allA and allB:
-    return result;
+    // allA and allB are guaranteed to have the same length. We have to return
+    // a list with the same length as allA and allB, so in this case we can
+    // simply map:
+    return allA.map((a, i) => {
+      return a + allB[i];
+    );
   }
 }
 ```
