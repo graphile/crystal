@@ -56,7 +56,7 @@ const typeDefs = /* GraphQL */ `
 ```
 
 Now we need to define the `plans` for the schema. The plan for our
-`Query.addTwoNumbers` field is to [read the arguments](./field-args), then use
+`Query.addTwoNumbers` field is to [read the arguments][field args], then use
 the [lambda][] step to add them together. The lambda step takes a list of other
 steps, and then determines the result by calling the given callback for each set
 of resulting values.
@@ -80,7 +80,7 @@ const plans = {
 `lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
 values rather than the batched processing that Grafast prefers for efficiency.
 It can be handy as a utility function, but in general you should pick a
-[more suitable step](./standard-steps).
+[more suitable step][step library].
 
 :::
 
@@ -195,9 +195,11 @@ classes, but it's worth being aware of how step classes work in case you want to
 push your optimizations further. [Read more about step classes][step classes],
 or continue through the documentation.
 
-[lambda]: ./standard-steps#lambda
-[servers]: ./servers
-[grafast]: ./servers#grafast
-[envelop]: ./servers#envelop
-[standard steps]: ./standard-steps
-[step classes]: ./step-classes
+[lambda]: ../step-library/standard-steps/lambda
+[servers]: ../servers
+[grafast]: ../servers#grafast
+[envelop]: ../servers#envelop
+[step library]: ../step-library
+[standard steps]: ../step-library/standard-steps
+[step classes]: ../step-classes
+[field args]: ../plan-resolvers#field-arguments-fieldargs

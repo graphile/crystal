@@ -54,6 +54,6 @@ Grafast automatically supports resolvers to help maintain compatibility with
 legacy schemas, but if you're ready to get the next level of performance you can
 replace the resolver with a plan on a field-by-field basis in a schema.
 
-For more information, see [Plan Resolvers](./plan-resolvers).
+For more information, see [Plan Resolvers](../plan-resolvers).
 
-[servers]: ./servers
+[servers]: ../servers
