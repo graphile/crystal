@@ -98,6 +98,14 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        id: "announcementBar-2",
+        content:
+          "This documentation is a work in progress, please forgive gaps, and feel free to send pull requests!",
+        //backgroundColor: "#fafbfc",
+        //textColor: "#091E42",
+        isCloseable: false,
+      },
       navbar: {
         title: "Grafast",
         logo: {
