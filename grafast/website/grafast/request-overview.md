@@ -60,6 +60,21 @@ steps take place for each element of the stream(s).
 
 :::
 
+## Executing operation and output plan
+
+At execution time, data (for example from variables and context) is fed into
+system steps, then execution flows down through the operation plan's step graph,
+executing each step exactly once until all steps have been executed, at which
+point the GraphQL output is produced.
+
+Since each step is only executed once per request, the execution must process
+all of the data in a batch. Thus, it is fed a list of data from each of its
+dependencies, and it must return a corresponding list of data that its
+dependents may themselves consume.
+
+[plan resolvers]: ./plan-resolvers
+[argument applyplan resolvers]: ./plan-resolvers#applyplan-plan-resolvers
+
 ## Returning data to user
 
 This can be the same as in a graphql-js project, but Grafast also supports an

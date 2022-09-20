@@ -38,6 +38,8 @@ A simplified version of the process is this:
 1. **Tree shake**
 1. **Finalise**
 
+## Constraints
+
 Whilst Grafast is building the operation plan, it may also determined particular
 constraints that govern whether the operation plan may be used for a future
 request or not. For example, if the request contains `@skip(if: $variable)` then
@@ -51,57 +53,38 @@ When an operation is seen a future time, Grafast first looks for an existing
 operation plan whose constraints fit the request before falling back to creating
 a new operation plan.
 
-### Step classes
+## Lifecycle events
 
-A step class is a JavaScript class that has an `execute` method. It may,
-optionally, implement other Grafast lifecycle methods, and other accessors and
-similar that child field plans may call.
+### Deduplicate
 
-Grafast provides a number of standard step classes that schemas may use, but
-step classes whose names start with two underscores (`__`) are Grafast internals
-and must not be used. Schema designers are also encouraged to write their own
-step classes, and/or use step classes made available in other packages.
+Once a field is fully planned, Grafast will _deduplicate_ the new steps it has
+produced, attempting to replace them with existing "peer" steps that already
+existed. These "peer" steps will have been constructed via the same step class,
+and will have the same dependencies. By deduplicating at this stage (before
+planning the child selection set) we help to ensure that the schema remains in
+adherence to the GraphQL specification. Deduplication can reduce the number of
+steps in the plan, leading to greater efficiency (and easier to understand
+plans).
 
-### Steps
+### Tree shake
 
-A step is an instance of a specific _step class_, produced during the planning
-of an operation. Each step may depend on 0 or more other steps, and through
-these dependencies ultimately form a directed acyclic graph which we refer to as
-the _operation plan_.
+Once every selection set has been fully visited and every field has been
+planned, the operation plan is complete.
 
-### Field plan method
+Grafast then walks through the output plans, their required steps and those
+steps dependencies (and their dependencies and so on), marking them as active.
+Any step that is not active is "unreachable" and thus is no longer needed,
+therefore it can be be removed from the operation plan.
 
-Each field in the schema may implement a `plan` method, and at operation
-planning time each time this field is referenced it may be called, with Grafast
-passing the resulting step of the parent plan[^1], and a "field args" object.
-The method may create as many intermediate steps as it likes, but it must return
-exactly one step that its children may use (or, in the case of a leaf, that may
-be used by the output plan).
-
-[^1]:
-    The resulting step will be the returned step from the parent field when that
-    field has an object type, but when the field has a list or polymorphic type
-    the resulting step will likely differ. This is covered in another section of
-    the documentation. (TODO: which other section?)
-
-In the case of a field that has a polymorphic type, the step that is returned
-must be a polymorphic-capable plan.
-
-In the case of a field that has a list type, the step that is returned must
-produce lists when executed.
-
-If the field accepts arguments, Grafast will look through any arguments that
-weren't explicitly used during the `plan` method, and if they have a `plan`
-method it will plan those too.
-
-Once the field is fully planned, Grafast will _deduplicate_ the steps it has
-produced against the other steps in the operation plan.
+Certain steps are immune to tree shaking (they're seen as always active), in
+particular these include certain system steps, and any step that has side
+effects.
 
 ### Optimize
 
-Once every selection set has been fully visited, the operation plan is complete.
-At this point, Grafast optimizes the plan by calling the `optimize` lifecycle
-method on each step that supports it. This gives steps a chance to replace
+Once the operation plan is complete and the unnecessary steps have been tree
+shaken away, Grafast optimizes the plan by calling the `optimize` lifecycle
+method on each step that supports it. This gives each step a chance to replace
 themselves with more optimal forms by inspecting and interacting with their
 ancestors.
 
@@ -115,6 +98,15 @@ operation.
 
 :::
 
+The optimize method is called starting with the dependencies (leaves) and
+working its way up the dependents (trunk) of the operation plan's directed
+acyclic graph. Since plans should only talk to their ancestors (and not their
+descendents) during optimize, this ensures that their dependencies remain what
+the class expects until after it is optimized.
+
+Once optimization is complete, Grafast tree shakes again to remove any
+unnecessary steps from the operation plan.
+
 ### Finalize
 
 Grafast then finalizes the plan by calling the `finalize` method on steps that
@@ -126,22 +118,10 @@ once, for example:
 - a step that performs templating may build an optimized template function
 - etc
 
-### Output plan
+### Output plan finalize
 
 Finally, the output plans are finalized, building optimized output functions and
 referencing the latest optimized steps.
-
-## Executing operation and output plan
-
-At execution time, data (for example from variables and context) is fed into
-system steps, then execution flows down through the operation plan's step graph,
-executing each step exactly once until all steps have been executed, at which
-point the GraphQL output is produced.
-
-Since each step is only executed once per request, the execution must process
-all of the data in a batch. Thus, it is fed a list of data from each of its
-dependencies, and it must return a corresponding list of data that its
-dependents may themselves consume.
 
 [plan resolvers]: ./plan-resolvers
 [argument applyplan resolvers]: ./plan-resolvers#applyplan-plan-resolvers
