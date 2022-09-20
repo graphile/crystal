@@ -8,6 +8,7 @@ graph TD
 
 
     %% define steps
+    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access8["Access[8∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
@@ -39,21 +40,21 @@ graph TD
     PgSelect7 --> First11
     First11 --> PgSelectSingle12
     PgSelectSingle12 --> PgClassExpression13
-    PgClassExpression13 & Object15 & __Value3 --> GraphQLResolver16
-    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver18
-    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver20
-    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver22
-    GraphQLResolver22 & Object15 & __Value3 --> GraphQLResolver24
-    GraphQLResolver24 & Object15 & __Value3 --> GraphQLResolver26
-    GraphQLResolver24 & Object15 & __Value3 --> GraphQLResolver28
-    GraphQLResolver24 & Object15 & __Value3 --> GraphQLResolver30
-    GraphQLResolver24 & Object15 & __Value3 --> GraphQLResolver38
-    GraphQLResolver22 & Object15 & __Value3 --> GraphQLResolver40
-    GraphQLResolver22 & Object15 & __Value3 --> GraphQLResolver42
-    GraphQLResolver16 & Object15 & __Value3 --> GraphQLResolver46
+    PgClassExpression13 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver16
+    GraphQLResolver16 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver18
+    GraphQLResolver16 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver20
+    GraphQLResolver16 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver22
+    GraphQLResolver22 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver24
+    GraphQLResolver24 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver26
+    GraphQLResolver24 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver28
+    GraphQLResolver24 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver30
+    GraphQLResolver24 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver38
+    GraphQLResolver22 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver40
+    GraphQLResolver22 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver42
+    GraphQLResolver16 & Object15 & __Value3 & __Value1 & __Value5 --> GraphQLResolver46
 
     subgraph "Buckets for queries/resolvers/basics-object-errors"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,Object15,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20,GraphQLResolver22,GraphQLResolver24,GraphQLResolver26,GraphQLResolver28,GraphQLResolver30,GraphQLResolver38,GraphQLResolver40,GraphQLResolver42,GraphQLResolver46 bucket0
+    class Bucket0,__Value1,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,Object15,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20,GraphQLResolver22,GraphQLResolver24,GraphQLResolver26,GraphQLResolver28,GraphQLResolver30,GraphQLResolver38,GraphQLResolver40,GraphQLResolver42,GraphQLResolver46 bucket0
     end
