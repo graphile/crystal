@@ -16,7 +16,6 @@ module.exports = {
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     //'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    "plugin:react/recommended",
     "plugin:import/errors",
     "plugin:import/typescript",
     "plugin:graphile-export/recommended",
@@ -170,7 +169,12 @@ module.exports = {
 
     // React rules
     {
-      files: ["grafast/ruru/src/**/*.ts", "grafast/ruru/src/**/*.tsx"],
+      files: [
+        "grafast/ruru/src/**/*.ts",
+        "grafast/ruru/src/**/*.tsx",
+        "**/website/src/**",
+      ],
+      extends: ["plugin:react/recommended"],
       rules: {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": [
