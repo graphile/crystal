@@ -4607,6 +4607,54 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@localrepo/grafast-website@workspace:grafast/website":
+  version: 0.0.0-use.local
+  resolution: "@localrepo/grafast-website@workspace:grafast/website"
+  dependencies:
+    "@docusaurus/core": "npm:2.1.0"
+    "@docusaurus/module-type-aliases": "npm:2.1.0"
+    "@docusaurus/preset-classic": "npm:2.1.0"
+    "@mdx-js/react": "npm:^1.6.22"
+    clsx: "npm:^1.2.1"
+    dataloader: "npm:^2.1.0"
+    mermaid: "npm:^9.1.7"
+    prism-react-renderer: "npm:^1.3.5"
+    react: "npm:^17.0.2"
+    react-dom: "npm:^17.0.2"
+    sqlite3: "npm:^5.1.1"
+  languageName: unknown
+  linkType: soft
+
+"@localrepo/graphile-build-website@workspace:graphile-build/website":
+  version: 0.0.0-use.local
+  resolution: "@localrepo/graphile-build-website@workspace:graphile-build/website"
+  dependencies:
+    "@docusaurus/core": "npm:2.1.0"
+    "@docusaurus/module-type-aliases": "npm:2.1.0"
+    "@docusaurus/preset-classic": "npm:2.1.0"
+    "@mdx-js/react": "npm:^1.6.22"
+    clsx: "npm:^1.2.1"
+    prism-react-renderer: "npm:^1.3.5"
+    react: "npm:^17.0.2"
+    react-dom: "npm:^17.0.2"
+  languageName: unknown
+  linkType: soft
+
+"@localrepo/postgraphile-website@workspace:postgraphile/website":
+  version: 0.0.0-use.local
+  resolution: "@localrepo/postgraphile-website@workspace:postgraphile/website"
+  dependencies:
+    "@docusaurus/core": "npm:2.1.0"
+    "@docusaurus/module-type-aliases": "npm:2.1.0"
+    "@docusaurus/preset-classic": "npm:2.1.0"
+    "@mdx-js/react": "npm:^1.6.22"
+    clsx: "npm:^1.2.1"
+    prism-react-renderer: "npm:^1.3.5"
+    react: "npm:^17.0.2"
+    react-dom: "npm:^17.0.2"
+  languageName: unknown
+  linkType: soft
+
 "@mapbox/node-pre-gyp@npm:^1.0.0":
   version: 1.0.10
   resolution: "@mapbox/node-pre-gyp@npm:1.0.10"
@@ -20453,24 +20501,6 @@ __metadata:
   checksum: 87489c4add0e88de4f1e3af9646776ec8f830546b159b7d6f7ed754d0cf2681f97b275e5c2395c303ec6d19311d1b2ef72333f2db9c86d9f21aac4f83da494d7
   languageName: node
   linkType: hard
-
-"website@workspace:grafast/website":
-  version: 0.0.0-use.local
-  resolution: "website@workspace:grafast/website"
-  dependencies:
-    "@docusaurus/core": "npm:2.1.0"
-    "@docusaurus/module-type-aliases": "npm:2.1.0"
-    "@docusaurus/preset-classic": "npm:2.1.0"
-    "@mdx-js/react": "npm:^1.6.22"
-    clsx: "npm:^1.2.1"
-    dataloader: "npm:^2.1.0"
-    mermaid: "npm:^9.1.7"
-    prism-react-renderer: "npm:^1.3.5"
-    react: "npm:^17.0.2"
-    react-dom: "npm:^17.0.2"
-    sqlite3: "npm:^5.1.1"
-  languageName: unknown
-  linkType: soft
 
 "websocket-driver@npm:>=0.5.1, websocket-driver@npm:^0.7.4":
   version: 0.7.4
