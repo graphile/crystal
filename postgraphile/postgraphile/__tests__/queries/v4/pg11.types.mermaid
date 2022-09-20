@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -89,13 +90,13 @@ graph TD
     List101 --> PgCursor99
 
     subgraph "Buckets for queries/v4/pg11.types"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Access37,Access38,Object39,Connection40,PgSelect41,PgSelect83,First84,PgSelectSingle85,PgClassExpression86,PgPageInfo87,Constant88,Constant89,First91,PgSelectSingle92,PgCursor93,PgClassExpression94,List95,Last97,PgSelectSingle98,PgCursor99,PgClassExpression100,List101 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />ROOT __Item{1}ᐸ41ᐳ[42]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ41ᐳ[42]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47,First54,PgSelectSingle55,PgClassExpression56,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgClassExpression62,Map102,List103 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ47ᐳ[48]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ47ᐳ[48]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item48 bucket2
     Bucket0 --> Bucket1

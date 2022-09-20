@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -135,19 +136,19 @@ graph TD
     PgSelectSingle114 --> PgClassExpression118
 
     subgraph "Buckets for mutations/basics/create-relational-post-x4"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,Access14,Access15,Object16,__InputStaticLeaf36,__InputStaticLeaf37,__InputStaticLeaf38,Constant39,Constant40,__InputStaticLeaf64,__InputStaticLeaf65,__InputStaticLeaf66,Constant67,Constant68,__InputStaticLeaf92,__InputStaticLeaf93,__InputStaticLeaf94,Constant95,Constant96 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert{1}[13]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[17]<br />3: PgInsert{1}[18]<br />4: PgClassExpression{1}ᐸ__relational_posts__ᐳ[22],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert{1}[13]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[17]<br />3: PgInsert{1}[18]<br />4: PgClassExpression{1}ᐸ__relational_posts__ᐳ[22],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 16, 39, 40, 36, 37, 38<br /><br />1: PgInsert{2}[41]<br />2: PgClassExpression{2}ᐸ__relation...ems__.”id”ᐳ[45]<br />3: PgInsert{2}[46]<br />4: PgClassExpression{2}ᐸ__relational_posts__ᐳ[50],PgClassExpression{2}ᐸ(__relatio...ts__).”id”ᐳ[51],PgClassExpression{2}ᐸ(__relatio...ts__).”id”ᐳ[51]"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 16, 39, 40, 36, 37, 38<br /><br />1: PgInsert{2}[41]<br />2: PgClassExpression{2}ᐸ__relation...ems__.”id”ᐳ[45]<br />3: PgInsert{2}[46]<br />4: PgClassExpression{2}ᐸ__relational_posts__ᐳ[50],PgClassExpression{2}ᐸ(__relatio...ts__).”id”ᐳ[51],PgClassExpression{2}ᐸ(__relatio...ts__).”id”ᐳ[51]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgInsert41,PgClassExpression45,PgInsert46,PgClassExpression50,PgClassExpression51,PgSelect53,First57,PgSelectSingle58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgClassExpression62 bucket2
-    Bucket3("Bucket 3<br />(mutationField)<br />Deps: 16, 67, 68, 64, 65, 66<br /><br />1: PgInsert{3}[69]<br />2: PgClassExpression{3}ᐸ__relation...ems__.”id”ᐳ[73]<br />3: PgInsert{3}[74]<br />4: PgClassExpression{3}ᐸ__relational_posts__ᐳ[78],PgClassExpression{3}ᐸ(__relatio...ts__).”id”ᐳ[79],PgClassExpression{3}ᐸ(__relatio...ts__).”id”ᐳ[79]"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 16, 67, 68, 64, 65, 66<br /><br />1: PgInsert{3}[69]<br />2: PgClassExpression{3}ᐸ__relation...ems__.”id”ᐳ[73]<br />3: PgInsert{3}[74]<br />4: PgClassExpression{3}ᐸ__relational_posts__ᐳ[78],PgClassExpression{3}ᐸ(__relatio...ts__).”id”ᐳ[79],PgClassExpression{3}ᐸ(__relatio...ts__).”id”ᐳ[79]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgInsert69,PgClassExpression73,PgInsert74,PgClassExpression78,PgClassExpression79,PgSelect81,First85,PgSelectSingle86,PgClassExpression87,PgClassExpression88,PgClassExpression89,PgClassExpression90 bucket3
-    Bucket4("Bucket 4<br />(mutationField)<br />Deps: 16, 95, 96, 92, 93, 94<br /><br />1: PgInsert{4}[97]<br />2: PgClassExpression{4}ᐸ__relation...ems__.”id”ᐳ[101]<br />3: PgInsert{4}[102]<br />4: PgClassExpression{4}ᐸ__relational_posts__ᐳ[106],PgClassExpression{4}ᐸ(__relatio...ts__).”id”ᐳ[107],PgClassExpression{4}ᐸ(__relatio...ts__).”id”ᐳ[107]"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 16, 95, 96, 92, 93, 94<br /><br />1: PgInsert{4}[97]<br />2: PgClassExpression{4}ᐸ__relation...ems__.”id”ᐳ[101]<br />3: PgInsert{4}[102]<br />4: PgClassExpression{4}ᐸ__relational_posts__ᐳ[106],PgClassExpression{4}ᐸ(__relatio...ts__).”id”ᐳ[107],PgClassExpression{4}ᐸ(__relatio...ts__).”id”ᐳ[107]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgInsert97,PgClassExpression101,PgInsert102,PgClassExpression106,PgClassExpression107,PgSelect109,First113,PgSelectSingle114,PgClassExpression115,PgClassExpression116,PgClassExpression117,PgClassExpression118 bucket4
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4

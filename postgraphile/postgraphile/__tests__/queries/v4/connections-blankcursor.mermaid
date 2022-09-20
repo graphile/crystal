@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -147,13 +148,13 @@ graph TD
     PgSelectSingle142 --> PgClassExpression150
 
     subgraph "Buckets for queries/v4/connections-blankcursor"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,__InputStaticLeaf11,Access31,Access32,Object33,Connection34,Lambda35,PgPageInfo36,PgSelect37,First38,PgSelectSingle39,PgCursor40,PgValidateParsedCursor41,Access42,ToPg43,PgClassExpression44,List45,Last47,PgSelectSingle48,PgCursor49,PgClassExpression53,List54,Lambda56,Constant60,PgSelect61,First62,PgSelectSingle63,PgClassExpression64,__InputStaticLeaf79,__InputStaticLeaf83,Connection106,Lambda107,PgPageInfo108,PgSelect109,First110,PgSelectSingle111,PgCursor112,PgValidateParsedCursor113,Access114,ToPg115,PgClassExpression116,List117,Last119,PgSelectSingle120,PgCursor121,PgClassExpression125,List126,Lambda128,Constant132,PgSelect133,First134,PgSelectSingle135,PgClassExpression136 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />ROOT __Item{1}ᐸ37ᐳ[69]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ37ᐳ[69]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item69,PgSelectSingle70,PgCursor71,PgClassExpression72,List73,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgClassExpression78 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ109ᐳ[141]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ109ᐳ[141]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item141,PgSelectSingle142,PgCursor143,PgClassExpression144,List145,PgClassExpression147,PgClassExpression148,PgClassExpression149,PgClassExpression150 bucket2
     Bucket0 --> Bucket1 & Bucket2

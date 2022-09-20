@@ -83,10 +83,6 @@ const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
 ]);
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
 
-function isNotNullish<T>(v: T | undefined | null): v is T {
-  return v != null;
-}
-
 /** In development we might run additional checks */
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -102,8 +98,10 @@ type OperationPlanPhase =
   | "finalize"
   | "ready";
 
-export interface MetaByStepId {
-  [planId: number]: Record<string, any>;
+// TODO: overhaul the TypeScript for this, allow steps to declaration merge
+// their own shapes into it.
+export interface MetaByMetaKey {
+  [metaKey: string | number | symbol]: Record<string, any>;
 }
 
 export class OperationPlan {
@@ -135,7 +133,7 @@ export class OperationPlan {
   public loc: string[] = [];
 
   /** @internal */
-  public layerPlans: LayerPlan[] = [];
+  public layerPlans: Array<LayerPlan | null> = [];
   /** @internal */
   public rootLayerPlan: LayerPlan;
   // Assigned during OperationPlan.planOperation(), guaranteed to exist after
@@ -186,7 +184,7 @@ export class OperationPlan {
   public readonly trackedRootValueStep: __TrackedObjectStep<any>;
 
   /** @internal */
-  public makeMetaByStepId: () => MetaByStepId;
+  public makeMetaByMetaKey: () => MetaByMetaKey;
 
   /**
    * @internal
@@ -300,17 +298,22 @@ export class OperationPlan {
     // this.walkFinalizedPlans();
     // this.preparePrefetches();
 
+    const allMetaKeys = new Set<string | number | symbol>();
+    for (let i = 0, l = this.steps.length; i < l; i++) {
+      const step = this.steps[i];
+      if (step && step.id === i) {
+        allMetaKeys.add(step.metaKey);
+      }
+    }
+    const allMetaKeysList = [...allMetaKeys];
+
     // A JIT'd object constructor
-    this.makeMetaByStepId = new Function(
-      `return { ${Object.entries(this.steps)
-        .map(([planId, plan]) =>
-          plan && plan.id === Number(planId)
-            ? `${JSON.stringify(plan.id)}: Object.create(null)`
-            : null,
-        )
-        .filter(isNotNullish)
-        .join(", ")} }`,
-    ) as any;
+    this.makeMetaByMetaKey = new Function(
+      "keys",
+      `return () => ({${allMetaKeysList
+        .map((key, idx) => `\n  [keys[${idx}]]: Object.create(null)`)
+        .join(",")}\n})`,
+    )(allMetaKeysList) as any;
   }
 
   /**
@@ -1020,7 +1023,23 @@ export class OperationPlan {
                 return memo;
               }, Object.create(null)) ?? Object.create(null),
             );
-            return graphqlResolver(resolver, step, $args, fieldType);
+            return graphqlResolver(resolver, step, $args, {
+              fieldName,
+              fieldNodes,
+              fragments: this.fragments,
+              operation: this.operation,
+              parentType: objectType,
+              returnType: fieldType,
+              schema: this.schema,
+              // @ts-ignore
+              path: {
+                typename: objectType.name,
+                key: fieldName,
+                // TODO if we decide to properly support path, we will need to
+                // build this at run-time.
+                prev: undefined,
+              },
+            });
           });
         }
 
@@ -1717,10 +1736,15 @@ export class OperationPlan {
         );
       } catch (e) {
         console.error(
-          `Error occurred whilst processing ${step} in ${order} mode`,
+          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
           e,
         );
         throw e;
+      }
+      if (!replacementStep) {
+        throw new Error(
+          `The callback did not return a step during ${actionDescription}`,
+        );
       }
 
       if (replacementStep != step) {
@@ -1796,6 +1820,9 @@ export class OperationPlan {
 
     // Ensure all the layer plan parents exist
     for (const layerPlan of this.layerPlans) {
+      if (!layerPlan) {
+        continue;
+      }
       if ("parentPlanId" in layerPlan.reason) {
         this.markStepActive(
           this.steps[layerPlan.reason.parentPlanId],
@@ -2240,6 +2267,11 @@ export class OperationPlan {
     // We know if it's streaming or not based on the LayerPlan it's contained within.
     const stepOptions = this.getStepOptionsForStep(step);
     const replacementStep = step.optimize(stepOptions);
+    if (!replacementStep) {
+      throw new Error(
+        `Bug in ${step}'s class: the 'optimize' method must return a step. Hint: did you forget 'return this;'?`,
+      );
+    }
     step.isOptimized = true;
     return replacementStep;
   }
@@ -2344,6 +2376,9 @@ export class OperationPlan {
     };
 
     for (const layerPlan of this.layerPlans) {
+      if (!layerPlan) {
+        continue;
+      }
       layerPlan.steps = this.steps.filter(
         (s) => s !== null && s.layerPlan === layerPlan,
       );
@@ -2558,6 +2593,68 @@ export class OperationPlan {
       }
     };
     process(layerPlan, [layerPlan]);
+  }
+
+  /**
+   * HIGHLY EXPERIMENTAL!
+   *
+   * @internal
+   */
+  deleteLayerPlan(layerPlan: LayerPlan) {
+    if (isDev) {
+      // TODO: validate assertions
+      if (layerPlan.children.length > 0) {
+        throw new Error(
+          "This layer plan has children... should we really be deleting it?!",
+        );
+      }
+      this.walkOutputPlans(this.rootOutputPlan, (o) => {
+        if (o.layerPlan === layerPlan) {
+          throw new Error(
+            "An output plan depends on this layer plan... should we really be deleting it?!",
+          );
+        }
+      });
+    }
+    this.layerPlans[layerPlan.id] = null;
+    // Remove layerPlan from its parent
+    if (layerPlan.parentLayerPlan) {
+      const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
+      if (idx >= 0) {
+        layerPlan.parentLayerPlan.children.splice(idx, 1);
+      }
+    }
+    // Remove all plans in this layer
+    for (let id = 0, l = this.steps.length; id < l; id++) {
+      const step = this.steps[id];
+      if (step && step.layerPlan === layerPlan) {
+        this.steps[id] = null as any;
+      }
+    }
+  }
+
+  getStepsByMetaKey(metaKey: string | number | symbol): ExecutableStep[] {
+    const matches: ExecutableStep[] = [];
+    for (let id = 0, l = this.steps.length; id < l; id++) {
+      const step = this.steps[id];
+      if (step && step.id === id && step.metaKey === metaKey) {
+        matches.push(step);
+      }
+    }
+    return matches;
+  }
+
+  getStepsByStepClass<TClass extends ExecutableStep>(klass: {
+    new (...args: any[]): TClass;
+  }): TClass[] {
+    const matches: TClass[] = [];
+    for (let id = 0, l = this.steps.length; id < l; id++) {
+      const step = this.steps[id];
+      if (step && step.id === id && step instanceof klass) {
+        matches.push(step);
+      }
+    }
+    return matches;
   }
 }
 

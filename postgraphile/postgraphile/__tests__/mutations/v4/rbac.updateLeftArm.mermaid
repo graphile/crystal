@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -38,10 +39,10 @@ graph TD
     PgUpdate12 --> PgClassExpression24
 
     subgraph "Buckets for mutations/v4/rbac.updateLeftArm"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf11,Access13,Access14,Object15,Constant17 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 15, 9, 11, 17<br /><br />1: PgUpdate{1}[12]<br />2: Object{1}ᐸ{result}ᐳ[16],PgClassExpression{1}ᐸ__left_arm__.”id”ᐳ[18],PgClassExpression{1}ᐸ__left_arm__.”id”ᐳ[18],PgClassExpression{1}ᐸ__left_arm...person_id”ᐳ[22],PgClassExpression{1}ᐸ__left_arm...in_metres”ᐳ[23],PgClassExpression{1}ᐸ__left_arm__.”mood”ᐳ[24]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 11, 17<br /><br />1: PgUpdate{1}[12]<br />2: Object{1}ᐸ{result}ᐳ[16],PgClassExpression{1}ᐸ__left_arm__.”id”ᐳ[18],PgClassExpression{1}ᐸ__left_arm__.”id”ᐳ[18],PgClassExpression{1}ᐸ__left_arm...person_id”ᐳ[22],PgClassExpression{1}ᐸ__left_arm...in_metres”ᐳ[23],PgClassExpression{1}ᐸ__left_arm__.”mood”ᐳ[24]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdate12,Object16,PgClassExpression18,List19,Lambda20,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket1
     Bucket0 --> Bucket1

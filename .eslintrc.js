@@ -2,6 +2,14 @@ module.exports = {
   parser: "@babel/eslint-parser",
   parserOptions: {
     sourceType: "module",
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
   },
   extends: [
     "eslint:recommended",
@@ -157,7 +165,12 @@ module.exports = {
 
     // React rules
     {
-      files: ["grafast/ruru/src/**/*.ts", "grafast/ruru/src/**/*.tsx"],
+      files: [
+        "grafast/ruru/src/**/*.ts",
+        "grafast/ruru/src/**/*.tsx",
+        "**/website/src/**",
+      ],
+      extends: ["plugin:react/recommended"],
       rules: {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": [
@@ -166,6 +179,10 @@ module.exports = {
             enableDangerousAutofixThisMayCauseInfiniteLoops: true,
           },
         ],
+
+        // Stuff I don't care about
+        "react/react-in-jsx-scope": "off",
+        "react/prop-types": "off",
       },
     },
 
@@ -175,6 +192,7 @@ module.exports = {
         "**/vendor/**/__tests__/**/*.tsx",
         "**/vendor/**/__testUtils__/**/*.ts",
         "**/vendor/**/__testUtils__/**/*.tsx",
+        "**/website/examples/**",
       ],
       rules: {
         "graphile-export/exhaustive-deps": 0,
@@ -182,6 +200,13 @@ module.exports = {
         "graphile-export/export-instances": 0,
         "graphile-export/export-subclasses": 0,
         "graphile-export/no-nested": 0,
+      },
+    },
+
+    {
+      files: ["**/website/**"],
+      rules: {
+        "import/no-unresolved": "off",
       },
     },
   ],

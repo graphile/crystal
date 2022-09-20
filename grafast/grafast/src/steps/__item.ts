@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import { ExecutableStep } from "../step.js";
+import { $$deepDepSkip, ExecutableStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
@@ -31,6 +31,10 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
     return chalk.bold.yellow(
       String(this.opPlan.dangerouslyGetStep(this.dependencies[0]).id),
     );
+  }
+
+  [$$deepDepSkip](): ExecutableStep {
+    return this.getDep(0);
   }
 
   execute(): never {

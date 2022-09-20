@@ -1,0 +1,127 @@
+---
+sidebar_position: 9
+---
+
+# Operation plan
+
+:::tip
+
+If you're unfamiliar with GraphQL terminology such as "selection set", "field",
+"type" and so on, please check out our
+[Operation Language](https://learn.graphile.org/docs/GraphQL_Operation_Cheatsheet.pdf)
+and
+[Schema Language](https://learn.graphile.org/docs/GraphQL_Schema_Language_Cheatsheet.pdf)
+cheatsheets.
+
+:::
+
+When Gra*fast* sees an operation for the first time, it builds an "operation
+plan." To do so, it walks the selection sets calling the user-provided `plan`
+method for each field to determine the _steps_ that need to be executed for that
+field. That series of steps, which we'll call the _field plan_, is then woven
+with all the other field plans in the operation, to form a directed acyclic
+graph we call the _operation plan_. Whilst doing this, Gra*fast* keeps track of
+which fields returned which steps, and uses this information to form the _output
+plan_. Finally the _operation plan_ is optimized and finalized and the _output
+plan_ is finalized, then they are ready for execution.
+
+A simplified version of the process is this:
+
+1. Start at the root selection set.
+1. For each field in the current selection set:
+   1. Call field [plan resolver][plan resolvers]
+   1. Call any uncalled [argument applyPlan resolvers][]
+   1. **Deduplicate** new steps
+   1. Repeat step 2 using the field's selection set (if any)
+1. **Tree shake**
+1. **Optimise**
+1. **Tree shake**
+1. **Finalise**
+
+## Constraints
+
+Whilst Grafast is building the operation plan, it may also determined particular
+constraints that govern whether the operation plan may be used for a future
+request or not. For example, if the request contains `@skip(if: $variable)` then
+a different operation plan would be needed depending on whether `$variable` was
+`true` or `false`. Where possible, constraints are kept as narrow as possible -
+for example "variable $foo is a list" is preferred over "variable
+$foo is the
+list [1,2,3]" - to maximize reuse.
+
+When an operation is seen a future time, Grafast first looks for an existing
+operation plan whose constraints fit the request before falling back to creating
+a new operation plan.
+
+## Lifecycle events
+
+### Deduplicate
+
+Once a field is fully planned, Grafast will _deduplicate_ the new steps it has
+produced, attempting to replace them with existing "peer" steps that already
+existed. These "peer" steps will have been constructed via the same step class,
+and will have the same dependencies. By deduplicating at this stage (before
+planning the child selection set) we help to ensure that the schema remains in
+adherence to the GraphQL specification. Deduplication can reduce the number of
+steps in the plan, leading to greater efficiency (and easier to understand
+plans).
+
+### Tree shake
+
+Once every selection set has been fully visited and every field has been
+planned, the operation plan is complete.
+
+Grafast then walks through the output plans, their required steps and those
+steps dependencies (and their dependencies and so on), marking them as active.
+Any step that is not active is "unreachable" and thus is no longer needed,
+therefore it can be be removed from the operation plan.
+
+Certain steps are immune to tree shaking (they're seen as always active), in
+particular these include certain system steps, and any step that has side
+effects.
+
+### Optimize
+
+Once the operation plan is complete and the unnecessary steps have been tree
+shaken away, Grafast optimizes the plan by calling the `optimize` lifecycle
+method on each step that supports it. This gives each step a chance to replace
+themselves with more optimal forms by inspecting and interacting with their
+ancestors.
+
+:::info
+
+For example if a "first" step is to optimize itself, and its parent is a "list"
+step, then it can simply replace itself with the first entry in the list of
+plans the "list" step contains. More advanced examples may include topics such
+as joining tables in a database, or adding selection sets to a remote GraphQL
+operation.
+
+:::
+
+The optimize method is called starting with the dependencies (leaves) and
+working its way up the dependents (trunk) of the operation plan's directed
+acyclic graph. Since plans should only talk to their ancestors (and not their
+descendents) during optimize, this ensures that their dependencies remain what
+the class expects until after it is optimized.
+
+Once optimization is complete, Grafast tree shakes again to remove any
+unnecessary steps from the operation plan.
+
+### Finalize
+
+Grafast then finalizes the plan by calling the `finalize` method on steps that
+support it. This gives each step a chance to do work that need only be done
+once, for example:
+
+- a step that talks to a database might compile the SQL it needs and cache it
+  for later
+- a step that performs templating may build an optimized template function
+- etc
+
+### Output plan finalize
+
+Finally, the output plans are finalized, building optimized output functions and
+referencing the latest optimized steps.
+
+[plan resolvers]: ./plan-resolvers
+[argument applyplan resolvers]: ./plan-resolvers#applyplan-plan-resolvers

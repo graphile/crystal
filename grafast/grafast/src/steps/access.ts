@@ -174,16 +174,18 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   private destructure: (value: TData) => any;
   private parentStepId: number;
   allowMultipleOptimizations = true;
+  public readonly path: (string | number)[];
 
   constructor(
     parentPlan: ExecutableStep<unknown>,
-    public readonly path: (string | number)[],
+    path: (string | number)[] | string | number,
     private fallback?: any,
   ) {
     super();
+    this.path = Array.isArray(path) ? path : [path];
     this.addDependency(parentPlan);
     this.parentStepId = parentPlan.id;
-    this.destructure = constructDestructureFunction(path, fallback);
+    this.destructure = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
@@ -247,7 +249,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
  */
 export function access<TData>(
   parentPlan: ExecutableStep<unknown>,
-  path: (string | number)[],
+  path: (string | number)[] | string | number,
   fallback?: any,
 ): AccessStep<TData> {
   return new AccessStep<TData>(parentPlan, path, fallback);

@@ -1,0 +1,68 @@
+---
+sidebar_position: 4
+---
+
+# Servers
+
+The most common use of a GraphQL schema is via an HTTP API. Serving a Grafast
+schema over HTTP is very much the same as serving a regular GraphQL schema over
+HTTP, the main difference is that you should use Grafast's `execute`/`grafast`
+function to execute requests rather than graphql-js' `execute`/`graphql`
+function, though it's also really important to memoize the parsing of documents
+to ensure that the same operation plan can be used again in future requests.
+
+You can use any GraphQL server that allows you to substitute the `execute`
+method with Grafast's; we have our native [Grafserv][] server, or if you don't
+need the absolute best possible performance you can use any of the GraphQL
+servers that Envelop supports with our `useGrafast` envelop plugin.
+
+## Grafserv
+
+[Grafserv][] is Grafast's companion server; it's probably the fastest
+general-purpose GraphQL server available in Node.js, but due to its youth it
+doesn't yet have the large ecosystem of extensions that other servers have.
+Grafserv automatically implements all optimisations that we could think of for
+serving GraphQL schemas over HTTP, including such optimizations as serializing
+directly to string without even building objects in memory in the first place!
+
+Read more in [Grafserv's documentation][grafserv].
+
+## Envelop
+
+[Envelop][] is an excellent plugin system written by the fine folks at [The
+Guild][]; it can be used with most major GraphQL servers in Node.js (and some in
+other environments!) so is a great way of integrating Grafast into an existing
+project. We bundle a `useGrafast()` envelop plugin which you can use alongside
+`useParserCache()` to get an optimized execution pipeline very easily, here's
+part of an example:
+
+```ts
+import { envelop, useExtendContext, useSchema } from "@envelop/core";
+import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
+import { schema } from "./schema";
+
+const getEnveloped = envelop({
+  plugins: [
+    // Use our executable schema
+    useSchema(schema),
+
+    // Caching the parser results is critical for Grafast, otherwise it
+    // must re-plan every GraphQL request!
+    useParserCache(),
+    useValidationCache(),
+
+    // Our context says how to communicate with Postgres
+    useExtendContext(() => contextValue),
+
+    // This replaces graphql-js' `execute` with Grafast's own
+    useGrafast(),
+  ],
+});
+```
+
+For more context, please refer to
+[Envelop's Documentation](https://www.envelop.dev/docs/getting-started).
+
+[grafserv]: /grafserv/
+[envelop]: https://www.envelop.dev/
+[the guild]: https://the-guild.dev/

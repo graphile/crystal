@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -65,10 +66,10 @@ graph TD
     PgSelectSingle45 --> PgClassExpression46
 
     subgraph "Buckets for queries/functions/computed-column-combined"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,First19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,First28,PgSelectSingle29,__InputStaticLeaf30,First36,PgSelectSingle37,PgClassExpression38,Map47,List48,Access49,Map50,List51,Map52,List53 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />ROOT __Item{1}ᐸ49ᐳ[44]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ49ᐳ[44]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item44,PgSelectSingle45,PgClassExpression46 bucket1
     Bucket0 --> Bucket1

@@ -1,14 +1,96 @@
+import LRU from "@graphile/lru";
+import { createHash } from "crypto";
 import type {
   AsyncExecutionResult,
+  DocumentNode,
   ExecutionResult,
   GraphQLArgs,
+  GraphQLSchema,
 } from "graphql";
-import { parse, validate, validateSchema } from "graphql";
+import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import type { GrafastExecuteOptions } from "./execute.js";
 import { execute } from "./execute.js";
 import { isPromiseLike } from "./utils.js";
+
+/** Rough average size per query */
+const CACHE_MULTIPLIER = 100000;
+const MEGABYTE = 1024 * 1024;
+
+// TODO: turn this into a setting.
+const queryCacheMaxSize = 50 * MEGABYTE;
+
+const cacheSize = Math.max(2, Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER));
+
+const queryCache = new LRU({ maxLength: cacheSize });
+
+let lastString: string;
+let lastHash: string;
+const calculateQueryHash = (queryString: string): string => {
+  if (queryString !== lastString) {
+    lastString = queryString;
+    lastHash = createHash("sha1").update(queryString).digest("base64");
+  }
+  return lastHash;
+};
+
+let lastGqlSchema: GraphQLSchema;
+const parseAndValidate = (
+  gqlSchema: GraphQLSchema,
+  stringOrSource: string | Source,
+): DocumentNode | ReadonlyArray<GraphQLError> => {
+  if (gqlSchema !== lastGqlSchema) {
+    if (queryCache) {
+      queryCache.reset();
+    }
+    lastGqlSchema = gqlSchema;
+  }
+
+  // Only cache queries that are less than 100kB, we don't want DOS attacks
+  // attempting to exhaust our memory.
+
+  const hash = calculateQueryHash(
+    typeof stringOrSource === "string" ? stringOrSource : stringOrSource.body,
+  );
+  const result = queryCache.get(hash);
+  if (result) {
+    return result;
+  } else {
+    const source =
+      typeof stringOrSource === "string"
+        ? new Source(stringOrSource, "GraphQL Http Request")
+        : stringOrSource;
+    let queryDocumentAst: DocumentNode | void;
+
+    // Catch an errors while parsing so that we can set the `statusCode` to
+    // 400. Otherwise we don’t need to parse this way.
+    try {
+      queryDocumentAst = parse(source);
+      // Validate our GraphQL query using given rules.
+      const validationErrors = validate(gqlSchema, queryDocumentAst);
+      const cacheResult =
+        validationErrors.length > 0 ? validationErrors : queryDocumentAst;
+      queryCache.set(hash, cacheResult);
+      return cacheResult;
+    } catch (error) {
+      const cacheResult = [
+        error instanceof GraphQLError
+          ? error
+          : new GraphQLError(
+              "Validation error occurred",
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              error,
+            ),
+      ];
+      queryCache.set(hash, cacheResult);
+      return cacheResult;
+    }
+  }
+};
 
 /**
  * A replacement for GraphQL.js' `graphql` method that calls Grafast's
@@ -37,19 +119,12 @@ export function grafastGraphql(
     return { errors: schemaValidationErrors };
   }
 
-  // Parse
-  let document;
-  try {
-    document = parse(source);
-  } catch (syntaxError) {
-    return { errors: [syntaxError] };
+  // Cached parse and validate
+  const documentOrErrors = parseAndValidate(schema, source);
+  if (Array.isArray(documentOrErrors)) {
+    return { errors: documentOrErrors };
   }
-
-  // Validate
-  const validationErrors = validate(schema, document);
-  if (validationErrors.length > 0) {
-    return { errors: validationErrors };
-  }
+  const document = documentOrErrors as DocumentNode;
 
   // Execute
   return execute(

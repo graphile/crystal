@@ -95,16 +95,17 @@ export function printPlanGraph(
     return COLORS[i % COLORS.length];
   };
 
-  const planStyle = `fill:#fff,stroke-width:3px,color:#000`;
-  const itemplanStyle = `fill:#fff,stroke-width:6px,color:#000`;
-  const sideeffectplanStyle = `fill:#f00,stroke-width:6px,color:#000`;
+  const planStyle = `fill:#fff,stroke-width:1px,color:#000`;
+  const itemplanStyle = `fill:#fff,stroke-width:2px,color:#000`;
+  const sideeffectplanStyle = `fill:#f00,stroke-width:2px,color:#000`;
   const graph = [
+    `%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%`,
     `${concise ? "flowchart" : "graph"} TD`,
     `    classDef path fill:#eee,stroke:#000,color:#000`,
     `    classDef plan ${planStyle}`,
     `    classDef itemplan ${itemplanStyle}`,
     `    classDef sideeffectplan ${sideeffectplanStyle}`,
-    `    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left`,
+    `    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left`,
     ``,
   ];
 
@@ -217,10 +218,10 @@ export function printPlanGraph(
   );
 
   graph.push("");
-  graph.push("    subgraph Buckets");
+  if (!concise) graph.push("    subgraph Buckets");
   for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
     const layerPlan = operationPlan.layerPlans[i];
-    if (layerPlan.id !== i) {
+    if (!layerPlan || layerPlan.id !== i) {
       continue;
     }
     const plansAndIds = Object.entries(steps).filter(
@@ -228,14 +229,14 @@ export function printPlanGraph(
         plan && plan.id === Number(id) && plan.layerPlan === layerPlan,
     );
     const raisonDEtre =
-      layerPlan.reason.type +
+      ` (${layerPlan.reason.type})` +
       (layerPlan.reason.type === "polymorphic"
-        ? `(${layerPlan.reason.typeNames})`
+        ? `\n${layerPlan.reason.typeNames}`
         : ``);
     const outputMapStuff: string[] = [];
     graph.push(
       `    Bucket${layerPlan.id}(${mermaidEscape(
-        `Bucket ${layerPlan.id}\n(${raisonDEtre})${
+        `Bucket ${layerPlan.id}${raisonDEtre}${
           layerPlan.copyPlanIds.length > 0
             ? `\nDeps: ${layerPlan.copyPlanIds
                 .map((pId) => steps[pId].id)
@@ -260,7 +261,7 @@ export function printPlanGraph(
   }
   for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
     const layerPlan = operationPlan.layerPlans[i];
-    if (layerPlan.id !== i) {
+    if (!layerPlan || layerPlan.id !== i) {
       continue;
     }
     const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
@@ -268,7 +269,7 @@ export function printPlanGraph(
       graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
     }
   }
-  graph.push("    end");
+  if (!concise) graph.push("    end");
 
   const graphString = graph.join("\n");
   return graphString;

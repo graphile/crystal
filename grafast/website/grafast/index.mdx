@@ -1,0 +1,231 @@
+---
+sidebar_position: 1
+---
+
+import Mermaid from "@theme/Mermaid";
+import mermaidPlan from "../examples/users-and-friends/plan.mermaid?raw";
+
+# Grafast introduction
+
+The GraphQL specification describes how a GraphQL operation should be executed,
+talking in terms of layer-by-layer resolution of data using "resolvers." But
+critical to note is this sentence from the beginning of the specification:
+
+> _Conformance requirements [...] can be fulfilled [...] in any way as long as
+> the perceived result is equivalent._  
+> ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
+
+Resolvers are relatively straightforward to understand, but when implemented
+naively can very quickly result in serious performance issues. [DataLoader][] is
+one of the approaches suggested to solve the "N+1 problem," but this is only the
+most egregious performance issue that a naive GraphQL schema may face - there
+are others such as server-side over-fetching and under-fetching and related
+issues that can really build up as your schemas and operations get more complex.
+
+Gra*fast* was designed from the ground up to eliminate these issues and more
+whilst maintaining pleasant APIs for developers to use. To do this, in addition
+to supporting resolvers for legacy fields, Grafast favors a planning strategy
+that takes a holistic approach to understanding the incoming operation, and
+unlocks the potential for significant optimizations not previously achievable
+without a herculean effort.
+
+Please note that Grafast is not tied to any particular storage or business logic
+layer - any valid GraphQL schema could be implemented with Grafast, and a
+Grafast schema can query any data source or business logic that Node.js can
+query.
+
+## Planning
+
+_This is just an overview, for full documentation see
+[Plan Resolvers](./plan-resolvers)._
+
+Where in a traditional schema you would add a "resolver," in a Grafast schema
+you would instead add a "plan resolver." These plan resolvers are generally
+small functions, like regular resolvers should be, but instead of being called
+many times and dealing with concrete runtime values, they are called only once
+at planning time and they build and manipulate "steps" which are the building
+blocks of an execution plan.
+
+Imagine that we have this GraphQL schema:
+
+```graphql
+type Query {
+  currentUser: User
+}
+type User {
+  name: String!
+  friends: [User!]!
+}
+```
+
+In [graphql-js][], you might have these resolvers:
+
+```ts
+const resolvers = {
+  Query: {
+    async currentUser(_, args, context) {
+      return context.userLoader.load(context.currentUserId);
+    },
+  },
+  User: {
+    name(user) {
+      return user.full_name;
+    },
+    async friends(user, args, context) {
+      const friendships = await context.friendshipsByUserIdLoader.load(user.id);
+      const friends = await Promise.all(
+        friendships.map((friendship) =>
+          context.userLoader.load(friendship.friend_id),
+        ),
+      );
+      return friends;
+    },
+  },
+};
+```
+
+In Grafast, we use "plan resolvers" instead, which might look something like:
+
+```ts
+const planResolvers = {
+  Query: {
+    currentUser() {
+      return userById(context().get("currentUserId"));
+    },
+  },
+  User: {
+    name($user) {
+      return $user.get("full_name");
+    },
+    friends($user) {
+      const $friendships = friendshipsByUserId($user.get("id"));
+      const $friends = each($friendships, ($friendship) =>
+        userById($friendship.get("friend_id")),
+      );
+      return $friends;
+    },
+  },
+};
+```
+
+As you can see, the shape of the logic is quite similar, but the Grafast plan
+resolvers are synchronous since their job isn't to get the data to use, but
+instead to outline the steps required to get the data. As the `friends` Grafast
+plan resolver cannot explicitly loop through the data (it hasn't been fetched
+yet!), it uses an `each` helper to detail which steps to take for each item made
+available later.
+
+:::tip
+
+By convention, when a variable represents a Grafast step, the variable will be
+named starting with a `$`.
+
+:::
+
+If we were to make a request to the above Grafast schema with the following
+query:
+
+```graphql
+{
+  currentUser {
+    name
+    friends {
+      name
+      friends {
+        name
+      }
+    }
+  }
+}
+```
+
+Grafast would build an operation plan for the operation, which for the above
+query is:
+
+<Mermaid chart={mermaidPlan} />
+
+This action should only happen once for each new GraphQL operation that's seen,
+when the same operation is seen again its existing plan can (generally) be
+reused.
+
+The "operation plan" diagram you see above is the final form of the plan, there
+were many intermediate states that it will have gone through in order to reach
+this most optimal form, made possible by Graphast's plan lifecycle.
+
+:::info
+
+If you want to explore this example more, please see the
+["users and friends" example](https://github.com/graphile/graphql/blob/main/grafast/website/examples/users-and-friends).
+
+:::
+
+## Plan Lifecycle
+
+_This is just an overview, for full documentation see [lifecycle][lifecycle]._
+
+All plan lifecycle methods are optional, and due to the always-batched nature of
+Grafast plans you can get good performance without using any of them. However,
+if you leverage them, your performance can go from "good" to :sparkles: amazing
+:rocket:.
+
+One of the great things about Grafast's design is that you don't need to build
+these optimizations from the start; you can implement them at a later stage,
+making your schema faster without requiring changes to your business logic _or_
+your plan resolvers!
+
+As a very approximate overview:
+
+- when a field is planned we **deduplicate** each new step
+- once the operation plan is complete, we **optimize** each step
+- finally, we **finalize** each step
+
+### Deduplicate
+
+**Deduplicate** lets a step indicate which of its siblings (defined by Grafast)
+are equivalent to it. One of these siblings can then, if possible, replace the
+new step, thereby reducing the number of steps in the plan.
+
+### Optimize
+
+**Optimize** lets a step "talk" to its ancestors, typically to tell them about
+data that will be needed. This should not change the observed behavior of the
+ancestor (e.g. you should not use it to apply filters to an ancestor!) but it
+can be used to ask the ancestor to fetch additional data. This method can also
+be used to replace the step with an alternative (presumably more-optimal) step.
+
+In the "friends" example above, this was used to change the DataLoader-style
+`select * from ...` query to a more optimal `select id, full_name from ...`
+query. In more advanced plans (for example those made available through
+[@dataplan/pg][]), optimize can go much further, for example inlining its data
+requirements into a parent and replacing itself with a simple "mapper" function.
+
+### Finalize
+
+**Finalize** is the final method called on a step, it gives the step a chance to
+do anything that it would generally only need to do once; for example a step
+that issues a GraphQL query might take this opportunity to build the GraphQL
+query string once. A step that converts a tuple into an object might build an
+optimized function to do so.
+
+## Further optimizations
+
+Grafast doesn't just help your schema to execute fewer and more efficient steps,
+it also optimizes how your data is output once it has been determined. This
+means that even without making a single change to your existing GraphQL schema
+(i.e. without adopting plans), running it though Grafast rather than graphql-js
+should result in a modest speedup, and an even better one if you need to output
+your result as a string (e.g. over a network socket/HTTP).
+
+## Convinced?
+
+If you're not convinced, please do reach out via the [Graphile Discord][] with
+your queries, we'd love to make improvements to both this page, and Grafast
+itself!
+
+If you are convinced, why not continue on with the navigation button below...
+
+[graphql-js]: https://github.com/graphql/graphql-js
+[dataloader]: https://github.com/graphql/dataloader
+[graphile discord]: https://discord.gg/graphile
+[@dataplan/pg]: ./step-library/dataplan-pg
+[lifecycle]: http://localhost:3000/grafast/step-classes#lifecycle-methods

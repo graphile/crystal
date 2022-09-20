@@ -1,5 +1,6 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
+import { list } from "./list.js";
 
 /**
  * Calls the given lambda function for each tuple
@@ -44,9 +45,28 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
  * callback. Note: if you need to pass more than one value, pass a `ListStep`
  * as the `$plan` argument.
  */
-export function lambda<TIn, TOut>(
+function lambda<TIn extends [...any[]], TOut>(
+  plans: { [Index in keyof TIn]: ExecutableStep<TIn[Index]> },
+  fn: (value: TIn) => TOut,
+): LambdaStep<TIn, TOut>;
+function lambda<TIn, TOut>(
   $plan: ExecutableStep<TIn> | null | undefined,
   fn: (value: TIn) => TOut,
-): LambdaStep<TIn, TOut> {
-  return new LambdaStep<TIn, TOut>($plan, fn);
+): LambdaStep<TIn, TOut>;
+function lambda(
+  planOrPlans: ExecutableStep | ExecutableStep[] | null | undefined,
+  fn: (value: any) => any,
+): LambdaStep<any, any> {
+  if (fn.length > 1) {
+    throw new Error(
+      "lambda callback should accept one argument, perhaps you forgot to destructure the arguments?",
+    );
+  }
+  if (Array.isArray(planOrPlans)) {
+    return new LambdaStep<any, any>(list(planOrPlans), fn);
+  } else {
+    return new LambdaStep<any, any>(planOrPlans, fn);
+  }
 }
+
+export { lambda };

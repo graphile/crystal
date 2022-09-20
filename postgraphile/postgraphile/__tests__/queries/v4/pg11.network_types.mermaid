@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -231,19 +232,19 @@ graph TD
     PgSelectSingle194 --> PgClassExpression202
 
     subgraph "Buckets for queries/v4/pg11.network_types"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf17,Access22,Access23,Object24,Connection25,PgPageInfo26,PgSelect27,First28,PgSelectSingle29,PgCursor30,PgClassExpression31,List32,Last34,PgSelectSingle35,PgCursor36,PgClassExpression37,List38,Constant39,Constant40,PgSelect41,First42,PgSelectSingle43,PgClassExpression44,__InputStaticLeaf67,Connection74,PgPageInfo75,PgSelect76,First77,PgSelectSingle78,PgCursor79,PgClassExpression80,List81,Last83,PgSelectSingle84,PgCursor85,PgClassExpression86,List87,Constant88,Constant89,PgSelect90,First91,PgSelectSingle92,PgClassExpression93,__InputStaticLeaf117,Connection123,PgPageInfo124,PgSelect125,First126,PgSelectSingle127,PgCursor128,PgClassExpression129,List130,Last132,PgSelectSingle133,PgCursor134,PgClassExpression135,List136,Constant137,Constant138,PgSelect139,First140,PgSelectSingle141,PgClassExpression142,__InputStaticLeaf167,Connection172,PgPageInfo173,PgSelect174,First175,PgSelectSingle176,PgCursor177,PgClassExpression178,List179,Last181,PgSelectSingle182,PgCursor183,PgClassExpression184,List185,Constant186,Constant187,PgSelect188,First189,PgSelectSingle190,PgClassExpression191 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />ROOT __Item{1}ᐸ27ᐳ[46]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ27ᐳ[46]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item46,PgSelectSingle47,PgCursor48,PgClassExpression49,List50,PgClassExpression52,PgClassExpression53,PgClassExpression54,PgClassExpression55 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ76ᐳ[95]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ76ᐳ[95]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item95,PgSelectSingle96,PgCursor97,PgClassExpression98,List99,PgClassExpression101,PgClassExpression102,PgClassExpression103,PgClassExpression104 bucket2
-    Bucket3("Bucket 3<br />(listItem)<br />ROOT __Item{3}ᐸ125ᐳ[144]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ125ᐳ[144]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item144,PgSelectSingle145,PgCursor146,PgClassExpression147,List148,PgClassExpression150,PgClassExpression151,PgClassExpression152,PgClassExpression153 bucket3
-    Bucket4("Bucket 4<br />(listItem)<br />ROOT __Item{4}ᐸ174ᐳ[193]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ174ᐳ[193]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item193,PgSelectSingle194,PgCursor195,PgClassExpression196,List197,PgClassExpression199,PgClassExpression200,PgClassExpression201,PgClassExpression202 bucket4
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4

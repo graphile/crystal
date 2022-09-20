@@ -14,6 +14,7 @@ jobs:
       LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
       TERM: xterm
       FORCE_COLOR: 1
+      NODE_OPTIONS: "--max-old-space-size=4096"
 
     strategy:
       fail-fast: false

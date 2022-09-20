@@ -117,15 +117,16 @@ export interface CrystalPlans {
  * Takes a GraphQL schema definition in Interface Definition Language (IDL/SDL)
  * syntax and configs for the types in it and returns a GraphQL schema.
  */
-export function makeCrystalSchema(details: {
+export function makeGrafastSchema(details: {
   typeDefs: string;
   plans: CrystalPlans;
+  enableDeferStream: boolean;
 }): GraphQLSchema {
-  const { typeDefs, plans } = details;
+  const { typeDefs, plans, enableDeferStream = true } = details;
 
   const schema = buildASTSchema(parse(typeDefs), {
     // TODO: enable?
-    enableDeferStream: true,
+    enableDeferStream,
   });
 
   // Now add the plans/etc to the schema

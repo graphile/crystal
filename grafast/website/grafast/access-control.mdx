@@ -1,0 +1,16 @@
+# Access control
+
+Access control is typically the responsibility of your business logic layer, as
+it would be with GraphQL resolvers. The role of a [plan resolver][] is to gather
+all the required details for your business logic to be able to make the
+decisions on whether the user is allowed to access the data they're requesting,
+and if so then what data to return.
+
+A common approach is to authenticate the user in your HTTP layer (for example
+with a session, cookie, auth token, or JWT) and then share the details of the
+authentication with schema via the GraphQL context. Plan resolvers can then use
+the standard [context()][context] step to extract the relevant information and
+pass it through to the business logic.
+
+[plan resolvers]: ./plan-resolvers
+[context]: ./step-library/standard-steps#context

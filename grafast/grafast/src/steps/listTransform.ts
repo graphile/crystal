@@ -13,7 +13,7 @@ import type {
   ExecutionExtra,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { $$deepDepSkip, ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
@@ -48,6 +48,9 @@ export interface ListTransformOptions<
   listItem?(itemPlan: ExecutableStep<any>): TItemStep;
   finalizeCallback?(data: TMemo): TMemo;
   meta?: string;
+  optimize?: (
+    this: __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep>,
+  ) => ExecutableStep;
 }
 
 /**
@@ -86,7 +89,10 @@ export class __ListTransformStep<
   /** Set during query planning.  */
   public itemStepId!: number;
 
-  private subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
+  /**
+   * @internal
+   */
+  public subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
 
   constructor(
     options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,
@@ -100,6 +106,7 @@ export class __ListTransformStep<
       finalizeCallback,
       listItem,
       meta,
+      optimize,
     } = options;
     this.listPlanDepId = this.addDependency(listPlan);
     this.itemPlanCallback = itemPlanCallback;
@@ -108,6 +115,9 @@ export class __ListTransformStep<
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
     this.meta = meta ?? null;
+    if (optimize) {
+      this.optimize = optimize;
+    }
 
     // Plan this subroutine
     this.subroutineLayer = new LayerPlan(
@@ -157,6 +167,10 @@ export class __ListTransformStep<
     return this.getDep(this.listPlanDepId) as TListStep;
   }
 
+  [$$deepDepSkip]() {
+    return this.getListStep();
+  }
+
   dangerouslyGetListPlan(): TListStep {
     return this.opPlan.dangerouslyGetStep(
       this.dependencies[this.listPlanDepId],
@@ -176,8 +190,9 @@ export class __ListTransformStep<
     );
   }
 
-  // ListTransform plans must _NOT_ optimize away. They must persist.
-  optimize() {
+  // ListTransform plans must _NOT_ optimize away. They must persist (unless
+  // the options overrides this)
+  optimize(): ExecutableStep {
     return this;
   }
 

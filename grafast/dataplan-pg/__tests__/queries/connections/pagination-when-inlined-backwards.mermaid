@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -90,13 +91,13 @@ graph TD
     PgSelectSingle85 --> PgClassExpression86
 
     subgraph "Buckets for queries/connections/pagination-when-inlined-backwards"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,__InputStaticLeaf25,Connection38,PgPageInfo67,Constant68 bucket0
-    Bucket1("Bucket 1<br />(listItem)<br />Deps: 38, 67, 68<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />Deps: 38, 67, 68<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,Lambda70,First72,PgSelectSingle73,PgCursor74,PgClassExpression75,List76,Last78,PgSelectSingle79,PgCursor80,PgClassExpression81,List82,First84,PgSelectSingle85,PgClassExpression86,Access89,Access90,Lambda91 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ91ᐳ[40]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ91ᐳ[40]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item40,PgSelectSingle41,PgClassExpression42,First48,PgSelectSingle49,PgClassExpression50,PgClassExpression51,PgCursor54,PgClassExpression55,List56,Map87,List88 bucket2
     Bucket0 --> Bucket1

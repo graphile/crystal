@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -18,9 +19,7 @@ graph TD
     PgSelectSingle13["PgSelectSingle[13∈1]<br />ᐸrandom_user_array_setᐳ"]:::plan
     PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__random_u..._set_idx__ᐳ"]:::plan
     __Item15>"__Item[15∈2]<br />ᐸ11ᐳ"]:::itemplan
-    __ListTransform16[["__ListTransform[16∈2]<br />ᐸeach:15ᐳ"]]:::plan
-    __Item17>"__Item[17∈3]<br />ᐸ15ᐳ"]:::itemplan
-    __Item18>"__Item[18∈4]<br />ᐸ16ᐳ"]:::itemplan
+    __Item18>"__Item[18∈4]<br />ᐸ15ᐳ"]:::itemplan
     PgSelectSingle19["PgSelectSingle[19∈4]<br />ᐸrandom_user_array_setᐳ"]:::plan
     PgClassExpression20["PgClassExpression[20∈4]<br />ᐸ__random_u...”username”ᐳ"]:::plan
     PgClassExpression21["PgClassExpression[21∈4]<br />ᐸ__random_u...vatar_url”ᐳ"]:::plan
@@ -35,29 +34,24 @@ graph TD
     __Item12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression14
     __ListTransform11 ==> __Item15
-    __Item15 --> __ListTransform16
-    __Item15 -.-> __Item17
-    __ListTransform16 ==> __Item18
+    __Item15 ==> __Item18
     __Item18 --> PgSelectSingle19
     PgSelectSingle19 --> PgClassExpression20
     PgSelectSingle19 --> PgClassExpression21
 
     subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,__ListTransform11 bucket0
-    Bucket1("Bucket 1<br />(subroutine)<br />ROOT PgClassExpression{1}ᐸ__random_u..._set_idx__ᐳ[14]"):::bucket
+    Bucket1("Bucket 1 (subroutine)<br />ROOT PgClassExpression{1}ᐸ__random_u..._set_idx__ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13,PgClassExpression14 bucket1
-    Bucket2("Bucket 2<br />(listItem)<br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item15,__ListTransform16 bucket2
-    Bucket3("Bucket 3<br />(subroutine)<br />ROOT __Item{3}ᐸ15ᐳ[17]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item17 bucket3
-    Bucket4("Bucket 4<br />(listItem)<br />ROOT __Item{4}ᐸ16ᐳ[18]"):::bucket
+    class Bucket2,__Item15 bucket2
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ15ᐳ[18]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item18,PgSelectSingle19,PgClassExpression20,PgClassExpression21 bucket4
     Bucket0 --> Bucket1 & Bucket2
-    Bucket2 --> Bucket3 & Bucket4
+    Bucket2 --> Bucket4
     end

@@ -26,6 +26,11 @@ import type { PolymorphicStep } from "../step.js";
 import { ExecutableStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
+type ResolveInfoBase = Omit<
+  GraphQLResolveInfo,
+  "path" | "rootValue" | "variableValues"
+>;
+
 function dcr(
   data: unknown, // but not a promise
   context: unknown,
@@ -54,16 +59,21 @@ export class GraphQLResolverStep extends ExecutableStep {
   private planDep: number;
   private argsDep: number;
   private contextDep: number;
+  private variableValuesDep: number;
+  private rootValueDep: number;
   constructor(
     private resolver: GraphQLFieldResolver<any, any> & { displayName?: string },
     $plan: ExecutableStep,
     $args: ObjectStep,
+    private resolveInfoBase: ResolveInfoBase,
     private returnContextAndResolveInfo = false,
   ) {
     super();
     this.planDep = this.addDependency($plan);
     this.argsDep = this.addDependency($args);
     this.contextDep = this.addDependency(context());
+    this.variableValuesDep = this.addDependency(this.opPlan.variableValuesStep);
+    this.rootValueDep = this.addDependency(this.opPlan.rootValueStep);
   }
 
   toStringMeta() {
@@ -79,7 +89,14 @@ export class GraphQLResolverStep extends ExecutableStep {
       try {
         const args = values[this.argsDep][i];
         const context = values[this.contextDep][i];
-        const resolveInfo = makeResolveInfo();
+        const resolveInfo: GraphQLResolveInfo = Object.assign(
+          Object.create(this.resolveInfoBase),
+          {
+            // TODO: add support for path
+            variableValues: values[this.variableValuesDep][i],
+            rootValue: values[this.rootValueDep][i],
+          },
+        );
         const data = this.resolver(source, args, context, resolveInfo);
         if (this.returnContextAndResolveInfo) {
           if (isPromiseLike(data)) {
@@ -95,19 +112,6 @@ export class GraphQLResolverStep extends ExecutableStep {
       }
     });
   }
-}
-
-export function makeResolveInfo(): GraphQLResolveInfo {
-  // TODO: at least fake _some_ of ResolveInfo!
-  return new Proxy(Object.create(null), {
-    get(target, p) {
-      throw new Error(
-        `GraphileInternalError<0d3f1e5e-617b-41ea-95c2-e86370e9a2d4>: Grafast doesn't currently implement the '${String(
-          p,
-        )}' field on GraphQLResolveInfo, sorry!`,
-      );
-    },
-  });
 }
 
 /** @internal */
@@ -296,15 +300,17 @@ export function graphqlResolver(
   resolver: GraphQLFieldResolver<any, any>,
   $plan: ExecutableStep,
   $args: ObjectStep,
-  fieldType: GraphQLOutputType,
+  resolveInfoBase: ResolveInfoBase,
 ): ExecutableStep {
-  const namedType = getNamedType(fieldType);
+  const { returnType } = resolveInfoBase;
+  const namedType = getNamedType(returnType);
   const isAbstract = isAbstractType(namedType);
-  const nullableType = getNullableType(fieldType);
+  const nullableType = getNullableType(returnType);
   const $resolverResult = new GraphQLResolverStep(
     resolver,
     $plan,
     $args,
+    resolveInfoBase,
     isAbstract,
   );
   if (isAbstract) {

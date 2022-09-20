@@ -1,7 +1,7 @@
 // import type { GraphQLScalarType } from "graphql";
 
 import type { LayerPlan } from "./engine/LayerPlan";
-import type { MetaByStepId } from "./engine/OperationPlan";
+import type { MetaByMetaKey } from "./engine/OperationPlan";
 import type { ExecutionEventEmitter } from "./interfaces.js";
 
 /**
@@ -21,7 +21,7 @@ export interface RequestContext {
 
   readonly eventEmitter: ExecutionEventEmitter | undefined;
 
-  metaByStepId: MetaByStepId;
+  metaByMetaKey: MetaByMetaKey;
 
   /**
    * If we're running inside GraphQL then we should not serialize scalars,

@@ -20,6 +20,22 @@ import type {
   StepOptions,
 } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
+import { __ListTransformStep } from "./steps/index.js";
+
+/**
+ * @internal
+ */
+export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
+
+type DeepDepSkippable<T> = ExecutableStep<T> & {
+  [$$deepDepSkip](): ExecutableStep;
+};
+
+function isDeepDepSkippable<T>(
+  $dep: ExecutableStep,
+): $dep is DeepDepSkippable<T> {
+  return $$deepDepSkip in $dep && typeof $dep[$$deepDepSkip] === "function";
+}
 
 function reallyAssertFinalized(plan: BaseStep): void {
   if (!plan.isFinalized) {
@@ -239,10 +255,20 @@ export class ExecutableStep<TData = any> extends BaseStep {
   /** @internal */
   public polymorphicPaths: ReadonlySet<string>;
 
+  /**
+   * Override the metaKey to be able to share execution meta between multiple
+   * steps of the same class (or even a family of step classes).
+   */
+  public metaKey: number | string | symbol;
+
   constructor() {
     super();
     this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
+    // @ts-ignore
+    if (this.metaKey === undefined) {
+      this.metaKey = this.id;
+    }
   }
 
   protected getStep(id: number): ExecutableStep {
@@ -251,6 +277,23 @@ export class ExecutableStep<TData = any> extends BaseStep {
 
   protected getDep(depId: number): ExecutableStep {
     return this.getStep(this.dependencies[depId]);
+  }
+
+  /**
+   * Like getDep, except it skips over __ItemStep and similar steps to get to
+   * where the parent really is.
+   *
+   * @experimental
+   */
+  protected getDepDeep(depId: number): ExecutableStep {
+    let $dep = this.getDep(depId);
+    // Walk up the tree, looking for the source of this record. We know that
+    // __ItemStep and __ListTransformStep are safe to walk through, but other
+    // classes may not be.
+    while (isDeepDepSkippable($dep)) {
+      $dep = $dep[$$deepDepSkip]();
+    }
+    return $dep;
   }
 
   public toString(): string {
@@ -273,15 +316,14 @@ export class ExecutableStep<TData = any> extends BaseStep {
         "You cannot add a dependency after the step is finalized.",
       );
     }
+    if (!(step instanceof ExecutableStep)) {
+      throw new Error(
+        `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
+          step,
+        )}'`,
+      );
+    }
     if (isDev) {
-      if (!(step instanceof ExecutableStep)) {
-        throw new Error(
-          `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
-            step,
-          )}'`,
-        );
-      }
-
       // Check that we can actually add this as a dependency
       if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
         throw new Error(

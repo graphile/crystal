@@ -1,9 +1,10 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
@@ -56,13 +57,13 @@ graph TD
     PgSelectSingle42 --> PgClassExpression44
 
     subgraph "Buckets for mutations/v4/inheritence.createUserFile"
-    Bucket0("Bucket 0<br />(root)"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf11,Access13,Access14,Object15,Constant17,__InputStaticLeaf27,__InputStaticLeaf28 bucket0
-    Bucket1("Bucket 1<br />(mutationField)<br />Deps: 15, 10, 11, 17<br /><br />1: PgInsert{1}[12]<br />2: Object{1}ᐸ{result}ᐳ[16],PgClassExpression{1}ᐸ__user__.”id”ᐳ[18],PgClassExpression{1}ᐸ__user__.”id”ᐳ[18],PgClassExpression{1}ᐸ__user__.”name”ᐳ[22]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 17<br /><br />1: PgInsert{1}[12]<br />2: Object{1}ᐸ{result}ᐳ[16],PgClassExpression{1}ᐸ__user__.”id”ᐳ[18],PgClassExpression{1}ᐸ__user__.”id”ᐳ[18],PgClassExpression{1}ᐸ__user__.”name”ᐳ[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert12,Object16,PgClassExpression18,List19,Lambda20,PgClassExpression22 bucket1
-    Bucket2("Bucket 2<br />(mutationField)<br />Deps: 15, 27, 28<br /><br />1: PgInsert{2}[29]<br />2: Object{2}ᐸ{result}ᐳ[33],PgClassExpression{2}ᐸ__user_file__.”id”ᐳ[34],PgClassExpression{2}ᐸ__user_fil...”filename”ᐳ[35],PgClassExpression{2}ᐸ__user_file__.”user_id”ᐳ[36]"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 15, 27, 28<br /><br />1: PgInsert{2}[29]<br />2: Object{2}ᐸ{result}ᐳ[33],PgClassExpression{2}ᐸ__user_file__.”id”ᐳ[34],PgClassExpression{2}ᐸ__user_fil...”filename”ᐳ[35],PgClassExpression{2}ᐸ__user_file__.”user_id”ᐳ[36]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgInsert29,Object33,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgSelect37,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44 bucket2
     Bucket0 --> Bucket1 & Bucket2
