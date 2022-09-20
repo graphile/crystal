@@ -1,18 +1,5 @@
 # connection
 
-```ts
-export function connection<
-  TItemStep extends ExecutableStep<any>,
-  TCursorStep extends ExecutableStep<any>,
-  TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
->(
-  $collection: TStep,
-  itemPlan?: ($item: TItemStep) => TNodeStep,
-  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>,
-): ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>;
-```
-
 Wraps a collection fetch to provide the utilities for working with GraphQL
 cursor connections. It only requires one argument which is a step that
 represents a collection of records; this step should support the connection
@@ -48,3 +35,16 @@ methods, specifically:
 ```
 
 TODO: the documentation for this is terrible. Sorry.
+
+```ts
+export function connection<
+  TItemStep extends ExecutableStep<any>,
+  TCursorStep extends ExecutableStep<any>,
+  TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
+  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+>(
+  $collection: TStep,
+  itemPlan?: ($item: TItemStep) => TNodeStep,
+  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>,
+): ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>;
+```
