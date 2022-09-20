@@ -7,7 +7,7 @@ import styles from "./styles.module.css";
 const FeatureList = [
   {
     title: "General purpose",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    Svg: require("@site/static/img/generalpurpose.svg").default,
     description: (
       <>
         <Grafast /> can implement any shape of GraphQL schema and is designed to
@@ -17,7 +17,7 @@ const FeatureList = [
   },
   {
     title: "Holistic approach",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    Svg: require("@site/static/img/holistic.svg").default,
     description: (
       <>
         Fine-tune your plans to only fetch the data you need from your business
@@ -28,7 +28,7 @@ const FeatureList = [
   },
   {
     title: "Everything is batched",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    Svg: require("@site/static/img/batched.svg").default,
     description: (
       <>
         By writing plans instead of resolvers you ensure every substep your
@@ -38,7 +38,7 @@ const FeatureList = [
   },
   {
     title: "Spec compliant",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    Svg: require("@site/static/img/speccompliant.svg").default,
     description: (
       <>
         <Grafast /> is carefully designed to ensure it remains fully compliant
@@ -49,7 +49,7 @@ const FeatureList = [
   },
   {
     title: "Ludicrous speed",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    Svg: require("@site/static/img/ludicrousspeed.svg").default,
     description: (
       <>
         <Grafast /> was designed to maximize performance throughout the entire
@@ -60,7 +60,7 @@ const FeatureList = [
   },
   {
     title: "Compatible with GraphQL.js",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    Svg: require("@site/static/img/graphqljscompatability.svg").default,
     description: (
       <>
         Regular{" "}
