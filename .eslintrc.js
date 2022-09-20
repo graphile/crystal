@@ -94,10 +94,6 @@ module.exports = {
     "no-duplicate-imports": "off",
     "import/no-duplicates": "off",
     "@typescript-eslint/no-duplicate-imports": ["error"],
-
-    // Stuff I don't care about
-    "react/react-in-jsx-scope": "off",
-    "react/prop-types": "off",
   },
   overrides: [
     // Rules for plugins
@@ -183,6 +179,10 @@ module.exports = {
             enableDangerousAutofixThisMayCauseInfiniteLoops: true,
           },
         ],
+
+        // Stuff I don't care about
+        "react/react-in-jsx-scope": "off",
+        "react/prop-types": "off",
       },
     },
 
