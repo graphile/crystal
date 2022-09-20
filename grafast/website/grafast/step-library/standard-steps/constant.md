@@ -5,7 +5,7 @@ returned by this step will be the given constant value.
 
 Usage:
 
-```
+```ts
 const $one = constant(1);
-const $str = constant`My string here`
+const $str = constant`My string here`;
 ```
