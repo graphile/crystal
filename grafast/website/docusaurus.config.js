@@ -110,7 +110,7 @@ const config = {
         title: "Home",
         logo: {
           alt: "Grafast Logo",
-          src: "img/logo.svg",
+          src: "img/green-graphile-logo.png",
         },
         items: [
           {
