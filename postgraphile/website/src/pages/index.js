@@ -28,7 +28,7 @@ function HomepageHeader() {
 }
 
 export default function Home() {
-  const { siteConfig } = useDocusaurusContext();
+  //const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
       title={`PostGraphile`}

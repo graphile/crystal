@@ -9,8 +9,8 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
     description: (
       <>
-        Don't repeat yourself, have Graphile Build do the repetative tasks for
-        you.
+        Don&apos;t repeat yourself, have Graphile Build do the repetative tasks
+        for you.
       </>
     ),
   },
@@ -29,7 +29,7 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
     description: (
       <>
-        Graphile Build is not rigid, it's plugin based system allows you to
+        Graphile Build is not rigid, it&apos;s plugin based system allows you to
         override every facet of the generated API.
       </>
     ),

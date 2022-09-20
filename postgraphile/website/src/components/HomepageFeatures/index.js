@@ -9,8 +9,8 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
     description: (
       <>
-        `npx postgraphile -c postgres://...` and you're running ─ try it out
-        without investing large amounts of time!
+        `npx postgraphile -c postgres://...` and you&apos;re running ─ try it
+        out without investing large amounts of time!
       </>
     ),
   },
@@ -19,8 +19,8 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
     description: (
       <>
-        Don't just take our defaults, spend a few minutes honing your API so
-        it's the shape that you'll want it to be for years to come.
+        Don&apos;t just take our defaults, spend a few minutes honing your API
+        so it&apos;s the shape that you&apos;ll want it to be for years to come.
       </>
     ),
   },
@@ -29,8 +29,9 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
     description: (
       <>
-        Whether you're building the backend API for your SaaS, build internal
-        tooling for your business, or anything else, PostGraphile has your back.
+        Whether you&apos;re building the backend API for your SaaS, build
+        internal tooling for your business, or anything else, PostGraphile has
+        your back.
       </>
     ),
   },
