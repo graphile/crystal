@@ -383,6 +383,7 @@ export default function makeExtendSchemaPlugin(
               const directives = getDirectives(definition.directives);
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
+                directives,
                 ...scopeFromDirectives(directives),
               };
               build.registerObjectType(
@@ -416,6 +417,7 @@ export default function makeExtendSchemaPlugin(
               const directives = getDirectives(definition.directives);
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
+                directives,
                 ...scopeFromDirectives(directives),
               };
               build.registerInputObjectType(
@@ -440,6 +442,7 @@ export default function makeExtendSchemaPlugin(
               const directives = getDirectives(definition.directives);
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
+                directives,
                 ...scopeFromDirectives(directives),
               };
               const resolveType = resolvers[name]?.__resolveType as any;
@@ -472,6 +475,7 @@ export default function makeExtendSchemaPlugin(
               const directives = getDirectives(definition.directives);
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
+                directives,
                 ...scopeFromDirectives(directives),
               };
               const resolveType = resolvers[name]?.__resolveType as any;
@@ -504,6 +508,7 @@ export default function makeExtendSchemaPlugin(
               const directives = getDirectives(definition.directives);
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
+                directives,
                 ...scopeFromDirectives(directives),
               };
               build.registerScalarType(
@@ -879,14 +884,10 @@ export default function makeExtendSchemaPlugin(
     },
     build: GraphileBuild.Build,
   ) {
-    const scopeByType = build.scopeByType || new Map();
     if (!build.graphql.isNamedType(SelfGeneric)) {
       throw new Error("getFields only supports named types");
     }
     const Self: GraphQLNamedType = SelfGeneric as any;
-    const {
-      graphql: { isScalarType, getNamedType },
-    } = build;
     if (fields && fields.length) {
       return fields.reduce((memo, field) => {
         if (field.kind === "FieldDefinition") {
@@ -894,11 +895,9 @@ export default function makeExtendSchemaPlugin(
           const fieldName = getName(field.name);
           const args = getArguments(field.arguments, build);
           const type = getType(field.type, build);
-          const nullableType = build.graphql.getNullableType(type);
-          const namedType = build.graphql.getNamedType(type);
-          const typeScope = scopeByType.get(namedType) || {};
           const directives = getDirectives(field.directives);
           const scope: any = {
+            /*
             ...(typeScope.pgIntrospection &&
             typeScope.pgIntrospection.kind === "class"
               ? {
@@ -911,8 +910,9 @@ export default function makeExtendSchemaPlugin(
                   pgFieldIntrospection: typeScope.pgIntrospection,
                 }
               : null),
+              */
             fieldDirectives: directives,
-            ...(directives.scope || {}),
+            ...scopeFromDirectives(directives),
           };
           const deprecatedDirective = directives.find(
             (d) => d.directiveName === "deprecated",
@@ -926,16 +926,6 @@ export default function makeExtendSchemaPlugin(
             typeof functionOrResolveObject === "function"
               ? { resolve: functionOrResolveObject }
               : functionOrResolveObject;
-          const isConnection = !!scope.isPgFieldConnection;
-          const isListType =
-            nullableType !== namedType &&
-            nullableType.constructor === build.graphql.GraphQLList;
-          const table: PgClass | null =
-            scope.pgFieldIntrospection &&
-            scope.pgFieldIntrospection.kind === "class"
-              ? scope.pgFieldIntrospection
-              : null;
-          const isScalar = isScalarType(getNamedType(type));
 
           /*
            * We accept a resolver function directly, or an object which can
@@ -976,7 +966,7 @@ export default function makeExtendSchemaPlugin(
             {
               [fieldName]: fieldWithHooks(fieldName, fieldSpecGenerator, scope),
             },
-            `Adding '${fieldName}' to '${Self.name}' from '${name}'`,
+            `Adding '${fieldName}' to '${Self.name}' from '${uniquePluginName}'`,
           );
         } else {
           throw new Error(
@@ -1027,7 +1017,6 @@ function scopeFromDirectives(
   directives: GraphileBuild.DirectiveDetails[],
 ): any {
   return {
-    directives,
     ...directives
       .filter((d) => d.directiveName === "scope")
       .map((d) => d.args)
