@@ -9,8 +9,8 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
     description: (
       <>
-        `npx postgraphile -c postgres://...` and you&apos;re running ─ try it
-        out without investing large amounts of time!
+        <code>npx postgraphile -c postgres://...</code> and you&apos;re running
+        ─ try it out without investing large amounts of time!
       </>
     ),
   },
