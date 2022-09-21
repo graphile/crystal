@@ -48,6 +48,11 @@ const config = {
           routeBasePath: "postgraphile",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          versions: {
+            '4.12.0': {
+              path: 'current',
+            },
+          },
         },
         blog: false,
         theme: {
