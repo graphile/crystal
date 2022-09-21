@@ -25,6 +25,7 @@ import type {
   GraphQLIsTypeOfFn,
   GraphQLNamedType,
   GraphQLObjectType,
+  GraphQLOutputType,
   GraphQLScalarType,
   // Union types:
   GraphQLType,
@@ -166,7 +167,7 @@ declare global {
   }
 }
 
-export default function makeExtendSchemaPlugin(
+export function makeExtendSchemaPlugin(
   generator:
     | ExtensionDefinition
     | ((
@@ -898,9 +899,7 @@ export default function makeExtendSchemaPlugin(
     plans: Plans,
     {
       fieldWithHooks,
-    }: {
-      fieldWithHooks: any;
-    },
+    }: GraphileBuild.ContextInterfaceFields | GraphileBuild.ContextObjectFields,
     build: GraphileBuild.Build,
   ) {
     if (!build.graphql.isNamedType(SelfGeneric)) {
@@ -916,6 +915,7 @@ export default function makeExtendSchemaPlugin(
           const type = getType(field.type, build);
           const directives = getDirectives(field.directives);
           const scope: any = {
+            fieldName,
             /*
             ...(typeScope.pgIntrospection &&
             typeScope.pgIntrospection.kind === "class"
@@ -966,7 +966,7 @@ export default function makeExtendSchemaPlugin(
           const fieldSpecGenerator = () => {
             const resolversSpec = rawResolversSpec;
             return {
-              type,
+              type: type as GraphQLOutputType,
               args,
               ...(deprecationReason
                 ? {
@@ -979,13 +979,15 @@ export default function makeExtendSchemaPlugin(
                   }
                 : null),
               ...resolversSpec,
-              ...(possiblePlan ? { plan: possiblePlan } : null),
+              ...(possiblePlan
+                ? { plan: possiblePlan as FieldPlanResolver<any, any, any> }
+                : null),
             };
           };
           return build.extend(
             memo,
             {
-              [fieldName]: fieldWithHooks(fieldName, fieldSpecGenerator, scope),
+              [fieldName]: fieldWithHooks(scope, fieldSpecGenerator),
             },
             `Adding '${fieldName}' to '${Self.name}' from '${uniquePluginName}'`,
           );
