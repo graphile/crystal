@@ -44,6 +44,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
+    "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
     "graphql": "*"
