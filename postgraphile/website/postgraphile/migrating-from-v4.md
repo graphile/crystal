@@ -256,6 +256,15 @@ keep in mind that we no longer have the lookahead system (so
 `addArgDataGenerator` and its ilk no longer exist), instead we use [Grafast plan
 resolvers][].
 
+## Plans, not resolvers
+
+The new system uses [Gra*fast*][grafast] which has a plan based system, so
+rather than writing traditional GraphQL resolvers for each field, you will write
+[Grafast plan resolvers][]. This lends a lot more power to the system, and is a
+lot more intuitive than our lookahead system once you've spent a little time
+learning it. It also completely removes the need for old awkward-to-use
+directives such as `@pgQuery` and `@requires`!
+
 ## Introspection
 
 `build.pgIntrospectionResultsByKind` is no more; instead we have a new library
