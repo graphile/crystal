@@ -6,7 +6,7 @@ import { resolvePresets } from "graphile-config";
 
 import { makeSchema, watchSchema } from "./schema.js";
 
-export { makeSchema } from "./schema.js";
+export { makePgSourcesFromConnectionString, makeSchema } from "./schema.js";
 
 export { GraphileBuild, GraphileConfig };
 
