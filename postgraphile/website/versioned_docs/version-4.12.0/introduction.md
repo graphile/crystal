@@ -1,8 +1,8 @@
 ---
-sidebar_position: 100
+layout: page
+path: /postgraphile/introduction/
+title: Introduction
 ---
-
-# PostGraphile Introduction
 
 <p class='intro'>
 PostGraphile (formerly PostGraphQL) builds a powerful, extensible and
