@@ -11791,6 +11791,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
+    grafast: "workspace:^"
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
     graphql: "*"

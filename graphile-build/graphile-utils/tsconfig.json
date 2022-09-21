@@ -7,5 +7,8 @@
     "moduleResolution": "nodenext"
   },
   "include": ["src"],
-  "references": [{ "path": "../../utils/graphile-config" }]
+  "references": [
+    { "path": "../../utils/graphile-config" },
+    { "path": "../../grafast/grafast" }
+  ]
 }
