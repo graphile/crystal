@@ -46,9 +46,12 @@ import type {
   ValueNode,
 } from "graphql";
 
-export interface ObjectFieldResolver<TSource = any, TContext = any> {
+export interface ObjectFieldConfig<TSource = any, TContext = any> {
   plan?: FieldPlanResolver<any, any, any>;
+  subscribePlan?: FieldPlanResolver<any, any, any>;
+  /** @deprecated Use 'plan' */
   resolve?: GraphQLFieldResolver<TSource, TContext>;
+  /** @deprecated Use 'subscribePlan' */
   subscribe?: GraphQLFieldResolver<TSource, TContext>;
   __resolveType?: GraphQLTypeResolver<TSource, TContext>;
   __isTypeOf?: GraphQLIsTypeOfFn<TSource, TContext>;
@@ -57,19 +60,20 @@ export interface ObjectFieldResolver<TSource = any, TContext = any> {
 export interface ObjectResolver<TSource = any, TContext = any> {
   [key: string]:
     | GraphQLFieldResolver<TSource, TContext>
-    | ObjectFieldResolver<TSource, TContext>;
+    | ObjectFieldConfig<TSource, TContext>;
 }
 
 export interface ObjectPlan<TSource = any, TContext = any> {
   [key: string]:
     | FieldPlanResolver<any, any, any>
-    | ObjectFieldResolver<TSource, TContext>;
+    | ObjectFieldConfig<TSource, TContext>;
 }
 
 export interface EnumResolver {
   [key: string]: string | number | Array<any> | Record<string, any> | symbol;
 }
 
+/** @deprecated Use Plans instead */
 export interface Resolvers<TSource = any, TContext = any> {
   [key: string]: ObjectResolver<TSource, TContext> | EnumResolver;
 }
@@ -80,6 +84,7 @@ export interface Plans<TSource = any, TContext = any> {
 
 export interface ExtensionDefinition {
   typeDefs: DocumentNode | DocumentNode[];
+  /** @deprecated Use 'plans' instead */
   resolvers?: Resolvers;
   plans?: Plans;
 }
@@ -304,7 +309,12 @@ export default function makeExtendSchemaPlugin(
         init(_, build, _context) {
           const {
             makeExtendSchemaPlugin: {
-              [uniquePluginName]: { typeExtensions, newTypes, resolvers },
+              [uniquePluginName]: {
+                typeExtensions,
+                newTypes,
+                resolvers,
+                plans,
+              },
             },
             graphql: {
               GraphQLEnumType,
@@ -324,7 +334,7 @@ export default function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
-              const relevantResolver = resolvers[name] || {};
+              const relevantResolver = plans[name] || resolvers[name] || {};
               const values: GraphQLEnumValueConfigMap = (
                 definition.values ?? []
               ).reduce(
@@ -397,6 +407,7 @@ export default function makeExtendSchemaPlugin(
                       fieldsContext.Self,
                       definition.fields,
                       resolvers,
+                      plans,
                       fieldsContext,
                       build,
                     ),
@@ -445,7 +456,9 @@ export default function makeExtendSchemaPlugin(
                 directives,
                 ...scopeFromDirectives(directives),
               };
-              const resolveType = resolvers[name]?.__resolveType as any;
+              const resolveType = resolvers[name]?.__resolveType as
+                | GraphQLTypeResolver<any, any>
+                | undefined;
               build.registerUnionType(
                 name,
                 scope,
@@ -478,7 +491,9 @@ export default function makeExtendSchemaPlugin(
                 directives,
                 ...scopeFromDirectives(directives),
               };
-              const resolveType = resolvers[name]?.__resolveType as any;
+              const resolveType = resolvers[name]?.__resolveType as
+                | GraphQLTypeResolver<any, any>
+                | undefined;
               build.registerInterfaceType(
                 name,
                 scope,
@@ -489,6 +504,7 @@ export default function makeExtendSchemaPlugin(
                     getFields(
                       fieldsContext.Self,
                       definition.fields,
+                      {}, // Interface doesn't need resolvers
                       {}, // Interface doesn't need resolvers
                       fieldsContext,
                       build,
@@ -602,6 +618,7 @@ export default function makeExtendSchemaPlugin(
                   Self,
                   extension.fields,
                   resolvers,
+                  plans,
                   context,
                   build,
                 );
@@ -681,6 +698,7 @@ export default function makeExtendSchemaPlugin(
                 const moreFields = getFields(
                   Self,
                   extension.fields,
+                  {}, // No resolvers for interfaces
                   {}, // No resolvers for interfaces
                   context,
                   build,
@@ -877,6 +895,7 @@ export default function makeExtendSchemaPlugin(
     SelfGeneric: TSource,
     fields: ReadonlyArray<FieldDefinitionNode> | undefined,
     resolvers: Resolvers,
+    plans: Plans,
     {
       fieldWithHooks,
     }: {
@@ -921,8 +940,8 @@ export default function makeExtendSchemaPlugin(
           const functionToResolveObject = <TContext>(
             functionOrResolveObject:
               | GraphQLFieldResolver<TSource, TContext>
-              | ObjectFieldResolver<TSource, TContext>,
-          ): ObjectFieldResolver<TSource, TContext> =>
+              | ObjectFieldConfig<TSource, TContext>,
+          ): ObjectFieldConfig<TSource, TContext> =>
             typeof functionOrResolveObject === "function"
               ? { resolve: functionOrResolveObject }
               : functionOrResolveObject;
@@ -931,6 +950,7 @@ export default function makeExtendSchemaPlugin(
            * We accept a resolver function directly, or an object which can
            * define 'resolve', 'subscribe' and other relevant methods.
            */
+          const possiblePlan = plans[Self.name]?.[fieldName];
           const possibleResolver = resolvers[Self.name]
             ? resolvers[Self.name][fieldName]
             : null;
@@ -959,6 +979,7 @@ export default function makeExtendSchemaPlugin(
                   }
                 : null),
               ...resolversSpec,
+              ...(possiblePlan ? { plan: possiblePlan } : null),
             };
           };
           return build.extend(
