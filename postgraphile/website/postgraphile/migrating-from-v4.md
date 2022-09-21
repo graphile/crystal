@@ -280,6 +280,16 @@ schema and then export it as executable code to a file using
 for database introspection, plugins, etc - and you instantly get your schema
 without the complexities of building it dynamically.
 
+## Smart tags
+
+Smart tags are still a thing, and they mostly behave the same, except we've
+replaced the `@omit` and `@simpleCollections` smart tags and a few others with a
+[behavior system](./behavior). This system gives much finer grained control over
+which things should/should not be exposed in the schema, and how. If you use the
+V4 preset then we'll automatically convert the old smart tags into their
+behavior equivalents, so you shouldn't need to worry too much about this right
+now.
+
 [grafast]: https://grafast.org
 [ruru]: https://grafast.org/ruru
 [grafast plan resolvers]: https://grafast.org/grafast/plan-resolvers
