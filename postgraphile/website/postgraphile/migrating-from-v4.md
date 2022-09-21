@@ -276,9 +276,9 @@ them independent of what your PostgreSQL schema actually is!
 
 There is no introspection cache any more; instead you can build the GraphQL
 schema and then export it as executable code to a file using
-[graphile-export][]. In production you simply run this code - there's no need
-for database introspection, plugins, etc - and you instantly get your schema
-without the complexities of building it dynamically.
+[graphile-export][exporting schema]. In production you simply run this code -
+there's no need for database introspection, plugins, etc - and you instantly get
+your schema without the complexities of building it dynamically.
 
 ## Smart tags
 
@@ -295,3 +295,4 @@ now.
 [grafast plan resolvers]: https://grafast.org/grafast/plan-resolvers
 [grafserv]: https://grafast.org/grafserv
 [pg-introspection]: https://npmjs.com/package/pg-introspection
+[exporting schema]: ./exporting-schema
