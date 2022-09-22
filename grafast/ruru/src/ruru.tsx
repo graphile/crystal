@@ -1,3 +1,5 @@
+import "graphiql/graphiql.css";
+
 import {
   DOC_EXPLORER_PLUGIN,
   GraphiQLProvider,
@@ -9,7 +11,7 @@ import {
   useMergeQuery,
   usePluginContext,
 } from "@graphiql/react";
-import { GraphiQLInterface, GraphiQL } from "graphiql";
+import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
@@ -17,20 +19,20 @@ import { ErrorPopup } from "./components/ErrorPopup.js";
 import { Explain } from "./components/Explain.js";
 import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
 import { RuruFooter } from "./components/Footer.js";
-import { ExplainHelpers, useExplain } from "./hooks/useExplain.js";
-import { ExplainResults, useFetcher } from "./hooks/useFetcher.js";
+import { defaultQuery } from "./defaultQuery.js";
+import type { ExplainHelpers } from "./hooks/useExplain.js";
+import { useExplain } from "./hooks/useExplain.js";
+import type { ExplainResults } from "./hooks/useFetcher.js";
+import { useFetcher } from "./hooks/useFetcher.js";
 import { usePrettify } from "./hooks/usePrettify.js";
-import { useQuery } from "./hooks/useQuery.js";
 import { useSchema } from "./hooks/useSchema.js";
-import { RuruStorage, useStorage } from "./hooks/useStorage.js";
+import type { RuruStorage } from "./hooks/useStorage.js";
+import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
-import "graphiql/graphiql.css";
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
 const nocheck = <span style={checkCss}></span>;
-
-function noop() {}
 
 export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
@@ -48,7 +50,11 @@ export const Ruru: FC<RuruProps> = (props) => {
   const explainHelpers = useExplain(storage);
   const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   return (
-    <GraphiQLProvider fetcher={fetcher} schema={schema}>
+    <GraphiQLProvider
+      fetcher={fetcher}
+      schema={schema}
+      defaultQuery={defaultQuery}
+    >
       <RuruInner
         storage={storage}
         editorTheme={props.editorTheme}
