@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
+import { createContext, useCallback, useState } from "react";
 
+import type { ExplainResults } from "./useFetcher.js";
 import type { RuruStorage } from "./useStorage.js";
 
 export interface ExplainHelpers {
@@ -10,6 +11,25 @@ export interface ExplainHelpers {
   setExplainAtBottom: (atBottom: boolean) => void;
   setShowExplain: (newShow: boolean) => void;
 }
+
+export const ExplainContext = createContext<{
+  explainHelpers: ExplainHelpers;
+  explain: boolean;
+  setExplain: (newExplain: boolean) => void;
+  explainResults: ExplainResults | null;
+}>({
+  explainHelpers: {
+    showExplain: false,
+    explainSize: 0,
+    explainAtBottom: true,
+    setExplainSize: () => {},
+    setExplainAtBottom: () => {},
+    setShowExplain: () => {},
+  },
+  explain: false,
+  setExplain: () => {},
+  explainResults: null,
+});
 
 export const useExplain = (storage: RuruStorage): ExplainHelpers => {
   const [showExplain, _setShowExplain] = useState(

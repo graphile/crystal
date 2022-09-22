@@ -5,7 +5,6 @@ import {
   DOC_EXPLORER_PLUGIN,
   GraphiQLProvider,
   HISTORY_PLUGIN,
-  Menu,
   MergeIcon,
   PrettifyIcon,
   SettingsIcon,
@@ -17,6 +16,8 @@ import {
 } from "@graphiql/react";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
+import { useContext } from "react";
+import { useMemo } from "react";
 import { useCallback, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
@@ -25,6 +26,7 @@ import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
 import { RuruFooter } from "./components/Footer.js";
 import { defaultQuery } from "./defaultQuery.js";
 import type { ExplainHelpers } from "./hooks/useExplain.js";
+import { ExplainContext } from "./hooks/useExplain.js";
 import { useExplain } from "./hooks/useExplain.js";
 import type { ExplainResults } from "./hooks/useFetcher.js";
 import { useFetcher } from "./hooks/useFetcher.js";
@@ -33,6 +35,7 @@ import { useSchema } from "./hooks/useSchema.js";
 import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
+import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
@@ -53,46 +56,44 @@ export const Ruru: FC<RuruProps> = (props) => {
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
   const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
+  const plugins = useMemo(() => {
+    return [EXPLAIN_PLUGIN];
+  }, []);
   return (
-    <GraphiQLProvider
-      fetcher={fetcher}
-      schema={schema}
-      defaultQuery={defaultQuery}
+    <ExplainContext.Provider
+      value={{
+        explainHelpers,
+        explain,
+        setExplain,
+        explainResults,
+      }}
     >
-      <RuruInner
-        storage={storage}
-        editorTheme={props.editorTheme}
-        explainHelpers={explainHelpers}
-        explain={explain}
-        setExplain={setExplain}
-        explainResults={explainResults}
-        error={error}
-        setError={setError}
-      />
-    </GraphiQLProvider>
+      <GraphiQLProvider
+        fetcher={fetcher}
+        schema={schema}
+        defaultQuery={defaultQuery}
+        plugins={plugins}
+      >
+        <RuruInner
+          storage={storage}
+          editorTheme={props.editorTheme}
+          error={error}
+          setError={setError}
+        />
+      </GraphiQLProvider>
+    </ExplainContext.Provider>
   );
 };
 
 export const RuruInner: FC<{
-  explainHelpers: ExplainHelpers;
   editorTheme?: string;
   storage: RuruStorage;
-  explain: boolean;
-  setExplain: (newExplain: boolean) => void;
-  explainResults: ExplainResults | null;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
 }> = (props) => {
-  const {
-    explainHelpers,
-    storage,
-    editorTheme,
-    explain,
-    setExplain,
-    explainResults,
-    error,
-    setError,
-  } = props;
+  const { storage, editorTheme, error, setError } = props;
+  const { explainHelpers, explain, setExplain, explainResults } =
+    useContext(ExplainContext);
   const { showExplain, explainSize, explainAtBottom, setShowExplain } =
     explainHelpers;
   const pluginContext = usePluginContext();
