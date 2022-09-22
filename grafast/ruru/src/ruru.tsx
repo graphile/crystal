@@ -13,11 +13,9 @@ import {
 } from "@graphiql/react";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
-import { Explain } from "./components/Explain.js";
-import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
 import { RuruFooter } from "./components/Footer.js";
 import { defaultQuery } from "./defaultQuery.js";
 import { ExplainContext, useExplain } from "./hooks/useExplain.js";
@@ -84,9 +82,6 @@ export const RuruInner: FC<{
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
 }> = (props) => {
   const { storage, editorTheme, error, setError } = props;
-  const { explainHelpers, explain, setExplain, explainResults } =
-    useContext(ExplainContext);
-  const { showExplain, explainSize, explainAtBottom } = explainHelpers;
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
@@ -99,7 +94,7 @@ export const RuruInner: FC<{
         width: "100%",
         height: "100%",
         display: "flex",
-        flexDirection: explainAtBottom ? "column" : "row",
+        flexDirection: "column",
         overflow: "hidden",
       }}
     >
@@ -180,26 +175,6 @@ export const RuruInner: FC<{
           </GraphiQL.Footer>
         </GraphiQLInterface>
       </div>
-      {showExplain ? <ExplainDragBar helpers={explainHelpers} /> : null}
-      {showExplain ? (
-        <div
-          style={{
-            flex: `0 0 ${explainSize - DRAG_WIDTH}px`,
-            position: "relative",
-            minWidth: 300,
-            ...(explainAtBottom
-              ? { maxWidth: "none", maxHeight: "calc(100vh - 8rem)" }
-              : { maxWidth: "calc(100vw - 500px)", maxHeight: "none" }),
-          }}
-        >
-          <Explain
-            explain={explain}
-            setExplain={setExplain}
-            helpers={explainHelpers}
-            results={explainResults}
-          />
-        </div>
-      ) : null}
       {error ? (
         <ErrorPopup error={error} onClose={() => setError(null)} />
       ) : null}
