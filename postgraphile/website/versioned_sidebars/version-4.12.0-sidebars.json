@@ -1,11 +1,15 @@
 {
   "docs": [
+    {
+      "type": "html",
+      "value": "<h4>OVERVIEW</h4>",
+      "defaultStyle": false
+    },
     "index",
-    "introduction",
     "examples",
     {
       "type": "category",
-      "label": "overview",
+      "label": "Usage",
       "items": [
         "usage",
         "usage-cli",
@@ -16,12 +20,17 @@
     "performance",
     "requirements",
     "required-knowledge",
+    {
+      "type": "html",
+      "value": "<h4>OPERATION</h4>",
+      "defaultStyle": false
+    },
     "quick-start-guide",
     "namespaces",
     "inflection",
     {
       "type": "category",
-      "label": "basics",
+      "label": "Tables",
       "items": [
         "tables",
         "relations",
@@ -33,7 +42,7 @@
     },
     {
       "type": "category",
-      "label": "basics",
+      "label": "Functions",
       "items": [
         "functions",
         "computed-columns",
@@ -50,7 +59,7 @@
     "security",
     {
       "type": "category",
-      "label": "basics",
+      "label": "Realtime",
       "items": [
         "realtime",
         "subscriptions",
@@ -61,8 +70,13 @@
     "reserved-keywords",
     "debugging",
     {
+      "type": "html",
+      "value": "<h4>CUSTOMISING</h4>",
+      "defaultStyle": false
+    },
+    {
       "type": "category",
-      "label": "customising",
+      "label": "Smart Tags",
       "items": [
         "smart-tags",
         "smart-tags-file",
@@ -71,7 +85,7 @@
     },
     {
       "type": "category",
-      "label": "customising",
+      "label": "Schema Plugins",
       "items": [
         "extending",
         "make-add-inflectors-plugin",
@@ -89,6 +103,11 @@
       ]
     },
     "plugins",
+    {
+      "type": "html",
+      "value": "<h4>GUIDES</h4>",
+      "defaultStyle": false
+    },
     "postgresql-schema-design",
     "evaluating",
     "best-practices",
@@ -104,13 +123,28 @@
     "multiple-schemas",
     "running-postgraphile-in-docker",
     "running-postgraphile-as-a-library-in-docker",
+    {
+      "type": "html",
+      "value": "<h4>DEPLOYING</h4>",
+      "defaultStyle": false
+    },
     "deploying-heroku",
     "deploying-docker",
     "deploying-lambda",
     "deploying-gcp",
+    {
+      "type": "html",
+      "value": "<h4>COMMUNITY</h4>",
+      "defaultStyle": false
+    },
     "community-contributions",
     "community-chat",
     "code-of-conduct",
+    {
+      "type": "html",
+      "value": "<h4>FAQ</h4>",
+      "defaultStyle": false
+    },
     "introspection",
     "why-nullable",
     "versioning-policy"
