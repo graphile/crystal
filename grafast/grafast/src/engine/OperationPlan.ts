@@ -2289,7 +2289,13 @@ export class OperationPlan {
         0,
         "dependents-first",
         loops === 0
-          ? (step) => this.optimizeStep(step)
+          ? (step) => {
+              const newStep = this.optimizeStep(step);
+              if (newStep !== step) {
+                replacedPlan = true;
+              }
+              return newStep;
+            }
           : (step) => {
               if (step.allowMultipleOptimizations) {
                 const replacement = this.optimizeStep(step);
