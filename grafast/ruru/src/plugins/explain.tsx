@@ -7,8 +7,9 @@ import { Explain } from "../components/Explain.js";
 import { ExplainContext } from "../hooks/useExplain.js";
 
 const ExplainPanel: FC = () => {
-  const { explainHelpers, explain, setExplain, explainResults } =
+  const { explainHelpers, explain, explainResults, setExplain } =
     useContext(ExplainContext);
+
   return (
     <div>
       <div className="graphiql-doc-explorer-header">

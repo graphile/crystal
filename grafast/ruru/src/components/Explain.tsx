@@ -1,5 +1,6 @@
 import type { FC } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import type { ExplainHelpers } from "../hooks/useExplain.js";
 import type { ExplainResults } from "../hooks/useFetcher.js";
@@ -49,6 +50,23 @@ export const ExplainMain: FC<{
     setSelectedIndex(0);
   }, [results]);
   const selectedResult = results.operations[selectedIndex];
+
+  const [expanded, setExpanded] = useState(false);
+  const expand = useCallback(() => {
+    setExpanded(true);
+  }, []);
+  const nodeRef = useRef<HTMLDivElement>();
+  if (!nodeRef.current) {
+    nodeRef.current = document.createElement("div");
+  }
+  const node = nodeRef.current;
+  useEffect(() => {
+    document.body.appendChild(node);
+    return () => {
+      document.body.removeChild(node);
+    };
+  }, [node]);
+
   const component = (() => {
     switch (selectedResult?.type) {
       case "sql": {
@@ -81,7 +99,81 @@ export const ExplainMain: FC<{
             <Copy text={selectedResult.diagram}>
               Copy Mermaid.js Definition
             </Copy>
-            <Mermaid diagram={selectedResult.diagram} />
+            <div onClick={expand}>
+              <Mermaid diagram={selectedResult.diagram} />
+            </div>
+            {expanded
+              ? createPortal(
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "1rem",
+                      left: "1rem",
+                      bottom: "1rem",
+                      right: "1rem",
+                      borderRadius: "1rem",
+                      backgroundColor: "white",
+                      border: "1px solid black",
+                      boxShadow: "rgba(0,0,0,0.8) 3px 3px 15px",
+                      overflow: "hidden",
+                      padding: "1rem",
+                      zIndex: 6,
+                      fontFamily: '"Roboto", sans-serif',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: "2rem",
+                        textAlign: "center",
+                        fontSize: "1.5rem",
+                      }}
+                    >
+                      Operation Plan
+                    </div>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                      }}
+                    >
+                      <button
+                        style={{
+                          fontSize: "2rem",
+                          padding: 0,
+                          margin: 0,
+                          background: "transparent",
+                          border: "none",
+                          outline: "none",
+                          width: "2rem",
+                          height: "2rem",
+                        }}
+                        onClick={() => setExpanded(false)}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                    <div
+                      style={{
+                        overflow: "auto",
+                        position: "absolute",
+                        top: "2rem",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                      }}
+                    >
+                      <Mermaid diagram={selectedResult.diagram} />
+                    </div>
+                  </div>,
+
+                  node,
+                )
+              : null}
           </>
         );
       }
