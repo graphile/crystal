@@ -35,8 +35,6 @@ graph TD
     PgSelectSingle35["PgSelectSingle[35∈3]<br />ᐸpostsᐳ<br />ᐳPost"]:::plan
     PgClassExpression36["PgClassExpression[36∈3]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳPost"]:::plan
     Map71["Map[71∈3]<br />ᐸ35:{”0”:1}ᐳ<br />ᐳPost"]:::plan
-    List72["List[72∈3]<br />ᐸ71ᐳ<br />ᐳPost"]:::plan
-    First42["First[42∈3]<br />ᐳPost"]:::plan
     PgSelectSingle43["PgSelectSingle[43∈3]<br />ᐸpeopleᐳ<br />ᐳPost"]:::plan
     PgClassExpression44["PgClassExpression[44∈3]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"]:::plan
     PgClassExpression45["PgClassExpression[45∈3]<br />ᐸ__posts__.”body”ᐳ<br />ᐳPost"]:::plan
@@ -45,13 +43,9 @@ graph TD
     PgSelectSingle51["PgSelectSingle[51∈3]<br />ᐸcommentsᐳ<br />ᐳComment"]:::plan
     PgClassExpression52["PgClassExpression[52∈3]<br />ᐸ__comments...omment_id”ᐳ<br />ᐳComment"]:::plan
     Map75["Map[75∈3]<br />ᐸ51:{”0”:4}ᐳ<br />ᐳComment"]:::plan
-    List76["List[76∈3]<br />ᐸ75ᐳ<br />ᐳComment"]:::plan
-    First58["First[58∈3]<br />ᐳComment"]:::plan
     PgSelectSingle59["PgSelectSingle[59∈3]<br />ᐸpeopleᐳ<br />ᐳComment"]:::plan
     PgClassExpression60["PgClassExpression[60∈3]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"]:::plan
     Map73["Map[73∈3]<br />ᐸ51:{”0”:1,”1”:2}ᐳ<br />ᐳComment"]:::plan
-    List74["List[74∈3]<br />ᐸ73ᐳ<br />ᐳComment"]:::plan
-    First66["First[66∈3]<br />ᐳComment"]:::plan
     PgSelectSingle67["PgSelectSingle[67∈3]<br />ᐸpostsᐳ<br />ᐳComment"]:::plan
     PgClassExpression68["PgClassExpression[68∈3]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳComment"]:::plan
     PgClassExpression69["PgClassExpression[69∈3]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"]:::plan
@@ -82,9 +76,7 @@ graph TD
     First34 --> PgSelectSingle35
     PgSelectSingle35 --> PgClassExpression36
     PgSelectSingle35 --> Map71
-    Map71 --> List72
-    List72 --> First42
-    First42 --> PgSelectSingle43
+    Map71 --> PgSelectSingle43
     PgSelectSingle43 --> PgClassExpression44
     PgSelectSingle35 --> PgClassExpression45
     Object11 & PgClassExpression19 --> PgSelect46
@@ -92,14 +84,10 @@ graph TD
     First50 --> PgSelectSingle51
     PgSelectSingle51 --> PgClassExpression52
     PgSelectSingle51 --> Map75
-    Map75 --> List76
-    List76 --> First58
-    First58 --> PgSelectSingle59
+    Map75 --> PgSelectSingle59
     PgSelectSingle59 --> PgClassExpression60
     PgSelectSingle51 --> Map73
-    Map73 --> List74
-    List74 --> First66
-    First66 --> PgSelectSingle67
+    Map73 --> PgSelectSingle67
     PgSelectSingle67 --> PgClassExpression68
     PgSelectSingle67 --> PgClassExpression69
     PgSelectSingle51 --> PgClassExpression70
@@ -116,7 +104,7 @@ graph TD
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,List20,PgPolymorphic21 bucket2
     Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,First42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,First58,PgSelectSingle59,PgClassExpression60,First66,PgSelectSingle67,PgClassExpression68,PgClassExpression69,PgClassExpression70,Map71,List72,Map73,List74,Map75,List76 bucket3
+    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgClassExpression60,PgSelectSingle67,PgClassExpression68,PgClassExpression69,PgClassExpression70,Map71,Map73,Map75 bucket3
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3
     end

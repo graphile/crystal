@@ -23,8 +23,6 @@ graph TD
     PgClassExpression42["PgClassExpression[42∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression44["PgClassExpression[44∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
     Map98["Map[98∈1]<br />ᐸ37:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"]:::plan
-    List99["List[99∈1]<br />ᐸ98ᐳ"]:::plan
-    First50["First[50∈1]"]:::plan
     PgSelectSingle51["PgSelectSingle[51∈1]<br />ᐸleftArmᐳ"]:::plan
     Constant52["Constant[52∈0]"]:::plan
     PgClassExpression53["PgClassExpression[53∈1]<br />ᐸ__left_arm__.”id”ᐳ"]:::plan
@@ -32,24 +30,18 @@ graph TD
     Lambda55["Lambda[55∈1]<br />ᐸencodeᐳ"]:::plan
     PgClassExpression57["PgClassExpression[57∈1]<br />ᐸ__left_arm...person_id”ᐳ"]:::plan
     Map94["Map[94∈1]<br />ᐸ51:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
-    List95["List[95∈1]<br />ᐸ94ᐳ"]:::plan
-    First63["First[63∈1]"]:::plan
     PgSelectSingle64["PgSelectSingle[64∈1]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression65["PgClassExpression[65∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression66["PgClassExpression[66∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression68["PgClassExpression[68∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
     PgClassExpression69["PgClassExpression[69∈1]<br />ᐸ__left_arm...in_metres”ᐳ"]:::plan
     Map100["Map[100∈1]<br />ᐸ37:{”0”:8,”1”:9,”2”:10,”3”:11,”4”:12}ᐳ"]:::plan
-    List101["List[101∈1]<br />ᐸ100ᐳ"]:::plan
-    First75["First[75∈1]"]:::plan
     PgSelectSingle76["PgSelectSingle[76∈1]<br />ᐸpersonSecretᐳ"]:::plan
     Constant77["Constant[77∈0]"]:::plan
     PgClassExpression78["PgClassExpression[78∈1]<br />ᐸ__person_s...person_id”ᐳ"]:::plan
     List79["List[79∈1]<br />ᐸ77,78ᐳ"]:::plan
     Lambda80["Lambda[80∈1]<br />ᐸencodeᐳ"]:::plan
     Map96["Map[96∈1]<br />ᐸ76:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
-    List97["List[97∈1]<br />ᐸ96ᐳ"]:::plan
-    First87["First[87∈1]"]:::plan
     PgSelectSingle88["PgSelectSingle[88∈1]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression89["PgClassExpression[89∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression90["PgClassExpression[90∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
@@ -69,32 +61,24 @@ graph TD
     PgSelectSingle37 --> PgClassExpression42
     PgSelectSingle37 --> PgClassExpression44
     PgSelectSingle37 --> Map98
-    Map98 --> List99
-    List99 --> First50
-    First50 --> PgSelectSingle51
+    Map98 --> PgSelectSingle51
     PgSelectSingle51 --> PgClassExpression53
     Constant52 & PgClassExpression53 --> List54
     List54 --> Lambda55
     PgSelectSingle51 --> PgClassExpression57
     PgSelectSingle51 --> Map94
-    Map94 --> List95
-    List95 --> First63
-    First63 --> PgSelectSingle64
+    Map94 --> PgSelectSingle64
     PgSelectSingle64 --> PgClassExpression65
     PgSelectSingle64 --> PgClassExpression66
     PgSelectSingle64 --> PgClassExpression68
     PgSelectSingle51 --> PgClassExpression69
     PgSelectSingle37 --> Map100
-    Map100 --> List101
-    List101 --> First75
-    First75 --> PgSelectSingle76
+    Map100 --> PgSelectSingle76
     PgSelectSingle76 --> PgClassExpression78
     Constant77 & PgClassExpression78 --> List79
     List79 --> Lambda80
     PgSelectSingle76 --> Map96
-    Map96 --> List97
-    List97 --> First87
-    First87 --> PgSelectSingle88
+    Map96 --> PgSelectSingle88
     PgSelectSingle88 --> PgClassExpression89
     PgSelectSingle88 --> PgClassExpression90
     PgSelectSingle88 --> PgClassExpression92
@@ -106,6 +90,6 @@ graph TD
     class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,PgSelect35,Constant52,Constant77 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 52, 77<br /><br />ROOT __Item{1}ᐸ35ᐳ[36]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item36,PgSelectSingle37,PgCursor38,PgClassExpression39,List40,PgClassExpression42,PgClassExpression44,First50,PgSelectSingle51,PgClassExpression53,List54,Lambda55,PgClassExpression57,First63,PgSelectSingle64,PgClassExpression65,PgClassExpression66,PgClassExpression68,PgClassExpression69,First75,PgSelectSingle76,PgClassExpression78,List79,Lambda80,First87,PgSelectSingle88,PgClassExpression89,PgClassExpression90,PgClassExpression92,PgClassExpression93,Map94,List95,Map96,List97,Map98,List99,Map100,List101 bucket1
+    class Bucket1,__Item36,PgSelectSingle37,PgCursor38,PgClassExpression39,List40,PgClassExpression42,PgClassExpression44,PgSelectSingle51,PgClassExpression53,List54,Lambda55,PgClassExpression57,PgSelectSingle64,PgClassExpression65,PgClassExpression66,PgClassExpression68,PgClassExpression69,PgSelectSingle76,PgClassExpression78,List79,Lambda80,PgSelectSingle88,PgClassExpression89,PgClassExpression90,PgClassExpression92,PgClassExpression93,Map94,Map96,Map98,Map100 bucket1
     Bucket0 --> Bucket1
     end

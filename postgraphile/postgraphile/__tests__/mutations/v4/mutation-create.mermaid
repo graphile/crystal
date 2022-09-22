@@ -207,8 +207,6 @@ graph TD
     First330["First[330∈1]"]:::plan
     PgSelectSingle331["PgSelectSingle[331∈1]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"]:::plan
     Map1279["Map[1279∈1]<br />ᐸ331:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7}ᐳ"]:::plan
-    List1280["List[1280∈1]<br />ᐸ1279ᐳ"]:::plan
-    First337["First[337∈1]"]:::plan
     PgSelectSingle338["PgSelectSingle[338∈1]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
     PgClassExpression339["PgClassExpression[339∈1]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
     PgClassExpression340["PgClassExpression[340∈1]<br />ᐸ__frmcdc_c...pe_1__.”b”ᐳ"]:::plan
@@ -218,8 +216,6 @@ graph TD
     PgClassExpression344["PgClassExpression[344∈1]<br />ᐸ__frmcdc_c...pe_1__.”f”ᐳ"]:::plan
     PgClassExpression345["PgClassExpression[345∈1]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
     Map1283["Map[1283∈1]<br />ᐸ331:{”0”:9,”1”:10,”2”:11,”3”:12,”4”:13,”5”:14,”6”:15,”7”:16}ᐳ"]:::plan
-    List1284["List[1284∈1]<br />ᐸ1283ᐳ"]:::plan
-    First351["First[351∈1]"]:::plan
     PgSelectSingle352["PgSelectSingle[352∈1]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
     PgClassExpression353["PgClassExpression[353∈1]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
     PgClassExpression354["PgClassExpression[354∈1]<br />ᐸ__frmcdc_c...pe_1__.”b”ᐳ"]:::plan
@@ -680,8 +676,6 @@ graph TD
     PgClassExpression1261["PgClassExpression[1261∈19]<br />ᐸ__frmcdc_c...”schedule”ᐳ"]:::plan
     PgClassExpression1262["PgClassExpression[1262∈19]<br />ᐸ__frmcdc_c...optimised”ᐳ"]:::plan
     Map1281["Map[1281∈17]<br />ᐸ1250:{”0”:0}ᐳ"]:::plan
-    List1282["List[1282∈17]<br />ᐸ1281ᐳ"]:::plan
-    First1268["First[1268∈17]"]:::plan
     PgSelectSingle1269["PgSelectSingle[1269∈17]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression1270["PgClassExpression[1270∈17]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression1278["PgClassExpression[1278∈17]<br />ᐸ__person__.”created_at”ᐳ"]:::plan
@@ -790,9 +784,7 @@ graph TD
     PgSelect326 --> First330
     First330 --> PgSelectSingle331
     PgSelectSingle331 --> Map1279
-    Map1279 --> List1280
-    List1280 --> First337
-    First337 --> PgSelectSingle338
+    Map1279 --> PgSelectSingle338
     PgSelectSingle338 --> PgClassExpression339
     PgSelectSingle338 --> PgClassExpression340
     PgSelectSingle338 --> PgClassExpression341
@@ -801,9 +793,7 @@ graph TD
     PgSelectSingle338 --> PgClassExpression344
     PgSelectSingle338 --> PgClassExpression345
     PgSelectSingle331 --> Map1283
-    Map1283 --> List1284
-    List1284 --> First351
-    First351 --> PgSelectSingle352
+    Map1283 --> PgSelectSingle352
     PgSelectSingle352 --> PgClassExpression353
     PgSelectSingle352 --> PgClassExpression354
     PgSelectSingle352 --> PgClassExpression355
@@ -1168,9 +1158,7 @@ graph TD
     PgSelectSingle1260 --> PgClassExpression1261
     PgSelectSingle1260 --> PgClassExpression1262
     PgSelectSingle1250 --> Map1281
-    Map1281 --> List1282
-    List1282 --> First1268
-    First1268 --> PgSelectSingle1269
+    Map1281 --> PgSelectSingle1269
     PgSelectSingle1269 --> PgClassExpression1270
     PgSelectSingle1230 --> PgClassExpression1278
 
@@ -1180,7 +1168,7 @@ graph TD
     class Bucket0,__Value1,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf11,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,__InputStaticLeaf20,__InputStaticLeaf22,__InputStaticLeaf23,__InputStaticLeaf25,__InputStaticLeaf26,__InputStaticLeaf27,__InputStaticLeaf28,__InputStaticLeaf29,__InputStaticLeaf30,__InputStaticLeaf31,__InputStaticLeaf32,__InputStaticLeaf33,__InputStaticLeaf35,__InputStaticLeaf36,__InputStaticLeaf46,__InputStaticLeaf47,__InputStaticLeaf49,__InputStaticLeaf50,__InputStaticLeaf53,__InputStaticLeaf54,__InputStaticLeaf56,__InputStaticLeaf57,__InputStaticLeaf60,__InputStaticLeaf61,__InputStaticLeaf63,__InputStaticLeaf64,__InputStaticLeaf65,__InputStaticLeaf66,__InputStaticLeaf67,__InputStaticLeaf68,__InputStaticLeaf69,__InputStaticLeaf71,__InputStaticLeaf72,__InputStaticLeaf73,__InputStaticLeaf74,__InputStaticLeaf75,__InputStaticLeaf76,__InputStaticLeaf79,__InputStaticLeaf80,__InputStaticLeaf81,__InputStaticLeaf82,__InputStaticLeaf83,__InputStaticLeaf84,__InputStaticLeaf86,__InputStaticLeaf87,__InputStaticLeaf88,__InputStaticLeaf89,__InputStaticLeaf90,__InputStaticLeaf91,__InputStaticLeaf99,__InputStaticLeaf101,__InputStaticLeaf102,__InputStaticLeaf103,__InputStaticLeaf104,__InputStaticLeaf105,__InputStaticLeaf106,__InputStaticLeaf114,__InputStaticLeaf117,__InputStaticLeaf118,__InputStaticLeaf119,__InputStaticLeaf120,__InputStaticLeaf121,__InputStaticLeaf122,__InputStaticLeaf130,__InputStaticLeaf132,__InputStaticLeaf133,__InputStaticLeaf134,__InputStaticLeaf135,__InputStaticLeaf136,__InputStaticLeaf137,__InputStaticLeaf145,__InputStaticLeaf146,__InputStaticLeaf195,__InputStaticLeaf196,__InputStaticLeaf201,__InputStaticLeaf202,__InputStaticLeaf212,__InputStaticLeaf213,__InputStaticLeaf214,__InputStaticLeaf217,__InputStaticLeaf218,__InputStaticLeaf219,Access222,Access223,Object224,List226,List227,Object228,Object229,Object230,Object231,Object232,Object233,Object234,Object235,Object236,Object237,Object238,Object239,List240,Object241,Object242,Object243,Object244,Object245,List246,List247,Constant248,Constant249,Constant374,Lambda375,__InputStaticLeaf379,__InputStaticLeaf380,__InputStaticLeaf383,__InputStaticLeaf384,Access387,__TrackedObject388,__InputStaticLeaf389,__InputStaticLeaf390,__InputStaticLeaf391,Constant398,Constant399,__InputStaticLeaf411,Constant436,Constant456,Constant476,Constant496,Constant516,Constant536,Constant556,Constant578,Constant583,Lambda584,__InputStaticLeaf586,__InputStaticLeaf588,__InputStaticLeaf589,__InputStaticLeaf592,__InputStaticLeaf593,__InputStaticLeaf596,__InputStaticLeaf597,__InputStaticLeaf598,__InputStaticLeaf599,Constant606,__InputStaticLeaf618,Constant643,Constant663,Constant683,Constant703,Constant723,Constant743,Constant763,Constant785,Constant790,Lambda791,__InputStaticLeaf793,__InputStaticLeaf795,__InputStaticLeaf796,__InputStaticLeaf797,Constant803,Constant818,Constant830,Constant842,Constant854,Constant859,Lambda860,__InputStaticLeaf864,Constant873,Lambda874,Constant887,Lambda888,__InputStaticLeaf892,__InputStaticLeaf893,__InputStaticLeaf896,__InputStaticLeaf897,__InputDynamicScalar900,__InputStaticLeaf901,__InputStaticLeaf902,__InputStaticLeaf903,Constant910,Constant911,__InputStaticLeaf923,Constant948,Constant968,Constant988,Constant1008,Constant1028,Constant1048,Constant1068,Constant1090,Constant1095,Lambda1096,__InputStaticLeaf1100,__InputStaticLeaf1101,__InputStaticLeaf1104,__InputStaticLeaf1105,__InputStaticLeaf1118,__InputStaticLeaf1131,__InputStaticLeaf1132,__InputStaticLeaf1144,__InputStaticLeaf1151,__InputStaticLeaf1152,__InputStaticLeaf1154,__InputStaticLeaf1155,__InputStaticLeaf1157,__InputStaticLeaf1158,Object1167,Object1168,Object1169,List1170,__InputStaticLeaf1186,__InputStaticLeaf1188,__InputStaticLeaf1193,__InputStaticLeaf1194,__InputStaticLeaf1196,__InputStaticLeaf1197,__InputStaticLeaf1199,__InputStaticLeaf1200,Object1209,Object1210,Object1211,List1212 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 224, 10, 11, 12, 13, 14, 15, 16, 17, 226, 22, 23, 227, 35, 36, 230, 233, 236, 65, 66, 67, 68, 69, 237, 240, 99, 241, 242, 245, 201, 202, 246, 247, 249, 248, 5, 375<br /><br />1: PgInsert{1}[221]<br />2: Object{1}ᐸ{result}ᐳ[225],PgClassExpression{1}ᐸ__types__.”id”ᐳ[250],PgClassExpression{1}ᐸ__types__.”id”ᐳ[250],PgClassExpression{1}ᐸ__types__.”smallint”ᐳ[254],PgClassExpression{1}ᐸ__types__.”bigint”ᐳ[255],PgClassExpression{1}ᐸ__types__.”numeric”ᐳ[256],PgClassExpression{1}ᐸ__types__.”decimal”ᐳ[257],PgClassExpression{1}ᐸ__types__.”boolean”ᐳ[258],PgClassExpression{1}ᐸ__types__.”varchar”ᐳ[259],PgClassExpression{1}ᐸ__types__.”enum”ᐳ[260],PgClassExpression{1}ᐸ__types__.”enum_array”ᐳ[261],PgClassExpression{1}ᐸ__types__.”domain”ᐳ[263],PgClassExpression{1}ᐸ__types__.”domain2”ᐳ[264],PgClassExpression{1}ᐸ__types__.”text_array”ᐳ[265],PgClassExpression{1}ᐸ__types__.”json”ᐳ[267],PgClassExpression{1}ᐸ__types__.”jsonb”ᐳ[268],PgClassExpression{1}ᐸ__types__.”numrange”ᐳ[269],PgClassExpression{1}ᐸ__types__.”daterange”ᐳ[276],PgClassExpression{1}ᐸ__types__....int_range”ᐳ[283],PgClassExpression{1}ᐸ__types__.”timestamp”ᐳ[290],PgClassExpression{1}ᐸ__types__.”timestamptz”ᐳ[291],PgClassExpression{1}ᐸ__types__.”date”ᐳ[292],PgClassExpression{1}ᐸ__types__.”time”ᐳ[293],PgClassExpression{1}ᐸ__types__.”timetz”ᐳ[294],PgClassExpression{1}ᐸ__types__.”interval”ᐳ[295],PgClassExpression{1}ᐸ__types__....val_array”ᐳ[302],PgClassExpression{1}ᐸ__types__.”money”ᐳ[310],PgClassExpression{1}ᐸ__types__....ound_type”ᐳ[311],PgClassExpression{1}ᐸ__types__....ound_type”ᐳ[325],PgClassExpression{1}ᐸ__types__.”point”ᐳ[361],PgClassExpression{1}ᐸ__types__....ablePoint”ᐳ[364],PgClassExpression{1}ᐸ__types__.”inet”ᐳ[367],PgClassExpression{1}ᐸ__types__.”cidr”ᐳ[368],PgClassExpression{1}ᐸ__types__.”macaddr”ᐳ[369],PgClassExpression{1}ᐸ__types__....ay_domain”ᐳ[370],PgClassExpression{1}ᐸ__types__....ay_domain”ᐳ[372]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert221,Object225,PgClassExpression250,List251,Lambda252,PgClassExpression254,PgClassExpression255,PgClassExpression256,PgClassExpression257,PgClassExpression258,PgClassExpression259,PgClassExpression260,PgClassExpression261,PgClassExpression263,PgClassExpression264,PgClassExpression265,PgClassExpression267,PgClassExpression268,PgClassExpression269,Access270,Access271,Access272,Access273,Access274,Access275,PgClassExpression276,Access277,Access278,Access279,Access280,Access281,Access282,PgClassExpression283,Access284,Access285,Access286,Access287,Access288,Access289,PgClassExpression290,PgClassExpression291,PgClassExpression292,PgClassExpression293,PgClassExpression294,PgClassExpression295,Access296,Access297,Access298,Access299,Access300,Access301,PgClassExpression302,PgClassExpression310,PgClassExpression311,PgSelect312,First316,PgSelectSingle317,PgClassExpression318,PgClassExpression319,PgClassExpression320,PgClassExpression321,PgClassExpression322,PgClassExpression323,PgClassExpression324,PgClassExpression325,PgSelect326,First330,PgSelectSingle331,First337,PgSelectSingle338,PgClassExpression339,PgClassExpression340,PgClassExpression341,PgClassExpression342,PgClassExpression343,PgClassExpression344,PgClassExpression345,First351,PgSelectSingle352,PgClassExpression353,PgClassExpression354,PgClassExpression355,PgClassExpression356,PgClassExpression357,PgClassExpression358,PgClassExpression359,PgClassExpression360,PgClassExpression361,Access362,Access363,PgClassExpression364,Access365,Access366,PgClassExpression367,PgClassExpression368,PgClassExpression369,PgClassExpression370,PgClassExpression372,Map1279,List1280,Map1283,List1284 bucket1
+    class Bucket1,PgInsert221,Object225,PgClassExpression250,List251,Lambda252,PgClassExpression254,PgClassExpression255,PgClassExpression256,PgClassExpression257,PgClassExpression258,PgClassExpression259,PgClassExpression260,PgClassExpression261,PgClassExpression263,PgClassExpression264,PgClassExpression265,PgClassExpression267,PgClassExpression268,PgClassExpression269,Access270,Access271,Access272,Access273,Access274,Access275,PgClassExpression276,Access277,Access278,Access279,Access280,Access281,Access282,PgClassExpression283,Access284,Access285,Access286,Access287,Access288,Access289,PgClassExpression290,PgClassExpression291,PgClassExpression292,PgClassExpression293,PgClassExpression294,PgClassExpression295,Access296,Access297,Access298,Access299,Access300,Access301,PgClassExpression302,PgClassExpression310,PgClassExpression311,PgSelect312,First316,PgSelectSingle317,PgClassExpression318,PgClassExpression319,PgClassExpression320,PgClassExpression321,PgClassExpression322,PgClassExpression323,PgClassExpression324,PgClassExpression325,PgSelect326,First330,PgSelectSingle331,PgSelectSingle338,PgClassExpression339,PgClassExpression340,PgClassExpression341,PgClassExpression342,PgClassExpression343,PgClassExpression344,PgClassExpression345,PgSelectSingle352,PgClassExpression353,PgClassExpression354,PgClassExpression355,PgClassExpression356,PgClassExpression357,PgClassExpression358,PgClassExpression359,PgClassExpression360,PgClassExpression361,Access362,Access363,PgClassExpression364,Access365,Access366,PgClassExpression367,PgClassExpression368,PgClassExpression369,PgClassExpression370,PgClassExpression372,Map1279,Map1283 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ261ᐳ[262]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item262 bucket2
@@ -1228,7 +1216,7 @@ graph TD
     class Bucket16,__Item1178,PgSelectSingle1179,PgClassExpression1180,PgClassExpression1181 bucket16
     Bucket17("Bucket 17 (mutationField)<br />Deps: 224, 1186, 1188, 1212<br /><br />1: PgInsert{17}[1204]<br />2: Object{17}ᐸ{result}ᐳ[1208],PgClassExpression{17}ᐸ__post__.”id”ᐳ[1213],PgClassExpression{17}ᐸ__post__.”headline”ᐳ[1214],PgClassExpression{17}ᐸ__post__.”comptypes”ᐳ[1215],PgClassExpression{17}ᐸ__post__.”author_id”ᐳ[1224],PgClassExpression{17}ᐸ__post__.”author_id”ᐳ[1224],PgClassExpression{17}ᐸ__post__.”id”ᐳ[1213],PgClassExpression{17}ᐸ__post__.”author_id”ᐳ[1224]"):::bucket
     classDef bucket17 stroke:#696969
-    class Bucket17,PgInsert1204,Object1208,PgClassExpression1213,PgClassExpression1214,PgClassExpression1215,PgSelect1216,PgClassExpression1224,PgSelect1225,First1229,PgSelectSingle1230,PgClassExpression1231,PgClassExpression1239,PgSelect1244,First1249,PgSelectSingle1250,Edge1251,PgClassExpression1252,PgClassExpression1253,First1268,PgSelectSingle1269,PgClassExpression1270,PgClassExpression1278,Map1281,List1282,Access1285 bucket17
+    class Bucket17,PgInsert1204,Object1208,PgClassExpression1213,PgClassExpression1214,PgClassExpression1215,PgSelect1216,PgClassExpression1224,PgSelect1225,First1229,PgSelectSingle1230,PgClassExpression1231,PgClassExpression1239,PgSelect1244,First1249,PgSelectSingle1250,Edge1251,PgClassExpression1252,PgClassExpression1253,PgSelectSingle1269,PgClassExpression1270,PgClassExpression1278,Map1281,Access1285 bucket17
     Bucket18("Bucket 18 (listItem)<br />ROOT __Item{18}ᐸ1216ᐳ[1220]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,__Item1220,PgSelectSingle1221,PgClassExpression1222,PgClassExpression1223 bucket18

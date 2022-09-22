@@ -21,18 +21,12 @@ graph TD
     First12["First[12∈0]"]:::plan
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸforumsᐳ"]:::plan
     Map41["Map[41∈0]<br />ᐸ13:{”0”:0}ᐳ"]:::plan
-    List42["List[42∈0]<br />ᐸ41ᐳ"]:::plan
-    First20["First[20∈0]"]:::plan
     PgSelectSingle21["PgSelectSingle[21∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
     PgClassExpression22["PgClassExpression[22∈0]<br />ᐸ__forums_u..._count__.vᐳ"]:::plan
     Map45["Map[45∈0]<br />ᐸ13:{”0”:2}ᐳ"]:::plan
-    List46["List[46∈0]<br />ᐸ45ᐳ"]:::plan
-    First29["First[29∈0]"]:::plan
     PgSelectSingle30["PgSelectSingle[30∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
     PgClassExpression31["PgClassExpression[31∈0]<br />ᐸ__forums_u..._count__.vᐳ"]:::plan
     Map43["Map[43∈0]<br />ᐸ13:{”0”:1}ᐳ"]:::plan
-    List44["List[44∈0]<br />ᐸ43ᐳ"]:::plan
-    First38["First[38∈0]"]:::plan
     PgSelectSingle39["PgSelectSingle[39∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
     PgClassExpression40["PgClassExpression[40∈0]<br />ᐸ__forums_u..._count__.vᐳ"]:::plan
 
@@ -44,23 +38,17 @@ graph TD
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
     PgSelectSingle13 --> Map41
-    Map41 --> List42
-    List42 --> First20
-    First20 --> PgSelectSingle21
+    Map41 --> PgSelectSingle21
     PgSelectSingle21 --> PgClassExpression22
     PgSelectSingle13 --> Map45
-    Map45 --> List46
-    List46 --> First29
-    First29 --> PgSelectSingle30
+    Map45 --> PgSelectSingle30
     PgSelectSingle30 --> PgClassExpression31
     PgSelectSingle13 --> Map43
-    Map43 --> List44
-    List44 --> First38
-    First38 --> PgSelectSingle39
+    Map43 --> PgSelectSingle39
     PgSelectSingle39 --> PgClassExpression40
 
     subgraph "Buckets for queries/functions/computed-column-scalar"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf14,First20,PgSelectSingle21,PgClassExpression22,__InputStaticLeaf23,First29,PgSelectSingle30,PgClassExpression31,__InputStaticLeaf32,First38,PgSelectSingle39,PgClassExpression40,Map41,List42,Map43,List44,Map45,List46 bucket0
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf14,PgSelectSingle21,PgClassExpression22,__InputStaticLeaf23,PgSelectSingle30,PgClassExpression31,__InputStaticLeaf32,PgSelectSingle39,PgClassExpression40,Map41,Map43,Map45 bucket0
     end

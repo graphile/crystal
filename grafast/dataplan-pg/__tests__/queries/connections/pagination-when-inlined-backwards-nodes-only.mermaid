@@ -25,8 +25,6 @@ graph TD
     PgSelectSingle41["PgSelectSingle[41∈2]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression42["PgClassExpression[42∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     Map72["Map[72∈2]<br />ᐸ41:{”0”:1,”1”:2}ᐳ"]:::plan
-    List73["List[73∈2]<br />ᐸ72ᐳ"]:::plan
-    First48["First[48∈2]"]:::plan
     PgSelectSingle49["PgSelectSingle[49∈2]<br />ᐸusersᐳ"]:::plan
     PgClassExpression50["PgClassExpression[50∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression51["PgClassExpression[51∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
@@ -63,9 +61,7 @@ graph TD
     __Item40 --> PgSelectSingle41
     PgSelectSingle41 --> PgClassExpression42
     PgSelectSingle41 --> Map72
-    Map72 --> List73
-    List73 --> First48
-    First48 --> PgSelectSingle49
+    Map72 --> PgSelectSingle49
     PgSelectSingle49 --> PgClassExpression50
     PgSelectSingle49 --> PgClassExpression51
     Lambda76 --> Lambda55
@@ -93,7 +89,7 @@ graph TD
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,Lambda55,First57,PgSelectSingle58,PgCursor59,PgClassExpression60,List61,Last63,PgSelectSingle64,PgCursor65,PgClassExpression66,List67,First69,PgSelectSingle70,PgClassExpression71,Access74,Access75,Lambda76 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ76ᐳ[40]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item40,PgSelectSingle41,PgClassExpression42,First48,PgSelectSingle49,PgClassExpression50,PgClassExpression51,Map72,List73 bucket2
+    class Bucket2,__Item40,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgClassExpression51,Map72 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

@@ -19,8 +19,6 @@ graph TD
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸrelational_topicsᐳ"]:::plan
     PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__relation...ics__.”id”ᐳ"]:::plan
     Map72["Map[72∈0]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
-    List73["List[73∈0]<br />ᐸ72ᐳ"]:::plan
-    First20["First[20∈0]"]:::plan
     PgSelectSingle21["PgSelectSingle[21∈0]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression22["PgClassExpression[22∈0]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
     PgClassExpression30["PgClassExpression[30∈0]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
@@ -40,9 +38,7 @@ graph TD
     First12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> Map72
-    Map72 --> List73
-    List73 --> First20
-    First20 --> PgSelectSingle21
+    Map72 --> PgSelectSingle21
     PgSelectSingle21 --> PgClassExpression22
     PgSelectSingle21 --> PgClassExpression30
     PgSelectSingle21 --> PgClassExpression38
@@ -55,5 +51,5 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/single-topic-as-item"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,First20,PgSelectSingle21,PgClassExpression22,PgClassExpression30,PgClassExpression38,PgClassExpression46,PgClassExpression54,PgClassExpression62,PgClassExpression70,PgClassExpression71,Map72,List73 bucket0
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgSelectSingle21,PgClassExpression22,PgClassExpression30,PgClassExpression38,PgClassExpression46,PgClassExpression54,PgClassExpression62,PgClassExpression70,PgClassExpression71,Map72 bucket0
     end
