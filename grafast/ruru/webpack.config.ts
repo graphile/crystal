@@ -65,6 +65,18 @@ export default {
         exclude: /node_modules/,
         resolve: { plugins: [new TsResolvePlugin()] },
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.svg$/,
+        use: [{ loader: "svg-inline-loader" }],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: ["file-loader"],
+      },
     ],
   },
   resolve: {

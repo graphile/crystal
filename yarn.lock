@@ -14267,6 +14267,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"loader-utils@npm:^1.1.0":
+  version: 1.4.0
+  resolution: "loader-utils@npm:1.4.0"
+  dependencies:
+    big.js: "npm:^5.2.2"
+    emojis-list: "npm:^3.0.0"
+    json5: "npm:^1.0.1"
+  checksum: ba50c7c77159d1f07d8d583b301fdd7f6b02101503b4057bb0cfbe474ce6aeb95d437a5f902fd969787177be740abbb058c2d5df686acaecd2a38e4ebad46a3c
+  languageName: node
+  linkType: hard
+
 "loader-utils@npm:^2.0.0":
   version: 2.0.2
   resolution: "loader-utils@npm:2.0.2"
@@ -15506,7 +15517,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"object-assign@npm:^4.1.0, object-assign@npm:^4.1.1":
+"object-assign@npm:^4.0.1, object-assign@npm:^4.1.0, object-assign@npm:^4.1.1":
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
   checksum: f5cd1f2f1e82e12207e4f2377d9d7d90fbc0d9822a6afa717a6dcab6930d8925e1ebbbb25df770c31ff11335ee423459ba65ffa2e53999926c328b806b4d73d6
@@ -18121,6 +18132,8 @@ __metadata:
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18.0.0"
     "@types/yargs": "npm:^17.0.10"
+    css-loader: "npm:^6.7.1"
+    file-loader: "npm:^6.2.0"
     graphile-config: "workspace:^"
     graphiql: "npm:^2.0.7"
     graphiql-explorer: "npm:^0.9.0"
@@ -18130,6 +18143,8 @@ __metadata:
     nodemon: "npm:^2.0.15"
     react: "npm:^18.0.0"
     react-dom: "npm:^18.0.0"
+    style-loader: "npm:^3.3.1"
+    svg-inline-loader: "npm:^0.8.2"
     ts-loader: "npm:^9.3.1"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -18604,6 +18619,13 @@ __metadata:
   version: 3.0.7
   resolution: "signal-exit@npm:3.0.7"
   checksum: 5cf7525c55a72d8d104d914acf2e470f74b2c156197277ad7b331bc5de3d8790170fed3c82ff98c7c31adaa8ff941bfd5ba44f55171cbe8ed0e939fa82a8322a
+  languageName: node
+  linkType: hard
+
+"simple-html-tokenizer@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "simple-html-tokenizer@npm:0.1.1"
+  checksum: 01656217fbb793cd833553dad98700f108bd1363d4bb5429d025d3983e90f7675aa69232dbc38614e2dffd297d819a8bc185a1e98842bd6ed55ae0a15d529c38
   languageName: node
   linkType: hard
 
@@ -19146,6 +19168,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"style-loader@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "style-loader@npm:3.3.1"
+  peerDependencies:
+    webpack: ^5.0.0
+  checksum: 74e11f0307646c6b4809c6e410e694d3011cce9498de0415fedbf7e8d5ae97055e34e887473a149c9f4feca8602acc9a9a4caa2344ac58d5280343dbc13bce4d
+  languageName: node
+  linkType: hard
+
 "style-to-object@npm:0.3.0, style-to-object@npm:^0.3.0":
   version: 0.3.0
   resolution: "style-to-object@npm:0.3.0"
@@ -19230,6 +19261,17 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 14609489b044de2eaffe0e7549173bb39d6997510ac4b7279d07bf2aafe309205abe172a8c8d248062a24e32ab61a2ae85efc5b4cdf7f932c7cdbe81ca1f39ec
+  languageName: node
+  linkType: hard
+
+"svg-inline-loader@npm:^0.8.2":
+  version: 0.8.2
+  resolution: "svg-inline-loader@npm:0.8.2"
+  dependencies:
+    loader-utils: "npm:^1.1.0"
+    object-assign: "npm:^4.0.1"
+    simple-html-tokenizer: "npm:^0.1.1"
+  checksum: 48637ae841ff83c2c3765b8f4ff41770b116cd02ab6c6892c4c3be0d45e7214959b5b042b4c873e9bb1e151e414ce03e22ec1c693b0d404e2b677bb066f71fb4
   languageName: node
   linkType: hard
 

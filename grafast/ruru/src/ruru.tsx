@@ -24,6 +24,7 @@ import { useQuery } from "./hooks/useQuery.js";
 import { useSchema } from "./hooks/useSchema.js";
 import { RuruStorage, useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
+import "graphiql/graphiql.css";
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
