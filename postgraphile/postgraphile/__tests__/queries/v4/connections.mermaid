@@ -620,8 +620,6 @@ graph TD
     PgSelectSingle1241["PgSelectSingle[1241∈22]<br />ᐸpostᐳ"]:::plan
     PgClassExpression1242["PgClassExpression[1242∈22]<br />ᐸ__post__.”id”ᐳ"]:::plan
     Map1409["Map[1409∈22]<br />ᐸ1241:{”0”:1,”1”:2}ᐳ"]:::plan
-    List1410["List[1410∈22]<br />ᐸ1409ᐳ"]:::plan
-    First1248["First[1248∈22]"]:::plan
     PgSelectSingle1249["PgSelectSingle[1249∈22]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression1250["PgClassExpression[1250∈22]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression1251["PgClassExpression[1251∈22]<br />ᐸ__post__.”headline”ᐳ"]:::plan
@@ -1232,9 +1230,7 @@ graph TD
     __Item1240 --> PgSelectSingle1241
     PgSelectSingle1241 --> PgClassExpression1242
     PgSelectSingle1241 --> Map1409
-    Map1409 --> List1410
-    List1410 --> First1248
-    First1248 --> PgSelectSingle1249
+    Map1409 --> PgSelectSingle1249
     PgSelectSingle1249 --> PgClassExpression1250
     PgSelectSingle1241 --> PgClassExpression1251
     PgSelectSingle1249 --> PgClassExpression1259
@@ -1367,7 +1363,7 @@ graph TD
     class Bucket21,__Item1202,PgSelectSingle1203,PgCursor1204,PgClassExpression1205,List1206,PgClassExpression1208,PgClassExpression1209,PgClassExpression1210,PgClassExpression1211,PgClassExpression1212,PgClassExpression1213 bucket21
     Bucket22("Bucket 22 (listItem)<br />Deps: 1262<br /><br />ROOT __Item{22}ᐸ1239ᐳ[1240]"):::bucket
     classDef bucket22 stroke:#7fff00
-    class Bucket22,__Item1240,PgSelectSingle1241,PgClassExpression1242,First1248,PgSelectSingle1249,PgClassExpression1250,PgClassExpression1251,PgClassExpression1259,List1264,Lambda1265,Map1409,List1410 bucket22
+    class Bucket22,__Item1240,PgSelectSingle1241,PgClassExpression1242,PgSelectSingle1249,PgClassExpression1250,PgClassExpression1251,PgClassExpression1259,List1264,Lambda1265,Map1409 bucket22
     Bucket23("Bucket 23 (listItem)<br />ROOT __Item{23}ᐸ1295ᐳ[1314]"):::bucket
     classDef bucket23 stroke:#ff1493
     class Bucket23,__Item1314,PgSelectSingle1315,PgCursor1316,PgClassExpression1317,List1318,PgClassExpression1320,PgClassExpression1321,PgClassExpression1322,PgClassExpression1323,PgClassExpression1324,PgClassExpression1325 bucket23

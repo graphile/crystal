@@ -18,8 +18,6 @@ graph TD
     First12["First[12∈0]"]:::plan
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸforumsᐳ"]:::plan
     Map23["Map[23∈0]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"]:::plan
-    List24["List[24∈0]<br />ᐸ23ᐳ"]:::plan
-    First19["First[19∈0]"]:::plan
     PgSelectSingle20["PgSelectSingle[20∈0]<br />ᐸusersᐳ"]:::plan
     PgClassExpression21["PgClassExpression[21∈0]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
     PgClassExpression22["PgClassExpression[22∈0]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
@@ -32,14 +30,12 @@ graph TD
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
     PgSelectSingle13 --> Map23
-    Map23 --> List24
-    List24 --> First19
-    First19 --> PgSelectSingle20
+    Map23 --> PgSelectSingle20
     PgSelectSingle20 --> PgClassExpression21
     PgSelectSingle20 --> PgClassExpression22
 
     subgraph "Buckets for queries/functions/computed-column-user"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,First19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,Map23,List24 bucket0
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgSelectSingle20,PgClassExpression21,PgClassExpression22,Map23 bucket0
     end

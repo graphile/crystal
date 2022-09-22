@@ -23,28 +23,22 @@ graph TD
     PgClassExpression39["PgClassExpression[39∈1]<br />ᐸ__post__.”headline”ᐳ"]:::plan
     PgClassExpression43["PgClassExpression[43∈1]<br />ᐸ”a”.”post_...(__post__)ᐳ"]:::plan
     Map119["Map[119∈1]<br />ᐸ34:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13,”11”:14,”12”:15}ᐳ"]:::plan
-    List120["List[120∈1]<br />ᐸ119ᐳ"]:::plan
-    First49["First[49∈1]"]:::plan
     PgSelectSingle50["PgSelectSingle[50∈1]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression51["PgClassExpression[51∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression52["PgClassExpression[52∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression54["PgClassExpression[54∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
     Map116["Map[116∈1]<br />ᐸ50:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9,”6”:10}ᐳ"]:::plan
-    List117["List[117∈1]<br />ᐸ116ᐳ"]:::plan
-    First60["First[60∈1]"]:::plan
     PgSelectSingle61["PgSelectSingle[61∈1]<br />ᐸperson_first_postᐳ"]:::plan
     PgClassExpression62["PgClassExpression[62∈1]<br />ᐸ__person_f...ost__.”id”ᐳ"]:::plan
     PgClassExpression63["PgClassExpression[63∈1]<br />ᐸ__person_f...”headline”ᐳ"]:::plan
     PgClassExpression67["PgClassExpression[67∈1]<br />ᐸ”a”.”post_...st_post__)ᐳ"]:::plan
     Map113["Map[113∈1]<br />ᐸ61:{”0”:3,”1”:4,”2”:5}ᐳ"]:::plan
-    List114["List[114∈1]<br />ᐸ113ᐳ"]:::plan
-    First73["First[73∈1]"]:::plan
     PgSelectSingle74["PgSelectSingle[74∈1]<br />ᐸpersonᐳ"]:::plan
     PgClassExpression75["PgClassExpression[75∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
     PgClassExpression76["PgClassExpression[76∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression78["PgClassExpression[78∈1]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
     Connection91["Connection[91∈0]<br />ᐸ87ᐳ"]:::plan
-    Access118["Access[118∈1]<br />ᐸ49.11ᐳ"]:::plan
+    Access118["Access[118∈1]<br />ᐸ119.11ᐳ"]:::plan
     __ListTransform93[["__ListTransform[93∈1]<br />ᐸeach:92ᐳ"]]:::plan
     __Item94>"__Item[94∈2]<br />ᐸ118ᐳ"]:::itemplan
     PgSelectSingle95["PgSelectSingle[95∈2]<br />ᐸperson_friendsᐳ"]:::plan
@@ -53,7 +47,7 @@ graph TD
     PgClassExpression98["PgClassExpression[98∈3]<br />ᐸ__person_friends__.”id”ᐳ"]:::plan
     PgClassExpression99["PgClassExpression[99∈3]<br />ᐸ__person_f...full_name”ᐳ"]:::plan
     PgClassExpression101["PgClassExpression[101∈3]<br />ᐸ”c”.”perso...friends__)ᐳ"]:::plan
-    Access115["Access[115∈1]<br />ᐸ49.3ᐳ"]:::plan
+    Access115["Access[115∈1]<br />ᐸ119.3ᐳ"]:::plan
     First103["First[103∈1]"]:::plan
     PgSelectSingle104["PgSelectSingle[104∈1]<br />ᐸperson_friendsᐳ"]:::plan
     PgClassExpression105["PgClassExpression[105∈1]<br />ᐸcount(*)ᐳ"]:::plan
@@ -77,27 +71,21 @@ graph TD
     PgSelectSingle34 --> PgClassExpression39
     PgSelectSingle34 --> PgClassExpression43
     PgSelectSingle34 --> Map119
-    Map119 --> List120
-    List120 --> First49
-    First49 --> PgSelectSingle50
+    Map119 --> PgSelectSingle50
     PgSelectSingle50 --> PgClassExpression51
     PgSelectSingle50 --> PgClassExpression52
     PgSelectSingle50 --> PgClassExpression54
     PgSelectSingle50 --> Map116
-    Map116 --> List117
-    List117 --> First60
-    First60 --> PgSelectSingle61
+    Map116 --> PgSelectSingle61
     PgSelectSingle61 --> PgClassExpression62
     PgSelectSingle61 --> PgClassExpression63
     PgSelectSingle61 --> PgClassExpression67
     PgSelectSingle61 --> Map113
-    Map113 --> List114
-    List114 --> First73
-    First73 --> PgSelectSingle74
+    Map113 --> PgSelectSingle74
     PgSelectSingle74 --> PgClassExpression75
     PgSelectSingle74 --> PgClassExpression76
     PgSelectSingle74 --> PgClassExpression78
-    First49 --> Access118
+    Map119 --> Access118
     Access118 --> __ListTransform93
     Access118 -.-> __Item94
     __Item94 --> PgSelectSingle95
@@ -106,7 +94,7 @@ graph TD
     PgSelectSingle97 --> PgClassExpression98
     PgSelectSingle97 --> PgClassExpression99
     PgSelectSingle97 --> PgClassExpression101
-    First49 --> Access115
+    Map119 --> Access115
     Access115 --> First103
     First103 --> PgSelectSingle104
     PgSelectSingle104 --> PgClassExpression105
@@ -122,7 +110,7 @@ graph TD
     class Bucket0,__Value3,__Value5,Access28,Access29,Object30,Connection31,PgSelect32,Connection91,PgPageInfo106 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 91, 106<br /><br />ROOT __Item{1}ᐸ32ᐳ[33]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,First49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,First60,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression67,First73,PgSelectSingle74,PgClassExpression75,PgClassExpression76,PgClassExpression78,__ListTransform93,First103,PgSelectSingle104,PgClassExpression105,First108,PgSelectSingle109,PgCursor110,PgClassExpression111,List112,Map113,List114,Access115,Map116,List117,Access118,Map119,List120 bucket1
+    class Bucket1,__Item33,PgSelectSingle34,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression54,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression67,PgSelectSingle74,PgClassExpression75,PgClassExpression76,PgClassExpression78,__ListTransform93,First103,PgSelectSingle104,PgClassExpression105,First108,PgSelectSingle109,PgCursor110,PgClassExpression111,List112,Map113,Access115,Map116,Access118,Map119 bucket1
     Bucket2("Bucket 2 (subroutine)<br />ROOT PgSelectSingle{2}ᐸperson_friendsᐳ[95]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item94,PgSelectSingle95 bucket2

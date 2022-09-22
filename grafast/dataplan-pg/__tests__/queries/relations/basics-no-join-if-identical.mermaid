@@ -21,8 +21,6 @@ graph TD
     PgClassExpression15["PgClassExpression[15∈0]<br />ᐸ__messages__.”body”ᐳ"]:::plan
     PgClassExpression16["PgClassExpression[16∈0]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
     Map24["Map[24∈0]<br />ᐸ13:{”0”:2}ᐳ"]:::plan
-    List25["List[25∈0]<br />ᐸ24ᐳ"]:::plan
-    First21["First[21∈0]"]:::plan
     PgSelectSingle22["PgSelectSingle[22∈0]<br />ᐸforumsᐳ"]:::plan
 
     %% plan dependencies
@@ -36,12 +34,10 @@ graph TD
     PgSelectSingle13 --> PgClassExpression15
     PgSelectSingle13 --> PgClassExpression16
     PgSelectSingle13 --> Map24
-    Map24 --> List25
-    List25 --> First21
-    First21 --> PgSelectSingle22
+    Map24 --> PgSelectSingle22
 
     subgraph "Buckets for queries/relations/basics-no-join-if-identical"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,PgClassExpression16,First21,PgSelectSingle22,Map24,List25 bucket0
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgSelectSingle22,Map24 bucket0
     end

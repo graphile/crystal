@@ -31,14 +31,10 @@ graph TD
     PgClassExpression26["PgClassExpression[26∈1]<br />ᐸ(__message... not null)ᐳ"]:::plan
     PgClassExpression27["PgClassExpression[27∈1]<br />ᐸ__messages__.”forum_id”ᐳ"]:::plan
     Map47["Map[47∈1]<br />ᐸ22:{”0”:4,”1”:5}ᐳ"]:::plan
-    List48["List[48∈1]<br />ᐸ47ᐳ"]:::plan
-    First32["First[32∈1]"]:::plan
     PgSelectSingle33["PgSelectSingle[33∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
     PgClassExpression36["PgClassExpression[36∈1]<br />ᐸ(__forums_... not null)ᐳ"]:::plan
     Map49["Map[49∈1]<br />ᐸ22:{”0”:6,”1”:7}ᐳ"]:::plan
-    List50["List[50∈1]<br />ᐸ49ᐳ"]:::plan
-    First43["First[43∈1]"]:::plan
     PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸusersᐳ"]:::plan
     PgClassExpression45["PgClassExpression[45∈1]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression46["PgClassExpression[46∈1]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
@@ -64,15 +60,11 @@ graph TD
     PgSelectSingle22 --> PgClassExpression26
     PgSelectSingle22 --> PgClassExpression27
     PgSelectSingle22 --> Map47
-    Map47 --> List48
-    List48 --> First32
-    First32 --> PgSelectSingle33
+    Map47 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression35
     PgSelectSingle33 --> PgClassExpression36
     PgSelectSingle22 --> Map49
-    Map49 --> List50
-    List50 --> First43
-    First43 --> PgSelectSingle44
+    Map49 --> PgSelectSingle44
     PgSelectSingle44 --> PgClassExpression45
     PgSelectSingle44 --> PgClassExpression46
 
@@ -82,6 +74,6 @@ graph TD
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,Lambda8,Access9,Listen10,Access18,Access19,Object20 bucket0
     Bucket1("Bucket 1 (subscription)<br />Deps: 20, 5<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item11,JSONParse12,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,First32,PgSelectSingle33,PgClassExpression35,PgClassExpression36,First43,PgSelectSingle44,PgClassExpression45,PgClassExpression46,Map47,List48,Map49,List50 bucket1
+    class Bucket1,__Item11,JSONParse12,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgSelectSingle33,PgClassExpression35,PgClassExpression36,PgSelectSingle44,PgClassExpression45,PgClassExpression46,Map47,Map49 bucket1
     Bucket0 --> Bucket1
     end

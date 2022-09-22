@@ -31,18 +31,12 @@ graph TD
     PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ__relation...scription”ᐳ"]:::plan
     PgClassExpression34["PgClassExpression[34∈1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
     Map67["Map[67∈1]<br />ᐸ30:{”0”:3}ᐳ"]:::plan
-    List68["List[68∈1]<br />ᐸ67ᐳ"]:::plan
-    First40["First[40∈1]"]:::plan
     PgSelectSingle41["PgSelectSingle[41∈1]<br />ᐸtextᐳ"]:::plan
     PgClassExpression42["PgClassExpression[42∈1]<br />ᐸ__relation..._lower__.vᐳ"]:::plan
     Map71["Map[71∈1]<br />ᐸ30:{”0”:5,”1”:6,”2”:7,”3”:8}ᐳ"]:::plan
-    List72["List[72∈1]<br />ᐸ71ᐳ"]:::plan
-    First48["First[48∈1]"]:::plan
     PgSelectSingle49["PgSelectSingle[49∈1]<br />ᐸrelational_itemsᐳ"]:::plan
     PgClassExpression50["PgClassExpression[50∈1]<br />ᐸ__relation..._archived”ᐳ"]:::plan
     Map69["Map[69∈1]<br />ᐸ49:{”0”:0,”1”:1}ᐳ"]:::plan
-    List70["List[70∈1]<br />ᐸ69ᐳ"]:::plan
-    First63["First[63∈1]"]:::plan
     PgSelectSingle64["PgSelectSingle[64∈1]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression65["PgClassExpression[65∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
     PgClassExpression66["PgClassExpression[66∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
@@ -64,19 +58,13 @@ graph TD
     PgSelectSingle30 --> PgClassExpression33
     PgSelectSingle30 --> PgClassExpression34
     PgSelectSingle30 --> Map67
-    Map67 --> List68
-    List68 --> First40
-    First40 --> PgSelectSingle41
+    Map67 --> PgSelectSingle41
     PgSelectSingle41 --> PgClassExpression42
     PgSelectSingle30 --> Map71
-    Map71 --> List72
-    List72 --> First48
-    First48 --> PgSelectSingle49
+    Map71 --> PgSelectSingle49
     PgSelectSingle49 --> PgClassExpression50
     PgSelectSingle49 --> Map69
-    Map69 --> List70
-    List70 --> First63
-    First63 --> PgSelectSingle64
+    Map69 --> PgSelectSingle64
     PgSelectSingle64 --> PgClassExpression65
     PgSelectSingle64 --> PgClassExpression66
 
@@ -86,6 +74,6 @@ graph TD
     class Bucket0,__Value3,__Value5,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,Access14,Access15,Object16 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert{1}[13]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[17]<br />3: PgInsert{1}[18]<br />4: PgClassExpression{1}ᐸ__relational_posts__ᐳ[22],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,First40,PgSelectSingle41,PgClassExpression42,First48,PgSelectSingle49,PgClassExpression50,First63,PgSelectSingle64,PgClassExpression65,PgClassExpression66,Map67,List68,Map69,List70,Map71,List72 bucket1
+    class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgSelectSingle64,PgClassExpression65,PgClassExpression66,Map67,Map69,Map71 bucket1
     Bucket0 --> Bucket1
     end
