@@ -2,9 +2,7 @@ import "graphiql/graphiql.css";
 
 import {
   CopyIcon,
-  DOC_EXPLORER_PLUGIN,
   GraphiQLProvider,
-  HISTORY_PLUGIN,
   MergeIcon,
   PrettifyIcon,
   SettingsIcon,
@@ -12,23 +10,17 @@ import {
   ToolbarMenu,
   useCopyQuery,
   useMergeQuery,
-  usePluginContext,
 } from "@graphiql/react";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
-import { useContext } from "react";
-import { useMemo } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { Explain } from "./components/Explain.js";
 import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
 import { RuruFooter } from "./components/Footer.js";
 import { defaultQuery } from "./defaultQuery.js";
-import type { ExplainHelpers } from "./hooks/useExplain.js";
-import { ExplainContext } from "./hooks/useExplain.js";
-import { useExplain } from "./hooks/useExplain.js";
-import type { ExplainResults } from "./hooks/useFetcher.js";
+import { ExplainContext, useExplain } from "./hooks/useExplain.js";
 import { useFetcher } from "./hooks/useFetcher.js";
 import { usePrettify } from "./hooks/usePrettify.js";
 import { useSchema } from "./hooks/useSchema.js";
@@ -94,9 +86,7 @@ export const RuruInner: FC<{
   const { storage, editorTheme, error, setError } = props;
   const { explainHelpers, explain, setExplain, explainResults } =
     useContext(ExplainContext);
-  const { showExplain, explainSize, explainAtBottom, setShowExplain } =
-    explainHelpers;
-  const pluginContext = usePluginContext();
+  const { showExplain, explainSize, explainAtBottom } = explainHelpers;
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
@@ -176,20 +166,6 @@ export const RuruInner: FC<{
               </ToolbarMenu.Item>
             </ToolbarMenu>
           </GraphiQL.Toolbar>
-          {/*
-          <GraphiQL.Toolbar>
-            <Menu title="Panels" label="Panels">
-              <ToolbarMenu.Item
-                title="Show details of what went on inside your GraphQL operation (if the server supports this)"
-                onSelect={() => setShowExplain(!showExplain)}
-              >
-                <span>{showExplain ? check : nocheck}Explain</span>
-              </ToolbarMenu.Item>
-            </Menu>
-            <Menu title="Options" label="Options">
-            </Menu>
-          </GraphiQL.Toolbar>
-            */}
           <GraphiQL.Footer>
             <RuruFooter />
           </GraphiQL.Footer>

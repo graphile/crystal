@@ -14,7 +14,6 @@ export const Explain: FC<{
   helpers: ExplainHelpers;
   results: ExplainResults | null;
 }> = ({ explain, setExplain, helpers, results }) => {
-  const { setShowExplain } = helpers;
   return (
     <>
       {!results ? (
