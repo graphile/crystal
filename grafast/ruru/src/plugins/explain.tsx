@@ -1,6 +1,6 @@
 import type { GraphiQLPlugin } from "@graphiql/react";
 import { MagnifyingGlassIcon } from "@graphiql/react";
-import type { FC} from "react";
+import type { FC } from "react";
 import { useContext } from "react";
 
 import { Explain } from "../components/Explain.js";
@@ -11,13 +11,17 @@ const ExplainPanel: FC = () => {
     useContext(ExplainContext);
   return (
     <div>
-      <h1>Explain</h1>
-      <Explain
-        explain={explain}
-        setExplain={setExplain}
-        helpers={explainHelpers}
-        results={explainResults}
-      />
+      <div className="graphiql-doc-explorer-header">
+        <div className="graphiql-doc-explorer-title">Explain</div>
+      </div>
+      <div className="graphiql-doc-explorer-content">
+        <Explain
+          explain={explain}
+          setExplain={setExplain}
+          helpers={explainHelpers}
+          results={explainResults}
+        />
+      </div>
     </div>
   );
 };
