@@ -7,7 +7,6 @@ import {
   Menu,
   ToolbarMenu,
   useCopyQuery,
-  useEditorContext,
   useMergeQuery,
   usePluginContext,
 } from "@graphiql/react";
@@ -91,10 +90,7 @@ export const RuruInner: FC<{
   } = props;
   const { showExplain, explainSize, explainAtBottom, setShowExplain } =
     explainHelpers;
-  const editorContext = useEditorContext();
   const pluginContext = usePluginContext();
-  const queryEditor = editorContext?.queryEditor;
-  const query = queryEditor?.getValue();
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
