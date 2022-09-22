@@ -112,7 +112,15 @@ export const RuruInner: FC<{
         }}
       >
         <GraphiQLInterface editorTheme={editorTheme ?? "dracula"}>
-          <GraphiQL.Logo>Ruru</GraphiQL.Logo>
+          <GraphiQL.Logo>
+            <a
+              href="https://grafast.org/ruru"
+              style={{ textDecoration: "none" }}
+              target="_blank" rel="noreferrer"
+            >
+              Ruru
+            </a>
+          </GraphiQL.Logo>
           <GraphiQL.Toolbar>
             <ToolbarButton
               onClick={prettify}
