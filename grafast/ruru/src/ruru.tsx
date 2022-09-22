@@ -1,6 +1,15 @@
-import { GraphiQL } from "graphiql";
-// @ts-ignore
-import GraphiQLExplorer from "graphiql-explorer";
+import {
+  DOC_EXPLORER_PLUGIN,
+  GraphiQLProvider,
+  HISTORY_PLUGIN,
+  Menu,
+  ToolbarMenu,
+  useCopyQuery,
+  useEditorContext,
+  useMergeQuery,
+  usePluginContext,
+} from "@graphiql/react";
+import { GraphiQLInterface, GraphiQL } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
@@ -8,19 +17,14 @@ import { ErrorPopup } from "./components/ErrorPopup.js";
 import { Explain } from "./components/Explain.js";
 import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
 import { RuruFooter } from "./components/Footer.js";
-import { useExplain } from "./hooks/useExplain.js";
-import { useExplorer } from "./hooks/useExplorer.js";
-import { useExtraKeys } from "./hooks/useExtraKeys.js";
-import { useFetcher } from "./hooks/useFetcher.js";
-import { useGraphiQL } from "./hooks/useGraphiQL.js";
+import { ExplainHelpers, useExplain } from "./hooks/useExplain.js";
+import { ExplainResults, useFetcher } from "./hooks/useFetcher.js";
 import { usePrettify } from "./hooks/usePrettify.js";
 import { useQuery } from "./hooks/useQuery.js";
 import { useSchema } from "./hooks/useSchema.js";
-import { useStorage } from "./hooks/useStorage.js";
+import { RuruStorage, useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 
-const GraphiQLAny = GraphiQL as any;
-const GraphiQLMenuAny = GraphiQL.Menu as any;
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
 const nocheck = <span style={checkCss}></span>;
@@ -39,26 +43,54 @@ export const Ruru: FC<RuruProps> = (props) => {
   const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
     explain,
   });
+  const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
+  const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
+  return (
+    <GraphiQLProvider fetcher={fetcher} schema={schema}>
+      <RuruInner
+        storage={storage}
+        editorTheme={props.editorTheme}
+        explainHelpers={explainHelpers}
+        explain={explain}
+        setExplain={setExplain}
+        explainResults={explainResults}
+        error={error}
+        setError={setError}
+      />
+    </GraphiQLProvider>
+  );
+};
+
+export const RuruInner: FC<{
+  explainHelpers: ExplainHelpers;
+  editorTheme?: string;
+  storage: RuruStorage;
+  explain: boolean;
+  setExplain: (newExplain: boolean) => void;
+  explainResults: ExplainResults | null;
+  error: Error | null;
+  setError: React.Dispatch<React.SetStateAction<Error | null>>;
+}> = (props) => {
+  const {
+    explainHelpers,
+    storage,
+    editorTheme,
+    explain,
+    setExplain,
+    explainResults,
+    error,
+    setError,
+  } = props;
   const { showExplain, explainSize, explainAtBottom, setShowExplain } =
     explainHelpers;
-  const [error, setError] = useState<Error | null>(null);
-  const [query, setQuery] = useQuery(props, storage);
-  const { graphiqlRef, graphiql, onToggleDocs, onToggleHistory } =
-    useGraphiQL(props);
-  const { schema } = useSchema(
-    props,
-    fetcher,
-    setError,
-    streamEndpoint,
-    graphiqlRef,
-  );
-  useExtraKeys(props, graphiql, query);
-  const { onRunOperation, explorerIsOpen, onToggleExplorer } = useExplorer(
-    graphiql,
-    storage,
-  );
-  const prettify = usePrettify(graphiqlRef);
+  const editorContext = useEditorContext();
+  const pluginContext = usePluginContext();
+  const queryEditor = editorContext?.queryEditor;
+  const query = queryEditor?.getValue();
+  const prettify = usePrettify();
+  const mergeQuery = useMergeQuery();
+  const copyQuery = useCopyQuery();
 
   return (
     <div
@@ -77,122 +109,89 @@ export const Ruru: FC<RuruProps> = (props) => {
           display: "flex",
           flex: "1 1 100%",
           overflow: "hidden",
+          position: "relative",
         }}
       >
-        <style>
-          {`\
-/* Work around a bug in GraphiQL where you can't click the down arrow. */
-.toolbar-menu.toolbar-button > svg { pointer-events: none; }
-`}
-        </style>
-        <GraphiQLExplorer
-          schema={schema}
-          query={query}
-          onEdit={setQuery}
-          onRunOperation={onRunOperation}
-          explorerIsOpen={explorerIsOpen}
-          onToggleExplorer={onToggleExplorer}
-        />
-        <GraphiQLAny
-          ref={graphiqlRef}
-          fetcher={fetcher}
-          schema={schema}
-          query={query}
-          onEditQuery={setQuery}
-          editorTheme={props.editorTheme ?? "dracula"}
-        >
+        <GraphiQLInterface editorTheme={editorTheme ?? "dracula"}>
           <GraphiQL.Logo>Ruru</GraphiQL.Logo>
           <GraphiQL.Toolbar>
-            <GraphiQLMenuAny title="Utils" label="Utilities">
-              <GraphiQL.MenuItem
+            <Menu title="Utils" label="Utilities">
+              <ToolbarMenu.Item
                 onSelect={prettify}
                 title="Prettify Query (Shift-Ctrl-P)"
-                label="Prettify"
-              />
-              <GraphiQL.MenuItem
-                onSelect={graphiql?.handleMergeQuery ?? noop}
+              >
+                Prettify
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
+                onSelect={mergeQuery}
                 title="Merge Query (Shift-Ctrl-M)"
-                label="Merge"
-              />
-              <GraphiQL.MenuItem
-                onSelect={graphiql?.handleCopyQuery ?? noop}
+              >
+                Merge
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
+                onSelect={copyQuery}
                 title="Copy Query (Shift-Ctrl-C)"
-                label="Copy"
-              />
-            </GraphiQLMenuAny>
-            <GraphiQLMenuAny title="Panels" label="Panels">
-              <GraphiQL.MenuItem
-                onSelect={onToggleDocs}
+              >
+                Copy
+              </ToolbarMenu.Item>
+            </Menu>
+            <Menu title="Panels" label="Panels">
+              <ToolbarMenu.Item
+                onSelect={() =>
+                  pluginContext?.setVisiblePlugin(DOC_EXPLORER_PLUGIN)
+                }
                 title="Docs"
-                label={
-                  (
-                    <span>
-                      {graphiql?.state.docExplorerOpen ? check : nocheck}
-                      Docs
-                    </span>
-                  ) as any
-                }
-              />
-              <GraphiQL.MenuItem
-                onSelect={onToggleHistory}
+              >
+                <span>
+                  {pluginContext?.visiblePlugin === DOC_EXPLORER_PLUGIN
+                    ? check
+                    : nocheck}
+                  Docs
+                </span>
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
+                onSelect={() => pluginContext?.setVisiblePlugin(HISTORY_PLUGIN)}
                 title="History"
-                label={
-                  (
-                    <span>
-                      {graphiql?.state.historyPaneOpen ? check : nocheck}
-                      History
-                    </span>
-                  ) as any
-                }
-              />
-              <GraphiQL.MenuItem
-                label={
-                  (
-                    <span>{explorerIsOpen ? check : nocheck}Explorer</span>
-                  ) as any
-                }
-                title="Construct a query with the GraphiQL explorer"
-                onSelect={onToggleExplorer}
-              />
-              <GraphiQL.MenuItem
-                label={
-                  (<span>{showExplain ? check : nocheck}Explain</span>) as any
-                }
+              >
+                <span>
+                  {pluginContext?.visiblePlugin === HISTORY_PLUGIN
+                    ? check
+                    : nocheck}
+                  History
+                </span>
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
                 title="Show details of what went on inside your GraphQL operation (if the server supports this)"
                 onSelect={() => setShowExplain(!showExplain)}
-              />
-            </GraphiQLMenuAny>
-            <GraphiQLMenuAny title="Options" label="Options">
-              <GraphiQL.MenuItem
-                label={
-                  (
-                    <span>
-                      {storage.get("explain") === "true" ? check : nocheck}
-                      Explain (show execution details if available)
-                    </span>
-                  ) as any
-                }
+              >
+                <span>{showExplain ? check : nocheck}Explain</span>
+              </ToolbarMenu.Item>
+            </Menu>
+            <Menu title="Options" label="Options">
+              <ToolbarMenu.Item
                 title="View the SQL statements that this query invokes"
                 onSelect={() => storage.toggle("explain")}
-              />
-              <GraphiQL.MenuItem
-                label={
-                  (
-                    <span>
-                      {storage.get("saveHeaders") === "true" ? check : nocheck}
-                      Save headers
-                    </span>
-                  ) as any
-                }
+              >
+                <span>
+                  {storage.get("explain") === "true" ? check : nocheck}
+                  Explain (show execution details if available)
+                </span>
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
                 title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
                 onSelect={() => storage.toggle("saveHeaders")}
-              />
-            </GraphiQLMenuAny>
+              >
+                <span>
+                  {storage.get("saveHeaders") === "true" ? check : nocheck}
+                  Save headers
+                </span>
+              </ToolbarMenu.Item>
+            </Menu>
           </GraphiQL.Toolbar>
           <GraphiQL.Footer>
             <RuruFooter />
           </GraphiQL.Footer>
-        </GraphiQLAny>
+        </GraphiQLInterface>
       </div>
       {showExplain ? <ExplainDragBar helpers={explainHelpers} /> : null}
       {showExplain ? (
