@@ -1,7 +1,3 @@
----
-sidebar_position: 100
----
-
 # PostGraphile Introduction
 
 <p class='intro'>
