@@ -44,10 +44,12 @@ export function options(yargs: Argv) {
 /**
  * Optionally we proxy the request.
  */
-async function tryLoadHttpProxyCreateProxyServer() {
+async function tryLoadHttpProxyCreateProxyServer(): Promise<
+  typeof createProxyServer | null
+> {
   try {
-    return ((await import("http-proxy")) as any).default
-      .createProxyServer as typeof createProxyServer;
+    const module = (await import("http-proxy")) as any;
+    return module.default?.createProxyServer ?? module.createProxyServer;
   } catch {
     return null;
   }
@@ -102,7 +104,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   if (!proxy) {
     console.log(
-      `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'ruru' and we'll proxy to the API for you`,
+      `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'ruru' and using the '-P' option so that we'll proxy to the API for you`,
     );
   }
   const server = createServer((req, res) => {
