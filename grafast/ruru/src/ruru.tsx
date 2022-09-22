@@ -116,7 +116,8 @@ export const RuruInner: FC<{
             <a
               href="https://grafast.org/ruru"
               style={{ textDecoration: "none" }}
-              target="_blank" rel="noreferrer"
+              target="_blank"
+              rel="noreferrer"
             >
               Ruru
             </a>
