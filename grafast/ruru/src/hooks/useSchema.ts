@@ -1,11 +1,11 @@
-import type { GraphiQL, GraphiQLProps } from "graphiql";
+import type { GraphiQLProps } from "graphiql";
 import type { GraphQLSchema } from "graphql";
 import { buildClientSchema, getIntrospectionQuery } from "graphql";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { RuruProps } from "../interfaces.js";
-import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
+// import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
 
 export const useSchema = (
@@ -13,7 +13,6 @@ export const useSchema = (
   fetcher: GraphiQLProps["fetcher"],
   setError: Dispatch<SetStateAction<Error | null>>,
   streamEndpoint: string | null,
-  graphiqlRef: React.MutableRefObject<GraphiQL | null>,
 ) => {
   const [schema, setSchema] = useState<GraphQLSchema | null>(null);
   const refetchStatusRef = useRef({
@@ -60,11 +59,6 @@ export const useSchema = (
       setSchema(schema);
       setError(null);
 
-      // Do some hacky stuff to GraphiQL.
-      if (graphiqlRef.current) {
-        updateGraphiQLDocExplorerNavStack(schema, graphiqlRef.current);
-      }
-
       console.log("Ruru: Schema updated");
     })()
       .catch((error) => {
@@ -84,7 +78,7 @@ export const useSchema = (
           refetchStatusRef.current.fetchAgain();
         }
       });
-  }, [fetcher, graphiqlRef, setError]);
+  }, [fetcher, setError]);
   useGraphQLChangeStream(props, refetch, streamEndpoint);
 
   useEffect(() => {

@@ -1,6 +1,10 @@
-import type { CreateFetcherOptions } from "@graphiql/toolkit";
+import type {
+  CreateFetcherOptions,
+  Fetcher,
+  FetcherParams,
+  FetcherReturnType,
+} from "@graphiql/toolkit";
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
-import type { Fetcher, FetcherParams, FetcherReturnType } from "graphiql";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";

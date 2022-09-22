@@ -1,4 +1,4 @@
-import type { GraphiQL } from "graphiql";
+import { useEditorContext, usePrettifyEditors } from "@graphiql/react";
 import { useCallback } from "react";
 
 declare global {
@@ -12,29 +12,28 @@ declare global {
  * Prettifies with 'prettier' if available, otherwise using GraphiQL's built in
  * prettify.
  */
-export const usePrettify = (
-  graphiqlRef: React.MutableRefObject<GraphiQL | null>,
-) => {
+export const usePrettify = () => {
+  const editorContext = useEditorContext();
+  const fallbackPrettify = usePrettifyEditors();
   return useCallback(() => {
-    const graphiql = graphiqlRef.current;
-    if (!graphiql) {
+    const queryEditor = editorContext?.queryEditor;
+    if (!queryEditor) {
       return;
     }
-    const editor = graphiql.getQueryEditor();
     if (
-      editor &&
+      queryEditor &&
       typeof window.prettier !== "undefined" &&
       typeof window.prettierPlugins !== "undefined"
     ) {
       // TODO: window.prettier.formatWithCursor
-      editor.setValue(
-        window.prettier.format(editor.getValue(), {
+      queryEditor.setValue(
+        window.prettier.format(queryEditor.getValue(), {
           parser: "graphql",
           plugins: window.prettierPlugins,
         }),
       );
     } else {
-      return graphiql.handlePrettifyQuery();
+      fallbackPrettify();
     }
-  }, [graphiqlRef]);
+  }, [editorContext?.queryEditor, fallbackPrettify]);
 };

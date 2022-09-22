@@ -14,43 +14,28 @@ export const Explain: FC<{
   helpers: ExplainHelpers;
   results: ExplainResults | null;
 }> = ({ explain, setExplain, helpers, results }) => {
-  const { setShowExplain } = helpers;
   return (
     <>
-      <div className="doc-explorer-title-bar">
-        <div className="doc-explorer-title">Explain</div>
-        <div className="doc-explorer-rhs">
-          <button
-            className="docExplorerHide"
-            aria-label="Close Explain"
-            onClick={() => setShowExplain(false)}
-          >
-            ✕
-          </button>
-        </div>
-      </div>
-      <div className="doc-explorer-contents">
-        {!results ? (
-          !explain ? (
-            <>
-              <p>
-                WARNING: you&apos;ve not enabled the &apos;explain&apos;
-                functionality
-              </p>
-              <button onClick={() => setExplain(true)}>Enable explain</button>
-            </>
-          ) : (
+      {!results ? (
+        !explain ? (
+          <>
             <p>
-              There are no explain results to display - perhaps you have not yet
-              ran an operation against a server that supports this feature?
+              WARNING: you&apos;ve not enabled the &apos;explain&apos;
+              functionality
             </p>
-          )
-        ) : results.operations.length === 0 ? (
-          <p>Empty explain results</p>
+            <button onClick={() => setExplain(true)}>Enable explain</button>
+          </>
         ) : (
-          <ExplainMain helpers={helpers} results={results} />
-        )}
-      </div>
+          <p>
+            There are no explain results to display - perhaps you have not yet
+            ran an operation against a server that supports this feature?
+          </p>
+        )
+      ) : results.operations.length === 0 ? (
+        <p>Empty explain results</p>
+      ) : (
+        <ExplainMain helpers={helpers} results={results} />
+      )}
     </>
   );
 };

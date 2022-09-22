@@ -1,31 +1,37 @@
-import { GraphiQL } from "graphiql";
-// @ts-ignore
-import GraphiQLExplorer from "graphiql-explorer";
+import "graphiql/graphiql.css";
+
+import {
+  CopyIcon,
+  GraphiQLProvider,
+  MergeIcon,
+  PrettifyIcon,
+  SettingsIcon,
+  ToolbarButton,
+  ToolbarMenu,
+  useCopyQuery,
+  useMergeQuery,
+} from "@graphiql/react";
+import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { Explain } from "./components/Explain.js";
 import { DRAG_WIDTH, ExplainDragBar } from "./components/ExplainDragBar.js";
 import { RuruFooter } from "./components/Footer.js";
-import { useExplain } from "./hooks/useExplain.js";
-import { useExplorer } from "./hooks/useExplorer.js";
-import { useExtraKeys } from "./hooks/useExtraKeys.js";
+import { defaultQuery } from "./defaultQuery.js";
+import { ExplainContext, useExplain } from "./hooks/useExplain.js";
 import { useFetcher } from "./hooks/useFetcher.js";
-import { useGraphiQL } from "./hooks/useGraphiQL.js";
 import { usePrettify } from "./hooks/usePrettify.js";
-import { useQuery } from "./hooks/useQuery.js";
 import { useSchema } from "./hooks/useSchema.js";
+import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
+import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
 
-const GraphiQLAny = GraphiQL as any;
-const GraphiQLMenuAny = GraphiQL.Menu as any;
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
 const nocheck = <span style={checkCss}></span>;
-
-function noop() {}
 
 export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
@@ -39,26 +45,51 @@ export const Ruru: FC<RuruProps> = (props) => {
   const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
     explain,
   });
-  const explainHelpers = useExplain(storage);
-  const { showExplain, explainSize, explainAtBottom, setShowExplain } =
-    explainHelpers;
   const [error, setError] = useState<Error | null>(null);
-  const [query, setQuery] = useQuery(props, storage);
-  const { graphiqlRef, graphiql, onToggleDocs, onToggleHistory } =
-    useGraphiQL(props);
-  const { schema } = useSchema(
-    props,
-    fetcher,
-    setError,
-    streamEndpoint,
-    graphiqlRef,
+  const explainHelpers = useExplain(storage);
+  const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
+  const plugins = useMemo(() => {
+    return [EXPLAIN_PLUGIN];
+  }, []);
+  return (
+    <ExplainContext.Provider
+      value={{
+        explainHelpers,
+        explain,
+        setExplain,
+        explainResults,
+      }}
+    >
+      <GraphiQLProvider
+        fetcher={fetcher}
+        schema={schema}
+        defaultQuery={defaultQuery}
+        plugins={plugins}
+      >
+        <RuruInner
+          storage={storage}
+          editorTheme={props.editorTheme}
+          error={error}
+          setError={setError}
+        />
+      </GraphiQLProvider>
+    </ExplainContext.Provider>
   );
-  useExtraKeys(props, graphiql, query);
-  const { onRunOperation, explorerIsOpen, onToggleExplorer } = useExplorer(
-    graphiql,
-    storage,
-  );
-  const prettify = usePrettify(graphiqlRef);
+};
+
+export const RuruInner: FC<{
+  editorTheme?: string;
+  storage: RuruStorage;
+  error: Error | null;
+  setError: React.Dispatch<React.SetStateAction<Error | null>>;
+}> = (props) => {
+  const { storage, editorTheme, error, setError } = props;
+  const { explainHelpers, explain, setExplain, explainResults } =
+    useContext(ExplainContext);
+  const { showExplain, explainSize, explainAtBottom } = explainHelpers;
+  const prettify = usePrettify();
+  const mergeQuery = useMergeQuery();
+  const copyQuery = useCopyQuery();
 
   return (
     <div
@@ -77,122 +108,68 @@ export const Ruru: FC<RuruProps> = (props) => {
           display: "flex",
           flex: "1 1 100%",
           overflow: "hidden",
+          position: "relative",
         }}
       >
-        <style>
-          {`\
-/* Work around a bug in GraphiQL where you can't click the down arrow. */
-.toolbar-menu.toolbar-button > svg { pointer-events: none; }
-`}
-        </style>
-        <GraphiQLExplorer
-          schema={schema}
-          query={query}
-          onEdit={setQuery}
-          onRunOperation={onRunOperation}
-          explorerIsOpen={explorerIsOpen}
-          onToggleExplorer={onToggleExplorer}
-        />
-        <GraphiQLAny
-          ref={graphiqlRef}
-          fetcher={fetcher}
-          schema={schema}
-          query={query}
-          onEditQuery={setQuery}
-          editorTheme={props.editorTheme ?? "dracula"}
-        >
+        <GraphiQLInterface editorTheme={editorTheme ?? "dracula"}>
           <GraphiQL.Logo>Ruru</GraphiQL.Logo>
           <GraphiQL.Toolbar>
-            <GraphiQLMenuAny title="Utils" label="Utilities">
-              <GraphiQL.MenuItem
-                onSelect={prettify}
-                title="Prettify Query (Shift-Ctrl-P)"
-                label="Prettify"
+            <ToolbarButton
+              onClick={prettify}
+              label="Prettify Query (Shift-Ctrl-P)"
+            >
+              <PrettifyIcon
+                className="graphiql-toolbar-icon"
+                aria-hidden="true"
               />
-              <GraphiQL.MenuItem
-                onSelect={graphiql?.handleMergeQuery ?? noop}
-                title="Merge Query (Shift-Ctrl-M)"
-                label="Merge"
-              />
-              <GraphiQL.MenuItem
-                onSelect={graphiql?.handleCopyQuery ?? noop}
-                title="Copy Query (Shift-Ctrl-C)"
-                label="Copy"
-              />
-            </GraphiQLMenuAny>
-            <GraphiQLMenuAny title="Panels" label="Panels">
-              <GraphiQL.MenuItem
-                onSelect={onToggleDocs}
-                title="Docs"
-                label={
-                  (
-                    <span>
-                      {graphiql?.state.docExplorerOpen ? check : nocheck}
-                      Docs
-                    </span>
-                  ) as any
-                }
-              />
-              <GraphiQL.MenuItem
-                onSelect={onToggleHistory}
-                title="History"
-                label={
-                  (
-                    <span>
-                      {graphiql?.state.historyPaneOpen ? check : nocheck}
-                      History
-                    </span>
-                  ) as any
-                }
-              />
-              <GraphiQL.MenuItem
-                label={
-                  (
-                    <span>{explorerIsOpen ? check : nocheck}Explorer</span>
-                  ) as any
-                }
-                title="Construct a query with the GraphiQL explorer"
-                onSelect={onToggleExplorer}
-              />
-              <GraphiQL.MenuItem
-                label={
-                  (<span>{showExplain ? check : nocheck}Explain</span>) as any
-                }
-                title="Show details of what went on inside your GraphQL operation (if the server supports this)"
-                onSelect={() => setShowExplain(!showExplain)}
-              />
-            </GraphiQLMenuAny>
-            <GraphiQLMenuAny title="Options" label="Options">
-              <GraphiQL.MenuItem
-                label={
-                  (
-                    <span>
-                      {storage.get("explain") === "true" ? check : nocheck}
-                      Explain (show execution details if available)
-                    </span>
-                  ) as any
-                }
+            </ToolbarButton>
+            <ToolbarButton
+              onSelect={mergeQuery}
+              label="Merge Query (Shift-Ctrl-M)"
+            >
+              <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={copyQuery}
+              label="Copy query (Shift-Ctrl-C)"
+            >
+              <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarMenu
+              label="Options"
+              button={
+                <ToolbarButton label="Options">
+                  <SettingsIcon
+                    className="graphiql-toolbar-icon"
+                    aria-hidden="true"
+                  />
+                </ToolbarButton>
+              }
+            >
+              <ToolbarMenu.Item
                 title="View the SQL statements that this query invokes"
                 onSelect={() => storage.toggle("explain")}
-              />
-              <GraphiQL.MenuItem
-                label={
-                  (
-                    <span>
-                      {storage.get("saveHeaders") === "true" ? check : nocheck}
-                      Save headers
-                    </span>
-                  ) as any
-                }
+              >
+                <span>
+                  {storage.get("explain") === "true" ? check : nocheck}
+                  Explain (if supported)
+                </span>
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
                 title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
                 onSelect={() => storage.toggle("saveHeaders")}
-              />
-            </GraphiQLMenuAny>
+              >
+                <span>
+                  {storage.get("saveHeaders") === "true" ? check : nocheck}
+                  Save headers
+                </span>
+              </ToolbarMenu.Item>
+            </ToolbarMenu>
           </GraphiQL.Toolbar>
           <GraphiQL.Footer>
             <RuruFooter />
           </GraphiQL.Footer>
-        </GraphiQLAny>
+        </GraphiQLInterface>
       </div>
       {showExplain ? <ExplainDragBar helpers={explainHelpers} /> : null}
       {showExplain ? (
