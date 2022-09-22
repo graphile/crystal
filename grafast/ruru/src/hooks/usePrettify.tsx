@@ -1,8 +1,4 @@
-import {
-  useEditorContext,
-  usePrettifyEditors as usePrettifyQuery,
-} from "@graphiql/react";
-import type { GraphiQL } from "graphiql";
+import { useEditorContext, usePrettifyEditors } from "@graphiql/react";
 import { useCallback } from "react";
 
 declare global {
@@ -18,7 +14,7 @@ declare global {
  */
 export const usePrettify = () => {
   const editorContext = useEditorContext();
-  const fallbackPrettify = usePrettifyQuery();
+  const fallbackPrettify = usePrettifyEditors();
   return useCallback(() => {
     const queryEditor = editorContext?.queryEditor;
     if (!queryEditor) {
@@ -39,5 +35,5 @@ export const usePrettify = () => {
     } else {
       fallbackPrettify();
     }
-  }, []);
+  }, [editorContext?.queryEditor, fallbackPrettify]);
 };

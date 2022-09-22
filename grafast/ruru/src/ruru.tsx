@@ -1,10 +1,15 @@
 import "graphiql/graphiql.css";
 
 import {
+  CopyIcon,
   DOC_EXPLORER_PLUGIN,
   GraphiQLProvider,
   HISTORY_PLUGIN,
   Menu,
+  MergeIcon,
+  PrettifyIcon,
+  SettingsIcon,
+  ToolbarButton,
   ToolbarMenu,
   useCopyQuery,
   useMergeQuery,
@@ -118,66 +123,45 @@ export const RuruInner: FC<{
         <GraphiQLInterface editorTheme={editorTheme ?? "dracula"}>
           <GraphiQL.Logo>Ruru</GraphiQL.Logo>
           <GraphiQL.Toolbar>
-            <Menu title="Utils" label="Utilities">
-              <ToolbarMenu.Item
-                onSelect={prettify}
-                title="Prettify Query (Shift-Ctrl-P)"
-              >
-                Prettify
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                onSelect={mergeQuery}
-                title="Merge Query (Shift-Ctrl-M)"
-              >
-                Merge
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                onSelect={copyQuery}
-                title="Copy Query (Shift-Ctrl-C)"
-              >
-                Copy
-              </ToolbarMenu.Item>
-            </Menu>
-            <Menu title="Panels" label="Panels">
-              <ToolbarMenu.Item
-                onSelect={() =>
-                  pluginContext?.setVisiblePlugin(DOC_EXPLORER_PLUGIN)
-                }
-                title="Docs"
-              >
-                <span>
-                  {pluginContext?.visiblePlugin === DOC_EXPLORER_PLUGIN
-                    ? check
-                    : nocheck}
-                  Docs
-                </span>
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                onSelect={() => pluginContext?.setVisiblePlugin(HISTORY_PLUGIN)}
-                title="History"
-              >
-                <span>
-                  {pluginContext?.visiblePlugin === HISTORY_PLUGIN
-                    ? check
-                    : nocheck}
-                  History
-                </span>
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                title="Show details of what went on inside your GraphQL operation (if the server supports this)"
-                onSelect={() => setShowExplain(!showExplain)}
-              >
-                <span>{showExplain ? check : nocheck}Explain</span>
-              </ToolbarMenu.Item>
-            </Menu>
-            <Menu title="Options" label="Options">
+            <ToolbarButton
+              onClick={prettify}
+              label="Prettify Query (Shift-Ctrl-P)"
+            >
+              <PrettifyIcon
+                className="graphiql-toolbar-icon"
+                aria-hidden="true"
+              />
+            </ToolbarButton>
+            <ToolbarButton
+              onSelect={mergeQuery}
+              label="Merge Query (Shift-Ctrl-M)"
+            >
+              <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={copyQuery}
+              label="Copy query (Shift-Ctrl-C)"
+            >
+              <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarMenu
+              label="Options"
+              button={
+                <ToolbarButton label="Options">
+                  <SettingsIcon
+                    className="graphiql-toolbar-icon"
+                    aria-hidden="true"
+                  />
+                </ToolbarButton>
+              }
+            >
               <ToolbarMenu.Item
                 title="View the SQL statements that this query invokes"
                 onSelect={() => storage.toggle("explain")}
               >
                 <span>
                   {storage.get("explain") === "true" ? check : nocheck}
-                  Explain (show execution details if available)
+                  Explain (if supported)
                 </span>
               </ToolbarMenu.Item>
               <ToolbarMenu.Item
@@ -189,8 +173,22 @@ export const RuruInner: FC<{
                   Save headers
                 </span>
               </ToolbarMenu.Item>
+            </ToolbarMenu>
+          </GraphiQL.Toolbar>
+          {/*
+          <GraphiQL.Toolbar>
+            <Menu title="Panels" label="Panels">
+              <ToolbarMenu.Item
+                title="Show details of what went on inside your GraphQL operation (if the server supports this)"
+                onSelect={() => setShowExplain(!showExplain)}
+              >
+                <span>{showExplain ? check : nocheck}Explain</span>
+              </ToolbarMenu.Item>
+            </Menu>
+            <Menu title="Options" label="Options">
             </Menu>
           </GraphiQL.Toolbar>
+            */}
           <GraphiQL.Footer>
             <RuruFooter />
           </GraphiQL.Footer>
