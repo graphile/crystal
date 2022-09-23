@@ -1,5 +1,5 @@
 {
-  "name": "ruru",
+  "name": "@grafast/ruru",
   "version": "0.0.0",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "module",
