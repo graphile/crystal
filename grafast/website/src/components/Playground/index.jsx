@@ -1,6 +1,6 @@
 import { Ruru } from "@grafast/ruru";
 import * as Grafast from "grafast";
-import { grafast, lambda, makeGrafastSchema } from "grafast";
+import { grafast, makeGrafastSchema } from "grafast";
 import { GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
 
@@ -22,16 +22,6 @@ const plans = {
   },
 };
 `;
-
-const plans = {
-  Query: {
-    addTwoNumbers(_, args) {
-      const $a = args.get("a");
-      const $b = args.get("b");
-      return lambda([$a, $b], ([a, b]) => a + b);
-    },
-  },
-};
 
 export default function Playground() {
   const [typeDefs, setTypedefs] = useState(INITIAL_TYPEDEFS);
@@ -76,7 +66,20 @@ with (Grafast) {
       <div className={styles.ruru}>
         <Ruru fetcher={fetcher} />
       </div>
-      <div className={styles.editor}>editor</div>
+      <div className={styles.editors}>
+        <div className={styles.editor}>
+          <textarea
+            value={typeDefs}
+            onChange={(e) => setTypedefs(e.target.value)}
+          ></textarea>
+        </div>
+        <div className={styles.editor}>
+          <textarea
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          ></textarea>
+        </div>
+      </div>
     </div>
   );
 }

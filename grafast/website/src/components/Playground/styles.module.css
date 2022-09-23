@@ -5,9 +5,17 @@
   height: 800px;
   flex-direction: column;
 }
-.editor {
+.editors {
   flex: 1 1 300px;
+  display: flex;
+}
+.editor {
+  flex: 1 1 0;
   position: relative;
+}
+.editor textarea {
+  width: 100%;
+  height: 100%;
 }
 .ruru {
   flex: 1 1 500px;
