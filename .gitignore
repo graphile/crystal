@@ -1,5 +1,6 @@
 node_modules
 coverage
+bundle
 dist
 /pg-omit-archived/
 /pg-simplify-inflector/
