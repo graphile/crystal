@@ -28,7 +28,10 @@ export function withGrafastArgs(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  if (process.env.NODE_ENV === "development") {
+  if (
+    typeof process !== "undefined" &&
+    process.env.NODE_ENV === "development"
+  ) {
     if (
       args.rootValue != null &&
       (typeof args.rootValue !== "object" ||

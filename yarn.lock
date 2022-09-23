@@ -3792,8 +3792,8 @@ __metadata:
     http-proxy: "npm:^1.18.1"
     jest: "npm:^28.1.0"
     nodemon: "npm:^2.0.15"
-    react: "npm:^18.0.0"
-    react-dom: "npm:^18.0.0"
+    react: "npm:>=16 <19"
+    react-dom: "npm:>=16 <19"
     style-loader: "npm:^3.3.1"
     svg-inline-loader: "npm:^0.8.2"
     ts-loader: "npm:^9.3.1"
@@ -17381,7 +17381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^17.0.2":
+"react-dom@npm:>=16 <19, react-dom@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-dom@npm:17.0.2"
   dependencies:
@@ -17391,18 +17391,6 @@ __metadata:
   peerDependencies:
     react: 17.0.2
   checksum: 51a70345e6ce512d39789750b46524a2bd0bd8474fabcded2e9cd90dda77ae834fdb8481ca1e64265b91bacf8a1d760f17d6c0382bdfacf455362e617abbe5fa
-  languageName: node
-  linkType: hard
-
-"react-dom@npm:^18.0.0":
-  version: 18.0.0
-  resolution: "react-dom@npm:18.0.0"
-  dependencies:
-    loose-envify: "npm:^1.1.0"
-    scheduler: "npm:^0.21.0"
-  peerDependencies:
-    react: ^18.0.0
-  checksum: 105260a7e004eaea625842d659fc14082baff86398043015e54f0522c203a9bf5157dc95eb10740bd7ad15ed23716a9b1fc7e12a6548e03b6484f8a9537483fe
   languageName: node
   linkType: hard
 
@@ -17625,22 +17613,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^17.0.2":
+"react@npm:>=16 <19, react@npm:^17.0.2":
   version: 17.0.2
   resolution: "react@npm:17.0.2"
   dependencies:
     loose-envify: "npm:^1.1.0"
     object-assign: "npm:^4.1.1"
   checksum: c21b6ec9641b973afe3974e77d67d20df6e83c7e4de718af85d12389baa1077604560f086ae0e54e3c34ea87c60bd5d26080ba0cbad1c770307f53d6fa495e32
-  languageName: node
-  linkType: hard
-
-"react@npm:^18.0.0":
-  version: 18.0.0
-  resolution: "react@npm:18.0.0"
-  dependencies:
-    loose-envify: "npm:^1.1.0"
-  checksum: ecf8e4c2d345921a0c229dd8c9920fbe21bb8ac5581a9f57e864b40032f0c6f34206b2e9e56d98b8bb65555e54d063b39985c1f4f73af8386c22838420c6e0b1
   languageName: node
   linkType: hard
 
@@ -18404,15 +18383,6 @@ __metadata:
     loose-envify: "npm:^1.1.0"
     object-assign: "npm:^4.1.1"
   checksum: b3ec1f4367776c1e8632d9b6d594fdf0d4fe0aefd738a7f6902f60e9b910142e4997c4ad931f07a553de7bae7bfc2144e9966a9a35e8ef084fe6e48f5dcf94c6
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:^0.21.0":
-  version: 0.21.0
-  resolution: "scheduler@npm:0.21.0"
-  dependencies:
-    loose-envify: "npm:^1.1.0"
-  checksum: 0116015778a6899ad75c509f0a573df83f742859390968ee9212c91c860cbdbd2b0de99bbae31741c377099328259eb49bcfaa3f920504075f3ba4eeb9097483
   languageName: node
   linkType: hard
 

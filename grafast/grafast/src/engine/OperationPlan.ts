@@ -85,7 +85,8 @@ Object.freeze(POLYMORPHIC_ROOT_PATHS);
 
 /** In development we might run additional checks */
 const isDev =
-  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
+  typeof process !== "undefined" &&
+  (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test");
 
 /** How many times will we try re-optimizing before giving up */
 const MAX_OPTIMIZATION_LOOPS = 10;

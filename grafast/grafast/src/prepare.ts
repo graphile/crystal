@@ -30,7 +30,8 @@ import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
-const isTest = process.env.NODE_ENV === "test";
+const isTest =
+  typeof process !== "undefined" && process.env.NODE_ENV === "test";
 const $$contextPlanCache = Symbol("contextPlanCache");
 const $$bypassGraphQL = Symbol("bypassGraphQL");
 
