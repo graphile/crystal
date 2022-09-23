@@ -1,7 +1,7 @@
 import type { GraphQLObjectType } from "graphql";
-import { inspect } from "util";
 
 import { isDev } from "../dev.js";
+import { inspect } from "../inspect.js";
 import type {
   GrafastResultsList,
   GrafastValuesList,

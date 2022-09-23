@@ -1,7 +1,7 @@
-import assert from "assert";
 import type { GraphQLInputType, ValueNode } from "graphql";
 import { GraphQLList, Kind } from "graphql";
 
+import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
 import { assertInputStep, inputPlan } from "../input.js";
 import { ExecutableStep } from "../step.js";

@@ -1,6 +1,6 @@
-import * as assert from "assert";
 import type { GraphQLError } from "graphql";
 
+import * as assert from "../assert.js";
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { JSONValue } from "../interfaces.js";

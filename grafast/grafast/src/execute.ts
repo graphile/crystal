@@ -1,12 +1,12 @@
-import EventEmitter from "events";
+import EventEmitter from "eventemitter3";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
-import { inspect } from "util";
 
+import { inspect } from "./inspect.js";
 import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import type { GrafastPrepareOptions } from "./prepare.js";

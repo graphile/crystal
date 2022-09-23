@@ -1,4 +1,4 @@
-import type EventEmitter from "events";
+import type EventEmitter from "eventemitter3";
 import type {
   ASTNode,
   GraphQLArgument,
@@ -643,7 +643,7 @@ export type EventMapKey<TEventMap extends BaseEventMap> = string &
 export type EventCallback<TPayload> = (params: TPayload) => void;
 
 export interface TypedEventEmitter<TEventMap extends BaseEventMap>
-  extends EventEmitter {
+  extends EventEmitter<any, any> {
   addListener<TEventName extends EventMapKey<TEventMap>>(
     eventName: TEventName,
     callback: EventCallback<TEventMap[TEventName]>,

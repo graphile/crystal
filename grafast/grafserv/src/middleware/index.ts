@@ -1,3 +1,4 @@
+import EventEmitter from "eventemitter3";
 import type { Deferred, PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { defer, isPromiseLike, stringifyPayload, stripAnsi } from "grafast";
 import { resolvePresets } from "graphile-config";
@@ -8,7 +9,6 @@ import type {
 } from "graphql";
 import { GraphQLError } from "graphql";
 import type { IncomingMessage, RequestListener, ServerResponse } from "http";
-import EventEmitter from "node:events";
 
 import type { ServerParams } from "../interfaces.js";
 import { makeGraphiQLHandler } from "./graphiql.js";

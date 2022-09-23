@@ -1,5 +1,4 @@
 import type LRU from "@graphile/lru";
-import * as assert from "assert";
 import type {
   DocumentNode,
   FieldNode,
@@ -19,11 +18,12 @@ import {
   Kind,
   OperationTypeNode,
 } from "graphql";
-import { inspect } from "util";
 
+import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { $$error } from "../error.js";
+import { inspect } from "../inspect.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
 import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";

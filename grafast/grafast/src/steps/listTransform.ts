@@ -1,5 +1,4 @@
-import * as assert from "assert";
-
+import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { executeBucket, newBucket } from "../engine/executeBucket.js";

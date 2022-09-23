@@ -1,5 +1,4 @@
-import * as assert from "assert";
-
+import * as assert from "../assert.js";
 import type { ExecutableStep, ModifierStep } from "../step";
 import type { OperationPlan } from "./OperationPlan";
 

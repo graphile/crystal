@@ -1,6 +1,7 @@
 node_modules
 coverage
 dist
+*/*/release/
 /pg-omit-archived/
 /pg-simplify-inflector/
 /operation-hooks/
