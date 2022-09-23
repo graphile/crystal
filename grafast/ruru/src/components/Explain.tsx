@@ -131,7 +131,7 @@ export const ExplainMain: FC<{
                       boxShadow: "rgba(0,0,0,0.8) 3px 3px 15px",
                       overflow: "hidden",
                       padding: "1rem",
-                      zIndex: 6,
+                      zIndex: 1000,
                       fontFamily: '"Roboto", sans-serif',
                     }}
                   >

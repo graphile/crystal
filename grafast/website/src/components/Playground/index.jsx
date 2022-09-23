@@ -52,12 +52,15 @@ with (Grafast) {
           errors: [new GraphQLError(schema)],
         };
       }
-      return grafast({
-        schema,
-        source: query,
-        operationName,
-        variableValues: variables,
-      });
+      return grafast(
+        {
+          schema,
+          source: query,
+          operationName,
+          variableValues: variables,
+        },
+        { explain: ["mermaid-js"] },
+      );
     },
     [schema],
   );
