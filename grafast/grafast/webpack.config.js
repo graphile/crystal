@@ -1,35 +1,21 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/index.ts",
+  entry: {
+    index: "./dist/index.js",
+    envelop: {
+      dependOn: "index",
+      import: "./dist/envelop.js",
+    },
+  },
   output: {
-    path: path.resolve(__dirname, "bundle"),
-    filename: "grafast.js",
+    path: path.resolve(__dirname, "release/dist"),
+    filename: "[name].js",
     library: {
       name: "grafast",
       type: "umd",
     },
     globalObject: "this",
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        loader: "ts-loader",
-        exclude: /node_modules/,
-        options: {
-          compilerOptions: {
-            noEmit: false,
-          },
-        },
-      },
-    ],
-  },
-  resolve: {
-    extensions: [".ts", ".js"],
-    extensionAlias: {
-      ".js": [".ts", ".js"],
-    },
   },
   externals: {
     // graphql -> external
