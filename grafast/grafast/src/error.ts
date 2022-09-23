@@ -54,21 +54,3 @@ export function newGrafastError(error: Error, planId: number | null) {
 export function isGrafastError(value: any): value is GrafastError {
   return typeof value === "object" && value !== null && $$error in value;
 }
-
-class FieldError {
-  constructor(
-    public readonly originalError: GrafastError,
-    public readonly path: ReadonlyArray<string | number>,
-  ) {}
-}
-
-export function newFieldError(
-  originalError: GrafastError,
-  path: ReadonlyArray<string | number>,
-) {
-  return new FieldError(originalError, path);
-}
-
-export function isFieldError(thing: any): thing is FieldError {
-  return thing instanceof FieldError;
-}
