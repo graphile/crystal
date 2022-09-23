@@ -84,6 +84,15 @@ const config = {
         return {
           module: {
             rules: [
+              // This rule enables Ruru to work even though it's a type:module
+              {
+                test: /\.m?js/,
+                resolve: {
+                  fullySpecified: false,
+                },
+              },
+
+              // This rule is for ?raw assets
               {
                 resourceQuery: /raw/,
                 type: "asset/source",
