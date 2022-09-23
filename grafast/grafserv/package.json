@@ -35,6 +35,7 @@
     "@grafast/ruru": "workspace:^",
     "@graphile/lru": "workspace:^",
     "debug": "^4.1.1",
+    "eventemitter3": "^4.0.7",
     "graphile-config": "workspace:^",
     "tslib": "^2.4.0"
   },

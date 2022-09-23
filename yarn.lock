@@ -10765,7 +10765,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eventemitter3@npm:^4.0.0":
+"eventemitter3@npm:^4.0.0, eventemitter3@npm:^4.0.7":
   version: 4.0.7
   resolution: "eventemitter3@npm:4.0.7"
   checksum: e6ecb1ac2fee59b0ba0e778564cec0a1fe0631f28a50f24aa0e7ba367e718c5f9b23156fb2c1d238bcebe7923dfff37a63c39b519121a47c7bf78c38c96febd8
@@ -11917,6 +11917,7 @@ __metadata:
     "@types/nodemon": "npm:1.19.1"
     chai: "npm:^4.3.6"
     chalk: "npm:^4.1.2"
+    eventemitter3: "npm:^4.0.7"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     iterall: "npm:^1.3.0"
     jest: "npm:^28.1.0"
@@ -11941,6 +11942,7 @@ __metadata:
     "@grafast/ruru": "workspace:^"
     "@graphile/lru": "workspace:^"
     debug: "npm:^4.1.1"
+    eventemitter3: "npm:^4.0.7"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     jest: "npm:^28.1.0"
