@@ -90,7 +90,7 @@ const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
  * @remarks Due to the optimisation in `establishOperationPlan`, the schema, document
  * and operationName checks have already been performed.
  */
-export function isOpPlanCompatible<
+function isOpPlanCompatible<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
