@@ -40,6 +40,7 @@ with (Grafast) {
       return makeGrafastSchema({
         typeDefs,
         plans,
+        enableDeferStream: false,
       });
     } catch (e) {
       return e;
