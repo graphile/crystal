@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import debugFactory from "debug";
-import { inspect } from "util";
 
+import { inspect } from "../inspect.js";
 import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 

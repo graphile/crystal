@@ -15,11 +15,11 @@ import {
   isLeafType,
   Kind,
 } from "graphql";
-import { inspect } from "util";
 
 import * as assert from "./assert.js";
 import { withGlobalLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
 import {

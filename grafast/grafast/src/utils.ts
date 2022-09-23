@@ -33,7 +33,6 @@ import {
   GraphQLUnionType,
   Kind,
 } from "graphql";
-import { inspect } from "util";
 
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
@@ -41,6 +40,7 @@ import { isDev } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { InputStep } from "./input.js";
+import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,

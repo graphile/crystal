@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { inspect } from "util";
 
+import { inspect } from "./inspect.js";
 import { ExecutableStep } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {

@@ -23,7 +23,6 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { inspect } from "util";
 
 import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";
@@ -42,6 +41,7 @@ import {
   object,
 } from "../index.js";
 import { inputPlan } from "../input.js";
+import { inspect } from "../inspect.js";
 import type {
   FieldArgs,
   FieldPlanResolver,

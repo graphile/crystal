@@ -5,9 +5,9 @@ import type {
   SelectionNode,
 } from "graphql";
 import { Kind } from "graphql";
-import { inspect } from "util";
 
 import type { OperationPlan } from "./index.js";
+import { inspect } from "./inspect.js";
 
 // TODO:perf: this is incredibly inefficient
 function typeMatchesCondition(

@@ -1,5 +1,4 @@
-import { inspect } from "util";
-
+import { inspect } from "./inspect.js";
 import type { PolymorphicData } from "./interfaces.js";
 import { $$concreteType, $$data } from "./interfaces.js";
 

@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
-import { inspect } from "util";
 
 import { isDev, noop } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
@@ -10,6 +9,7 @@ import {
 } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
+import { inspect } from "./inspect.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
