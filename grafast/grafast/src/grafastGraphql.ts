@@ -30,6 +30,9 @@ try {
   let lastString: string;
   let lastHash: string;
   const createHash = require("crypto").createHash;
+  if (typeof createHash !== "function") {
+    throw new Error("Failed to load createHash");
+  }
   calculateQueryHash = (queryString: string): string => {
     if (queryString !== lastString) {
       lastString = queryString;

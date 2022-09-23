@@ -99,6 +99,14 @@ const config = {
               },
             ],
           },
+
+          // These are optional in Grafast, don't polyfill them
+          resolve: {
+            fallback: {
+              crypto: false,
+              util: false,
+            },
+          },
         };
       },
     }),
