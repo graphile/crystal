@@ -1,6 +1,14 @@
+import type { Fetcher } from "@graphiql/toolkit";
 import type { GraphiQLProps } from "graphiql";
 
+export { Fetcher };
+
 export interface RuruProps {
+  /**
+   * Optionally override the fetcher.
+   */
+  fetcher?: Fetcher;
+
   /**
    * The URL to the GraphQL endpoint. (http:// or https://)
    */
