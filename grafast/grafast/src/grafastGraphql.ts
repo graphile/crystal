@@ -1,5 +1,4 @@
 import LRU from "@graphile/lru";
-import { createHash } from "crypto";
 import type {
   AsyncExecutionResult,
   DocumentNode,
@@ -25,15 +24,22 @@ const cacheSize = Math.max(2, Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER));
 
 const queryCache = new LRU({ maxLength: cacheSize });
 
-let lastString: string;
-let lastHash: string;
-const calculateQueryHash = (queryString: string): string => {
-  if (queryString !== lastString) {
-    lastString = queryString;
-    lastHash = createHash("sha1").update(queryString).digest("base64");
-  }
-  return lastHash;
-};
+// If we can use crypto to create a hash, great. Otherwise just use the string.
+let calculateQueryHash: (queryString: string) => string;
+try {
+  let lastString: string;
+  let lastHash: string;
+  const createHash = require("crypto").createHash;
+  calculateQueryHash = (queryString: string): string => {
+    if (queryString !== lastString) {
+      lastString = queryString;
+      lastHash = createHash("sha1").update(queryString).digest("base64");
+    }
+    return lastHash;
+  };
+} catch {
+  calculateQueryHash = (str) => str;
+}
 
 let lastGqlSchema: GraphQLSchema;
 const parseAndValidate = (
