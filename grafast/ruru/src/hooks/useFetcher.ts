@@ -142,8 +142,8 @@ export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
   );
 
   const fetcher = useMemo(
-    () => createGraphiQLFetcher(fetcherOptions),
-    [fetcherOptions],
+    () => props.fetcher ?? createGraphiQLFetcher(fetcherOptions),
+    [fetcherOptions, props.fetcher],
   );
 
   const wrappedFetcher = useMemo(() => {
