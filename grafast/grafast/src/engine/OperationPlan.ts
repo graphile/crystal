@@ -1,5 +1,4 @@
 import LRU from "@graphile/lru";
-import * as assert from "assert";
 import type {
   FieldNode,
   FragmentDefinitionNode,
@@ -26,6 +25,7 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
+import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";
 import type { SelectionSetDigest } from "../graphqlCollectFields.js";
 import {
@@ -2325,7 +2325,7 @@ export class OperationPlan {
   /** Finalizes each step */
   private finalizeSteps(): void {
     const initialStepCount = this.stepCount;
-    assert.equal(
+    assert.strictEqual(
       this.modifierSteps.length,
       0,
       "No modifier steps expected when performing finalizeSteps",
@@ -2335,7 +2335,7 @@ export class OperationPlan {
         step.finalize();
         assertFinalized(step);
         if (isDev) {
-          assert.equal(
+          assert.strictEqual(
             this.stepCount,
             initialStepCount,
             `When calling ${step}.finalize() a new plan was created; this is forbidden!`,

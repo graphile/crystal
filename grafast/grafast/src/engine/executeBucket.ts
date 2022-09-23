@@ -1,7 +1,7 @@
-import * as assert from "assert";
 import { isAsyncIterable, isIterable } from "iterall";
 import { inspect } from "util";
 
+import * as assert from "../assert.js";
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";

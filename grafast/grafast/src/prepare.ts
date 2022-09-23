@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import type { ExecutionArgs } from "graphql";
 import { GraphQLError } from "graphql";
 import type {
@@ -8,6 +7,7 @@ import type {
 import { buildExecutionContext } from "graphql/execution/execute";
 import { isAsyncIterable, isIterable } from "iterall";
 
+import * as assert from "./assert.js";
 import type { Bucket, RequestContext } from "./bucket.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
@@ -624,7 +624,11 @@ async function processStream(
       bucketIndex++;
     }
 
-    assert.strictEqual(bucketIndex, size);
+    assert.strictEqual(
+      bucketIndex,
+      size,
+      "GraphileInternalError<7c8deab0-8dfa-40f2-b625-97026f8fedcc>: expected bucket size does not match",
+    );
 
     // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
     // const childBucketIndex = 0;
@@ -769,7 +773,11 @@ function processSingleDeferred(
     bucketIndex++;
   }
 
-  assert.strictEqual(bucketIndex, size);
+  assert.strictEqual(
+    bucketIndex,
+    size,
+    "GraphileInternalError<4e88c671-f65b-42a6-8756-61247b188093>: expected bucket size does not match",
+  );
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
   // const childBucketIndex = 0;
