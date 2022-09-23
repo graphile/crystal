@@ -95,7 +95,7 @@ async function main() {
   /** Our fastify (server) app */
   const app = fastify();
 
-  const { ruruHTML } = await import("ruru/server");
+  const { ruruHTML } = await import("@grafast/ruru/server");
 
   // The root URL ('/') serves Ruru (GraphiQL)
   app.route({

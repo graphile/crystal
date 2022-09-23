@@ -198,7 +198,7 @@ pool.on("error", (e) => {
   // Create our fastify (server) app
   const app = fastify();
 
-  const { ruruHTML } = await import("ruru/server");
+  const { ruruHTML } = await import("@grafast/ruru/server");
 
   // The root URL ('/') serves GraphiQL
   app.route({
