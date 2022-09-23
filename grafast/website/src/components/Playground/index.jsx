@@ -47,13 +47,13 @@ with (Grafast) {
     }
   }, [code, typeDefs]);
   const fetcher = useCallback(
-    ({ query, operationName, variables }) => {
+    async ({ query, operationName, variables }) => {
       if (schema instanceof Error) {
         return {
           errors: [new GraphQLError(schema)],
         };
       }
-      return grafast(
+      const result = await grafast(
         {
           schema,
           source: query,
@@ -62,6 +62,16 @@ with (Grafast) {
         },
         { explain: ["mermaid-js"] },
       );
+      if (result.extensions) {
+        // Hide 'extensions' so it doesn't overwhelm people
+        const { extensions, ...rest } = result;
+        Object.defineProperty(rest, "extensions", {
+          value: extensions,
+        });
+        return rest;
+      } else {
+        return result;
+      }
     },
     [schema],
   );
