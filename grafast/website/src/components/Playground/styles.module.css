@@ -21,3 +21,7 @@
   flex: 1 1 500px;
   position: relative;
 }
+
+.container :global(.graphiql-container) * {
+  box-sizing: content-box;
+}
