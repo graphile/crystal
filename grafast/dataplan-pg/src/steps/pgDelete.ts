@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import type { GrafastResultsList, GrafastValuesList } from "grafast";
 import { ExecutableStep, isDev } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
@@ -239,8 +239,8 @@ export class PgDeleteStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
-    values: Array<CrystalValuesList<any>>,
-  ): Promise<CrystalResultsList<any>> {
+    values: Array<GrafastValuesList<any>>,
+  ): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }

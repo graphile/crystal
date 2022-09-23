@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { list } from "./list.js";
 
@@ -30,7 +30,7 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
     return peers.filter((peer) => peer.fn === this.fn);
   }
 
-  execute(values: [CrystalValuesList<TIn>]): CrystalResultsList<TOut> {
+  execute(values: [GrafastValuesList<TIn>]): GrafastResultsList<TOut> {
     const { planDep } = this;
     if (planDep != null) {
       return values[planDep].map(this.fn);

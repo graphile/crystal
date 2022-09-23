@@ -92,7 +92,7 @@ beforeAll(() => {
   optimizedSchema = makeExampleSchema();
   deoptimizedSchema = makeExampleSchema({ deoptimize: true });
   testPool = new Pool({
-    connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
+    connectionString: process.env.TEST_DATABASE_URL || "graphile_grafast",
   });
   testPool.on("connect", (client) => {
     client.query(`set TimeZone to 'UTC'`);

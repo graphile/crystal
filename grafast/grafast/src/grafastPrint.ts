@@ -44,7 +44,7 @@ const BG_COLORS = [
   chalk.underline,
 ] as const;
 
-export function _crystalPrint(
+export function _grafastPrint(
   symbol: string | symbol | symbol[] | Record<symbol, any> | Map<any, any>,
   seen: Set<any>,
 ): string {
@@ -67,7 +67,7 @@ export function _crystalPrint(
     seen.add(symbol);
     return `[${symbol
       .map((value, i) =>
-        BG_COLORS[i % BG_COLORS.length](_crystalPrint(value, new Set(seen))),
+        BG_COLORS[i % BG_COLORS.length](_grafastPrint(value, new Set(seen))),
       )
       .join(", ")}]`;
   }
@@ -81,7 +81,7 @@ export function _crystalPrint(
     for (const [key, value] of symbol.entries()) {
       pairs.push(
         BG_COLORS[i % BG_COLORS.length](
-          `${_crystalPrint(key, new Set(seen))}: ${_crystalPrint(
+          `${_grafastPrint(key, new Set(seen))}: ${_grafastPrint(
             value,
             new Set(seen),
           )}`,
@@ -114,7 +114,7 @@ export function _crystalPrint(
     return `{${[...Object.keys(symbol), ...Object.getOwnPropertySymbols(symbol)]
       .map((key, i) =>
         BG_COLORS[i % BG_COLORS.length](
-          `${_crystalPrint(key, new Set(seen))}: ${_crystalPrint(
+          `${_grafastPrint(key, new Set(seen))}: ${_grafastPrint(
             symbol[key],
             new Set(seen),
           )}`,
@@ -125,23 +125,23 @@ export function _crystalPrint(
   if (typeof symbol !== "symbol") {
     return inspect(symbol, { colors: true });
   }
-  return crystalPrintSymbol(symbol);
+  return grafastPrintSymbol(symbol);
 }
 
-function _crystalSymbolDescription(symbol: symbol): string {
+function _grafastSymbolDescription(symbol: symbol): string {
   if (!symbol.description) {
     return chalk.green("Symbol()");
   }
   const nStr = symbol.description?.replace(/[^0-9]/g, "") || "";
   const n = parseInt(nStr, 10) || 0;
   if (n > 0) {
-    return crystalColor(symbol.description, n);
+    return grafastColor(symbol.description, n);
   } else {
     return chalk.cyan(`$$${symbol.description}`);
   }
 }
 
-export function crystalColor(text: string, n: number): string {
+export function grafastColor(text: string, n: number): string {
   const color = COLORS[Math.abs(n) % COLORS.length];
   return color(text);
 }
@@ -155,8 +155,8 @@ let symbolClear: NodeJS.Timer | null = null;
  * numeric identifiers to the output. Only tracks symbols over a short period
  * so counts will reset very frequently.
  */
-function crystalPrintSymbol(symbol: symbol): string {
-  const description = _crystalSymbolDescription(symbol);
+function grafastPrintSymbol(symbol: symbol): string {
+  const description = _grafastSymbolDescription(symbol);
   if (!symbolClear) {
     // Only cache symbols for a few milliseconds, we don't want a memory leak!
     symbolClear = setTimeout(() => {
@@ -180,12 +180,12 @@ function crystalPrintSymbol(symbol: symbol): string {
 }
 
 /**
- * Prints something crystal-style (i.e. concise, coloured, with helpful detail)
+ * Prints something grafast-style (i.e. concise, coloured, with helpful detail)
  */
-export function crystalPrint(
+export function grafastPrint(
   symbol: symbol | symbol[] | Record<symbol, any> | Map<any, any> | any,
 ): string {
-  return _crystalPrint(symbol, new Set());
+  return _grafastPrint(symbol, new Set());
 }
 
 /**

@@ -1,8 +1,8 @@
 import { isDev } from "../dev.js";
 import type {
-  CrystalResultStreamList,
-  CrystalSubscriber,
-  CrystalValuesList,
+  GrafastResultStreamList,
+  GrafastSubscriber,
+  GrafastValuesList,
 } from "../interfaces.js";
 import type { StreamableStep } from "../step.js";
 import { ExecutableStep, isExecutableStep } from "../step.js";
@@ -40,8 +40,8 @@ export class ListenStep<
 
   constructor(
     pubsubOrPlan:
-      | ExecutableStep<CrystalSubscriber<TTopics>>
-      | CrystalSubscriber<TTopics>,
+      | ExecutableStep<GrafastSubscriber<TTopics>>
+      | GrafastSubscriber<TTopics>,
     topicOrPlan: ExecutableStep<TTopic> | string,
     public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
   ) {
@@ -61,10 +61,10 @@ export class ListenStep<
 
   stream(
     values: [
-      CrystalValuesList<CrystalSubscriber<TTopics>>,
-      CrystalValuesList<TTopic>,
+      GrafastValuesList<GrafastSubscriber<TTopics>>,
+      GrafastValuesList<TTopic>,
     ],
-  ): CrystalResultStreamList<TTopics[TTopic]> {
+  ): GrafastResultStreamList<TTopics[TTopic]> {
     return values[this.pubsubDep as 0].map((pubsub, i) => {
       const topic = values[this.topicDep as 1][i];
       if (!pubsub) {
@@ -74,7 +74,7 @@ export class ListenStep<
             ? {
                 hint: `${this.opPlan.dangerouslyGetStep(
                   this.pubsubDep,
-                )} did not provide a CrystalSubscriber; perhaps you forgot to add the relevant property to context?`,
+                )} did not provide a GrafastSubscriber; perhaps you forgot to add the relevant property to context?`,
               }
             : {},
         );
@@ -95,8 +95,8 @@ export function listen<
   TPayloadStep extends ExecutableStep,
 >(
   pubsubOrPlan:
-    | ExecutableStep<CrystalSubscriber<TTopics>>
-    | CrystalSubscriber<TTopics>,
+    | ExecutableStep<GrafastSubscriber<TTopics>>
+    | GrafastSubscriber<TTopics>,
   topicOrPlan: ExecutableStep<TTopic> | string,
   itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {

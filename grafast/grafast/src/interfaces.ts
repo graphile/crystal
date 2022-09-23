@@ -18,7 +18,7 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestContext } from "./bucket.js";
-import type { CrystalError } from "./error.js";
+import type { GrafastError } from "./error.js";
 import type { InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -116,7 +116,7 @@ declare module "graphql" {
   }
 }
 
-export const $$crystalContext = Symbol("context");
+export const $$grafastContext = Symbol("context");
 export const $$planResults = Symbol("planResults");
 export const $$id = Symbol("id");
 /** Return the value verbatim, don't execute */
@@ -170,11 +170,11 @@ export interface IndexByListItemStepId {
 }
 
 // These values are just to make reading the code a little clearer
-export type CrystalValuesList<T> = ReadonlyArray<T>;
+export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
-export type CrystalResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
-export type CrystalResultStreamList<T> = ReadonlyArray<
-  AsyncIterable<PromiseOrDirect<T>> | CrystalError
+export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+export type GrafastResultStreamList<T> = ReadonlyArray<
+  AsyncIterable<PromiseOrDirect<T>> | GrafastError
 >;
 
 export type BaseGraphQLRootValue = any;
@@ -565,7 +565,7 @@ export interface StepOptimizeOptions {
  * given topic (string) and will receive an AsyncIterableIterator with messages
  * published to that topic (standard pub/sub semantics).
  */
-export type CrystalSubscriber<
+export type GrafastSubscriber<
   TTopics extends { [key: string]: any } = { [key: string]: any },
 > = {
   subscribe<TTopic extends keyof TTopics = keyof TTopics>(

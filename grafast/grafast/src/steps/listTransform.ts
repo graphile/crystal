@@ -6,11 +6,11 @@ import { executeBucket, newBucket } from "../engine/executeBucket.js";
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { CrystalError } from "../error.js";
+import type { GrafastError } from "../error.js";
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
   ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { $$deepDepSkip, ExecutableStep, isListCapableStep } from "../step.js";
@@ -56,7 +56,7 @@ export interface ListTransformOptions<
 /**
  * **Experimental.**
  *
- * A "special" plan that has custom handling in Crystal. Used for turning lists
+ * A "special" plan that has custom handling in Grafast. Used for turning lists
  * into other things (or maybe more lists!).
  *
  * It's recommended that you don't use this directly, please use one of the
@@ -197,9 +197,9 @@ export class __ListTransformStep<
   }
 
   async execute(
-    values: [CrystalValuesList<any[] | null | undefined | CrystalError>],
+    values: [GrafastValuesList<any[] | null | undefined | GrafastError>],
     extra: ExecutionExtra,
-  ): Promise<CrystalResultsList<TMemo>> {
+  ): Promise<GrafastResultsList<TMemo>> {
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
@@ -307,7 +307,7 @@ export class __ListTransformStep<
 /**
  * **Experimental.**
  *
- * A "special" plan that has custom handling in Crystal. Used for turning lists
+ * A "special" plan that has custom handling in Grafast. Used for turning lists
  * into other things (or maybe more lists!).
  *
  * {@page ~grafast/steps/listTransform.md}

@@ -9,12 +9,12 @@ import { inspect } from "util";
 
 import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import type { CrystalPrepareOptions } from "./prepare.js";
+import type { GrafastPrepareOptions } from "./prepare.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 
 export interface GrafastExecuteOptions {
-  explain?: CrystalPrepareOptions["explain"];
+  explain?: GrafastPrepareOptions["explain"];
   asString?: boolean;
 }
 
@@ -35,7 +35,7 @@ export function withGrafastArgs(
         Object.keys(args.rootValue).length > 0)
     ) {
       throw new Error(
-        `Crystal executor doesn't support there being a rootValue (found ${inspect(
+        `Grafast executor doesn't support there being a rootValue (found ${inspect(
           args.rootValue,
         )})`,
       );

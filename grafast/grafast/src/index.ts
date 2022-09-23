@@ -1,11 +1,11 @@
 import debugFactory from "debug";
 
-import { crystalPrint } from "./crystalPrint.js";
 import { exportAsMany } from "./exportAs.js";
+import { grafastPrint } from "./grafastPrint.js";
 import {
-  CrystalPlans,
   EnumPlans,
   FieldPlans,
+  GrafastPlans,
   InputObjectPlans,
   InterfaceOrUnionPlans,
   makeGrafastSchema,
@@ -15,13 +15,13 @@ import {
 import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // TODO: doing this here feels "naughty".
-debugFactory.formatters.c = crystalPrint;
+debugFactory.formatters.c = grafastPrint;
 
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import { CrystalError, isCrystalError } from "./error.js";
+import { GrafastError, isGrafastError } from "./error.js";
 import { execute, GrafastExecuteOptions } from "./execute.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
@@ -39,10 +39,6 @@ import {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalSubscriber,
-  CrystalValuesList,
   EnumValueApplyPlanResolver,
   EventCallback,
   EventMapKey,
@@ -57,6 +53,10 @@ import {
   GrafastFieldExtensions,
   GrafastInputFieldExtensions,
   GrafastObjectTypeExtensions,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastSubscriber,
+  GrafastValuesList,
   GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -227,13 +227,6 @@ export {
   constant,
   ConstantStep,
   context,
-  CrystalError,
-  CrystalPlans,
-  crystalPrint,
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalSubscriber,
-  CrystalValuesList,
   debugPlans,
   defer,
   Deferred,
@@ -263,13 +256,20 @@ export {
   grafastGraphql as grafast, // TODO: rename grafastGraphql to just grafast
   GrafastArgumentExtensions,
   GrafastEnumValueExtensions,
+  GrafastError,
   GrafastExecuteOptions,
   GrafastFieldExtensions,
   grafastGraphql,
   grafastGraphqlSync,
   GrafastInputFieldExtensions,
   GrafastObjectTypeExtensions,
+  GrafastPlans,
+  grafastPrint,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastSubscriber,
   grafastGraphqlSync as grafastSync, // TODO: rename grafastGraphqlSync to just grafastSync
+  GrafastValuesList,
   GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -293,9 +293,9 @@ export {
   InputObjectTypeSpec,
   InputStep,
   InterfaceOrUnionPlans,
-  isCrystalError,
   isDev,
   isExecutableStep,
+  isGrafastError,
   isListCapableStep,
   isModifierStep,
   isObjectLikeStep,
@@ -380,7 +380,7 @@ export {
 };
 
 exportAsMany({
-  crystalPrint,
+  grafastPrint,
   makeGrafastSchema,
   OperationPlan,
   defer,
@@ -410,7 +410,7 @@ exportAsMany({
   constant,
   ConstantStep,
   context,
-  isCrystalError,
+  isGrafastError,
   debugPlans,
   each,
   error,

@@ -1,8 +1,8 @@
 import type { __ItemStep } from "../index.js";
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
   ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
@@ -111,9 +111,9 @@ export class LoadOneStep<
     this.metaKey = `LoadOneStep|${loadId}|${this.loadOptionsKey}`;
   }
   execute(
-    [specs]: [CrystalValuesList<TSpec>],
+    [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
-  ): PromiseOrDirect<CrystalResultsList<TData>> {
+  ): PromiseOrDirect<GrafastResultsList<TData>> {
     const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadOneMeta;
     let cache = meta.cache;

@@ -11,10 +11,10 @@ import {
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import type {
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalValuesList,
   ExecutionExtra,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastValuesList,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
@@ -177,7 +177,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * - The `execute` method must be a regular (not async) function
    * - The `execute` method must NEVER return a promise
    * - The values within the list returned from `execute` must NEVER include
-   *   promises or CrystalError objects
+   *   promises or GrafastError objects
    * - The result of calling `execute` should not differ after a
    *   `step.hasSideEffects` has executed (i.e. it should be pure, only
    *   dependent on its deps and use no external state)
@@ -396,9 +396,9 @@ export class ExecutableStep<TData = any> extends BaseStep {
 
   /**
    * This function will be called with a `values` list: an array of entries for
-   * each incoming crystal object, where each entry in the array is a list of
+   * each incoming grafast object, where each entry in the array is a list of
    * the values retrieved from executing the plans in `this.dependencies` for
-   * that crystal object.
+   * that grafast object.
    *
    * It must return a list with the same length as `values`, where each value
    * in the list relates to the result of executing this plan for the
@@ -407,15 +407,15 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * IMPORTANT: it is up to the execute function to cache/memoize results as
    * appropriate for performance, this can be done via the `meta` object.
    *
-   * The `meta` object is an empty object stored to `crystalContext.metaByPlan`
+   * The `meta` object is an empty object stored to `grafastContext.metaByPlan`
    * that can be used to store anything this plan needs. We recommend that you
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
   execute(
-    values: ReadonlyArray<CrystalValuesList<any>>,
+    values: ReadonlyArray<GrafastValuesList<any>>,
     extra: ExecutionExtra,
-  ): PromiseOrDirect<CrystalResultsList<TData>> {
+  ): PromiseOrDirect<GrafastResultsList<TData>> {
     // ESLint/TS: ignore not used.
     values;
     extra;
@@ -468,12 +468,12 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
    * rather than a list of results.
    */
   stream(
-    values: CrystalValuesList<ReadonlyArray<any>>,
+    values: GrafastValuesList<ReadonlyArray<any>>,
     extra: ExecutionExtra,
     streamOptions: {
       initialCount: number;
     },
-  ): PromiseOrDirect<CrystalResultStreamList<TData>>;
+  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
 };
 
 export function isStreamableStep<TData>(

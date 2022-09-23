@@ -1,5 +1,5 @@
 import type { Constraint } from "../constraints.js";
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
@@ -74,7 +74,7 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
     this.path = path;
   }
 
-  execute(values: [CrystalValuesList<TData>]): CrystalResultsList<TData> {
+  execute(values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
     // We have only one dependency, return the value of that.
     return values[0];
   }

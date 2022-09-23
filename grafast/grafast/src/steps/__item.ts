@@ -4,7 +4,7 @@ import { $$deepDepSkip, ExecutableStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
- * themselves!) that Crystal uses to refer to an individual item within a list
+ * themselves!) that Grafast uses to refer to an individual item within a list
  * or stream.
  */
 export class __ItemStep<TData> extends ExecutableStep<TData> {

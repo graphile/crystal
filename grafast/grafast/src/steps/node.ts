@@ -3,8 +3,8 @@ import { inspect } from "util";
 
 import { isDev } from "../dev.js";
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastValuesList,
   NodeIdCodec,
   NodeIdHandler,
   PolymorphicData,
@@ -89,8 +89,8 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   }
 
   execute(
-    values: Array<CrystalValuesList<any>>,
-  ): CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
+    values: Array<GrafastValuesList<any>>,
+  ): GrafastResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
     return values[this.specPlanDep].map((specifier) => {
       const typeName = specifier
         ? this.getTypeNameFromSpecifier(specifier)

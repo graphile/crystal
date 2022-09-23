@@ -1,8 +1,8 @@
 import type { __ItemStep } from "../index.js";
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
   ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
@@ -87,7 +87,7 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
     // can replace ourself with our dependency:
     return this.getDep(0);
   }
-  execute([records]: [CrystalValuesList<TData>]): CrystalResultsList<TData> {
+  execute([records]: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
     return records;
   }
 }
@@ -164,9 +164,9 @@ export class LoadManyStep<
     this.metaKey = `LoadManyStep|${loadId}|${this.loadOptionsKey}`;
   }
   execute(
-    [specs]: [CrystalValuesList<TSpec>],
+    [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
-  ): PromiseOrDirect<CrystalResultsList<ReadonlyArray<TData>>> {
+  ): PromiseOrDirect<GrafastResultsList<ReadonlyArray<TData>>> {
     const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadManyMeta;
     let cache = meta.cache;

@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
@@ -14,7 +14,7 @@ export class ErrorStep extends ExecutableStep {
     this.promise = Promise.reject(error);
   }
 
-  execute(values: CrystalValuesList<any>): CrystalResultsList<any> {
+  execute(values: GrafastValuesList<any>): GrafastResultsList<any> {
     return arrayOfLength(values[0].length, this.promise);
   }
 }

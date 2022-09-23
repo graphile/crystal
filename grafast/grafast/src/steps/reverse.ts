@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 
 /**
@@ -34,7 +34,7 @@ export class ReverseStep<TData> extends ExecutableStep<readonly TData[]> {
     this.addDependency(plan);
   }
 
-  execute(values: [CrystalValuesList<TData[]>]): CrystalResultsList<TData[]> {
+  execute(values: [GrafastValuesList<TData[]>]): GrafastResultsList<TData[]> {
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 

@@ -16,8 +16,8 @@ import {
 import type { __ItemStep, ObjectStep } from "../index.js";
 import { context } from "../index.js";
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastValuesList,
   PolymorphicData,
 } from "../interfaces.js";
 import { $$data } from "../interfaces.js";
@@ -84,7 +84,7 @@ export class GraphQLResolverStep extends ExecutableStep {
     return peers.filter((peer) => peer.resolver === this.resolver);
   }
 
-  execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
+  execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
     return values[this.planDep].map((source, i) => {
       try {
         const args = values[this.argsDep][i];
@@ -125,7 +125,7 @@ export class GraphQLPolymorphicUnwrap extends ExecutableStep {
     super();
     this.addDependency($parent);
   }
-  execute(values: [CrystalValuesList<PolymorphicData>]) {
+  execute(values: [GrafastValuesList<PolymorphicData>]) {
     return values[0].map((v) => (v ? v[$$data] : null));
   }
 }
@@ -239,7 +239,7 @@ export class GraphQLItemHandler
     return data.map((data) => dcr(data, context, resolveInfo));
   }
 
-  execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
+  execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
     if (this.abstractType) {
       return values[0].map((data) => {
         if (data == null) {

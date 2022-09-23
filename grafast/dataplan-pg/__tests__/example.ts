@@ -91,7 +91,7 @@ function replaceAll(
   }
 }
 
-const testPool = new Pool({ connectionString: "graphile_crystal" });
+const testPool = new Pool({ connectionString: "graphile_grafast" });
 
 async function main() {
   //console.log(printSchema(schema));

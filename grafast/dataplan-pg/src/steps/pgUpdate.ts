@@ -1,6 +1,6 @@
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastValuesList,
   SetterStep,
 } from "grafast";
 import { ExecutableStep, isDev, setter } from "grafast";
@@ -292,8 +292,8 @@ export class PgUpdateStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
-    values: Array<CrystalValuesList<any>>,
-  ): Promise<CrystalResultsList<any>> {
+    values: Array<GrafastValuesList<any>>,
+  ): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }

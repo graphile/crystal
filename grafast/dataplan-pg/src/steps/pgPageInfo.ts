@@ -1,6 +1,6 @@
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastValuesList,
   PageInfoCapableStep,
 } from "grafast";
 import { ConnectionStep, constant, ExecutableStep, first, last } from "grafast";
@@ -168,8 +168,8 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
   }
 
   execute(
-    values: CrystalValuesList<ReadonlyArray<any>>,
-  ): CrystalResultsList<object> {
+    values: GrafastValuesList<ReadonlyArray<any>>,
+  ): GrafastResultsList<object> {
     return new Array(values[0].length).fill(EMPTY_OBJECT);
   }
 }
