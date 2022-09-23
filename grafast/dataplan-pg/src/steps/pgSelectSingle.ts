@@ -1,7 +1,7 @@
 import type {
+  EdgeCapableStep,
   GrafastResultsList,
   GrafastValuesList,
-  EdgeCapableStep,
 } from "grafast";
 import { ExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";

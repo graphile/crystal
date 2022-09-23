@@ -3,10 +3,10 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
+  ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
-  ExecutionExtra,
   InputStep,
   LambdaStep,
   StepOptimizeOptions,

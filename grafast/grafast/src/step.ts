@@ -11,10 +11,10 @@ import {
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import type {
+  ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
-  ExecutionExtra,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,

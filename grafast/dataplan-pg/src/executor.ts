@@ -3,12 +3,12 @@ import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
-  GrafastError,
-  GrafastResultStreamList,
-  GrafastValuesList,
   Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
+  GrafastError,
+  GrafastResultStreamList,
+  GrafastValuesList,
   ObjectStep,
   PromiseOrDirect,
 } from "grafast";

@@ -8,9 +8,9 @@ import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import type { GrafastError } from "../error.js";
 import type {
+  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
-  ExecutionExtra,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { $$deepDepSkip, ExecutableStep, isListCapableStep } from "../step.js";

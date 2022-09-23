@@ -9,10 +9,10 @@ import { isGrafastError, newGrafastError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
 import { __ItemStep, isStreamableStep } from "../index.js";
 import type {
+  ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
-  ExecutionExtra,
   PromiseOrDirect,
 } from "../interfaces.js";
 import { $$concreteType, $$streamMore } from "../interfaces.js";

@@ -20,8 +20,8 @@ import type {
   AccessStep,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
-  GrafastSubscriber,
   ExecutableStep,
+  GrafastSubscriber,
   GraphileArgumentConfig,
   ListStep,
 } from "grafast";
