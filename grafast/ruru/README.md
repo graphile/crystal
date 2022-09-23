@@ -11,7 +11,7 @@ ultimately released. This also explains the shocking lack of documentation.
 We recommend that you install this alongside `http-proxy`:
 
 ```
-yarn add http-proxy ruru
+yarn add http-proxy @grafast/ruru
 ```
 
 Then you can run something like the following to automatically proxy requests
@@ -48,7 +48,10 @@ Options:
 <!-- Required below here -->
 <div id="ruru-root"></div>
 <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
-<script crossorigin src="https://unpkg.com/ruru/bundle/ruru.min.js"></script>
+<script
+  crossorigin
+  src="https://unpkg.com/@grafast/ruru/bundle/ruru.min.js"
+></script>
 <script>
   const { React, createRoot, Ruru } = RuruBundle;
   const tree = React.createElement(Ruru, {
@@ -63,7 +66,7 @@ Options:
 ## Usage - library
 
 ```js
-import { Ruru } from "ruru";
+import { Ruru } from "@grafast/ruru";
 
 React.render(<Ruru endpoint="/graphql" />);
 ```
@@ -71,7 +74,7 @@ React.render(<Ruru endpoint="/graphql" />);
 ## Usage - middleware
 
 ```js
-import { ruruHTML } from "ruru/server";
+import { ruruHTML } from "@grafast/ruru/server";
 
 // ...
 
