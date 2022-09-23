@@ -3,9 +3,9 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastValuesList,
   ExecutionExtra,
   InputStep,
   LambdaStep,
@@ -1244,9 +1244,9 @@ export class PgSelectStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
-    values: Array<CrystalValuesList<any>>,
+    values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
-  ): Promise<CrystalResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
+  ): Promise<GrafastResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -1318,9 +1318,9 @@ export class PgSelectStep<
    * Like `execute`, but stream the results via async iterables.
    */
   async stream(
-    values: Array<CrystalValuesList<any>>,
+    values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
-  ): Promise<CrystalResultStreamList<PgSourceRow<TColumns>>> {
+  ): Promise<GrafastResultStreamList<PgSourceRow<TColumns>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectStep before finalizing it.");
     }
@@ -2775,15 +2775,15 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   /**
    * When you return a plan in a situation where GraphQL is expecting a
    * GraphQLList, it must implement the `.listItem()` method to return a plan
-   * for an individual item within this list. Graphile Crystal will
+   * for an individual item within this list. Graphile Grafast will
    * automatically call this (possibly recursively) to pass to the plan
    * resolvers on the children of this field.
    *
-   * NOTE: Graphile Crystal handles the list indexes for you, so your list item
+   * NOTE: Graphile Grafast handles the list indexes for you, so your list item
    * plan should process just the single input list item.
    *
    * IMPORTANT: do not call `.listItem` from user code; it's only intended to
-   * be called by Graphile Crystal.
+   * be called by Graphile Grafast.
    */
   listItem(
     itemPlan: ExecutableStep,

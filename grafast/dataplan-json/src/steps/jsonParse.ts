@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import type {
   AccessStep,
-  CrystalResultsList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastValuesList,
 } from "grafast";
 import { access, ExecutableStep } from "grafast";
 
@@ -52,7 +52,7 @@ export class JSONParseStep<
     return access(this, [index]);
   }
 
-  execute(values: [CrystalValuesList<string>]): CrystalResultsList<TJSON> {
+  execute(values: [GrafastValuesList<string>]): GrafastResultsList<TJSON> {
     return values[0].map((v) => {
       if (typeof v === "string") {
         try {
@@ -71,7 +71,7 @@ export class JSONParseStep<
           ),
         );
       }
-    }) as CrystalResultsList<TJSON>;
+    }) as GrafastResultsList<TJSON>;
   }
 }
 

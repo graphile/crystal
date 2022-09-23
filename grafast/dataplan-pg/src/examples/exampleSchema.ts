@@ -20,7 +20,7 @@ import type {
   AccessStep,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
-  CrystalSubscriber,
+  GrafastSubscriber,
   ExecutableStep,
   GraphileArgumentConfig,
   ListStep,
@@ -4718,7 +4718,7 @@ export function makeExampleSchema(
               const $topic = lambda($forumId, (id) => `forum:${id}:message`);
               const $pgSubscriber = context<OurGraphQLContext>().get(
                 "pgSubscriber",
-              ) as unknown as AccessStep<CrystalSubscriber>;
+              ) as unknown as AccessStep<GrafastSubscriber>;
 
               return listen($pgSubscriber, $topic, jsonParse);
             },

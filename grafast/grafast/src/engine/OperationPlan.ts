@@ -870,13 +870,13 @@ export class OperationPlan {
         const namedReturnType = getNamedType(fieldType);
 
         /**
-         * This could be the crystal resolver or a user-supplied resolver or
+         * This could be the grafast resolver or a user-supplied resolver or
          * nothing.
          */
         const rawResolver = objectField.resolve;
 
         /**
-         * This will never be the crystal resolver - only ever the user-supplied
+         * This will never be the grafast resolver - only ever the user-supplied
          * resolver or nothing
          */
         const resolvedResolver = rawResolver;
@@ -929,13 +929,13 @@ export class OperationPlan {
          *    is to the same
          *    - If resultIsPlanned
          *      - Assert: there must not be a `resolve()`
-         *      - Crystal provides pure resolver.
+         *      - Grafast provides pure resolver.
          *    - Else if fieldHasPlan (which may be implied by typeIsPlanned
          *      above)
          *      - If `resolve()` is not set:
-         *        - crystal will return the value from the plan directly
+         *        - grafast will return the value from the plan directly
          *      - Otherwise:
-         *        - Crystal will wrap this resolver and will call `resolve()` (or
+         *        - Grafast will wrap this resolver and will call `resolve()` (or
          *          default resolver) with the plan result.  IMPORTANT: you may
          *          want to use an `ObjectStep` so that the parent object is of
          *          the expected shape; e.g. your plan might return

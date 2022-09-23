@@ -1,8 +1,8 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
 import type {
-  CrystalResultStreamList,
-  CrystalValuesList,
+  GrafastResultStreamList,
+  GrafastValuesList,
   ObjectStep,
 } from "grafast";
 import {
@@ -948,23 +948,23 @@ export class PgSource<
   }
 
   public executeWithCache<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
-  ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
+  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
     return this.executor.executeWithCache(values, options);
   }
 
   public executeWithoutCache<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
-  ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
+  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
     return this.executor.executeWithoutCache(values, options);
   }
 
   public executeStream<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
-  ): Promise<{ streams: CrystalResultStreamList<TOutput> }> {
+  ): Promise<{ streams: GrafastResultStreamList<TOutput> }> {
     return this.executor.executeStream(values, options);
   }
 

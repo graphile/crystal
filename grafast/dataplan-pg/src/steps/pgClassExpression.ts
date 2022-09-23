@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import type { GrafastResultsList, GrafastValuesList } from "grafast";
 import { ExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -226,8 +226,8 @@ export class PgClassExpressionStep<
   }
 
   public execute(
-    values: Array<CrystalValuesList<any>>,
-  ): CrystalResultsList<any> {
+    values: Array<GrafastValuesList<any>>,
+  ): GrafastResultsList<any> {
     const { attrIndex, tableId } = this;
     const pg2gql = this.pgCodec.fromPg;
     if (attrIndex != null) {

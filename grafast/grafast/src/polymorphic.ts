@@ -42,7 +42,7 @@ export function polymorphicWrap<TType extends string>(
 }
 
 /**
- * All polymorphic objects in Graphile Crystal have a $$concreteType property
+ * All polymorphic objects in Graphile Grafast have a $$concreteType property
  * which contains the GraphQL object's type name; we simply return that.
  */
 export function resolveType(o: unknown): string {

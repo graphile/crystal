@@ -1,4 +1,4 @@
-import type { CrystalResultsList } from "../interfaces.js";
+import type { GrafastResultsList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
@@ -16,7 +16,7 @@ export class ConstantStep<TData> extends ExecutableStep<TData> {
     super();
   }
 
-  execute(values: [[undefined]]): CrystalResultsList<TData> {
+  execute(values: [[undefined]]): GrafastResultsList<TData> {
     return arrayOfLength(values[0].length, this.data);
   }
 

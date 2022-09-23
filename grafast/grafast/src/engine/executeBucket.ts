@@ -4,14 +4,14 @@ import { inspect } from "util";
 
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
-import type { CrystalError } from "../error.js";
-import { isCrystalError, newCrystalError } from "../error.js";
+import type { GrafastError } from "../error.js";
+import { isGrafastError, newGrafastError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
 import { __ItemStep, isStreamableStep } from "../index.js";
 import type {
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastValuesList,
   ExecutionExtra,
   PromiseOrDirect,
 } from "../interfaces.js";
@@ -22,7 +22,7 @@ import { arrayOfLength, isPromiseLike } from "../utils.js";
 
 // An error that indicates this entry was skipped because it didn't match
 // polymorphicPath.
-const POLY_SKIPPED = newCrystalError(
+const POLY_SKIPPED = newGrafastError(
   new Error("Polymorphic skipped; you should never see this"),
   null,
 );
@@ -43,7 +43,7 @@ function noop() {
  */
 function mergeErrorsBackIn(
   results: ReadonlyArray<any>,
-  errors: { [index: number]: CrystalError },
+  errors: { [index: number]: GrafastError },
   resultCount: number,
 ): any[] {
   const finalResults: any[] = [];
@@ -178,7 +178,7 @@ export function executeBucket(
 
   function completedStep(
     finishedStep: ExecutableStep,
-    result: CrystalValuesList<any>,
+    result: GrafastValuesList<any>,
     noNewErrors = false,
   ): void | Promise<void> {
     if (!Array.isArray(result)) {
@@ -268,7 +268,7 @@ export function executeBucket(
                       result[resultIndex] = arr;
                     } catch (e) {
                       bucket.hasErrors = true;
-                      result[resultIndex] = newCrystalError(e, finishedStep.id);
+                      result[resultIndex] = newGrafastError(e, finishedStep.id);
                     }
                   })();
                   promises.push(promise);
@@ -278,7 +278,7 @@ export function executeBucket(
               }
             } else {
               bucket.hasErrors = true;
-              result[resultIndex] = newCrystalError(
+              result[resultIndex] = newGrafastError(
                 settledResult.reason,
                 finishedStep.id,
               );
@@ -300,16 +300,16 @@ export function executeBucket(
           console.error(
             `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
           );
-          const crystalError = newCrystalError(
+          const grafastError = newGrafastError(
             new Error(
               `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
             ),
             finishedStep.id,
           );
-          console.error(`${crystalError.originalError}\n  ${e}`);
+          console.error(`${grafastError.originalError}\n  ${e}`);
           store.set(
             finishedStep.id,
-            result.map(() => crystalError),
+            result.map(() => grafastError),
           );
           return reallyCompletedStep(finishedStep);
         });
@@ -320,7 +320,7 @@ export function executeBucket(
     step: ExecutableStep,
     dependencies: ReadonlyArray<any>[],
     extra: ExecutionExtra,
-  ): PromiseOrDirect<CrystalResultsList<any> | CrystalResultStreamList<any>> {
+  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     if (step._stepOptions.stream && isStreamableStep(step)) {
       return step.stream(dependencies, extra, step._stepOptions.stream);
     } else {
@@ -340,14 +340,14 @@ export function executeBucket(
     polymorphicPathList: readonly string[],
     extra: ExecutionExtra,
   ) {
-    const errors: { [index: number]: CrystalError } = Object.create(null);
+    const errors: { [index: number]: GrafastError } = Object.create(null);
     let foundErrors = false;
     for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
       const polymorphicPath = polymorphicPathList[index];
       if (!step.polymorphicPaths.has(polymorphicPath)) {
         foundErrors = true;
         if (isDev) {
-          errors[index] = newCrystalError(
+          errors[index] = newGrafastError(
             new Error(
               `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
                 ...step.polymorphicPaths,
@@ -361,7 +361,7 @@ export function executeBucket(
       } else if (extra._bucket.hasErrors) {
         for (const depList of dependencies) {
           const v = depList[index];
-          if (isCrystalError(v)) {
+          if (isGrafastError(v)) {
             if (!errors[index]) {
               foundErrors = true;
               errors[index] = v;
@@ -461,7 +461,7 @@ export function executeBucket(
             bucket.hasErrors = true;
             return completedStep(
               step,
-              arrayOfLength(size, newCrystalError(error, step.id)),
+              arrayOfLength(size, newGrafastError(error, step.id)),
             );
           },
         );
@@ -472,7 +472,7 @@ export function executeBucket(
       bucket.hasErrors = true;
       return completedStep(
         step,
-        arrayOfLength(size, newCrystalError(error, step.id)),
+        arrayOfLength(size, newGrafastError(error, step.id)),
         true,
       );
     }
@@ -539,7 +539,7 @@ export function executeBucket(
             originalIndex < bucket.size;
             originalIndex++
           ) {
-            const list: any[] | null | undefined | CrystalError =
+            const list: any[] | null | undefined | GrafastError =
               listStepStore[originalIndex];
             if (Array.isArray(list)) {
               const newIndexes: number[] = [];
@@ -657,7 +657,7 @@ export function executeBucket(
             if (value == null) {
               continue;
             }
-            if (isCrystalError(value)) {
+            if (isGrafastError(value)) {
               continue;
             }
             assertPolymorphicData(value);

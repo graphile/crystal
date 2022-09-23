@@ -3,9 +3,9 @@ import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
-  CrystalError,
-  CrystalResultStreamList,
-  CrystalValuesList,
+  GrafastError,
+  GrafastResultStreamList,
+  GrafastValuesList,
   Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
@@ -283,10 +283,10 @@ ${duration}
   }
 
   public async executeWithCache<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    values: CrystalValuesList<ReadonlyArray<TOutput>>;
+    values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
@@ -296,10 +296,10 @@ ${duration}
   }
 
   public async executeWithoutCache<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    values: CrystalValuesList<ReadonlyArray<TOutput>>;
+    values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
@@ -309,11 +309,11 @@ ${duration}
   }
 
   private async _executeWithOrWithoutCache<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
     useCache: boolean,
   ): Promise<{
-    values: CrystalValuesList<ReadonlyArray<TOutput>>;
+    values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
     const {
       text,
@@ -531,10 +531,10 @@ ${duration}
    * `common.text` with the given variables.
    */
   public async executeStream<TInput = any, TOutput = any>(
-    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    streams: CrystalResultStreamList<TOutput>;
+    streams: GrafastResultStreamList<TOutput>;
   }> {
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
@@ -799,7 +799,7 @@ ${duration}
     // Avoids UnhandledPromiseRejection error.
     await Promise.allSettled(promises);
 
-    return { streams: streams as Array<AsyncIterable<TOutput> | CrystalError> };
+    return { streams: streams as Array<AsyncIterable<TOutput> | GrafastError> };
   }
 
   public async executeMutation<TData>(

@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import type { GrafastResultsList, GrafastValuesList } from "grafast";
 import { ExecutableStep } from "grafast";
 
 import type { PgTypeCodec } from "../interfaces.js";
@@ -28,7 +28,7 @@ export class ToPgStep extends ExecutableStep<any> {
     return peers.filter((peer) => peer.codec === this.codec);
   }
 
-  execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
+  execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
     return values[0].map(this.codec.toPg);
   }
 }

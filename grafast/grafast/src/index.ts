@@ -1,9 +1,9 @@
 import debugFactory from "debug";
 
-import { crystalPrint } from "./crystalPrint.js";
+import { grafastPrint } from "./grafastPrint.js";
 import { exportAsMany } from "./exportAs.js";
 import {
-  CrystalPlans,
+  GrafastPlans,
   EnumPlans,
   FieldPlans,
   InputObjectPlans,
@@ -15,13 +15,13 @@ import {
 import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // TODO: doing this here feels "naughty".
-debugFactory.formatters.c = crystalPrint;
+debugFactory.formatters.c = grafastPrint;
 
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import { CrystalError, isCrystalError } from "./error.js";
+import { GrafastError, isGrafastError } from "./error.js";
 import { execute, GrafastExecuteOptions } from "./execute.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
@@ -39,10 +39,10 @@ import {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalSubscriber,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastSubscriber,
+  GrafastValuesList,
   EnumValueApplyPlanResolver,
   EventCallback,
   EventMapKey,
@@ -227,13 +227,13 @@ export {
   constant,
   ConstantStep,
   context,
-  CrystalError,
-  CrystalPlans,
-  crystalPrint,
-  CrystalResultsList,
-  CrystalResultStreamList,
-  CrystalSubscriber,
-  CrystalValuesList,
+  GrafastError,
+  GrafastPlans,
+  grafastPrint,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastSubscriber,
+  GrafastValuesList,
   debugPlans,
   defer,
   Deferred,
@@ -293,7 +293,7 @@ export {
   InputObjectTypeSpec,
   InputStep,
   InterfaceOrUnionPlans,
-  isCrystalError,
+  isGrafastError,
   isDev,
   isExecutableStep,
   isListCapableStep,
@@ -380,7 +380,7 @@ export {
 };
 
 exportAsMany({
-  crystalPrint,
+  grafastPrint,
   makeGrafastSchema,
   OperationPlan,
   defer,
@@ -410,7 +410,7 @@ exportAsMany({
   constant,
   ConstantStep,
   context,
-  isCrystalError,
+  isGrafastError,
   debugPlans,
   each,
   error,

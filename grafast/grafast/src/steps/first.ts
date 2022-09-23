@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
 
@@ -16,8 +16,8 @@ export class FirstStep<TData> extends ExecutableStep<TData> {
   }
 
   execute(
-    values: CrystalValuesList<[ReadonlyArray<TData>]>,
-  ): CrystalResultsList<TData> {
+    values: GrafastValuesList<[ReadonlyArray<TData>]>,
+  ): GrafastResultsList<TData> {
     return values[0].map((list) => list?.[0]);
   }
 

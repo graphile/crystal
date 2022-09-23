@@ -1,7 +1,7 @@
 import type { GraphQLLeafType, ValueNode } from "graphql";
 import { valueFromAST } from "graphql";
 
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
@@ -28,7 +28,7 @@ export class __InputStaticLeafStep<TLeaf = any> extends ExecutableStep<TLeaf> {
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
-  execute(values: [CrystalValuesList<TLeaf>]): CrystalResultsList<TLeaf> {
+  execute(values: [GrafastValuesList<TLeaf>]): GrafastResultsList<TLeaf> {
     return arrayOfLength(values[0].length, this.coercedValue);
   }
 

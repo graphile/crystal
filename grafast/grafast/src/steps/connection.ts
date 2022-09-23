@@ -1,5 +1,5 @@
 import type { InputStep } from "../input.js";
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 import { each } from "./each.js";
@@ -293,8 +293,8 @@ export class ConnectionStep<
   */
 
   public execute(
-    values: Array<CrystalValuesList<any>>,
-  ): CrystalResultsList<Record<string, never>> {
+    values: Array<GrafastValuesList<any>>,
+  ): GrafastResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
     return arrayOfLength(values[0].length, EMPTY_OBJECT);
   }
@@ -367,7 +367,7 @@ export class EdgeStep<
     }
   }
 
-  execute(values: Array<CrystalValuesList<any>>): CrystalResultsList<any> {
+  execute(values: Array<GrafastValuesList<any>>): GrafastResultsList<any> {
     // Handle nulls; everything else comes from the child plans
     const results: any[] = [];
     for (let i = 0, l = values[0].length; i < l; i++) {

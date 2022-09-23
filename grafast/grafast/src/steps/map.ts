@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
 
-import type { CrystalError } from "../error.js";
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastError } from "../error.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 
 const disallowedKeys = Object.keys(
@@ -40,7 +40,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     ) as any;
   }
   // Fallback to slow conversion
-  return (obj: object | null | CrystalError): object | null | CrystalError => {
+  return (obj: object | null | GrafastError): object | null | GrafastError => {
     if (obj == null) {
       return obj;
     }
@@ -81,7 +81,7 @@ export class MapStep extends ExecutableStep {
     );
   }
 
-  execute(values: CrystalValuesList<any[]>): CrystalResultsList<any> {
+  execute(values: GrafastValuesList<any[]>): GrafastResultsList<any> {
     return values[0].map(this.mapper);
   }
 

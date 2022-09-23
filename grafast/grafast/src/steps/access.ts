@@ -2,7 +2,7 @@ import chalk from "chalk";
 import debugFactory from "debug";
 import { inspect } from "util";
 
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
@@ -220,7 +220,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     ]);
   }
 
-  execute(values: [CrystalValuesList<TData>]): CrystalResultsList<TData> {
+  execute(values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
     return values[0].map(this.destructure);
   }
 

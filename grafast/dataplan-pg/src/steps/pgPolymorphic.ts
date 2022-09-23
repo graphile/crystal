@@ -1,6 +1,6 @@
 import type {
-  CrystalResultsList,
-  CrystalValuesList,
+  GrafastResultsList,
+  GrafastValuesList,
   PolymorphicData,
   PolymorphicStep,
 } from "grafast";
@@ -121,8 +121,8 @@ export class PgPolymorphicStep<
   }
 
   execute(
-    values: Array<CrystalValuesList<any>>,
-  ): CrystalResultsList<PolymorphicData<
+    values: Array<GrafastValuesList<any>>,
+  ): GrafastResultsList<PolymorphicData<
     string,
     ReadonlyArray<any> // TODO: something to do with TCodec
   > | null> {

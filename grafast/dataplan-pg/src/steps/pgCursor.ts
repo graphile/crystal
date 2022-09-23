@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import type { GrafastResultsList, GrafastValuesList } from "grafast";
 import { ExecutableStep, list } from "grafast";
 import sql from "pg-sql2";
 
@@ -54,8 +54,8 @@ export class PgCursorStep<
   }
 
   execute(
-    values: [CrystalValuesList<any[] | null>],
-  ): CrystalResultsList<string | null> {
+    values: [GrafastValuesList<any[] | null>],
+  ): GrafastResultsList<string | null> {
     return values[this.cursorValuesDepId].map((v) => {
       return v == null || v!.every((v) => v == null)
         ? null

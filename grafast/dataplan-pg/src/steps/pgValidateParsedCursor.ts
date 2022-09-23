@@ -1,4 +1,4 @@
-import type { CrystalResultsList, CrystalValuesList } from "grafast";
+import type { GrafastResultsList, GrafastValuesList } from "grafast";
 import { ExecutableStep, isDev } from "grafast";
 
 /**
@@ -38,8 +38,8 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
   }
 
   execute(
-    values: [CrystalValuesList<string | null>],
-  ): CrystalResultsList<undefined> {
+    values: [GrafastValuesList<string | null>],
+  ): GrafastResultsList<undefined> {
     return values[0].map((decoded) => {
       if (!decoded) {
         return;

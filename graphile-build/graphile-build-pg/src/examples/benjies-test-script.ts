@@ -97,7 +97,7 @@ pool.on("error", (e) => {
     "  " +
       input.pgSources
         .map(
-          (s) => crystalPrint((s as any).name),
+          (s) => grafastPrint((s as any).name),
           // + ` => ${(s as any).extensions?.tags?.name}`,
         )
         .join("\n  "),

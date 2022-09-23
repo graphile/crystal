@@ -23,7 +23,7 @@ import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import { coerceError } from "./engine/OutputPlan.js";
-import { isCrystalError } from "./error.js";
+import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
@@ -34,7 +34,7 @@ const isTest = process.env.NODE_ENV === "test";
 const $$contextPlanCache = Symbol("contextPlanCache");
 const $$bypassGraphQL = Symbol("bypassGraphQL");
 
-export interface CrystalPrepareOptions {
+export interface GrafastPrepareOptions {
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
    *
@@ -316,7 +316,7 @@ export function executePreemptive(
       ? rootBucket.store.get(rootBucket.layerPlan.rootStepId)
       : null;
     const bucketRootValue = rootValueList?.[0];
-    if (isCrystalError(bucketRootValue)) {
+    if (isGrafastError(bucketRootValue)) {
       // Something major went wrong!
       const errors = [
         new GraphQLError(
@@ -421,7 +421,7 @@ export function executePreemptive(
 
 /**
  * This method returns an object that you should use as the `rootValue` in your
- * call to GraphQL; it gives Graphile Crystal a chance to find/prepare an
+ * call to GraphQL; it gives Graphile Grafast a chance to find/prepare an
  * OpPlan and even pre-emptively execute the request if possible. In fact, the
  * result from this might be suitable to return to the user directly (if this
  * is the case then the `$$bypassGraphQL` key will be set on the result
@@ -431,7 +431,7 @@ export function executePreemptive(
  */
 export function grafastPrepare(
   args: ExecutionArgs,
-  options: CrystalPrepareOptions = {},
+  options: GrafastPrepareOptions = {},
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {

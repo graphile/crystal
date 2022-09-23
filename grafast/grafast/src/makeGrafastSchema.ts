@@ -104,7 +104,7 @@ export type EnumPlans = {
 /**
  * A map from GraphQL named type to the config for that type.
  */
-export interface CrystalPlans {
+export interface GrafastPlans {
   [typeName: string]:
     | ObjectPlans
     | InputObjectPlans
@@ -119,7 +119,7 @@ export interface CrystalPlans {
  */
 export function makeGrafastSchema(details: {
   typeDefs: string;
-  plans: CrystalPlans;
+  plans: GrafastPlans;
   enableDeferStream: boolean;
 }): GraphQLSchema {
   const { typeDefs, plans, enableDeferStream = true } = details;

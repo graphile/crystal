@@ -6,7 +6,7 @@ import type {
 } from "graphql";
 import { Kind } from "graphql";
 
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces.js";
+import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
 
@@ -116,7 +116,7 @@ export class __InputDynamicScalarStep<
     return convert(this.value);
   }
 
-  execute(values: [CrystalValuesList<TLeaf>]): CrystalResultsList<TLeaf> {
+  execute(values: [GrafastValuesList<TLeaf>]): GrafastResultsList<TLeaf> {
     return values[0].map((_, i) => {
       const variableValues = this.variableNames.map((_, j) => values[i][j]);
       const converted = this.valueFromValues(variableValues);

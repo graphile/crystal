@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import type { CrystalSubscriber, Deferred } from "grafast";
+import type { GrafastSubscriber, Deferred } from "grafast";
 import { defer } from "grafast";
 import type { Notification, Pool, PoolClient } from "pg";
 
@@ -16,7 +16,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 export class PgSubscriber<
   TTopics extends { [key: string]: string } = { [key: string]: string },
-> implements CrystalSubscriber<TTopics>
+> implements GrafastSubscriber<TTopics>
 {
   private topics: { [topic in keyof TTopics]?: AsyncIterableIterator<any>[] } =
     {};
