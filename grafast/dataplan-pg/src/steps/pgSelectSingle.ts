@@ -51,12 +51,11 @@ const CHEAP_COLUMN_TYPES = new Set([
 
 /**
  * Represents the single result of a unique PgSelectStep. This might be
- * retrieved explicitly by PgSelectStep.single(), or implicitly (via
- * Graphile Grafast) by PgSelectStep.item(). Since this is the result of a
- * fetch it does not make sense to support changing `.where` or similar;
- * however we now add methods such as `.get` and `.cursor` which can receive
- * specific properties by telling the PgSelectStep to select the relevant
- * expressions.
+ * retrieved explicitly by PgSelectStep.single(), or implicitly (via Grafast)
+ * by PgSelectStep.item(). Since this is the result of a fetch it does not make
+ * sense to support changing `.where` or similar; however we now add methods
+ * such as `.get` and `.cursor` which can receive specific properties by
+ * telling the PgSelectStep to select the relevant expressions.
  */
 export class PgSelectSingleStep<
     TColumns extends PgTypeColumns | undefined,

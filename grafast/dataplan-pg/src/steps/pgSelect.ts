@@ -2775,15 +2775,15 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   /**
    * When you return a plan in a situation where GraphQL is expecting a
    * GraphQLList, it must implement the `.listItem()` method to return a plan
-   * for an individual item within this list. Graphile Grafast will
-   * automatically call this (possibly recursively) to pass to the plan
-   * resolvers on the children of this field.
+   * for an individual item within this list. Grafast will automatically call
+   * this (possibly recursively) to pass to the plan resolvers on the children
+   * of this field.
    *
-   * NOTE: Graphile Grafast handles the list indexes for you, so your list item
-   * plan should process just the single input list item.
+   * NOTE: Grafast handles the list indexes for you, so your list item plan
+   * should process just the single input list item.
    *
    * IMPORTANT: do not call `.listItem` from user code; it's only intended to
-   * be called by Graphile Grafast.
+   * be called by Grafast.
    */
   listItem(
     itemPlan: ExecutableStep,

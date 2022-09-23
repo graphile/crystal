@@ -420,13 +420,6 @@ export function executePreemptive(
 }
 
 /**
- * This method returns an object that you should use as the `rootValue` in your
- * call to GraphQL; it gives Graphile Grafast a chance to find/prepare an
- * OpPlan and even pre-emptively execute the request if possible. In fact, the
- * result from this might be suitable to return to the user directly (if this
- * is the case then the `$$bypassGraphQL` key will be set on the result
- * object).
- *
  * @internal
  */
 export function grafastPrepare(
