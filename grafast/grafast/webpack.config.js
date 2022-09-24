@@ -1,3 +1,4 @@
+const webpack = require("webpack");
 const path = require("path");
 
 module.exports = {
@@ -17,6 +18,11 @@ module.exports = {
     },
     globalObject: "this",
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env.GRAPHILE_ENV": JSON.stringify("production"),
+    }),
+  ],
   externals: {
     // graphql -> external
     graphql: {

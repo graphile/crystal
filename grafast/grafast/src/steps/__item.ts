@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import { $$deepDepSkip, ExecutableStep } from "../step.js";
+import { $$deepDepSkip, $$noExec, ExecutableStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
@@ -13,6 +13,7 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
     exportName: "__ItemStep",
   };
   isSyncAndSafe = true;
+  [$$noExec] = true;
 
   /**
    * @internal

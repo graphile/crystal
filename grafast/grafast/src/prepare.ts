@@ -447,14 +447,14 @@ export function grafastPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const operationPlan = establishOperationPlan({
+  const operationPlan = establishOperationPlan(
     schema,
     operation,
     fragments,
-    variableValues: variableValues,
-    context: context as any,
+    variableValues,
+    context as any,
     rootValue,
-  });
+  );
 
   if (options.explain?.includes("mermaid-js")) {
     // Only build the plan once

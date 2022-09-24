@@ -54,6 +54,7 @@ import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
+  $$noExec,
   assertExecutableStep,
   assertFinalized,
   isListCapableStep,
@@ -2389,8 +2390,11 @@ export class OperationPlan {
       layerPlan.steps = this.steps.filter(
         (s) => s !== null && s.layerPlan === layerPlan,
       );
+      layerPlan.pendingSteps = layerPlan.steps.filter((s) => !($$noExec in s));
       // TODO: does this need sorting? Presumably lowest id first?
-      const sideEffectSteps = layerPlan.steps.filter((s) => s.hasSideEffects);
+      const sideEffectSteps = layerPlan.pendingSteps.filter(
+        (s) => s.hasSideEffects,
+      );
       if (sideEffectSteps.length > 0) {
         const processed = new Set<ExecutableStep>();
 
@@ -2442,7 +2446,7 @@ export class OperationPlan {
 
         // Start steps have no dependencies inside this layerPlan _OTHER THAN_
         // those already processed.
-        const startSteps = layerPlan.steps.filter((s) => {
+        const startSteps = layerPlan.pendingSteps.filter((s) => {
           if (processed.has(s)) {
             return false;
           }
@@ -2460,10 +2464,10 @@ export class OperationPlan {
         }
       } else {
         // Start steps have no dependencies inside this layerPlan
-        const startSteps = layerPlan.steps.filter((s) => {
+        const startSteps = layerPlan.pendingSteps.filter((s) => {
           for (const depId of s.dependencies) {
             const dep = this.steps[depId];
-            if (dep.layerPlan === layerPlan) {
+            if (dep.layerPlan === layerPlan && !($$noExec in dep)) {
               return false;
             }
           }
@@ -2477,7 +2481,7 @@ export class OperationPlan {
       // Populate copyPlanIds for each step
       for (const step of layerPlan.steps) {
         // Items shouldn't have their "list" copied in.
-        if (step instanceof __ItemStep) {
+        if ($$noExec in step) {
           continue;
         }
         for (const depId of step.dependencies) {

@@ -18,6 +18,9 @@ export interface GrafastExecuteOptions {
   asString?: boolean;
 }
 
+const isDev =
+  typeof process !== "undefined" && process.env.NODE_ENV === "development";
+
 /**
  * Used by `execute` and `subscribe`.
  * @internal
@@ -28,10 +31,7 @@ export function withGrafastArgs(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  if (
-    typeof process !== "undefined" &&
-    process.env.NODE_ENV === "development"
-  ) {
+  if (isDev) {
     if (
       args.rootValue != null &&
       (typeof args.rootValue !== "object" ||
