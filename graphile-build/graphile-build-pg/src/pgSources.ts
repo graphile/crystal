@@ -6,6 +6,8 @@ import type { Socket } from "node:net";
 
 import type { KeysOfType } from "./interfaces.js";
 
+const isTest = process.env.NODE_ENV === "test";
+
 declare global {
   namespace Grafast {
     interface PgDatabaseAdaptorOptions {
@@ -128,7 +130,7 @@ export function getWithPgClientFromPgSource(
             // Figure out why I did that?
             // }, 0);
           },
-          process.env.NODE_ENV === "test" ? 500 : 5000,
+          isTest ? 500 : 5000,
         );
       };
       pgClientBySourceCache.set(source, cachedValue);
