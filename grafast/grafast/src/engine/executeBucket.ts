@@ -134,7 +134,7 @@ export function executeBucket(
       // Must be some side effects yet to run
       return;
     }
-    const promises: PromiseLike<void>[] = [];
+    let promises: PromiseLike<void>[] | undefined;
     outerLoop: for (const potentialNextStep of finishedStep.dependentPlans) {
       const isPending = pendingSteps.has(potentialNextStep);
       if (!isPending) {
@@ -164,13 +164,22 @@ export function executeBucket(
       try {
         const r = executeStep(potentialNextStep);
         if (isPromiseLike(r)) {
-          promises.push(r);
+          if (promises) {
+            promises.push(r);
+          } else {
+            promises = [r];
+          }
         }
       } catch (e) {
-        promises.push(Promise.reject(e));
+        const r = Promise.reject(e);
+        if (promises) {
+          promises.push(r);
+        } else {
+          promises = [r];
+        }
       }
     }
-    if (promises.length > 0) {
+    if (promises) {
       return Promise.all(promises) as Promise<any> as Promise<void>;
     } else {
       return;
