@@ -1,3 +1,17 @@
+select __json_identity_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"json" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __json_identity_identifiers__,
+lateral (
+  select
+    __json_identity__.v::text as "0",
+    __json_identity_identifiers__.idx as "1"
+  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
+) as __json_identity_result__
+
 select
   __no_args_query__.v::text as "0"
 from "c"."no_args_query"() as __no_args_query__(v)
@@ -12,20 +26,6 @@ select
     from unnest(__query_interval_array__.v) t
   )::text as "0"
 from "a"."query_interval_array"() as __query_interval_array__(v)
-
-select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
-lateral (
-  select
-    __json_identity__.v::text as "0",
-    __json_identity_identifiers__.idx as "1"
-  from "c"."json_identity"(__json_identity_identifiers__."id0") as __json_identity__(v)
-) as __json_identity_result__
 
 select __jsonb_identity_result__.*
 from (

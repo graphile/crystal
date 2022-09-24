@@ -1,3 +1,21 @@
+select __func_in_inout_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_in_inout_identifiers__,
+lateral (
+  select
+    __func_in_inout__.v::text as "0",
+    __func_in_inout_identifiers__.idx as "1"
+  from "c"."func_in_inout"(
+    __func_in_inout_identifiers__."id0",
+    __func_in_inout_identifiers__."id1"
+  ) as __func_in_inout__(v)
+) as __func_in_inout_result__
+
 select
   __func_out__.v::text as "0"
 from "c"."func_out"() as __func_out__(v)
@@ -34,24 +52,6 @@ select
   __search_test_summaries__."id"::text as "1",
   (not (__search_test_summaries__ is null))::text as "2"
 from "c"."search_test_summaries"() as __search_test_summaries__
-
-select __func_in_inout_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_in_inout_identifiers__,
-lateral (
-  select
-    __func_in_inout__.v::text as "0",
-    __func_in_inout_identifiers__.idx as "1"
-  from "c"."func_in_inout"(
-    __func_in_inout_identifiers__."id0",
-    __func_in_inout_identifiers__."id1"
-  ) as __func_in_inout__(v)
-) as __func_in_inout_result__
 
 select __func_in_out_result__.*
 from (
