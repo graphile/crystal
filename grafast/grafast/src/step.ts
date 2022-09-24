@@ -26,6 +26,13 @@ import { __ListTransformStep } from "./steps/index.js";
  * @internal
  */
 export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
+/**
+ * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
+ * and thus when executed skips direct to reallyCompletedStep.
+ *
+ * @internal
+ */
+export const $$noExec = Symbol("noExec");
 
 type DeepDepSkippable<T> = ExecutableStep<T> & {
   [$$deepDepSkip](): ExecutableStep;

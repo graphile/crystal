@@ -17,6 +17,7 @@ import type {
 } from "../interfaces.js";
 import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { assertPolymorphicData } from "../polymorphic.js";
+import { $$noExec } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
 
@@ -419,8 +420,9 @@ export function executeBucket(
       return;
     }
     inProgressSteps.add(step);
-    if (step instanceof __ValueStep || step instanceof __ItemStep) {
+    if ($$noExec in step) {
       // Bypass execution
+      // TODO: we should be able to shorten this dance for no-execs.
       return reallyCompletedStep(step);
     }
     try {

@@ -1,4 +1,4 @@
-import { ExecutableStep } from "../step.js";
+import { $$noExec, ExecutableStep } from "../step.js";
 import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
 
@@ -13,6 +13,7 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
     exportName: "__ValueStep",
   };
   isSyncAndSafe = true;
+  [$$noExec] = true;
 
   constructor() {
     super();
