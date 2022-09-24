@@ -190,7 +190,8 @@ export function executeBucket(
         )}`,
       );
     }
-    if (result.length !== size) {
+    const resultLength = result.length;
+    if (resultLength !== size) {
       throw new Error(
         `Result array from ${finishedStep} should have length ${size}, instead it had length ${result.length}`,
       );
@@ -203,122 +204,146 @@ export function executeBucket(
       // Need to complete promises, check for errors, etc.
       // **DO NOT THROW, DO NOT ALLOW AN ERROR TO BE RAISED!**
       // **USE DEFENSIVE PROGRAMMING HERE!**
-      return Promise.allSettled(result)
-        .then((resultSettledResult) => {
-          // Deliberate shadowing
-          const result: any[] = [];
-          const promises: PromiseLike<void>[] = [];
-          for (
-            let resultIndex = 0, l = resultSettledResult.length;
-            resultIndex < l;
-            resultIndex++
-          ) {
-            const settledResult = resultSettledResult[resultIndex];
-            if (settledResult.status === "fulfilled") {
-              if (
-                // Detects async iterables (but excludes all the basic types
-                // like arrays, Maps, Sets, etc that are also iterables) and
-                // handles them specially.
-                isAsyncIterable(settledResult.value) &&
-                !isIterable(settledResult.value)
-              ) {
-                const iterator = settledResult.value[Symbol.asyncIterator]();
 
-                const streamOptions = finishedStep._stepOptions.stream;
-                const initialCount: number = streamOptions
-                  ? streamOptions.initialCount
-                  : Infinity;
+      const promises: PromiseLike<void>[] = [];
+      const finalResult: any[] = [];
+      const success = (value: unknown, resultIndex: number) => {
+        if (
+          // Detects async iterables (but excludes all the basic types
+          // like arrays, Maps, Sets, etc that are also iterables) and
+          // handles them specially.
+          isAsyncIterable(value) &&
+          !isIterable(value)
+        ) {
+          const iterator = value[Symbol.asyncIterator]();
 
-                // TODO:critical: need to ensure that iterator is terminated
-                // even if the stream is never consumed (e.g. if something else
-                // errors). For query/mutation we can do this when operation
-                // completes, for subscription we should do it after each
-                // individual payload (and all its streamed/deferred children)
-                // are complete before processing the next subscription event.
+          const streamOptions = finishedStep._stepOptions.stream;
+          const initialCount: number = streamOptions
+            ? streamOptions.initialCount
+            : Infinity;
 
-                if (initialCount === 0) {
-                  // Optimization - defer everything
-                  const arr: any[] = [];
-                  arr[$$streamMore] = iterator;
-                  result[resultIndex] = arr;
-                } else {
-                  // Evaluate the first initialCount entries, rest is streamed.
-                  const promise = (async () => {
-                    try {
-                      let valuesSeen = 0;
-                      const arr: any[] = [];
+          // TODO:critical: need to ensure that iterator is terminated
+          // even if the stream is never consumed (e.g. if something else
+          // errors). For query/mutation we can do this when operation
+          // completes, for subscription we should do it after each
+          // individual payload (and all its streamed/deferred children)
+          // are complete before processing the next subscription event.
 
-                      /*
-                       * We need to "shift" a few entries off the top of the
-                       * iterator, but still keep it iterable for the later
-                       * stream. To accomplish this we have to do manual
-                       * looping
-                       */
-
-                      let resultPromise: Promise<IteratorResult<any, any>>;
-                      while ((resultPromise = iterator.next())) {
-                        const result = await resultPromise;
-                        if (result.done) {
-                          break;
-                        }
-                        arr.push(await result.value);
-                        if (++valuesSeen >= initialCount) {
-                          // This is safe to do in the `while` since we checked
-                          // the `0` entries condition in the optimization
-                          // above.
-                          arr[$$streamMore] = iterator;
-                          break;
-                        }
-                      }
-
-                      result[resultIndex] = arr;
-                    } catch (e) {
-                      bucket.hasErrors = true;
-                      result[resultIndex] = newGrafastError(e, finishedStep.id);
-                    }
-                  })();
-                  promises.push(promise);
-                }
-              } else {
-                result[resultIndex] = settledResult.value;
-              }
-            } else {
-              bucket.hasErrors = true;
-              result[resultIndex] = newGrafastError(
-                settledResult.reason,
-                finishedStep.id,
-              );
-            }
-          }
-          if (promises.length > 0) {
-            // This _should not_ throw.
-            return Promise.all(promises).then(() => {
-              store.set(finishedStep.id, result);
-              return reallyCompletedStep(finishedStep);
-            });
+          if (initialCount === 0) {
+            // Optimization - defer everything
+            const arr: any[] = [];
+            arr[$$streamMore] = iterator;
+            finalResult[resultIndex] = arr;
           } else {
-            store.set(finishedStep.id, result);
-            return reallyCompletedStep(finishedStep);
+            // Evaluate the first initialCount entries, rest is streamed.
+            const promise = (async () => {
+              try {
+                let valuesSeen = 0;
+                const arr: any[] = [];
+
+                /*
+                 * We need to "shift" a few entries off the top of the
+                 * iterator, but still keep it iterable for the later
+                 * stream. To accomplish this we have to do manual
+                 * looping
+                 */
+
+                let resultPromise: Promise<IteratorResult<any, any>>;
+                while ((resultPromise = iterator.next())) {
+                  const finalResult = await resultPromise;
+                  if (finalResult.done) {
+                    break;
+                  }
+                  arr.push(await finalResult.value);
+                  if (++valuesSeen >= initialCount) {
+                    // This is safe to do in the `while` since we checked
+                    // the `0` entries condition in the optimization
+                    // above.
+                    arr[$$streamMore] = iterator;
+                    break;
+                  }
+                }
+
+                finalResult[resultIndex] = arr;
+              } catch (e) {
+                bucket.hasErrors = true;
+                finalResult[resultIndex] = newGrafastError(e, finishedStep.id);
+              }
+            })();
+            promises.push(promise);
           }
-        })
-        .then(null, (e) => {
-          // THIS SHOULD NEVER HAPPEN!
-          console.error(
-            `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-          );
-          const grafastError = newGrafastError(
-            new Error(
-              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-            ),
-            finishedStep.id,
-          );
-          console.error(`${grafastError.originalError}\n  ${e}`);
-          store.set(
-            finishedStep.id,
-            result.map(() => grafastError),
-          );
+        } else {
+          finalResult[resultIndex] = value;
+        }
+      };
+
+      // If there are no promises, we want to do the sync route.
+      const pendingPromises: PromiseLike<any>[] = [];
+      const pendingPromiseIndexes: number[] = [];
+      for (let i = 0; i < resultLength; i++) {
+        const val = result[i];
+        if (isPromiseLike(val)) {
+          pendingPromises.push(val);
+          pendingPromiseIndexes.push(i);
+        } else {
+          success(val, i);
+        }
+      }
+
+      const done = () => {
+        if (promises.length > 0) {
+          // This _should not_ throw.
+          return Promise.all(promises).then(() => {
+            store.set(finishedStep.id, finalResult);
+            return reallyCompletedStep(finishedStep);
+          });
+        } else {
+          store.set(finishedStep.id, finalResult);
           return reallyCompletedStep(finishedStep);
-        });
+        }
+      };
+
+      const pendingPromisesLength = pendingPromises.length;
+      if (pendingPromisesLength > 0) {
+        return Promise.allSettled(pendingPromises)
+          .then((resultSettledResult) => {
+            // Deliberate shadowing
+            for (let i = 0; i < pendingPromisesLength; i++) {
+              const settledResult = resultSettledResult[i];
+              const resultIndex = pendingPromiseIndexes[i];
+              if (settledResult.status === "fulfilled") {
+                success(settledResult.value, resultIndex);
+              } else {
+                bucket.hasErrors = true;
+                finalResult[resultIndex] = newGrafastError(
+                  settledResult.reason,
+                  finishedStep.id,
+                );
+              }
+            }
+            return done();
+          })
+          .then(null, (e) => {
+            // THIS SHOULD NEVER HAPPEN!
+            console.error(
+              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+            );
+            const grafastError = newGrafastError(
+              new Error(
+                `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+              ),
+              finishedStep.id,
+            );
+            console.error(`${grafastError.originalError}\n  ${e}`);
+            store.set(
+              finishedStep.id,
+              finalResult.map(() => grafastError),
+            );
+            return reallyCompletedStep(finishedStep);
+          });
+      } else {
+        return done();
+      }
     }
   }
 
