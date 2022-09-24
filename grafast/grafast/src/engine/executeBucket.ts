@@ -68,7 +68,7 @@ export function executeBucket(
 ): PromiseOrDirect<void> {
   const { metaByMetaKey } = requestContext;
   const inProgressSteps = new Set();
-  const pendingSteps = new Set(bucket.layerPlan.steps);
+  const pendingSteps = new Set(bucket.layerPlan.pendingSteps);
   const {
     size,
     store,
@@ -420,9 +420,9 @@ export function executeBucket(
       return;
     }
     inProgressSteps.add(step);
-    if ($$noExec in step) {
+    if (isDev && $$noExec in step) {
+      throw new Error("OLD PATH!");
       // Bypass execution
-      // TODO: we should be able to shorten this dance for no-execs.
       return reallyCompletedStep(step);
     }
     try {

@@ -162,6 +162,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   /** @internal */
   steps: ExecutableStep[] = [];
+  /** @internal */
+  pendingSteps: ExecutableStep[] = [];
 
   /**
    * Normally this will be a list with one element, which is a list of the
