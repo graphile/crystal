@@ -67,7 +67,7 @@ export function executeBucket(
   requestContext: RequestContext,
 ): PromiseOrDirect<void> {
   const { metaByMetaKey } = requestContext;
-  const inProgressSteps = new Set();
+  const startedSteps = new Set();
   const pendingSteps = new Set(bucket.layerPlan.pendingSteps);
   const {
     size,
@@ -118,7 +118,7 @@ export function executeBucket(
   function reallyCompletedStep(
     finishedStep: ExecutableStep,
   ): void | Promise<void> {
-    if (!inProgressSteps.delete(finishedStep)) {
+    if (isDev && !startedSteps.delete(finishedStep)) {
       console.error(
         `GraphileInternalError<c3d1276b-df0f-4f88-aabf-15fa0f7d8515>: Double complete of '${finishedStep}' detected; ignoring (but this indicates a bug in Grafast)`,
       );
@@ -416,10 +416,10 @@ export function executeBucket(
    * This function MIGHT throw or reject, so be sure to handle that.
    */
   function executeStep(step: ExecutableStep): void | PromiseLike<void> {
-    if (inProgressSteps.has(step)) {
+    if (startedSteps.has(step)) {
       return;
     }
-    inProgressSteps.add(step);
+    startedSteps.add(step);
     if (isDev && $$noExec in step) {
       throw new Error("OLD PATH!");
       // Bypass execution
