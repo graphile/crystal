@@ -208,7 +208,12 @@ export function executeBucket(
           // Deliberate shadowing
           const result: any[] = [];
           const promises: PromiseLike<void>[] = [];
-          resultSettledResult.forEach((settledResult, resultIndex): void => {
+          for (
+            let resultIndex = 0, l = resultSettledResult.length;
+            resultIndex < l;
+            resultIndex++
+          ) {
+            const settledResult = resultSettledResult[resultIndex];
             if (settledResult.status === "fulfilled") {
               if (
                 // Detects async iterables (but excludes all the basic types
@@ -284,7 +289,7 @@ export function executeBucket(
                 finishedStep.id,
               );
             }
-          });
+          }
           if (promises.length > 0) {
             // This _should not_ throw.
             return Promise.all(promises).then(() => {
