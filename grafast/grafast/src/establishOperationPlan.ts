@@ -136,16 +136,14 @@ export function establishOperationPlan<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
->(details: {
-  schema: GraphQLSchema;
-  operation: OperationDefinitionNode;
-  fragments: Fragments;
-  variableValues: TVariables;
-  context: TContext;
-  rootValue: TRootValue;
-}): OperationPlan {
-  const { schema, operation, fragments, variableValues, context, rootValue } =
-    details;
+>(
+  schema: GraphQLSchema,
+  operation: OperationDefinitionNode,
+  fragments: Fragments,
+  variableValues: TVariables,
+  context: TContext,
+  rootValue: TRootValue,
+): OperationPlan {
   let cacheByOperation: CacheByOperation | undefined =
     schema[$$cacheByOperation];
 
