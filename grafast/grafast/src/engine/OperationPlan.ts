@@ -53,8 +53,8 @@ import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
-import { $$noExec } from "../step.js";
 import {
+  $$noExec,
   assertExecutableStep,
   assertFinalized,
   isListCapableStep,
