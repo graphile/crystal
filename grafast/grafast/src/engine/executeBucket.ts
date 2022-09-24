@@ -205,8 +205,10 @@ export function executeBucket(
       // **DO NOT THROW, DO NOT ALLOW AN ERROR TO BE RAISED!**
       // **USE DEFENSIVE PROGRAMMING HERE!**
 
-      const promises: PromiseLike<void>[] = [];
       const finalResult: any[] = [];
+      let promises: PromiseLike<void>[] | undefined;
+      let pendingPromises: PromiseLike<any>[] | undefined;
+      let pendingPromiseIndexes: number[] | undefined;
       const success = (value: unknown, resultIndex: number) => {
         if (
           // Detects async iterables (but excludes all the basic types
@@ -270,7 +272,11 @@ export function executeBucket(
                 finalResult[resultIndex] = newGrafastError(e, finishedStep.id);
               }
             })();
-            promises.push(promise);
+            if (!promises) {
+              promises = [promise];
+            } else {
+              promises.push(promise);
+            }
           }
         } else {
           finalResult[resultIndex] = value;
@@ -278,20 +284,23 @@ export function executeBucket(
       };
 
       // If there are no promises, we want to do the sync route.
-      const pendingPromises: PromiseLike<any>[] = [];
-      const pendingPromiseIndexes: number[] = [];
       for (let i = 0; i < resultLength; i++) {
         const val = result[i];
         if (isPromiseLike(val)) {
-          pendingPromises.push(val);
-          pendingPromiseIndexes.push(i);
+          if (!pendingPromises) {
+            pendingPromises = [val];
+            pendingPromiseIndexes = [i];
+          } else {
+            pendingPromises.push(val);
+            pendingPromiseIndexes!.push(i);
+          }
         } else {
           success(val, i);
         }
       }
 
       const done = () => {
-        if (promises.length > 0) {
+        if (promises) {
           // This _should not_ throw.
           return Promise.all(promises).then(() => {
             store.set(finishedStep.id, finalResult);
@@ -303,14 +312,17 @@ export function executeBucket(
         }
       };
 
-      const pendingPromisesLength = pendingPromises.length;
-      if (pendingPromisesLength > 0) {
+      if (pendingPromises) {
         return Promise.allSettled(pendingPromises)
           .then((resultSettledResult) => {
             // Deliberate shadowing
-            for (let i = 0; i < pendingPromisesLength; i++) {
+            for (
+              let i = 0, pendingPromisesLength = resultSettledResult.length;
+              i < pendingPromisesLength;
+              i++
+            ) {
               const settledResult = resultSettledResult[i];
-              const resultIndex = pendingPromiseIndexes[i];
+              const resultIndex = pendingPromiseIndexes![i];
               if (settledResult.status === "fulfilled") {
                 success(settledResult.value, resultIndex);
               } else {
