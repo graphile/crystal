@@ -105,7 +105,7 @@ function scopeMatches(
   for (let i = 0, l = filterScopeTrimmed.length; i < l; i++) {
     const rule = specifiedScope[i];
     const filter = filterScopeTrimmed[i];
-    if (filter === "*" && !positive) {
+    if (filter === "*" && rule !== "*" && !positive) {
       return false;
     }
     if (rule === "*" || filter === "*") {

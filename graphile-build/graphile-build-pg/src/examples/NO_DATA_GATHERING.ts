@@ -324,7 +324,7 @@ async function main() {
         ],
         extensions: {
           tags: {
-            behavior: "query_field",
+            behavior: "queryField",
           },
         },
       }),
@@ -358,7 +358,7 @@ async function main() {
         ],
         extensions: {
           tags: {
-            // behavior: ["type_field"],
+            // behavior: ["typeField"],
             name: "unique_author_count",
           },
         },
@@ -385,7 +385,7 @@ async function main() {
         ],
         extensions: {
           tags: {
-            // behavior: ["type_field"],
+            // behavior: ["typeField"],
             name: "random_user",
           },
         },
@@ -412,7 +412,7 @@ async function main() {
         ],
         extensions: {
           tags: {
-            behavior: "type_field connection list",
+            behavior: "typeField connection list",
             name: "featured_messages",
           },
         },
