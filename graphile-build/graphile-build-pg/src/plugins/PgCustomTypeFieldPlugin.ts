@@ -196,25 +196,25 @@ function defaultProcSourceBehavior(
   if (
     !s.isMutation &&
     s.parameters &&
-    // Don't default to this being a query_field if it looks like a computed column function
+    // Don't default to this being a queryField if it looks like a computed column function
     (!firstParameter?.codec?.columns ||
       firstParameter?.codec?.extensions?.isTableLike === false)
   ) {
-    behavior.push("query_field");
+    behavior.push("queryField");
   } else {
-    behavior.push("-query_field");
+    behavior.push("-queryField");
   }
 
   if (s.isMutation && s.parameters) {
-    behavior.push("mutation_field");
+    behavior.push("mutationField");
   } else {
-    behavior.push("-mutation_field");
+    behavior.push("-mutationField");
   }
 
   if (s.parameters && s.parameters?.[0]?.codec?.columns && !s.isMutation) {
-    behavior.push("type_field");
+    behavior.push("typeField");
   } else {
-    behavior.push("-type_field");
+    behavior.push("-typeField");
   }
 
   if (s.parameters && !s.isUnique) {
@@ -409,7 +409,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 source.parameters &&
                 build.behavior.matches(
                   getBehavior(source.extensions),
-                  "query_field",
+                  "queryField",
                   defaultProcSourceBehavior(source, options),
                 );
               if (isQuerySource) {
@@ -425,7 +425,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 source.parameters &&
                 build.behavior.matches(
                   getBehavior(source.extensions),
-                  "mutation_field",
+                  "mutationField",
                   defaultProcSourceBehavior(source, options),
                 );
               // Add payload type for mutation functions
@@ -583,7 +583,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 source.parameters &&
                 build.behavior.matches(
                   getBehavior(source.extensions),
-                  "type_field",
+                  "typeField",
                   defaultProcSourceBehavior(source, options),
                 );
               if (isComputedSource) {
@@ -863,7 +863,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   return memo;
                 }
                 memo[fieldName] = fieldWithHooks(
-                  { fieldName, fieldBehaviorScope: "mutation_field" },
+                  { fieldName, fieldBehaviorScope: "mutationField" },
                   {
                     description: source.extensions?.description,
                     deprecationReason: tagToString(
@@ -904,8 +904,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     // return a list. But even if it does, we can't order it or
                     // filter it... So maybe `single` is fine?
                     fieldBehaviorScope: isRootQuery
-                      ? "query_field:single"
-                      : "type_field:single",
+                      ? "queryField:single"
+                      : "typeField:single",
                   },
                   {
                     description: source.description,
@@ -936,7 +936,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                 const behavior = getBehavior(source.extensions);
 
-                const baseScope = isRootQuery ? `query_field` : `type_field`;
+                const baseScope = isRootQuery ? `queryField` : `typeField`;
                 const connectionFieldBehaviorScope = `${baseScope}:connection`;
                 const listFieldBehaviorScope = `${baseScope}:list`;
                 if (

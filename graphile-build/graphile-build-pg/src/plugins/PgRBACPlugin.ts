@@ -113,7 +113,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
             source.extensions!.tags || Object.create(null);
           addBehaviorToTags(
             source.extensions!.tags!,
-            "-query_field -mutation_field -type_field -orderBy -filterBy",
+            "-queryField -mutationField -typeField -orderBy -filterBy",
           );
         }
       },

@@ -49,24 +49,24 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
           s as PgSource<any, any, any, PgSourceParameter[]>
         ).parameters[0];
         if (s.isMutation && s.parameters) {
-          behavior.push("-query_field mutation_field -type_field");
+          behavior.push("-queryField mutationField -typeField");
         } else if (
           s.parameters &&
           s.parameters?.[0]?.codec?.columns &&
           !s.isMutation &&
           v4ComputedColumnChecks(s, event.pgProc)
         ) {
-          behavior.push("-query_field -mutation_field type_field");
+          behavior.push("-queryField -mutationField typeField");
         } else if (
           !s.isMutation &&
           s.parameters &&
-          // Don't default to this being a query_field if it looks like a computed column function
+          // Don't default to this being a queryField if it looks like a computed column function
           (!firstParameter?.codec?.columns ||
             firstParameter?.codec?.extensions?.isTableLike === false)
         ) {
-          behavior.push("query_field -mutation_field -type_field");
+          behavior.push("queryField -mutationField -typeField");
         } else {
-          behavior.push("-query_field -mutation_field -type_field");
+          behavior.push("-queryField -mutationField -typeField");
         }
 
         if (!s.extensions) {

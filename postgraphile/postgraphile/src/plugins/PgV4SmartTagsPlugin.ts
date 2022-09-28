@@ -166,7 +166,7 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           break;
         }
         case "execute": {
-          behavior.push("-query_field -mutation_field -type_field");
+          behavior.push("-queryField -mutationField -typeField");
           break;
         }
         case "filter": {
