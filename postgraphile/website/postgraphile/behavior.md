@@ -4,6 +4,8 @@ For all but the simplest APIs you will want to control which parts of your data
 sources are exposed and how they are exposed. New to PostGraphile version 5 is
 the "behavior" system that gives you granular control over these topics.
 
+## Terminology
+
 A "behavior string" is a text-based string with a relatively simple syntax; here
 are some examples:
 
@@ -13,9 +15,11 @@ are some examples:
 
 A behavior string is made of a list of "behavior fragments" separated by spaces.
 Each behavior fragment optionally starts with a `+` or `-` symbol (if neither is
-specified then `+` is inferred) followed by a scope string. A scope string is
-one or more scope phrases joined by colons (`:`). A scope phrase is either a
+specified then `+` is inferred) followed by a "scope string." A scope string is
+one or more "scope phrases" joined by colons (`:`). A scope phrase is either a
 simple alphanumeric word (in camelCase), or an asterisk (`*`).
+
+## Determining entity behavior
 
 Many entities that PostGraphile processes when generating a schema (for example:
 tables, columns, functions, types, etc.) have associated behaviors which
