@@ -113,9 +113,13 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   };
 
   if (preset.extends!.length === 0) {
-    throw new Error(
-      "You must either specify a --preset or have a `graphile.config.js` file that provides one",
+    const defaultPreset = "--preset postgraphile/presets/amber";
+    console.error(
+      `ERROR: You must either specify a --preset or have a \`graphile.config.js\` file that provides one. One option is to add \`${defaultPreset}\` to your command line:\n\n  postgraphile ${defaultPreset}${
+        process.argv.length > 2 ? ` ${process.argv.slice(2).join(" ")}` : ""
+      }`,
     );
+    process.exit(1);
   }
 
   // Apply CLI options to preset
