@@ -586,7 +586,7 @@ export function pgSelectFromRecord<
   TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
   source: PgSource<TColumns, TUniques, TRelations, TParameters>,
-  record: PgClassExpressionStep<
+  $record: PgClassExpressionStep<
     TColumns,
     PgTypeCodec<TColumns, any, any>,
     TColumns,
@@ -599,7 +599,7 @@ export function pgSelectFromRecord<
     source,
     identifiers: [],
     from: (record) => sql`(select (${record.placeholder}).*)`,
-    args: [{ plan: record, pgCodec: source.codec }],
+    args: [{ step: $record, pgCodec: source.codec }],
     joinAsLateral: true,
   }) as PgSelectStep<TColumns, TUniques, TRelations, TParameters>;
 }

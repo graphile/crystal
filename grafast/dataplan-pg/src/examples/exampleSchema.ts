@@ -175,13 +175,13 @@ export function makeExampleSchema(
               any
             >,
       >(
-        plan: TStep,
+        step: TStep,
       ): TStep => {
         if (options.deoptimize) {
           const innerPlan =
-            plan instanceof __ListTransformStep
-              ? plan.getListStep()
-              : (plan as
+            step instanceof __ListTransformStep
+              ? step.getListStep()
+              : (step as
                   | PgSelectStep<any, any, any, any>
                   | PgSelectSingleStep<any, any, any, any>);
           if ("getClassStep" in innerPlan) {
@@ -190,7 +190,7 @@ export function makeExampleSchema(
             innerPlan.setInliningForbidden();
           }
         }
-        return plan;
+        return step;
       },
     [__ListTransformStep, options],
   );
@@ -410,8 +410,8 @@ export function makeExampleSchema(
    * Applies auth checks to the plan; we are using a placeholder here for now.
    */
   const selectAuth = EXPORTABLE(
-    (sql) => ($plan: PgSelectStep<any, any, any, any>) => {
-      $plan.where(sql`true /* authorization checks */`);
+    (sql) => ($step: PgSelectStep<any, any, any, any>) => {
+      $step.where(sql`true /* authorization checks */`);
     },
     [sql],
   );
@@ -2056,7 +2056,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, usersMostRecentForumSource) => ($user) => {
             const $forum = usersMostRecentForumSource.execute([
-              { plan: $user.record() },
+              { step: $user.record() },
             ]);
             deoptimizeIfAppropriate($forum);
             return $forum;
@@ -2120,10 +2120,10 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  step.orderBy({
                     codec: TYPES.text,
-                    fragment: sql`${plan.alias}.body`,
+                    fragment: sql`${step.alias}.body`,
                     direction: "ASC",
                   });
                 },
@@ -2137,10 +2137,10 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  step.orderBy({
                     codec: TYPES.text,
-                    fragment: sql`${plan.alias}.body`,
+                    fragment: sql`${step.alias}.body`,
                     direction: "DESC",
                   });
                 },
@@ -2154,9 +2154,9 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  const authorAlias = plan.singleRelation("author");
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  const authorAlias = step.singleRelation("author");
+                  step.orderBy({
                     codec: TYPES.text,
                     fragment: sql`${authorAlias}.username`,
                     direction: "ASC",
@@ -2172,9 +2172,9 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  const authorAlias = plan.singleRelation("author");
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  const authorAlias = step.singleRelation("author");
+                  step.orderBy({
                     codec: TYPES.text,
                     fragment: sql`${authorAlias}.username`,
                     direction: "DESC",
@@ -2781,10 +2781,10 @@ export function makeExampleSchema(
               const $featured = args.get("featured");
               return forumsUniqueAuthorCountSource.execute([
                 {
-                  plan: $forum.record(),
+                  step: $forum.record(),
                 },
                 {
-                  plan: $featured,
+                  step: $featured,
                   pgCodec: TYPES.boolean,
                 },
               ]);
@@ -2809,7 +2809,7 @@ export function makeExampleSchema(
                 identifiers: [],
                 args: [
                   {
-                    plan: $forum.record(),
+                    step: $forum.record(),
                   },
                 ],
                 from: (...args) =>
@@ -2838,7 +2838,7 @@ export function makeExampleSchema(
             function plan($forum) {
               const $messages = forumsFeaturedMessages.execute([
                 {
-                  plan: $forum.record(),
+                  step: $forum.record(),
                 },
               ]);
               deoptimizeIfAppropriate($messages);
@@ -2855,7 +2855,7 @@ export function makeExampleSchema(
             function plan($forum) {
               const $partitionedMessages = forumsMessagesListSetSource.execute([
                 {
-                  plan: $forum.record(),
+                  step: $forum.record(),
                 },
               ]);
               deoptimizeIfAppropriate($partitionedMessages);
@@ -3483,7 +3483,7 @@ export function makeExampleSchema(
                 identifiers: [],
                 args: [
                   {
-                    plan: $entity.record(),
+                    step: $entity.record(),
                   },
                 ],
                 from: (...args) =>
@@ -3883,7 +3883,7 @@ export function makeExampleSchema(
               const $featured = args.get("featured");
               const $plan = uniqueAuthorCountSource.execute([
                 {
-                  plan: $featured,
+                  step: $featured,
                   pgCodec: TYPES.boolean,
                   name: "featured",
                 },
@@ -4243,7 +4243,7 @@ export function makeExampleSchema(
             function plan(_$root, args) {
               const $plan = entitySearchSource.execute([
                 {
-                  plan: args.get("query"),
+                  step: args.get("query"),
                   pgCodec: TYPES.text,
                   name: "query",
                 },
@@ -4597,11 +4597,11 @@ export function makeExampleSchema(
                     sql`interfaces_and_unions.insert_post(${authorId.placeholder}, ${title.placeholder})`,
                   args: [
                     {
-                      plan: constant(2),
+                      step: constant(2),
                       pgCodec: TYPES.int,
                     },
                     {
-                      plan: constant(`Computed post #${i + 1}`),
+                      step: constant(`Computed post #${i + 1}`),
                       pgCodec: TYPES.text,
                     },
                   ],

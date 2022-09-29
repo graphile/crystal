@@ -84,16 +84,16 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                       graphile: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (plan: PgSelectStep<any, any, any, any>) => {
+                            (step: PgSelectStep<any, any, any, any>) => {
                               if (typeof pgFieldSource.source !== "function") {
                                 throw new Error(
                                   "Invalid computed column source",
                                 );
                               }
                               const expression = sql`${pgFieldSource.source({
-                                placeholder: plan.alias,
+                                placeholder: step.alias,
                               })}`;
-                              plan.orderBy({
+                              step.orderBy({
                                 codec: pgFieldSource.codec,
                                 fragment: expression,
                                 direction: ascDesc.toUpperCase() as
