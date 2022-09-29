@@ -40,7 +40,6 @@ export function options(yargs: Argv) {
       alias: "p",
       type: "number",
       description: "The port number on which to run our HTTP server",
-      default: 5678,
     })
     .option("config", {
       alias: "C",
@@ -157,13 +156,6 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const server = createServer(serv.handler);
   let started = false;
-  server.on("error", (e) => {
-    console.error("Server raised an error:", e);
-    if (!started) {
-      // Listen failed; exit
-      process.exit(2);
-    }
-  });
   server.on("listening", () => {
     started = true;
     const address = server.address();
@@ -178,6 +170,31 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     }
   });
 
-  const port = config.server?.port ?? 0;
-  server.listen(port);
+  function addServerErrorHandler() {
+    server.on("error", (e) => {
+      console.error("Server raised an error:", e);
+      if (!started) {
+        // Listen failed; exit
+        process.exit(2);
+      }
+    });
+  }
+
+  const port = config.server?.port;
+  if (port != null) {
+    addServerErrorHandler();
+    server.listen(port);
+  } else {
+    const tryPortZero = () => {
+      server.removeListener("error", tryPortZero);
+      addServerErrorHandler();
+      server.listen(0);
+    };
+    server.on("error", tryPortZero);
+    server.once("listening", () => {
+      server.removeListener("error", tryPortZero);
+      addServerErrorHandler();
+    });
+    server.listen(5678);
+  }
 }
