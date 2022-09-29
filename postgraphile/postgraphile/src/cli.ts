@@ -145,9 +145,12 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const config = resolvePresets([preset]);
   if (!config.pgSources || config.pgSources.length === 0) {
     // TODO: respect envvars here?
-    throw new Error(
-      "Please specify `-c` so we know which database to connect to (or populate the configuration with the relevant options)",
+    console.error(
+      `ERROR: Please specify \`--connection\` so we know which database to connect to (or add details to your \`graphile.config.js\`):\n\n  postgraphile${
+        process.argv.length > 2 ? ` ${process.argv.slice(2).join(" ")}` : ""
+      } --connection postgres://user:password@server:port/database_name?ssl=true`,
     );
+    process.exit(2);
   }
 
   const serv = postgraphile(config);
