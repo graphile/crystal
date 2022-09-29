@@ -41,6 +41,12 @@ export function options(yargs: Argv) {
       type: "number",
       description: "The port number on which to run our HTTP server",
     })
+    .option("host", {
+      alias: "n",
+      type: "string",
+      description: "The host to bind our HTTP server to",
+      default: "localhost",
+    })
     .option("config", {
       alias: "C",
       type: "string",
@@ -97,6 +103,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     connection: connectionString,
     schema: rawSchema,
     port: rawPort,
+    host: rawHost,
     config: configFileLocation,
     allowExplain: rawAllowExplain,
     watch,
@@ -134,6 +141,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   if (rawPort != null) {
     preset.server!.port = rawPort;
   }
+  if (rawHost != null) {
+    preset.server!.host = rawHost;
+  }
   if (rawAllowExplain != null) {
     preset.server!.exposePlan = rawAllowExplain;
   }
@@ -162,8 +172,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     if (typeof address === "string") {
       console.log(`Server listening at ${address}`);
     } else if (address) {
+      const host =
+        address.family === "IPv6" ? `[${address.address}]` : address.address;
       console.log(
-        `Server listening on port ${address.port} at http://localhost:${address.port}/graphql`,
+        `Server listening on port ${address.port} at http://${host}:${address.port}/graphql`,
       );
     } else {
       console.error(`Could not determine server address`);
@@ -181,20 +193,21 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
 
   const port = config.server?.port;
+  const host = config.server?.host;
   if (port != null) {
     addServerErrorHandler();
-    server.listen(port);
+    server.listen({ port, host });
   } else {
     const tryPortZero = () => {
       server.removeListener("error", tryPortZero);
       addServerErrorHandler();
-      server.listen(0);
+      server.listen({ host, port: 0 });
     };
     server.on("error", tryPortZero);
     server.once("listening", () => {
       server.removeListener("error", tryPortZero);
       addServerErrorHandler();
     });
-    server.listen(5678);
+    server.listen({ host, port: 5678 });
   }
 }
