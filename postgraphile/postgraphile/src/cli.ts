@@ -4,9 +4,10 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-// TODO: there should be no default preset
-import defaultPreset from "./presets/amber.js";
 import { makePgSourcesFromConnectionString } from "./schema.js";
+
+// The preset we recommend if the user doesn't specify one
+const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
 
 export function options(yargs: Argv) {
   return yargs
@@ -119,9 +120,8 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   };
 
   if (preset.extends!.length === 0) {
-    const defaultPreset = "--preset postgraphile/presets/amber";
     console.error(
-      `ERROR: You must either specify a --preset or have a \`graphile.config.js\` file that provides one. One option is to add \`${defaultPreset}\` to your command line:\n\n  postgraphile ${defaultPreset}${
+      `ERROR: You must either specify a --preset or have a \`graphile.config.js\` file that provides one. One option is to add \`${RECOMMENDED_PRESET}\` to your command line:\n\n  postgraphile ${RECOMMENDED_PRESET}${
         process.argv.length > 2 ? ` ${process.argv.slice(2).join(" ")}` : ""
       }`,
     );
