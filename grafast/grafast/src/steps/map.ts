@@ -103,8 +103,8 @@ export class MapStep extends ExecutableStep {
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
 export function map(
-  $plan: ExecutableStep,
+  $step: ExecutableStep,
   actualKeyByDesiredKey: { [desiredKey: string]: string },
 ): MapStep {
-  return new MapStep($plan, actualKeyByDesiredKey);
+  return new MapStep($step, actualKeyByDesiredKey);
 }

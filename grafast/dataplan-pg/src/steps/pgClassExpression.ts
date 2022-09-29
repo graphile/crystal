@@ -106,23 +106,23 @@ export class PgClassExpressionStep<
     >;
     this.tableId = this.addDependency(table);
 
-    const fragments: SQL[] = dependencies.map((plan, i) => {
-      if (!plan) {
-        throw new Error(`Invalid plan at index ${i}`);
+    const fragments: SQL[] = dependencies.map((stepOrSql, i) => {
+      if (!stepOrSql) {
+        throw new Error(`Invalid stepOrSql at index ${i}`);
       }
-      if (sql.isSQL(plan)) {
-        return plan;
+      if (sql.isSQL(stepOrSql)) {
+        return stepOrSql;
       } else if (
-        plan instanceof PgClassExpressionStep &&
-        plan.getParentStep() === table
+        stepOrSql instanceof PgClassExpressionStep &&
+        stepOrSql.getParentStep() === table
       ) {
         // TODO: when we defer placeholders until finalize we'll need to copy
         // deps/etc
-        return plan.expression;
+        return stepOrSql.expression;
       } else if (table instanceof PgSelectSingleStep) {
         // TODO: when we defer placeholders until finalize we'll need to store
         // deps/etc
-        const placeholder = table.placeholder(plan);
+        const placeholder = table.placeholder(stepOrSql);
         return placeholder;
       } else {
         throw new Error(`Cannot use placeholders when parent plan is ${table}`);
@@ -202,18 +202,18 @@ export class PgClassExpressionStep<
     TRelations,
     TParameters
   > {
-    const plan = this.getStep(this.dependencies[this.tableId]);
+    const step = this.getStep(this.dependencies[this.tableId]);
     if (
-      !(plan instanceof PgSelectSingleStep) &&
-      !(plan instanceof PgInsertStep) &&
-      !(plan instanceof PgUpdateStep) &&
-      !(plan instanceof PgDeleteStep)
+      !(step instanceof PgSelectSingleStep) &&
+      !(step instanceof PgInsertStep) &&
+      !(step instanceof PgUpdateStep) &&
+      !(step instanceof PgDeleteStep)
     ) {
       throw new Error(
-        `Expected ${plan} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep`,
+        `Expected ${step} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep`,
       );
     }
-    return plan;
+    return step;
   }
 
   public optimize(): this {

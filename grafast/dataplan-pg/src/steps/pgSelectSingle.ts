@@ -299,18 +299,18 @@ export class PgSelectSingleStep<
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
-  public placeholder($plan: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
-    $plan: ExecutableStep<any>,
+    $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL;
   public placeholder(
-    $plan: ExecutableStep<any> | PgTypedExecutableStep<any>,
+    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
     overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
     return overrideCodec
-      ? this.getClassStep().placeholder($plan, overrideCodec)
-      : this.getClassStep().placeholder($plan as PgTypedExecutableStep<any>);
+      ? this.getClassStep().placeholder($step, overrideCodec)
+      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
   }
 
   private existingSingleRelation<TRelationName extends keyof TRelations>(

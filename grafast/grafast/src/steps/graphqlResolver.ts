@@ -298,7 +298,7 @@ export function graphqlItemHandler(
  */
 export function graphqlResolver(
   resolver: GraphQLFieldResolver<any, any>,
-  $plan: ExecutableStep,
+  $step: ExecutableStep,
   $args: ObjectStep,
   resolveInfoBase: ResolveInfoBase,
 ): ExecutableStep {
@@ -308,7 +308,7 @@ export function graphqlResolver(
   const nullableType = getNullableType(returnType);
   const $resolverResult = new GraphQLResolverStep(
     resolver,
-    $plan,
+    $step,
     $args,
     resolveInfoBase,
     isAbstract,

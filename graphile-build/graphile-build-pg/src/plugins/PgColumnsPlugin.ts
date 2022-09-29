@@ -272,10 +272,10 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       pgSources,
                     ) =>
                     ($record: PgSelectSingleStep<any, any, any, any>) => {
-                      const $plan = $record.get(columnName);
+                      const $val = $record.get(columnName);
                       const $select = pgSelectFromRecords(
                         getSource(baseCodec, pgSources, $record),
-                        $plan,
+                        $val,
                       );
                       $select.setTrusted();
                       return $select;

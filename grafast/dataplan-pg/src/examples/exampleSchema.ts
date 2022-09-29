@@ -4241,15 +4241,15 @@ export function makeExampleSchema(
             entityUnion,
           ) =>
             function plan(_$root, args) {
-              const $plan = entitySearchSource.execute([
+              const $step = entitySearchSource.execute([
                 {
                   step: args.get("query"),
                   pgCodec: TYPES.text,
                   name: "query",
                 },
               ]) as PgSelectStep<any, any, any, any>;
-              deoptimizeIfAppropriate($plan);
-              return each($plan, ($item) => entityUnion($item));
+              deoptimizeIfAppropriate($step);
+              return each($step, ($item) => entityUnion($item));
             },
           [
             TYPES,
