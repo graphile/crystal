@@ -1,6 +1,7 @@
 import { loadConfig, resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { createServer } from "node:http";
+import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
 // TODO: there should be no default preset
@@ -9,6 +10,10 @@ import { makePgSourcesFromConnectionString } from "./schema.js";
 
 export function options(yargs: Argv) {
   return yargs
+    .parserConfiguration({
+      // Last option wins - do NOT make duplicates into arrays!
+      "duplicate-arguments-array": false,
+    })
     .usage("$0", "Run a PostGraphile HTTP server")
     .example(
       "$0 --connection postgres://localhost:5432/dbname --schema public --allow-explain",
@@ -43,12 +48,49 @@ export function options(yargs: Argv) {
       description: "The path to the config file",
       normalize: true,
     })
+    .option("preset", {
+      alias: "P",
+      type: "string",
+      description: "A comma separated list of the preset(s) to use",
+    })
     .option("allow-explain", {
       alias: "e",
       type: "boolean",
       description:
         "Allow visitors to view the plan/SQL queries/etc related to each GraphQL operation",
     });
+}
+
+function isGraphileConfigPreset(foo: unknown): foo is GraphileConfig.Preset {
+  if (typeof foo !== "object") return false;
+  if (foo === null) return false;
+  const prototype = Object.getPrototypeOf(foo);
+  if (prototype === null || prototype === Object.prototype) {
+    return true;
+  }
+  return false;
+}
+
+async function loadPresets(
+  presetSpecs: string,
+): Promise<GraphileConfig.Preset[]> {
+  const specs = presetSpecs.split(",");
+  const presets: GraphileConfig.Preset[] = [];
+  for (const spec of specs) {
+    const [moduleName, exportName = "default"] = spec.split(":");
+    const mod = await import(moduleName);
+    const possiblePreset = mod[exportName];
+    if (isGraphileConfigPreset(possiblePreset)) {
+      presets.push(possiblePreset);
+    } else {
+      throw new Error(
+        `Imported '${spec}' but the '${exportName}' export doesn't look like a preset: ${inspect(
+          spec,
+        )}`,
+      );
+    }
+  }
+  return presets;
 }
 
 export async function run(args: ArgsFromOptions<typeof options>) {
@@ -59,18 +101,22 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     config: configFileLocation,
     allowExplain: rawAllowExplain,
     watch,
+    preset: rawPresets,
   } = args;
+
+  const cliPresets = rawPresets ? await loadPresets(rawPresets) : [];
 
   // Try and load the preset
   const userPreset = await loadConfig(configFileLocation);
   const preset: GraphileConfig.Preset = {
-    extends: userPreset
-      ? [userPreset]
-      : [
-          // TODO: require a named preset
-          defaultPreset,
-        ],
+    extends: [...(userPreset ? [userPreset] : []), ...cliPresets],
   };
+
+  if (preset.extends!.length === 0) {
+    throw new Error(
+      "You must either specify a --preset or have a `graphile.config.js` file that provides one",
+    );
+  }
 
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
