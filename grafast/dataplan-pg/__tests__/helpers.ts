@@ -299,10 +299,10 @@ function clientForSettings(
             );
           }
           const stmt = `release savepoint tx${txLevel}`;
-          txLevel--;
           queries.push(
             txLevel === 1 ? { text: "commit /*fake*/" } : { text: stmt },
           );
+          txLevel--;
           await q(poolClient.query(stmt));
         },
         async rollbackTransaction() {
@@ -312,10 +312,10 @@ function clientForSettings(
             );
           }
           const stmt = `rollback to savepoint tx${txLevel}`;
-          txLevel--;
           queries.push(
             txLevel === 1 ? { text: "rollback /*fake*/" } : { text: stmt },
           );
+          txLevel--;
           await q(poolClient.query(stmt));
         },
       },
