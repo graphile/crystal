@@ -330,12 +330,13 @@ export function executePreemptive(
           null, // extensions
         ),
       ];
-      return Object.assign(Object.create(null), {
-        errors,
-        extensions: bucketRootValue[$$extensions] ?? undefined,
-        hasNext: undefined,
-        label: undefined,
-      });
+      const payload = Object.create(null);
+      payload.errors = errors;
+      const extensions = bucketRootValue[$$extensions];
+      if (extensions) {
+        payload.extensions = extensions;
+      }
+      return payload;
     }
 
     if (
@@ -656,14 +657,21 @@ async function processStream(
           spec.root.variables,
           asString,
         );
-        iterator.push({
-          data: result,
-          hasNext: true,
-          label: spec.label,
-          errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
-          extensions: undefined,
-          path: ctx.path,
-        });
+        const iteratorPayload = Object.create(null);
+        iteratorPayload.path = ctx.path;
+        if (spec.label != null) {
+          iteratorPayload.label = spec.label;
+        }
+        iteratorPayload.hasNext = true;
+        if (result !== undefined) {
+          iteratorPayload.data = result;
+        }
+        if (ctx.root.errors.length > 0) {
+          iteratorPayload.errors = ctx.root.errors;
+        }
+        // TODO: extensions?
+
+        iterator.push(iteratorPayload);
         const promise = processRoot(ctx, iterator, asString);
         if (isPromiseLike(promise)) {
           promises.push(promise);
@@ -805,14 +813,20 @@ function processSingleDeferred(
         spec.root.variables,
         asString,
       );
-      iterator.push({
-        data: result,
-        hasNext: true,
-        label: spec.label,
-        errors: ctx.root.errors.length > 0 ? ctx.root.errors : undefined,
-        extensions: undefined,
-        path: ctx.path,
-      });
+      const iteratorPayload = Object.create(null);
+      iteratorPayload.path = ctx.path;
+      if (spec.label != null) {
+        iteratorPayload.label = spec.label;
+      }
+      if (result !== undefined) {
+        iteratorPayload.data = result;
+      }
+      if (ctx.root.errors.length > 0) {
+        iteratorPayload.errors = ctx.root.errors;
+      }
+      // TODO: extensions?
+      iteratorPayload.hasNext = true;
+      iterator.push(iteratorPayload);
       const promise = processRoot(ctx, iterator, asString);
       if (isPromiseLike(promise)) {
         promises.push(promise);
