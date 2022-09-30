@@ -108,6 +108,8 @@ import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
 import { withPgClient, WithPgClientStep } from "../steps/withPgClient.js";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
   args: [...TScope],
@@ -4512,9 +4514,13 @@ export function makeExampleSchema(
     fields: {
       i: {
         type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
-        plan: EXPORTABLE(() => function plan($parent) {
-          return $parent;
-        }, []),
+        plan: EXPORTABLE(
+          () =>
+            function plan($parent) {
+              return $parent;
+            },
+          [],
+        ),
       },
     },
   });
@@ -4698,7 +4704,7 @@ export function makeExampleSchema(
         },
         type: MultipleActionsPayload,
         plan: EXPORTABLE(
-          (object, relationalPostsSource, sql, withPgClient) =>
+          (object, relationalPostsSource, sleep, sql, withPgClient) =>
             function plan(_$root, args) {
               const $transactionResult = withPgClient(
                 relationalPostsSource.executor,
@@ -4710,6 +4716,16 @@ export function makeExampleSchema(
                 async (client, { a }) => {
                   await client.startTransaction();
                   try {
+                    // Set a transaction variable to reference later
+                    await client.query(
+                      sql.compile(
+                        sql`select set_config('my_app.a', ${sql.value(
+                          a ?? 1,
+                        )}, true)`,
+                      ),
+                    );
+
+                    // Run some SQL
                     const { rows } = await client.query<{ i: number }>(
                       sql.compile(
                         sql`select * from generate_series(1, ${sql.value(
@@ -4718,8 +4734,23 @@ export function makeExampleSchema(
                       ),
                     );
 
+                    // Do some asynchronous work (e.g. talk to Stripe or whatever)
+                    await sleep(2);
+
+                    // Use the transaction variable to ensure we're still in the transaction
+                    const { rows: rows2 } = await client.query<{ i: number }>(
+                      sql.compile(
+                        sql`select i + current_setting('my_app.a', true)::int as i from generate_series(${sql.value(
+                          rows[rows.length - 1].i,
+                        )}, 10) as i`,
+                      ),
+                    );
+
+                    // Transaction complete!
                     await client.commitTransaction();
-                    return rows.map((row) => row.i);
+
+                    // Return the data
+                    return rows2.map((row) => row.i);
                   } catch (e) {
                     await client.rollbackTransaction();
                   }
@@ -4727,7 +4758,7 @@ export function makeExampleSchema(
               );
               return $transactionResult;
             },
-          [object, relationalPostsSource, sql, withPgClient],
+          [object, relationalPostsSource, sleep, sql, withPgClient],
         ),
       },
     },
