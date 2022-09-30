@@ -1,4 +1,5 @@
 import debugFactory from "debug";
+import { exportAsMany } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -13,7 +14,7 @@ function sqlPrint(fragment: SQL): string {
 // Registers the '%S' SQL formatter with the 'debug' module.
 debugFactory.formatters.S = sqlPrint;
 
-export {
+import {
   domainOfCodec,
   enumType,
   getCodecByPgCatalogTypeName,
@@ -28,7 +29,7 @@ export {
   recordType,
   TYPES,
 } from "./codecs.js";
-export {
+import {
   PgBox,
   PgCircle,
   PgHStore,
@@ -39,7 +40,7 @@ export {
   PgPoint,
   PgPolygon,
 } from "./codecUtils/index.js";
-export {
+import {
   PgEnumSource,
   PgEnumSourceExtensions,
   PgEnumSourceOptions,
@@ -56,7 +57,7 @@ export {
   PgSourceUnique,
   PgSourceUniqueExtensions,
 } from "./datasource.js";
-export {
+import {
   PgClient,
   PgClientQuery,
   PgClientResult,
@@ -68,10 +69,10 @@ export {
   PgExecutorOptions,
   WithPgClient,
 } from "./executor.js";
-export { BooleanFilterStep } from "./filters/booleanFilter.js";
-export { ClassFilterStep } from "./filters/classFilter.js";
-export { ManyFilterStep } from "./filters/manyFilter.js";
-export {
+import { BooleanFilterStep } from "./filters/booleanFilter.js";
+import { ClassFilterStep } from "./filters/classFilter.js";
+import { ManyFilterStep } from "./filters/manyFilter.js";
+import {
   PgClassSingleStep,
   PgDecode,
   PgEncode,
@@ -85,25 +86,25 @@ export {
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
-export { PgSubscriber } from "./PgSubscriber.js";
-export {
+import { PgSubscriber } from "./PgSubscriber.js";
+import {
   pgClassExpression,
   PgClassExpressionStep,
 } from "./steps/pgClassExpression.js";
-export {
+import {
   PgConditionCapableParentStep,
   PgConditionStep,
 } from "./steps/pgCondition.js";
-export { PgCursorStep } from "./steps/pgCursor.js";
-export { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
-export { pgInsert, PgInsertStep } from "./steps/pgInsert.js";
-export { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
-export {
+import { PgCursorStep } from "./steps/pgCursor.js";
+import { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
+import { pgInsert, PgInsertStep } from "./steps/pgInsert.js";
+import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
+import {
   pgPolymorphic,
   PgPolymorphicStep,
   PgPolymorphicTypeMap,
 } from "./steps/pgPolymorphic.js";
-export {
+import {
   pgSelect,
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
@@ -117,20 +118,182 @@ export {
   PgSelectStep,
   sqlFromArgDigests,
 } from "./steps/pgSelect.js";
-export {
+import {
   pgSelectFromRecord,
   pgSelectSingleFromRecord,
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
-export {
+import {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
 } from "./steps/pgSingleTablePolymorphic.js";
-export { pgUpdate, PgUpdateStep } from "./steps/pgUpdate.js";
-export {
+import { pgUpdate, PgUpdateStep } from "./steps/pgUpdate.js";
+import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
 } from "./steps/pgValidateParsedCursor.js";
-export { TempTableStep } from "./steps/tempTable.js";
-export { toPg, ToPgStep } from "./steps/toPg.js";
+import { TempTableStep } from "./steps/tempTable.js";
+import { toPg, ToPgStep } from "./steps/toPg.js";
+import {
+  withPgClient,
+  WithPgClientStep,
+  WithPgClientStepCallback,
+} from "./steps/withPgClient.js";
+
+export {
+  BooleanFilterStep,
+  ClassFilterStep,
+  domainOfCodec,
+  enumType,
+  getCodecByPgCatalogTypeName,
+  isEnumCodec,
+  listOfType,
+  ManyFilterStep,
+  PgBox,
+  PgCircle,
+  pgClassExpression,
+  PgClassExpressionStep,
+  PgClassSingleStep,
+  PgClient,
+  PgClientQuery,
+  PgClientResult,
+  PgConditionCapableParentStep,
+  PgConditionStep,
+  PgCursorStep,
+  PgDecode,
+  pgDelete,
+  PgDeleteStep,
+  PgEncode,
+  PgEnumSource,
+  PgEnumSourceExtensions,
+  PgEnumSourceOptions,
+  PgEnumTypeCodec,
+  PgEnumValue,
+  PgExecutor,
+  PgExecutorContext,
+  PgExecutorContextPlans,
+  PgExecutorInput,
+  PgExecutorMutationOptions,
+  PgExecutorOptions,
+  PgFunctionSourceOptions,
+  PgGroupSpec,
+  PgHStore,
+  pgInsert,
+  PgInsertStep,
+  PgInterval,
+  PgLine,
+  PgLseg,
+  PgOrderSpec,
+  pgPageInfo,
+  PgPageInfoStep,
+  PgPath,
+  PgPoint,
+  PgPolygon,
+  pgPolymorphic,
+  PgPolymorphicStep,
+  PgPolymorphicTypeMap,
+  pgSelect,
+  PgSelectArgumentDigest,
+  PgSelectArgumentSpec,
+  pgSelectFromRecord,
+  pgSelectFromRecords,
+  PgSelectIdentifierSpec,
+  PgSelectLockableParameter,
+  PgSelectLockCallback,
+  PgSelectMode,
+  PgSelectOptions,
+  PgSelectParsedCursorStep,
+  pgSelectSingleFromRecord,
+  PgSelectSinglePlanOptions,
+  PgSelectSingleStep,
+  PgSelectStep,
+  pgSingleTablePolymorphic,
+  PgSingleTablePolymorphicStep,
+  PgSource,
+  PgSourceBuilder,
+  PgSourceExtensions,
+  PgSourceOptions,
+  PgSourceParameter,
+  PgSourceRelation,
+  PgSourceRelationExtensions,
+  PgSourceRow,
+  PgSourceRowAttribute,
+  PgSourceUnique,
+  PgSourceUniqueExtensions,
+  PgSubscriber,
+  PgTypeCodec,
+  PgTypeCodecExtensions,
+  PgTypeColumn,
+  PgTypeColumnExtensions,
+  PgTypeColumns,
+  PgTypeColumnVia,
+  PgTypeColumnViaExplicit,
+  PgTypedExecutableStep,
+  pgUpdate,
+  PgUpdateStep,
+  pgValidateParsedCursor,
+  PgValidateParsedCursorStep,
+  PlanByUniques,
+  rangeOfCodec,
+  recordType,
+  sqlFromArgDigests,
+  TempTableStep,
+  toPg,
+  ToPgStep,
+  TuplePlanMap,
+  TYPES,
+  WithPgClient,
+  withPgClient,
+  WithPgClientStep,
+  WithPgClientStepCallback,
+};
+
+exportAsMany("@dataplan/pg", {
+  domainOfCodec,
+  enumType,
+  getCodecByPgCatalogTypeName,
+  isEnumCodec,
+  listOfType,
+  rangeOfCodec,
+  recordType,
+  TYPES,
+  PgEnumSource,
+  PgSource,
+  PgSourceBuilder,
+  PgExecutor,
+  BooleanFilterStep,
+  ClassFilterStep,
+  ManyFilterStep,
+  PgSubscriber,
+  pgClassExpression,
+  PgClassExpressionStep,
+  PgConditionStep,
+  PgCursorStep,
+  pgDelete,
+  PgDeleteStep,
+  pgInsert,
+  PgInsertStep,
+  pgPageInfo,
+  PgPageInfoStep,
+  pgPolymorphic,
+  PgPolymorphicStep,
+  pgSelect,
+  pgSelectFromRecords,
+  PgSelectStep,
+  sqlFromArgDigests,
+  pgSelectFromRecord,
+  pgSelectSingleFromRecord,
+  PgSelectSingleStep,
+  pgSingleTablePolymorphic,
+  PgSingleTablePolymorphicStep,
+  pgUpdate,
+  PgUpdateStep,
+  pgValidateParsedCursor,
+  PgValidateParsedCursorStep,
+  TempTableStep,
+  toPg,
+  ToPgStep,
+  withPgClient,
+  WithPgClientStep,
+});
