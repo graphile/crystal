@@ -1,0 +1,7 @@
+## expect(errors).toBeFalsy()
+## expect(data.multipleActions.i).toEqual([1, 2, 3])
+mutation {
+  multipleActions(input: { a: 3 }) {
+    i
+  }
+}

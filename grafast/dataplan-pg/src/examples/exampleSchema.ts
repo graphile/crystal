@@ -106,6 +106,7 @@ import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
+import { withPgClient, WithPgClientStep } from "../steps/withPgClient.js";
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
@@ -4494,6 +4495,30 @@ export function makeExampleSchema(
     },
   });
 
+  const MultipleActionsInput = newInputObjectTypeBuilder()({
+    name: "MultipleActionsInput",
+    fields: {
+      a: {
+        type: GraphQLInt,
+      },
+    },
+  });
+
+  const MultipleActionsPayload = newObjectTypeBuilder<
+    OurGraphQLContext,
+    WithPgClientStep<any, any>
+  >(WithPgClientStep)({
+    name: "MultipleActionsPayload",
+    fields: {
+      i: {
+        type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
+        plan: EXPORTABLE(() => function plan($parent) {
+          return $parent;
+        }, []),
+      },
+    },
+  });
+
   const Mutation = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValueStep<BaseGraphQLRootValue>
@@ -4662,6 +4687,47 @@ export function makeExampleSchema(
               return $post;
             },
           [pgDelete, relationalPostsSource],
+        ),
+      },
+
+      multipleActions: {
+        args: {
+          input: {
+            type: new GraphQLNonNull(MultipleActionsInput),
+          },
+        },
+        type: MultipleActionsPayload,
+        plan: EXPORTABLE(
+          (object, relationalPostsSource, sql, withPgClient) =>
+            function plan(_$root, args) {
+              const $transactionResult = withPgClient(
+                relationalPostsSource.executor,
+                object({
+                  a: args.get(["input", "a"]) as ExecutableStep<
+                    number | null | undefined
+                  >,
+                }),
+                async (client, { a }) => {
+                  await client.startTransaction();
+                  try {
+                    const { rows } = await client.query<{ i: number }>(
+                      sql.compile(
+                        sql`select * from generate_series(1, ${sql.value(
+                          a ?? 1,
+                        )}) as i`,
+                      ),
+                    );
+
+                    await client.commitTransaction();
+                    return rows.map((row) => row.i);
+                  } catch (e) {
+                    await client.rollbackTransaction();
+                  }
+                },
+              );
+              return $transactionResult;
+            },
+          [object, relationalPostsSource, sql, withPgClient],
         ),
       },
     },
