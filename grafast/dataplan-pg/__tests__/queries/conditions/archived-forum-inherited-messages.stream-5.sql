@@ -47,6 +47,8 @@ lateral (
   limit 1
 ) as __messages_result__
 
+begin /*fake*/
+
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select __messages_result__.*
 from (
@@ -87,3 +89,5 @@ lateral (
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
 
 close __SNAPSHOT_CURSOR_0__
+
+commit /*fake*/
