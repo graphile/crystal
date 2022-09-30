@@ -67,7 +67,7 @@ async function runTestQuery(basePath) {
   const operationType = "query";
 
   const errorMatches = source.match(
-    /^## expect\(errors\)\.toHaveLength\(([0-9]+)\)/,
+    /^## expect\(errors\)\.toHaveLength\(([0-9]+)\)/m,
   );
   const expectErrors = errorMatches ? parseInt(errorMatches[1], 10) : 0;
 
