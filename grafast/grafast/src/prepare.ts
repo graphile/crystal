@@ -658,17 +658,17 @@ async function processStream(
           asString,
         );
         const iteratorPayload = Object.create(null);
-        iteratorPayload.path = ctx.path;
-        if (spec.label != null) {
-          iteratorPayload.label = spec.label;
-        }
-        iteratorPayload.hasNext = true;
         if (result !== undefined) {
           iteratorPayload.data = result;
+        }
+        iteratorPayload.hasNext = true;
+        if (spec.label != null) {
+          iteratorPayload.label = spec.label;
         }
         if (ctx.root.errors.length > 0) {
           iteratorPayload.errors = ctx.root.errors;
         }
+        iteratorPayload.path = ctx.path;
         // TODO: extensions?
 
         iterator.push(iteratorPayload);
@@ -814,18 +814,18 @@ function processSingleDeferred(
         asString,
       );
       const iteratorPayload = Object.create(null);
-      iteratorPayload.path = ctx.path;
-      if (spec.label != null) {
-        iteratorPayload.label = spec.label;
-      }
       if (result !== undefined) {
         iteratorPayload.data = result;
+      }
+      iteratorPayload.hasNext = true;
+      if (spec.label != null) {
+        iteratorPayload.label = spec.label;
       }
       if (ctx.root.errors.length > 0) {
         iteratorPayload.errors = ctx.root.errors;
       }
       // TODO: extensions?
-      iteratorPayload.hasNext = true;
+      iteratorPayload.path = ctx.path;
       iterator.push(iteratorPayload);
       const promise = processRoot(ctx, iterator, asString);
       if (isPromiseLike(promise)) {
