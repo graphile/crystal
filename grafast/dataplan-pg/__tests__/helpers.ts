@@ -286,12 +286,11 @@ function clientForSettings(
             );
           }
           txLevel++;
+          const stmt = `savepoint tx${txLevel}`;
           queries.push(
-            txLevel === 1
-              ? { text: "begin /*fake*/" }
-              : { text: `savepoint tx${txLevel}` },
+            txLevel === 1 ? { text: "begin /*fake*/" } : { text: stmt },
           );
-          await q(poolClient.query(`savepoint tx${txLevel}`));
+          await q(poolClient.query(stmt));
         },
         async commitTransaction() {
           if (clientAndRelease.count <= 0) {
@@ -299,13 +298,12 @@ function clientForSettings(
               "Attempted to commit transaction on released client",
             );
           }
-          queries.push(
-            txLevel === 1
-              ? { text: "commit /*fake*/" }
-              : { text: `release savepoint tx${txLevel}` },
-          );
-          await q(poolClient.query(`release savepoint tx${txLevel}`));
+          const stmt = `release savepoint tx${txLevel}`;
           txLevel--;
+          queries.push(
+            txLevel === 1 ? { text: "commit /*fake*/" } : { text: stmt },
+          );
+          await q(poolClient.query(stmt));
         },
         async rollbackTransaction() {
           if (clientAndRelease.count <= 0) {
@@ -313,13 +311,12 @@ function clientForSettings(
               "Attempted to rollback transaction on released client",
             );
           }
-          queries.push(
-            txLevel === 1
-              ? { text: "rollback /*fake*/" }
-              : { text: `rollback to savepoint tx${txLevel}` },
-          );
-          await q(poolClient.query(`rollback to savepoint tx${txLevel}`));
+          const stmt = `rollback to savepoint tx${txLevel}`;
           txLevel--;
+          queries.push(
+            txLevel === 1 ? { text: "rollback /*fake*/" } : { text: stmt },
+          );
+          await q(poolClient.query(stmt));
         },
       },
       release() {
