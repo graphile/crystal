@@ -2,12 +2,12 @@
 import * as assert from "assert";
 import { readFile } from "fs/promises";
 import glob from "glob";
-import { graphql } from "graphql";
+import { grafast } from "grafast";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import pg from "pg";
 
-import { schema } from "./exampleSchemaExport.mjs.js";
+import { schema } from "./exampleSchemaExport.mjs";
 
 const pool = new pg.Pool({
   connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
@@ -56,7 +56,7 @@ async function runTestQuery(basePath) {
     }
   };
 
-  const result = await graphql({
+  const result = await grafast({
     schema,
     source,
     contextValue: {
