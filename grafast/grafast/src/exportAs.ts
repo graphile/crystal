@@ -5,9 +5,13 @@
  *
  * @internal
  */
-export function exportAs<T>(thing: T, exportName: string): T {
+export function exportAs<T>(
+  moduleName: string,
+  thing: T,
+  exportName: string,
+): T {
   Object.defineProperty(thing, "$$export", {
-    value: { moduleName: "grafast", exportName },
+    value: { moduleName, exportName },
   });
   return thing;
 }
@@ -19,7 +23,10 @@ export function exportAs<T>(thing: T, exportName: string): T {
  *
  * @internal
  */
-export function exportAsMany(all: { [key: string]: any }): void {
+export function exportAsMany(
+  moduleName: string,
+  all: { [key: string]: any },
+): void {
   for (const key of Object.keys(all)) {
     const value = all[key];
     if (
@@ -27,7 +34,7 @@ export function exportAsMany(all: { [key: string]: any }): void {
       value !== null &&
       !("$$export" in value)
     ) {
-      exportAs(all[key], key);
+      exportAs(moduleName, all[key], key);
     }
   }
 }
