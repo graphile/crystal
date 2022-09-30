@@ -170,7 +170,7 @@ function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
         },
         async startTransaction() {
           if (txLevel === 0) {
-            await poolClient.query("begin");
+            await q({ text: "begin" });
             if (pgSettingsEntries.length > 0) {
               await q({
                 text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json)",
@@ -254,6 +254,7 @@ function clientForSettings(
       promise.finally(() => pendingQueries.delete(promise));
       return promise;
     }
+    let txLevel = 0;
     const clientAndRelease: ClientAndRelease = {
       rawPoolClient: poolClient,
       count: 1,
@@ -284,7 +285,13 @@ function clientForSettings(
               "Attempted to start transaction on released client",
             );
           }
-          await q(poolClient.query("savepoint tx"));
+          txLevel++;
+          queries.push(
+            txLevel === 1
+              ? { text: "begin /*fake*/" }
+              : { text: `savepoint tx${txLevel}` },
+          );
+          await q(poolClient.query(`savepoint tx${txLevel}`));
         },
         async commitTransaction() {
           if (clientAndRelease.count <= 0) {
@@ -292,7 +299,13 @@ function clientForSettings(
               "Attempted to commit transaction on released client",
             );
           }
-          await q(poolClient.query("release savepoint tx"));
+          queries.push(
+            txLevel === 1
+              ? { text: "commit /*fake*/" }
+              : { text: `release savepoint tx${txLevel}` },
+          );
+          await q(poolClient.query(`release savepoint tx${txLevel}`));
+          txLevel--;
         },
         async rollbackTransaction() {
           if (clientAndRelease.count <= 0) {
@@ -300,7 +313,13 @@ function clientForSettings(
               "Attempted to rollback transaction on released client",
             );
           }
-          await q(poolClient.query("rollback to savepoint tx"));
+          queries.push(
+            txLevel === 1
+              ? { text: "rollback /*fake*/" }
+              : { text: `rollback to savepoint tx${txLevel}` },
+          );
+          await q(poolClient.query(`rollback to savepoint tx${txLevel}`));
+          txLevel--;
         },
       },
       release() {
