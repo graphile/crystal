@@ -48,26 +48,16 @@ export class WithPgClientStep<TData, TResult> extends ExecutableStep<TResult> {
     this.addDependency($data);
   }
 
-  async execute(
+  execute(
     values: [
       GrafastValuesList<{ pgSettings: any; withPgClient: WithPgClient }>,
       GrafastValuesList<TData>,
     ],
-  ): Promise<GrafastResultsList<TResult>> {
-    const results: PromiseOrDirect<TResult>[] = [];
-    for (let i = 0, l = values[0].length; i < l; i++) {
-      const { pgSettings, withPgClient } = values[0][i];
+  ): GrafastResultsList<TResult> {
+    return values[0].map(async ({ pgSettings, withPgClient }, i) => {
       const data = values[1][i];
-      try {
-        const result = await withPgClient(pgSettings, (client) =>
-          this.callback(client, data),
-        );
-        results.push(result);
-      } catch (e) {
-        results.push(Promise.reject(e));
-      }
-    }
-    return results;
+      return withPgClient(pgSettings, (client) => this.callback(client, data));
+    });
   }
 }
 
