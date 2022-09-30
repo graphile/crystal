@@ -4753,6 +4753,7 @@ export function makeExampleSchema(
                     return rows2.map((row) => row.i);
                   } catch (e) {
                     await client.rollbackTransaction();
+                    throw e;
                   }
                 },
               );

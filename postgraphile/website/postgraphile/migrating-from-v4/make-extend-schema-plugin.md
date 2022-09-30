@@ -234,9 +234,65 @@ and place it in a transaction, even if it isn't needed. This client was added to
 the GraphQL context as `pgClient`, and you could use it in your mutations.
 
 In V5, Postgres clients are provisioned on demand, so you can either use a built
-in mutation step, or you can...
+in mutation step, or for more complex mutations you can use `withPgClient` to
+run arbitrary (asynchronous) code with access to a pgClient which you may put
+into a transaction if you like. Note that this pgClient is a generic adaptor, so
+if you want to deal with your Postgres client of choice here you can do so!
 
-TODO: detail how to write a custom SQL mutation/series of mutations.
+```js
+const plans = {
+  Mutation: {
+    myCustomMutation(_$root, fieldArgs) {
+      const $transactionResult = withPgClient(
+        // Get the 'executor' that tells us which database we're talking to.
+        // You can get this from any source via `pgSource.executor`.
+        executor,
+
+        // Use this step to pass any existing data into your callback, e.g.
+        // args, other steps, etc. The result will be passed as the second
+        // argument to your callback
+        object({
+          a: fieldArgs.get(["input", "a"]),
+        }),
+
+        // Callback will be called with a client, whatever it returns (plain data)
+        // will be the result of the `withPgClient` step.
+        async (client, data) => {
+          // The data from the `object` step above
+          const { a } = data;
+
+          // If you need a transaction, start one - but be sure to use
+          // try/catch to ensure it gets committed/rolled back!
+          await client.startTransaction();
+          try {
+            // Run some SQL
+            const { rows } = await client.query(
+              sql.compile(
+                sql`select * from generate_series(1, ${sql.value(
+                  a ?? 1,
+                )}) as i`,
+              ),
+            );
+
+            // Do some asynchronous work (e.g. talk to Stripe or whatever)
+            await sleep(2);
+
+            // Transaction complete!
+            await client.commitTransaction();
+
+            // Return whatever data you'll need later
+            return rows2.map((row) => row.i);
+          } catch (e) {
+            await client.rollbackTransaction();
+            throw e;
+          }
+        },
+      );
+      return $transactionResult;
+    },
+  },
+};
+```
 
 ## QueryBuilder "named children"
 
@@ -271,7 +327,7 @@ const plans = {
       const $nodeId = fieldArgs.get("id");
       const spec = specFromNodeId(codec, handler, $nodeId);
       const plan = object({ result: pgUpdate(userSource, spec) });
-      args.apply(plan);
+      fieldArgs.apply(plan);
       return plan;
     },
   },
