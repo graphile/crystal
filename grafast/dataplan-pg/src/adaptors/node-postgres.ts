@@ -258,7 +258,14 @@ export function makeNodePostgresWithPgClient(
       };
       return await callback(client);
     } finally {
+      if (txLevel > 0) {
+        // eslint-disable-next-line no-unsafe-finally
+        throw new Error(
+          "Programming error: client was released without releasing the right number of transaction levels.",
+        );
+      }
       pgClient.removeListener("notification", notificationCallback);
+      // TODO: should we `RESET ALL` here?
       pgClient.release();
     }
   };
