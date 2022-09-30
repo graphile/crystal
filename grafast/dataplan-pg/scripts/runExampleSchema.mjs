@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import * as assert from "assert";
 import { readFile } from "fs/promises";
 import glob from "glob";
 import { grafast } from "grafast";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
+import { strict as assert } from "node:assert";
 import pg from "pg";
 
 import { schema } from "./exampleSchemaExport.mjs";
@@ -17,8 +17,19 @@ async function runTestQuery(basePath) {
   const source = await readFile(`${basePath}.test.graphql`, "utf8");
   const expectedData = JSON5.parse(await readFile(`${basePath}.json5`, "utf8"));
 
-  const withPgClient = async (_pgSettings, callback) => {
+  const withPgClient = async (pgSettings, callback) => {
     const client = await pool.connect();
+    const pairs = Object.entries(pgSettings);
+    if (pairs.length) {
+      const sets = [];
+      const values = [];
+      for (const [key, value] of pairs) {
+        sets.push(
+          `set_config($${values.push(key)}, $${values.push(value)}, false)`,
+        );
+      }
+      await client.query(`select ${sets.join(",")};`, values);
+    }
     try {
       let transactionDepth = -1;
       const crystalPgClient = {
@@ -60,7 +71,9 @@ async function runTestQuery(basePath) {
     schema,
     source,
     contextValue: {
-      pgSettings: {},
+      pgSettings: {
+        timezone: "UTC",
+      },
       withPgClient,
     },
   });
@@ -143,7 +156,7 @@ async function runTestQuery(basePath) {
       ...originalPayloads.slice(1).sort(sortPayloads),
     ];
     assert.deepEqual(
-      payloads,
+      JSON.parse(JSON.stringify(payloads)),
       expectedData,
       "Expected the stream data to match the test data",
     );
@@ -166,7 +179,7 @@ async function runTestQuery(basePath) {
       process.exit(1);
     }
     assert.deepEqual(
-      data,
+      JSON.parse(JSON.stringify(data)),
       expectedData,
       "Expected the data to match the test data",
     );
