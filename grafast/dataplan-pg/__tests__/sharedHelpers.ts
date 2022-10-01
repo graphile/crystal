@@ -47,15 +47,15 @@ export async function withTestWithPgClient<T>(
     if (!opts.text.includes("--ignore--")) {
       if (!direct) {
         switch (opts.text) {
-          case "savepoint tx0": {
+          case "savepoint tx": {
             queries.push({ text: "begin /*fake*/" });
             break;
           }
-          case "release savepoint tx0": {
+          case "release savepoint tx": {
             queries.push({ text: "commit /*fake*/" });
             break;
           }
-          case "rollback to savepoint tx0": {
+          case "rollback to savepoint tx": {
             queries.push({ text: "rollback /*fake*/" });
             break;
           }
