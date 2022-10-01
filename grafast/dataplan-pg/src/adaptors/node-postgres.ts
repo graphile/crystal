@@ -77,7 +77,7 @@ function newNodePostgresPgClient(
   let queue: Promise<void> | null = null;
   const addToQueue = <T>(callback: () => Promise<T>): Promise<T> => {
     const result = queue ? queue.then(callback) : callback();
-    const newQueue = result.then(noop);
+    const newQueue = result.then(noop, noop);
     queue = newQueue;
     queue.then(() => {
       // Clear queue unless it has moved on
