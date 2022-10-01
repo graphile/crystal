@@ -44,7 +44,7 @@ export async function withTestWithPgClient<T>(
   const oldQuery = poolClient.query;
   poolClient.query = function (...args: any[]) {
     const opts = typeof args[0] === "string" ? { text: args[0] } : args[0];
-    if (typeof opts !== "string") {
+    if (!opts.text.includes("--ignore--")) {
       if (!direct) {
         switch (opts.text) {
           case "savepoint tx0": {
