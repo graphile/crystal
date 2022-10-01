@@ -49,7 +49,7 @@ import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers";
+import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
 import { makeSchema } from "..";
 import AmberPreset from "../src/presets/amber.js";
 import { makeV4Preset } from "../src/presets/v4.js";
