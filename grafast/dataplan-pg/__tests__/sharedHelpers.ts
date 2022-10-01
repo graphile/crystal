@@ -82,7 +82,23 @@ export async function withTestWithPgClient<T>(
           poolClient,
           poolClientIsInTransaction: true,
         });
-        return await callback(queuedWPC(withPgClient));
+        const withPgClientWithSavepoints: WithPgClient = async (
+          pgSettings,
+          callback,
+        ) => {
+          await poolClient.query("savepoint notxhonest --ignore--");
+          try {
+            const result = await withPgClient(pgSettings, callback);
+            await poolClient.query("release savepoint notxhonest --ignore--");
+            return result;
+          } catch (e) {
+            await poolClient.query(
+              "rollback to savepoint notxhonest --ignore--",
+            );
+            throw e;
+          }
+        };
+        return await callback(queuedWPC(withPgClientWithSavepoints));
       } finally {
         await poolClient.query("rollback --ignore--");
       }
