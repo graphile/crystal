@@ -1,3 +1,7 @@
+begin /*fake*/
+
+select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+
 insert into "c"."person" as __person__ ("person_full_name", "aliases", "about", "email", "site") values ($1::"varchar", $2::"text"[], $3::"text", $4::"b"."email", $5::"b"."wrapped_url") returning
   __person__."id"::text as "0",
   __person__."person_full_name" as "1",
@@ -6,6 +10,12 @@ insert into "c"."person" as __person__ ("person_full_name", "aliases", "about", 
   __person__."email" as "4",
   __person__."site"::text as "5"
 
+
+commit /*fake*/
+
+begin /*fake*/
+
+select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __frmcdc_wrapped_url_1_result__.*
 from (
@@ -20,3 +30,5 @@ lateral (
     __frmcdc_wrapped_url_1_identifiers__.idx as "1"
   from (select (__frmcdc_wrapped_url_1_identifiers__."id0").*) as __frmcdc_wrapped_url_1__
 ) as __frmcdc_wrapped_url_1_result__
+
+commit /*fake*/
