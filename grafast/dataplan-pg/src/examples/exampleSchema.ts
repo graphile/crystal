@@ -4714,8 +4714,7 @@ export function makeExampleSchema(
                   >,
                 }),
                 async (client, { a }) => {
-                  await client.startTransaction();
-                  try {
+                  return client.withTransaction(async (client) => {
                     // Set a transaction variable to reference later
                     await client.query(
                       sql.compile(
@@ -4746,15 +4745,9 @@ export function makeExampleSchema(
                       ),
                     );
 
-                    // Transaction complete!
-                    await client.commitTransaction();
-
                     // Return the data
                     return rows2.map((row) => row.i);
-                  } catch (e) {
-                    await client.rollbackTransaction();
-                    throw e;
-                  }
+                  });
                 },
               );
               return $transactionResult;

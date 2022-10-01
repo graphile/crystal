@@ -13,6 +13,67 @@ const pool = new pg.Pool({
   connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
 });
 
+function noop() {
+  /*noop*/
+}
+
+function newCrystalPgClient(client, txLevel = 0) {
+  let queue = null;
+  const addToQueue = (callback) => {
+    const result = queue ? queue.then(callback) : callback();
+    let newQueue = result.then(noop);
+    queue = newQueue;
+    queue.then(() => {
+      // Clear queue unless it has moved on
+      if (queue === newQueue) {
+        queue = null;
+      }
+    });
+    return result;
+  };
+  return {
+    withTransaction(callback) {
+      // Transactions always queue; creating queue if need be
+      return addToQueue(async () => {
+        if (txLevel === 0) {
+          await client.query("begin");
+        } else {
+          await client.query(`savepoint tx${txLevel}`);
+        }
+        try {
+          const newClient = newCrystalPgClient(client, txLevel + 1);
+          const innerResult = await callback(newClient);
+          if (txLevel === 0) {
+            await client.query("commit");
+          } else {
+            await client.query(`release savepoint tx${txLevel}`);
+          }
+          return innerResult;
+        } catch (e) {
+          try {
+            if (txLevel === 0) {
+              await client.query("rollback");
+            } else {
+              await client.query(`rollback savepoint tx${txLevel}`);
+            }
+          } catch (e2) {
+            console.error(`Error occurred whilst rolling back: ${e}`);
+          }
+          throw e;
+        }
+      });
+    },
+    query(...args) {
+      // Queries only need to queue if there's a queue already
+      if (queue) {
+        return addToQueue(() => this.query(...args));
+      } else {
+        return client.query(...args);
+      }
+    },
+  };
+}
+
 async function runTestQuery(basePath) {
   const source = await readFile(`${basePath}.test.graphql`, "utf8");
   const expectedData = JSON5.parse(await readFile(`${basePath}.json5`, "utf8"));
@@ -31,38 +92,10 @@ async function runTestQuery(basePath) {
       await client.query(`select ${sets.join(",")};`, values);
     }
     try {
-      let transactionDepth = -1;
-      const crystalPgClient = {
-        async startTransaction() {
-          transactionDepth++;
-          if (transactionDepth === 0) {
-            await client.query("begin");
-          } else {
-            await client.query(`savepoint tx${transactionDepth}`);
-          }
-        },
-        async commitTransaction() {
-          if (transactionDepth === 0) {
-            await client.query("commit");
-          } else {
-            await client.query(`release savepoint tx${transactionDepth}`);
-          }
-          transactionDepth--;
-        },
-        async rollbackTransaction() {
-          if (transactionDepth === 0) {
-            await client.query("rollback");
-          } else {
-            await client.query(`rollback savepoint tx${transactionDepth}`);
-          }
-          transactionDepth--;
-        },
-        query(...args) {
-          return client.query(...args);
-        },
-      };
+      const crystalPgClient = newCrystalPgClient(client);
       return await callback(crystalPgClient);
     } finally {
+      await client.query(`reset all`);
       client.release();
     }
   };
