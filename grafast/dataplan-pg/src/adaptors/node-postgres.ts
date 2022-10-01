@@ -94,7 +94,9 @@ function newNodePostgresPgClient(
         if (txLevel === 0 && !alreadyInTransaction) {
           await pgClient.query({ text: "begin" });
         } else {
-          await pgClient.query({ text: `savepoint tx${txLevel}` });
+          await pgClient.query({
+            text: `savepoint tx${txLevel === 0 ? "" : txLevel}`,
+          });
         }
         try {
           const newClient = newNodePostgresPgClient(
@@ -108,7 +110,9 @@ function newNodePostgresPgClient(
           if (txLevel === 0 && !alreadyInTransaction) {
             await pgClient.query({ text: "commit" });
           } else {
-            await pgClient.query({ text: `release savepoint tx${txLevel}` });
+            await pgClient.query({
+              text: `release savepoint tx${txLevel === 0 ? "" : txLevel}`,
+            });
           }
           return innerResult;
         } catch (e) {
@@ -116,7 +120,9 @@ function newNodePostgresPgClient(
             if (txLevel === 0 && !alreadyInTransaction) {
               await pgClient.query({ text: "rollback" });
             } else {
-              await pgClient.query({ text: `rollback savepoint tx${txLevel}` });
+              await pgClient.query({
+                text: `rollback to savepoint tx${txLevel === 0 ? "" : txLevel}`,
+              });
             }
           } catch (e2) {
             console.error(`Error occurred whilst rolling back: ${e}`);
