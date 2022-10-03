@@ -88,6 +88,5 @@ it("Can tweak the schema", async () => {
       """
       query: Query!
     }
-
   `);
 });
