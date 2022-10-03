@@ -46,7 +46,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             ),
           "graphile-build built-in (BigInt type)",
         );
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "BigInt",
           scope: {},
           nonNullNode: false,
@@ -64,7 +64,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             ),
           "graphile-build built-in (BigFloat type)",
         );
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "BigFloat",
           scope: {},
           nonNullNode: false,
@@ -82,7 +82,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             ),
           "graphile-build built-in (Datetime type)",
         );
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "Datetime",
           scope: {},
           nonNullNode: false,
@@ -100,7 +100,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             ),
           "graphile-build built-in (Datetype)",
         );
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "Date",
           scope: {},
           nonNullNode: false,
@@ -133,7 +133,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             ),
           "graphile-build built-in (UUID type)",
         );
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "UUID",
           scope: {},
           nonNullNode: false,
@@ -224,7 +224,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             "graphile-build built-in (JSON type; simple)",
           );
         }
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "JSON",
           scope: {},
           nonNullNode: false,
@@ -237,7 +237,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
             stringTypeSpec(build.wrapDescription("An XML document", "type")),
           "graphile-build built-in (XML type)",
         );
-        build.registerCursorConnection({
+        build.registerCursorConnection?.({
           typeName: "XML",
           scope: {},
           nonNullNode: false,
