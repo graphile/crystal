@@ -70,7 +70,7 @@ export function withPgClientTransaction<TData, TResult>(
   $data: ExecutableStep<TData>,
   callback: WithPgClientStepCallback<TData, TResult>,
 ) {
-  return new WithPgClientStep(executor, $data, (client, data) =>
+  return withPgClient(executor, $data, (client, data) =>
     client.withTransaction((txClient) => callback(txClient, data)),
   );
 }
