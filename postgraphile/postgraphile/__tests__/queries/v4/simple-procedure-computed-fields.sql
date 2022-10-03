@@ -175,7 +175,7 @@ lateral (
     __person_identifiers__.idx as "13"
   from "c"."person" as __person__
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -336,4 +336,4 @@ lateral (
     __person_identifiers__.idx as "10"
   from "c"."person" as __person__
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;

@@ -13,7 +13,7 @@ lateral (
   where (
     true /* authorization checks */
   )
-) as __unique_author_count_result__
+) as __unique_author_count_result__;
 
 select __unique_author_count_result__.*
 from (
@@ -30,7 +30,7 @@ lateral (
   where (
     true /* authorization checks */
   )
-) as __unique_author_count_result__
+) as __unique_author_count_result__;
 
 select __unique_author_count_result__.*
 from (
@@ -47,4 +47,4 @@ lateral (
   where (
     true /* authorization checks */
   )
-) as __unique_author_count_result__
+) as __unique_author_count_result__;

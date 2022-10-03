@@ -15,7 +15,7 @@ lateral (
     __person__."email" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -34,7 +34,7 @@ lateral (
     __person__."email" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __compound_key_result__.*
 from (
@@ -57,7 +57,7 @@ lateral (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-) as __compound_key_result__
+) as __compound_key_result__;
 
 select __compound_key_result__.*
 from (
@@ -80,7 +80,7 @@ lateral (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-) as __compound_key_result__
+) as __compound_key_result__;
 
 select __compound_key_result__.*
 from (
@@ -103,4 +103,4 @@ lateral (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-) as __compound_key_result__
+) as __compound_key_result__;

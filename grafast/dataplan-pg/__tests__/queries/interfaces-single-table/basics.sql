@@ -24,4 +24,4 @@ from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
 )
-order by __people__."person_id" asc
+order by __people__."person_id" asc;

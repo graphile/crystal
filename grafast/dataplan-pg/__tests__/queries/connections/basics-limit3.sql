@@ -14,7 +14,7 @@ where
     true /* authorization checks */
   )
 order by __messages__."id" asc
-limit 4
+limit 4;
 
 select
   (count(*))::text as "0"
@@ -24,4 +24,4 @@ where
     __messages__.archived_at is null
   ) and (
     true /* authorization checks */
-  )
+  );

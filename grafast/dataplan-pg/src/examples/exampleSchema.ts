@@ -4728,7 +4728,7 @@ export function makeExampleSchema(
                     sql.compile(
                       sql`select set_config('my_app.a', ${sql.value(
                         a ?? 1,
-                      )}, true)`,
+                      )}, true);`,
                     ),
                   );
 
@@ -4737,7 +4737,7 @@ export function makeExampleSchema(
                     sql.compile(
                       sql`select * from generate_series(1, ${sql.value(
                         a ?? 1,
-                      )}) as i`,
+                      )}) as i;`,
                     ),
                   );
 
@@ -4749,7 +4749,7 @@ export function makeExampleSchema(
                     sql.compile(
                       sql`select i + current_setting('my_app.a', true)::int as i from generate_series(${sql.value(
                         rows[rows.length - 1].i,
-                      )}, 10) as i`,
+                      )}, 10) as i;`,
                     ),
                   );
 

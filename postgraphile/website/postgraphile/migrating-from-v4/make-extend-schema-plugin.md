@@ -268,7 +268,7 @@ const plans = {
           // Run some SQL
           const { rows } = await client.query(
             sql.compile(
-              sql`select * from generate_series(1, ${sql.value(a ?? 1)}) as i`,
+              sql`select * from generate_series(1, ${sql.value(a ?? 1)}) as i;`,
             ),
           );
 
@@ -276,7 +276,7 @@ const plans = {
           await sleep(2);
 
           // Maybe run some more SQL as part of the transaction
-          await client.query(sql.compile(sql`select 1`));
+          await client.query(sql.compile(sql`select 1;`));
 
           // Return whatever data you'll need later
           return rows2.map((row) => row.i);

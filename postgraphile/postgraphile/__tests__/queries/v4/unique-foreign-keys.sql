@@ -34,4 +34,4 @@ on (
     __compound_key__."person_id_2"::"int4" = __unique_foreign_key__."compound_key_2"
   )
 )
-order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
+order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc;

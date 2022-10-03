@@ -1,4 +1,4 @@
-begin /*fake*/
+begin; /*fake*/
 
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
@@ -17,6 +17,6 @@ lateral (
     __left_arm_identity__."mood" as "3",
     __left_arm_identity_identifiers__.idx as "4"
   from "c"."left_arm_identity"(__left_arm_identity_identifiers__."id0") as __left_arm_identity__
-) as __left_arm_identity_result__
+) as __left_arm_identity_result__;
 
-commit /*fake*/
+commit; /*fake*/

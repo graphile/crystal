@@ -28,4 +28,4 @@ lateral (
       __single_table_items__."type" = __single_table_items_identifiers__."id1"
     )
   order by __single_table_items__."id" asc
-) as __single_table_items_result__
+) as __single_table_items_result__;

@@ -19,7 +19,7 @@ lateral (
     __authenticate_payload_identifiers__."id1",
     __authenticate_payload_identifiers__."id2"
   ) as __authenticate_payload__
-) as __authenticate_payload_result__
+) as __authenticate_payload_result__;
 
 select __frmcdc_jwt_token_1_result__.*
 from (
@@ -34,7 +34,7 @@ lateral (
     (not (__frmcdc_jwt_token_1__ is null))::text as "1",
     __frmcdc_jwt_token_1_identifiers__.idx as "2"
   from (select (__frmcdc_jwt_token_1_identifiers__."id0").*) as __frmcdc_jwt_token_1__
-) as __frmcdc_jwt_token_1_result__
+) as __frmcdc_jwt_token_1_result__;
 
 select __person_result__.*
 from (
@@ -53,4 +53,4 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;

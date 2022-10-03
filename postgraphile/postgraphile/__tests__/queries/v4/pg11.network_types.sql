@@ -18,7 +18,7 @@ lateral (
     __network__."inet" = __network_identifiers__."id0"
   )
   order by __network__."id" asc
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -35,7 +35,7 @@ lateral (
   where (
     __network__."inet" = __network_identifiers__."id0"
   )
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -57,7 +57,7 @@ lateral (
     __network__."cidr" = __network_identifiers__."id0"
   )
   order by __network__."id" asc
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -74,7 +74,7 @@ lateral (
   where (
     __network__."cidr" = __network_identifiers__."id0"
   )
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -96,7 +96,7 @@ lateral (
     __network__."macaddr" = __network_identifiers__."id0"
   )
   order by __network__."id" asc
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -113,7 +113,7 @@ lateral (
   where (
     __network__."macaddr" = __network_identifiers__."id0"
   )
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -135,7 +135,7 @@ lateral (
     __network__."macaddr8" = __network_identifiers__."id0"
   )
   order by __network__."id" asc
-) as __network_result__
+) as __network_result__;
 
 select __network_result__.*
 from (
@@ -152,4 +152,4 @@ lateral (
   where (
     __network__."macaddr8" = __network_identifiers__."id0"
   )
-) as __network_result__
+) as __network_result__;

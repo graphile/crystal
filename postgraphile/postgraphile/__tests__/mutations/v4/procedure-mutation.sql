@@ -10,7 +10,7 @@ lateral (
     __json_identity_mutation__.v::text as "0",
     __json_identity_mutation_identifiers__.idx as "1"
   from "c"."json_identity_mutation"(__json_identity_mutation_identifiers__."id0") as __json_identity_mutation__(v)
-) as __json_identity_mutation_result__
+) as __json_identity_mutation_result__;
 
 select __jsonb_identity_mutation_result__.*
 from (
@@ -24,7 +24,7 @@ lateral (
     __jsonb_identity_mutation__.v::text as "0",
     __jsonb_identity_mutation_identifiers__.idx as "1"
   from "c"."jsonb_identity_mutation"(__jsonb_identity_mutation_identifiers__."id0") as __jsonb_identity_mutation__(v)
-) as __jsonb_identity_mutation_result__
+) as __jsonb_identity_mutation_result__;
 
 select __json_identity_mutation_result__.*
 from (
@@ -38,7 +38,7 @@ lateral (
     __json_identity_mutation__.v::text as "0",
     __json_identity_mutation_identifiers__.idx as "1"
   from "c"."json_identity_mutation"(__json_identity_mutation_identifiers__."id0") as __json_identity_mutation__(v)
-) as __json_identity_mutation_result__
+) as __json_identity_mutation_result__;
 
 select __jsonb_identity_mutation_result__.*
 from (
@@ -52,7 +52,7 @@ lateral (
     __jsonb_identity_mutation__.v::text as "0",
     __jsonb_identity_mutation_identifiers__.idx as "1"
   from "c"."jsonb_identity_mutation"(__jsonb_identity_mutation_identifiers__."id0") as __jsonb_identity_mutation__(v)
-) as __jsonb_identity_mutation_result__
+) as __jsonb_identity_mutation_result__;
 
 select __jsonb_identity_mutation_plpgsql_result__.*
 from (
@@ -66,11 +66,11 @@ lateral (
     __jsonb_identity_mutation_plpgsql__.v::text as "0",
     __jsonb_identity_mutation_plpgsql_identifiers__.idx as "1"
   from "c"."jsonb_identity_mutation_plpgsql"(__jsonb_identity_mutation_plpgsql_identifiers__."id0") as __jsonb_identity_mutation_plpgsql__(v)
-) as __jsonb_identity_mutation_plpgsql_result__
+) as __jsonb_identity_mutation_plpgsql_result__;
 
 select
   __jsonb_identity_mutation_plpgsql_with_default__.v::text as "0"
-from "c"."jsonb_identity_mutation_plpgsql_with_default"() as __jsonb_identity_mutation_plpgsql_with_default__(v)
+from "c"."jsonb_identity_mutation_plpgsql_with_default"() as __jsonb_identity_mutation_plpgsql_with_default__(v);
 
 select __jsonb_identity_mutation_plpgsql_with_default_resul__.*
 from (
@@ -84,7 +84,7 @@ lateral (
     __jsonb_identity_mutation_plpgsql_with_default__.v::text as "0",
     __jsonb_identity_mutation_plpgsql_with_default_ident__.idx as "1"
   from "c"."jsonb_identity_mutation_plpgsql_with_default"(__jsonb_identity_mutation_plpgsql_with_default_ident__."id0") as __jsonb_identity_mutation_plpgsql_with_default__(v)
-) as __jsonb_identity_mutation_plpgsql_with_default_resul__
+) as __jsonb_identity_mutation_plpgsql_with_default_resul__;
 
 select __add_1_mutation_result__.*
 from (
@@ -102,7 +102,7 @@ lateral (
     __add_1_mutation_identifiers__."id0",
     __add_1_mutation_identifiers__."id1"
   ) as __add_1_mutation__(v)
-) as __add_1_mutation_result__
+) as __add_1_mutation_result__;
 
 select __add_2_mutation_result__.*
 from (
@@ -120,7 +120,7 @@ lateral (
     __add_2_mutation_identifiers__."id0",
     __add_2_mutation_identifiers__."id1"
   ) as __add_2_mutation__(v)
-) as __add_2_mutation_result__
+) as __add_2_mutation_result__;
 
 select __add_3_mutation_result__.*
 from (
@@ -138,7 +138,7 @@ lateral (
     __add_3_mutation_identifiers__."id0",
     __add_3_mutation_identifiers__."id1"
   ) as __add_3_mutation__(v)
-) as __add_3_mutation_result__
+) as __add_3_mutation_result__;
 
 select __add_4_mutation_result__.*
 from (
@@ -156,7 +156,7 @@ lateral (
     __add_4_mutation_identifiers__."id0",
     __add_4_mutation_identifiers__."id1"
   ) as __add_4_mutation__(v)
-) as __add_4_mutation_result__
+) as __add_4_mutation_result__;
 
 select __add_4_mutation_error_result__.*
 from (
@@ -174,7 +174,7 @@ lateral (
     __add_4_mutation_error_identifiers__."id0",
     __add_4_mutation_error_identifiers__."id1"
   ) as __add_4_mutation_error__(v)
-) as __add_4_mutation_error_result__
+) as __add_4_mutation_error_result__;
 
 select __mult_1_result__.*
 from (
@@ -192,7 +192,7 @@ lateral (
     __mult_1_identifiers__."id0",
     __mult_1_identifiers__."id1"
   ) as __mult_1__(v)
-) as __mult_1_result__
+) as __mult_1_result__;
 
 select __mult_2_result__.*
 from (
@@ -210,7 +210,7 @@ lateral (
     __mult_2_identifiers__."id0",
     __mult_2_identifiers__."id1"
   ) as __mult_2__(v)
-) as __mult_2_result__
+) as __mult_2_result__;
 
 select __mult_3_result__.*
 from (
@@ -228,7 +228,7 @@ lateral (
     __mult_3_identifiers__."id0",
     __mult_3_identifiers__."id1"
   ) as __mult_3__(v)
-) as __mult_3_result__
+) as __mult_3_result__;
 
 select __mult_4_result__.*
 from (
@@ -246,7 +246,7 @@ lateral (
     __mult_4_identifiers__."id0",
     __mult_4_identifiers__."id1"
   ) as __mult_4__(v)
-) as __mult_4_result__
+) as __mult_4_result__;
 
 select __types_mutation_result__.*
 from (
@@ -272,7 +272,7 @@ lateral (
     __types_mutation_identifiers__."id4",
     __types_mutation_identifiers__."id5"
   ) as __types_mutation__(v)
-) as __types_mutation_result__
+) as __types_mutation_result__;
 
 select __compound_type_mutation_result__.*
 from (
@@ -294,7 +294,7 @@ lateral (
     (not (__compound_type_mutation__ is null))::text as "8",
     __compound_type_mutation_identifiers__.idx as "9"
   from "b"."compound_type_mutation"(__compound_type_mutation_identifiers__."id0") as __compound_type_mutation__
-) as __compound_type_mutation_result__
+) as __compound_type_mutation_result__;
 
 select __compound_type_set_mutation_result__.*
 from (
@@ -316,7 +316,7 @@ lateral (
     (not (__compound_type_set_mutation__ is null))::text as "8",
     __compound_type_set_mutation_identifiers__.idx as "9"
   from "b"."compound_type_set_mutation"(__compound_type_set_mutation_identifiers__."id0") as __compound_type_set_mutation__
-) as __compound_type_set_mutation_result__
+) as __compound_type_set_mutation_result__;
 
 select __compound_type_array_mutation_result__.*
 from (
@@ -338,7 +338,7 @@ lateral (
     (not (__compound_type_array_mutation__ is null))::text as "8",
     __compound_type_array_mutation_identifiers__.idx as "9"
   from unnest("b"."compound_type_array_mutation"(__compound_type_array_mutation_identifiers__."id0")) as __compound_type_array_mutation__
-) as __compound_type_array_mutation_result__
+) as __compound_type_array_mutation_result__;
 
 select __table_mutation_result__.*
 from (
@@ -354,7 +354,7 @@ lateral (
     __table_mutation__."id"::text as "2",
     __table_mutation_identifiers__.idx as "3"
   from "c"."table_mutation"(__table_mutation_identifiers__."id0") as __table_mutation__
-) as __table_mutation_result__
+) as __table_mutation_result__;
 
 select __post_result__.*
 from (
@@ -373,7 +373,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __person_result__.*
 from (
@@ -392,7 +392,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __table_mutation_result__.*
 from (
@@ -408,7 +408,7 @@ lateral (
     __table_mutation__."id"::text as "2",
     __table_mutation_identifiers__.idx as "3"
   from "c"."table_mutation"(__table_mutation_identifiers__."id0") as __table_mutation__
-) as __table_mutation_result__
+) as __table_mutation_result__;
 
 select __post_result__.*
 from (
@@ -427,7 +427,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __person_result__.*
 from (
@@ -446,11 +446,11 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select
   __table_set_mutation__."person_full_name" as "0"
-from "c"."table_set_mutation"() as __table_set_mutation__
+from "c"."table_set_mutation"() as __table_set_mutation__;
 
 select __int_set_mutation_result__.*
 from (
@@ -470,15 +470,15 @@ lateral (
     __int_set_mutation_identifiers__."id1",
     __int_set_mutation_identifiers__."id2"
   ) as __int_set_mutation__(v)
-) as __int_set_mutation_result__
+) as __int_set_mutation_result__;
 
 select
   __no_args_mutation__.v::text as "0"
-from "c"."no_args_mutation"() as __no_args_mutation__(v)
+from "c"."no_args_mutation"() as __no_args_mutation__(v);
 
 select
   __return_void_mutation__.v::text as "0"
-from "a"."return_void_mutation"() as __return_void_mutation__(v)
+from "a"."return_void_mutation"() as __return_void_mutation__(v);
 
 select __guid_fn_result__.*
 from (
@@ -492,7 +492,7 @@ lateral (
     __guid_fn__.v as "0",
     __guid_fn_identifiers__.idx as "1"
   from "b"."guid_fn"(__guid_fn_identifiers__."id0") as __guid_fn__(v)
-) as __guid_fn_result__
+) as __guid_fn_result__;
 
 select __guid_fn_result__.*
 from (
@@ -506,7 +506,7 @@ lateral (
     __guid_fn__.v as "0",
     __guid_fn_identifiers__.idx as "1"
   from "b"."guid_fn"(__guid_fn_identifiers__."id0") as __guid_fn__(v)
-) as __guid_fn_result__
+) as __guid_fn_result__;
 
 select __post_many_result__.*
 from (
@@ -522,7 +522,7 @@ lateral (
     __post_many__."comptypes"::text as "2",
     __post_many_identifiers__.idx as "3"
   from "a"."post_many"(__post_many_identifiers__."id0") as __post_many__
-) as __post_many_result__
+) as __post_many_result__;
 
 select __frmcdc_comptype_1_result__.*
 from (
@@ -538,7 +538,7 @@ lateral (
     (not (__frmcdc_comptype_1__ is null))::text as "2",
     __frmcdc_comptype_1_identifiers__.idx as "3"
   from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
-) as __frmcdc_comptype_1_result__
+) as __frmcdc_comptype_1_result__;
 
 select __post_with_suffix_result__.*
 from (
@@ -557,17 +557,17 @@ lateral (
     __post_with_suffix_identifiers__."id0",
     __post_with_suffix_identifiers__."id1"
   ) as __post_with_suffix__
-) as __post_with_suffix_result__
+) as __post_with_suffix_result__;
 
 select
   __issue756_mutation__."id"::text as "0",
   to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
-from "c"."issue756_mutation"() as __issue756_mutation__
+from "c"."issue756_mutation"() as __issue756_mutation__;
 
 select
   __issue756_set_mutation__."id"::text as "0",
   to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
-from "c"."issue756_set_mutation"() as __issue756_set_mutation__
+from "c"."issue756_set_mutation"() as __issue756_set_mutation__;
 
 select __mutation_compound_type_array_result__.*
 from (
@@ -589,19 +589,19 @@ lateral (
     (not (__mutation_compound_type_array__ is null))::text as "8",
     __mutation_compound_type_array_identifiers__.idx as "9"
   from unnest("a"."mutation_compound_type_array"(__mutation_compound_type_array_identifiers__."id0")) as __mutation_compound_type_array__
-) as __mutation_compound_type_array_result__
+) as __mutation_compound_type_array_result__;
 
 select
   __mutation_text_array__.v::text as "0"
-from "a"."mutation_text_array"() as __mutation_text_array__(v)
+from "a"."mutation_text_array"() as __mutation_text_array__(v);
 
 select
   (
     select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
     from unnest(__mutation_interval_array__.v) t
   )::text as "0"
-from "a"."mutation_interval_array"() as __mutation_interval_array__(v)
+from "a"."mutation_interval_array"() as __mutation_interval_array__(v);
 
 select
   to_char(__mutation_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
-from "a"."mutation_interval_set"() as __mutation_interval_set__(v)
+from "a"."mutation_interval_set"() as __mutation_interval_set__(v);

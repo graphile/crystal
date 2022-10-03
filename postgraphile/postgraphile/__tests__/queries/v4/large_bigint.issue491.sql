@@ -2,7 +2,7 @@ select
   __large_node_id__."id"::text as "0",
   __large_node_id__."text" as "1"
 from "large_bigint"."large_node_id" as __large_node_id__
-order by __large_node_id__."id" asc
+order by __large_node_id__."id" asc;
 
 select __large_node_id_result__.*
 from (
@@ -21,7 +21,7 @@ lateral (
     __large_node_id__."id" = __large_node_id_identifiers__."id0"
   )
   order by __large_node_id__."id" asc
-) as __large_node_id_result__
+) as __large_node_id_result__;
 
 select __large_node_id_result__.*
 from (
@@ -40,4 +40,4 @@ lateral (
     __large_node_id__."id" = __large_node_id_identifiers__."id0"
   )
   order by __large_node_id__."id" asc
-) as __large_node_id_result__
+) as __large_node_id_result__;

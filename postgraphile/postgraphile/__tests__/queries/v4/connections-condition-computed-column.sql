@@ -15,4 +15,4 @@ lateral (
     "c"."person_computed_out"(__person__) = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;

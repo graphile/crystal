@@ -62,7 +62,7 @@ lateral (
     __type_function_mutation__."id"::text as "44",
     __type_function_mutation_identifiers__.idx as "45"
   from "b"."type_function_mutation"(__type_function_mutation_identifiers__."id0") as __type_function_mutation__
-) as __type_function_mutation_result__
+) as __type_function_mutation_result__;
 
 select __post_result__.*
 from (
@@ -81,7 +81,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __post_result__.*
 from (
@@ -100,7 +100,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -121,7 +121,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -158,7 +158,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -179,7 +179,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -216,7 +216,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select
   __type_function_list_mutation__."bigint"::text as "0",
@@ -272,7 +272,7 @@ select
   __type_function_list_mutation__."int8_array_domain"::text as "42",
   __type_function_list_mutation__."smallint"::text as "43",
   __type_function_list_mutation__."id"::text as "44"
-from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__
+from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__;
 
 select __post_result__.*
 from (
@@ -291,7 +291,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __post_result__.*
 from (
@@ -310,7 +310,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -331,7 +331,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -368,7 +368,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -389,7 +389,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -426,7 +426,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select
   __type_function_connection_mutation__."bigint"::text as "0",
@@ -482,7 +482,7 @@ select
   __type_function_connection_mutation__."nested_compound_type"::text as "42",
   __type_function_connection_mutation__."nullable_compound_type"::text as "43",
   __type_function_connection_mutation__."nullable_nested_compound_type"::text as "44"
-from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__
+from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
 
 select __post_result__.*
 from (
@@ -501,7 +501,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __post_result__.*
 from (
@@ -520,7 +520,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -541,7 +541,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -578,7 +578,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -599,7 +599,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -636,7 +636,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int8", "numeric" = $3::"numeric", "decimal" = $4::"numeric", "boolean" = $5::"bool", "varchar" = $6::"varchar", "enum" = $7::"b"."color", "enum_array" = $8::"b"."color"[], "domain" = $9::"a"."an_int", "domain2" = $10::"b"."another_int", "text_array" = $11::"text"[], "json" = $12::"json", "jsonb" = $13::"jsonb", "numrange" = $14::"pg_catalog"."numrange", "daterange" = $15::"pg_catalog"."daterange", "an_int_range" = $16::"a"."an_int_range", "timestamp" = $17::"timestamp", "timestamptz" = $18::"timestamptz", "date" = $19::"date", "time" = $20::"time", "timetz" = $21::"timetz", "interval" = $22::"interval", "interval_array" = $23::"interval"[], "money" = $24::"money", "compound_type" = $25::"c"."compound_type", "nested_compound_type" = $26::"b"."nested_compound_type", "point" = $27::"point", "nullablePoint" = $28::"point", "inet" = $29::"inet", "cidr" = $30::"cidr", "macaddr" = $31::"macaddr", "regproc" = $32::"regproc", "regprocedure" = $33::"regprocedure", "regoper" = $34::"regoper", "regoperator" = $35::"regoperator", "regclass" = $36::"regclass", "regtype" = $37::"regtype", "regconfig" = $38::"regconfig", "regdictionary" = $39::"regdictionary", "text_array_domain" = $40::"c"."text_array_domain", "int8_array_domain" = $41::"c"."int8_array_domain" where (__types__."id" = $42::"int4") returning
   __types__."id"::text as "0",
@@ -691,27 +691,7 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
   __types__."boolean"::text as "41",
   __types__."decimal"::text as "42",
   __types__."numeric"::text as "43",
-  __types__."bigint"::text as "44"
-
-
-select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
-lateral (
-  select
-    __post__."headline" as "0",
-    __post__."id"::text as "1",
-    __post_identifiers__.idx as "2"
-  from "a"."post" as __post__
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-  order by __post__."id" asc
-) as __post_result__
+  __types__."bigint"::text as "44";
 
 select __post_result__.*
 from (
@@ -730,7 +710,26 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."headline" as "0",
+    __post__."id"::text as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+  order by __post__."id" asc
+) as __post_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -751,7 +750,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -788,7 +787,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -809,7 +808,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -846,7 +845,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal", "boolean", "varchar", "enum", "enum_array", "domain", "domain2", "text_array", "json", "jsonb", "numrange", "daterange", "an_int_range", "timestamp", "timestamptz", "date", "time", "timetz", "interval", "interval_array", "money", "compound_type", "nested_compound_type", "point", "regproc", "regprocedure", "regoper", "regoperator", "regclass", "regtype", "regconfig", "regdictionary") values ($1::"int2", $2::"int8", $3::"numeric", $4::"numeric", $5::"bool", $6::"varchar", $7::"b"."color", $8::"b"."color"[], $9::"a"."an_int", $10::"b"."another_int", $11::"text"[], $12::"json", $13::"jsonb", $14::"pg_catalog"."numrange", $15::"pg_catalog"."daterange", $16::"a"."an_int_range", $17::"timestamp", $18::"timestamptz", $19::"date", $20::"time", $21::"timetz", $22::"interval", $23::"interval"[], $24::"money", $25::"c"."compound_type", $26::"b"."nested_compound_type", $27::"point", $28::"regproc", $29::"regprocedure", $30::"regoper", $31::"regoperator", $32::"regclass", $33::"regtype", $34::"regconfig", $35::"regdictionary") returning
   __types__."id"::text as "0",
@@ -901,8 +900,7 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
   __types__."boolean"::text as "41",
   __types__."decimal"::text as "42",
   __types__."numeric"::text as "43",
-  __types__."bigint"::text as "44"
-
+  __types__."bigint"::text as "44";
 
 select __post_result__.*
 from (
@@ -921,7 +919,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -942,7 +940,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -979,7 +977,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -1000,7 +998,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -1037,4 +1035,4 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;

@@ -45,4 +45,4 @@ lateral (
       true /* authorization checks */
     )
   order by __forums__."id" asc
-) as __forums_result__
+) as __forums_result__;

@@ -11,7 +11,7 @@ left outer join "c"."person" as __person__
 on (__compound_key__."person_id_1"::"int4" = __person__."id")
 left outer join "c"."person" as __person_2
 on (__compound_key__."person_id_2"::"int4" = __person_2."id")
-order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
+order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc;
 
 select
   __compound_key__."extra"::text as "0",
@@ -34,4 +34,4 @@ on (
 )
 left outer join "c"."person" as __person__
 on (__foreign_key__."person_id"::"int4" = __person__."id")
-order by __foreign_key__."person_id" asc, __foreign_key__."compound_key_1" desc, __foreign_key__."compound_key_2" asc
+order by __foreign_key__."person_id" asc, __foreign_key__."compound_key_1" desc, __foreign_key__."compound_key_2" asc;

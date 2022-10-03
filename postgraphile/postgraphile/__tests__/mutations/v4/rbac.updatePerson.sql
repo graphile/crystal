@@ -1,4 +1,4 @@
-begin /*fake*/
+begin; /*fake*/
 
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
@@ -8,12 +8,11 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "alias
   __person__."aliases"::text as "2",
   __person__."about" as "3",
   __person__."email" as "4",
-  __person__."site"::text as "5"
+  __person__."site"::text as "5";
 
+commit; /*fake*/
 
-commit /*fake*/
-
-begin /*fake*/
+begin; /*fake*/
 
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
@@ -29,6 +28,6 @@ lateral (
     __frmcdc_wrapped_url_1__."url" as "0",
     __frmcdc_wrapped_url_1_identifiers__.idx as "1"
   from (select (__frmcdc_wrapped_url_1_identifiers__."id0").*) as __frmcdc_wrapped_url_1__
-) as __frmcdc_wrapped_url_1_result__
+) as __frmcdc_wrapped_url_1_result__;
 
-commit /*fake*/
+commit; /*fake*/

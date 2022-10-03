@@ -20,7 +20,7 @@ from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
 )
-order by __people__."person_id" asc
+order by __people__."person_id" asc;
 
 select __single_table_items_result__.*
 from (
@@ -42,4 +42,4 @@ lateral (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
     )
   order by __single_table_items__."id" asc
-) as __single_table_items_result__
+) as __single_table_items_result__;

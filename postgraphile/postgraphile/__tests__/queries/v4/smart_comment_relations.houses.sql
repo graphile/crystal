@@ -123,7 +123,7 @@ left outer join "smart_comment_relations"."properties" as __properties_3
 on (__houses__."property_id"::"int4" = __properties_3."id")
 left outer join "smart_comment_relations"."streets" as __streets_6
 on (__properties_3."street_id"::"int4" = __streets_6."id")
-order by __houses__."street_id" asc, __houses__."property_id" asc
+order by __houses__."street_id" asc, __houses__."property_id" asc;
 
 select __houses_result__.*
 from (
@@ -149,4 +149,4 @@ lateral (
       __houses__."property_id" = __houses_identifiers__."id1"
     )
   order by __houses__."street_id" asc, __houses__."property_id" asc
-) as __houses_result__
+) as __houses_result__;

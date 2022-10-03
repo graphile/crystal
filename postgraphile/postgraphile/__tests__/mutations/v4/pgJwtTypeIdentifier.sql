@@ -17,4 +17,4 @@ lateral (
     __authenticate_identifiers__."id1",
     __authenticate_identifiers__."id2"
   ) as __authenticate__
-) as __authenticate_result__
+) as __authenticate_result__;

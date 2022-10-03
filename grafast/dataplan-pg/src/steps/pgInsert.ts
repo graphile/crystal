@@ -363,7 +363,7 @@ export class PgInsertStep<
         }
         const columns = sql.join(sqlColumns, ", ");
         const values = sql.join(valuePlaceholders, ", ");
-        const query = sql`insert into ${table} (${columns}) values (${values})${returning}`;
+        const query = sql`insert into ${table} (${columns}) values (${values})${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
         this.finalizeResults = {
@@ -373,7 +373,7 @@ export class PgInsertStep<
         };
       } else {
         // No columns to insert?! Odd... but okay.
-        const query = sql`insert into ${table} default values${returning}`;
+        const query = sql`insert into ${table} default values${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
         this.finalizeResults = {

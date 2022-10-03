@@ -18,7 +18,7 @@ where
     true /* authorization checks */
   )
 order by __author__.username desc, __messages__.body asc, __messages__."id" asc
-limit 6
+limit 6;
 
 select
   (count(*))::text as "0"
@@ -30,4 +30,4 @@ where
     __messages__.archived_at is null
   ) and (
     true /* authorization checks */
-  )
+  );

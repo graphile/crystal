@@ -60,15 +60,15 @@ export async function withTestWithPgClient<T>(
         // begin/commit/rollback.
         switch (opts.text) {
           case "savepoint tx": {
-            queries.push({ text: "begin /*fake*/" });
+            queries.push({ text: "begin; /*fake*/" });
             break;
           }
           case "release savepoint tx": {
-            queries.push({ text: "commit /*fake*/" });
+            queries.push({ text: "commit; /*fake*/" });
             break;
           }
           case "rollback to savepoint tx": {
-            queries.push({ text: "rollback /*fake*/" });
+            queries.push({ text: "rollback; /*fake*/" });
             break;
           }
           default: {
@@ -86,7 +86,7 @@ export async function withTestWithPgClient<T>(
       });
       return await callback(queuedWPC(withPgClient));
     } else {
-      await poolClient.query("begin --ignore--");
+      await poolClient.query("begin; --ignore--");
       try {
         const withPgClient = createWithPgClient({
           poolClient,
@@ -101,21 +101,21 @@ export async function withTestWithPgClient<T>(
           callback,
         ) => {
           // No transaction here; honest, gov!
-          await poolClient.query("savepoint notxhonest --ignore--");
+          await poolClient.query("savepoint notxhonest; --ignore--");
           try {
             const result = await withPgClient(pgSettings, callback);
-            await poolClient.query("release savepoint notxhonest --ignore--");
+            await poolClient.query("release savepoint notxhonest; --ignore--");
             return result;
           } catch (e) {
             await poolClient.query(
-              "rollback to savepoint notxhonest --ignore--",
+              "rollback to savepoint notxhonest; --ignore--",
             );
             throw e;
           }
         };
         return await callback(queuedWPC(withPgClientWithSavepoints));
       } finally {
-        await poolClient.query("rollback --ignore--");
+        await poolClient.query("rollback; --ignore--");
       }
     }
   } finally {

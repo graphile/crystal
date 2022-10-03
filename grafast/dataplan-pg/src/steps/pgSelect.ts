@@ -2004,7 +2004,7 @@ from json_array_elements(${sql.value(
             // a value before executing the query.
             this.queryValuesSymbol as any,
           )}::json) with ordinality as ids`)}) as ${alias},
-lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
+lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           return { query, identifierIndex };
         } else if (
           (limit != null && limit >= 0) ||
@@ -2057,12 +2057,12 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
                   offset != null && offset > 0
                     ? sql`\noffset ${sql.literal(offset)}`
                     : sql.blank
-                }`
-              : baseQuery;
+                };`
+              : sql`${baseQuery};`;
           return { query: wrappedInnerQuery, identifierIndex: null };
         } else {
           const { sql: query } = this.buildQuery();
-          return { query, identifierIndex: null };
+          return { query: sql`${query};`, identifierIndex: null };
         }
       };
 

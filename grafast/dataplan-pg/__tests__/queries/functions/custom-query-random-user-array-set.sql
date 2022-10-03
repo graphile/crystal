@@ -6,4 +6,4 @@ select
 from app_public.random_user_array_set() with ordinality as __random_user_array_set_tmp__ (arr, __random_user_array_set_idx__) cross join lateral unnest (__random_user_array_set_tmp__.arr) as __random_user_array_set__
 where (
   true /* authorization checks */
-)
+);

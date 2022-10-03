@@ -26,4 +26,4 @@ lateral (
     __person__."email" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;

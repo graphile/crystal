@@ -20,9 +20,9 @@ where
   ) and (
     true /* authorization checks */
   )
-order by __forums__."id" asc
+order by __forums__."id" asc;
 
-begin /*fake*/
+begin; /*fake*/
 
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select __messages_result__.*
@@ -57,15 +57,15 @@ lateral (
     order by __messages__."id" asc
   ) __stream_wrapped__
   order by __stream_wrapped__."5"
-) as __messages_result__
+) as __messages_result__;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
 
 close __SNAPSHOT_CURSOR_0__
 
-commit /*fake*/
+commit; /*fake*/
 
-begin /*fake*/
+begin; /*fake*/
 
 declare __SNAPSHOT_CURSOR_1__ insensitive no scroll cursor without hold for
 select __messages_result__.*
@@ -101,10 +101,10 @@ lateral (
     order by __messages__."id" asc
   ) __stream_wrapped__
   order by __stream_wrapped__."6"
-) as __messages_result__
+) as __messages_result__;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_1__
 
 close __SNAPSHOT_CURSOR_1__
 
-commit /*fake*/
+commit; /*fake*/

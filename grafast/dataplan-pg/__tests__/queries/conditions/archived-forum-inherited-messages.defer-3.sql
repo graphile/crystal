@@ -9,7 +9,7 @@ where
   ) and (
     true /* authorization checks */
   )
-order by __forums__."id" asc
+order by __forums__."id" asc;
 
 select __messages_result__.*
 from (
@@ -36,7 +36,7 @@ lateral (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )
   order by __messages__."id" asc
-) as __messages_result__
+) as __messages_result__;
 
 select __messages_result__.*
 from (
@@ -64,4 +64,4 @@ lateral (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )
   order by __messages__."id" asc
-) as __messages_result__
+) as __messages_result__;

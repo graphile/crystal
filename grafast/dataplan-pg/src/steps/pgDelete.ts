@@ -349,7 +349,7 @@ export class PgDeleteStep<
         const where = sql` where ${sql.parens(
           sql.join(sqlWhereClauses, " and "),
         )}`;
-        const query = sql`delete from ${table}${where}${returning}`;
+        const query = sql`delete from ${table}${where}${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
         this.finalizeResults = {

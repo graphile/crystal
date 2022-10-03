@@ -50,7 +50,7 @@ left outer join lateral (select (__frmcdc_nested_compound_type_1_2."a").*) as __
 on TRUE
 left outer join lateral (select (__frmcdc_nested_compound_type_1_2."b").*) as __frmcdc_compound_type_1_6
 on TRUE
-order by __types__."id" asc
+order by __types__."id" asc;
 
 select __post_result__.*
 from (
@@ -113,7 +113,7 @@ lateral (
   left outer join lateral (select (__post__).*) as __post_2
   on TRUE
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select
   __person_first_post__."headline" as "0",
@@ -140,13 +140,13 @@ select
 from "c"."person" as __person__
 left outer join "c"."person_first_post"(__person__) as __person_first_post__
 on TRUE
-order by __person__."id" asc
+order by __person__."id" asc;
 
 select
   "c"."edge_case_computed"(__edge_case__) as "0",
   __edge_case__."wont_cast_easy"::text as "1",
   __edge_case__."not_null_has_default"::text as "2"
-from "c"."edge_case" as __edge_case__
+from "c"."edge_case" as __edge_case__;
 
 select __post_result__.*
 from (
@@ -168,7 +168,7 @@ lateral (
     __post_identifiers__.idx as "2"
   from (select (__post_identifiers__."id0").*) as __post__
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __post_computed_compound_type_array_result__.*
 from (
@@ -194,4 +194,4 @@ lateral (
     __post_computed_compound_type_array_identifiers__."id0",
     __post_computed_compound_type_array_identifiers__."id1"
   )) as __post_computed_compound_type_array__
-) as __post_computed_compound_type_array_result__
+) as __post_computed_compound_type_array_result__;

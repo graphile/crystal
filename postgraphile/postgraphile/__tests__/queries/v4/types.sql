@@ -133,7 +133,7 @@ left outer join "a"."post" as __post__
 on (__types__."smallint"::"int4" = __post__."id")
 left outer join "a"."post" as __post_2
 on (__types__."id"::"int4" = __post_2."id")
-order by __types__."id" asc
+order by __types__."id" asc;
 
 select
   __type_function_list__."bigint"::text as "0",
@@ -269,11 +269,11 @@ on TRUE
 left outer join "a"."post" as __post__
 on (__type_function_list__."smallint"::"int4" = __post__."id")
 left outer join "a"."post" as __post_2
-on (__type_function_list__."id"::"int4" = __post_2."id")
+on (__type_function_list__."id"::"int4" = __post_2."id");
 
 select
   (count(*))::text as "0"
-from "b"."types" as __types__
+from "b"."types" as __types__;
 
 select __types_result__.*
 from (
@@ -423,7 +423,7 @@ lateral (
     __types__."id" = __types_identifiers__."id0"
   )
   order by __types__."id" asc
-) as __types_result__
+) as __types_result__;
 
 select __type_function_result__.*
 from (
@@ -569,7 +569,7 @@ lateral (
   on (__type_function__."smallint"::"int4" = __post__."id")
   left outer join "a"."post" as __post_2
   on (__type_function__."id"::"int4" = __post_2."id")
-) as __type_function_result__
+) as __type_function_result__;
 
 select
   (row_number() over (partition by 1))::text as "0",
@@ -786,11 +786,11 @@ on TRUE
 left outer join "a"."post" as __post_3
 on (__type_function_connection__."id"::"int4" = __post_3."id")
 left outer join "a"."post" as __post_4
-on (__type_function_connection__."smallint"::"int4" = __post_4."id")
+on (__type_function_connection__."smallint"::"int4" = __post_4."id");
 
 select
   (count(*))::text as "0"
-from "b"."type_function_connection"() as __type_function_connection__
+from "b"."type_function_connection"() as __type_function_connection__;
 
 select __person_result__.*
 from (
@@ -1308,7 +1308,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __post_result__.*
 from (
@@ -1611,4 +1611,4 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;

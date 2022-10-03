@@ -23,7 +23,7 @@ where
   ) and (
     true /* authorization checks */
   )
-order by __forums__."id" asc
+order by __forums__."id" asc;
 
 select __users_result__.*
 from (
@@ -45,4 +45,4 @@ lateral (
       __users__."id" = __users_identifiers__."id0"
     )
   order by __users__."id" asc
-) as __users_result__
+) as __users_result__;

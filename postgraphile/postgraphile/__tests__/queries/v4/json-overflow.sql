@@ -526,4 +526,4 @@ lateral (
   from "a"."post" as __post__
   order by __post__."id" asc
   limit 1
-) as __post_result__
+) as __post_result__;

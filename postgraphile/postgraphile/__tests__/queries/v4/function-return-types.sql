@@ -14,44 +14,44 @@ lateral (
     __func_in_inout_identifiers__."id0",
     __func_in_inout_identifiers__."id1"
   ) as __func_in_inout__(v)
-) as __func_in_inout_result__
+) as __func_in_inout_result__;
 
 select
   __func_out__.v::text as "0"
-from "c"."func_out"() as __func_out__(v)
+from "c"."func_out"() as __func_out__(v);
 
 select
   __func_out_out__."first_out"::text as "0",
   __func_out_out__."second_out" as "1",
   (not (__func_out_out__ is null))::text as "2"
-from "c"."func_out_out"() as __func_out_out__
+from "c"."func_out_out"() as __func_out_out__;
 
 select
   __func_out_out_unnamed__."column1"::text as "0",
   __func_out_out_unnamed__."column2" as "1",
   (not (__func_out_out_unnamed__ is null))::text as "2"
-from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__
+from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__;
 
 select
   __func_out_table__."id"::text as "0"
-from "c"."func_out_table"() as __func_out_table__
+from "c"."func_out_table"() as __func_out_table__;
 
 select
   __func_out_unnamed__.v::text as "0"
-from "c"."func_out_unnamed"() as __func_out_unnamed__(v)
+from "c"."func_out_unnamed"() as __func_out_unnamed__(v);
 
 select
   __func_out_unnamed_out_out_unnamed__."column1"::text as "0",
   __func_out_unnamed_out_out_unnamed__."column3"::text as "1",
   __func_out_unnamed_out_out_unnamed__."o2" as "2",
   (not (__func_out_unnamed_out_out_unnamed__ is null))::text as "3"
-from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__
+from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__;
 
 select
   to_char(__search_test_summaries__."total_duration", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
   __search_test_summaries__."id"::text as "1",
   (not (__search_test_summaries__ is null))::text as "2"
-from "c"."search_test_summaries"() as __search_test_summaries__
+from "c"."search_test_summaries"() as __search_test_summaries__;
 
 select __func_in_out_result__.*
 from (
@@ -65,7 +65,7 @@ lateral (
     __func_in_out__.v::text as "0",
     __func_in_out_identifiers__.idx as "1"
   from "c"."func_in_out"(__func_in_out_identifiers__."id0") as __func_in_out__(v)
-) as __func_in_out_result__
+) as __func_in_out_result__;
 
 select __func_out_complex_result__.*
 from (
@@ -105,7 +105,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__func_out_complex__."z").*) as __person__
   on TRUE
-) as __func_out_complex_result__
+) as __func_out_complex_result__;
 
 select __func_out_complex_setof_result__.*
 from (
@@ -145,7 +145,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
   on TRUE
-) as __func_out_complex_setof_result__
+) as __func_out_complex_setof_result__;
 
 select __func_out_complex_setof_result__.*
 from (
@@ -163,7 +163,7 @@ lateral (
     __func_out_complex_setof_identifiers__."id0",
     __func_out_complex_setof_identifiers__."id1"
   ) as __func_out_complex_setof__
-) as __func_out_complex_setof_result__
+) as __func_out_complex_setof_result__;
 
 select __func_out_out_compound_type_result__.*
 from (
@@ -185,33 +185,33 @@ lateral (
   from "c"."func_out_out_compound_type"(__func_out_out_compound_type_identifiers__."id0") as __func_out_out_compound_type__
   left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __frmcdc_compound_type_1__
   on TRUE
-) as __func_out_out_compound_type_result__
+) as __func_out_out_compound_type_result__;
 
 select
   (not (__func_out_out_setof__ is null))::text as "0",
   __func_out_out_setof__."o1"::text as "1",
   __func_out_out_setof__."o2" as "2"
-from "c"."func_out_out_setof"() as __func_out_out_setof__
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
 
 select
   (count(*))::text as "0"
-from "c"."func_out_out_setof"() as __func_out_out_setof__
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
 
 select
   __func_out_setof__.v::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v)
+from "c"."func_out_setof"() as __func_out_setof__(v);
 
 select
   (count(*))::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v)
+from "c"."func_out_setof"() as __func_out_setof__(v);
 
 select
   __func_out_table_setof__."id"::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select
   (count(*))::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select __func_returns_table_multi_col_result__.*
 from (
@@ -227,7 +227,7 @@ lateral (
     __func_returns_table_multi_col__."col2" as "2",
     __func_returns_table_multi_col_identifiers__.idx as "3"
   from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
-) as __func_returns_table_multi_col_result__
+) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_multi_col_result__.*
 from (
@@ -241,7 +241,7 @@ lateral (
     (count(*))::text as "0",
     __func_returns_table_multi_col_identifiers__.idx as "1"
   from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
-) as __func_returns_table_multi_col_result__
+) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_one_col_result__.*
 from (
@@ -255,7 +255,7 @@ lateral (
     __func_returns_table_one_col__.v::text as "0",
     __func_returns_table_one_col_identifiers__.idx as "1"
   from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
-) as __func_returns_table_one_col_result__
+) as __func_returns_table_one_col_result__;
 
 select __func_returns_table_one_col_result__.*
 from (
@@ -269,7 +269,7 @@ lateral (
     (count(*))::text as "0",
     __func_returns_table_one_col_identifiers__.idx as "1"
   from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
-) as __func_returns_table_one_col_result__
+) as __func_returns_table_one_col_result__;
 
 select __person_result__.*
 from (
@@ -353,7 +353,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __query_output_two_rows_result__.*
 from (
@@ -403,7 +403,7 @@ lateral (
   on (__left_arm__."person_id"::"int4" = __person_2."id")
   left outer join "c"."person_secret" as __person_secret_2
   on (__person_2."id"::"int4" = __person_secret_2."person_id")
-) as __query_output_two_rows_result__
+) as __query_output_two_rows_result__;
 
 select __query_output_two_rows_result__.*
 from (
@@ -453,4 +453,4 @@ lateral (
   on (__left_arm__."person_id"::"int4" = __person_2."id")
   left outer join "c"."person_secret" as __person_secret_2
   on (__person_2."id"::"int4" = __person_secret_2."person_id")
-) as __query_output_two_rows_result__
+) as __query_output_two_rows_result__;
