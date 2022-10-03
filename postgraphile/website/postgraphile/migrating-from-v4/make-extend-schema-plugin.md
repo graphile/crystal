@@ -235,9 +235,11 @@ the GraphQL context as `pgClient`, and you could use it in your mutations.
 
 In V5, Postgres clients are provisioned on demand, so you can either use a built
 in mutation step, or for more complex mutations you can use `withPgClient` to
-run arbitrary (asynchronous) code with access to a pgClient which you may put
-into a transaction if you like. Note that this pgClient is a generic adaptor, so
-if you want to deal with your Postgres client of choice here you can do so!
+run arbitrary (asynchronous) code with access to a pgClient (which you may place
+in a transaction if you like), or `withPgClientTransaction` to do the same with
+a client that's already in a transaction. Note that this pgClient is a generic
+adaptor, so if you want to deal with your Postgres client of choice here you can
+do so!
 
 ```js
 const { withPgClientTransaction } = require("grafast");
