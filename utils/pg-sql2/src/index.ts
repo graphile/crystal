@@ -397,6 +397,10 @@ export function compile(
       const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
       switch (item.type) {
         case "RAW": {
+          if (item.text === "") {
+            // No need to add blank raw text!
+            break;
+          }
           // Special-case `;` - remove the previous \n
           if (isDev && itemIndex === itemCount - 1 && item.text === ";") {
             const prevIndex = sqlFragments.length - 1;
