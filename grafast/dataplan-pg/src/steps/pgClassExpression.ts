@@ -80,7 +80,12 @@ export class PgClassExpressionStep<
   public readonly expression: SQL;
 
   constructor(
-    table: PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>,
+    $table: PgClassSingleStep<
+      TSourceColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
@@ -98,13 +103,13 @@ export class PgClassExpressionStep<
       );
     }
     // TODO: fix this TypeScript cast
-    this.source = table.source as PgSource<
+    this.source = $table.source as PgSource<
       TSourceColumns,
       TUniques,
       TRelations,
       any
     >;
-    this.tableId = this.addDependency(table);
+    this.tableId = this.addDependency($table);
 
     const fragments: SQL[] = dependencies.map((stepOrSql, i) => {
       if (!stepOrSql) {
@@ -114,18 +119,20 @@ export class PgClassExpressionStep<
         return stepOrSql;
       } else if (
         stepOrSql instanceof PgClassExpressionStep &&
-        stepOrSql.getParentStep() === table
+        stepOrSql.getParentStep() === $table
       ) {
         // TODO: when we defer placeholders until finalize we'll need to copy
         // deps/etc
         return stepOrSql.expression;
-      } else if (table instanceof PgSelectSingleStep) {
+      } else if ($table instanceof PgSelectSingleStep) {
         // TODO: when we defer placeholders until finalize we'll need to store
         // deps/etc
-        const placeholder = table.placeholder(stepOrSql);
+        const placeholder = $table.placeholder(stepOrSql);
         return placeholder;
       } else {
-        throw new Error(`Cannot use placeholders when parent plan is ${table}`);
+        throw new Error(
+          `Cannot use placeholders when parent plan is ${$table}`,
+        );
       }
     });
 
