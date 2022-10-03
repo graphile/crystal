@@ -165,9 +165,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const serv = postgraphile(config);
 
   const server = createServer(serv.handler);
-  let started = false;
-  server.on("listening", () => {
-    started = true;
+  server.once("listening", () => {
+    server.on("error", (e) => {
+      console.error("Server raised an error:", e);
+    });
     const address = server.address();
     if (typeof address === "string") {
       console.log(`Server listening at ${address}`);
@@ -182,31 +183,27 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     }
   });
 
-  function addServerErrorHandler() {
-    server.on("error", (e) => {
-      console.error("Server raised an error:", e);
-      if (!started) {
-        // Listen failed; exit
-        process.exit(2);
-      }
-    });
-  }
-
   const port = config.server?.port;
   const host = config.server?.host;
   if (port != null) {
-    addServerErrorHandler();
+    const listenFailed = (e: Error) => {
+      // Listen failed; exit
+      console.error("Failed to listen", e);
+      process.exit(2);
+    };
+    server.on("error", listenFailed);
+    server.once("listening", () => {
+      server.removeListener("error", listenFailed);
+    });
     server.listen({ port, host });
   } else {
     const tryPortZero = () => {
       server.removeListener("error", tryPortZero);
-      addServerErrorHandler();
       server.listen({ host, port: 0 });
     };
     server.on("error", tryPortZero);
     server.once("listening", () => {
       server.removeListener("error", tryPortZero);
-      addServerErrorHandler();
     });
     server.listen({ host, port: 5678 });
   }
