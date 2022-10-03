@@ -4707,7 +4707,14 @@ export function makeExampleSchema(
         },
         type: MultipleActionsPayload,
         plan: EXPORTABLE(
-          (object, relationalPostsSource, sleep, sql, withPgClientTransaction) => function plan(_$root, args) {
+          (
+            object,
+            relationalPostsSource,
+            sleep,
+            sql,
+            withPgClientTransaction,
+          ) =>
+            function plan(_$root, args) {
               const $transactionResult = withPgClientTransaction(
                 relationalPostsSource.executor,
                 object({
