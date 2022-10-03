@@ -347,6 +347,23 @@ their behavior equivalents, so you shouldn't need to worry too much about this
 right now. We do advise that you migrate to the behavior system though, it's
 much more powerful.
 
+## `buildSchema`
+
+`buildSchema` is now synchronous - you need to run the asynchronous gather phase
+first. The arguments have also changed: first is the preset (this encompasses
+the list of plugins which was previously the first argument, and any settings
+which were previously the second argument), second comes the result of gather
+and finally comes the shared object which contains inflection.
+
+```js
+const preset = require("./graphile.config.js");
+
+const config = resolvePresets([preset]);
+const shared = { inflection: buildInflection(config) };
+const input = await gather(config, shared);
+const schema = buildSchema(config, input, shared);
+```
+
 [grafast]: https://grafast.org
 [ruru]: https://grafast.org/ruru
 [grafast plan resolvers]: https://grafast.org/grafast/plan-resolvers
