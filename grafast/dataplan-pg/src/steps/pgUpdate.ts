@@ -417,7 +417,7 @@ export class PgUpdateStep<
         const where = sql` where ${sql.parens(
           sql.join(sqlWhereClauses, " and "),
         )}`;
-        const query = sql`update ${table}${set}${where}${returning}`;
+        const query = sql`update ${table}${set}${where}${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
         this.finalizeResults = {

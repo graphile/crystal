@@ -516,7 +516,8 @@ export const assertSnapshotsMatch = async (
     const formattedQueries = queries
       .map((q) => makeSQLSnapshotSafe(q.text))
       .join("\n\n");
-    await snapshot(formattedQueries, sqlFileName);
+    // Consistently end in a newline
+    await snapshot(formattedQueries + "\n", sqlFileName);
   } else if (only === "mermaid") {
     const graphString = extensions?.explain?.operations?.find(
       (op) => op.type === "mermaid-js",
