@@ -135,14 +135,14 @@ const config = {
             docId: "index",
             docsPluginId: "default",
             position: "left",
-            label: "Grafast",
+            html: "Gra<em>fast</em>",
           },
           {
             type: "doc",
             docId: "index",
             docsPluginId: "grafserv",
             position: "left",
-            label: "Grafserv",
+            html: "Grafserv",
           },
           {
             type: "doc",
@@ -170,8 +170,7 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Grafast",
-                to: "/grafast/",
+                html: '<a class="footer__link-item" href="/grafast">Gra<em>fast</em></a>',
               },
               {
                 label: "Grafserv",

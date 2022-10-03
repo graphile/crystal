@@ -1,11 +1,12 @@
 ---
 sidebar_position: 1
+title: 'Grafast Introduction'
 ---
 
 import Mermaid from "@theme/Mermaid";
 import mermaidPlan from "../examples/users-and-friends/plan.mermaid?raw";
 
-# Grafast introduction
+# <grafast /> introduction
 
 The GraphQL specification describes how a GraphQL operation should be executed,
 talking in terms of layer-by-layer resolution of data using "resolvers." But
@@ -22,16 +23,16 @@ most egregious performance issue that a naive GraphQL schema may face - there
 are others such as server-side over-fetching and under-fetching and related
 issues that can really build up as your schemas and operations get more complex.
 
-Gra*fast* was designed from the ground up to eliminate these issues and more
+<grafast /> was designed from the ground up to eliminate these issues and more
 whilst maintaining pleasant APIs for developers to use. To do this, in addition
-to supporting resolvers for legacy fields, Grafast favors a planning strategy
+to supporting resolvers for legacy fields, <grafast /> favors a planning strategy
 that takes a holistic approach to understanding the incoming operation, and
 unlocks the potential for significant optimizations not previously achievable
 without a herculean effort.
 
-Please note that Grafast is not tied to any particular storage or business logic
-layer - any valid GraphQL schema could be implemented with Grafast, and a
-Grafast schema can query any data source or business logic that Node.js can
+Please note that <grafast /> is not tied to any particular storage or business logic
+layer - any valid GraphQL schema could be implemented with <grafast />, and a
+<grafast /> schema can query any data source or business logic that Node.js can
 query.
 
 ## Planning
@@ -39,7 +40,7 @@ query.
 _This is just an overview, for full documentation see
 [Plan Resolvers](./plan-resolvers)._
 
-Where in a traditional schema you would add a "resolver," in a Grafast schema
+Where in a traditional schema you would add a "resolver," in a <grafast /> schema
 you would instead add a "plan resolver." These plan resolvers are generally
 small functions, like regular resolvers should be, but instead of being called
 many times and dealing with concrete runtime values, they are called only once
@@ -84,7 +85,7 @@ const resolvers = {
 };
 ```
 
-In Grafast, we use "plan resolvers" instead, which might look something like:
+In <grafast />, we use "plan resolvers" instead, which might look something like:
 
 ```ts
 const planResolvers = {
@@ -108,21 +109,21 @@ const planResolvers = {
 };
 ```
 
-As you can see, the shape of the logic is quite similar, but the Grafast plan
+As you can see, the shape of the logic is quite similar, but the <grafast /> plan
 resolvers are synchronous since their job isn't to get the data to use, but
-instead to outline the steps required to get the data. As the `friends` Grafast
+instead to outline the steps required to get the data. As the `friends` <grafast />
 plan resolver cannot explicitly loop through the data (it hasn't been fetched
 yet!), it uses an `each` helper to detail which steps to take for each item made
 available later.
 
 :::tip
 
-By convention, when a variable represents a Grafast step, the variable will be
+By convention, when a variable represents a <grafast /> step, the variable will be
 named starting with a `$`.
 
 :::
 
-If we were to make a request to the above Grafast schema with the following
+If we were to make a request to the above <grafast /> schema with the following
 query:
 
 ```graphql
@@ -139,7 +140,7 @@ query:
 }
 ```
 
-Grafast would build an operation plan for the operation, which for the above
+<grafast /> would build an operation plan for the operation, which for the above
 query is:
 
 <Mermaid chart={mermaidPlan} />
@@ -164,11 +165,11 @@ If you want to explore this example more, please see the
 _This is just an overview, for full documentation see [lifecycle][lifecycle]._
 
 All plan lifecycle methods are optional, and due to the always-batched nature of
-Grafast plans you can get good performance without using any of them. However,
+<grafast /> plans you can get good performance without using any of them. However,
 if you leverage them, your performance can go from "good" to :sparkles: amazing
 :rocket:.
 
-One of the great things about Grafast's design is that you don't need to build
+One of the great things about <grafast />'s design is that you don't need to build
 these optimizations from the start; you can implement them at a later stage,
 making your schema faster without requiring changes to your business logic _or_
 your plan resolvers!
@@ -181,7 +182,7 @@ As a very approximate overview:
 
 ### Deduplicate
 
-**Deduplicate** lets a step indicate which of its siblings (defined by Grafast)
+**Deduplicate** lets a step indicate which of its siblings (defined by <grafast />)
 are equivalent to it. One of these siblings can then, if possible, replace the
 new step, thereby reducing the number of steps in the plan.
 
@@ -209,17 +210,17 @@ optimized function to do so.
 
 ## Further optimizations
 
-Grafast doesn't just help your schema to execute fewer and more efficient steps,
+<grafast /> doesn't just help your schema to execute fewer and more efficient steps,
 it also optimizes how your data is output once it has been determined. This
 means that even without making a single change to your existing GraphQL schema
-(i.e. without adopting plans), running it though Grafast rather than graphql-js
+(i.e. without adopting plans), running it though <grafast /> rather than graphql-js
 should result in a modest speedup, and an even better one if you need to output
 your result as a string (e.g. over a network socket/HTTP).
 
 ## Convinced?
 
 If you're not convinced, please do reach out via the [Graphile Discord][] with
-your queries, we'd love to make improvements to both this page, and Grafast
+your queries, we'd love to make improvements to both this page, and <grafast />
 itself!
 
 If you are convinced, why not continue on with the navigation button below...
