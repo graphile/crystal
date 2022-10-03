@@ -1,0 +1,30 @@
+version: '3'
+
+x-uffizzi:
+  ingress:
+    service: postgraphile
+    port: 5000
+
+services:
+  db:
+    image: "${DB_IMAGE}"
+    environment:
+        # Add your credentials as GitHub Actions Secrets, then use the commented syntax below:
+        POSTGRES_USER: postgres # "${PGUSER}"
+        POSTGRES_PASSWORD: postgres # "${PGPASSWORD}"
+        POSTGRES_DB: forum_example # "${POSTGRESDB}"
+    ports:
+        - "5432:5432"
+
+  postgraphile:
+    image: "${APP_IMAGE}"
+    command:
+            [
+              "--retry-on-init-fail",
+              "--connection",
+              "postgres://postgres:postgres@localhost:5432/forum_example",
+              "--port",
+              "5000",
+              "--schema",
+              "public",
+            ]
