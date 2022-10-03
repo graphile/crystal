@@ -398,7 +398,7 @@ export function compile(
       switch (item.type) {
         case "RAW": {
           // Special-case `;` - remove the previous \n
-          if (isDev && item.text === ";") {
+          if (isDev && itemIndex === itemCount - 1 && item.text === ";") {
             const prevIndex = sqlFragments.length - 1;
             const prev = sqlFragments[prevIndex];
             if (prev.endsWith("\n")) {
