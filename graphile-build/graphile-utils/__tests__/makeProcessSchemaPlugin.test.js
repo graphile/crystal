@@ -25,11 +25,10 @@ const makeSchemaWithSpy = (spy) =>
         QueryQueryPlugin,
         makeProcessSchemaPlugin(spy),
       ],
-    },
-    {},
-    {
       optionKey: "optionValue",
     },
+    {},
+    {},
   );
 
 const makeSpy = (fn) => jest.fn(fn || ((schema) => schema));
