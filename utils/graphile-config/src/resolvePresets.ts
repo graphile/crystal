@@ -1,6 +1,7 @@
 import "./interfaces.js";
 
 import * as assert from "assert";
+import { inspect } from "util";
 
 function isResolvedPreset(
   preset: GraphileConfig.Preset,
@@ -30,6 +31,16 @@ export function resolvePresets(
   return finalPreset;
 }
 
+function isGraphileConfigPreset(foo: unknown): foo is GraphileConfig.Preset {
+  if (typeof foo !== "object") return false;
+  if (foo === null) return false;
+  const prototype = Object.getPrototypeOf(foo);
+  if (prototype === null || prototype === Object.prototype) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Turns a preset into a resolved preset (i.e. resolves all its `extends`).
  *
@@ -38,6 +49,13 @@ export function resolvePresets(
 function resolvePreset(
   preset: GraphileConfig.Preset,
 ): GraphileConfig.ResolvedPreset {
+  if (!isGraphileConfigPreset(preset)) {
+    throw new Error(
+      `Expected a GraphileConfig preset (a plain JS object), but found '${inspect(
+        preset,
+      )}'`,
+    );
+  }
   const { extends: presets = [] } = preset;
   const basePreset = resolvePresets(presets);
   mergePreset(basePreset, preset);
