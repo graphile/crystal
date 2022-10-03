@@ -185,12 +185,14 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const port = config.server?.port;
   const host = config.server?.host;
+
+  const listenFailed = (e: Error) => {
+    // Listen failed; exit
+    console.error("Failed to listen", e);
+    process.exit(2);
+  };
+
   if (port != null) {
-    const listenFailed = (e: Error) => {
-      // Listen failed; exit
-      console.error("Failed to listen", e);
-      process.exit(2);
-    };
     server.on("error", listenFailed);
     server.once("listening", () => {
       server.removeListener("error", listenFailed);
@@ -199,6 +201,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   } else {
     const tryPortZero = () => {
       server.removeListener("error", tryPortZero);
+      server.on("error", listenFailed);
+      server.once("listening", () => {
+        server.removeListener("error", listenFailed);
+      });
       server.listen({ host, port: 0 });
     };
     server.on("error", tryPortZero);
