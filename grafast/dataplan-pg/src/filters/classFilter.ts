@@ -22,10 +22,10 @@ export class ClassFilterStep extends ModifierStep<PgConditionStep<any>> {
   }
 
   placeholder(
-    $plan: ExecutableStep<any>,
+    $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL {
-    return this.$parent.placeholder($plan, codec);
+    return this.$parent.placeholder($step, codec);
   }
 
   apply() {

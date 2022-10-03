@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-import * as assert from "assert";
 import { readFile } from "fs/promises";
 import glob from "glob";
-import { graphql } from "graphql";
+import { grafast } from "grafast";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
+import { strict as assert } from "node:assert";
 import pg from "pg";
 
-import { schema } from "./exampleSchemaExport.mjs.js";
+import { createWithPgClient } from "../dist/adaptors/node-postgres.js";
+import { schema } from "./exampleSchemaExport.mjs";
 
 const pool = new pg.Pool({
   connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
@@ -17,57 +18,24 @@ async function runTestQuery(basePath) {
   const source = await readFile(`${basePath}.test.graphql`, "utf8");
   const expectedData = JSON5.parse(await readFile(`${basePath}.json5`, "utf8"));
 
-  const withPgClient = async (_pgSettings, callback) => {
-    const client = await pool.connect();
-    try {
-      let transactionDepth = -1;
-      const crystalPgClient = {
-        async startTransaction() {
-          transactionDepth++;
-          if (transactionDepth === 0) {
-            await client.query("begin");
-          } else {
-            await client.query(`savepoint tx${transactionDepth}`);
-          }
-        },
-        async commitTransaction() {
-          if (transactionDepth === 0) {
-            await client.query("commit");
-          } else {
-            await client.query(`release savepoint tx${transactionDepth}`);
-          }
-          transactionDepth--;
-        },
-        async rollbackTransaction() {
-          if (transactionDepth === 0) {
-            await client.query("rollback");
-          } else {
-            await client.query(`rollback savepoint tx${transactionDepth}`);
-          }
-          transactionDepth--;
-        },
-        query(...args) {
-          return client.query(...args);
-        },
-      };
-      return await callback(crystalPgClient);
-    } finally {
-      client.release();
-    }
-  };
+  const withPgClient = createWithPgClient({
+    pool,
+  });
 
-  const result = await graphql({
+  const result = await grafast({
     schema,
     source,
     contextValue: {
-      pgSettings: {},
+      pgSettings: {
+        timezone: "UTC",
+      },
       withPgClient,
     },
   });
   const operationType = "query";
 
   const errorMatches = source.match(
-    /^## expect\(errors\)\.toHaveLength\(([0-9]+)\)/,
+    /^## expect\(errors\)\.toHaveLength\(([0-9]+)\)/m,
   );
   const expectErrors = errorMatches ? parseInt(errorMatches[1], 10) : 0;
 
@@ -143,7 +111,7 @@ async function runTestQuery(basePath) {
       ...originalPayloads.slice(1).sort(sortPayloads),
     ];
     assert.deepEqual(
-      payloads,
+      JSON.parse(JSON.stringify(payloads)),
       expectedData,
       "Expected the stream data to match the test data",
     );
@@ -166,7 +134,7 @@ async function runTestQuery(basePath) {
       process.exit(1);
     }
     assert.deepEqual(
-      data,
+      JSON.parse(JSON.stringify(data)),
       expectedData,
       "Expected the data to match the test data",
     );

@@ -17,6 +17,8 @@ export interface ServerParams {
 export interface ServerOptions {
   /** Port number to listen on */
   port?: number;
+  /** Host to listen on */
+  host?: string;
 
   /** The path at which GraphQL will be available; usually /graphql */
   graphqlPath?: string;

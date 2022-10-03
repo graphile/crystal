@@ -60,12 +60,12 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (plan: PgSelectStep<any, any, any, any>) => {
+                      (step: PgSelectStep<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
-                          plan.orderBy({
+                          step.orderBy({
                             codec: column.codec,
-                            fragment: sql`${plan.alias}.${sql.identifier(
+                            fragment: sql`${step.alias}.${sql.identifier(
                               columnName,
                             )}`,
                             direction: "ASC",
@@ -76,7 +76,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                               : null),
                           });
                         });
-                        plan.setOrderIsUnique();
+                        step.setOrderIsUnique();
                       },
                     [orderByNullsLast, pgCodec, primaryKeyColumns, sql],
                   ),
@@ -88,12 +88,12 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (plan: PgSelectStep<any, any, any, any>) => {
+                      (step: PgSelectStep<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
-                          plan.orderBy({
+                          step.orderBy({
                             codec: column.codec,
-                            fragment: sql`${plan.alias}.${sql.identifier(
+                            fragment: sql`${step.alias}.${sql.identifier(
                               columnName,
                             )}`,
                             direction: "DESC",
@@ -104,7 +104,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                               : null),
                           });
                         });
-                        plan.setOrderIsUnique();
+                        step.setOrderIsUnique();
                       },
                     [orderByNullsLast, pgCodec, primaryKeyColumns, sql],
                   ),

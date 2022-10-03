@@ -106,6 +106,12 @@ import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
+import {
+  WithPgClientStep,
+  withPgClientTransaction,
+} from "../steps/withPgClient.js";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
@@ -175,13 +181,13 @@ export function makeExampleSchema(
               any
             >,
       >(
-        plan: TStep,
+        step: TStep,
       ): TStep => {
         if (options.deoptimize) {
           const innerPlan =
-            plan instanceof __ListTransformStep
-              ? plan.getListStep()
-              : (plan as
+            step instanceof __ListTransformStep
+              ? step.getListStep()
+              : (step as
                   | PgSelectStep<any, any, any, any>
                   | PgSelectSingleStep<any, any, any, any>);
           if ("getClassStep" in innerPlan) {
@@ -190,7 +196,7 @@ export function makeExampleSchema(
             innerPlan.setInliningForbidden();
           }
         }
-        return plan;
+        return step;
       },
     [__ListTransformStep, options],
   );
@@ -410,8 +416,8 @@ export function makeExampleSchema(
    * Applies auth checks to the plan; we are using a placeholder here for now.
    */
   const selectAuth = EXPORTABLE(
-    (sql) => ($plan: PgSelectStep<any, any, any, any>) => {
-      $plan.where(sql`true /* authorization checks */`);
+    (sql) => ($step: PgSelectStep<any, any, any, any>) => {
+      $step.where(sql`true /* authorization checks */`);
     },
     [sql],
   );
@@ -2056,7 +2062,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, usersMostRecentForumSource) => ($user) => {
             const $forum = usersMostRecentForumSource.execute([
-              { plan: $user.record() },
+              { step: $user.record() },
             ]);
             deoptimizeIfAppropriate($forum);
             return $forum;
@@ -2120,10 +2126,10 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  step.orderBy({
                     codec: TYPES.text,
-                    fragment: sql`${plan.alias}.body`,
+                    fragment: sql`${step.alias}.body`,
                     direction: "ASC",
                   });
                 },
@@ -2137,10 +2143,10 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  step.orderBy({
                     codec: TYPES.text,
-                    fragment: sql`${plan.alias}.body`,
+                    fragment: sql`${step.alias}.body`,
                     direction: "DESC",
                   });
                 },
@@ -2154,9 +2160,9 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  const authorAlias = plan.singleRelation("author");
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  const authorAlias = step.singleRelation("author");
+                  step.orderBy({
                     codec: TYPES.text,
                     fragment: sql`${authorAlias}.username`,
                     direction: "ASC",
@@ -2172,9 +2178,9 @@ export function makeExampleSchema(
           graphile: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) =>
-                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
-                  const authorAlias = plan.singleRelation("author");
-                  plan.orderBy({
+                (step: PgSelectPlanFromSource<typeof messageSource>) => {
+                  const authorAlias = step.singleRelation("author");
+                  step.orderBy({
                     codec: TYPES.text,
                     fragment: sql`${authorAlias}.username`,
                     direction: "DESC",
@@ -2781,10 +2787,10 @@ export function makeExampleSchema(
               const $featured = args.get("featured");
               return forumsUniqueAuthorCountSource.execute([
                 {
-                  plan: $forum.record(),
+                  step: $forum.record(),
                 },
                 {
-                  plan: $featured,
+                  step: $featured,
                   pgCodec: TYPES.boolean,
                 },
               ]);
@@ -2809,7 +2815,7 @@ export function makeExampleSchema(
                 identifiers: [],
                 args: [
                   {
-                    plan: $forum.record(),
+                    step: $forum.record(),
                   },
                 ],
                 from: (...args) =>
@@ -2838,7 +2844,7 @@ export function makeExampleSchema(
             function plan($forum) {
               const $messages = forumsFeaturedMessages.execute([
                 {
-                  plan: $forum.record(),
+                  step: $forum.record(),
                 },
               ]);
               deoptimizeIfAppropriate($messages);
@@ -2855,7 +2861,7 @@ export function makeExampleSchema(
             function plan($forum) {
               const $partitionedMessages = forumsMessagesListSetSource.execute([
                 {
-                  plan: $forum.record(),
+                  step: $forum.record(),
                 },
               ]);
               deoptimizeIfAppropriate($partitionedMessages);
@@ -3483,7 +3489,7 @@ export function makeExampleSchema(
                 identifiers: [],
                 args: [
                   {
-                    plan: $entity.record(),
+                    step: $entity.record(),
                   },
                 ],
                 from: (...args) =>
@@ -3883,7 +3889,7 @@ export function makeExampleSchema(
               const $featured = args.get("featured");
               const $plan = uniqueAuthorCountSource.execute([
                 {
-                  plan: $featured,
+                  step: $featured,
                   pgCodec: TYPES.boolean,
                   name: "featured",
                 },
@@ -4241,15 +4247,15 @@ export function makeExampleSchema(
             entityUnion,
           ) =>
             function plan(_$root, args) {
-              const $plan = entitySearchSource.execute([
+              const $step = entitySearchSource.execute([
                 {
-                  plan: args.get("query"),
+                  step: args.get("query"),
                   pgCodec: TYPES.text,
                   name: "query",
                 },
               ]) as PgSelectStep<any, any, any, any>;
-              deoptimizeIfAppropriate($plan);
-              return each($plan, ($item) => entityUnion($item));
+              deoptimizeIfAppropriate($step);
+              return each($step, ($item) => entityUnion($item));
             },
           [
             TYPES,
@@ -4494,6 +4500,34 @@ export function makeExampleSchema(
     },
   });
 
+  const MultipleActionsInput = newInputObjectTypeBuilder()({
+    name: "MultipleActionsInput",
+    fields: {
+      a: {
+        type: GraphQLInt,
+      },
+    },
+  });
+
+  const MultipleActionsPayload = newObjectTypeBuilder<
+    OurGraphQLContext,
+    WithPgClientStep<any, any>
+  >(WithPgClientStep)({
+    name: "MultipleActionsPayload",
+    fields: {
+      i: {
+        type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
+        plan: EXPORTABLE(
+          () =>
+            function plan($parent) {
+              return $parent;
+            },
+          [],
+        ),
+      },
+    },
+  });
+
   const Mutation = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValueStep<BaseGraphQLRootValue>
@@ -4597,11 +4631,11 @@ export function makeExampleSchema(
                     sql`interfaces_and_unions.insert_post(${authorId.placeholder}, ${title.placeholder})`,
                   args: [
                     {
-                      plan: constant(2),
+                      step: constant(2),
                       pgCodec: TYPES.int,
                     },
                     {
-                      plan: constant(`Computed post #${i + 1}`),
+                      step: constant(`Computed post #${i + 1}`),
                       pgCodec: TYPES.text,
                     },
                   ],
@@ -4662,6 +4696,70 @@ export function makeExampleSchema(
               return $post;
             },
           [pgDelete, relationalPostsSource],
+        ),
+      },
+
+      multipleActions: {
+        args: {
+          input: {
+            type: new GraphQLNonNull(MultipleActionsInput),
+          },
+        },
+        type: MultipleActionsPayload,
+        plan: EXPORTABLE(
+          (
+            object,
+            relationalPostsSource,
+            sleep,
+            sql,
+            withPgClientTransaction,
+          ) =>
+            function plan(_$root, args) {
+              const $transactionResult = withPgClientTransaction(
+                relationalPostsSource.executor,
+                object({
+                  a: args.get(["input", "a"]) as ExecutableStep<
+                    number | null | undefined
+                  >,
+                }),
+                async (client, { a }) => {
+                  // Set a transaction variable to reference later
+                  await client.query(
+                    sql.compile(
+                      sql`select set_config('my_app.a', ${sql.value(
+                        a ?? 1,
+                      )}, true)`,
+                    ),
+                  );
+
+                  // Run some SQL
+                  const { rows } = await client.query<{ i: number }>(
+                    sql.compile(
+                      sql`select * from generate_series(1, ${sql.value(
+                        a ?? 1,
+                      )}) as i`,
+                    ),
+                  );
+
+                  // Do some asynchronous work (e.g. talk to Stripe or whatever)
+                  await sleep(2);
+
+                  // Use the transaction variable to ensure we're still in the transaction
+                  const { rows: rows2 } = await client.query<{ i: number }>(
+                    sql.compile(
+                      sql`select i + current_setting('my_app.a', true)::int as i from generate_series(${sql.value(
+                        rows[rows.length - 1].i,
+                      )}, 10) as i`,
+                    ),
+                  );
+
+                  // Return the data
+                  return rows2.map((row) => row.i);
+                },
+              );
+              return $transactionResult;
+            },
+          [object, relationalPostsSource, sleep, sql, withPgClientTransaction],
         ),
       },
     },

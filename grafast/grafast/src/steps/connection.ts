@@ -391,9 +391,9 @@ export function connection<
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
   TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
 >(
-  plan: TStep,
+  step: TStep,
   itemPlan?: ($item: TItemStep) => TNodeStep,
   cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>,
 ): ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep> {
-  return new ConnectionStep(plan, itemPlan, cursorPlan);
+  return new ConnectionStep(step, itemPlan, cursorPlan);
 }

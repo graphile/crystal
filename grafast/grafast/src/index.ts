@@ -244,6 +244,7 @@ export {
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  exportAsMany,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -379,7 +380,8 @@ export {
   TypedEventEmitter,
 };
 
-exportAsMany({
+exportAsMany("grafast", {
+  exportAsMany,
   grafastPrint,
   makeGrafastSchema,
   OperationPlan,

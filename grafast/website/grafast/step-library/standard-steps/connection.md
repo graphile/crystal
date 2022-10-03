@@ -25,13 +25,13 @@ methods, specifically:
     >,
   ): PageInfoCapableStep;
 
-  setFirst($plan: InputStep): void;
-  setLast($plan: InputStep): void;
-  setOffset($plan: InputStep): void;
+  setFirst($step: InputStep): void;
+  setLast($step: InputStep): void;
+  setOffset($step: InputStep): void;
 
-  parseCursor($plan: InputStep): TCursorStep | null | undefined;
-  setBefore($plan: TCursorStep): void;
-  setAfter($plan: TCursorStep): void;
+  parseCursor($step: InputStep): TCursorStep | null | undefined;
+  setBefore($step: TCursorStep): void;
+  setAfter($step: TCursorStep): void;
 ```
 
 TODO: the documentation for this is terrible. Sorry.

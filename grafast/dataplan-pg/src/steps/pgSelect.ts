@@ -122,7 +122,7 @@ export type PgSelectLockCallback<
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
-> = (plan: PgSelectStep<TColumns, TUniques, TRelations, TParameters>) => void;
+> = (step: PgSelectStep<TColumns, TUniques, TRelations, TParameters>) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgSelectStep:plan");
 // const debugExecute = debugFactory("datasource:pg:PgSelectStep:execute");
@@ -166,12 +166,12 @@ type PgSelectPlaceholder = {
 
 export type PgSelectIdentifierSpec =
   | {
-      plan: ExecutableStep<any>;
+      step: ExecutableStep<any>;
       codec: PgTypeCodec<any, any, any>;
       matches: (alias: SQL) => SQL;
     }
   | {
-      plan: PgTypedExecutableStep<any>;
+      step: PgTypedExecutableStep<any>;
       codec?: PgTypeCodec<any, any, any>;
       matches: (alias: SQL) => SQL;
     };
@@ -179,12 +179,13 @@ export type PgSelectIdentifierSpec =
 export type PgSelectArgumentSpec =
   | {
       // TODO: Rename to step
-      plan: ExecutableStep<any>;
+      step: ExecutableStep<any>;
       pgCodec: PgTypeCodec<any, any, any, any>;
       name?: string;
     }
   | {
-      plan: PgTypedExecutableStep<any>;
+      // TODO: Rename to step
+      step: PgTypedExecutableStep<any>;
       name?: string;
     };
 
@@ -199,13 +200,13 @@ interface QueryValue {
   codec: PgTypeCodec<any, any, any>;
 }
 
-function assertSensible(plan: ExecutableStep): void {
-  if (plan instanceof PgSelectStep) {
+function assertSensible(step: ExecutableStep): void {
+  if (step instanceof PgSelectStep) {
     throw new Error(
       "You passed a PgSelectStep as an identifier, perhaps you forgot to add `.record()`?",
     );
   }
-  if (plan instanceof PgSelectSingleStep) {
+  if (step instanceof PgSelectSingleStep) {
     throw new Error(
       "You passed a PgSelectSingleStep as an identifier, perhaps you forgot to add `.record()`?",
     );
@@ -639,14 +640,14 @@ export class PgSelectStep<
       let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
         if (isDev) {
-          assertSensible(identifier.plan);
+          assertSensible(identifier.step);
         }
-        const { plan, matches } = identifier;
+        const { step, matches } = identifier;
         const codec =
           identifier.codec ||
-          (identifier.plan as PgTypedExecutableStep<any>).pgCodec;
+          (identifier.step as PgTypedExecutableStep<any>).pgCodec;
         queryValues.push({
-          dependencyIndex: this.addDependency(plan),
+          dependencyIndex: this.addDependency(step),
           codec,
         });
         identifierMatches.push(matches(this.alias));
@@ -654,14 +655,14 @@ export class PgSelectStep<
       if (inArgs) {
         inArgs.forEach((identifier) => {
           if (isDev) {
-            assertSensible(identifier.plan);
+            assertSensible(identifier.step);
           }
-          const { plan, name } = identifier;
+          const { step, name } = identifier;
           const codec =
             "pgCodec" in identifier
               ? identifier.pgCodec
-              : identifier.plan.pgCodec;
-          const placeholder = this.placeholder(plan, codec);
+              : identifier.step.pgCodec;
+          const placeholder = this.placeholder(step, codec);
           if (name) {
             argIndex = null;
             args.push({
@@ -874,13 +875,13 @@ export class PgSelectStep<
     return this.isUnique;
   }
 
-  public placeholder($plan: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
-    $plan: ExecutableStep<any>,
+    $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL;
   public placeholder(
-    $plan: ExecutableStep<any> | PgTypedExecutableStep<any>,
+    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
     overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
     if (this.locked) {
@@ -892,16 +893,16 @@ export class PgSelectStep<
       );
     }
 
-    const codec = overrideCodec ?? ("pgCodec" in $plan ? $plan.pgCodec : null);
+    const codec = overrideCodec ?? ("pgCodec" in $step ? $step.pgCodec : null);
     if (!codec) {
       throw new Error(
-        `Step ${$plan} does not contain pgCodec information, please wrap ` +
-          `it in \`pgCast\`. E.g. \`pgCast($plan, TYPES.boolean)\``,
+        `Step ${$step} does not contain pgCodec information, please wrap ` +
+          `it in \`pgCast\`. E.g. \`pgCast($step, TYPES.boolean)\``,
       );
     }
 
-    const dependencyIndex = this.addDependency($plan);
-    const symbol = Symbol(`plan-${$plan.id}`);
+    const dependencyIndex = this.addDependency($step);
+    const symbol = Symbol(`step-${$step.id}`);
     const sqlPlaceholder = sql.placeholder(
       symbol,
       sql`(1/0) /* ERROR! Unhandled placeholder! */`,
@@ -2580,19 +2581,19 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, codec } = this.queryValues[i];
-                const plan = this.getStep(this.dependencies[dependencyIndex]);
-                if (plan instanceof PgClassExpressionStep) {
-                  return sql`${plan.toSQL()}::${
+                const step = this.getStep(this.dependencies[dependencyIndex]);
+                if (step instanceof PgClassExpressionStep) {
+                  return sql`${step.toSQL()}::${
                     codec.sqlType
                   } = ${identifierMatch}`;
-                } else if (isStaticInputStep(plan)) {
+                } else if (isStaticInputStep(step)) {
                   return sql`${this.placeholder(
-                    plan,
+                    step,
                     codec,
                   )} = ${identifierMatch}`;
                 } else {
                   throw new Error(
-                    `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionStep`,
+                    `Expected ${step} (${i}th dependency of ${this}; step with id ${dependencyIndex}) to be a PgClassExpressionStep`,
                   );
                 }
               }),
@@ -2649,18 +2650,18 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           const parent2 = this.getStep(parent.dependencies[parent.itemStepId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, codec } = this.queryValues[i];
-            const plan = this.getStep(this.dependencies[dependencyIndex]);
-            if (plan instanceof PgClassExpressionStep) {
+            const step = this.getStep(this.dependencies[dependencyIndex]);
+            if (step instanceof PgClassExpressionStep) {
               return this.where(
-                sql`${plan.toSQL()}::${codec.sqlType} = ${identifierMatch}`,
+                sql`${step.toSQL()}::${codec.sqlType} = ${identifierMatch}`,
               );
-            } else if (isStaticInputStep(plan)) {
+            } else if (isStaticInputStep(step)) {
               return this.where(
-                sql`${this.placeholder(plan, codec)} = ${identifierMatch}`,
+                sql`${this.placeholder(step, codec)} = ${identifierMatch}`,
               );
             } else {
               throw new Error(
-                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionStep`,
+                `Expected ${step} (${i}th dependency of ${this}; step with id ${dependencyIndex}) to be a PgClassExpressionStep`,
               );
             }
           });
@@ -2947,19 +2948,19 @@ function joinMatches(
 /**
  * Apply a default order in case our default is not unique.
  */
-function ensureOrderIsUnique(plan: PgSelectStep<any, any, any, any>) {
-  const unique = (plan.source.uniques as PgSourceUnique[])[0];
+function ensureOrderIsUnique(step: PgSelectStep<any, any, any, any>) {
+  const unique = (step.source.uniques as PgSourceUnique[])[0];
   if (unique) {
-    const ordersIsUnique = plan.orderIsUnique();
+    const ordersIsUnique = step.orderIsUnique();
     if (!ordersIsUnique) {
       unique.columns.forEach((c) => {
-        plan.orderBy({
-          fragment: sql`${plan.alias}.${sql.identifier(c as string)}`,
-          codec: plan.source.codec.columns[c].codec,
+        step.orderBy({
+          fragment: sql`${step.alias}.${sql.identifier(c as string)}`,
+          codec: step.source.codec.columns[c].codec,
           direction: "ASC",
         });
       });
-      plan.setOrderIsUnique();
+      step.setOrderIsUnique();
     }
   }
 }
@@ -3013,7 +3014,7 @@ export function pgSelectFromRecords<
     source,
     identifiers: [],
     from: (records) => sql`unnest(${records.placeholder})`,
-    args: [{ plan: records, pgCodec: listOfType(source.codec) }],
+    args: [{ step: records, pgCodec: listOfType(source.codec) }],
   }) as PgSelectStep<TColumns, TUniques, TRelations, TParameters>;
 }
 

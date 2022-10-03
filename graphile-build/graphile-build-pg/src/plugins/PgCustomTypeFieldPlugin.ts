@@ -698,7 +698,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         required,
                       } = argDetailsSimple[i];
                       const $raw = args.getRaw([...path, graphqlArgName]);
-                      let plan: ExecutableStep;
+                      let step: ExecutableStep;
                       if ($raw.evalIs(undefined)) {
                         if (
                           !required &&
@@ -707,10 +707,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           skipped = true;
                           continue;
                         } else {
-                          plan = constant(null);
+                          step = constant(null);
                         }
                       } else {
-                        plan = args.get([...path, graphqlArgName]);
+                        step = args.get([...path, graphqlArgName]);
                       }
 
                       if (skipped) {
@@ -721,13 +721,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           );
                         }
                         selectArgs.push({
-                          plan,
+                          step,
                           pgCodec,
                           name,
                         });
                       } else {
                         selectArgs.push({
-                          plan,
+                          step,
                           pgCodec,
                         });
                       }
@@ -796,13 +796,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         const canUseExpressionDirectly =
                           $in instanceof PgSelectSingleStep &&
                           extraSelectArgs.every((a) =>
-                            stepAMayDependOnStepB($in.getClassStep(), a.plan),
+                            stepAMayDependOnStepB($in.getClassStep(), a.step),
                           );
                         const $row = canUseExpressionDirectly
                           ? $in
                           : pgSelectSingleFromRecord($in.source, $in.record());
-                        const selectArgs = [
-                          { plan: $row.record() },
+                        const selectArgs: PgSelectArgumentSpec[] = [
+                          { step: $row.record() },
                           ...extraSelectArgs,
                         ];
                         if (
@@ -815,10 +815,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             if (i === 0) {
                               return $row.getClassStep().alias;
                             } else if ("pgCodec" in arg && arg.pgCodec) {
-                              return $row.placeholder(arg.plan, arg.pgCodec);
+                              return $row.placeholder(arg.step, arg.pgCodec);
                             } else {
                               return $row.placeholder(
-                                arg.plan as PgTypedExecutableStep<any>,
+                                arg.step as PgTypedExecutableStep<any>,
                               );
                             }
                           });

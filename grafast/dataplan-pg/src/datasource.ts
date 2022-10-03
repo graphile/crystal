@@ -39,6 +39,7 @@ import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
+  PgSelectIdentifierSpec,
   PgSelectMode,
   PgSelectStep,
 } from "./steps/pgSelect.js";
@@ -208,7 +209,7 @@ export interface PgSourceOptions<
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
-  selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
+  selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
 
   name: string;
   identifier?: string;
@@ -257,7 +258,7 @@ export interface PgFunctionSourceOptions<
   uniques?: TUniques;
   extensions?: PgSourceExtensions;
   isMutation?: boolean;
-  selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
+  selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
   description?: string;
 }
 // TODO: is there a better way?
@@ -394,7 +395,7 @@ export class PgSource<
   >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
-  private selectAuth?: ($plan: PgSelectStep<any, any, any, any>) => void;
+  private selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -870,7 +871,7 @@ export class PgSource<
       );
     }
 
-    const identifiers = keys.map((key) => {
+    const identifiers = keys.map((key): PgSelectIdentifierSpec => {
       const column = columns[key];
       if ("via" in column && column.via) {
         throw new Error(
@@ -882,8 +883,8 @@ export class PgSource<
         );
       }
       const { codec } = column;
-      const plan = spec[key as keyof TColumns];
-      if (plan == undefined) {
+      const stepOrConstant = spec[key as keyof TColumns];
+      if (stepOrConstant == undefined) {
         throw new Error(
           `Attempted to call ${this}.find({${keys.join(
             ", ",
@@ -891,7 +892,10 @@ export class PgSource<
         );
       }
       return {
-        plan: plan instanceof ExecutableStep ? plan : constant(plan),
+        step:
+          stepOrConstant instanceof ExecutableStep
+            ? stepOrConstant
+            : constant(stepOrConstant),
         codec,
         matches: (alias: SQL) =>
           typeof column.expression === "function"
@@ -934,12 +938,12 @@ export class PgSource<
   }
 
   public applyAuthorizationChecksToPlan(
-    $plan: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
+    $step: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
   ): void {
     if (this.selectAuth) {
-      this.selectAuth($plan);
+      this.selectAuth($step);
     }
-    // e.g. $plan.where(sql`user_id = ${me}`);
+    // e.g. $step.where(sql`user_id = ${me}`);
     return;
   }
 

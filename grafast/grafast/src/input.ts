@@ -75,6 +75,7 @@ export function graphqlGetTypeForNode(
   }
 }
 
+// TODO: rename to 'inputStep'
 /**
  * Returns a plan for the given `rawInputValue` AST node which could be a
  * variable or a literal, and could be nested so that a variable (or more than

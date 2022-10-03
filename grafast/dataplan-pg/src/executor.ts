@@ -78,9 +78,7 @@ export interface PgClient {
     callback: (event: TEvent) => void,
   ): Promise<() => void>;
 
-  startTransaction(): Promise<void>;
-  commitTransaction(): Promise<void>;
-  rollbackTransaction(): Promise<void>;
+  withTransaction<T>(callback: (client: PgClient) => Promise<T>): Promise<T>;
 }
 
 export interface WithPgClient {
@@ -259,26 +257,16 @@ ${duration}
     );
   }
 
-  private async withTransaction<T>(
+  private withTransaction<T>(
     context: PgExecutorContext,
-    callback: (execute: ExecuteFunction) => PromiseLike<T>,
+    callback: (execute: ExecuteFunction) => Promise<T>,
   ): Promise<T> {
-    return await context.withPgClient<T>(
-      context.pgSettings,
-      async (client): Promise<T> => {
-        await client.startTransaction();
-        try {
-          const execute: ExecuteFunction = (text, values) =>
-            this._executeWithClient(client, text, values);
-          const result = await callback(execute);
-
-          await client.commitTransaction();
-          return result;
-        } catch (e) {
-          await client.rollbackTransaction();
-          throw e;
-        }
-      },
+    return context.withPgClient<T>(context.pgSettings, (baseClient) =>
+      baseClient.withTransaction((transactionClient) => {
+        const execute: ExecuteFunction = (text, values) =>
+          this._executeWithClient(transactionClient, text, values);
+        return callback(execute);
+      }),
     );
   }
 
@@ -706,7 +694,7 @@ ${duration}
           }
         };
 
-        this.withTransaction(context, (_execute) => {
+        this.withTransaction(context, async (_execute) => {
           executePromise.resolve(_execute);
           return tx;
         }).then(null, handleFetchError);
@@ -806,9 +794,11 @@ ${duration}
     options: PgExecutorMutationOptions,
   ): Promise<PgClientResult<TData>> {
     const { context, text, values } = options;
+    const { withPgClient, pgSettings } = context;
 
-    const queryResult = await this.withTransaction(context, (execute) =>
-      execute<TData>(text, values),
+    // We don't explicitly need a transaction for mutations
+    const queryResult = await withPgClient(pgSettings, (client) =>
+      this._executeWithClient<TData>(client, text, values),
     );
 
     // TODO: we could probably make this more efficient rather than blowing away the entire cache!

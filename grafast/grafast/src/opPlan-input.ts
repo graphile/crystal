@@ -397,19 +397,19 @@ function withFieldArgsForArgumentsOrInputObject<
       if (details.$value.evalIs(undefined)) {
         return;
       }
-      const plan = planArgumentOrInputField(details, $target);
+      const step = planArgumentOrInputField(details, $target);
       /*
-      if (plan && plan !== $target) {
+      if (step && step !== $target) {
         assertModifierStep(
-          plan,
+          step,
           `UNKNOWN` /* TODO : `${objectType.name}.${field.name}(${argName}:)` * /,
         );
       }
     */
-      return plan;
+      return step;
     },
   };
-  const plan = (callback(fieldArgs) ?? parentPlan) as
+  const step = (callback(fieldArgs) ?? parentPlan) as
     | ExecutableStep
     | ModifierStep;
 
@@ -417,11 +417,11 @@ function withFieldArgsForArgumentsOrInputObject<
   operationPlan.loc.push("handle_remaining");
   if (
     !analyzedCoordinates.includes("") &&
-    plan != null &&
-    !(plan instanceof ConstantStep && plan.isNull())
+    step != null &&
+    !(step instanceof ConstantStep && step.isNull())
   ) {
     if (!fields) {
-      fieldArgs.apply(plan);
+      fieldArgs.apply(step);
     } else {
       const process = (
         layerFields: typeof fields,
@@ -444,7 +444,7 @@ function withFieldArgsForArgumentsOrInputObject<
             process(inputObjectType.getFields(), newPath);
             // recurse
           } else {
-            fieldArgs.apply(plan, newPath);
+            fieldArgs.apply(step, newPath);
           }
         }
       };
@@ -453,7 +453,7 @@ function withFieldArgsForArgumentsOrInputObject<
   }
   operationPlan.loc.pop();
 
-  return plan as any;
+  return step as any;
 }
 
 function withFieldArgsForArgOrField<

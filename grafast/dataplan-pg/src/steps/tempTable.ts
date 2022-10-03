@@ -29,10 +29,10 @@ export class TempTableStep<TDataSource extends PgSource<any, any, any, any>>
   }
 
   placeholder(
-    $plan: ExecutableStep<any>,
+    $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL {
-    return this.$parent.placeholder($plan, codec);
+    return this.$parent.placeholder($step, codec);
   }
 
   where(condition: SQL): void {

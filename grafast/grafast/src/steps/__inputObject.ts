@@ -17,7 +17,7 @@ export class __InputObjectStep extends ExecutableStep {
   isSyncAndSafe = true;
 
   private inputFields: {
-    [fieldName: string]: { dependencyIndex: number; plan: InputStep };
+    [fieldName: string]: { dependencyIndex: number; step: InputStep };
   } = Object.create(null);
   constructor(
     private inputObjectType: GraphQLInputObjectType,
@@ -37,15 +37,15 @@ export class __InputObjectStep extends ExecutableStep {
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );
-      const plan = inputPlan(
+      const step = inputPlan(
         this.opPlan,
         inputFieldType,
         inputFieldValue?.value,
         defaultValue,
       );
       this.inputFields[inputFieldName] = {
-        plan,
-        dependencyIndex: this.addDependency(plan),
+        step,
+        dependencyIndex: this.addDependency(step),
       };
     }
   }
@@ -77,13 +77,13 @@ export class __InputObjectStep extends ExecutableStep {
   }
 
   get(attrName: string): InputStep {
-    const plan = this.inputFields[attrName]?.plan;
-    if (plan === undefined) {
+    const step = this.inputFields[attrName]?.step;
+    if (step === undefined) {
       throw new Error(
         `Tried to '.get("${attrName}")', but no such attribute exists on ${this.inputObjectType.name}`,
       );
     }
-    return plan;
+    return step;
   }
 
   eval(): any {
@@ -92,7 +92,7 @@ export class __InputObjectStep extends ExecutableStep {
     }
     const resultValues = Object.create(null);
     for (const inputFieldName in this.inputFields) {
-      const inputFieldPlan = this.inputFields[inputFieldName].plan;
+      const inputFieldPlan = this.inputFields[inputFieldName].step;
       resultValues[inputFieldName] = inputFieldPlan.eval();
     }
     return resultValues;
@@ -125,6 +125,6 @@ export class __InputObjectStep extends ExecutableStep {
     if (!(attrName in this.inputFields)) {
       return false;
     }
-    return !this.inputFields[attrName].plan.evalIs(undefined);
+    return !this.inputFields[attrName].step.evalIs(undefined);
   }
 }

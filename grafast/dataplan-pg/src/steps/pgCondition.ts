@@ -8,7 +8,7 @@ import type { PgTypeCodec } from "../interfaces.js";
 export interface PgConditionCapableParentStep extends BaseStep {
   alias: SQL;
   placeholder(
-    $plan: ExecutableStep<any>,
+    $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL;
   where(condition: SQL): void;
@@ -52,10 +52,10 @@ export class PgConditionStep<
   }
 
   placeholder(
-    $plan: ExecutableStep<any>,
+    $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL {
-    return this.$parent.placeholder($plan, codec);
+    return this.$parent.placeholder($step, codec);
   }
 
   apply(): void {
