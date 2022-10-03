@@ -9,4 +9,4 @@ select
   __geom__."polygon"::text as "7",
   __geom__."circle"::text as "8"
 from "geometry"."geom" as __geom__
-order by __geom__."id" asc
+order by __geom__."id" asc;

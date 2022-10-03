@@ -7,4 +7,4 @@ delete from "d"."person" as __person__ where (__person__."id" = $1::"int4") retu
   __person__."col_no_order" as "5",
   __person__."col_no_filter" as "6",
   __person__."col_no_create_update" as "7",
-  __person__."col_no_create_update_order_filter" as "8"
+  __person__."col_no_create_update_order_filter" as "8";

@@ -1,7 +1,6 @@
 delete from interfaces_and_unions.relational_posts as __relational_posts__ where (__relational_posts__."id" = $1::"int4") returning
   __relational_posts__."id"::text as "0",
-  __relational_posts__::text as "1"
-
+  __relational_posts__::text as "1";
 
 select __relational_posts_result__.*
 from (
@@ -33,8 +32,8 @@ lateral (
     true /* authorization checks */
   )
   order by __relational_posts__."id" asc
-) as __relational_posts_result__
+) as __relational_posts_result__;
 
 delete from interfaces_and_unions.relational_posts as __relational_posts__ where (__relational_posts__."id" = $1::"int4") returning
   __relational_posts__."id"::text as "0",
-  __relational_posts__::text as "1"
+  __relational_posts__::text as "1";

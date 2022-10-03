@@ -36,4 +36,4 @@ where (
   true /* authorization checks */
 )
 order by __forums__."id" asc
-limit 2
+limit 2;

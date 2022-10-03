@@ -1,6 +1,6 @@
 select
   (count(*))::text as "0"
-from "c"."person" as __person__
+from "c"."person" as __person__;
 
 select
   (select json_agg(_) from (
@@ -11,8 +11,8 @@ select
   __person__::text as "1",
   __person__."id"::text as "2"
 from "c"."person" as __person__
-order by __person__."id" asc
+order by __person__."id" asc;
 
 select
   (count(*))::text as "0"
-from "c"."table_set_query"() as __table_set_query__
+from "c"."table_set_query"() as __table_set_query__;

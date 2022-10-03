@@ -4,4 +4,4 @@ select
   __person__."aliases"::text as "2"
 from "c"."person" as __person__
 order by __person__."id" asc
-limit 1
+limit 1;

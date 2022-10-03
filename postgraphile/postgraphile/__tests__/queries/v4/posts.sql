@@ -34,4 +34,4 @@ left outer join "c"."person_first_post"(__person__) as __person_first_post__
 on TRUE
 left outer join "c"."person" as __person_2
 on (__person_first_post__."author_id"::"int4" = __person_2."id")
-order by __post__."id" asc
+order by __post__."id" asc;

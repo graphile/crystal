@@ -15,7 +15,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __edge_case_result__.*
 from (
@@ -33,4 +33,4 @@ lateral (
   where (
     __edge_case__."row_id" = __edge_case_identifiers__."id0"
   )
-) as __edge_case_result__
+) as __edge_case_result__;

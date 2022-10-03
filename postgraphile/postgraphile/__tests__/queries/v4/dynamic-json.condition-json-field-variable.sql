@@ -15,7 +15,7 @@ lateral (
     __my_table__."json_data" = __my_table_identifiers__."id0"
   )
   order by __my_table__."id" asc
-) as __my_table_result__
+) as __my_table_result__;
 
 select __my_table_result__.*
 from (
@@ -34,4 +34,4 @@ lateral (
     __my_table__."json_data" = __my_table_identifiers__."id0"
   )
   order by __my_table__."id" asc
-) as __my_table_result__
+) as __my_table_result__;

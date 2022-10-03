@@ -19,7 +19,7 @@ lateral (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
     )
   order by __single_table_items__."id" asc
-) as __single_table_items_result__
+) as __single_table_items_result__;
 
 select __single_table_items_result__.*
 from (
@@ -41,7 +41,7 @@ lateral (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
     )
   order by __single_table_items__."id" asc
-) as __single_table_items_result__
+) as __single_table_items_result__;
 
 select __people_result__.*
 from (
@@ -62,4 +62,4 @@ lateral (
       __people__."person_id" = __people_identifiers__."id0"
     )
   order by __people__."person_id" asc
-) as __people_result__
+) as __people_result__;

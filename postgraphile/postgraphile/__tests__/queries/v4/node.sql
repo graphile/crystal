@@ -2,13 +2,13 @@ select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1"
 from "c"."person" as __person__
-order by __person__."id" asc
+order by __person__."id" asc;
 
 select
   __compound_key__."person_id_2"::text as "0",
   __compound_key__."person_id_1"::text as "1"
 from "c"."compound_key" as __compound_key__
-order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
+order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc;
 
 select __person_result__.*
 from (
@@ -27,7 +27,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -46,7 +46,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -65,7 +65,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __compound_key_result__.*
 from (
@@ -88,7 +88,7 @@ lateral (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-) as __compound_key_result__
+) as __compound_key_result__;
 
 select __compound_key_result__.*
 from (
@@ -111,7 +111,7 @@ lateral (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-) as __compound_key_result__
+) as __compound_key_result__;
 
 select __compound_key_result__.*
 from (
@@ -134,7 +134,7 @@ lateral (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-) as __compound_key_result__
+) as __compound_key_result__;
 
 select __similar_table1_result__.*
 from (
@@ -155,7 +155,7 @@ lateral (
     __similar_table1__."id" = __similar_table1_identifiers__."id0"
   )
   order by __similar_table1__."id" asc
-) as __similar_table1_result__
+) as __similar_table1_result__;
 
 select __similar_table2_result__.*
 from (
@@ -176,4 +176,4 @@ lateral (
     __similar_table2__."id" = __similar_table2_identifiers__."id0"
   )
   order by __similar_table2__."id" asc
-) as __similar_table2_result__
+) as __similar_table2_result__;

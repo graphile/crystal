@@ -4,7 +4,7 @@ select
   __letter_descriptions__."letter_via_view"::text as "2",
   __letter_descriptions__."description" as "3"
 from "enum_tables"."letter_descriptions" as __letter_descriptions__
-order by __letter_descriptions__."id" asc
+order by __letter_descriptions__."id" asc;
 
 select
   __letter_descriptions__."id"::text as "0",
@@ -12,7 +12,7 @@ select
   __letter_descriptions__."letter_via_view"::text as "2",
   __letter_descriptions__."description" as "3"
 from "enum_tables"."letter_descriptions" as __letter_descriptions__
-order by __letter_descriptions__."letter" desc
+order by __letter_descriptions__."letter" desc;
 
 select
   __letter_descriptions__."id"::text as "0",
@@ -20,7 +20,7 @@ select
   __letter_descriptions__."letter_via_view"::text as "2",
   __letter_descriptions__."description" as "3"
 from "enum_tables"."letter_descriptions" as __letter_descriptions__
-order by __letter_descriptions__."letter_via_view" desc
+order by __letter_descriptions__."letter_via_view" desc;
 
 select __letter_descriptions_result__.*
 from (
@@ -41,7 +41,7 @@ lateral (
     __letter_descriptions__."letter" = __letter_descriptions_identifiers__."id0"
   )
   order by __letter_descriptions__."id" asc
-) as __letter_descriptions_result__
+) as __letter_descriptions_result__;
 
 select __letter_descriptions_result__.*
 from (
@@ -62,7 +62,7 @@ lateral (
     __letter_descriptions__."letter_via_view" = __letter_descriptions_identifiers__."id0"
   )
   order by __letter_descriptions__."id" asc
-) as __letter_descriptions_result__
+) as __letter_descriptions_result__;
 
 select __letter_descriptions_result__.*
 from (
@@ -83,7 +83,7 @@ lateral (
     __letter_descriptions__."letter" = __letter_descriptions_identifiers__."id0"
   )
   order by __letter_descriptions__."id" asc
-) as __letter_descriptions_result__
+) as __letter_descriptions_result__;
 
 select __letter_descriptions_result__.*
 from (
@@ -104,4 +104,4 @@ lateral (
     __letter_descriptions__."letter_via_view" = __letter_descriptions_identifiers__."id0"
   )
   order by __letter_descriptions__."id" asc
-) as __letter_descriptions_result__
+) as __letter_descriptions_result__;

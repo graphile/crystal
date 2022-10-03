@@ -22,4 +22,4 @@ left outer join "c"."person_secret" as __person_secret__
 on (__person__."id"::"int4" = __person_secret__."person_id")
 left outer join "c"."person" as __person_3
 on (__person_secret__."person_id"::"int4" = __person_3."id")
-order by __person__."id" asc
+order by __person__."id" asc;

@@ -39,4 +39,4 @@ lateral (
       __forums__."id" = __forums_identifiers__."id0"
     )
   order by __forums__."id" asc
-) as __forums_result__
+) as __forums_result__;

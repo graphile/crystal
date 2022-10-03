@@ -6,7 +6,7 @@ where (
   true /* authorization checks */
 )
 order by __relational_commentables__.id asc
-limit 1
+limit 1;
 
 select __relational_posts_result__.*
 from (
@@ -32,4 +32,4 @@ lateral (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
   order by __relational_posts__."id" asc
-) as __relational_posts_result__
+) as __relational_posts_result__;

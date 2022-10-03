@@ -40,8 +40,7 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   __types__."cidr"::text as "30",
   __types__."macaddr"::text as "31",
   __types__."text_array_domain"::text as "32",
-  __types__."int8_array_domain"::text as "33"
-
+  __types__."int8_array_domain"::text as "33";
 
 select __frmcdc_compound_type_1_result__.*
 from (
@@ -62,7 +61,7 @@ lateral (
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__
+) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
 from (
@@ -99,7 +98,7 @@ lateral (
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__
+) as __frmcdc_nested_compound_type_1_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -110,8 +109,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."last_login_from_subnet"::text as "5",
   __person__."user_mac"::text as "6",
   __person__::text as "7",
-  __person__."id"::text as "8"
-
+  __person__."id"::text as "8";
 
 select __person_result__.*
 from (
@@ -130,7 +128,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -149,7 +147,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -169,7 +167,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -189,7 +187,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -209,7 +207,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" desc, __person__."id" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -229,7 +227,7 @@ lateral (
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -240,8 +238,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."last_login_from_subnet"::text as "5",
   __person__."user_mac"::text as "6",
   __person__::text as "7",
-  __person__."id"::text as "8"
-
+  __person__."id"::text as "8";
 
 select __person_result__.*
 from (
@@ -260,7 +257,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -279,7 +276,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -299,7 +296,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -319,7 +316,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -339,7 +336,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" desc, __person__."id" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -359,32 +356,12 @@ lateral (
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1", "extra") values ($1::"int4", $2::"int4", $3::"bool") returning
   __compound_key__."extra"::text as "0",
   __compound_key__."person_id_1"::text as "1",
-  __compound_key__."person_id_2"::text as "2"
-
-
-select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
-lateral (
-  select
-    __person__."person_full_name" as "0",
-    __person__."id"::text as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__
+  __compound_key__."person_id_2"::text as "2";
 
 select __person_result__.*
 from (
@@ -403,15 +380,32 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    __person__."person_full_name" as "0",
+    __person__."id"::text as "1",
+    __person_identifiers__.idx as "2"
+  from "c"."person" as __person__
+  where (
+    __person__."id" = __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+) as __person_result__;
 
 insert into "c"."edge_case" as __edge_case__ ("not_null_has_default") values ($1::"bool") returning
-  __edge_case__."not_null_has_default"::text as "0"
-
+  __edge_case__."not_null_has_default"::text as "0";
 
 insert into "c"."edge_case" as __edge_case__ default values returning
-  __edge_case__."not_null_has_default"::text as "0"
-
+  __edge_case__."not_null_has_default"::text as "0";
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -422,8 +416,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."last_login_from_subnet"::text as "5",
   __person__."user_mac"::text as "6",
   __person__::text as "7",
-  __person__."id"::text as "8"
-
+  __person__."id"::text as "8";
 
 select __person_result__.*
 from (
@@ -442,7 +435,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -461,7 +454,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -481,7 +474,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" asc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -501,7 +494,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -521,7 +514,7 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."email" desc, __person__."id" desc
-) as __person_result__
+) as __person_result__;
 
 select __person_result__.*
 from (
@@ -541,11 +534,10 @@ lateral (
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
-  __person__::text as "0"
-
+  __person__::text as "0";
 
 select __person_result__.*
 from (
@@ -565,18 +557,16 @@ lateral (
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;
 
 insert into "a"."default_value" as __default_value__ ("id", "null_value") values ($1::"int4", $2::"text") returning
   __default_value__."id"::text as "0",
-  __default_value__."null_value" as "1"
-
+  __default_value__."null_value" as "1";
 
 insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text", $2::"a"."comptype"[]) returning
   __post__."id"::text as "0",
   __post__."headline" as "1",
-  __post__."comptypes"::text as "2"
-
+  __post__."comptypes"::text as "2";
 
 select __frmcdc_comptype_1_result__.*
 from (
@@ -592,14 +582,13 @@ lateral (
     (not (__frmcdc_comptype_1__ is null))::text as "2",
     __frmcdc_comptype_1_identifiers__.idx as "3"
   from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
-) as __frmcdc_comptype_1_result__
+) as __frmcdc_comptype_1_result__;
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
   __post__."headline" as "0",
   __post__."comptypes"::text as "1",
   __post__."author_id"::text as "2",
-  __post__."id"::text as "3"
-
+  __post__."id"::text as "3";
 
 select __post_result__.*
 from (
@@ -630,7 +619,7 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
   order by __post__."id" asc
-) as __post_result__
+) as __post_result__;
 
 select __frmcdc_comptype_1_result__.*
 from (
@@ -646,7 +635,7 @@ lateral (
     (not (__frmcdc_comptype_1__ is null))::text as "2",
     __frmcdc_comptype_1_identifiers__.idx as "3"
   from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
-) as __frmcdc_comptype_1_result__
+) as __frmcdc_comptype_1_result__;
 
 select __person_result__.*
 from (
@@ -666,4 +655,4 @@ lateral (
     __person__."id" = __person_identifiers__."id0"
   )
   order by __person__."id" asc
-) as __person_result__
+) as __person_result__;

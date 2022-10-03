@@ -7,4 +7,4 @@ insert into "geometry"."geom" as __geom__ ("point", "line", "lseg", "box", "open
   __geom__."open_path"::text as "5",
   __geom__."closed_path"::text as "6",
   __geom__."polygon"::text as "7",
-  __geom__."circle"::text as "8"
+  __geom__."circle"::text as "8";

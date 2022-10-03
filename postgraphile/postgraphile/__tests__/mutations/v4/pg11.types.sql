@@ -3,8 +3,7 @@ update "pg11"."types" as __types__ set "regrole" = $1::"regrole", "regnamespace"
   __types__."regrole"::text as "1",
   __types__."regnamespace"::text as "2",
   __types__."bigint_domain_array_domain"::text as "3",
-  __types__."domain_constrained_compound_type"::text as "4"
-
+  __types__."domain_constrained_compound_type"::text as "4";
 
 select __frmcdc_domain_constrained_compound_type_1_result__.*
 from (
@@ -25,15 +24,14 @@ lateral (
     (not (__frmcdc_domain_constrained_compound_type_1__ is null))::text as "7",
     __frmcdc_domain_constrained_compound_type_1_identifi__.idx as "8"
   from (select (__frmcdc_domain_constrained_compound_type_1_identifi__."id0").*) as __frmcdc_domain_constrained_compound_type_1__
-) as __frmcdc_domain_constrained_compound_type_1_result__
+) as __frmcdc_domain_constrained_compound_type_1_result__;
 
 insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_domain_array_domain", "domain_constrained_compound_type") values ($1::"regrole", $2::"regnamespace", $3::"c"."bigint_domain_array_domain", $4::"pg11"."domain_constrained_compound_type") returning
   __types__."id"::text as "0",
   __types__."regrole"::text as "1",
   __types__."regnamespace"::text as "2",
   __types__."bigint_domain_array_domain"::text as "3",
-  __types__."domain_constrained_compound_type"::text as "4"
-
+  __types__."domain_constrained_compound_type"::text as "4";
 
 select __frmcdc_domain_constrained_compound_type_1_result__.*
 from (
@@ -54,4 +52,4 @@ lateral (
     (not (__frmcdc_domain_constrained_compound_type_1__ is null))::text as "7",
     __frmcdc_domain_constrained_compound_type_1_identifi__.idx as "8"
   from (select (__frmcdc_domain_constrained_compound_type_1_identifi__."id0").*) as __frmcdc_domain_constrained_compound_type_1__
-) as __frmcdc_domain_constrained_compound_type_1_result__
+) as __frmcdc_domain_constrained_compound_type_1_result__;
