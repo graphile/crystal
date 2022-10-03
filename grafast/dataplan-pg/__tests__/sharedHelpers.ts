@@ -5,16 +5,20 @@ import type { Pool } from "pg";
 import type { PgClientQuery, WithPgClient } from "../src";
 import { createWithPgClient } from "../src/adaptors/node-postgres.js";
 
+function noop() {}
+
+/**
+ * For the tests we want to ensure that `withPgClient` calls hang waiting for
+ * the previous to complete - this allows our snapshots to be in a consistent
+ * predictable order. You would not want this in production!
+ */
 function queuedWPC(withPgClient: WithPgClient): WithPgClient {
   let queue: Promise<void> | null;
   return (pgSettings, callback) => {
     const result = queue
       ? queue.then(() => withPgClient(pgSettings, callback))
       : withPgClient(pgSettings, callback);
-    const nextQueue = result.then(
-      () => {},
-      () => {},
-    );
+    const nextQueue = result.then(noop, noop);
     queue = nextQueue;
     queue.then(() => {
       if (queue === nextQueue) {
@@ -33,6 +37,9 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
  * entire thing will be wrapped in a transaction and calls  to withTransaction
  * will trigger a savepoint, otherwise no transaction is required initially and
  * withTransaction will simply issue 'BEGIN'.
+ *
+ * If !direct then everything will be wrapped in transactions and savepoints so
+ * that it can be rolled back at the end.
  */
 export async function withTestWithPgClient<T>(
   testPool: Pool,
@@ -45,7 +52,12 @@ export async function withTestWithPgClient<T>(
   poolClient.query = function (...args: any[]) {
     const opts = typeof args[0] === "string" ? { text: args[0] } : args[0];
     if (!opts.text.includes("--ignore--")) {
-      if (!direct) {
+      if (direct) {
+        queries.push(opts);
+      } else {
+        // Because we're wrapping everything in a transaction already, we need
+        // to "pretend" for the SQL snapshots that this was actually
+        // begin/commit/rollback.
         switch (opts.text) {
           case "savepoint tx": {
             queries.push({ text: "begin /*fake*/" });
@@ -63,8 +75,6 @@ export async function withTestWithPgClient<T>(
             queries.push(opts);
           }
         }
-      } else {
-        queries.push(opts);
       }
     }
     return oldQuery.apply(this, args);
@@ -82,10 +92,15 @@ export async function withTestWithPgClient<T>(
           poolClient,
           poolClientIsInTransaction: true,
         });
+        // Because we're already in a transaction, to pretend that we're _not_
+        // in a transaction we actually have to create a sub-transaction so
+        // that a statement failure can automatically rollback as if we weren't
+        // in a transaction...
         const withPgClientWithSavepoints: WithPgClient = async (
           pgSettings,
           callback,
         ) => {
+          // No transaction here; honest, gov!
           await poolClient.query("savepoint notxhonest --ignore--");
           try {
             const result = await withPgClient(pgSettings, callback);
