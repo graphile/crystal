@@ -305,7 +305,7 @@ rather than writing traditional GraphQL resolvers for each field, you will write
 lot more intuitive than our lookahead system once you've spent a little time
 learning it. It also completely removes the need for old awkward-to-use
 directives such as `@pgQuery` and `@requires`! (See
-[makeExtendSchemaPlugin migration](./make-extend-schema-plugin') for details on
+[makeExtendSchemaPlugin migration](./make-extend-schema-plugin) for details on
 migrating these directives.)
 
 ## Introspection
@@ -352,4 +352,4 @@ much more powerful.
 [grafast plan resolvers]: https://grafast.org/grafast/plan-resolvers
 [grafserv]: https://grafast.org/grafserv
 [pg-introspection]: https://npmjs.com/package/pg-introspection
-[exporting schema]: ./exporting-schema
+[exporting schema]: ../exporting-schema

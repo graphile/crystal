@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         postgres-version: [11] #, 12, 13, 14]
-        node-version: [16.10] #, 18.x]
+        node-version: [16.14] #, 18.x]
 
     services:
       postgres:
