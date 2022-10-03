@@ -139,6 +139,7 @@ import {
   withPgClient,
   WithPgClientStep,
   WithPgClientStepCallback,
+  withPgClientTransaction,
 } from "./steps/withPgClient.js";
 
 export {
@@ -247,6 +248,7 @@ export {
   withPgClient,
   WithPgClientStep,
   WithPgClientStepCallback,
+  withPgClientTransaction,
 };
 
 exportAsMany("@dataplan/pg", {
@@ -295,5 +297,6 @@ exportAsMany("@dataplan/pg", {
   toPg,
   ToPgStep,
   withPgClient,
+  withPgClientTransaction,
   WithPgClientStep,
 });

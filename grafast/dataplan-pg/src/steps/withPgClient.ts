@@ -64,3 +64,13 @@ export function withPgClient<TData, TResult>(
 ) {
   return new WithPgClientStep(executor, $data, callback);
 }
+
+export function withPgClientTransaction<TData, TResult>(
+  executor: PgExecutor,
+  $data: ExecutableStep<TData>,
+  callback: WithPgClientStepCallback<TData, TResult>,
+) {
+  return new WithPgClientStep(executor, $data, (client, data) =>
+    client.withTransaction((txClient) => callback(txClient, data)),
+  );
+}

@@ -34,7 +34,7 @@ function queuedWPC(withPgClient: WithPgClient): WithPgClient {
  * 'queries' array.
  *
  * Manages transactions automatically - if pgSettings are supplied then the
- * entire thing will be wrapped in a transaction and calls  to withTransaction
+ * entire thing will be wrapped in a transaction and calls to withTransaction
  * will trigger a savepoint, otherwise no transaction is required initially and
  * withTransaction will simply issue 'BEGIN'.
  *
