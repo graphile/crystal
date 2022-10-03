@@ -240,10 +240,11 @@ into a transaction if you like. Note that this pgClient is a generic adaptor, so
 if you want to deal with your Postgres client of choice here you can do so!
 
 ```js
+const { withPgClientTransaction } = require("grafast");
 const plans = {
   Mutation: {
     myCustomMutation(_$root, fieldArgs) {
-      const $transactionResult = withPgClient(
+      const $transactionResult = withPgClientTransaction(
         // Get the 'executor' that tells us which database we're talking to.
         // You can get this from any source via `pgSource.executor`.
         executor,
@@ -255,37 +256,30 @@ const plans = {
           a: fieldArgs.get(["input", "a"]),
         }),
 
-        // Callback will be called with a client, whatever it returns (plain data)
-        // will be the result of the `withPgClient` step.
+        // Callback will be called with a client that's in a transaction,
+        // whatever it returns (plain data) will be the result of the
+        // `withPgClientTransaction` step; if it throws an error then the
+        // transaction will roll back and the error will be the result of the
+        // step.
         async (client, data) => {
           // The data from the `object` step above
           const { a } = data;
 
-          // If you need a transaction, start one - but be sure to use
-          // try/catch to ensure it gets committed/rolled back!
-          await client.startTransaction();
-          try {
-            // Run some SQL
-            const { rows } = await client.query(
-              sql.compile(
-                sql`select * from generate_series(1, ${sql.value(
-                  a ?? 1,
-                )}) as i`,
-              ),
-            );
+          // Run some SQL
+          const { rows } = await client.query(
+            sql.compile(
+              sql`select * from generate_series(1, ${sql.value(a ?? 1)}) as i`,
+            ),
+          );
 
-            // Do some asynchronous work (e.g. talk to Stripe or whatever)
-            await sleep(2);
+          // Do some asynchronous work (e.g. talk to Stripe or whatever)
+          await sleep(2);
 
-            // Transaction complete!
-            await client.commitTransaction();
+          // Maybe run some more SQL as part of the transaction
+          await client.query(sql.compile(sql`select 1`));
 
-            // Return whatever data you'll need later
-            return rows2.map((row) => row.i);
-          } catch (e) {
-            await client.rollbackTransaction();
-            throw e;
-          }
+          // Return whatever data you'll need later
+          return rows2.map((row) => row.i);
         },
       );
       return $transactionResult;
