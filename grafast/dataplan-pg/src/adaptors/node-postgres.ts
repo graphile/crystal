@@ -63,10 +63,6 @@ const $$isSetup = Symbol("isConfiguredForDataplanPg");
  */
 const DONT_DISABLE_JIT = process.env.DATAPLAN_PG_DONT_DISABLE_JIT === "1";
 
-function noop() {
-  /*noop*/
-}
-
 function newNodePostgresPgClient(
   pgClient: pg.PoolClient,
   subscriptions: Map<string, ((notification: any) => void)[]>,
@@ -77,14 +73,16 @@ function newNodePostgresPgClient(
   let queue: Promise<void> | null = null;
   const addToQueue = <T>(callback: () => Promise<T>): Promise<T> => {
     const result = queue ? queue.then(callback) : callback();
-    const newQueue = result.then(noop, noop);
-    queue = newQueue;
-    queue.then(() => {
+
+    const clearIfSame = () => {
       // Clear queue unless it has moved on
       if (queue === newQueue) {
         queue = null;
       }
-    });
+    };
+    const newQueue = result.then(clearIfSame, clearIfSame);
+    queue = newQueue;
+
     return result;
   };
   return {
