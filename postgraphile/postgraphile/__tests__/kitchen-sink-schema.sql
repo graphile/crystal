@@ -408,13 +408,13 @@ create function a.mutation_interval_set() returns setof interval as $$ begin ret
 -- Procs returning `type` record (to test JSON encoding)
 create function b.type_function(id int) returns b.types as $$ select * from b.types where types.id = $1; $$ language sql stable;
 create function b.type_function_list() returns b.types[] as $$ select array_agg(types) from b.types $$ language sql stable;
-create function b.type_function_connection() returns setof b.types as $$ select * from b.types $$ language sql stable;
+create function b.type_function_connection() returns setof b.types as $$ select * from b.types order by id asc $$ language sql stable;
 create function c.person_type_function(p c.person, id int) returns b.types as $$ select * from b.types where types.id = $2; $$ language sql stable;
 create function c.person_type_function_list(p c.person) returns b.types[] as $$ select array_agg(types) from b.types $$ language sql stable;
-create function c.person_type_function_connection(p c.person) returns setof b.types as $$ select * from b.types $$ language sql stable;
+create function c.person_type_function_connection(p c.person) returns setof b.types as $$ select * from b.types order by id asc $$ language sql stable;
 create function b.type_function_mutation(id int) returns b.types as $$ select * from b.types where types.id = $1; $$ language sql;
 create function b.type_function_list_mutation() returns b.types[] as $$ select array_agg(types) from b.types $$ language sql;
-create function b.type_function_connection_mutation() returns setof b.types as $$ select * from b.types $$ language sql;
+create function b.type_function_connection_mutation() returns setof b.types as $$ select * from b.types order by id asc $$ language sql;
 
 create type b.jwt_token as (
   role text,
@@ -856,6 +856,7 @@ returns setof d.post as $$
     from d.post
     where
       body ilike ('%' || search || '%')
+    order by post.id asc
   $$ language sql stable;
 
   comment on function d.search_posts(text) is E'@name returnPostsMatching';
@@ -1072,7 +1073,7 @@ create table simple_collections.pets (
 );
 
 create function simple_collections.people_odd_pets(p simple_collections.people) returns setof simple_collections.pets as $$
-  select * from simple_collections.pets where owner_id = p.id and id % 2 = 1;
+  select * from simple_collections.pets where owner_id = p.id and id % 2 = 1 order by pets.id asc;
 $$ language sql stable;
 
 create schema live_test;
