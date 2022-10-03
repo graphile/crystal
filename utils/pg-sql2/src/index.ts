@@ -397,6 +397,14 @@ export function compile(
       const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
       switch (item.type) {
         case "RAW": {
+          // Special-case `;` - remove the previous \n
+          if (isDev && item.text === ";") {
+            const prevIndex = sqlFragments.length - 1;
+            const prev = sqlFragments[prevIndex];
+            if (prev.endsWith("\n")) {
+              sqlFragments[prevIndex] = prev.substring(0, prev.length - 1);
+            }
+          }
           sqlFragments.push(
             isDev
               ? item.text.replace(/\n/g, "\n" + "  ".repeat(indent))
