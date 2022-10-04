@@ -1326,7 +1326,7 @@ export class PgSelectStep<
    * Like `execute`, but stream the results via async iterables.
    */
   async stream(
-    values: Array<GrafastValuesList<any>>,
+    values: ReadonlyArray<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
   ): Promise<GrafastResultStreamList<PgSourceRow<TColumns>>> {
     if (!this.finalizeResults) {

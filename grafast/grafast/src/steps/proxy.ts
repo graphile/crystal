@@ -23,6 +23,8 @@ export class ProxyStep<T> extends ExecutableStep<T> {
   execute(values: [GrafastValuesList<T>]): GrafastResultsList<T> {
     return values[0];
   }
+  // Do not proxy stream requests
+  stream = undefined;
 }
 
 function makeProxyHandler<T>(
