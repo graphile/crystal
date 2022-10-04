@@ -8,18 +8,21 @@ Since PostGraphile V5 no longer uses resolvers, wrapping resolvers is
 meaningless. And yet! Since we now use `plans`, you can suddenly do a lot more
 by wrapping the plans than you ever could by wrapping resolvers - not only does
 it allow you to affect the data that's returned, it also allows you to change
-the very plan of what's being built!
+the very plan of what will be done!
 
-## makeWrapPlansPlugin
+`makeWrapPlansPlugin` is the new plugin generator that replaces
+`makeWrapResolversPlugin`. It has a similar API, but it's somewhat simplified:
 
-This new plugin generator replaces makeWrapResolversPlugin. It has a similar
-API, but it's somewhat simplified:
-
-- No need for `requires` any more, since you can use steps to get what you need
+- No need for `requires` any more, since you can use the methods on steps to get
+  what you need
 - No resolveInfo since it's not needed in Gra*fast*
-- No context, but you can retrieve it via the [`context()` step][context]
+- No context (but you can retrieve it via the [`context()` step][context] if you
+  need it)
 
 [context]: https://grafast.org/grafast/step-library/standard-steps/context
+
+Now let's look at some of the things you might have used
+`makeWrapResolversPlugin` for in the past, and see how to map them into V5.
 
 ## Setting a create/update mutation column value
 
@@ -62,9 +65,9 @@ makeWrapPlansPlugin({
 });
 ```
 
-## Performing an access check before calling plan
+## Performing an access check before a field plan
 
-Steps that have side effects never get tree shaken or deduplicated, so if we
+Steps that have side effects never get tree shaken or de-duplicated, so if we
 want to throw an error before the mutation takes place we can do so like this:
 
 ```js
@@ -89,3 +92,61 @@ const plugin = makeWrapPlansPlugin({
   },
 });
 ```
+
+## Manipulating the data a field will return
+
+It's quite common for developers to store a users `email` into the `users` table
+(see tip below on why you _shouldn't_ do this). You typically wouldn't want
+other users to be able to see someone's email address; so you could mask it out
+with a field plan wrapper:
+
+```js
+const plugin = makeWrapPlansPlugin({
+  User: {
+    email(plan, $user, args, info) {
+      // Get 'userId' from the GraphQL context
+      const $myUserId = context().get("userId");
+
+      // Get the user's ID
+      const $theirUserId = $user.get("id");
+
+      // Get the email via the original plan
+      const $email = plan();
+
+      // Now return a new plan that only returns the email if the IDs match
+      return lambda(
+        [$myUserId, $theirUserId, $email],
+        ([myUserId, theirUserId, email]) => {
+          if (myUserId === theirUserId) {
+            return email;
+          } else {
+            return null; // TODO: ensure the 'email' field is nullable!
+          }
+        },
+      );
+    },
+  },
+});
+```
+
+:::tip
+
+In my opinion, storing the `email` onto the `users` table is generally a bad
+design pattern. One reason is that it complicates security (see warning below),
+another reason is _plurality_: it's a lot harder to go from 1 to 2 of something
+than it is to go from 2 to 3. You should design your system to allow users to
+have more than one email address even if you don't allow it to start with, for
+example by storing emails into a `user_emails` table.
+
+:::
+
+:::warning
+
+Though the above example may mask the `email` field when fetched directly, there
+are side channel attacks that someone could use to determine someones email -
+for example they could order by the email address and extract it from the
+`cursor`, or they could use advanced filtering to perform a dictionary search
+for the users email address. We strongly advise that you store email addresses
+and other private information into a separate table for the best security.
+
+:::
