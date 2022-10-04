@@ -29,16 +29,14 @@ type PlanWrapperRulesGenerator = (
   options: GraphileBuild.GraphileBuildSchemaOptions,
 ) => PlanWrapperRules;
 
-type ResolverWrapperFilter<T> = (
+type PlanWrapperFilter<T> = (
   context: GraphileBuild.ContextObject,
   build: GraphileBuild.Build,
   field: GraphileFieldConfig<any, any, any, any, any>,
   options: GraphileBuild.GraphileBuildSchemaOptions,
 ) => T | null;
 
-type ResolverWrapperFilterRule<T> = (
-  match: T,
-) => PlanWrapperRule | PlanWrapperFn;
+type PlanWrapperFilterRule<T> = (match: T) => PlanWrapperRule | PlanWrapperFn;
 
 let counter = 0;
 
@@ -46,15 +44,15 @@ export function makeWrapPlansPlugin(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
 ): GraphileConfig.Plugin;
 export function makeWrapPlansPlugin<T>(
-  filter: ResolverWrapperFilter<T>,
-  rule: ResolverWrapperFilterRule<T>,
+  filter: PlanWrapperFilter<T>,
+  rule: PlanWrapperFilterRule<T>,
 ): GraphileConfig.Plugin;
 export function makeWrapPlansPlugin<T>(
   rulesOrGeneratorOrFilter:
     | PlanWrapperRules
     | PlanWrapperRulesGenerator
-    | ResolverWrapperFilter<T>,
-  rule?: ResolverWrapperFilterRule<T>,
+    | PlanWrapperFilter<T>,
+  rule?: PlanWrapperFilterRule<T>,
 ): GraphileConfig.Plugin {
   if (rule && typeof rule !== "function") {
     throw new Error(
@@ -74,7 +72,7 @@ export function makeWrapPlansPlugin<T>(
             | PlanWrapperRules
             | PlanWrapperRulesGenerator
             | null = rule ? null : (rulesOrGeneratorOrFilter as any);
-          const filter: ResolverWrapperFilter<T> | null = rule
+          const filter: PlanWrapperFilter<T> | null = rule
             ? (rulesOrGeneratorOrFilter as any)
             : null;
 
@@ -90,8 +88,7 @@ export function makeWrapPlansPlugin<T>(
         },
         GraphQLObjectType_fields_field(field, build, context) {
           const rules = build[symbol].rules as PlanWrapperRules | null;
-          const filter = build[symbol]
-            .filter as ResolverWrapperFilter<T> | null;
+          const filter = build[symbol].filter as PlanWrapperFilter<T> | null;
           const {
             Self,
             scope: { fieldName },
