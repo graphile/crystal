@@ -17,7 +17,7 @@ const plans = {
     addTwoNumbers(_, args) {
       const $a = args.get("a");
       const $b = args.get("b");
-      return lambda([$a, $b], ([a, b]) => a + b);
+      return lambda([$a, $b], ([a, b]) => a + b, true);
     },
   },
 };

@@ -58,13 +58,17 @@ export const NodePlugin: GraphileConfig.Plugin = {
           Object.create(null);
 
         // Add the 'raw' encoder
+        function encode(value: any): string | null {
+          return typeof value === "string" ? value : null;
+        }
+        encode.isSyncAndSafe = true; // Optimization
+        function decode(value: string): any {
+          return typeof value === "string" ? value : null;
+        }
+        decode.isSyncAndSafe = true; // Optimization
         nodeIdCodecs.raw = {
-          encode(value) {
-            return typeof value === "string" ? value : null;
-          },
-          decode(value) {
-            return typeof value === "string" ? value : null;
-          },
+          encode,
+          decode,
         };
 
         return build.extend(

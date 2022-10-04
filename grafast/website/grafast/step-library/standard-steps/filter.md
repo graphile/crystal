@@ -7,6 +7,6 @@ Usage:
 
 ```ts
 const $filteredList = filter($oldList, ($listItem) =>
-  lambda($listItem, (value) => value > 42),
+  lambda($listItem, (value) => value > 42, true),
 );
 ```
