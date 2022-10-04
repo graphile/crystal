@@ -31,8 +31,16 @@ function makeProxyHandler<T>(
   $toStep: ExecutableStep<T>,
 ): ProxyHandler<ExecutableStep<T>> {
   return {
-    get(target, p) {
+    get(target, p, proxy) {
       if (p in target) {
+        // Do not deduplicate the proxy-ness away!
+        if (p === "deduplicate") {
+          return () => [proxy];
+        }
+        // DO optimize the proxy-ness away, so execution doesn't need to be proxied
+        if (p === "optimize") {
+          return () => [target];
+        }
         const val = target[p];
         if (typeof val === "function") {
           return function (...args: any[]) {
