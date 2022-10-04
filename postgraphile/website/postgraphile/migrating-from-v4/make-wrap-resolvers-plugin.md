@@ -20,3 +20,44 @@ API, but it's somewhat simplified:
 - No context, but you can retrieve it via the [`context()` step][context]
 
 [context]: https://grafast.org/grafast/step-library/standard-steps/context
+
+## Setting a create/update mutation column value
+
+You could use makeWrapResolversPlugin in V4 as a clumsy workaround to set
+specific column values in a builtin CRUD mutation by overriding what the system
+thought the arguments were. Fortunately V5's plan system means that you no
+longer need to do this and you can address the problem more directly - you don't
+even have to have the column in your GraphQL schema in order to set it any more!
+:sweat_smile:
+
+```js
+makeWrapPlansPlugin({
+  Mutation: {
+    // This same pattern works for 'update' mutations too
+    createPost(plan, $source, fieldArgs) {
+      // Call the original plan
+      const $planResult = plan();
+
+      // Get a reference to the `PgInsertStep`.
+      // Remember: it's a step, it has not executed yet, so we can still
+      // augment what it will do.
+      const $insert = $planResult.get("result");
+
+      // We have a legacy 'name' field that needs populating; build it from
+      // each tuple of firstName/lastName fields:
+      const $name = lambda(
+        [fieldArgs.get("firstName"), fieldArgs.get("lastName")],
+        ([firstName, lastName]) => `${firstName} ${lastName}`,
+        // Our callback is synchronous and won't throw
+        true,
+      );
+
+      // Now set this as the value of 'name' in the PgInsertStep:
+      $insert.set("name", $name);
+
+      // Our result is the same as before (otherwise dependent plans may fail)
+      return $planResult;
+    },
+  },
+});
+```
