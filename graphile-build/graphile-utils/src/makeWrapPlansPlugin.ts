@@ -1,10 +1,10 @@
 import type {
-  ExecutableStep,
   FieldArgs,
   FieldPlanResolver,
   GraphileFieldConfig,
 } from "grafast";
-import { access } from "grafast";
+import { access, ExecutableStep } from "grafast";
+import { inspect } from "util";
 
 type PlanWrapperFn = (
   plan: FieldPlanResolver<any, any, any>,
@@ -140,13 +140,26 @@ export function makeWrapPlansPlugin<T>(
           return {
             ...field,
             plan(...planParams) {
-              const smartResolve = (...overrideParams: Array<any>) =>
-                oldPlan(
+              const smartResolve = (...overrideParams: Array<any>) => {
+                const $prev = oldPlan(
                   // @ts-ignore We're calling it dynamically, allowing the parent to override args.
                   ...overrideParams.concat(
                     planParams.slice(overrideParams.length),
                   ),
                 );
+                if (!($prev instanceof ExecutableStep)) {
+                  console.error(
+                    `Wrapped a plan function, but that function did not return a step!\n${String(
+                      oldPlan,
+                    )}\n${inspect(field)}`,
+                  );
+
+                  throw new Error(
+                    "Wrapped a plan function, but that function did not return a step!",
+                  );
+                }
+                return $prev;
+              };
               const [$source, fieldArgs] = planParams;
               return planWrapper(smartResolve, $source, fieldArgs);
             },
