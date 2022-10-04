@@ -144,9 +144,12 @@ describe("wrapping named plans", () => {
       return plan();
     };
     let called = false;
-    const spy = makeEchoSpy(() => {
+    const spy2 = jest.fn((a) => {
       called = true;
-      return constant`hi`;
+      return a;
+    });
+    const spy = makeEchoSpy(() => {
+      return lambda(constant`hi`, spy2);
     });
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin({
@@ -168,7 +171,9 @@ describe("wrapping named plans", () => {
     });
     expect(result.errors).toBeTruthy();
     expect(result.data.echo).toBe(null);
-    expect(spy).not.toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
+    // But should NOT have called the lambda
+    expect(spy2).not.toHaveBeenCalled();
     expect(result.errors).toHaveLength(1);
     expect(called).toBe(false);
     expect(result.errors[0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
@@ -185,9 +190,13 @@ describe("wrapping named plans", () => {
       return $result;
     };
     let called = false;
+    const spy2 = jest.fn((a) => {
+      called = true;
+      return a;
+    });
     const spy = makeEchoSpy(() => {
       called = true;
-      return constant`hi`;
+      return lambda(constant`hi`, spy2);
     });
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin({
@@ -210,6 +219,7 @@ describe("wrapping named plans", () => {
     expect(result.errors).toBeTruthy();
     expect(result.data.echo).toBe(null);
     expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy2).toHaveBeenCalledTimes(1);
     expect(result.errors).toHaveLength(1);
     expect(called).toBe(true);
     expect(result.errors[0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
