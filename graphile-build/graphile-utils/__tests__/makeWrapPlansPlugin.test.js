@@ -37,7 +37,9 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
         })),
         ...plugins,
       ],
-      optionKey: "optionValue",
+      schema: {
+        optionKey: "optionValue",
+      },
     },
     {},
     {},

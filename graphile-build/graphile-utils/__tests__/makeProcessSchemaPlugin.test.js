@@ -25,7 +25,9 @@ const makeSchemaWithSpy = (spy) =>
         QueryQueryPlugin,
         makeProcessSchemaPlugin(spy),
       ],
-      optionKey: "optionValue",
+      schema: {
+        optionKey: "optionValue",
+      },
     },
     {},
     {},
