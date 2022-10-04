@@ -2896,6 +2896,7 @@ export function makeExampleSchema(
                 lambda(
                   list([$message.get("forum_id"), $forum.get("id")]),
                   ([messageForumId, forumId]) => messageForumId !== forumId,
+                  true,
                 ),
               );
 
@@ -2905,7 +2906,11 @@ export function makeExampleSchema(
               );
 
               // Since `groupBy` results in a `Map`, turn it into an array by just getting the values
-              const $entries = lambda($grouped, (map) => [...map.values()]);
+              const $entries = lambda(
+                $grouped,
+                (map) => [...map.values()],
+                true,
+              );
 
               // Now map over the resulting list of list of values and wrap with the message list item plan.
               return each($entries, ($group) =>
@@ -2949,7 +2954,7 @@ export function makeExampleSchema(
   const singleTableTypeName = EXPORTABLE(
     (lambda, singleTableTypeNameCallback) => ($entity: SingleTableItemStep) => {
       const $type = $entity.get("type");
-      const $typeName = lambda($type, singleTableTypeNameCallback);
+      const $typeName = lambda($type, singleTableTypeNameCallback, true);
       return $typeName;
     },
     [lambda, singleTableTypeNameCallback],
@@ -3970,7 +3975,7 @@ export function makeExampleSchema(
               });
               // return lambda($names, (names: string[]) => names.map(name => name.toUpperCase())),
               return each($names, ($name) =>
-                lambda($name, (name) => name.toUpperCase()),
+                lambda($name, (name) => name.toUpperCase(), true),
               );
             },
           [each, lambda, pgSelect, scalarTextSource, sql],
@@ -4776,8 +4781,10 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (lambda) =>
             function plan($event) {
-              return lambda($event.get("op"), (txt) =>
-                String(txt).toLowerCase(),
+              return lambda(
+                $event.get("op"),
+                (txt) => String(txt).toLowerCase(),
+                true,
               );
             },
           [lambda],
@@ -4813,7 +4820,11 @@ export function makeExampleSchema(
           (context, jsonParse, lambda, listen) =>
             function subscribePlan(_$root, args) {
               const $forumId = args.get("forumId");
-              const $topic = lambda($forumId, (id) => `forum:${id}:message`);
+              const $topic = lambda(
+                $forumId,
+                (id) => `forum:${id}:message`,
+                true,
+              );
               const $pgSubscriber = context<OurGraphQLContext>().get(
                 "pgSubscriber",
               ) as unknown as AccessStep<GrafastSubscriber>;

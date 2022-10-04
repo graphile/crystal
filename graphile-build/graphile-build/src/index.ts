@@ -352,11 +352,11 @@ export const getBuilder = (
 export const buildSchema = (
   preset: GraphileConfig.Preset,
   input: GraphileBuild.BuildInput,
-  options: {
+  shared: {
     inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
-  const builder = getBuilder(preset, options.inflection);
+  const builder = getBuilder(preset, shared.inflection);
   return builder.buildSchema(input);
 };
 

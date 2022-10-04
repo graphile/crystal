@@ -14,7 +14,8 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
-        build.registerNodeIdHandler(build.inflection.builtin("Query"), {
+        build.registerNodeIdHandler({
+          typeName: build.inflection.builtin("Query"),
           codecName: "raw",
           match: EXPORTABLE(
             () => (specifier) => {

@@ -343,9 +343,18 @@ function withFieldArgsForArgumentsOrInputObject<
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
         if (!typeContainingFields) {
-          throw new Error(
-            "You cannot call `get()` without a path in this situation",
-          );
+          if (fields) {
+            return object(
+              Object.values(fields).reduce((memo, arg) => {
+                memo[arg.name] = fieldArgs.get(arg.name);
+                return memo;
+              }, Object.create(null)) ?? Object.create(null),
+            );
+          } else {
+            throw new Error(
+              "You cannot call `get()` without a path in this situation",
+            );
+          }
         } else {
           return getPlannedValue($current as InputStep, typeContainingFields);
         }

@@ -595,6 +595,11 @@ export type NodeIdHandler<
   TSpec = any,
 > = {
   /**
+   * The name of the object type this handler is for.
+   */
+  typeName: string;
+
+  /**
    * Which codec are we using to encode/decode the NodeID string?
    */
   codecName: TCodecName & string;

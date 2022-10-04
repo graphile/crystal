@@ -93,7 +93,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
           const firstSource = sources.find((s) => !s.parameters);
 
-          build.registerNodeIdHandler(tableTypeName, {
+          build.registerNodeIdHandler({
+            typeName: tableTypeName,
             codecName: "base64JSON",
             deprecationReason: tagToString(
               codec.extensions?.tags?.deprecation ??

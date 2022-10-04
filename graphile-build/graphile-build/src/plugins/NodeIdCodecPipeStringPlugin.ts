@@ -1,5 +1,14 @@
 import "graphile-config";
 
+function pipeStringEncode(value: any): string | null {
+  return Array.isArray(value) ? value.join("|") : null;
+}
+pipeStringEncode.isSyncAndSafe = true; // Optimization
+function pipeStringDecode(value: string): any {
+  return typeof value === "string" ? value.split("|") : null;
+}
+pipeStringDecode.isSyncAndSafe = true; // Optimization
+
 export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
   name: "NodeIdCodecPipeStringPlugin",
   version: "1.0.0",
@@ -12,12 +21,8 @@ export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
           return _;
         }
         build.registerNodeIdCodec("pipeString", {
-          encode(value) {
-            return Array.isArray(value) ? value.join("|") : null;
-          },
-          decode(value) {
-            return typeof value === "string" ? value.split("|") : null;
-          },
+          encode: pipeStringEncode,
+          decode: pipeStringDecode,
         });
         return _;
       },

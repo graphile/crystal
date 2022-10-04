@@ -74,9 +74,15 @@ const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
 // Constant functions so lambdas can be optimized
-const listHasMore = (list: any | null | undefined) => list?.hasMore || false;
-const parseCursor = (cursor: string | null) => {
+function listHasMore(list: any | null | undefined) {
+  return list?.hasMore || false;
+}
+listHasMore.isSyncAndSafe = true; // Optimization
+
+function parseCursor(cursor: string | null) {
   if (cursor == null) {
+    // This throw should never happen, so we can still be isSyncAndSafe.
+    // If it does throw, the entire lambda will throw, which is allowed.
     throw new Error(
       "GraphileInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
     );
@@ -95,7 +101,8 @@ const parseCursor = (cursor: string | null) => {
       "Invalid cursor, please enter a cursor from a previous request, or null.",
     );
   }
-};
+}
+parseCursor.isSyncAndSafe = true; // Optimization
 
 function isStaticInputStep(
   dep: ExecutableStep,
@@ -1319,7 +1326,7 @@ export class PgSelectStep<
    * Like `execute`, but stream the results via async iterables.
    */
   async stream(
-    values: Array<GrafastValuesList<any>>,
+    values: ReadonlyArray<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
   ): Promise<GrafastResultStreamList<PgSourceRow<TColumns>>> {
     if (!this.finalizeResults) {
@@ -1782,6 +1789,7 @@ export class PgSelectStep<
 
           return [limit, offset];
         },
+        true,
       );
       this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
       const limitLambda = access(limitAndOffsetLambda, [0]);
@@ -2686,28 +2694,32 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           const rowsPlan = access<any[]>(parent2, [selfIndex], []);
           const shouldReverse = this.shouldReverseOrder();
           if ((this.fetchOneExtra || firstAndLast) && limit != null) {
-            return lambda(rowsPlan, (rows) => {
-              if (!rows) {
-                return rows;
-              }
-              const hasMore = rows.length > limit;
-              const limitedRows = hasMore ? rows.slice(0, limit) : rows;
-              const slicedRows =
-                firstAndLast && this.last != null
-                  ? limitedRows.slice(-this.last)
-                  : limitedRows;
-              const orderedRows = shouldReverse
-                ? reverseArray(slicedRows)
-                : slicedRows;
-              if (this.fetchOneExtra) {
-                // TODO: this is an ugly hack; really we should consider resolving to an
-                // object that can contain metadata as well as the rows.
-                Object.defineProperty(orderedRows, "hasMore", {
-                  value: hasMore,
-                });
-              }
-              return orderedRows;
-            });
+            return lambda(
+              rowsPlan,
+              (rows) => {
+                if (!rows) {
+                  return rows;
+                }
+                const hasMore = rows.length > limit;
+                const limitedRows = hasMore ? rows.slice(0, limit) : rows;
+                const slicedRows =
+                  firstAndLast && this.last != null
+                    ? limitedRows.slice(-this.last)
+                    : limitedRows;
+                const orderedRows = shouldReverse
+                  ? reverseArray(slicedRows)
+                  : slicedRows;
+                if (this.fetchOneExtra) {
+                  // TODO: this is an ugly hack; really we should consider resolving to an
+                  // object that can contain metadata as well as the rows.
+                  Object.defineProperty(orderedRows, "hasMore", {
+                    value: hasMore,
+                  });
+                }
+                return orderedRows;
+              },
+              true,
+            );
           } else {
             const orderedPlan = shouldReverse ? reverse(rowsPlan) : rowsPlan;
             return orderedPlan;

@@ -22,8 +22,8 @@ declare global {
   }
 }
 
-const specForHandler =
-  (handler: NodeIdHandler, codec: NodeIdCodec) => (nodeId: string) => {
+const specForHandler = (handler: NodeIdHandler, codec: NodeIdCodec) => {
+  function spec(nodeId: string) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     try {
@@ -35,7 +35,11 @@ const specForHandler =
       // Ignore errors
     }
     return null;
-  };
+  }
+  spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
+  spec.isSyncAndSafe = true; // Optimization
+  return spec;
+};
 
 export const NodeAccessorPlugin: GraphileConfig.Plugin = {
   name: "NodeAccessorPlugin",

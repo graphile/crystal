@@ -475,7 +475,7 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
    * rather than a list of results.
    */
   stream(
-    values: GrafastValuesList<ReadonlyArray<any>>,
+    values: ReadonlyArray<GrafastValuesList<any>>,
     extra: ExecutionExtra,
     streamOptions: {
       initialCount: number;

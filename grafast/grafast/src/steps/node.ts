@@ -43,21 +43,21 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     $id: ExecutableStep<string>,
   ) {
     super();
-    this.specPlanDep = this.addDependency(
-      lambda($id, (raw) =>
-        Object.entries(codecs).reduce(
-          (memo, [codecName, codec]) => {
-            try {
-              memo[codecName] = codec.decode(raw);
-            } catch (e) {
-              memo[codecName] = null;
-            }
-            return memo;
-          },
-          { raw },
-        ),
-      ),
-    );
+    function decodeNodeIdWithCodecs(raw: string) {
+      return Object.entries(codecs).reduce(
+        (memo, [codecName, codec]) => {
+          try {
+            memo[codecName] = codec.decode(raw);
+          } catch (e) {
+            memo[codecName] = null;
+          }
+          return memo;
+        },
+        { raw },
+      );
+    }
+    decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
+    this.specPlanDep = this.addDependency(lambda($id, decodeNodeIdWithCodecs));
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
@@ -131,7 +131,7 @@ export function specFromNodeId(
   handler: NodeIdHandler<any>,
   $id: ExecutableStep<string>,
 ) {
-  const $decoded = lambda($id, (raw) => {
+  function decodeWithCodecAndHandler(raw: string) {
     try {
       const decoded = codec.decode(raw);
       if (handler.match(decoded)) {
@@ -141,6 +141,9 @@ export function specFromNodeId(
     } catch (e) {
       return null;
     }
-  });
+  }
+  decodeWithCodecAndHandler.displayName = `decode_${handler.typeName}_${handler.codecName}`;
+  decodeWithCodecAndHandler.isSyncAndSafe = true; // Optimization
+  const $decoded = lambda($id, decodeWithCodecAndHandler);
   return handler.getSpec($decoded);
 }

@@ -1,6 +1,7 @@
 import "./interfaces.js";
 
 import * as assert from "assert";
+import { inspect } from "util";
 
 function isResolvedPreset(
   preset: GraphileConfig.Preset,
@@ -30,6 +31,42 @@ export function resolvePresets(
   return finalPreset;
 }
 
+function isGraphileConfigPreset(foo: unknown): foo is GraphileConfig.Preset {
+  if (typeof foo !== "object") return false;
+  if (foo === null) return false;
+  const prototype = Object.getPrototypeOf(foo);
+  if (prototype === null || prototype === Object.prototype) {
+    return true;
+  }
+  return false;
+}
+
+function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
+  if (typeof plugin !== "object" || plugin == null) {
+    throw new Error(`Expected plugin, but found '${inspect(plugin)}'`);
+  }
+  const proto = Object.getPrototypeOf(plugin);
+  if (proto !== Object.prototype && proto !== null) {
+    throw new Error(
+      `Expected plugin to be a plain object, but found '${inspect(plugin)}'`,
+    );
+  }
+  if (typeof plugin.name !== "string") {
+    throw new Error(
+      `Expected plugin to have a string 'name'; found ${inspect(
+        plugin.name,
+      )} (${inspect(plugin)})`,
+    );
+  }
+  if (plugin.version != null && typeof plugin.version !== "string") {
+    throw new Error(
+      `Expected plugin '${
+        plugin.name
+      }' to have a string 'version'; found ${inspect(plugin.version)}`,
+    );
+  }
+}
+
 /**
  * Turns a preset into a resolved preset (i.e. resolves all its `extends`).
  *
@@ -38,21 +75,30 @@ export function resolvePresets(
 function resolvePreset(
   preset: GraphileConfig.Preset,
 ): GraphileConfig.ResolvedPreset {
-  const { extends: presets = [] } = preset;
-  const basePreset = resolvePresets(presets);
-  mergePreset(basePreset, preset);
+  if (!isGraphileConfigPreset(preset)) {
+    throw new Error(
+      `Expected a GraphileConfig preset (a plain JS object), but found '${inspect(
+        preset,
+      )}'`,
+    );
+  }
+  try {
+    const { extends: presets = [] } = preset;
+    const basePreset = resolvePresets(presets);
+    mergePreset(basePreset, preset);
 
-  const disabled = basePreset.disablePlugins;
-  if (disabled) {
-    const plugins = new Set(basePreset.plugins);
-    const remaining = new Set(disabled);
-    for (const plugin of plugins) {
-      if (remaining.has(plugin.name)) {
-        remaining.delete(plugin.name);
-        plugins.delete(plugin);
+    const disabled = basePreset.disablePlugins;
+    if (disabled) {
+      const plugins = new Set(basePreset.plugins);
+      const remaining = new Set(disabled);
+      for (const plugin of plugins) {
+        assertPlugin(plugin);
+        if (remaining.has(plugin.name)) {
+          remaining.delete(plugin.name);
+          plugins.delete(plugin);
+        }
       }
-    }
-    /*
+      /*
 
     TODO: we need an alert like this, but only at the very top level.
     The easiest way to check is to just see if `disablePlugins` has length.
@@ -65,11 +111,15 @@ function resolvePreset(
       );
     }
     */
-    basePreset.plugins = [...plugins];
-    basePreset.disablePlugins = [...remaining];
+      basePreset.plugins = [...plugins];
+      basePreset.disablePlugins = [...remaining];
+    }
+    return basePreset;
+  } catch (e) {
+    throw new Error(
+      `Error occurred when resolving preset: ${e}\nPreset: ${inspect(preset)}`,
+    );
   }
-
-  return basePreset;
 }
 
 /**

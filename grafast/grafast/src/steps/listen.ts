@@ -60,7 +60,7 @@ export class ListenStep<
   }
 
   stream(
-    values: [
+    values: readonly [
       GrafastValuesList<GrafastSubscriber<TTopics>>,
       GrafastValuesList<TTopic>,
     ],

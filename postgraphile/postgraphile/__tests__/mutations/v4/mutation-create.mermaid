@@ -133,7 +133,7 @@ graph TD
     Constant249["Constant[249∈0]"]:::plan
     PgClassExpression250["PgClassExpression[250∈1]<br />ᐸ__types__.”id”ᐳ"]:::plan
     List251["List[251∈1]<br />ᐸ249,250ᐳ"]:::plan
-    Lambda252["Lambda[252∈1]<br />ᐸencodeᐳ"]:::plan
+    Lambda252["Lambda[252∈1]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression254["PgClassExpression[254∈1]<br />ᐸ__types__.”smallint”ᐳ"]:::plan
     PgClassExpression255["PgClassExpression[255∈1]<br />ᐸ__types__.”bigint”ᐳ"]:::plan
     PgClassExpression256["PgClassExpression[256∈1]<br />ᐸ__types__.”numeric”ᐳ"]:::plan
@@ -239,7 +239,7 @@ graph TD
     PgClassExpression372["PgClassExpression[372∈1]<br />ᐸ__types__....ay_domain”ᐳ"]:::plan
     __Item373>"__Item[373∈6]<br />ᐸ372ᐳ"]:::itemplan
     Constant374["Constant[374∈0]"]:::plan
-    Lambda375["Lambda[375∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda375["Lambda[375∈0]<br />ᐸrawEncodeᐳ"]:::plan
     __InputStaticLeaf379["__InputStaticLeaf[379∈0]"]:::plan
     __InputStaticLeaf380["__InputStaticLeaf[380∈0]"]:::plan
     __InputStaticLeaf383["__InputStaticLeaf[383∈0]"]:::plan
@@ -255,7 +255,7 @@ graph TD
     Constant399["Constant[399∈0]"]:::plan
     PgClassExpression400["PgClassExpression[400∈7]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List401["List[401∈7]<br />ᐸ399,400ᐳ"]:::plan
-    Lambda402["Lambda[402∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda402["Lambda[402∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression404["PgClassExpression[404∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression405["PgClassExpression[405∈7]<br />ᐸ__person__.”email”ᐳ"]:::plan
     PgClassExpression406["PgClassExpression[406∈7]<br />ᐸ__person__.”about”ᐳ"]:::plan
@@ -278,7 +278,7 @@ graph TD
     Edge432["Edge[432∈7]"]:::plan
     Constant436["Constant[436∈0]"]:::plan
     List438["List[438∈7]<br />ᐸ436,434ᐳ"]:::plan
-    Lambda439["Lambda[439∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda439["Lambda[439∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression440["PgClassExpression[440∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect445[["PgSelect[445∈7]<br />ᐸpersonᐳ"]]:::plan
     First450["First[450∈7]"]:::plan
@@ -289,18 +289,18 @@ graph TD
     Edge452["Edge[452∈7]"]:::plan
     Constant456["Constant[456∈0]"]:::plan
     List458["List[458∈7]<br />ᐸ456,454ᐳ"]:::plan
-    Lambda459["Lambda[459∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda459["Lambda[459∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression460["PgClassExpression[460∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgCursor473["PgCursor[473∈7]"]:::plan
     Edge472["Edge[472∈7]"]:::plan
     Constant476["Constant[476∈0]"]:::plan
     List478["List[478∈7]<br />ᐸ476,434ᐳ"]:::plan
-    Lambda479["Lambda[479∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda479["Lambda[479∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgCursor493["PgCursor[493∈7]"]:::plan
     Edge492["Edge[492∈7]"]:::plan
     Constant496["Constant[496∈0]"]:::plan
     List498["List[498∈7]<br />ᐸ496,454ᐳ"]:::plan
-    Lambda499["Lambda[499∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda499["Lambda[499∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgSelect505[["PgSelect[505∈7]<br />ᐸpersonᐳ"]]:::plan
     First510["First[510∈7]"]:::plan
     PgSelectSingle511["PgSelectSingle[511∈7]<br />ᐸpersonᐳ"]:::plan
@@ -311,7 +311,7 @@ graph TD
     Constant516["Constant[516∈0]"]:::plan
     PgClassExpression517["PgClassExpression[517∈7]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List518["List[518∈7]<br />ᐸ516,517ᐳ"]:::plan
-    Lambda519["Lambda[519∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda519["Lambda[519∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression520["PgClassExpression[520∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect525[["PgSelect[525∈7]<br />ᐸpersonᐳ"]]:::plan
     First530["First[530∈7]"]:::plan
@@ -323,13 +323,13 @@ graph TD
     Constant536["Constant[536∈0]"]:::plan
     PgClassExpression537["PgClassExpression[537∈7]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List538["List[538∈7]<br />ᐸ536,537ᐳ"]:::plan
-    Lambda539["Lambda[539∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda539["Lambda[539∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression540["PgClassExpression[540∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgCursor553["PgCursor[553∈7]"]:::plan
     Edge552["Edge[552∈7]"]:::plan
     Constant556["Constant[556∈0]"]:::plan
     List558["List[558∈7]<br />ᐸ556,434ᐳ"]:::plan
-    Lambda559["Lambda[559∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda559["Lambda[559∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgSelect566[["PgSelect[566∈7]<br />ᐸpersonᐳ"]]:::plan
     First571["First[571∈7]"]:::plan
     PgSelectSingle572["PgSelectSingle[572∈7]<br />ᐸpersonᐳ"]:::plan
@@ -340,10 +340,10 @@ graph TD
     Edge573["Edge[573∈7]"]:::plan
     Constant578["Constant[578∈0]"]:::plan
     List580["List[580∈7]<br />ᐸ578,576ᐳ"]:::plan
-    Lambda581["Lambda[581∈7]<br />ᐸencodeᐳ"]:::plan
+    Lambda581["Lambda[581∈7]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression582["PgClassExpression[582∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     Constant583["Constant[583∈0]"]:::plan
-    Lambda584["Lambda[584∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda584["Lambda[584∈0]<br />ᐸrawEncodeᐳ"]:::plan
     __InputStaticLeaf586["__InputStaticLeaf[586∈0]"]:::plan
     __InputStaticLeaf588["__InputStaticLeaf[588∈0]"]:::plan
     __InputStaticLeaf589["__InputStaticLeaf[589∈0]"]:::plan
@@ -358,7 +358,7 @@ graph TD
     Constant606["Constant[606∈0]"]:::plan
     PgClassExpression607["PgClassExpression[607∈8]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List608["List[608∈8]<br />ᐸ606,607ᐳ"]:::plan
-    Lambda609["Lambda[609∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda609["Lambda[609∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression611["PgClassExpression[611∈8]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression612["PgClassExpression[612∈8]<br />ᐸ__person__.”email”ᐳ"]:::plan
     PgClassExpression613["PgClassExpression[613∈8]<br />ᐸ__person__.”about”ᐳ"]:::plan
@@ -381,7 +381,7 @@ graph TD
     Edge639["Edge[639∈8]"]:::plan
     Constant643["Constant[643∈0]"]:::plan
     List645["List[645∈8]<br />ᐸ643,641ᐳ"]:::plan
-    Lambda646["Lambda[646∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda646["Lambda[646∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression647["PgClassExpression[647∈8]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect652[["PgSelect[652∈8]<br />ᐸpersonᐳ"]]:::plan
     First657["First[657∈8]"]:::plan
@@ -392,18 +392,18 @@ graph TD
     Edge659["Edge[659∈8]"]:::plan
     Constant663["Constant[663∈0]"]:::plan
     List665["List[665∈8]<br />ᐸ663,661ᐳ"]:::plan
-    Lambda666["Lambda[666∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda666["Lambda[666∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression667["PgClassExpression[667∈8]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgCursor680["PgCursor[680∈8]"]:::plan
     Edge679["Edge[679∈8]"]:::plan
     Constant683["Constant[683∈0]"]:::plan
     List685["List[685∈8]<br />ᐸ683,641ᐳ"]:::plan
-    Lambda686["Lambda[686∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda686["Lambda[686∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgCursor700["PgCursor[700∈8]"]:::plan
     Edge699["Edge[699∈8]"]:::plan
     Constant703["Constant[703∈0]"]:::plan
     List705["List[705∈8]<br />ᐸ703,661ᐳ"]:::plan
-    Lambda706["Lambda[706∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda706["Lambda[706∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgSelect712[["PgSelect[712∈8]<br />ᐸpersonᐳ"]]:::plan
     First717["First[717∈8]"]:::plan
     PgSelectSingle718["PgSelectSingle[718∈8]<br />ᐸpersonᐳ"]:::plan
@@ -414,7 +414,7 @@ graph TD
     Constant723["Constant[723∈0]"]:::plan
     PgClassExpression724["PgClassExpression[724∈8]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List725["List[725∈8]<br />ᐸ723,724ᐳ"]:::plan
-    Lambda726["Lambda[726∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda726["Lambda[726∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression727["PgClassExpression[727∈8]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect732[["PgSelect[732∈8]<br />ᐸpersonᐳ"]]:::plan
     First737["First[737∈8]"]:::plan
@@ -426,13 +426,13 @@ graph TD
     Constant743["Constant[743∈0]"]:::plan
     PgClassExpression744["PgClassExpression[744∈8]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List745["List[745∈8]<br />ᐸ743,744ᐳ"]:::plan
-    Lambda746["Lambda[746∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda746["Lambda[746∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression747["PgClassExpression[747∈8]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgCursor760["PgCursor[760∈8]"]:::plan
     Edge759["Edge[759∈8]"]:::plan
     Constant763["Constant[763∈0]"]:::plan
     List765["List[765∈8]<br />ᐸ763,641ᐳ"]:::plan
-    Lambda766["Lambda[766∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda766["Lambda[766∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgSelect773[["PgSelect[773∈8]<br />ᐸpersonᐳ"]]:::plan
     First778["First[778∈8]"]:::plan
     PgSelectSingle779["PgSelectSingle[779∈8]<br />ᐸpersonᐳ"]:::plan
@@ -443,10 +443,10 @@ graph TD
     Edge780["Edge[780∈8]"]:::plan
     Constant785["Constant[785∈0]"]:::plan
     List787["List[787∈8]<br />ᐸ785,783ᐳ"]:::plan
-    Lambda788["Lambda[788∈8]<br />ᐸencodeᐳ"]:::plan
+    Lambda788["Lambda[788∈8]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression789["PgClassExpression[789∈8]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     Constant790["Constant[790∈0]"]:::plan
-    Lambda791["Lambda[791∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda791["Lambda[791∈0]<br />ᐸrawEncodeᐳ"]:::plan
     __InputStaticLeaf793["__InputStaticLeaf[793∈0]"]:::plan
     __InputStaticLeaf795["__InputStaticLeaf[795∈0]"]:::plan
     __InputStaticLeaf796["__InputStaticLeaf[796∈0]"]:::plan
@@ -457,7 +457,7 @@ graph TD
     PgClassExpression804["PgClassExpression[804∈9]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
     PgClassExpression805["PgClassExpression[805∈9]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
     List806["List[806∈9]<br />ᐸ803,804,805ᐳ"]:::plan
-    Lambda807["Lambda[807∈9]<br />ᐸencodeᐳ"]:::plan
+    Lambda807["Lambda[807∈9]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression810["PgClassExpression[810∈9]<br />ᐸ__compound...__.”extra”ᐳ"]:::plan
     PgSelect812[["PgSelect[812∈9]<br />ᐸpersonᐳ"]]:::plan
     First816["First[816∈9]"]:::plan
@@ -465,7 +465,7 @@ graph TD
     Constant818["Constant[818∈0]"]:::plan
     PgClassExpression819["PgClassExpression[819∈9]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List820["List[820∈9]<br />ᐸ818,819ᐳ"]:::plan
-    Lambda821["Lambda[821∈9]<br />ᐸencodeᐳ"]:::plan
+    Lambda821["Lambda[821∈9]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression822["PgClassExpression[822∈9]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect824[["PgSelect[824∈9]<br />ᐸpersonᐳ"]]:::plan
     First828["First[828∈9]"]:::plan
@@ -473,27 +473,27 @@ graph TD
     Constant830["Constant[830∈0]"]:::plan
     PgClassExpression831["PgClassExpression[831∈9]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List832["List[832∈9]<br />ᐸ830,831ᐳ"]:::plan
-    Lambda833["Lambda[833∈9]<br />ᐸencodeᐳ"]:::plan
+    Lambda833["Lambda[833∈9]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression834["PgClassExpression[834∈9]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     Constant842["Constant[842∈0]"]:::plan
     List844["List[844∈9]<br />ᐸ842,819ᐳ"]:::plan
-    Lambda845["Lambda[845∈9]<br />ᐸencodeᐳ"]:::plan
+    Lambda845["Lambda[845∈9]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     Constant854["Constant[854∈0]"]:::plan
     List856["List[856∈9]<br />ᐸ854,831ᐳ"]:::plan
-    Lambda857["Lambda[857∈9]<br />ᐸencodeᐳ"]:::plan
+    Lambda857["Lambda[857∈9]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     Constant859["Constant[859∈0]"]:::plan
-    Lambda860["Lambda[860∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda860["Lambda[860∈0]<br />ᐸrawEncodeᐳ"]:::plan
     __InputStaticLeaf864["__InputStaticLeaf[864∈0]"]:::plan
     PgInsert867[["PgInsert[867∈10]"]]:::sideeffectplan
     Object871["Object[871∈10]<br />ᐸ{result}ᐳ"]:::plan
     PgClassExpression872["PgClassExpression[872∈10]<br />ᐸ__edge_cas...s_default”ᐳ"]:::plan
     Constant873["Constant[873∈0]"]:::plan
-    Lambda874["Lambda[874∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda874["Lambda[874∈0]<br />ᐸrawEncodeᐳ"]:::plan
     PgInsert881[["PgInsert[881∈11]"]]:::sideeffectplan
     Object885["Object[885∈11]<br />ᐸ{result}ᐳ"]:::plan
     PgClassExpression886["PgClassExpression[886∈11]<br />ᐸ__edge_cas...s_default”ᐳ"]:::plan
     Constant887["Constant[887∈0]"]:::plan
-    Lambda888["Lambda[888∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda888["Lambda[888∈0]<br />ᐸrawEncodeᐳ"]:::plan
     __InputStaticLeaf892["__InputStaticLeaf[892∈0]"]:::plan
     __InputStaticLeaf893["__InputStaticLeaf[893∈0]"]:::plan
     __InputStaticLeaf896["__InputStaticLeaf[896∈0]"]:::plan
@@ -508,7 +508,7 @@ graph TD
     Constant911["Constant[911∈0]"]:::plan
     PgClassExpression912["PgClassExpression[912∈12]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List913["List[913∈12]<br />ᐸ911,912ᐳ"]:::plan
-    Lambda914["Lambda[914∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda914["Lambda[914∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression916["PgClassExpression[916∈12]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgClassExpression917["PgClassExpression[917∈12]<br />ᐸ__person__.”email”ᐳ"]:::plan
     PgClassExpression918["PgClassExpression[918∈12]<br />ᐸ__person__.”about”ᐳ"]:::plan
@@ -531,7 +531,7 @@ graph TD
     Edge944["Edge[944∈12]"]:::plan
     Constant948["Constant[948∈0]"]:::plan
     List950["List[950∈12]<br />ᐸ948,946ᐳ"]:::plan
-    Lambda951["Lambda[951∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda951["Lambda[951∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression952["PgClassExpression[952∈12]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect957[["PgSelect[957∈12]<br />ᐸpersonᐳ"]]:::plan
     First962["First[962∈12]"]:::plan
@@ -542,18 +542,18 @@ graph TD
     Edge964["Edge[964∈12]"]:::plan
     Constant968["Constant[968∈0]"]:::plan
     List970["List[970∈12]<br />ᐸ968,966ᐳ"]:::plan
-    Lambda971["Lambda[971∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda971["Lambda[971∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression972["PgClassExpression[972∈12]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgCursor985["PgCursor[985∈12]"]:::plan
     Edge984["Edge[984∈12]"]:::plan
     Constant988["Constant[988∈0]"]:::plan
     List990["List[990∈12]<br />ᐸ988,946ᐳ"]:::plan
-    Lambda991["Lambda[991∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda991["Lambda[991∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgCursor1005["PgCursor[1005∈12]"]:::plan
     Edge1004["Edge[1004∈12]"]:::plan
     Constant1008["Constant[1008∈0]"]:::plan
     List1010["List[1010∈12]<br />ᐸ1008,966ᐳ"]:::plan
-    Lambda1011["Lambda[1011∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda1011["Lambda[1011∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgSelect1017[["PgSelect[1017∈12]<br />ᐸpersonᐳ"]]:::plan
     First1022["First[1022∈12]"]:::plan
     PgSelectSingle1023["PgSelectSingle[1023∈12]<br />ᐸpersonᐳ"]:::plan
@@ -564,7 +564,7 @@ graph TD
     Constant1028["Constant[1028∈0]"]:::plan
     PgClassExpression1029["PgClassExpression[1029∈12]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List1030["List[1030∈12]<br />ᐸ1028,1029ᐳ"]:::plan
-    Lambda1031["Lambda[1031∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda1031["Lambda[1031∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression1032["PgClassExpression[1032∈12]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgSelect1037[["PgSelect[1037∈12]<br />ᐸpersonᐳ"]]:::plan
     First1042["First[1042∈12]"]:::plan
@@ -576,13 +576,13 @@ graph TD
     Constant1048["Constant[1048∈0]"]:::plan
     PgClassExpression1049["PgClassExpression[1049∈12]<br />ᐸ__person__.”id”ᐳ"]:::plan
     List1050["List[1050∈12]<br />ᐸ1048,1049ᐳ"]:::plan
-    Lambda1051["Lambda[1051∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda1051["Lambda[1051∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression1052["PgClassExpression[1052∈12]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     PgCursor1065["PgCursor[1065∈12]"]:::plan
     Edge1064["Edge[1064∈12]"]:::plan
     Constant1068["Constant[1068∈0]"]:::plan
     List1070["List[1070∈12]<br />ᐸ1068,946ᐳ"]:::plan
-    Lambda1071["Lambda[1071∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda1071["Lambda[1071∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgSelect1078[["PgSelect[1078∈12]<br />ᐸpersonᐳ"]]:::plan
     First1083["First[1083∈12]"]:::plan
     PgSelectSingle1084["PgSelectSingle[1084∈12]<br />ᐸpersonᐳ"]:::plan
@@ -593,10 +593,10 @@ graph TD
     Edge1085["Edge[1085∈12]"]:::plan
     Constant1090["Constant[1090∈0]"]:::plan
     List1092["List[1092∈12]<br />ᐸ1090,1088ᐳ"]:::plan
-    Lambda1093["Lambda[1093∈12]<br />ᐸencodeᐳ"]:::plan
+    Lambda1093["Lambda[1093∈12]<br />ᐸbase64JSONEncodeᐳ"]:::plan
     PgClassExpression1094["PgClassExpression[1094∈12]<br />ᐸ__person__...full_name”ᐳ"]:::plan
     Constant1095["Constant[1095∈0]"]:::plan
-    Lambda1096["Lambda[1096∈0]<br />ᐸencodeᐳ"]:::plan
+    Lambda1096["Lambda[1096∈0]<br />ᐸrawEncodeᐳ"]:::plan
     __InputStaticLeaf1100["__InputStaticLeaf[1100∈0]"]:::plan
     __InputStaticLeaf1101["__InputStaticLeaf[1101∈0]"]:::plan
     __InputStaticLeaf1104["__InputStaticLeaf[1104∈0]"]:::plan

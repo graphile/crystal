@@ -78,6 +78,8 @@ export function executeBucket(
 
   const l = startSteps.length;
 
+  let sideEffectPlanIdsWithErrors: null | number[] = null;
+
   // Like a `for(i = 0; i < l; i++)` loop with some `await`s in it, except it does promise
   // handling manually so that it can complete synchronously (no promises) if
   // possible.
@@ -87,20 +89,53 @@ export function executeBucket(
     }
     bucket.cascadeEnabled = i === l - 1;
     const steps = startSteps[i];
-    const starterPromises: PromiseLike<void>[] = [];
+    let starterPromises: PromiseLike<void>[] | null = null;
+    let sideEffectPlanIds: null | number[] = null;
     for (const step of steps) {
+      if (step.hasSideEffects) {
+        if (sideEffectPlanIds === null) {
+          sideEffectPlanIds = [step.id];
+        } else {
+          sideEffectPlanIds.push(step.id);
+        }
+      }
       try {
         const r = executeStep(step);
         if (isPromiseLike(r)) {
-          starterPromises.push(r);
+          if (!starterPromises) {
+            starterPromises = [r];
+          } else {
+            starterPromises.push(r);
+          }
         }
       } catch (e) {
-        starterPromises.push(Promise.reject(e));
+        const r = Promise.reject(e);
+        if (!starterPromises) {
+          starterPromises = [r];
+        } else {
+          starterPromises.push(r);
+        }
       }
     }
-    if (starterPromises.length > 0) {
-      return Promise.all(starterPromises).then(() => nextSteps(i + 1));
+    const handleSideEffectPlanIds = () => {
+      if (!sideEffectPlanIdsWithErrors) {
+        sideEffectPlanIdsWithErrors = [];
+      }
+      for (const id of sideEffectPlanIds!) {
+        sideEffectPlanIdsWithErrors.push(id);
+      }
+    };
+    if (starterPromises !== null) {
+      return Promise.all(starterPromises).then(() => {
+        if (bucket.hasErrors && sideEffectPlanIds) {
+          handleSideEffectPlanIds();
+        }
+        return nextSteps(i + 1);
+      });
     } else {
+      if (bucket.hasErrors && sideEffectPlanIds) {
+        handleSideEffectPlanIds();
+      }
       return nextSteps(i + 1);
     }
   };
@@ -381,7 +416,7 @@ export function executeBucket(
    */
   function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
-    dependencies: ReadonlyArray<any>[],
+    dependenciesIncludingSideEffects: ReadonlyArray<any>[],
     polymorphicPathList: readonly string[],
     extra: ExecutionExtra,
   ) {
@@ -404,7 +439,7 @@ export function executeBucket(
           errors[index] = POLY_SKIPPED;
         }
       } else if (extra._bucket.hasErrors) {
-        for (const depList of dependencies) {
+        for (const depList of dependenciesIncludingSideEffects) {
           const v = depList[index];
           if (isGrafastError(v)) {
             if (!errors[index]) {
@@ -415,6 +450,17 @@ export function executeBucket(
         }
       }
     }
+
+    // Trim the side-effect dependencies back out again
+    const dependencies = sideEffectPlanIdsWithErrors
+      ? dependenciesIncludingSideEffects.slice(
+          0,
+          // There must always be at least one dependency! This serves the same
+          // purpose as bucket.noDepsList
+          Math.max(1, step.dependencies.length),
+        )
+      : dependenciesIncludingSideEffects;
+
     if (foundErrors) {
       const dependenciesWithoutErrors = dependencies.map((depList) =>
         depList.filter((_, index) => !errors[index]),
@@ -479,10 +525,18 @@ export function executeBucket(
       };
       const dependencies: ReadonlyArray<any>[] = [];
       const depCount = step.dependencies.length;
-      if (depCount > 0) {
+      if (depCount > 0 || sideEffectPlanIdsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const depId = step.dependencies[i];
           dependencies[i] = store.get(depId)!;
+        }
+        if (sideEffectPlanIdsWithErrors !== null) {
+          for (const sideEffectPlanId of sideEffectPlanIdsWithErrors) {
+            const sideEffectStoreEntry = store.get(sideEffectPlanId)!;
+            if (!dependencies.includes(sideEffectStoreEntry)) {
+              dependencies.push(sideEffectStoreEntry);
+            }
+          }
         }
       } else {
         dependencies.push(noDepsList);

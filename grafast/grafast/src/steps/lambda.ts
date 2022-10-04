@@ -10,7 +10,8 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
     moduleName: "grafast",
     exportName: "LambdaStep",
   };
-  isSyncAndSafe = true;
+  // Lambda is only sync and safe if the callback is; so default to false
+  isSyncAndSafe = false;
   allowMultipleOptimizations = true;
 
   private planDep: number | null;
@@ -20,6 +21,9 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
   ) {
     super();
     this.planDep = $plan != null ? this.addDependency($plan) : null;
+    if ((fn as any).isSyncAndSafe) {
+      this.isSyncAndSafe = true;
+    }
   }
 
   toStringMeta() {
@@ -48,25 +52,30 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
 function lambda<TIn extends [...any[]], TOut>(
   plans: { [Index in keyof TIn]: ExecutableStep<TIn[Index]> },
   fn: (value: TIn) => TOut,
+  isSyncAndSafe?: boolean,
 ): LambdaStep<TIn, TOut>;
 function lambda<TIn, TOut>(
   $plan: ExecutableStep<TIn> | null | undefined,
   fn: (value: TIn) => TOut,
+  isSyncAndSafe?: boolean,
 ): LambdaStep<TIn, TOut>;
 function lambda(
   planOrPlans: ExecutableStep | ExecutableStep[] | null | undefined,
   fn: (value: any) => any,
+  isSyncAndSafe = false,
 ): LambdaStep<any, any> {
   if (fn.length > 1) {
     throw new Error(
       "lambda callback should accept one argument, perhaps you forgot to destructure the arguments?",
     );
   }
-  if (Array.isArray(planOrPlans)) {
-    return new LambdaStep<any, any>(list(planOrPlans), fn);
-  } else {
-    return new LambdaStep<any, any>(planOrPlans, fn);
+  const $lambda = Array.isArray(planOrPlans)
+    ? new LambdaStep<any, any>(list(planOrPlans), fn)
+    : new LambdaStep<any, any>(planOrPlans, fn);
+  if (isSyncAndSafe) {
+    $lambda.isSyncAndSafe = true;
   }
+  return $lambda;
 }
 
 export { lambda };
