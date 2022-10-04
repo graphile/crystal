@@ -36,6 +36,15 @@ export const NODE_ID_CODECS = Symbol("nodeIdCodecs");
  */
 export const NODE_ID_HANDLER_BY_TYPE_NAME = Symbol("nodeIdHandlerByTypeName");
 
+function rawEncode(value: any): string | null {
+  return typeof value === "string" ? value : null;
+}
+rawEncode.isSyncAndSafe = true; // Optimization
+function rawDecode(value: string): any {
+  return typeof value === "string" ? value : null;
+}
+rawDecode.isSyncAndSafe = true; // Optimization
+
 export const NodePlugin: GraphileConfig.Plugin = {
   name: "NodePlugin",
   version: "1.0.0",
@@ -58,14 +67,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
           Object.create(null);
 
         // Add the 'raw' encoder
-        function rawEncode(value: any): string | null {
-          return typeof value === "string" ? value : null;
-        }
-        rawEncode.isSyncAndSafe = true; // Optimization
-        function rawDecode(value: string): any {
-          return typeof value === "string" ? value : null;
-        }
-        rawDecode.isSyncAndSafe = true; // Optimization
         nodeIdCodecs.raw = {
           encode: rawEncode,
           decode: rawDecode,
