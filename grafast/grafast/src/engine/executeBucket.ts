@@ -530,7 +530,7 @@ export function executeBucket(
           const depId = step.dependencies[i];
           dependencies[i] = store.get(depId)!;
         }
-        if (sideEffectPlanIdsWithErrors) {
+        if (sideEffectPlanIdsWithErrors !== null) {
           for (const sideEffectPlanId of sideEffectPlanIdsWithErrors) {
             const sideEffectStoreEntry = store.get(sideEffectPlanId)!;
             if (!dependencies.includes(sideEffectStoreEntry)) {
