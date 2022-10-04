@@ -61,3 +61,31 @@ makeWrapPlansPlugin({
   },
 });
 ```
+
+## Performing an access check before calling plan
+
+Steps that have side effects never get tree shaken or deduplicated, so if we
+want to throw an error before the mutation takes place we can do so like this:
+
+```js
+const plugin = makeWrapPlansPlugin({
+  Mutation: {
+    createUser(plan) {
+      // Extract the 'isAdmin' property from the GraphQL context
+      const $isAdmin = context().get("isAdmin");
+
+      // If the user isn't an admin, throw an error
+      const $preCheck = lambda($isAdmin, (isAdmin) => {
+        if (!isAdmin) {
+          throw new Error("Abort");
+        }
+      });
+      // Force this plan to run by marking it as having side effects
+      $preCheck.hasSideEffects = true;
+
+      // Now call the underlying plans; these will never execute if the above throws
+      return plan();
+    },
+  },
+});
+```
