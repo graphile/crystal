@@ -5,6 +5,7 @@ import {
   grafast,
   lambda,
   LambdaStep,
+  proxy,
 } from "grafast";
 import {
   buildSchema,
@@ -187,7 +188,9 @@ describe("wrapping named plans", () => {
         await delay(10);
         throw new Error("Abort");
       });
-      return $result;
+      const $proxy = proxy($result);
+      $proxy.addDependency($postCheck);
+      return $proxy;
     };
     let called = false;
     const spy2 = jest.fn((a) => {
