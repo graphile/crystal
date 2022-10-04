@@ -123,7 +123,7 @@ describe("wrapping named plans", () => {
       contextValue: { test: true },
     });
     expect(result.errors).toBeFalsy();
-    expect(result.data.echo).toEqual("HELLO");
+    expect(result.data.echo).toEqual("Hello");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
