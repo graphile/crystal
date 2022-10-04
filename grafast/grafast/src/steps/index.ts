@@ -89,3 +89,4 @@ export {
   LoadOneOptions,
   LoadOneStep,
 } from "./loadOne.js";
+export { proxy, ProxyStep } from "./proxy.js";
