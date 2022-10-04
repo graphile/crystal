@@ -1,13 +1,13 @@
 import "graphile-config";
 
-function encode(value: any): string | null {
+function pipeStringEncode(value: any): string | null {
   return Array.isArray(value) ? value.join("|") : null;
 }
-encode.isSyncAndSafe = true; // Optimization
-function decode(value: string): any {
+pipeStringEncode.isSyncAndSafe = true; // Optimization
+function pipeStringDecode(value: string): any {
   return typeof value === "string" ? value.split("|") : null;
 }
-decode.isSyncAndSafe = true; // Optimization
+pipeStringDecode.isSyncAndSafe = true; // Optimization
 
 export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
   name: "NodeIdCodecPipeStringPlugin",
@@ -21,8 +21,8 @@ export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
           return _;
         }
         build.registerNodeIdCodec("pipeString", {
-          encode,
-          decode,
+          encode: pipeStringEncode,
+          decode: pipeStringDecode,
         });
         return _;
       },

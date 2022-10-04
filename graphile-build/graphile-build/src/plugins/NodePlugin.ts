@@ -16,7 +16,7 @@ declare global {
       [NODE_ID_HANDLER_BY_TYPE_NAME]: { [typeName: string]: NodeIdHandler };
       registerNodeIdCodec(codecName: string, codec: NodeIdCodec): void;
       getNodeIdCodec(codecName: string): NodeIdCodec;
-      registerNodeIdHandler(typeName: string, matcher: NodeIdHandler): void;
+      registerNodeIdHandler(matcher: NodeIdHandler): void;
       getNodeIdHandler(typeName: string): NodeIdHandler | undefined;
       getNodeTypeNames(): string[];
     }
@@ -58,17 +58,17 @@ export const NodePlugin: GraphileConfig.Plugin = {
           Object.create(null);
 
         // Add the 'raw' encoder
-        function encode(value: any): string | null {
+        function rawEncode(value: any): string | null {
           return typeof value === "string" ? value : null;
         }
-        encode.isSyncAndSafe = true; // Optimization
-        function decode(value: string): any {
+        rawEncode.isSyncAndSafe = true; // Optimization
+        function rawDecode(value: string): any {
           return typeof value === "string" ? value : null;
         }
-        decode.isSyncAndSafe = true; // Optimization
+        rawDecode.isSyncAndSafe = true; // Optimization
         nodeIdCodecs.raw = {
-          encode,
-          decode,
+          encode: rawEncode,
+          decode: rawDecode,
         };
 
         return build.extend(
@@ -91,7 +91,8 @@ export const NodePlugin: GraphileConfig.Plugin = {
               }
               return codec;
             },
-            registerNodeIdHandler(typeName, handler) {
+            registerNodeIdHandler(handler) {
+              const { typeName } = handler;
               if (nodeIdHandlerByTypeName[typeName]) {
                 throw new Error(
                   `Node ID handler for type '${typeName}' already registered`,

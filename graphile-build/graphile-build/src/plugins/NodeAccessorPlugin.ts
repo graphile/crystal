@@ -36,6 +36,7 @@ const specForHandler = (handler: NodeIdHandler, codec: NodeIdCodec) => {
     }
     return null;
   }
+  spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 };
