@@ -139,7 +139,8 @@ export function makeWrapPlansPlugin<T>(
           return {
             ...field,
             plan(...planParams) {
-              const smartResolve = (...overrideParams: Array<any>) => {
+              // A replacement for `oldPlan` that automatically passes through arguments that weren't replaced
+              const smartPlan = (...overrideParams: Array<any>) => {
                 const $prev = oldPlan(
                   // @ts-ignore We're calling it dynamically, allowing the parent to override args.
                   ...overrideParams.concat(
@@ -160,7 +161,7 @@ export function makeWrapPlansPlugin<T>(
                 return $prev;
               };
               const [$source, fieldArgs, info] = planParams;
-              return planWrapper(smartResolve, $source, fieldArgs, info);
+              return planWrapper(smartPlan, $source, fieldArgs, info);
             },
           };
         },
