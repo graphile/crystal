@@ -1,14 +1,14 @@
 /* eslint-disable graphile-export/export-methods  */
+import { __ValueStep, constant, grafast, lambda, LambdaStep } from "grafast";
 import {
   buildSchema,
+  // defaultPlugins,
+  CommonTypesPlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
   QueryPlugin,
-  // defaultPlugins,
-  StandardTypesPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import { grafast, lambda } from "grafast";
 
 import { gql, makeExtendSchemaPlugin, makeWrapPlansPlugin } from "../";
 
@@ -18,7 +18,7 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
   buildSchema(
     {
       plugins: [
-        StandardTypesPlugin,
+        CommonTypesPlugin,
         QueryPlugin,
         MutationPlugin,
         SubscriptionPlugin,
@@ -84,14 +84,13 @@ describe("wrapping named plans", () => {
       expect(result.data.echo).toEqual("Hello");
       expect(spy).toHaveBeenCalledTimes(1);
       const spyArgs = spy.mock.calls[0];
-      const [parent, args, info] = spyArgs;
-      expect(parent).toBe(rootValue);
+      const [$parent, args, info] = spyArgs;
+      expect($parent).toBeInstanceOf(__ValueStep);
       expect(args).toBeTruthy();
       expect(info).toBeTruthy();
     }
   });
 
-  // TODO: how to override args?
   it("can override parent", async () => {
     const wrapper = (plan, $parent, args, info) =>
       plan(lambda($parent, (parent) => ({ ...parent, rideover: true })));
@@ -125,11 +124,16 @@ describe("wrapping named plans", () => {
     expect(info).toBeTruthy();
   });
 
-  // TODO: how to do this? Is this access control?
   it("can abort plan before", async () => {
-    const wrapper = async () => {
-      await delay(10);
-      throw new Error("Abort");
+    const wrapper = (plan) => {
+      const $preCheck = lambda(constant(null), async () => {
+        await delay(10);
+        throw new Error("Abort");
+      });
+      // Force this plan to run before any others for this field
+      $preCheck.hasSideEffects = true;
+
+      return plan();
     };
     let called = false;
     const spy = makeEchoSpy(() => {
@@ -163,13 +167,13 @@ describe("wrapping named plans", () => {
 
   it("can abort plan after", async () => {
     const wrapper = (plan) => {
-      const result = plan();
+      const $result = plan();
       // eslint-disable-next-line no-constant-condition
-      if (true) {
+      const $postCheck = lambda($result, async () => {
         await delay(10);
         throw new Error("Abort");
-      }
-      return result;
+      });
+      return $result;
     };
     let called = false;
     const spy = makeEchoSpy(() => {
@@ -230,7 +234,7 @@ describe("wrapping named plans", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
-    expect($parent).toBe(rootValue);
+    expect($parent).toBeInstanceOf(__ValueStep);
     expect(args).toBeTruthy();
     expect(info).toBeTruthy();
   });
@@ -272,7 +276,7 @@ describe("wrapping named plans", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
-    expect($parent).toBe(rootValue);
+    expect($parent).toBeInstanceOf(__ValueStep);
     expect(args).toBeTruthy();
     expect(info).toBeTruthy();
   });
@@ -291,13 +295,22 @@ describe("wrapping plans matching a filter", () => {
     const rule =
       ({ scope }) =>
       (plan, user, args, _info) => {
-        before.push([
-          `Mutation '${scope.fieldName}' starting with arguments:`,
-          args,
-        ]);
-        const result = plan();
-        after.push([`Mutation '${scope.fieldName}' result:`, result]);
-        return result;
+        const $before = lambda(args.get(), (argValues) => {
+          before.push([
+            `Mutation '${scope.fieldName}' starting with arguments:`,
+            argValues,
+          ]);
+        });
+        $before.hasSideEffects = true;
+
+        const $result = plan();
+
+        const $after = lambda($result, (result) => {
+          after.push([`Mutation '${scope.fieldName}' result:`, result]);
+        });
+        $after.hasSideEffects = true;
+
+        return $result;
       };
     const add = (_, args) =>
       lambda(
