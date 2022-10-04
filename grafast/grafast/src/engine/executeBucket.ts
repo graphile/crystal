@@ -87,18 +87,27 @@ export function executeBucket(
     }
     bucket.cascadeEnabled = i === l - 1;
     const steps = startSteps[i];
-    const starterPromises: PromiseLike<void>[] = [];
+    let starterPromises: PromiseLike<void>[] | null = null;
     for (const step of steps) {
       try {
         const r = executeStep(step);
         if (isPromiseLike(r)) {
-          starterPromises.push(r);
+          if (!starterPromises) {
+            starterPromises = [r];
+          } else {
+            starterPromises.push(r);
+          }
         }
       } catch (e) {
-        starterPromises.push(Promise.reject(e));
+        const r = Promise.reject(e);
+        if (!starterPromises) {
+          starterPromises = [r];
+        } else {
+          starterPromises.push(r);
+        }
       }
     }
-    if (starterPromises.length > 0) {
+    if (starterPromises !== null) {
       return Promise.all(starterPromises).then(() => nextSteps(i + 1));
     } else {
       return nextSteps(i + 1);
