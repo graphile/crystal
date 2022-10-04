@@ -532,7 +532,10 @@ export function executeBucket(
         }
         if (sideEffectPlanIdsWithErrors) {
           for (const sideEffectPlanId of sideEffectPlanIdsWithErrors) {
-            dependencies.push(store.get(sideEffectPlanId)!);
+            const sideEffectStoreEntry = store.get(sideEffectPlanId)!;
+            if (!dependencies.includes(sideEffectStoreEntry)) {
+              dependencies.push(sideEffectStoreEntry);
+            }
           }
         }
       } else {
