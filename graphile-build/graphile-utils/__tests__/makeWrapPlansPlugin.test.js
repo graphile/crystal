@@ -1,5 +1,11 @@
 /* eslint-disable graphile-export/export-methods  */
-import { __ValueStep, constant, grafast, lambda, LambdaStep } from "grafast";
+import {
+  __TrackedObjectStep,
+  constant,
+  grafast,
+  lambda,
+  LambdaStep,
+} from "grafast";
 import {
   buildSchema,
   // defaultPlugins,
@@ -54,15 +60,15 @@ const makeEchoSpy = (fn) =>
   );
 
 describe("wrapping named plans", () => {
-  it("passes args by default", async () => {
-    const wrappers = [
-      (plan) => plan(),
-      (plan, $parent) => plan($parent),
-      (plan, $parent, args) => plan($parent, args),
-      (plan, $parent, args, info) => plan($parent, args, info),
-    ];
-
-    for (const wrapper of wrappers) {
+  const wrappers = [
+    [0, (plan) => plan()],
+    [1, (plan, $parent) => plan($parent)],
+    [2, (plan, $parent, args) => plan($parent, args)],
+    [3, (plan, $parent, args, info) => plan($parent, args, info)],
+  ];
+  it.each(wrappers)(
+    "passes args by default when passed %i arguments",
+    async (nargs, wrapper) => {
       const spy = makeEchoSpy();
       const schema = makeSchemaWithSpyAndPlugins(spy, [
         makeWrapPlansPlugin({
@@ -87,11 +93,11 @@ describe("wrapping named plans", () => {
       expect(spy).toHaveBeenCalledTimes(1);
       const spyArgs = spy.mock.calls[0];
       const [$parent, args, info] = spyArgs;
-      expect($parent).toBeInstanceOf(__ValueStep);
+      expect($parent).toBeInstanceOf(__TrackedObjectStep);
       expect(args).toBeTruthy();
       expect(info).toBeTruthy();
-    }
-  });
+    },
+  );
 
   it("can override parent", async () => {
     const wrapper = (plan, $parent, args, info) =>
@@ -140,6 +146,7 @@ describe("wrapping named plans", () => {
     let called = false;
     const spy = makeEchoSpy(() => {
       called = true;
+      return constant`hi`;
     });
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin({
@@ -180,6 +187,7 @@ describe("wrapping named plans", () => {
     let called = false;
     const spy = makeEchoSpy(() => {
       called = true;
+      return constant`hi`;
     });
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin({
@@ -236,7 +244,7 @@ describe("wrapping named plans", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
-    expect($parent).toBeInstanceOf(__ValueStep);
+    expect($parent).toBeInstanceOf(__TrackedObjectStep);
     expect(args).toBeTruthy();
     expect(info).toBeTruthy();
   });
@@ -278,7 +286,7 @@ describe("wrapping named plans", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
-    expect($parent).toBeInstanceOf(__ValueStep);
+    expect($parent).toBeInstanceOf(__TrackedObjectStep);
     expect(args).toBeTruthy();
     expect(info).toBeTruthy();
   });

@@ -1,5 +1,6 @@
 import type {
   FieldArgs,
+  FieldInfo,
   FieldPlanResolver,
   GraphileFieldConfig,
 } from "grafast";
@@ -10,6 +11,7 @@ type PlanWrapperFn = (
   plan: FieldPlanResolver<any, any, any>,
   $source: ExecutableStep,
   args: FieldArgs,
+  info: FieldInfo,
 ) => any;
 
 interface PlanWrapperRule {
@@ -160,8 +162,8 @@ export function makeWrapPlansPlugin<T>(
                 }
                 return $prev;
               };
-              const [$source, fieldArgs] = planParams;
-              return planWrapper(smartResolve, $source, fieldArgs);
+              const [$source, fieldArgs, info] = planParams;
+              return planWrapper(smartResolve, $source, fieldArgs, info);
             },
           };
         },
