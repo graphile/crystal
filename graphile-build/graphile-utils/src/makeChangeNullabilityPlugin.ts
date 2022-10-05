@@ -115,7 +115,11 @@ function doIt(
 export function makeChangeNullabilityPlugin(
   rules: ChangeNullabilityRules,
 ): GraphileConfig.Plugin {
-  let matches: string[];
+  const expectedMatches = Object.entries(rules).flatMap(
+    ([typeName, typeRules]) =>
+      Object.keys(typeRules).map((fieldName) => `${typeName}.${fieldName}`),
+  );
+  let pendingMatches = new Set<string>();
 
   function objectOrInterfaceFieldCallback<
     T extends GraphileFieldConfig<any, any, any, any, any>,
@@ -139,7 +143,7 @@ export function makeChangeNullabilityPlugin(
       return field;
     }
     const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
-    matches.push(`${Self.name}.${fieldName}`);
+    pendingMatches.delete(`${Self.name}.${fieldName}`);
     if (rule.type) {
       field.type = doIt(
         field.type,
@@ -204,7 +208,7 @@ export function makeChangeNullabilityPlugin(
     schema: {
       hooks: {
         init(_) {
-          matches = [];
+          pendingMatches = new Set(expectedMatches);
           return _;
         },
         GraphQLInputObjectType_fields_field(field, build, context) {
@@ -222,7 +226,7 @@ export function makeChangeNullabilityPlugin(
           }
           const rule =
             typeof rawRule !== "object" ? { type: rawRule } : rawRule;
-          matches.push(`${Self.name}.${fieldName}`);
+          pendingMatches.delete(`${Self.name}.${fieldName}`);
           if (rule.type) {
             field.type = doIt(
               field.type,
@@ -243,7 +247,13 @@ export function makeChangeNullabilityPlugin(
         GraphQLObjectType_fields_field: objectOrInterfaceFieldCallback,
         GraphQLObjectType_fields_field_args: objectOrInterfaceArgsCallback,
         finalize(schema) {
-          throw new Error(`Didn't match...`);
+          if (pendingMatches.size > 0) {
+            throw new Error(
+              `The following entries in your makeChangeNullabilityPlugin didn't match anything in your GraphQL schema; please check your spelling: ${[
+                ...pendingMatches,
+              ].join(", ")}`,
+            );
+          }
           return schema;
         },
       },
