@@ -6,6 +6,13 @@ title: Introduction
 
 # PostGraphile Introduction
 
+:::tip
+
+Coming from PostGraphile Version 4? Check out the
+[migration guide](./migrating-from-v4/index.md)!
+
+:::
+
 If you already use PostgreSQL then you understand the value that a strongly
 typed and well defined schema can bring to application development; GraphQL is
 the perfect match for this technology when it comes to making your data layer
