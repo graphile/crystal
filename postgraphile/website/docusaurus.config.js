@@ -49,8 +49,8 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
           versions: {
-            '4.12.0': {
-              path: 'current',
+            "4.12.0": {
+              path: "current",
             },
           },
         },
@@ -104,6 +104,12 @@ const config = {
             docsPluginId: "default",
             position: "left",
             label: "PostGraphile",
+          },
+          {
+            type: "docsVersionDropdown",
+            position: "right",
+            // dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
+            dropdownActiveClassDisabled: true,
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
