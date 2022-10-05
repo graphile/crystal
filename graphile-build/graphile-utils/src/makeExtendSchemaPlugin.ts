@@ -759,6 +759,44 @@ export function makeExtendSchemaPlugin(
             return fields;
           }
         },
+
+        GraphQLInterfaceType_interfaces(interfaces, build, context: any) {
+          const {
+            extend,
+            makeExtendSchemaPlugin: {
+              [uniquePluginName]: { typeExtensions },
+            },
+          } = build;
+          const { Self } = context;
+          if (typeExtensions.GraphQLInterfaceType[Self.name]) {
+            const newInterfaces = typeExtensions.GraphQLInterfaceType[
+              Self.name
+            ].reduce(
+              (
+                memo: GraphQLInterfaceType[],
+                extension: InterfaceTypeExtensionNode,
+              ) => {
+                const moreInterfaces = getInterfaces(
+                  extension.interfaces,
+                  build,
+                );
+                return extend(
+                  memo,
+                  moreInterfaces,
+                  `Adding interfaces from ${uniquePluginName}`,
+                );
+              },
+              {},
+            );
+            return extend(
+              interfaces,
+              newInterfaces,
+              `Adding interfaces from ${uniquePluginName}`,
+            );
+          } else {
+            return interfaces;
+          }
+        },
       },
     },
   };

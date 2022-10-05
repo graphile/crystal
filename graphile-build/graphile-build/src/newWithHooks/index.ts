@@ -444,6 +444,25 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               }
               return fieldsSpec;
             },
+            interfaces: () => {
+              const interfacesContext: GraphileBuild.ContextInterfaceInterfaces =
+                {
+                  ...interfaceContext,
+                  Self,
+                };
+              const rawInterfaces =
+                (typeof rawSpec.interfaces === "function"
+                  ? rawSpec.interfaces(interfacesContext)
+                  : rawSpec.interfaces) || [];
+              const interfacesSpec = builder.applyHooks(
+                "GraphQLInterfaceType_interfaces",
+                rawInterfaces,
+                build,
+                interfacesContext,
+                `|${rawSpec.name}`,
+              );
+              return interfacesSpec;
+            },
           };
           const Self: GraphQLInterfaceType = new GraphQLInterfaceType(
             finalSpec,

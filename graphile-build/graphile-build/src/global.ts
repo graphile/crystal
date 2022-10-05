@@ -167,12 +167,18 @@ declare global {
 
     /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
     interface GraphileInterfaceTypeConfig<TSource, TContext>
-      extends Omit<GraphQLInterfaceTypeConfig<TSource, TContext>, "fields"> {
+      extends Omit<
+        GraphQLInterfaceTypeConfig<TSource, TContext>,
+        "fields" | "interfaces"
+      > {
       fields?:
         | GraphQLFieldConfigMap<TSource, TContext>
         | ((
             context: ContextInterfaceFields,
           ) => GraphQLFieldConfigMap<TSource, TContext>);
+      interfaces?:
+        | GraphQLInterfaceType[]
+        | ((context: ContextInterfaceInterfaces) => GraphQLInterfaceType[]);
     }
 
     /**
@@ -531,6 +537,12 @@ declare global {
       scope: ScopeInterfaceFieldsFieldArgs;
     }
 
+    interface ScopeInterfaceInterfaces extends ScopeInterface {}
+    interface ContextInterfaceInterfaces extends ContextInterface {
+      scope: ScopeInterfaceInterfaces;
+      Self: GraphQLInterfaceType;
+    }
+
     interface ScopeUnion extends Scope {}
     interface ContextUnion extends Context {
       scope: ScopeUnion;
@@ -857,6 +869,11 @@ declare global {
       GraphQLInterfaceType_fields_field_args: GraphileBuild.Hook<
         GraphQLFieldConfigArgumentMap,
         GraphileBuild.ContextInterfaceFieldsFieldArgs,
+        TBuild
+      >[];
+      GraphQLInterfaceType_interfaces: GraphileBuild.Hook<
+        GraphQLInterfaceType[],
+        GraphileBuild.ContextInterfaceInterfaces,
         TBuild
       >[];
 

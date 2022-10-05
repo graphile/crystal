@@ -29,6 +29,7 @@ export function makeSchemaBuilderHooks<
     GraphQLInterfaceType_fields: [],
     GraphQLInterfaceType_fields_field: [],
     GraphQLInterfaceType_fields_field_args: [],
+    GraphQLInterfaceType_interfaces: [],
     GraphQLScalarType: [],
   };
 }

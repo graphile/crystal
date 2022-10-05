@@ -410,6 +410,13 @@ declare global {
               GraphileBuild.Build
             >
           >;
+          GraphQLInterfaceType_interfaces?: PluginHook<
+            GraphileBuild.Hook<
+              GraphQLInterfaceType[],
+              GraphileBuild.ContextInterfaceInterfaces,
+              GraphileBuild.Build
+            >
+          >;
 
           /**
            * For scalars
