@@ -10,12 +10,11 @@
     {
       "type": "category",
       "label": "Usage",
-      "items": [
-        "usage",
-        "usage-cli",
-        "usage-library",
-        "usage-schema"
-      ]
+      "link": {
+        "type": "doc",
+        "id": "usage"
+      },
+      "items": ["usage-cli", "usage-library", "usage-schema"]
     },
     "performance",
     "requirements",
@@ -31,8 +30,11 @@
     {
       "type": "category",
       "label": "Tables",
+      "link": {
+        "type": "doc",
+        "id": "tables"
+      },
       "items": [
-        "tables",
         "relations",
         "connections",
         "filtering",
@@ -43,8 +45,11 @@
     {
       "type": "category",
       "label": "Functions",
+      "link": {
+        "type": "doc",
+        "id": "functions"
+      },
       "items": [
-        "functions",
         "computed-columns",
         "custom-queries",
         "custom-mutations",
@@ -60,11 +65,11 @@
     {
       "type": "category",
       "label": "Realtime",
-      "items": [
-        "realtime",
-        "subscriptions",
-        "live-queries"
-      ]
+      "link": {
+        "type": "doc",
+        "id": "realtime"
+      },
+      "items": ["subscriptions", "live-queries"]
     },
     "background-tasks",
     "reserved-keywords",
@@ -77,17 +82,20 @@
     {
       "type": "category",
       "label": "Smart Tags",
-      "items": [
-        "smart-tags",
-        "smart-tags-file",
-        "smart-comments"
-      ]
+      "link": {
+        "type": "doc",
+        "id": "smart-tags"
+      },
+      "items": ["smart-tags-file", "smart-comments"]
     },
     {
       "type": "category",
       "label": "Schema Plugins",
+      "link": {
+        "type": "doc",
+        "id": "extending"
+      },
       "items": [
-        "extending",
         "make-add-inflectors-plugin",
         "make-change-nullability-plugin",
         "make-extend-schema-plugin",
