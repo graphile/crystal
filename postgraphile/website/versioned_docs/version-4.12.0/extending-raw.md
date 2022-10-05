@@ -113,7 +113,7 @@ postgraphile --append-plugins `pwd`/add-http-bin-plugin.js -c postgres:///mydb
 
 Note that the types of added fields do not need to be implemented via Graphile
 Engine's
-[`newWithHooks`](/graphile-build/build-object/#newwithhookstype-spec-scope) -
+[`newWithHooks`](https://graphile.org/graphile-build/build-object/#newwithhookstype-spec-scope) -
 you can use standard GraphQL objects too, as we have demonstrated with the
 `JSONType` above. (However, if you do not use `newWithHooks` then the objects
 referenced cannot be extended via plugins.)
@@ -151,12 +151,12 @@ Previously we used `GraphQLObjectType:fields` to add a field, as that
 manipulates the list of fields. This time we are manipulating an individual
 field, so we will use the `GraphQLObjectType:fields:field` hook. This makes our
 intent clear, and also grants us access to
-[the `addArgDataGenerator`](/graphile-build/look-ahead/#when-processing-arguments-addargdatagenerator)
+[the `addArgDataGenerator`](https://graphile.org/graphile-build/look-ahead/#when-processing-arguments-addargdatagenerator)
 function which we need to request the record id. The following example also uses
 an instance of
 [`queryBuilder.`](./make-extend-schema-plugin/#querybuilder) (Read
 more about the different hooks
-[in the Graphile Engine docs](/graphile-build/all-hooks/).)
+[in the Graphile Engine docs](https://graphile.org/graphile-build/all-hooks/).)
 
 ```js
 function performAnotherTask(linkId) {

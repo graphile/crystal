@@ -23,8 +23,8 @@ By combining powerful features such as PostgreSQL's
 and
 [row-level security policies](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
 with Graphile Engine's advanced
-[GraphQL look-ahead](/graphile-build/look-ahead/) and
-[plugin expansion](/graphile-build/plugins/) technologies, PostGraphile ensures
+[GraphQL look-ahead](https://graphile.org/graphile-build/look-ahead/) and
+[plugin expansion](https://graphile.org/graphile-build/plugins/) technologies, PostGraphile ensures
 your generated schema is secure, performant and extensible.
 
 Some of the features we offer:

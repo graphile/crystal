@@ -140,15 +140,15 @@ instead (see below). The below options are valid for
     extensions are excluded from the generated GraphQL schema as general
     applications don't need them to be exposed to the end user. You can use this
     flag to include them in the generated schema (not recommended).
-  - `appendPlugins`: An array of [Graphile Engine](/graphile-build/plugins/)
+  - `appendPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
     schema plugins to load after the default plugins.
-  - `prependPlugins`: An array of [Graphile Engine](/graphile-build/plugins/)
+  - `prependPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
     schema plugins to load before the default plugins (you probably don't want
     this).
   - `replaceAllPlugins`: The full array of
-    [Graphile Engine](/graphile-build/plugins/) schema plugins to use for schema
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema plugins to use for schema
     generation (you almost definitely don't want this!).
-  - `skipPlugins`: An array of [Graphile Engine](/graphile-build/plugins/)
+  - `skipPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
     schema plugins to skip.
   - `readCache`: A file path string or an object. Reads cached values to improve
     startup time (you may want to do this in production).

@@ -75,7 +75,7 @@ on Medium.
 
 ### How is it so fast?
 
-We leverage graphile-build's [look-ahead](/graphile-build/look-ahead/) features
+We leverage graphile-build's [look-ahead](https://graphile.org/graphile-build/look-ahead/) features
 when resolving a GraphQL request so that a single root level query, no matter
 how nested, is compiled into just one SQL query. PostgreSQL has an excellent
 query planner which optimises and executes this query for us, avoiding the need
