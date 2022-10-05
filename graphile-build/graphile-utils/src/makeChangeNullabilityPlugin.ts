@@ -85,12 +85,16 @@ function doIt(
       location,
       originalSpec,
     );
-    if (innerType === listInnerType && isNonNull === shouldBeNonNull) {
+    const newListType =
+      innerType === listInnerType
+        ? nullableType
+        : new graphql.GraphQLList(innerType);
+    if (newListType === nullableType && isNonNull === shouldBeNonNull) {
       return inType;
     } else if (shouldBeNonNull) {
-      return new graphql.GraphQLNonNull(innerType);
+      return new graphql.GraphQLNonNull(newListType);
     } else {
-      return innerType;
+      return newListType;
     }
   } else {
     if (specSansBang.length > 0) {
