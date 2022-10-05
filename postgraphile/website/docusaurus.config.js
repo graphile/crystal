@@ -53,6 +53,15 @@ const config = {
               path: "current",
             },
           },
+          remarkPlugins: [
+            [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
+          ],
+        },
+        pages: {
+          remarkPlugins: [
+            require("@docusaurus/remark-plugin-npm2yarn"),
+            { sync: true },
+          ],
         },
         blog: false,
         theme: {
