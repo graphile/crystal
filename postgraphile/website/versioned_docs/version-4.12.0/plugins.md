@@ -8,9 +8,9 @@ Stability: experimental, may change in **semver minor** versions.
 
 _NOTE: This page relates to changing how the PostGraphile HTTP server and CLI
 work. If you're instead looking to change the generated GraphQL schema (e.g. to
-add fields or types), see [Schema Plugins](/postgraphile/extending/)._
+add fields or types), see [Schema Plugins](./extending/)._
 
-In addition to the [Graphile Engine plugin system](/postgraphile/extending/)
+In addition to the [Graphile Engine plugin system](./extending/)
 which builds the GraphQL schema in PostGraphile, PostGraphile also has a plugin
 system for the CLI and web layer. This plugin system is less mature, help
 documenting it is welcome!
@@ -61,7 +61,7 @@ current license
 in to generate a new license code.
 
 For more information, see the FAQ at the bottom of the
-[Go Pro!](/postgraphile/pricing/) page.
+[Go Pro!](./pricing/) page.
 
 ### Installing
 
@@ -231,9 +231,9 @@ const postGraphileMiddleware = postgraphile(databaseUrl, "app_public", {
 #### Origin specific CORS
 
 You can enable _generous_ CORS by
-[adding the `-o,--cors` flag to the CLI](/postgraphile/usage-cli/#cli-options)
+[adding the `-o,--cors` flag to the CLI](./usage-cli/#cli-options)
 or by
-[adding a `enableCors: true` option when using PostGraphile as a library](/postgraphile/usage-library/#api-postgraphilepgconfig-schemaname-options).
+[adding a `enableCors: true` option when using PostGraphile as a library](./usage-library/#api-postgraphilepgconfig-schemaname-options).
 
 However, by being _generous_, you allow **any** origin to communicate with you
 PostGraphile instance. If you want to allow just one specific origin, and using

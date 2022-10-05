@@ -20,7 +20,7 @@ the below first though!)
   favour of a shared connection with the tables themselves - only affects you if
   you have referenced the type name in queries/fragments
 - What's nullable and what isn't has changed slightly - shouldn't cause an issue
-  in most cases (please read [Why is it nullable?](/postgraphile/why-nullable/)
+  in most cases (please read [Why is it nullable?](./why-nullable/)
   for an explanation of why each thing is nullable)
 - JWTs now have an audience of 'postgraphile' rather than 'postgraphql', but you
   can change this with the `--jwt-verify-audience` option
@@ -256,7 +256,7 @@ tests to ensure this doesn't happen again.
 
 Workaround: you can change the inflection engine back to the old one with a
 plugin -
-[see `makeAddInflectorsPlugin`](/postgraphile/make-add-inflectors-plugin/).
+[see `makeAddInflectorsPlugin`](./make-add-inflectors-plugin/).
 
 #### Procedures that only supported `orderBy: NATURAL` now **do not have `orderBy` at all**.
 
@@ -290,8 +290,8 @@ front means that whether or not you add that table later it'll still be fine
 without breaking existing functionality.
 
 You can rename tables directly, or if you prefer not to change your database
-layout you can use [smart comments](/postgraphile/smart-comments/) or write a
-custom [inflector](/postgraphile/inflection/).
+layout you can use [smart comments](./smart-comments/) or write a
+custom [inflector](./inflection/).
 
 #### Very large numbers
 

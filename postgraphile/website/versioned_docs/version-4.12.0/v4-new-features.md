@@ -11,7 +11,7 @@ which is plugin-based.
 
 Despite this huge change, v4 is still broadly compatible with v3; you can read
 more about migrating from v3 to v4 in our
-[migration guide](/postgraphile/v3-migration/).
+[migration guide](./v3-migration/).
 
 **Headlines**:
 
@@ -27,9 +27,9 @@ more about migrating from v3 to v4 in our
   - with `--no-ignore-rbac`, automatically omit tables and columns the user
     account you connect to PostgreSQL with (from your connection string) doesn't
     have permission to access.
-  - [smart comments](/postgraphile/smart-comments/) for omitting, renaming and
+  - [smart comments](./smart-comments/) for omitting, renaming and
     deprecating things easily
-  - [write your own naming functions](/postgraphile/inflection/) if you don't
+  - [write your own naming functions](./inflection/) if you don't
     like the built in ones!
     - `userByAuthorId` becomes just `author` with the help of
       `@graphile-contrib/pg-simplify-inflector`
@@ -106,7 +106,7 @@ core at a later point.
 
 It's also possible to turn off, or even replace, built in plugins - and of
 course to add your own. So you can really customise PostGraphile now! See
-[Schema Plugins](/postgraphile/extending/) for more information.
+[Schema Plugins](./extending/) for more information.
 
 ### Tidier schema
 
@@ -126,7 +126,7 @@ enabled by default in v5.
 
 If there's something (a column, table, function, filter, relation) that you
 don't want to express to GraphQL you can now remove it using our
-[smart comments](/postgraphile/smart-comments/) feature. This feature is highly
+[smart comments](./smart-comments/) feature. This feature is highly
 flexible, so get in touch if you can think of more ways for it to help you build
 your perfect schema!
 
@@ -143,9 +143,9 @@ comment on column c.person.site is E'@deprecated Use `website` instead\nThe user
 
 You no longer have to trust us to come up with the best names for your fields.
 You can override individual fields using our
-[smart comments](/postgraphile/smart-comments/) feature, or override the names
+[smart comments](./smart-comments/) feature, or override the names
 that we auto-generate by using a plugin to
-[override our inflectors](/postgraphile/inflection/) with your own.
+[override our inflectors](./inflection/) with your own.
 
 These naming overrides can be shared like other plugins, for example I've
 [written `@graphile-contrib/pg-simplify-inflector`](https://github.com/graphile-contrib/pg-simplify-inflector)
@@ -215,8 +215,8 @@ interface exclusively with `--simple-collections only`.
 ### GraphQL query batching
 
 With the `--enable-query-batching` option for
-[the CLI](/postgraphile/usage-cli/); or `enableQueryBatching: true` for the
-[library](/postgraphile/usage-library/) you can enable our experimental Query
+[the CLI](./usage-cli/); or `enableQueryBatching: true` for the
+[library](./usage-library/) you can enable our experimental Query
 Batching support.
 
 Your GraphQL client will need query batching support to make use of this

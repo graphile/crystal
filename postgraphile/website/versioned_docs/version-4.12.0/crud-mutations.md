@@ -10,21 +10,21 @@ automatically add CRUD mutations to the schema for each table; this behaviour
 can be disabled via the `--disable-default-mutations` CLI setting (or the
 `disableDefaultMutations: true` library setting) if you prefer to define all of
 your mutations yourself (e.g. with
-[custom mutations](/postgraphile/custom-mutations/)).
+[custom mutations](./custom-mutations/)).
 
-Using the `users` table from the [parent article](/postgraphile/tables/),
+Using the `users` table from the [parent article](./tables/),
 depending on the PostGraphile settings you use (and the permissions you've
 granted), you might get the following mutations:
 
 - createUser - Creates a single `User`.
-  [See example](/postgraphile/examples/#Mutations__Create).
+  [See example](./examples/#Mutations__Create).
 - updateUser - Updates a single `User` using its globally unique id and a patch.
 - updateUserById - Updates a single `User` using a unique key and a patch.
-  [See example](/postgraphile/examples/#Mutations__Update).
+  [See example](./examples/#Mutations__Update).
 - updateUserByUsername - Updates a single `User` using a unique key and a patch.
 - deleteUser - Deletes a single `User` using its globally unique id.
 - deleteUserById - Deletes a single `User` using a unique key.
-  [See example](/postgraphile/examples/#Mutations__Delete).
+  [See example](./examples/#Mutations__Delete).
 - deleteUserByUsername - Deletes a single `User` using a unique key.
 
 **The `update` and `delete` mutations are created only if the table contains a
@@ -35,7 +35,7 @@ You also get the following query fields ("Read"):
 - user - Returns a single `User` using its globally unique `ID`.
 - userById - Reads a single `User` using its globally unique `ID`.
 - userByUsername - Reads a single `User` using its unique `username`.
-- allUsers - Returns a [connection](/postgraphile/connections/) enabling
+- allUsers - Returns a [connection](./connections/) enabling
   pagination through a set of (visible) `User`.
 
 ### Examples

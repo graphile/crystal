@@ -26,7 +26,7 @@ own plugins.
 
 A common request is to add additional root-level fields to your schema, for
 example to integrate external services. The easiest way to do this is to
-[use `makeExtendSchemaPlugin`](/postgraphile/make-extend-schema-plugin/) to
+[use `makeExtendSchemaPlugin`](./make-extend-schema-plugin/) to
 generate a plugin that will extend your schema (this can be used to add fields
 anywhere, not just at the root-level):
 
@@ -125,7 +125,7 @@ that PostGraphile works (where the root Query field resolvers are the only ones
 who perform SQL queries) this is generally most useful at the top level.
 
 In PostGraphile version 4.1 and above, you can
-[use `makeWrapResolversPlugin`](/postgraphile/make-wrap-resolvers-plugin/) to
+[use `makeWrapResolversPlugin`](./make-wrap-resolvers-plugin/) to
 easily wrap a resolver:
 
 ```js
@@ -154,7 +154,7 @@ intent clear, and also grants us access to
 [the `addArgDataGenerator`](/graphile-build/look-ahead/#when-processing-arguments-addargdatagenerator)
 function which we need to request the record id. The following example also uses
 an instance of
-[`queryBuilder.`](/postgraphile/make-extend-schema-plugin/#querybuilder) (Read
+[`queryBuilder.`](./make-extend-schema-plugin/#querybuilder) (Read
 more about the different hooks
 [in the Graphile Engine docs](/graphile-build/all-hooks/).)
 
@@ -246,7 +246,7 @@ things, you instead avoid them being generated in the first place.
 
 **If you're looking for an easy way to prevent certain tables, fields, functions
 or relations being added to your GraphQL schema, check out
-[smart comments](/postgraphile/smart-comments/).**
+[smart comments](./smart-comments/).**
 
 If you want to remove a class of things from the schema then you can remove the
 plugin that adds them; for example if you no longer wanted to allow ordering by
@@ -264,7 +264,7 @@ and return the set of fields less the one you want removed.
 
 Here's an example of a plugin generator you could use to generate plugins to
 remove individual fields. This is just to demonstrate how a plugin to do this
-might work, [smart comments](/postgraphile/smart-comments/) are likely a better
+might work, [smart comments](./smart-comments/) are likely a better
 approach.
 
 ```js

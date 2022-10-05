@@ -28,7 +28,7 @@ discuss how you can use the schema we create with PostGraphile, this article
 should be useful for anyone designing a Postgres schema.
 
 If you haven't installed PostGraphile already, you can follow our
-[Quick Start Guide](/postgraphile/quick-start-guide/) to get PostGraphile up and
+[Quick Start Guide](./quick-start-guide/) to get PostGraphile up and
 running.
 
 ### Table of Contents

@@ -19,7 +19,7 @@ Many GraphQL experts would opine that GraphQL filters should not be overly
 complicated, and should not reveal too much of the underlying data store. This
 is why we don't have advanced filtering built in by default; however, should you
 desire that, please check out the filter plugin
-[documented on our Filtering page](/postgraphile/filtering/).
+[documented on our Filtering page](./filtering/).
 
 Here's an example of filtering forums to those created by a particular user:
 
@@ -145,7 +145,7 @@ reach out on [our Discord chat](https://discord.gg/graphile) for advice.
 ## Example with ordering
 
 It's also possible for condition plugins to change the order of results by using
-[QueryBuilder](/postgraphile/make-extend-schema-plugin/#querybuilder)'s
+[QueryBuilder](./make-extend-schema-plugin/#querybuilder)'s
 `orderBy` method. The following example both limits the list of quizzes returned
 to only those with a certain number of entries, _and_ orders the results such
 that the quizzes with the most entries are listed first.

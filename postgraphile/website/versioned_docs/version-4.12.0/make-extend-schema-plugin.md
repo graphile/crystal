@@ -70,7 +70,7 @@ language you write into an abstract syntax tree (AST) that the application can
 understand. Our `gql` help differs slightly from the one you may be familiar
 with in the `graphql-tag` npm module, namely in how the placeholders work. Ours
 is designed to work with PostGraphile's
-[inflection system](/postgraphile/inflection/), so you can embed strings
+[inflection system](./inflection/), so you can embed strings
 directly. You may also embed other gql tags directly. For example:
 
 ```js
@@ -352,7 +352,7 @@ level of complexity.
 #### Query Example
 
 The below is a simple example which would have been better served by
-[Custom Query SQL Procedures](/postgraphile/custom-queries/#custom-query-sql-procedures);
+[Custom Query SQL Procedures](./custom-queries/#custom-query-sql-procedures);
 however it demonstrates using `makeExtendSchemaPlugin` with a database record,
 table connection, and list of database records.
 
@@ -616,8 +616,8 @@ not defined at the root level) then for performance reasons you should hook into
 the "look-ahead" system when adding a custom connection/list/record, rather than
 using a resolver. You can achieve this with the `@pgQuery` directive, as shown
 below. Alternative approaches you may wish to consider are
-[Smart Comments](/postgraphile/smart-comments/) and
-[Computed Columns](/postgraphile/computed-columns/).
+[Smart Comments](./smart-comments/) and
+[Computed Columns](./computed-columns/).
 
 #### @pgQuery with an object type
 
@@ -729,4 +729,4 @@ the action your plugin is attempting to achieve then you may need to create a
 companion database function that is marked as `SECURITY DEFINER` in order to
 perform the action with elevated privileges; alternatively you could use this
 database function directly - see
-[Custom Mutations](/postgraphile/custom-mutations/) for more details.
+[Custom Mutations](./custom-mutations/) for more details.

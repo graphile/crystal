@@ -42,7 +42,7 @@ yarn add @graphile/pg-pubsub
   it from the supporter plugin, now import it from `postgraphile` directly. The
   call signature is now
   `enhanceHttpServerWithSubscriptions(httpServer, postgraphileMiddleware)` - see
-  [Subscriptions Advanced Setup](/postgraphile/subscriptions/#advanced-setup).
+  [Subscriptions Advanced Setup](./subscriptions/#advanced-setup).
 - **If** you were passing `middlewares` to `enhanceHttpServerWithSubscriptions`;
   you should instead pass these middlewares as `websocketMiddlewares` via the
   `postgraphile` options.
@@ -57,4 +57,4 @@ add the `--subscriptions` flag.
 Now PostGraphile natively supports subscriptions, our built in GraphiQL
 (http://localhost:5000/graphiql by default) now supports subscriptions too, so
 it's easier than ever to try out a subscription. Also note we have experimental
-support for [live queries](/postgraphile/live-queries/).
+support for [live queries](./live-queries/).

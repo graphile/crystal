@@ -20,15 +20,15 @@ to restart the server for smart tag changes to take effect.
 
 We often refer to things like the `@omit` smart tag or the `@name` smart tag;
 really these tags are just `omit` and `name` respectively; but in the
-[Smart Comment](/postgraphile/smart-comments/) syntax (the oldest form of smart
+[Smart Comment](./smart-comments/) syntax (the oldest form of smart
 tags in PostGraphile) the `@` is required to denote a smart tag, and this
 pattern has stuck when referring to smart tags.
 
 You will also often see the
-[smart comment syntax](/postgraphile/smart-comments/#smart-comment-spec) used to
+[smart comment syntax](./smart-comments/#smart-comment-spec) used to
 refer to smart tags in general, it's because the syntax is a little easier to
 write quickly. Read the
-[Smart Comments Spec](/postgraphile/smart-comments/#smart-comment-spec) and
+[Smart Comments Spec](./smart-comments/#smart-comment-spec) and
 you'll soon learn to translate `@omit update,delete` to `omit: "update,delete"`
 (and vice-versa) in your head.
 
@@ -46,10 +46,10 @@ Some tags only support one or two of these types of values.
 
 There's multiple ways of adding tags to entities:
 
-- The [postgraphile.tags.json5](/postgraphile/smart-tags-file/) file
-- [Smart Comments](/postgraphile/smart-comments/) in the database via `COMMENT`
-- A [`makePgSmartTagsPlugin`](/postgraphile/make-pg-smart-tags-plugin/) instance
-- Your own custom [Graphile Engine plugin](/postgraphile/extending-raw/)
+- The [postgraphile.tags.json5](./smart-tags-file/) file
+- [Smart Comments](./smart-comments/) in the database via `COMMENT`
+- A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin/) instance
+- Your own custom [Graphile Engine plugin](./extending-raw/)
 
 ### Example
 
@@ -157,9 +157,9 @@ Applies to:
 - Composite types (one direction only)
 - Columns
 - Types
-- [Custom Query](/postgraphile/custom-queries/) functions: the `Query` field
+- [Custom Query](./custom-queries/) functions: the `Query` field
   name
-- [Custom Mutation](/postgraphile/custom-mutations/) functions: the `Mutation`
+- [Custom Mutation](./custom-mutations/) functions: the `Mutation`
   field name
 
 ```json5
@@ -213,7 +213,7 @@ See also: `@fieldName`
 
 Applies to:
 
-- [Custom Mutation](/postgraphile/custom-mutations/) functions: the field on the
+- [Custom Mutation](./custom-mutations/) functions: the field on the
   mutation payload type
 
 ```json5

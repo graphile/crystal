@@ -6,9 +6,9 @@ fullTitle: Using PostGraphile as a Library
 ---
 
 Library mode is the most popular way of running PostGraphile; it gives more
-power than using the CLI (see [CLI usage](/postgraphile/usage-cli/)), but is
+power than using the CLI (see [CLI usage](./usage-cli/)), but is
 much easier to setup and more fully featured than
-[Schema-only Usage](/postgraphile/usage-schema/).
+[Schema-only Usage](./usage-schema/).
 
 Details of
 [the configuration options can be found below](#api-postgraphilepgconfig-schemaname-options).
@@ -523,7 +523,7 @@ which are optional. The below options are valid for
     not accurate at all). Default `50000000` (~50MB). Set to 0 to disable.
 
 The following options are not part of PostGraphile core, but are available from
-the `@graphile/pg-pubsub` [subscriptions plugin](/postgraphile/subscriptions/)
+the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/)
 (formerly the paid "supporter" plugin, but now fully free and open source -
 please consider [sponsoring us](/sponsor/)!):
 
@@ -533,7 +533,7 @@ please consider [sponsoring us](/sponsor/)!):
   subscribe
 
 The following options are not part of PostGraphile core, but are available from
-the Pro plugin - see [Go Pro!](/postgraphile/pricing/) for more information.
+the Pro plugin - see [Go Pro!](./pricing/) for more information.
 
 - **`options`**:
   - `readOnlyConnection` [PRO] ⚡️[experimental] set this to a PostgreSQL

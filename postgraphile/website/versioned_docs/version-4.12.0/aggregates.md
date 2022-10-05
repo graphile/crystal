@@ -29,4 +29,4 @@ information then you could calculate these on the client).
 
 If you're using `simpleCollections: "only"` you can override it on a
 per-collection basis with the
-[`@simpleCollections` smart comment](/postgraphile/smart-comments/#simple-collections).
+[`@simpleCollections` smart comment](./smart-comments/#simple-collections).

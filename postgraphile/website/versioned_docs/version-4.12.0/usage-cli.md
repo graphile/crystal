@@ -271,7 +271,7 @@ from <tt>postgraphile@4.12.3</tt>):
   output usage information
 
 The following options are not part of PostGraphile core, but are available from
-the `@graphile/pg-pubsub` [subscriptions plugin](/postgraphile/subscriptions/)
+the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/)
 (formerly the paid "supporter" plugin, but now fully free and open source -
 please consider [sponsoring us](/sponsor/)!):
 
@@ -280,7 +280,7 @@ please consider [sponsoring us](/sponsor/)!):
   is allowed to subscribe
 
 The following features and not part of PostGraphile core, but are available from
-the Pro plugin - see [Go Pro!](/postgraphile/pricing/) for more information.
+the Pro plugin - see [Go Pro!](./pricing/) for more information.
 
 - `--read-only-connection <string>` [PRO] ⚡️[experimental] a PostgreSQL
   connection string to use for read-only queries (i.e. not mutations)

@@ -48,7 +48,7 @@ GRANT UPDATE ON users TO graphql_role;
 ```
 
 Column-level SELECT grants
-[cause a lot of issues](/postgraphile/requirements/#dont-use-column-based-select-grants):
+[cause a lot of issues](./requirements/#dont-use-column-based-select-grants):
 
 - Reduces the number of optimisations we can do
 - Cannot `SELECT * FROM`
@@ -75,7 +75,7 @@ knowledge of PostGraphile and your database.)
 
 ### Protect Your API
 
-See [Production Considerations](/postgraphile/production/).
+See [Production Considerations](./production/).
 
 ### Use `LANGUAGE sql` Over `LANGUAGE plpgsql` Where Possible
 
