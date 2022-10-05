@@ -67,7 +67,7 @@ current license
 [in the Graphile Store validator](https://store.graphile.com/validate) and log
 in to generate a new license code.
 
-For more information, see the FAQ at the bottom of the [Go Pro!](./pricing/)
+For more information, see the FAQ at the bottom of the [Go Pro!](/pricing/)
 page.
 
 ### Installing

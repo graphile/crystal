@@ -527,7 +527,7 @@ which are optional. The below options are valid for
 The following options are not part of PostGraphile core, but are available from
 the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/) (formerly the
 paid "supporter" plugin, but now fully free and open source - please consider
-[sponsoring us](/sponsor/)!):
+[sponsoring us](https://graphile.org/sponsor/)!):
 
 - `simpleSubscriptions`: set this to `true` to add simple subscription support
 - `subscriptionAuthorizationFunction [fn]` set this to the name (excluding
@@ -535,7 +535,7 @@ paid "supporter" plugin, but now fully free and open source - please consider
   subscribe
 
 The following options are not part of PostGraphile core, but are available from
-the Pro plugin - see [Go Pro!](./pricing/) for more information.
+the Pro plugin - see [Go Pro!](/pricing/) for more information.
 
 - **`options`**:
   - `readOnlyConnection` [PRO] ⚡️[experimental] set this to a PostgreSQL
