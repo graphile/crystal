@@ -62,8 +62,7 @@ not directly related to the problem of serving GraphQL from your PostgreSQL
 database, PostGraphile does not include these things by default. We recommend
 that you use something like Express middlewares to implement these common
 requirements. This is why we recommend
-[using PostGraphile as a library](./usage-library/) for production
-usage.
+[using PostGraphile as a library](./usage-library/) for production usage.
 
 Picking the Express (or similar) middlewares that work for you is beyond the
 scope of this article; below is an example of where to place these middlewares.
@@ -157,8 +156,8 @@ before a query is ever sent to the database using one or more of the techniques
 detailed below.
 
 Currently you can set this on a per-transaction basis using the
-[`pgSettings` functionality](./usage-library/#pgsettings-function)
-in PostGraphile library mode, e.g.:
+[`pgSettings` functionality](./usage-library/#pgsettings-function) in
+PostGraphile library mode, e.g.:
 
 ```js
 app.use(
@@ -167,7 +166,7 @@ app.use(
     pgSettings: {
       statement_timeout: "3000",
     },
-  })
+  }),
 );
 ```
 
@@ -217,8 +216,8 @@ GraphQL clients, but it does have a few caveats:
   where possible, even if it means having additional static operations.
 - It does not protect you from writing expensive queries yourself; it may be
   wise to combine this technique with a cost estimation technique such as that
-  provided by the [Graphile Pro plugin](./pricing/) to help guide
-  your developers and avoid accidentally writing expensive queries.
+  provided by the [Graphile Pro plugin](./pricing/) to help guide your
+  developers and avoid accidentally writing expensive queries.
 
 PostGraphile has first-party support for persisted operations via the open
 source
@@ -235,11 +234,11 @@ you wish arbitrary third parties to be able to send queries to your API without
 the queries being pre-approved and without the risk of bringing your servers to
 their knees.
 
-**You are highly encouraged to purchase the
-[Pro Plugin [PRO]](./pricing/), which implements these protections
-in a deeply integrated and PostGraphile optimised way, and has the added benefit
-of helping sustain development and maintenance on the project.** You can read
-the [@graphile/pro README on npm](https://www.npmjs.com/package/@graphile/pro).
+**You are highly encouraged to purchase the [Pro Plugin [PRO]](./pricing/),
+which implements these protections in a deeply integrated and PostGraphile
+optimised way, and has the added benefit of helping sustain development and
+maintenance on the project.** You can read the
+[@graphile/pro README on npm](https://www.npmjs.com/package/@graphile/pro).
 
 The following details how the Pro Plugin addresses these issues, including hints
 on how you might go about solving the issues for yourself. Many of these
@@ -280,8 +279,8 @@ option: `defaultPaginationCap`) which enables you to enforce a pagination cap on
 all connections. Whatever number you pass will be used as the pagination cap
 (allowing requests smaller or equal to this cap to go through, and blocking
 those above it), but you can override it on a table-by-table basis using
-[smart comments](./smart-comments/) - in this case the
-`@paginationCap`[PRO] smart comment.
+[smart comments](./smart-comments/) - in this case the `@paginationCap`[PRO]
+smart comment.
 
 ```sql
 comment on table users is

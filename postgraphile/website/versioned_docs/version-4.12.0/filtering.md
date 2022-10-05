@@ -5,17 +5,16 @@ title: Filtering
 ---
 
 Out of the box, PostGraphile supports rudimentary filtering on
-[connections](./connections/) using a `condition` argument. This
-allows you to filter for specific values (e.g. `username: "Alice"` or
-`category: ARTICLE`).
+[connections](./connections/) using a `condition` argument. This allows you to
+filter for specific values (e.g. `username: "Alice"` or `category: ARTICLE`).
 
 [See an example using the `connection` argument.](./examples/#Collections__Relation_condition)
 
 It's important when implementing filters to keep performance in mind, so
 PostGraphile gives you the ability to omit certain fields from the list of
-filters using the `@omit filter` [smart comment](./smart-comments/).
-You may also use the `--no-ignore-indexes` option to try and automatically omit
-fields that don't appear to be indexed.
+filters using the `@omit filter` [smart comment](./smart-comments/). You may
+also use the `--no-ignore-indexes` option to try and automatically omit fields
+that don't appear to be indexed.
 
 ### Advanced filtering
 
@@ -47,16 +46,15 @@ filters, including filtering on related records from other tables, using greater
 than, less than and ranges for filtering, and even filtering against the output
 of functions. If you need advanced filtering in your GraphQL API (and you can
 use something like
-[persisted queries](./production/#simple-query-whitelist-persisted-queries)
-to prevent malicious parties issuing complex requests) then I recommend you
-check it out!
+[persisted queries](./production/#simple-query-whitelist-persisted-queries) to
+prevent malicious parties issuing complex requests) then I recommend you check
+it out!
 
 Be aware that the connection-filter plugin has no live-query specific handling.
-This means while [live queries](./live-queries/) will work, the
-filters are not taken into account when checking if the query result changed.
-This means that you may get a subscription update every time something in the
-collection changes, even if the result with the applied filter is still the
-same.
+This means while [live queries](./live-queries/) will work, the filters are not
+taken into account when checking if the query result changed. This means that
+you may get a subscription update every time something in the collection
+changes, even if the result with the applied filter is still the same.
 
 With the included `condition` filters live queries work as expected until you
 start using `makeAddPgConditionPlugin` to add your own conditions.

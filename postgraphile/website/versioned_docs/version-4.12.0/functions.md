@@ -7,13 +7,13 @@ title: Database Functions
 One of the easiest ways to add more capabilities to your PostGraphile schema is
 with PostgreSQL functions. The three main methods are:
 
-- [Computed Columns](./computed-columns/) enable you to add a
-  computed field to a table type
-- [Custom Queries](./custom-queries/) enable you to add a root level
-  Query field which can return a scalar, list, custom type, table row or even a
-  table connection
-- [Custom Mutations](./custom-mutations/) enable you to add a root
-  level Mutation field which can cause modifications to your database and return
+- [Computed Columns](./computed-columns/) enable you to add a computed field to
+  a table type
+- [Custom Queries](./custom-queries/) enable you to add a root level Query field
+  which can return a scalar, list, custom type, table row or even a table
+  connection
+- [Custom Mutations](./custom-mutations/) enable you to add a root level
+  Mutation field which can cause modifications to your database and return
   nothing (`void`), a scalar, list, custom type, table row or list of table rows
   (but not a connection, since you cannot paginate over a mutation)
 
@@ -266,8 +266,7 @@ To use the HTTP analogy again, `IMMUTABLE` and `STABLE` are comparable to “saf
 HTTP methods like `GET` and `HEAD`.
 
 Certain STABLE/IMMUTABLE functions will be exposed by PostGraphile as
-[custom queries](./custom-queries/) or
-[computed columns](./computed-columns/).
+[custom queries](./custom-queries/) or [computed columns](./computed-columns/).
 
 ### SETOF Functions - Connections
 
@@ -285,8 +284,8 @@ To create a function that returns a connection, you could use SQL such as this:
 CREATE FUNCTION my_function(a int, b int) RETURNS SETOF person AS $$ … $$ LANGUAGE sql STABLE;
 ```
 
-This function would be recognised as a
-[custom query](./custom-queries/), and could be queried like this:
+This function would be recognised as a [custom query](./custom-queries/), and
+could be queried like this:
 
 ```graphql{2}
 {

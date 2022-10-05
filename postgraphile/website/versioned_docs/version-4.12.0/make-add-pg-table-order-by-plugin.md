@@ -54,9 +54,9 @@ module.exports = makeAddPgTableOrderByPlugin(
         where ${sqlIdentifier}.forum_id = ${queryBuilder.getTableAlias()}.id
         order by ${sqlIdentifier}.created_at desc
         limit 1
-      )`
+      )`,
     );
-  }
+  },
 );
 ```
 
@@ -89,7 +89,7 @@ function makeAddPgTableOrderByPlugin(
   schemaName: string,
   tableName: string,
   ordersGenerator: (build: Build) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`
+  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`,
 ): Plugin;
 
 interface MakeAddPgTableOrderByPluginOrders {
@@ -136,7 +136,7 @@ reversed sort:
 export function orderByAscDesc(
   baseName: string,
   columnOrSqlFragment: string | SQL,
-  uniqueOrOptions: boolean | OrderByAscDescOptions = false
+  uniqueOrOptions: boolean | OrderByAscDescOptions = false,
 ): MakeAddPgTableOrderByPluginOrders;
 ```
 
@@ -186,7 +186,7 @@ or lowest-rated first (meaning the average of the movie's reviews):
 ```ts
 const customOrderBy = orderByAscDesc(
   "RATING",
-  helpers => {
+  (helpers) => {
     const { queryBuilder } = helpers;
 
     const orderByFrag = sql.fragment`(
@@ -197,7 +197,7 @@ const customOrderBy = orderByAscDesc(
 
     return orderByFrag;
   },
-  { nulls: "last" }
+  { nulls: "last" },
 );
 ```
 

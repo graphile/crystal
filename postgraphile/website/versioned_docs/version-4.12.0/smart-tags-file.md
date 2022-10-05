@@ -105,7 +105,7 @@ app.use(
       // Automatically loads and watches the 'postgraphile.tags.json5' file:
       require("postgraphile/plugins").TagsFilePlugin,
     ],
-  })
+  }),
 );
 ```
 
@@ -116,7 +116,7 @@ const postGraphileOptions = {
   appendPlugins: [
     require("postgraphile/plugins").makePgSmartTagsFromFilePlugin(
       // JSON and JSONC are also JSON5 compatible, so you can use these extensions if you prefer:
-      "/path/to/my/tags.file.json"
+      "/path/to/my/tags.file.json",
     ),
   ],
 };
@@ -153,7 +153,7 @@ app.use(
   postgraphile(DATABASE_URL, SCHEMAS, {
     // ...
     appendPlugins: [MySmartTagsPlugin],
-  })
+  }),
 );
 ```
 

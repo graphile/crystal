@@ -4,13 +4,13 @@ path: /postgraphile/custom-mutations/
 title: Custom Mutations
 ---
 
-PostGraphile automatically generates
-[CRUD Mutations](./crud-mutations/) for you; but it's rare that
-these will cover all your needs - and many people just disable them outright.
-Custom mutations enable you to write exactly the business logic you need with
-access to all of your data all wrapped up in a PostgreSQL function. You can even
-bypass the RLS and GRANT checks, should you so choose, by tagging your function
-as `SECURITY DEFINER` - but be very careful when you do so!
+PostGraphile automatically generates [CRUD Mutations](./crud-mutations/) for
+you; but it's rare that these will cover all your needs - and many people just
+disable them outright. Custom mutations enable you to write exactly the business
+logic you need with access to all of your data all wrapped up in a PostgreSQL
+function. You can even bypass the RLS and GRANT checks, should you so choose, by
+tagging your function as `SECURITY DEFINER` - but be very careful when you do
+so!
 
 To create a function that PostGraphile will recognise as a custom mutation, it
 must obey the following rules:
@@ -93,7 +93,7 @@ app.use(
     graphileBuildOptions: {
       pgStrictFunctions: true,
     },
-  })
+  }),
 );
 ```
 

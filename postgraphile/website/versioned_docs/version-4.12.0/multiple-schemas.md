@@ -43,7 +43,7 @@ for (const [service, connectionString] of Object.entries(services)) {
       graphiql: true,
       graphqlRoute: `/${service}/graphql`,
       graphiqlRoute: `/${service}/graphiql`,
-    })
+    }),
   );
 }
 ```
@@ -60,7 +60,7 @@ const services = {
     "public",
     {
       graphiql: true,
-    }
+    },
   ),
   user: postgraphile("CONNECTION_STRING_TO_USER_SERVICE", "public", {
     graphiql: true,

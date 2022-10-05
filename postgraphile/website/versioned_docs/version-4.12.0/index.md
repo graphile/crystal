@@ -24,28 +24,24 @@ and
 [row-level security policies](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
 with Graphile Engine's advanced
 [GraphQL look-ahead](https://graphile.org/graphile-build/look-ahead/) and
-[plugin expansion](https://graphile.org/graphile-build/plugins/) technologies, PostGraphile ensures
-your generated schema is secure, performant and extensible.
+[plugin expansion](https://graphile.org/graphile-build/plugins/) technologies,
+PostGraphile ensures your generated schema is secure, performant and extensible.
 
 Some of the features we offer:
 
 - [Incredible performance](./performance/) - no N+1 query issues
-- Extensibility via [schema](./extending/) and
-  [server](./plugins/) plugins
+- Extensibility via [schema](./extending/) and [server](./plugins/) plugins
 - [Auto-discovered relations](./relations/) e.g. `userByAuthorId`
-- [Computed columns](./computed-columns/) allowing easy expansion of
-  your API
-- [Custom query procedures](./custom-queries/) enabling arbitrary
-  SQL queries
+- [Computed columns](./computed-columns/) allowing easy expansion of your API
+- [Custom query procedures](./custom-queries/) enabling arbitrary SQL queries
 - [Automatic CRUD mutations](./crud-mutations/) e.g. `updatePost`
-- [Custom mutation procedures](./custom-mutations/) enabling complex
-  changes to be exposed simply
-- [Real-time](./realtime/) features powered by LISTEN/NOTIFY and/or
-  logical decoding
+- [Custom mutation procedures](./custom-mutations/) enabling complex changes to
+  be exposed simply
+- [Real-time](./realtime/) features powered by LISTEN/NOTIFY and/or logical
+  decoding
 
-The easiest way to get started is with the
-[CLI interface](./usage-cli/); if you have `npx` installed you can
-try it out with:
+The easiest way to get started is with the [CLI interface](./usage-cli/); if you
+have `npx` installed you can try it out with:
 
 ```
 npx postgraphile -c 'postgres://user:pass@localhost/mydb' --watch --enhance-graphiql --dynamic-json

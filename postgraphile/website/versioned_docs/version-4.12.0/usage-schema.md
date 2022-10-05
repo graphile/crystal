@@ -140,16 +140,19 @@ instead (see below). The below options are valid for
     extensions are excluded from the generated GraphQL schema as general
     applications don't need them to be exposed to the end user. You can use this
     flag to include them in the generated schema (not recommended).
-  - `appendPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
-    schema plugins to load after the default plugins.
-  - `prependPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
-    schema plugins to load before the default plugins (you probably don't want
-    this).
+  - `appendPlugins`: An array of
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to load after the default plugins.
+  - `prependPlugins`: An array of
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to load before the default plugins (you probably don't want this).
   - `replaceAllPlugins`: The full array of
-    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema plugins to use for schema
-    generation (you almost definitely don't want this!).
-  - `skipPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
-    schema plugins to skip.
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to use for schema generation (you almost definitely don't want
+    this!).
+  - `skipPlugins`: An array of
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to skip.
   - `readCache`: A file path string or an object. Reads cached values to improve
     startup time (you may want to do this in production).
   - `writeCache`: A file path string. Writes computed values to local cache file
@@ -255,8 +258,8 @@ resolver. To do so you need the following:
     `await postgraphileMiddleware.getGqlSchema()`
   - if you don't need the PostGraphile middleware, you can use
     `await createPostGraphileSchema(...)` - see
-    [schema only usage](./usage-schema/) - do this once and cache it
-    because it's expensive to compute
+    [schema only usage](./usage-schema/) - do this once and cache it because
+    it's expensive to compute
 - A GraphQL operation (aka query, but includes mutations, subscriptions) to
   execute; this can be a string or an AST
 - The variables to feed to the operation (if necessary)

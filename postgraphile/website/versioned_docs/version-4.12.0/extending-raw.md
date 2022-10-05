@@ -26,9 +26,9 @@ own plugins.
 
 A common request is to add additional root-level fields to your schema, for
 example to integrate external services. The easiest way to do this is to
-[use `makeExtendSchemaPlugin`](./make-extend-schema-plugin/) to
-generate a plugin that will extend your schema (this can be used to add fields
-anywhere, not just at the root-level):
+[use `makeExtendSchemaPlugin`](./make-extend-schema-plugin/) to generate a
+plugin that will extend your schema (this can be used to add fields anywhere,
+not just at the root-level):
 
 ```js
 // add-http-bin-plugin.js
@@ -67,7 +67,7 @@ function AddHttpBinPlugin(builder, { pgExtendedTypes }) {
     (
       fields, // Input object - the fields for this GraphQLObjectType
       { extend, getTypeByName }, // Build object - handy utils
-      { scope: { isRootQuery } } // Context object - used for filtering
+      { scope: { isRootQuery } }, // Context object - used for filtering
     ) => {
       if (!isRootQuery) {
         // This isn't the object we want to modify:
@@ -95,7 +95,7 @@ function AddHttpBinPlugin(builder, { pgExtendedTypes }) {
           },
         },
       });
-    }
+    },
   );
 }
 
@@ -125,8 +125,8 @@ that PostGraphile works (where the root Query field resolvers are the only ones
 who perform SQL queries) this is generally most useful at the top level.
 
 In PostGraphile version 4.1 and above, you can
-[use `makeWrapResolversPlugin`](./make-wrap-resolvers-plugin/) to
-easily wrap a resolver:
+[use `makeWrapResolversPlugin`](./make-wrap-resolvers-plugin/) to easily wrap a
+resolver:
 
 ```js
 module.exports = makeWrapResolversPlugin({
@@ -153,9 +153,8 @@ field, so we will use the `GraphQLObjectType:fields:field` hook. This makes our
 intent clear, and also grants us access to
 [the `addArgDataGenerator`](https://graphile.org/graphile-build/look-ahead/#when-processing-arguments-addargdatagenerator)
 function which we need to request the record id. The following example also uses
-an instance of
-[`queryBuilder.`](./make-extend-schema-plugin/#querybuilder) (Read
-more about the different hooks
+an instance of [`queryBuilder.`](./make-extend-schema-plugin/#querybuilder)
+(Read more about the different hooks
 [in the Graphile Engine docs](https://graphile.org/graphile-build/all-hooks/).)
 
 ```js
@@ -169,7 +168,7 @@ module.exports = function CreateLinkWrapPlugin(builder) {
     (
       field,
       { pgSql: sql },
-      { scope: { isRootMutation, fieldName }, addArgDataGenerator }
+      { scope: { isRootMutation, fieldName }, addArgDataGenerator },
     ) => {
       if (!isRootMutation || fieldName !== "createLink") {
         // The 'GraphQLObjectType:fields:field' hook runs for every field on
@@ -185,19 +184,19 @@ module.exports = function CreateLinkWrapPlugin(builder) {
       // the result to a field that begins with `__` as that's forbidden by
       // GraphQL and thus cannot clash with a user's fields.
       addArgDataGenerator(() => ({
-        pgQuery: queryBuilder => {
+        pgQuery: (queryBuilder) => {
           queryBuilder.select(
             // Select this value from the result of the INSERT:
             sql.query`${queryBuilder.getTableAlias()}.id`,
             // And give it this name in the result data:
-            "__createdRecordId"
+            "__createdRecordId",
           );
         },
       }));
 
       // It's possible that `resolve` isn't specified on a field, so in that case
       // we fall back to a default resolver.
-      const defaultResolver = obj => obj[fieldName];
+      const defaultResolver = (obj) => obj[fieldName];
 
       // Extract the old resolver from `field`
       const { resolve: oldResolve = defaultResolver, ...rest } = field;
@@ -232,7 +231,7 @@ module.exports = function CreateLinkWrapPlugin(builder) {
           return oldResolveResult;
         },
       };
-    }
+    },
   );
 };
 ```
@@ -264,14 +263,13 @@ and return the set of fields less the one you want removed.
 
 Here's an example of a plugin generator you could use to generate plugins to
 remove individual fields. This is just to demonstrate how a plugin to do this
-might work, [smart comments](./smart-comments/) are likely a better
-approach.
+might work, [smart comments](./smart-comments/) are likely a better approach.
 
 ```js
 const omit = require("lodash/omit");
 
 function removeFieldPluginGenerator(objectName, fieldName) {
-  const fn = function(builder) {
+  const fn = function (builder) {
     builder.hook("GraphQLObjectType:fields", (fields, _, { Self }) => {
       if (Self.name !== objectName) return fields;
       return omit(fields, [fieldName]);

@@ -271,9 +271,9 @@ from <tt>postgraphile@4.12.3</tt>):
   output usage information
 
 The following options are not part of PostGraphile core, but are available from
-the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/)
-(formerly the paid "supporter" plugin, but now fully free and open source -
-please consider [sponsoring us](/sponsor/)!):
+the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/) (formerly the
+paid "supporter" plugin, but now fully free and open source - please consider
+[sponsoring us](/sponsor/)!):
 
 - `-S`, `--simple-subscriptions` add simple subscription support
 - `--subscription-authorization-function [fn]` PG function to call to check user

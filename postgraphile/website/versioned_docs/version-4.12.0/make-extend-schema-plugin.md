@@ -20,7 +20,7 @@ GraphQL types and resolvers into your schema using a similar syntax to
 ```js
 const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
 
-const MyPlugin = makeExtendSchemaPlugin(build => {
+const MyPlugin = makeExtendSchemaPlugin((build) => {
   // Get any helpers we need from `build`
   const { pgSql: sql, inflection } = build;
 
@@ -69,9 +69,9 @@ The `gql` helper is responsible for turning the human-readable GraphQL schema
 language you write into an abstract syntax tree (AST) that the application can
 understand. Our `gql` help differs slightly from the one you may be familiar
 with in the `graphql-tag` npm module, namely in how the placeholders work. Ours
-is designed to work with PostGraphile's
-[inflection system](./inflection/), so you can embed strings
-directly. You may also embed other gql tags directly. For example:
+is designed to work with PostGraphile's [inflection system](./inflection/), so
+you can embed strings directly. You may also embed other gql tags directly. For
+example:
 
 ```js
 const nameOfType = "MyType"; // Or use the inflection system to generate a type
@@ -126,7 +126,7 @@ however you should only use it like this to maintain future compatibility:
 ```js
 const { rows } = await context.pgClient.query(
   sqlText, // e.g. "select * from users where id = $1"
-  optionalVariables // e.g. [27]
+  optionalVariables, // e.g. [27]
 );
 ```
 
@@ -284,7 +284,7 @@ queries it like this:
 const matchingUserResolver = async (parent, args, context, resolveInfo) => {
   const [row] = await resolveInfo.graphile.selectGraphQLResultFromTable(
     sql.fragment`(select * from match_user(${sql.value(args.searchText)}))`,
-    () => {} // no-op
+    () => {}, // no-op
   );
   return row;
 };
@@ -366,7 +366,7 @@ const express = require("express");
 
 const app = express();
 
-const MyRandomUserPlugin = makeExtendSchemaPlugin(build => {
+const MyRandomUserPlugin = makeExtendSchemaPlugin((build) => {
   const { pgSql: sql } = build;
   return {
     typeDefs: gql`
@@ -396,7 +396,7 @@ const MyRandomUserPlugin = makeExtendSchemaPlugin(build => {
             (tableAlias, queryBuilder) => {
               queryBuilder.orderBy(sql.fragment`random()`);
               queryBuilder.limit(1);
-            }
+            },
           );
           return rows[0];
         },
@@ -412,14 +412,14 @@ const MyRandomUserPlugin = makeExtendSchemaPlugin(build => {
             sql.fragment`app_public.users`,
             (tableAlias, queryBuilder) => {
               queryBuilder.orderBy(sql.fragment`random()`);
-            }
+            },
           ),
         randomUsersList: (_query, args, context, resolveInfo) =>
           resolveInfo.graphile.selectGraphQLResultFromTable(
             sql.fragment`app_public.users`,
             (tableAlias, queryBuilder) => {
               queryBuilder.orderBy(sql.fragment`random()`);
-            }
+            },
           ),
       },
     },
@@ -430,7 +430,7 @@ app.use(
   postgraphile(process.env.DATABASE_URL, ["app_public"], {
     graphiql: true,
     appendPlugins: [MyRandomUserPlugin],
-  })
+  }),
 );
 app.listen(3030);
 ```
@@ -545,7 +545,7 @@ check that the user performing the soft-delete is the owner of the record.
 [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived)
 
 ```js
-const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin(build => {
+const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
   const typeDefs = gql`
     input DeleteItemInput {
       nodeId: ID!
@@ -566,7 +566,7 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin(build => {
 
         // Decode the node ID
         const { Type, identifiers } = build.getTypeAndIdentifiersFromNodeId(
-          args.input.nodeId
+          args.input.nodeId,
         );
 
         // Check it applies to our type
@@ -586,7 +586,7 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin(build => {
             `UPDATE app_public.items SET is_archived = true
               WHERE id = $1
               AND user_id = $2;`,
-            [itemId, jwtClaims.user_id]
+            [itemId, jwtClaims.user_id],
           );
 
           return {
@@ -616,8 +616,7 @@ not defined at the root level) then for performance reasons you should hook into
 the "look-ahead" system when adding a custom connection/list/record, rather than
 using a resolver. You can achieve this with the `@pgQuery` directive, as shown
 below. Alternative approaches you may wish to consider are
-[Smart Comments](./smart-comments/) and
-[Computed Columns](./computed-columns/).
+[Smart Comments](./smart-comments/) and [Computed Columns](./computed-columns/).
 
 #### @pgQuery with an object type
 
@@ -645,7 +644,7 @@ constraint.) You can see examples of these three use cases
 ```js
 const { makeExtendSchemaPlugin, gql, embed } = require("graphile-utils");
 
-module.exports = makeExtendSchemaPlugin(build => {
+module.exports = makeExtendSchemaPlugin((build) => {
   const { pgSql: sql } = build;
   return {
     typeDefs: gql`
@@ -654,7 +653,7 @@ module.exports = makeExtendSchemaPlugin(build => {
           source: ${embed(sql.fragment`app_public.pets`)}
           withQueryBuilder: ${embed((queryBuilder, args) => {
             queryBuilder.where(
-              sql.fragment`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`
+              sql.fragment`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`,
             );
           })}
         )
@@ -693,7 +692,7 @@ This argument can take two forms:
 ```js
 const { makeExtendSchemaPlugin, gql, embed } = require("graphile-utils");
 
-module.exports = makeExtendSchemaPlugin(build => {
+module.exports = makeExtendSchemaPlugin((build) => {
   const { pgSql: sql } = build;
   return {
     typeDefs: gql`
@@ -702,8 +701,8 @@ module.exports = makeExtendSchemaPlugin(build => {
           fragment: ${embed(
             (queryBuilder, args) =>
               sql.fragment`(${queryBuilder.getTableAlias()}.name || ' ' || ${sql.value(
-                args.suffix
-              )}::text)`
+                args.suffix,
+              )}::text)`,
           )}
         )
       }
@@ -728,5 +727,5 @@ are subject to RLS/RBAC/etc. If your user does not have privileges to perform
 the action your plugin is attempting to achieve then you may need to create a
 companion database function that is marked as `SECURITY DEFINER` in order to
 perform the action with elevated privileges; alternatively you could use this
-database function directly - see
-[Custom Mutations](./custom-mutations/) for more details.
+database function directly - see [Custom Mutations](./custom-mutations/) for
+more details.

@@ -15,8 +15,8 @@ authorization checks. This is not the only way of achieving this goal with
 PostGraphile, for example you can do as the PostGraphile maintainer does and use
 standard session-based authentication (i.e. with cookies) via the relevant
 Express/Koa/Fastify middleware and PostGraphile's
-[`pgSettings` function](./usage-library/#pgsettings-function)
-allowing you to leverage powerful pre-built authentication stacks such as
+[`pgSettings` function](./usage-library/#pgsettings-function) allowing you to
+leverage powerful pre-built authentication stacks such as
 [passport.js](http://www.passportjs.org/) which has OAuth integration with most
 major "social login" providers.
 

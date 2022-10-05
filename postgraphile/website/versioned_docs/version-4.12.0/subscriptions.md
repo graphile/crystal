@@ -88,7 +88,7 @@ module.exports = makeExtendSchemaPlugin(({ pgSql: sql }) => ({
       - when their organization membership changes
       """
       currentUserUpdated: UserSubscriptionPayload @pgSubscription(topic: ${embed(
-        currentUserTopicFromContext
+        currentUserTopicFromContext,
       )})
     }
   `,
@@ -105,15 +105,15 @@ module.exports = makeExtendSchemaPlugin(({ pgSql: sql }) => ({
         event,
         _args,
         _context,
-        { graphile: { selectGraphQLResultFromTable } }
+        { graphile: { selectGraphQLResultFromTable } },
       ) {
         const rows = await selectGraphQLResultFromTable(
           sql.fragment`app_public.users`,
           (tableAlias, sqlBuilder) => {
             sqlBuilder.where(
-              sql.fragment`${tableAlias}.id = ${sql.value(event.subject)}`
+              sql.fragment`${tableAlias}.id = ${sql.value(event.subject)}`,
             );
-          }
+          },
         );
         return rows[0];
       },
@@ -729,7 +729,7 @@ const postgraphileOptions = {
 const postgraphileMiddleware = postgraphile(
   databaseUrl,
   "app_public",
-  postgraphileOptions
+  postgraphileOptions,
 );
 
 app.use(postgraphileMiddleware);

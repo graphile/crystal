@@ -45,6 +45,6 @@ module.exports = makePluginByCombiningPlugins(
         },
       },
     },
-  })
+  }),
 );
 ```

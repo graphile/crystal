@@ -6,9 +6,8 @@ fullTitle: Using PostGraphile as a Library
 ---
 
 Library mode is the most popular way of running PostGraphile; it gives more
-power than using the CLI (see [CLI usage](./usage-cli/)), but is
-much easier to setup and more fully featured than
-[Schema-only Usage](./usage-schema/).
+power than using the CLI (see [CLI usage](./usage-cli/)), but is much easier to
+setup and more fully featured than [Schema-only Usage](./usage-schema/).
 
 Details of
 [the configuration options can be found below](#api-postgraphilepgconfig-schemaname-options).
@@ -404,16 +403,19 @@ which are optional. The below options are valid for
   - `handleErrors`: Enables ability to modify errors before sending them down to
     the client. Optionally can send down custom responses. If you use this then
     `showErrorStack` and `extendedError` may have no effect.
-  - `appendPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
-    schema plugins to load after the default plugins.
-  - `prependPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
-    schema plugins to load before the default plugins (you probably don't want
-    this).
+  - `appendPlugins`: An array of
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to load after the default plugins.
+  - `prependPlugins`: An array of
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to load before the default plugins (you probably don't want this).
   - `replaceAllPlugins`: The full array of
-    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema plugins to use for schema
-    generation (you almost definitely don't want this!).
-  - `skipPlugins`: An array of [Graphile Engine](https://graphile.org/graphile-build/plugins/)
-    schema plugins to skip.
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to use for schema generation (you almost definitely don't want
+    this!).
+  - `skipPlugins`: An array of
+    [Graphile Engine](https://graphile.org/graphile-build/plugins/) schema
+    plugins to skip.
   - `readCache`: A file path string or an object. Reads cached values to improve
     startup time (you may want to do this in production).
   - `writeCache`: A file path string. Writes computed values to local cache file
@@ -523,9 +525,9 @@ which are optional. The below options are valid for
     not accurate at all). Default `50000000` (~50MB). Set to 0 to disable.
 
 The following options are not part of PostGraphile core, but are available from
-the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/)
-(formerly the paid "supporter" plugin, but now fully free and open source -
-please consider [sponsoring us](/sponsor/)!):
+the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/) (formerly the
+paid "supporter" plugin, but now fully free and open source - please consider
+[sponsoring us](/sponsor/)!):
 
 - `simpleSubscriptions`: set this to `true` to add simple subscription support
 - `subscriptionAuthorizationFunction [fn]` set this to the name (excluding

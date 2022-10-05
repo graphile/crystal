@@ -10,10 +10,10 @@ _NOTE: This page relates to changing how the PostGraphile HTTP server and CLI
 work. If you're instead looking to change the generated GraphQL schema (e.g. to
 add fields or types), see [Schema Plugins](./extending/)._
 
-In addition to the [Graphile Engine plugin system](./extending/)
-which builds the GraphQL schema in PostGraphile, PostGraphile also has a plugin
-system for the CLI and web layer. This plugin system is less mature, help
-documenting it is welcome!
+In addition to the [Graphile Engine plugin system](./extending/) which builds
+the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for
+the CLI and web layer. This plugin system is less mature, help documenting it is
+welcome!
 
 ### First-party open-source plugins
 
@@ -60,8 +60,8 @@ current license
 [in the Graphile Store validator](https://store.graphile.com/validate) and log
 in to generate a new license code.
 
-For more information, see the FAQ at the bottom of the
-[Go Pro!](./pricing/) page.
+For more information, see the FAQ at the bottom of the [Go Pro!](./pricing/)
+page.
 
 ### Installing
 
@@ -214,7 +214,7 @@ const graphiqlBrandingTweak = {
     console.log("Applying GraphiQL Branding Tweak...");
     return html.replace(
       "</head>",
-      '<style type="text/css">div.topBar > div.title > div { visibility: hidden; display: none !important; } div.topBar > div.title::after { content: "GraphiQL for MyCompany" }</style></head>'
+      '<style type="text/css">div.topBar > div.title > div { visibility: hidden; display: none !important; } div.topBar > div.title::after { content: "GraphiQL for MyCompany" }</style></head>',
     );
   },
 };
@@ -231,8 +231,7 @@ const postGraphileMiddleware = postgraphile(databaseUrl, "app_public", {
 #### Origin specific CORS
 
 You can enable _generous_ CORS by
-[adding the `-o,--cors` flag to the CLI](./usage-cli/#cli-options)
-or by
+[adding the `-o,--cors` flag to the CLI](./usage-cli/#cli-options) or by
 [adding a `enableCors: true` option when using PostGraphile as a library](./usage-library/#api-postgraphilepgconfig-schemaname-options).
 
 However, by being _generous_, you allow **any** origin to communicate with you
@@ -268,11 +267,11 @@ function makeAllowedOriginTweak(origin) {
           "Content-Length",
           // For our 'Explain' feature
           "X-PostGraphile-Explain",
-        ].join(", ")
+        ].join(", "),
       );
       res.setHeader(
         "Access-Control-Expose-Headers",
-        ["X-GraphQL-Event-Stream"].join(", ")
+        ["X-GraphQL-Event-Stream"].join(", "),
       );
       return req;
     },

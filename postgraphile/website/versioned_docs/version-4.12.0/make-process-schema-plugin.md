@@ -33,7 +33,7 @@ delegates to the PostGraphile schema but can be mutated.
 ```js
 const { makeProcessSchemaPlugin } = require("graphile-utils");
 
-module.exports = makeProcessSchemaPlugin(schema => {
+module.exports = makeProcessSchemaPlugin((schema) => {
   return addThirdPartyEnhancementsToSchema(schema);
 });
 ```
@@ -44,7 +44,7 @@ stitched schema and run it from within the PostGraphile server:
 ```js
 const { makeProcessSchemaPlugin } = require("graphile-utils");
 
-module.exports = makeProcessSchemaPlugin(schema => {
+module.exports = makeProcessSchemaPlugin((schema) => {
   return stitchOtherSchemasInto(schema);
 });
 ```

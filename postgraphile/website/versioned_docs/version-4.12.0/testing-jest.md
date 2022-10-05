@@ -58,7 +58,7 @@ const pools = {};
 afterAll(() => {
   const keys = Object.keys(pools);
   return Promise.all(
-    keys.map(async key => {
+    keys.map(async (key) => {
       try {
         const pool = pools[key];
         delete pools[key];
@@ -67,7 +67,7 @@ afterAll(() => {
         console.error("Failed to release connection!");
         console.error(e);
       }
-    })
+    }),
   );
 });
 
@@ -112,19 +112,19 @@ export type Organization = { id: string; name: string };
 
 export const becomeUser = async (
   client: PoolClient,
-  userOrUserId: User | string | null
+  userOrUserId: User | string | null,
 ) => {
   await becomeRoot(client);
   const session = userOrUserId
     ? await createSession(
         client,
-        typeof userOrUserId === "object" ? userOrUserId.id : userOrUserId
+        typeof userOrUserId === "object" ? userOrUserId.id : userOrUserId,
       )
     : null;
   await client.query(
     `select set_config('role', $1::text, true),
             set_config('jwt.claims.session_id', $2::text, true)`,
-    [process.env.DATABASE_VISITOR, session ? session.uuid : ""]
+    [process.env.DATABASE_VISITOR, session ? session.uuid : ""],
   );
 };
 
@@ -138,7 +138,7 @@ beforeEach(() => {
 export const createUsers = async function createUsers(
   client: PoolClient,
   count: number = 1,
-  verified: boolean = true
+  verified: boolean = true,
 ) {
   const users = [];
   if (userCreationCounter > 25) {
@@ -166,7 +166,7 @@ export const createUsers = async function createUsers(
           `User ${userLetter}`,
           null,
           password,
-        ]
+        ],
       )
     ).rows[0];
     expect(user.id).not.toBeNull();
@@ -265,10 +265,8 @@ import { getPostGraphileOptions } from "../src/middleware/installPostGraphile";
 
 const MockReq = require("mock-req");
 
-let known: Record<
-  string,
-  { counter: number; values: Map<unknown, string> }
-> = {};
+let known: Record<string, { counter: number; values: Map<unknown, string> }> =
+  {};
 beforeEach(() => {
   known = {};
 });
@@ -292,7 +290,7 @@ export function sanitize(json: any): any {
   }
 
   if (Array.isArray(json)) {
-    return json.map(val => sanitize(val));
+    return json.map((val) => sanitize(val));
   } else if (json && typeof json === "object") {
     const result = { ...json };
     for (const k in result) {
@@ -347,7 +345,7 @@ export const setup = async () => {
   const schema = await createPostGraphileSchema(
     rootPgPool,
     "app_public",
-    options
+    options,
   );
 
   // Store the context
@@ -379,8 +377,8 @@ export const runGraphQLQuery = async function runGraphQLQuery(
   reqOptions: { [key: string]: any } | null, // Any additional items to set on `req` (e.g. `{user: {id: 17}}`)
   checker: (
     result: ExecutionResult,
-    context: { pgClient: PoolClient }
-  ) => void | ExecutionResult | Promise<void | ExecutionResult> = () => {} // Place test assertions in this function
+    context: { pgClient: PoolClient },
+  ) => void | ExecutionResult | Promise<void | ExecutionResult> = () => {}, // Place test assertions in this function
 ) {
   if (!ctx) throw new Error("No ctx!");
   const { schema, rootPgPool, options } = ctx;
@@ -418,7 +416,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
       pgSettings,
       pgForceTransaction: true,
     },
-    async context => {
+    async (context) => {
       let checkResult;
       const { pgClient } = context;
       try {
@@ -435,7 +433,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
             ...additionalContext,
             __TESTING: true,
           },
-          variables
+          variables,
         );
         // Expand errors
         if (result.errors) {
@@ -444,7 +442,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
           } else {
             // This does a similar transform that PostGraphile does to errors.
             // It's not the same. Sorry.
-            result.errors = result.errors.map(rawErr => {
+            result.errors = result.errors.map((rawErr) => {
               const e = Object.create(rawErr);
               Object.defineProperty(e, "originalError", {
                 value: rawErr.originalError,
@@ -452,7 +450,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
               });
 
               if (e.originalError) {
-                Object.keys(e.originalError).forEach(k => {
+                Object.keys(e.originalError).forEach((k) => {
                   try {
                     e[k] = e.originalError[k];
                   } catch (err) {
@@ -482,7 +480,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
         // makes our tests fairly deterministic.
         await pgClient.query("rollback");
       }
-    }
+    },
   );
 };
 ```

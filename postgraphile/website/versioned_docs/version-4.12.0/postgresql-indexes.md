@@ -28,11 +28,10 @@ _This article was originally written by
 ### Advice - Foreign Key Indexes
 
 Many people don't realise that when you create a
-[foreign key relation](./relations/), PostgreSQL does NOT
-automatically create an index on the referencing column(s). That can mean that
-when you query based on that relation, which PostGraphile does a lot when
-traversing relationships, it can involve a full table scan which is very
-expensive.
+[foreign key relation](./relations/), PostgreSQL does NOT automatically create
+an index on the referencing column(s). That can mean that when you query based
+on that relation, which PostGraphile does a lot when traversing relationships,
+it can involve a full table scan which is very expensive.
 
 Cameron Ellis has written a short article on
 [finding missing indexes on foreign keys](https://medium.com/@awesboss/how-to-find-missing-indexes-on-foreign-keys-2faffd7e6958)

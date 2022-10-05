@@ -43,8 +43,7 @@ experience.
   [`@omit` smart comment](./smart-comments/#omitting).
 - **Function restrictions**: we have pretty good support for PostgreSQL
   functions, but there's some
-  [common function restrictions](./function-restrictions/) you
-  should check out.
+  [common function restrictions](./function-restrictions/) you should check out.
 - **Use unique constraints** rather than unique indexes when appropriate: we use
   unique constraints to create mutations such as `updateUserByUsername`; note
   that "PostgreSQL automatically creates a unique index when a unique constraint
@@ -53,8 +52,7 @@ experience.
 - **Use the defaults** for formatting output; for example we only support the
   default `intervalstyle = 'postgres'` rather than `intervalstyle = 'iso_8601'`.
   Many times this can be solved by returning the relevant default setting value
-  from the
-  [pgSettings function](./usage-library/#pgsettings-function).
+  from the [pgSettings function](./usage-library/#pgsettings-function).
 - **Use UTF8 encoding**: GraphQL operates over the UTF8 character set, using
   different encodings may impact your ability to store/retrieve certain values.
 

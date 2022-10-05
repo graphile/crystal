@@ -10,8 +10,8 @@ If you're not happy with the default naming conventions in PostGraphile (or if
 you want to extend PostGraphile's functionality and use the inflection system to
 do so), you can use `makeAddInflectorsPlugin` from `graphile-utils`.
 
-Please see the [inflection article](./inflection/) for more
-information on inflection in PostGraphile.
+Please see the [inflection article](./inflection/) for more information on
+inflection in PostGraphile.
 
 ### Syntax
 
@@ -23,12 +23,12 @@ interface Inflectors {
 type InflectorsGenerator = (
   inflection: Inflectors,
   build: Build,
-  options: Options
+  options: Options,
 ) => Inflectors;
 
 function makeAddInflectorsPlugin(
   additionalInflectorsOrGenerator: Inflectors | InflectorsGenerator,
-  replace = false
+  replace = false,
 ): Plugin;
 ```
 
@@ -47,7 +47,7 @@ keep the `this` binding correct; e.g.:
 ```ts
 const { makeAddInflectorsPlugin } = require("graphile-utils");
 
-module.exports = makeAddInflectorsPlugin(inflectors => {
+module.exports = makeAddInflectorsPlugin((inflectors) => {
   // Here 'enumName' is dereferenced to 'oldEnumName' from the existing
   // inflectors.
   const { enumName: oldEnumName } = inflectors;

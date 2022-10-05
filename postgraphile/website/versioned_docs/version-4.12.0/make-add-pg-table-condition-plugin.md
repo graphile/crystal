@@ -51,7 +51,7 @@ module.exports = makeAddPgTableConditionPlugin(
   "app_public",
   "forums",
   "idIn",
-  build => {
+  (build) => {
     const { GraphQLList, GraphQLNonNull, GraphQLInt } = build.graphql;
     return {
       description: "Filters to records matching one of these ids",
@@ -71,7 +71,7 @@ module.exports = makeAddPgTableConditionPlugin(
     // This SQL fragment will be merged into the `WHERE` clause, so
     // it must be valid in that context.
     return sql.fragment`${sqlTableAlias}.id = ANY (${sql.value(value)}::int[])`;
-  }
+  },
 );
 ```
 
@@ -87,7 +87,7 @@ module.exports = makeAddPgTableConditionPlugin(
   "app_public",
   "forums",
   "containsPostsByUserId",
-  build => ({
+  (build) => ({
     description:
       "Filters the list of forums to only those which " +
       "contain posts written by the specified user.",
@@ -115,7 +115,7 @@ module.exports = makeAddPgTableConditionPlugin(
       where ${sqlIdentifier}.forum_id = ${sqlTableAlias}.id
       and ${sqlIdentifier}.user_id = ${sql.value(value)}
     )`;
-  }
+  },
 );
 ````
 
@@ -145,10 +145,10 @@ reach out on [our Discord chat](https://discord.gg/graphile) for advice.
 ## Example with ordering
 
 It's also possible for condition plugins to change the order of results by using
-[QueryBuilder](./make-extend-schema-plugin/#querybuilder)'s
-`orderBy` method. The following example both limits the list of quizzes returned
-to only those with a certain number of entries, _and_ orders the results such
-that the quizzes with the most entries are listed first.
+[QueryBuilder](./make-extend-schema-plugin/#querybuilder)'s `orderBy` method.
+The following example both limits the list of quizzes returned to only those
+with a certain number of entries, _and_ orders the results such that the quizzes
+with the most entries are listed first.
 
 This example if quite contrived, but this functionality can be useful for a
 number of purposes: filtering and ordering by full text search results,
@@ -165,7 +165,7 @@ module.exports = makeAddPgTableConditionPlugin(
   "app_public",
   "quiz",
   "entryCountMin",
-  build => ({
+  (build) => ({
     type: build.graphql.GraphQLInt,
   }),
   (value, { queryBuilder, sql, sqlTableAlias }) => {
@@ -177,14 +177,14 @@ module.exports = makeAddPgTableConditionPlugin(
     queryBuilder.orderBy(
       sql.fragment`(select count(*) from app_public.quiz_entry where quiz_entry.quiz_id = ${sqlTableAlias}.id)`,
       false,
-      false
+      false,
     );
 
     // Filter to only quizzes that have at least `value` entries.
     return sql.fragment`(select count(*) from app_public.quiz_entry where quiz_entry.quiz_id = ${sqlTableAlias}.id) >= ${sql.value(
-      value
+      value,
     )}`;
-  }
+  },
 );
 ```
 
@@ -207,8 +207,8 @@ export default function makeAddPgTableConditionPlugin(
       sql: typeof pgsql2 /* the 'pg-sql2' module */;
       sqlTableAlias: SQL;
     },
-    build: Build
-  ) => SQL | null | void
+    build: Build,
+  ) => SQL | null | void,
 ): Plugin;
 ```
 

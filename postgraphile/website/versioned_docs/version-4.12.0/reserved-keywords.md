@@ -7,8 +7,7 @@ title: Reserved Keywords / Table Names
 Some table, column, function and argument names can cause issues with
 PostGraphile due to conflicts with auto-generated type and field names. In these
 cases you can generally change the GraphQL type and field names for your
-PostgreSQL schema to avoid conflicts using
-[smart comments](./smart-comments/).
+PostgreSQL schema to avoid conflicts using [smart comments](./smart-comments/).
 
 Note that in many cases the **singular** or the **plural** of the words below
 may also cause issues, so assume the list below includes singulars and plurals
@@ -39,6 +38,5 @@ identifiers. On the CLI you'd do this like:
 `postgraphile --skip-plugins graphile-build-pg:PgNodeAliasPostGraphile`.
 
 To support non-unique table names you should implement an
-[inflection override](./inflection/#overriding-inflection---general)
-that will change how the GraphQL type names are generated from the raw table
-name.
+[inflection override](./inflection/#overriding-inflection---general) that will
+change how the GraphQL type names are generated from the raw table name.
