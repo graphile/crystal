@@ -33,6 +33,8 @@ const sidebars = {
     "performance",
     "requirements",
     "required-knowledge",
+    "behavior",
+    "exporting-schema",
     {
       type: "html",
       value: "<h4>OPERATION</h4>",
@@ -138,13 +140,25 @@ const sidebars = {
     "jwk-verification",
     "default-role",
     "pg-pubsub-migration",
-    "v4-new-features",
-    "v3-migration",
     "testing-jest",
     "bundling-webpack",
     "multiple-schemas",
     "running-postgraphile-in-docker",
     "running-postgraphile-as-a-library-in-docker",
+    {
+      type: "category",
+      label: "Migrating from V4",
+      link: {
+        type: "doc",
+        id: "migrating-from-v4/index",
+      },
+      items: [
+        "migrating-from-v4/make-plugin-by-combining-plugins",
+        "migrating-from-v4/make-wrap-resolvers-plugin",
+        "migrating-from-v4/make-add-inflectors-plugin",
+        "migrating-from-v4/make-extend-schema-plugin",
+      ],
+    },
     {
       type: "html",
       value: "<h4>DEPLOYING</h4>",
