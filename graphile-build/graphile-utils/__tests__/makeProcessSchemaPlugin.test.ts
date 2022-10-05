@@ -11,9 +11,17 @@ import {
 } from "graphile-build";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 
-import { makeProcessSchemaPlugin } from "../";
+import { makeProcessSchemaPlugin } from "../src/index.js";
 
-const makeSchemaWithSpy = (spy) =>
+declare global {
+  namespace GraphileBuild {
+    interface GraphileBuildSchemaOptions {
+      optionKey?: string;
+    }
+  }
+}
+
+const makeSchemaWithSpy = (spy: (schema: GraphQLSchema) => GraphQLSchema) =>
   buildSchema(
     {
       plugins: [
@@ -33,11 +41,12 @@ const makeSchemaWithSpy = (spy) =>
     {},
   );
 
-const makeSpy = (fn) => jest.fn(fn || ((schema) => schema));
+const makeSpy = (fn?: (schema: GraphQLSchema) => GraphQLSchema) =>
+  jest.fn(fn || ((schema) => schema));
 
 it("Gets passed the final schema", async () => {
-  let spySchema;
-  const spy = makeSpy((_schema) => {
+  let spySchema: GraphQLSchema;
+  const spy = makeSpy((_schema: GraphQLSchema) => {
     spySchema = _schema;
     return _schema;
   });
@@ -59,7 +68,7 @@ const simpleSchema = new GraphQLSchema({
 });
 
 it("Can replace the schema", async () => {
-  let spySchema;
+  let spySchema: GraphQLSchema;
   const spy = makeSpy((_schema) => {
     spySchema = _schema;
     return simpleSchema;
@@ -71,7 +80,7 @@ it("Can replace the schema", async () => {
 });
 
 it("Can tweak the schema", async () => {
-  let spySchema;
+  let spySchema: GraphQLSchema;
   const spy = makeSpy((_schema) => {
     _schema.getQueryType().description = "MODIFIED DESCRIPTION";
     spySchema = _schema;

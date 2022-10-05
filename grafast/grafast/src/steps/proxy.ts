@@ -87,7 +87,9 @@ function makeProxyHandler<T>(
  * This could change at any time, may impact performance, and just, generally,
  * needs more work. You shouldn't need this in the vast majority of cases.
  */
-export function proxy<T>($step: ExecutableStep<T>): ExecutableStep<T> {
+export function proxy<TData, TStep extends ExecutableStep<TData>>(
+  $step: TStep,
+): TStep & { addDependency(step: ExecutableStep): number } {
   const $proxy = new ProxyStep($step);
-  return new Proxy($proxy, makeProxyHandler($step));
+  return new Proxy($proxy, makeProxyHandler($step)) as any; // Lie.
 }

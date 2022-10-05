@@ -1,4 +1,5 @@
 /* eslint-disable graphile-export/export-methods  */
+import type { ExecutableStep, FieldPlanResolver } from "grafast";
 import {
   __TrackedObjectStep,
   constant,
@@ -16,12 +17,25 @@ import {
   QueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
+import type { ExecutionResult } from "graphql";
 
-import { gql, makeExtendSchemaPlugin, makeWrapPlansPlugin } from "../";
+import type {
+  PlanWrapperFilter,
+  PlanWrapperFilterRule,
+  PlanWrapperFn,
+} from "../src/index.js";
+import {
+  gql,
+  makeExtendSchemaPlugin,
+  makeWrapPlansPlugin,
+} from "../src/index.js";
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
+const makeSchemaWithSpyAndPlugins = (
+  spy: FieldPlanResolver<any, any, any>,
+  plugins: GraphileConfig.Plugin[],
+) =>
   buildSchema(
     {
       plugins: [
@@ -52,7 +66,7 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
     {},
   );
 
-const makeEchoSpy = (fn) =>
+const makeEchoSpy = (fn?: FieldPlanResolver<any, any, any>) =>
   jest.fn(
     fn ||
       (($parent, args) => {
@@ -61,7 +75,7 @@ const makeEchoSpy = (fn) =>
   );
 
 describe("wrapping named plans", () => {
-  const wrappers = [
+  const wrappers: Array<[number, PlanWrapperFn]> = [
     [0, (plan) => plan()],
     [1, (plan, $parent) => plan($parent)],
     [2, (plan, $parent, args) => plan($parent, args)],
@@ -79,7 +93,7 @@ describe("wrapping named plans", () => {
         }),
       ]);
       const rootValue = { root: true };
-      const result = await grafast({
+      const result = (await grafast({
         schema,
         source: `
           {
@@ -88,7 +102,7 @@ describe("wrapping named plans", () => {
         `,
         rootValue,
         contextValue: { test: true },
-      });
+      })) as ExecutionResult;
       expect(result.errors).toBeFalsy();
       expect(result.data.echo).toEqual("Hello");
       expect(spy).toHaveBeenCalledTimes(1);
@@ -101,7 +115,7 @@ describe("wrapping named plans", () => {
   );
 
   it("can override parent", async () => {
-    const wrapper = (plan, $parent, args, info) =>
+    const wrapper: PlanWrapperFn = (plan, $parent, args, info) =>
       plan(lambda($parent, (parent) => ({ ...parent, rideover: true })));
 
     const spy = makeEchoSpy();
@@ -113,7 +127,7 @@ describe("wrapping named plans", () => {
       }),
     ]);
     const rootValue = { root: true };
-    const result = await grafast({
+    const result = (await grafast({
       schema,
       source: `
         {
@@ -122,7 +136,7 @@ describe("wrapping named plans", () => {
       `,
       rootValue,
       contextValue: { test: true },
-    });
+    })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
     expect(result.data.echo).toEqual("Hello");
     expect(spy).toHaveBeenCalledTimes(1);
@@ -134,7 +148,7 @@ describe("wrapping named plans", () => {
   });
 
   it("can abort plan before", async () => {
-    const wrapper = (plan) => {
+    const wrapper: PlanWrapperFn = (plan) => {
       const $preCheck = lambda(constant(null), async () => {
         await delay(10);
         throw new Error("Abort");
@@ -160,7 +174,7 @@ describe("wrapping named plans", () => {
       }),
     ]);
     const rootValue = { root: true };
-    const result = await grafast({
+    const result = (await grafast({
       schema,
       source: `
         {
@@ -169,7 +183,7 @@ describe("wrapping named plans", () => {
       `,
       rootValue,
       contextValue: { test: true },
-    });
+    })) as ExecutionResult;
     expect(result.errors).toBeTruthy();
     expect(result.data.echo).toBe(null);
     expect(spy).toHaveBeenCalled();
@@ -181,7 +195,7 @@ describe("wrapping named plans", () => {
   });
 
   it("can abort plan after", async () => {
-    const wrapper = (plan) => {
+    const wrapper: PlanWrapperFn = (plan) => {
       const $result = plan();
       // eslint-disable-next-line no-constant-condition
       const $postCheck = lambda($result, async () => {
@@ -209,7 +223,7 @@ describe("wrapping named plans", () => {
       }),
     ]);
     const rootValue = { root: true };
-    const result = await grafast({
+    const result = (await grafast({
       schema,
       source: `
         {
@@ -218,7 +232,7 @@ describe("wrapping named plans", () => {
       `,
       rootValue,
       contextValue: { test: true },
-    });
+    })) as ExecutionResult;
     expect(result.errors).toBeTruthy();
     expect(result.data.echo).toBe(null);
     expect(spy).toHaveBeenCalledTimes(1);
@@ -229,9 +243,9 @@ describe("wrapping named plans", () => {
   });
 
   it("can modify result of plan", async () => {
-    const wrapper = (plan) => {
-      const result = plan();
-      return lambda(result, (str) => str.toLowerCase());
+    const wrapper: PlanWrapperFn = (plan) => {
+      const $result = plan() as ExecutableStep<string>;
+      return lambda($result, (str) => str.toLowerCase());
     };
     const spy = makeEchoSpy();
     const schema = makeSchemaWithSpyAndPlugins(spy, [
@@ -242,7 +256,7 @@ describe("wrapping named plans", () => {
       }),
     ]);
     const rootValue = { root: true };
-    const result = await grafast({
+    const result = (await grafast({
       schema,
       source: `
         {
@@ -251,7 +265,7 @@ describe("wrapping named plans", () => {
       `,
       rootValue,
       contextValue: { test: true },
-    });
+    })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
     expect(result.data.echo).toBe("hello");
     expect(spy).toHaveBeenCalledTimes(1);
@@ -263,12 +277,12 @@ describe("wrapping named plans", () => {
   });
 
   it("can supports options modify result of plan", async () => {
-    const wrapper = (plan) => {
-      const result = plan();
+    const wrapper: PlanWrapperFn = (plan) => {
+      const result = plan() as ExecutableStep<string>;
       return lambda(result, (str) => str.toLowerCase());
     };
     const spy = makeEchoSpy();
-    let options;
+    let options: GraphileBuild.GraphileBuildSchemaOptions;
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin((_options) => {
         options = _options;
@@ -282,7 +296,7 @@ describe("wrapping named plans", () => {
       }),
     ]);
     const rootValue = { root: true };
-    const result = await grafast({
+    const result = (await grafast({
       schema,
       source: `
         {
@@ -291,7 +305,7 @@ describe("wrapping named plans", () => {
       `,
       rootValue,
       contextValue: { test: true },
-    });
+    })) as ExecutionResult;
     expect(options).toBeTruthy();
     expect(options.optionKey).toEqual("optionValue");
     expect(result.errors).toBeFalsy();
@@ -307,7 +321,9 @@ describe("wrapping named plans", () => {
 
 describe("wrapping plans matching a filter", () => {
   it("filters correctly", async () => {
-    const filter = (context) => {
+    const filter: PlanWrapperFilter<{
+      scope: GraphileBuild.ScopeObjectFieldsField;
+    }> = (context) => {
       if (context.scope.isRootMutation && context.scope.fieldName !== "c") {
         return { scope: context.scope };
       }
@@ -315,7 +331,9 @@ describe("wrapping plans matching a filter", () => {
     };
     const before = [];
     const after = [];
-    const rule =
+    const rule: PlanWrapperFilterRule<{
+      scope: GraphileBuild.ScopeObjectFieldsField;
+    }> =
       ({ scope }) =>
       (plan, user, args, _info) => {
         const $before = lambda(args.get(), (argValues) => {
@@ -335,9 +353,12 @@ describe("wrapping plans matching a filter", () => {
 
         return $result;
       };
-    const add = (_, args) =>
+    const add: FieldPlanResolver<any, any, any> = (_, args) =>
       lambda(
-        [args.get("arg1"), args.get("arg2")],
+        [
+          args.get("arg1") as ExecutableStep<number>,
+          args.get("arg2") as ExecutableStep<number>,
+        ],
         ([arg1, arg2]) => arg1 + arg2,
       );
     const schema = makeSchemaWithSpyAndPlugins(null, [
@@ -360,7 +381,7 @@ describe("wrapping plans matching a filter", () => {
       makeWrapPlansPlugin(filter, rule),
     ]);
     const rootValue = { root: true };
-    const result = await grafast({
+    const result = (await grafast({
       schema,
       source: `
         mutation {
@@ -371,7 +392,7 @@ describe("wrapping plans matching a filter", () => {
       `,
       rootValue,
       contextValue: { test: true },
-    });
+    })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
     expect(result.data.a).toBe(8);
     expect(result.data.b).toBe("1ARG2");

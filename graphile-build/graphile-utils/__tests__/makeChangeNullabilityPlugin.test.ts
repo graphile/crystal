@@ -6,6 +6,7 @@ import {
   QueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
+import type { GraphQLType } from "graphql";
 import {
   GraphQLInputObjectType,
   GraphQLInterfaceType,
@@ -14,9 +15,14 @@ import {
   isNonNullType,
 } from "graphql";
 
-import { gql, makeChangeNullabilityPlugin, makeExtendSchemaPlugin } from "../";
+import type { NullabilitySpecString } from "../src/index.js";
+import {
+  gql,
+  makeChangeNullabilityPlugin,
+  makeExtendSchemaPlugin,
+} from "../src/index.js";
 
-const makeSchema = (plugins) =>
+const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
   buildSchema(
     {
       plugins: [
@@ -55,7 +61,7 @@ const makeSchema = (plugins) =>
     {},
   );
 
-function getNullability(type) {
+function getNullability(type: GraphQLType) {
   if (isNonNullType(type)) {
     const nullableType = type.ofType;
     if (isListType(nullableType)) {
@@ -74,7 +80,7 @@ function getNullability(type) {
 }
 
 describe("object, interface and input", () => {
-  const wrappers = [
+  const wrappers: Array<[NullabilitySpecString, boolean[]]> = [
     ["", [true, false, true]],
     ["!", [true, false, false]],
     ["[]", [true, true, true]],
@@ -110,8 +116,7 @@ describe("object, interface and input", () => {
     ]);
 
     {
-      /** @type {GraphQLObjectType} */
-      const Query = schema.getType("Query");
+      const Query = schema.getType("Query") as GraphQLObjectType;
       expect(Query).toBeInstanceOf(GraphQLObjectType);
       {
         const field = Query.getFields().echo;
@@ -129,8 +134,7 @@ describe("object, interface and input", () => {
     }
 
     {
-      /** @type {GraphQLInterfaceType} */
-      const EchoCapable = schema.getType("EchoCapable");
+      const EchoCapable = schema.getType("EchoCapable") as GraphQLInterfaceType;
       expect(EchoCapable).toBeInstanceOf(GraphQLInterfaceType);
       const field = EchoCapable.getFields().echo;
       const nullability = getNullability(field.type);
@@ -141,8 +145,7 @@ describe("object, interface and input", () => {
     }
 
     {
-      /** @type {GraphQLInputType} */
-      const MyInput = schema.getType("MyInput");
+      const MyInput = schema.getType("MyInput") as GraphQLInputObjectType;
       expect(MyInput).toBeInstanceOf(GraphQLInputObjectType);
       const field = MyInput.getFields().message;
       const nullability = getNullability(field.type);

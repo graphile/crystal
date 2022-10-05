@@ -7,36 +7,44 @@ import type {
 import { access, ExecutableStep } from "grafast";
 import { inspect } from "util";
 
-type PlanWrapperFn = (
-  plan: FieldPlanResolver<any, any, any>,
+type ToOptional<T> = { [K in keyof T]+?: T[K] };
+
+type SmartFieldPlanResolver = (
+  ...args: ToOptional<Parameters<FieldPlanResolver<any, any, any>>>
+) => ReturnType<FieldPlanResolver<any, any, any>>;
+
+export type PlanWrapperFn = (
+  plan: SmartFieldPlanResolver,
   $source: ExecutableStep,
   args: FieldArgs,
   info: FieldInfo,
 ) => any;
 
-interface PlanWrapperRule {
+export interface PlanWrapperRule {
   plan?: PlanWrapperFn;
   // subscribePlan?: PlanWrapperFn;
 }
 
-interface PlanWrapperRules {
+export interface PlanWrapperRules {
   [typeName: string]: {
     [fieldName: string]: PlanWrapperRule | PlanWrapperFn;
   };
 }
 
-type PlanWrapperRulesGenerator = (
+export type PlanWrapperRulesGenerator = (
   options: GraphileBuild.GraphileBuildSchemaOptions,
 ) => PlanWrapperRules;
 
-type PlanWrapperFilter<T> = (
-  context: GraphileBuild.ContextObject,
+export type PlanWrapperFilter<T> = (
+  context: GraphileBuild.ContextObjectFieldsField,
   build: GraphileBuild.Build,
   field: GraphileFieldConfig<any, any, any, any, any>,
   options: GraphileBuild.GraphileBuildSchemaOptions,
 ) => T | null;
 
-type PlanWrapperFilterRule<T> = (match: T) => PlanWrapperRule | PlanWrapperFn;
+export type PlanWrapperFilterRule<T> = (
+  match: T,
+) => PlanWrapperRule | PlanWrapperFn;
 
 let counter = 0;
 

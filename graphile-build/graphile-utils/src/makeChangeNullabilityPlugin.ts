@@ -6,7 +6,7 @@ import type * as AllGraphQL from "graphql";
 import type { GraphQLInputType, GraphQLOutputType, GraphQLType } from "graphql";
 import { inspect } from "util";
 
-type NullabilitySpecString =
+export type NullabilitySpecString =
   | ""
   | "!"
   | "[]"
@@ -23,9 +23,9 @@ type NullabilitySpecString =
   | "[[!]!]!";
 
 // For backwards compatibility
-type NullabilitySpec = boolean | NullabilitySpecString;
+export type NullabilitySpec = boolean | NullabilitySpecString;
 
-interface ChangeNullabilityTypeRules {
+export interface ChangeNullabilityTypeRules {
   [fieldName: string]:
     | NullabilitySpec
     | {
@@ -35,7 +35,7 @@ interface ChangeNullabilityTypeRules {
         };
       };
 }
-interface ChangeNullabilityRules {
+export interface ChangeNullabilityRules {
   [typeName: string]: ChangeNullabilityTypeRules;
 }
 
