@@ -4,6 +4,13 @@ path: /postgraphile/jwt-guide/
 title: PostGraphile JWT Guide
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 > This specification was authored by
 > [Caleb Meredith](https://twitter.com/calebmer) for use in the PostGraphQL
 > project. The language of the specification is meant to be generally applicable

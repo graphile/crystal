@@ -4,6 +4,13 @@ path: /postgraphile/postgresql-indexes/
 title: PostgreSQL Indexes
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 It’s important that your queries stay fast for your users, this section outlines
 some resources to help you optimize you queries with indexes.
 

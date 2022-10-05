@@ -5,6 +5,13 @@ title: Database Function Gallery
 showExamples: functions
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Below you'll find some examples of various PostgreSQL functions, and their
 effects on PostGraphile.
 

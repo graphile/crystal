@@ -4,6 +4,13 @@ path: /postgraphile/subscriptions/
 title: GraphQL Subscriptions
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 <p class='intro'>
 Subscriptions notify you when an event occurs on the server side.
 </p>

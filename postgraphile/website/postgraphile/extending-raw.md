@@ -4,6 +4,13 @@ path: /postgraphile/extending-raw/
 title: Schema Plugins - Graphile Engine
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Engine plugins. The core PG-related plugins can be found here:
 

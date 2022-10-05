@@ -4,6 +4,13 @@ path: /postgraphile/deploying-gcp/
 title: Deploying to GCP
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 _aka Google Cloud Platform (App Engine)_
 
 _This post is a work in progress. Please see

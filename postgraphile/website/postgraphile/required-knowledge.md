@@ -4,6 +4,13 @@ path: /postgraphile/required-knowledge/
 title: Required Knowledge
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 **WORK IN PROGRESS**: PR's welcome!
 
 PostGraphile builds upon other technologies such as PostgreSQL and GraphQL, and

@@ -4,6 +4,13 @@ path: /postgraphile/postgresql-schema-design/
 title: PostgreSQL Schema Design
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
 leverage the features in Postgres to completely express their application

@@ -5,6 +5,13 @@ title: PostGraphile as a Library
 fullTitle: Using PostGraphile as a Library
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Library mode is the most popular way of running PostGraphile; it gives more
 power than using the CLI (see [CLI usage](./usage-cli/)), but is much easier to
 setup and more fully featured than [Schema-only Usage](./usage-schema/).

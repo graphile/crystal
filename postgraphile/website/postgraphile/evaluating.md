@@ -5,6 +5,13 @@ title: Evaluating
 fullTitle: Evaluating PostGraphile For Your Project
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Hopefully you’ve been convinced that PostGraphile serves an awesome GraphQL API,
 but now let’s take a more critical look at whether or not you should adopt
 PostGraphile for your project.

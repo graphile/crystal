@@ -4,6 +4,13 @@ path: /postgraphile/make-wrap-resolvers-plugin/
 title: makeWrapResolversPlugin (graphile-utils)
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 **NOTE: this documentation applies to PostGraphile v4.1.0+**
 
 Resolver wrapping enables you to easily take actions before or after an existing

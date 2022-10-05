@@ -4,6 +4,13 @@ path: /postgraphile/usage-cli/
 title: Command Line Interface
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 The easiest way to get up and running with PostGraphile is to use the Command
 Line Interface.
 

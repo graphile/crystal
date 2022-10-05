@@ -4,6 +4,13 @@ path: /postgraphile/usage/
 title: Usage
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile is formed of three layers.
 
 - At the very top is the [**PostGraphile CLI**](./usage-cli/). This layer is the

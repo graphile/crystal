@@ -4,6 +4,13 @@ path: /postgraphile/tables/
 title: PostgreSQL Tables
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile automatically adds a number of elements to the generated GraphQL
 schema based on the tables and columns found in the inspected schema.
 

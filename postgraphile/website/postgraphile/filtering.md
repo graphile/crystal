@@ -4,6 +4,13 @@ path: /postgraphile/filtering/
 title: Filtering
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Out of the box, PostGraphile supports rudimentary filtering on
 [connections](./connections/) using a `condition` argument. This allows you to
 filter for specific values (e.g. `username: "Alice"` or `category: ARTICLE`).

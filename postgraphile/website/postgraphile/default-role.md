@@ -4,6 +4,13 @@ path: /postgraphile/default-role/
 title: Default Role
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile makes full use of PostgreSQL roles, so in this article we will
 explain briefly how PostgreSQL roles and users work and how that relates to how
 we use them in PostGraphile.

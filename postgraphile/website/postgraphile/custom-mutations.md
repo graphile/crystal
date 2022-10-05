@@ -4,6 +4,13 @@ path: /postgraphile/custom-mutations/
 title: Custom Mutations
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile automatically generates [CRUD Mutations](./crud-mutations/) for
 you; but it's rare that these will cover all your needs - and many people just
 disable them outright. Custom mutations enable you to write exactly the business

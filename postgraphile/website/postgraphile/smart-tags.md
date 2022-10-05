@@ -4,6 +4,13 @@ path: /postgraphile/smart-tags/
 title: Smart Tags
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 You can customise your PostGraphile GraphQL schema by tagging tables, columns,
 functions, relations, etc. These changes could be renaming something, omitting
 things from your GraphQL schema, or anything else a plugin supports!

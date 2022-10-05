@@ -4,6 +4,13 @@ path: /postgraphile/performance/
 title: Performance
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 On a Digital Ocean compute-optimised droplet with 8GB of RAM, running
 PostGraphile, PostgreSQL _and_ the benchmarking software all through Docker,
 PostGraphile running in cluster mode over 4 vCPUs can handle 3250 requests per

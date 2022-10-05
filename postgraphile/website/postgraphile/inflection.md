@@ -4,6 +4,13 @@ path: /postgraphile/inflection/
 title: Inflection
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 In PostGraphile, we have the concept of "inflection" which details how things in
 PostgreSQL are named in the generated GraphQL schema.
 

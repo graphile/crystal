@@ -4,6 +4,13 @@ path: /postgraphile/crud-mutations/
 title: CRUD Mutations
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 CRUD, or "Create, Read, Update, Delete", is a common paradigm in data
 manipulation APIs; "CRUD Mutations" refer to all but the "R". PostGraphile will
 automatically add CRUD mutations to the schema for each table; this behaviour

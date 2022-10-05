@@ -4,6 +4,13 @@ path: /postgraphile/reserved-keywords/
 title: Reserved Keywords / Table Names
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Some table, column, function and argument names can cause issues with
 PostGraphile due to conflicts with auto-generated type and field names. In these
 cases you can generally change the GraphQL type and field names for your

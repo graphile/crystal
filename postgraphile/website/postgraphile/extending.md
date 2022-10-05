@@ -4,6 +4,13 @@ path: /postgraphile/extending/
 title: GraphQL Schema Plugins
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile's schema generator is built from a number of
 [Graphile Engine plugins](https://graphile.org/graphile-build/plugins/). You can
 write your own plugins - either using the helpers available in `graphile-utils`,

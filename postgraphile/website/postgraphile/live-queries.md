@@ -4,6 +4,13 @@ path: /postgraphile/live-queries/
 title: Live Queries
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 <p class='intro'>
 A “live query” monitors the query a user provides and gives the client an updated version whenever the query would return a different result.
 </p>

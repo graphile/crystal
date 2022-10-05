@@ -4,6 +4,13 @@ path: /postgraphile/v3-migration/
 title: Migrating from PostGraphQL v3
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Despite the fact that PostGraphile v4 has rewritten the _entire_ GraphQL schema
 generation from scratch it is still broadly compatible with version 3. This
 document aims to outline solutions to issues you might face whilst upgrading. If

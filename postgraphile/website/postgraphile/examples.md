@@ -5,6 +5,13 @@ title: Example queries and mutations
 showExamples: queries
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 _If you are new to GraphQL then I recommend you read through the official
 introduction to GraphQL [here](https://graphql.org/learn/) before continuing
 through the PostGraphile documentation._

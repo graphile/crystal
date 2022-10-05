@@ -4,6 +4,13 @@ path: /postgraphile/jwk-verification/
 title: PostGraphile JWT/JWK Verification Quickstart
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 This guide is an adaption of the official quickstart tutorial for Node (Express)
 provided by
 [Auth0](https://auth0.com/docs/quickstart/backend/nodejs/01-authorization). The

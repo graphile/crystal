@@ -4,6 +4,13 @@ path: /postgraphile/
 title: Introduction
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 # PostGraphile Introduction
 
 <p class='intro'>

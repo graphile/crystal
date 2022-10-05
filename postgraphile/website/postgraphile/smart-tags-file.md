@@ -4,6 +4,13 @@ path: /postgraphile/smart-tags-file/
 title: The postgraphile.tags.json5 file
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 When running PostGraphile in CLI mode, PostGraphile will automatically look for
 a `postgraphile.tags.json5` file in the current directory, and will process the
 tags and descriptions therein.

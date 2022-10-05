@@ -4,6 +4,13 @@ path: /postgraphile/community-plugins/
 title: PostGraphile community plugins
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Community members can write plugins for PostGraphile that extends its
 functionality; this page lists some of them. Issues with these plugins should be
 directed to the plugin authors, not to this project. This page is maintained by

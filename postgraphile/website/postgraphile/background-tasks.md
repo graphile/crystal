@@ -4,6 +4,13 @@ path: /postgraphile/background-tasks/
 title: Background Tasks in PostGraphile
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 In your GraphQL server typically most processing will be done in the
 "foreground", as part of the request-response cycle. However, since clients
 typically wait for this request cycle to complete before allowing the user to

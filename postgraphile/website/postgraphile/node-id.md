@@ -4,6 +4,13 @@ path: /postgraphile/node-id/
 title: Globally Unique Object Identification ("nodeId" / "id")
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 We implement the
 [GraphQL Global Object Identification Specification](https://facebook.github.io/relay/graphql/objectidentification.htm),
 so any table that has a primary key will automatically have a unique `nodeId`

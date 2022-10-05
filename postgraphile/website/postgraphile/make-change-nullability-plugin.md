@@ -4,6 +4,13 @@ path: /postgraphile/make-change-nullability-plugin/
 title: makeChangeNullabilityPlugin (graphile-utils)
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 **NOTE: this documentation applies to PostGraphile v4.1.0+**
 
 Use this plugin to easily change the nullability of fields in your GraphQL,

@@ -4,6 +4,13 @@ path: /postgraphile/enums/
 title: Enums
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile will automatically map PostgreSQL enums into GraphQL enums; they'll
 be automatically renamed in order to make sure they conform to the GraphQL
 naming requirements and conventions.

@@ -4,6 +4,13 @@ path: /postgraphile/make-add-inflectors-plugin/
 title: makeAddInflectorsPlugin (graphile-utils)
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 **NOTE: this documentation applies to PostGraphile v4.1.0+**
 
 If you're not happy with the default naming conventions in PostGraphile (or if

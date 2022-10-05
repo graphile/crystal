@@ -4,6 +4,13 @@ path: /postgraphile/realtime/
 title: PostGraphile Realtime
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 Every application is different, and no more so than when it comes to their
 realtime requirements. Some applications are read-heavy, others write-heavy, and
 others are collaborative and need to put in effort to avoid conflicts between

@@ -4,6 +4,13 @@ path: /postgraphile/function-restrictions/
 title: Database Function Restrictions
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile supports a wide range of PostgreSQL functions; however we do not
 support:
 

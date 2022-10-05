@@ -4,6 +4,13 @@ path: /postgraphile/deploying-heroku/
 title: Deploying to Heroku
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 It's possible to use PostGraphile on Heroku with either AWS RDS or Heroku
 Postgres.
 

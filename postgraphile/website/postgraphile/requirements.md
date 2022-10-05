@@ -4,6 +4,13 @@ path: /postgraphile/requirements/
 title: Requirements
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile is packaged as a Node.js module, you can install it with `npm` or
 `yarn` (depending on your preference) - users tend to have fewer issues with
 `yarn`, so we recommend it.

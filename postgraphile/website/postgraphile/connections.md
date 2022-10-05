@@ -4,6 +4,13 @@ path: /postgraphile/connections/
 title: Connections
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 When a GraphQL field is expected to return a large list of database records, we
 typically implement a connection adhering to the
 [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm)

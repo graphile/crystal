@@ -4,6 +4,13 @@ path: /postgraphile/relations/
 title: Relations
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 We automatically discover relations between database tables by inspecting their
 foreign keys (and indexes if `--no-ignore-indexes` or `ignoreIndexes: false` is
 set), and use these to build relations into the generated GraphQL schema.

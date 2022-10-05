@@ -4,6 +4,13 @@ path: /postgraphile/aggregates/
 title: Aggregates
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 PostGraphile has support in its plugin system for powerful aggregates. This
 system was only introduced in 4.4 and is not well documented yet; should you
 need aggregates good starting points are:

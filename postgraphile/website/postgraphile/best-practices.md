@@ -4,6 +4,13 @@ path: /postgraphile/best-practices/
 title: PostGraphile best practices
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 This guide is a work in progress. If you have ideas for best practices, please
 use the "Suggest improvements to this page" link above to submit them, or
 discuss them in #documentation on

@@ -4,6 +4,13 @@ path: /postgraphile/usage-schema/
 title: Usage - Schema Only
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 The PostGraphile middleware gives you a lot of excellent features for running
 your own GraphQL server. However, if you want to execute a PostGraphile query in
 Node.js without having to go through HTTP you can use some other exported

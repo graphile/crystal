@@ -4,6 +4,13 @@ path: /postgraphile/make-plugin-by-combining-plugins/
 title: makePluginByCombiningPlugins (graphile-utils)
 ---
 
+:::caution
+
+This documentation is copied from Version 4 and has not been updated to Version
+5 yet; it may not be valid.
+
+:::
+
 **NOTE: this documentation applies to PostGraphile v4.1.0+**
 
 This is a simple helper for combining multiple smaller plugins into one plugin
