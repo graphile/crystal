@@ -5,10 +5,11 @@ title: Migrating from the Supporter Plugin to @graphile/pg-pubsub
 ---
 
 Before April 2019, PostGraphile had rudimentary support for GraphQL
-subscriptions available only to [Patreon supporters](https://graphile.org/sponsor/) via "the
-supporter plugin" which was originally only available over a custom `git` URL,
-but later was moved to `npm` for easier installation. **If you were not one of
-these users then this article isn't for you.**
+subscriptions available only to
+[Patreon supporters](https://graphile.org/sponsor/) via "the supporter plugin"
+which was originally only available over a custom `git` URL, but later was moved
+to `npm` for easier installation. **If you were not one of these users then this
+article isn't for you.**
 
 With v4.4.0, PostGraphile's subscriptions support was extended and open-sourced.
 Users of `@graphile/supporter` are encouraged to move to using the open source
