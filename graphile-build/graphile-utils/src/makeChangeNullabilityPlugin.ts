@@ -1,7 +1,39 @@
+import type {
+  GraphileFieldConfig,
+  GraphileFieldConfigArgumentMap,
+} from "grafast";
+import type * as AllGraphQL from "graphql";
 import type { GraphQLInputType, GraphQLOutputType, GraphQLType } from "graphql";
+import { inspect } from "util";
+
+type NullabilitySpecString =
+  | ""
+  | "!"
+  | "[]"
+  | "[]!"
+  | "[!]"
+  | "[!]!"
+  | "[[]]"
+  | "[[]]!"
+  | "[[]!]"
+  | "[[]!]!"
+  | "[[!]]"
+  | "[[!]]!"
+  | "[[!]!]"
+  | "[[!]!]!";
+
+// For backwards compatibility
+type NullabilitySpec = boolean | NullabilitySpecString;
 
 interface ChangeNullabilityTypeRules {
-  [fieldName: string]: boolean;
+  [fieldName: string]:
+    | NullabilitySpec
+    | {
+        type?: NullabilitySpec;
+        args?: {
+          [argName: string]: NullabilitySpec;
+        };
+      };
 }
 interface ChangeNullabilityRules {
   [typeName: string]: ChangeNullabilityTypeRules;
@@ -9,61 +41,210 @@ interface ChangeNullabilityRules {
 
 let counter = 0;
 
+function doIt(
+  inType: GraphQLType,
+  rawSpec: NullabilitySpec,
+  graphql: typeof AllGraphQL,
+  location: string,
+  originalSpec = rawSpec,
+): GraphQLType {
+  const spec = rawSpec === true ? "" : rawSpec === false ? "!" : rawSpec;
+  if (typeof spec !== "string") {
+    throw new Error(
+      `Invalid spec for '${location}': '${inspect(originalSpec)}'`,
+    );
+  }
+  const shouldBeNonNull = spec.endsWith("!");
+  const isNonNull = graphql.isNonNullType(inType);
+  const nullableType = isNonNull ? inType.ofType : inType;
+  const specSansBang = shouldBeNonNull
+    ? spec.substring(0, spec.length - 1)
+    : spec;
+  if (specSansBang.startsWith("[")) {
+    if (!specSansBang.endsWith("]")) {
+      throw new Error(
+        `Invalid syntax in spec for '${location}': '${inspect(originalSpec)}'`,
+      );
+    }
+    const rest = specSansBang.substring(
+      1,
+      specSansBang.length - 1,
+    ) as NullabilitySpecString;
+    if (!graphql.isListType(nullableType)) {
+      throw new Error(
+        `Spec for '${location}' anticipated a list where there wasn't one: '${inspect(
+          originalSpec,
+        )}'`,
+      );
+    }
+    const listInnerType = nullableType.ofType;
+    const innerType = doIt(
+      listInnerType,
+      rest,
+      graphql,
+      location,
+      originalSpec,
+    );
+    if (innerType === listInnerType && isNonNull === shouldBeNonNull) {
+      return inType;
+    } else if (shouldBeNonNull) {
+      return new graphql.GraphQLNonNull(innerType);
+    } else {
+      return innerType;
+    }
+  } else {
+    if (specSansBang.length > 0) {
+      throw new Error(
+        `Invalid syntax in spec for '${location}'; expected nothing left, but found '${specSansBang}': '${inspect(
+          originalSpec,
+        )}'`,
+      );
+    }
+    if (shouldBeNonNull && isNonNull) {
+      return inType;
+    } else if (shouldBeNonNull) {
+      return new graphql.GraphQLNonNull(nullableType);
+    } else {
+      return nullableType;
+    }
+  }
+
+  return inType;
+}
+
 export function makeChangeNullabilityPlugin(
   rules: ChangeNullabilityRules,
 ): GraphileConfig.Plugin {
-  function applyNullability<T extends GraphQLInputType | GraphQLOutputType>(
-    type: GraphQLType,
-    fieldName: string,
-    typeRules: ChangeNullabilityTypeRules,
+  let matches: string[];
+
+  function objectOrInterfaceFieldCallback<
+    T extends GraphileFieldConfig<any, any, any, any, any>,
+  >(
+    field: T,
     build: GraphileBuild.Build,
-  ): T {
-    const shouldBeNullable = typeRules[fieldName];
-    if (shouldBeNullable == null) {
-      return type as any;
-    }
+    context:
+      | GraphileBuild.ContextObjectFieldsField
+      | GraphileBuild.ContextInterfaceFieldsField,
+  ) {
     const {
-      graphql: { getNullableType, GraphQLNonNull },
-    } = build;
-    const nullableType = getNullableType(type);
-    return shouldBeNullable
-      ? nullableType
-      : nullableType === type
-      ? new GraphQLNonNull(type)
-      : (type as any); // Optimisation if it's already non-null
+      Self,
+      scope: { fieldName },
+    } = context;
+    const typeRules = rules[Self.name];
+    if (!typeRules) {
+      return field;
+    }
+    const rawRule = typeRules[fieldName];
+    if (rawRule == null) {
+      return field;
+    }
+    const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
+    matches.push(`${Self.name}.${fieldName}`);
+    if (rule.type) {
+      field.type = doIt(
+        field.type,
+        rule.type,
+        build.graphql,
+        `${Self.name}.${fieldName}`,
+      ) as GraphQLOutputType;
+    }
+    return field;
   }
+
+  function objectOrInterfaceArgsCallback<
+    T extends GraphileFieldConfigArgumentMap<any, any, any, any>,
+  >(
+    args: T,
+    build: GraphileBuild.Build,
+    context:
+      | GraphileBuild.ContextObjectFieldsField
+      | GraphileBuild.ContextInterfaceFieldsField,
+  ) {
+    const {
+      Self,
+      scope: { fieldName },
+    } = context;
+    const typeRules = rules[Self.name];
+    if (!typeRules) {
+      return args;
+    }
+    const rawRule = typeRules[fieldName];
+    if (rawRule == null) {
+      return args;
+    }
+    const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
+    if (rule.args) {
+      for (const [argName, spec] of Object.entries(rule.args)) {
+        const arg = args?.[argName];
+        if (!arg) {
+          throw new Error(
+            `Could not find ${
+              Self.name
+            }.${fieldName} argument named '${argName}' (names: ${
+              Object.keys(args).length > 0
+                ? `'${Object.keys(args).join("', '")}'`
+                : "none"
+            })`,
+          );
+        }
+        arg.type = doIt(
+          arg.type,
+          spec,
+          build.graphql,
+          `${Self.name}.${fieldName}(${argName}:)`,
+        );
+      }
+    }
+    return args;
+  }
+
   return {
     name: `ChangeNullabilityPlugin_${++counter}`,
     version: "0.0.0",
     schema: {
       hooks: {
+        init(_) {
+          matches = [];
+          return _;
+        },
         GraphQLInputObjectType_fields_field(field, build, context) {
-          const { Self, scope } = context;
+          const {
+            Self,
+            scope: { fieldName },
+          } = context;
           const typeRules = rules[Self.name];
           if (!typeRules) {
             return field;
           }
-          field.type = applyNullability<GraphQLInputType>(
-            field.type,
-            scope.fieldName,
-            typeRules,
-            build,
-          );
+          const rawRule = typeRules[fieldName];
+          if (rawRule == null) {
+            return field;
+          }
+          const rule =
+            typeof rawRule !== "object" ? { type: rawRule } : rawRule;
+          matches.push(`${Self.name}.${fieldName}`);
+          if (rule.type) {
+            field.type = doIt(
+              field.type,
+              rule.type,
+              build.graphql,
+              `${Self.name}.${fieldName}`,
+            ) as GraphQLInputType;
+          }
+          if (rule.args) {
+            throw new Error(
+              `${Self.name} is an input type, field '${fieldName}' cannot have args`,
+            );
+          }
           return field;
         },
-        GraphQLObjectType_fields_field(field, build, context) {
-          const { Self, scope } = context;
-          const typeRules = rules[Self.name];
-          if (!typeRules) {
-            return field;
-          }
-          field.type = applyNullability<GraphQLOutputType>(
-            field.type,
-            scope.fieldName,
-            typeRules,
-            build,
-          );
-          return field;
+        GraphQLInterfaceType_fields_field: objectOrInterfaceFieldCallback,
+        GraphQLInterfaceType_fields_field_args: objectOrInterfaceArgsCallback,
+        GraphQLObjectType_fields_field: objectOrInterfaceFieldCallback,
+        GraphQLObjectType_fields_field_args: objectOrInterfaceArgsCallback,
+        finalize(schema) {
+          throw new Error(`Didn't match...`);
+          return schema;
         },
       },
     },
