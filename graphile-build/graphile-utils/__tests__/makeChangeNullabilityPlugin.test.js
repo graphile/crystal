@@ -111,6 +111,9 @@ describe("object and interface", () => {
       const field = Query.getFields().echo;
       const nullability = getNullability(field.type);
       expect(nullability).toEqual(expectation);
+      const arg = field.args.find((a) => a.name === "message");
+      const argNullability = getNullability(arg.type);
+      expect(argNullability).toEqual(expectation);
     }
 
     {
@@ -120,6 +123,9 @@ describe("object and interface", () => {
       const field = EchoCapable.getFields().echo;
       const nullability = getNullability(field.type);
       expect(nullability).toEqual(expectation);
+      const arg = field.args.find((a) => a.name === "message");
+      const argNullability = getNullability(arg.type);
+      expect(argNullability).toEqual(expectation);
     }
   });
 });
