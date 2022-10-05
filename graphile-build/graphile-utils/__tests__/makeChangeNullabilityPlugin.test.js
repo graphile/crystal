@@ -7,6 +7,7 @@ import {
   SubscriptionPlugin,
 } from "graphile-build";
 import {
+  GraphQLInputObjectType,
   GraphQLInterfaceType,
   GraphQLObjectType,
   isListType,
@@ -72,7 +73,7 @@ function getNullability(type) {
   }
 }
 
-describe("object and interface", () => {
+describe("object, interface and input", () => {
   const wrappers = [
     ["", [true, false, true]],
     ["!", [true, false, false]],
@@ -92,6 +93,7 @@ describe("object and interface", () => {
               message: spec,
             },
           },
+          echo2: spec,
         },
         EchoCapable: {
           echo: {
@@ -101,6 +103,9 @@ describe("object and interface", () => {
             },
           },
         },
+        MyInput: {
+          message: spec,
+        },
       }),
     ]);
 
@@ -108,12 +113,19 @@ describe("object and interface", () => {
       /** @type {GraphQLObjectType} */
       const Query = schema.getType("Query");
       expect(Query).toBeInstanceOf(GraphQLObjectType);
-      const field = Query.getFields().echo;
-      const nullability = getNullability(field.type);
-      expect(nullability).toEqual(expectation);
-      const arg = field.args.find((a) => a.name === "message");
-      const argNullability = getNullability(arg.type);
-      expect(argNullability).toEqual(expectation);
+      {
+        const field = Query.getFields().echo;
+        const nullability = getNullability(field.type);
+        expect(nullability).toEqual(expectation);
+        const arg = field.args.find((a) => a.name === "message");
+        const argNullability = getNullability(arg.type);
+        expect(argNullability).toEqual(expectation);
+      }
+      {
+        const field = Query.getFields().echo2;
+        const nullability = getNullability(field.type);
+        expect(nullability).toEqual(expectation);
+      }
     }
 
     {
@@ -126,6 +138,15 @@ describe("object and interface", () => {
       const arg = field.args.find((a) => a.name === "message");
       const argNullability = getNullability(arg.type);
       expect(argNullability).toEqual(expectation);
+    }
+
+    {
+      /** @type {GraphQLInputType} */
+      const MyInput = schema.getType("MyInput");
+      expect(MyInput).toBeInstanceOf(GraphQLInputObjectType);
+      const field = MyInput.getFields().message;
+      const nullability = getNullability(field.type);
+      expect(nullability).toEqual(expectation);
     }
   });
 });
