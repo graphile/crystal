@@ -1,3 +1,9 @@
+---
+layout: page
+path: /postgraphile/
+title: Introduction
+---
+
 # PostGraphile Introduction
 
 <p class='intro'>
