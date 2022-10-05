@@ -48,6 +48,20 @@ const config = {
           routeBasePath: "postgraphile",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          versions: {
+            "4.12.0": {
+              path: "current",
+            },
+          },
+          remarkPlugins: [
+            [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
+          ],
+        },
+        pages: {
+          remarkPlugins: [
+            require("@docusaurus/remark-plugin-npm2yarn"),
+            { sync: true },
+          ],
         },
         blog: false,
         theme: {
@@ -99,6 +113,12 @@ const config = {
             docsPluginId: "default",
             position: "left",
             label: "PostGraphile",
+          },
+          {
+            type: "docsVersionDropdown",
+            position: "right",
+            // dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
+            dropdownActiveClassDisabled: true,
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,

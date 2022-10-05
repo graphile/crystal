@@ -3488,6 +3488,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@docusaurus/remark-plugin-npm2yarn@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@docusaurus/remark-plugin-npm2yarn@npm:2.1.0"
+  dependencies:
+    npm-to-yarn: "npm:^1.0.1"
+    tslib: "npm:^2.4.0"
+    unist-util-visit: "npm:^2.0.3"
+  checksum: cf1ec13d89ae76074131ab2c2e3d1487fb93417f79da87621547e4937e526dd6a9347339fadced83c9873ea5d6cb91585f7d3c0cf9e7d8080715fbbf554812d1
+  languageName: node
+  linkType: hard
+
 "@docusaurus/theme-classic@npm:2.1.0":
   version: 2.1.0
   resolution: "@docusaurus/theme-classic@npm:2.1.0"
@@ -4644,6 +4655,7 @@ __metadata:
     "@docusaurus/core": "npm:2.1.0"
     "@docusaurus/module-type-aliases": "npm:2.1.0"
     "@docusaurus/preset-classic": "npm:2.1.0"
+    "@docusaurus/remark-plugin-npm2yarn": "npm:^2.1.0"
     "@mdx-js/react": "npm:^1.6.22"
     clsx: "npm:^1.2.1"
     prism-react-renderer: "npm:^1.3.5"
@@ -15680,6 +15692,13 @@ __metadata:
   dependencies:
     path-key: "npm:^3.0.0"
   checksum: 059e7eda4dfa26f1f870886cf034471d5355521138b33d575a24b4a05b08593e29332a96da8aabe908c608779367ad898f46dade2cb29f0cc14213f642cd4609
+  languageName: node
+  linkType: hard
+
+"npm-to-yarn@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "npm-to-yarn@npm:1.0.1"
+  checksum: 9b01b6b02d725e40b5bdb73e382b5896298227f00480c401f0d5d23977570285b5132744db7afcdf818f45b5f51899aaa6e130246ca34ec470d64aeafff90046
   languageName: node
   linkType: hard
 
