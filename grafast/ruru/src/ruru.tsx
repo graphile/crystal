@@ -1,5 +1,7 @@
 import "graphiql/graphiql.css";
+import "@graphiql/plugin-explorer/dist/style.css";
 
+import { useExplorerPlugin } from "@graphiql/plugin-explorer";
 import {
   CopyIcon,
   GraphiQLProvider,
@@ -11,6 +13,7 @@ import {
   useCopyQuery,
   useMergeQuery,
 } from "@graphiql/react";
+import type { GraphiQLProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -46,9 +49,14 @@ export const Ruru: FC<RuruProps> = (props) => {
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
   const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
+  const [query, setQuery] = useState(storage.get("query") ?? defaultQuery);
+  const explorerPlugin = useExplorerPlugin({
+    query,
+    onEdit: setQuery,
+  });
   const plugins = useMemo(() => {
-    return [EXPLAIN_PLUGIN];
-  }, []);
+    return [explorerPlugin, EXPLAIN_PLUGIN];
+  }, [explorerPlugin]);
   return (
     <ExplainContext.Provider
       value={{
@@ -62,6 +70,7 @@ export const Ruru: FC<RuruProps> = (props) => {
         fetcher={fetcher}
         schema={schema}
         defaultQuery={defaultQuery}
+        query={query}
         plugins={plugins}
       >
         <RuruInner
@@ -69,6 +78,7 @@ export const Ruru: FC<RuruProps> = (props) => {
           editorTheme={props.editorTheme}
           error={error}
           setError={setError}
+          onEditQuery={setQuery}
         />
       </GraphiQLProvider>
     </ExplainContext.Provider>
@@ -80,8 +90,9 @@ export const RuruInner: FC<{
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
+  onEditQuery: GraphiQLProps["onEditQuery"];
 }> = (props) => {
-  const { storage, editorTheme, error, setError } = props;
+  const { storage, editorTheme, error, setError, onEditQuery } = props;
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
@@ -106,7 +117,10 @@ export const RuruInner: FC<{
           position: "relative",
         }}
       >
-        <GraphiQLInterface editorTheme={editorTheme ?? "dracula"}>
+        <GraphiQLInterface
+          editorTheme={editorTheme ?? "dracula"}
+          onEditQuery={onEditQuery}
+        >
           <GraphiQL.Logo>
             <a
               href="https://grafast.org/ruru"

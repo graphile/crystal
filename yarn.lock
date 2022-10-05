@@ -3772,7 +3772,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@grafast/ruru@workspace:grafast/ruru"
   dependencies:
-    "@graphiql/react": "npm:^0.13.1"
+    "@graphiql/plugin-explorer": "npm:^0.1.5"
+    "@graphiql/react": "npm:^0.13.2"
     "@graphiql/toolkit": "npm:^0.8.0"
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
@@ -3786,7 +3787,7 @@ __metadata:
     css-loader: "npm:^6.7.1"
     file-loader: "npm:^6.2.0"
     graphile-config: "workspace:^"
-    graphiql: "npm:^2.0.7"
+    graphiql: "npm:^2.0.8"
     graphiql-explorer: "npm:^0.9.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     http-proxy: "npm:^1.18.1"
@@ -3848,9 +3849,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/react@npm:^0.13.1":
-  version: 0.13.1
-  resolution: "@graphiql/react@npm:0.13.1"
+"@graphiql/plugin-explorer@npm:^0.1.5":
+  version: 0.1.5
+  resolution: "@graphiql/plugin-explorer@npm:0.1.5"
+  dependencies:
+    "@graphiql/react": "npm:^0.13.2"
+    graphiql-explorer: "npm:^0.9.0"
+  peerDependencies:
+    graphql: ^15.5.0 || ^16.0.0
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: b60f2ff1b0f7029d1f2389fa1302f159c80ef2f88361557489b461b8bdcda463e667ef869c547ed55b1ac6584dea7bf23fb45492b3b1d7fd7a4a1a7a16e40fdc
+  languageName: node
+  linkType: hard
+
+"@graphiql/react@npm:^0.13.2":
+  version: 0.13.2
+  resolution: "@graphiql/react@npm:0.13.2"
   dependencies:
     "@graphiql/toolkit": "npm:^0.8.0"
     "@reach/combobox": "npm:^0.17.0"
@@ -3869,7 +3884,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: b2a9ca0be736ebd5e813275980097f33f05f481e28bcaa247d9ddf534102fa5b357a4d148b4e773af4c99a1981bdd6bd4d9f37d80511500378a6f022694e41da
+  checksum: 9a7588b36be58db8ea189092cc5ec29eede6ecdda2523f07c03d5fb0685bdbd784f3d19e1f20b422304a42efdf51dca209d7396167cf4f21c1407c17be5e69cc
   languageName: node
   linkType: hard
 
@@ -12218,11 +12233,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^2.0.7":
-  version: 2.0.7
-  resolution: "graphiql@npm:2.0.7"
+"graphiql@npm:^2.0.8":
+  version: 2.0.8
+  resolution: "graphiql@npm:2.0.8"
   dependencies:
-    "@graphiql/react": "npm:^0.13.1"
+    "@graphiql/react": "npm:^0.13.2"
     "@graphiql/toolkit": "npm:^0.8.0"
     entities: "npm:^2.0.0"
     graphql-language-service: "npm:^5.1.0"
@@ -12231,7 +12246,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 5ec5e34ce3d9a1fce622df15a9fb963731b4e492a62cfde843d291f12b728335881703a36b4ef56be7abc73592ce33075154e4965a7135b89f7321f7114fd040
+  checksum: 27843b1afbdadc961c992ca083936054c3c2dc5b7b8b9e24fdf31fc13e22d56f04f89efe41bd5e051e8dae74c7c9cdd985368bfb6f5d0530df28d423f240523e
   languageName: node
   linkType: hard
 
