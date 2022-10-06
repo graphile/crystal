@@ -32,7 +32,8 @@ if the same plugin is referenced in multiple presets.
 The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, and PostGraphile registers the `server` scope.
+scopes, `graphile-build-pg` registers the `pgSources` scope, and PostGraphile
+registers the `server` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope. It may be necessary
@@ -53,6 +54,7 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 import { StreamDeferPlugin } from "graphile-build";
+import { makePgSourcesFromConnectionString } from "postgraphile";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -62,13 +64,22 @@ const preset = {
   ],
 
   plugins: [
-    /* Add plugins here, e.g. */
+    /* Add plugins here, e.g.: */
     StreamDeferPlugin,
   ],
 
   inflection: {
     /* options for the inflection system */
   },
+  pgSources: [
+    /* list of PG database configurations, e.g.: */
+    ...makePgSourcesFromConnectionString(
+      // Database connection string:
+      process.env.DATABASE_URL,
+      // List of schemas to expose:
+      ["app_public"],
+    ),
+  ],
   gather: {
     /* options for the gather phase */
   },
@@ -88,6 +99,69 @@ export default preset;
 _(TypeScript type: `GraphileBuild.GraphileBuildInflectionOptions`)_
 
 _None at this time._
+
+## pgSources
+
+_(TypeScript type: `ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>`)_
+
+Details the PostgreSQL database(s) for PostGraphile to connect to; this is a
+separate option because it's used in both the `gather` phase (for introspection)
+and at runtime.
+
+Generally it's best to construct this by using the
+`makePgSourcesFromConnectionString` helper (see below), but if you want to know
+the nitty-gritty: each entry in the list is an object with the following keys
+(only `name` and `adaptor` are required):
+
+- `name: string` - an arbitrary unique name for this source; please keep it
+  alphanumeric!
+- `adaptor: string` - the name of the module to use as the postgres adaptor;
+  e.g. `@dataplan/pg/adaptors/node-postgres` for the `pg` module
+- `adaptorSettings` - options to pass to the adaptor, these are different for
+  each adaptor
+- `schemas: string[]` - an array of PostgreSQL schema names to use
+- `listen: (topic: string) => AsyncIterable<string>` - a callback function to
+  use to listen to a particular topic
+- `pgSettings: (ctx: GraphileConfig.GraphQLRequestContext) => Record<string, string> | null` -
+  a callback function that will be called by the server to determine the
+  pgSettings to use for a particular request
+- `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings
+  to use when introspecting the database (for example if you want to change
+  roles)
+- `withPgClientKey: string` - the key on the `context` object to store the
+  `withPgClient` method the schema uses for communicating with the database
+- `pgSettingsKey: string` - the key on the `context` object to store the
+  `pgSettings` configuration to use when communicating with the database
+
+```js title="Example manual configuration"
+import * as pg from "pg";
+
+const pgSources = [
+  {
+    name: "main",
+    schemas: ["app_public"],
+    pgSettingsKey: "pgSettings",
+    withPgClientKey: "withPgClient",
+    adaptor: "@dataplan/pg/adaptors/node-postgres",
+    adaptorSettings: {
+      pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
+    },
+  },
+];
+```
+
+### makePgSourcesFromConnectionString
+
+This simple function will take a PostgreSQL connection string and a list of
+schemas and will return an array containing a configuration object suitable for
+inclusion in `pgSources`. Currently this uses the `pg` module, but we may change
+that default over time.
+
+```js title="Example configuration via makePgSourcesFromConnectionString"
+const pgSources = makePgSourcesFromConnectionString(process.env.DATABASE_URL, [
+  "app_public",
+]);
+```
 
 ## Gather options
 
