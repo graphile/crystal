@@ -162,9 +162,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     process.exit(2);
   }
 
-  const serv = postgraphile(config);
+  const instance = postgraphile(config);
 
-  const server = createServer(serv.handler);
+  const server = createServer(instance.getServer().handler);
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);

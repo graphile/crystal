@@ -1,2 +1,2 @@
 export { ServerParams } from "./interfaces.js";
-export { grafserv } from "./middleware/index.js";
+export { Grafserv, grafserv } from "./middleware/index.js";
