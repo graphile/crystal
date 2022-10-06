@@ -1,4 +1,4 @@
-import type { Deferred, PromiseOrDirect } from "grafast";
+import type { Deferred } from "grafast";
 import { defer } from "grafast";
 import type { Grafserv, ServerParams } from "grafserv";
 import { grafserv } from "grafserv";
