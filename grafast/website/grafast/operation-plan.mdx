@@ -72,7 +72,7 @@ plans).
 Once every selection set has been fully visited and every field has been
 planned, the operation plan is complete.
 
-<grafast /> then walks through the output plans, their required steps and those
+&ZeroWidthSpace;<grafast /> then walks through the output plans, their required steps and those
 steps dependencies (and their dependencies and so on), marking them as active.
 Any step that is not active is "unreachable" and thus is no longer needed,
 therefore it can be be removed from the operation plan.
@@ -110,7 +110,7 @@ unnecessary steps from the operation plan.
 
 ### Finalize
 
-<grafast /> then finalizes the plan by calling the `finalize` method on steps
+&ZeroWidthSpace;<grafast /> then finalizes the plan by calling the `finalize` method on steps
 that support it. This gives each step a chance to do work that need only be done
 once, for example:
 

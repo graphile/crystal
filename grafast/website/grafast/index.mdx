@@ -23,7 +23,7 @@ most egregious performance issue that a naive GraphQL schema may face - there
 are others such as server-side over-fetching and under-fetching and related
 issues that can really build up as your schemas and operations get more complex.
 
-<grafast /> was designed from the ground up to eliminate these issues and more
+&ZeroWidthSpace;<grafast /> was designed from the ground up to eliminate these issues and more
 whilst maintaining pleasant APIs for developers to use. To do this, in addition
 to supporting resolvers for legacy fields, <grafast /> favors a planning
 strategy that takes a holistic approach to understanding the incoming operation,
@@ -141,7 +141,7 @@ query:
 }
 ```
 
-<grafast /> would build an operation plan for the operation, which for the above
+&ZeroWidthSpace;<grafast /> would build an operation plan for the operation, which for the above
 query is:
 
 <Mermaid chart={mermaidPlan} />
@@ -211,7 +211,7 @@ optimized function to do so.
 
 ## Further optimizations
 
-<grafast /> doesn't just help your schema to execute fewer and more efficient
+&ZeroWidthSpace;<grafast /> doesn't just help your schema to execute fewer and more efficient
 steps, it also optimizes how your data is output once it has been determined.
 This means that even without making a single change to your existing GraphQL
 schema (i.e. without adopting plans), running it though <grafast /> rather than
