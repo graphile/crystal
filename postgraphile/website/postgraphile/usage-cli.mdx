@@ -43,30 +43,27 @@ you can run PostGraphile with no (or minimal) CLI flags.
 - `--help`  
   output usage information
 - `--preset <string>` (alias: `-P`)
-  <equivalent>{`{ extends: [...] }`}</equivalent>  
-  can be used to specify a comma-separated list of presets to add to the
-  configuration
+  <equivalent>{`{ extends: [...] }`}</equivalent>
+  can be used to specify a comma-separated list of presets to add to the configuration
 - `--allow-explain` (alias: `-e`)
-  <equivalent>{ `{ server: { exposePlan: true } }`}</equivalent>  
-  enables "explain" mode, you won't want this in production but it's very
-  helpful in development to know what's going on
+  <equivalent>{`{ server: { exposePlan: true } }`}</equivalent>
+  enables "explain" mode, you won't want this in production but it's very helpful
+  in development to know what's going on
 - `--connection <string>` (alias: `-c`)
-  <equivalent>{`{ pgSources: makePgSources('...') }`}</equivalent>  
-  the PostgreSQL connection string. If omitted, inferred from environmental
-  variables (see
-  https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples:
+  <equivalent>{`{ pgSources: makePgSources('...') }`}</equivalent>
+  the PostgreSQL connection string. If omitted, inferred from environmental variables
+  (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples:
   'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=true'
 - `--schema <string>` (alias: `-s`)
-  <equivalent>{
-  `{ pgSources: makePgSources(databaseUrl, ['...']) }`}</equivalent>  
+  <equivalent>{`{ pgSources: makePgSources(databaseUrl, ['...']) }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
 - `--watch` (alias: `-w`)
-  <equivalent>{`{ server: { watch: true } }`}</equivalent>  
-  automatically updates your GraphQL schema when your database schema changes
-  (NOTE: requires DB superuser to install `postgraphile_watch` schema)
+  <equivalent>{`{ server: { watch: true } }`}</equivalent>
+  automatically updates your GraphQL schema when your database schema changes (NOTE:
+  requires DB superuser to install `postgraphile_watch` schema)
 - `--host <string>` (alias: `-n`)
-  <equivalent>{`{ server: { host: 'localhost' } }`}</equivalent>  
+  <equivalent>{`{ server: { host: 'localhost' } }`}</equivalent>
   the hostname to be used. Defaults to `localhost`
 - `--port <number>` (alias: `-p`)
-  <equivalent>{`{ server: { port: 5678 } }`}</equivalent>  
+  <equivalent>{`{ server: { port: 5678 } }`}</equivalent>
   the port to be used. Defaults to 5000

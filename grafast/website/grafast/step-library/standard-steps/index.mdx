@@ -11,13 +11,13 @@ sidebar_position: 6
 
 ## Forming objects and lists
 
-- [list][]: takes a list of steps and turns it into a single step that resolves to
-  list of the underlying steps' values
+- [list][]: takes a list of steps and turns it into a single step that resolves
+  to list of the underlying steps' values
 - [object][]: takes an object, the keys of which are steps, and turns it into a
   single step that resolves to an object where the values are the corresponding
   underlying steps' values
-- [map][]: returns step that results in an object made up of the given renamed keys
-  and values from another object step
+- [map][]: returns step that results in an object made up of the given renamed
+  keys and values from another object step
 
 ## Operating on lists
 
@@ -29,8 +29,8 @@ sidebar_position: 6
   grouping key. Returns a plan that results in a Map where the keys are the
   grouping keys and the values are lists of the original entries that match
   these grouping keys.
-- [each][]: Transforms a list by wrapping each element in the list with the given
-  mapper.
+- [each][]: Transforms a list by wrapping each element in the list with the
+  given mapper.
 
 ## Utility
 
@@ -43,14 +43,14 @@ sidebar_position: 6
 ## GraphQL
 
 - [context][]: returns the GraphQL contextValue
-- [connection][]: wraps a list-returning plan with connection-related capabilities
-  such as PageInfo
+- [connection][]: wraps a list-returning plan with connection-related
+  capabilities such as PageInfo
 - [node][]: gets a Node by it's global object identifier
 
 ## Realtime
 
-- [listen][]: Subscribes to the given `pubsubOrPlan` to get realtime updates on a
-  given topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
+- [listen][]: Subscribes to the given `pubsubOrPlan` to get realtime updates on
+  a given topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
   callback.
 
 [access]: ./access
@@ -61,13 +61,13 @@ sidebar_position: 6
 [error]: ./error
 [filter]: ./filter
 [first]: ./first
-[groupBy]: ./groupBy
+[groupby]: ./groupBy
 [lambda]: ./lambda
 [last]: ./last
 [list]: ./list
 [listen]: ./listen
-[loadMany]: ./loadMany
-[loadOne]: ./loadOne
+[loadmany]: ./loadMany
+[loadone]: ./loadOne
 [map]: ./map
 [node]: ./node
 [object]: ./object
