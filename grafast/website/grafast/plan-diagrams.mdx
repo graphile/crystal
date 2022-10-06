@@ -1,5 +1,63 @@
 # Plan diagrams
 
+TODO: add images and more detail
+
 ## What they mean
 
+A plan diagram is a directed acyclic graph made of a number of step nodes
+connected by arrows which show the flow of data. It also details the LayerPlans
+(aka "buckets") and the relationships between them.
+
+### Synchronous steps
+
+A synchronous step is represented by a rectangle, something like:
+
+```
++-------------------+
+|    Access[7∈0]    |
+| <3.currentUserId> |
++-------------------+
+```
+
+`Access` is the name of the Step (but with the redundant 'Step' removed - truly it's called "AccessStep").
+
+`7` is the step ID - every step has a unique identifier.
+
+`∈0` means that the step "belongs" to LayerPlan (aka "bucket") numbered `0`.
+
+The next line contains additional step-specific metadata; in this case it's telling us that we're accessing the `currentUserId` property of the step with id `3`.
+
+### Asynchronous steps
+
+These are identical to synchronous steps, except that they have a double border on the left and right (and the run asynchronously):
+
+```
+++---------------++
+|| LoadOne[18∈2] ||
+||  <userById>   ||
+++---------------++
+```
+
+### Item steps
+
+`__ItemStep` steps never execute, they're managed by <grafast /> manually to
+represent individual entries in a list or stream. They look something like
+this:
+
+
+```
+\----------------+
+ \  __Item[15∈2] |
+ /      <11>     |
+/----------------+
+```
+
 ## How to see them
+
+Your server must be configured to expose plans; if it is then you can use a
+tool such as [Ruru][] to view the operation plan, or you can render it directly
+from the JSON response. The diagrams are currently built in mermaid-js syntax,
+so you can load them into the [mermaid live editor][].
+
+[ruru]: /ruru
+[mermaid live editor]: https://mermaid-js.github.io/mermaid-live-editor/edit
