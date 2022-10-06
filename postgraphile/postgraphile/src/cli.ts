@@ -131,10 +131,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const newPgSources = makePgSources(
-      connectionString,
-      schemas,
-    );
+    const newPgSources = makePgSources(connectionString, schemas);
     preset.pgSources = newPgSources;
   }
   preset.server = preset.server || {};

@@ -108,10 +108,9 @@ Details the PostgreSQL database(s) for PostGraphile to connect to; this is a
 separate option because it's used in both the `gather` phase (for introspection)
 and at runtime.
 
-Generally it's best to construct this by using the
-`makePgSources` helper (see below), but if you want to know
-the nitty-gritty: each entry in the list is an object with the following keys
-(only `name` and `adaptor` are required):
+Generally it's best to construct this by using the `makePgSources` helper (see
+below), but if you want to know the nitty-gritty: each entry in the list is an
+object with the following keys (only `name` and `adaptor` are required):
 
 - `name: string` - an arbitrary unique name for this source; please keep it
   alphanumeric!
@@ -158,9 +157,7 @@ inclusion in `pgSources`. Currently this uses the `pg` module, but we may change
 that default over time.
 
 ```js title="Example configuration via makePgSources"
-const pgSources = makePgSources(process.env.DATABASE_URL, [
-  "app_public",
-]);
+const pgSources = makePgSources(process.env.DATABASE_URL, ["app_public"]);
 ```
 
 ## Gather options
