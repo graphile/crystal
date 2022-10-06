@@ -1,3 +1,17 @@
+import Mermaid from "@theme/Mermaid";
+const init = `\
+%%{init: {'themeVariables': { 'fontSize': '16px'}}}%%
+flowchart TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+    classDef bucket0 stroke:#696969
+    classDef bucket2 stroke:#7f007f
+`
+
+
 # Plan diagrams
 
 TODO: add images and more detail
@@ -12,12 +26,12 @@ connected by arrows which show the flow of data. It also details the LayerPlans
 
 A synchronous step is represented by a rectangle, something like:
 
-```
-+-------------------+
-|    Access[7∈0]    |
-| <3.currentUserId> |
-+-------------------+
-```
+<Mermaid chart={`\
+${init}
+    Access7["Access[7∈0]<br />ᐸ3.currentUserIdᐳ"]:::plan
+    class Access7 bucket0
+`} />
+
 
 `Access` is the name of the Step (but with the redundant 'Step' removed - truly it's called "AccessStep").
 
@@ -31,12 +45,11 @@ The next line contains additional step-specific metadata; in this case it's tell
 
 These are identical to synchronous steps, except that they have a double border on the left and right (and the run asynchronously):
 
-```
-++---------------++
-|| LoadOne[18∈2] ||
-||  <userById>   ||
-++---------------++
-```
+<Mermaid chart={`\
+${init}
+    LoadOne18[["LoadOne[18∈2]<br />ᐸuserByIdᐳ"]]:::plan
+    class LoadOne18 bucket2
+`} />
 
 ### Item steps
 
@@ -45,12 +58,12 @@ represent individual entries in a list or stream. They look something like
 this:
 
 
-```
-\----------------+
- \  __Item[15∈2] |
- /      <11>     |
-/----------------+
-```
+<Mermaid chart={`\
+${init}
+    __Item15>"__Item[15∈2]<br />ᐸ11ᐳ"]:::itemplan
+    class __Item15 bucket2
+`} />
+
 
 ## How to see them
 
