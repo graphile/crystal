@@ -15,6 +15,10 @@ const preset = {
       jwtPgTypeIdentifier: '"b"."jwt_token"',
     }),
   ],
+  inflection: {},
+  gather: {},
+  schema: {},
+  server: {},
 };
 
 export default preset;
