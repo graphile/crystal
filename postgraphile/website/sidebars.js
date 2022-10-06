@@ -28,7 +28,7 @@ const sidebars = {
         type: "doc",
         id: "usage",
       },
-      items: ["usage-cli", "usage-library", "usage-schema"],
+      items: ["usage-cli", "usage-library", "usage-schema", "config"],
     },
     "performance",
     "requirements",
