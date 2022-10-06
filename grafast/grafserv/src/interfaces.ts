@@ -31,9 +31,8 @@ export interface ServerOptions {
   /** The path at which GraphiQL will be available; usually / */
   graphiqlPath?: string;
 
+  /** If true, the mermaid diagram and SQL queries will be made available to clients */
   exposePlan?: boolean;
-  /** The path at which the latest plan will be visible; usually /plan */
-  planPath?: string;
 
   /** Set true to enable watch mode */
   watch?: boolean;
