@@ -145,3 +145,25 @@ to determine the options that they offer.
   cannot return null, so our list and connection types can be non-nullable in
   more places.
 - `subscriptions`
+
+## Server options
+
+_(TypeScript type: `import('postgraphile').ServerOptions`)_
+
+- `port: number` - Port number to listen on (default: 5678)
+- `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to
+  '0.0.0.0' in Docker and similar environments)
+- `graphqlPath: string` - The path at which GraphQL will be available; usually
+  `/graphql`
+- `eventStreamRoute: string` - The path at which the GraphQL event stream would
+  be made available; usually `/graphql/stream`
+- `graphiql: boolean`
+- `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
+  requests to the `/graphql` endpoint
+- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
+  `/`
+- `exposePlan: boolean` - If true, the mermaid diagram and SQL queries will be
+  made available to clients
+- `watch: boolean` - Set true to enable watch mode
+- `maxRequestLength: number` - The length, in bytes, for the largest request
+  body that the server will accept
