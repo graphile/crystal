@@ -8,10 +8,61 @@
 .editors {
   flex: 1 1 300px;
   display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.editor h4 {
+  text-align: center;
 }
 .editor {
   flex: 1 1 0;
   position: relative;
+  /* Copy of CSS variables from GraphiQL */
+  --color-primary: 320, 95%, 43%;
+  --color-secondary: 242, 51%, 61%;
+  --color-tertiary: 188, 100%, 36%;
+  --color-info: 208, 100%, 46%;
+  --color-success: 158, 60%, 42%;
+  --color-warning: 36, 100%, 41%;
+  --color-error: 13, 93%, 58%;
+  --color-neutral: 219, 28%, 32%;
+  --color-base: 219, 28%, 100%;
+  --alpha-secondary: 0.76;
+  --alpha-tertiary: 0.5;
+  --alpha-background-heavy: 0.15;
+  --alpha-background-medium: 0.1;
+  --alpha-background-light: 0.07;
+  --font-family: "Roboto", sans-serif;
+  --font-family-mono: "Fira Code", monospace;
+  --font-size-hint: 0.75rem;
+  --font-size-inline-code: 0.8125rem;
+  --font-size-body: 0.9375rem;
+  --font-size-h4: 1.125rem;
+  --font-size-h3: 1.375rem;
+  --font-size-h2: 1.8125rem;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --line-height: 1.5;
+  --px-2: 2px;
+  --px-4: 4px;
+  --px-6: 6px;
+  --px-8: 8px;
+  --px-10: 10px;
+  --px-12: 12px;
+  --px-16: 16px;
+  --px-20: 20px;
+  --px-24: 24px;
+  --border-radius-2: 2px;
+  --border-radius-4: 4px;
+  --border-radius-8: 8px;
+  --border-radius-12: 12px;
+  --popover-box-shadow: 0px 6px 20px rgba(59, 76, 106, 0.13),
+    0px 1.34018px 4.46726px rgba(59, 76, 106, 0.0774939),
+    0px 0.399006px 1.33002px rgba(59, 76, 106, 0.0525061);
+  --popover-border: none;
+  --sidebar-width: 44px;
+  --toolbar-width: 40px;
+  --session-header-height: 51px;
 }
 .editor textarea {
   width: 100%;

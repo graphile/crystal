@@ -1,4 +1,13 @@
+import "@uiw/react-codemirror";
+import "codemirror/keymap/sublime";
+import "codemirror/theme/monokai.css";
+import "codemirror/mode/javascript/javascript";
+import "codemirror-graphql/hint";
+import "codemirror-graphql/lint";
+import "codemirror-graphql/mode";
+
 import { Ruru } from "@grafast/ruru";
+import CodeMirror from "@uiw/react-codemirror";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { GraphQLError } from "graphql";
@@ -87,9 +96,11 @@ with (Grafast) {
       </div>
       <div className={styles.editors}>
         <div className={styles.editor}>
+          <h4>typeDefs.graphql</h4>
           <Editor lang="graphql" value={typeDefs} onValueChange={setTypedefs} />
         </div>
         <div className={styles.editor}>
+          <h4>plans.js</h4>
           <Editor lang="js" value={code} onValueChange={setCode} />
         </div>
       </div>
@@ -97,10 +108,24 @@ with (Grafast) {
   );
 }
 
-const Editor = ({ value, onValueChange }) => {
+const Editor = ({ value, onValueChange, lang }) => {
   const onChange = useCallback(
-    (e) => onValueChange(e.target.value),
+    (e) => onValueChange(e.getValue()),
     [onValueChange],
   );
-  return <textarea value={value} onChange={onChange}></textarea>;
+  const options = useMemo(() => {
+    return {
+      theme: "monokai",
+      keyMap: "sublime",
+      mode: lang,
+    };
+  }, [lang]);
+  return (
+    <CodeMirror
+      lazyLoadMode={false}
+      value={value}
+      onChange={onChange}
+      options={options}
+    />
+  );
 };

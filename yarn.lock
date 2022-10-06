@@ -2907,7 +2907,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.3, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.6":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.3, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.6, @babel/runtime@npm:^7.18.9":
   version: 7.19.0
   resolution: "@babel/runtime@npm:7.19.0"
   dependencies:
@@ -4624,7 +4624,10 @@ __metadata:
     "@docusaurus/preset-classic": "npm:2.1.0"
     "@docusaurus/remark-plugin-npm2yarn": "npm:^2.1.0"
     "@mdx-js/react": "npm:^1.6.22"
+    "@uiw/react-codemirror": "npm:^3.0.0"
     clsx: "npm:^1.2.1"
+    codemirror: "npm:^5.0.0"
+    codemirror-graphql: "npm:^2.0.0"
     dataloader: "npm:^2.1.0"
     mermaid: "npm:^9.1.7"
     prism-react-renderer: "npm:^1.3.5"
@@ -6267,6 +6270,21 @@ __metadata:
     "@typescript-eslint/types": "npm:5.37.0"
     eslint-visitor-keys: "npm:^3.3.0"
   checksum: c99e70e56bff5862b623e45662b9f04e8766fdcbaa6b81e15a3a942f8d574ebcf32b371c5756d6274d7ee2ff849dbca60ff0069573d5722c237b411e17204d30
+  languageName: node
+  linkType: hard
+
+"@uiw/react-codemirror@npm:^3.0.0":
+  version: 3.2.9
+  resolution: "@uiw/react-codemirror@npm:3.2.9"
+  dependencies:
+    "@babel/runtime": "npm:^7.18.9"
+    codemirror: "npm:^5.65.8"
+  peerDependencies:
+    "@babel/runtime": ">=7.11.0"
+    codemirror: ">=5.49.2"
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 26b143b2c5798bf8de6f0843e246d19906d70a4da2c7f493e10c01af6a2d5a349cafdcc60ccb9aabc36182c5913de27ed1a0893e31a2a329a86b9580206a0327
   languageName: node
   linkType: hard
 
@@ -8045,7 +8063,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror@npm:^5.65.3":
+"codemirror@npm:^5.0.0, codemirror@npm:^5.65.3, codemirror@npm:^5.65.8":
   version: 5.65.9
   resolution: "codemirror@npm:5.65.9"
   checksum: 3c6f7b54eacb2574e997e802e8a7dc65cdd29fdc02442be0b779fc1c73bea2afd64da49b586660b17e4d7c5f13461b814d9136230b027e1a226bf03c818d4f9f
