@@ -15,12 +15,9 @@ some resources to help you optimize you queries with indexes.
 - The PostgreSQL documentation has a great article describing the relationship
   between [Indexes and `ORDER BY`][].
 
-[efficient use of postgresql indexes]:
-  https://devcenter.heroku.com/articles/postgresql-indexes
-[managing and maintaining indexes]:
-  https://devcenter.heroku.com/articles/postgresql-indexes#managing-and-maintaining-indexes
-[indexes and `order by`]:
-  http://www.postgresql.org/docs/current/static/indexes-ordering.html
+[efficient use of postgresql indexes]: https://devcenter.heroku.com/articles/postgresql-indexes
+[managing and maintaining indexes]: https://devcenter.heroku.com/articles/postgresql-indexes#managing-and-maintaining-indexes
+[indexes and `order by`]: http://www.postgresql.org/docs/current/static/indexes-ordering.html
 
 _This article was originally written by
 [Caleb Meredith](https://twitter.com/calebmer)._

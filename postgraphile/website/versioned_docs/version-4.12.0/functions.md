@@ -28,8 +28,7 @@ for data intensive uses.
 
 For some function examples, you can refer to the [forum example SQL schema][].
 
-[forum example sql schema]:
-  https://github.com/graphile/postgraphile/blob/v4/examples/forum/schema.sql
+[forum example sql schema]: https://github.com/graphile/postgraphile/blob/v4/examples/forum/schema.sql
 
 ### Recommended Reading
 
@@ -38,10 +37,8 @@ For some function examples, you can refer to the [forum example SQL schema][].
 - PostgreSQL [`CREATE TRIGGER`][] documentation.
 - StackOverflow answer describing [computed columns in PostgreSQL][].
 
-[`create function`]:
-  http://www.postgresql.org/docs/current/static/sql-createfunction.html
-[`create trigger`]:
-  http://www.postgresql.org/docs/current/static/sql-createtrigger.html
+[`create function`]: http://www.postgresql.org/docs/current/static/sql-createfunction.html
+[`create trigger`]: http://www.postgresql.org/docs/current/static/sql-createtrigger.html
 [computed columns in postgresql]: http://stackoverflow.com/a/11166268/1568890
 
 ### Procedural Languages
@@ -307,8 +304,7 @@ could be queried like this:
 More information on constructing advanced queries can be found
 [here](./custom-queries/).
 
-[forum example sql schema]:
-  https://github.com/graphile/postgraphile/blob/v4/examples/forum/schema.sql
+[forum example sql schema]: https://github.com/graphile/postgraphile/blob/v4/examples/forum/schema.sql
 
 ---
 

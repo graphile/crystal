@@ -131,5 +131,4 @@ const text = inflection.enhanced("avatarUrl");
 
 :::
 
-[declaration merging]:
-  https://www.typescriptlang.org/docs/handbook/declaration-merging.html
+[declaration merging]: https://www.typescriptlang.org/docs/handbook/declaration-merging.html
