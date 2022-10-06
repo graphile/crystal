@@ -9,6 +9,14 @@ module.exports = {
       },
     },
     {
+      // Due to the following Prettier issue, it's unsafe to proseWrap MDX currently
+      // https://github.com/prettier/prettier/issues/13586
+      files: ["**/website/**/*.mdx", "**/website/**/*.md"],
+      options: {
+        proseWrap: "preserve",
+      },
+    },
+    {
       files: "grafast/grafast/vendor/graphql-js/**",
       options: {
         singleQuote: true,
