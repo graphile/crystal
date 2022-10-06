@@ -54,7 +54,7 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 import { StreamDeferPlugin } from "graphile-build";
-import { makePgSourcesFromConnectionString } from "postgraphile";
+import { makePgSources } from "postgraphile";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -73,7 +73,7 @@ const preset = {
   },
   pgSources: [
     /* list of PG database configurations, e.g.: */
-    ...makePgSourcesFromConnectionString(
+    ...makePgSources(
       // Database connection string:
       process.env.DATABASE_URL,
       // List of schemas to expose:
@@ -109,7 +109,7 @@ separate option because it's used in both the `gather` phase (for introspection)
 and at runtime.
 
 Generally it's best to construct this by using the
-`makePgSourcesFromConnectionString` helper (see below), but if you want to know
+`makePgSources` helper (see below), but if you want to know
 the nitty-gritty: each entry in the list is an object with the following keys
 (only `name` and `adaptor` are required):
 
@@ -150,15 +150,15 @@ const pgSources = [
 ];
 ```
 
-### makePgSourcesFromConnectionString
+### makePgSources
 
 This simple function will take a PostgreSQL connection string and a list of
 schemas and will return an array containing a configuration object suitable for
 inclusion in `pgSources`. Currently this uses the `pg` module, but we may change
 that default over time.
 
-```js title="Example configuration via makePgSourcesFromConnectionString"
-const pgSources = makePgSourcesFromConnectionString(process.env.DATABASE_URL, [
+```js title="Example configuration via makePgSources"
+const pgSources = makePgSources(process.env.DATABASE_URL, [
   "app_public",
 ]);
 ```

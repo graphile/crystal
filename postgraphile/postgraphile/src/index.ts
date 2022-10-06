@@ -7,7 +7,7 @@ import type { GraphQLSchema } from "graphql";
 
 import { makeSchema, watchSchema } from "./schema.js";
 
-export { makePgSourcesFromConnectionString, makeSchema } from "./schema.js";
+export { makePgSources, makeSchema } from "./schema.js";
 
 export { GraphileBuild, GraphileConfig };
 
