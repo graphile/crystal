@@ -47,7 +47,10 @@ Note that the schema build process in PostGraphile is:
   the "gather" phase
 - Synchronously build the GraphQL schema during the "schema" phase
 
-```js
+```ts
+// Only needed for TypeScript types support
+import "postgraphile";
+
 import amber from "postgraphile/presets/amber";
 import { StreamDeferPlugin } from "graphile-build";
 
@@ -82,9 +85,13 @@ export default preset;
 
 ## Inflection options
 
+_(TypeScript type: `GraphileBuild.GraphileBuildInflectionOptions`)_
+
 _None at this time._
 
 ## Gather options
+
+_(TypeScript type: `GraphileBuild.GraphileBuildGatherOptions`)_
 
 - `pgStrictFunctions: boolean` - if true, we'll treat all PostgreSQL function
   arguments that don't have defaults as being required (non-nullable)
@@ -102,6 +109,8 @@ Deprecated options:
   significantly increases the risk of NodeID conflicts)
 
 ## Schema options
+
+_(TypeScript type: `GraphileBuild.GraphileBuildSchemaOptions`)_
 
 :::tip
 
