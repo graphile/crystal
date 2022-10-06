@@ -47,6 +47,15 @@ const config = {
           routeBasePath: "grafast",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          remarkPlugins: [
+            [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
+          ],
+        },
+        pages: {
+          remarkPlugins: [
+            require("@docusaurus/remark-plugin-npm2yarn"),
+            { sync: true },
+          ],
         },
         blog: false,
         theme: {

@@ -79,8 +79,8 @@ const plans = {
 
 `lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
 values rather than the batched processing that Grafast prefers for efficiency.
-It can be handy as a utility function, but in general you should pick a [more
-suitable step][step library].
+It can be handy as a utility function when batching would confer no benefit,
+but in general you should pick a [more suitable step][step library].
 
 :::
 
@@ -125,7 +125,8 @@ The result is what we'd expect:
 
 Our schema is so simple the query could be ran synchronously with `grafastSync`,
 but most queries in the real world should be executed through `grafast` and will
-return a promise, or even an async iterable!
+return a promise, or even an async iterable for `@stream`, `@defer`,
+subscriptions and similar!
 
 :::
 
@@ -203,3 +204,4 @@ or continue through the documentation.
 [standard steps]: ../step-library/standard-steps
 [step classes]: ../step-classes
 [field args]: ../plan-resolvers#field-arguments-fieldargs
+[grafserv]: /grafserv

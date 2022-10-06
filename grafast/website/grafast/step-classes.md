@@ -245,7 +245,6 @@ Do not set this true unless the following hold:
 - The `execute` method must be a regular (not async) function
 - The `execute` method must NEVER return a promise
 - The values within the list returned from `execute` must NEVER include promises
-  or CrystalError objects
 - The result of calling `execute` should not differ after a
   `step.hasSideEffects` has executed (i.e. it should be pure, only dependent on
   its deps and use no external state)

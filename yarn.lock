@@ -4622,6 +4622,7 @@ __metadata:
     "@docusaurus/core": "npm:2.1.0"
     "@docusaurus/module-type-aliases": "npm:2.1.0"
     "@docusaurus/preset-classic": "npm:2.1.0"
+    "@docusaurus/remark-plugin-npm2yarn": "npm:^2.1.0"
     "@mdx-js/react": "npm:^1.6.22"
     clsx: "npm:^1.2.1"
     dataloader: "npm:^2.1.0"
