@@ -4,7 +4,7 @@ PostGraphile is formed of three layers, each building on top of the layer below.
 
 ## CLI
 
-At the very top is the [**PostGraphile CLI**](./usage-cli/). This layer is the
+At the very top is the [**PostGraphile CLI**](./usage-cli.mdx). This layer is the
 most user-friendly but also the most limited: it accepts a few command line
 options, will load your [config file][], and spins up a Node `http` server (or
 cluster thereof) to host the Grafserv instance from the PostGraphile library
@@ -15,7 +15,7 @@ production.**
 
 ## Library
 
-The [**PostGraphile library**](./usage-library/) builds your GraphQL schema (see
+The [**PostGraphile library**](./usage-library.md) builds your GraphQL schema (see
 next), possibly in watch mode, and lets you access it or retrieve a [Grafserv][]
 instance. You can mount the grafserv instance in Node's `http` server, or as a
 middleware in any of a number of Node.js web servers, such as Connect, Express,
@@ -37,7 +37,7 @@ the full power of the Node.js ecosystem.
 ## Schema
 
 Deepest down is the
-[**PostGraphile GraphQL schema** ("schema-only")](./usage-schema/) itself which
+[**PostGraphile GraphQL schema** ("schema-only")](./usage-schema.md) itself which
 contains all the types, fields and plans (Gra*fast*'s replacement for
 resolvers). The plans inside the schema take care of configuring a PG client
 with the relevant settings when needed, so the schema can be used without
@@ -67,7 +67,7 @@ the PostGraphile middleware if you need deeper integration with Node.js.
 
 Which layer would you like to read more about?
 
-- [**CLI**](./usage-cli.md)
+- [**CLI**](./usage-cli.mdx)
 - [**Middleware** ("library")](./usage-library.md)
 - [**GraphQL schema** ("schema-only")](./usage-schema.md)
 - [Configuration](./config.md)
