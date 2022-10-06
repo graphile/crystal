@@ -9,6 +9,7 @@ import { version } from "../index.js";
 declare global {
   namespace GraphileBuild {
     interface GraphileBuildSchemaOptions {
+      // TODO: rename to `pgOrderByNullsLast`?
       orderByNullsLast?: boolean;
     }
   }
