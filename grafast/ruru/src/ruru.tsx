@@ -20,7 +20,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { RuruFooter } from "./components/Footer.js";
-import { defaultQuery } from "./defaultQuery.js";
+import { defaultQuery as DEFAULT_QUERY } from "./defaultQuery.js";
 import { ExplainContext, useExplain } from "./hooks/useExplain.js";
 import { useFetcher } from "./hooks/useFetcher.js";
 import { usePrettify } from "./hooks/usePrettify.js";
@@ -49,6 +49,7 @@ export const Ruru: FC<RuruProps> = (props) => {
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
   const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
+  const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
   const [query, setQuery] = useState(storage.get("query") ?? defaultQuery);
   const explorerPlugin = useExplorerPlugin({
     query,

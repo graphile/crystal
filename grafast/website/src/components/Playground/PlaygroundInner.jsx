@@ -6,6 +6,11 @@ import React, { useCallback, useMemo, useState } from "react";
 
 import styles from "./styles.module.css";
 
+const INITIAL_QUERY = `\
+query Example {
+  meaningOfLife: addTwoNumbers(a:37, b:5)
+}
+`;
 const INITIAL_TYPEDEFS = `\
 type Query {
   addTwoNumbers(a: Int!, b: Int!): Int
@@ -78,7 +83,7 @@ with (Grafast) {
   return (
     <div className={styles.container}>
       <div className={styles.ruru}>
-        <Ruru fetcher={fetcher} />
+        <Ruru fetcher={fetcher} defaultQuery={INITIAL_QUERY} />
       </div>
       <div className={styles.editors}>
         <div className={styles.editor}>
