@@ -84,13 +84,10 @@ Still worried about a certain aspect of a schema driven API? Open an issue,
 we're confident we can convince you otherwise 😉
 
 [user-management]: http://www.postgresql.org/docs/current/static/user-manag.html
-[row-level-security]:
-  http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
+[row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
 [pg-views]: http://www.postgresql.org/docs/current/static/sql-createview.html
-[pg-udpatable-views]:
-  http://www.postgresql.org/docs/current/static/sql-createview.html#SQL-CREATEVIEW-UPDATABLE-VIEWS
-[js-in-pg]:
-  https://blog.heroku.com/archives/2013/6/5/javascript_in_your_postgres
+[pg-udpatable-views]: http://www.postgresql.org/docs/current/static/sql-createview.html#SQL-CREATEVIEW-UPDATABLE-VIEWS
+[js-in-pg]: https://blog.heroku.com/archives/2013/6/5/javascript_in_your_postgres
 [ruby-in-pg]: https://github.com/knu/postgresql-plruby
 [pg-notify]: http://www.postgresql.org/docs/current/static/sql-notify.html
 [node-pg-notify]: https://www.npmjs.com/package/pg-pubsub

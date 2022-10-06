@@ -37,3 +37,5 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
   return getFriendshipsByUserIds(ids, { columns: attributes });
 };
 ```
+
+[dataloader]: https://github.com/graphql/dataloader

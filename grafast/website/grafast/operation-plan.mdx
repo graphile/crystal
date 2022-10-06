@@ -40,14 +40,15 @@ A simplified version of the process is this:
 
 ## Constraints
 
-Whilst <grafast /> is building the operation plan, it may also determined particular
-constraints that govern whether the operation plan may be used for a future
-request or not. For example, if the request contains `@skip(if: $variable)` then
-a different operation plan would be needed depending on whether `$variable` was
-`true` or `false`. Where possible, constraints are kept as narrow as possible -
-for example "variable $foo is a list" is preferred over "variable
-$foo is the
-list [1,2,3]" - to maximize reuse.
+Whilst <grafast /> is building the operation plan, it may also determined
+particular constraints that govern whether the operation plan may be used for a
+future request or not. For example, if the request contains
+`@skip(if: $variable)` then a different operation plan would be needed depending
+on whether `$variable` was `true` or `false`. Where possible, constraints are
+kept as narrow as possible - for example "variable
+$foo is a list" is preferred over "variable
+$foo is the list [1,2,3]" - to
+maximize reuse.
 
 When an operation is seen a future time, <grafast /> first looks for an existing
 operation plan whose constraints fit the request before falling back to creating
@@ -57,8 +58,8 @@ a new operation plan.
 
 ### Deduplicate
 
-Once a field is fully planned, <grafast /> will _deduplicate_ the new steps it has
-produced, attempting to replace them with existing "peer" steps that already
+Once a field is fully planned, <grafast /> will _deduplicate_ the new steps it
+has produced, attempting to replace them with existing "peer" steps that already
 existed. These "peer" steps will have been constructed via the same step class,
 and will have the same dependencies. By deduplicating at this stage (before
 planning the child selection set) we help to ensure that the schema remains in
@@ -71,7 +72,7 @@ plans).
 Once every selection set has been fully visited and every field has been
 planned, the operation plan is complete.
 
-<grafast /> then walks through the output plans, their required steps and those
+&ZeroWidthSpace;<grafast /> then walks through the output plans, their required steps and those
 steps dependencies (and their dependencies and so on), marking them as active.
 Any step that is not active is "unreachable" and thus is no longer needed,
 therefore it can be be removed from the operation plan.
@@ -109,8 +110,8 @@ unnecessary steps from the operation plan.
 
 ### Finalize
 
-<grafast /> then finalizes the plan by calling the `finalize` method on steps that
-support it. This gives each step a chance to do work that need only be done
+&ZeroWidthSpace;<grafast /> then finalizes the plan by calling the `finalize` method on steps
+that support it. This gives each step a chance to do work that need only be done
 once, for example:
 
 - a step that talks to a database might compile the SQL it needs and cache it

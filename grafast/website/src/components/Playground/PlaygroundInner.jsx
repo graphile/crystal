@@ -1,4 +1,14 @@
+import "@uiw/react-codemirror";
+import "codemirror/keymap/sublime";
+import "codemirror/theme/monokai.css";
+import "codemirror/mode/javascript/javascript";
+import "codemirror-graphql/hint";
+import "codemirror-graphql/lint";
+import "codemirror-graphql/mode";
+
 import { Ruru } from "@grafast/ruru";
+// eslint-disable-next-line @typescript-eslint/no-duplicate-imports
+import CodeMirror from "@uiw/react-codemirror";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { GraphQLError } from "graphql";
@@ -6,6 +16,11 @@ import React, { useCallback, useMemo, useState } from "react";
 
 import styles from "./styles.module.css";
 
+const INITIAL_QUERY = `\
+query Example {
+  meaningOfLife: addTwoNumbers(a:37, b:5)
+}
+`;
 const INITIAL_TYPEDEFS = `\
 type Query {
   addTwoNumbers(a: Int!, b: Int!): Int
@@ -78,22 +93,40 @@ with (Grafast) {
   return (
     <div className={styles.container}>
       <div className={styles.ruru}>
-        <Ruru fetcher={fetcher} />
+        <Ruru fetcher={fetcher} defaultQuery={INITIAL_QUERY} />
       </div>
       <div className={styles.editors}>
         <div className={styles.editor}>
-          <textarea
-            value={typeDefs}
-            onChange={(e) => setTypedefs(e.target.value)}
-          ></textarea>
+          <h4>typeDefs.graphql</h4>
+          <Editor lang="graphql" value={typeDefs} onValueChange={setTypedefs} />
         </div>
         <div className={styles.editor}>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          ></textarea>
+          <h4>plans.js</h4>
+          <Editor lang="js" value={code} onValueChange={setCode} />
         </div>
       </div>
     </div>
   );
 }
+
+const Editor = ({ value, onValueChange, lang }) => {
+  const onChange = useCallback(
+    (e) => onValueChange(e.getValue()),
+    [onValueChange],
+  );
+  const options = useMemo(() => {
+    return {
+      theme: "monokai",
+      keyMap: "sublime",
+      mode: lang,
+    };
+  }, [lang]);
+  return (
+    <CodeMirror
+      lazyLoadMode={false}
+      value={value}
+      onChange={onChange}
+      options={options}
+    />
+  );
+};

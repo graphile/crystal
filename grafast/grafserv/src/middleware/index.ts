@@ -77,15 +77,18 @@ function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   };
 }
 
-export function grafserv(
-  preset: GraphileConfig.Preset,
-  initialParams?: PromiseOrDirect<ServerParams>,
-): {
+export interface Grafserv {
+  // TODO: should build handler on demand depending on flavour needed
   handler: RequestListener;
   release(): Promise<void>;
   onRelease(cb: () => PromiseOrDirect<void>): void;
   setParams(result: ServerParams): void;
-} {
+}
+
+export function grafserv(
+  preset: GraphileConfig.Preset,
+  initialParams?: PromiseOrDirect<ServerParams>,
+): Grafserv {
   /**
    * Mutable options, change them by calling `setParams`. Don't dereference
    * properties as they should be dynamic.

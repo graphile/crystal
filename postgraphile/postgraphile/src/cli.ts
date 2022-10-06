@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-import { makePgSourcesFromConnectionString } from "./schema.js";
+import { makePgSources } from "./schema.js";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -131,10 +131,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const newPgSources = makePgSourcesFromConnectionString(
-      connectionString,
-      schemas,
-    );
+    const newPgSources = makePgSources(connectionString, schemas);
     preset.pgSources = newPgSources;
   }
   preset.server = preset.server || {};
@@ -162,9 +159,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     process.exit(2);
   }
 
-  const serv = postgraphile(config);
+  const instance = postgraphile(config);
 
-  const server = createServer(serv.handler);
+  const server = createServer(instance.getServer().handler);
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);

@@ -6,13 +6,13 @@ sidebar_position: 3
 
 ## Requirements
 
-To run an existing GraphQL schema with `grafast` you must ensure that the
+To run an existing GraphQL schema with <grafast /> you must ensure that the
 following hold:
 
-- Your resolvers are built into your schema (not passed via `rootValue`)
+- Your resolvers are built into your schema as is the norm (not passed via `rootValue`)
 - If any of your resolvers use `GraphQLResolveInfo` (the 4th argument to the
-  resolver) then they must not rely on `path` since we don't currently populate
-  that correctly.
+  resolver) then they must not rely on `path` since we can't currently populate
+  that in an equivalent fashion
 - `context` must be an object (anything suitable to be used as the key to a
   `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
 - `rootValue`, if specified, must be an object or `null`/`undefined`
@@ -21,8 +21,8 @@ following hold:
 
 Ensure that you have both the `graphql` and `grafast` modules installed:
 
-```
-yarn add grafast graphql
+```bash npm2yarn
+npm install grafast graphql
 ```
 
 ## Running
@@ -50,9 +50,10 @@ or use a server/framework that does this for you; see [Servers][].
 
 ## Replacing resolvers with plans
 
-Grafast automatically supports resolvers to help maintain compatibility with
-legacy schemas, but if you're ready to get the next level of performance you can
-replace the resolver with a plan on a field-by-field basis in a schema.
+&ZeroWidthSpace;<grafast /> automatically supports resolvers to help maintain
+compatibility with legacy schemas, but if you're ready to get the next level of
+performance you can replace the resolver with a plan on a field-by-field basis
+in a schema.
 
 For more information, see [Plan Resolvers](../plan-resolvers).
 

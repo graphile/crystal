@@ -1,0 +1,69 @@
+# Command Line Interface
+
+The easiest way to get up and running with PostGraphile is to use the Command
+Line Interface.
+
+Create yourself a new directory for your project, we'll refer to this as
+`~/postgraphile`. Open a terminal in this directory and install PostGraphile:
+
+```bash npm2yarn
+cd ~/postgraphile
+npm install postgraphile
+```
+
+You can then run PostGraphile via:
+
+```bash npm2yarn
+npx postgraphile -P postgraphile/presets/amber -e -c postgres:///mydb
+```
+
+:::info
+
+You should replace `postgres:///mydb` with a PostgreSQL connection string
+pointing at your database, and if you use a non-standard PostgreSQL schema you
+should indicate the schema name via `-s my_schema_name_here`.
+
+:::
+
+:::caution
+
+The `-e` option should only be used in development.
+
+:::
+
+### CLI flags
+
+The CLI accepts a small number of configuration options to get you started. It
+also reads [options from a `graphile.config.js`](./config.md) file from the
+current working directory (if it exists); by specifying all options in this file
+you can run PostGraphile with no (or minimal) CLI flags.
+
+- `--version`  
+  output the version number
+- `--help`  
+  output usage information
+- `--preset <string>` (alias: `-P`)
+  <equivalent>{`{ extends: [...] }`}</equivalent>
+  can be used to specify a comma-separated list of presets to add to the configuration
+- `--allow-explain` (alias: `-e`)
+  <equivalent>{`{ server: { exposePlan: true } }`}</equivalent>
+  enables "explain" mode, you won't want this in production but it's very helpful
+  in development to know what's going on
+- `--connection <string>` (alias: `-c`)
+  <equivalent>{`{ pgSources: makePgSources('...') }`}</equivalent>
+  the PostgreSQL connection string. If omitted, inferred from environmental variables
+  (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples:
+  'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=true'
+- `--schema <string>` (alias: `-s`)
+  <equivalent>{`{ pgSources: makePgSources(databaseUrl, ['...']) }`}</equivalent>
+  a comma-separated list of PostgreSQL schemas to be introspected.
+- `--watch` (alias: `-w`)
+  <equivalent>{`{ server: { watch: true } }`}</equivalent>
+  automatically updates your GraphQL schema when your database schema changes (NOTE:
+  requires DB superuser to install `postgraphile_watch` schema)
+- `--host <string>` (alias: `-n`)
+  <equivalent>{`{ server: { host: 'localhost' } }`}</equivalent>
+  the hostname to be used. Defaults to `localhost`
+- `--port <number>` (alias: `-p`)
+  <equivalent>{`{ server: { port: 5678 } }`}</equivalent>
+  the port to be used. Defaults to 5000

@@ -28,4 +28,6 @@ export interface RuruProps {
    * plan - output the plan executed
    */
   debugTools?: Array<"explain" | "plan">;
+
+  defaultQuery?: string;
 }

@@ -44,7 +44,7 @@ previous paragraph).
 
 ## Execute operation and output plan
 
-<grafast /> will populate the relevant system steps in the plan with the
+&ZeroWidthSpace;<grafast /> will populate the relevant system steps in the plan with the
 variables, context value, root value, etc and will then execute the plan,
 calling the relevant step resolvers in turn.
 

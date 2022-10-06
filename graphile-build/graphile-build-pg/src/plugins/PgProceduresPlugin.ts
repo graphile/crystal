@@ -50,7 +50,7 @@ declare global {
     }
     interface GraphileBuildGatherOptions {
       /**
-       * If true, we'll treat all arguments that don't have arguments as being
+       * If true, we'll treat all arguments that don't have defaults as being
        * required.
        */
       pgStrictFunctions?: boolean;
