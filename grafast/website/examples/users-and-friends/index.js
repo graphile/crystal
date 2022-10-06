@@ -137,7 +137,7 @@ async function runGraphQL() {
 }
 
 const baseContext = { currentUserId: 1 };
-async function runGraphastWithGraphQLSchema() {
+async function runGrafastWithGraphQLSchema() {
   const result = await grafastExecute(
     {
       schema: schemaDL,
@@ -149,7 +149,7 @@ async function runGraphastWithGraphQLSchema() {
   return stringifyPayload(result, asString);
 }
 
-async function runGraphast() {
+async function runGrafast() {
   const result = await grafastExecute(
     {
       schema: schemaGF,
@@ -256,9 +256,9 @@ async function main() {
     case "graphql":
       return benchmark(runGraphQL);
     case "grafast":
-      return benchmark(runGraphast);
+      return benchmark(runGrafast);
     case "grafast-resolvers":
-      return benchmark(runGraphastWithGraphQLSchema);
+      return benchmark(runGrafastWithGraphQLSchema);
     default: {
       return runCompare();
     }
