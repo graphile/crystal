@@ -17,9 +17,13 @@ You can then run PostGraphile via:
 npx postgraphile -P postgraphile/presets/amber -e -c postgres:///mydb
 ```
 
-( You should replace `postgres:///mydb` with a PostgreSQL connection string
+:::info
+
+You should replace `postgres:///mydb` with a PostgreSQL connection string
 pointing at your database, and if you use a non-standard PostgreSQL schema you
-should indicate the schema name via `-s my_schema_name_here`.)
+should indicate the schema name via `-s my_schema_name_here`.
+
+:::
 
 :::caution
 
