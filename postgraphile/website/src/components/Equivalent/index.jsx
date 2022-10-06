@@ -10,7 +10,7 @@ export default function Equivalent({ children }) {
           display: "inline",
           color: "black",
           borderRadius: "0.5rem",
-          backgroundColor: "#95cdff",
+          backgroundColor: "rgb(176, 215, 249)",
           padding: "0.1rem 0.4rem 0.2rem",
           //marginLeft: "-0.4rem",
           marginLeft: "0.5rem",
@@ -22,7 +22,7 @@ export default function Equivalent({ children }) {
         <code
           style={{
             fontSize: "0.65rem",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor: "rgba(255, 255, 255, 0.75)",
           }}
         >
           {children}
