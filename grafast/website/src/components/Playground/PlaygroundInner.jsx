@@ -87,18 +87,20 @@ with (Grafast) {
       </div>
       <div className={styles.editors}>
         <div className={styles.editor}>
-          <textarea
-            value={typeDefs}
-            onChange={(e) => setTypedefs(e.target.value)}
-          ></textarea>
+          <Editor lang="graphql" value={typeDefs} onValueChange={setTypedefs} />
         </div>
         <div className={styles.editor}>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          ></textarea>
+          <Editor lang="js" value={code} onValueChange={setCode} />
         </div>
       </div>
     </div>
   );
 }
+
+const Editor = ({ value, onValueChange }) => {
+  const onChange = useCallback(
+    (e) => onValueChange(e.target.value),
+    [onValueChange],
+  );
+  return <textarea value={value} onChange={onChange}></textarea>;
+};
