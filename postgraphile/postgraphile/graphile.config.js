@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import "graphile-config";
+import "postgraphile";
 
 import { StreamDeferPlugin } from "graphile-build";
 import postgraphilePresetAmber from "postgraphile/presets/amber";
