@@ -54,6 +54,9 @@ function needsHasOwnPropertyCheck(str: string): boolean {
 const warnedAboutItems = new Set<string>();
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
+/** @internal */
+export const expressionSymbol = Symbol("expression");
+
 /**
  * Returns a function that will extract the value at the given path from an
  * incoming object. If possible it will return a dynamically constructed
@@ -148,6 +151,7 @@ function constructDestructureFunction(
         : new Function("extra", "value", functionBody)
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
+    quicklyExtractValueAtPath[expressionSymbol] = expression;
     return quicklyExtractValueAtPath;
   }
 }
@@ -177,7 +181,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   constructor(
     parentPlan: ExecutableStep<unknown>,
     path: (string | number)[] | string | number,
-    private fallback?: any,
+    public readonly fallback?: any,
   ) {
     super();
     this.path = Array.isArray(path) ? path : [path];
