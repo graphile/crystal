@@ -139,14 +139,15 @@ function constructDestructureFunction(
     const expression = jitParts.join("");
 
     // return value?.blah?.bog?.["!!!"]?.[0]
-    const functionBody = `return value${expression}`;
+    const functionBody = `return value${expression}`; /* THERE MUST BE NO SEMICOLON IN STRING */
 
     // JIT this via `new Function` for great performance.
     const quicklyExtractValueAtPath = (
       fallback !== undefined
-        ? new Function("fallback", `return (meta, value) => {${functionBody}}`)(
-            fallback,
-          )
+        ? new Function(
+            "fallback",
+            `return (meta, value) => {${functionBody} ?? fallback}`,
+          )(fallback)
         : new Function("meta", "value", functionBody)
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
