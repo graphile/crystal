@@ -199,4 +199,9 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
     });
     return length;
   }
+
+  // At runtime, __TrackedObjectStep doesn't need to exist
+  optimize() {
+    return this.getDep(0);
+  }
 }
