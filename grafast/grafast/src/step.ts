@@ -428,6 +428,8 @@ export class ExecutableStep<TData = any> extends BaseStep {
     extra;
     throw new Error(`${this} has not implemented an 'execute' method`);
   }
+
+  executeSingle?: (meta: any, ...tuple: any[]) => TData;
 }
 
 export function isExecutableStep<TData = any>(

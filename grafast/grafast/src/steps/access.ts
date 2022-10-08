@@ -2,7 +2,11 @@ import chalk from "chalk";
 import debugFactory from "debug";
 
 import { inspect } from "../inspect.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
@@ -64,7 +68,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 function constructDestructureFunction(
   path: (string | number)[],
   fallback: any,
-): (value: any) => any {
+): (_meta: any, value: any) => any {
   const jitParts: string[] = [];
 
   let slowMode = false;
@@ -111,7 +115,7 @@ function constructDestructureFunction(
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
   // a JIT-d function.
   if (slowMode) {
-    return function slowlyExtractValueAtPath(value: any): any {
+    return function slowlyExtractValueAtPath(_meta, value: any): any {
       let current = value;
       for (let i = 0, l = path.length; i < l; i++) {
         const pathItem = path[i];
@@ -139,6 +143,7 @@ function constructDestructureFunction(
 
     // JIT this via `new Function` for great performance.
     const quicklyExtractValueAtPath = new Function(
+      "meta",
       "value",
       functionBody,
     ) as any;
@@ -171,7 +176,6 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   };
   isSyncAndSafe = true;
 
-  private destructure: (value: TData) => any;
   private parentStepId: number;
   allowMultipleOptimizations = true;
   public readonly path: (string | number)[];
@@ -185,7 +189,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     this.path = Array.isArray(path) ? path : [path];
     this.addDependency(parentPlan);
     this.parentStepId = parentPlan.id;
-    this.destructure = constructDestructureFunction(this.path, fallback);
+    this.executeSingle = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
@@ -233,8 +237,12 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     return this;
   }
 
-  execute(values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
-    return values[0].map(this.destructure);
+  execute(
+    values: [GrafastValuesList<TData>],
+    extra: ExecutionExtra,
+  ): GrafastResultsList<TData> {
+    const { meta } = extra;
+    return values[0].map((v) => this.executeSingle!(meta, v));
   }
 
   finalize(): void {

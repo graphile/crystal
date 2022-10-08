@@ -83,8 +83,8 @@ export class ObjectStep<
 
   // TODO: JIT this function
   tupleToObject(
-    tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>,
     meta: ObjectPlanMeta<TPlans>,
+    ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
   ): DataFromPlans<TPlans> {
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
@@ -140,20 +140,10 @@ export class ObjectStep<
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.executeSingle!(
-        values.map((v) => v[i]),
-        meta,
-      );
+      result[i] = this.executeSingle!(meta, ...values.map((v) => v[i]));
     }
     return result;
   }
-
-  executeSingle:
-    | ((
-        values: Array<DataFromPlans<TPlans>[keyof TPlans]>,
-        meta: ObjectPlanMeta<TPlans>,
-      ) => DataFromPlans<TPlans>)
-    | null = null;
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);
