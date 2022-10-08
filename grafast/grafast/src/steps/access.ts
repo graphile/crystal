@@ -139,24 +139,18 @@ function constructDestructureFunction(
     const expression = jitParts.join("");
 
     // return value?.blah?.bog?.["!!!"]?.[0]
-    const functionBody = `return value${expression};`;
+    const functionBody = `return value${expression}`;
 
     // JIT this via `new Function` for great performance.
-    const quicklyExtractValueAtPath = new Function(
-      "meta",
-      "value",
-      functionBody,
+    const quicklyExtractValueAtPath = (
+      fallback !== undefined
+        ? new Function("fallback", `return (meta, value) => {${functionBody}}`)(
+            fallback,
+          )
+        : new Function("meta", "value", functionBody)
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
-    if (fallback !== undefined) {
-      const quicklyExtractValueAtPathWithFallback = (
-        meta: any,
-        value: any,
-      ): any => quicklyExtractValueAtPath(meta, value) ?? fallback;
-      return quicklyExtractValueAtPathWithFallback;
-    } else {
-      return quicklyExtractValueAtPath;
-    }
+    return quicklyExtractValueAtPath;
   }
 }
 
