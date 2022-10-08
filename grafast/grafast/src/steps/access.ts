@@ -61,10 +61,10 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  *
  * TODO: this is security critical! Be hyper vigilant when reviewing it.
  */
-function constructExecuteFunction<TData>(
+function constructDestructureFunction(
   path: (string | number)[],
   fallback: any,
-): (values: [GrafastValuesList<TData>]) => GrafastResultsList<TData> {
+): (value: any) => any {
   const jitParts: string[] = [];
 
   let slowMode = false;
@@ -111,53 +111,45 @@ function constructExecuteFunction<TData>(
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
   // a JIT-d function.
   if (slowMode) {
-    return function slowlyExtractValueAtPath(tuple): any {
-      const values = tuple[0];
-      const results = [];
-      for (let i = 0, l = values.length; i < l; i++) {
-        let current: any = values[i];
-        for (let i = 0, l = path.length; i < l; i++) {
-          const pathItem = path[i];
-          if (current == null) {
-            current = undefined;
-          } else if (typeof pathItem === "number") {
-            current = Array.isArray(current) ? current[pathItem] : undefined;
-          } else {
-            current =
-              typeof current === "object" &&
-              current &&
-              hasOwnProperty.call(current, pathItem)
-                ? current[pathItem]
-                : undefined;
-          }
+    return function slowlyExtractValueAtPath(value: any): any {
+      let current = value;
+      for (let i = 0, l = path.length; i < l; i++) {
+        const pathItem = path[i];
+        if (current == null) {
+          current = undefined;
+        } else if (typeof pathItem === "number") {
+          current = Array.isArray(current) ? current[pathItem] : undefined;
+        } else {
+          current =
+            typeof current === "object" &&
+            current &&
+            hasOwnProperty.call(current, pathItem)
+              ? current[pathItem]
+              : undefined;
         }
-        results.push(current ?? fallback);
       }
-      return results;
+      return current ?? fallback;
     };
   } else {
     // ?.blah?.bog?.["!!!"]?.[0]
     const expression = jitParts.join("");
 
     // return value?.blah?.bog?.["!!!"]?.[0]
-    const functionBody = `\
-return (tuple) => {
-  const values = tuple[0];
-  const results = [];
-  for (let i = 0, l = values.length; i < l; i++) {
-    results.push(values[i]${expression}${fallback !== 'undefined' ? ` ?? fallback` : ''});
-  }
-  return results;
-}\
-`;
+    const functionBody = `return value${expression};`;
 
     // JIT this via `new Function` for great performance.
-    const quicklyExtractValueAtPath = (new Function(
+    const quicklyExtractValueAtPath = new Function(
       "value",
       functionBody,
-    ))(fallback);
+    ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
-    return quicklyExtractValueAtPath;
+    if (fallback !== undefined) {
+      const quicklyExtractValueAtPathWithFallback = (value: any): any =>
+        quicklyExtractValueAtPath(value) ?? fallback;
+      return quicklyExtractValueAtPathWithFallback;
+    } else {
+      return quicklyExtractValueAtPath;
+    }
   }
 }
 
@@ -179,6 +171,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   };
   isSyncAndSafe = true;
 
+  private destructure: (value: TData) => any;
   private parentStepId: number;
   allowMultipleOptimizations = true;
   public readonly path: (string | number)[];
@@ -192,7 +185,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     this.path = Array.isArray(path) ? path : [path];
     this.addDependency(parentPlan);
     this.parentStepId = parentPlan.id;
-    this.execute = constructExecuteFunction<TData>(this.path, fallback);
+    this.destructure = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
@@ -240,8 +233,8 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     return this;
   }
 
-  execute(_values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
-    throw new Error(`${this} wasn't constructed correctly`);
+  execute(values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
+    return values[0].map(this.destructure);
   }
 
   finalize(): void {
