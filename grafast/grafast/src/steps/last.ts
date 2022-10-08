@@ -21,7 +21,7 @@ export class LastStep<TData> extends ExecutableStep<TData> {
     return values[0].map((list) => list?.[list?.length - 1]);
   }
 
-  executeSingle = ([list]: [ReadonlyArray<TData>]): TData => {
+  executeSingle = (meta: any, list: ReadonlyArray<TData>): TData => {
     return list?.[list?.length - 1];
   };
 

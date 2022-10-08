@@ -90,10 +90,6 @@ export class ObjectStep<
     // First look for an existing match:
     outerloop: for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
-      // Shortcut for identical tuples (unlikely).
-      if (values === tuple) {
-        return obj;
-      }
       // Slow loop over each value in the tuples; this is not expected to be a
       // particularly big loop, typically only 2-5 keys.
       for (let j = 0, m = this.keys.length; j < m; j++) {

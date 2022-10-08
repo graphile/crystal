@@ -100,7 +100,8 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   }
 
   executeSingle = (
-    v: any[],
+    meta: any,
+    ...v: any[]
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
     const specifier = v[this.specPlanDep];
     const typeName = specifier

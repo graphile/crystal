@@ -79,7 +79,7 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
     return values[0];
   }
 
-  executeSingle = (v: [TData]): TData => v[0];
+  executeSingle = (meta: any, v: TData): TData => v;
 
   /**
    * Get the named property of an object.

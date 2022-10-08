@@ -85,7 +85,7 @@ export class MapStep extends ExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  executeSingle = (value: any[]): any => this.mapper(value[0]);
+  executeSingle = (meta: any, value: any): any => this.mapper(value);
 
   deduplicate(peers: MapStep[]): MapStep[] {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);

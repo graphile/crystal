@@ -38,7 +38,7 @@ export class ReverseStep<TData> extends ExecutableStep<readonly TData[]> {
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 
-  executeSingle = ([arr]: [TData[]]): TData[] =>
+  executeSingle = (meta: any, arr: TData[]): TData[] =>
     arr == null ? arr : reverseArray(arr);
 
   deduplicate(peers: ReverseStep<TData>[]): ReverseStep<TData>[] {
