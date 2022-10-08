@@ -1,0 +1,43 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+
+    %% define steps
+    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Constant7["Constant[7∈0]"]:::plan
+    Object8["Object[8∈0]<br />ᐸ{}ᐳ"]:::plan
+    GraphQLResolver9[["GraphQLResolver[9∈0]<br />ᐸresolveᐳ"]]:::plan
+    Access10["Access[10∈0]<br />ᐸ9.numberᐳ"]:::plan
+    Access11["Access[11∈0]<br />ᐸ9.numbersᐳ"]:::plan
+    __Item12>"__Item[12∈1]<br />ᐸ11ᐳ"]:::itemplan
+    Access13["Access[13∈0]<br />ᐸ9.friendᐳ"]:::plan
+    Access17["Access[17∈0]<br />ᐸ9.friend.nameᐳ"]:::plan
+    Access18["Access[18∈0]<br />ᐸ9.friend.statusᐳ"]:::plan
+    Access19["Access[19∈0]<br />ᐸ9.friend.occupationᐳ"]:::plan
+
+    %% plan dependencies
+    Constant7 & Object8 & __Value3 & __Value1 & __Value5 --> GraphQLResolver9
+    GraphQLResolver9 --> Access10
+    GraphQLResolver9 --> Access11
+    Access11 ==> __Item12
+    GraphQLResolver9 --> Access13
+    GraphQLResolver9 --> Access17
+    GraphQLResolver9 --> Access18
+    GraphQLResolver9 --> Access19
+
+    subgraph "Buckets for queries/resolvers/objectDefaults"
+    Bucket0("Bucket 0 (root)"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value1,__Value3,__Value5,Constant7,Object8,GraphQLResolver9,Access10,Access11,Access13,Access17,Access18,Access19 bucket0
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,__Item12 bucket1
+    Bucket0 --> Bucket1
+    end

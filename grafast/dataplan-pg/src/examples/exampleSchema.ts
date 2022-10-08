@@ -4317,6 +4317,53 @@ export function makeExampleSchema(
           [error],
         ),
       },
+
+      deepObject: {
+        type: new GraphQLObjectType({
+          name: "DeepObject",
+          fields: {
+            number: {
+              type: GraphQLInt,
+            },
+            numbers: {
+              type: new GraphQLList(GraphQLInt),
+            },
+            friend: {
+              type: new GraphQLObjectType({
+                name: "DeepObjectFriend",
+                fields: {
+                  name: { type: GraphQLString },
+                  occupation: { type: GraphQLString },
+                  status: { type: GraphQLString },
+                },
+              }),
+            },
+          },
+        }),
+        // TODO: this should not be needed!
+        plan: EXPORTABLE(
+          (constant) =>
+            function plan() {
+              return constant({});
+            },
+          [constant],
+        ),
+        resolve: EXPORTABLE(
+          () =>
+            function resolve() {
+              return {
+                number: 42,
+                numbers: [1, 1, 2, 3, 5, 8, 13],
+                friend: {
+                  name: "Marvin",
+                  occupation: "Android",
+                  status: "paranoid",
+                },
+              };
+            },
+          [],
+        ),
+      },
     },
   });
 
