@@ -115,7 +115,7 @@ function constructDestructureFunction(
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
   // a JIT-d function.
   if (slowMode) {
-    return function slowlyExtractValueAtPath(_meta, value: any): any {
+    return function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
       for (let i = 0, l = path.length; i < l; i++) {
         const pathItem = path[i];
@@ -149,8 +149,10 @@ function constructDestructureFunction(
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
     if (fallback !== undefined) {
-      const quicklyExtractValueAtPathWithFallback = (value: any): any =>
-        quicklyExtractValueAtPath(value) ?? fallback;
+      const quicklyExtractValueAtPathWithFallback = (
+        meta: any,
+        value: any,
+      ): any => quicklyExtractValueAtPath(meta, value) ?? fallback;
       return quicklyExtractValueAtPathWithFallback;
     } else {
       return quicklyExtractValueAtPath;
