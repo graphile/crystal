@@ -4,7 +4,7 @@ import type {
   GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
-import type { ExecutableStep} from "../step.js";
+import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { list } from "./list.js";
 
@@ -49,12 +49,9 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     }
   }
 
-  executeSingle = (
-    extra: ExecutionExtra,
-    value: TIn,
-  ): PromiseOrDirect<TOut> => {
+  executeSingle(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
     return this.fn(value);
-  };
+  }
 }
 
 /**

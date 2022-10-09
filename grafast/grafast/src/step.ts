@@ -442,14 +442,33 @@ export abstract class UnbatchedExecutableStep<
     this.execute = new Function(
       "values",
       "extra",
-      `\
+      this.isSyncAndSafe
+        ? `\
+    const count = values[0].length;
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      results[i] = this.executeSingle(extra, ${
+        this.dependencies.length === 0
+          ? "values[0][i]"
+          : this.dependencies
+              .map((_, depIndex) => `values[${depIndex}][i]`)
+              .join(", ")
+      });
+    }
+    return results;
+`
+        : `\
     const count = values[0].length;
     const results = [];
     for (let i = 0; i < count; i++) {
       try {
-        results[i] = this.executeSingle(extra, ${this.dependencies
-          .map((_, depIndex) => `values[${depIndex}][i]`)
-          .join(", ")});
+        results[i] = this.executeSingle(extra, ${
+          this.dependencies.length === 0
+            ? "values[0][i]"
+            : this.dependencies
+                .map((_, depIndex) => `values[${depIndex}][i]`)
+                .join(", ")
+        });
       } catch (e) {
         results[i] = Promise.reject(e);
       }
