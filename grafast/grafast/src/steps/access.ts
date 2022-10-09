@@ -68,7 +68,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 function constructDestructureFunction(
   path: (string | number)[],
   fallback: any,
-): (_meta: any, value: any) => any {
+): (_extra: ExecutionExtra, value: any) => any {
   const jitParts: string[] = [];
 
   let slowMode = false;
@@ -146,9 +146,9 @@ function constructDestructureFunction(
       fallback !== undefined
         ? new Function(
             "fallback",
-            `return (meta, value) => {${functionBody} ?? fallback}`,
+            `return (extra, value) => {${functionBody} ?? fallback}`,
           )(fallback)
-        : new Function("meta", "value", functionBody)
+        : new Function("extra", "value", functionBody)
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
     return quicklyExtractValueAtPath;
@@ -238,8 +238,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     values: [GrafastValuesList<TData>],
     extra: ExecutionExtra,
   ): GrafastResultsList<TData> {
-    const { meta } = extra;
-    return values[0].map((v) => this.executeSingle!(meta, v));
+    return values[0].map((v) => this.executeSingle!(extra, v));
   }
 
   finalize(): void {

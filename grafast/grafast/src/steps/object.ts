@@ -7,8 +7,8 @@ import type { SetterCapableStep } from "./setter.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
-const debugObjectPlan = debugFactory("grafast:ObjectStep");
-const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
+// const debugObjectPlan = debugFactory("grafast:ObjectStep");
+// const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
 type DataFromStep<TStep extends ExecutableStep<any>> =
   TStep extends ExecutableStep<infer TData> ? TData : never;
@@ -123,7 +123,7 @@ export class ObjectStep<
   */
 
   tupleToObjectJIT(): (
-    meta: ObjectPlanMeta<TPlans>,
+    extra: ExecutionExtra,
     ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
   ) => DataFromPlans<TPlans> {
     if (this.keys.length === 0) {
@@ -149,7 +149,7 @@ ${this.keys
 ${this.keys.map((key, i) => `  newObj[keys[${i}]] = val${i};\n`).join("")}\
 `;
     const functionBody = `\
-return function (meta, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
+return function ({ meta }, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
   if (meta.nextIndex) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
@@ -161,6 +161,9 @@ return function (meta, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
     }
   } else {
     meta.nextIndex = 0;
+    if (!meta.results) {
+      meta.results = [];
+    }
   }
 ${inner}
   meta.results[meta.nextIndex] = [[${this.keys
@@ -187,21 +190,18 @@ ${inner}
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
     extra: ExecutionExtra,
   ): Array<DataFromPlans<TPlans>> {
-    const { meta: inMeta } = extra;
-    if (!inMeta.results) {
-      inMeta.results = [];
-    }
-    const meta = inMeta as any as ObjectPlanMeta<TPlans>;
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.executeSingle!(meta, ...values.map((v) => v[i]));
+      result[i] = this.executeSingle!(extra, ...values.map((v) => v[i]));
     }
     return result;
   }
 
-  executeSingle?: (meta: any, ...tuple: any[]) => DataFromPlans<TPlans> =
-    undefined;
+  executeSingle?: (
+    extra: ExecutionExtra,
+    ...tuple: any[]
+  ) => DataFromPlans<TPlans> = undefined;
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);

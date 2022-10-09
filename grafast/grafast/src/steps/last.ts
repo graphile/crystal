@@ -1,4 +1,8 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
 
@@ -21,7 +25,10 @@ export class LastStep<TData> extends ExecutableStep<TData> {
     return values[0].map((list) => list?.[list?.length - 1]);
   }
 
-  executeSingle = (meta: any, list: ReadonlyArray<TData>): TData => {
+  executeSingle = (
+    extra: ExecutionExtra,
+    list: ReadonlyArray<TData>,
+  ): TData => {
     return list?.[list?.length - 1];
   };
 

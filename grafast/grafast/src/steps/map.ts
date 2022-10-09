@@ -2,7 +2,11 @@
 import chalk from "chalk";
 
 import type { GrafastError } from "../error.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 
@@ -76,7 +80,8 @@ export class MapStep extends ExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  executeSingle = (meta: any, value: any): any => this.mapper(value);
+  executeSingle = (extra: ExecutionExtra, value: any): any =>
+    this.mapper(value);
 
   deduplicate(peers: MapStep[]): MapStep[] {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);

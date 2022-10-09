@@ -1,5 +1,9 @@
 import type { Constraint } from "../constraints.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
@@ -79,7 +83,7 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
     return values[0];
   }
 
-  executeSingle = (meta: any, v: TData): TData => v;
+  executeSingle = (extra: ExecutionExtra, v: TData): TData => v;
 
   /**
    * Get the named property of an object.

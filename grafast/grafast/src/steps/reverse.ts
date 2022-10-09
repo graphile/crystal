@@ -1,4 +1,8 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 
 /**
@@ -38,7 +42,7 @@ export class ReverseStep<TData> extends ExecutableStep<readonly TData[]> {
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 
-  executeSingle = (meta: any, arr: TData[]): TData[] =>
+  executeSingle = (extra: ExecutionExtra, arr: TData[]): TData[] =>
     arr == null ? arr : reverseArray(arr);
 
   deduplicate(peers: ReverseStep<TData>[]): ReverseStep<TData>[] {

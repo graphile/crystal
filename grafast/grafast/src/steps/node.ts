@@ -3,6 +3,7 @@ import type { GraphQLObjectType } from "graphql";
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
+  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
   NodeIdCodec,
@@ -100,7 +101,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   }
 
   executeSingle = (
-    meta: any,
+    extra: ExecutionExtra,
     ...v: any[]
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
     const specifier = v[this.specPlanDep];

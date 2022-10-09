@@ -1,4 +1,5 @@
 import type {
+  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
   PromiseOrDirect,
@@ -47,7 +48,10 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
     }
   }
 
-  executeSingle = (meta: any, value: TIn): PromiseOrDirect<TOut> => {
+  executeSingle = (
+    extra: ExecutionExtra,
+    value: TIn,
+  ): PromiseOrDirect<TOut> => {
     return this.fn(value);
   };
 }
