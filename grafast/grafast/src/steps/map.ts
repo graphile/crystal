@@ -4,17 +4,8 @@ import chalk from "chalk";
 import type { GrafastError } from "../error.js";
 import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
+import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 
-const disallowedKeys = Object.keys(
-  Object.getOwnPropertyDescriptors(Object.prototype),
-);
-
-// Do **NOT** allow variables that start with `__`!
-export const isSafeIdentifier = (key: string) =>
-  /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key) &&
-  !disallowedKeys.includes(key);
-
-const STARTS_WITH_NUMBER = /^[0-9]/;
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
 export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
