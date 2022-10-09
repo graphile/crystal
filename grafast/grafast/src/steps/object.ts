@@ -2,7 +2,10 @@ import debugFactory from "debug";
 
 import type { ExecutionExtra } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
+import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
+
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 const debugObjectPlan = debugFactory("grafast:ObjectStep");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
@@ -41,7 +44,7 @@ export class ObjectStep<
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
-  private keys: Array<keyof TPlans>;
+  private keys: Array<keyof TPlans & string>;
   constructor(obj: TPlans) {
     super();
     this.keys = Object.keys(obj);
@@ -55,7 +58,7 @@ export class ObjectStep<
    * handy.
    */
   public set<TKey extends keyof TPlans>(key: TKey, plan: TPlans[TKey]): void {
-    this.keys.push(key);
+    this.keys.push(key as string);
     this.addDependency(plan);
   }
 
@@ -63,7 +66,7 @@ export class ObjectStep<
     key: TKey,
     allowMissing = false,
   ): TKey extends keyof TPlans ? TPlans[TKey] : null {
-    const idx = this.keys.indexOf(key);
+    const idx = this.keys.indexOf(key as string);
     if (idx < 0) {
       if (!allowMissing) {
         throw new Error(
@@ -81,7 +84,7 @@ export class ObjectStep<
     return "{" + this.keys.join(",") + "}";
   }
 
-  // TODO: JIT this function
+  /*
   tupleToObject(
     meta: ObjectPlanMeta<TPlans>,
     ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
@@ -117,10 +120,66 @@ export class ObjectStep<
     meta.results.push([tuple, newObj]);
     return newObj;
   }
+  */
+
+  tupleToObjectJIT(): (
+    meta: ObjectPlanMeta<TPlans>,
+    ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
+  ) => DataFromPlans<TPlans> {
+    if (this.keys.length === 0) {
+      // Shortcut simple case
+      return () => EMPTY_OBJECT;
+    }
+    const keysAreSafe = this.keys.every(isSafeIdentifier);
+    const inner = keysAreSafe
+      ? `\
+  const newObj = {
+${this.keys
+  .map(
+    (key, i) =>
+      `    ${
+        STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key
+      }: val${i}`,
+  )
+  .join(",\n")}
+  };
+`
+      : `\
+  const newObj = Object.create(null);
+${this.keys.map((key, i) => `  newObj[keys[${i}]] = val${i};\n`).join("")}\
+`;
+    const functionBody = `\
+return function (meta, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
+  if (meta.nextIndex) {
+    for (let i = 0, l = meta.results.length; i < l; i++) {
+      const [values, obj] = meta.results[i];
+      if (${this.keys
+        .map((key, i) => `values[${i}] === val${i}`)
+        .join(" && ")}) {
+        return obj;
+      }
+    }
+  } else {
+    meta.nextIndex = 0;
+  }
+${inner}
+  meta.results[meta.nextIndex] = [[${this.keys
+    .map((key, i) => `val${i}`)
+    .join(",")}], newObj];
+  // Only cache 10 results, use a round-robin
+  meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
+  return newObj;
+}
+`;
+    if (keysAreSafe) {
+      return new Function(functionBody)() as any;
+    } else {
+      return new Function("keys", functionBody)(this.keys) as any;
+    }
+  }
 
   finalize() {
-    // TODO: JIT here
-    this.executeSingle = this.tupleToObject.bind(this);
+    this.executeSingle = this.tupleToObjectJIT();
     return super.finalize();
   }
 
@@ -150,7 +209,7 @@ export class ObjectStep<
    * Get the original plan with the given key back again.
    */
   get<TKey extends keyof TPlans>(key: TKey): TPlans[TKey] {
-    const index = this.keys.indexOf(key);
+    const index = this.keys.indexOf(key as string);
     if (index < 0) {
       throw new Error(
         `This ObjectStep doesn't have key '${String(
