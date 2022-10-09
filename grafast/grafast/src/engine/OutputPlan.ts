@@ -704,8 +704,13 @@ function makeExecutor<TAsString extends boolean>(
   };
   const functionBody = `return function compiledOutputPlan${
     asString ? "String" : ""
-  }_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
-  const rawBucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
+  }_${nameExtra}(
+  root,
+  mutablePath,
+  bucket,
+  bucketIndex,
+  rawBucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex]
+) {
   const bucketRootValue = this.processRoot ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}  if (bucketRootValue == null) {
     ${
@@ -740,7 +745,7 @@ function makeExecuteChildPlanCode(
     return `
       const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex});
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
       if (fieldResult == ${asString ? '"null"' : "null"}) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
@@ -751,7 +756,7 @@ function makeExecuteChildPlanCode(
       try {
         const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex});
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));
