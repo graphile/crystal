@@ -1,4 +1,8 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  GrafastResultsList,
+  GrafastValuesList,
+  PromiseOrDirect,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { list } from "./list.js";
 
@@ -42,6 +46,10 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
       return values[0].map(this.fn);
     }
   }
+
+  executeSingle = (meta: any, value: TIn): PromiseOrDirect<TOut> => {
+    return this.fn(value);
+  };
 }
 
 /**

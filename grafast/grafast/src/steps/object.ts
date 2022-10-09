@@ -200,6 +200,9 @@ ${inner}
     return result;
   }
 
+  executeSingle?: (meta: any, ...tuple: any[]) => DataFromPlans<TPlans> =
+    undefined;
+
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);
     return peers.filter((p) => JSON.stringify(p.keys) === myKeys);
