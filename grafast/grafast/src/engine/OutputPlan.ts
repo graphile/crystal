@@ -164,7 +164,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
    */
-  public rootStepSuffix = "";
+  private processRoot: ((value: any) => any) | null = null;
 
   // TODO: since polymorphic handles branching, we can remove the `typeName` layer from this.
   /**
@@ -417,13 +417,15 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.rootStepId,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
-      const expression = $root[expressionSymbol];
-      if (expression) {
-        console.log(`FOUND AN ACCESS STEP! ${$root}`);
+      const expression = $root.executeSingle![expressionSymbol];
+      if (expression && expression.length > 0) {
         // @ts-ignore
         const $parent: ExecutableStep<any> = $root.getDep(0);
         this.rootStepId = $parent.id;
-        this.rootStepSuffix = expression;
+        this.processRoot = new Function(
+          "value",
+          `return value${expression};`,
+        ) as (value: any) => any;
       }
     }
   }
@@ -703,7 +705,8 @@ function makeExecutor<TAsString extends boolean>(
   const functionBody = `return function compiledOutputPlan${
     asString ? "String" : ""
   }_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
-  const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
+  const rawBucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
+  const bucketRootValue = this.processRoot ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}  if (bucketRootValue == null) {
     ${
       skipNullHandling
