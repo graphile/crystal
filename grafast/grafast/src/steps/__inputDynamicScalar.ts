@@ -6,7 +6,11 @@ import type {
 } from "graphql";
 import { Kind } from "graphql";
 
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
 
@@ -116,13 +120,22 @@ export class __InputDynamicScalarStep<
     return convert(this.value);
   }
 
-  execute(values: [GrafastValuesList<TLeaf>]): GrafastResultsList<TLeaf> {
-    return values[0].map((_, i) => {
-      const variableValues = this.variableNames.map((_, j) => values[i][j]);
-      const converted = this.valueFromValues(variableValues);
-      return converted;
-    });
+  execute(
+    values: [GrafastValuesList<TLeaf>],
+    extra: ExecutionExtra,
+  ): GrafastResultsList<TLeaf> {
+    return values[0].map((_, i) =>
+      this.executeSingle!(
+        extra,
+        ...this.variableNames.map((_, j) => values[j][i]),
+      ),
+    );
   }
+
+  executeSingle = (extra: ExecutionExtra, ...variableValues: any[]): TLeaf => {
+    const converted = this.valueFromValues(variableValues);
+    return converted;
+  };
 
   eval(): TLeaf {
     const variableValues = this.variableNames.map((variableName, i) =>
