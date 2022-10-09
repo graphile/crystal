@@ -1,6 +1,6 @@
 import type { InputStep } from "../input.js";
 import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 import { each } from "./each.js";
 
@@ -66,7 +66,7 @@ export class ConnectionStep<
   TCursorStep extends ExecutableStep<any>,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
   TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
-> extends ExecutableStep<unknown> {
+> extends UnbatchedExecutableStep<unknown> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConnectionStep",
@@ -297,6 +297,10 @@ export class ConnectionStep<
   ): GrafastResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
     return arrayOfLength(values[0].length, EMPTY_OBJECT);
+  }
+
+  public executeSingle() {
+    return EMPTY_OBJECT;
   }
 }
 

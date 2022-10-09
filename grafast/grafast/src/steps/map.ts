@@ -7,7 +7,8 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
 } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
@@ -50,7 +51,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
  * A plan that returns an object resulting from extracting the given
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
-export class MapStep extends ExecutableStep {
+export class MapStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "MapStep ",
@@ -80,8 +81,9 @@ export class MapStep extends ExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  executeSingle = (extra: ExecutionExtra, value: any): any =>
-    this.mapper(value);
+  executeSingle(extra: ExecutionExtra, value: any): any {
+    return this.mapper(value);
+  }
 
   deduplicate(peers: MapStep[]): MapStep[] {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);

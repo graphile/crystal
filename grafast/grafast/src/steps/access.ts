@@ -7,7 +7,8 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
 } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in
@@ -166,7 +167,7 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  * preferably where the objects have null prototypes, and be sure to adhere to
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
-export class AccessStep<TData> extends ExecutableStep<TData> {
+export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "AccessStep",
@@ -234,15 +235,12 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     return this;
   }
 
-  execute(
-    values: [GrafastValuesList<TData>],
-    extra: ExecutionExtra,
-  ): GrafastResultsList<TData> {
-    return values[0].map((v) => this.executeSingle!(extra, v));
-  }
-
   finalize(): void {
     super.finalize();
+  }
+
+  executeSingle(_extra: ExecutionExtra, ..._values: any[]): any {
+    throw new Error(`${this}: should have had executeSingle method replaced`);
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {

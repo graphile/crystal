@@ -1,7 +1,8 @@
-import debugFactory from "debug";
+// import debugFactory from "debug";
 
 import type { ExecutionExtra } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
 
@@ -35,7 +36,7 @@ export class ObjectStep<
       [key: string]: ExecutableStep<any>;
     },
   >
-  extends ExecutableStep<DataFromPlans<TPlans>>
+  extends UnbatchedExecutableStep<DataFromPlans<TPlans>>
   implements SetterCapableStep<TPlans>
 {
   static $$export = {
@@ -198,10 +199,9 @@ ${inner}
     return result;
   }
 
-  executeSingle?: (
-    extra: ExecutionExtra,
-    ...tuple: any[]
-  ) => DataFromPlans<TPlans> = undefined;
+  executeSingle(_extra: ExecutionExtra, ..._values: any[]): any {
+    throw new Error(`${this} didn't finalize? No executeSingle method.`);
+  }
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);

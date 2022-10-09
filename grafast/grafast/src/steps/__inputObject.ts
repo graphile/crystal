@@ -2,14 +2,15 @@ import type { GraphQLInputObjectType, ValueNode } from "graphql";
 
 import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutionExtra } from "../interfaces.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";
 
 /**
  * Implements `InputObjectStep`
  */
-export class __InputObjectStep extends ExecutableStep {
+export class __InputObjectStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputObjectStep",
@@ -57,23 +58,38 @@ export class __InputObjectStep extends ExecutableStep {
     return this;
   }
 
-  execute(values: any[][]): any[] {
-    const count = values[0].length;
-    const results = [];
-    for (let i = 0; i < count; i++) {
-      const resultValues = Object.create(null);
-      for (const inputFieldName in this.inputFields) {
-        const dependencyIndex =
-          this.inputFields[inputFieldName].dependencyIndex;
+  finalize() {
+    this.executeSingle = new Function(
+      "extra",
+      ...this.dependencies.map((_, i) => `val${i}`),
+      `\
+    const resultValues = Object.create(null);
+    ${Object.entries(this.inputFields)
+      .map(([inputFieldName, { dependencyIndex }]) => {
         if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
-        const value = values[dependencyIndex][i];
-        resultValues[inputFieldName] = value;
+        return `\
+    resultValues[${JSON.stringify(inputFieldName)}] = val${dependencyIndex};`;
+      })
+      .join("\n")}
+    return resultValues;
+`,
+    ) as any;
+    super.finalize();
+  }
+
+  executeSingle(extra: ExecutionExtra, ...values: any[]) {
+    const resultValues = Object.create(null);
+    for (const inputFieldName in this.inputFields) {
+      const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;
+      if (dependencyIndex == null) {
+        throw new Error("inputFieldPlan has gone missing.");
       }
-      results[i] = resultValues;
+      const value = values[dependencyIndex];
+      resultValues[inputFieldName] = value;
     }
-    return results;
+    return resultValues;
   }
 
   get(attrName: string): InputStep {

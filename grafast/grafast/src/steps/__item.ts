@@ -1,13 +1,14 @@
 import chalk from "chalk";
 
-import { $$deepDepSkip, $$noExec, ExecutableStep } from "../step.js";
+import type { ExecutableStep } from "../step.js";
+import { $$deepDepSkip, $$noExec, UnbatchedExecutableStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
  * themselves!) that Grafast uses to refer to an individual item within a list
  * or stream.
  */
-export class __ItemStep<TData> extends ExecutableStep<TData> {
+export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__ItemStep",
@@ -39,6 +40,9 @@ export class __ItemStep<TData> extends ExecutableStep<TData> {
   }
 
   execute(): never {
+    throw new Error("__ItemStep must never execute");
+  }
+  executeSingle(): never {
     throw new Error("__ItemStep must never execute");
   }
 

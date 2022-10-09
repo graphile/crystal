@@ -1,12 +1,14 @@
 import type { GrafastResultsList, GrafastValuesList } from "../index.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 
 /**
  * @experimental
  *
  * Never build this class directly.
  */
-export class ProxyStep<T> extends ExecutableStep<T> {
+export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ProxyStep",
@@ -22,6 +24,9 @@ export class ProxyStep<T> extends ExecutableStep<T> {
   }
   execute(values: [GrafastValuesList<T>]): GrafastResultsList<T> {
     return values[0];
+  }
+  executeSingle(extra: ExecutionExtra, value: T): T {
+    return value;
   }
   // Do not proxy stream requests
   stream = undefined;

@@ -1,4 +1,6 @@
-import { ExecutableStep } from "../step.js";
+import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 
 type UnwrapPlanTuple<TPlanTuple extends readonly ExecutableStep<any>[]> = [
   ...(TPlanTuple extends readonly ExecutableStep<infer U>[]
@@ -8,7 +10,7 @@ type UnwrapPlanTuple<TPlanTuple extends readonly ExecutableStep<any>[]> = [
 
 export class ListStep<
   TPlanTuple extends readonly ExecutableStep<any>[],
-> extends ExecutableStep<UnwrapPlanTuple<TPlanTuple>> {
+> extends UnbatchedExecutableStep<UnwrapPlanTuple<TPlanTuple>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ListStep",
@@ -68,6 +70,13 @@ export class ListStep<
       result[i] = values.map((list) => list[i]);
     }
     return result;
+  }
+
+  executeSingle(
+    extra: ExecutionExtra,
+    ...values: any[] //UnwrapPlanTuple<TPlanTuple>,
+  ): UnwrapPlanTuple<TPlanTuple> {
+    return values as any;
   }
 
   deduplicate(peers: ListStep<TPlanTuple>[]): ListStep<TPlanTuple>[] {

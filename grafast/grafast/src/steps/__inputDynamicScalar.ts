@@ -11,7 +11,7 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
 } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
 
 /**
@@ -19,7 +19,7 @@ import type { __TrackedObjectStep } from "./__trackedObject.js";
  */
 export class __InputDynamicScalarStep<
   TLeaf = any,
-> extends ExecutableStep<TLeaf> {
+> extends UnbatchedExecutableStep<TLeaf> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputDynamicScalarStep",
@@ -118,18 +118,6 @@ export class __InputDynamicScalarStep<
       }
     };
     return convert(this.value);
-  }
-
-  execute(
-    values: [GrafastValuesList<TLeaf>],
-    extra: ExecutionExtra,
-  ): GrafastResultsList<TLeaf> {
-    return values[0].map((_, i) =>
-      this.executeSingle!(
-        extra,
-        ...this.variableNames.map((_, j) => values[j][i]),
-      ),
-    );
   }
 
   executeSingle = (extra: ExecutionExtra, ...variableValues: any[]): TLeaf => {

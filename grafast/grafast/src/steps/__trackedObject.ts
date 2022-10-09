@@ -4,7 +4,7 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
 } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
 
@@ -29,7 +29,9 @@ import type { AccessStep } from "./access.js";
  * change the query plan, but it can also be used within plan resolvers to
  * branch the logic of a plan based on something in these entities.
  */
-export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
+export class __TrackedObjectStep<
+  TData = any,
+> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__TrackedObjectStep",
@@ -83,7 +85,9 @@ export class __TrackedObjectStep<TData = any> extends ExecutableStep<TData> {
     return values[0];
   }
 
-  executeSingle = (extra: ExecutionExtra, v: TData): TData => v;
+  executeSingle(extra: ExecutionExtra, v: TData): TData {
+    return v;
+  }
 
   /**
    * Get the named property of an object.

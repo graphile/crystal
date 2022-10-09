@@ -1,8 +1,13 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
+import type { ExecutableStep} from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
 
-export class FirstStep<TData> extends ExecutableStep<TData> {
+export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "FirstStep",
@@ -19,6 +24,10 @@ export class FirstStep<TData> extends ExecutableStep<TData> {
     values: GrafastValuesList<[ReadonlyArray<TData>]>,
   ): GrafastResultsList<TData> {
     return values[0].map((list) => list?.[0]);
+  }
+
+  executeSingle(extra: ExecutionExtra, list: any[]) {
+    return list[0];
   }
 
   deduplicate(peers: FirstStep<TData>[]): FirstStep<TData>[] {

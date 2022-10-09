@@ -11,8 +11,8 @@ import type {
   PolymorphicData,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
-import type { PolymorphicStep } from "../step.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutableStep, PolymorphicStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { access } from "./access.js";
 import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
@@ -24,7 +24,7 @@ import { lambda } from "./lambda.js";
  * etc), and finally the Node id string plan.
  */
 export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
-  extends ExecutableStep
+  extends UnbatchedExecutableStep
   implements PolymorphicStep
 {
   static $$export = {
@@ -89,22 +89,10 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     return null;
   }
 
-  execute(
-    values: Array<GrafastValuesList<any>>,
-  ): GrafastResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
-    return values[this.specPlanDep].map((specifier) => {
-      const typeName = specifier
-        ? this.getTypeNameFromSpecifier(specifier)
-        : null;
-      return typeName ? polymorphicWrap(typeName) : null;
-    });
-  }
-
   executeSingle = (
     extra: ExecutionExtra,
-    ...v: any[]
+    specifier: any,
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
-    const specifier = v[this.specPlanDep];
     const typeName = specifier
       ? this.getTypeNameFromSpecifier(specifier)
       : null;

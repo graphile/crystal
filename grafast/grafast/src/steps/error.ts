@@ -1,8 +1,8 @@
 import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
-export class ErrorStep extends ExecutableStep {
+export class ErrorStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "ErrorStep",
@@ -16,6 +16,9 @@ export class ErrorStep extends ExecutableStep {
 
   execute(values: GrafastValuesList<any>): GrafastResultsList<any> {
     return arrayOfLength(values[0].length, this.promise);
+  }
+  executeSingle(): any {
+    return this.promise;
   }
 }
 

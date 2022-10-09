@@ -82,6 +82,11 @@ export class __InputListStep extends ExecutableStep {
       "__InputListStep should never execute; it should have been optimized away.",
     );
   }
+  executeSingle = (): any => {
+    throw new Error(
+      "__InputListStep should never execute; it should have been optimized away.",
+    );
+  };
 
   at(index: number): InputStep {
     const itemStepId = this.itemPlanIds[index];

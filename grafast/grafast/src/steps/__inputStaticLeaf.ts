@@ -1,16 +1,16 @@
 import type { GraphQLLeafType, ValueNode } from "graphql";
 import { valueFromAST } from "graphql";
 
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
-import { arrayOfLength } from "../utils.js";
+import { UnbatchedExecutableStep } from "../step.js";
 
 /**
  * Implements `InputStaticLeafStep`
  *
  * @see __InputDynamicScalarStep
  */
-export class __InputStaticLeafStep<TLeaf = any> extends ExecutableStep<TLeaf> {
+export class __InputStaticLeafStep<
+  TLeaf = any,
+> extends UnbatchedExecutableStep<TLeaf> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputStaticLeafStep",
@@ -28,8 +28,8 @@ export class __InputStaticLeafStep<TLeaf = any> extends ExecutableStep<TLeaf> {
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
-  execute(values: [GrafastValuesList<TLeaf>]): GrafastResultsList<TLeaf> {
-    return arrayOfLength(values[0].length, this.coercedValue);
+  executeSingle(): TLeaf {
+    return this.coercedValue;
   }
 
   eval(): TLeaf {

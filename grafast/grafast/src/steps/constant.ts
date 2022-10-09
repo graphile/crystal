@@ -1,11 +1,11 @@
 import type { GrafastResultsList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan
  */
-export class ConstantStep<TData> extends ExecutableStep<TData> {
+export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConstantStep",
@@ -18,6 +18,10 @@ export class ConstantStep<TData> extends ExecutableStep<TData> {
 
   execute(values: [[undefined]]): GrafastResultsList<TData> {
     return arrayOfLength(values[0].length, this.data);
+  }
+
+  executeSingle() {
+    return this.data;
   }
 
   isNull() {

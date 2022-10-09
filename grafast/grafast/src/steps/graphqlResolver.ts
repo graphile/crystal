@@ -16,6 +16,7 @@ import {
 import type { __ItemStep, ObjectStep } from "../index.js";
 import { context } from "../index.js";
 import type {
+  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
   PolymorphicData,
@@ -23,7 +24,7 @@ import type {
 import { $$data } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
-import { ExecutableStep } from "../step.js";
+import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
 type ResolveInfoBase = Omit<
@@ -48,7 +49,7 @@ function dcr(
  *
  * @internal
  */
-export class GraphQLResolverStep extends ExecutableStep {
+export class GraphQLResolverStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLResolverStep",
@@ -84,38 +85,37 @@ export class GraphQLResolverStep extends ExecutableStep {
     return peers.filter((peer) => peer.resolver === this.resolver);
   }
 
-  execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
-    return values[this.planDep].map((source, i) => {
-      try {
-        const args = values[this.argsDep][i];
-        const context = values[this.contextDep][i];
-        const resolveInfo: GraphQLResolveInfo = Object.assign(
-          Object.create(this.resolveInfoBase),
-          {
-            // TODO: add support for path
-            variableValues: values[this.variableValuesDep][i],
-            rootValue: values[this.rootValueDep][i],
-          },
-        );
-        const data = this.resolver(source, args, context, resolveInfo);
-        if (this.returnContextAndResolveInfo) {
-          if (isPromiseLike(data)) {
-            return data.then((data) => dcr(data, context, resolveInfo));
-          } else {
-            return dcr(data, context, resolveInfo);
-          }
-        } else {
-          return data;
-        }
-      } catch (e) {
-        return Promise.reject(e);
+  executeSingle(
+    extra: ExecutionExtra,
+    source: any,
+    args: any,
+    context: any,
+    variableValues: any,
+    rootValue: any,
+  ): any {
+    const resolveInfo: GraphQLResolveInfo = Object.assign(
+      Object.create(this.resolveInfoBase),
+      {
+        // TODO: add support for path
+        variableValues,
+        rootValue,
+      },
+    );
+    const data = this.resolver(source, args, context, resolveInfo);
+    if (this.returnContextAndResolveInfo) {
+      if (isPromiseLike(data)) {
+        return data.then((data) => dcr(data, context, resolveInfo));
+      } else {
+        return dcr(data, context, resolveInfo);
       }
-    });
+    } else {
+      return data;
+    }
   }
 }
 
 /** @internal */
-export class GraphQLPolymorphicUnwrap extends ExecutableStep {
+export class GraphQLPolymorphicUnwrap extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLPolymorphicUnwrap",
@@ -127,6 +127,9 @@ export class GraphQLPolymorphicUnwrap extends ExecutableStep {
   }
   execute(values: [GrafastValuesList<PolymorphicData>]) {
     return values[0].map((v) => (v ? v[$$data] : null));
+  }
+  executeSingle(extra: ExecutionExtra, v: PolymorphicData) {
+    return v ? v[$$data] : null;
   }
 }
 
