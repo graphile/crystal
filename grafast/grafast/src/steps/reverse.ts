@@ -1,5 +1,10 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 
 /**
  * Returns a reversed copy of the list.
@@ -21,7 +26,9 @@ export function reverseArray<TData = any>(list: readonly TData[]): TData[] {
 /**
  * Reverses a list.
  */
-export class ReverseStep<TData> extends ExecutableStep<readonly TData[]> {
+export class ReverseStep<TData> extends UnbatchedExecutableStep<
+  readonly TData[]
+> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ReverseStep",
@@ -38,8 +45,9 @@ export class ReverseStep<TData> extends ExecutableStep<readonly TData[]> {
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 
-  executeSingle = ([arr]: [TData[]]): TData[] =>
-    arr == null ? arr : reverseArray(arr);
+  unbatchedExecute(extra: ExecutionExtra, arr: TData[]): TData[] {
+    return arr == null ? arr : reverseArray(arr);
+  }
 
   deduplicate(peers: ReverseStep<TData>[]): ReverseStep<TData>[] {
     return peers;

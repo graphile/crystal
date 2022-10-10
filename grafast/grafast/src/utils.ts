@@ -939,3 +939,14 @@ export function stepsAreInSamePhase(
 
 // TODO: implement this!
 export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
+
+const disallowedKeys = Object.keys(
+  Object.getOwnPropertyDescriptors(Object.prototype),
+);
+
+// Do **NOT** allow variables that start with `__`!
+export const isSafeIdentifier = (key: string) =>
+  /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key) &&
+  !disallowedKeys.includes(key);
+
+export const STARTS_WITH_NUMBER = /^[0-9]/;

@@ -2,8 +2,9 @@ import chalk from "chalk";
 import debugFactory from "debug";
 
 import { inspect } from "../inspect.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in
@@ -64,7 +65,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 function constructDestructureFunction(
   path: (string | number)[],
   fallback: any,
-): (value: any) => any {
+): (_extra: ExecutionExtra, value: any) => any {
   const jitParts: string[] = [];
 
   let slowMode = false;
@@ -111,7 +112,7 @@ function constructDestructureFunction(
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
   // a JIT-d function.
   if (slowMode) {
-    return function slowlyExtractValueAtPath(value: any): any {
+    return function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
       for (let i = 0, l = path.length; i < l; i++) {
         const pathItem = path[i];
@@ -135,21 +136,19 @@ function constructDestructureFunction(
     const expression = jitParts.join("");
 
     // return value?.blah?.bog?.["!!!"]?.[0]
-    const functionBody = `return value${expression};`;
+    const functionBody = `return value${expression}`; /* THERE MUST BE NO SEMICOLON IN STRING */
 
     // JIT this via `new Function` for great performance.
-    const quicklyExtractValueAtPath = new Function(
-      "value",
-      functionBody,
+    const quicklyExtractValueAtPath = (
+      fallback !== undefined
+        ? new Function(
+            "fallback",
+            `return (extra, value) => {${functionBody} ?? fallback}`,
+          )(fallback)
+        : new Function("extra", "value", functionBody)
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
-    if (fallback !== undefined) {
-      const quicklyExtractValueAtPathWithFallback = (value: any): any =>
-        quicklyExtractValueAtPath(value) ?? fallback;
-      return quicklyExtractValueAtPathWithFallback;
-    } else {
-      return quicklyExtractValueAtPath;
-    }
+    return quicklyExtractValueAtPath;
   }
 }
 
@@ -164,14 +163,13 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  * preferably where the objects have null prototypes, and be sure to adhere to
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
-export class AccessStep<TData> extends ExecutableStep<TData> {
+export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "AccessStep",
   };
   isSyncAndSafe = true;
 
-  private destructure: (value: TData) => any;
   private parentStepId: number;
   allowMultipleOptimizations = true;
   public readonly path: (string | number)[];
@@ -185,7 +183,7 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     this.path = Array.isArray(path) ? path : [path];
     this.addDependency(parentPlan);
     this.parentStepId = parentPlan.id;
-    this.destructure = constructDestructureFunction(this.path, fallback);
+    this.unbatchedExecute = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
@@ -233,12 +231,14 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
     return this;
   }
 
-  execute(values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
-    return values[0].map(this.destructure);
-  }
-
   finalize(): void {
     super.finalize();
+  }
+
+  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+    throw new Error(
+      `${this}: should have had unbatchedExecute method replaced`,
+    );
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {

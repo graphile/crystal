@@ -1,11 +1,17 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+  PromiseOrDirect,
+} from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { list } from "./list.js";
 
 /**
  * Calls the given lambda function for each tuple
  */
-export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
+export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LambdaStep",
@@ -41,6 +47,10 @@ export class LambdaStep<TIn, TOut> extends ExecutableStep<TOut> {
     } else {
       return values[0].map(this.fn);
     }
+  }
+
+  unbatchedExecute(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
+    return this.fn(value);
   }
 }
 

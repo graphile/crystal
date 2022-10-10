@@ -2,19 +2,15 @@
 import chalk from "chalk";
 
 import type { GrafastError } from "../error.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
+import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 
-const disallowedKeys = Object.keys(
-  Object.getOwnPropertyDescriptors(Object.prototype),
-);
-
-// Do **NOT** allow variables that start with `__`!
-export const isSafeIdentifier = (key: string) =>
-  /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key) &&
-  !disallowedKeys.includes(key);
-
-const STARTS_WITH_NUMBER = /^[0-9]/;
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
 export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
@@ -55,7 +51,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
  * A plan that returns an object resulting from extracting the given
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
-export class MapStep extends ExecutableStep {
+export class MapStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "MapStep ",
@@ -85,7 +81,9 @@ export class MapStep extends ExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  executeSingle = (value: any[]): any => this.mapper(value[0]);
+  unbatchedExecute(extra: ExecutionExtra, value: any): any {
+    return this.mapper(value);
+  }
 
   deduplicate(peers: MapStep[]): MapStep[] {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);

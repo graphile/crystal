@@ -156,7 +156,7 @@ export abstract class BaseStep {
  * Executable plans are the plans associated with leaves on the GraphQL tree,
  * they must be able to execute to return values.
  */
-export class ExecutableStep<TData = any> extends BaseStep {
+export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
@@ -419,7 +419,7 @@ export class ExecutableStep<TData = any> extends BaseStep {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  execute(
+  /* abstract */ execute(
     values: ReadonlyArray<GrafastValuesList<any>>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
@@ -428,6 +428,79 @@ export class ExecutableStep<TData = any> extends BaseStep {
     extra;
     throw new Error(`${this} has not implemented an 'execute' method`);
   }
+}
+
+export abstract class UnbatchedExecutableStep<
+  TData = any,
+> extends ExecutableStep<TData> {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "UnbatchedExecutableStep",
+  };
+
+  finalize() {
+    // If they've not replaced 'execute', use our optimized form
+    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
+      const depIndexes =
+        this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
+      const tryOrNot = (inStr: string): string => {
+        if (this.isSyncAndSafe) {
+          return inStr;
+        } else {
+          return `\
+      try {
+${inStr.replace(/^/gm, "  ")}
+      } catch (e) {
+        results[i] = Promise.reject(e);
+      }
+`;
+        }
+      };
+      this.execute = new Function(
+        "values",
+        "extra",
+        `\
+    const [ ${depIndexes.map((i) => `list${i}`).join(", ")} ] = values;
+    const count = list0.length;
+    const results = [];
+    for (let i = 0; i < count; i++) {
+${tryOrNot(`\
+      results[i] = this.unbatchedExecute(extra, ${depIndexes
+        .map((depIndex) => `list${depIndex}[i]`)
+        .join(", ")});
+`)}\
+    }
+    return results;
+`,
+      ) as any;
+    }
+    super.finalize();
+  }
+
+  execute(
+    values: ReadonlyArray<GrafastValuesList<any>>,
+    extra: ExecutionExtra,
+  ): PromiseOrDirect<GrafastResultsList<TData>> {
+    console.warn(
+      `${this} didn't call 'super.finalize()' in the finalize method.`,
+    );
+    const count = values[0].length;
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      try {
+        const tuple = values.map((list) => list[i]);
+        results[i] = this.unbatchedExecute(extra, ...tuple);
+      } catch (e) {
+        results[i] = Promise.reject(e);
+      }
+    }
+    return results;
+  }
+
+  abstract unbatchedExecute(
+    extra: ExecutionExtra,
+    ...tuple: any[]
+  ): PromiseOrDirect<TData>;
 }
 
 export function isExecutableStep<TData = any>(

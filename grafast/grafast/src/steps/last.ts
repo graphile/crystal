@@ -1,8 +1,9 @@
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
 
-export class LastStep<TData> extends ExecutableStep<TData> {
+export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LastStep",
@@ -15,13 +16,10 @@ export class LastStep<TData> extends ExecutableStep<TData> {
     this.addDependency(parentPlan);
   }
 
-  execute(
-    values: [GrafastValuesList<ReadonlyArray<TData>>],
-  ): GrafastResultsList<TData> {
-    return values[0].map((list) => list?.[list?.length - 1]);
-  }
-
-  executeSingle = ([list]: [ReadonlyArray<TData>]): TData => {
+  unbatchedExecute = (
+    extra: ExecutionExtra,
+    list: ReadonlyArray<TData>,
+  ): TData => {
     return list?.[list?.length - 1];
   };
 

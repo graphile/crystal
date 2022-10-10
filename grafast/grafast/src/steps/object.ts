@@ -1,11 +1,15 @@
-import debugFactory from "debug";
+// import debugFactory from "debug";
 
 import type { ExecutionExtra } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
+import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
 
-const debugObjectPlan = debugFactory("grafast:ObjectStep");
-const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+
+// const debugObjectPlan = debugFactory("grafast:ObjectStep");
+// const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
 type DataFromStep<TStep extends ExecutableStep<any>> =
   TStep extends ExecutableStep<infer TData> ? TData : never;
@@ -32,7 +36,7 @@ export class ObjectStep<
       [key: string]: ExecutableStep<any>;
     },
   >
-  extends ExecutableStep<DataFromPlans<TPlans>>
+  extends UnbatchedExecutableStep<DataFromPlans<TPlans>>
   implements SetterCapableStep<TPlans>
 {
   static $$export = {
@@ -41,7 +45,7 @@ export class ObjectStep<
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
-  private keys: Array<keyof TPlans>;
+  private keys: Array<keyof TPlans & string>;
   constructor(obj: TPlans) {
     super();
     this.keys = Object.keys(obj);
@@ -55,7 +59,7 @@ export class ObjectStep<
    * handy.
    */
   public set<TKey extends keyof TPlans>(key: TKey, plan: TPlans[TKey]): void {
-    this.keys.push(key);
+    this.keys.push(key as string);
     this.addDependency(plan);
   }
 
@@ -63,7 +67,7 @@ export class ObjectStep<
     key: TKey,
     allowMissing = false,
   ): TKey extends keyof TPlans ? TPlans[TKey] : null {
-    const idx = this.keys.indexOf(key);
+    const idx = this.keys.indexOf(key as string);
     if (idx < 0) {
       if (!allowMissing) {
         throw new Error(
@@ -81,19 +85,15 @@ export class ObjectStep<
     return "{" + this.keys.join(",") + "}";
   }
 
-  // TODO: JIT this function
+  /*
   tupleToObject(
-    tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>,
     meta: ObjectPlanMeta<TPlans>,
+    ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
   ): DataFromPlans<TPlans> {
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
     outerloop: for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
-      // Shortcut for identical tuples (unlikely).
-      if (values === tuple) {
-        return obj;
-      }
       // Slow loop over each value in the tuples; this is not expected to be a
       // particularly big loop, typically only 2-5 keys.
       for (let j = 0, m = this.keys.length; j < m; j++) {
@@ -121,10 +121,69 @@ export class ObjectStep<
     meta.results.push([tuple, newObj]);
     return newObj;
   }
+  */
+
+  tupleToObjectJIT(): (
+    extra: ExecutionExtra,
+    ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
+  ) => DataFromPlans<TPlans> {
+    if (this.keys.length === 0) {
+      // Shortcut simple case
+      return () => EMPTY_OBJECT;
+    }
+    const keysAreSafe = this.keys.every(isSafeIdentifier);
+    const inner = keysAreSafe
+      ? `\
+  const newObj = {
+${this.keys
+  .map(
+    (key, i) =>
+      `    ${
+        STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key
+      }: val${i}`,
+  )
+  .join(",\n")}
+  };
+`
+      : `\
+  const newObj = Object.create(null);
+${this.keys.map((key, i) => `  newObj[keys[${i}]] = val${i};\n`).join("")}\
+`;
+    const functionBody = `\
+return function ({ meta }, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
+  if (meta.nextIndex) {
+    for (let i = 0, l = meta.results.length; i < l; i++) {
+      const [values, obj] = meta.results[i];
+      if (${this.keys
+        .map((key, i) => `values[${i}] === val${i}`)
+        .join(" && ")}) {
+        return obj;
+      }
+    }
+  } else {
+    meta.nextIndex = 0;
+    if (!meta.results) {
+      meta.results = [];
+    }
+  }
+${inner}
+  meta.results[meta.nextIndex] = [[${this.keys
+    .map((key, i) => `val${i}`)
+    .join(",")}], newObj];
+  // Only cache 10 results, use a round-robin
+  meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
+  return newObj;
+}
+`;
+    if (keysAreSafe) {
+      return new Function(functionBody)() as any;
+    } else {
+      return new Function("keys", functionBody)(this.keys) as any;
+    }
+  }
 
   finalize() {
-    // TODO: JIT here
-    this.executeSingle = this.tupleToObject.bind(this);
+    this.unbatchedExecute = this.tupleToObjectJIT();
     return super.finalize();
   }
 
@@ -132,28 +191,17 @@ export class ObjectStep<
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
     extra: ExecutionExtra,
   ): Array<DataFromPlans<TPlans>> {
-    const { meta: inMeta } = extra;
-    if (!inMeta.results) {
-      inMeta.results = [];
-    }
-    const meta = inMeta as any as ObjectPlanMeta<TPlans>;
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.executeSingle!(
-        values.map((v) => v[i]),
-        meta,
-      );
+      result[i] = this.unbatchedExecute!(extra, ...values.map((v) => v[i]));
     }
     return result;
   }
 
-  executeSingle:
-    | ((
-        values: Array<DataFromPlans<TPlans>[keyof TPlans]>,
-        meta: ObjectPlanMeta<TPlans>,
-      ) => DataFromPlans<TPlans>)
-    | null = null;
+  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+    throw new Error(`${this} didn't finalize? No unbatchedExecute method.`);
+  }
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);
@@ -164,7 +212,7 @@ export class ObjectStep<
    * Get the original plan with the given key back again.
    */
   get<TKey extends keyof TPlans>(key: TKey): TPlans[TKey] {
-    const index = this.keys.indexOf(key);
+    const index = this.keys.indexOf(key as string);
     if (index < 0) {
       throw new Error(
         `This ObjectStep doesn't have key '${String(
