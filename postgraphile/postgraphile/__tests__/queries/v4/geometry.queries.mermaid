@@ -23,25 +23,13 @@ graph TD
     Access74["Access[74∈1]<br />ᐸ72.yᐳ"]:::plan
     PgClassExpression75["PgClassExpression[75∈1]<br />ᐸ__geom__.”line”ᐳ"]:::plan
     Access76["Access[76∈1]<br />ᐸ75.aᐳ"]:::plan
-    Access77["Access[77∈1]<br />ᐸ76.xᐳ"]:::plan
-    Access78["Access[78∈1]<br />ᐸ76.yᐳ"]:::plan
     Access79["Access[79∈1]<br />ᐸ75.bᐳ"]:::plan
-    Access80["Access[80∈1]<br />ᐸ79.xᐳ"]:::plan
-    Access81["Access[81∈1]<br />ᐸ79.yᐳ"]:::plan
     PgClassExpression82["PgClassExpression[82∈1]<br />ᐸ__geom__.”lseg”ᐳ"]:::plan
     Access83["Access[83∈1]<br />ᐸ82.aᐳ"]:::plan
-    Access84["Access[84∈1]<br />ᐸ83.xᐳ"]:::plan
-    Access85["Access[85∈1]<br />ᐸ83.yᐳ"]:::plan
     Access86["Access[86∈1]<br />ᐸ82.bᐳ"]:::plan
-    Access87["Access[87∈1]<br />ᐸ86.xᐳ"]:::plan
-    Access88["Access[88∈1]<br />ᐸ86.yᐳ"]:::plan
     PgClassExpression89["PgClassExpression[89∈1]<br />ᐸ__geom__.”box”ᐳ"]:::plan
     Access90["Access[90∈1]<br />ᐸ89.aᐳ"]:::plan
-    Access91["Access[91∈1]<br />ᐸ90.xᐳ"]:::plan
-    Access92["Access[92∈1]<br />ᐸ90.yᐳ"]:::plan
     Access93["Access[93∈1]<br />ᐸ89.bᐳ"]:::plan
-    Access94["Access[94∈1]<br />ᐸ93.xᐳ"]:::plan
-    Access95["Access[95∈1]<br />ᐸ93.yᐳ"]:::plan
     PgClassExpression96["PgClassExpression[96∈1]<br />ᐸ__geom__.”open_path”ᐳ"]:::plan
     Access97["Access[97∈1]<br />ᐸ96.isOpenᐳ"]:::plan
     Access98["Access[98∈1]<br />ᐸ96.pointsᐳ"]:::plan
@@ -61,9 +49,21 @@ graph TD
     Access112["Access[112∈4]<br />ᐸ110.yᐳ"]:::plan
     PgClassExpression113["PgClassExpression[113∈1]<br />ᐸ__geom__.”circle”ᐳ"]:::plan
     Access114["Access[114∈1]<br />ᐸ113.centerᐳ"]:::plan
-    Access115["Access[115∈1]<br />ᐸ114.xᐳ"]:::plan
-    Access116["Access[116∈1]<br />ᐸ114.yᐳ"]:::plan
     Access117["Access[117∈1]<br />ᐸ113.radiusᐳ"]:::plan
+    Access118["Access[118∈1]<br />ᐸ75.a.xᐳ"]:::plan
+    Access119["Access[119∈1]<br />ᐸ113.center.yᐳ"]:::plan
+    Access120["Access[120∈1]<br />ᐸ75.a.yᐳ"]:::plan
+    Access121["Access[121∈1]<br />ᐸ113.center.xᐳ"]:::plan
+    Access122["Access[122∈1]<br />ᐸ75.b.xᐳ"]:::plan
+    Access123["Access[123∈1]<br />ᐸ89.b.yᐳ"]:::plan
+    Access124["Access[124∈1]<br />ᐸ75.b.yᐳ"]:::plan
+    Access125["Access[125∈1]<br />ᐸ89.b.xᐳ"]:::plan
+    Access126["Access[126∈1]<br />ᐸ82.a.xᐳ"]:::plan
+    Access127["Access[127∈1]<br />ᐸ89.a.yᐳ"]:::plan
+    Access128["Access[128∈1]<br />ᐸ82.a.yᐳ"]:::plan
+    Access129["Access[129∈1]<br />ᐸ89.a.xᐳ"]:::plan
+    Access130["Access[130∈1]<br />ᐸ82.b.xᐳ"]:::plan
+    Access131["Access[131∈1]<br />ᐸ82.b.yᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access64
@@ -78,25 +78,13 @@ graph TD
     PgClassExpression72 --> Access74
     PgSelectSingle70 --> PgClassExpression75
     PgClassExpression75 --> Access76
-    Access76 --> Access77
-    Access76 --> Access78
     PgClassExpression75 --> Access79
-    Access79 --> Access80
-    Access79 --> Access81
     PgSelectSingle70 --> PgClassExpression82
     PgClassExpression82 --> Access83
-    Access83 --> Access84
-    Access83 --> Access85
     PgClassExpression82 --> Access86
-    Access86 --> Access87
-    Access86 --> Access88
     PgSelectSingle70 --> PgClassExpression89
     PgClassExpression89 --> Access90
-    Access90 --> Access91
-    Access90 --> Access92
     PgClassExpression89 --> Access93
-    Access93 --> Access94
-    Access93 --> Access95
     PgSelectSingle70 --> PgClassExpression96
     PgClassExpression96 --> Access97
     PgClassExpression96 --> Access98
@@ -116,9 +104,21 @@ graph TD
     __Item110 --> Access112
     PgSelectSingle70 --> PgClassExpression113
     PgClassExpression113 --> Access114
-    Access114 --> Access115
-    Access114 --> Access116
     PgClassExpression113 --> Access117
+    PgClassExpression75 --> Access118
+    PgClassExpression113 --> Access119
+    PgClassExpression75 --> Access120
+    PgClassExpression113 --> Access121
+    PgClassExpression75 --> Access122
+    PgClassExpression89 --> Access123
+    PgClassExpression75 --> Access124
+    PgClassExpression89 --> Access125
+    PgClassExpression82 --> Access126
+    PgClassExpression89 --> Access127
+    PgClassExpression82 --> Access128
+    PgClassExpression89 --> Access129
+    PgClassExpression82 --> Access130
+    PgClassExpression82 --> Access131
 
     subgraph "Buckets for queries/v4/geometry.queries"
     Bucket0("Bucket 0 (root)"):::bucket
@@ -126,7 +126,7 @@ graph TD
     class Bucket0,__Value3,__Value5,Access64,Access65,Object66,Connection67,PgSelect68 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ68ᐳ[69]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item69,PgSelectSingle70,PgClassExpression71,PgClassExpression72,Access73,Access74,PgClassExpression75,Access76,Access77,Access78,Access79,Access80,Access81,PgClassExpression82,Access83,Access84,Access85,Access86,Access87,Access88,PgClassExpression89,Access90,Access91,Access92,Access93,Access94,Access95,PgClassExpression96,Access97,Access98,PgClassExpression102,Access103,Access104,PgClassExpression108,Access109,PgClassExpression113,Access114,Access115,Access116,Access117 bucket1
+    class Bucket1,__Item69,PgSelectSingle70,PgClassExpression71,PgClassExpression72,Access73,Access74,PgClassExpression75,Access76,Access79,PgClassExpression82,Access83,Access86,PgClassExpression89,Access90,Access93,PgClassExpression96,Access97,Access98,PgClassExpression102,Access103,Access104,PgClassExpression108,Access109,PgClassExpression113,Access114,Access117,Access118,Access119,Access120,Access121,Access122,Access123,Access124,Access125,Access126,Access127,Access128,Access129,Access130,Access131 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ98ᐳ[99]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item99,Access100,Access101 bucket2

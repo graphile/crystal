@@ -441,47 +441,47 @@ select
   __type_function_connection_mutation__."text_array"::text as "9",
   __type_function_connection_mutation__."json"::text as "10",
   __type_function_connection_mutation__."jsonb"::text as "11",
-  __type_function_connection_mutation__."nullable_range"::text as "12",
-  __type_function_connection_mutation__."numrange"::text as "13",
+  __type_function_connection_mutation__."id"::text as "12",
+  __type_function_connection_mutation__."smallint"::text as "13",
+  __type_function_connection_mutation__."int8_array_domain"::text as "14",
+  __type_function_connection_mutation__."text_array_domain"::text as "15",
+  __type_function_connection_mutation__."regdictionary"::text as "16",
+  __type_function_connection_mutation__."regconfig"::text as "17",
+  __type_function_connection_mutation__."regtype"::text as "18",
+  __type_function_connection_mutation__."regclass"::text as "19",
+  __type_function_connection_mutation__."regoperator"::text as "20",
+  __type_function_connection_mutation__."regoper"::text as "21",
+  __type_function_connection_mutation__."regprocedure"::text as "22",
+  __type_function_connection_mutation__."regproc"::text as "23",
+  __type_function_connection_mutation__."macaddr"::text as "24",
+  __type_function_connection_mutation__."cidr"::text as "25",
+  __type_function_connection_mutation__."inet"::text as "26",
+  __type_function_connection_mutation__."nullablePoint"::text as "27",
+  __type_function_connection_mutation__."point"::text as "28",
+  __type_function_connection_mutation__."nullable_nested_compound_type"::text as "29",
+  __type_function_connection_mutation__."nullable_compound_type"::text as "30",
+  __type_function_connection_mutation__."nullable_range"::text as "31",
+  __type_function_connection_mutation__."nested_compound_type"::text as "32",
+  __type_function_connection_mutation__."compound_type"::text as "33",
+  __type_function_connection_mutation__."money"::numeric::text as "34",
+  (
+    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    from unnest(__type_function_connection_mutation__."interval_array") t
+  )::text as "35",
+  to_char(__type_function_connection_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "36",
+  to_char(date '1970-01-01' + __type_function_connection_mutation__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "37",
+  to_char(date '1970-01-01' + __type_function_connection_mutation__."time", 'HH24:MI:SS.US'::text) as "38",
+  to_char(__type_function_connection_mutation__."date", 'YYYY-MM-DD'::text) as "39",
+  to_char(__type_function_connection_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "40",
+  to_char(__type_function_connection_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "41",
+  __type_function_connection_mutation__."numrange"::text as "42",
+  __type_function_connection_mutation__."an_int_range"::text as "43",
   json_build_array(
     lower_inc(__type_function_connection_mutation__."daterange"),
     to_char(lower(__type_function_connection_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_connection_mutation__."daterange"), 'YYYY-MM-DD'::text),
     upper_inc(__type_function_connection_mutation__."daterange")
-  )::text as "14",
-  __type_function_connection_mutation__."an_int_range"::text as "15",
-  to_char(__type_function_connection_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "16",
-  to_char(__type_function_connection_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "17",
-  to_char(__type_function_connection_mutation__."date", 'YYYY-MM-DD'::text) as "18",
-  to_char(date '1970-01-01' + __type_function_connection_mutation__."time", 'HH24:MI:SS.US'::text) as "19",
-  to_char(date '1970-01-01' + __type_function_connection_mutation__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "20",
-  to_char(__type_function_connection_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "21",
-  (
-    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
-    from unnest(__type_function_connection_mutation__."interval_array") t
-  )::text as "22",
-  __type_function_connection_mutation__."money"::numeric::text as "23",
-  __type_function_connection_mutation__."compound_type"::text as "24",
-  __type_function_connection_mutation__."id"::text as "25",
-  __type_function_connection_mutation__."smallint"::text as "26",
-  __type_function_connection_mutation__."int8_array_domain"::text as "27",
-  __type_function_connection_mutation__."text_array_domain"::text as "28",
-  __type_function_connection_mutation__."regdictionary"::text as "29",
-  __type_function_connection_mutation__."regconfig"::text as "30",
-  __type_function_connection_mutation__."regtype"::text as "31",
-  __type_function_connection_mutation__."regclass"::text as "32",
-  __type_function_connection_mutation__."regoperator"::text as "33",
-  __type_function_connection_mutation__."regoper"::text as "34",
-  __type_function_connection_mutation__."regprocedure"::text as "35",
-  __type_function_connection_mutation__."regproc"::text as "36",
-  __type_function_connection_mutation__."macaddr"::text as "37",
-  __type_function_connection_mutation__."cidr"::text as "38",
-  __type_function_connection_mutation__."inet"::text as "39",
-  __type_function_connection_mutation__."nullablePoint"::text as "40",
-  __type_function_connection_mutation__."point"::text as "41",
-  __type_function_connection_mutation__."nested_compound_type"::text as "42",
-  __type_function_connection_mutation__."nullable_compound_type"::text as "43",
-  __type_function_connection_mutation__."nullable_nested_compound_type"::text as "44"
+  )::text as "44"
 from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
 
 select __post_result__.*
@@ -531,13 +531,13 @@ from (
 ) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
+    __frmcdc_compound_type_1__."foo_bar"::text as "0",
+    __frmcdc_compound_type_1__."f"::text as "1",
+    __frmcdc_compound_type_1__."e"::text as "2",
     __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
+    __frmcdc_compound_type_1__."c"::text as "4",
+    __frmcdc_compound_type_1__."b" as "5",
+    __frmcdc_compound_type_1__."a"::text as "6",
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
@@ -552,31 +552,31 @@ from (
 ) as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_nested_compound_type_1__."a"::text as "8",
-    __frmcdc_compound_type_1_2."a"::text as "9",
-    __frmcdc_compound_type_1_2."b" as "10",
-    __frmcdc_compound_type_1_2."c"::text as "11",
-    __frmcdc_compound_type_1_2."d" as "12",
-    __frmcdc_compound_type_1_2."e"::text as "13",
-    __frmcdc_compound_type_1_2."f"::text as "14",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "15",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "16",
-    __frmcdc_nested_compound_type_1__."b"::text as "17",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "18",
+    __frmcdc_nested_compound_type_1__."baz_buz"::text as "0",
+    __frmcdc_compound_type_1__."foo_bar"::text as "1",
+    __frmcdc_compound_type_1__."f"::text as "2",
+    __frmcdc_compound_type_1__."e"::text as "3",
+    __frmcdc_compound_type_1__."d" as "4",
+    __frmcdc_compound_type_1__."c"::text as "5",
+    __frmcdc_compound_type_1__."b" as "6",
+    __frmcdc_compound_type_1__."a"::text as "7",
+    (not (__frmcdc_compound_type_1__ is null))::text as "8",
+    __frmcdc_nested_compound_type_1__."b"::text as "9",
+    __frmcdc_compound_type_1_2."foo_bar"::text as "10",
+    __frmcdc_compound_type_1_2."f"::text as "11",
+    __frmcdc_compound_type_1_2."e"::text as "12",
+    __frmcdc_compound_type_1_2."d" as "13",
+    __frmcdc_compound_type_1_2."c"::text as "14",
+    __frmcdc_compound_type_1_2."b" as "15",
+    __frmcdc_compound_type_1_2."a"::text as "16",
+    (not (__frmcdc_compound_type_1_2 is null))::text as "17",
+    __frmcdc_nested_compound_type_1__."a"::text as "18",
     (not (__frmcdc_nested_compound_type_1__ is null))::text as "19",
     __frmcdc_nested_compound_type_1_identifiers__.idx as "20"
   from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
   on TRUE
 ) as __frmcdc_nested_compound_type_1_result__;
 
@@ -589,13 +589,13 @@ from (
 ) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
+    __frmcdc_compound_type_1__."foo_bar"::text as "0",
+    __frmcdc_compound_type_1__."f"::text as "1",
+    __frmcdc_compound_type_1__."e"::text as "2",
     __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
+    __frmcdc_compound_type_1__."c"::text as "4",
+    __frmcdc_compound_type_1__."b" as "5",
+    __frmcdc_compound_type_1__."a"::text as "6",
     (not (__frmcdc_compound_type_1__ is null))::text as "7",
     __frmcdc_compound_type_1_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
