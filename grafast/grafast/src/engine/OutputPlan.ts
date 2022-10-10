@@ -23,11 +23,13 @@ import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { $$error } from "../error.js";
+import { AccessStep } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
 import { $$concreteType, $$streamMore } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { ExecutableStep } from "../step.js";
+import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
@@ -158,6 +160,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * OutputPlanMode.
    */
   public rootStepId: number;
+
+  /**
+   * Appended to the root step when accessed to avoid the need for AccessSteps
+   */
+  private processRoot: ((value: any) => any) | null = null;
 
   // TODO: since polymorphic handles branching, we can remove the `typeName` layer from this.
   /**
@@ -405,7 +412,25 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     throw new Error(`OutputPlan.executeString has yet to be built!`);
   }
 
-  finalize() {
+  optimize(): void {
+    const $root = this.layerPlan.operationPlan.dangerouslyGetStep(
+      this.rootStepId,
+    );
+    if ($root instanceof AccessStep && $root.fallback === undefined) {
+      const expression = $root.unbatchedExecute![expressionSymbol];
+      if (expression && expression.length > 0) {
+        // @ts-ignore
+        const $parent: ExecutableStep<any> = $root.getDep(0);
+        this.rootStepId = $parent.id;
+        this.processRoot = new Function(
+          "value",
+          `return value${expression};`,
+        ) as (value: any) => any;
+      }
+    }
+  }
+
+  finalize(): void {
     this.rootStepId = this.layerPlan.operationPlan.dangerouslyGetStep(
       this.rootStepId,
     ).id;
@@ -679,8 +704,14 @@ function makeExecutor<TAsString extends boolean>(
   };
   const functionBody = `return function compiledOutputPlan${
     asString ? "String" : ""
-  }_${nameExtra}(root, mutablePath, bucket, bucketIndex) {
-  const bucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex];
+  }_${nameExtra}(
+  root,
+  mutablePath,
+  bucket,
+  bucketIndex,
+  rawBucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex]
+) {
+  const bucketRootValue = this.processRoot ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}  if (bucketRootValue == null) {
     ${
       skipNullHandling
@@ -714,7 +745,7 @@ function makeExecuteChildPlanCode(
     return `
       const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex});
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
       if (fieldResult == ${asString ? '"null"' : "null"}) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
@@ -725,7 +756,7 @@ function makeExecuteChildPlanCode(
       try {
         const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex});
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));

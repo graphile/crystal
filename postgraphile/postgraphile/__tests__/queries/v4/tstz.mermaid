@@ -18,9 +18,6 @@ graph TD
     First12["First[12∈0]"]:::plan
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸrangeTestᐳ"]:::plan
     PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__range_test__.”tstz”ᐳ"]:::plan
-    Access15["Access[15∈0]<br />ᐸ14.startᐳ"]:::plan
-    Access18["Access[18∈0]<br />ᐸ14.start.valueᐳ"]:::plan
-    Access19["Access[19∈0]<br />ᐸ14.start.inclusiveᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access9
@@ -30,12 +27,9 @@ graph TD
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression14
-    PgClassExpression14 --> Access15
-    PgClassExpression14 --> Access18
-    PgClassExpression14 --> Access19
 
     subgraph "Buckets for queries/v4/tstz"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,Access15,Access18,Access19 bucket0
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14 bucket0
     end

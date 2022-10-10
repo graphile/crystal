@@ -1,0 +1,19 @@
+{
+  deepObject: {
+    number: 42,
+    numbers: [
+      1,
+      1,
+      2,
+      3,
+      5,
+      8,
+      13,
+    ],
+    friend: {
+      name: "Marvin",
+      occupation: "Android",
+      status: "paranoid",
+    },
+  },
+}

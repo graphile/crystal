@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy()
+
+{
+  deepObject {
+    number
+    numbers
+    friend {
+      name
+      occupation
+      status
+    }
+  }
+}

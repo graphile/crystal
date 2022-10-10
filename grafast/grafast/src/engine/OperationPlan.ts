@@ -282,6 +282,9 @@ export class OperationPlan {
     // Replace/inline/optimise steps
     this.optimizeSteps();
 
+    // Replace access plans with direct access, etc
+    this.optimizeOutputPlans();
+
     // Get rid of steps that are no longer needed after optimising
     this.treeShakeSteps();
 
@@ -2545,6 +2548,13 @@ export class OperationPlan {
       const rootPlan = this.steps[outputPlan.rootStepId];
       ensurePlanAvailableInLayer(rootPlan, outputPlan.layerPlan);
     });
+  }
+
+  /** Optimizes each output plan */
+  private optimizeOutputPlans(): void {
+    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) =>
+      outputPlan.optimize(),
+    );
   }
 
   /** Finalizes each output plan */
