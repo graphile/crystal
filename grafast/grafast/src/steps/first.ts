@@ -27,7 +27,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   unbatchedExecute(extra: ExecutionExtra, list: any[]) {
-    return list[0];
+    return list?.[0];
   }
 
   deduplicate(peers: FirstStep<TData>[]): FirstStep<TData>[] {
