@@ -224,7 +224,11 @@ export class AccessStep<TData> extends ExecutableStep<TData> {
   optimize(): AccessStep<TData> {
     const $dep = this.getDep(0);
     if ($dep instanceof AccessStep && $dep.fallback === undefined) {
-      return access($dep.getDep(0), [...$dep.path, ...this.path], this.fallback);
+      return access(
+        $dep.getDep(0),
+        [...$dep.path, ...this.path],
+        this.fallback,
+      );
     }
     return this;
   }
