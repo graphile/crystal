@@ -6,11 +6,7 @@ import type {
 } from "graphql";
 import { Kind } from "graphql";
 
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "../interfaces.js";
+import type { ExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
 

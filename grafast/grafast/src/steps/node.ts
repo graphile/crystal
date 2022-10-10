@@ -4,8 +4,6 @@ import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
   NodeIdCodec,
   NodeIdHandler,
   PolymorphicData,

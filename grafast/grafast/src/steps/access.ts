@@ -2,11 +2,7 @@ import chalk from "chalk";
 import debugFactory from "debug";
 
 import { inspect } from "../inspect.js";
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "../interfaces.js";
+import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
