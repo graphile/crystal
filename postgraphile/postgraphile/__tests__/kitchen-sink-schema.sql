@@ -603,7 +603,7 @@ create function c.func_out_table_setof(out c.person) returns setof c.person as $
 $$ language sql stable;
 
 create function c.func_out_out_compound_type(i1 int, out o1 int, out o2 c.compound_type) as $$
-  select i1 + 10 as o1, compound_type as o2 from b.types limit 1;
+  select i1 + 10 as o1, compound_type as o2 from b.types order by id asc limit 1;
 $$ language sql stable;
 
 create function c.person_computed_out (person c.person, out o1 text) as $$
@@ -630,6 +630,7 @@ create function c.person_computed_complex (person c.person, in a int, in b text,
     person as z
   from c.person
     inner join b.types on c.person.id = (b.types.id - 10)
+  order by person.id asc, types.id asc
   limit 1;
 $$ language sql stable;
 
@@ -660,6 +661,7 @@ create function c.func_out_complex(in a int, in b text, out x int, out y c.compo
     person as z
   from c.person
     inner join b.types on c.person.id = (b.types.id - 10)
+  order by person.id asc, types.id asc
   limit 1;
 $$ language sql stable;
 
@@ -670,6 +672,7 @@ create function c.func_out_complex_setof(in a int, in b text, out x int, out y c
     person as z
   from c.person
     inner join b.types on c.person.id = (b.types.id - 10)
+  order by person.id asc, types.id asc
   limit 1;
 $$ language sql stable;
 
@@ -704,6 +707,7 @@ create function c.mutation_out_complex(in a int, in b text, out x int, out y c.c
     person as z
   from c.person
     inner join b.types on c.person.id = (b.types.id - 10)
+  order by person.id asc, types.id asc
   limit 1;
 $$ language sql volatile;
 
@@ -714,6 +718,7 @@ create function c.mutation_out_complex_setof(in a int, in b text, out x int, out
     person as z
   from c.person
     inner join b.types on c.person.id = (b.types.id - 10)
+  order by person.id asc, types.id asc
   limit 1;
 $$ language sql volatile;
 
@@ -722,7 +727,7 @@ create function c.mutation_out_out(out first_out int, out second_out text) as $$
 $$ language sql volatile;
 
 create function c.mutation_out_out_compound_type(i1 int, out o1 int, out o2 c.compound_type) as $$
-  select i1 + 10 as o1, compound_type as o2 from b.types limit 1;
+  select i1 + 10 as o1, compound_type as o2 from b.types order by id asc limit 1;
 $$ language sql volatile;
 
 create function c.mutation_out_out_setof(out o1 int, out o2 text) returns setof record as $$
