@@ -37,6 +37,7 @@ const nocheck = <span style={checkCss}></span>;
 export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
+  const verbose = storage.get("verbose") === "true";
   const setExplain = useCallback(
     (newExplain: boolean) => {
       storage.set("explain", newExplain ? "true" : "");
@@ -45,6 +46,7 @@ export const Ruru: FC<RuruProps> = (props) => {
   );
   const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
     explain,
+    verbose,
   });
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
@@ -172,6 +174,15 @@ export const RuruInner: FC<{
                 <span>
                   {storage.get("explain") === "true" ? check : nocheck}
                   Explain (if supported)
+                </span>
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
+                title="Don't hide explain from results"
+                onSelect={() => storage.toggle("verbose")}
+              >
+                <span>
+                  {storage.get("verbose") === "true" ? check : nocheck}
+                  Verbose
                 </span>
               </ToolbarMenu.Item>
               <ToolbarMenu.Item

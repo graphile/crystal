@@ -81,7 +81,16 @@ function makeWsUrl(url: string): string {
   }
 }
 
-export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
+function hideProperty(obj: object, property: string) {
+  const value = obj[property];
+  delete obj[property];
+  Object.defineProperty(obj, property, { value, enumerable: false });
+}
+
+export const useFetcher = (
+  props: RuruProps,
+  options: { explain?: boolean; verbose?: boolean } = {},
+) => {
   const [streamEndpoint, setStreamEndpoint] = useState<string | null>(null);
   const url =
     props.endpoint ??
@@ -103,6 +112,7 @@ export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
   const explain =
     options.explain &&
     (!props.debugTools || props.debugTools.includes("explain"));
+  const verbose = !!options.verbose;
 
   const ourFetch = useMemo<typeof fetch>(() => {
     return (
@@ -172,6 +182,14 @@ export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
             "The response had `extensions.explain` set, but in an incompatible format.",
           );
         }
+        // Hide it if not verbose
+        if (!verbose) {
+          if (Object.keys(result.extensions).length === 1) {
+            hideProperty(result, "extensions");
+          } else {
+            hideProperty(result.extensions, "explain");
+          }
+        }
       } else if (legacy) {
         setTimeout(() => {
           setExplainResults({
@@ -223,7 +241,7 @@ export const useFetcher = (props: RuruProps, options: { explain: boolean }) => {
       }
       return result;
     };
-  }, [fetcher]);
+  }, [fetcher, verbose]);
 
   return { fetcher: wrappedFetcher, explainResults, streamEndpoint };
 };

@@ -9,6 +9,7 @@ export interface StoredKeys {
   explainAtBottom: "true" | "";
   explainSize: string;
   query: string;
+  verbose: "true" | "";
 }
 
 const KEYS: { [key in keyof StoredKeys]: string } = {
@@ -20,6 +21,7 @@ const KEYS: { [key in keyof StoredKeys]: string } = {
   explainAtBottom: "Ruru:explainAtBottom",
   explorerIsOpen: "graphiql:explorerIsOpen",
   query: "graphiql:query",
+  verbose: "Ruru:verbose",
 };
 
 const up = (v: number) => v + 1;
