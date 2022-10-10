@@ -316,8 +316,6 @@ graph TD
     PgSelectSingle630["PgSelectSingle[630∈16]<br />ᐸsearch_test_summariesᐳ"]:::plan
     PgClassExpression631["PgClassExpression[631∈16]<br />ᐸ__search_t...ies__.”id”ᐳ"]:::plan
     PgClassExpression632["PgClassExpression[632∈16]<br />ᐸ__search_t..._duration”ᐳ"]:::plan
-    Access633["Access[633∈16]<br />ᐸ632.hoursᐳ"]:::plan
-    Access634["Access[634∈16]<br />ᐸ632.minutesᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access10
@@ -587,8 +585,6 @@ graph TD
     __Item629 --> PgSelectSingle630
     PgSelectSingle630 --> PgClassExpression631
     PgSelectSingle630 --> PgClassExpression632
-    PgClassExpression632 --> Access633
-    PgClassExpression632 --> Access634
 
     subgraph "Buckets for queries/v4/function-return-types"
     Bucket0("Bucket 0 (root)"):::bucket
@@ -641,7 +637,7 @@ graph TD
     class Bucket15,__Item426,PgSelectSingle427,PgClassExpression429,List430,Lambda431 bucket15
     Bucket16("Bucket 16 (listItem)<br />ROOT __Item{16}ᐸ625ᐳ[629]"):::bucket
     classDef bucket16 stroke:#f5deb3
-    class Bucket16,__Item629,PgSelectSingle630,PgClassExpression631,PgClassExpression632,Access633,Access634 bucket16
+    class Bucket16,__Item629,PgSelectSingle630,PgClassExpression631,PgClassExpression632 bucket16
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13 & Bucket14 & Bucket15 & Bucket16
     Bucket3 --> Bucket4
     end

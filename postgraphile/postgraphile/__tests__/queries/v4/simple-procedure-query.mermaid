@@ -23,9 +23,6 @@ graph TD
     PgClassExpression19["PgClassExpression[19∈1]<br />ᐸ__compound...uery__.”e”ᐳ"]:::plan
     PgClassExpression20["PgClassExpression[20∈1]<br />ᐸ__compound...uery__.”f”ᐳ"]:::plan
     PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__compound...uery__.”g”ᐳ"]:::plan
-    Access22["Access[22∈1]<br />ᐸ21.hoursᐳ"]:::plan
-    Access23["Access[23∈1]<br />ᐸ21.minutesᐳ"]:::plan
-    Access24["Access[24∈1]<br />ᐸ21.secondsᐳ"]:::plan
     PgSelect44[["PgSelect[44∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
     __Item48>"__Item[48∈2]<br />ᐸ44ᐳ"]:::itemplan
     PgSelectSingle49["PgSelectSingle[49∈2]<br />ᐸtable_set_queryᐳ"]:::plan
@@ -49,12 +46,6 @@ graph TD
     __Item105>"__Item[105∈6]<br />ᐸ101ᐳ"]:::itemplan
     PgSelectSingle106["PgSelectSingle[106∈6]<br />ᐸquery_interval_setᐳ"]:::plan
     PgClassExpression107["PgClassExpression[107∈6]<br />ᐸ__query_in...al_set__.vᐳ"]:::plan
-    Access108["Access[108∈6]<br />ᐸ107.secondsᐳ"]:::plan
-    Access109["Access[109∈6]<br />ᐸ107.minutesᐳ"]:::plan
-    Access110["Access[110∈6]<br />ᐸ107.hoursᐳ"]:::plan
-    Access111["Access[111∈6]<br />ᐸ107.daysᐳ"]:::plan
-    Access112["Access[112∈6]<br />ᐸ107.monthsᐳ"]:::plan
-    Access113["Access[113∈6]<br />ᐸ107.yearsᐳ"]:::plan
     PgSelect130[["PgSelect[130∈0]<br />ᐸpostᐳ"]]:::plan
     __Item134>"__Item[134∈7]<br />ᐸ130ᐳ"]:::itemplan
     PgSelectSingle135["PgSelectSingle[135∈7]<br />ᐸpostᐳ"]:::plan
@@ -63,8 +54,6 @@ graph TD
     __Item144>"__Item[144∈8]<br />ᐸ149ᐳ"]:::itemplan
     PgSelectSingle145["PgSelectSingle[145∈8]<br />ᐸpost_computed_interval_setᐳ"]:::plan
     PgClassExpression146["PgClassExpression[146∈8]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
-    Access147["Access[147∈8]<br />ᐸ146.secondsᐳ"]:::plan
-    Access148["Access[148∈8]<br />ᐸ146.minutesᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access10
@@ -80,9 +69,6 @@ graph TD
     PgSelectSingle14 --> PgClassExpression19
     PgSelectSingle14 --> PgClassExpression20
     PgSelectSingle14 --> PgClassExpression21
-    PgClassExpression21 --> Access22
-    PgClassExpression21 --> Access23
-    PgClassExpression21 --> Access24
     Object12 --> PgSelect44
     PgSelect44 ==> __Item48
     __Item48 --> PgSelectSingle49
@@ -103,12 +89,6 @@ graph TD
     PgSelect101 ==> __Item105
     __Item105 --> PgSelectSingle106
     PgSelectSingle106 --> PgClassExpression107
-    PgClassExpression107 --> Access108
-    PgClassExpression107 --> Access109
-    PgClassExpression107 --> Access110
-    PgClassExpression107 --> Access111
-    PgClassExpression107 --> Access112
-    PgClassExpression107 --> Access113
     Object12 --> PgSelect130
     PgSelect130 ==> __Item134
     __Item134 --> PgSelectSingle135
@@ -117,8 +97,6 @@ graph TD
     Access149 ==> __Item144
     __Item144 --> PgSelectSingle145
     PgSelectSingle145 --> PgClassExpression146
-    PgClassExpression146 --> Access147
-    PgClassExpression146 --> Access148
 
     subgraph "Buckets for queries/v4/simple-procedure-query"
     Bucket0("Bucket 0 (root)"):::bucket
@@ -126,7 +104,7 @@ graph TD
     class Bucket0,__Value3,__Value5,PgSelect9,Access10,Access11,Object12,PgSelect44,PgSelect70,__InputStaticLeaf77,__InputStaticLeaf79,Constant82,PgSelect83,PgSelect92,PgSelect101,PgSelect130 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ9ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item13,PgSelectSingle14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,Access22,Access23,Access24 bucket1
+    class Bucket1,__Item13,PgSelectSingle14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ44ᐳ[48]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item48,PgSelectSingle49,PgClassExpression50 bucket2
@@ -141,13 +119,13 @@ graph TD
     class Bucket5,__Item96,PgSelectSingle97,PgClassExpression98 bucket5
     Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ101ᐳ[105]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item105,PgSelectSingle106,PgClassExpression107,Access108,Access109,Access110,Access111,Access112,Access113 bucket6
+    class Bucket6,__Item105,PgSelectSingle106,PgClassExpression107 bucket6
     Bucket7("Bucket 7 (listItem)<br />ROOT __Item{7}ᐸ130ᐳ[134]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item134,PgSelectSingle135,PgClassExpression136,Access149 bucket7
     Bucket8("Bucket 8 (listItem)<br />ROOT __Item{8}ᐸ149ᐳ[144]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,__Item144,PgSelectSingle145,PgClassExpression146,Access147,Access148 bucket8
+    class Bucket8,__Item144,PgSelectSingle145,PgClassExpression146 bucket8
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7
     Bucket7 --> Bucket8
     end
