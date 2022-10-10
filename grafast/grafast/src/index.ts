@@ -89,6 +89,7 @@ import {
   ObjectLikeStep,
   PolymorphicStep,
   StreamableStep,
+  UnbatchedExecutableStep,
 } from "./step.js";
 import {
   __InputListStep,
@@ -382,6 +383,7 @@ export {
   stripAnsi,
   subscribe,
   TypedEventEmitter,
+  UnbatchedExecutableStep,
 };
 
 exportAsMany("grafast", {
