@@ -16,7 +16,7 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
     this.addDependency(parentPlan);
   }
 
-  executeSingle = (
+  unbatchedExecute = (
     extra: ExecutionExtra,
     list: ReadonlyArray<TData>,
   ): TData => {

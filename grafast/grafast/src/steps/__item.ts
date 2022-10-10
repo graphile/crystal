@@ -42,7 +42,7 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
   execute(): never {
     throw new Error("__ItemStep must never execute");
   }
-  executeSingle(): never {
+  unbatchedExecute(): never {
     throw new Error("__ItemStep must never execute");
   }
 

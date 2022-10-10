@@ -183,7 +183,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     this.path = Array.isArray(path) ? path : [path];
     this.addDependency(parentPlan);
     this.parentStepId = parentPlan.id;
-    this.executeSingle = constructDestructureFunction(this.path, fallback);
+    this.unbatchedExecute = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
@@ -235,8 +235,10 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     super.finalize();
   }
 
-  executeSingle(_extra: ExecutionExtra, ..._values: any[]): any {
-    throw new Error(`${this}: should have had executeSingle method replaced`);
+  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+    throw new Error(
+      `${this}: should have had unbatchedExecute method replaced`,
+    );
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {

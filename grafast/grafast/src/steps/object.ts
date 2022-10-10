@@ -183,7 +183,7 @@ ${inner}
   }
 
   finalize() {
-    this.executeSingle = this.tupleToObjectJIT();
+    this.unbatchedExecute = this.tupleToObjectJIT();
     return super.finalize();
   }
 
@@ -194,13 +194,13 @@ ${inner}
     const count = values[0].length;
     const result = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.executeSingle!(extra, ...values.map((v) => v[i]));
+      result[i] = this.unbatchedExecute!(extra, ...values.map((v) => v[i]));
     }
     return result;
   }
 
-  executeSingle(_extra: ExecutionExtra, ..._values: any[]): any {
-    throw new Error(`${this} didn't finalize? No executeSingle method.`);
+  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+    throw new Error(`${this} didn't finalize? No unbatchedExecute method.`);
   }
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {

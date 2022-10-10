@@ -3,7 +3,7 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
 } from "../interfaces.js";
-import type { ExecutableStep} from "../step.js";
+import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
 
@@ -26,7 +26,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
     return values[0].map((list) => list?.[0]);
   }
 
-  executeSingle(extra: ExecutionExtra, list: any[]) {
+  unbatchedExecute(extra: ExecutionExtra, list: any[]) {
     return list[0];
   }
 

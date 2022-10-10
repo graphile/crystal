@@ -82,7 +82,7 @@ export class __InputListStep extends ExecutableStep {
       "__InputListStep should never execute; it should have been optimized away.",
     );
   }
-  executeSingle = (): any => {
+  unbatchedExecute = (): any => {
     throw new Error(
       "__InputListStep should never execute; it should have been optimized away.",
     );

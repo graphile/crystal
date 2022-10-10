@@ -87,7 +87,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     return null;
   }
 
-  executeSingle = (
+  unbatchedExecute = (
     extra: ExecutionExtra,
     specifier: any,
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {

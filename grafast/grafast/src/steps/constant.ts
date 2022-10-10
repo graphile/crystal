@@ -20,7 +20,7 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     return arrayOfLength(values[0].length, this.data);
   }
 
-  executeSingle() {
+  unbatchedExecute() {
     return this.data;
   }
 

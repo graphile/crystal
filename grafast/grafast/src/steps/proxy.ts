@@ -25,7 +25,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   execute(values: [GrafastValuesList<T>]): GrafastResultsList<T> {
     return values[0];
   }
-  executeSingle(extra: ExecutionExtra, value: T): T {
+  unbatchedExecute(extra: ExecutionExtra, value: T): T {
     return value;
   }
   // Do not proxy stream requests

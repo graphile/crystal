@@ -299,7 +299,7 @@ export class ConnectionStep<
     return arrayOfLength(values[0].length, EMPTY_OBJECT);
   }
 
-  public executeSingle() {
+  public unbatchedExecute() {
     return EMPTY_OBJECT;
   }
 }

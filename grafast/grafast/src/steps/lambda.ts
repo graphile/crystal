@@ -49,7 +49,7 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     }
   }
 
-  executeSingle(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
+  unbatchedExecute(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
     return this.fn(value);
   }
 }

@@ -59,7 +59,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   }
 
   finalize() {
-    this.executeSingle = new Function(
+    this.unbatchedExecute = new Function(
       "extra",
       ...this.dependencies.map((_, i) => `val${i}`),
       `\
@@ -79,7 +79,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     super.finalize();
   }
 
-  executeSingle(extra: ExecutionExtra, ...values: any[]) {
+  unbatchedExecute(extra: ExecutionExtra, ...values: any[]) {
     const resultValues = Object.create(null);
     for (const inputFieldName in this.inputFields) {
       const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;

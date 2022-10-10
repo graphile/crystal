@@ -28,7 +28,7 @@ export class __InputStaticLeafStep<
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
-  executeSingle(): TLeaf {
+  unbatchedExecute(): TLeaf {
     return this.coercedValue;
   }
 

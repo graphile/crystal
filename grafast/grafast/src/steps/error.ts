@@ -17,7 +17,7 @@ export class ErrorStep extends UnbatchedExecutableStep {
   execute(values: GrafastValuesList<any>): GrafastResultsList<any> {
     return arrayOfLength(values[0].length, this.promise);
   }
-  executeSingle(): any {
+  unbatchedExecute(): any {
     return this.promise;
   }
 }

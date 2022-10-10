@@ -85,7 +85,7 @@ export class __TrackedObjectStep<
     return values[0];
   }
 
-  executeSingle(extra: ExecutionExtra, v: TData): TData {
+  unbatchedExecute(extra: ExecutionExtra, v: TData): TData {
     return v;
   }
 

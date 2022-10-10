@@ -72,7 +72,7 @@ export class ListStep<
     return result;
   }
 
-  executeSingle(
+  unbatchedExecute(
     extra: ExecutionExtra,
     ...values: any[] //UnwrapPlanTuple<TPlanTuple>,
   ): UnwrapPlanTuple<TPlanTuple> {

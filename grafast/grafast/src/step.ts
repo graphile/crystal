@@ -447,7 +447,7 @@ export abstract class UnbatchedExecutableStep<
     const count = values[0].length;
     const results = [];
     for (let i = 0; i < count; i++) {
-      results[i] = this.executeSingle(extra, ${
+      results[i] = this.unbatchedExecute(extra, ${
         this.dependencies.length === 0
           ? "values[0][i]"
           : this.dependencies
@@ -462,7 +462,7 @@ export abstract class UnbatchedExecutableStep<
     const results = [];
     for (let i = 0; i < count; i++) {
       try {
-        results[i] = this.executeSingle(extra, ${
+        results[i] = this.unbatchedExecute(extra, ${
           this.dependencies.length === 0
             ? "values[0][i]"
             : this.dependencies
@@ -491,7 +491,7 @@ export abstract class UnbatchedExecutableStep<
     for (let i = 0; i < count; i++) {
       try {
         const tuple = values.map((list) => list[i]);
-        results[i] = this.executeSingle(extra, ...tuple);
+        results[i] = this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
         results[i] = Promise.reject(e);
       }
@@ -499,7 +499,7 @@ export abstract class UnbatchedExecutableStep<
     return results;
   }
 
-  abstract executeSingle(
+  abstract unbatchedExecute(
     extra: ExecutionExtra,
     ...tuple: any[]
   ): PromiseOrDirect<TData>;

@@ -81,7 +81,7 @@ export class MapStep extends UnbatchedExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  executeSingle(extra: ExecutionExtra, value: any): any {
+  unbatchedExecute(extra: ExecutionExtra, value: any): any {
     return this.mapper(value);
   }
 

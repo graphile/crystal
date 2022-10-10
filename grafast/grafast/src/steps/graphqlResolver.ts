@@ -85,7 +85,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     return peers.filter((peer) => peer.resolver === this.resolver);
   }
 
-  executeSingle(
+  unbatchedExecute(
     extra: ExecutionExtra,
     source: any,
     args: any,
@@ -128,7 +128,7 @@ export class GraphQLPolymorphicUnwrap extends UnbatchedExecutableStep {
   execute(values: [GrafastValuesList<PolymorphicData>]) {
     return values[0].map((v) => (v ? v[$$data] : null));
   }
-  executeSingle(extra: ExecutionExtra, v: PolymorphicData) {
+  unbatchedExecute(extra: ExecutionExtra, v: PolymorphicData) {
     return v ? v[$$data] : null;
   }
 }
