@@ -439,25 +439,27 @@ export abstract class UnbatchedExecutableStep<
   };
 
   finalize() {
-    const depIndexes =
-      this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
-    const tryOrNot = (inStr: string): string => {
-      if (this.isSyncAndSafe) {
-        return inStr;
-      } else {
-        return `\
+    // If they've not replaced 'execute', use our optimized form
+    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
+      const depIndexes =
+        this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
+      const tryOrNot = (inStr: string): string => {
+        if (this.isSyncAndSafe) {
+          return inStr;
+        } else {
+          return `\
       try {
 ${inStr.replace(/^/gm, "  ")}
       } catch (e) {
         results[i] = Promise.reject(e);
       }
 `;
-      }
-    };
-    this.execute = new Function(
-      "values",
-      "extra",
-      `\
+        }
+      };
+      this.execute = new Function(
+        "values",
+        "extra",
+        `\
     const [ ${depIndexes.map((i) => `list${i}`).join(", ")} ] = values;
     const count = list0.length;
     const results = [];
@@ -470,7 +472,8 @@ ${tryOrNot(`\
     }
     return results;
 `,
-    ) as any;
+      ) as any;
+    }
     super.finalize();
   }
 
