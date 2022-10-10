@@ -417,7 +417,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.rootStepId,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
-      const expression = $root.executeSingle![expressionSymbol];
+      const expression = $root.unbatchedExecute![expressionSymbol];
       if (expression && expression.length > 0) {
         // @ts-ignore
         const $parent: ExecutableStep<any> = $root.getDep(0);
