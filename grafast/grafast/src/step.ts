@@ -439,39 +439,34 @@ export abstract class UnbatchedExecutableStep<
   };
 
   finalize() {
-    this.execute = new Function(
-      "values",
-      "extra",
-      this.isSyncAndSafe
-        ? `\
-    const count = values[0].length;
-    const results = [];
-    for (let i = 0; i < count; i++) {
-      results[i] = this.unbatchedExecute(extra, ${
-        this.dependencies.length === 0
-          ? "values[0][i]"
-          : this.dependencies
-              .map((_, depIndex) => `values[${depIndex}][i]`)
-              .join(", ")
-      });
-    }
-    return results;
-`
-        : `\
-    const count = values[0].length;
-    const results = [];
-    for (let i = 0; i < count; i++) {
+    const depIndexes =
+      this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
+    const tryOrNot = (inStr: string): string => {
+      if (this.isSyncAndSafe) {
+        return inStr;
+      } else {
+        return `\
       try {
-        results[i] = this.unbatchedExecute(extra, ${
-          this.dependencies.length === 0
-            ? "values[0][i]"
-            : this.dependencies
-                .map((_, depIndex) => `values[${depIndex}][i]`)
-                .join(", ")
-        });
+${inStr.replace(/^/gm, "  ")}
       } catch (e) {
         results[i] = Promise.reject(e);
       }
+`;
+      }
+    };
+    this.execute = new Function(
+      "values",
+      "extra",
+      `\
+    const [ ${depIndexes.map((i) => `list${i}`).join(", ")} ] = values;
+    const count = list0.length;
+    const results = [];
+    for (let i = 0; i < count; i++) {
+${tryOrNot(`\
+      results[i] = this.unbatchedExecute(extra, ${depIndexes
+        .map((depIndex) => `list${depIndex}[i]`)
+        .join(", ")});
+`)}\
     }
     return results;
 `,
