@@ -451,7 +451,7 @@ export abstract class UnbatchedExecutableStep<
       try {
 ${inStr.replace(/^/gm, "  ")}
       } catch (e) {
-        results[i] = Promise.reject(e);
+        results[i] = e instanceof Error ? e : Promise.reject(e);
       }
 `;
         }
@@ -491,7 +491,7 @@ ${tryOrNot(`\
         const tuple = values.map((list) => list[i]);
         results[i] = this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
-        results[i] = Promise.reject(e);
+        results[i] = e instanceof Error ? (e as never) : Promise.reject(e);
       }
     }
     return results;
