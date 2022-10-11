@@ -107,9 +107,9 @@ export interface MetaByMetaKey {
 }
 
 export class OperationPlan {
-  private queryType: GraphQLObjectType;
-  private mutationType: GraphQLObjectType | null;
-  private subscriptionType: GraphQLObjectType | null;
+  public readonly queryType: GraphQLObjectType;
+  public readonly mutationType: GraphQLObjectType | null;
+  public readonly subscriptionType: GraphQLObjectType | null;
   public readonly unionsContainingObjectType: {
     [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
   };

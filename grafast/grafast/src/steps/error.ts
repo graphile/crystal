@@ -1,27 +1,33 @@
+import { inspect } from "../inspect.js";
 import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
-export class ErrorStep extends UnbatchedExecutableStep {
+export class ErrorStep<
+  TError extends Error,
+> extends UnbatchedExecutableStep<never> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ErrorStep",
   };
   isSyncAndSafe = false;
-  promise: Promise<void>;
-  constructor(error: Error) {
+  error: TError;
+  constructor(error: TError) {
     super();
-    this.promise = Promise.reject(error);
+    if (!(error instanceof Error)) {
+      throw new Error(`${this} called with non-Error ${inspect(error)}`);
+    }
+    this.error = error;
   }
 
   execute(values: GrafastValuesList<any>): GrafastResultsList<any> {
-    return arrayOfLength(values[0].length, this.promise);
+    return arrayOfLength(values[0].length, this.error);
   }
   unbatchedExecute(): any {
-    return this.promise;
+    return this.error;
   }
 }
 
-export function error(error: Error): ErrorStep {
+export function error<TError extends Error>(error: TError): ErrorStep<TError> {
   return new ErrorStep(error);
 }

@@ -4,7 +4,7 @@ import * as assert from "../assert.js";
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
-import { isGrafastError, newGrafastError } from "../error.js";
+import { $$error, isGrafastError, newGrafastError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
 import { __ItemStep, isStreamableStep } from "../index.js";
 import { inspect } from "../inspect.js";
@@ -109,12 +109,10 @@ export function executeBucket(
           }
         }
       } catch (e) {
-        const r = Promise.reject(e);
-        if (!starterPromises) {
-          starterPromises = [r];
-        } else {
-          starterPromises.push(r);
-        }
+        const r = newGrafastError(e, step.id);
+        bucket.store.set(step.id, arrayOfLength(bucket.size, r));
+        bucket.hasErrors = true;
+        reallyCompletedStep(step);
       }
     }
     const handleSideEffectPlanIds = () => {
@@ -206,12 +204,10 @@ export function executeBucket(
           }
         }
       } catch (e) {
-        const r = Promise.reject(e);
-        if (promises) {
-          promises.push(r);
-        } else {
-          promises = [r];
-        }
+        const r = newGrafastError(e, potentialNextStep.id);
+        bucket.store.set(potentialNextStep.id, arrayOfLength(bucket.size, r));
+        bucket.hasErrors = true;
+        reallyCompletedStep(potentialNextStep);
       }
     }
     if (promises) {
@@ -248,7 +244,22 @@ export function executeBucket(
     let pendingPromises: PromiseLike<any>[] | undefined;
     let pendingPromiseIndexes: number[] | undefined;
     const success = (value: unknown, resultIndex: number) => {
+      let proto: any;
       if (
+        // Fast-lane for non-objects and simple objects
+        typeof value !== "object" ||
+        value === null ||
+        (proto = Object.getPrototypeOf(value)) === null ||
+        proto === Object.prototype
+      ) {
+        finalResult[resultIndex] = value;
+      } else if (value instanceof Error) {
+        const e = value[$$error]
+          ? value
+          : newGrafastError(value, finishedStep.id);
+        finalResult[resultIndex] = e;
+        bucket.hasErrors = true;
+      } else if (
         // Detects async iterables (but excludes all the basic types
         // like arrays, Maps, Sets, etc that are also iterables) and
         // handles them specially.
@@ -387,7 +398,7 @@ export function executeBucket(
           console.error(`${grafastError.originalError}\n  ${e}`);
           store.set(
             finishedStep.id,
-            finalResult.map(() => grafastError),
+            arrayOfLength(finalResult.length, grafastError),
           );
           return reallyCompletedStep(finishedStep);
         });
@@ -559,10 +570,7 @@ export function executeBucket(
           },
           (error) => {
             bucket.hasErrors = true;
-            return completedStep(
-              step,
-              arrayOfLength(size, newGrafastError(error, step.id)),
-            );
+            return completedStep(step, arrayOfLength(size, error));
           },
         );
       } else {
@@ -576,12 +584,13 @@ export function executeBucket(
       }
     } catch (error) {
       bucket.hasErrors = true;
-      const newResult = arrayOfLength(size, newGrafastError(error, step.id));
       if (step.isSyncAndSafe) {
         // It promises not to add new errors, and not to include promises in the result array
+        const newResult = arrayOfLength(size, newGrafastError(error, step.id));
         store.set(step.id, newResult);
         return reallyCompletedStep(step);
       } else {
+        const newResult = arrayOfLength(size, error);
         return completedStep(step, newResult);
       }
     }

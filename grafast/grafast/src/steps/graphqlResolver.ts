@@ -62,6 +62,8 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   private contextDep: number;
   private variableValuesDep: number;
   private rootValueDep: number;
+  /** root fields can have null parent */
+  private isNotRoot: boolean;
   constructor(
     private resolver: GraphQLFieldResolver<any, any> & { displayName?: string },
     $plan: ExecutableStep,
@@ -75,6 +77,11 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     this.contextDep = this.addDependency(context());
     this.variableValuesDep = this.addDependency(this.opPlan.variableValuesStep);
     this.rootValueDep = this.addDependency(this.opPlan.rootValueStep);
+    this.isNotRoot = ![
+      this.opPlan.queryType,
+      this.opPlan.mutationType,
+      this.opPlan.subscriptionType,
+    ].includes(resolveInfoBase.parentType);
   }
 
   toStringMeta() {
@@ -93,6 +100,9 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     variableValues: any,
     rootValue: any,
   ): any {
+    if (this.isNotRoot && source == null) {
+      return source;
+    }
     const resolveInfo: GraphQLResolveInfo = Object.assign(
       Object.create(this.resolveInfoBase),
       {
@@ -207,7 +217,7 @@ export class GraphQLItemHandler
     if (typeName) {
       return polymorphicWrap(typeName, data);
     } else {
-      return Promise.reject(new Error("Could not determine type of data"));
+      return new Error("Could not determine type of data");
     }
   }
 
