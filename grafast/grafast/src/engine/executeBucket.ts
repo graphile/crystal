@@ -4,6 +4,7 @@ import * as assert from "../assert.js";
 import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
+import { $$error } from "../error.js";
 import { isGrafastError, newGrafastError } from "../error.js";
 import type { ExecutableStep } from "../index.js";
 import { __ItemStep, isStreamableStep } from "../index.js";
@@ -244,8 +245,19 @@ export function executeBucket(
     let pendingPromises: PromiseLike<any>[] | undefined;
     let pendingPromiseIndexes: number[] | undefined;
     const success = (value: unknown, resultIndex: number) => {
-      if (value instanceof Error) {
-        const e = newGrafastError(value, finishedStep.id);
+      let proto: any;
+      if (
+        // Fast-lane for non-objects and simple objects
+        typeof value !== "object" ||
+        value === null ||
+        (proto = Object.getPrototypeOf(value)) === null ||
+        proto === Object.prototype
+      ) {
+        finalResult[resultIndex] = value;
+      } else if (value instanceof Error) {
+        const e = value[$$error]
+          ? value
+          : newGrafastError(value, finishedStep.id);
         finalResult[resultIndex] = e;
         bucket.hasErrors = true;
       } else if (
@@ -387,7 +399,7 @@ export function executeBucket(
           console.error(`${grafastError.originalError}\n  ${e}`);
           store.set(
             finishedStep.id,
-            finalResult.map(() => grafastError),
+            arrayOfLength(finalResult.length, grafastError),
           );
           return reallyCompletedStep(finishedStep);
         });
@@ -559,10 +571,7 @@ export function executeBucket(
           },
           (error) => {
             bucket.hasErrors = true;
-            return completedStep(
-              step,
-              arrayOfLength(size, newGrafastError(error, step.id)),
-            );
+            return completedStep(step, arrayOfLength(size, error));
           },
         );
       } else {
@@ -576,12 +585,13 @@ export function executeBucket(
       }
     } catch (error) {
       bucket.hasErrors = true;
-      const newResult = arrayOfLength(size, newGrafastError(error, step.id));
       if (step.isSyncAndSafe) {
         // It promises not to add new errors, and not to include promises in the result array
+        const newResult = arrayOfLength(size, newGrafastError(error, step.id));
         store.set(step.id, newResult);
         return reallyCompletedStep(step);
       } else {
+        const newResult = arrayOfLength(size, error);
         return completedStep(step, newResult);
       }
     }
