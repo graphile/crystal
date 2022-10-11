@@ -207,7 +207,7 @@ export class GraphQLItemHandler
     if (typeName) {
       return polymorphicWrap(typeName, data);
     } else {
-      return Promise.reject(new Error("Could not determine type of data"));
+      return new Error("Could not determine type of data");
     }
   }
 

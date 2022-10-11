@@ -109,12 +109,10 @@ export function executeBucket(
           }
         }
       } catch (e) {
-        const r = Promise.reject(e);
-        if (!starterPromises) {
-          starterPromises = [r];
-        } else {
-          starterPromises.push(r);
-        }
+        const r = newGrafastError(e, step.id);
+        bucket.store.set(step.id, arrayOfLength(bucket.size, r));
+        bucket.hasErrors = true;
+        reallyCompletedStep(step);
       }
     }
     const handleSideEffectPlanIds = () => {
@@ -206,12 +204,10 @@ export function executeBucket(
           }
         }
       } catch (e) {
-        const r = Promise.reject(e);
-        if (promises) {
-          promises.push(r);
-        } else {
-          promises = [r];
-        }
+        const r = newGrafastError(e, potentialNextStep.id);
+        bucket.store.set(potentialNextStep.id, arrayOfLength(bucket.size, r));
+        bucket.hasErrors = true;
+        reallyCompletedStep(potentialNextStep);
       }
     }
     if (promises) {
@@ -248,7 +244,11 @@ export function executeBucket(
     let pendingPromises: PromiseLike<any>[] | undefined;
     let pendingPromiseIndexes: number[] | undefined;
     const success = (value: unknown, resultIndex: number) => {
-      if (
+      if (value instanceof Error) {
+        const e = newGrafastError(value, finishedStep.id);
+        finalResult[resultIndex] = e;
+        bucket.hasErrors = true;
+      } else if (
         // Detects async iterables (but excludes all the basic types
         // like arrays, Maps, Sets, etc that are also iterables) and
         // handles them specially.
