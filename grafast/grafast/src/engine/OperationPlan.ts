@@ -2400,6 +2400,7 @@ export class OperationPlan {
           (step.dependencies as number[])[i] = dep.id;
           dep.dependentPlans.push(step);
           if (dep.layerPlan === step.layerPlan) {
+            dep.sameLayerDependentPlans.push(step);
             step._sameLayerDependencies.push(dep.id);
           }
         }

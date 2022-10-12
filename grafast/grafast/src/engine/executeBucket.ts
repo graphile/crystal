@@ -168,7 +168,7 @@ export function executeBucket(
       return;
     }
     let promises: PromiseLike<void>[] | undefined;
-    outerLoop: for (const potentialNextStep of finishedStep.dependentPlans) {
+    outerLoop: for (const potentialNextStep of finishedStep.sameLayerDependentPlans) {
       const isPending = pendingSteps.has(potentialNextStep);
       if (!isPending) {
         // We've already ran it, skip
