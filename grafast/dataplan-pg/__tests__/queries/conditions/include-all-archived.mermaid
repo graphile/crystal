@@ -17,14 +17,14 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈2]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    Access51["Access[51∈1]<br />ᐸ21.1ᐳ"]:::plan
+    Access51["Access[51∈2]<br />ᐸ21.1ᐳ"]:::plan
     __Item37>"__Item[37∈3]<br />ᐸ51ᐳ"]:::itemplan
     PgSelectSingle38["PgSelectSingle[38∈3]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression39["PgClassExpression[39∈4]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    Map49["Map[49∈3]<br />ᐸ38:{”0”:1,”1”:2}ᐳ"]:::plan
-    PgSelectSingle46["PgSelectSingle[46∈3]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression47["PgClassExpression[47∈4]<br />ᐸ__users__.”username”ᐳ"]:::plan
-    PgClassExpression48["PgClassExpression[48∈4]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
+    Map49["Map[49∈4]<br />ᐸ38:{”0”:1,”1”:2}ᐳ"]:::plan
+    PgSelectSingle46["PgSelectSingle[46∈4]<br />ᐸusersᐳ"]:::plan
+    PgClassExpression47["PgClassExpression[47∈5]<br />ᐸ__users__.”username”ᐳ"]:::plan
+    PgClassExpression48["PgClassExpression[48∈5]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access18
@@ -49,19 +49,19 @@ graph TD
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,Access51 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 51<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
+    class Bucket1,__Item21,PgSelectSingle22 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 21<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression23 bucket2
+    class Bucket2,PgClassExpression23,Access51 bucket2
     Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ51ᐳ[37]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item37,PgSelectSingle38,PgSelectSingle46,Map49 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 38, 46<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[38]"):::bucket
+    class Bucket3,__Item37,PgSelectSingle38 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 38<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[38]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression39,PgClassExpression47,PgClassExpression48 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 46, 47, 48<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[46]"):::bucket
+    class Bucket4,PgClassExpression39,PgSelectSingle46,Map49 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 46<br /><br />ROOT PgSelectSingle{4}ᐸusersᐳ[46]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5 bucket5
+    class Bucket5,PgClassExpression47,PgClassExpression48 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

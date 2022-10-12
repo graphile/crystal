@@ -17,7 +17,7 @@ graph TD
     __Item11>"__Item[11∈1]<br />ᐸ7ᐳ"]:::itemplan
     PgSelectSingle12["PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression13["PgClassExpression[13∈2]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    Access371["Access[371∈1]<br />ᐸ11.1ᐳ"]:::plan
+    Access371["Access[371∈2]<br />ᐸ11.1ᐳ"]:::plan
     __ListTransform19[["__ListTransform[19∈2]<br />ᐸeach:15ᐳ"]]:::plan
     __Item20>"__Item[20∈3]<br />ᐸ371ᐳ"]:::itemplan
     PgSelectSingle21["PgSelectSingle[21∈3]<br />ᐸrelational_itemsᐳ"]:::plan
@@ -129,10 +129,10 @@ graph TD
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 10<br /><br />ROOT __Item{1}ᐸ7ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item11,PgSelectSingle12,Access371 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 12, 371, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]"):::bucket
+    class Bucket1,__Item11,PgSelectSingle12 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 12, 11, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression13,__ListTransform19 bucket2
+    class Bucket2,PgClassExpression13,__ListTransform19,Access371 bucket2
     Bucket3("Bucket 3 (subroutine)<br />ROOT PgSelectSingle{3}ᐸrelational_itemsᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item20,PgSelectSingle21 bucket3

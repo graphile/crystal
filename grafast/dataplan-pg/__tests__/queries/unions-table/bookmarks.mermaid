@@ -19,17 +19,17 @@ graph TD
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸpeopleᐳ"]:::plan
     PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
     PgClassExpression15["PgClassExpression[15∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
-    Access94["Access[94∈0]<br />ᐸ12.1ᐳ"]:::plan
+    Access94["Access[94∈1]<br />ᐸ12.1ᐳ"]:::plan
     __Item21>"__Item[21∈2]<br />ᐸ94ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈2]<br />ᐸperson_bookmarksᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈3]<br />ᐸ__person_b...rks__.”id”ᐳ"]:::plan
-    Map86["Map[86∈2]<br />ᐸ22:{”0”:1}ᐳ"]:::plan
-    PgSelectSingle30["PgSelectSingle[30∈2]<br />ᐸpeopleᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    Map86["Map[86∈3]<br />ᐸ22:{”0”:1}ᐳ"]:::plan
+    PgSelectSingle30["PgSelectSingle[30∈3]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈4]<br />ᐸ__people__.”username”ᐳ"]:::plan
     PgClassExpression32["PgClassExpression[32∈3]<br />ᐸ__person_b...ed_entity”ᐳ"]:::plan
-    PgClassExpression33["PgClassExpression[33∈2]<br />ᐸ(__person_...person_id”ᐳ"]:::plan
-    PgClassExpression34["PgClassExpression[34∈2]<br />ᐸ(__person_....”post_id”ᐳ"]:::plan
-    PgClassExpression35["PgClassExpression[35∈2]<br />ᐸ(__person_...omment_id”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈3]<br />ᐸ(__person_...person_id”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈3]<br />ᐸ(__person_....”post_id”ᐳ"]:::plan
+    PgClassExpression35["PgClassExpression[35∈3]<br />ᐸ(__person_...omment_id”ᐳ"]:::plan
     List36["List[36∈3]<br />ᐸ33,34,35ᐳ"]:::plan
     PgPolymorphic37["PgPolymorphic[37∈3]"]:::plan
     PgSelect38[["PgSelect[38∈5]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
@@ -107,19 +107,19 @@ graph TD
     subgraph "Buckets for queries/unions-table/bookmarks"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Access94 bucket0
-    Bucket1("Bucket 1 (nullableField)<br />Deps: 13, 94, 11<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[13]"):::bucket
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 13, 12, 11<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression14,PgClassExpression15 bucket1
+    class Bucket1,PgClassExpression14,PgClassExpression15,Access94 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ94ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item21,PgSelectSingle22,PgSelectSingle30,PgClassExpression33,PgClassExpression34,PgClassExpression35,Map86 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 22, 30, 33, 34, 35, 11<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]"):::bucket
+    class Bucket2,__Item21,PgSelectSingle22 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 22, 11<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression31,PgClassExpression32,List36,PgPolymorphic37 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 30, 31<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[30]"):::bucket
+    class Bucket3,PgClassExpression23,PgSelectSingle30,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,List36,PgPolymorphic37,Map86 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 30<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[30]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4 bucket4
+    class Bucket4,PgClassExpression31 bucket4
     Bucket5("Bucket 5 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 33, 34, 35, 37<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect38,First42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgClassExpression61,PgSelect62,First66,PgSelectSingle67,PgClassExpression68,PgSelectSingle75,PgSelectSingle83,PgClassExpression85,Map88,Map90,Map92 bucket5

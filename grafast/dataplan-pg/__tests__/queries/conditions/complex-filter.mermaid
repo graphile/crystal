@@ -19,7 +19,7 @@ graph TD
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     PgClassExpression23["PgClassExpression[23∈2]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    Access42["Access[42∈1]<br />ᐸ21.1ᐳ"]:::plan
+    Access42["Access[42∈2]<br />ᐸ21.1ᐳ"]:::plan
     __Item38>"__Item[38∈3]<br />ᐸ42ᐳ"]:::itemplan
     PgSelectSingle39["PgSelectSingle[39∈3]<br />ᐸmessagesᐳ"]:::plan
     PgClassExpression40["PgClassExpression[40∈4]<br />ᐸ__messages__.”body”ᐳ"]:::plan
@@ -45,10 +45,10 @@ graph TD
     class Bucket0,__Value3,__Value5,__InputStaticLeaf15,PgSelect17,Access18,Access19,Object20,__InputStaticLeaf30 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,Access42 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 42<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
+    class Bucket1,__Item21,PgSelectSingle22 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 21<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression23 bucket2
+    class Bucket2,PgClassExpression23,Access42 bucket2
     Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ42ᐳ[38]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item38,PgSelectSingle39 bucket3
