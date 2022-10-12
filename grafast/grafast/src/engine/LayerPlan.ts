@@ -240,9 +240,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       this.reason.type === "polymorphic"
         ? `{${this.reason.typeNames.join(",")}}`
         : "";
+    const deps = this.copyPlanIds.length > 0 ? `%${this.copyPlanIds}` : "";
     return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
       this.rootStepId ?? "x"
-    }>`;
+    }${deps}>`;
   }
 
   print(depth = 0) {
