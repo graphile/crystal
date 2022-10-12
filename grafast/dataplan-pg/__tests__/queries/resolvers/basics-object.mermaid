@@ -39,4 +39,12 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value1,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,Object15,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 12, 16, 13, 18, 20<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 16, 18, 20<br /><br />ROOT GraphQLResolverᐸresolveᐳ[16]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
     end

@@ -38,5 +38,13 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 38, 40, 41, 42<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 38, 23, 40, 41, 42<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 38, 40, 41, 42<br /><br />ROOT Connectionᐸ34ᐳ[38]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
     end

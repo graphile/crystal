@@ -28,9 +28,9 @@ graph TD
     PgSelectSingle37["PgSelectSingle[37∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
     PgClassExpression38["PgClassExpression[38∈0]<br />ᐸ__forums_u..._count__.vᐳ"]:::plan
     Access49["Access[49∈0]<br />ᐸ50.1ᐳ"]:::plan
-    __Item44>"__Item[44∈1]<br />ᐸ49ᐳ"]:::itemplan
-    PgSelectSingle45["PgSelectSingle[45∈1]<br />ᐸforums_featured_messagesᐳ"]:::plan
-    PgClassExpression46["PgClassExpression[46∈1]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
+    __Item44>"__Item[44∈4]<br />ᐸ49ᐳ"]:::itemplan
+    PgSelectSingle45["PgSelectSingle[45∈4]<br />ᐸforums_featured_messagesᐳ"]:::plan
+    PgClassExpression46["PgClassExpression[46∈4]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access9
@@ -57,8 +57,24 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgSelectSingle29,__InputStaticLeaf30,PgSelectSingle37,PgClassExpression38,Map47,Access49,Map50,Map52 bucket0
-    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ49ᐳ[44]"):::bucket
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 13, 20, 29, 49, 21, 22, 38<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item44,PgSelectSingle45,PgClassExpression46 bucket1
+    class Bucket1 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 20, 29, 49, 21, 22, 38<br /><br />ROOT PgSelectSingleᐸusersᐳ[20]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 29, 49, 38<br /><br />ROOT PgSelectSingleᐸusers_most_recent_forumᐳ[29]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ49ᐳ[44]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item44,PgSelectSingle45,PgClassExpression46 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 45, 46<br /><br />ROOT PgSelectSingle{4}ᐸforums_featured_messagesᐳ[45]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5
     end

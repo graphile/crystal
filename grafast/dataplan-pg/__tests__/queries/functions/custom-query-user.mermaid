@@ -33,4 +33,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,PgClassExpression14 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 12, 13, 14<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1 bucket1
+    Bucket0 --> Bucket1
     end

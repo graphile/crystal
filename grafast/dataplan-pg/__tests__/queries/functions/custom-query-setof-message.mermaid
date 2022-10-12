@@ -34,5 +34,9 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ7ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 12, 13<br /><br />ROOT PgSelectSingle{1}ᐸfeatured_messagesᐳ[12]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
     end

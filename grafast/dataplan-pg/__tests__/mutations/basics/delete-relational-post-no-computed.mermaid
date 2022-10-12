@@ -17,8 +17,8 @@ graph TD
     PgDelete9[["PgDelete[9∈1]"]]:::sideeffectplan
     PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
     __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
-    PgDelete16[["PgDelete[16∈2]"]]:::sideeffectplan
-    PgClassExpression20["PgClassExpression[20∈2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgDelete16[["PgDelete[16∈3]"]]:::sideeffectplan
+    PgClassExpression20["PgClassExpression[20∈3]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access10
@@ -36,8 +36,16 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8<br /><br />1: PgDelete{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...sts__.”id”ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9,PgClassExpression13 bucket1
-    Bucket2("Bucket 2 (mutationField)<br />Deps: 12, 15<br /><br />1: PgDelete{2}[16]<br />2: PgClassExpression{2}ᐸ__relation...sts__.”id”ᐳ[20]"):::bucket
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 9, 13<br /><br />ROOT PgDelete{1}[9]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgDelete16,PgClassExpression20 bucket2
-    Bucket0 --> Bucket1 & Bucket2
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 12, 15<br /><br />1: PgDelete{3}[16]<br />2: PgClassExpression{3}ᐸ__relation...sts__.”id”ᐳ[20]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgDelete16,PgClassExpression20 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 16, 20<br /><br />ROOT PgDelete{3}[16]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+    Bucket0 --> Bucket1 & Bucket3
+    Bucket1 --> Bucket2
+    Bucket3 --> Bucket4
     end

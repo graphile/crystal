@@ -21,13 +21,13 @@ graph TD
     Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
     Access75["Access[75∈1]<br />ᐸ21.2ᐳ"]:::plan
     Lambda76["Lambda[76∈1]"]:::plan
-    __Item40>"__Item[40∈2]<br />ᐸ76ᐳ"]:::itemplan
-    PgSelectSingle41["PgSelectSingle[41∈2]<br />ᐸmessagesᐳ"]:::plan
-    PgClassExpression42["PgClassExpression[42∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    Map72["Map[72∈2]<br />ᐸ41:{”0”:1,”1”:2}ᐳ"]:::plan
-    PgSelectSingle49["PgSelectSingle[49∈2]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression50["PgClassExpression[50∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
-    PgClassExpression51["PgClassExpression[51∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
+    __Item40>"__Item[40∈4]<br />ᐸ76ᐳ"]:::itemplan
+    PgSelectSingle41["PgSelectSingle[41∈4]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression42["PgClassExpression[42∈4]<br />ᐸ__messages__.”body”ᐳ"]:::plan
+    Map72["Map[72∈4]<br />ᐸ41:{”0”:1,”1”:2}ᐳ"]:::plan
+    PgSelectSingle49["PgSelectSingle[49∈4]<br />ᐸusersᐳ"]:::plan
+    PgClassExpression50["PgClassExpression[50∈4]<br />ᐸ__users__.”username”ᐳ"]:::plan
+    PgClassExpression51["PgClassExpression[51∈4]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
     PgPageInfo52["PgPageInfo[52∈0]"]:::plan
     Constant53["Constant[53∈0]"]:::plan
     Lambda55["Lambda[55∈1]<br />ᐸlistHasMoreᐳ"]:::plan
@@ -87,9 +87,25 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 38, 52, 53<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,Lambda55,First57,PgSelectSingle58,PgCursor59,PgClassExpression60,List61,Last63,PgSelectSingle64,PgCursor65,PgClassExpression66,List67,First69,PgSelectSingle70,PgClassExpression71,Access74,Access75,Lambda76 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ76ᐳ[40]"):::bucket
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 38, 76, 23, 52, 53, 55, 59, 65, 71<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item40,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgClassExpression51,Map72 bucket2
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 38, 76, 52, 53, 55, 59, 65, 71<br /><br />ROOT Connectionᐸ34ᐳ[38]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ76ᐳ[40]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item40,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgClassExpression51,Map72 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 41, 49, 42, 50, 51<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[41]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    Bucket6("Bucket 6 (nullableField)<br />Deps: 49, 50, 51<br /><br />ROOT PgSelectSingle{4}ᐸusersᐳ[49]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5
+    Bucket5 --> Bucket6
     end

@@ -75,5 +75,24 @@ graph TD
     Bucket1("Bucket 1 (subscription)<br />Deps: 20, 5<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,JSONParse12,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgSelectSingle33,PgClassExpression35,PgClassExpression36,PgSelectSingle44,PgClassExpression45,PgClassExpression46,Map47,Map49 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 12, 22, 33, 44, 15, 23, 24, 25, 26, 27, 35, 36, 45, 46<br /><br />ROOT JSONParse{1}ᐸ11ᐳ[12]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 22, 33, 44, 23, 24, 25, 26, 27, 35, 36, 45, 46<br /><br />ROOT PgSelectSingle{1}ᐸmessagesᐳ[22]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 33, 27, 35, 36<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[33]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 33, 35<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[33]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    Bucket6("Bucket 6 (nullableField)<br />Deps: 44, 45, 46<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[44]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4 & Bucket6
+    Bucket4 --> Bucket5
     end

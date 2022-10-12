@@ -16,7 +16,7 @@ graph TD
     Access12["Access[12∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object13["Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     WithPgClient10[["WithPgClient[10∈1]"]]:::sideeffectplan
-    __Item14>"__Item[14∈2]<br />ᐸ10ᐳ"]:::itemplan
+    __Item14>"__Item[14∈3]<br />ᐸ10ᐳ"]:::itemplan
 
     %% plan dependencies
     __InputStaticLeaf8 --> Object9
@@ -33,9 +33,13 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,WithPgClient10 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ10ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 10<br /><br />ROOT WithPgClient{1}[10]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item14 bucket2
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ10ᐳ[14]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item14 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
     end

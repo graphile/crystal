@@ -34,25 +34,25 @@ graph TD
     PgClassExpression47["PgClassExpression[47∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
     PgClassExpression48["PgClassExpression[48∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
     __InputStaticLeaf50["__InputStaticLeaf[50∈0]"]:::plan
-    PgDelete51[["PgDelete[51∈2]"]]:::sideeffectplan
-    PgClassExpression55["PgClassExpression[55∈2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgClassExpression56["PgClassExpression[56∈2]<br />ᐸ__relational_posts__ᐳ"]:::plan
-    PgSelect57[["PgSelect[57∈2]<br />ᐸrelational_postsᐳ"]]:::plan
-    First61["First[61∈2]"]:::plan
-    PgSelectSingle62["PgSelectSingle[62∈2]<br />ᐸrelational_postsᐳ"]:::plan
-    PgClassExpression63["PgClassExpression[63∈2]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgClassExpression64["PgClassExpression[64∈2]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    PgClassExpression65["PgClassExpression[65∈2]<br />ᐸ__relation...scription”ᐳ"]:::plan
-    PgClassExpression66["PgClassExpression[66∈2]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    Map101["Map[101∈2]<br />ᐸ62:{”0”:4}ᐳ"]:::plan
-    PgSelectSingle73["PgSelectSingle[73∈2]<br />ᐸtextᐳ"]:::plan
-    PgClassExpression74["PgClassExpression[74∈2]<br />ᐸ__relation..._lower__.vᐳ"]:::plan
-    Map97["Map[97∈2]<br />ᐸ62:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
-    PgSelectSingle81["PgSelectSingle[81∈2]<br />ᐸrelational_itemsᐳ"]:::plan
-    Map93["Map[93∈2]<br />ᐸ81:{”0”:0,”1”:1}ᐳ"]:::plan
-    PgSelectSingle88["PgSelectSingle[88∈2]<br />ᐸpeopleᐳ"]:::plan
-    PgClassExpression89["PgClassExpression[89∈2]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
-    PgClassExpression90["PgClassExpression[90∈2]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgDelete51[["PgDelete[51∈5]"]]:::sideeffectplan
+    PgClassExpression55["PgClassExpression[55∈5]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgClassExpression56["PgClassExpression[56∈5]<br />ᐸ__relational_posts__ᐳ"]:::plan
+    PgSelect57[["PgSelect[57∈5]<br />ᐸrelational_postsᐳ"]]:::plan
+    First61["First[61∈5]"]:::plan
+    PgSelectSingle62["PgSelectSingle[62∈5]<br />ᐸrelational_postsᐳ"]:::plan
+    PgClassExpression63["PgClassExpression[63∈5]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgClassExpression64["PgClassExpression[64∈5]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    PgClassExpression65["PgClassExpression[65∈5]<br />ᐸ__relation...scription”ᐳ"]:::plan
+    PgClassExpression66["PgClassExpression[66∈5]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
+    Map101["Map[101∈5]<br />ᐸ62:{”0”:4}ᐳ"]:::plan
+    PgSelectSingle73["PgSelectSingle[73∈5]<br />ᐸtextᐳ"]:::plan
+    PgClassExpression74["PgClassExpression[74∈5]<br />ᐸ__relation..._lower__.vᐳ"]:::plan
+    Map97["Map[97∈5]<br />ᐸ62:{”0”:0,”1”:1,”2”:2}ᐳ"]:::plan
+    PgSelectSingle81["PgSelectSingle[81∈5]<br />ᐸrelational_itemsᐳ"]:::plan
+    Map93["Map[93∈5]<br />ᐸ81:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle88["PgSelectSingle[88∈5]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression89["PgClassExpression[89∈5]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
+    PgClassExpression90["PgClassExpression[90∈5]<br />ᐸ__people__.”username”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access10
@@ -104,8 +104,32 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8<br /><br />1: PgDelete{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...sts__.”id”ᐳ[13],PgClassExpression{1}ᐸ__relational_posts__ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9,PgClassExpression13,PgClassExpression14,PgSelect15,First19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgSelectSingle31,PgClassExpression32,PgSelectSingle39,PgSelectSingle46,PgClassExpression47,PgClassExpression48,Map91,Map95,Map99 bucket1
-    Bucket2("Bucket 2 (mutationField)<br />Deps: 12, 50<br /><br />1: PgDelete{2}[51]<br />2: PgClassExpression{2}ᐸ__relation...sts__.”id”ᐳ[55],PgClassExpression{2}ᐸ__relational_posts__ᐳ[56]"):::bucket
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 9, 20, 46, 13, 21, 22, 23, 24, 32, 47, 48<br /><br />ROOT PgDelete{1}[9]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgDelete51,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgSelectSingle88,PgClassExpression89,PgClassExpression90,Map93,Map97,Map101 bucket2
-    Bucket0 --> Bucket1 & Bucket2
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 20, 46, 21, 22, 23, 24, 32, 47, 48<br /><br />ROOT PgSelectSingle{1}ᐸrelational_postsᐳ[20]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 46, 47, 48<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[46]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+    Bucket5("Bucket 5 (mutationField)<br />Deps: 12, 50<br /><br />1: PgDelete{5}[51]<br />2: PgClassExpression{5}ᐸ__relation...sts__.”id”ᐳ[55],PgClassExpression{5}ᐸ__relational_posts__ᐳ[56]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgDelete51,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgSelectSingle88,PgClassExpression89,PgClassExpression90,Map93,Map97,Map101 bucket5
+    Bucket6("Bucket 6 (nullableField)<br />Deps: 51, 62, 88, 55, 63, 64, 65, 66, 74, 89, 90<br /><br />ROOT PgDelete{5}[51]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
+    Bucket7("Bucket 7 (nullableField)<br />Deps: 62, 88, 63, 64, 65, 66, 74, 89, 90<br /><br />ROOT PgSelectSingle{5}ᐸrelational_postsᐳ[62]"):::bucket
+    classDef bucket7 stroke:#808000
+    class Bucket7 bucket7
+    Bucket8("Bucket 8 (nullableField)<br />Deps: 88, 89, 90<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[88]"):::bucket
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8 bucket8
+    Bucket0 --> Bucket1 & Bucket5
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket5 --> Bucket6
+    Bucket6 --> Bucket7
+    Bucket7 --> Bucket8
     end
