@@ -22,6 +22,7 @@ import type {
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
+import { getChildBucketAndIndex } from "./engine/OutputPlan.js";
 import { coerceError } from "./engine/OutputPlan.js";
 import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
@@ -167,7 +168,7 @@ const finalize = (
 function outputBucket(
   outputPlan: OutputPlan,
   rootBucket: Bucket,
-  bucketIndex: number,
+  rootBucketIndex: number,
   requestContext: RequestContext,
   path: readonly (string | number)[],
   variables: { [key: string]: any },
@@ -188,12 +189,32 @@ function outputBucket(
     root,
     path,
   };
+  let childBucket;
+  let childBucketIndex;
+  if (outputPlan.layerPlan === rootBucket.layerPlan) {
+    childBucket = rootBucket;
+    childBucketIndex = rootBucketIndex;
+  } else {
+    const c = getChildBucketAndIndex(
+      outputPlan,
+      null,
+      rootBucket,
+      rootBucketIndex,
+      null,
+    );
+    if (!c) {
+      throw new Error(
+        `GraphileInternalError<8bbf56c1-8e2a-4ee9-b5fc-724fd0ee222b>: could not find relevant bucket for output plan`,
+      );
+    }
+    [childBucket, childBucketIndex] = c;
+  }
   try {
     const result = executeOutputPlan(
       ctx,
       outputPlan,
-      rootBucket,
-      bucketIndex,
+      childBucket,
+      childBucketIndex,
       asString,
     );
     return [ctx, result ?? null];

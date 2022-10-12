@@ -536,7 +536,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
                 : "outputPlan?",
             sameBucket:
               spec.type === "__typename" ||
-              spec.layerPlanId === this.layerPlan.id,
+              spec.outputPlan.layerPlan.id === this.layerPlan.id,
           };
         }
         this.execute = makeObjectExecutor(
@@ -636,20 +636,25 @@ export function nonNullError(
  *
  * Now we want to run `childOutputPlan`, but to do so we need to find the
  * related `childBucket` and `childBucketIndex`.
+ *
+ * @internal
  */
-function getChildBucketAndIndex(
+export function getChildBucketAndIndex(
   childOutputPlan: OutputPlan,
-  outputPlan: OutputPlan,
+  outputPlan: OutputPlan | null,
   bucket: Bucket,
   bucketIndex: number,
   arrayIndex: number | null = null,
 ): [Bucket, number] | null {
-  if ((arrayIndex == null) === (outputPlan.type.mode === "array")) {
+  if (
+    (arrayIndex == null) ===
+    (outputPlan != null && outputPlan.type.mode === "array")
+  ) {
     throw new Error(
       "GraphileInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
-  if (childOutputPlan.layerPlan === outputPlan.layerPlan) {
+  if (outputPlan && childOutputPlan.layerPlan === bucket.layerPlan) {
     // Same layer; straightforward
     return [bucket, bucketIndex];
   }
@@ -1315,7 +1320,7 @@ ${makeExecuteChildPlanCode(
 )}`
     : `\
       let childBucket, childBucketIndex;
-      const directChild = children[spec.layerPlanId];
+      const directChild = children[spec.outputPlan.layerPlanId];
       if (directChild) {
         childBucket = directChild.bucket;
         childBucketIndex = directChild.map.get(bucketIndex);
