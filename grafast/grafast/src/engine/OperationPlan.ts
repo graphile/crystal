@@ -2180,21 +2180,40 @@ export class OperationPlan {
         }
       }
     });
-    const dependentNullableFieldLayerPlanParents: LayerPlan[] = [];
+    const layerPlansDirectlyDependent: LayerPlan[] = [];
     for (const layerPlan of this.layerPlans) {
       if (!layerPlan) continue;
       if (
         layerPlan.reason.type === "nullableField" &&
         this.steps[layerPlan.rootStepId!] === step
       ) {
-        dependentNullableFieldLayerPlanParents.push(layerPlan.parentLayerPlan!);
+        layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
+      }
+
+      // Very much a copy from treeShakeSteps
+      if ("parentPlanId" in layerPlan.reason) {
+        if (this.steps[layerPlan.reason.parentPlanId] === step) {
+          layerPlansDirectlyDependent.push(layerPlan);
+        }
+      }
+      if (layerPlan.rootStepId) {
+        if (this.steps[layerPlan.rootStepId] === step) {
+          layerPlansDirectlyDependent.push(layerPlan);
+        }
+      }
+      for (const typeRootStepId of Object.values(
+        layerPlan.rootStepIdByTypeName,
+      )) {
+        if (this.steps[typeRootStepId] === step) {
+          layerPlansDirectlyDependent.push(layerPlan);
+        }
       }
     }
     const dependentLayerPlans = [
       ...new Set([
         ...dependentSteps.map((s) => s.layerPlan),
         ...dependentOutputPlans.map((op) => op.layerPlan),
-        ...dependentNullableFieldLayerPlanParents,
+        ...layerPlansDirectlyDependent,
       ]),
     ];
     if (dependentLayerPlans.length === 0) {
