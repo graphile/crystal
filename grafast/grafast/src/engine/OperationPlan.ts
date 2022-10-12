@@ -2196,7 +2196,7 @@ export class OperationPlan {
       // Very much a copy from treeShakeSteps
       if ("parentPlanId" in layerPlan.reason) {
         if (this.steps[layerPlan.reason.parentPlanId] === step) {
-          layerPlansDirectlyDependent.push(layerPlan);
+          layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
         }
       }
       if (layerPlan.rootStepId) {
@@ -2616,7 +2616,7 @@ export class OperationPlan {
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
           throw new Error(
-            `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan.id}`,
+            `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan}`,
           );
         }
       }
