@@ -2027,8 +2027,8 @@ export class OperationPlan {
         break;
       }
       case "nullableField": {
-        // Should be safe to hoist
-        break;
+        // Don't hoist past nullable boundary (causes too much duplication)
+        return;
       }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
