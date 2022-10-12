@@ -91,7 +91,6 @@ export interface SubsequentStreamSpec {
   label: string | undefined;
   stream: AsyncIterableIterator<any>;
   startIndex: number;
-  listItemStepId: number;
 }
 
 // TODO: to start with we're going to do looping here; but later we can compile

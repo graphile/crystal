@@ -482,9 +482,19 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
         const childIsNonNull = this.childIsNonNull;
+        let directLayerPlanChild = this.child.layerPlan;
+        while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
+          const parent = directLayerPlanChild.parentLayerPlan;
+          if (!parent) {
+            throw new Error(
+              `GraphileInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
+            );
+          }
+          directLayerPlanChild = parent;
+        }
         const canStream =
-          this.child.layerPlan.reason.type === "listItem" &&
-          !!this.child.layerPlan.reason.stream;
+          directLayerPlanChild.reason.type === "listItem" &&
+          !!directLayerPlanChild.reason.stream;
 
         if (childIsNonNull) {
           if (canStream) {
@@ -1091,7 +1101,6 @@ ${
       label: childOutputPlan.layerPlan.reason.stream?.label,
       stream,
       startIndex: bucketRootValue.length,
-      listItemStepId: childOutputPlan.layerPlan.rootStepId,
     });
   }`
     : ``

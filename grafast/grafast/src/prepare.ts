@@ -605,22 +605,42 @@ async function processStream(
     const size = entries.length;
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: string[] = [];
-    store.set(spec.listItemStepId, []);
 
-    for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
+    let directLayerPlanChild = spec.outputPlan.layerPlan;
+    while (directLayerPlanChild.parentLayerPlan !== spec.bucket.layerPlan) {
+      const parent = directLayerPlanChild.parentLayerPlan;
+      if (!parent) {
+        throw new Error(
+          `GraphileInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
+        );
+      }
+      directLayerPlanChild = parent;
+    }
+
+    const listItemStepId = directLayerPlanChild.rootStepId!;
+    const listItemStepIdList: any[] = [];
+    store.set(listItemStepId, listItemStepIdList);
+
+    for (const copyPlanId of directLayerPlanChild.copyPlanIds) {
       store.set(copyPlanId, []);
     }
 
     let bucketIndex = 0;
     for (const entry of entries) {
       const [result] = entry;
-      store.get(spec.listItemStepId)![bucketIndex] = result;
+      listItemStepIdList[bucketIndex] = result;
 
       polymorphicPathList[bucketIndex] =
         spec.bucket.polymorphicPathList[spec.bucketIndex];
-      for (const copyPlanId of spec.outputPlan.layerPlan.copyPlanIds) {
-        store.get(copyPlanId)![bucketIndex] =
-          spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
+      for (const copyPlanId of directLayerPlanChild.copyPlanIds) {
+        const list = spec.bucket.store.get(copyPlanId);
+        if (!list) {
+          throw new Error(
+            `GraphileInternalError<2db7b749-399f-486b-bd12-7ca337b937e4>: ${spec.bucket.layerPlan} doesn't seem to include ${copyPlanId} (required by ${directLayerPlanChild} via ${spec.outputPlan})`,
+          );
+        }
+        // TODO: optimize away these .get calls
+        store.get(copyPlanId)![bucketIndex] = list[spec.bucketIndex];
       }
       // TODO: we should be able to optimize this
       bucketIndex++;
@@ -632,10 +652,10 @@ async function processStream(
       "GraphileInternalError<7c8deab0-8dfa-40f2-b625-97026f8fedcc>: expected bucket size does not match",
     );
 
-    // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
+    // const childBucket = newBucket(directLayerPlanChild, noDepsList, store);
     // const childBucketIndex = 0;
     const rootBucket: Bucket = newBucket({
-      layerPlan: spec.outputPlan.layerPlan,
+      layerPlan: directLayerPlanChild,
       size,
       store,
       hasErrors: false,
