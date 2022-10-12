@@ -87,6 +87,7 @@ export async function withTestWithPgClient<T>(
       return await callback(queuedWPC(withPgClient));
     } else {
       await poolClient.query("begin; --ignore--");
+      let alive = true;
       try {
         const withPgClient = createWithPgClient({
           poolClient,
@@ -100,21 +101,43 @@ export async function withTestWithPgClient<T>(
           pgSettings,
           callback,
         ) => {
+          if (!alive) {
+            throw new Error(
+              "Test transaction has already been ended - async operations shouldn't keep happening after grafast returns",
+            );
+          }
           // No transaction here; honest, gov!
           await poolClient.query("savepoint notxhonest; --ignore--");
+          let result: any;
           try {
-            const result = await withPgClient(pgSettings, callback);
-            await poolClient.query("release savepoint notxhonest; --ignore--");
-            return result;
+            result = await withPgClient(pgSettings, callback);
           } catch (e) {
-            await poolClient.query(
-              "rollback to savepoint notxhonest; --ignore--",
-            );
+            if (alive) {
+              try {
+                await poolClient.query(
+                  "rollback to savepoint notxhonest; --ignore--",
+                );
+              } catch (e2) {
+                console.error(
+                  `Error occurred releasing 'notxhonest' savepoint in tests`,
+                  e2,
+                );
+              }
+            }
             throw e;
           }
+          if (!alive) {
+            throw new Error(
+              "Test transaction has already been ended - async operations shouldn't keep happening after grafast returns",
+            );
+          }
+          await poolClient.query("release savepoint notxhonest; --ignore--");
+
+          return result;
         };
         return await callback(queuedWPC(withPgClientWithSavepoints));
       } finally {
+        alive = false;
         await poolClient.query("rollback; --ignore--");
       }
     }
