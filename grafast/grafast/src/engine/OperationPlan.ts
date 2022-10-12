@@ -2040,8 +2040,13 @@ export class OperationPlan {
         break;
       }
       case "nullableField": {
-        // Should be safe to hoist.
-        break;
+        // Safe to hoist _unless_ it depends on the root step of the nullableField.
+        const $root = this.steps[step.layerPlan.rootStepId!];
+        if (step.dependencies.some((dep) => this.steps[dep] === $root)) {
+          return;
+        } else {
+          break;
+        }
       }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
