@@ -693,9 +693,6 @@ export function executeBucket(
                   store.get(planId)![newIndex] =
                     bucket.store.get(planId)![originalIndex];
                 }
-              } else {
-                // TODO: delete this
-                map.set(originalIndex, null as any);
               }
             }
           }
