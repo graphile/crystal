@@ -1269,10 +1269,11 @@ export class OperationPlan {
       // Polymorphic
       const isUnion = isUnionType(nullableFieldType);
       const isInterface = isInterfaceType(nullableFieldType);
-      assert.ok(
-        isUnion || isInterface,
-        `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
-      );
+      if (!(isUnion || isInterface)) {
+        throw new Error(
+          `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
+        );
+      }
       assert.ok(
         selections,
         "GraphileInternalError<d94e281c-1a10-463e-b7f5-2b0a3665d99b>: A polymorphic type with no selections is invalid",
@@ -1284,10 +1285,11 @@ export class OperationPlan {
        *
        * First we ensure we're dealing with a polymorphic step.
        */
-      assert.ok(
-        isPolymorphicStep($step),
-        `${$step} is not a polymorphic capable step, it must have a planForType method`,
-      );
+      if (!isPolymorphicStep($step)) {
+        throw new Error(
+          `${$step} is not a polymorphic capable step, it must have a planForType method`,
+        );
+      }
 
       /*
        * Next, we figure out the list of `possibleTypes` based on the

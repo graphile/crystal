@@ -737,10 +737,11 @@ export function executeBucket(
           }
 
           const itemStepId = childLayerPlan.rootStepId;
-          assert.ok(
-            itemStepId != null,
-            "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
-          );
+          if (itemStepId == null) {
+            throw new Error(
+              "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+            );
+          }
           store.set(itemStepId, []);
 
           // Prepare store with an empty list for each copyPlanId
@@ -960,7 +961,11 @@ export function newBucket(
 ): Bucket {
   if (isDev) {
     // Some validations
-    assert.ok(spec.size > 0, "No need to create an empty bucket!");
+    if (!(spec.size > 0)) {
+      throw new Error(
+        "GraphileInternalError<eb5c962d-c748-4759-95e3-52c50c873593>: No need to create an empty bucket!",
+      );
+    }
     assert.strictEqual(
       spec.polymorphicPathList.length,
       spec.size,

@@ -211,10 +211,11 @@ export class __ListTransformStep<
 
     // TODO: do this better!
     const itemStepId = this.opPlan.dangerouslyGetStep(this.itemStepId).id;
-    assert.ok(
-      itemStepId != null,
-      "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
-    );
+    if (itemStepId == null) {
+      throw new Error(
+        "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+      );
+    }
     store.set(itemStepId, []);
 
     // Prepare store with an empty list for each copyPlanId

@@ -326,25 +326,27 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
       }
     } else if (this.type.mode === "polymorphic") {
-      assert.ok(
-        type && this.type.typeNames.includes(type.name),
-        "GraphileInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
-      );
-      assert.strictEqual(
-        key,
-        null,
-        "GraphileInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
-      );
-      assert.ok(
-        child.type === "outputPlan",
-        "GraphileInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
-      );
-      assert.ok(
-        child.outputPlan.type.mode === "object",
-        "GraphileInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
-      );
-      this.childByTypeName[type.name] =
-        child.outputPlan as OutputPlan<OutputPlanTypeObject>;
+      if (isDev) {
+        assert.ok(
+          type && this.type.typeNames.includes(type.name),
+          "GraphileInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
+        );
+        assert.strictEqual(
+          key,
+          null,
+          "GraphileInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
+        );
+        assert.ok(
+          child.type === "outputPlan",
+          "GraphileInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
+        );
+        assert.ok(
+          child.outputPlan.type.mode === "object",
+          "GraphileInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
+        );
+      }
+      this.childByTypeName[type!.name] = (child as OutputPlanKeyValueOutputPlan)
+        .outputPlan as OutputPlan<OutputPlanTypeObject>;
     } else {
       throw new Error(
         `GraphileInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
@@ -682,23 +684,26 @@ function getChildBucketAndIndex(
      * nested arrays? I'm concerned there's a bug here.
      */
     if (arrayIndex == null || i !== l - 1) {
-      assert.ok(
-        !Array.isArray(out),
-        "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
-      );
+      if (Array.isArray(out)) {
+        throw new Error(
+          "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
+        );
+      }
       currentBucket = child.bucket;
       currentIndex = out;
     } else {
-      assert.ok(
-        Array.isArray(out),
-        `GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
-          out,
-        )}`,
-      );
-      assert.ok(
-        out.length > arrayIndex,
-        `GraphileInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
-      );
+      if (!Array.isArray(out)) {
+        throw new Error(
+          `GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
+            out,
+          )}`,
+        );
+      }
+      if (!(out.length > arrayIndex)) {
+        throw new Error(
+          `GraphileInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
+        );
+      }
       currentBucket = child.bucket;
       currentIndex = out[arrayIndex];
     }
