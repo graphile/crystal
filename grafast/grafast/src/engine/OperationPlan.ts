@@ -1125,6 +1125,7 @@ export class OperationPlan {
     const polymorphicPaths = new Set([polymorphicPath]);
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
+
     if (isListType(nullableFieldType)) {
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
@@ -1206,7 +1207,6 @@ export class OperationPlan {
         locationDetails,
       });
     } else if (isObjectType(nullableFieldType)) {
-      // TODO: graphqlMergeSelectionSets ?
       if (isDev) {
         // Check that the plan we're dealing with is the one the user declared
         const ExpectedStep = nullableFieldType.extensions?.graphile?.Step;
@@ -1223,8 +1223,26 @@ export class OperationPlan {
           );
         }
       }
+
+      const objectLayerPlan = isNonNull
+        ? parentLayerPlan
+        : Object.assign(
+            new LayerPlan(
+              this,
+              parentLayerPlan,
+              {
+                type: "nullableField",
+                parentStepId: $step.id,
+              },
+              new Set([polymorphicPath]),
+            ),
+            {
+              rootStepId: $step.id,
+            },
+          );
+
       const objectOutputPlan = new OutputPlan(
-        parentLayerPlan,
+        objectLayerPlan,
         $step,
         {
           mode: "object",
@@ -1994,6 +2012,10 @@ export class OperationPlan {
         // Should be safe to hoist.
         break;
       }
+      case "nullableField": {
+        // Should be safe to hoist
+        break;
+      }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
         // `__ItemStep` itself (which is just a regular dependency, so it'll be
@@ -2535,6 +2557,10 @@ export class OperationPlan {
         case "polymorphic":
         case "listItem": {
           reason.parentPlanId = this.steps[reason.parentPlanId].id;
+          break;
+        }
+        case "nullableField": {
+          reason.parentStepId = this.steps[reason.parentStepId].id;
           break;
         }
         default: {

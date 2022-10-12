@@ -623,6 +623,68 @@ export function executeBucket(
     loop: for (const childLayerPlan of childLayerPlans) {
       const copyStepIds = childLayerPlan.copyPlanIds;
       switch (childLayerPlan.reason.type) {
+        case "nullableField": {
+          const store: Bucket["store"] = new Map();
+          const polymorphicPathList: string[] = [];
+          const map: Map<number, number> = new Map();
+          let size = 0;
+
+          const itemStepId = childLayerPlan.rootStepId;
+          assert.ok(
+            itemStepId != null,
+            "GraphileInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
+          );
+          const nullableStepStore = bucket.store.get(itemStepId);
+          if (!nullableStepStore) {
+            throw new Error(
+              `GraphileInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
+                itemStepId,
+              )}) in store`,
+            );
+          }
+
+          // TODO:perf: if parent bucket has no nulls in `itemStepId` then we
+          // can just copy everything wholesale rather than building new arrays
+          // and looping.
+
+          store.set(itemStepId, nullableStepStore);
+          for (const planId of copyStepIds) {
+            store.set(planId, bucket.store.get(planId)!);
+          }
+          for (
+            let originalIndex = 0;
+            originalIndex < bucket.size;
+            originalIndex++
+          ) {
+            const newIndex = size++;
+            map.set(originalIndex, newIndex);
+            polymorphicPathList[newIndex] =
+              bucket.polymorphicPathList[originalIndex];
+          }
+
+          if (size > 0) {
+            // Reference
+            const childBucket = newBucket({
+              layerPlan: childLayerPlan,
+              size,
+              store,
+              // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+              hasErrors: bucket.hasErrors,
+              polymorphicPathList,
+            });
+            bucket.children[childLayerPlan.id] = {
+              bucket: childBucket,
+              map,
+            };
+
+            // Execute
+            const result = executeBucket(childBucket, requestContext);
+            if (isPromiseLike(result)) {
+              childPromises.push(result);
+            }
+          }
+          break;
+        }
         case "listItem": {
           const store: Bucket["store"] = new Map();
           const polymorphicPathList: string[] = [];

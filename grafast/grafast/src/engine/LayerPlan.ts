@@ -21,6 +21,18 @@ export interface LayerPlanReasonRoot {
   type: "root";
 }
 /** Non-branching, non-deferred */
+export interface LayerPlanReasonNullableField {
+  type: "nullableField";
+  /**
+   * Can be used such that the same LayerPlan can be used for two selection
+   * sets for the same parent plan. In this case an additional output plan
+   * would be added to the LayerPlan.
+   *
+   * Also needed for execution (see `executeBucket`).
+   */
+  parentStepId: number;
+}
+/** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
   type: "listItem";
   /**
@@ -88,6 +100,7 @@ export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
 
 export type LayerPlanReason =
   | LayerPlanReasonRoot
+  | LayerPlanReasonNullableField
   | LayerPlanReasonListItem
   | LayerPlanReasonSubscription
   | LayerPlanReasonMutationField

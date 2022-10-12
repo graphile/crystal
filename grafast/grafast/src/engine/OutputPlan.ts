@@ -616,6 +616,15 @@ export function nonNullError(
   );
 }
 
+/**
+ * We're currently running OutputPlan `outputPlan` in bucket `bucket` at index
+ * `bucketIndex`. If this is an array OutputPlan then we're looping over the
+ * entries in our list and we're currently at index `inArrayIndex` (otherwise
+ * this is null).
+ *
+ * Now we want to run `childOutputPlan`, but to do so we need to find the
+ * related `childBucket` and `childBucketIndex`.
+ */
 function getChildBucketAndIndex(
   childOutputPlan: OutputPlan,
   outputPlan: OutputPlan,
@@ -648,7 +657,7 @@ function getChildBucketAndIndex(
   let currentBucket = bucket;
   let currentIndex = bucketIndex;
 
-  for (let i = reversePath.length - 1; i >= 0; i--) {
+  for (let l = reversePath.length, i = l - 1; i >= 0; i--) {
     const layerPlan = reversePath[i];
     const child = currentBucket.children[layerPlan.id];
     if (!child) {
@@ -662,7 +671,12 @@ function getChildBucketAndIndex(
       out != null,
       `GraphileInternalError<e955b964-7bad-4649-84aa-a2a076c6b9ea>: Could not find a matching entry in the map for bucket index ${currentIndex}`,
     );
-    if (arrayIndex == null) {
+
+    /*
+     * TODO: this '|| i > 0' feels really really really hacky... What happens if we have
+     * nested arrays? I'm concerned there's a bug here.
+     */
+    if (arrayIndex == null || i !== l - 1) {
       assert.ok(
         !Array.isArray(out),
         "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
@@ -672,7 +686,9 @@ function getChildBucketAndIndex(
     } else {
       assert.ok(
         Array.isArray(out),
-        "GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array",
+        `GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
+          out,
+        )}`,
       );
       assert.ok(
         out.length > arrayIndex,
