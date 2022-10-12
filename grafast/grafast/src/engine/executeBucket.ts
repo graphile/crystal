@@ -697,7 +697,7 @@ export function executeBucket(
             throw new Error(
               `GraphileInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not find entry '${listStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
                 listStepId,
-              )}) in store`,
+              )}) in store for layerPlan ${bucket.layerPlan}`,
             );
           }
 

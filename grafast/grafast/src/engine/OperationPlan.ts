@@ -2544,6 +2544,12 @@ export class OperationPlan {
         ensurePlanAvailableInLayer(parentStep, layerPlan);
       }
 
+      // Ensure list is accessible in parent layerPlan
+      if (layerPlan.reason.type === "listItem") {
+        const parentStep = this.steps[layerPlan.reason.parentPlanId];
+        ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+      }
+
       // Update plan references so executeBucket doesn't need to do explicit lookups
       const reason = layerPlan.reason;
       switch (reason.type) {
