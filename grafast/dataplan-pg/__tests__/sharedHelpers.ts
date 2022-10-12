@@ -137,6 +137,7 @@ export async function withTestWithPgClient<T>(
         };
         return await callback(queuedWPC(withPgClientWithSavepoints));
       } finally {
+        await new Promise((resolve) => setTimeout(resolve, 0));
         alive = false;
         await poolClient.query("rollback; --ignore--");
       }
