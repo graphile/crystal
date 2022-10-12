@@ -1227,22 +1227,25 @@ export class OperationPlan {
         }
       }
 
-      const objectLayerPlan = isNonNull
-        ? parentLayerPlan
-        : Object.assign(
-            new LayerPlan(
-              this,
-              parentLayerPlan,
+      const objectLayerPlan =
+        isNonNull ||
+        (parentLayerPlan.reason.type === "nullableField" &&
+          this.steps[parentLayerPlan.rootStepId!] === $step)
+          ? parentLayerPlan
+          : Object.assign(
+              new LayerPlan(
+                this,
+                parentLayerPlan,
+                {
+                  type: "nullableField",
+                  parentStepId: $step.id,
+                },
+                new Set([polymorphicPath]),
+              ),
               {
-                type: "nullableField",
-                parentStepId: $step.id,
+                rootStepId: $step.id,
               },
-              new Set([polymorphicPath]),
-            ),
-            {
-              rootStepId: $step.id,
-            },
-          );
+            );
 
       const objectOutputPlan = new OutputPlan(
         objectLayerPlan,
