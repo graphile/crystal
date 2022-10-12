@@ -40,15 +40,6 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     return peers.filter((peer) => peer.fn === this.fn);
   }
 
-  execute(values: [GrafastValuesList<TIn>]): GrafastResultsList<TOut> {
-    const { planDep } = this;
-    if (planDep != null) {
-      return values[planDep].map(this.fn);
-    } else {
-      return values[0].map(this.fn);
-    }
-  }
-
   unbatchedExecute(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
     return this.fn(value);
   }
