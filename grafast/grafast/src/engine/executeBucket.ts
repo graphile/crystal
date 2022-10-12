@@ -643,23 +643,74 @@ export function executeBucket(
             );
           }
 
-          // TODO:perf: if parent bucket has no nulls in `itemStepId` then we
-          // can just copy everything wholesale rather than building new arrays
-          // and looping.
+          // TODO:perf: if parent bucket has no nulls/errors in `itemStepId`
+          // then we can just copy everything wholesale rather than building
+          // new arrays and looping.
+          const hasNoNullsOrErrors = false;
 
-          store.set(itemStepId, nullableStepStore);
-          for (const planId of copyStepIds) {
-            store.set(planId, bucket.store.get(planId)!);
-          }
-          for (
-            let originalIndex = 0;
-            originalIndex < bucket.size;
-            originalIndex++
-          ) {
-            const newIndex = size++;
-            map.set(originalIndex, newIndex);
-            polymorphicPathList[newIndex] =
-              bucket.polymorphicPathList[originalIndex];
+          if (hasNoNullsOrErrors) {
+            store.set(itemStepId, nullableStepStore);
+            for (const planId of copyStepIds) {
+              store.set(planId, bucket.store.get(planId)!);
+            }
+            for (
+              let originalIndex = 0;
+              originalIndex < bucket.size;
+              originalIndex++
+            ) {
+              const newIndex = size++;
+              map.set(originalIndex, newIndex);
+              polymorphicPathList[newIndex] =
+                bucket.polymorphicPathList[originalIndex];
+            }
+          } else {
+            const itemStepIdList: any[] = [];
+            store.set(itemStepId, itemStepIdList);
+
+            // Prepare store with an empty list for each copyPlanId
+            for (const planId of copyStepIds) {
+              store.set(planId, []);
+            }
+
+            let nullIndex: number | undefined;
+
+            // We'll typically be creating fewer nullableField bucket entries
+            // than we have parent bucket entries (because we exclude nulls), so
+            // we must "multiply up" (down) the store entries.
+            for (
+              let originalIndex = 0;
+              originalIndex < bucket.size;
+              originalIndex++
+            ) {
+              const fieldValue: any[] | null | undefined | GrafastError =
+                nullableStepStore[originalIndex];
+              if (fieldValue != null && !fieldValue[$$error]) {
+                const newIndex = size++;
+                map.set(originalIndex, newIndex);
+                itemStepIdList[newIndex] = fieldValue;
+
+                polymorphicPathList[newIndex] =
+                  bucket.polymorphicPathList[originalIndex];
+                for (const planId of copyStepIds) {
+                  store.get(planId)![newIndex] =
+                    bucket.store.get(planId)![originalIndex];
+                }
+              } else {
+                if (nullIndex === undefined) {
+                  nullIndex = size++;
+                  itemStepIdList[nullIndex] = fieldValue;
+
+                  // Irrelevant
+                  polymorphicPathList[nullIndex] =
+                    bucket.polymorphicPathList[originalIndex];
+                  for (const planId of copyStepIds) {
+                    store.get(planId)![nullIndex] =
+                      bucket.store.get(planId)![originalIndex];
+                  }
+                }
+                map.set(originalIndex, nullIndex);
+              }
+            }
           }
 
           if (size > 0) {
