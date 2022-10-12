@@ -1981,6 +1981,18 @@ export class OperationPlan {
     if (step instanceof __ItemStep) {
       return;
     }
+    // TODO:perf: we should calculate this _once only_ rather than for every step!
+    const subroutineParentStepIds = this.layerPlans
+      .filter(
+        (p): p is LayerPlan<LayerPlanReasonSubroutine> =>
+          !!(p && p.reason.type === "subroutine"),
+      )
+      .map((p) => this.steps[p.reason.parentPlanId].id);
+    if (subroutineParentStepIds.includes(step.id)) {
+      // Don't hoist steps that are the root of a subroutine
+      // TODO: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
+      return;
+    }
     switch (step.layerPlan.reason.type) {
       case "root": {
         // There is no higher layerPlan
