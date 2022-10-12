@@ -19,14 +19,14 @@ graph TD
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
     __InputStaticLeaf23["__InputStaticLeaf[23∈0]"]:::plan
     Connection37["Connection[37∈0]<br />ᐸ33ᐳ"]:::plan
-    PgPageInfo39["PgPageInfo[39∈0]"]:::plan
-    Access46["Access[46∈1]<br />ᐸ21.0ᐳ"]:::plan
-    Lambda47["Lambda[47∈1]"]:::plan
-    Lambda41["Lambda[41∈1]<br />ᐸlistHasMoreᐳ"]:::plan
-    Access48["Access[48∈1]<br />ᐸ21.1ᐳ"]:::plan
-    First43["First[43∈1]"]:::plan
-    PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸmessagesᐳ"]:::plan
-    PgClassExpression45["PgClassExpression[45∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    PgPageInfo39["PgPageInfo[39∈1]"]:::plan
+    Access46["Access[46∈2]<br />ᐸ21.0ᐳ"]:::plan
+    Lambda47["Lambda[47∈2]"]:::plan
+    Lambda41["Lambda[41∈2]<br />ᐸlistHasMoreᐳ"]:::plan
+    Access48["Access[48∈2]<br />ᐸ21.1ᐳ"]:::plan
+    First43["First[43∈2]"]:::plan
+    PgSelectSingle44["PgSelectSingle[44∈2]<br />ᐸmessagesᐳ"]:::plan
+    PgClassExpression45["PgClassExpression[45∈2]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access18
@@ -47,13 +47,13 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,__InputStaticLeaf23,__InputStaticLeaf26,Connection37,PgPageInfo39 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 37, 39<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
+    class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,__InputStaticLeaf23,__InputStaticLeaf26,Connection37 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 37<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,Lambda41,First43,PgSelectSingle44,PgClassExpression45,Access46,Lambda47,Access48 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 37, 39, 41, 45<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
+    class Bucket1,__Item21,PgSelectSingle22,PgPageInfo39 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 21, 22, 37, 39<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
+    class Bucket2,Lambda41,First43,PgSelectSingle44,PgClassExpression45,Access46,Lambda47,Access48 bucket2
     Bucket3("Bucket 3 (nullableField)<br />Deps: 37, 39, 41, 45<br /><br />ROOT Connectionᐸ33ᐳ[37]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3

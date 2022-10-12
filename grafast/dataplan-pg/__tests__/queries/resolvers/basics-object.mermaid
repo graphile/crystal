@@ -20,8 +20,8 @@ graph TD
     PgClassExpression13["PgClassExpression[13∈0]<br />ᐸ__random_u...”username”ᐳ"]:::plan
     Object15["Object[15∈0]<br />ᐸ{}ᐳ"]:::plan
     GraphQLResolver16[["GraphQLResolver[16∈0]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver18[["GraphQLResolver[18∈0]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver20[["GraphQLResolver[20∈0]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver18[["GraphQLResolver[18∈1]<br />ᐸresolveᐳ"]]:::plan
+    GraphQLResolver20[["GraphQLResolver[20∈1]<br />ᐸresolveᐳ"]]:::plan
 
     %% plan dependencies
     __Value3 --> Access8
@@ -38,10 +38,10 @@ graph TD
     subgraph "Buckets for queries/resolvers/basics-object"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value1,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,Object15,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20 bucket0
-    Bucket1("Bucket 1 (nullableField)<br />Deps: 12, 16, 13, 18, 20<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]"):::bucket
+    class Bucket0,__Value1,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,Object15,GraphQLResolver16 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 16, 15, 3, 1, 5, 12, 13<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1 bucket1
+    class Bucket1,GraphQLResolver18,GraphQLResolver20 bucket1
     Bucket2("Bucket 2 (nullableField)<br />Deps: 16, 18, 20<br /><br />ROOT GraphQLResolverᐸresolveᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2

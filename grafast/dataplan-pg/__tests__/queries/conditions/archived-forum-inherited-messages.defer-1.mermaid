@@ -16,10 +16,10 @@ graph TD
     PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈2]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈2]<br />ᐸ__forums__.”id”ᐳ"]:::plan
     Connection38["Connection[38∈0]<br />ᐸ34ᐳ"]:::plan
-    PgClassExpression39["PgClassExpression[39∈1]<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
+    PgClassExpression39["PgClassExpression[39∈2]<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
     PgSelect40[["PgSelect[40∈3]<br />ᐸmessagesᐳ"]]:::plan
     __Item41>"__Item[41∈5]<br />ᐸ40ᐳ"]:::itemplan
     PgSelectSingle42["PgSelectSingle[42∈5]<br />ᐸmessagesᐳ"]:::plan
@@ -28,9 +28,9 @@ graph TD
     PgSelectSingle50["PgSelectSingle[50∈5]<br />ᐸusersᐳ"]:::plan
     PgClassExpression51["PgClassExpression[51∈5]<br />ᐸ__users__.”username”ᐳ"]:::plan
     PgClassExpression52["PgClassExpression[52∈5]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
-    PgClassExpression56["PgClassExpression[56∈5]<br />ᐸ__messages__.”id”ᐳ"]:::plan
-    List57["List[57∈5]<br />ᐸ56ᐳ"]:::plan
-    PgCursor55["PgCursor[55∈5]"]:::plan
+    PgClassExpression56["PgClassExpression[56∈8]<br />ᐸ__messages__.”id”ᐳ"]:::plan
+    List57["List[57∈8]<br />ᐸ56ᐳ"]:::plan
+    PgCursor55["PgCursor[55∈8]"]:::plan
 
     %% plan dependencies
     __Value3 --> Access18
@@ -60,10 +60,10 @@ graph TD
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,Connection38 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 20, 38<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression33,PgClassExpression39 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 20, 33, 39, 38, 23<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
+    class Bucket1,__Item21,PgSelectSingle22 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 20, 38<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
+    class Bucket2,PgClassExpression23,PgClassExpression33,PgClassExpression39 bucket2
     Bucket3("Bucket 3 (defer)<br />Deps: 20, 33, 39, 38, 22"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect40 bucket3
@@ -72,22 +72,19 @@ graph TD
     class Bucket4 bucket4
     Bucket5("Bucket 5 (listItem)<br />ROOT __Item{5}ᐸ40ᐳ[41]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item41,PgSelectSingle42,PgClassExpression43,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgCursor55,PgClassExpression56,List57,Map68 bucket5
+    class Bucket5,__Item41,PgSelectSingle42,PgClassExpression43,PgSelectSingle50,PgClassExpression51,PgClassExpression52,Map68 bucket5
     Bucket6("Bucket 6 (nullableField)<br />Deps: 42, 50, 43, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
     Bucket7("Bucket 7 (nullableField)<br />Deps: 50, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[50]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7
-    Bucket8("Bucket 8 (nullableField)<br />Deps: 42, 50, 55, 43, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]"):::bucket
+    Bucket8("Bucket 8 (nullableField)<br />Deps: 42, 50, 43, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8 bucket8
-    Bucket9("Bucket 9 (nullableField)<br />Deps: 42, 50, 43, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]"):::bucket
+    class Bucket8,PgCursor55,PgClassExpression56,List57 bucket8
+    Bucket9("Bucket 9 (nullableField)<br />Deps: 50, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[50]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9 bucket9
-    Bucket10("Bucket 10 (nullableField)<br />Deps: 50, 51, 52<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[50]"):::bucket
-    classDef bucket10 stroke:#ffff00
-    class Bucket10 bucket10
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
@@ -96,5 +93,4 @@ graph TD
     Bucket5 --> Bucket6 & Bucket8
     Bucket6 --> Bucket7
     Bucket8 --> Bucket9
-    Bucket9 --> Bucket10
     end

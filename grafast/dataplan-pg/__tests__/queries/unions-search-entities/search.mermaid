@@ -36,7 +36,7 @@ graph TD
     PgClassExpression36["PgClassExpression[36∈3]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳPost"]:::plan
     Map71["Map[71∈3]<br />ᐸ35:{”0”:1}ᐳ<br />ᐳPost"]:::plan
     PgSelectSingle43["PgSelectSingle[43∈3]<br />ᐸpeopleᐳ<br />ᐳPost"]:::plan
-    PgClassExpression44["PgClassExpression[44∈3]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"]:::plan
+    PgClassExpression44["PgClassExpression[44∈4]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"]:::plan
     PgClassExpression45["PgClassExpression[45∈3]<br />ᐸ__posts__.”body”ᐳ<br />ᐳPost"]:::plan
     PgSelect46[["PgSelect[46∈3]<br />ᐸcommentsᐳ<br />ᐳComment"]]:::plan
     First50["First[50∈3]<br />ᐳComment"]:::plan
@@ -44,11 +44,11 @@ graph TD
     PgClassExpression52["PgClassExpression[52∈3]<br />ᐸ__comments...omment_id”ᐳ<br />ᐳComment"]:::plan
     Map75["Map[75∈3]<br />ᐸ51:{”0”:4}ᐳ<br />ᐳComment"]:::plan
     PgSelectSingle59["PgSelectSingle[59∈3]<br />ᐸpeopleᐳ<br />ᐳComment"]:::plan
-    PgClassExpression60["PgClassExpression[60∈3]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"]:::plan
+    PgClassExpression60["PgClassExpression[60∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"]:::plan
     Map73["Map[73∈3]<br />ᐸ51:{”0”:1,”1”:2}ᐳ<br />ᐳComment"]:::plan
     PgSelectSingle67["PgSelectSingle[67∈3]<br />ᐸpostsᐳ<br />ᐳComment"]:::plan
-    PgClassExpression68["PgClassExpression[68∈3]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳComment"]:::plan
-    PgClassExpression69["PgClassExpression[69∈3]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"]:::plan
+    PgClassExpression68["PgClassExpression[68∈6]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳComment"]:::plan
+    PgClassExpression69["PgClassExpression[69∈6]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"]:::plan
     PgClassExpression70["PgClassExpression[70∈3]<br />ᐸ__comments__.”body”ᐳ<br />ᐳComment"]:::plan
 
     %% plan dependencies
@@ -104,16 +104,16 @@ graph TD
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,List20,PgPolymorphic21 bucket2
     Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgClassExpression60,PgSelectSingle67,PgClassExpression68,PgClassExpression69,PgClassExpression70,Map71,Map73,Map75 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 43, 44<br />ᐳPost<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[43]"):::bucket
+    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgSelectSingle67,PgClassExpression70,Map71,Map73,Map75 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 43<br />ᐳPost<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[43]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 59, 60<br />ᐳComment<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[59]"):::bucket
+    class Bucket4,PgClassExpression44 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 59<br />ᐳComment<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[59]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableField)<br />Deps: 67, 68, 69<br />ᐳComment<br />ROOT PgSelectSingle{3}ᐸpostsᐳ[67]"):::bucket
+    class Bucket5,PgClassExpression60 bucket5
+    Bucket6("Bucket 6 (nullableField)<br />Deps: 67<br />ᐳComment<br />ROOT PgSelectSingle{3}ᐸpostsᐳ[67]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6 bucket6
+    class Bucket6,PgClassExpression68,PgClassExpression69 bucket6
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5 & Bucket6

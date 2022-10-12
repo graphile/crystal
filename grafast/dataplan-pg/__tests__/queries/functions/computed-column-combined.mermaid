@@ -20,17 +20,17 @@ graph TD
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸforumsᐳ"]:::plan
     Map52["Map[52∈0]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
     PgSelectSingle20["PgSelectSingle[20∈0]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression21["PgClassExpression[21∈0]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
-    PgClassExpression22["PgClassExpression[22∈0]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__forums_r...”username”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22∈1]<br />ᐸ__forums_r...vatar_url”ᐳ"]:::plan
     Map50["Map[50∈0]<br />ᐸ20:{”0”:2,”1”:3,”2”:4,”3”:5}ᐳ"]:::plan
     PgSelectSingle29["PgSelectSingle[29∈0]<br />ᐸusers_most_recent_forumᐳ"]:::plan
-    Map47["Map[47∈0]<br />ᐸ29:{”0”:0}ᐳ"]:::plan
-    PgSelectSingle37["PgSelectSingle[37∈0]<br />ᐸforums_unique_author_countᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38∈0]<br />ᐸ__forums_u..._count__.vᐳ"]:::plan
+    Map47["Map[47∈1]<br />ᐸ29:{”0”:0}ᐳ"]:::plan
+    PgSelectSingle37["PgSelectSingle[37∈1]<br />ᐸforums_unique_author_countᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸ__forums_u..._count__.vᐳ"]:::plan
     Access49["Access[49∈0]<br />ᐸ50.1ᐳ"]:::plan
     __Item44>"__Item[44∈4]<br />ᐸ49ᐳ"]:::itemplan
     PgSelectSingle45["PgSelectSingle[45∈4]<br />ᐸforums_featured_messagesᐳ"]:::plan
-    PgClassExpression46["PgClassExpression[46∈4]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
+    PgClassExpression46["PgClassExpression[46∈5]<br />ᐸ__forums_f...s__.”body”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access9
@@ -56,10 +56,10 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-combined"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgSelectSingle29,__InputStaticLeaf30,PgSelectSingle37,PgClassExpression38,Map47,Access49,Map50,Map52 bucket0
-    Bucket1("Bucket 1 (nullableField)<br />Deps: 13, 20, 29, 49, 21, 22, 38<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgSelectSingle20,PgSelectSingle29,__InputStaticLeaf30,Access49,Map50,Map52 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 20, 29, 13, 49<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1 bucket1
+    class Bucket1,PgClassExpression21,PgClassExpression22,PgSelectSingle37,PgClassExpression38,Map47 bucket1
     Bucket2("Bucket 2 (nullableField)<br />Deps: 20, 29, 49, 21, 22, 38<br /><br />ROOT PgSelectSingleᐸusersᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
@@ -68,10 +68,10 @@ graph TD
     class Bucket3 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ49ᐳ[44]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item44,PgSelectSingle45,PgClassExpression46 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 45, 46<br /><br />ROOT PgSelectSingle{4}ᐸforums_featured_messagesᐳ[45]"):::bucket
+    class Bucket4,__Item44,PgSelectSingle45 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 45<br /><br />ROOT PgSelectSingle{4}ᐸforums_featured_messagesᐳ[45]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5 bucket5
+    class Bucket5,PgClassExpression46 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

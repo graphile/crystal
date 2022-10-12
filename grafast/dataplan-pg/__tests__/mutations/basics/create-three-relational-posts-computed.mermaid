@@ -29,8 +29,8 @@ graph TD
     PgSelect29[["PgSelect[29∈1]<br />ᐸrelational_itemsᐳ"]]:::plan
     First33["First[33∈1]"]:::plan
     PgSelectSingle34["PgSelectSingle[34∈1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression35["PgClassExpression[35∈1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgPolymorphic36["PgPolymorphic[36∈1]"]:::plan
+    PgClassExpression35["PgClassExpression[35∈2]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgPolymorphic36["PgPolymorphic[36∈2]"]:::plan
     PgClassExpression37["PgClassExpression[37∈1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgSelect38[["PgSelect[38∈4]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     First42["First[42∈4]<br />ᐳRelationalTopic"]:::plan
@@ -54,8 +54,8 @@ graph TD
     PgSelect81[["PgSelect[81∈1]<br />ᐸrelational_itemsᐳ"]]:::plan
     First85["First[85∈1]"]:::plan
     PgSelectSingle86["PgSelectSingle[86∈1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression87["PgClassExpression[87∈1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgPolymorphic88["PgPolymorphic[88∈1]"]:::plan
+    PgClassExpression87["PgClassExpression[87∈2]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgPolymorphic88["PgPolymorphic[88∈2]"]:::plan
     PgClassExpression89["PgClassExpression[89∈1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgSelect90[["PgSelect[90∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     First94["First[94∈5]<br />ᐳRelationalTopic"]:::plan
@@ -79,8 +79,8 @@ graph TD
     PgSelect133[["PgSelect[133∈1]<br />ᐸrelational_itemsᐳ"]]:::plan
     First137["First[137∈1]"]:::plan
     PgSelectSingle138["PgSelectSingle[138∈1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression139["PgClassExpression[139∈1]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgPolymorphic140["PgPolymorphic[140∈1]"]:::plan
+    PgClassExpression139["PgClassExpression[139∈2]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
+    PgPolymorphic140["PgPolymorphic[140∈2]"]:::plan
     PgClassExpression141["PgClassExpression[141∈1]<br />ᐸ__relation...ems__.”id”ᐳ"]:::plan
     PgSelect142[["PgSelect[142∈6]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     First146["First[146∈6]<br />ᐳRelationalTopic"]:::plan
@@ -190,10 +190,10 @@ graph TD
     class Bucket0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant13,Constant14,Constant19,Constant20,__InputStaticLeaf28,__InputStaticLeaf80,__InputStaticLeaf132 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 13, 14, 19, 20, 28, 80, 132, 5<br /><br />1: PgSelect{1}ᐸrelational_posts(mutation)ᐳ[9]<br />2: PgSelect{1}ᐸrelational_posts(mutation)ᐳ[15]<br />3: PgSelect{1}ᐸrelational_posts(mutation)ᐳ[21]<br />4: First{1}[25],PgSelect{1}ᐸrelational_itemsᐳ[29],PgSelect{1}ᐸrelational_itemsᐳ[81],PgSelect{1}ᐸrelational_itemsᐳ[133]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect9,PgSelect15,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgSelect29,First33,PgSelectSingle34,PgClassExpression35,PgPolymorphic36,PgClassExpression37,PgSelect81,First85,PgSelectSingle86,PgClassExpression87,PgPolymorphic88,PgClassExpression89,PgSelect133,First137,PgSelectSingle138,PgClassExpression139,PgPolymorphic140,PgClassExpression141 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 27, 5, 12, 37, 36, 89, 88, 141, 140<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[27]"):::bucket
+    class Bucket1,PgSelect9,PgSelect15,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgSelect29,First33,PgSelectSingle34,PgClassExpression37,PgSelect81,First85,PgSelectSingle86,PgClassExpression89,PgSelect133,First137,PgSelectSingle138,PgClassExpression141 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 34, 86, 138, 27, 5, 12, 37, 89, 141<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[27]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
+    class Bucket2,PgClassExpression35,PgPolymorphic36,PgClassExpression87,PgPolymorphic88,PgClassExpression139,PgPolymorphic140 bucket2
     Bucket3("Bucket 3 (nullableField)<br />Deps: 5, 12, 37, 36, 89, 88, 141, 140<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
