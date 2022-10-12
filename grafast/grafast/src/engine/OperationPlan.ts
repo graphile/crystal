@@ -687,6 +687,7 @@ export class OperationPlan {
    * create one item plan per parent plan.
    */
   private itemStepForListStep<TData>(
+    parentLayerPlan: LayerPlan,
     listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
     depth = 0,
   ): __ItemStep<TData> {
@@ -697,7 +698,7 @@ export class OperationPlan {
     // Create a new LayerPlan for this list item
     const layerPlan = new LayerPlan(
       this,
-      listStep.layerPlan,
+      parentLayerPlan,
       {
         type: "listItem",
         parentPlanId: listStep.id,
@@ -1140,7 +1141,11 @@ export class OperationPlan {
         locationDetails,
       });
 
-      const $__item = this.itemStepForListStep($step, listDepth);
+      const $__item = this.itemStepForListStep(
+        parentLayerPlan,
+        $step,
+        listDepth,
+      );
       const $item = isListCapableStep($step)
         ? withGlobalLayerPlan($__item.layerPlan, polymorphicPaths, () =>
             ($step as ListCapableStep<any>).listItem($__item),
