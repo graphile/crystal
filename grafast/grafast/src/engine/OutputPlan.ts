@@ -641,7 +641,7 @@ function getChildBucketAndIndex(
   bucket: Bucket,
   bucketIndex: number,
   arrayIndex: number | null = null,
-): [Bucket, number] {
+): [Bucket, number] | null {
   if ((arrayIndex == null) === (outputPlan.type.mode === "array")) {
     throw new Error(
       "GraphileInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
@@ -657,9 +657,7 @@ function getChildBucketAndIndex(
   while (!bucket.children[current.id]) {
     current = current.parentLayerPlan;
     if (!current) {
-      throw new Error(
-        `GraphileInternalError<c354573b-7714-4b5b-9db1-0beae1074fec>: Could not find child for '${childOutputPlan.layerPlan}' in bucket for '${bucket.layerPlan}'`,
-      );
+      return null;
     }
     reversePath.push(current);
   }
@@ -671,16 +669,13 @@ function getChildBucketAndIndex(
     const layerPlan = reversePath[i];
     const child = currentBucket.children[layerPlan.id];
     if (!child) {
-      throw new Error(
-        `GraphileInternalError<f26a3170-3849-4aca-9c0c-85229105da7b>: Could not find child for '${childOutputPlan.layerPlan}' in bucket for '${currentBucket.layerPlan}'`,
-      );
+      return null;
     }
 
     const out = child.map.get(currentIndex);
-    assert.ok(
-      out != null,
-      `GraphileInternalError<e955b964-7bad-4649-84aa-a2a076c6b9ea>: Could not find a matching entry in the map for bucket index ${currentIndex}`,
-    );
+    if (out == null) {
+      return null;
+    }
 
     /*
      * TODO: this '|| i > 0' feels really really really hacky... What happens if we have
@@ -707,6 +702,9 @@ function getChildBucketAndIndex(
       currentBucket = child.bucket;
       currentIndex = out[arrayIndex];
     }
+  }
+  if (currentIndex == null) {
+    return null;
   }
   return [currentBucket, currentIndex];
 }
@@ -769,6 +767,9 @@ function makeExecuteChildPlanCode(
   if (isNonNull) {
     // No need to catch error
     return `
+      if (${childBucket} == null) {
+        throw nonNullError(${locationDetails}, mutablePath.slice(1));
+      }
       const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
@@ -780,7 +781,9 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return `
       try {
-        const fieldResult = ${childOutputPlan}.${
+        const fieldResult = ${childBucket} == null ? ${
+      asString ? '"null"' : "null"
+    } : ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
@@ -1006,12 +1009,16 @@ ${
       asString ? "executeString" : "execute"
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
-    const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+    const c = getChildBucketAndIndex(
       childOutputPlan,
       this,
       bucket,
       bucketIndex,
     );
+    if (!c) {
+      throw new Error("GraphileInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket");
+    }
+    const [childBucket, childBucketIndex] = c;
     return childOutputPlan.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, childBucket, childBucketIndex);
@@ -1064,13 +1071,18 @@ ${asString ? '    string = "[";\n' : ""}\
       if (directChild) {
         childBucketIndex = lookup[i];
       } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+        const c = getChildBucketAndIndex(
           childOutputPlan,
           this,
           bucket,
           bucketIndex,
           i,
-        ));
+        );
+        if (c) {
+          ([childBucket, childBucketIndex] = c);
+        } else {
+          childBucket = childBucketIndex = null;
+        }
       }
 
       mutablePath[mutablePathIndex] = i;
@@ -1303,12 +1315,17 @@ ${makeExecuteChildPlanCode(
         childBucket = directChild.bucket;
         childBucketIndex = directChild.map.get(bucketIndex);
       } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+        const c = getChildBucketAndIndex(
           spec.outputPlan,
           this,
           bucket,
           bucketIndex,
-        ));
+        );
+        if (c) {
+          ([childBucket, childBucketIndex] = c);
+        } else {
+          childBucket = childBucketIndex = null;
+        }
       }
 ${makeExecuteChildPlanCode(
   asString

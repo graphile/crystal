@@ -672,8 +672,6 @@ export function executeBucket(
               store.set(planId, []);
             }
 
-            let nullIndex: number | undefined;
-
             // We'll typically be creating fewer nullableField bucket entries
             // than we have parent bucket entries (because we exclude nulls), so
             // we must "multiply up" (down) the store entries.
@@ -684,7 +682,7 @@ export function executeBucket(
             ) {
               const fieldValue: any[] | null | undefined | GrafastError =
                 nullableStepStore[originalIndex];
-              if (fieldValue != null && !fieldValue[$$error]) {
+              if (fieldValue != null) {
                 const newIndex = size++;
                 map.set(originalIndex, newIndex);
                 itemStepIdList[newIndex] = fieldValue;
@@ -696,19 +694,8 @@ export function executeBucket(
                     bucket.store.get(planId)![originalIndex];
                 }
               } else {
-                if (nullIndex === undefined) {
-                  nullIndex = size++;
-                  itemStepIdList[nullIndex] = fieldValue;
-
-                  // Irrelevant
-                  polymorphicPathList[nullIndex] =
-                    bucket.polymorphicPathList[originalIndex];
-                  for (const planId of copyStepIds) {
-                    store.get(planId)![nullIndex] =
-                      bucket.store.get(planId)![originalIndex];
-                  }
-                }
-                map.set(originalIndex, nullIndex);
+                // TODO: delete this
+                map.set(originalIndex, null as any);
               }
             }
           }
