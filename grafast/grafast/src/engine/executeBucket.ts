@@ -639,7 +639,7 @@ export function executeBucket(
             throw new Error(
               `GraphileInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
                 itemStepId,
-              )}) in store`,
+              )}) in store for ${bucket.layerPlan}`,
             );
           }
 

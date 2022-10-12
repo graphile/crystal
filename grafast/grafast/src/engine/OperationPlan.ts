@@ -288,6 +288,9 @@ export class OperationPlan {
     // Get rid of steps that are no longer needed after optimising
     this.treeShakeSteps();
 
+    // Now shove steps as deep down as they can go (opposite of hoist)
+    this.pushDownSteps();
+
     this.phase = "finalize";
 
     // Plans are expected to execute later; they may take steps here to prepare
@@ -1972,16 +1975,12 @@ export class OperationPlan {
     return peers;
   }
 
-  /**
-   * Attempts to hoist the step into a higher layerPlan to maximize
-   * deduplication.
-   */
-  private hoistStep(step: ExecutableStep) {
+  private isImmoveable(step: ExecutableStep): boolean {
     if (step.hasSideEffects) {
-      return;
+      return true;
     }
-    if (step instanceof __ItemStep) {
-      return;
+    if (step instanceof __ItemStep || step instanceof __ValueStep) {
+      return true;
     }
     // TODO:perf: we should calculate this _once only_ rather than for every step!
     const subroutineParentStepIds = this.layerPlans
@@ -1993,6 +1992,17 @@ export class OperationPlan {
     if (subroutineParentStepIds.includes(step.id)) {
       // Don't hoist steps that are the root of a subroutine
       // TODO: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Attempts to hoist the step into a higher layerPlan to maximize
+   * deduplication.
+   */
+  private hoistStep(step: ExecutableStep) {
+    if (this.isImmoveable(step)) {
       return;
     }
     switch (step.layerPlan.reason.type) {
@@ -2111,6 +2121,156 @@ export class OperationPlan {
 
     // Now try and hoist it again!
     this.hoistStep(step);
+  }
+
+  /**
+   * Attempts to push the step into the lowest layerPlan to minimize the need
+   * for copying between layer plans.
+   */
+  private pushDown(step: ExecutableStep): void {
+    if (this.isImmoveable(step)) {
+      return;
+    }
+    switch (step.layerPlan.reason.type) {
+      case "root":
+      case "subscription":
+      case "defer":
+      case "polymorphic":
+      case "subroutine":
+      case "nullableField":
+      case "listItem": {
+        // Fine to push lower
+        break;
+      }
+      case "mutationField": {
+        // NOTE: It's the user's responsibility to ensure that steps that have
+        // side effects are marked as such via `step.hasSideEffects = true`.
+        if (step.isSyncAndSafe) {
+          // TODO: warn user we're hoisting from a mutationField?
+          break;
+        } else {
+          // Plans that rely on external state shouldn't be hoisted because
+          // their results may change after a mutation, so the mutation should
+          // run first.
+          return;
+        }
+      }
+      default: {
+        const never: never = step.layerPlan.reason;
+        throw new Error(
+          `GraphileInternalError<81e3a7d4-aaa0-416b-abbb-a887734009bc>: unhandled layer plan reason ${inspect(
+            never,
+          )}`,
+        );
+      }
+    }
+
+    // TODO: don't allow pushing down into mutationField?
+
+    // Now find the lowest bucket that still satisfies all of it's dependents.
+    // TODO: make this calculation faster
+    const dependentSteps = this.steps.filter(
+      (s) => s && s.dependencies.some((d) => this.steps[d] === step),
+    );
+    const dependentOutputPlans: OutputPlan[] = [];
+    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+      if (outputPlan.rootStepId) {
+        if (this.steps[outputPlan.rootStepId] === step) {
+          dependentOutputPlans.push(outputPlan);
+        }
+      }
+    });
+    const dependentNullableFieldLayerPlanParents: LayerPlan[] = [];
+    for (const layerPlan of this.layerPlans) {
+      if (!layerPlan) continue;
+      if (
+        layerPlan.reason.type === "nullableField" &&
+        this.steps[layerPlan.rootStepId!] === step
+      ) {
+        dependentNullableFieldLayerPlanParents.push(layerPlan.parentLayerPlan!);
+      }
+    }
+    const dependentLayerPlans = [
+      ...new Set([
+        ...dependentSteps.map((s) => s.layerPlan),
+        ...dependentOutputPlans.map((op) => op.layerPlan),
+        ...dependentNullableFieldLayerPlanParents,
+      ]),
+    ];
+    if (dependentLayerPlans.length === 0) {
+      throw new Error(`Nothing depends on ${step}?!`);
+    }
+    if (dependentLayerPlans.includes(step.layerPlan)) {
+      // Already as deep as it can go
+      return;
+    }
+
+    const paths: LayerPlan[][] = [];
+    let minPathLength = Infinity;
+
+    for (const dependentLayerPlan of dependentLayerPlans) {
+      let lp = dependentLayerPlan;
+      const path: LayerPlan[] = [lp];
+      while (lp.parentLayerPlan != step.layerPlan) {
+        const parent = lp.parentLayerPlan;
+        if (!parent) {
+          throw new Error(
+            `GraphileInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy`,
+          );
+        }
+        lp = parent;
+        path.push(lp);
+      }
+      paths.push(path);
+      minPathLength = Math.min(path.length, minPathLength);
+    }
+
+    const dependentLayerPlanCount = dependentLayerPlans.length;
+
+    let deepest = step.layerPlan;
+    outerloop: for (let i = 0; i < minPathLength; i++) {
+      const expected = paths[0][i];
+      if (expected.reason.type === "polymorphic") {
+        // TODO: reconsider
+        // Let's not pass polymorphic boundaries for now
+        break;
+      }
+      if (expected.reason.type === "subroutine") {
+        // TODO: reconsider
+        // Let's not pass subroutine boundaries for now
+        break;
+      }
+      if (expected.reason.type === "mutationField") {
+        // Let's not pass mutationField boundaries for now
+        break;
+      }
+      for (let j = 1; j < dependentLayerPlanCount; j++) {
+        const actual = paths[j][i];
+        if (expected != actual) {
+          break outerloop;
+        }
+      }
+      deepest = expected;
+    }
+
+    if (deepest === step.layerPlan) {
+      return;
+    }
+
+    // All our checks passed, shove it down!
+
+    // 1: no need to adjust polymorphicPaths, since we don't cross polymorphic boundary
+    const targetPolymorphicPaths = deepest.polymorphicPaths;
+    if (!targetPolymorphicPaths.has([...step.polymorphicPaths][0])) {
+      throw new Error(
+        `GraphileInternalError<53907e56-940a-4173-979d-bc620e4f1ff8>: polymorphic assumption doesn't hold. Mine = ${[
+          ...step.polymorphicPaths,
+        ]}; theirs = ${[...deepest.polymorphicPaths]}`,
+      );
+    }
+
+    // 2: move it to target layer
+    step.layerPlan = deepest;
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {
@@ -2280,6 +2440,13 @@ export class OperationPlan {
       // Even if step wasn't hoisted, its deps may have been so we should still
       // re-deduplicate it.
       return this.deduplicateStep(step);
+    });
+  }
+
+  private pushDownSteps() {
+    this.processSteps("pushDown", 0, "dependents-first", (step) => {
+      this.pushDown(step);
+      return step;
     });
   }
 
