@@ -22,8 +22,7 @@ import type {
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
-import { getChildBucketAndIndex } from "./engine/OutputPlan.js";
-import { coerceError } from "./engine/OutputPlan.js";
+import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
 import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";

@@ -1,9 +1,4 @@
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-  PromiseOrDirect,
-} from "../interfaces.js";
+import type { ExecutionExtra, PromiseOrDirect } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { list } from "./list.js";
