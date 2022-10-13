@@ -1,9 +1,5 @@
-import type {
-  EdgeCapableStep,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "grafast";
-import { ExecutableStep } from "grafast";
+import type { EdgeCapableStep, ExecutableStep,ExecutionExtra } from "grafast";
+import { UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -69,7 +65,7 @@ export class PgSelectSingleStep<
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
-  extends ExecutableStep<PgSourceRow<TColumns> | null>
+  extends UnbatchedExecutableStep<PgSourceRow<TColumns> | null>
   implements
     PgTypedExecutableStep<PgTypeCodec<TColumns, any, any>>,
     EdgeCapableStep<any>
@@ -94,11 +90,11 @@ export class PgSelectSingleStep<
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
+    this.itemStepId = this.addDependency(itemPlan);
     this.source = classPlan.source;
     this.pgCodec = this.source.codec;
     this.mode = classPlan.mode;
     this.classStepId = classPlan.id;
-    this.itemStepId = this.addDependency(itemPlan);
   }
 
   public coalesceToEmptyObject(): void {
@@ -546,28 +542,27 @@ export class PgSelectSingleStep<
     return this;
   }
 
-  execute(
-    values: GrafastValuesList<[PgSourceRow<TColumns>]>,
-  ): GrafastResultsList<PgSourceRow<TColumns> | null> {
-    return values[this.itemStepId].map((result) => {
-      if (result == null) {
+  unbatchedExecute(
+    extra: ExecutionExtra,
+    result: PgSourceRow<TColumns>,
+  ): PgSourceRow<TColumns> | null {
+    if (result == null) {
+      return this._coalesceToEmptyObject ? Object.create(null) : null;
+    } else if (this.nullCheckAttributeIndex != null) {
+      const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
+      if (nullIfAttributeNull == null) {
         return this._coalesceToEmptyObject ? Object.create(null) : null;
-      } else if (this.nullCheckAttributeIndex != null) {
-        const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
-        if (nullIfAttributeNull == null) {
-          return this._coalesceToEmptyObject ? Object.create(null) : null;
-        }
-      } else if (this.nullCheckId != null) {
-        const nullIfExpressionNotTrue = result[this.nullCheckId];
-        if (
-          nullIfExpressionNotTrue == null ||
-          TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
-        ) {
-          return this._coalesceToEmptyObject ? Object.create(null) : null;
-        }
       }
-      return result;
-    });
+    } else if (this.nullCheckId != null) {
+      const nullIfExpressionNotTrue = result[this.nullCheckId];
+      if (
+        nullIfExpressionNotTrue == null ||
+        TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
+      ) {
+        return this._coalesceToEmptyObject ? Object.create(null) : null;
+      }
+    }
+    return result;
   }
 }
 

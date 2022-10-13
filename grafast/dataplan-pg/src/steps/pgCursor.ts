@@ -1,5 +1,5 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { ExecutableStep, list } from "grafast";
+import type { ExecutionExtra } from "grafast";
+import { list, UnbatchedExecutableStep } from "grafast";
 import sql from "pg-sql2";
 
 import { TYPES } from "../codecs.js";
@@ -12,7 +12,7 @@ import { PgSelectSingleStep } from "./pgSelectSingle.js";
  */
 export class PgCursorStep<
   TStep extends PgSelectSingleStep<any, any, any, any>,
-> extends ExecutableStep<any> {
+> extends UnbatchedExecutableStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgCursorStep",
@@ -53,15 +53,11 @@ export class PgCursorStep<
     return plan as TStep;
   }
 
-  execute(
-    values: [GrafastValuesList<any[] | null>],
-  ): GrafastResultsList<string | null> {
-    return values[this.cursorValuesDepId].map((v) => {
-      return v == null || v!.every((v) => v == null)
-        ? null
-        : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(
-            "base64",
-          );
-    });
+  unbatchedExecute(extra: ExecutionExtra, v: any[] | null): string | null {
+    return v == null || v!.every((v) => v == null)
+      ? null
+      : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(
+          "base64",
+        );
   }
 }
