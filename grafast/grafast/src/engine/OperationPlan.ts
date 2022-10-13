@@ -1227,25 +1227,39 @@ export class OperationPlan {
         }
       }
 
-      const objectLayerPlan =
+      let objectLayerPlan: LayerPlan;
+      if (
         isNonNull ||
         (parentLayerPlan.reason.type === "nullableField" &&
           this.steps[parentLayerPlan.rootStepId!] === $step)
-          ? parentLayerPlan
-          : Object.assign(
-              new LayerPlan(
-                this,
-                parentLayerPlan,
-                {
-                  type: "nullableField",
-                  parentStepId: $step.id,
-                },
-                new Set([polymorphicPath]),
-              ),
+      ) {
+        objectLayerPlan = parentLayerPlan;
+      } else {
+        // Find existing match
+        const match = parentLayerPlan.children.find(
+          (clp) =>
+            clp.reason.type === "nullableField" &&
+            this.steps[clp.rootStepId!] === $step,
+        );
+        if (match) {
+          objectLayerPlan = match;
+        } else {
+          objectLayerPlan = Object.assign(
+            new LayerPlan(
+              this,
+              parentLayerPlan,
               {
-                rootStepId: $step.id,
+                type: "nullableField",
+                parentStepId: $step.id,
               },
-            );
+              new Set([polymorphicPath]),
+            ),
+            {
+              rootStepId: $step.id,
+            },
+          );
+        }
+      }
 
       const objectOutputPlan = new OutputPlan(
         objectLayerPlan,
