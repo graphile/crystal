@@ -1230,7 +1230,7 @@ export class OperationPlan {
       let objectLayerPlan: LayerPlan;
       if (
         isNonNull ||
-        (parentLayerPlan.reason.type === "nullableField" &&
+        (parentLayerPlan.reason.type === "nullableBoundary" &&
           this.steps[parentLayerPlan.rootStepId!] === $step)
       ) {
         objectLayerPlan = parentLayerPlan;
@@ -1238,7 +1238,7 @@ export class OperationPlan {
         // Find existing match
         const match = parentLayerPlan.children.find(
           (clp) =>
-            clp.reason.type === "nullableField" &&
+            clp.reason.type === "nullableBoundary" &&
             this.steps[clp.rootStepId!] === $step,
         );
         if (match) {
@@ -1249,7 +1249,7 @@ export class OperationPlan {
               this,
               parentLayerPlan,
               {
-                type: "nullableField",
+                type: "nullableBoundary",
                 parentStepId: $step.id,
               },
               new Set([polymorphicPath]),
@@ -2053,8 +2053,8 @@ export class OperationPlan {
         // Should be safe to hoist.
         break;
       }
-      case "nullableField": {
-        // Safe to hoist _unless_ it depends on the root step of the nullableField.
+      case "nullableBoundary": {
+        // Safe to hoist _unless_ it depends on the root step of the nullableBoundary.
         const $root = this.steps[step.layerPlan.rootStepId!];
         if (step.dependencies.some((dep) => this.steps[dep] === $root)) {
           return;
@@ -2159,7 +2159,7 @@ export class OperationPlan {
       case "defer":
       case "polymorphic":
       case "subroutine":
-      case "nullableField":
+      case "nullableBoundary":
       case "listItem": {
         // Fine to push lower
         break;
@@ -2206,7 +2206,7 @@ export class OperationPlan {
     for (const layerPlan of this.layerPlans) {
       if (!layerPlan) continue;
       if (
-        layerPlan.reason.type === "nullableField" &&
+        layerPlan.reason.type === "nullableBoundary" &&
         this.steps[layerPlan.rootStepId!] === step
       ) {
         layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
@@ -2788,7 +2788,7 @@ export class OperationPlan {
           reason.parentPlanId = this.steps[reason.parentPlanId].id;
           break;
         }
-        case "nullableField": {
+        case "nullableBoundary": {
           reason.parentStepId = this.steps[reason.parentStepId].id;
           break;
         }

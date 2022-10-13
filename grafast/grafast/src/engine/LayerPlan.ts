@@ -22,7 +22,7 @@ export interface LayerPlanReasonRoot {
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonNullableField {
-  type: "nullableField";
+  type: "nullableBoundary";
   /**
    * Can be used such that the same LayerPlan can be used for two selection
    * sets for the same parent plan. In this case an additional output plan

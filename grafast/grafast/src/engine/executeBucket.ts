@@ -640,7 +640,7 @@ export function executeBucket(
     loop: for (const childLayerPlan of childLayerPlans) {
       const copyStepIds = childLayerPlan.copyPlanIds;
       switch (childLayerPlan.reason.type) {
-        case "nullableField": {
+        case "nullableBoundary": {
           const store: Bucket["store"] = new Map();
           const polymorphicPathList: string[] = [];
           const map: Map<number, number> = new Map();
@@ -689,7 +689,7 @@ export function executeBucket(
               store.set(planId, []);
             }
 
-            // We'll typically be creating fewer nullableField bucket entries
+            // We'll typically be creating fewer nullableBoundary bucket entries
             // than we have parent bucket entries (because we exclude nulls), so
             // we must "multiply up" (down) the store entries.
             for (
