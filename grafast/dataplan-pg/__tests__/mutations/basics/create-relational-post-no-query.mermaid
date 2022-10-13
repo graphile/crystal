@@ -359,16 +359,16 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert{1}[13]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[17]<br />3: PgInsert{1}[18]<br />4: PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
     Bucket3("Bucket 3 (mutationField)<br />Deps: 16, 27, 28, 24, 25, 26, 39, 91, 143, 5<br /><br />1: PgInsert{3}[29]<br />2: PgClassExpression{3}ᐸ__relation...ems__.”id”ᐳ[33]<br />3: PgInsert{3}[34]<br />4: PgClassExpression{3}ᐸ__relational_posts__ᐳ[38],PgSelect{3}ᐸrelational_itemsᐳ[40],PgSelect{3}ᐸrelational_itemsᐳ[92],PgSelect{3}ᐸrelational_itemsᐳ[144]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgInsert29,PgClassExpression33,PgInsert34,PgClassExpression38,PgSelect40,First44,PgSelectSingle45,PgClassExpression48,PgSelect92,First96,PgSelectSingle97,PgClassExpression100,PgSelect144,First148,PgSelectSingle149,PgClassExpression152 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 45, 97, 149, 38, 5, 16, 48, 100, 152<br /><br />ROOT PgClassExpression{3}ᐸ__relational_posts__ᐳ[38]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 45, 97, 149, 38, 5, 16, 48, 100, 152<br /><br />ROOT PgClassExpression{3}ᐸ__relational_posts__ᐳ[38]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression46,PgPolymorphic47,PgClassExpression98,PgPolymorphic99,PgClassExpression150,PgPolymorphic151 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 5, 16, 48, 47, 100, 99, 152, 151<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 5, 16, 48, 47, 100, 99, 152, 151<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 16, 48, 47<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
@@ -383,10 +383,10 @@ graph TD
     Bucket9("Bucket 9 (mutationField)<br />Deps: 16, 199, 200, 196, 197, 198, 211, 263, 315, 5<br /><br />1: PgInsert{9}[201]<br />2: PgClassExpression{9}ᐸ__relation...ems__.”id”ᐳ[205]<br />3: PgInsert{9}[206]<br />4: PgClassExpression{9}ᐸ__relational_posts__ᐳ[210],PgSelect{9}ᐸrelational_itemsᐳ[212],PgSelect{9}ᐸrelational_itemsᐳ[264],PgSelect{9}ᐸrelational_itemsᐳ[316]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgInsert201,PgClassExpression205,PgInsert206,PgClassExpression210,PgSelect212,First216,PgSelectSingle217,PgClassExpression220,PgSelect264,First268,PgSelectSingle269,PgClassExpression272,PgSelect316,First320,PgSelectSingle321,PgClassExpression324 bucket9
-    Bucket10("Bucket 10 (nullableField)<br />Deps: 217, 269, 321, 210, 5, 16, 220, 272, 324<br /><br />ROOT PgClassExpression{9}ᐸ__relational_posts__ᐳ[210]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 217, 269, 321, 210, 5, 16, 220, 272, 324<br /><br />ROOT PgClassExpression{9}ᐸ__relational_posts__ᐳ[210]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,PgClassExpression218,PgPolymorphic219,PgClassExpression270,PgPolymorphic271,PgClassExpression322,PgPolymorphic323 bucket10
-    Bucket11("Bucket 11 (nullableField)<br />Deps: 5, 16, 220, 219, 272, 271, 324, 323<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 5, 16, 220, 219, 272, 271, 324, 323<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11 bucket11
     Bucket12("Bucket 12 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 16, 220, 219<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket

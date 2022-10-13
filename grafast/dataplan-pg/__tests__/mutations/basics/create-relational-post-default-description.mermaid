@@ -54,10 +54,10 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 10<br /><br />1: PgInsert{1}[13]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[17]<br />3: PgInsert{1}[18]<br />4: PgClassExpression{1}ᐸ__relational_posts__ᐳ[22],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 22, 30, 23<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 30, 23<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 30<br /><br />ROOT PgSelectSingle{1}ᐸrelational_postsᐳ[30]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{1}ᐸrelational_postsᐳ[30]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket3
     Bucket0 --> Bucket1

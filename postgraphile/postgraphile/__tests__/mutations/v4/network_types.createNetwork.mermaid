@@ -46,10 +46,10 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 11, 12, 13<br /><br />1: PgInsert{1}[14]<br />2: Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert14,Object18 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 18, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Constant19 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 14, 19<br /><br />ROOT PgInsert{1}[14]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14, 19<br /><br />ROOT PgInsert{1}[14]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression20,List21,Lambda22,PgClassExpression24,PgClassExpression25,PgClassExpression26 bucket3
     Bucket0 --> Bucket1

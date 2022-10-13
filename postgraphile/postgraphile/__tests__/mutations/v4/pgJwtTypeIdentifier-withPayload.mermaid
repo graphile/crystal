@@ -65,16 +65,16 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect{1}ᐸauthenticate_payload(mutation)ᐳ[12]<br />2: First{1}[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18,PgClassExpression38 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 15, 38, 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 38, 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect30,First34,PgSelectSingle35 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 17, 15, 35, 38<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[17]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 15, 35, 38<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[17]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgSelect20,First24,PgSelectSingle25,PgClassExpression26,PgClassExpression28 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression36,PgClassExpression37 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression45,PgClassExpression46 bucket5
     Bucket0 --> Bucket1

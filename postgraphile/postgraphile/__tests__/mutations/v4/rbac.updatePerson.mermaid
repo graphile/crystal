@@ -63,16 +63,16 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 23, 9, 11, 25, 16, 17, 26<br /><br />1: PgUpdate{1}[20]<br />2: Object{1}ᐸ{result}ᐳ[24]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdate20,Object24 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 24, 20, 23<br /><br />ROOT Object{1}ᐸ{result}ᐳ[24]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 24, 20, 23<br /><br />ROOT Object{1}ᐸ{result}ᐳ[24]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 20, 23<br /><br />ROOT PgUpdate{1}[20]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 23<br /><br />ROOT PgUpdate{1}[20]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgSelect34,First38,PgSelectSingle39 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ29ᐳ[30]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item30 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 39<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrl_1ᐳ[39]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrl_1ᐳ[39]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression40 bucket5
     Bucket0 --> Bucket1

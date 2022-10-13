@@ -163,43 +163,43 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 96, 98, 101, 104, 107, 113, 119, 125, 127<br /><br />1: PgInsert{1}[93]<br />2: Object{1}ᐸ{result}ᐳ[97]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert93,Object97 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 97, 93<br /><br />ROOT Object{1}ᐸ{result}ᐳ[97]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 97, 93<br /><br />ROOT Object{1}ᐸ{result}ᐳ[97]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 93<br /><br />ROOT PgInsert{1}[93]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 93<br /><br />ROOT PgInsert{1}[93]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression128,PgClassExpression129,PgClassExpression132,PgClassExpression139,PgClassExpression146,PgClassExpression153,PgClassExpression159,PgClassExpression165,PgClassExpression170 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 129<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”point”ᐳ[129]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 129<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”point”ᐳ[129]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 132<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”line”ᐳ[132]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 132<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”line”ᐳ[132]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableField)<br />Deps: 139<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”lseg”ᐳ[139]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 139<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”lseg”ᐳ[139]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
-    Bucket7("Bucket 7 (nullableField)<br />Deps: 146<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”box”ᐳ[146]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 146<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”box”ᐳ[146]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7
-    Bucket8("Bucket 8 (nullableField)<br />Deps: 153<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”open_path”ᐳ[153]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 153<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”open_path”ᐳ[153]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,Access155 bucket8
     Bucket9("Bucket 9 (listItem)<br />ROOT __Item{9}ᐸ155ᐳ[156]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,__Item156 bucket9
-    Bucket10("Bucket 10 (nullableField)<br />Deps: 159<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”closed_path”ᐳ[159]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 159<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”closed_path”ᐳ[159]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,Access161 bucket10
     Bucket11("Bucket 11 (listItem)<br />ROOT __Item{11}ᐸ161ᐳ[162]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,__Item162 bucket11
-    Bucket12("Bucket 12 (nullableField)<br />Deps: 165<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”polygon”ᐳ[165]"):::bucket
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 165<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”polygon”ᐳ[165]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,Access166 bucket12
     Bucket13("Bucket 13 (listItem)<br />ROOT __Item{13}ᐸ166ᐳ[167]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item167 bucket13
-    Bucket14("Bucket 14 (nullableField)<br />Deps: 170<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”circle”ᐳ[170]"):::bucket
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 170<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”circle”ᐳ[170]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14 bucket14
     Bucket0 --> Bucket1

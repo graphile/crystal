@@ -104,25 +104,25 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 9, 12<br /><br />ROOT PgDelete{1}[9]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgDelete{1}[9]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13,PgClassExpression14,PgSelect15,First19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 20<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[20]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[20]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgSelectSingle31,PgClassExpression32,PgSelectSingle39,PgSelectSingle46,Map91,Map95,Map99 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 46<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[46]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[46]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression47,PgClassExpression48 bucket4
     Bucket5("Bucket 5 (mutationField)<br />Deps: 12, 50"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgDelete51 bucket5
-    Bucket6("Bucket 6 (nullableField)<br />Deps: 51, 12<br /><br />ROOT PgDelete{5}[51]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 12<br /><br />ROOT PgDelete{5}[51]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62 bucket6
-    Bucket7("Bucket 7 (nullableField)<br />Deps: 62<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 62<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgSelectSingle88,Map93,Map97,Map101 bucket7
-    Bucket8("Bucket 8 (nullableField)<br />Deps: 88<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[88]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 88<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[88]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression89,PgClassExpression90 bucket8
     Bucket0 --> Bucket1 & Bucket5

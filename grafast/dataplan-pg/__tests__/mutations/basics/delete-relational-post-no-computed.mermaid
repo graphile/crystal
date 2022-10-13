@@ -36,13 +36,13 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 9<br /><br />ROOT PgDelete{1}[9]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9<br /><br />ROOT PgDelete{1}[9]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13 bucket2
     Bucket3("Bucket 3 (mutationField)<br />Deps: 12, 15"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgDelete16 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 16<br /><br />ROOT PgDelete{3}[16]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgDelete{3}[16]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression20 bucket4
     Bucket0 --> Bucket1 & Bucket3

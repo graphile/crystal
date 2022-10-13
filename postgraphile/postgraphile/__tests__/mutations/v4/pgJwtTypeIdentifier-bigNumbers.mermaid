@@ -39,7 +39,7 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect{1}ᐸauthenticate(mutation)ᐳ[12]<br />2: First{1}[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression19 bucket2
     Bucket0 --> Bucket1

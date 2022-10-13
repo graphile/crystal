@@ -191,10 +191,10 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 13, 14, 19, 20, 28, 80, 132, 5<br /><br />1: PgSelect{1}ᐸrelational_posts(mutation)ᐳ[9]<br />2: PgSelect{1}ᐸrelational_posts(mutation)ᐳ[15]<br />3: PgSelect{1}ᐸrelational_posts(mutation)ᐳ[21]<br />4: First{1}[25],PgSelect{1}ᐸrelational_itemsᐳ[29],PgSelect{1}ᐸrelational_itemsᐳ[81],PgSelect{1}ᐸrelational_itemsᐳ[133]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect9,PgSelect15,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgSelect29,First33,PgSelectSingle34,PgClassExpression37,PgSelect81,First85,PgSelectSingle86,PgClassExpression89,PgSelect133,First137,PgSelectSingle138,PgClassExpression141 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 34, 86, 138, 27, 5, 12, 37, 89, 141<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[27]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 34, 86, 138, 27, 5, 12, 37, 89, 141<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[27]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression35,PgPolymorphic36,PgClassExpression87,PgPolymorphic88,PgClassExpression139,PgPolymorphic140 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 5, 12, 37, 36, 89, 88, 141, 140<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 5, 12, 37, 36, 89, 88, 141, 140<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
     Bucket4("Bucket 4 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 12, 37, 36<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket

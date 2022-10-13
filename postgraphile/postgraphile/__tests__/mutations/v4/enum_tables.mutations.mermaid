@@ -67,25 +67,25 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9<br /><br />1: PgDelete{1}[10]<br />2: Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete10,Object14 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 14, 10<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 10<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 10<br /><br />ROOT PgDelete{1}[10]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10<br /><br />ROOT PgDelete{1}[10]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression15,PgClassExpression16,PgClassExpression17 bucket3
     Bucket4("Bucket 4 (mutationField)<br />Deps: 13, 22, 23, 24<br /><br />1: PgInsert{4}[25]<br />2: Object{4}ᐸ{result}ᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgInsert25,Object29 bucket4
-    Bucket5("Bucket 5 (nullableField)<br />Deps: 29, 25<br /><br />ROOT Object{4}ᐸ{result}ᐳ[29]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 29, 25<br /><br />ROOT Object{4}ᐸ{result}ᐳ[29]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableField)<br />Deps: 25<br /><br />ROOT PgInsert{4}[25]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 25<br /><br />ROOT PgInsert{4}[25]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket6
     Bucket7("Bucket 7 (mutationField)<br />Deps: 13, 41<br /><br />1: PgSelect{7}ᐸreferencing_table_mutation(mutation)ᐳ[42]<br />2: First{7}[46]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgSelect42,First46,PgSelectSingle47,PgClassExpression48,Object49 bucket7
-    Bucket8("Bucket 8 (nullableField)<br />Deps: 49, 48<br /><br />ROOT Object{7}ᐸ{result}ᐳ[49]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 49, 48<br /><br />ROOT Object{7}ᐸ{result}ᐳ[49]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8 bucket8
     Bucket0 --> Bucket1 & Bucket4 & Bucket7

@@ -208,10 +208,10 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 14, 15, 16, 21, 22, 28, 29, 30, 35, 36, 42, 43, 44, 50, 102, 154, 5<br /><br />1: PgInsert{1}[9]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[13]<br />3: PgInsert{1}[17]<br />4: PgInsert{1}[23]<br />5: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[27]<br />6: PgInsert{1}[31]<br />7: PgInsert{1}[37]<br />8: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[41]<br />9: PgInsert{1}[45]<br />10: PgClassExpression{1}ᐸ__relational_posts__ᐳ[49],PgSelect{1}ᐸrelational_itemsᐳ[51],PgSelect{1}ᐸrelational_itemsᐳ[103],PgSelect{1}ᐸrelational_itemsᐳ[155]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert9,PgClassExpression13,PgInsert17,PgInsert23,PgClassExpression27,PgInsert31,PgInsert37,PgClassExpression41,PgInsert45,PgClassExpression49,PgSelect51,First55,PgSelectSingle56,PgClassExpression59,PgSelect103,First107,PgSelectSingle108,PgClassExpression111,PgSelect155,First159,PgSelectSingle160,PgClassExpression163 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 56, 108, 160, 49, 5, 12, 59, 111, 163<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[49]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 56, 108, 160, 49, 5, 12, 59, 111, 163<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[49]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression57,PgPolymorphic58,PgClassExpression109,PgPolymorphic110,PgClassExpression161,PgPolymorphic162 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 5, 12, 59, 58, 111, 110, 163, 162<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 5, 12, 59, 58, 111, 110, 163, 162<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
     Bucket4("Bucket 4 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 12, 59, 58<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket

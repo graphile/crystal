@@ -36,16 +36,16 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
-    Bucket1("Bucket 1 (nullableField)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrangeTestᐳ[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrangeTestᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14 bucket1
-    Bucket2("Bucket 2 (nullableField)<br />Deps: 14<br /><br />ROOT PgClassExpression{1}ᐸ__range_test__.”num”ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgClassExpression{1}ᐸ__range_test__.”num”ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Access15,Access18 bucket2
-    Bucket3("Bucket 3 (nullableField)<br />Deps: 15, 14<br /><br />ROOT Access{2}ᐸ14.startᐳ[15]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 14<br /><br />ROOT Access{2}ᐸ14.startᐳ[15]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
-    Bucket4("Bucket 4 (nullableField)<br />Deps: 18, 14<br /><br />ROOT Access{2}ᐸ14.endᐳ[18]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 14<br /><br />ROOT Access{2}ᐸ14.endᐳ[18]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     Bucket0 --> Bucket1
