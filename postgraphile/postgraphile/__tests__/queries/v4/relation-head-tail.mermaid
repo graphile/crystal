@@ -3,62 +3,63 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access31["Access[31∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access32["Access[32∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object33["Object[33∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection34["Connection[34∈0]<br />ᐸ30ᐳ"]:::plan
-    __InputStaticLeaf81["__InputStaticLeaf[81∈1]"]:::plan
+    Access31{{"Access[31∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access32{{"Access[32∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object33{{"Object[33∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection34{{"Connection[34∈0]<br />ᐸ30ᐳ"}}:::plan
+    __InputStaticLeaf81{{"__InputStaticLeaf[81∈1]"}}:::plan
     PgSelect35[["PgSelect[35∈1]<br />ᐸpersonᐳ"]]:::plan
-    __Item36>"__Item[36∈2]<br />ᐸ35ᐳ"]:::itemplan
-    PgSelectSingle37["PgSelectSingle[37∈2]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38∈3]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression39["PgClassExpression[39∈3]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    __InputStaticLeaf41["__InputStaticLeaf[41∈1]"]:::plan
-    Connection65["Connection[65∈1]<br />ᐸ61ᐳ"]:::plan
-    Access195["Access[195∈3]<br />ᐸ36.1ᐳ"]:::plan
-    Reverse196["Reverse[196∈3]"]:::plan
-    __Item67>"__Item[67∈4]<br />ᐸ196ᐳ"]:::itemplan
-    PgSelectSingle68["PgSelectSingle[68∈4]<br />ᐸpostᐳ"]:::plan
-    PgClassExpression69["PgClassExpression[69∈5]<br />ᐸ__post__.”headline”ᐳ"]:::plan
-    PgClassExpression70["PgClassExpression[70∈5]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
-    Connection96["Connection[96∈1]<br />ᐸ92ᐳ"]:::plan
-    Access198["Access[198∈3]<br />ᐸ36.2ᐳ"]:::plan
-    __Item98>"__Item[98∈6]<br />ᐸ198ᐳ"]:::itemplan
-    PgSelectSingle99["PgSelectSingle[99∈6]<br />ᐸpostᐳ"]:::plan
-    PgClassExpression100["PgClassExpression[100∈7]<br />ᐸ__post__.”headline”ᐳ"]:::plan
-    PgClassExpression101["PgClassExpression[101∈7]<br />ᐸ__post__.”author_id”ᐳ"]:::plan
-    Connection119["Connection[119∈1]<br />ᐸ115ᐳ"]:::plan
-    Access200["Access[200∈3]<br />ᐸ36.4ᐳ"]:::plan
-    __Item121>"__Item[121∈8]<br />ᐸ200ᐳ"]:::itemplan
-    PgSelectSingle122["PgSelectSingle[122∈8]<br />ᐸcompoundKeyᐳ"]:::plan
-    PgClassExpression123["PgClassExpression[123∈9]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
-    PgClassExpression124["PgClassExpression[124∈9]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
-    Connection142["Connection[142∈1]<br />ᐸ138ᐳ"]:::plan
-    Access199["Access[199∈3]<br />ᐸ36.3ᐳ"]:::plan
-    __Item144>"__Item[144∈10]<br />ᐸ199ᐳ"]:::itemplan
-    PgSelectSingle145["PgSelectSingle[145∈10]<br />ᐸcompoundKeyᐳ"]:::plan
-    PgClassExpression146["PgClassExpression[146∈11]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
-    PgClassExpression147["PgClassExpression[147∈11]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
-    Connection164["Connection[164∈0]<br />ᐸ160ᐳ"]:::plan
+    __Item36[/"__Item[36∈2]<br />ᐸ35ᐳ"\]:::itemplan
+    PgSelectSingle37{{"PgSelectSingle[37∈2]<br />ᐸpersonᐳ"}}:::plan
+    PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    __InputStaticLeaf41{{"__InputStaticLeaf[41∈1]"}}:::plan
+    Connection65{{"Connection[65∈1]<br />ᐸ61ᐳ"}}:::plan
+    Access195{{"Access[195∈3]<br />ᐸ36.1ᐳ"}}:::plan
+    Reverse196{{"Reverse[196∈3]"}}:::plan
+    __Item67[/"__Item[67∈4]<br />ᐸ196ᐳ"\]:::itemplan
+    PgSelectSingle68{{"PgSelectSingle[68∈4]<br />ᐸpostᐳ"}}:::plan
+    PgClassExpression69{{"PgClassExpression[69∈5]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
+    PgClassExpression70{{"PgClassExpression[70∈5]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
+    Connection96{{"Connection[96∈1]<br />ᐸ92ᐳ"}}:::plan
+    Access198{{"Access[198∈3]<br />ᐸ36.2ᐳ"}}:::plan
+    __Item98[/"__Item[98∈6]<br />ᐸ198ᐳ"\]:::itemplan
+    PgSelectSingle99{{"PgSelectSingle[99∈6]<br />ᐸpostᐳ"}}:::plan
+    PgClassExpression100{{"PgClassExpression[100∈7]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
+    PgClassExpression101{{"PgClassExpression[101∈7]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
+    Connection119{{"Connection[119∈1]<br />ᐸ115ᐳ"}}:::plan
+    Access200{{"Access[200∈3]<br />ᐸ36.4ᐳ"}}:::plan
+    __Item121[/"__Item[121∈8]<br />ᐸ200ᐳ"\]:::itemplan
+    PgSelectSingle122{{"PgSelectSingle[122∈8]<br />ᐸcompoundKeyᐳ"}}:::plan
+    PgClassExpression123{{"PgClassExpression[123∈9]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgClassExpression124{{"PgClassExpression[124∈9]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    Connection142{{"Connection[142∈1]<br />ᐸ138ᐳ"}}:::plan
+    Access199{{"Access[199∈3]<br />ᐸ36.3ᐳ"}}:::plan
+    __Item144[/"__Item[144∈10]<br />ᐸ199ᐳ"\]:::itemplan
+    PgSelectSingle145{{"PgSelectSingle[145∈10]<br />ᐸcompoundKeyᐳ"}}:::plan
+    PgClassExpression146{{"PgClassExpression[146∈11]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgClassExpression147{{"PgClassExpression[147∈11]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    Connection164{{"Connection[164∈0]<br />ᐸ160ᐳ"}}:::plan
     PgSelect165[["PgSelect[165∈12]<br />ᐸcompoundKeyᐳ"]]:::plan
-    __Item166>"__Item[166∈13]<br />ᐸ165ᐳ"]:::itemplan
-    PgSelectSingle167["PgSelectSingle[167∈13]<br />ᐸcompoundKeyᐳ"]:::plan
-    PgClassExpression168["PgClassExpression[168∈14]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
-    PgClassExpression169["PgClassExpression[169∈14]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
-    Connection188["Connection[188∈12]<br />ᐸ184ᐳ"]:::plan
-    Access197["Access[197∈14]<br />ᐸ166.0ᐳ"]:::plan
-    __Item190>"__Item[190∈15]<br />ᐸ197ᐳ"]:::itemplan
-    PgSelectSingle191["PgSelectSingle[191∈15]<br />ᐸforeignKeyᐳ"]:::plan
-    PgClassExpression192["PgClassExpression[192∈16]<br />ᐸ__foreign_...person_id”ᐳ"]:::plan
-    PgClassExpression193["PgClassExpression[193∈16]<br />ᐸ__foreign_...und_key_1”ᐳ"]:::plan
-    PgClassExpression194["PgClassExpression[194∈16]<br />ᐸ__foreign_...und_key_2”ᐳ"]:::plan
+    __Item166[/"__Item[166∈13]<br />ᐸ165ᐳ"\]:::itemplan
+    PgSelectSingle167{{"PgSelectSingle[167∈13]<br />ᐸcompoundKeyᐳ"}}:::plan
+    PgClassExpression168{{"PgClassExpression[168∈14]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgClassExpression169{{"PgClassExpression[169∈14]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    Connection188{{"Connection[188∈12]<br />ᐸ184ᐳ"}}:::plan
+    Access197{{"Access[197∈14]<br />ᐸ166.0ᐳ"}}:::plan
+    __Item190[/"__Item[190∈15]<br />ᐸ197ᐳ"\]:::itemplan
+    PgSelectSingle191{{"PgSelectSingle[191∈15]<br />ᐸforeignKeyᐳ"}}:::plan
+    PgClassExpression192{{"PgClassExpression[192∈16]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
+    PgClassExpression193{{"PgClassExpression[193∈16]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
+    PgClassExpression194{{"PgClassExpression[194∈16]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access31

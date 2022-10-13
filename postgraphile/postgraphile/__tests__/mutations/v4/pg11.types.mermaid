@@ -3,69 +3,70 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
-    __InputStaticLeaf12["__InputStaticLeaf[12∈0]"]:::plan
-    __InputStaticLeaf13["__InputStaticLeaf[13∈0]"]:::plan
-    __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
-    __InputStaticLeaf16["__InputStaticLeaf[16∈0]"]:::plan
-    __InputStaticLeaf17["__InputStaticLeaf[17∈0]"]:::plan
-    __InputStaticLeaf20["__InputStaticLeaf[20∈0]"]:::plan
-    Access35["Access[35∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access36["Access[36∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object37["Object[37∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    List39["List[39∈0]<br />ᐸ15,16,17ᐳ"]:::plan
-    Object40["Object[40∈0]<br />ᐸ{a}ᐳ"]:::plan
+    __InputStaticLeaf9{{"__InputStaticLeaf[9∈0]"}}:::plan
+    __InputStaticLeaf12{{"__InputStaticLeaf[12∈0]"}}:::plan
+    __InputStaticLeaf13{{"__InputStaticLeaf[13∈0]"}}:::plan
+    __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
+    __InputStaticLeaf16{{"__InputStaticLeaf[16∈0]"}}:::plan
+    __InputStaticLeaf17{{"__InputStaticLeaf[17∈0]"}}:::plan
+    __InputStaticLeaf20{{"__InputStaticLeaf[20∈0]"}}:::plan
+    Access35{{"Access[35∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access36{{"Access[36∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object37{{"Object[37∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    List39{{"List[39∈0]<br />ᐸ15,16,17ᐳ"}}:::plan
+    Object40{{"Object[40∈0]<br />ᐸ{a}ᐳ"}}:::plan
     PgUpdate34[["PgUpdate[34∈1]"]]:::sideeffectplan
-    Object38["Object[38∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression41["PgClassExpression[41∈3]<br />ᐸ__types__.”id”ᐳ"]:::plan
-    PgClassExpression42["PgClassExpression[42∈3]<br />ᐸ__types__.”regrole”ᐳ"]:::plan
-    PgClassExpression43["PgClassExpression[43∈3]<br />ᐸ__types__....namespace”ᐳ"]:::plan
-    PgClassExpression44["PgClassExpression[44∈3]<br />ᐸ__types__....ay_domain”ᐳ"]:::plan
-    __Item45>"__Item[45∈4]<br />ᐸ44ᐳ"]:::itemplan
-    PgClassExpression46["PgClassExpression[46∈3]<br />ᐸ__types__....ound_type”ᐳ"]:::plan
+    Object38{{"Object[38∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__types__.”id”ᐳ"}}:::plan
+    PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
+    PgClassExpression43{{"PgClassExpression[43∈3]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈3]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
+    __Item45[/"__Item[45∈4]<br />ᐸ44ᐳ"\]:::itemplan
+    PgClassExpression46{{"PgClassExpression[46∈3]<br />ᐸ__types__....ound_type”ᐳ"}}:::plan
     PgSelect47[["PgSelect[47∈3]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"]]:::plan
-    First51["First[51∈3]"]:::plan
-    PgSelectSingle52["PgSelectSingle[52∈3]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"]:::plan
-    PgClassExpression53["PgClassExpression[53∈5]<br />ᐸ__frmcdc_d...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression54["PgClassExpression[54∈5]<br />ᐸ__frmcdc_d...pe_1__.”b”ᐳ"]:::plan
-    PgClassExpression55["PgClassExpression[55∈5]<br />ᐸ__frmcdc_d...pe_1__.”c”ᐳ"]:::plan
-    PgClassExpression56["PgClassExpression[56∈5]<br />ᐸ__frmcdc_d...pe_1__.”d”ᐳ"]:::plan
-    PgClassExpression57["PgClassExpression[57∈5]<br />ᐸ__frmcdc_d...pe_1__.”e”ᐳ"]:::plan
-    PgClassExpression58["PgClassExpression[58∈5]<br />ᐸ__frmcdc_d...pe_1__.”f”ᐳ"]:::plan
-    PgClassExpression59["PgClassExpression[59∈5]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"]:::plan
-    __InputStaticLeaf64["__InputStaticLeaf[64∈0]"]:::plan
-    __InputStaticLeaf65["__InputStaticLeaf[65∈0]"]:::plan
-    __InputStaticLeaf67["__InputStaticLeaf[67∈0]"]:::plan
-    __InputStaticLeaf68["__InputStaticLeaf[68∈0]"]:::plan
-    __InputStaticLeaf69["__InputStaticLeaf[69∈0]"]:::plan
-    __InputStaticLeaf72["__InputStaticLeaf[72∈0]"]:::plan
-    List91["List[91∈0]<br />ᐸ67,68,69ᐳ"]:::plan
-    Object92["Object[92∈0]<br />ᐸ{a}ᐳ"]:::plan
+    First51{{"First[51∈3]"}}:::plan
+    PgSelectSingle52{{"PgSelectSingle[52∈3]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"}}:::plan
+    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ__frmcdc_d...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈5]<br />ᐸ__frmcdc_d...pe_1__.”b”ᐳ"}}:::plan
+    PgClassExpression55{{"PgClassExpression[55∈5]<br />ᐸ__frmcdc_d...pe_1__.”c”ᐳ"}}:::plan
+    PgClassExpression56{{"PgClassExpression[56∈5]<br />ᐸ__frmcdc_d...pe_1__.”d”ᐳ"}}:::plan
+    PgClassExpression57{{"PgClassExpression[57∈5]<br />ᐸ__frmcdc_d...pe_1__.”e”ᐳ"}}:::plan
+    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__frmcdc_d...pe_1__.”f”ᐳ"}}:::plan
+    PgClassExpression59{{"PgClassExpression[59∈5]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
+    __InputStaticLeaf64{{"__InputStaticLeaf[64∈0]"}}:::plan
+    __InputStaticLeaf65{{"__InputStaticLeaf[65∈0]"}}:::plan
+    __InputStaticLeaf67{{"__InputStaticLeaf[67∈0]"}}:::plan
+    __InputStaticLeaf68{{"__InputStaticLeaf[68∈0]"}}:::plan
+    __InputStaticLeaf69{{"__InputStaticLeaf[69∈0]"}}:::plan
+    __InputStaticLeaf72{{"__InputStaticLeaf[72∈0]"}}:::plan
+    List91{{"List[91∈0]<br />ᐸ67,68,69ᐳ"}}:::plan
+    Object92{{"Object[92∈0]<br />ᐸ{a}ᐳ"}}:::plan
     PgInsert86[["PgInsert[86∈6]"]]:::sideeffectplan
-    Object90["Object[90∈6]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression93["PgClassExpression[93∈8]<br />ᐸ__types__.”id”ᐳ"]:::plan
-    PgClassExpression94["PgClassExpression[94∈8]<br />ᐸ__types__.”regrole”ᐳ"]:::plan
-    PgClassExpression95["PgClassExpression[95∈8]<br />ᐸ__types__....namespace”ᐳ"]:::plan
-    PgClassExpression96["PgClassExpression[96∈8]<br />ᐸ__types__....ay_domain”ᐳ"]:::plan
-    __Item97>"__Item[97∈9]<br />ᐸ96ᐳ"]:::itemplan
-    PgClassExpression98["PgClassExpression[98∈8]<br />ᐸ__types__....ound_type”ᐳ"]:::plan
+    Object90{{"Object[90∈6]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression93{{"PgClassExpression[93∈8]<br />ᐸ__types__.”id”ᐳ"}}:::plan
+    PgClassExpression94{{"PgClassExpression[94∈8]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
+    PgClassExpression95{{"PgClassExpression[95∈8]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
+    PgClassExpression96{{"PgClassExpression[96∈8]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
+    __Item97[/"__Item[97∈9]<br />ᐸ96ᐳ"\]:::itemplan
+    PgClassExpression98{{"PgClassExpression[98∈8]<br />ᐸ__types__....ound_type”ᐳ"}}:::plan
     PgSelect99[["PgSelect[99∈8]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"]]:::plan
-    First103["First[103∈8]"]:::plan
-    PgSelectSingle104["PgSelectSingle[104∈8]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"]:::plan
-    PgClassExpression105["PgClassExpression[105∈10]<br />ᐸ__frmcdc_d...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression106["PgClassExpression[106∈10]<br />ᐸ__frmcdc_d...pe_1__.”b”ᐳ"]:::plan
-    PgClassExpression107["PgClassExpression[107∈10]<br />ᐸ__frmcdc_d...pe_1__.”c”ᐳ"]:::plan
-    PgClassExpression108["PgClassExpression[108∈10]<br />ᐸ__frmcdc_d...pe_1__.”d”ᐳ"]:::plan
-    PgClassExpression109["PgClassExpression[109∈10]<br />ᐸ__frmcdc_d...pe_1__.”e”ᐳ"]:::plan
-    PgClassExpression110["PgClassExpression[110∈10]<br />ᐸ__frmcdc_d...pe_1__.”f”ᐳ"]:::plan
-    PgClassExpression111["PgClassExpression[111∈10]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"]:::plan
+    First103{{"First[103∈8]"}}:::plan
+    PgSelectSingle104{{"PgSelectSingle[104∈8]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"}}:::plan
+    PgClassExpression105{{"PgClassExpression[105∈10]<br />ᐸ__frmcdc_d...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression106{{"PgClassExpression[106∈10]<br />ᐸ__frmcdc_d...pe_1__.”b”ᐳ"}}:::plan
+    PgClassExpression107{{"PgClassExpression[107∈10]<br />ᐸ__frmcdc_d...pe_1__.”c”ᐳ"}}:::plan
+    PgClassExpression108{{"PgClassExpression[108∈10]<br />ᐸ__frmcdc_d...pe_1__.”d”ᐳ"}}:::plan
+    PgClassExpression109{{"PgClassExpression[109∈10]<br />ᐸ__frmcdc_d...pe_1__.”e”ᐳ"}}:::plan
+    PgClassExpression110{{"PgClassExpression[110∈10]<br />ᐸ__frmcdc_d...pe_1__.”f”ᐳ"}}:::plan
+    PgClassExpression111{{"PgClassExpression[111∈10]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access35
@@ -116,7 +117,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf20,Access35,Access36,Object37,List39,Object40,__InputStaticLeaf64,__InputStaticLeaf65,__InputStaticLeaf67,__InputStaticLeaf68,__InputStaticLeaf69,__InputStaticLeaf72,List91,Object92 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 37, 9, 12, 13, 39, 40<br /><br />1: PgUpdate{1}[34]<br />2: Object{1}ᐸ{result}ᐳ[38]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 37, 9, 12, 13, 39, 40<br /><br />1: PgUpdate[34]<br />2: Object[38]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdate34,Object38 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 38, 34, 37<br /><br />ROOT Object{1}ᐸ{result}ᐳ[38]"):::bucket
@@ -131,7 +132,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 52<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ[52]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression53,PgClassExpression54,PgClassExpression55,PgClassExpression56,PgClassExpression57,PgClassExpression58,PgClassExpression59 bucket5
-    Bucket6("Bucket 6 (mutationField)<br />Deps: 37, 64, 65, 91, 92<br /><br />1: PgInsert{6}[86]<br />2: Object{6}ᐸ{result}ᐳ[90]"):::bucket
+    Bucket6("Bucket 6 (mutationField)<br />Deps: 37, 64, 65, 91, 92<br /><br />1: PgInsert[86]<br />2: Object[90]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgInsert86,Object90 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 90, 86, 37<br /><br />ROOT Object{6}ᐸ{result}ᐳ[90]"):::bucket

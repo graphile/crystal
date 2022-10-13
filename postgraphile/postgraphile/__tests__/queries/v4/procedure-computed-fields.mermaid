@@ -3,169 +3,170 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access197["Access[197∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access198["Access[198∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object199["Object[199∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection200["Connection[200∈0]<br />ᐸ196ᐳ"]:::plan
+    Access197{{"Access[197∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access198{{"Access[198∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object199{{"Object[199∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection200{{"Connection[200∈0]<br />ᐸ196ᐳ"}}:::plan
     PgSelect201[["PgSelect[201∈1]<br />ᐸtypesᐳ"]]:::plan
-    __Item202>"__Item[202∈2]<br />ᐸ201ᐳ"]:::itemplan
-    PgSelectSingle203["PgSelectSingle[203∈2]<br />ᐸtypesᐳ"]:::plan
-    Map558["Map[558∈3]<br />ᐸ203:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"]:::plan
-    PgSelectSingle210["PgSelectSingle[210∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
-    PgClassExpression211["PgClassExpression[211∈3]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression212["PgClassExpression[212∈3]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
-    PgClassExpression214["PgClassExpression[214∈3]<br />ᐸ”c”.”compo..._type_1__)ᐳ"]:::plan
-    Map568["Map[568∈3]<br />ᐸ203:{”0”:5,”1”:6,”2”:7,”3”:8,”4”:9,”5”:10,”6”:11,”7”:12,”8”:13,”9”:14,”10”:15}ᐳ"]:::plan
-    PgSelectSingle221["PgSelectSingle[221∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"]:::plan
-    Map562["Map[562∈3]<br />ᐸ221:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"]:::plan
-    PgSelectSingle228["PgSelectSingle[228∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
-    PgClassExpression229["PgClassExpression[229∈4]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression230["PgClassExpression[230∈4]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
-    PgClassExpression232["PgClassExpression[232∈4]<br />ᐸ”c”.”compo..._type_1__)ᐳ"]:::plan
-    Map565["Map[565∈3]<br />ᐸ221:{”0”:5,”1”:6,”2”:7,”3”:8}ᐳ"]:::plan
-    PgSelectSingle239["PgSelectSingle[239∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
-    PgClassExpression240["PgClassExpression[240∈5]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression241["PgClassExpression[241∈5]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
-    PgClassExpression243["PgClassExpression[243∈5]<br />ᐸ”c”.”compo..._type_1__)ᐳ"]:::plan
-    Map571["Map[571∈3]<br />ᐸ203:{”0”:17,”1”:18,”2”:19,”3”:20}ᐳ"]:::plan
-    PgSelectSingle250["PgSelectSingle[250∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
-    PgClassExpression251["PgClassExpression[251∈6]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression252["PgClassExpression[252∈6]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
-    PgClassExpression254["PgClassExpression[254∈6]<br />ᐸ”c”.”compo..._type_1__)ᐳ"]:::plan
-    Map579["Map[579∈3]<br />ᐸ203:{”0”:22,”1”:23,”2”:24,”3”:25,”4”:26,”5”:27,”6”:28,”7”:29,”8”:30,”9”:31,”10”:32}ᐳ"]:::plan
-    PgSelectSingle261["PgSelectSingle[261∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"]:::plan
-    Map575["Map[575∈7]<br />ᐸ261:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"]:::plan
-    PgSelectSingle268["PgSelectSingle[268∈7]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
-    PgClassExpression269["PgClassExpression[269∈8]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression270["PgClassExpression[270∈8]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
-    PgClassExpression272["PgClassExpression[272∈8]<br />ᐸ”c”.”compo..._type_1__)ᐳ"]:::plan
-    Map577["Map[577∈7]<br />ᐸ261:{”0”:4,”1”:5,”2”:6,”3”:7}ᐳ"]:::plan
-    PgSelectSingle279["PgSelectSingle[279∈7]<br />ᐸfrmcdc_compoundType_1ᐳ"]:::plan
-    PgClassExpression280["PgClassExpression[280∈9]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"]:::plan
-    PgClassExpression281["PgClassExpression[281∈9]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"]:::plan
-    PgClassExpression283["PgClassExpression[283∈9]<br />ᐸ”c”.”compo..._type_1__)ᐳ"]:::plan
-    Connection308["Connection[308∈0]<br />ᐸ304ᐳ"]:::plan
-    __InputStaticLeaf317["__InputStaticLeaf[317∈10]"]:::plan
-    __InputStaticLeaf321["__InputStaticLeaf[321∈10]"]:::plan
-    __InputStaticLeaf322["__InputStaticLeaf[322∈10]"]:::plan
-    __InputStaticLeaf329["__InputStaticLeaf[329∈10]"]:::plan
-    __InputStaticLeaf333["__InputStaticLeaf[333∈10]"]:::plan
-    __InputStaticLeaf334["__InputStaticLeaf[334∈10]"]:::plan
-    __InputStaticLeaf349["__InputStaticLeaf[349∈10]"]:::plan
-    __InputStaticLeaf350["__InputStaticLeaf[350∈10]"]:::plan
+    __Item202[/"__Item[202∈2]<br />ᐸ201ᐳ"\]:::itemplan
+    PgSelectSingle203{{"PgSelectSingle[203∈2]<br />ᐸtypesᐳ"}}:::plan
+    Map558{{"Map[558∈3]<br />ᐸ203:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
+    PgSelectSingle210{{"PgSelectSingle[210∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
+    PgClassExpression211{{"PgClassExpression[211∈3]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression212{{"PgClassExpression[212∈3]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression214{{"PgClassExpression[214∈3]<br />ᐸ”c”.”compo..._type_1__)ᐳ"}}:::plan
+    Map568{{"Map[568∈3]<br />ᐸ203:{”0”:5,”1”:6,”2”:7,”3”:8,”4”:9,”5”:10,”6”:11,”7”:12,”8”:13,”9”:14,”10”:15}ᐳ"}}:::plan
+    PgSelectSingle221{{"PgSelectSingle[221∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"}}:::plan
+    Map562{{"Map[562∈3]<br />ᐸ221:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
+    PgSelectSingle228{{"PgSelectSingle[228∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
+    PgClassExpression229{{"PgClassExpression[229∈4]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression230{{"PgClassExpression[230∈4]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression232{{"PgClassExpression[232∈4]<br />ᐸ”c”.”compo..._type_1__)ᐳ"}}:::plan
+    Map565{{"Map[565∈3]<br />ᐸ221:{”0”:5,”1”:6,”2”:7,”3”:8}ᐳ"}}:::plan
+    PgSelectSingle239{{"PgSelectSingle[239∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
+    PgClassExpression240{{"PgClassExpression[240∈5]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression241{{"PgClassExpression[241∈5]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression243{{"PgClassExpression[243∈5]<br />ᐸ”c”.”compo..._type_1__)ᐳ"}}:::plan
+    Map571{{"Map[571∈3]<br />ᐸ203:{”0”:17,”1”:18,”2”:19,”3”:20}ᐳ"}}:::plan
+    PgSelectSingle250{{"PgSelectSingle[250∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
+    PgClassExpression251{{"PgClassExpression[251∈6]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression252{{"PgClassExpression[252∈6]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression254{{"PgClassExpression[254∈6]<br />ᐸ”c”.”compo..._type_1__)ᐳ"}}:::plan
+    Map579{{"Map[579∈3]<br />ᐸ203:{”0”:22,”1”:23,”2”:24,”3”:25,”4”:26,”5”:27,”6”:28,”7”:29,”8”:30,”9”:31,”10”:32}ᐳ"}}:::plan
+    PgSelectSingle261{{"PgSelectSingle[261∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"}}:::plan
+    Map575{{"Map[575∈7]<br />ᐸ261:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
+    PgSelectSingle268{{"PgSelectSingle[268∈7]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
+    PgClassExpression269{{"PgClassExpression[269∈8]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression270{{"PgClassExpression[270∈8]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression272{{"PgClassExpression[272∈8]<br />ᐸ”c”.”compo..._type_1__)ᐳ"}}:::plan
+    Map577{{"Map[577∈7]<br />ᐸ261:{”0”:4,”1”:5,”2”:6,”3”:7}ᐳ"}}:::plan
+    PgSelectSingle279{{"PgSelectSingle[279∈7]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
+    PgClassExpression280{{"PgClassExpression[280∈9]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression281{{"PgClassExpression[281∈9]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression283{{"PgClassExpression[283∈9]<br />ᐸ”c”.”compo..._type_1__)ᐳ"}}:::plan
+    Connection308{{"Connection[308∈0]<br />ᐸ304ᐳ"}}:::plan
+    __InputStaticLeaf317{{"__InputStaticLeaf[317∈10]"}}:::plan
+    __InputStaticLeaf321{{"__InputStaticLeaf[321∈10]"}}:::plan
+    __InputStaticLeaf322{{"__InputStaticLeaf[322∈10]"}}:::plan
+    __InputStaticLeaf329{{"__InputStaticLeaf[329∈10]"}}:::plan
+    __InputStaticLeaf333{{"__InputStaticLeaf[333∈10]"}}:::plan
+    __InputStaticLeaf334{{"__InputStaticLeaf[334∈10]"}}:::plan
+    __InputStaticLeaf349{{"__InputStaticLeaf[349∈10]"}}:::plan
+    __InputStaticLeaf350{{"__InputStaticLeaf[350∈10]"}}:::plan
     PgSelect309[["PgSelect[309∈10]<br />ᐸpostᐳ"]]:::plan
-    __Item310>"__Item[310∈11]<br />ᐸ309ᐳ"]:::itemplan
-    PgSelectSingle311["PgSelectSingle[311∈11]<br />ᐸpostᐳ"]:::plan
-    PgClassExpression312["PgClassExpression[312∈12]<br />ᐸ__post__.”headline”ᐳ"]:::plan
-    PgClassExpression315["PgClassExpression[315∈12]<br />ᐸ__post__ᐳ"]:::plan
-    PgClassExpression316["PgClassExpression[316∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"]:::plan
-    PgClassExpression320["PgClassExpression[320∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"]:::plan
-    PgClassExpression324["PgClassExpression[324∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"]:::plan
-    PgClassExpression328["PgClassExpression[328∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"]:::plan
-    PgClassExpression332["PgClassExpression[332∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"]:::plan
-    PgClassExpression336["PgClassExpression[336∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"]:::plan
-    __InputStaticLeaf337["__InputStaticLeaf[337∈10]"]:::plan
-    Constant339["Constant[339∈10]"]:::plan
+    __Item310[/"__Item[310∈11]<br />ᐸ309ᐳ"\]:::itemplan
+    PgSelectSingle311{{"PgSelectSingle[311∈11]<br />ᐸpostᐳ"}}:::plan
+    PgClassExpression312{{"PgClassExpression[312∈12]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
+    PgClassExpression315{{"PgClassExpression[315∈12]<br />ᐸ__post__ᐳ"}}:::plan
+    PgClassExpression316{{"PgClassExpression[316∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
+    PgClassExpression320{{"PgClassExpression[320∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"}}:::plan
+    PgClassExpression324{{"PgClassExpression[324∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"}}:::plan
+    PgClassExpression328{{"PgClassExpression[328∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
+    PgClassExpression332{{"PgClassExpression[332∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"}}:::plan
+    PgClassExpression336{{"PgClassExpression[336∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"}}:::plan
+    __InputStaticLeaf337{{"__InputStaticLeaf[337∈10]"}}:::plan
+    Constant339{{"Constant[339∈10]"}}:::plan
     PgSelect341[["PgSelect[341∈12]<br />ᐸpostᐳ"]]:::plan
-    First345["First[345∈12]"]:::plan
-    PgSelectSingle346["PgSelectSingle[346∈12]<br />ᐸpostᐳ"]:::plan
-    PgClassExpression348["PgClassExpression[348∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"]:::plan
-    PgClassExpression352["PgClassExpression[352∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"]:::plan
-    __InputStaticLeaf354["__InputStaticLeaf[354∈10]"]:::plan
-    __InputStaticLeaf355["__InputStaticLeaf[355∈10]"]:::plan
-    __InputStaticLeaf356["__InputStaticLeaf[356∈10]"]:::plan
-    __InputStaticLeaf358["__InputStaticLeaf[358∈10]"]:::plan
-    __InputStaticLeaf359["__InputStaticLeaf[359∈10]"]:::plan
-    __InputStaticLeaf361["__InputStaticLeaf[361∈10]"]:::plan
-    __InputStaticLeaf362["__InputStaticLeaf[362∈10]"]:::plan
-    __InputStaticLeaf363["__InputStaticLeaf[363∈10]"]:::plan
-    __InputStaticLeaf364["__InputStaticLeaf[364∈10]"]:::plan
-    __InputStaticLeaf365["__InputStaticLeaf[365∈10]"]:::plan
-    __InputStaticLeaf366["__InputStaticLeaf[366∈10]"]:::plan
-    __InputStaticLeaf367["__InputStaticLeaf[367∈10]"]:::plan
-    Object369["Object[369∈10]<br />ᐸ{seconds,minutes,hours,days,months,years}ᐳ"]:::plan
-    Object368["Object[368∈10]<br />ᐸ{a,b,c,e,f,g,foo_bar}ᐳ"]:::plan
-    Map573["Map[573∈12]<br />ᐸ311:{”0”:3,”1”:4}ᐳ"]:::plan
-    PgSelectSingle376["PgSelectSingle[376∈12]<br />ᐸpostᐳ"]:::plan
-    PgClassExpression377["PgClassExpression[377∈12]<br />ᐸ__post__ᐳ"]:::plan
+    First345{{"First[345∈12]"}}:::plan
+    PgSelectSingle346{{"PgSelectSingle[346∈12]<br />ᐸpostᐳ"}}:::plan
+    PgClassExpression348{{"PgClassExpression[348∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"}}:::plan
+    PgClassExpression352{{"PgClassExpression[352∈12]<br />ᐸ”a”.”post_...lder! */<br />)ᐳ"}}:::plan
+    __InputStaticLeaf354{{"__InputStaticLeaf[354∈10]"}}:::plan
+    __InputStaticLeaf355{{"__InputStaticLeaf[355∈10]"}}:::plan
+    __InputStaticLeaf356{{"__InputStaticLeaf[356∈10]"}}:::plan
+    __InputStaticLeaf358{{"__InputStaticLeaf[358∈10]"}}:::plan
+    __InputStaticLeaf359{{"__InputStaticLeaf[359∈10]"}}:::plan
+    __InputStaticLeaf361{{"__InputStaticLeaf[361∈10]"}}:::plan
+    __InputStaticLeaf362{{"__InputStaticLeaf[362∈10]"}}:::plan
+    __InputStaticLeaf363{{"__InputStaticLeaf[363∈10]"}}:::plan
+    __InputStaticLeaf364{{"__InputStaticLeaf[364∈10]"}}:::plan
+    __InputStaticLeaf365{{"__InputStaticLeaf[365∈10]"}}:::plan
+    __InputStaticLeaf366{{"__InputStaticLeaf[366∈10]"}}:::plan
+    __InputStaticLeaf367{{"__InputStaticLeaf[367∈10]"}}:::plan
+    Object369{{"Object[369∈10]<br />ᐸ{seconds,minutes,hours,days,months,years}ᐳ"}}:::plan
+    Object368{{"Object[368∈10]<br />ᐸ{a,b,c,e,f,g,foo_bar}ᐳ"}}:::plan
+    Map573{{"Map[573∈12]<br />ᐸ311:{”0”:3,”1”:4}ᐳ"}}:::plan
+    PgSelectSingle376{{"PgSelectSingle[376∈12]<br />ᐸpostᐳ"}}:::plan
+    PgClassExpression377{{"PgClassExpression[377∈12]<br />ᐸ__post__ᐳ"}}:::plan
     PgSelect378[["PgSelect[378∈12]<br />ᐸpost_computed_compound_type_arrayᐳ"]]:::plan
-    __Item382>"__Item[382∈13]<br />ᐸ378ᐳ"]:::itemplan
-    PgSelectSingle383["PgSelectSingle[383∈13]<br />ᐸpost_computed_compound_type_arrayᐳ"]:::plan
-    PgClassExpression384["PgClassExpression[384∈14]<br />ᐸ__post_com...rray__.”a”ᐳ"]:::plan
-    PgClassExpression385["PgClassExpression[385∈14]<br />ᐸ__post_com...rray__.”b”ᐳ"]:::plan
-    PgClassExpression386["PgClassExpression[386∈14]<br />ᐸ__post_com...rray__.”c”ᐳ"]:::plan
-    PgClassExpression387["PgClassExpression[387∈14]<br />ᐸ__post_com...rray__.”d”ᐳ"]:::plan
-    PgClassExpression388["PgClassExpression[388∈14]<br />ᐸ__post_com...rray__.”e”ᐳ"]:::plan
-    PgClassExpression389["PgClassExpression[389∈14]<br />ᐸ__post_com...rray__.”f”ᐳ"]:::plan
-    PgClassExpression390["PgClassExpression[390∈14]<br />ᐸ__post_com...rray__.”g”ᐳ"]:::plan
-    PgClassExpression394["PgClassExpression[394∈14]<br />ᐸ__post_com....”foo_bar”ᐳ"]:::plan
-    PgClassExpression396["PgClassExpression[396∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"]:::plan
-    __Item397>"__Item[397∈16]<br />ᐸ396ᐳ"]:::itemplan
-    PgClassExpression399["PgClassExpression[399∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"]:::plan
-    __Item400>"__Item[400∈17]<br />ᐸ399ᐳ"]:::itemplan
-    Connection417["Connection[417∈0]<br />ᐸ413ᐳ"]:::plan
-    Access570["Access[570∈12]<br />ᐸ310.0ᐳ"]:::plan
+    __Item382[/"__Item[382∈13]<br />ᐸ378ᐳ"\]:::itemplan
+    PgSelectSingle383{{"PgSelectSingle[383∈13]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
+    PgClassExpression384{{"PgClassExpression[384∈14]<br />ᐸ__post_com...rray__.”a”ᐳ"}}:::plan
+    PgClassExpression385{{"PgClassExpression[385∈14]<br />ᐸ__post_com...rray__.”b”ᐳ"}}:::plan
+    PgClassExpression386{{"PgClassExpression[386∈14]<br />ᐸ__post_com...rray__.”c”ᐳ"}}:::plan
+    PgClassExpression387{{"PgClassExpression[387∈14]<br />ᐸ__post_com...rray__.”d”ᐳ"}}:::plan
+    PgClassExpression388{{"PgClassExpression[388∈14]<br />ᐸ__post_com...rray__.”e”ᐳ"}}:::plan
+    PgClassExpression389{{"PgClassExpression[389∈14]<br />ᐸ__post_com...rray__.”f”ᐳ"}}:::plan
+    PgClassExpression390{{"PgClassExpression[390∈14]<br />ᐸ__post_com...rray__.”g”ᐳ"}}:::plan
+    PgClassExpression394{{"PgClassExpression[394∈14]<br />ᐸ__post_com....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression396{{"PgClassExpression[396∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
+    __Item397[/"__Item[397∈16]<br />ᐸ396ᐳ"\]:::itemplan
+    PgClassExpression399{{"PgClassExpression[399∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
+    __Item400[/"__Item[400∈17]<br />ᐸ399ᐳ"\]:::itemplan
+    Connection417{{"Connection[417∈0]<br />ᐸ413ᐳ"}}:::plan
+    Access570{{"Access[570∈12]<br />ᐸ310.0ᐳ"}}:::plan
     __ListTransform419[["__ListTransform[419∈12]<br />ᐸeach:418ᐳ"]]:::plan
-    __Item420>"__Item[420∈19]<br />ᐸ570ᐳ"]:::itemplan
-    PgSelectSingle421["PgSelectSingle[421∈19]<br />ᐸpost_computed_interval_setᐳ"]:::plan
-    PgClassExpression422["PgClassExpression[422∈19]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
-    __Item423>"__Item[423∈20]<br />ᐸ419ᐳ"]:::itemplan
-    PgSelectSingle424["PgSelectSingle[424∈20]<br />ᐸpost_computed_interval_setᐳ"]:::plan
-    PgClassExpression425["PgClassExpression[425∈20]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
+    __Item420[/"__Item[420∈19]<br />ᐸ570ᐳ"\]:::itemplan
+    PgSelectSingle421{{"PgSelectSingle[421∈19]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
+    PgClassExpression422{{"PgClassExpression[422∈19]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
+    __Item423[/"__Item[423∈20]<br />ᐸ419ᐳ"\]:::itemplan
+    PgSelectSingle424{{"PgSelectSingle[424∈20]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
+    PgClassExpression425{{"PgClassExpression[425∈20]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
     __ListTransform433[["__ListTransform[433∈12]<br />ᐸeach:432ᐳ"]]:::plan
-    __Item434>"__Item[434∈22]<br />ᐸ570ᐳ"]:::itemplan
-    PgSelectSingle435["PgSelectSingle[435∈22]<br />ᐸpost_computed_interval_setᐳ"]:::plan
-    PgClassExpression436["PgClassExpression[436∈22]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
-    __Item437>"__Item[437∈23]<br />ᐸ433ᐳ"]:::itemplan
-    PgSelectSingle438["PgSelectSingle[438∈23]<br />ᐸpost_computed_interval_setᐳ"]:::plan
-    PgClassExpression439["PgClassExpression[439∈23]<br />ᐸ__post_com...al_set__.vᐳ"]:::plan
-    PgClassExpression442["PgClassExpression[442∈23]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
-    List443["List[443∈23]<br />ᐸ442ᐳ"]:::plan
-    PgCursor441["PgCursor[441∈23]"]:::plan
-    Edge440["Edge[440∈23]"]:::plan
-    Connection474["Connection[474∈0]<br />ᐸ470ᐳ"]:::plan
+    __Item434[/"__Item[434∈22]<br />ᐸ570ᐳ"\]:::itemplan
+    PgSelectSingle435{{"PgSelectSingle[435∈22]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
+    PgClassExpression436{{"PgClassExpression[436∈22]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
+    __Item437[/"__Item[437∈23]<br />ᐸ433ᐳ"\]:::itemplan
+    PgSelectSingle438{{"PgSelectSingle[438∈23]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
+    PgClassExpression439{{"PgClassExpression[439∈23]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
+    PgClassExpression442{{"PgClassExpression[442∈23]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    List443{{"List[443∈23]<br />ᐸ442ᐳ"}}:::plan
+    PgCursor441{{"PgCursor[441∈23]"}}:::plan
+    Edge440{{"Edge[440∈23]"}}:::plan
+    Connection474{{"Connection[474∈0]<br />ᐸ470ᐳ"}}:::plan
     PgSelect475[["PgSelect[475∈26]<br />ᐸpersonᐳ"]]:::plan
-    __Item476>"__Item[476∈27]<br />ᐸ475ᐳ"]:::itemplan
-    PgSelectSingle477["PgSelectSingle[477∈27]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression478["PgClassExpression[478∈28]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression480["PgClassExpression[480∈28]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    Connection493["Connection[493∈26]<br />ᐸ489ᐳ"]:::plan
-    Access567["Access[567∈28]<br />ᐸ476.2ᐳ"]:::plan
+    __Item476[/"__Item[476∈27]<br />ᐸ475ᐳ"\]:::itemplan
+    PgSelectSingle477{{"PgSelectSingle[477∈27]<br />ᐸpersonᐳ"}}:::plan
+    PgClassExpression478{{"PgClassExpression[478∈28]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression480{{"PgClassExpression[480∈28]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    Connection493{{"Connection[493∈26]<br />ᐸ489ᐳ"}}:::plan
+    Access567{{"Access[567∈28]<br />ᐸ476.2ᐳ"}}:::plan
     __ListTransform495[["__ListTransform[495∈28]<br />ᐸeach:494ᐳ"]]:::plan
-    __Item496>"__Item[496∈29]<br />ᐸ567ᐳ"]:::itemplan
-    PgSelectSingle497["PgSelectSingle[497∈29]<br />ᐸperson_friendsᐳ"]:::plan
-    __Item498>"__Item[498∈30]<br />ᐸ495ᐳ"]:::itemplan
-    PgSelectSingle499["PgSelectSingle[499∈30]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression500["PgClassExpression[500∈31]<br />ᐸ__person_f...full_name”ᐳ"]:::plan
-    PgClassExpression502["PgClassExpression[502∈31]<br />ᐸ”c”.”perso...friends__)ᐳ"]:::plan
-    __InputStaticLeaf503["__InputStaticLeaf[503∈26]"]:::plan
-    Connection515["Connection[515∈26]<br />ᐸ511ᐳ"]:::plan
-    Access564["Access[564∈31]<br />ᐸ498.0ᐳ"]:::plan
+    __Item496[/"__Item[496∈29]<br />ᐸ567ᐳ"\]:::itemplan
+    PgSelectSingle497{{"PgSelectSingle[497∈29]<br />ᐸperson_friendsᐳ"}}:::plan
+    __Item498[/"__Item[498∈30]<br />ᐸ495ᐳ"\]:::itemplan
+    PgSelectSingle499{{"PgSelectSingle[499∈30]<br />ᐸperson_friendsᐳ"}}:::plan
+    PgClassExpression500{{"PgClassExpression[500∈31]<br />ᐸ__person_f...full_name”ᐳ"}}:::plan
+    PgClassExpression502{{"PgClassExpression[502∈31]<br />ᐸ”c”.”perso...friends__)ᐳ"}}:::plan
+    __InputStaticLeaf503{{"__InputStaticLeaf[503∈26]"}}:::plan
+    Connection515{{"Connection[515∈26]<br />ᐸ511ᐳ"}}:::plan
+    Access564{{"Access[564∈31]<br />ᐸ498.0ᐳ"}}:::plan
     __ListTransform517[["__ListTransform[517∈31]<br />ᐸeach:516ᐳ"]]:::plan
-    __Item518>"__Item[518∈32]<br />ᐸ564ᐳ"]:::itemplan
-    PgSelectSingle519["PgSelectSingle[519∈32]<br />ᐸperson_friendsᐳ"]:::plan
-    __Item520>"__Item[520∈33]<br />ᐸ517ᐳ"]:::itemplan
-    PgSelectSingle521["PgSelectSingle[521∈33]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression522["PgClassExpression[522∈34]<br />ᐸ__person_f...full_name”ᐳ"]:::plan
-    PgClassExpression524["PgClassExpression[524∈34]<br />ᐸ”c”.”perso...friends__)ᐳ"]:::plan
-    Map560["Map[560∈28]<br />ᐸ477:{”0”:0,”1”:1}ᐳ"]:::plan
-    PgSelectSingle531["PgSelectSingle[531∈28]<br />ᐸperson_first_postᐳ"]:::plan
-    PgClassExpression532["PgClassExpression[532∈35]<br />ᐸ__person_f...ost__.”id”ᐳ"]:::plan
-    PgClassExpression533["PgClassExpression[533∈35]<br />ᐸ__person_f...”headline”ᐳ"]:::plan
-    Connection550["Connection[550∈0]<br />ᐸ546ᐳ"]:::plan
+    __Item518[/"__Item[518∈32]<br />ᐸ564ᐳ"\]:::itemplan
+    PgSelectSingle519{{"PgSelectSingle[519∈32]<br />ᐸperson_friendsᐳ"}}:::plan
+    __Item520[/"__Item[520∈33]<br />ᐸ517ᐳ"\]:::itemplan
+    PgSelectSingle521{{"PgSelectSingle[521∈33]<br />ᐸperson_friendsᐳ"}}:::plan
+    PgClassExpression522{{"PgClassExpression[522∈34]<br />ᐸ__person_f...full_name”ᐳ"}}:::plan
+    PgClassExpression524{{"PgClassExpression[524∈34]<br />ᐸ”c”.”perso...friends__)ᐳ"}}:::plan
+    Map560{{"Map[560∈28]<br />ᐸ477:{”0”:0,”1”:1}ᐳ"}}:::plan
+    PgSelectSingle531{{"PgSelectSingle[531∈28]<br />ᐸperson_first_postᐳ"}}:::plan
+    PgClassExpression532{{"PgClassExpression[532∈35]<br />ᐸ__person_f...ost__.”id”ᐳ"}}:::plan
+    PgClassExpression533{{"PgClassExpression[533∈35]<br />ᐸ__person_f...”headline”ᐳ"}}:::plan
+    Connection550{{"Connection[550∈0]<br />ᐸ546ᐳ"}}:::plan
     PgSelect551[["PgSelect[551∈36]<br />ᐸedgeCaseᐳ"]]:::plan
-    __Item552>"__Item[552∈37]<br />ᐸ551ᐳ"]:::itemplan
-    PgSelectSingle553["PgSelectSingle[553∈37]<br />ᐸedgeCaseᐳ"]:::plan
-    PgClassExpression554["PgClassExpression[554∈38]<br />ᐸ__edge_cas...s_default”ᐳ"]:::plan
-    PgClassExpression555["PgClassExpression[555∈38]<br />ᐸ__edge_cas...cast_easy”ᐳ"]:::plan
-    PgClassExpression557["PgClassExpression[557∈38]<br />ᐸ”c”.”edge_...ge_case__)ᐳ"]:::plan
+    __Item552[/"__Item[552∈37]<br />ᐸ551ᐳ"\]:::itemplan
+    PgSelectSingle553{{"PgSelectSingle[553∈37]<br />ᐸedgeCaseᐳ"}}:::plan
+    PgClassExpression554{{"PgClassExpression[554∈38]<br />ᐸ__edge_cas...s_default”ᐳ"}}:::plan
+    PgClassExpression555{{"PgClassExpression[555∈38]<br />ᐸ__edge_cas...cast_easy”ᐳ"}}:::plan
+    PgClassExpression557{{"PgClassExpression[557∈38]<br />ᐸ”c”.”edge_...ge_case__)ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access197
