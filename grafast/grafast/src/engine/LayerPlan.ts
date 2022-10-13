@@ -1,5 +1,12 @@
 import * as assert from "../assert.js";
+import type { Bucket } from "../bucket.js";
+import type { GrafastError } from "../error.js";
+import { isGrafastError } from "../error.js";
+import { inspect } from "../inspect.js";
+import { $$concreteType } from "../interfaces.js";
+import { assertPolymorphicData } from "../polymorphic.js";
 import type { ExecutableStep, ModifierStep } from "../step";
+import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
 /*
@@ -267,5 +274,308 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   public _addModifierStep(step: ModifierStep<any>): string {
     return this.operationPlan._addModifierStep(step);
+  }
+
+  public optimize() {}
+
+  public newBucket(parentBucket: Bucket): Bucket | null {
+    const copyStepIds = this.copyPlanIds;
+    // throw new Error(`Need to call LayerPlan.optimize() first`);
+    switch (this.reason.type) {
+      case "nullableBoundary": {
+        const store: Bucket["store"] = new Map();
+        const polymorphicPathList: string[] = [];
+        const map: Map<number, number> = new Map();
+        let size = 0;
+
+        const itemStepId = this.rootStepId;
+        assert.ok(
+          itemStepId != null,
+          "GraphileInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
+        );
+        const nullableStepStore = parentBucket.store.get(itemStepId);
+        if (!nullableStepStore) {
+          throw new Error(
+            `GraphileInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+              itemStepId,
+            )}) in store for ${parentBucket.layerPlan}`,
+          );
+        }
+
+        // TODO:perf: if parent bucket has no nulls/errors in `itemStepId`
+        // then we can just copy everything wholesale rather than building
+        // new arrays and looping.
+        const hasNoNullsOrErrors = false;
+
+        if (hasNoNullsOrErrors) {
+          store.set(itemStepId, nullableStepStore);
+          for (const planId of copyStepIds) {
+            store.set(planId, parentBucket.store.get(planId)!);
+          }
+          for (
+            let originalIndex = 0;
+            originalIndex < parentBucket.size;
+            originalIndex++
+          ) {
+            const newIndex = size++;
+            map.set(originalIndex, newIndex);
+            polymorphicPathList[newIndex] =
+              parentBucket.polymorphicPathList[originalIndex];
+          }
+        } else {
+          const itemStepIdList: any[] = [];
+          store.set(itemStepId, itemStepIdList);
+
+          // Prepare store with an empty list for each copyPlanId
+          for (const planId of copyStepIds) {
+            store.set(planId, []);
+          }
+
+          // We'll typically be creating fewer nullableBoundary bucket entries
+          // than we have parent bucket entries (because we exclude nulls), so
+          // we must "multiply up" (down) the store entries.
+          for (
+            let originalIndex = 0;
+            originalIndex < parentBucket.size;
+            originalIndex++
+          ) {
+            const fieldValue: any[] | null | undefined | GrafastError =
+              nullableStepStore[originalIndex];
+            if (fieldValue != null) {
+              const newIndex = size++;
+              map.set(originalIndex, newIndex);
+              itemStepIdList[newIndex] = fieldValue;
+
+              polymorphicPathList[newIndex] =
+                parentBucket.polymorphicPathList[originalIndex];
+              for (const planId of copyStepIds) {
+                store.get(planId)![newIndex] =
+                  parentBucket.store.get(planId)![originalIndex];
+              }
+            }
+          }
+        }
+
+        if (size > 0) {
+          // Reference
+          const childBucket = newBucket({
+            layerPlan: this,
+            size,
+            store,
+            // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+            hasErrors: parentBucket.hasErrors,
+            polymorphicPathList,
+          });
+          parentBucket.children[this.id] = {
+            bucket: childBucket,
+            map,
+          };
+
+          return childBucket;
+        } else {
+          return null;
+        }
+      }
+      case "listItem": {
+        const store: Bucket["store"] = new Map();
+        const polymorphicPathList: string[] = [];
+        const map: Map<number, number[]> = new Map();
+        let size = 0;
+
+        const listStepId = this.reason.parentPlanId;
+        const listStepStore = parentBucket.store.get(listStepId);
+        if (!listStepStore) {
+          throw new Error(
+            `GraphileInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not find entry '${listStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+              listStepId,
+            )}) in store for layerPlan ${parentBucket.layerPlan}`,
+          );
+        }
+
+        const itemStepId = this.rootStepId;
+        if (itemStepId == null) {
+          throw new Error(
+            "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+          );
+        }
+        store.set(itemStepId, []);
+
+        // Prepare store with an empty list for each copyPlanId
+        for (const planId of copyStepIds) {
+          store.set(planId, []);
+        }
+
+        // We'll typically be creating more listItem bucket entries than we
+        // have parent buckets, so we must "multiply up" the store entries.
+        for (
+          let originalIndex = 0;
+          originalIndex < parentBucket.size;
+          originalIndex++
+        ) {
+          const list: any[] | null | undefined | GrafastError =
+            listStepStore[originalIndex];
+          if (Array.isArray(list)) {
+            const newIndexes: number[] = [];
+            map.set(originalIndex, newIndexes);
+            for (let j = 0, l = list.length; j < l; j++) {
+              const newIndex = size++;
+              newIndexes.push(newIndex);
+              store.get(itemStepId)![newIndex] = list[j];
+
+              polymorphicPathList[newIndex] =
+                parentBucket.polymorphicPathList[originalIndex];
+              for (const planId of copyStepIds) {
+                store.get(planId)![newIndex] =
+                  parentBucket.store.get(planId)![originalIndex];
+              }
+            }
+          }
+        }
+
+        if (size > 0) {
+          // Reference
+          const childBucket = newBucket({
+            layerPlan: this,
+            size,
+            store,
+            hasErrors: parentBucket.hasErrors,
+            polymorphicPathList,
+          });
+          parentBucket.children[this.id] = {
+            bucket: childBucket,
+            map,
+          };
+          return childBucket;
+        } else {
+          return null;
+        }
+      }
+      case "mutationField": {
+        const store: Bucket["store"] = new Map();
+        const polymorphicPathList = parentBucket.polymorphicPathList;
+        const map: Map<number, number> = new Map();
+        // This is a 1-to-1 map, so we can mostly just copy from parent bucket
+        const size = parentBucket.size;
+        for (let i = 0; i < parentBucket.size; i++) {
+          map.set(i, i);
+        }
+        for (const planId of copyStepIds) {
+          store.set(planId, parentBucket.store.get(planId)!);
+        }
+
+        // Reference
+        const childBucket = newBucket({
+          layerPlan: this,
+          size,
+          store,
+          hasErrors: parentBucket.hasErrors,
+          polymorphicPathList,
+        });
+        parentBucket.children[this.id] = {
+          bucket: childBucket,
+          map,
+        };
+        return childBucket;
+      }
+      case "polymorphic": {
+        const polymorphicPlanId = this.reason.parentPlanId;
+        const polymorphicPlanStore = parentBucket.store.get(polymorphicPlanId);
+        if (!polymorphicPlanStore) {
+          throw new Error(
+            `GraphileInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+              polymorphicPlanId,
+            )}' not found in bucket for '${parentBucket.layerPlan}'`,
+          );
+        }
+        const store: Bucket["store"] = new Map();
+        const polymorphicPathList: string[] = [];
+        const map: Map<number, number> = new Map();
+        let size = 0;
+
+        // We're only copying over the entries that match this type (note:
+        // they may end up being null, but that's okay)
+        const targetTypeNames = this.reason.typeNames;
+
+        for (const planId of copyStepIds) {
+          store.set(planId, []);
+          if (!parentBucket.store.has(planId)) {
+            throw new Error(
+              `GraphileInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
+                planId,
+              )}, but bucket for ${
+                parentBucket.layerPlan
+              } doesn't contain that plan`,
+            );
+          }
+        }
+
+        for (
+          let originalIndex = 0;
+          originalIndex < parentBucket.size;
+          originalIndex++
+        ) {
+          const value = polymorphicPlanStore[originalIndex];
+          if (value == null) {
+            continue;
+          }
+          if (isGrafastError(value)) {
+            continue;
+          }
+          assertPolymorphicData(value);
+          const typeName = value[$$concreteType];
+          if (!targetTypeNames.includes(typeName)) {
+            continue;
+          }
+          const newIndex = size++;
+          map.set(originalIndex, newIndex);
+
+          // TODO:perf: might be faster if we look this up as a constant rather than using concatenation here
+          const newPolymorphicPath =
+            parentBucket.polymorphicPathList[originalIndex] + ">" + typeName;
+
+          polymorphicPathList[newIndex] = newPolymorphicPath;
+          for (const planId of copyStepIds) {
+            store.get(planId)![newIndex] =
+              parentBucket.store.get(planId)![originalIndex];
+          }
+        }
+
+        if (size > 0) {
+          // Reference
+          const childBucket = newBucket({
+            layerPlan: this,
+            size,
+            store,
+            hasErrors: parentBucket.hasErrors,
+            polymorphicPathList,
+          });
+          parentBucket.children[this.id] = {
+            bucket: childBucket,
+            map,
+          };
+          return childBucket;
+        } else {
+          return null;
+        }
+      }
+      case "subroutine":
+      case "subscription":
+      case "defer": {
+        // TODO
+        throw new Error("TODO");
+      }
+      case "root": {
+        throw new Error(
+          // *confused emoji*
+          "GraphileInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
+        );
+      }
+      default: {
+        const never: never = this.reason;
+        throw new Error(
+          `GraphileInternalError<>: unhandled reason '${inspect(never)}'`,
+        );
+      }
+    }
   }
 }
