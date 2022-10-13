@@ -97,13 +97,15 @@ export function printPlanGraph(
 
   const planStyle = `fill:#fff,stroke-width:1px,color:#000`;
   const itemplanStyle = `fill:#fff,stroke-width:2px,color:#000`;
-  const sideeffectplanStyle = `fill:#f00,stroke-width:2px,color:#000`;
+  const unbatchedplanStyle = `fill:#dff,stroke-width:1px,color:#000`;
+  const sideeffectplanStyle = `fill:#fcc,stroke-width:2px,color:#000`;
   const graph = [
     `%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%`,
     `${concise ? "flowchart" : "graph"} TD`,
     `    classDef path fill:#eee,stroke:#000,color:#000`,
     `    classDef plan ${planStyle}`,
     `    classDef itemplan ${itemplanStyle}`,
+    `    classDef unbatchedplan ${unbatchedplanStyle}`,
     `    classDef sideeffectplan ${sideeffectplanStyle}`,
     `    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left`,
     ``,
@@ -126,20 +128,25 @@ export function printPlanGraph(
       const strippedMeta = rawMeta != null ? stripAnsi(rawMeta) : null;
       const meta =
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
+      const isUnbatched = typeof (plan as any).unbatchedExecute === "function";
 
       const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
         meta ? `\n<${meta}>` : ""
       }\n${pp(plan.polymorphicPaths)}`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
-          ? [">", "]"]
+          ? ["[/", "\\]"]
           : plan.isSyncAndSafe
-          ? ["[", "]"]
+          ? isUnbatched
+            ? ["{{", "}}"]
+            : ["[", "]"]
           : ["[[", "]]"];
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
         : plan instanceof __ItemStep
         ? "itemplan"
+        : isUnbatched && !plan.isSyncAndSafe
+        ? "unbatchedplan"
         : "plan";
       graph.push(
         `    ${planNode}${lBrace}${mermaidEscape(
@@ -285,5 +292,15 @@ function pp(polymorphicPaths: ReadonlySet<string>) {
 function startSteps(layerPlan: LayerPlan) {
   return layerPlan.startSteps.length === 1
     ? ``
-    : `\n${layerPlan.startSteps.map((s, i) => `${i + 1}: ${s}`).join("\n")}`;
+    : `\n${layerPlan.startSteps
+        .map(
+          (s, i) =>
+            `${i + 1}: ${s
+              .map(
+                (s) =>
+                  `${s.constructor.name?.replace(/Step$/, "") ?? ""}[${s.id}]`,
+              )
+              .join(", ")}`,
+        )
+        .join("\n")}`;
 }
