@@ -1037,8 +1037,6 @@ export class PgSelectStep<
     mode?: PgSelectMode,
   ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
     const $plan = this.clone(mode);
-    // In case any errors are raised
-    $plan.addDependency($connection);
     return $plan;
   }
 
