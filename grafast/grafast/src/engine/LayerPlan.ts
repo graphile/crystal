@@ -276,7 +276,144 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addModifierStep(step);
   }
 
-  public optimize() {}
+  public makeNewBucketCallback(inner: string): typeof this.newBucket {
+    const body = `\
+return function newBucket${this.id}(parentBucket) {
+  const store = new Map();
+  const polymorphicPathList = ${
+    this.reason.type === "mutationField"
+      ? "parentBucket.polymorphicPathList"
+      : "[]"
+  };
+  const map = new Map();
+  let size = 0;
+
+${inner}
+
+  if (size > 0) {
+    // Reference
+    const childBucket = newBucket({
+      layerPlan: that,
+      size,
+      store,
+      // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+      hasErrors: parentBucket.hasErrors,
+      polymorphicPathList,
+    });
+    parentBucket.children[${this.id}] = {
+      bucket: childBucket,
+      map,
+    };
+
+    return childBucket;
+  } else {
+    return null;
+  }
+}
+`;
+    //console.log(body);
+    return new Function("that", "newBucket", body)(this, newBucket);
+  }
+
+  public finalize(): void {
+    const copyStepIds = [...this.copyPlanIds];
+    if (this.reason.type === "nullableBoundary") {
+      // TODO:perf: if parent bucket has no nulls/errors in itemStepId
+      // then we can just copy everything wholesale rather than building
+      // new arrays and looping.
+
+      this.newBucket = this.makeNewBucketCallback(`\
+  const itemStepId = ${this.rootStepId};
+  const nullableStepStore = parentBucket.store.get(itemStepId);
+
+  const itemStepIdList = [];
+  store.set(itemStepId, itemStepIdList);
+
+  // Prepare store with an empty list for each copyPlanId
+${copyStepIds
+  .map(
+    (planId) => `\
+  const source${planId} = parentBucket.store.get(${planId});
+  const target${planId} = [];
+  store.set(${planId}, target${planId});
+`,
+  )
+  .join("")}
+
+  // We'll typically be creating fewer nullableBoundary bucket entries
+  // than we have parent bucket entries (because we exclude nulls), so
+  // we must "multiply up" (down) the store entries.
+  for (
+    let originalIndex = 0;
+    originalIndex < parentBucket.size;
+    originalIndex++
+  ) {
+    const fieldValue = nullableStepStore[originalIndex];
+    if (fieldValue != null) {
+      const newIndex = size++;
+      map.set(originalIndex, newIndex);
+      itemStepIdList[newIndex] = fieldValue;
+
+      polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
+${copyStepIds
+  .map(
+    (planId) => `\
+      target${planId}[newIndex] = source${planId}[originalIndex];
+`,
+  )
+  .join("")}
+    }
+  }
+`);
+    } else if (this.reason.type === "listItem") {
+      this.newBucket = this.makeNewBucketCallback(`\
+  const listStepStore = parentBucket.store.get(${this.reason.parentPlanId});
+
+  const itemStepIdList = [];
+  store.set(${this.rootStepId}, itemStepIdList);
+
+  // Prepare store with an empty list for each copyPlanId
+  ${copyStepIds
+    .map(
+      (planId) => `\
+  const source${planId} = parentBucket.store.get(${planId});
+  const target${planId} = [];
+  store.set(${planId}, target${planId});
+  `,
+    )
+    .join("")}
+
+  // We'll typically be creating more listItem bucket entries than we
+  // have parent buckets, so we must "multiply up" the store entries.
+  for (
+    let originalIndex = 0;
+    originalIndex < parentBucket.size;
+    originalIndex++
+  ) {
+    const list = listStepStore[originalIndex];
+    if (Array.isArray(list)) {
+      const newIndexes = [];
+      map.set(originalIndex, newIndexes);
+      for (let j = 0, l = list.length; j < l; j++) {
+        const newIndex = size++;
+        newIndexes.push(newIndex);
+        itemStepIdList[newIndex] = list[j];
+
+        polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
+        ${copyStepIds
+          .map(
+            (planId) => `\
+        target${planId}[newIndex] = source${planId}[originalIndex];
+        `,
+          )
+          .join("")}
+      }
+    }
+  }
+
+`);
+    }
+  }
 
   public newBucket(parentBucket: Bucket): Bucket | null {
     const copyStepIds = this.copyPlanIds;
