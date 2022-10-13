@@ -326,15 +326,30 @@ export class EdgeStep<
   isSyncAndSafe = true;
 
   private connectionStepId: number;
-  private cursorDepId: number | null = null;
+  private readonly cursorDepId: number | null;
+  private needCursor = false;
 
   constructor(
     $connection: ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>,
     $item: TItemStep,
+    private skipCursor = false,
   ) {
     super();
     this.connectionStepId = $connection.id;
     this.addDependency($item);
+    if (!skipCursor) {
+      const $cursor =
+        this.getConnectionStep().cursorPlan?.($item) ??
+        (
+          $item as ExecutableStep & { cursor?: () => ExecutableStep }
+        ).cursor?.();
+      if (!$cursor) {
+        throw new Error(`No cursor plan known for '${$item}'`);
+      }
+      this.cursorDepId = this.addDependency($cursor);
+    } else {
+      this.cursorDepId = null;
+    }
   }
 
   private getConnectionStep(): ConnectionStep<
@@ -356,19 +371,15 @@ export class EdgeStep<
   }
 
   cursor(): ExecutableStep<string | null> {
-    if (this.cursorDepId != null) {
-      return this.getDep(this.cursorDepId);
+    this.needCursor = true;
+    return this.getDep(this.cursorDepId!);
+  }
+
+  optimize() {
+    if (!this.needCursor && this.cursorDepId !== null) {
+      return new EdgeStep(this.getConnectionStep(), this.getItemStep(), true);
     }
-    const $item = this.getItemStep();
-    const $cursor =
-      this.getConnectionStep().cursorPlan?.($item) ??
-      ($item as ExecutableStep & { cursor?: () => ExecutableStep }).cursor?.();
-    if ($cursor) {
-      this.cursorDepId = this.addDependency($cursor);
-      return $cursor;
-    } else {
-      throw new Error(`No cursor plan known for '${$item}'`);
-    }
+    return this;
   }
 
   execute(values: Array<GrafastValuesList<any>>): GrafastResultsList<any> {
