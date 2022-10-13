@@ -430,35 +430,49 @@ export function executeBucket(
     dependenciesIncludingSideEffects: ReadonlyArray<any>[],
     polymorphicPathList: readonly string[],
     extra: ExecutionExtra,
-  ) {
+  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     const errors: { [index: number]: GrafastError } = Object.create(null);
+
+    /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;
+
+    /** If all we see is errors, there's no need to execute! */
+    let needsNoExecution = true;
+
     for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
       const polymorphicPath = polymorphicPathList[index];
       if (!step.polymorphicPaths.has(polymorphicPath)) {
         foundErrors = true;
-        if (isDev) {
-          errors[index] = newGrafastError(
-            new Error(
-              `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
-                ...step.polymorphicPaths,
-              ]}) has no match for '${polymorphicPath}'`,
-            ),
-            step.id,
-          );
-        } else {
-          errors[index] = POLY_SKIPPED;
-        }
+        const e = isDev
+          ? newGrafastError(
+              new Error(
+                `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
+                  ...step.polymorphicPaths,
+                ]}) has no match for '${polymorphicPath}'`,
+              ),
+              step.id,
+            )
+          : POLY_SKIPPED;
+
+        errors[index] = e;
       } else if (extra._bucket.hasErrors) {
+        let noError = true;
         for (const depList of dependenciesIncludingSideEffects) {
           const v = depList[index];
           if (isGrafastError(v)) {
             if (!errors[index]) {
+              noError = false;
               foundErrors = true;
               errors[index] = v;
+              break;
             }
           }
         }
+        if (noError) {
+          needsNoExecution = false;
+        }
+      } else {
+        needsNoExecution = false;
       }
     }
 
@@ -472,7 +486,10 @@ export function executeBucket(
         )
       : dependenciesIncludingSideEffects;
 
-    if (foundErrors) {
+    if (needsNoExecution) {
+      // Everything is errors; we can skip execution
+      return Object.values(errors);
+    } else if (foundErrors) {
       const dependenciesWithoutErrors = dependencies.map((depList) =>
         depList.filter((_, index) => !errors[index]),
       );
