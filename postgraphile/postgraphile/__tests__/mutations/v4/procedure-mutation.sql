@@ -356,25 +356,6 @@ lateral (
   from "c"."table_mutation"(__table_mutation_identifiers__."id0") as __table_mutation__
 ) as __table_mutation_result__;
 
-select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    __post_identifiers__.idx as "2"
-  from "a"."post" as __post__
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-  order by __post__."id" asc
-) as __post_result__;
-
 select __person_result__.*
 from (
   select
@@ -393,6 +374,25 @@ lateral (
   )
   order by __person__."id" asc
 ) as __person_result__;
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+  order by __post__."id" asc
+) as __post_result__;
 
 select __table_mutation_result__.*
 from (
@@ -410,25 +410,6 @@ lateral (
   from "c"."table_mutation"(__table_mutation_identifiers__."id0") as __table_mutation__
 ) as __table_mutation_result__;
 
-select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    __post_identifiers__.idx as "2"
-  from "a"."post" as __post__
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-  order by __post__."id" asc
-) as __post_result__;
-
 select __person_result__.*
 from (
   select
@@ -447,6 +428,25 @@ lateral (
   )
   order by __person__."id" asc
 ) as __person_result__;
+
+select __post_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+  order by __post__."id" asc
+) as __post_result__;
 
 select
   __table_set_mutation__."person_full_name" as "0"

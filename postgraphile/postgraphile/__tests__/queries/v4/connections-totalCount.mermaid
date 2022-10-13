@@ -14,24 +14,24 @@ graph TD
     Access32["Access[32∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object33["Object[33∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Connection34["Connection[34∈0]<br />ᐸ30ᐳ"]:::plan
-    PgSelect35[["PgSelect[35∈0]<br />ᐸperson(aggregate)ᐳ"]]:::plan
-    First36["First[36∈0]"]:::plan
-    PgSelectSingle37["PgSelectSingle[37∈0]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    PgSelect35[["PgSelect[35∈1]<br />ᐸperson(aggregate)ᐳ"]]:::plan
+    First36["First[36∈1]"]:::plan
+    PgSelectSingle37["PgSelectSingle[37∈1]<br />ᐸpersonᐳ"]:::plan
+    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸcount(*)ᐳ"]:::plan
     Connection66["Connection[66∈0]<br />ᐸ62ᐳ"]:::plan
-    PgSelect67[["PgSelect[67∈0]<br />ᐸpersonᐳ"]]:::plan
-    __Item68>"__Item[68∈1]<br />ᐸ67ᐳ"]:::itemplan
-    PgSelectSingle69["PgSelectSingle[69∈1]<br />ᐸpersonᐳ"]:::plan
-    Connection82["Connection[82∈0]<br />ᐸ78ᐳ"]:::plan
-    Access118["Access[118∈1]<br />ᐸ68.0ᐳ"]:::plan
-    First84["First[84∈1]"]:::plan
-    PgSelectSingle85["PgSelectSingle[85∈1]<br />ᐸperson_friendsᐳ"]:::plan
-    PgClassExpression86["PgClassExpression[86∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    PgSelect67[["PgSelect[67∈2]<br />ᐸpersonᐳ"]]:::plan
+    __Item68>"__Item[68∈3]<br />ᐸ67ᐳ"]:::itemplan
+    PgSelectSingle69["PgSelectSingle[69∈3]<br />ᐸpersonᐳ"]:::plan
+    Connection82["Connection[82∈2]<br />ᐸ78ᐳ"]:::plan
+    Access118["Access[118∈4]<br />ᐸ68.0ᐳ"]:::plan
+    First84["First[84∈4]"]:::plan
+    PgSelectSingle85["PgSelectSingle[85∈4]<br />ᐸperson_friendsᐳ"]:::plan
+    PgClassExpression86["PgClassExpression[86∈4]<br />ᐸcount(*)ᐳ"]:::plan
     Connection113["Connection[113∈0]<br />ᐸ109ᐳ"]:::plan
-    PgSelect114[["PgSelect[114∈0]<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
-    First115["First[115∈0]"]:::plan
-    PgSelectSingle116["PgSelectSingle[116∈0]<br />ᐸtable_set_queryᐳ"]:::plan
-    PgClassExpression117["PgClassExpression[117∈0]<br />ᐸcount(*)ᐳ"]:::plan
+    PgSelect114[["PgSelect[114∈5]<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
+    First115["First[115∈5]"]:::plan
+    PgSelectSingle116["PgSelectSingle[116∈5]<br />ᐸtable_set_queryᐳ"]:::plan
+    PgClassExpression117["PgClassExpression[117∈5]<br />ᐸcount(*)ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access31
@@ -56,9 +56,23 @@ graph TD
     subgraph "Buckets for queries/v4/connections-totalCount"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,PgSelect35,First36,PgSelectSingle37,PgClassExpression38,Connection66,PgSelect67,Connection82,Connection113,PgSelect114,First115,PgSelectSingle116,PgClassExpression117 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 82<br /><br />ROOT __Item{1}ᐸ67ᐳ[68]"):::bucket
+    class Bucket0,__Value3,__Value5,Access31,Access32,Object33,Connection34,Connection66,Connection113 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 33, 34<br /><br />ROOT Connectionᐸ30ᐳ[34]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item68,PgSelectSingle69,First84,PgSelectSingle85,PgClassExpression86,Access118 bucket1
-    Bucket0 --> Bucket1
+    class Bucket1,PgSelect35,First36,PgSelectSingle37,PgClassExpression38 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 33, 66<br /><br />ROOT Connectionᐸ62ᐳ[66]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgSelect67,Connection82 bucket2
+    Bucket3("Bucket 3 (listItem)<br />Deps: 82<br /><br />ROOT __Item{3}ᐸ67ᐳ[68]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item68,PgSelectSingle69 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 68, 69, 82<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[69]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,First84,PgSelectSingle85,PgClassExpression86,Access118 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 33, 113<br /><br />ROOT Connectionᐸ109ᐳ[113]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgSelect114,First115,PgSelectSingle116,PgClassExpression117 bucket5
+    Bucket0 --> Bucket1 & Bucket2 & Bucket5
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
     end

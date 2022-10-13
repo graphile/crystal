@@ -11,9 +11,19 @@ select
   __frmcdc_domain_constrained_compound_type_1__."f"::text as "9",
   __frmcdc_domain_constrained_compound_type_1__."foo_bar"::text as "10",
   (not (__frmcdc_domain_constrained_compound_type_1__ is null))::text as "11",
-  __types__."domain_constrained_compound_type"::text as "12"
+  __frmcdc_domain_constrained_compound_type_1_2."foo_bar"::text as "12",
+  __frmcdc_domain_constrained_compound_type_1_2."f"::text as "13",
+  __frmcdc_domain_constrained_compound_type_1_2."e"::text as "14",
+  __frmcdc_domain_constrained_compound_type_1_2."d" as "15",
+  __frmcdc_domain_constrained_compound_type_1_2."c"::text as "16",
+  __frmcdc_domain_constrained_compound_type_1_2."b" as "17",
+  __frmcdc_domain_constrained_compound_type_1_2."a"::text as "18",
+  (not (__frmcdc_domain_constrained_compound_type_1_2 is null))::text as "19",
+  __types__."domain_constrained_compound_type"::text as "20"
 from "pg11"."types" as __types__
 left outer join lateral (select (__types__."domain_constrained_compound_type").*) as __frmcdc_domain_constrained_compound_type_1__
+on TRUE
+left outer join lateral (select (__types__."domain_constrained_compound_type").*) as __frmcdc_domain_constrained_compound_type_1_2
 on TRUE
 order by __types__."id" asc;
 

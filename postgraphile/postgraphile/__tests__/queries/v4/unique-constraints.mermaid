@@ -17,35 +17,35 @@ graph TD
     PgSelect8[["PgSelect[8∈0]<br />ᐸpersonᐳ"]]:::plan
     First12["First[12∈0]"]:::plan
     PgSelectSingle13["PgSelectSingle[13∈0]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression14["PgClassExpression[14∈0]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression15["PgClassExpression[15∈0]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    PgClassExpression14["PgClassExpression[14∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression15["PgClassExpression[15∈1]<br />ᐸ__person__.”email”ᐳ"]:::plan
     __InputStaticLeaf16["__InputStaticLeaf[16∈0]"]:::plan
     PgSelect17[["PgSelect[17∈0]<br />ᐸpersonᐳ"]]:::plan
     First21["First[21∈0]"]:::plan
     PgSelectSingle22["PgSelectSingle[22∈0]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈0]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression24["PgClassExpression[24∈0]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈2]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24∈2]<br />ᐸ__person__.”email”ᐳ"]:::plan
     __InputStaticLeaf25["__InputStaticLeaf[25∈0]"]:::plan
     __InputStaticLeaf26["__InputStaticLeaf[26∈0]"]:::plan
     PgSelect27[["PgSelect[27∈0]<br />ᐸcompoundKeyᐳ"]]:::plan
     First31["First[31∈0]"]:::plan
     PgSelectSingle32["PgSelectSingle[32∈0]<br />ᐸcompoundKeyᐳ"]:::plan
-    PgClassExpression33["PgClassExpression[33∈0]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
-    PgClassExpression34["PgClassExpression[34∈0]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈3]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈3]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
     __InputStaticLeaf35["__InputStaticLeaf[35∈0]"]:::plan
     __InputStaticLeaf36["__InputStaticLeaf[36∈0]"]:::plan
     PgSelect37[["PgSelect[37∈0]<br />ᐸcompoundKeyᐳ"]]:::plan
     First41["First[41∈0]"]:::plan
     PgSelectSingle42["PgSelectSingle[42∈0]<br />ᐸcompoundKeyᐳ"]:::plan
-    PgClassExpression43["PgClassExpression[43∈0]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
-    PgClassExpression44["PgClassExpression[44∈0]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    PgClassExpression43["PgClassExpression[43∈4]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression44["PgClassExpression[44∈4]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
     __InputStaticLeaf45["__InputStaticLeaf[45∈0]"]:::plan
     __InputStaticLeaf46["__InputStaticLeaf[46∈0]"]:::plan
     PgSelect47[["PgSelect[47∈0]<br />ᐸcompoundKeyᐳ"]]:::plan
     First51["First[51∈0]"]:::plan
     PgSelectSingle52["PgSelectSingle[52∈0]<br />ᐸcompoundKeyᐳ"]:::plan
-    PgClassExpression53["PgClassExpression[53∈0]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
-    PgClassExpression54["PgClassExpression[54∈0]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
+    PgClassExpression53["PgClassExpression[53∈5]<br />ᐸ__compound...rson_id_1”ᐳ"]:::plan
+    PgClassExpression54["PgClassExpression[54∈5]<br />ᐸ__compound...rson_id_2”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access9
@@ -80,5 +80,21 @@ graph TD
     subgraph "Buckets for queries/v4/unique-constraints"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,__InputStaticLeaf16,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,__InputStaticLeaf25,__InputStaticLeaf26,PgSelect27,First31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,__InputStaticLeaf35,__InputStaticLeaf36,PgSelect37,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44,__InputStaticLeaf45,__InputStaticLeaf46,PgSelect47,First51,PgSelectSingle52,PgClassExpression53,PgClassExpression54 bucket0
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf16,PgSelect17,First21,PgSelectSingle22,__InputStaticLeaf25,__InputStaticLeaf26,PgSelect27,First31,PgSelectSingle32,__InputStaticLeaf35,__InputStaticLeaf36,PgSelect37,First41,PgSelectSingle42,__InputStaticLeaf45,__InputStaticLeaf46,PgSelect47,First51,PgSelectSingle52 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgClassExpression14,PgClassExpression15 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 22<br /><br />ROOT PgSelectSingleᐸpersonᐳ[22]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgClassExpression23,PgClassExpression24 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 32<br /><br />ROOT PgSelectSingleᐸcompoundKeyᐳ[32]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression33,PgClassExpression34 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 42<br /><br />ROOT PgSelectSingleᐸcompoundKeyᐳ[42]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression43,PgClassExpression44 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 52<br /><br />ROOT PgSelectSingleᐸcompoundKeyᐳ[52]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgClassExpression53,PgClassExpression54 bucket5
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5
     end

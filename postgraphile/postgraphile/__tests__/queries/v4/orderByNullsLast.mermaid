@@ -14,23 +14,23 @@ graph TD
     Access22["Access[22∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object23["Object[23∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Connection24["Connection[24∈0]<br />ᐸ20ᐳ"]:::plan
-    PgSelect25[["PgSelect[25∈0]<br />ᐸsimilarTable1ᐳ"]]:::plan
-    __Item26>"__Item[26∈1]<br />ᐸ25ᐳ"]:::itemplan
-    PgSelectSingle27["PgSelectSingle[27∈1]<br />ᐸsimilarTable1ᐳ"]:::plan
-    Constant28["Constant[28∈0]"]:::plan
-    PgClassExpression29["PgClassExpression[29∈1]<br />ᐸ__similar_table1__.”id”ᐳ"]:::plan
-    List30["List[30∈1]<br />ᐸ28,29ᐳ"]:::plan
-    Lambda31["Lambda[31∈1]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__similar_...1__.”col2”ᐳ"]:::plan
+    PgSelect25[["PgSelect[25∈1]<br />ᐸsimilarTable1ᐳ"]]:::plan
+    __Item26>"__Item[26∈2]<br />ᐸ25ᐳ"]:::itemplan
+    PgSelectSingle27["PgSelectSingle[27∈2]<br />ᐸsimilarTable1ᐳ"]:::plan
+    Constant28["Constant[28∈1]"]:::plan
+    PgClassExpression29["PgClassExpression[29∈3]<br />ᐸ__similar_table1__.”id”ᐳ"]:::plan
+    List30["List[30∈3]<br />ᐸ28,29ᐳ"]:::plan
+    Lambda31["Lambda[31∈3]<br />ᐸbase64JSONEncodeᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"]:::plan
     Connection50["Connection[50∈0]<br />ᐸ46ᐳ"]:::plan
-    PgSelect51[["PgSelect[51∈0]<br />ᐸsimilarTable1ᐳ"]]:::plan
-    __Item52>"__Item[52∈2]<br />ᐸ51ᐳ"]:::itemplan
-    PgSelectSingle53["PgSelectSingle[53∈2]<br />ᐸsimilarTable1ᐳ"]:::plan
-    Constant54["Constant[54∈0]"]:::plan
-    PgClassExpression55["PgClassExpression[55∈2]<br />ᐸ__similar_table1__.”id”ᐳ"]:::plan
-    List56["List[56∈2]<br />ᐸ54,55ᐳ"]:::plan
-    Lambda57["Lambda[57∈2]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    PgClassExpression58["PgClassExpression[58∈2]<br />ᐸ__similar_...1__.”col2”ᐳ"]:::plan
+    PgSelect51[["PgSelect[51∈4]<br />ᐸsimilarTable1ᐳ"]]:::plan
+    __Item52>"__Item[52∈5]<br />ᐸ51ᐳ"]:::itemplan
+    PgSelectSingle53["PgSelectSingle[53∈5]<br />ᐸsimilarTable1ᐳ"]:::plan
+    Constant54["Constant[54∈4]"]:::plan
+    PgClassExpression55["PgClassExpression[55∈6]<br />ᐸ__similar_table1__.”id”ᐳ"]:::plan
+    List56["List[56∈6]<br />ᐸ54,55ᐳ"]:::plan
+    Lambda57["Lambda[57∈6]<br />ᐸbase64JSONEncodeᐳ"]:::plan
+    PgClassExpression58["PgClassExpression[58∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access21
@@ -54,12 +54,28 @@ graph TD
     subgraph "Buckets for queries/v4/orderByNullsLast"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access21,Access22,Object23,Connection24,PgSelect25,Constant28,Connection50,PgSelect51,Constant54 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 28<br /><br />ROOT __Item{1}ᐸ25ᐳ[26]"):::bucket
+    class Bucket0,__Value3,__Value5,Access21,Access22,Object23,Connection24,Connection50 bucket0
+    Bucket1("Bucket 1 (nullableField)<br />Deps: 23, 24<br /><br />ROOT Connectionᐸ20ᐳ[24]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item26,PgSelectSingle27,PgClassExpression29,List30,Lambda31,PgClassExpression32 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 54<br /><br />ROOT __Item{2}ᐸ51ᐳ[52]"):::bucket
+    class Bucket1,PgSelect25,Constant28 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 28<br /><br />ROOT __Item{2}ᐸ25ᐳ[26]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item52,PgSelectSingle53,PgClassExpression55,List56,Lambda57,PgClassExpression58 bucket2
-    Bucket0 --> Bucket1 & Bucket2
+    class Bucket2,__Item26,PgSelectSingle27 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 27, 28<br /><br />ROOT PgSelectSingle{2}ᐸsimilarTable1ᐳ[27]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression29,List30,Lambda31,PgClassExpression32 bucket3
+    Bucket4("Bucket 4 (nullableField)<br />Deps: 23, 50<br /><br />ROOT Connectionᐸ46ᐳ[50]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelect51,Constant54 bucket4
+    Bucket5("Bucket 5 (listItem)<br />Deps: 54<br /><br />ROOT __Item{5}ᐸ51ᐳ[52]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item52,PgSelectSingle53 bucket5
+    Bucket6("Bucket 6 (nullableField)<br />Deps: 53, 54<br /><br />ROOT PgSelectSingle{5}ᐸsimilarTable1ᐳ[53]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,PgClassExpression55,List56,Lambda57,PgClassExpression58 bucket6
+    Bucket0 --> Bucket1 & Bucket4
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket4 --> Bucket5
+    Bucket5 --> Bucket6
     end

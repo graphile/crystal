@@ -24,17 +24,17 @@ graph TD
     Object26["Object[26∈0]<br />ᐸ{url}ᐳ"]:::plan
     PgUpdate20[["PgUpdate[20∈1]"]]:::sideeffectplan
     Object24["Object[24∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression27["PgClassExpression[27∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28∈1]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression29["PgClassExpression[29∈1]<br />ᐸ__person__.”aliases”ᐳ"]:::plan
-    __Item30>"__Item[30∈2]<br />ᐸ29ᐳ"]:::itemplan
-    PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__person__.”about”ᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__person__.”email”ᐳ"]:::plan
-    PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ__person__.”site”ᐳ"]:::plan
-    PgSelect34[["PgSelect[34∈1]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"]]:::plan
-    First38["First[38∈1]"]:::plan
-    PgSelectSingle39["PgSelectSingle[39∈1]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"]:::plan
-    PgClassExpression40["PgClassExpression[40∈1]<br />ᐸ__frmcdc_w..._1__.”url”ᐳ"]:::plan
+    PgClassExpression27["PgClassExpression[27∈3]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression28["PgClassExpression[28∈3]<br />ᐸ__person__...full_name”ᐳ"]:::plan
+    PgClassExpression29["PgClassExpression[29∈3]<br />ᐸ__person__.”aliases”ᐳ"]:::plan
+    __Item30>"__Item[30∈4]<br />ᐸ29ᐳ"]:::itemplan
+    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__person__.”about”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈3]<br />ᐸ__person__.”email”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈3]<br />ᐸ__person__.”site”ᐳ"]:::plan
+    PgSelect34[["PgSelect[34∈3]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"]]:::plan
+    First38["First[38∈3]"]:::plan
+    PgSelectSingle39["PgSelectSingle[39∈3]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"]:::plan
+    PgClassExpression40["PgClassExpression[40∈5]<br />ᐸ__frmcdc_w..._1__.”url”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access21
@@ -60,12 +60,23 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf11,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,Access21,Access22,Object23,List25,Object26 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 23, 9, 11, 25, 16, 17, 26<br /><br />1: PgUpdate{1}[20]<br />2: Object{1}ᐸ{result}ᐳ[24],PgClassExpression{1}ᐸ__person__.”id”ᐳ[27],PgClassExpression{1}ᐸ__person__...full_name”ᐳ[28],PgClassExpression{1}ᐸ__person__.”aliases”ᐳ[29],PgClassExpression{1}ᐸ__person__.”about”ᐳ[31],PgClassExpression{1}ᐸ__person__.”email”ᐳ[32],PgClassExpression{1}ᐸ__person__.”site”ᐳ[33]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 23, 9, 11, 25, 16, 17, 26<br /><br />1: PgUpdate{1}[20]<br />2: Object{1}ᐸ{result}ᐳ[24]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUpdate20,Object24,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgSelect34,First38,PgSelectSingle39,PgClassExpression40 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ29ᐳ[30]"):::bucket
+    class Bucket1,PgUpdate20,Object24 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 24, 20, 23<br /><br />ROOT Object{1}ᐸ{result}ᐳ[24]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item30 bucket2
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 20, 23<br /><br />ROOT PgUpdate{1}[20]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgSelect34,First38,PgSelectSingle39 bucket3
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ29ᐳ[30]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item30 bucket4
+    Bucket5("Bucket 5 (nullableField)<br />Deps: 39<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrl_1ᐳ[39]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgClassExpression40 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4 & Bucket5
     end

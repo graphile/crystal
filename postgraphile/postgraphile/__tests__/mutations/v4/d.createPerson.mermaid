@@ -19,15 +19,15 @@ graph TD
     Object19["Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     PgInsert16[["PgInsert[16∈1]"]]:::sideeffectplan
     Object20["Object[20∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression21["PgClassExpression[21∈1]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression22["PgClassExpression[22∈1]<br />ᐸ__person__.”first_name”ᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__person__.”last_name”ᐳ"]:::plan
-    PgClassExpression24["PgClassExpression[24∈1]<br />ᐸ__person__...no_create”ᐳ"]:::plan
-    PgClassExpression25["PgClassExpression[25∈1]<br />ᐸ__person__...no_update”ᐳ"]:::plan
-    PgClassExpression26["PgClassExpression[26∈1]<br />ᐸ__person__..._no_order”ᐳ"]:::plan
-    PgClassExpression27["PgClassExpression[27∈1]<br />ᐸ__person__...no_filter”ᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28∈1]<br />ᐸ__person__...te_update”ᐳ"]:::plan
-    PgClassExpression29["PgClassExpression[29∈1]<br />ᐸ__person__...er_filter”ᐳ"]:::plan
+    PgClassExpression21["PgClassExpression[21∈3]<br />ᐸ__person__.”id”ᐳ"]:::plan
+    PgClassExpression22["PgClassExpression[22∈3]<br />ᐸ__person__.”first_name”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈3]<br />ᐸ__person__.”last_name”ᐳ"]:::plan
+    PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__person__...no_create”ᐳ"]:::plan
+    PgClassExpression25["PgClassExpression[25∈3]<br />ᐸ__person__...no_update”ᐳ"]:::plan
+    PgClassExpression26["PgClassExpression[26∈3]<br />ᐸ__person__..._no_order”ᐳ"]:::plan
+    PgClassExpression27["PgClassExpression[27∈3]<br />ᐸ__person__...no_filter”ᐳ"]:::plan
+    PgClassExpression28["PgClassExpression[28∈3]<br />ᐸ__person__...te_update”ᐳ"]:::plan
+    PgClassExpression29["PgClassExpression[29∈3]<br />ᐸ__person__...er_filter”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access17
@@ -49,8 +49,16 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,Access17,Access18,Object19 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 12, 13, 14, 15<br /><br />1: PgInsert{1}[16]<br />2: Object{1}ᐸ{result}ᐳ[20],PgClassExpression{1}ᐸ__person__.”id”ᐳ[21],PgClassExpression{1}ᐸ__person__.”first_name”ᐳ[22],PgClassExpression{1}ᐸ__person__.”last_name”ᐳ[23],PgClassExpression{1}ᐸ__person__...no_create”ᐳ[24],PgClassExpression{1}ᐸ__person__...no_update”ᐳ[25],PgClassExpression{1}ᐸ__person__..._no_order”ᐳ[26],PgClassExpression{1}ᐸ__person__...no_filter”ᐳ[27],PgClassExpression{1}ᐸ__person__...te_update”ᐳ[28],PgClassExpression{1}ᐸ__person__...er_filter”ᐳ[29]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 12, 13, 14, 15<br /><br />1: PgInsert{1}[16]<br />2: Object{1}ᐸ{result}ᐳ[20]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert16,Object20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29 bucket1
+    class Bucket1,PgInsert16,Object20 bucket1
+    Bucket2("Bucket 2 (nullableField)<br />Deps: 20, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableField)<br />Deps: 16<br /><br />ROOT PgInsert{1}[16]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29 bucket3
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
     end

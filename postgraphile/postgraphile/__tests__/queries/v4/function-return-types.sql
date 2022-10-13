@@ -107,64 +107,6 @@ lateral (
   on TRUE
 ) as __func_out_complex_result__;
 
-select __func_out_complex_setof_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_out_complex_setof_identifiers__,
-lateral (
-  select
-    (not (__func_out_complex_setof__ is null))::text as "0",
-    __func_out_complex_setof__."x"::text as "1",
-    __frmcdc_compound_type_1__."a"::text as "2",
-    __frmcdc_compound_type_1__."b" as "3",
-    __frmcdc_compound_type_1__."c"::text as "4",
-    (not (__frmcdc_compound_type_1__ is null))::text as "5",
-    __func_out_complex_setof__."y"::text as "6",
-    __person__."person_full_name" as "7",
-    (select json_agg(_) from (
-      select
-        __post__."id"::text as "0"
-      from "a"."post" as __post__
-      where (
-        __person__."id"::"int4" = __post__."author_id"
-      )
-      order by __post__."id" asc
-    ) _) as "8",
-    __person__."id"::text as "9",
-    __func_out_complex_setof__."z"::text as "10",
-    __func_out_complex_setof_identifiers__.idx as "11"
-  from "c"."func_out_complex_setof"(
-    __func_out_complex_setof_identifiers__."id0",
-    __func_out_complex_setof_identifiers__."id1"
-  ) as __func_out_complex_setof__
-  left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type_1__
-  on TRUE
-  left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
-  on TRUE
-) as __func_out_complex_setof_result__;
-
-select __func_out_complex_setof_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_out_complex_setof_identifiers__,
-lateral (
-  select
-    (count(*))::text as "0",
-    __func_out_complex_setof_identifiers__.idx as "1"
-  from "c"."func_out_complex_setof"(
-    __func_out_complex_setof_identifiers__."id0",
-    __func_out_complex_setof_identifiers__."id1"
-  ) as __func_out_complex_setof__
-) as __func_out_complex_setof_result__;
-
 select __func_out_out_compound_type_result__.*
 from (
   select
@@ -186,90 +128,6 @@ lateral (
   left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __frmcdc_compound_type_1__
   on TRUE
 ) as __func_out_out_compound_type_result__;
-
-select
-  (not (__func_out_out_setof__ is null))::text as "0",
-  __func_out_out_setof__."o1"::text as "1",
-  __func_out_out_setof__."o2" as "2"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
-
-select
-  __func_out_setof__.v::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  __func_out_table_setof__."id"::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select __func_returns_table_multi_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_multi_col_identifiers__,
-lateral (
-  select
-    (not (__func_returns_table_multi_col__ is null))::text as "0",
-    __func_returns_table_multi_col__."col1"::text as "1",
-    __func_returns_table_multi_col__."col2" as "2",
-    __func_returns_table_multi_col_identifiers__.idx as "3"
-  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
-) as __func_returns_table_multi_col_result__;
-
-select __func_returns_table_multi_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_multi_col_identifiers__,
-lateral (
-  select
-    (count(*))::text as "0",
-    __func_returns_table_multi_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
-) as __func_returns_table_multi_col_result__;
-
-select __func_returns_table_one_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_one_col_identifiers__,
-lateral (
-  select
-    __func_returns_table_one_col__.v::text as "0",
-    __func_returns_table_one_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
-) as __func_returns_table_one_col_result__;
-
-select __func_returns_table_one_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_one_col_identifiers__,
-lateral (
-  select
-    (count(*))::text as "0",
-    __func_returns_table_one_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
-) as __func_returns_table_one_col_result__;
 
 select __person_result__.*
 from (
@@ -454,3 +312,145 @@ lateral (
   left outer join "c"."person_secret" as __person_secret_2
   on (__person_2."id"::"int4" = __person_secret_2."person_id")
 ) as __query_output_two_rows_result__;
+
+select __func_out_complex_setof_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"text" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_out_complex_setof_identifiers__,
+lateral (
+  select
+    (not (__func_out_complex_setof__ is null))::text as "0",
+    __func_out_complex_setof__."x"::text as "1",
+    __frmcdc_compound_type_1__."a"::text as "2",
+    __frmcdc_compound_type_1__."b" as "3",
+    __frmcdc_compound_type_1__."c"::text as "4",
+    (not (__frmcdc_compound_type_1__ is null))::text as "5",
+    __func_out_complex_setof__."y"::text as "6",
+    __person__."person_full_name" as "7",
+    (select json_agg(_) from (
+      select
+        __post__."id"::text as "0"
+      from "a"."post" as __post__
+      where (
+        __person__."id"::"int4" = __post__."author_id"
+      )
+      order by __post__."id" asc
+    ) _) as "8",
+    __person__."id"::text as "9",
+    __func_out_complex_setof__."z"::text as "10",
+    __func_out_complex_setof_identifiers__.idx as "11"
+  from "c"."func_out_complex_setof"(
+    __func_out_complex_setof_identifiers__."id0",
+    __func_out_complex_setof_identifiers__."id1"
+  ) as __func_out_complex_setof__
+  left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type_1__
+  on TRUE
+  left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
+  on TRUE
+) as __func_out_complex_setof_result__;
+
+select __func_out_complex_setof_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"text" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_out_complex_setof_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __func_out_complex_setof_identifiers__.idx as "1"
+  from "c"."func_out_complex_setof"(
+    __func_out_complex_setof_identifiers__."id0",
+    __func_out_complex_setof_identifiers__."id1"
+  ) as __func_out_complex_setof__
+) as __func_out_complex_setof_result__;
+
+select
+  (not (__func_out_out_setof__ is null))::text as "0",
+  __func_out_out_setof__."o1"::text as "1",
+  __func_out_out_setof__."o2" as "2"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
+  __func_out_setof__.v::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
+  __func_out_table_setof__."id"::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
+
+select __func_returns_table_multi_col_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_returns_table_multi_col_identifiers__,
+lateral (
+  select
+    (not (__func_returns_table_multi_col__ is null))::text as "0",
+    __func_returns_table_multi_col__."col1"::text as "1",
+    __func_returns_table_multi_col__."col2" as "2",
+    __func_returns_table_multi_col_identifiers__.idx as "3"
+  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
+) as __func_returns_table_multi_col_result__;
+
+select __func_returns_table_multi_col_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_returns_table_multi_col_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __func_returns_table_multi_col_identifiers__.idx as "1"
+  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
+) as __func_returns_table_multi_col_result__;
+
+select __func_returns_table_one_col_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_returns_table_one_col_identifiers__,
+lateral (
+  select
+    __func_returns_table_one_col__.v::text as "0",
+    __func_returns_table_one_col_identifiers__.idx as "1"
+  from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
+) as __func_returns_table_one_col_result__;
+
+select __func_returns_table_one_col_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __func_returns_table_one_col_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __func_returns_table_one_col_identifiers__.idx as "1"
+  from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
+) as __func_returns_table_one_col_result__;
