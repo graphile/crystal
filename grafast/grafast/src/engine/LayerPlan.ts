@@ -280,14 +280,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   public newBucket(parentBucket: Bucket): Bucket | null {
     const copyStepIds = this.copyPlanIds;
-    // throw new Error(`Need to call LayerPlan.optimize() first`);
+    const store: Bucket["store"] = new Map();
+    const polymorphicPathList: string[] =
+      this.reason.type === "mutationField"
+        ? (parentBucket.polymorphicPathList as string[])
+        : [];
+    const map: Map<number, number | number[]> = new Map();
+    let size = 0;
     switch (this.reason.type) {
       case "nullableBoundary": {
-        const store: Bucket["store"] = new Map();
-        const polymorphicPathList: string[] = [];
-        const map: Map<number, number> = new Map();
-        let size = 0;
-
         const itemStepId = this.rootStepId;
         assert.ok(
           itemStepId != null,
@@ -356,32 +357,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           }
         }
 
-        if (size > 0) {
-          // Reference
-          const childBucket = newBucket({
-            layerPlan: this,
-            size,
-            store,
-            // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
-            hasErrors: parentBucket.hasErrors,
-            polymorphicPathList,
-          });
-          parentBucket.children[this.id] = {
-            bucket: childBucket,
-            map,
-          };
-
-          return childBucket;
-        } else {
-          return null;
-        }
+        break;
       }
       case "listItem": {
-        const store: Bucket["store"] = new Map();
-        const polymorphicPathList: string[] = [];
-        const map: Map<number, number[]> = new Map();
-        let size = 0;
-
         const listStepId = this.reason.parentPlanId;
         const listStepStore = parentBucket.store.get(listStepId);
         if (!listStepStore) {
@@ -432,30 +410,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           }
         }
 
-        if (size > 0) {
-          // Reference
-          const childBucket = newBucket({
-            layerPlan: this,
-            size,
-            store,
-            hasErrors: parentBucket.hasErrors,
-            polymorphicPathList,
-          });
-          parentBucket.children[this.id] = {
-            bucket: childBucket,
-            map,
-          };
-          return childBucket;
-        } else {
-          return null;
-        }
+        break;
       }
       case "mutationField": {
-        const store: Bucket["store"] = new Map();
-        const polymorphicPathList = parentBucket.polymorphicPathList;
-        const map: Map<number, number> = new Map();
         // This is a 1-to-1 map, so we can mostly just copy from parent bucket
-        const size = parentBucket.size;
+        size = parentBucket.size;
         for (let i = 0; i < parentBucket.size; i++) {
           map.set(i, i);
         }
@@ -463,19 +422,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           store.set(planId, parentBucket.store.get(planId)!);
         }
 
-        // Reference
-        const childBucket = newBucket({
-          layerPlan: this,
-          size,
-          store,
-          hasErrors: parentBucket.hasErrors,
-          polymorphicPathList,
-        });
-        parentBucket.children[this.id] = {
-          bucket: childBucket,
-          map,
-        };
-        return childBucket;
+        break;
       }
       case "polymorphic": {
         const polymorphicPlanId = this.reason.parentPlanId;
@@ -487,10 +434,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             )}' not found in bucket for '${parentBucket.layerPlan}'`,
           );
         }
-        const store: Bucket["store"] = new Map();
-        const polymorphicPathList: string[] = [];
-        const map: Map<number, number> = new Map();
-        let size = 0;
 
         // We're only copying over the entries that match this type (note:
         // they may end up being null, but that's okay)
@@ -540,23 +483,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           }
         }
 
-        if (size > 0) {
-          // Reference
-          const childBucket = newBucket({
-            layerPlan: this,
-            size,
-            store,
-            hasErrors: parentBucket.hasErrors,
-            polymorphicPathList,
-          });
-          parentBucket.children[this.id] = {
-            bucket: childBucket,
-            map,
-          };
-          return childBucket;
-        } else {
-          return null;
-        }
+        break;
       }
       case "subscription":
       case "defer": {
@@ -580,6 +507,26 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           `GraphileInternalError<>: unhandled reason '${inspect(never)}'`,
         );
       }
+    }
+
+    if (size > 0) {
+      // Reference
+      const childBucket = newBucket({
+        layerPlan: this,
+        size,
+        store,
+        // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+        hasErrors: parentBucket.hasErrors,
+        polymorphicPathList,
+      });
+      parentBucket.children[this.id] = {
+        bucket: childBucket,
+        map,
+      };
+
+      return childBucket;
+    } else {
+      return null;
     }
   }
 }
