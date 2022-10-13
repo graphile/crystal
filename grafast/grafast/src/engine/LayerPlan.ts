@@ -558,11 +558,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           return null;
         }
       }
-      case "subroutine":
       case "subscription":
       case "defer": {
         // TODO
         throw new Error("TODO");
+      }
+      case "subroutine": {
+        throw new Error(
+          "Subroutines are experimental and must currently handle their own bucket creation",
+        );
       }
       case "root": {
         throw new Error(
