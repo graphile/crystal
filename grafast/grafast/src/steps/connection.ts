@@ -382,6 +382,18 @@ export class EdgeStep<
     return this;
   }
 
+  deduplicate(
+    _peers: EdgeStep<any, any, any, any>[],
+  ): EdgeStep<TItemStep, TCursorStep, TStep, TNodeStep>[] {
+    return _peers;
+  }
+
+  deduplicatedWith(replacement: EdgeStep<any, any, any, any>) {
+    if (this.needCursor) {
+      replacement.needCursor = true;
+    }
+  }
+
   execute(values: Array<GrafastValuesList<any>>): GrafastResultsList<any> {
     // Handle nulls; everything else comes from the child plans
     const results: any[] = [];
