@@ -1,8 +1,4 @@
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "grafast";
+import type { ExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";

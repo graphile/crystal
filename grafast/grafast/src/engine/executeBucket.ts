@@ -15,8 +15,7 @@ import type {
   GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
-import { $$concreteType, $$streamMore } from "../interfaces.js";
-import { assertPolymorphicData } from "../polymorphic.js";
+import { $$streamMore } from "../interfaces.js";
 import { $$noExec } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
