@@ -276,12 +276,10 @@ export function executePreemptive(
     (c) => c.reason.type === "subscription",
   );
 
-  const executeStreamPayload = (
+  function executeStreamPayload(
     payload: any,
     index: number,
-  ): PromiseOrDirect<
-    ExecutionResult | AsyncGenerator<AsyncExecutionResult>
-  > => {
+  ): PromiseOrDirect<ExecutionResult | AsyncGenerator<AsyncExecutionResult>> {
     const layerPlan = subscriptionLayerPlan!;
     // TODO: we could consider batching this.
     const store: Bucket["store"] = new Map();
@@ -305,7 +303,7 @@ export function executePreemptive(
       size: 1,
     });
     const bucketPromise = executeBucket(subscriptionBucket, requestContext);
-    const output = () => {
+    function outputStreamBucket() {
       const [ctx, result] = outputBucket(
         operationPlan.rootOutputPlan,
         subscriptionBucket,
@@ -321,15 +319,15 @@ export function executePreemptive(
         index === 0 ? rootValue[$$extensions] ?? undefined : undefined,
         asString,
       );
-    };
-    if (isPromiseLike(bucketPromise)) {
-      return bucketPromise.then(output);
-    } else {
-      return output();
     }
-  };
+    if (isPromiseLike(bucketPromise)) {
+      return bucketPromise.then(outputStreamBucket);
+    } else {
+      return outputStreamBucket();
+    }
+  }
 
-  const output = () => {
+  function output() {
     // Later we'll need to loop
 
     // If it's a subscription we need to use the stream
@@ -360,10 +358,10 @@ export function executePreemptive(
     }
 
     if (
-      bucketRootValue &&
-      isAsyncIterable(bucketRootValue) &&
+      bucketRootValue != null &&
+      subscriptionLayerPlan != null &&
       !isIterable(bucketRootValue) &&
-      subscriptionLayerPlan
+      isAsyncIterable(bucketRootValue)
     ) {
       const stream = bucketRootValue[Symbol.asyncIterator]();
       // Do the async iterable
@@ -432,7 +430,7 @@ export function executePreemptive(
       rootValue[$$extensions] ?? undefined,
       asString,
     );
-  };
+  }
 
   if (isPromiseLike(bucketPromise)) {
     return bucketPromise.then(output);

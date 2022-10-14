@@ -746,7 +746,8 @@ function makeExecutor<TAsString extends boolean>(
   rawBucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex]
 ) {
   const bucketRootValue = this.processRoot ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
-${preamble}  if (bucketRootValue == null) {
+${preamble}\
+  if (bucketRootValue == null) {
     ${
       skipNullHandling
         ? `// root/introspection, null is fine`
