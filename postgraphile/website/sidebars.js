@@ -20,7 +20,7 @@ const sidebars = {
       defaultStyle: false,
     },
     "index",
-    "examples",
+    // TODO: "examples",
     {
       type: "category",
       label: "Usage",

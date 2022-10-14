@@ -153,8 +153,14 @@ const pgSources = [
 
 This simple function will take a PostgreSQL connection string and a list of
 schemas and will return an array containing a configuration object suitable for
-inclusion in `pgSources`. Currently this uses the `pg` module, but we may change
+inclusion in `pgSources`.
+
+:::info
+
+Currently this uses the `pg` module, but we may change
 that default over time.
+
+:::
 
 ```js title="Example configuration via makePgSources"
 const pgSources = makePgSources(process.env.DATABASE_URL, ["app_public"]);
