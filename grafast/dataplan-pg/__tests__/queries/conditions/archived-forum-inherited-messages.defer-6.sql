@@ -3,8 +3,8 @@ select
   (select json_agg(_) from (
     select
       __messages__."body" as "0",
-      __messages__."id" as "1",
-      __messages__."author_id" as "2"
+      __messages__."author_id" as "1",
+      __messages__."id" as "2"
     from app_public.messages as __messages__
     where
       (

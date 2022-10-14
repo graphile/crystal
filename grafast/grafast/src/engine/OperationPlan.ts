@@ -288,6 +288,9 @@ export class OperationPlan {
     // Get rid of steps that are no longer needed after optimising
     this.treeShakeSteps();
 
+    // Now shove steps as deep down as they can go (opposite of hoist)
+    this.pushDownSteps();
+
     this.phase = "finalize";
 
     // Plans are expected to execute later; they may take steps here to prepare
@@ -687,6 +690,7 @@ export class OperationPlan {
    * create one item plan per parent plan.
    */
   private itemStepForListStep<TData>(
+    parentLayerPlan: LayerPlan,
     listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
     depth = 0,
   ): __ItemStep<TData> {
@@ -697,7 +701,7 @@ export class OperationPlan {
     // Create a new LayerPlan for this list item
     const layerPlan = new LayerPlan(
       this,
-      listStep.layerPlan,
+      parentLayerPlan,
       {
         type: "listItem",
         parentPlanId: listStep.id,
@@ -1124,6 +1128,7 @@ export class OperationPlan {
     const polymorphicPaths = new Set([polymorphicPath]);
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
+
     if (isListType(nullableFieldType)) {
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
@@ -1140,7 +1145,11 @@ export class OperationPlan {
         locationDetails,
       });
 
-      const $__item = this.itemStepForListStep($step, listDepth);
+      const $__item = this.itemStepForListStep(
+        parentLayerPlan,
+        $step,
+        listDepth,
+      );
       const $item = isListCapableStep($step)
         ? withGlobalLayerPlan($__item.layerPlan, polymorphicPaths, () =>
             ($step as ListCapableStep<any>).listItem($__item),
@@ -1201,7 +1210,6 @@ export class OperationPlan {
         locationDetails,
       });
     } else if (isObjectType(nullableFieldType)) {
-      // TODO: graphqlMergeSelectionSets ?
       if (isDev) {
         // Check that the plan we're dealing with is the one the user declared
         const ExpectedStep = nullableFieldType.extensions?.graphile?.Step;
@@ -1218,8 +1226,43 @@ export class OperationPlan {
           );
         }
       }
+
+      let objectLayerPlan: LayerPlan;
+      if (
+        isNonNull ||
+        (parentLayerPlan.reason.type === "nullableBoundary" &&
+          this.steps[parentLayerPlan.rootStepId!] === $step)
+      ) {
+        objectLayerPlan = parentLayerPlan;
+      } else {
+        // Find existing match
+        const match = parentLayerPlan.children.find(
+          (clp) =>
+            clp.reason.type === "nullableBoundary" &&
+            this.steps[clp.rootStepId!] === $step,
+        );
+        if (match) {
+          objectLayerPlan = match;
+        } else {
+          objectLayerPlan = Object.assign(
+            new LayerPlan(
+              this,
+              parentLayerPlan,
+              {
+                type: "nullableBoundary",
+                parentStepId: $step.id,
+              },
+              new Set([polymorphicPath]),
+            ),
+            {
+              rootStepId: $step.id,
+            },
+          );
+        }
+      }
+
       const objectOutputPlan = new OutputPlan(
-        parentLayerPlan,
+        objectLayerPlan,
         $step,
         {
           mode: "object",
@@ -1246,10 +1289,11 @@ export class OperationPlan {
       // Polymorphic
       const isUnion = isUnionType(nullableFieldType);
       const isInterface = isInterfaceType(nullableFieldType);
-      assert.ok(
-        isUnion || isInterface,
-        `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
-      );
+      if (!(isUnion || isInterface)) {
+        throw new Error(
+          `GraphileInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
+        );
+      }
       assert.ok(
         selections,
         "GraphileInternalError<d94e281c-1a10-463e-b7f5-2b0a3665d99b>: A polymorphic type with no selections is invalid",
@@ -1261,10 +1305,11 @@ export class OperationPlan {
        *
        * First we ensure we're dealing with a polymorphic step.
        */
-      assert.ok(
-        isPolymorphicStep($step),
-        `${$step} is not a polymorphic capable step, it must have a planForType method`,
-      );
+      if (!isPolymorphicStep($step)) {
+        throw new Error(
+          `${$step} is not a polymorphic capable step, it must have a planForType method`,
+        );
+      }
 
       /*
        * Next, we figure out the list of `possibleTypes` based on the
@@ -1947,15 +1992,34 @@ export class OperationPlan {
     return peers;
   }
 
+  private isImmoveable(step: ExecutableStep): boolean {
+    if (step.hasSideEffects) {
+      return true;
+    }
+    if (step instanceof __ItemStep || step instanceof __ValueStep) {
+      return true;
+    }
+    // TODO:perf: we should calculate this _once only_ rather than for every step!
+    const subroutineParentStepIds = this.layerPlans
+      .filter(
+        (p): p is LayerPlan<LayerPlanReasonSubroutine> =>
+          !!(p && p.reason.type === "subroutine"),
+      )
+      .map((p) => this.steps[p.reason.parentPlanId].id);
+    if (subroutineParentStepIds.includes(step.id)) {
+      // Don't hoist steps that are the root of a subroutine
+      // TODO: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Attempts to hoist the step into a higher layerPlan to maximize
    * deduplication.
    */
   private hoistStep(step: ExecutableStep) {
-    if (step.hasSideEffects) {
-      return;
-    }
-    if (step instanceof __ItemStep) {
+    if (this.isImmoveable(step)) {
       return;
     }
     switch (step.layerPlan.reason.type) {
@@ -1988,6 +2052,15 @@ export class OperationPlan {
       case "subroutine": {
         // Should be safe to hoist.
         break;
+      }
+      case "nullableBoundary": {
+        // Safe to hoist _unless_ it depends on the root step of the nullableBoundary.
+        const $root = this.steps[step.layerPlan.rootStepId!];
+        if (step.dependencies.some((dep) => this.steps[dep] === $root)) {
+          return;
+        } else {
+          break;
+        }
       }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
@@ -2070,6 +2143,175 @@ export class OperationPlan {
 
     // Now try and hoist it again!
     this.hoistStep(step);
+  }
+
+  /**
+   * Attempts to push the step into the lowest layerPlan to minimize the need
+   * for copying between layer plans.
+   */
+  private pushDown(step: ExecutableStep): void {
+    if (this.isImmoveable(step)) {
+      return;
+    }
+    switch (step.layerPlan.reason.type) {
+      case "root":
+      case "subscription":
+      case "defer":
+      case "polymorphic":
+      case "subroutine":
+      case "nullableBoundary":
+      case "listItem": {
+        // Fine to push lower
+        break;
+      }
+      case "mutationField": {
+        // NOTE: It's the user's responsibility to ensure that steps that have
+        // side effects are marked as such via `step.hasSideEffects = true`.
+        if (step.isSyncAndSafe) {
+          // TODO: warn user we're hoisting from a mutationField?
+          break;
+        } else {
+          // Plans that rely on external state shouldn't be hoisted because
+          // their results may change after a mutation, so the mutation should
+          // run first.
+          return;
+        }
+      }
+      default: {
+        const never: never = step.layerPlan.reason;
+        throw new Error(
+          `GraphileInternalError<81e3a7d4-aaa0-416b-abbb-a887734009bc>: unhandled layer plan reason ${inspect(
+            never,
+          )}`,
+        );
+      }
+    }
+
+    // TODO: don't allow pushing down into mutationField?
+
+    // Now find the lowest bucket that still satisfies all of it's dependents.
+    // TODO: make this calculation faster
+    const dependentSteps = this.steps.filter(
+      (s) => s && s.dependencies.some((d) => this.steps[d] === step),
+    );
+    const dependentOutputPlans: OutputPlan[] = [];
+    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+      if (outputPlan.rootStepId) {
+        if (this.steps[outputPlan.rootStepId] === step) {
+          dependentOutputPlans.push(outputPlan);
+        }
+      }
+    });
+    const layerPlansDirectlyDependent: LayerPlan[] = [];
+    for (const layerPlan of this.layerPlans) {
+      if (!layerPlan) continue;
+      if (
+        layerPlan.reason.type === "nullableBoundary" &&
+        this.steps[layerPlan.rootStepId!] === step
+      ) {
+        layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
+      }
+
+      // Very much a copy from treeShakeSteps
+      if ("parentPlanId" in layerPlan.reason) {
+        if (this.steps[layerPlan.reason.parentPlanId] === step) {
+          layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
+        }
+      }
+      if (layerPlan.rootStepId) {
+        if (this.steps[layerPlan.rootStepId] === step) {
+          layerPlansDirectlyDependent.push(layerPlan);
+        }
+      }
+      for (const typeRootStepId of Object.values(
+        layerPlan.rootStepIdByTypeName,
+      )) {
+        if (this.steps[typeRootStepId] === step) {
+          layerPlansDirectlyDependent.push(layerPlan);
+        }
+      }
+    }
+    const dependentLayerPlans = [
+      ...new Set([
+        ...dependentSteps.map((s) => s.layerPlan),
+        ...dependentOutputPlans.map((op) => op.layerPlan),
+        ...layerPlansDirectlyDependent,
+      ]),
+    ];
+    if (dependentLayerPlans.length === 0) {
+      throw new Error(`Nothing depends on ${step}?!`);
+    }
+    if (dependentLayerPlans.includes(step.layerPlan)) {
+      // Already as deep as it can go
+      return;
+    }
+
+    const paths: LayerPlan[][] = [];
+    let minPathLength = Infinity;
+
+    for (const dependentLayerPlan of dependentLayerPlans) {
+      let lp = dependentLayerPlan;
+      const path: LayerPlan[] = [lp];
+      while (lp.parentLayerPlan != step.layerPlan) {
+        const parent = lp.parentLayerPlan;
+        if (!parent) {
+          throw new Error(
+            `GraphileInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy`,
+          );
+        }
+        lp = parent;
+        path.push(lp);
+      }
+      paths.push(path);
+      minPathLength = Math.min(path.length, minPathLength);
+    }
+
+    const dependentLayerPlanCount = dependentLayerPlans.length;
+
+    let deepest = step.layerPlan;
+    outerloop: for (let i = 0; i < minPathLength; i++) {
+      const expected = paths[0][i];
+      if (expected.reason.type === "polymorphic") {
+        // TODO: reconsider
+        // Let's not pass polymorphic boundaries for now
+        break;
+      }
+      if (expected.reason.type === "subroutine") {
+        // TODO: reconsider
+        // Let's not pass subroutine boundaries for now
+        break;
+      }
+      if (expected.reason.type === "mutationField") {
+        // Let's not pass mutationField boundaries for now
+        break;
+      }
+      for (let j = 1; j < dependentLayerPlanCount; j++) {
+        const actual = paths[j][i];
+        if (expected != actual) {
+          break outerloop;
+        }
+      }
+      deepest = expected;
+    }
+
+    if (deepest === step.layerPlan) {
+      return;
+    }
+
+    // All our checks passed, shove it down!
+
+    // 1: no need to adjust polymorphicPaths, since we don't cross polymorphic boundary
+    const targetPolymorphicPaths = deepest.polymorphicPaths;
+    if (!targetPolymorphicPaths.has([...step.polymorphicPaths][0])) {
+      throw new Error(
+        `GraphileInternalError<53907e56-940a-4173-979d-bc620e4f1ff8>: polymorphic assumption doesn't hold. Mine = ${[
+          ...step.polymorphicPaths,
+        ]}; theirs = ${[...deepest.polymorphicPaths]}`,
+      );
+    }
+
+    // 2: move it to target layer
+    step.layerPlan = deepest;
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {
@@ -2242,6 +2484,13 @@ export class OperationPlan {
     });
   }
 
+  private pushDownSteps() {
+    this.processSteps("pushDown", 0, "dependents-first", (step) => {
+      this.pushDown(step);
+      return step;
+    });
+  }
+
   private getStepOptionsForStep(step: ExecutableStep): StepOptions {
     return step._stepOptions;
     /*
@@ -2359,6 +2608,7 @@ export class OperationPlan {
           (step.dependencies as number[])[i] = dep.id;
           dep.dependentPlans.push(step);
           if (dep.layerPlan === step.layerPlan) {
+            dep.sameLayerDependentPlans.push(step);
             step._sameLayerDependencies.push(dep.id);
           }
         }
@@ -2385,7 +2635,7 @@ export class OperationPlan {
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
           throw new Error(
-            `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan.id}`,
+            `GraphileInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan}`,
           );
         }
       }
@@ -2517,6 +2767,12 @@ export class OperationPlan {
         ensurePlanAvailableInLayer(parentStep, layerPlan);
       }
 
+      // Ensure list is accessible in parent layerPlan
+      if (layerPlan.reason.type === "listItem") {
+        const parentStep = this.steps[layerPlan.reason.parentPlanId];
+        ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+      }
+
       // Update plan references so executeBucket doesn't need to do explicit lookups
       const reason = layerPlan.reason;
       switch (reason.type) {
@@ -2530,6 +2786,10 @@ export class OperationPlan {
         case "polymorphic":
         case "listItem": {
           reason.parentPlanId = this.steps[reason.parentPlanId].id;
+          break;
+        }
+        case "nullableBoundary": {
+          reason.parentStepId = this.steps[reason.parentStepId].id;
           break;
         }
         default: {

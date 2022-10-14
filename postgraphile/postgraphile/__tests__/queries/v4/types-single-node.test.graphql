@@ -1,0 +1,11 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+query {
+  node(nodeId: "WyJ0eXBlcyIsMTFd") {
+    ... on Type {
+      id
+    }
+  }
+}

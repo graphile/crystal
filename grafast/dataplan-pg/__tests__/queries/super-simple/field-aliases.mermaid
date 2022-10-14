@@ -16,7 +16,7 @@ graph TD
     PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
     __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
     PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
+    PgClassExpression23["PgClassExpression[23∈2]<br />ᐸ__forums__.”name”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access18
@@ -33,6 +33,10 @@ graph TD
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23 bucket1
+    class Bucket1,__Item21,PgSelectSingle22 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgClassExpression23 bucket2
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
     end

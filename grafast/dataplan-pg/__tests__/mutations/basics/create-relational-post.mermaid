@@ -26,20 +26,20 @@ graph TD
     PgSelect25[["PgSelect[25∈1]<br />ᐸrelational_postsᐳ"]]:::plan
     First29["First[29∈1]"]:::plan
     PgSelectSingle30["PgSelectSingle[30∈1]<br />ᐸrelational_postsᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
-    PgClassExpression33["PgClassExpression[33∈1]<br />ᐸ__relation...scription”ᐳ"]:::plan
-    PgClassExpression34["PgClassExpression[34∈1]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
-    Map67["Map[67∈1]<br />ᐸ30:{”0”:3}ᐳ"]:::plan
-    PgSelectSingle41["PgSelectSingle[41∈1]<br />ᐸtextᐳ"]:::plan
-    PgClassExpression42["PgClassExpression[42∈1]<br />ᐸ__relation..._lower__.vᐳ"]:::plan
-    Map71["Map[71∈1]<br />ᐸ30:{”0”:5,”1”:6,”2”:7,”3”:8}ᐳ"]:::plan
-    PgSelectSingle49["PgSelectSingle[49∈1]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression50["PgClassExpression[50∈1]<br />ᐸ__relation..._archived”ᐳ"]:::plan
-    Map69["Map[69∈1]<br />ᐸ49:{”0”:0,”1”:1}ᐳ"]:::plan
-    PgSelectSingle64["PgSelectSingle[64∈1]<br />ᐸpeopleᐳ"]:::plan
-    PgClassExpression65["PgClassExpression[65∈1]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
-    PgClassExpression66["PgClassExpression[66∈1]<br />ᐸ__people__.”username”ᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__relation...sts__.”id”ᐳ"]:::plan
+    PgClassExpression32["PgClassExpression[32∈3]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    PgClassExpression33["PgClassExpression[33∈3]<br />ᐸ__relation...scription”ᐳ"]:::plan
+    PgClassExpression34["PgClassExpression[34∈3]<br />ᐸ__relation...s__.”note”ᐳ"]:::plan
+    Map67["Map[67∈3]<br />ᐸ30:{”0”:3}ᐳ"]:::plan
+    PgSelectSingle41["PgSelectSingle[41∈3]<br />ᐸtextᐳ"]:::plan
+    PgClassExpression42["PgClassExpression[42∈3]<br />ᐸ__relation..._lower__.vᐳ"]:::plan
+    Map71["Map[71∈3]<br />ᐸ30:{”0”:5,”1”:6,”2”:7,”3”:8}ᐳ"]:::plan
+    PgSelectSingle49["PgSelectSingle[49∈3]<br />ᐸrelational_itemsᐳ"]:::plan
+    PgClassExpression50["PgClassExpression[50∈3]<br />ᐸ__relation..._archived”ᐳ"]:::plan
+    Map69["Map[69∈3]<br />ᐸ49:{”0”:0,”1”:1}ᐳ"]:::plan
+    PgSelectSingle64["PgSelectSingle[64∈3]<br />ᐸpeopleᐳ"]:::plan
+    PgClassExpression65["PgClassExpression[65∈4]<br />ᐸ__people__.”person_id”ᐳ"]:::plan
+    PgClassExpression66["PgClassExpression[66∈4]<br />ᐸ__people__.”username”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access14
@@ -74,6 +74,18 @@ graph TD
     class Bucket0,__Value3,__Value5,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,Access14,Access15,Object16 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert{1}[13]<br />2: PgClassExpression{1}ᐸ__relation...ems__.”id”ᐳ[17]<br />3: PgInsert{1}[18]<br />4: PgClassExpression{1}ᐸ__relational_posts__ᐳ[22],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23],PgClassExpression{1}ᐸ(__relatio...ts__).”id”ᐳ[23]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgSelectSingle64,PgClassExpression65,PgClassExpression66,Map67,Map69,Map71 bucket1
+    class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 30, 23<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{1}ᐸrelational_postsᐳ[30]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgSelectSingle64,Map67,Map69,Map71 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 64<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[64]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression65,PgClassExpression66 bucket4
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
     end

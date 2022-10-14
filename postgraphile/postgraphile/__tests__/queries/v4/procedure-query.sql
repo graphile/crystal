@@ -329,20 +329,6 @@ lateral (
   from "b"."compound_type_query"(__compound_type_query_identifiers__."id0") as __compound_type_query__
 ) as __compound_type_query_result__;
 
-select
-  (not (__compound_type_set_query__ is null))::text as "0",
-  (row_number() over (partition by 1))::text as "1",
-  __compound_type_set_query__."a"::text as "2",
-  __compound_type_set_query__."b" as "3",
-  __compound_type_set_query__."c"::text as "4",
-  __compound_type_set_query__."d" as "5",
-  __compound_type_set_query__."e"::text as "6",
-  __compound_type_set_query__."f"::text as "7",
-  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "8",
-  __compound_type_set_query__."foo_bar"::text as "9"
-from "c"."compound_type_set_query"() as __compound_type_set_query__
-limit 6;
-
 select __compound_type_array_query_result__.*
 from (
   select
@@ -381,6 +367,42 @@ lateral (
   from "c"."table_query"(__table_query_identifiers__."id0") as __table_query__
 ) as __table_query_result__;
 
+select __query_compound_type_array_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __query_compound_type_array_identifiers__,
+lateral (
+  select
+    __query_compound_type_array__."foo_bar"::text as "0",
+    to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
+    __query_compound_type_array__."f"::text as "2",
+    __query_compound_type_array__."e"::text as "3",
+    __query_compound_type_array__."d" as "4",
+    __query_compound_type_array__."c"::text as "5",
+    __query_compound_type_array__."b" as "6",
+    __query_compound_type_array__."a"::text as "7",
+    (not (__query_compound_type_array__ is null))::text as "8",
+    __query_compound_type_array_identifiers__.idx as "9"
+  from unnest("a"."query_compound_type_array"(__query_compound_type_array_identifiers__."id0")) as __query_compound_type_array__
+) as __query_compound_type_array_result__;
+
+select
+  (not (__compound_type_set_query__ is null))::text as "0",
+  (row_number() over (partition by 1))::text as "1",
+  __compound_type_set_query__."a"::text as "2",
+  __compound_type_set_query__."b" as "3",
+  __compound_type_set_query__."c"::text as "4",
+  __compound_type_set_query__."d" as "5",
+  __compound_type_set_query__."e"::text as "6",
+  __compound_type_set_query__."f"::text as "7",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "8",
+  __compound_type_set_query__."foo_bar"::text as "9"
+from "c"."compound_type_set_query"() as __compound_type_set_query__
+limit 6;
+
 select
   __table_set_query__."id"::text as "0",
   (row_number() over (partition by 1))::text as "1",
@@ -410,6 +432,63 @@ lateral (
   where (
     __table_set_query__."person_full_name" = __table_set_query_identifiers__."id0"
   )
+) as __table_set_query_result__;
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__;
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__;
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    __table_set_query__."id"::text as "0",
+    (row_number() over (partition by 1))::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
 ) as __table_set_query_result__;
 
 select __table_set_query_result__.*
@@ -463,12 +542,69 @@ from "c"."table_set_query"() as __table_set_query__
 limit 7
 offset 0;
 
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."id"::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__;
+
+select __table_set_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query__."id"::text as "1",
+    __table_set_query__."person_full_name" as "2",
+    __table_set_query_identifiers__.idx as "3"
+  from "c"."table_set_query"() as __table_set_query__
+  limit __table_set_query_identifiers__."id0"
+  offset __table_set_query_identifiers__."id1"
+) as __table_set_query_result__;
+
 select
   (row_number() over (partition by 1))::text as "0",
   __table_set_query_plpgsql__."id"::text as "1",
   __table_set_query_plpgsql__."person_full_name" as "2"
 from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
 limit 3;
+
+select __table_set_query_plpgsql_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_set_query_plpgsql_identifiers__,
+lateral (
+  select
+    (row_number() over (partition by 1))::text as "0",
+    __table_set_query_plpgsql__."id"::text as "1",
+    __table_set_query_plpgsql__."person_full_name" as "2",
+    __table_set_query_plpgsql_identifiers__.idx as "3"
+  from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
+  limit __table_set_query_plpgsql_identifiers__."id0"
+  offset __table_set_query_plpgsql_identifiers__."id1"
+) as __table_set_query_plpgsql_result__;
 
 select __int_set_query_result__.*
 from (
@@ -512,34 +648,13 @@ lateral (
 ) as __int_set_query_result__;
 
 select
-  __static_big_integer__.v::text as "0"
+  __static_big_integer__.v::text as "0",
+  (row_number() over (partition by 1))::text as "1"
 from "a"."static_big_integer"() as __static_big_integer__(v);
 
 select
   (count(*))::text as "0"
 from "a"."static_big_integer"() as __static_big_integer__(v);
-
-select __query_compound_type_array_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __query_compound_type_array_identifiers__,
-lateral (
-  select
-    __query_compound_type_array__."foo_bar"::text as "0",
-    to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
-    __query_compound_type_array__."f"::text as "2",
-    __query_compound_type_array__."e"::text as "3",
-    __query_compound_type_array__."d" as "4",
-    __query_compound_type_array__."c"::text as "5",
-    __query_compound_type_array__."b" as "6",
-    __query_compound_type_array__."a"::text as "7",
-    (not (__query_compound_type_array__ is null))::text as "8",
-    __query_compound_type_array_identifiers__.idx as "9"
-  from unnest("a"."query_compound_type_array"(__query_compound_type_array_identifiers__."id0")) as __query_compound_type_array__
-) as __query_compound_type_array_result__;
 
 select
   (row_number() over (partition by 1))::text as "0",
@@ -549,117 +664,3 @@ from "a"."query_interval_set"() as __query_interval_set__(v);
 select
   (count(*))::text as "0"
 from "a"."query_interval_set"() as __query_interval_set__(v);
-
-select __table_set_query_plpgsql_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_plpgsql_identifiers__,
-lateral (
-  select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query_plpgsql__."id"::text as "1",
-    __table_set_query_plpgsql__."person_full_name" as "2",
-    __table_set_query_plpgsql_identifiers__.idx as "3"
-  from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
-  limit __table_set_query_plpgsql_identifiers__."id0"
-  offset __table_set_query_plpgsql_identifiers__."id1"
-) as __table_set_query_plpgsql_result__;
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."id"::text as "1",
-    __table_set_query__."person_full_name" as "2",
-    __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__;
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    __table_set_query__."id"::text as "0",
-    (row_number() over (partition by 1))::text as "1",
-    __table_set_query__."person_full_name" as "2",
-    __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__;
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."id"::text as "1",
-    __table_set_query__."person_full_name" as "2",
-    __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__;
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    __table_set_query__."id"::text as "0",
-    (row_number() over (partition by 1))::text as "1",
-    __table_set_query__."person_full_name" as "2",
-    __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__;
-
-select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
-lateral (
-  select
-    (row_number() over (partition by 1))::text as "0",
-    __table_set_query__."id"::text as "1",
-    __table_set_query__."person_full_name" as "2",
-    __table_set_query_identifiers__.idx as "3"
-  from "c"."table_set_query"() as __table_set_query__
-  limit __table_set_query_identifiers__."id0"
-  offset __table_set_query_identifiers__."id1"
-) as __table_set_query_result__;

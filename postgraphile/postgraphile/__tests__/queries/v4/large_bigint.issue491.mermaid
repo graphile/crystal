@@ -14,36 +14,36 @@ graph TD
     Access20["Access[20∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
     Object21["Object[21∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
     Connection22["Connection[22∈0]<br />ᐸ18ᐳ"]:::plan
-    PgSelect23[["PgSelect[23∈0]<br />ᐸlargeNodeIdᐳ"]]:::plan
-    __Item24>"__Item[24∈1]<br />ᐸ23ᐳ"]:::itemplan
-    PgSelectSingle25["PgSelectSingle[25∈1]<br />ᐸlargeNodeIdᐳ"]:::plan
-    Constant26["Constant[26∈0]"]:::plan
-    PgClassExpression27["PgClassExpression[27∈1]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
-    List28["List[28∈1]<br />ᐸ26,27ᐳ"]:::plan
-    Lambda29["Lambda[29∈1]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈1]<br />ᐸ__large_no...d__.”text”ᐳ"]:::plan
+    PgSelect23[["PgSelect[23∈1]<br />ᐸlargeNodeIdᐳ"]]:::plan
+    __Item24>"__Item[24∈2]<br />ᐸ23ᐳ"]:::itemplan
+    PgSelectSingle25["PgSelectSingle[25∈2]<br />ᐸlargeNodeIdᐳ"]:::plan
+    Constant26["Constant[26∈1]"]:::plan
+    PgClassExpression27["PgClassExpression[27∈3]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
+    List28["List[28∈3]<br />ᐸ26,27ᐳ"]:::plan
+    Lambda29["Lambda[29∈3]<br />ᐸbase64JSONEncodeᐳ"]:::plan
+    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__large_no...d__.”text”ᐳ"]:::plan
     __InputStaticLeaf32["__InputStaticLeaf[32∈0]"]:::plan
     Lambda33["Lambda[33∈0]<br />ᐸspecifier_LargeNodeId_base64JSONᐳ"]:::plan
     Access34["Access[34∈0]<br />ᐸ33.1ᐳ"]:::plan
     PgSelect35[["PgSelect[35∈0]<br />ᐸlargeNodeIdᐳ"]]:::plan
     First39["First[39∈0]"]:::plan
     PgSelectSingle40["PgSelectSingle[40∈0]<br />ᐸlargeNodeIdᐳ"]:::plan
-    Constant41["Constant[41∈0]"]:::plan
-    PgClassExpression42["PgClassExpression[42∈0]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
-    List43["List[43∈0]<br />ᐸ41,42ᐳ"]:::plan
-    Lambda44["Lambda[44∈0]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    PgClassExpression46["PgClassExpression[46∈0]<br />ᐸ__large_no...d__.”text”ᐳ"]:::plan
+    Constant41["Constant[41∈4]"]:::plan
+    PgClassExpression42["PgClassExpression[42∈4]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
+    List43["List[43∈4]<br />ᐸ41,42ᐳ"]:::plan
+    Lambda44["Lambda[44∈4]<br />ᐸbase64JSONEncodeᐳ"]:::plan
+    PgClassExpression46["PgClassExpression[46∈4]<br />ᐸ__large_no...d__.”text”ᐳ"]:::plan
     __InputStaticLeaf47["__InputStaticLeaf[47∈0]"]:::plan
     Lambda48["Lambda[48∈0]<br />ᐸspecifier_LargeNodeId_base64JSONᐳ"]:::plan
     Access49["Access[49∈0]<br />ᐸ48.1ᐳ"]:::plan
     PgSelect50[["PgSelect[50∈0]<br />ᐸlargeNodeIdᐳ"]]:::plan
     First54["First[54∈0]"]:::plan
     PgSelectSingle55["PgSelectSingle[55∈0]<br />ᐸlargeNodeIdᐳ"]:::plan
-    Constant56["Constant[56∈0]"]:::plan
-    PgClassExpression57["PgClassExpression[57∈0]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
-    List58["List[58∈0]<br />ᐸ56,57ᐳ"]:::plan
-    Lambda59["Lambda[59∈0]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    PgClassExpression61["PgClassExpression[61∈0]<br />ᐸ__large_no...d__.”text”ᐳ"]:::plan
+    Constant56["Constant[56∈5]"]:::plan
+    PgClassExpression57["PgClassExpression[57∈5]<br />ᐸ__large_node_id__.”id”ᐳ"]:::plan
+    List58["List[58∈5]<br />ᐸ56,57ᐳ"]:::plan
+    Lambda59["Lambda[59∈5]<br />ᐸbase64JSONEncodeᐳ"]:::plan
+    PgClassExpression61["PgClassExpression[61∈5]<br />ᐸ__large_no...d__.”text”ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access19
@@ -78,9 +78,23 @@ graph TD
     subgraph "Buckets for queries/v4/large_bigint.issue491"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access19,Access20,Object21,Connection22,PgSelect23,Constant26,__InputStaticLeaf32,Lambda33,Access34,PgSelect35,First39,PgSelectSingle40,Constant41,PgClassExpression42,List43,Lambda44,PgClassExpression46,__InputStaticLeaf47,Lambda48,Access49,PgSelect50,First54,PgSelectSingle55,Constant56,PgClassExpression57,List58,Lambda59,PgClassExpression61 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 26<br /><br />ROOT __Item{1}ᐸ23ᐳ[24]"):::bucket
+    class Bucket0,__Value3,__Value5,Access19,Access20,Object21,Connection22,__InputStaticLeaf32,Lambda33,Access34,PgSelect35,First39,PgSelectSingle40,__InputStaticLeaf47,Lambda48,Access49,PgSelect50,First54,PgSelectSingle55 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 21, 22<br /><br />ROOT Connectionᐸ18ᐳ[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item24,PgSelectSingle25,PgClassExpression27,List28,Lambda29,PgClassExpression31 bucket1
-    Bucket0 --> Bucket1
+    class Bucket1,PgSelect23,Constant26 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 26<br /><br />ROOT __Item{2}ᐸ23ᐳ[24]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item24,PgSelectSingle25 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 26<br /><br />ROOT PgSelectSingle{2}ᐸlargeNodeIdᐳ[25]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression27,List28,Lambda29,PgClassExpression31 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 40<br /><br />ROOT PgSelectSingleᐸlargeNodeIdᐳ[40]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,Constant41,PgClassExpression42,List43,Lambda44,PgClassExpression46 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgSelectSingleᐸlargeNodeIdᐳ[55]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,Constant56,PgClassExpression57,List58,Lambda59,PgClassExpression61 bucket5
+    Bucket0 --> Bucket1 & Bucket4 & Bucket5
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
     end

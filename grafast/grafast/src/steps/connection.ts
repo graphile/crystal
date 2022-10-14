@@ -1,6 +1,12 @@
+import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
-import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "../interfaces.js";
+import type { ExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 import { each } from "./each.js";
 
@@ -316,7 +322,7 @@ export class EdgeStep<
     TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
     TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
   >
-  extends ExecutableStep
+  extends UnbatchedExecutableStep
   implements EdgeCapableStep<TNodeStep>
 {
   static $$export = {
@@ -325,16 +331,41 @@ export class EdgeStep<
   };
   isSyncAndSafe = true;
 
-  private connectionStepId: number;
-  private cursorDepId: number | null = null;
+  private connectionDepId: number;
+  private readonly cursorDepId: number | null;
+  private needCursor = false;
 
   constructor(
     $connection: ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>,
     $item: TItemStep,
+    private skipCursor = false,
   ) {
     super();
-    this.connectionStepId = $connection.id;
-    this.addDependency($item);
+    const itemDepId = this.addDependency($item);
+    assert.strictEqual(
+      itemDepId,
+      0,
+      "GraphileInternalError<89cc75cd-ccaf-4b7e-873f-a629c36d55f7>: item must be first dependency",
+    );
+    if (!skipCursor) {
+      const $cursor =
+        $connection.cursorPlan?.($item) ??
+        (
+          $item as ExecutableStep & { cursor?: () => ExecutableStep }
+        ).cursor?.();
+      if (!$cursor) {
+        throw new Error(`No cursor plan known for '${$item}'`);
+      }
+      this.cursorDepId = this.addDependency($cursor);
+      assert.strictEqual(
+        this.cursorDepId,
+        1,
+        "GraphileInternalError<46e4b5ca-0c11-4737-973d-0edd0be060c9>: cursor must be second dependency",
+      );
+    } else {
+      this.cursorDepId = null;
+    }
+    this.connectionDepId = this.addDependency($connection);
   }
 
   private getConnectionStep(): ConnectionStep<
@@ -343,7 +374,7 @@ export class EdgeStep<
     TStep,
     TNodeStep
   > {
-    return this.getStep(this.connectionStepId) as any;
+    return this.getDep(this.connectionDepId) as any;
   }
 
   private getItemStep(): TItemStep {
@@ -356,32 +387,34 @@ export class EdgeStep<
   }
 
   cursor(): ExecutableStep<string | null> {
-    if (this.cursorDepId != null) {
-      return this.getDep(this.cursorDepId);
+    this.needCursor = true;
+    return this.getDep(this.cursorDepId!);
+  }
+
+  optimize() {
+    if (!this.needCursor && this.cursorDepId !== null) {
+      return new EdgeStep(this.getConnectionStep(), this.getItemStep(), true);
     }
-    const $item = this.getItemStep();
-    const $cursor =
-      this.getConnectionStep().cursorPlan?.($item) ??
-      ($item as ExecutableStep & { cursor?: () => ExecutableStep }).cursor?.();
-    if ($cursor) {
-      this.cursorDepId = this.addDependency($cursor);
-      return $cursor;
-    } else {
-      throw new Error(`No cursor plan known for '${$item}'`);
+    return this;
+  }
+
+  deduplicate(
+    _peers: EdgeStep<any, any, any, any>[],
+  ): EdgeStep<TItemStep, TCursorStep, TStep, TNodeStep>[] {
+    return _peers;
+  }
+
+  deduplicatedWith(replacement: EdgeStep<any, any, any, any>) {
+    if (this.needCursor) {
+      replacement.needCursor = true;
     }
   }
 
-  execute(values: Array<GrafastValuesList<any>>): GrafastResultsList<any> {
+  unbatchedExecute(extra: ExecutionExtra, record: any, cursor: any): any {
     // Handle nulls; everything else comes from the child plans
-    const results: any[] = [];
-    for (let i = 0, l = values[0].length; i < l; i++) {
-      results[i] =
-        values[0][i] == null &&
-        (this.cursorDepId == null || values[this.cursorDepId][i] == null)
-          ? null
-          : EMPTY_OBJECT;
-    }
-    return results;
+    return record == null && (this.cursorDepId == null || cursor == null)
+      ? null
+      : EMPTY_OBJECT;
   }
 }
 

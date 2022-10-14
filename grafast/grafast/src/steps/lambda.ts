@@ -1,9 +1,4 @@
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-  PromiseOrDirect,
-} from "../interfaces.js";
+import type { ExecutionExtra, PromiseOrDirect } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { list } from "./list.js";
@@ -38,15 +33,6 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
 
   deduplicate(peers: LambdaStep<any, any>[]): LambdaStep<TIn, TOut>[] {
     return peers.filter((peer) => peer.fn === this.fn);
-  }
-
-  execute(values: [GrafastValuesList<TIn>]): GrafastResultsList<TOut> {
-    const { planDep } = this;
-    if (planDep != null) {
-      return values[planDep].map(this.fn);
-    } else {
-      return values[0].map(this.fn);
-    }
   }
 
   unbatchedExecute(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {

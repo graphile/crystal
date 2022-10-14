@@ -226,6 +226,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
+  public sameLayerDependentPlans: Array<ExecutableStep> = [];
+  /**
+   * Just for mermaid
+   * @internal
+   */
   public dependentPlans: Array<ExecutableStep> = [];
 
   /**

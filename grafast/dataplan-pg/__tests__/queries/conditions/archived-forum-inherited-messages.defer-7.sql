@@ -22,8 +22,8 @@ from (
 lateral (
   select
     __messages__."body" as "0",
-    __messages__."id" as "1",
-    __messages__."author_id" as "2",
+    __messages__."author_id" as "1",
+    __messages__."id" as "2",
     __messages_identifiers__.idx as "3"
   from app_public.messages as __messages__
   where

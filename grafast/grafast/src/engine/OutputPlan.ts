@@ -326,25 +326,27 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
       }
     } else if (this.type.mode === "polymorphic") {
-      assert.ok(
-        type && this.type.typeNames.includes(type.name),
-        "GraphileInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
-      );
-      assert.strictEqual(
-        key,
-        null,
-        "GraphileInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
-      );
-      assert.ok(
-        child.type === "outputPlan",
-        "GraphileInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
-      );
-      assert.ok(
-        child.outputPlan.type.mode === "object",
-        "GraphileInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
-      );
-      this.childByTypeName[type.name] =
-        child.outputPlan as OutputPlan<OutputPlanTypeObject>;
+      if (isDev) {
+        assert.ok(
+          type && this.type.typeNames.includes(type.name),
+          "GraphileInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
+        );
+        assert.strictEqual(
+          key,
+          null,
+          "GraphileInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
+        );
+        assert.ok(
+          child.type === "outputPlan",
+          "GraphileInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
+        );
+        assert.ok(
+          child.outputPlan.type.mode === "object",
+          "GraphileInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
+        );
+      }
+      this.childByTypeName[type!.name] = (child as OutputPlanKeyValueOutputPlan)
+        .outputPlan as OutputPlan<OutputPlanTypeObject>;
     } else {
       throw new Error(
         `GraphileInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
@@ -482,9 +484,19 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
         const childIsNonNull = this.childIsNonNull;
+        let directLayerPlanChild = this.child.layerPlan;
+        while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
+          const parent = directLayerPlanChild.parentLayerPlan;
+          if (!parent) {
+            throw new Error(
+              `GraphileInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
+            );
+          }
+          directLayerPlanChild = parent;
+        }
         const canStream =
-          this.child.layerPlan.reason.type === "listItem" &&
-          !!this.child.layerPlan.reason.stream;
+          directLayerPlanChild.reason.type === "listItem" &&
+          !!directLayerPlanChild.reason.stream;
 
         if (childIsNonNull) {
           if (canStream) {
@@ -524,7 +536,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
                 : "outputPlan?",
             sameBucket:
               spec.type === "__typename" ||
-              spec.layerPlanId === this.layerPlan.id,
+              spec.outputPlan.layerPlan.id === this.layerPlan.id,
           };
         }
         this.execute = makeObjectExecutor(
@@ -616,19 +628,33 @@ export function nonNullError(
   );
 }
 
-function getChildBucketAndIndex(
+/**
+ * We're currently running OutputPlan `outputPlan` in bucket `bucket` at index
+ * `bucketIndex`. If this is an array OutputPlan then we're looping over the
+ * entries in our list and we're currently at index `inArrayIndex` (otherwise
+ * this is null).
+ *
+ * Now we want to run `childOutputPlan`, but to do so we need to find the
+ * related `childBucket` and `childBucketIndex`.
+ *
+ * @internal
+ */
+export function getChildBucketAndIndex(
   childOutputPlan: OutputPlan,
-  outputPlan: OutputPlan,
+  outputPlan: OutputPlan | null,
   bucket: Bucket,
   bucketIndex: number,
   arrayIndex: number | null = null,
-): [Bucket, number] {
-  if ((arrayIndex == null) === (outputPlan.type.mode === "array")) {
+): [Bucket, number] | null {
+  if (
+    (arrayIndex == null) ===
+    (outputPlan != null && outputPlan.type.mode === "array")
+  ) {
     throw new Error(
       "GraphileInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
-  if (childOutputPlan.layerPlan === outputPlan.layerPlan) {
+  if (outputPlan && childOutputPlan.layerPlan === bucket.layerPlan) {
     // Same layer; straightforward
     return [bucket, bucketIndex];
   }
@@ -638,9 +664,7 @@ function getChildBucketAndIndex(
   while (!bucket.children[current.id]) {
     current = current.parentLayerPlan;
     if (!current) {
-      throw new Error(
-        `GraphileInternalError<c354573b-7714-4b5b-9db1-0beae1074fec>: Could not find child for '${childOutputPlan.layerPlan}' in bucket for '${bucket.layerPlan}'`,
-      );
+      return null;
     }
     reversePath.push(current);
   }
@@ -648,39 +672,49 @@ function getChildBucketAndIndex(
   let currentBucket = bucket;
   let currentIndex = bucketIndex;
 
-  for (let i = reversePath.length - 1; i >= 0; i--) {
+  for (let l = reversePath.length, i = l - 1; i >= 0; i--) {
     const layerPlan = reversePath[i];
     const child = currentBucket.children[layerPlan.id];
     if (!child) {
-      throw new Error(
-        `GraphileInternalError<f26a3170-3849-4aca-9c0c-85229105da7b>: Could not find child for '${childOutputPlan.layerPlan}' in bucket for '${currentBucket.layerPlan}'`,
-      );
+      return null;
     }
 
     const out = child.map.get(currentIndex);
-    assert.ok(
-      out != null,
-      `GraphileInternalError<e955b964-7bad-4649-84aa-a2a076c6b9ea>: Could not find a matching entry in the map for bucket index ${currentIndex}`,
-    );
-    if (arrayIndex == null) {
-      assert.ok(
-        !Array.isArray(out),
-        "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
-      );
+    if (out == null) {
+      return null;
+    }
+
+    /*
+     * TODO: this '|| i > 0' feels really really really hacky... What happens if we have
+     * nested arrays? I'm concerned there's a bug here.
+     */
+    if (arrayIndex == null || i !== l - 1) {
+      if (Array.isArray(out)) {
+        throw new Error(
+          "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
+        );
+      }
       currentBucket = child.bucket;
       currentIndex = out;
     } else {
-      assert.ok(
-        Array.isArray(out),
-        "GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array",
-      );
-      assert.ok(
-        out.length > arrayIndex,
-        `GraphileInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
-      );
+      if (!Array.isArray(out)) {
+        throw new Error(
+          `GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
+            out,
+          )}`,
+        );
+      }
+      if (!(out.length > arrayIndex)) {
+        throw new Error(
+          `GraphileInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
+        );
+      }
       currentBucket = child.bucket;
       currentIndex = out[arrayIndex];
     }
+  }
+  if (currentIndex == null) {
+    return null;
   }
   return [currentBucket, currentIndex];
 }
@@ -743,6 +777,9 @@ function makeExecuteChildPlanCode(
   if (isNonNull) {
     // No need to catch error
     return `
+      if (${childBucket} == null) {
+        throw nonNullError(${locationDetails}, mutablePath.slice(1));
+      }
       const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
@@ -754,7 +791,9 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return `
       try {
-        const fieldResult = ${childOutputPlan}.${
+        const fieldResult = ${childBucket} == null ? ${
+      asString ? '"null"' : "null"
+    } : ${childOutputPlan}.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
@@ -980,12 +1019,16 @@ ${
       asString ? "executeString" : "execute"
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
-    const [childBucket, childBucketIndex] = getChildBucketAndIndex(
+    const c = getChildBucketAndIndex(
       childOutputPlan,
       this,
       bucket,
       bucketIndex,
     );
+    if (!c) {
+      throw new Error("GraphileInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket");
+    }
+    const [childBucket, childBucketIndex] = c;
     return childOutputPlan.${
       asString ? "executeString" : "execute"
     }(root, mutablePath, childBucket, childBucketIndex);
@@ -1038,13 +1081,18 @@ ${asString ? '    string = "[";\n' : ""}\
       if (directChild) {
         childBucketIndex = lookup[i];
       } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+        const c = getChildBucketAndIndex(
           childOutputPlan,
           this,
           bucket,
           bucketIndex,
           i,
-        ));
+        );
+        if (c) {
+          ([childBucket, childBucketIndex] = c);
+        } else {
+          childBucket = childBucketIndex = null;
+        }
       }
 
       mutablePath[mutablePathIndex] = i;
@@ -1075,7 +1123,6 @@ ${
       label: childOutputPlan.layerPlan.reason.stream?.label,
       stream,
       startIndex: bucketRootValue.length,
-      listItemStepId: childOutputPlan.layerPlan.rootStepId,
     });
   }`
     : ``
@@ -1273,17 +1320,22 @@ ${makeExecuteChildPlanCode(
 )}`
     : `\
       let childBucket, childBucketIndex;
-      const directChild = children[spec.layerPlanId];
+      const directChild = children[spec.outputPlan.layerPlanId];
       if (directChild) {
         childBucket = directChild.bucket;
         childBucketIndex = directChild.map.get(bucketIndex);
       } else {
-        ([childBucket, childBucketIndex] = getChildBucketAndIndex(
+        const c = getChildBucketAndIndex(
           spec.outputPlan,
           this,
           bucket,
           bucketIndex,
-        ));
+        );
+        if (c) {
+          ([childBucket, childBucketIndex] = c);
+        } else {
+          childBucket = childBucketIndex = null;
+        }
       }
 ${makeExecuteChildPlanCode(
   asString

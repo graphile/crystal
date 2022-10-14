@@ -1,3 +1,29 @@
+select __houses_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"int4" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __houses_identifiers__,
+lateral (
+  select
+    __houses__."property_id"::text as "0",
+    __houses__."street_id"::text as "1",
+    __houses__."street_name" as "2",
+    __houses__."property_name_or_number" as "3",
+    __houses__."building_name" as "4",
+    __houses_identifiers__.idx as "5"
+  from "smart_comment_relations"."houses" as __houses__
+  where
+    (
+      __houses__."street_id" = __houses_identifiers__."id0"
+    ) and (
+      __houses__."property_id" = __houses_identifiers__."id1"
+    )
+  order by __houses__."street_id" asc, __houses__."property_id" asc
+) as __houses_result__;
+
 select
   __houses__."building_name" as "0",
   __houses__."property_name_or_number" as "1",
@@ -124,29 +150,3 @@ on (__houses__."property_id"::"int4" = __properties_3."id")
 left outer join "smart_comment_relations"."streets" as __streets_6
 on (__properties_3."street_id"::"int4" = __streets_6."id")
 order by __houses__."street_id" asc, __houses__."property_id" asc;
-
-select __houses_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __houses_identifiers__,
-lateral (
-  select
-    __houses__."property_id"::text as "0",
-    __houses__."street_id"::text as "1",
-    __houses__."street_name" as "2",
-    __houses__."property_name_or_number" as "3",
-    __houses__."building_name" as "4",
-    __houses_identifiers__.idx as "5"
-  from "smart_comment_relations"."houses" as __houses__
-  where
-    (
-      __houses__."street_id" = __houses_identifiers__."id0"
-    ) and (
-      __houses__."property_id" = __houses_identifiers__."id1"
-    )
-  order by __houses__."street_id" asc, __houses__."property_id" asc
-) as __houses_result__;

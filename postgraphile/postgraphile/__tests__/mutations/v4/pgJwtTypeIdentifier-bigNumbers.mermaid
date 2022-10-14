@@ -20,7 +20,7 @@ graph TD
     First16["First[16∈1]"]:::plan
     PgSelectSingle17["PgSelectSingle[17∈1]<br />ᐸauthenticateᐳ"]:::plan
     Object18["Object[18∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression19["PgClassExpression[19∈1]<br />ᐸ__authenticate__ᐳ"]:::plan
+    PgClassExpression19["PgClassExpression[19∈2]<br />ᐸ__authenticate__ᐳ"]:::plan
 
     %% plan dependencies
     __Value3 --> Access13
@@ -38,6 +38,10 @@ graph TD
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf10,__InputStaticLeaf11,Access13,Access14,Object15 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect{1}ᐸauthenticate(mutation)ᐳ[12]<br />2: First{1}[16]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18,PgClassExpression19 bucket1
+    class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgClassExpression19 bucket2
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
     end

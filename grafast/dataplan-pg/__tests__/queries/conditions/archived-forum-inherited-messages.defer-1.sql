@@ -24,12 +24,16 @@ lateral (
     __messages__."body" as "0",
     __users__."username" as "1",
     __users__."gravatar_url" as "2",
-    __messages__."id" as "3",
-    __messages__."author_id" as "4",
-    __messages_identifiers__.idx as "5"
+    __users_2."gravatar_url" as "3",
+    __users_2."username" as "4",
+    __messages__."author_id" as "5",
+    __messages__."id" as "6",
+    __messages_identifiers__.idx as "7"
   from app_public.messages as __messages__
   left outer join app_public.users as __users__
   on (__messages__."author_id"::"uuid" = __users__."id")
+  left outer join app_public.users as __users_2
+  on (__messages__."author_id"::"uuid" = __users_2."id")
   where
     (
       (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)

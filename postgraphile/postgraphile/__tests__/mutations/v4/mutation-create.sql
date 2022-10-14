@@ -621,22 +621,6 @@ lateral (
   order by __post__."id" asc
 ) as __post_result__;
 
-select __frmcdc_comptype_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."comptype"[] as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_comptype_1_identifiers__,
-lateral (
-  select
-    __frmcdc_comptype_1__."is_optimised"::text as "0",
-    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
-    (not (__frmcdc_comptype_1__ is null))::text as "2",
-    __frmcdc_comptype_1_identifiers__.idx as "3"
-  from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
-) as __frmcdc_comptype_1_result__;
-
 select __person_result__.*
 from (
   select
@@ -656,3 +640,19 @@ lateral (
   )
   order by __person__."id" asc
 ) as __person_result__;
+
+select __frmcdc_comptype_1_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"a"."comptype"[] as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __frmcdc_comptype_1_identifiers__,
+lateral (
+  select
+    __frmcdc_comptype_1__."is_optimised"::text as "0",
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
+    (not (__frmcdc_comptype_1__ is null))::text as "2",
+    __frmcdc_comptype_1_identifiers__.idx as "3"
+  from unnest(__frmcdc_comptype_1_identifiers__."id0") as __frmcdc_comptype_1__
+) as __frmcdc_comptype_1_result__;

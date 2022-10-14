@@ -168,7 +168,7 @@ export function executeBucket(
       return;
     }
     let promises: PromiseLike<void>[] | undefined;
-    outerLoop: for (const potentialNextStep of finishedStep.dependentPlans) {
+    outerLoop: for (const potentialNextStep of finishedStep.sameLayerDependentPlans) {
       const isPending = pendingSteps.has(potentialNextStep);
       if (!isPending) {
         // We've already ran it, skip
@@ -430,35 +430,49 @@ export function executeBucket(
     dependenciesIncludingSideEffects: ReadonlyArray<any>[],
     polymorphicPathList: readonly string[],
     extra: ExecutionExtra,
-  ) {
+  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     const errors: { [index: number]: GrafastError } = Object.create(null);
+
+    /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;
+
+    /** If all we see is errors, there's no need to execute! */
+    let needsNoExecution = true;
+
     for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
       const polymorphicPath = polymorphicPathList[index];
       if (!step.polymorphicPaths.has(polymorphicPath)) {
         foundErrors = true;
-        if (isDev) {
-          errors[index] = newGrafastError(
-            new Error(
-              `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
-                ...step.polymorphicPaths,
-              ]}) has no match for '${polymorphicPath}'`,
-            ),
-            step.id,
-          );
-        } else {
-          errors[index] = POLY_SKIPPED;
-        }
+        const e = isDev
+          ? newGrafastError(
+              new Error(
+                `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
+                  ...step.polymorphicPaths,
+                ]}) has no match for '${polymorphicPath}'`,
+              ),
+              step.id,
+            )
+          : POLY_SKIPPED;
+
+        errors[index] = e;
       } else if (extra._bucket.hasErrors) {
+        let noError = true;
         for (const depList of dependenciesIncludingSideEffects) {
           const v = depList[index];
           if (isGrafastError(v)) {
             if (!errors[index]) {
+              noError = false;
               foundErrors = true;
               errors[index] = v;
+              break;
             }
           }
         }
+        if (noError) {
+          needsNoExecution = false;
+        }
+      } else {
+        needsNoExecution = false;
       }
     }
 
@@ -472,7 +486,10 @@ export function executeBucket(
         )
       : dependenciesIncludingSideEffects;
 
-    if (foundErrors) {
+    if (needsNoExecution) {
+      // Everything is errors; we can skip execution
+      return Object.values(errors);
+    } else if (foundErrors) {
       const dependenciesWithoutErrors = dependencies.map((depList) =>
         depList.filter((_, index) => !errors[index]),
       );
@@ -623,6 +640,103 @@ export function executeBucket(
     loop: for (const childLayerPlan of childLayerPlans) {
       const copyStepIds = childLayerPlan.copyPlanIds;
       switch (childLayerPlan.reason.type) {
+        case "nullableBoundary": {
+          const store: Bucket["store"] = new Map();
+          const polymorphicPathList: string[] = [];
+          const map: Map<number, number> = new Map();
+          let size = 0;
+
+          const itemStepId = childLayerPlan.rootStepId;
+          assert.ok(
+            itemStepId != null,
+            "GraphileInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
+          );
+          const nullableStepStore = bucket.store.get(itemStepId);
+          if (!nullableStepStore) {
+            throw new Error(
+              `GraphileInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
+                itemStepId,
+              )}) in store for ${bucket.layerPlan}`,
+            );
+          }
+
+          // TODO:perf: if parent bucket has no nulls/errors in `itemStepId`
+          // then we can just copy everything wholesale rather than building
+          // new arrays and looping.
+          const hasNoNullsOrErrors = false;
+
+          if (hasNoNullsOrErrors) {
+            store.set(itemStepId, nullableStepStore);
+            for (const planId of copyStepIds) {
+              store.set(planId, bucket.store.get(planId)!);
+            }
+            for (
+              let originalIndex = 0;
+              originalIndex < bucket.size;
+              originalIndex++
+            ) {
+              const newIndex = size++;
+              map.set(originalIndex, newIndex);
+              polymorphicPathList[newIndex] =
+                bucket.polymorphicPathList[originalIndex];
+            }
+          } else {
+            const itemStepIdList: any[] = [];
+            store.set(itemStepId, itemStepIdList);
+
+            // Prepare store with an empty list for each copyPlanId
+            for (const planId of copyStepIds) {
+              store.set(planId, []);
+            }
+
+            // We'll typically be creating fewer nullableBoundary bucket entries
+            // than we have parent bucket entries (because we exclude nulls), so
+            // we must "multiply up" (down) the store entries.
+            for (
+              let originalIndex = 0;
+              originalIndex < bucket.size;
+              originalIndex++
+            ) {
+              const fieldValue: any[] | null | undefined | GrafastError =
+                nullableStepStore[originalIndex];
+              if (fieldValue != null) {
+                const newIndex = size++;
+                map.set(originalIndex, newIndex);
+                itemStepIdList[newIndex] = fieldValue;
+
+                polymorphicPathList[newIndex] =
+                  bucket.polymorphicPathList[originalIndex];
+                for (const planId of copyStepIds) {
+                  store.get(planId)![newIndex] =
+                    bucket.store.get(planId)![originalIndex];
+                }
+              }
+            }
+          }
+
+          if (size > 0) {
+            // Reference
+            const childBucket = newBucket({
+              layerPlan: childLayerPlan,
+              size,
+              store,
+              // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+              hasErrors: bucket.hasErrors,
+              polymorphicPathList,
+            });
+            bucket.children[childLayerPlan.id] = {
+              bucket: childBucket,
+              map,
+            };
+
+            // Execute
+            const result = executeBucket(childBucket, requestContext);
+            if (isPromiseLike(result)) {
+              childPromises.push(result);
+            }
+          }
+          break;
+        }
         case "listItem": {
           const store: Bucket["store"] = new Map();
           const polymorphicPathList: string[] = [];
@@ -631,18 +745,20 @@ export function executeBucket(
 
           const listStepId = childLayerPlan.reason.parentPlanId;
           const listStepStore = bucket.store.get(listStepId);
-          assert.ok(
-            listStepStore,
-            `GraphileInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not found entry '${listStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
-              listStepId,
-            )}) in store`,
-          );
+          if (!listStepStore) {
+            throw new Error(
+              `GraphileInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not find entry '${listStepId}' (${bucket.layerPlan.operationPlan.dangerouslyGetStep(
+                listStepId,
+              )}) in store for layerPlan ${bucket.layerPlan}`,
+            );
+          }
 
           const itemStepId = childLayerPlan.rootStepId;
-          assert.ok(
-            itemStepId != null,
-            "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
-          );
+          if (itemStepId == null) {
+            throw new Error(
+              "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+            );
+          }
           store.set(itemStepId, []);
 
           // Prepare store with an empty list for each copyPlanId
@@ -862,7 +978,11 @@ export function newBucket(
 ): Bucket {
   if (isDev) {
     // Some validations
-    assert.ok(spec.size > 0, "No need to create an empty bucket!");
+    if (!(spec.size > 0)) {
+      throw new Error(
+        "GraphileInternalError<eb5c962d-c748-4759-95e3-52c50c873593>: No need to create an empty bucket!",
+      );
+    }
     assert.strictEqual(
       spec.polymorphicPathList.length,
       spec.size,
