@@ -2808,6 +2808,12 @@ export class OperationPlan {
       const rootPlan = this.steps[outputPlan.rootStepId];
       ensurePlanAvailableInLayer(rootPlan, outputPlan.layerPlan);
     });
+
+    for (const layerPlan of this.layerPlans) {
+      if (layerPlan) {
+        layerPlan.finalize();
+      }
+    }
   }
 
   /** Optimizes each output plan */
