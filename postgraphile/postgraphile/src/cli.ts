@@ -161,7 +161,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const instance = postgraphile(config);
 
-  const server = createServer(instance.getServer().handler);
+  const server = createServer(instance.getGrafserv().handler);
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);
