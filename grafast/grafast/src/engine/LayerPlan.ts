@@ -9,6 +9,9 @@ import type { ExecutableStep, ModifierStep } from "../step";
 import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
+/** Gets rid of the as-available step execution strategy, instead opting to define execution order up front */
+export const FORCE_START_STEPS = true;
+
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
  * directions can be chosen - the plan "branches" at that point based on a

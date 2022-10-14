@@ -19,6 +19,7 @@ import { $$streamMore } from "../interfaces.js";
 import { $$noExec } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
+import { FORCE_START_STEPS } from "./LayerPlan.js";
 
 // An error that indicates this entry was skipped because it didn't match
 // polymorphicPath.
@@ -66,8 +67,10 @@ export function executeBucket(
   requestContext: RequestContext,
 ): PromiseOrDirect<void> {
   const { metaByMetaKey } = requestContext;
-  const startedSteps = new Set();
-  const pendingSteps = new Set(bucket.layerPlan.pendingSteps);
+  const startedSteps = FORCE_START_STEPS ? null : new Set();
+  const pendingSteps = FORCE_START_STEPS
+    ? null
+    : new Set(bucket.layerPlan.pendingSteps);
   const {
     size,
     store,
@@ -111,7 +114,9 @@ export function executeBucket(
         const r = newGrafastError(e, step.id);
         bucket.store.set(step.id, arrayOfLength(bucket.size, r));
         bucket.hasErrors = true;
-        reallyCompletedStep(step);
+        if (!FORCE_START_STEPS) {
+          reallyCompletedStep(step);
+        }
       }
     }
     const handleSideEffectPlanIds = () => {
@@ -150,15 +155,15 @@ export function executeBucket(
   function reallyCompletedStep(
     finishedStep: ExecutableStep,
   ): void | Promise<void> {
-    if (isDev && !startedSteps.delete(finishedStep)) {
+    if (isDev && !startedSteps!.delete(finishedStep)) {
       console.error(
         `GraphileInternalError<c3d1276b-df0f-4f88-aabf-15fa0f7d8515>: Double complete of '${finishedStep}' detected; ignoring (but this indicates a bug in Grafast)`,
       );
       // DOUBLE COMPLETE?
       return;
     }
-    pendingSteps.delete(finishedStep);
-    if (pendingSteps.size === 0) {
+    pendingSteps!.delete(finishedStep);
+    if (pendingSteps!.size === 0) {
       // Finished!
       return;
     }
@@ -168,7 +173,7 @@ export function executeBucket(
     }
     let promises: PromiseLike<void>[] | undefined;
     outerLoop: for (const potentialNextStep of finishedStep.sameLayerDependentPlans) {
-      const isPending = pendingSteps.has(potentialNextStep);
+      const isPending = pendingSteps!.has(potentialNextStep);
       if (!isPending) {
         // We've already ran it, skip
         continue;
@@ -206,7 +211,9 @@ export function executeBucket(
         const r = newGrafastError(e, potentialNextStep.id);
         bucket.store.set(potentialNextStep.id, arrayOfLength(bucket.size, r));
         bucket.hasErrors = true;
-        reallyCompletedStep(potentialNextStep);
+        if (!FORCE_START_STEPS) {
+          reallyCompletedStep(potentialNextStep);
+        }
       }
     }
     if (promises) {
@@ -352,11 +359,19 @@ export function executeBucket(
         // This _should not_ throw.
         return Promise.all(promises).then(() => {
           store.set(finishedStep.id, finalResult);
-          return reallyCompletedStep(finishedStep);
+          if (FORCE_START_STEPS) {
+            return;
+          } else {
+            return reallyCompletedStep(finishedStep);
+          }
         });
       } else {
         store.set(finishedStep.id, finalResult);
-        return reallyCompletedStep(finishedStep);
+        if (FORCE_START_STEPS) {
+          return;
+        } else {
+          return reallyCompletedStep(finishedStep);
+        }
       }
     };
 
@@ -399,7 +414,11 @@ export function executeBucket(
             finishedStep.id,
             arrayOfLength(finalResult.length, grafastError),
           );
-          return reallyCompletedStep(finishedStep);
+          if (FORCE_START_STEPS) {
+            return;
+          } else {
+            return reallyCompletedStep(finishedStep);
+          }
         });
     } else {
       return done();
@@ -533,10 +552,12 @@ export function executeBucket(
    * This function MIGHT throw or reject, so be sure to handle that.
    */
   function executeStep(step: ExecutableStep): void | PromiseLike<void> {
-    if (startedSteps.has(step)) {
-      return;
+    if (!FORCE_START_STEPS) {
+      if (startedSteps!.has(step)) {
+        return;
+      }
+      startedSteps!.add(step);
     }
-    startedSteps.add(step);
     if (isDev && $$noExec in step) {
       throw new Error("OLD PATH!");
       // Bypass execution
@@ -593,7 +614,11 @@ export function executeBucket(
         if (step.isSyncAndSafe) {
           // It promises not to add new errors, and not to include promises in the result array
           store.set(step.id, result as any[]);
-          return reallyCompletedStep(step);
+          if (FORCE_START_STEPS) {
+            return;
+          } else {
+            return reallyCompletedStep(step);
+          }
         } else {
           return completedStep(step, result);
         }
@@ -604,7 +629,11 @@ export function executeBucket(
         // It promises not to add new errors, and not to include promises in the result array
         const newResult = arrayOfLength(size, newGrafastError(error, step.id));
         store.set(step.id, newResult);
-        return reallyCompletedStep(step);
+        if (FORCE_START_STEPS) {
+          return;
+        } else {
+          return reallyCompletedStep(step);
+        }
       } else {
         const newResult = arrayOfLength(size, error);
         return completedStep(step, newResult);
@@ -613,10 +642,10 @@ export function executeBucket(
   }
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
-    if (pendingSteps.size > 0) {
+    if (!FORCE_START_STEPS && pendingSteps!.size > 0) {
       throw new Error(
         `GraphileInternalError<8c518856-6e96-425e-91ce-0e0713dbdead>: executeSamePhaseChildren called before all steps were complete! Remaining steps were: ${[
-          ...pendingSteps,
+          ...pendingSteps!,
         ].join(", ")}`,
       );
     }
