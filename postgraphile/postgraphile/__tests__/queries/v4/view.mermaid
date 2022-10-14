@@ -3,35 +3,36 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access20["Access[20∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access21["Access[21∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object22["Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection23["Connection[23∈0]<br />ᐸ19ᐳ"]:::plan
+    Access20{{"Access[20∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access21{{"Access[21∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object22{{"Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection23{{"Connection[23∈0]<br />ᐸ19ᐳ"}}:::plan
     PgSelect24[["PgSelect[24∈1]<br />ᐸtestviewᐳ"]]:::plan
-    __Item25>"__Item[25∈2]<br />ᐸ24ᐳ"]:::itemplan
-    PgSelectSingle26["PgSelectSingle[26∈2]<br />ᐸtestviewᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28∈3]<br />ᐸrow_number...tion by 1)ᐳ"]:::plan
-    List29["List[29∈3]<br />ᐸ28ᐳ"]:::plan
-    PgCursor27["PgCursor[27∈3]"]:::plan
-    PgClassExpression30["PgClassExpression[30∈3]<br />ᐸ__testview...estviewid”ᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__testview__.”col1”ᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈3]<br />ᐸ__testview__.”col2”ᐳ"]:::plan
-    Connection49["Connection[49∈0]<br />ᐸ45ᐳ"]:::plan
+    __Item25[/"__Item[25∈2]<br />ᐸ24ᐳ"\]:::itemplan
+    PgSelectSingle26{{"PgSelectSingle[26∈2]<br />ᐸtestviewᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    List29{{"List[29∈3]<br />ᐸ28ᐳ"}}:::plan
+    PgCursor27{{"PgCursor[27∈3]"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
+    Connection49{{"Connection[49∈0]<br />ᐸ45ᐳ"}}:::plan
     PgSelect50[["PgSelect[50∈4]<br />ᐸtestviewᐳ"]]:::plan
-    __Item51>"__Item[51∈5]<br />ᐸ50ᐳ"]:::itemplan
-    PgSelectSingle52["PgSelectSingle[52∈5]<br />ᐸtestviewᐳ"]:::plan
-    PgClassExpression54["PgClassExpression[54∈6]<br />ᐸ__testview__.”col1”ᐳ"]:::plan
-    List55["List[55∈6]<br />ᐸ54ᐳ"]:::plan
-    PgCursor53["PgCursor[53∈6]"]:::plan
-    PgClassExpression56["PgClassExpression[56∈6]<br />ᐸ__testview...estviewid”ᐳ"]:::plan
-    PgClassExpression58["PgClassExpression[58∈6]<br />ᐸ__testview__.”col2”ᐳ"]:::plan
+    __Item51[/"__Item[51∈5]<br />ᐸ50ᐳ"\]:::itemplan
+    PgSelectSingle52{{"PgSelectSingle[52∈5]<br />ᐸtestviewᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈6]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
+    List55{{"List[55∈6]<br />ᐸ54ᐳ"}}:::plan
+    PgCursor53{{"PgCursor[53∈6]"}}:::plan
+    PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
+    PgClassExpression58{{"PgClassExpression[58∈6]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access20

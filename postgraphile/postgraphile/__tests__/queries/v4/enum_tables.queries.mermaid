@@ -3,74 +3,75 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access21["Access[21∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access22["Access[22∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object23["Object[23∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection24["Connection[24∈0]<br />ᐸ20ᐳ"]:::plan
+    Access21{{"Access[21∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access22{{"Access[22∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object23{{"Object[23∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection24{{"Connection[24∈0]<br />ᐸ20ᐳ"}}:::plan
     PgSelect25[["PgSelect[25∈1]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    __Item26>"__Item[26∈2]<br />ᐸ25ᐳ"]:::itemplan
-    PgSelectSingle27["PgSelectSingle[27∈2]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28∈3]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression29["PgClassExpression[29∈3]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression30["PgClassExpression[30∈3]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    Connection49["Connection[49∈0]<br />ᐸ45ᐳ"]:::plan
+    __Item26[/"__Item[26∈2]<br />ᐸ25ᐳ"\]:::itemplan
+    PgSelectSingle27{{"PgSelectSingle[27∈2]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    Connection49{{"Connection[49∈0]<br />ᐸ45ᐳ"}}:::plan
     PgSelect50[["PgSelect[50∈4]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    __Item51>"__Item[51∈5]<br />ᐸ50ᐳ"]:::itemplan
-    PgSelectSingle52["PgSelectSingle[52∈5]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression53["PgClassExpression[53∈6]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression54["PgClassExpression[54∈6]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression55["PgClassExpression[55∈6]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression56["PgClassExpression[56∈6]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    Connection74["Connection[74∈0]<br />ᐸ70ᐳ"]:::plan
+    __Item51[/"__Item[51∈5]<br />ᐸ50ᐳ"\]:::itemplan
+    PgSelectSingle52{{"PgSelectSingle[52∈5]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression53{{"PgClassExpression[53∈6]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈6]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    Connection74{{"Connection[74∈0]<br />ᐸ70ᐳ"}}:::plan
     PgSelect75[["PgSelect[75∈7]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    __Item76>"__Item[76∈8]<br />ᐸ75ᐳ"]:::itemplan
-    PgSelectSingle77["PgSelectSingle[77∈8]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression78["PgClassExpression[78∈9]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression79["PgClassExpression[79∈9]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression80["PgClassExpression[80∈9]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression81["PgClassExpression[81∈9]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf82["__InputStaticLeaf[82∈0]"]:::plan
+    __Item76[/"__Item[76∈8]<br />ᐸ75ᐳ"\]:::itemplan
+    PgSelectSingle77{{"PgSelectSingle[77∈8]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression78{{"PgClassExpression[78∈9]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression79{{"PgClassExpression[79∈9]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression80{{"PgClassExpression[80∈9]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression81{{"PgClassExpression[81∈9]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    __InputStaticLeaf82{{"__InputStaticLeaf[82∈0]"}}:::plan
     PgSelect83[["PgSelect[83∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    First87["First[87∈0]"]:::plan
-    PgSelectSingle88["PgSelectSingle[88∈0]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression89["PgClassExpression[89∈10]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression90["PgClassExpression[90∈10]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression91["PgClassExpression[91∈10]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression92["PgClassExpression[92∈10]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf93["__InputStaticLeaf[93∈0]"]:::plan
+    First87{{"First[87∈0]"}}:::plan
+    PgSelectSingle88{{"PgSelectSingle[88∈0]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression89{{"PgClassExpression[89∈10]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression90{{"PgClassExpression[90∈10]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression91{{"PgClassExpression[91∈10]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression92{{"PgClassExpression[92∈10]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    __InputStaticLeaf93{{"__InputStaticLeaf[93∈0]"}}:::plan
     PgSelect94[["PgSelect[94∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    First98["First[98∈0]"]:::plan
-    PgSelectSingle99["PgSelectSingle[99∈0]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression100["PgClassExpression[100∈11]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression101["PgClassExpression[101∈11]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression102["PgClassExpression[102∈11]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression103["PgClassExpression[103∈11]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf114["__InputStaticLeaf[114∈12]"]:::plan
-    Connection121["Connection[121∈0]<br />ᐸ117ᐳ"]:::plan
+    First98{{"First[98∈0]"}}:::plan
+    PgSelectSingle99{{"PgSelectSingle[99∈0]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression100{{"PgClassExpression[100∈11]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression101{{"PgClassExpression[101∈11]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression102{{"PgClassExpression[102∈11]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression103{{"PgClassExpression[103∈11]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    __InputStaticLeaf114{{"__InputStaticLeaf[114∈12]"}}:::plan
+    Connection121{{"Connection[121∈0]<br />ᐸ117ᐳ"}}:::plan
     PgSelect122[["PgSelect[122∈12]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    __Item123>"__Item[123∈13]<br />ᐸ122ᐳ"]:::itemplan
-    PgSelectSingle124["PgSelectSingle[124∈13]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression125["PgClassExpression[125∈14]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression126["PgClassExpression[126∈14]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression127["PgClassExpression[127∈14]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression128["PgClassExpression[128∈14]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
-    __InputStaticLeaf140["__InputStaticLeaf[140∈15]"]:::plan
-    Connection146["Connection[146∈0]<br />ᐸ142ᐳ"]:::plan
+    __Item123[/"__Item[123∈13]<br />ᐸ122ᐳ"\]:::itemplan
+    PgSelectSingle124{{"PgSelectSingle[124∈13]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression125{{"PgClassExpression[125∈14]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression126{{"PgClassExpression[126∈14]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression127{{"PgClassExpression[127∈14]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression128{{"PgClassExpression[128∈14]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    __InputStaticLeaf140{{"__InputStaticLeaf[140∈15]"}}:::plan
+    Connection146{{"Connection[146∈0]<br />ᐸ142ᐳ"}}:::plan
     PgSelect147[["PgSelect[147∈15]<br />ᐸletterDescriptionsᐳ"]]:::plan
-    __Item148>"__Item[148∈16]<br />ᐸ147ᐳ"]:::itemplan
-    PgSelectSingle149["PgSelectSingle[149∈16]<br />ᐸletterDescriptionsᐳ"]:::plan
-    PgClassExpression150["PgClassExpression[150∈17]<br />ᐸ__letter_d...ons__.”id”ᐳ"]:::plan
-    PgClassExpression151["PgClassExpression[151∈17]<br />ᐸ__letter_d..._.”letter”ᐳ"]:::plan
-    PgClassExpression152["PgClassExpression[152∈17]<br />ᐸ__letter_d..._via_view”ᐳ"]:::plan
-    PgClassExpression153["PgClassExpression[153∈17]<br />ᐸ__letter_d...scription”ᐳ"]:::plan
+    __Item148[/"__Item[148∈16]<br />ᐸ147ᐳ"\]:::itemplan
+    PgSelectSingle149{{"PgSelectSingle[149∈16]<br />ᐸletterDescriptionsᐳ"}}:::plan
+    PgClassExpression150{{"PgClassExpression[150∈17]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression151{{"PgClassExpression[151∈17]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression152{{"PgClassExpression[152∈17]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression153{{"PgClassExpression[153∈17]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access21

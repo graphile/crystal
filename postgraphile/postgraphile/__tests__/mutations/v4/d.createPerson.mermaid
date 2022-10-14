@@ -3,31 +3,32 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf12["__InputStaticLeaf[12∈0]"]:::plan
-    __InputStaticLeaf13["__InputStaticLeaf[13∈0]"]:::plan
-    __InputStaticLeaf14["__InputStaticLeaf[14∈0]"]:::plan
-    __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
-    Access17["Access[17∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access18["Access[18∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object19["Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __InputStaticLeaf12{{"__InputStaticLeaf[12∈0]"}}:::plan
+    __InputStaticLeaf13{{"__InputStaticLeaf[13∈0]"}}:::plan
+    __InputStaticLeaf14{{"__InputStaticLeaf[14∈0]"}}:::plan
+    __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
+    Access17{{"Access[17∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgInsert16[["PgInsert[16∈1]"]]:::sideeffectplan
-    Object20["Object[20∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression21["PgClassExpression[21∈3]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression22["PgClassExpression[22∈3]<br />ᐸ__person__.”first_name”ᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈3]<br />ᐸ__person__.”last_name”ᐳ"]:::plan
-    PgClassExpression24["PgClassExpression[24∈3]<br />ᐸ__person__...no_create”ᐳ"]:::plan
-    PgClassExpression25["PgClassExpression[25∈3]<br />ᐸ__person__...no_update”ᐳ"]:::plan
-    PgClassExpression26["PgClassExpression[26∈3]<br />ᐸ__person__..._no_order”ᐳ"]:::plan
-    PgClassExpression27["PgClassExpression[27∈3]<br />ᐸ__person__...no_filter”ᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28∈3]<br />ᐸ__person__...te_update”ᐳ"]:::plan
-    PgClassExpression29["PgClassExpression[29∈3]<br />ᐸ__person__...er_filter”ᐳ"]:::plan
+    Object20{{"Object[20∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access17
@@ -49,7 +50,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,Access17,Access18,Object19 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 12, 13, 14, 15<br /><br />1: PgInsert{1}[16]<br />2: Object{1}ᐸ{result}ᐳ[20]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 12, 13, 14, 15<br /><br />1: PgInsert[16]<br />2: Object[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert16,Object20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket

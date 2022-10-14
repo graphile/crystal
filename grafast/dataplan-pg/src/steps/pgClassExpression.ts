@@ -1,5 +1,9 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { ExecutableStep } from "grafast";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "grafast";
+import { UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -45,7 +49,7 @@ export class PgClassExpressionStep<
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
-  extends ExecutableStep<any>
+  extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
 {
   static $$export = {
@@ -91,6 +95,7 @@ export class PgClassExpressionStep<
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
   ) {
     super();
+    this.tableId = this.addDependency($table);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
         `Invalid call to PgClassExpressionStep; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgClassExpression.`,
@@ -109,7 +114,6 @@ export class PgClassExpressionStep<
       TRelations,
       any
     >;
-    this.tableId = this.addDependency($table);
 
     const fragments: SQL[] = dependencies.map((stepOrSql, i) => {
       if (!stepOrSql) {
@@ -232,28 +236,16 @@ export class PgClassExpressionStep<
     return this;
   }
 
-  public execute(
-    values: Array<GrafastValuesList<any>>,
-  ): GrafastResultsList<any> {
-    const { attrIndex, tableId } = this;
-    const pg2gql = this.pgCodec.fromPg;
-    if (attrIndex != null) {
-      const result = values[tableId].map((v) => {
-        if (v == null) {
-          return null;
-        }
-        const rawValue = v[attrIndex];
-        if (rawValue == null) {
-          return null;
-        } else {
-          return pg2gql(rawValue);
-        }
-      });
-      return result;
+  public unbatchedExecute(extra: ExecutionExtra, v: any): any {
+    if (v == null) {
+      return null;
+    }
+    const rawValue = v[this.attrIndex!];
+    if (rawValue == null) {
+      return null;
     } else {
-      throw new Error(
-        "Cannot execute PgClassExpressionStep without first optimizing it",
-      );
+      const pg2gql = this.pgCodec.fromPg;
+      return pg2gql(rawValue);
     }
   }
 

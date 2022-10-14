@@ -3,50 +3,51 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access31["Access[31∈1]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access32["Access[32∈1]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object33["Object[33∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    Connection34["Connection[34∈0]<br />ᐸ30ᐳ"]:::plan
+    Access31{{"Access[31∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access32{{"Access[32∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object33{{"Object[33∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection34{{"Connection[34∈0]<br />ᐸ30ᐳ"}}:::plan
     PgSelect35[["PgSelect[35∈1]<br />ᐸpersonᐳ"]]:::plan
-    __Item36>"__Item[36∈2]<br />ᐸ35ᐳ"]:::itemplan
-    PgSelectSingle37["PgSelectSingle[37∈2]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression39["PgClassExpression[39∈3]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    List40["List[40∈3]<br />ᐸ39ᐳ"]:::plan
-    PgCursor38["PgCursor[38∈3]"]:::plan
-    PgClassExpression42["PgClassExpression[42∈3]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression44["PgClassExpression[44∈3]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    Map98["Map[98∈3]<br />ᐸ37:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"]:::plan
-    PgSelectSingle51["PgSelectSingle[51∈3]<br />ᐸleftArmᐳ"]:::plan
-    Constant52["Constant[52∈1]"]:::plan
-    PgClassExpression53["PgClassExpression[53∈4]<br />ᐸ__left_arm__.”id”ᐳ"]:::plan
-    List54["List[54∈4]<br />ᐸ52,53ᐳ"]:::plan
-    Lambda55["Lambda[55∈4]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    PgClassExpression57["PgClassExpression[57∈4]<br />ᐸ__left_arm...person_id”ᐳ"]:::plan
-    Map94["Map[94∈4]<br />ᐸ51:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
-    PgSelectSingle64["PgSelectSingle[64∈4]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression65["PgClassExpression[65∈5]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression66["PgClassExpression[66∈5]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression68["PgClassExpression[68∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    PgClassExpression69["PgClassExpression[69∈4]<br />ᐸ__left_arm...in_metres”ᐳ"]:::plan
-    Map100["Map[100∈3]<br />ᐸ37:{”0”:8,”1”:9,”2”:10,”3”:11,”4”:12}ᐳ"]:::plan
-    PgSelectSingle76["PgSelectSingle[76∈3]<br />ᐸpersonSecretᐳ"]:::plan
-    Constant77["Constant[77∈1]"]:::plan
-    PgClassExpression78["PgClassExpression[78∈6]<br />ᐸ__person_s...person_id”ᐳ"]:::plan
-    List79["List[79∈6]<br />ᐸ77,78ᐳ"]:::plan
-    Lambda80["Lambda[80∈6]<br />ᐸbase64JSONEncodeᐳ"]:::plan
-    Map96["Map[96∈6]<br />ᐸ76:{”0”:1,”1”:2,”2”:3}ᐳ"]:::plan
-    PgSelectSingle88["PgSelectSingle[88∈6]<br />ᐸpersonᐳ"]:::plan
-    PgClassExpression89["PgClassExpression[89∈7]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression90["PgClassExpression[90∈7]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression92["PgClassExpression[92∈7]<br />ᐸ”c”.”perso..._person__)ᐳ"]:::plan
-    PgClassExpression93["PgClassExpression[93∈6]<br />ᐸ__person_s..._.”sekrit”ᐳ"]:::plan
+    __Item36[/"__Item[36∈2]<br />ᐸ35ᐳ"\]:::itemplan
+    PgSelectSingle37{{"PgSelectSingle[37∈2]<br />ᐸpersonᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    List40{{"List[40∈3]<br />ᐸ39ᐳ"}}:::plan
+    PgCursor38{{"PgCursor[38∈3]"}}:::plan
+    PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈3]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    Map98{{"Map[98∈3]<br />ᐸ37:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"}}:::plan
+    PgSelectSingle51{{"PgSelectSingle[51∈3]<br />ᐸleftArmᐳ"}}:::plan
+    Constant52{{"Constant[52∈1]"}}:::plan
+    PgClassExpression53{{"PgClassExpression[53∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    List54{{"List[54∈4]<br />ᐸ52,53ᐳ"}}:::plan
+    Lambda55{{"Lambda[55∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    PgClassExpression57{{"PgClassExpression[57∈4]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    Map94{{"Map[94∈4]<br />ᐸ51:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    PgSelectSingle64{{"PgSelectSingle[64∈4]<br />ᐸpersonᐳ"}}:::plan
+    PgClassExpression65{{"PgClassExpression[65∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression66{{"PgClassExpression[66∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression68{{"PgClassExpression[68∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    PgClassExpression69{{"PgClassExpression[69∈4]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    Map100{{"Map[100∈3]<br />ᐸ37:{”0”:8,”1”:9,”2”:10,”3”:11,”4”:12}ᐳ"}}:::plan
+    PgSelectSingle76{{"PgSelectSingle[76∈3]<br />ᐸpersonSecretᐳ"}}:::plan
+    Constant77{{"Constant[77∈1]"}}:::plan
+    PgClassExpression78{{"PgClassExpression[78∈6]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
+    List79{{"List[79∈6]<br />ᐸ77,78ᐳ"}}:::plan
+    Lambda80{{"Lambda[80∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Map96{{"Map[96∈6]<br />ᐸ76:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    PgSelectSingle88{{"PgSelectSingle[88∈6]<br />ᐸpersonᐳ"}}:::plan
+    PgClassExpression89{{"PgClassExpression[89∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression90{{"PgClassExpression[90∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression92{{"PgClassExpression[92∈7]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    PgClassExpression93{{"PgClassExpression[93∈6]<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access31

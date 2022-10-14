@@ -3,37 +3,38 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf10["__InputStaticLeaf[10∈0]"]:::plan
-    __InputStaticLeaf12["__InputStaticLeaf[12∈0]"]:::plan
-    __InputStaticLeaf13["__InputStaticLeaf[13∈0]"]:::plan
-    __InputStaticLeaf15["__InputStaticLeaf[15∈0]"]:::plan
-    __InputStaticLeaf16["__InputStaticLeaf[16∈0]"]:::plan
-    __InputStaticLeaf18["__InputStaticLeaf[18∈0]"]:::plan
-    Access20["Access[20∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access21["Access[21∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object22["Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    List24["List[24∈0]<br />ᐸ12,13ᐳ"]:::plan
-    Object25["Object[25∈0]<br />ᐸ{url}ᐳ"]:::plan
+    __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
+    __InputStaticLeaf12{{"__InputStaticLeaf[12∈0]"}}:::plan
+    __InputStaticLeaf13{{"__InputStaticLeaf[13∈0]"}}:::plan
+    __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
+    __InputStaticLeaf16{{"__InputStaticLeaf[16∈0]"}}:::plan
+    __InputStaticLeaf18{{"__InputStaticLeaf[18∈0]"}}:::plan
+    Access20{{"Access[20∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access21{{"Access[21∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object22{{"Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    List24{{"List[24∈0]<br />ᐸ12,13ᐳ"}}:::plan
+    Object25{{"Object[25∈0]<br />ᐸ{url}ᐳ"}}:::plan
     PgInsert19[["PgInsert[19∈1]"]]:::sideeffectplan
-    Object23["Object[23∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression26["PgClassExpression[26∈3]<br />ᐸ__person__.”id”ᐳ"]:::plan
-    PgClassExpression27["PgClassExpression[27∈3]<br />ᐸ__person__...full_name”ᐳ"]:::plan
-    PgClassExpression28["PgClassExpression[28∈3]<br />ᐸ__person__.”aliases”ᐳ"]:::plan
-    __Item29>"__Item[29∈4]<br />ᐸ28ᐳ"]:::itemplan
-    PgClassExpression30["PgClassExpression[30∈3]<br />ᐸ__person__.”about”ᐳ"]:::plan
-    PgClassExpression31["PgClassExpression[31∈3]<br />ᐸ__person__.”email”ᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈3]<br />ᐸ__person__.”site”ᐳ"]:::plan
+    Object23{{"Object[23∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__.”aliases”ᐳ"}}:::plan
+    __Item29[/"__Item[29∈4]<br />ᐸ28ᐳ"\]:::itemplan
+    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__person__.”site”ᐳ"}}:::plan
     PgSelect33[["PgSelect[33∈3]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"]]:::plan
-    First37["First[37∈3]"]:::plan
-    PgSelectSingle38["PgSelectSingle[38∈3]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"]:::plan
-    PgClassExpression39["PgClassExpression[39∈5]<br />ᐸ__frmcdc_w..._1__.”url”ᐳ"]:::plan
+    First37{{"First[37∈3]"}}:::plan
+    PgSelectSingle38{{"PgSelectSingle[38∈3]<br />ᐸfrmcdc_wrappedUrl_1ᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈5]<br />ᐸ__frmcdc_w..._1__.”url”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access20
@@ -59,7 +60,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf18,Access20,Access21,Object22,List24,Object25 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 22, 10, 24, 15, 16, 25<br /><br />1: PgInsert{1}[19]<br />2: Object{1}ᐸ{result}ᐳ[23]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 22, 10, 24, 15, 16, 25<br /><br />1: PgInsert[19]<br />2: Object[23]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert19,Object23 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 23, 19, 22<br /><br />ROOT Object{1}ᐸ{result}ᐳ[23]"):::bucket

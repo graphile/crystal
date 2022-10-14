@@ -3,7 +3,8 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
@@ -11,23 +12,23 @@ graph TD
     __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access8["Access[8∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access9["Access[9∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object10["Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    Access8{{"Access[8∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgSelect7[["PgSelect[7∈0]<br />ᐸrandom_userᐳ"]]:::plan
-    First11["First[11∈0]"]:::plan
-    PgSelectSingle12["PgSelectSingle[12∈0]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression13["PgClassExpression[13∈1]<br />ᐸ__random_u...”username”ᐳ"]:::plan
-    Object15["Object[15∈0]<br />ᐸ{}ᐳ"]:::plan
-    GraphQLResolver16[["GraphQLResolver[16∈1]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver18[["GraphQLResolver[18∈2]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver20[["GraphQLResolver[20∈2]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver22[["GraphQLResolver[22∈2]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver24[["GraphQLResolver[24∈3]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver26[["GraphQLResolver[26∈4]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver28[["GraphQLResolver[28∈4]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver30[["GraphQLResolver[30∈3]<br />ᐸresolveᐳ"]]:::plan
-    GraphQLResolver32[["GraphQLResolver[32∈3]<br />ᐸresolveᐳ"]]:::plan
+    First11{{"First[11∈0]"}}:::plan
+    PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸusersᐳ"}}:::plan
+    PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
+    Object15{{"Object[15∈0]<br />ᐸ{}ᐳ"}}:::plan
+    GraphQLResolver16[["GraphQLResolver[16∈1]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver18[["GraphQLResolver[18∈2]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver20[["GraphQLResolver[20∈2]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver22[["GraphQLResolver[22∈2]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver24[["GraphQLResolver[24∈3]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver26[["GraphQLResolver[26∈4]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver28[["GraphQLResolver[28∈4]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver30[["GraphQLResolver[30∈3]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver32[["GraphQLResolver[32∈3]<br />ᐸresolveᐳ"]]:::unbatchedplan
 
     %% plan dependencies
     __Value3 --> Access8

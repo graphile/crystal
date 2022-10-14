@@ -3,28 +3,29 @@ graph TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf9["__InputStaticLeaf[9∈0]"]:::plan
-    __InputStaticLeaf10["__InputStaticLeaf[10∈0]"]:::plan
-    __InputStaticLeaf11["__InputStaticLeaf[11∈0]"]:::plan
-    Access13["Access[13∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access14["Access[14∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object15["Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
+    __InputStaticLeaf9{{"__InputStaticLeaf[9∈0]"}}:::plan
+    __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
+    __InputStaticLeaf11{{"__InputStaticLeaf[11∈0]"}}:::plan
+    Access13{{"Access[13∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access14{{"Access[14∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgSelect12[["PgSelect[12∈1]<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
-    First16["First[16∈1]"]:::plan
-    PgSelectSingle17["PgSelectSingle[17∈1]<br />ᐸauthenticateᐳ"]:::plan
-    Object18["Object[18∈1]<br />ᐸ{result}ᐳ"]:::plan
-    PgClassExpression19["PgClassExpression[19∈3]<br />ᐸ__authenticate__.”role”ᐳ"]:::plan
-    PgClassExpression20["PgClassExpression[20∈3]<br />ᐸ__authenticate__.”exp”ᐳ"]:::plan
-    PgClassExpression21["PgClassExpression[21∈3]<br />ᐸ__authenticate__.”a”ᐳ"]:::plan
-    PgClassExpression22["PgClassExpression[22∈3]<br />ᐸ__authenticate__.”b”ᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈3]<br />ᐸ__authenticate__.”c”ᐳ"]:::plan
+    First16{{"First[16∈1]"}}:::plan
+    PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸauthenticateᐳ"}}:::plan
+    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__authenticate__.”role”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__authenticate__.”exp”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__authenticate__.”a”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__authenticate__.”b”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__authenticate__.”c”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access13
@@ -44,7 +45,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf10,__InputStaticLeaf11,Access13,Access14,Object15 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect{1}ᐸauthenticate(mutation)ᐳ[12]<br />2: First{1}[16]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect[12]<br />2: First[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
