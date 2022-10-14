@@ -79,10 +79,10 @@ graph TD
     PgSelectSingle78 --> PgClassExpression81
 
     subgraph "Buckets for queries/v4/simple-relations-tail-head"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: Access[16], Access[17]<br />2: Object[18]<br />3: PgSelect[15], PgSelect[53]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect15,Access16,Access17,Object18,PgSelect53 bucket0
-    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ15ᐳ[19]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ15ᐳ[19]<br />1: PgSelectSingle[20]<br />2: PgClassExpression[21], PgClassExpression[22], PgClassExpression[23], Map[82], Map[86]<br />3: PgSelectSingle[30], PgSelectSingle[39]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgSelectSingle30,PgSelectSingle39,Map82,Map86 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[30]"):::bucket
@@ -91,7 +91,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[39]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression40,PgClassExpression41 bucket3
-    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ53ᐳ[57]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ53ᐳ[57]<br />1: PgSelectSingle[58]<br />2: PgClassExpression[59], PgClassExpression[60], PgClassExpression[61], Map[88], Map[84]<br />3: PgSelectSingle[68], PgSelectSingle[78]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item57,PgSelectSingle58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgSelectSingle68,PgSelectSingle78,Map84,Map88 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 68<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[68]"):::bucket

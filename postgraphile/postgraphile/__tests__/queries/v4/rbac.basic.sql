@@ -27,17 +27,6 @@ begin; /*fake*/
 
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
-select
-  __return_table_without_grants__."person_id_2"::text as "0",
-  __return_table_without_grants__."person_id_1"::text as "1"
-from "c"."return_table_without_grants"() as __return_table_without_grants__;
-
-commit; /*fake*/
-
-begin; /*fake*/
-
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
-
 select __person_result__.*
 from (
   select
@@ -179,6 +168,17 @@ lateral (
   )
   order by __person__."id" asc
 ) as __person_result__;
+
+commit; /*fake*/
+
+begin; /*fake*/
+
+select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+
+select
+  __return_table_without_grants__."person_id_2"::text as "0",
+  __return_table_without_grants__."person_id_1"::text as "1"
+from "c"."return_table_without_grants"() as __return_table_without_grants__;
 
 commit; /*fake*/
 

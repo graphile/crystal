@@ -32,7 +32,7 @@ graph TD
     PgClassExpression14 --> Access15
 
     subgraph "Buckets for queries/v4/ts"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: First[12]<br />5: PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrangeTestᐳ[13]"):::bucket

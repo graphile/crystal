@@ -109,19 +109,19 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Connection31 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 31<br /><br />ROOT Connectionᐸ27ᐳ[31]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 31<br /><br />ROOT Connectionᐸ27ᐳ[31]<br />1: Access[28], Access[29], Connection[91], PgPageInfo[106]<br />2: Object[30]<br />3: PgSelect[32]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access28,Access29,Object30,PgSelect32,Connection91,PgPageInfo106 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 91, 106<br /><br />ROOT __Item{2}ᐸ32ᐳ[33]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item33,PgSelectSingle34 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 34, 91, 106<br /><br />ROOT PgSelectSingle{2}ᐸpostᐳ[34]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 34, 91, 106<br /><br />ROOT PgSelectSingle{2}ᐸpostᐳ[34]<br />1: PgClassExpression[36], PgClassExpression[39], PgClassExpression[43], Map[119]<br />2: List[37], PgSelectSingle[50]<br />3: PgCursor[35]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,PgSelectSingle50,Map119 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 50, 119, 91, 106<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[50]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 50, 119, 91, 106<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[50]<br />1: PgClassExpression[51], PgClassExpression[52], PgClassExpression[54], Map[116], Access[118], Access[115]<br />2: PgSelectSingle[61], __ListTransform[93], First[103], First[108]<br />3: PgSelectSingle[104], PgSelectSingle[109]<br />4: PgClassExpression[105], PgClassExpression[111]<br />5: List[112]<br />6: PgCursor[110]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression51,PgClassExpression52,PgClassExpression54,PgSelectSingle61,__ListTransform93,First103,PgSelectSingle104,PgClassExpression105,First108,PgSelectSingle109,PgCursor110,PgClassExpression111,List112,Access115,Map116,Access118 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgSelectSingle{4}ᐸperson_first_postᐳ[61]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgSelectSingle{4}ᐸperson_first_postᐳ[61]<br />1: PgClassExpression[62], PgClassExpression[63], PgClassExpression[67], Map[113]<br />2: PgSelectSingle[74]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression62,PgClassExpression63,PgClassExpression67,PgSelectSingle74,Map113 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 74<br /><br />ROOT PgSelectSingle{5}ᐸpersonᐳ[74]"):::bucket

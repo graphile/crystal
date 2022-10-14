@@ -317,46 +317,46 @@ graph TD
     PgSelectSingle313 --> PgClassExpression314
 
     subgraph "Buckets for mutations/v4/mutation-return-types"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[9], __InputStaticLeaf[10], Access[12], Access[13], __InputStaticLeaf[21], __InputStaticLeaf[42], __InputStaticLeaf[43], __InputStaticLeaf[111], __InputStaticLeaf[112], __InputStaticLeaf[191], __InputStaticLeaf[294], __InputStaticLeaf[306]<br />2: Object[14]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf10,Access12,Access13,Object14,__InputStaticLeaf21,__InputStaticLeaf42,__InputStaticLeaf43,__InputStaticLeaf111,__InputStaticLeaf112,__InputStaticLeaf191,__InputStaticLeaf294,__InputStaticLeaf306 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 9, 10<br /><br />1: PgSelect[11]<br />2: First[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 9, 10<br /><br />1: PgSelect[11]<br />2: First[15]<br />3: PgSelectSingle[16]<br />4: PgClassExpression[17]<br />5: Object[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First15,PgSelectSingle16,PgClassExpression17,Object18 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (mutationField)<br />Deps: 14, 21<br /><br />1: PgSelect[22]<br />2: First[26]"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 14, 21<br /><br />1: PgSelect[22]<br />2: First[26]<br />3: PgSelectSingle[27]<br />4: PgClassExpression[28]<br />5: Object[29]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,Object29 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 28<br /><br />ROOT Object{3}ᐸ{result}ᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
-    Bucket5("Bucket 5 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[32]<br />2: First[36]"):::bucket
+    Bucket5("Bucket 5 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[32]<br />2: First[36]<br />3: PgSelectSingle[37]<br />4: PgClassExpression[38]<br />5: Object[39]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,Object39 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 39, 38<br /><br />ROOT Object{5}ᐸ{result}ᐳ[39]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 14, 42, 43<br /><br />1: PgSelect[44]<br />2: First[48]"):::bucket
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 14, 42, 43<br /><br />1: PgSelect[44]<br />2: First[48]<br />3: PgSelectSingle[49]<br />4: Object[50]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgSelect44,First48,PgSelectSingle49,Object50 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 50, 49, 14<br /><br />ROOT Object{7}ᐸ{result}ᐳ[50]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,Constant69,Connection100,Constant104 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 49, 14, 69, 104, 100<br /><br />ROOT PgSelectSingle{7}ᐸmutation_out_complexᐳ[49]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 49, 14, 69, 104, 100<br /><br />ROOT PgSelectSingle{7}ᐸmutation_out_complexᐳ[49]<br />1: PgClassExpression[51], PgClassExpression[52], PgClassExpression[62]<br />2: PgSelect[53], PgSelect[63]<br />3: First[57], First[67]<br />4: PgSelectSingle[58], PgSelectSingle[68]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgClassExpression51,PgClassExpression52,PgSelect53,First57,PgSelectSingle58,PgClassExpression62,PgSelect63,First67,PgSelectSingle68 bucket9
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 58<br /><br />ROOT PgSelectSingle{9}ᐸfrmcdc_compoundType_1ᐳ[58]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,PgClassExpression59,PgClassExpression60,PgClassExpression61 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 68, 69, 67, 104, 100<br /><br />ROOT PgSelectSingle{9}ᐸpersonᐳ[68]"):::bucket
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 68, 69, 67, 104, 100<br /><br />ROOT PgSelectSingle{9}ᐸpersonᐳ[68]<br />1: PgClassExpression[70], PgClassExpression[74], Access[315]<br />2: List[71]<br />3: Lambda[72]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgClassExpression70,List71,Lambda72,PgClassExpression74,Access315 bucket11
     Bucket12("Bucket 12 (listItem)<br />Deps: 104<br /><br />ROOT __Item{12}ᐸ315ᐳ[102]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,__Item102,PgSelectSingle103 bucket12
-    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 103, 104<br /><br />ROOT PgSelectSingle{12}ᐸpostᐳ[103]"):::bucket
+    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 103, 104<br /><br />ROOT PgSelectSingle{12}ᐸpostᐳ[103]<br />1: PgClassExpression[105]<br />2: List[106]<br />3: Lambda[107]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgClassExpression105,List106,Lambda107 bucket13
     Bucket14("Bucket 14 (mutationField)<br />Deps: 14, 111, 112<br /><br />1: PgSelect[113]<br />2: Object[117]"):::bucket
@@ -368,22 +368,22 @@ graph TD
     Bucket16("Bucket 16 (listItem)<br />Deps: 14, 138, 173, 169<br /><br />ROOT __Item{16}ᐸ113ᐳ[118]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,__Item118,PgSelectSingle119 bucket16
-    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 119, 14, 138, 173, 169<br /><br />ROOT PgSelectSingle{16}ᐸmutation_out_complex_setofᐳ[119]"):::bucket
+    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 119, 14, 138, 173, 169<br /><br />ROOT PgSelectSingle{16}ᐸmutation_out_complex_setofᐳ[119]<br />1: PgClassExpression[120], PgClassExpression[121], PgClassExpression[131]<br />2: PgSelect[122], PgSelect[132]<br />3: First[126], First[136]<br />4: PgSelectSingle[127], PgSelectSingle[137]"):::bucket
     classDef bucket17 stroke:#696969
     class Bucket17,PgClassExpression120,PgClassExpression121,PgSelect122,First126,PgSelectSingle127,PgClassExpression131,PgSelect132,First136,PgSelectSingle137 bucket17
     Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 127<br /><br />ROOT PgSelectSingle{17}ᐸfrmcdc_compoundType_1ᐳ[127]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,PgClassExpression128,PgClassExpression129,PgClassExpression130 bucket18
-    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 137, 138, 136, 173, 169<br /><br />ROOT PgSelectSingle{17}ᐸpersonᐳ[137]"):::bucket
+    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 137, 138, 136, 173, 169<br /><br />ROOT PgSelectSingle{17}ᐸpersonᐳ[137]<br />1: PgClassExpression[139], PgClassExpression[143], Access[316]<br />2: List[140]<br />3: Lambda[141]"):::bucket
     classDef bucket19 stroke:#7f007f
     class Bucket19,PgClassExpression139,List140,Lambda141,PgClassExpression143,Access316 bucket19
     Bucket20("Bucket 20 (listItem)<br />Deps: 173<br /><br />ROOT __Item{20}ᐸ316ᐳ[171]"):::bucket
     classDef bucket20 stroke:#ffa500
     class Bucket20,__Item171,PgSelectSingle172 bucket20
-    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 172, 173<br /><br />ROOT PgSelectSingle{20}ᐸpostᐳ[172]"):::bucket
+    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 172, 173<br /><br />ROOT PgSelectSingle{20}ᐸpostᐳ[172]<br />1: PgClassExpression[174]<br />2: List[175]<br />3: Lambda[176]"):::bucket
     classDef bucket21 stroke:#0000ff
     class Bucket21,PgClassExpression174,List175,Lambda176 bucket21
-    Bucket22("Bucket 22 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[180]<br />2: First[184]"):::bucket
+    Bucket22("Bucket 22 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[180]<br />2: First[184]<br />3: PgSelectSingle[185]<br />4: Object[186]"):::bucket
     classDef bucket22 stroke:#7fff00
     class Bucket22,PgSelect180,First184,PgSelectSingle185,Object186 bucket22
     Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 186, 185<br /><br />ROOT Object{22}ᐸ{result}ᐳ[186]"):::bucket
@@ -392,13 +392,13 @@ graph TD
     Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 185<br /><br />ROOT PgSelectSingle{22}ᐸmutation_out_outᐳ[185]"):::bucket
     classDef bucket24 stroke:#808000
     class Bucket24,PgClassExpression187,PgClassExpression188 bucket24
-    Bucket25("Bucket 25 (mutationField)<br />Deps: 14, 191<br /><br />1: PgSelect[192]<br />2: First[196]"):::bucket
+    Bucket25("Bucket 25 (mutationField)<br />Deps: 14, 191<br /><br />1: PgSelect[192]<br />2: First[196]<br />3: PgSelectSingle[197]<br />4: Object[198]"):::bucket
     classDef bucket25 stroke:#dda0dd
     class Bucket25,PgSelect192,First196,PgSelectSingle197,Object198 bucket25
     Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 198, 197, 14<br /><br />ROOT Object{25}ᐸ{result}ᐳ[198]"):::bucket
     classDef bucket26 stroke:#ff0000
     class Bucket26 bucket26
-    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 197, 14<br /><br />ROOT PgSelectSingle{25}ᐸmutation_out_out_compound_typeᐳ[197]"):::bucket
+    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 197, 14<br /><br />ROOT PgSelectSingle{25}ᐸmutation_out_out_compound_typeᐳ[197]<br />1: PgClassExpression[199], PgClassExpression[200]<br />2: PgSelect[201]<br />3: First[205]<br />4: PgSelectSingle[206]"):::bucket
     classDef bucket27 stroke:#ffff00
     class Bucket27,PgClassExpression199,PgClassExpression200,PgSelect201,First205,PgSelectSingle206 bucket27
     Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 206<br /><br />ROOT PgSelectSingle{27}ᐸfrmcdc_compoundType_1ᐳ[206]"):::bucket
@@ -416,7 +416,7 @@ graph TD
     Bucket32("Bucket 32 (nullableBoundary)<br />Deps: 218<br /><br />ROOT PgSelectSingle{31}ᐸmutation_out_out_setofᐳ[218]"):::bucket
     classDef bucket32 stroke:#ff00ff
     class Bucket32,PgClassExpression219,PgClassExpression220 bucket32
-    Bucket33("Bucket 33 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[223]<br />2: First[227]"):::bucket
+    Bucket33("Bucket 33 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[223]<br />2: First[227]<br />3: PgSelectSingle[228]<br />4: Object[229]"):::bucket
     classDef bucket33 stroke:#f5deb3
     class Bucket33,PgSelect223,First227,PgSelectSingle228,Object229 bucket33
     Bucket34("Bucket 34 (nullableBoundary)<br />Deps: 229, 228<br /><br />ROOT Object{33}ᐸ{result}ᐳ[229]"):::bucket
@@ -431,16 +431,16 @@ graph TD
     Bucket37("Bucket 37 (nullableBoundary)<br />Deps: 238, 234<br /><br />ROOT Object{36}ᐸ{result}ᐳ[238]"):::bucket
     classDef bucket37 stroke:#ffa500
     class Bucket37 bucket37
-    Bucket38("Bucket 38 (listItem)<br />ROOT __Item{38}ᐸ234ᐳ[239]"):::bucket
+    Bucket38("Bucket 38 (listItem)<br />ROOT __Item{38}ᐸ234ᐳ[239]<br />1: PgSelectSingle[240]<br />2: PgClassExpression[241]"):::bucket
     classDef bucket38 stroke:#0000ff
     class Bucket38,__Item239,PgSelectSingle240,PgClassExpression241 bucket38
-    Bucket39("Bucket 39 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[244]<br />2: First[248]"):::bucket
+    Bucket39("Bucket 39 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[244]<br />2: First[248]<br />3: PgSelectSingle[249]<br />4: Object[250]"):::bucket
     classDef bucket39 stroke:#7fff00
     class Bucket39,PgSelect244,First248,PgSelectSingle249,Object250 bucket39
     Bucket40("Bucket 40 (nullableBoundary)<br />Deps: 250, 249<br /><br />ROOT Object{39}ᐸ{result}ᐳ[250]"):::bucket
     classDef bucket40 stroke:#ff1493
     class Bucket40,Constant251 bucket40
-    Bucket41("Bucket 41 (nullableBoundary)<br />Deps: 249, 251<br /><br />ROOT PgSelectSingle{39}ᐸmutation_out_tableᐳ[249]"):::bucket
+    Bucket41("Bucket 41 (nullableBoundary)<br />Deps: 249, 251<br /><br />ROOT PgSelectSingle{39}ᐸmutation_out_tableᐳ[249]<br />1: PgClassExpression[252]<br />2: List[253]<br />3: Lambda[254]"):::bucket
     classDef bucket41 stroke:#808000
     class Bucket41,PgClassExpression252,List253,Lambda254 bucket41
     Bucket42("Bucket 42 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[258]<br />2: Object[262]"):::bucket
@@ -452,16 +452,16 @@ graph TD
     Bucket44("Bucket 44 (listItem)<br />Deps: 265<br /><br />ROOT __Item{44}ᐸ258ᐳ[263]"):::bucket
     classDef bucket44 stroke:#ffff00
     class Bucket44,__Item263,PgSelectSingle264 bucket44
-    Bucket45("Bucket 45 (nullableBoundary)<br />Deps: 264, 265<br /><br />ROOT PgSelectSingle{44}ᐸmutation_out_table_setofᐳ[264]"):::bucket
+    Bucket45("Bucket 45 (nullableBoundary)<br />Deps: 264, 265<br /><br />ROOT PgSelectSingle{44}ᐸmutation_out_table_setofᐳ[264]<br />1: PgClassExpression[266]<br />2: List[267]<br />3: Lambda[268]"):::bucket
     classDef bucket45 stroke:#00ffff
     class Bucket45,PgClassExpression266,List267,Lambda268 bucket45
-    Bucket46("Bucket 46 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[272]<br />2: First[276]"):::bucket
+    Bucket46("Bucket 46 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[272]<br />2: First[276]<br />3: PgSelectSingle[277]<br />4: PgClassExpression[278]<br />5: Object[279]"):::bucket
     classDef bucket46 stroke:#4169e1
     class Bucket46,PgSelect272,First276,PgSelectSingle277,PgClassExpression278,Object279 bucket46
     Bucket47("Bucket 47 (nullableBoundary)<br />Deps: 279, 278<br /><br />ROOT Object{46}ᐸ{result}ᐳ[279]"):::bucket
     classDef bucket47 stroke:#3cb371
     class Bucket47 bucket47
-    Bucket48("Bucket 48 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[282]<br />2: First[286]"):::bucket
+    Bucket48("Bucket 48 (mutationField)<br />Deps: 14<br /><br />1: PgSelect[282]<br />2: First[286]<br />3: PgSelectSingle[287]<br />4: Object[288]"):::bucket
     classDef bucket48 stroke:#a52a2a
     class Bucket48,PgSelect282,First286,PgSelectSingle287,Object288 bucket48
     Bucket49("Bucket 49 (nullableBoundary)<br />Deps: 288, 287<br /><br />ROOT Object{48}ᐸ{result}ᐳ[288]"):::bucket
@@ -488,7 +488,7 @@ graph TD
     Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 311, 307<br /><br />ROOT Object{55}ᐸ{result}ᐳ[311]"):::bucket
     classDef bucket56 stroke:#7fff00
     class Bucket56 bucket56
-    Bucket57("Bucket 57 (listItem)<br />ROOT __Item{57}ᐸ307ᐳ[312]"):::bucket
+    Bucket57("Bucket 57 (listItem)<br />ROOT __Item{57}ᐸ307ᐳ[312]<br />1: PgSelectSingle[313]<br />2: PgClassExpression[314]"):::bucket
     classDef bucket57 stroke:#ff1493
     class Bucket57,__Item312,PgSelectSingle313,PgClassExpression314 bucket57
     Bucket0 --> Bucket1 & Bucket3 & Bucket5 & Bucket7 & Bucket14 & Bucket22 & Bucket25 & Bucket29 & Bucket33 & Bucket36 & Bucket39 & Bucket42 & Bucket46 & Bucket48 & Bucket51 & Bucket55

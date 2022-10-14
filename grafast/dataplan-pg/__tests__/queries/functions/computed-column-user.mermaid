@@ -36,10 +36,10 @@ graph TD
     PgSelectSingle20 --> PgClassExpression22
 
     subgraph "Buckets for queries/functions/computed-column-user"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: First[12]<br />5: PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: Map[23]<br />2: PgSelectSingle[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelectSingle20,Map23 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[20]"):::bucket

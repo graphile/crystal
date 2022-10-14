@@ -90,16 +90,16 @@ graph TD
     PgSelectSingle67 --> PgClassExpression68
 
     subgraph "Buckets for queries/connections/order"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[14]<br />2: Connection[26]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf14,Connection26 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 26<br /><br />ROOT Connectionᐸ22ᐳ[26]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 26<br /><br />ROOT Connectionᐸ22ᐳ[26]<br />1: Access[23], Access[24], PgPageInfo[45], Constant[48]<br />2: Object[25]<br />3: PgSelect[27], PgSelect[65]<br />4: Lambda[47], First[50], Last[58], First[66]<br />5: PgSelectSingle[51], PgSelectSingle[59], PgSelectSingle[67]<br />6: PgClassExpression[53], PgClassExpression[54], PgClassExpression[55], PgClassExpression[61], PgClassExpression[62], PgClassExpression[63], PgClassExpression[68]<br />7: List[56], List[64]<br />8: PgCursor[52], PgCursor[60]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access23,Access24,Object25,PgSelect27,PgPageInfo45,Lambda47,Constant48,First50,PgSelectSingle51,PgCursor52,PgClassExpression53,PgClassExpression54,PgClassExpression55,List56,Last58,PgSelectSingle59,PgCursor60,PgClassExpression61,PgClassExpression62,PgClassExpression63,List64,PgSelect65,First66,PgSelectSingle67,PgClassExpression68 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ27ᐳ[28]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item28,PgSelectSingle29 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[29]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[29]<br />1: PgClassExpression[31], PgClassExpression[32], PgClassExpression[33], PgClassExpression[35], Map[69]<br />2: List[34], PgSelectSingle[42]<br />3: PgCursor[30]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor30,PgClassExpression31,PgClassExpression32,PgClassExpression33,List34,PgClassExpression35,PgSelectSingle42,Map69 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[42]"):::bucket

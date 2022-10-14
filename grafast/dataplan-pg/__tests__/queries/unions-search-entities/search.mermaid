@@ -94,16 +94,16 @@ graph TD
     PgSelectSingle51 --> PgClassExpression70
 
     subgraph "Buckets for queries/unions-search-entities/search"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: __ListTransform[12]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸentity_searchᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]<br />1: PgSelectSingle[16]<br />2: PgClassExpression[17], PgClassExpression[18], PgClassExpression[19]<br />3: List[20]<br />4: PgPolymorphic[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,List20,PgPolymorphic21 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment<br />1: PgSelect[22], PgSelect[30], PgSelect[46]<br />2: First[26], First[34], First[50]<br />3: PgSelectSingle[27], PgSelectSingle[35], PgSelectSingle[51]<br />4: PgClassExpression[28], PgClassExpression[29], PgClassExpression[36], Map[71], PgClassExpression[45], PgClassExpression[52], Map[75], Map[73], PgClassExpression[70]<br />5: PgSelectSingle[43], PgSelectSingle[59], PgSelectSingle[67]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgSelectSingle67,PgClassExpression70,Map71,Map73,Map75 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 43<br />ᐳPost<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[43]"):::bucket

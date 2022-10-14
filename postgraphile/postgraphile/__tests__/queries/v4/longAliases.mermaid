@@ -55,10 +55,10 @@ graph TD
     PgSelectSingle51 --> PgClassExpression52
 
     subgraph "Buckets for queries/v4/longAliases"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: First[12]<br />5: PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 12<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 12<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]<br />1: Constant[14], PgClassExpression[15], PgClassExpression[18], Connection[31], Access[53], Connection[48], Access[54]<br />2: List[16], First[33], First[50]<br />3: Lambda[17], PgSelectSingle[34], PgSelectSingle[51]<br />4: PgClassExpression[35], PgClassExpression[52]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,Connection31,First33,PgSelectSingle34,PgClassExpression35,Connection48,First50,PgSelectSingle51,PgClassExpression52,Access53,Access54 bucket1
     Bucket0 --> Bucket1

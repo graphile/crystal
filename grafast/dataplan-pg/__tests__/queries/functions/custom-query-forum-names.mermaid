@@ -29,10 +29,10 @@ graph TD
     PgSelectSingle12 --> PgClassExpression13
 
     subgraph "Buckets for queries/functions/custom-query-forum-names"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: Access[8], Access[9]<br />2: Object[10]<br />3: PgSelect[7]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10 bucket0
-    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ7ᐳ[11]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ7ᐳ[11]<br />1: PgSelectSingle[12]<br />2: PgClassExpression[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13 bucket1
     Bucket0 --> Bucket1
