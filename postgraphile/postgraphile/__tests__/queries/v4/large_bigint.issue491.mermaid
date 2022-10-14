@@ -77,7 +77,7 @@ graph TD
     PgSelectSingle55 --> PgClassExpression61
 
     subgraph "Buckets for queries/v4/large_bigint.issue491"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: Access[19], Access[20], Connection[22], __InputStaticLeaf[32], __InputStaticLeaf[47]<br />2: Object[21], Lambda[33], Lambda[48]<br />3: Access[34], Access[49]<br />4: PgSelect[35], PgSelect[50]<br />5: First[39], First[54]<br />6: PgSelectSingle[40], PgSelectSingle[55]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Access19,Access20,Object21,Connection22,__InputStaticLeaf32,Lambda33,Access34,PgSelect35,First39,PgSelectSingle40,__InputStaticLeaf47,Lambda48,Access49,PgSelect50,First54,PgSelectSingle55 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 21, 22<br /><br />ROOT Connectionᐸ18ᐳ[22]"):::bucket
@@ -86,13 +86,13 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 26<br /><br />ROOT __Item{2}ᐸ23ᐳ[24]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item24,PgSelectSingle25 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 26<br /><br />ROOT PgSelectSingle{2}ᐸlargeNodeIdᐳ[25]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 26<br /><br />ROOT PgSelectSingle{2}ᐸlargeNodeIdᐳ[25]<br />1: PgClassExpression[27], PgClassExpression[31]<br />2: List[28]<br />3: Lambda[29]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression27,List28,Lambda29,PgClassExpression31 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 40<br /><br />ROOT PgSelectSingleᐸlargeNodeIdᐳ[40]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 40<br /><br />ROOT PgSelectSingleᐸlargeNodeIdᐳ[40]<br />1: Constant[41], PgClassExpression[42], PgClassExpression[46]<br />2: List[43]<br />3: Lambda[44]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,Constant41,PgClassExpression42,List43,Lambda44,PgClassExpression46 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgSelectSingleᐸlargeNodeIdᐳ[55]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgSelectSingleᐸlargeNodeIdᐳ[55]<br />1: Constant[56], PgClassExpression[57], PgClassExpression[61]<br />2: List[58]<br />3: Lambda[59]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,Constant56,PgClassExpression57,List58,Lambda59,PgClassExpression61 bucket5
     Bucket0 --> Bucket1 & Bucket4 & Bucket5

@@ -47,10 +47,10 @@ graph TD
     PgSelectSingle35 --> PgClassExpression36
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[15], __InputStaticLeaf[17]<br />2: Lambda[25]<br />3: Connection[24]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf15,__InputStaticLeaf17,Connection24,Lambda25 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 24, 25<br /><br />ROOT Connectionᐸ20ᐳ[24]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 24, 25<br /><br />ROOT Connectionᐸ20ᐳ[24]<br />1: Access[21], Access[22], PgPageInfo[26], Constant[27], PgValidateParsedCursor[30], Access[31]<br />2: Object[23], ToPg[32]<br />3: PgSelect[28], PgSelect[33]<br />4: Lambda[29], First[34]<br />5: PgSelectSingle[35]<br />6: PgClassExpression[36]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access21,Access22,Object23,PgPageInfo26,Constant27,PgSelect28,Lambda29,PgValidateParsedCursor30,Access31,ToPg32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36 bucket1
     Bucket0 --> Bucket1

@@ -62,7 +62,7 @@ graph TD
     PgClassExpression48 --> Object49
 
     subgraph "Buckets for mutations/v4/enum_tables.mutations"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[9], Access[11], Access[12], __InputStaticLeaf[22], __InputStaticLeaf[23], __InputStaticLeaf[24], __InputStaticLeaf[38], __InputStaticLeaf[39], __InputStaticLeaf[40]<br />2: Object[13], Object[41]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,Access11,Access12,Object13,__InputStaticLeaf22,__InputStaticLeaf23,__InputStaticLeaf24,__InputStaticLeaf38,__InputStaticLeaf39,__InputStaticLeaf40,Object41 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9<br /><br />1: PgDelete[10]<br />2: Object[14]"):::bucket
@@ -83,7 +83,7 @@ graph TD
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 25<br /><br />ROOT PgInsert{4}[25]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 13, 41<br /><br />1: PgSelect[42]<br />2: First[46]"):::bucket
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 13, 41<br /><br />1: PgSelect[42]<br />2: First[46]<br />3: PgSelectSingle[47]<br />4: PgClassExpression[48]<br />5: Object[49]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgSelect42,First46,PgSelectSingle47,PgClassExpression48,Object49 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 49, 48<br /><br />ROOT Object{7}ᐸ{result}ᐳ[49]"):::bucket

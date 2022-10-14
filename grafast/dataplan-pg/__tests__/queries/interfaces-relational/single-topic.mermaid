@@ -50,10 +50,10 @@ graph TD
     PgSelectSingle13 --> PgClassExpression71
 
     subgraph "Buckets for queries/interfaces-relational/single-topic"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: First[12]<br />5: PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]<br />1: PgClassExpression[14], Map[72], PgClassExpression[71]<br />2: PgSelectSingle[21]<br />3: PgClassExpression[22], PgClassExpression[30], PgClassExpression[38], PgClassExpression[46], PgClassExpression[54], PgClassExpression[62], PgClassExpression[70]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgSelectSingle21,PgClassExpression22,PgClassExpression30,PgClassExpression38,PgClassExpression46,PgClassExpression54,PgClassExpression62,PgClassExpression70,PgClassExpression71,Map72 bucket1
     Bucket0 --> Bucket1

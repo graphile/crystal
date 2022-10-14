@@ -105,16 +105,16 @@ graph TD
     PgSelectSingle93 --> PgClassExpression120
 
     subgraph "Buckets for queries/interfaces-relational/commentables"
-    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: __ListTransform[12]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸrelational_commentablesᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]<br />1: PgSelectSingle[16]<br />2: PgClassExpression[17], PgClassExpression[19]<br />3: PgPolymorphic[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgPolymorphic18,PgClassExpression19 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br />1: PgSelect[20], PgSelect[55], PgSelect[88]<br />2: First[24], First[59], First[92]<br />3: PgSelectSingle[25], PgSelectSingle[60], PgSelectSingle[93]<br />4: PgClassExpression[26], Map[121], PgClassExpression[51], PgClassExpression[52], PgClassExpression[53], PgClassExpression[61], Map[125], PgClassExpression[86], PgClassExpression[94], Map[123], PgClassExpression[119], PgClassExpression[120]<br />5: PgSelectSingle[33], PgSelectSingle[68], PgSelectSingle[101]<br />6: PgClassExpression[34], PgClassExpression[42], PgClassExpression[50], PgClassExpression[69], PgClassExpression[77], PgClassExpression[85], PgClassExpression[102], PgClassExpression[110], PgClassExpression[118]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect20,First24,PgSelectSingle25,PgClassExpression26,PgSelectSingle33,PgClassExpression34,PgClassExpression42,PgClassExpression50,PgClassExpression51,PgClassExpression52,PgClassExpression53,PgSelect55,First59,PgSelectSingle60,PgClassExpression61,PgSelectSingle68,PgClassExpression69,PgClassExpression77,PgClassExpression85,PgClassExpression86,PgSelect88,First92,PgSelectSingle93,PgClassExpression94,PgSelectSingle101,PgClassExpression102,PgClassExpression110,PgClassExpression118,PgClassExpression119,PgClassExpression120,Map121,Map123,Map125 bucket3
     Bucket0 --> Bucket1 & Bucket2
