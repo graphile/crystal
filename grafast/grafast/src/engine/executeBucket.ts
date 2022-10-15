@@ -310,7 +310,27 @@ export function executeBucket(
             _requestContext: requestContext,
           };
         }
-        for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+        outerLoop: for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+          if (sideEffectPlanIdsWithErrors) {
+            for (const depId of sideEffectPlanIdsWithErrors) {
+              const depVal = bucket.store.get(depId)![dataIndex];
+              if (isGrafastError(depVal)) {
+                for (
+                  let allStepsIndex = executedLength;
+                  allStepsIndex < allStepsLength;
+                  allStepsIndex++
+                ) {
+                  const step = _allSteps[
+                    allStepsIndex
+                  ] as UnbatchedExecutableStep;
+                  const storeEntry = bucket.store.get(step.id)!;
+                  storeEntry[dataIndex] = depVal;
+                }
+                continue outerLoop;
+              }
+            }
+          }
+
           stepLoop: for (
             let allStepsIndex = executedLength;
             allStepsIndex < allStepsLength;
@@ -319,16 +339,6 @@ export function executeBucket(
             const step = _allSteps[allStepsIndex] as UnbatchedExecutableStep;
             const storeEntry = bucket.store.get(step.id)!;
             try {
-              if (sideEffectPlanIdsWithErrors) {
-                for (const depId of sideEffectPlanIdsWithErrors) {
-                  const depVal = bucket.store.get(depId)![dataIndex];
-                  if (isGrafastError(depVal)) {
-                    storeEntry[dataIndex] = depVal;
-                    continue stepLoop;
-                  }
-                }
-              }
-
               const deps: any = [];
               for (const depId of step.dependencies) {
                 const depVal = bucket.store.get(depId)![dataIndex];
