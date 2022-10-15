@@ -107,22 +107,22 @@ graph TD
     PgSelectSingle99 --> PgClassExpression109
 
     subgraph "Buckets for queries/interfaces-relational/basics-with-fragments"
-    Bucket0("Bucket 0 (root)<br />1: Access[8], Access[9]<br />2: Object[10]<br />3: PgSelect[7]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[8],Access[9],Object[10]<br />2: PgSelect[7]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 10<br /><br />ROOT __Item{1}ᐸ7ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 11, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1: PgClassExpression[13], Access[110]<br />2: __ListTransform[19]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 11, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1:  / PgClassExpression[13],Access[110]<br />2: __ListTransform[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13,__ListTransform19,Access110 bucket2
     Bucket3("Bucket 3 (subroutine)<br />ROOT PgSelectSingle{3}ᐸrelational_itemsᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item20,PgSelectSingle21 bucket3
-    Bucket4("Bucket 4 (listItem)<br />Deps: 10<br /><br />ROOT __Item{4}ᐸ19ᐳ[22]<br />1: PgSelectSingle[23]<br />2: PgClassExpression[24], PgClassExpression[26], PgClassExpression[35], PgClassExpression[36], PgClassExpression[37], PgClassExpression[38], PgClassExpression[39], PgClassExpression[40]<br />3: PgPolymorphic[25]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />Deps: 10<br /><br />ROOT __Item{4}ᐸ19ᐳ[22]<br />1:  / PgSelectSingle[23],PgClassExpression[24],PgClassExpression[26],PgClassExpression[35],PgClassExpression[36],PgClassExpression[37],PgClassExpression[38],PgClassExpression[39],PgClassExpression[40]<br />2: PgPolymorphic[25]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item22,PgSelectSingle23,PgClassExpression24,PgPolymorphic25,PgClassExpression26,PgClassExpression35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 26, 25, 24, 35, 36, 37, 38, 39, 40<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br />1: PgSelect[27], PgSelect[43], PgSelect[61], PgSelect[78], PgSelect[94]<br />2: First[31], First[47], First[65], First[82], First[98]<br />3: PgSelectSingle[32], PgSelectSingle[48], PgSelectSingle[66], PgSelectSingle[83], PgSelectSingle[99]<br />4: PgClassExpression[41], PgClassExpression[57], PgClassExpression[58], PgClassExpression[59], PgClassExpression[75], PgClassExpression[76], PgClassExpression[92], PgClassExpression[108], PgClassExpression[109]"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 26, 25, 24, 35, 36, 37, 38, 39, 40<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect27,First31,PgSelectSingle32,PgClassExpression41,PgSelect43,First47,PgSelectSingle48,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgSelect61,First65,PgSelectSingle66,PgClassExpression75,PgClassExpression76,PgSelect78,First82,PgSelectSingle83,PgClassExpression92,PgSelect94,First98,PgSelectSingle99,PgClassExpression108,PgClassExpression109 bucket5
     Bucket0 --> Bucket1

@@ -268,6 +268,16 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public polymorphicPaths: ReadonlySet<string>;
 
   /**
+   * True if this needs to be permanently stored; for example:
+   *
+   * - Is the dep of another LayerPlan
+   * - Is used in an OutputPlan
+   *
+   * @internal
+   */
+  public store = true;
+
+  /**
    * Override the metaKey to be able to share execution meta between multiple
    * steps of the same class (or even a family of step classes).
    */
@@ -509,23 +519,32 @@ ${tryOrNot(`\
 }
 
 export function isExecutableStep<TData = any>(
-  plan: unknown,
-): plan is ExecutableStep<TData> {
+  step: unknown,
+): step is ExecutableStep<TData> {
   return (
-    plan instanceof BaseStep &&
-    "execute" in plan &&
-    typeof (plan as any).execute === "function"
+    step instanceof BaseStep &&
+    "execute" in step &&
+    typeof (step as any).execute === "function"
   );
 }
 
 export function assertExecutableStep<TData>(
-  plan: BaseStep | null | undefined | void,
-): asserts plan is ExecutableStep<TData> {
-  if (!isExecutableStep(plan)) {
+  step: BaseStep | null | undefined | void,
+): asserts step is ExecutableStep<TData> {
+  if (!isExecutableStep(step)) {
     throw new Error(
-      `The plan returned should be an executable plan, but it does not implement the 'execute' method.`,
+      `The step returned should be an executable step, but it does not implement the 'execute' method.`,
     );
   }
+}
+
+export function isUnbatchedExecutableStep<TData = any>(
+  step: unknown,
+): step is UnbatchedExecutableStep<TData> {
+  return (
+    isExecutableStep(step) &&
+    typeof (step as any).unbatchedExecute === "function"
+  );
 }
 
 export type ObjectLikeStep<

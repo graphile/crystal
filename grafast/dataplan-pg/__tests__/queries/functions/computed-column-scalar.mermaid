@@ -49,10 +49,10 @@ graph TD
     PgSelectSingle39 --> PgClassExpression40
 
     subgraph "Buckets for queries/functions/computed-column-scalar"
-    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10], __InputStaticLeaf[14], __InputStaticLeaf[23], __InputStaticLeaf[32]<br />2: Object[11]<br />3: PgSelect[8]<br />4: First[12]<br />5: PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / __InputStaticLeaf[7],Access[9],Access[10],__InputStaticLeaf[14],__InputStaticLeaf[23],__InputStaticLeaf[32],Object[11]<br />2: PgSelect[8] / First[12],PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf14,__InputStaticLeaf23,__InputStaticLeaf32 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: Map[41], Map[45], Map[43]<br />2: PgSelectSingle[21], PgSelectSingle[30], PgSelectSingle[39]<br />3: PgClassExpression[22], PgClassExpression[31], PgClassExpression[40]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelectSingle21,PgClassExpression22,PgSelectSingle30,PgClassExpression31,PgSelectSingle39,PgClassExpression40,Map41,Map43,Map45 bucket1
     Bucket0 --> Bucket1

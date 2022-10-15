@@ -60,16 +60,16 @@ graph TD
     PgSelectSingle35 --> PgClassExpression46
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-withPayload"
-    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[9], __InputStaticLeaf[10], __InputStaticLeaf[11], Access[13], Access[14]<br />2: Object[15]"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf10,__InputStaticLeaf11,Access13,Access14,Object15 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect[12]<br />2: First[16]<br />3: PgSelectSingle[17]<br />4: Object[18], PgClassExpression[38]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect[12]<br />2:  / First[16],PgSelectSingle[17],Object[18],PgClassExpression[38]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18,PgClassExpression38 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 38, 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]<br />1: PgSelect[30]<br />2: First[34]<br />3: PgSelectSingle[35]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 38, 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect30,First34,PgSelectSingle35 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 15, 35, 38<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[17]<br />1: PgClassExpression[19], PgClassExpression[28]<br />2: PgSelect[20]<br />3: First[24]<br />4: PgSelectSingle[25]<br />5: PgClassExpression[26]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 15, 35, 38<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[17]<br />1:  / PgClassExpression[19],PgClassExpression[28]<br />2: PgSelect[20] / First[24],PgSelectSingle[25],PgClassExpression[26]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgSelect20,First24,PgSelectSingle25,PgClassExpression26,PgClassExpression28 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket

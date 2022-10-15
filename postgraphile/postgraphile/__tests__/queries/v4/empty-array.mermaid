@@ -38,10 +38,10 @@ graph TD
     PgClassExpression40 ==> __Item41
 
     subgraph "Buckets for queries/v4/empty-array"
-    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7]<br />2: Connection[34]"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,Connection34 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 34<br /><br />ROOT Connectionᐸ30ᐳ[34]<br />1: Access[31], Access[32]<br />2: Object[33]<br />3: PgSelect[35]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 34<br /><br />ROOT Connectionᐸ30ᐳ[34]<br />1:  / Access[31],Access[32],Object[33]<br />2: PgSelect[35]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access31,Access32,Object33,PgSelect35 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ35ᐳ[36]"):::bucket

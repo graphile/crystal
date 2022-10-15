@@ -50,7 +50,7 @@ graph TD
     First85{{"First[85∈1]"}}:::plan
     PgSelectSingle86{{"PgSelectSingle[86∈1]<br />ᐸtypesᐳ"}}:::plan
     PgClassExpression87{{"PgClassExpression[87∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgPageInfo88["PgPageInfo[88∈1]"]:::plan
+    PgPageInfo88{{"PgPageInfo[88∈1]"}}:::plan
     Constant89{{"Constant[89∈1]"}}:::plan
     Constant90{{"Constant[90∈1]"}}:::plan
     First92{{"First[92∈1]"}}:::plan
@@ -118,13 +118,13 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Connection40 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 40<br /><br />ROOT Connectionᐸ36ᐳ[40]<br />1: Access[37], Access[38], PgPageInfo[88], Constant[89], Constant[90]<br />2: Object[39]<br />3: PgSelect[41], PgSelect[84]<br />4: First[85], First[92], Last[98]<br />5: PgSelectSingle[86], PgSelectSingle[93], PgSelectSingle[99]<br />6: PgClassExpression[87], PgClassExpression[95], PgClassExpression[101]<br />7: List[96], List[102]<br />8: PgCursor[94], PgCursor[100]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 40<br /><br />ROOT Connectionᐸ36ᐳ[40]<br />1:  / Access[37],Access[38],PgPageInfo[88],Constant[89],Constant[90],Object[39]<br />2: PgSelect[41], PgSelect[84] / First[85],PgSelectSingle[86],PgClassExpression[87],First[92],PgSelectSingle[93],PgClassExpression[95],List[96],Last[98],PgSelectSingle[99],PgClassExpression[101],List[102],PgCursor[94],PgCursor[100]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access37,Access38,Object39,PgSelect41,PgSelect84,First85,PgSelectSingle86,PgClassExpression87,PgPageInfo88,Constant89,Constant90,First92,PgSelectSingle93,PgCursor94,PgClassExpression95,List96,Last98,PgSelectSingle99,PgCursor100,PgClassExpression101,List102 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ41ᐳ[42]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item42,PgSelectSingle43 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[43]<br />1: PgClassExpression[44], PgClassExpression[45], PgClassExpression[46], PgClassExpression[47], Map[103]<br />2: PgSelectSingle[55]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[43]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgSelectSingle55,Map103 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ47ᐳ[48]"):::bucket
@@ -133,7 +133,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ[55]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression56,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgClassExpression60,PgClassExpression61,PgClassExpression62 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[43]<br />1: PgClassExpression[65], PgClassExpression[66], PgClassExpression[67], PgClassExpression[68], Map[105]<br />2: PgSelectSingle[76]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[43]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression65,PgClassExpression66,PgClassExpression67,PgClassExpression68,PgSelectSingle76,Map105 bucket6
     Bucket7("Bucket 7 (listItem)<br />ROOT __Item{7}ᐸ68ᐳ[69]"):::bucket

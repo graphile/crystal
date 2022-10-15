@@ -19,7 +19,7 @@ graph TD
     PgSelectSingle22{{"PgSelectSingle[22∈1]<br />ᐸforumsᐳ"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     Connection38{{"Connection[38∈0]<br />ᐸ34ᐳ"}}:::plan
-    PgPageInfo40["PgPageInfo[40∈1]"]:::plan
+    PgPageInfo40{{"PgPageInfo[40∈1]"}}:::plan
     Constant41{{"Constant[41∈1]"}}:::plan
     Constant42{{"Constant[42∈1]"}}:::plan
 
@@ -33,7 +33,7 @@ graph TD
     PgSelectSingle22 --> PgClassExpression23
 
     subgraph "Buckets for queries/connections/empty"
-    Bucket0("Bucket 0 (root)<br />1: Access[18], Access[19], Connection[38]<br />2: Object[20]<br />3: PgSelect[17]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[18],Access[19],Connection[38],Object[20]<br />2: PgSelect[17]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,Connection38 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 38<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket

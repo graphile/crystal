@@ -5,21 +5,18 @@ import type { Bucket, RequestContext } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { $$error, isGrafastError, newGrafastError } from "../error.js";
-import type { ExecutableStep } from "../index.js";
 import { __ItemStep, isStreamableStep } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
 import { $$streamMore } from "../interfaces.js";
-import { $$noExec } from "../step.js";
+import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
-import { FORCE_START_STEPS } from "./LayerPlan.js";
 
 // An error that indicates this entry was skipped because it didn't match
 // polymorphicPath.
@@ -67,55 +64,66 @@ export function executeBucket(
   requestContext: RequestContext,
 ): PromiseOrDirect<void> {
   const { metaByMetaKey } = requestContext;
-  const startedSteps = FORCE_START_STEPS ? null : new Set();
-  const pendingSteps = FORCE_START_STEPS
-    ? null
-    : new Set(bucket.layerPlan.pendingSteps);
   const {
     size,
     store,
     noDepsList,
-    layerPlan: { startSteps, children: childLayerPlans },
+    layerPlan: { phases, children: childLayerPlans },
   } = bucket;
 
-  const l = startSteps.length;
+  const phaseCount = phases.length;
 
   let sideEffectPlanIdsWithErrors: null | number[] = null;
 
-  // Like a `for(i = 0; i < l; i++)` loop with some `await`s in it, except it does promise
+  // Like a `for(i = 0; i < phaseCount; i++)` loop with some `await`s in it, except it does promise
   // handling manually so that it can complete synchronously (no promises) if
   // possible.
-  const nextSteps = (i: number): PromiseOrDirect<void> => {
-    if (i >= l) {
+  const nextPhase = (phaseIndex: number): PromiseOrDirect<void> => {
+    if (phaseIndex >= phaseCount) {
       return;
     }
-    bucket.cascadeEnabled = i === l - 1;
-    const steps = startSteps[i];
-    let starterPromises: PromiseLike<void>[] | null = null;
+    const phase = phases[phaseIndex];
+    const normalSteps = phase.normalSteps?.map((s) => s.step) ?? [];
+    let executePromises:
+      | PromiseLike<GrafastResultsList<any> | GrafastResultStreamList<any>>[]
+      | null = null;
     let sideEffectPlanIds: null | number[] = null;
-    for (const step of steps) {
-      if (step.hasSideEffects) {
-        if (sideEffectPlanIds === null) {
-          sideEffectPlanIds = [step.id];
-        } else {
-          sideEffectPlanIds.push(step.id);
-        }
-      }
-      try {
-        const r = executeStep(step);
-        if (isPromiseLike(r)) {
-          if (!starterPromises) {
-            starterPromises = [r];
+    let executePromiseResultIndex: number[] | null = null;
+    const results: Array<
+      GrafastResultsList<any> | GrafastResultStreamList<any> | undefined
+    > = [];
+    if (normalSteps) {
+      for (
+        let normalStepIndex = 0, l = normalSteps.length;
+        normalStepIndex < l;
+        normalStepIndex++
+      ) {
+        const step = normalSteps[normalStepIndex];
+        if (step.hasSideEffects) {
+          if (sideEffectPlanIds === null) {
+            sideEffectPlanIds = [step.id];
           } else {
-            starterPromises.push(r);
+            sideEffectPlanIds.push(step.id);
           }
         }
-      } catch (e) {
-        const r = newGrafastError(e, step.id);
-        bucket.store.set(step.id, arrayOfLength(bucket.size, r));
-        bucket.hasErrors = true;
-        if (!FORCE_START_STEPS) {
-          reallyCompletedStep(step);
+        try {
+          const r = executeStep(step);
+          if (isPromiseLike(r)) {
+            results[normalStepIndex] = undefined /* will populate shortly */;
+            if (!executePromises) {
+              executePromises = [r];
+              executePromiseResultIndex = [normalStepIndex];
+            } else {
+              const newIndex = executePromises.push(r) - 1;
+              executePromiseResultIndex![newIndex] = normalStepIndex;
+            }
+          } else {
+            results[normalStepIndex] = r;
+          }
+        } catch (e) {
+          const r = newGrafastError(e, step.id);
+          bucket.store.set(step.id, arrayOfLength(bucket.size, r));
+          bucket.hasErrors = true;
         }
       }
     }
@@ -127,22 +135,338 @@ export function executeBucket(
         sideEffectPlanIdsWithErrors.push(id);
       }
     };
-    if (starterPromises !== null) {
-      return Promise.all(starterPromises).then(() => {
+
+    const next = () => {
+      return nextPhase(phaseIndex + 1);
+    };
+
+    const loopOverResults = () => {
+      const { _allSteps } = phase;
+      const allStepsLength = _allSteps.length;
+      const executedLength = results.length;
+
+      if (isDev) {
+        assert.strictEqual(
+          executedLength,
+          phase.normalSteps?.length ?? 0,
+          "Expected only and all normalSteps to have executed",
+        );
+      }
+
+      // Validate executed steps
+      for (
+        let allStepsIndex = 0;
+        allStepsIndex < executedLength;
+        allStepsIndex++
+      ) {
+        const result = results[allStepsIndex];
+        if (!Array.isArray(result)) {
+          const finishedStep = _allSteps[allStepsIndex];
+          throw new Error(
+            `Result from ${finishedStep} should be an array, instead received ${inspect(
+              result,
+              { colors: true },
+            )}`,
+          );
+        }
+        const resultLength = result.length;
+        if (resultLength !== size) {
+          const finishedStep = _allSteps[allStepsIndex];
+          throw new Error(
+            `Result array from ${finishedStep} should have length ${size}, instead it had length ${result.length}`,
+          );
+        }
+      }
+
+      // Need to complete promises, check for errors, etc.
+      // **DO NOT THROW, DO NOT ALLOW AN ERROR TO BE RAISED!**
+      // **USE DEFENSIVE PROGRAMMING HERE!**
+
+      let promises: PromiseLike<void>[] | undefined;
+      let pendingPromises: PromiseLike<any>[] | undefined;
+      let pendingPromiseIndexes:
+        | Array<{
+            /** The step (results) index */
+            s: number;
+            /** The data index */
+            i: number;
+          }>
+        | undefined;
+
+      for (const step of _allSteps) {
+        bucket.store.set(step.id, arrayOfLength(size));
+      }
+
+      const success = (
+        finishedStep: ExecutableStep,
+        finalResult: any[],
+        resultIndex: number,
+        value: unknown,
+      ) => {
+        let proto: any;
+        if (
+          // Fast-lane for non-objects and simple objects
+          typeof value !== "object" ||
+          value === null ||
+          (proto = Object.getPrototypeOf(value)) === null ||
+          proto === Object.prototype
+        ) {
+          finalResult[resultIndex] = value;
+        } else if (value instanceof Error) {
+          const e = value[$$error]
+            ? value
+            : newGrafastError(value, finishedStep.id);
+          finalResult[resultIndex] = e;
+          bucket.hasErrors = true;
+        } else if (
+          // Detects async iterables (but excludes all the basic types
+          // like arrays, Maps, Sets, etc that are also iterables) and
+          // handles them specially.
+          isAsyncIterable(value) &&
+          !isIterable(value)
+        ) {
+          const iterator = value[Symbol.asyncIterator]();
+
+          const streamOptions = finishedStep._stepOptions.stream;
+          const initialCount: number = streamOptions
+            ? streamOptions.initialCount
+            : Infinity;
+
+          // TODO:critical: need to ensure that iterator is terminated
+          // even if the stream is never consumed (e.g. if something else
+          // errors). For query/mutation we can do this when operation
+          // completes, for subscription we should do it after each
+          // individual payload (and all its streamed/deferred children)
+          // are complete before processing the next subscription event.
+
+          if (initialCount === 0) {
+            // Optimization - defer everything
+            const arr: any[] = [];
+            arr[$$streamMore] = iterator;
+            finalResult[resultIndex] = arr;
+          } else {
+            // Evaluate the first initialCount entries, rest is streamed.
+            const promise = (async () => {
+              try {
+                let valuesSeen = 0;
+                const arr: any[] = [];
+
+                /*
+                 * We need to "shift" a few entries off the top of the
+                 * iterator, but still keep it iterable for the later
+                 * stream. To accomplish this we have to do manual
+                 * looping
+                 */
+
+                let resultPromise: Promise<IteratorResult<any, any>>;
+                while ((resultPromise = iterator.next())) {
+                  const finalResult = await resultPromise;
+                  if (finalResult.done) {
+                    break;
+                  }
+                  arr.push(await finalResult.value);
+                  if (++valuesSeen >= initialCount) {
+                    // This is safe to do in the `while` since we checked
+                    // the `0` entries condition in the optimization
+                    // above.
+                    arr[$$streamMore] = iterator;
+                    break;
+                  }
+                }
+
+                finalResult[resultIndex] = arr;
+              } catch (e) {
+                bucket.hasErrors = true;
+                finalResult[resultIndex] = newGrafastError(e, finishedStep.id);
+              }
+            })();
+            if (!promises) {
+              promises = [promise];
+            } else {
+              promises.push(promise);
+            }
+          }
+        } else {
+          finalResult[resultIndex] = value;
+        }
+      };
+
+      const runSyncSteps = () => {
+        if (!phase.unbatchedSyncAndSafeSteps) {
+          return next();
+        }
+        const extras: ExecutionExtra[] = [];
+        for (
+          let allStepsIndex = executedLength;
+          allStepsIndex < allStepsLength;
+          allStepsIndex++
+        ) {
+          const step = _allSteps[allStepsIndex];
+          const meta = metaByMetaKey[step.metaKey];
+          extras[allStepsIndex] = {
+            meta,
+            eventEmitter: requestContext.eventEmitter,
+            _bucket: bucket,
+            _requestContext: requestContext,
+          };
+        }
+        outerLoop: for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+          if (sideEffectPlanIdsWithErrors) {
+            for (const depId of sideEffectPlanIdsWithErrors) {
+              const depVal = bucket.store.get(depId)![dataIndex];
+              if (isGrafastError(depVal)) {
+                for (
+                  let allStepsIndex = executedLength;
+                  allStepsIndex < allStepsLength;
+                  allStepsIndex++
+                ) {
+                  const step = _allSteps[
+                    allStepsIndex
+                  ] as UnbatchedExecutableStep;
+                  const storeEntry = bucket.store.get(step.id)!;
+                  storeEntry[dataIndex] = depVal;
+                }
+                continue outerLoop;
+              }
+            }
+          }
+
+          stepLoop: for (
+            let allStepsIndex = executedLength;
+            allStepsIndex < allStepsLength;
+            allStepsIndex++
+          ) {
+            const step = _allSteps[allStepsIndex] as UnbatchedExecutableStep;
+            const storeEntry = bucket.store.get(step.id)!;
+            try {
+              const deps: any = [];
+              for (const depId of step.dependencies) {
+                const depVal = bucket.store.get(depId)![dataIndex];
+                if (bucket.hasErrors && isGrafastError(depVal)) {
+                  storeEntry[dataIndex] = depVal;
+                  continue stepLoop;
+                }
+                deps.push(depVal);
+              }
+              storeEntry[dataIndex] = step.unbatchedExecute(
+                extras[allStepsIndex],
+                ...deps,
+              );
+            } catch (e) {
+              bucket.hasErrors = true;
+              storeEntry[dataIndex] = newGrafastError(e, step.id);
+            }
+          }
+        }
+        return next();
+      };
+
+      const awaitPromises = async () => {
+        // This _should not_ throw.
+        await Promise.all(promises!);
+        return runSyncSteps();
+      };
+
+      for (
+        let allStepsIndex = 0;
+        allStepsIndex < executedLength;
+        allStepsIndex++
+      ) {
+        const step = _allSteps[allStepsIndex];
+        const result = results[allStepsIndex]!;
+        const storeEntry = bucket.store.get(step.id)!;
+        for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+          const val = result[dataIndex];
+          if (step.isSyncAndSafe || !isPromiseLike(val)) {
+            success(step, storeEntry, dataIndex, val);
+          } else {
+            if (!pendingPromises) {
+              pendingPromises = [val];
+              pendingPromiseIndexes = [{ s: allStepsIndex, i: dataIndex }];
+            } else {
+              pendingPromises.push(val);
+              pendingPromiseIndexes!.push({ s: allStepsIndex, i: dataIndex });
+            }
+          }
+        }
+      }
+
+      if (pendingPromises) {
+        return Promise.allSettled(pendingPromises).then(
+          (resultSettledResult) => {
+            for (
+              let i = 0, pendingPromisesLength = resultSettledResult.length;
+              i < pendingPromisesLength;
+              i++
+            ) {
+              const settledResult = resultSettledResult[i];
+              const { s: allStepsIndex, i: dataIndex } =
+                pendingPromiseIndexes![i];
+              const finishedStep = _allSteps[allStepsIndex];
+              const storeEntry = bucket.store.get(finishedStep.id)!;
+              if (settledResult.status === "fulfilled") {
+                success(
+                  finishedStep,
+                  storeEntry,
+                  dataIndex,
+                  settledResult.value,
+                );
+              } else {
+                bucket.hasErrors = true;
+                storeEntry[dataIndex] = newGrafastError(
+                  settledResult.reason,
+                  finishedStep.id,
+                );
+              }
+            }
+            if (bucket.hasErrors && sideEffectPlanIds) {
+              handleSideEffectPlanIds();
+            }
+            return promises ? awaitPromises() : runSyncSteps();
+          },
+        );
+        // TODO: rehandle this!
+        /*
+          .then(null, (e) => {
+            // THIS SHOULD NEVER HAPPEN!
+            console.error(
+              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+            );
+            const grafastError = newGrafastError(
+              new Error(
+                `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+              ),
+              finishedStep.id,
+            );
+            console.error(`${grafastError.originalError}\n  ${e}`);
+            store.set(
+              finishedStep.id,
+              arrayOfLength(finalResult.length, grafastError),
+            );
+          });
+          */
+      } else {
         if (bucket.hasErrors && sideEffectPlanIds) {
           handleSideEffectPlanIds();
         }
-        return nextSteps(i + 1);
+        return promises ? awaitPromises() : runSyncSteps();
+      }
+    };
+
+    if (executePromises !== null) {
+      return Promise.all(executePromises).then((promiseResults) => {
+        for (let i = 0, l = promiseResults.length; i < l; i++) {
+          const index = executePromiseResultIndex![i];
+          results[index] = promiseResults[i];
+        }
+        return loopOverResults();
       });
     } else {
-      if (bucket.hasErrors && sideEffectPlanIds) {
-        handleSideEffectPlanIds();
-      }
-      return nextSteps(i + 1);
+      return loopOverResults();
     }
   };
 
-  const promise = nextSteps(0);
+  const promise = nextPhase(0);
 
   if (isPromiseLike(promise)) {
     return promise.then(executeSamePhaseChildren);
@@ -151,279 +475,6 @@ export function executeBucket(
   }
 
   // Function definitions below here
-
-  function reallyCompletedStep(
-    finishedStep: ExecutableStep,
-  ): void | Promise<void> {
-    if (isDev && !startedSteps!.delete(finishedStep)) {
-      console.error(
-        `GraphileInternalError<c3d1276b-df0f-4f88-aabf-15fa0f7d8515>: Double complete of '${finishedStep}' detected; ignoring (but this indicates a bug in Grafast)`,
-      );
-      // DOUBLE COMPLETE?
-      return;
-    }
-    pendingSteps!.delete(finishedStep);
-    if (pendingSteps!.size === 0) {
-      // Finished!
-      return;
-    }
-    if (!bucket.cascadeEnabled) {
-      // Must be some side effects yet to run
-      return;
-    }
-    let promises: PromiseLike<void>[] | undefined;
-    outerLoop: for (const potentialNextStep of finishedStep.sameLayerDependentPlans) {
-      const isPending = pendingSteps!.has(potentialNextStep);
-      if (!isPending) {
-        // We've already ran it, skip
-        continue;
-      }
-
-      // Check if it's suitable
-      const sld = potentialNextStep._sameLayerDependencies;
-      for (let i = 0, l = sld.length; i < l; i++) {
-        const depId = sld[i];
-        if (!store.has(depId)) {
-          if (isDev) {
-            const dep =
-              bucket.layerPlan.operationPlan.dangerouslyGetStep(depId)!;
-            assert.strictEqual(
-              dep.layerPlan,
-              bucket.layerPlan,
-              `GraphileInternalError<4ca7f9f9-0a00-415f-b6f7-46858fde17c3>: Waiting on ${dep} but it'll never complete because it's not in this bucket (${bucket.layerPlan.id}); this is most likely a bug in copyPlanIds`,
-            );
-          }
-          continue outerLoop;
-        }
-      }
-
-      // It's suitable; let's run it
-      try {
-        const r = executeStep(potentialNextStep);
-        if (isPromiseLike(r)) {
-          if (promises) {
-            promises.push(r);
-          } else {
-            promises = [r];
-          }
-        }
-      } catch (e) {
-        const r = newGrafastError(e, potentialNextStep.id);
-        bucket.store.set(potentialNextStep.id, arrayOfLength(bucket.size, r));
-        bucket.hasErrors = true;
-        if (!FORCE_START_STEPS) {
-          reallyCompletedStep(potentialNextStep);
-        }
-      }
-    }
-    if (promises) {
-      return Promise.all(promises) as Promise<any> as Promise<void>;
-    } else {
-      return;
-    }
-  }
-
-  function completedStep(
-    finishedStep: ExecutableStep,
-    result: GrafastValuesList<any>,
-  ): void | Promise<void> {
-    if (!Array.isArray(result)) {
-      throw new Error(
-        `Result from ${finishedStep} should be an array, instead received ${inspect(
-          result,
-          { colors: true },
-        )}`,
-      );
-    }
-    const resultLength = result.length;
-    if (resultLength !== size) {
-      throw new Error(
-        `Result array from ${finishedStep} should have length ${size}, instead it had length ${result.length}`,
-      );
-    }
-    // Need to complete promises, check for errors, etc.
-    // **DO NOT THROW, DO NOT ALLOW AN ERROR TO BE RAISED!**
-    // **USE DEFENSIVE PROGRAMMING HERE!**
-
-    const finalResult: any[] = [];
-    let promises: PromiseLike<void>[] | undefined;
-    let pendingPromises: PromiseLike<any>[] | undefined;
-    let pendingPromiseIndexes: number[] | undefined;
-    const success = (value: unknown, resultIndex: number) => {
-      let proto: any;
-      if (
-        // Fast-lane for non-objects and simple objects
-        typeof value !== "object" ||
-        value === null ||
-        (proto = Object.getPrototypeOf(value)) === null ||
-        proto === Object.prototype
-      ) {
-        finalResult[resultIndex] = value;
-      } else if (value instanceof Error) {
-        const e = value[$$error]
-          ? value
-          : newGrafastError(value, finishedStep.id);
-        finalResult[resultIndex] = e;
-        bucket.hasErrors = true;
-      } else if (
-        // Detects async iterables (but excludes all the basic types
-        // like arrays, Maps, Sets, etc that are also iterables) and
-        // handles them specially.
-        isAsyncIterable(value) &&
-        !isIterable(value)
-      ) {
-        const iterator = value[Symbol.asyncIterator]();
-
-        const streamOptions = finishedStep._stepOptions.stream;
-        const initialCount: number = streamOptions
-          ? streamOptions.initialCount
-          : Infinity;
-
-        // TODO:critical: need to ensure that iterator is terminated
-        // even if the stream is never consumed (e.g. if something else
-        // errors). For query/mutation we can do this when operation
-        // completes, for subscription we should do it after each
-        // individual payload (and all its streamed/deferred children)
-        // are complete before processing the next subscription event.
-
-        if (initialCount === 0) {
-          // Optimization - defer everything
-          const arr: any[] = [];
-          arr[$$streamMore] = iterator;
-          finalResult[resultIndex] = arr;
-        } else {
-          // Evaluate the first initialCount entries, rest is streamed.
-          const promise = (async () => {
-            try {
-              let valuesSeen = 0;
-              const arr: any[] = [];
-
-              /*
-               * We need to "shift" a few entries off the top of the
-               * iterator, but still keep it iterable for the later
-               * stream. To accomplish this we have to do manual
-               * looping
-               */
-
-              let resultPromise: Promise<IteratorResult<any, any>>;
-              while ((resultPromise = iterator.next())) {
-                const finalResult = await resultPromise;
-                if (finalResult.done) {
-                  break;
-                }
-                arr.push(await finalResult.value);
-                if (++valuesSeen >= initialCount) {
-                  // This is safe to do in the `while` since we checked
-                  // the `0` entries condition in the optimization
-                  // above.
-                  arr[$$streamMore] = iterator;
-                  break;
-                }
-              }
-
-              finalResult[resultIndex] = arr;
-            } catch (e) {
-              bucket.hasErrors = true;
-              finalResult[resultIndex] = newGrafastError(e, finishedStep.id);
-            }
-          })();
-          if (!promises) {
-            promises = [promise];
-          } else {
-            promises.push(promise);
-          }
-        }
-      } else {
-        finalResult[resultIndex] = value;
-      }
-    };
-
-    // If there are no promises, we want to do the sync route.
-    for (let i = 0; i < resultLength; i++) {
-      const val = result[i];
-      if (isPromiseLike(val)) {
-        if (!pendingPromises) {
-          pendingPromises = [val];
-          pendingPromiseIndexes = [i];
-        } else {
-          pendingPromises.push(val);
-          pendingPromiseIndexes!.push(i);
-        }
-      } else {
-        success(val, i);
-      }
-    }
-
-    const done = () => {
-      if (promises) {
-        // This _should not_ throw.
-        return Promise.all(promises).then(() => {
-          store.set(finishedStep.id, finalResult);
-          if (FORCE_START_STEPS) {
-            return;
-          } else {
-            return reallyCompletedStep(finishedStep);
-          }
-        });
-      } else {
-        store.set(finishedStep.id, finalResult);
-        if (FORCE_START_STEPS) {
-          return;
-        } else {
-          return reallyCompletedStep(finishedStep);
-        }
-      }
-    };
-
-    if (pendingPromises) {
-      return Promise.allSettled(pendingPromises)
-        .then((resultSettledResult) => {
-          // Deliberate shadowing
-          for (
-            let i = 0, pendingPromisesLength = resultSettledResult.length;
-            i < pendingPromisesLength;
-            i++
-          ) {
-            const settledResult = resultSettledResult[i];
-            const resultIndex = pendingPromiseIndexes![i];
-            if (settledResult.status === "fulfilled") {
-              success(settledResult.value, resultIndex);
-            } else {
-              bucket.hasErrors = true;
-              finalResult[resultIndex] = newGrafastError(
-                settledResult.reason,
-                finishedStep.id,
-              );
-            }
-          }
-          return done();
-        })
-        .then(null, (e) => {
-          // THIS SHOULD NEVER HAPPEN!
-          console.error(
-            `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-          );
-          const grafastError = newGrafastError(
-            new Error(
-              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-            ),
-            finishedStep.id,
-          );
-          console.error(`${grafastError.originalError}\n  ${e}`);
-          store.set(
-            finishedStep.id,
-            arrayOfLength(finalResult.length, grafastError),
-          );
-          if (FORCE_START_STEPS) {
-            return;
-          } else {
-            return reallyCompletedStep(finishedStep);
-          }
-        });
-    } else {
-      return done();
-    }
-  }
 
   function executeOrStream(
     step: ExecutableStep,
@@ -551,18 +602,9 @@ export function executeBucket(
   /**
    * This function MIGHT throw or reject, so be sure to handle that.
    */
-  function executeStep(step: ExecutableStep): void | PromiseLike<void> {
-    if (!FORCE_START_STEPS) {
-      if (startedSteps!.has(step)) {
-        return;
-      }
-      startedSteps!.add(step);
-    }
-    if (isDev && $$noExec in step) {
-      throw new Error("OLD PATH!");
-      // Bypass execution
-      return reallyCompletedStep(step);
-    }
+  function executeStep(
+    step: ExecutableStep,
+  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     try {
       const meta = metaByMetaKey[step.metaKey];
       const extra: ExecutionExtra = {
@@ -601,55 +643,20 @@ export function executeBucket(
             )
           : reallyExecuteStepWithNoErrors(step, dependencies, extra);
       if (isPromiseLike(result)) {
-        return result.then(
-          (values) => {
-            return completedStep(step, values);
-          },
-          (error) => {
-            bucket.hasErrors = true;
-            return completedStep(step, arrayOfLength(size, error));
-          },
-        );
+        return result.then(null, (error) => {
+          // bucket.hasErrors = true;
+          return arrayOfLength(size, error);
+        });
       } else {
-        if (step.isSyncAndSafe) {
-          // It promises not to add new errors, and not to include promises in the result array
-          store.set(step.id, result as any[]);
-          if (FORCE_START_STEPS) {
-            return;
-          } else {
-            return reallyCompletedStep(step);
-          }
-        } else {
-          return completedStep(step, result);
-        }
+        return result;
       }
     } catch (error) {
-      bucket.hasErrors = true;
-      if (step.isSyncAndSafe) {
-        // It promises not to add new errors, and not to include promises in the result array
-        const newResult = arrayOfLength(size, newGrafastError(error, step.id));
-        store.set(step.id, newResult);
-        if (FORCE_START_STEPS) {
-          return;
-        } else {
-          return reallyCompletedStep(step);
-        }
-      } else {
-        const newResult = arrayOfLength(size, error);
-        return completedStep(step, newResult);
-      }
+      // bucket.hasErrors = true;
+      return arrayOfLength(size, error);
     }
   }
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
-    if (!FORCE_START_STEPS && pendingSteps!.size > 0) {
-      throw new Error(
-        `GraphileInternalError<8c518856-6e96-425e-91ce-0e0713dbdead>: executeSamePhaseChildren called before all steps were complete! Remaining steps were: ${[
-          ...pendingSteps!,
-        ].join(", ")}`,
-      );
-    }
-
     // TODO: create a JIT factory for this at planning time
     const childPromises: PromiseLike<any>[] = [];
 
@@ -773,7 +780,6 @@ export function newBucket(
     polymorphicPathList: spec.polymorphicPathList,
 
     isComplete: false,
-    cascadeEnabled: false,
     noDepsList: arrayOfLength(spec.size, undefined),
     children: Object.create(null),
   };

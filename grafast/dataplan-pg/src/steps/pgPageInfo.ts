@@ -1,9 +1,16 @@
 import type {
+  ExecutableStep,
   GrafastResultsList,
   GrafastValuesList,
   PageInfoCapableStep,
 } from "grafast";
-import { ConnectionStep, constant, ExecutableStep, first, last } from "grafast";
+import {
+  ConnectionStep,
+  constant,
+  first,
+  last,
+  UnbatchedExecutableStep,
+} from "grafast";
 
 import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";
@@ -26,7 +33,7 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  * {@page ~@dataplan/pg/steps/pgPageInfo.md}
  */
 export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
-  extends ExecutableStep<any>
+  extends UnbatchedExecutableStep<any>
   implements PageInfoCapableStep
 {
   static $$export = {
@@ -171,6 +178,10 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
     values: GrafastValuesList<ReadonlyArray<any>>,
   ): GrafastResultsList<object> {
     return new Array(values[0].length).fill(EMPTY_OBJECT);
+  }
+
+  unbatchedExecute() {
+    return EMPTY_OBJECT;
   }
 }
 

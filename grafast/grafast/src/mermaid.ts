@@ -290,17 +290,19 @@ function pp(polymorphicPaths: ReadonlySet<string>) {
 }
 
 function startSteps(layerPlan: LayerPlan) {
-  return layerPlan.startSteps.length === 1
+  function shortStep({ step }: { step: ExecutableStep }) {
+    return `${step.constructor.name?.replace(/Step$/, "") ?? ""}[${step.id}]`;
+  }
+  return layerPlan.phases.length === 1
     ? ``
-    : `\n${layerPlan.startSteps
+    : `\n${layerPlan.phases
         .map(
-          (s, i) =>
-            `${i + 1}: ${s
-              .map(
-                (s) =>
-                  `${s.constructor.name?.replace(/Step$/, "") ?? ""}[${s.id}]`,
-              )
-              .join(", ")}`,
+          (phase, i) =>
+            `${i + 1}: ${phase.normalSteps?.map(shortStep).join(", ") ?? ""}${
+              phase.unbatchedSyncAndSafeSteps
+                ? ` / ${phase.unbatchedSyncAndSafeSteps.map(shortStep)}`
+                : ""
+            }`,
         )
         .join("\n")}`;
 }

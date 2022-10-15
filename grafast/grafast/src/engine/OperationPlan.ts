@@ -60,6 +60,7 @@ import {
   isListCapableStep,
   isPolymorphicStep,
   isStreamableStep,
+  isUnbatchedExecutableStep,
 } from "../step.js";
 import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
@@ -71,14 +72,11 @@ import {
   isTypePlanned,
 } from "../utils.js";
 import type {
+  LayerPlanPhase,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
-import {
-  FORCE_START_STEPS,
-  isDeferredLayerPlan,
-  LayerPlan,
-} from "./LayerPlan.js";
+import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 
@@ -2653,127 +2651,142 @@ export class OperationPlan {
         (s) => s !== null && s.layerPlan === layerPlan,
       );
       layerPlan.pendingSteps = layerPlan.steps.filter((s) => !($$noExec in s));
-      // TODO: does this need sorting? Presumably lowest id first?
       const sideEffectSteps = layerPlan.pendingSteps.filter(
         (s) => s.hasSideEffects,
       );
-      if (FORCE_START_STEPS || sideEffectSteps.length > 0) {
-        const pending = new Set<ExecutableStep>(layerPlan.pendingSteps);
-        const processed = new Set<ExecutableStep>();
+      const pending = new Set<ExecutableStep>(layerPlan.pendingSteps);
+      const processed = new Set<ExecutableStep>();
 
-        // TODO: we should be able to use a different algorithm that minimizes
-        // the number of layers in layerPlan.startSteps. This one is just a stub
-        // so I can continue my work.
-        const processSideEffectPlan = (step: ExecutableStep) => {
-          if (processed.has(step)) {
-            return;
+      const processSideEffectPlan = (step: ExecutableStep) => {
+        if (processed.has(step)) {
+          return;
+        }
+        processed.add(step);
+        pending.delete(step);
+
+        const sideEffectDeps: ExecutableStep[] = [];
+        const rest: ExecutableStep[] = [];
+        for (let i = 0, l = step.dependencies.length; i < l; i++) {
+          const dep = this.steps[step.dependencies[i]];
+          if (dep.layerPlan !== layerPlan) {
+            continue;
           }
+          if (processed.has(dep)) {
+            continue;
+          }
+          if (dep.hasSideEffects) {
+            sideEffectDeps.push(dep);
+          } else {
+            rest.push(dep);
+          }
+        }
+
+        // Call any side effects we're dependent on
+        for (const sideEffectDep of sideEffectDeps) {
+          processSideEffectPlan(sideEffectDep);
+        }
+
+        // TODO: this is silly, we should be able to group them together and
+        // run them in parallel, and they don't even have side effects!
+        for (const dep of rest) {
+          processSideEffectPlan(dep);
+        }
+
+        layerPlan.phases.push({ normalSteps: [{ step }], _allSteps: [step] });
+      };
+
+      for (const sideEffectStep of sideEffectSteps) {
+        processSideEffectPlan(sideEffectStep);
+      }
+
+      const readyToExecute = (step: ExecutableStep): boolean => {
+        for (const depId of step.dependencies) {
+          const dep = this.steps[depId];
+          if (dep.layerPlan === layerPlan && pending.has(dep)) {
+            return false;
+          }
+        }
+        return true;
+      };
+
+      while (pending.size > 0) {
+        const nextSteps: ExecutableStep[] = [];
+        for (const step of pending) {
+          if (readyToExecute(step)) {
+            nextSteps.push(step);
+          }
+        }
+        if (nextSteps.length === 0) {
+          console.log(this.printPlanGraph());
+          throw new Error(
+            `GraphileInternalError<2904ebbf-6344-4f2b-9305-8db9c1ff29c5>: Could not compute execution order?! Remaining: ${[
+              ...pending,
+            ]} (processed: ${[...processed]}; all: ${layerPlan.pendingSteps})`,
+          );
+        }
+
+        // Do not add to processed until whole layer is known
+        const phase: Omit<LayerPlanPhase, "_allSteps"> = Object.create(null);
+        for (const step of nextSteps) {
           processed.add(step);
           pending.delete(step);
-
-          const sideEffectDeps: ExecutableStep[] = [];
-          const rest: ExecutableStep[] = [];
-          for (let i = 0, l = step.dependencies.length; i < l; i++) {
-            const dep = this.steps[step.dependencies[i]];
-            if (dep.layerPlan !== layerPlan) {
-              continue;
-            }
-            if (processed.has(dep)) {
-              continue;
-            }
-            if (dep.hasSideEffects) {
-              sideEffectDeps.push(dep);
+          if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+            if (phase.unbatchedSyncAndSafeSteps) {
+              phase.unbatchedSyncAndSafeSteps.push({
+                step,
+                scratchpad: undefined,
+              });
             } else {
-              rest.push(dep);
+              phase.unbatchedSyncAndSafeSteps = [
+                { step, scratchpad: undefined },
+              ];
+            }
+          } else {
+            if (phase.normalSteps) {
+              phase.normalSteps.push({ step });
+            } else {
+              phase.normalSteps = [{ step }];
             }
           }
-
-          // Call any side effects we're dependent on
-          for (const sideEffectDep of sideEffectDeps) {
-            processSideEffectPlan(sideEffectDep);
-          }
-
-          // TODO: this is silly, we should be able to group them together and
-          // run them in parallel, and they don't even have side effects!
-          for (const dep of rest) {
-            // if (!processed.has(dep)) {
-            processSideEffectPlan(dep);
-            // }
-          }
-
-          layerPlan.startSteps.push([step]);
-        };
-
-        for (const sideEffectStep of sideEffectSteps) {
-          processSideEffectPlan(sideEffectStep);
         }
 
-        if (FORCE_START_STEPS) {
-          while (pending.size > 0) {
-            const nextLayer: ExecutableStep[] = [];
-            for (const step of pending) {
-              let match = true;
-              for (const depId of step.dependencies) {
-                const dep = this.steps[depId];
-                if (dep.layerPlan === layerPlan && pending.has(dep)) {
-                  match = false;
-                  break;
+        // Add more isSyncAndSafe unbatched steps if possible
+        let foundOne = false;
+        do {
+          foundOne = false;
+          for (const step of pending) {
+            if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+              if (readyToExecute(step)) {
+                processed.add(step);
+                pending.delete(step);
+                foundOne = true;
+                if (phase.unbatchedSyncAndSafeSteps) {
+                  phase.unbatchedSyncAndSafeSteps.push({
+                    step,
+                    scratchpad: undefined,
+                  });
+                } else {
+                  phase.unbatchedSyncAndSafeSteps = [
+                    { step, scratchpad: undefined },
+                  ];
                 }
               }
-              if (match) {
-                nextLayer.push(step);
-              }
             }
-            if (nextLayer.length === 0) {
-              console.log(this.printPlanGraph());
-              throw new Error(
-                `GraphileInternalError<2904ebbf-6344-4f2b-9305-8db9c1ff29c5>: Could not compute execution order?! Remaining: ${[
-                  ...pending,
-                ]} (processed: ${[...processed]}; all: ${
-                  layerPlan.pendingSteps
-                })`,
-              );
-            }
-            // Do not add to processed until whole layer is known
-            for (const step of nextLayer) {
-              processed.add(step);
-              pending.delete(step);
-            }
-            layerPlan.startSteps.push(nextLayer);
           }
-        } else {
-          // Start steps have no dependencies inside this layerPlan _OTHER THAN_
-          // those already processed.
-          const startSteps = layerPlan.pendingSteps.filter((s) => {
-            if (processed.has(s)) {
-              return false;
-            }
-            for (const depId of s.dependencies) {
-              const dep = this.steps[depId];
-              if (dep.layerPlan === layerPlan && pending.has(dep)) {
-                return false;
-              }
-            }
-            return true;
-          });
+        } while (foundOne);
 
-          if (startSteps.length > 0) {
-            layerPlan.startSteps.push(startSteps);
+        const _allSteps: ExecutableStep[] = [];
+        if (phase.normalSteps) {
+          for (const { step } of phase.normalSteps) {
+            _allSteps.push(step);
           }
         }
-      } else {
-        // Start steps have no dependencies inside this layerPlan
-        const startSteps = layerPlan.pendingSteps.filter((s) => {
-          for (const depId of s.dependencies) {
-            const dep = this.steps[depId];
-            if (dep.layerPlan === layerPlan && !($$noExec in dep)) {
-              return false;
-            }
+        if (phase.unbatchedSyncAndSafeSteps) {
+          for (const { step } of phase.unbatchedSyncAndSafeSteps) {
+            _allSteps.push(step);
           }
-          return true;
-        });
-
-        layerPlan.startSteps.push(startSteps);
+        }
+        layerPlan.phases.push(Object.assign(phase, { _allSteps }));
       }
 
       // TODO:perf: this could probably be faster.
