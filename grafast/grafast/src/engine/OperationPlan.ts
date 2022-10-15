@@ -2699,18 +2699,20 @@ export class OperationPlan {
         processSideEffectPlan(sideEffectStep);
       }
 
+      const readyToExecute = (step: ExecutableStep): boolean => {
+        for (const depId of step.dependencies) {
+          const dep = this.steps[depId];
+          if (dep.layerPlan === layerPlan && pending.has(dep)) {
+            return false;
+          }
+        }
+        return true;
+      };
+
       while (pending.size > 0) {
         const nextSteps: ExecutableStep[] = [];
         for (const step of pending) {
-          let match = true;
-          for (const depId of step.dependencies) {
-            const dep = this.steps[depId];
-            if (dep.layerPlan === layerPlan && pending.has(dep)) {
-              match = false;
-              break;
-            }
-          }
-          if (match) {
+          if (readyToExecute(step)) {
             nextSteps.push(step);
           }
         }
@@ -2747,7 +2749,32 @@ export class OperationPlan {
             }
           }
         }
-        // TODO: add more isSyncAndSafe Unbatched steps here
+
+        // Add more isSyncAndSafe unbatched steps if possible
+        let foundOne = false;
+        do {
+          foundOne = false;
+          for (const step of pending) {
+            if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+              if (readyToExecute(step)) {
+                processed.add(step);
+                pending.delete(step);
+                foundOne = true;
+                if (phase.unbatchedSyncAndSafeSteps) {
+                  phase.unbatchedSyncAndSafeSteps.push({
+                    step,
+                    scratchpad: undefined,
+                  });
+                } else {
+                  phase.unbatchedSyncAndSafeSteps = [
+                    { step, scratchpad: undefined },
+                  ];
+                }
+              }
+            }
+          }
+        } while (foundOne);
+
         layerPlan.phases.push(phase);
       }
 
