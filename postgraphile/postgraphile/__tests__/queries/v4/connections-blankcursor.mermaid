@@ -18,7 +18,7 @@ graph TD
     Object33{{"Object[33∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Lambda35{{"Lambda[35∈0]<br />ᐸparseCursorᐳ"}}:::plan
     Connection34{{"Connection[34∈0]<br />ᐸ30ᐳ"}}:::plan
-    PgPageInfo36["PgPageInfo[36∈1]"]:::plan
+    PgPageInfo36{{"PgPageInfo[36∈1]"}}:::plan
     PgValidateParsedCursor41["PgValidateParsedCursor[41∈1]"]:::plan
     Access42{{"Access[42∈1]<br />ᐸ35.1ᐳ"}}:::plan
     ToPg43["ToPg[43∈1]"]:::plan
@@ -52,7 +52,7 @@ graph TD
     __InputStaticLeaf83{{"__InputStaticLeaf[83∈0]"}}:::plan
     Lambda107{{"Lambda[107∈0]<br />ᐸparseCursorᐳ"}}:::plan
     Connection106{{"Connection[106∈0]<br />ᐸ102ᐳ"}}:::plan
-    PgPageInfo108["PgPageInfo[108∈4]"]:::plan
+    PgPageInfo108{{"PgPageInfo[108∈4]"}}:::plan
     PgValidateParsedCursor113["PgValidateParsedCursor[113∈4]"]:::plan
     Access114{{"Access[114∈4]<br />ᐸ107.1ᐳ"}}:::plan
     ToPg115["ToPg[115∈4]"]:::plan
@@ -152,7 +152,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,__InputStaticLeaf11,Access31,Access32,Object33,Connection34,Lambda35,__InputStaticLeaf79,__InputStaticLeaf83,Connection106,Lambda107 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 33, 34, 35<br /><br />ROOT Connectionᐸ30ᐳ[34]<br />1: PgPageInfo[36], PgValidateParsedCursor[41], PgSelect[61] / Access[42],Constant[60],First[62],PgSelectSingle[63],PgClassExpression[64]<br />2: ToPg[43]<br />3: PgSelect[37] / First[38],PgSelectSingle[39],PgClassExpression[44],List[45],Last[47],PgSelectSingle[48],PgClassExpression[53],List[54],Lambda[56],PgCursor[40],PgCursor[49]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 33, 34, 35<br /><br />ROOT Connectionᐸ30ᐳ[34]<br />1: PgValidateParsedCursor[41], PgSelect[61] / PgPageInfo[36],Access[42],Constant[60],First[62],PgSelectSingle[63],PgClassExpression[64]<br />2: ToPg[43]<br />3: PgSelect[37] / First[38],PgSelectSingle[39],PgClassExpression[44],List[45],Last[47],PgSelectSingle[48],PgClassExpression[53],List[54],Lambda[56],PgCursor[40],PgCursor[49]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgPageInfo36,PgSelect37,First38,PgSelectSingle39,PgCursor40,PgValidateParsedCursor41,Access42,ToPg43,PgClassExpression44,List45,Last47,PgSelectSingle48,PgCursor49,PgClassExpression53,List54,Lambda56,Constant60,PgSelect61,First62,PgSelectSingle63,PgClassExpression64 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ37ᐳ[69]"):::bucket
@@ -161,7 +161,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 70<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[70]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor71,PgClassExpression72,List73,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgClassExpression78 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 106, 107<br /><br />ROOT Connectionᐸ102ᐳ[106]<br />1: PgPageInfo[108], PgValidateParsedCursor[113], PgSelect[133] / Access[114],Constant[132],First[134],PgSelectSingle[135],PgClassExpression[136]<br />2: ToPg[115]<br />3: PgSelect[109] / First[110],PgSelectSingle[111],PgClassExpression[116],List[117],Last[119],PgSelectSingle[120],PgClassExpression[125],List[126],Lambda[128],PgCursor[112],PgCursor[121]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 106, 107<br /><br />ROOT Connectionᐸ102ᐳ[106]<br />1: PgValidateParsedCursor[113], PgSelect[133] / PgPageInfo[108],Access[114],Constant[132],First[134],PgSelectSingle[135],PgClassExpression[136]<br />2: ToPg[115]<br />3: PgSelect[109] / First[110],PgSelectSingle[111],PgClassExpression[116],List[117],Last[119],PgSelectSingle[120],PgClassExpression[125],List[126],Lambda[128],PgCursor[112],PgCursor[121]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgPageInfo108,PgSelect109,First110,PgSelectSingle111,PgCursor112,PgValidateParsedCursor113,Access114,ToPg115,PgClassExpression116,List117,Last119,PgSelectSingle120,PgCursor121,PgClassExpression125,List126,Lambda128,Constant132,PgSelect133,First134,PgSelectSingle135,PgClassExpression136 bucket4
     Bucket5("Bucket 5 (listItem)<br />ROOT __Item{5}ᐸ109ᐳ[141]"):::bucket

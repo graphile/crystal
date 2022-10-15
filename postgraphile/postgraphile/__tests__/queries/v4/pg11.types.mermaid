@@ -50,7 +50,7 @@ graph TD
     First85{{"First[85∈1]"}}:::plan
     PgSelectSingle86{{"PgSelectSingle[86∈1]<br />ᐸtypesᐳ"}}:::plan
     PgClassExpression87{{"PgClassExpression[87∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgPageInfo88["PgPageInfo[88∈1]"]:::plan
+    PgPageInfo88{{"PgPageInfo[88∈1]"}}:::plan
     Constant89{{"Constant[89∈1]"}}:::plan
     Constant90{{"Constant[90∈1]"}}:::plan
     First92{{"First[92∈1]"}}:::plan
@@ -118,7 +118,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Connection40 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 40<br /><br />ROOT Connectionᐸ36ᐳ[40]<br />1: PgPageInfo[88] / Access[37],Access[38],Constant[89],Constant[90],Object[39]<br />2: PgSelect[41], PgSelect[84] / First[85],PgSelectSingle[86],PgClassExpression[87],First[92],PgSelectSingle[93],PgClassExpression[95],List[96],Last[98],PgSelectSingle[99],PgClassExpression[101],List[102],PgCursor[94],PgCursor[100]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 40<br /><br />ROOT Connectionᐸ36ᐳ[40]<br />1:  / Access[37],Access[38],PgPageInfo[88],Constant[89],Constant[90],Object[39]<br />2: PgSelect[41], PgSelect[84] / First[85],PgSelectSingle[86],PgClassExpression[87],First[92],PgSelectSingle[93],PgClassExpression[95],List[96],Last[98],PgSelectSingle[99],PgClassExpression[101],List[102],PgCursor[94],PgCursor[100]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access37,Access38,Object39,PgSelect41,PgSelect84,First85,PgSelectSingle86,PgClassExpression87,PgPageInfo88,Constant89,Constant90,First92,PgSelectSingle93,PgCursor94,PgClassExpression95,List96,Last98,PgSelectSingle99,PgCursor100,PgClassExpression101,List102 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ41ᐳ[42]"):::bucket

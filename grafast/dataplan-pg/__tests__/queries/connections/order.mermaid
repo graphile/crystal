@@ -29,7 +29,7 @@ graph TD
     PgSelectSingle42{{"PgSelectSingle[42∈3]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression43{{"PgClassExpression[43∈4]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgPageInfo45["PgPageInfo[45∈1]"]:::plan
+    PgPageInfo45{{"PgPageInfo[45∈1]"}}:::plan
     Lambda47{{"Lambda[47∈1]<br />ᐸlistHasMoreᐳ"}}:::plan
     Constant48{{"Constant[48∈1]"}}:::plan
     First50{{"First[50∈1]"}}:::plan
@@ -93,7 +93,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf14,Connection26 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 26<br /><br />ROOT Connectionᐸ22ᐳ[26]<br />1: PgPageInfo[45] / Access[23],Access[24],Constant[48],Object[25]<br />2: PgSelect[27], PgSelect[65] / Lambda[47],First[50],PgSelectSingle[51],PgClassExpression[53],PgClassExpression[54],PgClassExpression[55],List[56],Last[58],PgSelectSingle[59],PgClassExpression[61],PgClassExpression[62],PgClassExpression[63],List[64],First[66],PgSelectSingle[67],PgClassExpression[68],PgCursor[52],PgCursor[60]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 26<br /><br />ROOT Connectionᐸ22ᐳ[26]<br />1:  / Access[23],Access[24],PgPageInfo[45],Constant[48],Object[25]<br />2: PgSelect[27], PgSelect[65] / Lambda[47],First[50],PgSelectSingle[51],PgClassExpression[53],PgClassExpression[54],PgClassExpression[55],List[56],Last[58],PgSelectSingle[59],PgClassExpression[61],PgClassExpression[62],PgClassExpression[63],List[64],First[66],PgSelectSingle[67],PgClassExpression[68],PgCursor[52],PgCursor[60]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access23,Access24,Object25,PgSelect27,PgPageInfo45,Lambda47,Constant48,First50,PgSelectSingle51,PgCursor52,PgClassExpression53,PgClassExpression54,PgClassExpression55,List56,Last58,PgSelectSingle59,PgCursor60,PgClassExpression61,PgClassExpression62,PgClassExpression63,List64,PgSelect65,First66,PgSelectSingle67,PgClassExpression68 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ27ᐳ[28]"):::bucket
