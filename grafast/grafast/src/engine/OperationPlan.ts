@@ -2692,7 +2692,7 @@ export class OperationPlan {
           processSideEffectPlan(dep);
         }
 
-        layerPlan.phases.push({ normalSteps: [{ step }] });
+        layerPlan.phases.push({ normalSteps: [{ step }], _allSteps: [step] });
       };
 
       for (const sideEffectStep of sideEffectSteps) {
@@ -2726,7 +2726,7 @@ export class OperationPlan {
         }
 
         // Do not add to processed until whole layer is known
-        const phase: LayerPlanPhase = Object.create(null);
+        const phase: Omit<LayerPlanPhase, "_allSteps"> = Object.create(null);
         for (const step of nextSteps) {
           processed.add(step);
           pending.delete(step);
@@ -2775,7 +2775,18 @@ export class OperationPlan {
           }
         } while (foundOne);
 
-        layerPlan.phases.push(phase);
+        const _allSteps: ExecutableStep[] = [];
+        if (phase.normalSteps) {
+          for (const { step } of phase.normalSteps) {
+            _allSteps.push(step);
+          }
+        }
+        if (phase.unbatchedSyncAndSafeSteps) {
+          for (const { step } of phase.unbatchedSyncAndSafeSteps) {
+            _allSteps.push(step);
+          }
+        }
+        layerPlan.phases.push(Object.assign(phase, { _allSteps }));
       }
 
       // TODO:perf: this could probably be faster.

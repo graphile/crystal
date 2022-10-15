@@ -144,6 +144,13 @@ export interface LayerPlanPhase {
      */
     scratchpad: any;
   }>;
+
+  /**
+   * Optimization - a digest of all steps in normalSteps and unbatchedSyncAndSafeSteps
+   *
+   * @internal
+   */
+  _allSteps: ExecutableStep[];
 }
 
 /**
