@@ -128,13 +128,17 @@ export function executeBucket(
         if (bucket.hasErrors && sideEffectPlanIds) {
           handleSideEffectPlanIds();
         }
-        return sync ? nextSteps(i + 1, false) : nextSteps(i, true);
+        return sync || !phase.unbatchedSyncAndSafeSteps
+          ? nextSteps(i + 1, false)
+          : nextSteps(i, true);
       });
     } else {
       if (bucket.hasErrors && sideEffectPlanIds) {
         handleSideEffectPlanIds();
       }
-      return sync ? nextSteps(i + 1, false) : nextSteps(i, true);
+      return sync || !phase.unbatchedSyncAndSafeSteps
+        ? nextSteps(i + 1, false)
+        : nextSteps(i, true);
     }
   };
 
