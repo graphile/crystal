@@ -69,19 +69,19 @@ graph TD
     PgSelectSingle23 --> PgClassExpression56
 
     subgraph "Buckets for queries/interfaces-single-table/basics-with-fragments"
-    Bucket0("Bucket 0 (root)<br />1: Access[8], Access[9]<br />2: Object[10]<br />3: PgSelect[7]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[8],Access[9],Object[10]<br />2: PgSelect[7]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ7ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 11<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1: PgClassExpression[13], Access[76]<br />2: __ListTransform[19]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 11<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1:  / PgClassExpression[13],Access[76]<br />2: __ListTransform[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13,__ListTransform19,Access76 bucket2
     Bucket3("Bucket 3 (subroutine)<br />ROOT PgSelectSingle{3}ᐸsingle_table_itemsᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item20,PgSelectSingle21 bucket3
-    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ19ᐳ[22]<br />1: PgSelectSingle[23]<br />2: PgClassExpression[24], PgClassExpression[27], PgClassExpression[29], PgClassExpression[30], PgClassExpression[31], PgClassExpression[32], PgClassExpression[33], PgClassExpression[34]<br />3: Lambda[25]<br />4: PgSingleTablePolymorphic[26]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ19ᐳ[22]<br />1:  / PgSelectSingle[23],PgClassExpression[24],Lambda[25],PgClassExpression[27],PgClassExpression[29],PgClassExpression[30],PgClassExpression[31],PgClassExpression[32],PgClassExpression[33],PgClassExpression[34]<br />2: PgSingleTablePolymorphic[26]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item22,PgSelectSingle23,PgClassExpression24,Lambda25,PgSingleTablePolymorphic26,PgClassExpression27,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket4
     Bucket5("Bucket 5 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 23, 26, 27, 24, 29, 30, 31, 32, 33, 34<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"):::bucket

@@ -240,37 +240,6 @@ lateral (
   ) as __optional_missing_middle_5__(v)
 ) as __optional_missing_middle_5_result__;
 
-select __table_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_query_identifiers__,
-lateral (
-  select
-    __table_query__."id"::text as "0",
-    __table_query__."headline" as "1",
-    __table_query__."author_id"::text as "2",
-    __table_query_identifiers__.idx as "3"
-  from "c"."table_query"(__table_query_identifiers__."id0") as __table_query__
-) as __table_query_result__;
-
-select
-  __no_args_query__.v::text as "0"
-from "c"."no_args_query"() as __no_args_query__(v);
-
-select
-  __query_text_array__.v::text as "0"
-from "a"."query_text_array"() as __query_text_array__(v);
-
-select
-  (
-    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
-    from unnest(__query_interval_array__.v) t
-  )::text as "0"
-from "a"."query_interval_array"() as __query_interval_array__(v);
-
 select __types_query_result__.*
 from (
   select
@@ -367,6 +336,26 @@ lateral (
   from unnest("b"."compound_type_array_query"(__compound_type_array_query_identifiers__."id0")) as __compound_type_array_query__
 ) as __compound_type_array_query_result__;
 
+select __table_query_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __table_query_identifiers__,
+lateral (
+  select
+    __table_query__."id"::text as "0",
+    __table_query__."headline" as "1",
+    __table_query__."author_id"::text as "2",
+    __table_query_identifiers__.idx as "3"
+  from "c"."table_query"(__table_query_identifiers__."id0") as __table_query__
+) as __table_query_result__;
+
+select
+  __no_args_query__.v::text as "0"
+from "c"."no_args_query"() as __no_args_query__(v);
+
 select __query_compound_type_array_result__.*
 from (
   select
@@ -388,6 +377,17 @@ lateral (
     __query_compound_type_array_identifiers__.idx as "9"
   from unnest("a"."query_compound_type_array"(__query_compound_type_array_identifiers__."id0")) as __query_compound_type_array__
 ) as __query_compound_type_array_result__;
+
+select
+  __query_text_array__.v::text as "0"
+from "a"."query_text_array"() as __query_text_array__(v);
+
+select
+  (
+    select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    from unnest(__query_interval_array__.v) t
+  )::text as "0"
+from "a"."query_interval_array"() as __query_interval_array__(v);
 
 select
   (not (__compound_type_set_query__ is null))::text as "0",

@@ -70,16 +70,16 @@ graph TD
     PgSelectSingle64 --> PgClassExpression66
 
     subgraph "Buckets for mutations/basics/create-relational-post"
-    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[8], __InputStaticLeaf[9], __InputStaticLeaf[10], Constant[11], Constant[12], Access[14], Access[15]<br />2: Object[16]"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,Access14,Access15,Object16 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert[13]<br />2: PgClassExpression[17]<br />3: PgInsert[18]<br />4: PgClassExpression[22], PgClassExpression[23]<br />5: PgSelect[25]<br />6: First[29]<br />7: PgSelectSingle[30]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert[13]<br />2: PgClassExpression[17]<br />3: PgInsert[18]<br />4:  / PgClassExpression[22],PgClassExpression[23]<br />5: PgSelect[25] / First[29],PgSelectSingle[30]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22,PgClassExpression23,PgSelect25,First29,PgSelectSingle30 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 30, 23<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{1}ᐸrelational_postsᐳ[30]<br />1: PgClassExpression[31], PgClassExpression[32], PgClassExpression[33], PgClassExpression[34], Map[67], Map[71]<br />2: PgSelectSingle[41], PgSelectSingle[49]<br />3: PgClassExpression[42], PgClassExpression[50], Map[69]<br />4: PgSelectSingle[64]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{1}ᐸrelational_postsᐳ[30]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgSelectSingle64,Map67,Map69,Map71 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 64<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[64]"):::bucket

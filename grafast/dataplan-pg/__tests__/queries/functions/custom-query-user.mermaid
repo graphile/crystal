@@ -31,7 +31,7 @@ graph TD
     PgSelectSingle12 --> PgClassExpression14
 
     subgraph "Buckets for queries/functions/custom-query-user"
-    Bucket0("Bucket 0 (root)<br />1: Access[8], Access[9]<br />2: Object[10]<br />3: PgSelect[7]<br />4: First[11]<br />5: PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[8],Access[9],Object[10]<br />2: PgSelect[7] / First[11],PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]"):::bucket

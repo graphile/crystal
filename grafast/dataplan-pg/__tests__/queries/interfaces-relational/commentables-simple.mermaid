@@ -87,16 +87,16 @@ graph TD
     PgSelectSingle94 --> PgClassExpression111
 
     subgraph "Buckets for queries/interfaces-relational/commentables-simple"
-    Bucket0("Bucket 0 (root)<br />1: Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: __ListTransform[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[9],Access[10],Object[11]<br />2: PgSelect[8]<br />3: __ListTransform[12]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸrelational_commentablesᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]<br />1: PgSelectSingle[16]<br />2: PgClassExpression[17], PgClassExpression[19]<br />3: PgPolymorphic[18]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]<br />1:  / PgSelectSingle[16],PgClassExpression[17],PgClassExpression[19]<br />2: PgPolymorphic[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgPolymorphic18,PgClassExpression19 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br />1: PgSelect[20], PgSelect[51], PgSelect[82]<br />2: First[24], First[55], First[86]<br />3: PgSelectSingle[25], PgSelectSingle[56], PgSelectSingle[87]<br />4: Map[112], Map[116], Map[114]<br />5: PgSelectSingle[32], PgSelectSingle[63], PgSelectSingle[94]<br />6: PgClassExpression[33], PgClassExpression[41], PgClassExpression[49], PgClassExpression[64], PgClassExpression[72], PgClassExpression[80], PgClassExpression[95], PgClassExpression[103], PgClassExpression[111]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect20,First24,PgSelectSingle25,PgSelectSingle32,PgClassExpression33,PgClassExpression41,PgClassExpression49,PgSelect51,First55,PgSelectSingle56,PgSelectSingle63,PgClassExpression64,PgClassExpression72,PgClassExpression80,PgSelect82,First86,PgSelectSingle87,PgSelectSingle94,PgClassExpression95,PgClassExpression103,PgClassExpression111,Map112,Map114,Map116 bucket3
     Bucket0 --> Bucket1 & Bucket2

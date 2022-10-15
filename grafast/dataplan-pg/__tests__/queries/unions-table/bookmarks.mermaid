@@ -106,7 +106,7 @@ graph TD
     PgSelectSingle67 --> PgClassExpression85
 
     subgraph "Buckets for queries/unions-table/bookmarks"
-    Bucket0("Bucket 0 (root)<br />1: __InputStaticLeaf[7], Access[9], Access[10]<br />2: Object[11]<br />3: PgSelect[8]<br />4: First[12]<br />5: PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / __InputStaticLeaf[7],Access[9],Access[10],Object[11]<br />2: PgSelect[8] / First[12],PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 12, 11<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[13]"):::bucket
@@ -115,13 +115,13 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ94ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 11<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]<br />1: PgClassExpression[23], Map[86], PgClassExpression[32], PgClassExpression[33], PgClassExpression[34], PgClassExpression[35]<br />2: PgSelectSingle[30], List[36]<br />3: PgPolymorphic[37]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 11<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]<br />1:  / PgClassExpression[23],Map[86],PgClassExpression[32],PgClassExpression[33],PgClassExpression[34],PgClassExpression[35],PgSelectSingle[30],List[36]<br />2: PgPolymorphic[37]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgSelectSingle30,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,List36,PgPolymorphic37,Map86 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[30]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression31 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 33, 34, 35, 37<br />ᐳPerson<br />ᐳPost<br />ᐳComment<br />1: PgSelect[38], PgSelect[46], PgSelect[62]<br />2: First[42], First[50], First[66]<br />3: PgSelectSingle[43], PgSelectSingle[51], PgSelectSingle[67]<br />4: PgClassExpression[44], PgClassExpression[45], PgClassExpression[52], Map[90], PgClassExpression[61], PgClassExpression[68], Map[92], Map[88], PgClassExpression[85]<br />5: PgSelectSingle[59], PgSelectSingle[75], PgSelectSingle[83]"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 33, 34, 35, 37<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect38,First42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgClassExpression61,PgSelect62,First66,PgSelectSingle67,PgClassExpression68,PgSelectSingle75,PgSelectSingle83,PgClassExpression85,Map88,Map90,Map92 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 59<br />ᐳPost<br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[59]"):::bucket

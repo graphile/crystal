@@ -81,7 +81,7 @@ graph TD
     PgSelectSingle89 --> PgClassExpression92
 
     subgraph "Buckets for queries/v4/relation-tail-head"
-    Bucket0("Bucket 0 (root)<br />1: Access[20], Access[21], Connection[23], Connection[66]<br />2: Object[22]"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Access20,Access21,Object22,Connection23,Connection66 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 22, 23<br /><br />ROOT Connectionᐸ19ᐳ[23]"):::bucket
@@ -90,7 +90,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ24ᐳ[25]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item25,PgSelectSingle26 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{2}ᐸcompoundKeyᐳ[26]<br />1: PgClassExpression[27], PgClassExpression[28], PgClassExpression[29], Map[93], Map[97]<br />2: PgSelectSingle[36], PgSelectSingle[45]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{2}ᐸcompoundKeyᐳ[26]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgSelectSingle36,PgSelectSingle45,Map93,Map97 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[36]"):::bucket
@@ -105,7 +105,7 @@ graph TD
     Bucket7("Bucket 7 (listItem)<br />ROOT __Item{7}ᐸ67ᐳ[68]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item68,PgSelectSingle69 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 69<br /><br />ROOT PgSelectSingle{7}ᐸforeignKeyᐳ[69]<br />1: PgClassExpression[70], PgClassExpression[71], PgClassExpression[72], Map[99], Map[95]<br />2: PgSelectSingle[79], PgSelectSingle[89]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 69<br /><br />ROOT PgSelectSingle{7}ᐸforeignKeyᐳ[69]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression70,PgClassExpression71,PgClassExpression72,PgSelectSingle79,PgSelectSingle89,Map95,Map99 bucket8
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 79<br /><br />ROOT PgSelectSingle{8}ᐸpersonᐳ[79]"):::bucket

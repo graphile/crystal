@@ -66,7 +66,7 @@ graph TD
     PgSelectSingle65 --> PgClassExpression67
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-2"
-    Bucket0("Bucket 0 (root)<br />1: Access[18], Access[19], Connection[38]<br />2: Object[20]<br />3: PgSelect[17]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[18],Access[19],Connection[38],Object[20]<br />2: PgSelect[17]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,Connection38 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 38, 20<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
@@ -84,13 +84,13 @@ graph TD
     Bucket5("Bucket 5 (listItem)<br />ROOT __Item{5}ᐸ40ᐳ[41]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item41,PgSelectSingle42 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]<br />1: PgClassExpression[43], Map[68]<br />2: PgSelectSingle[50]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression43,PgSelectSingle50,Map68 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 50<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[50]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression51,PgClassExpression52 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]<br />1: PgClassExpression[56], PgClassExpression[58], Map[70]<br />2: List[57], PgSelectSingle[65]<br />3: PgCursor[55]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[42]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgCursor55,PgClassExpression56,List57,PgClassExpression58,PgSelectSingle65,Map70 bucket8
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 65<br /><br />ROOT PgSelectSingle{8}ᐸusersᐳ[65]"):::bucket

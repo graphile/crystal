@@ -39,13 +39,13 @@ graph TD
     PgClassExpression17 --> Lambda18
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
-    Bucket0("Bucket 0 (root)<br />1: Access[8], Access[9]<br />2: Object[10]<br />3: PgSelect[7]<br />4: __ListTransform[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1:  / Access[8],Access[9],Object[10]<br />2: PgSelect[7]<br />3: __ListTransform[11]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,__ListTransform11 bucket0
-    Bucket1("Bucket 1 (subroutine)<br />ROOT PgClassExpression{1}ᐸ__forum_names__.vᐳ[14]<br />1: PgSelectSingle[13]<br />2: PgClassExpression[14]"):::bucket
+    Bucket1("Bucket 1 (subroutine)<br />ROOT PgClassExpression{1}ᐸ__forum_names__.vᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13,PgClassExpression14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ11ᐳ[15]<br />1: PgSelectSingle[16]<br />2: PgClassExpression[17]<br />3: Lambda[18]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,Lambda18 bucket2
     Bucket0 --> Bucket1 & Bucket2
