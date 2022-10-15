@@ -319,12 +319,18 @@ export function executeBucket(
             const step = _allSteps[allStepsIndex] as UnbatchedExecutableStep;
             const storeEntry = bucket.store.get(step.id)!;
             try {
-              const deps: any = [];
-              const dependencies = sideEffectPlanIdsWithErrors
-                ? [...step.dependencies, ...sideEffectPlanIdsWithErrors]
-                : step.dependencies;
+              if (sideEffectPlanIdsWithErrors) {
+                for (const depId of sideEffectPlanIdsWithErrors) {
+                  const depVal = bucket.store.get(depId)![dataIndex];
+                  if (isGrafastError(depVal)) {
+                    storeEntry[dataIndex] = depVal;
+                    continue stepLoop;
+                  }
+                }
+              }
 
-              for (const depId of dependencies) {
+              const deps: any = [];
+              for (const depId of step.dependencies) {
                 const depVal = bucket.store.get(depId)![dataIndex];
                 if (bucket.hasErrors && isGrafastError(depVal)) {
                   storeEntry[dataIndex] = depVal;
@@ -337,6 +343,7 @@ export function executeBucket(
                 ...deps,
               );
             } catch (e) {
+              bucket.hasErrors = true;
               storeEntry[dataIndex] = newGrafastError(e, step.id);
             }
           }
@@ -377,9 +384,6 @@ export function executeBucket(
       if (pendingPromises) {
         return Promise.allSettled(pendingPromises).then(
           (resultSettledResult) => {
-            if (bucket.hasErrors && sideEffectPlanIds) {
-              handleSideEffectPlanIds();
-            }
             for (
               let i = 0, pendingPromisesLength = resultSettledResult.length;
               i < pendingPromisesLength;
@@ -404,6 +408,9 @@ export function executeBucket(
                   finishedStep.id,
                 );
               }
+            }
+            if (bucket.hasErrors && sideEffectPlanIds) {
+              handleSideEffectPlanIds();
             }
             return promises ? awaitPromises() : runSyncSteps();
           },
