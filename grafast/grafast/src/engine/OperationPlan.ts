@@ -53,6 +53,7 @@ import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
+import { isUnbatchedExecutableStep } from "../step.js";
 import {
   $$noExec,
   assertExecutableStep,
@@ -71,6 +72,7 @@ import {
   isTypePlanned,
 } from "../utils.js";
 import type {
+  LayerPlanPhase,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
@@ -2649,16 +2651,12 @@ export class OperationPlan {
         (s) => s !== null && s.layerPlan === layerPlan,
       );
       layerPlan.pendingSteps = layerPlan.steps.filter((s) => !($$noExec in s));
-      // TODO: does this need sorting? Presumably lowest id first?
       const sideEffectSteps = layerPlan.pendingSteps.filter(
         (s) => s.hasSideEffects,
       );
       const pending = new Set<ExecutableStep>(layerPlan.pendingSteps);
       const processed = new Set<ExecutableStep>();
 
-      // TODO: we should be able to use a different algorithm that minimizes
-      // the number of layers in layerPlan.startSteps. This one is just a stub
-      // so I can continue my work.
       const processSideEffectPlan = (step: ExecutableStep) => {
         if (processed.has(step)) {
           return;
@@ -2691,12 +2689,10 @@ export class OperationPlan {
         // TODO: this is silly, we should be able to group them together and
         // run them in parallel, and they don't even have side effects!
         for (const dep of rest) {
-          // if (!processed.has(dep)) {
           processSideEffectPlan(dep);
-          // }
         }
 
-        layerPlan.startSteps.push([step]);
+        layerPlan.phases.push({ normalSteps: [{ step }] });
       };
 
       for (const sideEffectStep of sideEffectSteps) {
@@ -2704,7 +2700,7 @@ export class OperationPlan {
       }
 
       while (pending.size > 0) {
-        const nextLayer: ExecutableStep[] = [];
+        const nextSteps: ExecutableStep[] = [];
         for (const step of pending) {
           let match = true;
           for (const depId of step.dependencies) {
@@ -2715,10 +2711,10 @@ export class OperationPlan {
             }
           }
           if (match) {
-            nextLayer.push(step);
+            nextSteps.push(step);
           }
         }
-        if (nextLayer.length === 0) {
+        if (nextSteps.length === 0) {
           console.log(this.printPlanGraph());
           throw new Error(
             `GraphileInternalError<2904ebbf-6344-4f2b-9305-8db9c1ff29c5>: Could not compute execution order?! Remaining: ${[
@@ -2726,12 +2722,33 @@ export class OperationPlan {
             ]} (processed: ${[...processed]}; all: ${layerPlan.pendingSteps})`,
           );
         }
+
         // Do not add to processed until whole layer is known
-        for (const step of nextLayer) {
+        const phase: LayerPlanPhase = Object.create(null);
+        for (const step of nextSteps) {
           processed.add(step);
           pending.delete(step);
+          if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+            if (phase.unbatchedSyncAndSafeSteps) {
+              phase.unbatchedSyncAndSafeSteps.push({
+                step,
+                scratchpad: undefined,
+              });
+            } else {
+              phase.unbatchedSyncAndSafeSteps = [
+                { step, scratchpad: undefined },
+              ];
+            }
+          } else {
+            if (phase.normalSteps) {
+              phase.normalSteps.push({ step });
+            } else {
+              phase.normalSteps = [{ step }];
+            }
+          }
         }
-        layerPlan.startSteps.push(nextLayer);
+        // TODO: add more isSyncAndSafe Unbatched steps here
+        layerPlan.phases.push(phase);
       }
 
       // TODO:perf: this could probably be faster.

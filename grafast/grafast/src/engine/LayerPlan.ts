@@ -5,7 +5,11 @@ import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
 import { $$concreteType } from "../interfaces.js";
 import { assertPolymorphicData } from "../polymorphic.js";
-import type { ExecutableStep, ModifierStep } from "../step";
+import type {
+  ExecutableStep,
+  ModifierStep,
+  UnbatchedExecutableStep,
+} from "../step";
 import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -115,6 +119,33 @@ export type LayerPlanReason =
   | LayerPlanReasonPolymorphic
   | LayerPlanReasonSubroutine;
 
+/** @internal */
+export interface LayerPlanPhase {
+  /**
+   * A list of steps that can be ran in parallel at this point, since all
+   * their previous dependencies have already been satisfied.
+   */
+  normalSteps?: Array<{
+    step: ExecutableStep;
+  }>;
+
+  /**
+   * A list of 'isSyncAndSafe' steps with unbatchedExecute methods that can be
+   * ran once the `normalSteps` have completed; they must only depend on steps
+   * that have already been executed before them (including previous
+   * unbatchedSyncAndSafeSteps in the same list).
+   */
+  unbatchedSyncAndSafeSteps?: Array<{
+    step: UnbatchedExecutableStep;
+
+    /**
+     * Store the result of the step here if you want - useful to avoid lookups
+     * and when there's no storage. HIGHLY VOLATILE, will not survive a tick!
+     */
+    scratchpad: any;
+  }>;
+}
+
 /**
  * A LayerPlan represents (via "reason") either the root (root), when something
  * happens at a later time (mutationField, defer), when plurality changes
@@ -186,21 +217,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   pendingSteps: ExecutableStep[] = [];
 
   /**
-   * Normally this will be a list with one element, which is a list of the
-   * steps in this layerPlan that aren't dependent on any other steps in this
-   * layerPlan - these will run first, and then execution will automatically
-   * cascade to the other plans in the LayerPlan as they complete.
+   * Describes the order in which the steps within this LayerPlan are executed.
    *
-   * **HOWEVER**, when the layer contains steps that have side effects
-   * (step.hasSideEffects) it's essential that we run these steps before all
-   * the plans that aren't dependent on them, and that we do so in a serial
-   * order (one at a time). Keep in mind that these steps with side effects
-   * might be dependent on normal steps (without side effects), so those must
-   * be ran first _without_ triggering cascade. Fun.
+   * Special attention must be paid to steps that have side effects.
    *
    * @internal
    */
-  startSteps: Array<ExecutableStep[]> = [];
+  phases: Array<LayerPlanPhase> = [];
 
   /**
    * The list of layerPlans that steps added to this LayerPlan may depend upon.

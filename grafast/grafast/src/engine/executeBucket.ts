@@ -70,22 +70,26 @@ export function executeBucket(
     size,
     store,
     noDepsList,
-    layerPlan: { startSteps, children: childLayerPlans },
+    layerPlan: { phases, children: childLayerPlans },
   } = bucket;
 
-  const l = startSteps.length;
+  const l = phases.length;
 
   let sideEffectPlanIdsWithErrors: null | number[] = null;
 
   // Like a `for(i = 0; i < l; i++)` loop with some `await`s in it, except it does promise
   // handling manually so that it can complete synchronously (no promises) if
   // possible.
-  const nextSteps = (i: number): PromiseOrDirect<void> => {
+  const nextSteps = (i: number, sync: boolean): PromiseOrDirect<void> => {
     if (i >= l) {
       return;
     }
     bucket.cascadeEnabled = i === l - 1;
-    const steps = startSteps[i];
+    const phase = phases[i];
+    const steps =
+      (sync ? phase.unbatchedSyncAndSafeSteps : phase.normalSteps)?.map(
+        (s) => s.step,
+      ) ?? [];
     let starterPromises: PromiseLike<void>[] | null = null;
     let sideEffectPlanIds: null | number[] = null;
     for (const step of steps) {
@@ -124,17 +128,17 @@ export function executeBucket(
         if (bucket.hasErrors && sideEffectPlanIds) {
           handleSideEffectPlanIds();
         }
-        return nextSteps(i + 1);
+        return sync ? nextSteps(i + 1, false) : nextSteps(i, true);
       });
     } else {
       if (bucket.hasErrors && sideEffectPlanIds) {
         handleSideEffectPlanIds();
       }
-      return nextSteps(i + 1);
+      return sync ? nextSteps(i + 1, false) : nextSteps(i, true);
     }
   };
 
-  const promise = nextSteps(0);
+  const promise = nextSteps(0, false);
 
   if (isPromiseLike(promise)) {
     return promise.then(executeSamePhaseChildren);
