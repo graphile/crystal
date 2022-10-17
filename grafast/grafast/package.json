@@ -50,7 +50,13 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
-    "graphql": "*"
+    "graphql": "*",
+    "graphile-config": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "graphile-config": {
+      "optional": true
+    }
   },
   "files": [
     "dist"

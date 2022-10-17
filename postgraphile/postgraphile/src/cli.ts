@@ -142,7 +142,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     preset.server!.host = rawHost;
   }
   if (rawAllowExplain != null) {
-    preset.server!.exposePlan = rawAllowExplain;
+    preset.grafast!.explain = rawAllowExplain;
   }
   if (watch != null) {
     preset.server!.watch = watch;

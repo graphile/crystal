@@ -7,6 +7,7 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import type { GrafastExecuteOptions } from "./execute.js";
 import { withGrafastArgs } from "./execute.js";
+import { NULL_PRESET } from "./config.js";
 
 /**
  * Use this instead of GraphQL.js' subscribe method and we'll automatically
@@ -14,10 +15,10 @@ import { withGrafastArgs } from "./execute.js";
  */
 export function subscribe(
   args: ExecutionArgs,
-  options: GrafastExecuteOptions = {},
+  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
 ): PromiseOrValue<
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {
-  return withGrafastArgs(args, options);
+  return withGrafastArgs(args, resolvedPreset);
 }

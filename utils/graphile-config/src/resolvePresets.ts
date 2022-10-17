@@ -146,8 +146,8 @@ function mergePreset(
   if (sourcePreset.disablePlugins) {
     targetPreset.disablePlugins = [
       ...new Set([
-        ...targetPreset.disablePlugins,
-        ...sourcePreset.disablePlugins,
+        ...(targetPreset.disablePlugins ?? []),
+        ...(sourcePreset.disablePlugins ?? []),
       ]),
     ];
   }

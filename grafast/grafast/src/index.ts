@@ -484,3 +484,5 @@ exportAsMany("grafast", {
   loadOneCallback,
   LoadOneStep,
 });
+
+export { hookArgs } from "./args.js";
