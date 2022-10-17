@@ -50,8 +50,8 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
-    "graphql": "*",
-    "graphile-config": "workspace:^"
+    "graphile-config": "workspace:^",
+    "graphql": "*"
   },
   "peerDependenciesMeta": {
     "graphile-config": {

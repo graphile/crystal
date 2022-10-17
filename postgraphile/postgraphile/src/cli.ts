@@ -141,6 +141,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   if (rawHost != null) {
     preset.server!.host = rawHost;
   }
+  preset.grafast = preset.grafast || {};
   if (rawAllowExplain != null) {
     preset.grafast!.explain = rawAllowExplain;
   }

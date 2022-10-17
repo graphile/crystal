@@ -19,10 +19,10 @@ import type {
 import { PgSubscriber } from "@dataplan/pg";
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "grafast";
-import { hookArgs } from "grafast";
 import {
   $$bypassGraphQL,
   execute as grafastExecute,
+  hookArgs,
   subscribe as grafastSubscribe,
 } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
