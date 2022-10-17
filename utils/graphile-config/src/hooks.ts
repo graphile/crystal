@@ -2,12 +2,22 @@ import * as assert from "assert";
 
 import type { PluginHook, PluginHookObject } from "./interfaces.js";
 
-export type HookObject<T> = Record<keyof T, (...args: any[]) => any>;
+export type HookObject<T> = Record<
+  keyof T,
+  PluginHook<(...args: any[]) => any>
+>;
 
 export class AsyncHooks<THooks extends HookObject<THooks>> {
-  callbacks: { [key in keyof THooks]?: Array<THooks[keyof THooks]> } = {};
+  callbacks: {
+    [key in keyof THooks]?: Array<
+      THooks[keyof THooks] extends PluginHook<infer U> ? U : never
+    >;
+  } = {};
 
-  hook<TKey extends keyof THooks>(event: TKey, fn: THooks[TKey]): void {
+  hook<THookName extends keyof THooks>(
+    event: THookName,
+    fn: THooks[THookName] extends PluginHook<infer U> ? U : never,
+  ): void {
     this.callbacks[event] = this.callbacks[event] || [];
     this.callbacks[event]!.push(fn);
   }
@@ -16,9 +26,11 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
    * Hooks can _mutate_ the argument, they cannot return a replacement. This
    * allows us to completely side-step the problem of recursive calls.
    */
-  async process<TKey extends keyof THooks>(
-    event: TKey,
-    ...args: Parameters<THooks[TKey]>
+  async process<THookName extends keyof THooks>(
+    event: THookName,
+    ...args: Parameters<
+      THooks[THookName] extends PluginHook<infer U> ? U : never
+    >
   ): Promise<void> {
     const [arg, ...rest] = args;
     const callbacks = this.callbacks[event];
@@ -30,11 +42,7 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
   }
 }
 
-export function applyHooks<
-  THooks extends {
-    [key: string]: PluginHook<(...args: any[]) => any>;
-  },
->(
+export function applyHooks<THooks extends HookObject<THooks>>(
   plugins: GraphileConfig.Plugin[],
   hooksRetriever: (
     plugin: GraphileConfig.Plugin,
