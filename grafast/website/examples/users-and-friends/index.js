@@ -144,7 +144,8 @@ async function runGrafastWithGraphQLSchema() {
       document,
       contextValue: { ...baseContext, ...makeDataLoaders() },
     },
-    { asString },
+    {},
+    asString,
   );
   return stringifyPayload(result, asString);
 }
@@ -156,7 +157,8 @@ async function runGrafast() {
       document,
       contextValue: baseContext,
     },
-    { asString },
+    {},
+    asString,
   );
   return stringifyPayload(result, asString);
 }

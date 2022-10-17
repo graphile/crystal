@@ -22,7 +22,7 @@ import { defer, Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { GrafastError, isGrafastError } from "./error.js";
-import { execute, GrafastExecuteOptions } from "./execute.js";
+import { execute } from "./execute.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
 import {
@@ -261,7 +261,6 @@ export {
   GrafastArgumentExtensions,
   GrafastEnumValueExtensions,
   GrafastError,
-  GrafastExecuteOptions,
   GrafastFieldExtensions,
   grafastGraphql,
   grafastGraphqlSync,

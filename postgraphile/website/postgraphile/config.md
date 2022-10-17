@@ -86,6 +86,9 @@ const preset = {
   schema: {
     /* options for the schema build phase */
   },
+  grafast: {
+    /* options for Grafast, including setting GraphQL context*/
+  },
   server: {
     /* options for the server */
   },
@@ -222,6 +225,19 @@ to determine the options that they offer.
   cannot return null, so our list and connection types can be non-nullable in
   more places.
 - `subscriptions`
+
+## Grafast options
+
+- `explain` - a list of 'explain' types that should be exposed to clients via
+  `extensions.explain` (`mermaid-js` for the operation plan, `sql` for the
+  SQL), or `true` to expose everything.
+- `context` - an object (or function that returns an object, or promise to an
+  object) to be merged into the GraphQL context, accessible from plan
+  resolvers. If a function, it will receive two parameters, first is the
+  request context (which may contain details such as the incoming HTTP request,
+  depends on what server/etc you are using) and the second is the current
+  context object that your results will be merged into (overwriting
+  pre-existing keys).
 
 ## Server options
 

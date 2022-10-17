@@ -1,6 +1,5 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { GrafastExecuteOptions } from "grafast";
 import { hookArgs } from "grafast";
 import {
   $$extensions,

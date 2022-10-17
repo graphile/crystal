@@ -14,11 +14,6 @@ import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 import { NULL_PRESET } from "./config.js";
 
-export interface GrafastExecuteOptions {
-  explain?: GrafastPrepareOptions["explain"];
-  asString?: boolean;
-}
-
 const isDev =
   typeof process !== "undefined" && process.env.NODE_ENV === "development";
 
@@ -28,7 +23,8 @@ const isDev =
  */
 export function withGrafastArgs(
   args: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  asString: boolean,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -90,7 +86,7 @@ export function withGrafastArgs(
 
   const rootValue = grafastPrepare(args, {
     explain: options?.explain,
-    asString: options?.asString,
+    asString,
   });
   if (unlisten) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
@@ -110,8 +106,9 @@ export function withGrafastArgs(
 export function execute(
   args: ExecutionArgs,
   resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
+  asString = false,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  return withGrafastArgs(args, resolvedPreset);
+  return withGrafastArgs(args, resolvedPreset, asString);
 }

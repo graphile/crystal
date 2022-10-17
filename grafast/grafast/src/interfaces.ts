@@ -57,13 +57,6 @@ export interface GrafastOptions {
    * If set to `true` then all possible explain types will be exposed.
    */
   explain?: boolean | string[];
-
-  /**
-   * If true, the result will be returned as a string rather than an object -
-   * this is an optimization for returning the data over a network socket or
-   * similar.
-   */
-  asString?: boolean;
 }
 
 declare global {

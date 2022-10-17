@@ -192,7 +192,6 @@ export async function runTestQuery(
         const preset: GraphileConfig.ResolvedPreset = {
           grafast: {
             explain: ["mermaid-js"],
-            asString,
           },
         };
         const result =
@@ -205,6 +204,7 @@ export async function runTestQuery(
                   contextValue,
                 },
                 preset,
+                asString,
               )
             : await execute(
                 {
@@ -214,6 +214,7 @@ export async function runTestQuery(
                   contextValue,
                 },
                 preset,
+                asString,
               );
 
         if (isAsyncIterable(result)) {
