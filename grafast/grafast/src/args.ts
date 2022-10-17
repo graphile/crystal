@@ -18,6 +18,32 @@ export function hookArgs(
   ctx: GraphileConfig.GraphQLRequestContext,
   resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
 ): ExecutionArgs | PromiseLike<ExecutionArgs> {
+  // Make context mutable
+  args.contextValue = Object.assign(Object.create(null), args.contextValue);
+
+  // finalize(args): args is deliberately shadowed
+  const finalize = (args: ExecutionArgs) => {
+    const userContext = resolvedPreset.grafast?.context;
+    if (typeof userContext === "function") {
+      const result = userContext(ctx, args.contextValue as Record<string, any>);
+      if (isPromiseLike(result)) {
+        // Deliberately shadowed 'result'
+        return result.then((result) => {
+          Object.assign(args.contextValue as Record<string, any>, result);
+          return args;
+        });
+      } else {
+        Object.assign(args.contextValue as Record<string, any>, result);
+        return args;
+      }
+    } else if (typeof userContext === "object" && userContext !== null) {
+      Object.assign(args.contextValue as Record<string, any>, userContext);
+      return args;
+    } else {
+      return args;
+    }
+  };
+
   if (
     resolvedPreset !== NULL_PRESET &&
     resolvedPreset.plugins &&
@@ -26,10 +52,10 @@ export function hookArgs(
     const event = { args, ctx, resolvedPreset };
     const result = hook(resolvedPreset, "args", event);
     if (isPromiseLike(result)) {
-      return result.then(() => event.args);
+      return result.then(() => finalize(event.args));
     } else {
-      return event.args;
+      return finalize(event.args);
     }
   }
-  return args;
+  return finalize(args);
 }
