@@ -1,5 +1,3 @@
-import * as assert from "assert";
-
 import type { PluginHook, PluginHookObject } from "./interfaces.js";
 
 export type HookObject<T> = Record<
@@ -194,11 +192,11 @@ export function applyHooks<THooks extends HookObject<THooks>>(
       }
     }
 
-    assert.equal(
-      final.length,
-      hooks.length,
-      `Expected the same number of hooks after sorting`,
-    );
+    if (final.length !== hooks.length) {
+      throw new Error(
+        `Expected the same number of hooks after sorting (${final.length} != ${hooks.length})`,
+      );
+    }
 
     // Finally we can register the hooks
     for (const hook of final) {

@@ -12,7 +12,8 @@
     },
     "./envelop": {
       "types": "./dist/envelop.d.ts",
-      "node": "./dist/envelop.js"
+      "node": "./dist/envelop.js",
+      "default": "./dist/envelop.js"
     }
   },
   "scripts": {

@@ -1,5 +1,6 @@
-import { loadConfig, resolvePresets } from "graphile-config";
+import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
+import { loadConfig } from "graphile-config/load";
 import { createServer } from "node:http";
 import { inspect } from "node:util";
 

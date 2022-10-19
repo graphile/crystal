@@ -8,7 +8,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "node": "./dist/index.js"
+      "node": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./cli": {
       "types": "./dist/cli.d.ts",
@@ -16,11 +17,13 @@
     },
     "./presets/amber": {
       "types": "./dist/presets/amber.d.ts",
-      "node": "./dist/presets/amber.js"
+      "node": "./dist/presets/amber.js",
+      "default": "./dist/presets/amber.js"
     },
     "./presets/v4": {
       "types": "./dist/presets/v4.d.ts",
-      "node": "./dist/presets/v4.js"
+      "node": "./dist/presets/v4.js",
+      "default": "./dist/presets/v4.js"
     }
   },
   "bin": "./dist/cli-run.js",

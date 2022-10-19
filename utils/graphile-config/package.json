@@ -8,11 +8,15 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "node": "./dist/index.js"
+      "default": "./dist/index.js"
+    },
+    "./load": {
+      "types": "./dist/loadConfig.d.ts",
+      "default": "./dist/loadConfig.js"
     },
     "./cli": {
       "types": "./dist/cli.d.ts",
-      "node": "./dist/cli.js"
+      "default": "./dist/cli.js"
     }
   },
   "scripts": {
