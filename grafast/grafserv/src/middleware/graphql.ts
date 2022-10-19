@@ -1,9 +1,9 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import { hookArgs } from "grafast";
 import {
   $$extensions,
   execute as grafastExecute,
+  hookArgs,
   isAsyncIterable,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
@@ -80,7 +80,7 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
 }
 
 export const makeGraphQLHandler = (params: ServerParams) => {
-  const { schema, config } = params;
+  const { schema } = params;
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const asString = true;
 

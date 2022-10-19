@@ -6,13 +6,12 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
+import { NULL_PRESET } from "./config.js";
 import { inspect } from "./inspect.js";
 import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import type { GrafastPrepareOptions } from "./prepare.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
-import { NULL_PRESET } from "./config.js";
 
 const isDev =
   typeof process !== "undefined" && process.env.NODE_ENV === "development";

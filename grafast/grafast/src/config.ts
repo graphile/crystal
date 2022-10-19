@@ -1,10 +1,10 @@
 import type { AsyncHooks, PluginHook } from "graphile-config";
-import { isPromiseLike } from "./index";
 
 export const NULL_PRESET: GraphileConfig.ResolvedPreset = Object.freeze(
   Object.create(null),
 );
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type GraphileConfigModule = typeof import("graphile-config");
 
 type PromiseOrValue<T> = T | Promise<T>;
@@ -61,7 +61,7 @@ export function withHooks<TResult>(
       gc.applyHooks(
         plugins,
         (p) => p.grafast?.hooks,
-        (name, fn, plugin) => {
+        (name, fn, _plugin) => {
           hooks.hook(name, fn);
         },
       );

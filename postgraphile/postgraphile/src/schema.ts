@@ -7,7 +7,6 @@ import {
   gather,
   watchGather,
 } from "graphile-build";
-import { withPgClientFromPgSource } from "graphile-build-pg";
 import { resolvePresets } from "graphile-config";
 import * as pg from "pg";
 

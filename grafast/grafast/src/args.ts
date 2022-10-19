@@ -1,10 +1,7 @@
-import { AsyncHooks, PluginHook } from "graphile-config";
 import type { ExecutionArgs } from "graphql";
 
-import { NULL_PRESET, hook } from "./config.js";
+import { hook, NULL_PRESET } from "./config.js";
 import { isPromiseLike } from "./utils.js";
-
-type PromiseOrValue<T> = T | Promise<T>;
 
 // TODO: rename this.
 /**

@@ -5,8 +5,8 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import { withGrafastArgs } from "./execute.js";
 import { NULL_PRESET } from "./config.js";
+import { withGrafastArgs } from "./execute.js";
 
 /**
  * Use this instead of GraphQL.js' subscribe method and we'll automatically
