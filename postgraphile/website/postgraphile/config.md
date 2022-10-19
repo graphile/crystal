@@ -239,6 +239,171 @@ to determine the options that they offer.
   context object that your results will be merged into (overwriting
   pre-existing keys).
 
+### Making HTTP data available to plan resolvers
+
+Using the `grafast.context` callback we can extract data from the incoming HTTP
+request and make it accessible from within the Gra*fast* schema via the GraphQL context.
+
+:::warning
+
+Be careful to not clash with system context keys such as `withPgClient`,
+`pgSettings` and `jwtClaims` (you can see the existing context keys by
+inspecting the second argument to the `context` function).
+
+For the absolute best future compatibility, we recommend that you prefix your
+context keys with your initials, company name, or similar.
+
+:::
+
+Example:
+
+```js title="graphile.config.js"
+export default {
+  grafast: {
+    async context(requestContext) {
+      const req = requestContext.httpRequest;
+      // You can perform asynchronous actions here if you need to; for example
+      // looking up the current user in the database.
+
+      // Return here things that your resolvers need
+      return {
+        // Return the current user from Passport.js or similar
+        user: req.user,
+
+        // Add a helper to get a header
+        getHeader(name) {
+          return req.get(name);
+        },
+
+        // Give access to the database-owner PostgreSQL pool, for example to
+        // perform privileged actions
+        rootPgPool,
+      };
+    },
+  },
+};
+```
+
+:::tip
+
+It's _not_ a good idea to give direct access to the `req` or `res` objects
+via `context` as it binds the context too tightly to the HTTP request
+lifecycle — this will cause you issues if you try and use the GraphQL schema in
+other contexts (e.g. directly or over alternative transports such as websockets
+for realtime). Instead, add helpers to get/set the data you need.
+
+:::
+
+### Exposing HTTP request data to PostgreSQL
+
+Using the `pgSettings` functionality mentioned in the `pgSources` section above
+you can extend the data made available within PostgreSQL through
+`current_setting(...)`. To do so, include a `pgSettings` entry in the GraphQL
+context mentioned in the "Grafast options" section above, the value for which
+should be a POJO (plain old JavaScript object) with string keys and values.
+
+:::warning
+
+You can use `pgSettings` to define variables that your Postgres
+functions/policies depend on, or to tweak internal Postgres settings.
+
+When adding variables for your own usage, the keys **must** contain either one
+or two period (`.`) characters, and the prefix (the bit before the first
+period) must not be used by any Postgres extension. We recommend using a prefix
+such as `jwt.` or `myapp.`. Examples: `jwt.claims.userid`, `myapp.is_admin`
+
+Variables without periods will be interpreted as internal Postgres settings,
+such as `role`, and will be applied by Postgres.
+
+:::
+
+Remember: the `context` entry can be a callback (even an asynchronous callback
+if you need) which can extract details from the HTTP request. Here's an example
+that extracts the user's ID from a JWT and adds information from a specific
+HTTP header:
+
+```ts title="graphile.config.js"
+import jwt from "jsonwebtoken";
+
+// TODO: test this actually works
+
+export default {
+  // ...
+
+  grafast: {
+    async context(requestCtx, graphqlContext) {
+      // Extract details from the requestCtx
+      const req = requestCtx.httpRequest;
+      const auth = req.getHeader("authorization");
+
+      const context = {};
+
+      // Process the authorization header
+      if (typeof auth === "string") {
+        const parts = auth.split(" ");
+        if (parts.length === 2 && parts[0].toLowerCase() === "bearer") {
+          const token = parts[1];
+          const claims = jwt.verify(token, process.env.JWT_SECRET);
+          const userId = claims.uid;
+          context.pgSettings = {
+            "myapp.user_id": userId,
+            "myapp.headers.x_something": req.getHeader("x-something"),
+          };
+        }
+      }
+
+      return context;
+    },
+  },
+};
+```
+
+:::tip
+
+GraphQL itself is transport agnostic, as is `grafast`, so depending on how you
+choose to use your PostGraphile schema you may or may not have access to an
+`httpRequest` or similar. Your `context` callback should be written to support
+all the different ways that your schema may be used: directly, over HTTP, using
+websockets, etc.
+
+:::
+
+With the above example, you could write an SQL function `get_x_something()` to
+get the `myapp.headers.x_something` setting:
+
+```sql
+create function get_x_something() returns text as $$
+  select nullif(current_setting('myapp.headers.x_something', true), '')::text;
+$$ language sql stable;
+```
+
+By default, everything in `pgSettings` is applied to the current transaction
+with `set_config($key, $value, true)`; note that `set_config` only supports
+string values so it is best to only feed `pgSettings` string values (we'll
+convert other values using the `String` constructor function, which may not
+have the effect you intend). All settings are automatically reset when the
+transaction completes.
+
+Here's an example of switching the PostgreSQL client into the 'visitor' role,
+and applying the application setting `jwt.claims.user_id` using the `req.user`
+object from an Express server:
+
+```js title="graphile.config.js"
+export default {
+  grafast: {
+    context: ({ httpRequest: req }) => ({
+      pgSettings: {
+        role: "visitor",
+        "jwt.claims.user_id": `${req.user.id}`,
+        //...
+      },
+    }),
+  },
+};
+```
+
+<!-- TODO: verify the above works. -->
+
 ## Server options
 
 _(TypeScript type: `import('postgraphile').ServerOptions`)_
@@ -255,8 +420,6 @@ _(TypeScript type: `import('postgraphile').ServerOptions`)_
   requests to the `/graphql` endpoint
 - `graphiqlPath: string` - The path at which GraphiQL will be available; usually
   `/`
-- `exposePlan: boolean` - If true, the mermaid diagram and SQL queries will be
-  made available to clients
 - `watch: boolean` - Set true to enable watch mode
 - `maxRequestLength: number` - The length, in bytes, for the largest request
   body that the server will accept
