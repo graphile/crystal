@@ -1,6 +1,5 @@
 import "graphile-config";
 
-import { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "graphql";
 import type { IncomingMessage } from "node:http";
 import type { Socket } from "node:net";

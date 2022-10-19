@@ -228,6 +228,8 @@ to determine the options that they offer.
 
 ## Grafast options
 
+_(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
+
 - `explain` - a list of 'explain' types that should be exposed to clients via
   `extensions.explain` (`mermaid-js` for the operation plan, `sql` for the
   SQL), or `true` to expose everything.
@@ -406,7 +408,7 @@ export default {
 
 ## Server options
 
-_(TypeScript type: `import('postgraphile').ServerOptions`)_
+_(TypeScript type: `import { ServerOptions } from "grafserv"`)_
 
 - `port: number` - Port number to listen on (default: 5678)
 - `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to

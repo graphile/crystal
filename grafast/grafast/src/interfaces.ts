@@ -1,6 +1,8 @@
 import type EventEmitter from "eventemitter3";
+import type { PluginHook } from "graphile-config";
 import type {
   ASTNode,
+  ExecutionArgs,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLField,
@@ -15,7 +17,6 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
-  ExecutionArgs,
 } from "graphql";
 
 import type { Bucket, RequestContext } from "./bucket.js";
@@ -30,7 +31,6 @@ import type {
   __TrackedObjectStep,
 } from "./steps/index.js";
 import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
-import { PluginHook } from "graphile-config";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
