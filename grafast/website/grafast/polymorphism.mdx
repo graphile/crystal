@@ -1,0 +1,51 @@
+# Polymorphism
+
+GraphQL has two types of output polymorphism currently: interfaces and unions.
+An interface defines a list of fields and all implementing objects must
+implement fields compatible with these. A union is a simple list of possible
+object types.
+
+Gra*fast* supports both of these forms of GraphQL polymorphism, both through
+resolvers and through plans. Resolvers work the same (basically) as they do in
+GraphQL.js so we won't dig into them here, but let's look into how Gra*fast*
+supports polymorphism via plans.
+
+## Polymorphic-capable steps
+
+When a polymorphic position in an operation is being planned,
+Gra*fast* will first call the field's plan resolver function as usual (or the
+resulting step's `itemPlan` method for polymorphism occurring inside of lists)
+to get the step representing this polymorphic position.
+Gra*fast* requires that this step must be a polymorphic-capable step, that is
+a step whose class implements the `planForType` method, otherwise
+a planning error will be raised.
+
+Next, Gra*fast* will create a polymorphic LayerPlan, and will loop through all
+of the possible concrete object types valid at that location, passing each to
+the polymorphic-capable step's `planForType` method to determine the step
+that represents each concreate object type.
+
+At run-time, when a polymorphic-capable step executes, each of the entries in
+the `execute` result list must be either `null`, an error, or the result of
+calling Gra*fast*'s `polymorphicWrap` function, passing the concrete object
+type's name as the first argument, and optionally any associated data as the
+second argument. This allows Gra*fast* to determine which "polymorphic branch"
+has been taken, which will control which future steps will be executed against
+this data.
+
+:::info
+
+Currently Gra*fast* uses a rudimentary strategy where all possible polymorphic
+types at each point in the GraphQL operation are planned at planning time. This
+is a simple approach, but it can inflate the time spent planning an operation,
+especially for highly polymorphic operations.
+
+At some point, Gra*fast* will add support for on-demand polymorphic planning.
+With this strategy, each "polymorphic branch" of the plan will only be planned
+the first time that an object of that type is met at runtime. This on-demand
+polymorphic planning strategy should significantly decrease initial planning
+time for highly polymorphic operations, and may result in many of the paths
+never needing to be planned at all!
+
+:::
+
