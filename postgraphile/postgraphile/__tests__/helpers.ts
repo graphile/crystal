@@ -22,6 +22,7 @@ import type { BaseGraphQLContext } from "grafast";
 import {
   $$bypassGraphQL,
   execute as grafastExecute,
+  hookArgs,
   subscribe as grafastSubscribe,
 } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
@@ -233,6 +234,9 @@ export async function runTestQuery(
         config.setofFunctionsContainNulls === false,
       ...graphileBuildOptions,
     },
+    grafast: {
+      explain: ["mermaid-js"],
+    },
   };
 
   if (path.includes("/v4")) {
@@ -250,7 +254,7 @@ export async function runTestQuery(
     await testPool.query(await pg11Data());
   }
 
-  const { schema, config: _config, contextCallback } = await makeSchema(preset);
+  const { schema, config: resolvedPreset } = await makeSchema(preset);
   return withTestWithPgClient(
     testPool,
     queries,
@@ -258,10 +262,18 @@ export async function runTestQuery(
     async (withPgClient) => {
       const pgSubscriber = new PgSubscriber(testPool);
       try {
+        const document = parse(source);
+        const args: ExecutionArgs = {
+          schema,
+          document,
+          variableValues,
+        };
+
+        await hookArgs(args, {}, resolvedPreset);
+
         // We must override the context so that we can listen to the SQL queries.
-        const originalContext = contextCallback({}) as any;
-        const contextValue: BaseGraphQLContext = {
-          pgSettings: originalContext.pgSettings,
+        args.contextValue = {
+          pgSettings: (args.contextValue as any).pgSettings,
           withPgClient,
           pgSubscriber,
         };
@@ -274,8 +286,6 @@ export async function runTestQuery(
               .join(",")}`,
           );
         }
-
-        const document = parse(source);
 
         const operationAST = getOperationAST(document, undefined);
         const operationType = operationAST.operation;
@@ -300,28 +310,8 @@ export async function runTestQuery(
 
         const result =
           operationType === "subscription"
-            ? await subscribe(
-                {
-                  schema,
-                  document,
-                  variableValues,
-                  contextValue,
-                },
-                {
-                  explain: ["mermaid-js"],
-                },
-              )
-            : await execute(
-                {
-                  schema,
-                  document,
-                  variableValues,
-                  contextValue,
-                },
-                {
-                  explain: ["mermaid-js"],
-                },
-              );
+            ? await subscribe(args, resolvedPreset)
+            : await execute(args, resolvedPreset);
 
         if (isAsyncIterable(result)) {
           let errors: GraphQLError[] | undefined = undefined;

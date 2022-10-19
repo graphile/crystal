@@ -97,7 +97,18 @@ hopefully we can fix that!
 
 :::
 
-### Breaking changes
+### additionalGraphQLContextFromRequest
+
+This has been replaced with the 'grafast.context' option; please see
+[configuration - context](../config.md#grafast-options).
+
+### pgSettings
+
+This is now a regular entry inside the GraphQL context returned from your
+'grafast.context' configuration, for more details see
+[configuration - context](../config.md#grafast-options).
+
+## Breaking changes
 
 We've done our best to maintain as much compatibility with a V4 GraphQL schema
 as possible, but some breaking changes persist (we'd argue they're for the

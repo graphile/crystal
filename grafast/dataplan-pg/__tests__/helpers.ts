@@ -189,7 +189,11 @@ export async function runTestQuery(
 
         const execute = grafastExecute;
         const subscribe = grafastSubscribe;
-
+        const preset: GraphileConfig.ResolvedPreset = {
+          grafast: {
+            explain: ["mermaid-js"],
+          },
+        };
         const result =
           operationType === "subscription"
             ? await subscribe(
@@ -199,10 +203,8 @@ export async function runTestQuery(
                   variableValues,
                   contextValue,
                 },
-                {
-                  explain: ["mermaid-js"],
-                  asString,
-                },
+                preset,
+                asString,
               )
             : await execute(
                 {
@@ -211,10 +213,8 @@ export async function runTestQuery(
                   variableValues,
                   contextValue,
                 },
-                {
-                  explain: ["mermaid-js"],
-                  asString,
-                },
+                preset,
+                asString,
               );
 
         if (isAsyncIterable(result)) {

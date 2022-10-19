@@ -1,7 +1,14 @@
 import "./interfaces.js";
 
-import * as assert from "assert";
-import { inspect } from "util";
+function inspect(a: any): string {
+  // TODO: if node, use util.inspect
+  return Array.isArray(a) ||
+    !a ||
+    Object.getPrototypeOf(a) === null ||
+    Object.getPrototypeOf(a) === Object.prototype
+    ? JSON.stringify(a)
+    : String(a);
+}
 
 function isResolvedPreset(
   preset: GraphileConfig.Preset,
@@ -134,10 +141,9 @@ function mergePreset(
   targetPreset: GraphileConfig.ResolvedPreset,
   sourcePreset: GraphileConfig.Preset,
 ): void {
-  assert.ok(
-    targetPreset.extends == null || targetPreset.extends.length === 0,
-    "First argument to mergePreset must be a resolved preset",
-  );
+  if (targetPreset.extends != null && targetPreset.extends.length !== 0) {
+    throw new Error("First argument to mergePreset must be a resolved preset");
+  }
   const plugins = new Set([
     ...(targetPreset.plugins || []),
     ...(sourcePreset.plugins || []),
@@ -146,8 +152,8 @@ function mergePreset(
   if (sourcePreset.disablePlugins) {
     targetPreset.disablePlugins = [
       ...new Set([
-        ...targetPreset.disablePlugins,
-        ...sourcePreset.disablePlugins,
+        ...(targetPreset.disablePlugins ?? []),
+        ...(sourcePreset.disablePlugins ?? []),
       ]),
     ];
   }

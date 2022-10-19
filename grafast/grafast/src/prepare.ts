@@ -41,8 +41,10 @@ export interface GrafastPrepareOptions {
    *
    * - `mermaid-js` will cause the mermaid plan to be included
    * - other values are dependent on the plugins in play
+   *
+   * If set to `true` then all possible explain types will be exposed.
    */
-  explain?: string[] | null;
+  explain?: boolean | string[];
 
   /**
    * If true, the result will be returned as a string rather than an object -
@@ -475,7 +477,10 @@ export function grafastPrepare(
     rootValue,
   );
 
-  if (options.explain?.includes("mermaid-js")) {
+  if (
+    options.explain === true ||
+    (options.explain && options.explain.includes("mermaid-js"))
+  ) {
     // Only build the plan once
     if (operationPlan[$$contextPlanCache] == null) {
       operationPlan[$$contextPlanCache] = operationPlan.printPlanGraph({

@@ -1,5 +1,6 @@
-import { loadConfig, resolvePresets } from "graphile-config";
+import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
+import { loadConfig } from "graphile-config/load";
 import { createServer } from "node:http";
 import { inspect } from "node:util";
 
@@ -141,8 +142,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   if (rawHost != null) {
     preset.server!.host = rawHost;
   }
+  preset.grafast = preset.grafast || {};
   if (rawAllowExplain != null) {
-    preset.server!.exposePlan = rawAllowExplain;
+    preset.grafast!.explain = rawAllowExplain;
   }
   if (watch != null) {
     preset.server!.watch = watch;
@@ -161,7 +163,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const instance = postgraphile(config);
 
-  const server = createServer(instance.getServer().handler);
+  const server = createServer(instance.getGrafserv().handler);
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);

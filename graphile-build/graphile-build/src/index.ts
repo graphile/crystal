@@ -61,48 +61,50 @@ export const buildInflection = (
   const inflectors: Partial<GraphileBuild.Inflection> = makeInitialInflection();
 
   // Add the base inflectors
-  for (const plugin of plugins) {
-    if (plugin.inflection?.add) {
-      const inflectorsToAdd = plugin.inflection.add;
-      for (const inflectorName of Object.keys(
-        inflectorsToAdd,
-      ) as (keyof GraphileBuild.Inflection)[]) {
-        const fn = inflectorsToAdd[inflectorName];
-        if (fn) {
-          const inflector = (fn as any).bind(
-            inflectors as GraphileBuild.Inflection,
-            preset,
-          );
-          extend(
-            inflectors,
-            { [inflectorName]: inflector },
-            `Adding inflectors from ${plugin.name}`,
-          );
+  if (plugins) {
+    for (const plugin of plugins) {
+      if (plugin.inflection?.add) {
+        const inflectorsToAdd = plugin.inflection.add;
+        for (const inflectorName of Object.keys(
+          inflectorsToAdd,
+        ) as (keyof GraphileBuild.Inflection)[]) {
+          const fn = inflectorsToAdd[inflectorName];
+          if (fn) {
+            const inflector = (fn as any).bind(
+              inflectors as GraphileBuild.Inflection,
+              preset,
+            );
+            extend(
+              inflectors,
+              { [inflectorName]: inflector },
+              `Adding inflectors from ${plugin.name}`,
+            );
+          }
         }
       }
     }
-  }
 
-  // Overwrite the inflectors
-  applyHooks(
-    plugins,
-    (plugin) => plugin.inflection?.replace,
-    (inflectorName, replacementFunction, plugin) => {
-      const previous = inflectors[inflectorName];
-      const ignore = plugin.inflection?.ignoreReplaceIfNotExists ?? [];
-      if (!previous && !ignore?.includes(inflectorName)) {
-        console.warn(
-          `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
+    // Overwrite the inflectors
+    applyHooks(
+      plugins,
+      (plugin) => plugin.inflection?.replace,
+      (inflectorName, replacementFunction, plugin) => {
+        const previous = inflectors[inflectorName];
+        const ignore = plugin.inflection?.ignoreReplaceIfNotExists ?? [];
+        if (!previous && !ignore?.includes(inflectorName)) {
+          console.warn(
+            `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
+          );
+        }
+        const inflector = (replacementFunction as any).bind(
+          inflectors as GraphileBuild.Inflection,
+          previous,
+          preset,
         );
-      }
-      const inflector = (replacementFunction as any).bind(
-        inflectors as GraphileBuild.Inflection,
-        previous,
-        preset,
-      );
-      inflectors[inflectorName as any] = inflector;
-    },
-  );
+        inflectors[inflectorName as any] = inflector;
+      },
+    );
+  }
 
   return inflectors as GraphileBuild.Inflection;
 };
@@ -132,83 +134,87 @@ const gatherBase = (
     GatherPluginContext<any, any>
   >();
 
-  const gatherPlugins = plugins.filter((p) => p.gather);
+  const gatherPlugins = plugins?.filter((p) => p.gather);
 
-  // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
-  for (const plugin of gatherPlugins) {
-    const spec = plugin.gather!;
-    if (spec.namespace != null) {
-      if (spec.namespace in globalState) {
-        // TODO: track who registers which namespace, output more helpful error.
-        throw new Error(
-          `Namespace '${spec.namespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique.`,
-        );
+  if (gatherPlugins) {
+    // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
+    for (const plugin of gatherPlugins) {
+      const spec = plugin.gather!;
+      if (spec.namespace != null) {
+        if (spec.namespace in globalState) {
+          // TODO: track who registers which namespace, output more helpful error.
+          throw new Error(
+            `Namespace '${spec.namespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique.`,
+          );
+        }
       }
-    }
-    const cache =
-      spec.namespace != null
-        ? (globalState[spec.namespace] = spec.initialCache?.() ?? {})
-        : EMPTY_OBJECT;
-    const state =
-      spec.namespace != null
-        ? (gatherState[spec.namespace] = spec.initialState?.() ?? {})
-        : EMPTY_OBJECT;
-    const context: GatherPluginContext<any, any> = {
-      helpers: helpers as GraphileConfig.GatherHelpers,
-      options,
-      state,
-      cache,
-      process: hooks.process.bind(hooks),
-      inflection,
-      resolvedPreset,
-    };
-    pluginContext.set(plugin, context);
-    if (spec.namespace != null) {
-      helpers[spec.namespace] = {};
-      if (spec.helpers != null) {
-        const specHelpers = spec.helpers;
-        for (const helperName of Object.keys(specHelpers)) {
-          helpers[spec.namespace][helperName] = (...args: any[]): any => {
-            return specHelpers[helperName](context, ...args);
-          };
+      const cache =
+        spec.namespace != null
+          ? (globalState[spec.namespace] = spec.initialCache?.() ?? {})
+          : EMPTY_OBJECT;
+      const state =
+        spec.namespace != null
+          ? (gatherState[spec.namespace] = spec.initialState?.() ?? {})
+          : EMPTY_OBJECT;
+      const context: GatherPluginContext<any, any> = {
+        helpers: helpers as GraphileConfig.GatherHelpers,
+        options,
+        state,
+        cache,
+        process: hooks.process.bind(hooks),
+        inflection,
+        resolvedPreset,
+      };
+      pluginContext.set(plugin, context);
+      if (spec.namespace != null) {
+        helpers[spec.namespace] = {};
+        if (spec.helpers != null) {
+          const specHelpers = spec.helpers;
+          for (const helperName of Object.keys(specHelpers)) {
+            helpers[spec.namespace][helperName] = (...args: any[]): any => {
+              return specHelpers[helperName](context, ...args);
+            };
+          }
         }
       }
     }
+
+    // Register the hooks
+    applyHooks(
+      gatherPlugins,
+      (p) => p.gather!.hooks,
+      (name, fn, plugin) => {
+        const context = pluginContext.get(plugin)!;
+
+        // hooks.hook(name, (...args) => fn(context, ...args));
+        (hooks.hook as any)(
+          name as any,
+          ((...args: any[]) => (fn as any)(context, ...args)) as any,
+        );
+      },
+    );
   }
 
-  // Register the hooks
-  applyHooks(
-    gatherPlugins,
-    (p) => p.gather!.hooks,
-    (name, fn, plugin) => {
-      const context = pluginContext.get(plugin)!;
-
-      // hooks.hook(name, (...args) => fn(context, ...args));
-      (hooks.hook as any)(
-        name as any,
-        ((...args: any[]) => (fn as any)(context, ...args)) as any,
-      );
-    },
-  );
-
   async function run() {
-    // Reset state
-    for (const plugin of gatherPlugins) {
-      const spec = plugin.gather!;
-      const context = pluginContext.get(plugin)!;
-      if (spec.namespace != null) {
-        context.state = gatherState[spec.namespace] =
-          spec.initialState?.() ?? {};
-      }
-    }
-
-    // Now call the main functions
     const output: Partial<GraphileBuild.BuildInput> = {};
-    for (const plugin of gatherPlugins) {
-      const spec = plugin.gather!;
-      if (spec.main) {
+    if (gatherPlugins) {
+      // Reset state
+      for (const plugin of gatherPlugins) {
+        const spec = plugin.gather!;
         const context = pluginContext.get(plugin)!;
-        await spec.main(output, context);
+        if (spec.namespace != null) {
+          context.state = gatherState[spec.namespace] =
+            spec.initialState?.() ?? {};
+        }
+      }
+
+      // Now call the main functions
+      for (const plugin of gatherPlugins) {
+        const spec = plugin.gather!;
+        if (spec.main) {
+          const context = pluginContext.get(plugin)!;
+          await spec.main(output, context);
+        }
       }
     }
 
@@ -256,12 +262,14 @@ const gatherBase = (
       );
     };
 
-    // Put all the plugins into watch mode.
-    for (const plugin of gatherPlugins) {
-      const spec = plugin.gather!;
-      if (spec.watch) {
-        const context = pluginContext.get(plugin)!;
-        unlisten.push(await spec.watch(context, handleChange));
+    if (gatherPlugins) {
+      // Put all the plugins into watch mode.
+      for (const plugin of gatherPlugins) {
+        const spec = plugin.gather!;
+        if (spec.watch) {
+          const context = pluginContext.get(plugin)!;
+          unlisten.push(await spec.watch(context, handleChange));
+        }
       }
     }
 
@@ -338,11 +346,13 @@ export const getBuilder = (
   const resolvedPreset = resolvePresets([preset]);
   const { plugins, schema: options } = resolvedPreset;
   const builder = new SchemaBuilder(options || {}, inflection);
-  applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
-    builder._setPluginName(plugin.name);
-    builder.hook(hookName, hookFn);
-    builder._setPluginName(null);
-  });
+  if (plugins) {
+    applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
+      builder._setPluginName(plugin.name);
+      builder.hook(hookName, hookFn);
+      builder._setPluginName(null);
+    });
+  }
   return builder;
 };
 

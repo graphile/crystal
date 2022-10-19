@@ -11,7 +11,6 @@ export type ContextCallback = (
 export interface ServerParams {
   schema: GraphQLSchema;
   config: GraphileConfig.ResolvedPreset;
-  contextCallback: ContextCallback;
 }
 
 export interface ServerOptions {
@@ -30,9 +29,6 @@ export interface ServerOptions {
   graphiqlOnGraphQLGET?: boolean;
   /** The path at which GraphiQL will be available; usually / */
   graphiqlPath?: string;
-
-  /** If true, the mermaid diagram and SQL queries will be made available to clients */
-  exposePlan?: boolean;
 
   /** Set true to enable watch mode */
   watch?: boolean;

@@ -1,9 +1,9 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { GrafastExecuteOptions } from "grafast";
 import {
   $$extensions,
   execute as grafastExecute,
+  hookArgs,
   isAsyncIterable,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
@@ -80,18 +80,13 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
 }
 
 export const makeGraphQLHandler = (params: ServerParams) => {
-  const { schema, config } = params;
-  const { exposePlan = false } = config.server ?? {};
+  const { schema } = params;
   const parseAndValidate = makeParseAndValidateFunction(schema);
   const asString = true;
-  const grafastOptions: GrafastExecuteOptions = {
-    // TODO: revisit 'exposePlan'; also should be more generic ('sql' shouldn't be referenced in grafserv)
-    explain: exposePlan ? ["mermaid-js", "sql"] : null,
-    asString,
-  };
 
   return async (
-    contextValue: object,
+    resolvedPreset: GraphileConfig.ResolvedPreset,
+    ctx: GraphileConfig.GraphQLRequestContext,
     body: unknown,
   ): Promise<HandlerResult> => {
     // Parse the body
@@ -123,13 +118,15 @@ export const makeGraphQLHandler = (params: ServerParams) => {
       schema,
       document,
       rootValue: null,
-      contextValue,
+      contextValue: Object.create(null),
       variableValues,
       operationName,
     };
 
+    await hookArgs(args, ctx, resolvedPreset);
+
     try {
-      const result = await grafastExecute(args, grafastOptions);
+      const result = await grafastExecute(args, resolvedPreset);
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",

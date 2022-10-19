@@ -1,6 +1,8 @@
 import type EventEmitter from "eventemitter3";
+import type { PluginHook } from "graphile-config";
 import type {
   ASTNode,
+  ExecutionArgs,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLField,
@@ -29,6 +31,56 @@ import type {
   __TrackedObjectStep,
 } from "./steps/index.js";
 import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
+
+type PromiseOrValue<T> = T | Promise<T>;
+
+export interface GrafastOptions {
+  // TODO: context should be a generic
+  /**
+   * An object to merge into the GraphQL context. Alternatively, pass an
+   * (optionally asynchronous) function that returns an object to merge into
+   * the GraphQL context.
+   */
+  context?:
+    | Record<string, any>
+    | (<TContext extends Record<string, any>>(
+        ctx: GraphileConfig.GraphQLRequestContext,
+        currentContext: Partial<TContext>,
+      ) => PromiseOrValue<Partial<TContext>>);
+
+  /**
+   * A list of 'explain' types that should be included in `extensions.explain`.
+   *
+   * - `mermaid-js` will cause the mermaid plan to be included
+   * - other values are dependent on the plugins in play
+   *
+   * If set to `true` then all possible explain types will be exposed.
+   */
+  explain?: boolean | string[];
+}
+
+declare global {
+  namespace GraphileConfig {
+    interface GraphQLRequestContext {}
+    interface Preset {
+      grafast?: GrafastOptions;
+    }
+    interface GrafastHooks {
+      args: PluginHook<
+        (event: {
+          args: ExecutionArgs;
+          ctx: GraphileConfig.GraphQLRequestContext;
+          resolvedPreset: GraphileConfig.ResolvedPreset;
+        }) => PromiseOrValue<ExecutionArgs>
+      >;
+    }
+    interface Plugin {
+      grafast?: {
+        hooks?: GrafastHooks;
+      };
+    }
+  }
+}
 
 export interface GrafastFieldExtensions {
   plan?: FieldPlanResolver<any, any, any>;

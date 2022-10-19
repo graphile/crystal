@@ -12,7 +12,8 @@
     },
     "./envelop": {
       "types": "./dist/envelop.d.ts",
-      "node": "./dist/envelop.js"
+      "node": "./dist/envelop.js",
+      "default": "./dist/envelop.js"
     }
   },
   "scripts": {
@@ -50,7 +51,13 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
+    "graphile-config": "workspace:^",
     "graphql": "*"
+  },
+  "peerDependenciesMeta": {
+    "graphile-config": {
+      "optional": true
+    }
   },
   "files": [
     "dist"

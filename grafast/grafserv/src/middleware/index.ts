@@ -93,7 +93,8 @@ export function grafserv(
    * Mutable options, change them by calling `setParams`. Don't dereference
    * properties as they should be dynamic.
    */
-  let dynamicOptions = optionsFromConfig(resolvePresets([preset]));
+  const resolvedPreset = resolvePresets([preset]);
+  let dynamicOptions = optionsFromConfig(resolvedPreset);
 
   const sendResult = (
     res: ServerResponse,
@@ -412,8 +413,13 @@ export function grafserv(
         const sP = isPromiseLike(serverParams)
           ? await serverParams
           : serverParams;
-        const contextValue = sP.contextCallback(req);
-        const result = await sP.graphqlHandler(contextValue, body);
+        const result = await sP.graphqlHandler(
+          resolvedPreset,
+          {
+            httpRequest: req,
+          },
+          body,
+        );
         sendResult(res, result);
       })().catch((e) => {
         // Special error handling for GraphQL route

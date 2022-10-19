@@ -12,7 +12,7 @@ export { makePgSources, makeSchema } from "./schema.js";
 export { GraphileBuild, GraphileConfig };
 
 export function postgraphile(preset: GraphileConfig.Preset): {
-  getServer(): Grafserv;
+  getGrafserv(): Grafserv;
   getServerParams(): Promise<ServerParams>;
   getSchema(): Promise<GraphQLSchema>;
   release(): Promise<void>;
@@ -56,7 +56,7 @@ export function postgraphile(preset: GraphileConfig.Preset): {
   }
 
   return {
-    getServer() {
+    getGrafserv() {
       assertAlive();
       if (!server) {
         server = grafserv(config, serverParams);
@@ -95,3 +95,5 @@ export function postgraphile(preset: GraphileConfig.Preset): {
     },
   };
 }
+
+export default postgraphile;

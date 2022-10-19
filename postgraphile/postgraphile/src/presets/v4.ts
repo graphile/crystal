@@ -1,13 +1,20 @@
 import "graphile-config";
 
 import { PgRBACPlugin } from "graphile-build-pg";
+import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexes.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
-export interface V4Options {
+type PromiseOrDirect<T> = T | Promise<T>;
+type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
+
+export interface V4Options<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse,
+> {
   simpleCollections?: "both" | "only" | "omit";
   classicIds?: boolean;
   setofFunctionsContainNulls?: boolean;
@@ -18,6 +25,15 @@ export interface V4Options {
   ignoreIndexes?: boolean;
   appendPlugins?: GraphileConfig.Plugin[];
   skipPlugins?: GraphileConfig.Plugin[];
+
+  /** @deprecated Please use grafast.context 'pgSettings' key instead */
+  pgSettings?: DirectOrCallback<Request, { [key: string]: string | undefined }>;
+  allowExplain?: DirectOrCallback<Request, boolean>;
+  /** @deprecated Please use grafast.context callback instead */
+  additionalGraphQLContextFromRequest?: (
+    req: Request,
+    res: Response,
+  ) => Promise<Record<string, any>>;
 
   subscriptions?: boolean;
   ignoreRBAC?: boolean;
@@ -144,6 +160,33 @@ export const makeV4Preset = (
       ...(options.jwtPgTypeIdentifier
         ? {
             pgJwtType: parseJWTType(options.jwtPgTypeIdentifier),
+          }
+        : null),
+    },
+    grafast: {
+      ...(options.additionalGraphQLContextFromRequest || options.pgSettings
+        ? {
+            async context(ctx) {
+              const context = Object.create(null);
+
+              if (options.additionalGraphQLContextFromRequest) {
+                const addl = await options.additionalGraphQLContextFromRequest(
+                  ctx.httpRequest as any,
+                  (ctx.httpRequest as any)?.res,
+                );
+                Object.assign(context, addl);
+              }
+
+              if (options.pgSettings) {
+                const pgSettings =
+                  typeof options.pgSettings === "function"
+                    ? await options.pgSettings(ctx.httpRequest as any)
+                    : options.pgSettings;
+                Object.assign(context, { pgSettings });
+              }
+
+              return context;
+            },
           }
         : null),
     },

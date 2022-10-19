@@ -9,7 +9,7 @@ import type {
 import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import type { GrafastExecuteOptions } from "./execute.js";
+import { NULL_PRESET } from "./config.js";
 import { execute } from "./execute.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -107,7 +107,7 @@ const parseAndValidate = (
  */
 export function grafastGraphql(
   args: GraphQLArgs,
-  options: GrafastExecuteOptions = {},
+  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
@@ -147,15 +147,15 @@ export function grafastGraphql(
       fieldResolver,
       typeResolver,
     },
-    options,
+    resolvedPreset,
   );
 }
 
 export function grafastGraphqlSync(
   args: GraphQLArgs,
-  options: GrafastExecuteOptions = {},
+  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
 ): ExecutionResult {
-  const result = grafastGraphql(args, options);
+  const result = grafastGraphql(args, resolvedPreset);
   if (isPromiseLike(result)) {
     throw new Error("Grafast execution failed to complete synchronously.");
   }

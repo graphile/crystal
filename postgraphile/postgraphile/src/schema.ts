@@ -7,7 +7,6 @@ import {
   gather,
   watchGather,
 } from "graphile-build";
-import { withPgClientFromPgSource } from "graphile-build-pg";
 import { resolvePresets } from "graphile-config";
 import * as pg from "pg";
 
@@ -49,53 +48,6 @@ export function makePgSources(
   return [source];
 }
 
-// TODO: should we move this to graphile-build-pg?
-/**
- * @internal
- */
-function makeContextCallback(config: GraphileConfig.ResolvedPreset) {
-  return (graphqlRequestContext: GraphileConfig.GraphQLRequestContext) => {
-    const contextValue: Record<string, any> = {};
-    if (config.pgSources) {
-      for (const pgSource of config.pgSources) {
-        const { pgSettings, pgSettingsKey, withPgClientKey } = pgSource;
-        if (pgSettings && pgSettingsKey == null) {
-          throw new Error(
-            `pgSource '${pgSource.name}' specifies pgSettings, but has no pgSettingsKey.`,
-          );
-        }
-        if (pgSettingsKey != null) {
-          if (pgSettingsKey in contextValue) {
-            throw new Error(
-              `Key '${pgSettingsKey}' already set on the context; refusing to overwrite - please check your configuration.`,
-            );
-          }
-          if (pgSettings) {
-            Object.assign(contextValue, {
-              [pgSettingsKey]:
-                typeof pgSettings === "function"
-                  ? pgSettings(graphqlRequestContext)
-                  : pgSettings,
-            });
-          } else {
-            contextValue[pgSettingsKey] = undefined;
-          }
-        }
-        if (withPgClientKey in contextValue) {
-          throw new Error(
-            `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
-          );
-        }
-        contextValue[withPgClientKey] = withPgClientFromPgSource.bind(
-          null,
-          pgSource,
-        );
-      }
-    }
-    return contextValue;
-  };
-}
-
 /**
  * Builds the GraphQL schema by resolving the preset, running inflection then
  * gather and building the schema. Returns the results.
@@ -109,8 +61,7 @@ export async function makeSchema(
   const shared = { inflection: buildInflection(config) };
   const input = await gather(config, shared);
   const schema = buildSchema(config, input, shared);
-  const contextCallback = makeContextCallback(config);
-  return { schema, config, contextCallback };
+  return { schema, config };
 }
 
 /**
@@ -135,8 +86,7 @@ export async function watchSchema(
       callback(error);
     } else {
       const schema = buildSchema(config, input!, shared);
-      const contextCallback = makeContextCallback(config);
-      callback(null, { schema, config, contextCallback });
+      callback(null, { schema, config });
     }
   });
   return stopWatching;

@@ -12099,7 +12099,11 @@ __metadata:
     webpack-cli: "npm:^4.10.0"
     zx: "npm:^7.0.8"
   peerDependencies:
+    graphile-config: "workspace:^"
     graphql: "*"
+  peerDependenciesMeta:
+    graphile-config:
+      optional: true
   languageName: unknown
   linkType: soft
 

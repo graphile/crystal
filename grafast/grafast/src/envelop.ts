@@ -51,7 +51,11 @@ export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
         (opts.args.contextValue as any)?.req as IncomingMessage | undefined
       )?.headers["x-graphql-explain"];
       const explain = processExplain(explainAllowed, explainHeaders);
-      opts.setExecuteFn((args) => grafastExecute(args, { explain }));
+      opts.setExecuteFn((args) =>
+        grafastExecute(args, {
+          grafast: { explain },
+        }),
+      );
     },
     async onSubscribe(opts) {
       const ctx = opts.args.contextValue as any;
@@ -59,7 +63,11 @@ export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
         ctx?.request?.headers ||
         ctx?.connectionParams)?.["x-graphql-explain"];
       const explain = processExplain(explainAllowed, explainHeaders);
-      opts.setSubscribeFn(async (args) => grafastSubscribe(args, { explain }));
+      opts.setSubscribeFn(async (args) =>
+        grafastSubscribe(args, {
+          grafast: { explain },
+        }),
+      );
     },
   };
 };

@@ -6,17 +6,12 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
+import { NULL_PRESET } from "./config.js";
 import { inspect } from "./inspect.js";
 import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import type { GrafastPrepareOptions } from "./prepare.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
-
-export interface GrafastExecuteOptions {
-  explain?: GrafastPrepareOptions["explain"];
-  asString?: boolean;
-}
 
 const isDev =
   typeof process !== "undefined" && process.env.NODE_ENV === "development";
@@ -27,10 +22,12 @@ const isDev =
  */
 export function withGrafastArgs(
   args: ExecutionArgs,
-  options: GrafastExecuteOptions = {},
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  asString: boolean,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
+  const options = resolvedPreset?.grafast;
   if (isDev) {
     if (
       args.rootValue != null &&
@@ -50,7 +47,8 @@ export function withGrafastArgs(
   if (typeof args.rootValue !== "object" || args.rootValue == null) {
     throw new Error("Grafast requires that the 'rootValue' be an object");
   }
-  const shouldExplain = !!options.explain?.length;
+  const explain = options?.explain;
+  const shouldExplain = !!explain;
   const eventEmitter: ExecutionEventEmitter | undefined = shouldExplain
     ? new EventEmitter()
     : undefined;
@@ -68,7 +66,7 @@ export function withGrafastArgs(
   const handleExplainOperation = ({
     operation,
   }: ExecutionEventMap["explainOperation"]) => {
-    if (options.explain!.includes(operation.type)) {
+    if (explain === true || (explain && explain.includes(operation.type))) {
       explainOperations.push(operation);
     }
   };
@@ -86,8 +84,8 @@ export function withGrafastArgs(
     : undefined;
 
   const rootValue = grafastPrepare(args, {
-    explain: options.explain,
-    asString: options.asString,
+    explain: options?.explain,
+    asString,
   });
   if (unlisten) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
@@ -106,9 +104,10 @@ export function withGrafastArgs(
  */
 export function execute(
   args: ExecutionArgs,
-  options: GrafastExecuteOptions = {},
+  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
+  asString = false,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  return withGrafastArgs(args, options);
+  return withGrafastArgs(args, resolvedPreset, asString);
 }
