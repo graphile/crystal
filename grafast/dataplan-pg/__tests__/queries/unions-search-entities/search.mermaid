@@ -25,7 +25,7 @@ graph TD
     PgClassExpression18{{"PgClassExpression[18∈2]<br />ᐸ__entity_s....”post_id”ᐳ"}}:::plan
     PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__entity_s...omment_id”ᐳ"}}:::plan
     List20{{"List[20∈2]<br />ᐸ17,18,19ᐳ"}}:::plan
-    PgPolymorphic21["PgPolymorphic[21∈2]"]:::plan
+    PgPolymorphic21{{"PgPolymorphic[21∈2]"}}:::plan
     PgSelect22[["PgSelect[22∈3]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
     First26{{"First[26∈3]<br />ᐳPerson"}}:::plan
     PgSelectSingle27{{"PgSelectSingle[27∈3]<br />ᐸpeopleᐳ<br />ᐳPerson"}}:::plan
@@ -100,7 +100,7 @@ graph TD
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸentity_searchᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]<br />1:  / PgSelectSingle[16],PgClassExpression[17],PgClassExpression[18],PgClassExpression[19],List[20]<br />2: PgPolymorphic[21]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,List20,PgPolymorphic21 bucket2
     Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket

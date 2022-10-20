@@ -48,12 +48,12 @@ export class PgSingleTablePolymorphicStep<
   private rowStepId: number;
 
   constructor(
-    $typePlan: ExecutableStep<string>,
-    $rowPlan: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
+    $typeName: ExecutableStep<string>,
+    $row: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
   ) {
     super();
-    this.typeStepId = this.addDependency($typePlan);
-    this.rowStepId = this.addDependency($rowPlan);
+    this.typeStepId = this.addDependency($typeName);
+    this.rowStepId = this.addDependency($row);
   }
 
   private rowPlan() {
@@ -97,10 +97,10 @@ export function pgSingleTablePolymorphic<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
-  $typePlan: ExecutableStep<string>,
-  $rowPlan: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
+  $typeName: ExecutableStep<string>,
+  $row: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
 ): PgSingleTablePolymorphicStep<TColumns, TUniques, TRelations, TParameters> {
-  return new PgSingleTablePolymorphicStep($typePlan, $rowPlan);
+  return new PgSingleTablePolymorphicStep($typeName, $row);
 }
 
 Object.defineProperty(pgSingleTablePolymorphic, "$$export", {
