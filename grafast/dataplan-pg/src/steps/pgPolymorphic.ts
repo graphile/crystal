@@ -1,10 +1,10 @@
 import type {
-  GrafastResultsList,
-  GrafastValuesList,
+  ExecutableStep,
+  ExecutionExtra,
   PolymorphicData,
   PolymorphicStep,
 } from "grafast";
-import { ExecutableStep, isDev, polymorphicWrap } from "grafast";
+import { isDev, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
@@ -41,7 +41,7 @@ export class PgPolymorphicStep<
     TTypeSpecifier,
     TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
   >
-  extends ExecutableStep<any>
+  extends UnbatchedExecutableStep<any>
   implements PolymorphicStep
 {
   static $$export = {
@@ -55,8 +55,8 @@ export class PgPolymorphicStep<
   private types: string[];
 
   constructor(
-    $itemPlan: TItemStep,
-    $typeSpecifierPlan: TTypeSpecifierStep,
+    $item: TItemStep,
+    $typeSpecifier: TTypeSpecifierStep,
     private possibleTypes: PgPolymorphicTypeMap<
       TItemStep,
       TTypeSpecifier,
@@ -64,8 +64,8 @@ export class PgPolymorphicStep<
     >,
   ) {
     super();
-    this.itemStepId = this.addDependency($itemPlan);
-    this.typeSpecifierStepId = this.addDependency($typeSpecifierPlan);
+    this.itemStepId = this.addDependency($item);
+    this.typeSpecifierStepId = this.addDependency($typeSpecifier);
     this.types = Object.keys(possibleTypes);
   }
 
@@ -120,20 +120,17 @@ export class PgPolymorphicStep<
     return t;
   }
 
-  execute(
-    values: Array<GrafastValuesList<any>>,
-  ): GrafastResultsList<PolymorphicData<
-    string,
-    ReadonlyArray<any> // TODO: something to do with TCodec
-  > | null> {
-    return values[this.typeSpecifierStepId].map((specifier) => {
-      if (specifier) {
-        const typeName = this.getTypeNameFromSpecifier(specifier);
-        return polymorphicWrap(typeName);
-      } else {
-        return null;
-      }
-    });
+  unbatchedExecute(
+    extra: ExecutionExtra,
+    item: any,
+    specifier: any,
+  ): PolymorphicData<string> | null {
+    if (specifier) {
+      const typeName = this.getTypeNameFromSpecifier(specifier);
+      return polymorphicWrap(typeName);
+    } else {
+      return null;
+    }
   }
 }
 
@@ -150,8 +147,8 @@ export function pgPolymorphic<
   TTypeSpecifier = any,
   TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
 >(
-  $itemPlan: TItemStep,
-  $typeSpecifierPlan: TTypeSpecifierStep,
+  $item: TItemStep,
+  $typeSpecifier: TTypeSpecifierStep,
   possibleTypes: PgPolymorphicTypeMap<
     TItemStep,
     TTypeSpecifier,
@@ -159,8 +156,8 @@ export function pgPolymorphic<
   >,
 ): PgPolymorphicStep<TItemStep, TTypeSpecifier, TTypeSpecifierStep> {
   return new PgPolymorphicStep<TItemStep, TTypeSpecifier, TTypeSpecifierStep>(
-    $itemPlan,
-    $typeSpecifierPlan,
+    $item,
+    $typeSpecifier,
     possibleTypes,
   );
 }
