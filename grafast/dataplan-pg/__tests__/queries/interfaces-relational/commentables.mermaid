@@ -21,7 +21,7 @@ graph TD
     __Item15[/"__Item[15∈2]<br />ᐸ12ᐳ"\]:::itemplan
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸrelational_commentablesᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgPolymorphic18["PgPolymorphic[18∈2]"]:::plan
+    PgPolymorphic18{{"PgPolymorphic[18∈2]"}}:::plan
     PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__relation...les__.”id”ᐳ"}}:::plan
     PgSelect20[["PgSelect[20∈3]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     First24{{"First[24∈3]<br />ᐳRelationalPost"}}:::plan
@@ -111,7 +111,7 @@ graph TD
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸrelational_commentablesᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]<br />1:  / PgSelectSingle[16],PgClassExpression[17],PgClassExpression[19]<br />2: PgPolymorphic[18]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ12ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgPolymorphic18,PgClassExpression19 bucket2
     Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
