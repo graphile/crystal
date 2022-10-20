@@ -112,10 +112,10 @@ this data.
 export function polymorphicWrap<TType extends string>(
   type: TType,
   data?: unknown,
-): PolymorphicData<TType>
+): PolymorphicData<TType>;
 ```
 
-## Caveats 
+## Caveats
 
 Highly polymorphic operations may result in very significant planning time,
 this is something we're working to optimize but for now we recommend that you
