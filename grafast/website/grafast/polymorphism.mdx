@@ -1,44 +1,136 @@
 # Polymorphism
 
 GraphQL has two types of output polymorphism currently: interfaces and unions.
-An interface defines a list of fields and all implementing objects must
-implement fields compatible with these. A union is a simple list of possible
-object types.
+An interface defines a list of fields; all objects that implement the interface
+must implement fields compatible with these. A union is a simple list of
+possible object types.
 
 Gra*fast* supports both of these forms of GraphQL polymorphism, both through
 resolvers and through plans. Resolvers work the same (basically) as they do in
 GraphQL.js so we won't dig into them here, but let's look into how Gra*fast*
 supports polymorphism via plans.
 
+## Polymorphic positions
+
+Let's define the term "polymorphic position" to make it easier to talk about
+planning our polymorphic GraphQL query. Imagine you have a GraphQL schema such
+as:
+
+```graphql
+interface Animal {
+  name: String!
+}
+type Cat extends Animal {
+  name: String!
+  numberOfLives: Int!
+}
+type Dog extends Animal {
+  name: String!
+  wagsTail: Boolean!
+}
+type Query {
+  bestAnimal: Animal
+  randomAnimals: [Animal]
+}
+```
+
+One query to this schema could be:
+
+```graphql
+{
+  bestAnimal {
+    name
+    ... on Cat {
+      numberOfLives
+    }
+    ... on Dog {
+      wagsTail
+    }
+  }
+}
+```
+
+Here the return type of the `bestAnimal` field is a polymorphic type (`Animal`,
+which is an interface), so the return type of `bestAnimal` is a polymorphic
+position in this query.
+
+Another query could be:
+
+```graphql
+{
+  randomAnimals {
+    name
+    ... on Cat {
+      numberOfLives
+    }
+    ... on Dog {
+      wagsTail
+    }
+  }
+}
+```
+
+Here the return type of `randomAnimals` is a list (`[Animal]`). A list is not
+itself polymorphic, however the type inside the list is a polymorphic type
+(`Animal` again), so a polymorphic position in this query is inside the list
+returned by `randomAnimals`.
+
+Operations may have any number (0 or higher) of polymorphic positions.
+
 ## Polymorphic-capable steps
 
-When a polymorphic position in an operation is being planned,
-Gra*fast* will first call the field's plan resolver function as usual (or the
-resulting step's `itemPlan` method for polymorphism occurring inside of lists)
-to get the step representing this polymorphic position.
-Gra*fast* requires that this step must be a polymorphic-capable step, that is
-a step whose class implements the `planForType` method, otherwise
-a planning error will be raised.
+When a polymorphic position in an operation is being planned, Gra*fast* will
+call the field's plan resolver function as usual (or the resulting step's
+`itemPlan` method for polymorphic positions occurring inside of lists) to get
+the step representing this polymorphic position. Gra*fast* requires that this
+step must be a polymorphic-capable step, that is a step whose class implements
+the `planForType` method, otherwise a planning error will be raised.
 
-Next, Gra*fast* will create a polymorphic LayerPlan, and will loop through all
-of the possible concrete object types valid at that location, passing each to
-the polymorphic-capable step's `planForType` method to determine the step
-that represents each concreate object type.
+```ts
+  planForType(objectType: GraphQLObjectType): ExecutableStep;
+```
+
+Having determined the polymorphic-capable step that represents this polymorphic
+position, Gra*fast* will create a polymorphic LayerPlan and loop through all of
+the possible concrete object types valid at that location. For each concrete
+object type, Gra*fast* will pass the type to the polymorphic-capable step's
+`planForType` method and the resulting step will represent that concrete object
+type. Multiple concrete object types may be represented by the same step.
+
+Planning then continues with the child selection sets being traversed for each
+possible concrete object type and corresponding step.
 
 At run-time, when a polymorphic-capable step executes, each of the entries in
-the `execute` result list must be either `null`, an error, or the result of
+the `execute()` result list must be either `null`, an error, or the result of
 calling Gra*fast*'s `polymorphicWrap` function, passing the concrete object
 type's name as the first argument, and optionally any associated data as the
 second argument. This allows Gra*fast* to determine which "polymorphic branch"
 has been taken, which will control which future steps will be executed against
 this data.
 
+```ts
+export function polymorphicWrap<TType extends string>(
+  type: TType,
+  data?: unknown,
+): PolymorphicData<TType>
+```
+
+## Caveats 
+
+Highly polymorphic operations may result in very significant planning time,
+this is something we're working to optimize but for now we recommend that you
+use persisted operations (aka persisted queries) to ensure that only your
+developers operations are allowed. Alternatively, use our plugin that validates
+that operations don't contain too much polymorphism (TODO: plugin not yet
+available).
+
 :::info
 
 Currently Gra*fast* uses a rudimentary strategy where all possible polymorphic
 types at each point in the GraphQL operation are planned at planning time. This
 is a simple approach, but it can inflate the time spent planning an operation,
-especially for highly polymorphic operations.
+especially for highly polymorphic operations where combinatorics is a
+significant concern.
 
 At some point, Gra*fast* will add support for on-demand polymorphic planning.
 With this strategy, each "polymorphic branch" of the plan will only be planned
@@ -48,4 +140,3 @@ time for highly polymorphic operations, and may result in many of the paths
 never needing to be planned at all!
 
 :::
-
