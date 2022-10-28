@@ -106,6 +106,7 @@ import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
+import { pgUnionAll } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
   withPgClientTransaction,
@@ -1934,6 +1935,205 @@ export function makeExampleSchema(
       unionTopicsSource,
     ],
   );
+
+  ////////////////////////////////////////
+
+  const awsApplicationsSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.aws_applications",
+          sql`interfaces_and_unions.aws_applications`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
+            aws_id: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.aws_applications`,
+        name: "aws_applications",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const gcpApplicationsSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.gcp_applications",
+          sql`interfaces_and_unions.gcp_applications`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
+            gcp_id: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.gcp_applications`,
+        name: "gcp_applications",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const firstPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.first_party_vulnerabilities",
+          sql`interfaces_and_unions.first_party_vulnerabilities`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            cvss_score: col({ codec: TYPES.float, notNull: true }),
+            team_name: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        name: "first_party_vulnerabilities",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const thirdPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.third_party_vulnerabilities",
+          sql`interfaces_and_unions.third_party_vulnerabilities`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            cvss_score: col({ codec: TYPES.float, notNull: true }),
+            team_name: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        name: "third_party_vulnerabilities",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  // or: pgSelectUnionAll?
+  // IMPORTANT: for cursor pagination, type must be part of cursor condition
+  const $vulnerabilities = pgUnionAll({
+    attributes: {
+      cvss_score: {
+        codec: TYPES.float,
+      },
+    },
+    sources: {
+      FirstPartyVulnerability: {
+        source: firstPartyVulnerabilitiesSourceBuilder.get(),
+        /*
+        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        pk: (alias) => [sql`${alias}.id`],
+        */
+        /* Could add attribute overrides here */
+      },
+      ThirdPartyVulnerability: {
+        source: thirdPartyVulnerabilitiesSourceBuilder.get(),
+        /*
+        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        pk: (alias) => [sql`${alias}.id`],
+        */
+      },
+    },
+  });
+  $vulnerabilities.orderBy({
+    attribute: "cvss_score",
+    direction: "ASC",
+  });
+  $vulnerabilities.where({
+    attribute: "cvss_score",
+    callback: (alias) =>
+      sql`${alias} > ${$vulnerabilities.placeholder(constant(6), TYPES.float)}`,
+  });
+
+  const vulnerabilitiesSource = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "vulnerability",
+          sql`anonymous_vulnerability`,
+          {
+            type: col({ codec: TYPES.text, notNull: true }), // Values: 'FirstPartyVulnerability', 'ThirdPartyVulnerability'
+            pk: col({ codec: TYPES.json, notNull: true }), // JSON array of primary keys
+            cvss_score: col({ codec: TYPES.float, notNull: true }),
+          },
+          {},
+          true,
+        ),
+        source: sql`(
+select
+  'FirstPartyVulnerability' as type,
+  json_build_array(id::text)::text as pk,
+  cvss_score,
+  rn
+from (
+  select id, cvss_score, row_number() over (partition by 1) rn
+  from first_party_vulnerabilities
+  where cvss_score > 6 -- condition
+  order by cvss_score desc, id asc -- Ensure unique order
+  limit ($1::int + $2::int) -- first+offset
+) tmp
+union all
+select
+  'ThirdPartyVulnerability' as type,
+  json_build_array(id::text)::text as pk,
+  cvss_score,
+  rn
+from (
+  select id, cvss_score, row_number() over (partition by 1) rn
+  from third_party_vulnerabilities
+  where cvss_score > 6 -- condition
+  order by cvss_score desc, id asc -- Ensure unique order
+  limit ($1::int + $2::int) -- first+offset
+) tmp
+order by 3 desc, rn asc, 1 asc -- Ensure unique order
+limit $1
+offset $2
+)`,
+        name: "third_party_vulnerabilities",
+        uniques: [
+          /* none! */
+        ],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  ////////////////////////////////////////
 
   function attrField<TColumns extends PgTypeColumns>(
     attrName: keyof TColumns,
