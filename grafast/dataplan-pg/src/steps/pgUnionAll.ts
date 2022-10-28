@@ -157,10 +157,7 @@ export class PgUnionAllStep<TAttributes extends string>
   private orders: PgUnionAllStepOrder<TAttributes>[] = [];
 
   private executor!: PgExecutor;
-
-  private contextIds: {
-    [specIdentifier: string]: number;
-  } = Object.create(null);
+  private contextId!: number;
 
   constructor(private spec: PgUnionAllStepConfig<TAttributes>) {
     super();
@@ -169,6 +166,7 @@ export class PgUnionAllStep<TAttributes extends string>
       if (first) {
         first = false;
         this.executor = sourceSpec.source.executor;
+        this.contextId = this.addDependency(this.executor.context());
       } else {
         if (this.executor !== sourceSpec.source.executor) {
           throw new Error(
@@ -176,11 +174,6 @@ export class PgUnionAllStep<TAttributes extends string>
           );
         }
       }
-      // TODO: grabbing all these contexts seems sub-optimal... especially when
-      // they should all be the same thing.
-      this.contextIds[identifier] = this.addDependency(
-        sourceSpec.source.context(),
-      );
     }
   }
 
@@ -824,18 +817,8 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
   ): Promise<GrafastValuesList<any>> {
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults!;
-    let contexts: readonly any[] | undefined = undefined;
 
-    for (const specIdentifier in this.contextIds) {
-      const contextStepId = this.contextIds[specIdentifier];
-      if (!contexts) {
-        contexts = values[contextStepId];
-      } else {
-        if (values[contextStepId] !== contexts) {
-          throw new Error(`All contexts in union must match`);
-        }
-      }
-    }
+    const contexts = values[this.contextId];
     if (!contexts) {
       throw new Error("No contexts");
     }
