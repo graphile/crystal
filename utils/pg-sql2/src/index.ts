@@ -773,7 +773,19 @@ export function join(
   return currentItems;
 }
 
-export function indent(fragment: SQL): SQL {
+export function indent(fragment: SQL): SQL;
+export function indent(
+  strings: TemplateStringsArray,
+  ...values: Array<SQL>
+): SQL;
+export function indent(
+  fragmentOrStrings: SQL | TemplateStringsArray,
+  ...values: Array<SQL>
+): SQL {
+  const fragment =
+    "raw" in fragmentOrStrings
+      ? sql(fragmentOrStrings, ...values)
+      : fragmentOrStrings;
   return isDev ? makeIndentNode(fragment) : fragment;
 }
 
