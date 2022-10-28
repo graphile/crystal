@@ -20,7 +20,6 @@ import type {
   AccessStep,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
-  ExecutableStep,
   GrafastSubscriber,
   GraphileArgumentConfig,
   ListStep,
@@ -34,6 +33,7 @@ import {
   context,
   each,
   error,
+  ExecutableStep,
   filter,
   getEnumValueConfig,
   groupBy,
@@ -48,6 +48,7 @@ import {
   resolveType,
 } from "grafast";
 import type { GraphQLOutputType } from "graphql";
+import { GraphQLFloat } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -2042,42 +2043,10 @@ export function makeExampleSchema(
     [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
   );
 
-  // or: pgSelectUnionAll?
-  // IMPORTANT: for cursor pagination, type must be part of cursor condition
-  const $vulnerabilities = pgUnionAll({
-    attributes: {
-      cvss_score: {
-        codec: TYPES.float,
-      },
-    },
-    sources: {
-      FirstPartyVulnerability: {
-        source: firstPartyVulnerabilitiesSourceBuilder.get(),
-        /*
-        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
-        pk: (alias) => [sql`${alias}.id`],
-        */
-        /* Could add attribute overrides here */
-      },
-      ThirdPartyVulnerability: {
-        source: thirdPartyVulnerabilitiesSourceBuilder.get(),
-        /*
-        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
-        pk: (alias) => [sql`${alias}.id`],
-        */
-      },
-    },
-  });
-  $vulnerabilities.orderBy({
-    attribute: "cvss_score",
-    direction: "ASC",
-  });
-  $vulnerabilities.where({
-    attribute: "cvss_score",
-    callback: (alias) =>
-      sql`${alias} > ${$vulnerabilities.placeholder(constant(6), TYPES.float)}`,
-  });
+  firstPartyVulnerabilitiesSourceBuilder.build({});
+  thirdPartyVulnerabilitiesSourceBuilder.build({});
 
+  /*
   const vulnerabilitiesSource = EXPORTABLE(
     (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
       return new PgSourceBuilder({
@@ -2126,12 +2095,13 @@ offset $2
 )`,
         name: "third_party_vulnerabilities",
         uniques: [
-          /* none! */
+          /* none! * /
         ],
       });
     },
     [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
   );
+  */
 
   ////////////////////////////////////////
 
@@ -3829,6 +3799,49 @@ offset $2
 
   ////////////////////////////////////////
 
+  const Vulnerability = new GraphQLInterfaceType({
+    name: "Vulnerability",
+    fields: {
+      cvssScore: {
+        type: GraphQLFloat,
+      },
+    },
+  });
+
+  const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
+    name: "FirstPartyVulnerability",
+    fields: {
+      cvssScore: {
+        type: GraphQLFloat,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("cvss_score");
+            },
+          [],
+        ),
+      },
+    },
+  });
+
+  const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
+    name: "ThirdPartyVulnerability",
+    fields: {
+      cvssScore: {
+        type: GraphQLFloat,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("cvss_score");
+            },
+          [],
+        ),
+      },
+    },
+  });
+
+  ////////////////////////////////////////
+
   const Query = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValueStep<BaseGraphQLRootValue>
@@ -4564,6 +4577,70 @@ offset $2
           [],
         ),
       },
+
+      vulnerabilities: {
+        type: new GraphQLList(Vulnerability),
+        plan: EXPORTABLE(
+          (
+            TYPES,
+            constant,
+            firstPartyVulnerabilitiesSourceBuilder,
+            pgUnionAll,
+            sql,
+            thirdPartyVulnerabilitiesSourceBuilder,
+          ) =>
+            function plan() {
+              // or: pgSelectUnionAll?
+              // IMPORTANT: for cursor pagination, type must be part of cursor condition
+              const $vulnerabilities = pgUnionAll({
+                executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
+                attributes: {
+                  cvss_score: {
+                    codec: TYPES.float,
+                  },
+                },
+                sources: {
+                  FirstPartyVulnerability: {
+                    source: firstPartyVulnerabilitiesSourceBuilder.get(),
+                    /*
+        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        pk: (alias) => [sql`${alias}.id`],
+        */
+                    /* Could add attribute overrides here */
+                  },
+                  ThirdPartyVulnerability: {
+                    source: thirdPartyVulnerabilitiesSourceBuilder.get(),
+                    /*
+        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        pk: (alias) => [sql`${alias}.id`],
+        */
+                  },
+                },
+              });
+              $vulnerabilities.orderBy({
+                attribute: "cvss_score",
+                direction: "ASC",
+              });
+              $vulnerabilities.where({
+                attribute: "cvss_score",
+                callback: (alias) =>
+                  sql`${alias} > ${$vulnerabilities.placeholder(
+                    constant(6),
+                    TYPES.float,
+                  )}`,
+              });
+              return $vulnerabilities;
+            },
+          [
+            TYPES,
+            constant,
+            firstPartyVulnerabilitiesSourceBuilder,
+            pgUnionAll,
+            sql,
+            thirdPartyVulnerabilitiesSourceBuilder,
+          ],
+        ),
+      },
     },
   });
 
@@ -5110,6 +5187,9 @@ offset $2
       RelationalDivider,
       RelationalChecklist,
       RelationalChecklistItem,
+
+      FirstPartyVulnerability,
+      ThirdPartyVulnerability,
     ],
     extensions: {
       graphileExporter: {

@@ -15,6 +15,7 @@ import {
 import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgUnionAllStep } from "./pgUnionAll.js";
 
 /*
  * **IMPORTANT**: see pgPageInfo.md for reasoning behind decisions made in this file
@@ -32,7 +33,9 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  *
  * {@page ~@dataplan/pg/steps/pgPageInfo.md}
  */
-export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
+export class PgPageInfoStep<
+    TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any>,
+  >
   extends UnbatchedExecutableStep<any>
   implements PageInfoCapableStep
 {
@@ -190,7 +193,9 @@ export class PgPageInfoStep<TStep extends PgSelectStep<any, any, any, any>>
  *
  * {@page ~@dataplan/pg/steps/pgPageInfo.md}
  */
-export function pgPageInfo<TStep extends PgSelectStep<any, any, any, any>>(
+export function pgPageInfo<
+  TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any>,
+>(
   connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>,
 ): PgPageInfoStep<TStep> {
   return new PgPageInfoStep(connectionPlan);

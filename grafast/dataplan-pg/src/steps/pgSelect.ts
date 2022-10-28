@@ -1885,7 +1885,9 @@ export class PgSelectStep<
     this.locked = false;
 
     if (!this.isFinalized) {
-      const alias = sql.identifier(Symbol(this.name + "_identifiers"));
+      const identifiersAlias = sql.identifier(
+        Symbol(this.name + "_identifiers"),
+      );
 
       this.placeholders.forEach((placeholder) => {
         // NOTE: we're NOT adding to `this.identifierMatches`.
@@ -1910,7 +1912,7 @@ export class PgSelectStep<
         // Finally alias this symbol to a reference to this placeholder
         this.placeholderValues.set(
           placeholder.symbol,
-          sql`${alias}.${sql.identifier(`id${idx}`)}`,
+          sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
         );
       });
 
@@ -1927,7 +1929,7 @@ export class PgSelectStep<
           const extraWheres: SQL[] = [];
 
           const identifierIndexOffset =
-            extraSelects.push(sql`${alias}.idx`) - 1;
+            extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
           const rowNumberIndexOffset =
             forceOrder || limit != null || offset != null
               ? extraSelects.push(
@@ -1940,7 +1942,9 @@ export class PgSelectStep<
           extraWheres.push(
             ...this.identifierMatches.map(
               (frag, idx) =>
-                sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+                sql`${frag} = ${identifiersAlias}.${sql.identifier(
+                  `id${idx}`,
+                )}`,
             ),
           );
           const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
@@ -2011,7 +2015,7 @@ from json_array_elements(${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
             // a value before executing the query.
             this.queryValuesSymbol as any,
-          )}::json) with ordinality as ids`)}) as ${alias},
+          )}::json) with ordinality as ids`)}) as ${identifiersAlias},
 lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           return { query, identifierIndex };
         } else if (
