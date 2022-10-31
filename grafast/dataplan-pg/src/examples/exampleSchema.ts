@@ -4681,7 +4681,7 @@ offset $2
               });
               $vulnerabilities.orderBy({
                 attribute: "cvss_score",
-                direction: "ASC",
+                direction: "DESC",
               });
               $vulnerabilities.where({
                 attribute: "cvss_score",
