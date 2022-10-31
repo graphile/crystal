@@ -353,7 +353,7 @@ export class PgUnionAllStep<TAttributes extends string>
         if (!sqlSource) {
           throw new Error(`${this}: parameterized sources not yet supported`);
         }
-        const symbol = Symbol("identifier");
+        const symbol = Symbol(identifier);
         const alias = sql.identifier(symbol);
         this.detailsBySource.set(identifier, {
           symbol,
