@@ -4661,21 +4661,13 @@ offset $2
                     codec: TYPES.float,
                   },
                 },
-                sources: {
+                sourceSpecs: {
                   FirstPartyVulnerability: {
                     source: firstPartyVulnerabilitiesSourceBuilder.get(),
-                    /*
-        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
-        pk: (alias) => [sql`${alias}.id`],
-        */
                     /* Could add attribute overrides here */
                   },
                   ThirdPartyVulnerability: {
                     source: thirdPartyVulnerabilitiesSourceBuilder.get(),
-                    /*
-        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
-        pk: (alias) => [sql`${alias}.id`],
-        */
                   },
                 },
               });

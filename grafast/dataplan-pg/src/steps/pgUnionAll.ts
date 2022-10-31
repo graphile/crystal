@@ -105,7 +105,7 @@ interface PgUnionAllStepConfig<TAttributes extends string> {
       codec: PgTypeCodec<any, any, any>;
     };
   };
-  sources: {
+  sourceSpecs: {
     [sourceName: string]: PgUnionAllSourceSpec;
   };
 }
@@ -159,7 +159,7 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
   }
 
   planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep<any> {
-    const sourceSpec = this.spec.sources[objectType.name];
+    const sourceSpec = this.spec.sourceSpecs[objectType.name];
     if (!sourceSpec) {
       // This type isn't handled; so it should never occur
       return constant(null);
@@ -335,7 +335,7 @@ export class PgUnionAllStep<TAttributes extends string>
 
       let first = true;
       this.detailsBySource = new Map();
-      for (const [identifier, sourceSpec] of Object.entries(spec.sources)) {
+      for (const [identifier, sourceSpec] of Object.entries(spec.sourceSpecs)) {
         if (first) {
           first = false;
           this.executor = sourceSpec.source.executor;
@@ -428,7 +428,9 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   where(whereSpec: PgUnionAllStepCondition<TAttributes>): void {
-    for (const [identifier, sourceSpec] of Object.entries(this.spec.sources)) {
+    for (const [identifier, sourceSpec] of Object.entries(
+      this.spec.sourceSpecs,
+    )) {
       const details = this.detailsBySource.get(identifier)!;
       const { alias: tableAlias } = details;
       const ident = sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
@@ -440,7 +442,9 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   orderBy(orderSpec: PgUnionAllStepOrder<TAttributes>): void {
-    for (const [identifier, sourceSpec] of Object.entries(this.spec.sources)) {
+    for (const [identifier, sourceSpec] of Object.entries(
+      this.spec.sourceSpecs,
+    )) {
       const details = this.detailsBySource.get(identifier)!;
       const { alias: tableAlias } = details;
       const ident = sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
@@ -736,7 +740,7 @@ export class PgUnionAllStep<TAttributes extends string>
       const tables: SQL[] = [];
 
       for (const [identifier, sourceSpec] of Object.entries(
-        this.spec.sources,
+        this.spec.sourceSpecs,
       )) {
         const details = this.detailsBySource.get(identifier)!;
         const { sqlSource, alias: tableAlias, conditions, orders } = details;
