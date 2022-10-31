@@ -66,16 +66,20 @@ export const expressionSymbol = Symbol("expression");
  * TODO: this is security critical! Be hyper vigilant when reviewing it.
  */
 function constructDestructureFunction(
-  path: (string | number)[],
+  path: (string | number | symbol)[],
   fallback: any,
 ): (_extra: ExecutionExtra, value: any) => any {
   const jitParts: string[] = [];
+  const symbols: symbol[] = [];
 
   let slowMode = false;
 
   for (let i = 0, l = path.length; i < l; i++) {
     const pathItem = path[i];
-    if (typeof pathItem === "string") {
+    if (typeof pathItem === "symbol") {
+      const symbolIndex = symbols.push(pathItem) - 1;
+      jitParts.push(`?.[symbols[${symbolIndex}]]`);
+    } else if (typeof pathItem === "string") {
       // Don't use JIT mode if we need to add hasOwnProperty checks.
       if (!slowMode && needsHasOwnPropertyCheck(pathItem)) {
         slowMode = true;
@@ -143,11 +147,12 @@ function constructDestructureFunction(
 
     // JIT this via `new Function` for great performance.
     const quicklyExtractValueAtPath = (
-      fallback !== undefined
+      fallback !== undefined || symbols.length > 0
         ? new Function(
             "fallback",
+            "symbols",
             `return (extra, value) => {${functionBody} ?? fallback}`,
-          )(fallback)
+          )(fallback, symbols)
         : new Function("extra", "value", functionBody)
     ) as any;
     quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
@@ -176,24 +181,24 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
 
   private parentStepId: number;
   allowMultipleOptimizations = true;
-  public readonly path: (string | number)[];
+  public readonly path: (string | number | symbol)[];
 
   constructor(
     parentPlan: ExecutableStep<unknown>,
-    path: (string | number)[] | string | number,
+    path: (string | number | symbol)[],
     public readonly fallback?: any,
   ) {
     super();
-    this.path = Array.isArray(path) ? path : [path];
+    this.path = path;
     this.addDependency(parentPlan);
     this.parentStepId = parentPlan.id;
     this.unbatchedExecute = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
-    return `${chalk.bold.yellow(String(this.dependencies[0]))}.${this.path.join(
-      ".",
-    )}`;
+    return `${chalk.bold.yellow(String(this.dependencies[0]))}.${this.path
+      .map((p) => String(p))
+      .join(".")}`;
   }
 
   /**
@@ -266,8 +271,12 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
  */
 export function access<TData>(
   parentPlan: ExecutableStep<unknown>,
-  path: (string | number)[] | string | number,
+  path: (string | number | symbol)[] | string | number | symbol,
   fallback?: any,
 ): AccessStep<TData> {
-  return new AccessStep<TData>(parentPlan, path, fallback);
+  return new AccessStep<TData>(
+    parentPlan,
+    Array.isArray(path) ? path : [path],
+    fallback,
+  );
 }
