@@ -79,9 +79,13 @@ function add([a, b]: [a: number, b: number]): number {
 add.isSyncAndSafe = true;
 
 type PgUnionAllStepSelect<TAttributes extends string> =
-  | { type: "attribute"; attribute: TAttributes }
   | { type: "pk" }
   | { type: "type" }
+  | {
+      type: "attribute";
+      attribute: TAttributes;
+      codec: PgTypeCodec<any, any, any, any>;
+    }
   | {
       type: "expression";
       expression: SQL;
@@ -374,7 +378,12 @@ export class PgUnionAllStep<TAttributes extends string>
     if (existingIndex >= 0) {
       return existingIndex;
     }
-    const index = this.selects.push({ type: "attribute", attribute: key }) - 1;
+    const index =
+      this.selects.push({
+        type: "attribute",
+        attribute: key,
+        codec: this.spec.attributes[key].codec,
+      }) - 1;
     return index;
   }
 
@@ -731,7 +740,7 @@ export class PgUnionAllStep<TAttributes extends string>
         const { sqlSource, alias: tableAlias, conditions, orders } = details;
 
         const pk = sourceSpec.source.uniques?.find((u) => u.isPrimary === true);
-        const outerSelects: SQL[] = [];
+        const midSelects: SQL[] = [];
         const innerSelects = this.selects.map((s, selectIndex) => {
           const [frag, codec] = ((): [SQL, PgTypeCodec<any, any, any, any>] => {
             switch (s.type) {
@@ -774,19 +783,17 @@ export class PgUnionAllStep<TAttributes extends string>
           const alias = String(selectIndex);
           const ident = sql.identifier(alias);
           const fullIdent = sql`${tableAlias}.${ident}`;
-          outerSelects.push(
-            codec.castFromPg?.(fullIdent) ?? sql`${fullIdent}::text`,
-          );
+          midSelects.push(fullIdent);
           return sql`${frag} as ${ident}`;
         });
-        outerSelects.push(rowNumberIdent);
+        midSelects.push(rowNumberIdent);
         innerSelects.push(
           sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
         );
 
         const query = sql.indent`\
 select
-${sql.indent(sql.join(outerSelects, ",\n"))}
+${sql.indent(sql.join(midSelects, ",\n"))}
 from (${sql.indent`
 select
 ${sql.indent(sql.join(innerSelects, ",\n"))}
@@ -804,12 +811,27 @@ ${this.innerLimitSQL!}
         tables.push(query);
       }
 
-      const innerQuery = sql`${sql.join(
-        tables,
-        `
+      const outerSelects = this.selects.map((select, i) => {
+        const sqlSrc = sql`x.${sql.identifier(String(i))}`;
+        const codec =
+          select.type === "type"
+            ? TYPES.text
+            : select.type === "pk"
+            ? TYPES.json
+            : select.codec;
+        return codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`;
+      });
+
+      const innerQuery = sql`\
+select
+${sql.indent(sql.join(outerSelects, ",\n"))}
+from (${sql.indent`
+${sql.join(
+  tables,
+  `
 union all
 `,
-      )}
+)}
 order by${sql.indent`
 ${
   this.outerOrderExpressions.length
@@ -820,6 +842,7 @@ ${rowNumberIdent} asc,
 ${sql.identifier(String(typeIdx))} asc\
 `}
 ${this.limitAndOffsetSQL!}
+`}) x
 `;
       return innerQuery;
     };
