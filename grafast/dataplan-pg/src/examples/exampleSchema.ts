@@ -4603,8 +4603,8 @@ export function makeExampleSchema(
             thirdPartyVulnerabilitiesSourceBuilder,
           ) =>
             function plan(_, fieldArgs) {
-              const $first = fieldArgs.get("first");
-              const $offset = fieldArgs.get("offset");
+              const $first = fieldArgs.getRaw("first");
+              const $offset = fieldArgs.getRaw("offset");
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
