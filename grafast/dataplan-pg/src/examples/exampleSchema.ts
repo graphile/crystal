@@ -2046,63 +2046,6 @@ export function makeExampleSchema(
   firstPartyVulnerabilitiesSourceBuilder.build({});
   thirdPartyVulnerabilitiesSourceBuilder.build({});
 
-  /*
-  const vulnerabilitiesSource = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
-      return new PgSourceBuilder({
-        executor,
-        selectAuth,
-        codec: recordType(
-          "vulnerability",
-          sql`anonymous_vulnerability`,
-          {
-            type: col({ codec: TYPES.text, notNull: true }), // Values: 'FirstPartyVulnerability', 'ThirdPartyVulnerability'
-            pk: col({ codec: TYPES.json, notNull: true }), // JSON array of primary keys
-            cvss_score: col({ codec: TYPES.float, notNull: true }),
-          },
-          {},
-          true,
-        ),
-        source: sql`(
-select
-  'FirstPartyVulnerability' as type,
-  json_build_array(id::text)::text as pk,
-  cvss_score,
-  rn
-from (
-  select id, cvss_score, row_number() over (partition by 1) rn
-  from first_party_vulnerabilities
-  where cvss_score > 6 -- condition
-  order by cvss_score desc, id asc -- Ensure unique order
-  limit ($1::int + $2::int) -- first+offset
-) tmp
-union all
-select
-  'ThirdPartyVulnerability' as type,
-  json_build_array(id::text)::text as pk,
-  cvss_score,
-  rn
-from (
-  select id, cvss_score, row_number() over (partition by 1) rn
-  from third_party_vulnerabilities
-  where cvss_score > 6 -- condition
-  order by cvss_score desc, id asc -- Ensure unique order
-  limit ($1::int + $2::int) -- first+offset
-) tmp
-order by 3 desc, rn asc, 1 asc -- Ensure unique order
-limit $1
-offset $2
-)`,
-        name: "third_party_vulnerabilities",
-        uniques: [
-          /* none! * /
-        ],
-      });
-    },
-    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
-  );
-  */
-
   ////////////////////////////////////////
 
   function attrField<TColumns extends PgTypeColumns>(
