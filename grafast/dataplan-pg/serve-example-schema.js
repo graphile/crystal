@@ -8,7 +8,7 @@ const withPgClient = createWithPgClient({
   connectionString: process.env.TEST_DATABASE_URL || "graphile_grafast",
 });
 const instance = grafserv(
-  { grafast: { context: { withPgClient } } },
+  { grafast: { context: { withPgClient }, explain: true } },
   { schema },
 );
 const server = createServer(instance.handler);

@@ -1,3 +1,4 @@
+import { jsonParse } from "@dataplan/json";
 import { createHash } from "crypto";
 import type {
   __InputStaticLeafStep,
@@ -140,14 +141,35 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
   };
   public isSyncAndSafe = true;
   private typeKey: number;
+  private pkKey: number;
+  private readonly spec: PgUnionAllStepConfig<string>;
   constructor($parent: PgUnionAllStep<any>, $item: ExecutableStep<any>) {
     super();
     this.addDependency($item);
+    this.spec = $parent.spec;
     this.typeKey = $parent.selectType();
+    this.pkKey = $parent.selectPk();
   }
 
   planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep<any> {
-    return this;
+    const sourceSpec = this.spec.sources[objectType.name];
+    if (!sourceSpec) {
+      // This type isn't handled; so it should never occur
+      return constant(null);
+    }
+    const pk = sourceSpec.source.uniques?.find((u) => u.isPrimary === true);
+    if (!pk) {
+      throw new Error(
+        `No PK found for ${objectType.name}; this should have been caught earlier?!`,
+      );
+    }
+    const spec = {};
+    const parsed = jsonParse(access(this, this.pkKey));
+    for (let i = 0, l = pk.columns.length; i < l; i++) {
+      const col = pk.columns[i];
+      spec[col] = access(parsed, [i]);
+    }
+    return sourceSpec.source.get(spec);
   }
 
   execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
@@ -192,7 +214,8 @@ export class PgUnionAllStep<TAttributes extends string>
 
   private detailsBySource: Map<string, SourceDetails>;
 
-  private spec: PgUnionAllStepConfig<TAttributes>;
+  /** @internal */
+  public readonly spec: PgUnionAllStepConfig<TAttributes>;
 
   private outerOrderExpressions: SQL[];
 
