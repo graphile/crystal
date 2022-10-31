@@ -48,10 +48,10 @@ import {
   resolveType,
 } from "grafast";
 import type { GraphQLOutputType } from "graphql";
-import { GraphQLFloat } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLFloat,
   GraphQLInt,
   GraphQLInterfaceType,
   GraphQLList,
@@ -2032,7 +2032,7 @@ export function makeExampleSchema(
               notNull: true,
             }),
             cvss_score: col({ codec: TYPES.float, notNull: true }),
-            team_name: col({ codec: TYPES.text, notNull: false }),
+            vendor_name: col({ codec: TYPES.text, notNull: false }),
           },
         ),
         source: sql`interfaces_and_unions.third_party_vulnerabilities`,
@@ -3810,7 +3810,28 @@ offset $2
 
   const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "FirstPartyVulnerability",
+    interfaces: [Vulnerability],
     fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("id");
+            },
+          [],
+        ),
+      },
+      name: {
+        type: new GraphQLNonNull(GraphQLString),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("name");
+            },
+          [],
+        ),
+      },
       cvssScore: {
         type: GraphQLFloat,
         plan: EXPORTABLE(
@@ -3821,18 +3842,59 @@ offset $2
           [],
         ),
       },
+      teamName: {
+        type: GraphQLString,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("team_name");
+            },
+          [],
+        ),
+      },
     },
   });
 
   const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "ThirdPartyVulnerability",
+    interfaces: [Vulnerability],
     fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("id");
+            },
+          [],
+        ),
+      },
+      name: {
+        type: new GraphQLNonNull(GraphQLString),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("name");
+            },
+          [],
+        ),
+      },
       cvssScore: {
         type: GraphQLFloat,
         plan: EXPORTABLE(
           () =>
             function plan($v: any) {
               return $v.get("cvss_score");
+            },
+          [],
+        ),
+      },
+      vendorName: {
+        type: GraphQLString,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("vendor_name");
             },
           [],
         ),
