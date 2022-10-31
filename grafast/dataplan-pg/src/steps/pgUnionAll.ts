@@ -10,9 +10,15 @@ import type {
   InputStep,
   PolymorphicStep,
 } from "grafast";
-import { reverseArray } from "grafast";
-import { isPromiseLike } from "grafast";
-import { access, constant, ExecutableStep, lambda, list } from "grafast";
+import {
+  access,
+  constant,
+  ExecutableStep,
+  isPromiseLike,
+  lambda,
+  list,
+  reverseArray,
+} from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { sql } from "pg-sql2";
@@ -25,6 +31,14 @@ import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+
+// In future we'll allow mapping columns to different attributes/types
+const sourceSpecificExpressionFromAttributeName = (
+  sourceSpec: PgUnionAllSourceSpec,
+  name: string,
+): SQL => {
+  return sql.identifier(name);
+};
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 
@@ -71,6 +85,10 @@ type PgUnionAllStepSelect<TAttributes extends string> =
       codec: PgTypeCodec<any, any, any, any>;
     };
 
+interface PgUnionAllSourceSpec {
+  source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+}
+
 interface PgUnionAllStepConfig<TAttributes extends string> {
   executor: PgExecutor;
   attributes: {
@@ -79,9 +97,7 @@ interface PgUnionAllStepConfig<TAttributes extends string> {
     };
   };
   sources: {
-    [sourceName: string]: {
-      source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
-    };
+    [sourceName: string]: PgUnionAllSourceSpec;
   };
 }
 
@@ -121,6 +137,7 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllSingleStep",
   };
+  public isSyncAndSafe = true;
   constructor($parent: PgUnionAllStep<any>, $item: ExecutableStep<any>) {
     super();
     this.addDependency($item);
@@ -133,6 +150,14 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
   execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
     return values[0];
   }
+}
+
+interface SourceDetails {
+  symbol: symbol;
+  alias: SQL;
+  conditions: SQL[];
+  orders: SQL[];
+  sqlSource: SQL;
 }
 
 /**
@@ -152,39 +177,83 @@ export class PgUnionAllStep<TAttributes extends string>
     exportName: "PgUnionAllStep",
   };
 
+  public isSyncAndSafe = false;
+
   private selects: PgUnionAllStepSelect<TAttributes>[] = [];
-  private conditions: PgUnionAllStepCondition<TAttributes>[] = [];
-  private orders: PgUnionAllStepOrder<TAttributes>[] = [];
 
   private executor!: PgExecutor;
   private contextId!: number;
 
-  constructor(private spec: PgUnionAllStepConfig<TAttributes>) {
+  private detailsBySource: Map<string, SourceDetails>;
+
+  private spec: PgUnionAllStepConfig<TAttributes>;
+
+  private outerOrderExpressions: SQL[];
+
+  constructor(cloneFrom: PgUnionAllStep<TAttributes>);
+  constructor(spec: PgUnionAllStepConfig<TAttributes>);
+  constructor(
+    specOrCloneFrom:
+      | PgUnionAllStepConfig<TAttributes>
+      | PgUnionAllStep<TAttributes>,
+  ) {
     super();
-    let first = true;
-    for (const [identifier, sourceSpec] of Object.entries(spec.sources)) {
-      if (first) {
-        first = false;
-        this.executor = sourceSpec.source.executor;
-        this.contextId = this.addDependency(this.executor.context());
-      } else {
-        if (this.executor !== sourceSpec.source.executor) {
-          throw new Error(
-            `${this}: all sources must currently come from same executor`,
-          );
+    if (specOrCloneFrom instanceof PgUnionAllStep) {
+      const cloneFrom = specOrCloneFrom;
+      this.spec = cloneFrom.spec;
+
+      this.placeholders = [...cloneFrom.placeholders];
+      this.queryValues = [...cloneFrom.queryValues];
+      this.placeholderValues = new Map(cloneFrom.placeholderValues);
+      this.queryValuesSymbol = cloneFrom.queryValuesSymbol;
+      this.outerOrderExpressions = [...cloneFrom.outerOrderExpressions];
+
+      this.detailsBySource = new Map(cloneFrom.detailsBySource);
+    } else {
+      const spec = specOrCloneFrom;
+      this.spec = spec;
+
+      this.placeholders = [];
+      this.queryValues = [];
+      this.placeholderValues = new Map();
+      this.queryValuesSymbol = Symbol("union_identifier_values");
+      this.outerOrderExpressions = [];
+
+      let first = true;
+      this.detailsBySource = new Map();
+      for (const [identifier, sourceSpec] of Object.entries(spec.sources)) {
+        if (first) {
+          first = false;
+          this.executor = sourceSpec.source.executor;
+          this.contextId = this.addDependency(this.executor.context());
+        } else {
+          if (this.executor !== sourceSpec.source.executor) {
+            throw new Error(
+              `${this}: all sources must currently come from same executor`,
+            );
+          }
         }
+        const sqlSource = sql.isSQL(sourceSpec.source.source)
+          ? sourceSpec.source.source
+          : null; // sourceSpec.source.source(/* TODO: ADD PARAMETERS! */);
+        if (!sqlSource) {
+          throw new Error(`${this}: parameterized sources not yet supported`);
+        }
+        const symbol = Symbol("identifier");
+        const alias = sql.identifier(symbol);
+        this.detailsBySource.set(identifier, {
+          symbol,
+          alias,
+          conditions: [],
+          orders: [],
+          sqlSource,
+        });
       }
     }
   }
 
-  connectionClone() {
-    const replacement = new PgUnionAllStep(this.spec);
-    replacement.conditions.push(...this.conditions);
-    replacement.orders.push(...this.orders);
-    replacement.placeholders.push(...this.placeholders);
-    replacement.queryValues.push(...this.queryValues);
-    replacement.queryValuesSymbol = this.queryValuesSymbol;
-    return replacement;
+  connectionClone(): PgUnionAllStep<TAttributes> {
+    return new PgUnionAllStep(this);
   }
 
   select<TAttribute extends TAttributes>(key: TAttribute): number {
@@ -239,12 +308,35 @@ export class PgUnionAllStep<TAttributes extends string>
     return pgPageInfo($connectionPlan);
   }
 
-  where(spec: PgUnionAllStepCondition<TAttributes>): void {
-    this.conditions.push(spec);
+  where(whereSpec: PgUnionAllStepCondition<TAttributes>): void {
+    for (const [identifier, sourceSpec] of Object.entries(this.spec.sources)) {
+      const details = this.detailsBySource.get(identifier)!;
+      const { alias: tableAlias } = details;
+      const ident = sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
+        sourceSpec,
+        whereSpec.attribute,
+      )}`;
+      details.conditions.push(whereSpec.callback(ident));
+    }
   }
 
-  orderBy(spec: PgUnionAllStepOrder<TAttributes>): void {
-    this.orders.push(spec);
+  orderBy(orderSpec: PgUnionAllStepOrder<TAttributes>): void {
+    for (const [identifier, sourceSpec] of Object.entries(this.spec.sources)) {
+      const details = this.detailsBySource.get(identifier)!;
+      const { alias: tableAlias } = details;
+      const ident = sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
+        sourceSpec,
+        orderSpec.attribute,
+      )}`;
+      details.orders.push(
+        sql`${ident} ${orderSpec.direction === "DESC" ? sql`desc` : sql`asc`}`,
+      );
+    }
+    this.outerOrderExpressions.push(
+      sql`${sql.identifier(String(this.select(orderSpec.attribute)))} ${
+        orderSpec.direction === "DESC" ? sql`desc` : sql`asc`
+      }`,
+    );
   }
 
   /**
@@ -254,20 +346,20 @@ export class PgUnionAllStep<TAttributes extends string>
    * records in the result set should be returned to which GraphQL resolvers,
    * parameters for conditions or orders, etc.
    */
-  private queryValues: Array<QueryValue> = [];
+  private queryValues: Array<QueryValue>;
 
   /**
    * If this plan has queryValues, we must feed the queryValues into the placeholders to
    * feed into the SQL statement after compiling the query; we'll use this
    * symbol as the placeholder to replace.
    */
-  private queryValuesSymbol = Symbol("union_identifier_values");
+  private queryValuesSymbol: symbol;
 
   /**
    * Values used in this plan.
    */
-  private placeholders: Array<PgUnionAllPlaceholder> = [];
-  private placeholderValues: Map<symbol, SQL> = new Map();
+  private placeholders: Array<PgUnionAllPlaceholder>;
+  private placeholderValues: Map<symbol, SQL>;
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
@@ -592,11 +684,6 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   finalize() {
-    const outerOrderExpressions = this.orders.map((o) => {
-      return sql`${sql.identifier(String(this.select(o.attribute)))} ${
-        o.direction === "DESC" ? sql`desc` : sql`asc`
-      }`;
-    });
     const typeIdx = this.selectType();
     const rowNumberAlias = "n";
     const rowNumberIdent = sql.identifier(rowNumberAlias);
@@ -607,21 +694,9 @@ export class PgUnionAllStep<TAttributes extends string>
       for (const [identifier, sourceSpec] of Object.entries(
         this.spec.sources,
       )) {
-        const sqlSource = sql.isSQL(sourceSpec.source.source)
-          ? sourceSpec.source.source
-          : null; // sourceSpec.source.source(/* TODO: ADD PARAMETERS! */);
-        if (!sqlSource) {
-          throw new Error(`${this}: parameterized sources not yet supported`);
-        }
+        const details = this.detailsBySource.get(identifier)!;
+        const { sqlSource, alias: tableAlias, conditions, orders } = details;
 
-        // In future we'll allow mapping columns to different attributes/types
-        const sourceSpecificExpressionFromAttributeName = (
-          name: string,
-        ): SQL => {
-          return sql.identifier(name);
-        };
-
-        const tableAlias = sql.identifier(identifier);
         const pk = sourceSpec.source.uniques?.find((u) => u.isPrimary === true);
         const outerSelects: SQL[] = [];
         const innerSelects = this.selects.map((s, selectIndex) => {
@@ -631,6 +706,7 @@ export class PgUnionAllStep<TAttributes extends string>
                 const attr = this.spec.attributes[s.attribute];
                 return [
                   sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
+                    sourceSpec,
                     s.attribute,
                   )}`,
                   attr.codec,
@@ -675,20 +751,6 @@ export class PgUnionAllStep<TAttributes extends string>
           sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
         );
 
-        const conditions = this.conditions.map((c) => {
-          const ident = sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
-            c.attribute,
-          )}`;
-          return c.callback(ident);
-        });
-
-        const orders = this.orders.map((c) => {
-          const ident = sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
-            c.attribute,
-          )}`;
-          return sql`${ident} ${c.direction === "DESC" ? sql`desc` : sql`asc`}`;
-        });
-
         const query = sql.indent`\
 select
 ${sql.indent(sql.join(outerSelects, ",\n"))}
@@ -701,7 +763,7 @@ ${
     ? sql`where ${sql.join(conditions, `\nand `)}\n`
     : sql.blank
 }\
-${orders.length > 0 ? sql`where ${sql.join(orders, `,\n`)}\n` : sql.blank}\
+${orders.length > 0 ? sql`order by ${sql.join(orders, `,\n`)}\n` : sql.blank}\
 ${this.innerLimitSQL!}
 `}
 ) as ${tableAlias}\
@@ -717,8 +779,8 @@ union all
       )}
 order by${sql.indent`
 ${
-  outerOrderExpressions.length
-    ? sql`${sql.join(outerOrderExpressions, ",\n")}},\n`
+  this.outerOrderExpressions.length
+    ? sql`${sql.join(this.outerOrderExpressions, ",\n")},\n`
     : sql.blank
 }\
 ${rowNumberIdent} asc,
@@ -801,6 +863,7 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
     const { text, values: rawSqlValues } = sql.compile(finalQuery, {
       placeholderValues: this.placeholderValues,
     });
+    console.log(text);
     this.finalizeResults = {
       text,
       rawSqlValues,
@@ -809,6 +872,8 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
       shouldReverseOrder: this.shouldReverseOrder(),
       name: hash(text),
     };
+
+    super.finalize();
   }
 
   async execute(
