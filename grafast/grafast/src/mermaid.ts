@@ -130,9 +130,16 @@ export function printPlanGraph(
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
       const isUnbatched = typeof (plan as any).unbatchedExecute === "function";
 
+      const polyPaths = pp(plan.polymorphicPaths);
+      const polyPathsIfDifferent =
+        plan.dependencies.length === 1 &&
+        pp(steps[plan.dependencies[0]].polymorphicPaths) === polyPaths
+          ? ""
+          : `\n${polyPaths}`;
+
       const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
         meta ? `\n<${meta}>` : ""
-      }\n${pp(plan.polymorphicPaths)}`;
+      }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
           ? ["[/", "\\]"]
