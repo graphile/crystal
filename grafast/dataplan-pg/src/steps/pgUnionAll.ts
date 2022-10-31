@@ -179,7 +179,7 @@ export class PgUnionAllStep<TAttributes extends string>
 
   public isSyncAndSafe = false;
 
-  private selects: PgUnionAllStepSelect<TAttributes>[] = [];
+  private selects: PgUnionAllStepSelect<TAttributes>[];
 
   private executor!: PgExecutor;
   private contextId!: number;
@@ -189,6 +189,82 @@ export class PgUnionAllStep<TAttributes extends string>
   private spec: PgUnionAllStepConfig<TAttributes>;
 
   private outerOrderExpressions: SQL[];
+
+  /**
+   * Since this is effectively like a DataLoader it processes the data for many
+   * different resolvers at once. This list of (hopefully scalar) plans is used
+   * to represent queryValues the query will need such as identifiers for which
+   * records in the result set should be returned to which GraphQL resolvers,
+   * parameters for conditions or orders, etc.
+   */
+  private queryValues: Array<QueryValue>;
+
+  /**
+   * If this plan has queryValues, we must feed the queryValues into the placeholders to
+   * feed into the SQL statement after compiling the query; we'll use this
+   * symbol as the placeholder to replace.
+   */
+  private queryValuesSymbol: symbol;
+
+  /**
+   * Values used in this plan.
+   */
+  private placeholders: Array<PgUnionAllPlaceholder>;
+  private placeholderValues: Map<symbol, SQL>;
+
+  // LIMIT
+
+  private first: number | null = null;
+  private last: number | null = null;
+  private fetchOneExtra = false;
+  /** When using natural pagination, this index is the lower bound (and should be excluded) */
+  private lowerIndexStepId: number | null = null;
+  /** When using natural pagination, this index is the upper bound (and should be excluded) */
+  private upperIndexStepId: number | null = null;
+  /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
+  private limitAndOffsetId: number | null = null;
+
+  // OFFSET
+
+  private offset: number | null = null;
+
+  // CURSORS
+
+  private beforeStepId: number | null = null;
+  private afterStepId: number | null = null;
+
+  /**
+   * When finalized, we build the SQL query, queryValues, and note where to feed in
+   * the relevant queryValues. This saves repeating this work at execution time.
+   */
+  private finalizeResults: {
+    // The SQL query text
+    text: string;
+
+    // The values to feed into the query
+    rawSqlValues: SQLRawValue[];
+
+    // The `DECLARE ... CURSOR` query for @stream
+    textForDeclare?: string;
+
+    // The values to feed into the `DECLARE ... CURSOR` query
+    rawSqlValuesForDeclare?: SQLRawValue[];
+
+    // If streaming, what's the initialCount
+    streamInitialCount?: number;
+
+    // The column on the result that indicates which group the result belongs to
+    identifierIndex: number | null;
+
+    // If last but not first, reverse order.
+    shouldReverseOrder: boolean;
+
+    // For prepared queries
+    name?: string;
+  } | null = null;
+
+  private limitAndOffsetSQL: SQL | null = null;
+  private innerLimitSQL: SQL | null = null;
 
   constructor(cloneFrom: PgUnionAllStep<TAttributes>);
   constructor(spec: PgUnionAllStepConfig<TAttributes>);
@@ -202,6 +278,7 @@ export class PgUnionAllStep<TAttributes extends string>
       const cloneFrom = specOrCloneFrom;
       this.spec = cloneFrom.spec;
 
+      this.selects = [...cloneFrom.selects];
       this.placeholders = [...cloneFrom.placeholders];
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
@@ -213,6 +290,7 @@ export class PgUnionAllStep<TAttributes extends string>
       const spec = specOrCloneFrom;
       this.spec = spec;
 
+      this.selects = [];
       this.placeholders = [];
       this.queryValues = [];
       this.placeholderValues = new Map();
@@ -339,28 +417,6 @@ export class PgUnionAllStep<TAttributes extends string>
     );
   }
 
-  /**
-   * Since this is effectively like a DataLoader it processes the data for many
-   * different resolvers at once. This list of (hopefully scalar) plans is used
-   * to represent queryValues the query will need such as identifiers for which
-   * records in the result set should be returned to which GraphQL resolvers,
-   * parameters for conditions or orders, etc.
-   */
-  private queryValues: Array<QueryValue>;
-
-  /**
-   * If this plan has queryValues, we must feed the queryValues into the placeholders to
-   * feed into the SQL statement after compiling the query; we'll use this
-   * symbol as the placeholder to replace.
-   */
-  private queryValuesSymbol: symbol;
-
-  /**
-   * Values used in this plan.
-   */
-  private placeholders: Array<PgUnionAllPlaceholder>;
-  private placeholderValues: Map<symbol, SQL>;
-
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
     $step: ExecutableStep<any>,
@@ -405,27 +461,6 @@ export class PgUnionAllStep<TAttributes extends string>
     // when we're inlining this into a parent query.
     return sqlPlaceholder;
   }
-
-  // LIMIT
-
-  private first: number | null = null;
-  private last: number | null = null;
-  private fetchOneExtra = false;
-  /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  private lowerIndexStepId: number | null = null;
-  /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  private upperIndexStepId: number | null = null;
-  /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
-  private limitAndOffsetId: number | null = null;
-
-  // OFFSET
-
-  private offset: number | null = null;
-
-  // CURSORS
-
-  private beforeStepId: number | null = null;
-  private afterStepId: number | null = null;
 
   // TODO: rename?
   // TODO: should this be a static method?
@@ -484,38 +519,6 @@ export class PgUnionAllStep<TAttributes extends string>
     return this;
   }
 
-  /**
-   * When finalized, we build the SQL query, queryValues, and note where to feed in
-   * the relevant queryValues. This saves repeating this work at execution time.
-   */
-  private finalizeResults: {
-    // The SQL query text
-    text: string;
-
-    // The values to feed into the query
-    rawSqlValues: SQLRawValue[];
-
-    // The `DECLARE ... CURSOR` query for @stream
-    textForDeclare?: string;
-
-    // The values to feed into the `DECLARE ... CURSOR` query
-    rawSqlValuesForDeclare?: SQLRawValue[];
-
-    // If streaming, what's the initialCount
-    streamInitialCount?: number;
-
-    // The column on the result that indicates which group the result belongs to
-    identifierIndex: number | null;
-
-    // If last but not first, reverse order.
-    shouldReverseOrder: boolean;
-
-    // For prepared queries
-    name?: string;
-  } | null = null;
-
-  private limitAndOffsetSQL: SQL | null = null;
-  private innerLimitSQL: SQL | null = null;
   private planLimitAndOffset() {
     if (this.lowerIndexStepId != null || this.upperIndexStepId != null) {
       /*
@@ -792,7 +795,7 @@ ${this.limitAndOffsetSQL!}
     };
 
     const { query: finalQuery, identifierIndex } = (() => {
-      if (this.queryValues.length > 0) {
+      if (this.queryValues.length > 0 || this.placeholders.length > 0) {
         const wrapperAlias = sql.identifier(Symbol("union_result"));
         const identifiersAlias = sql.identifier(Symbol("union_identifiers"));
         this.placeholders.forEach((placeholder) => {
