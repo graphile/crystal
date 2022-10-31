@@ -751,7 +751,7 @@ export class PgUnionAllStep<TAttributes extends string>
           sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
         );
 
-        const query = sql.indent`\
+        const query = sql`\
 select
 ${sql.indent(sql.join(outerSelects, ",\n"))}
 from (${sql.indent`
@@ -774,9 +774,11 @@ ${this.innerLimitSQL!}
       const innerQuery = sql`${sql.join(
         tables,
         `
+--
 union all
 `,
       )}
+--
 order by${sql.indent`
 ${
   this.outerOrderExpressions.length
