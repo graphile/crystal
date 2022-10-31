@@ -752,6 +752,7 @@ export class PgUnionAllStep<TAttributes extends string>
             switch (s.type) {
               case "attribute": {
                 const attr = this.spec.attributes[s.attribute];
+                // TODO: check that attr.codec is compatible with the s.codec (and if not, do the necessary casting?)
                 return [
                   sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
                     sourceSpec,
