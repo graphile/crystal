@@ -4585,6 +4585,14 @@ export function makeExampleSchema(
 
       vulnerabilities: {
         type: new GraphQLList(Vulnerability),
+        args: {
+          first: {
+            type: GraphQLInt,
+          },
+          offset: {
+            type: GraphQLInt,
+          },
+        },
         plan: EXPORTABLE(
           (
             TYPES,
@@ -4594,8 +4602,9 @@ export function makeExampleSchema(
             sql,
             thirdPartyVulnerabilitiesSourceBuilder,
           ) =>
-            function plan() {
-              // or: pgSelectUnionAll?
+            function plan(_, fieldArgs) {
+              const $first = fieldArgs.get("first");
+              const $offset = fieldArgs.get("offset");
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
@@ -4626,6 +4635,8 @@ export function makeExampleSchema(
                     TYPES.float,
                   )}`,
               });
+              $vulnerabilities.setFirst($first);
+              $vulnerabilities.setOffset($offset);
               return $vulnerabilities;
             },
           [
