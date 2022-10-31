@@ -543,19 +543,19 @@ export class PgUnionAllStep<TAttributes extends string>
     );
   }
 
-  public setFirst(first: InputStep): this {
+  public setFirst(first: InputStep | number): this {
     // TODO: don't eval
-    this.first = first.eval() ?? null;
+    this.first = typeof first === "number" ? first : first.eval() ?? null;
     return this;
   }
 
-  public setLast(last: InputStep): this {
-    this.last = last.eval() ?? null;
+  public setLast(last: InputStep | number): this {
+    this.last = typeof last === "number" ? last : last.eval() ?? null;
     return this;
   }
 
-  public setOffset(offset: InputStep): this {
-    this.offset = offset.eval() ?? null;
+  public setOffset(offset: InputStep | number): this {
+    this.offset = typeof offset === "number" ? offset : offset.eval() ?? null;
     if (this.offset !== null) {
       if (this.last != null) {
         throw new Error("Cannot use 'offset' with 'last'");
