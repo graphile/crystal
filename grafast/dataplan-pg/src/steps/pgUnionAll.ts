@@ -1,7 +1,6 @@
 import { createHash } from "crypto";
 import type {
   __InputStaticLeafStep,
-  __ItemStep,
   ConnectionCapableStep,
   ConnectionStep,
   ExecutionExtra,
@@ -11,12 +10,14 @@ import type {
   PolymorphicStep,
 } from "grafast";
 import {
+  __ItemStep,
   access,
   constant,
   ExecutableStep,
   isPromiseLike,
   lambda,
   list,
+  polymorphicWrap,
   reverseArray,
 } from "grafast";
 import type { GraphQLObjectType } from "graphql";
@@ -138,9 +139,11 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
     exportName: "PgUnionAllSingleStep",
   };
   public isSyncAndSafe = true;
+  private typeKey: number;
   constructor($parent: PgUnionAllStep<any>, $item: ExecutableStep<any>) {
     super();
     this.addDependency($item);
+    this.typeKey = $parent.selectType();
   }
 
   planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep<any> {
@@ -148,7 +151,10 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
   }
 
   execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
-    return values[0];
+    return values[0].map((v) => {
+      const type = v[this.typeKey];
+      return polymorphicWrap(type, v);
+    });
   }
 }
 
