@@ -12,6 +12,7 @@ import type {
 } from "grafast";
 import {
   __ItemStep,
+  $$data,
   access,
   constant,
   ExecutableStep,
@@ -164,10 +165,10 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
       );
     }
     const spec = {};
-    const parsed = jsonParse(access(this, this.pkKey));
+    const $parsed = jsonParse(access(this, [$$data, this.pkKey]));
     for (let i = 0, l = pk.columns.length; i < l; i++) {
       const col = pk.columns[i];
-      spec[col] = access(parsed, [i]);
+      spec[col] = access($parsed, [i]);
     }
     return sourceSpec.source.get(spec);
   }
