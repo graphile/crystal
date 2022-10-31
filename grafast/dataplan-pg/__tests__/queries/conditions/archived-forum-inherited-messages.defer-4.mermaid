@@ -97,7 +97,7 @@ graph TD
     PgSelectSingle85 --> PgClassExpression86
 
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-4"
-    Bucket0("Bucket 0 (root)<br />1:  / Access[18],Access[19],Connection[38],Object[20]<br />2: PgSelect[17]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 18, 19, 38, 20<br />2: PgSelect[17]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,Connection38 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 38, 20<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
@@ -115,7 +115,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 42, 20<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[42]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (defer)<br />Deps: 42, 20<br /><br />1:  / PgClassExpression[43],PgClassExpression[44]<br />2: PgSelect[45] / First[49],PgSelectSingle[50]"):::bucket
+    Bucket6("Bucket 6 (defer)<br />Deps: 42, 20<br /><br />1: <br />ᐳ: 43, 44<br />2: PgSelect[45]<br />ᐳ: First[49], PgSelectSingle[50]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression43,PgClassExpression44,PgSelect45,First49,PgSelectSingle50 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 50<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[50]"):::bucket
