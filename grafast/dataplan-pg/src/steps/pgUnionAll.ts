@@ -35,6 +35,8 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
+const castAlias = sql.identifier(Symbol("union"));
+
 // In future we'll allow mapping columns to different attributes/types
 const sourceSpecificExpressionFromAttributeName = (
   sourceSpec: PgUnionAllSourceSpec,
@@ -791,10 +793,9 @@ export class PgUnionAllStep<TAttributes extends string>
           sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
         );
 
-        const query = sql.indent`\
-select
-${sql.indent(sql.join(midSelects, ",\n"))}
-from (${sql.indent`
+        // Can't order individual selects in a `union all` so we're using
+        // subqueries to do so.
+        const innerQuery = sql.indent`
 select
 ${sql.indent(sql.join(innerSelects, ",\n"))}
 from ${sqlSource} as ${tableAlias}
@@ -805,14 +806,19 @@ ${
 }\
 ${orders.length > 0 ? sql`order by ${sql.join(orders, `,\n`)}\n` : sql.blank}\
 ${this.innerLimitSQL!}
-`}
-) as ${tableAlias}\
+`;
+
+        // Relies on Postgres maintaining the order of the subquery
+        const query = sql.indent`\
+select
+${sql.indent(sql.join(midSelects, ",\n"))}
+from (${innerQuery}) as ${tableAlias}\
 `;
         tables.push(query);
       }
 
       const outerSelects = this.selects.map((select, i) => {
-        const sqlSrc = sql`x.${sql.identifier(String(i))}`;
+        const sqlSrc = sql`${castAlias}.${sql.identifier(String(i))}`;
         const codec =
           select.type === "type"
             ? TYPES.text
@@ -822,10 +828,9 @@ ${this.innerLimitSQL!}
         return codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`;
       });
 
-      const innerQuery = sql`\
-select
-${sql.indent(sql.join(outerSelects, ",\n"))}
-from (${sql.indent`
+      // Union must be ordered _before_ applying `::text`/etc transforms to
+      // select, so we wrap this with another select.
+      const unionQuery = sql.indent`
 ${sql.join(
   tables,
   `
@@ -842,7 +847,13 @@ ${rowNumberIdent} asc,
 ${sql.identifier(String(typeIdx))} asc\
 `}
 ${this.limitAndOffsetSQL!}
-`}) x
+`;
+
+      // Adds all the `::text`/etc casting
+      const innerQuery = sql`\
+select
+${sql.indent(sql.join(outerSelects, ",\n"))}
+from (${unionQuery}) ${castAlias}
 `;
       return innerQuery;
     };
