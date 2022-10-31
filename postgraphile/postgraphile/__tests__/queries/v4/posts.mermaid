@@ -109,7 +109,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,Connection31 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 31<br /><br />ROOT Connectionᐸ27ᐳ[31]<br />1:  / Access[28],Access[29],Connection[91],PgPageInfo[106],Object[30]<br />2: PgSelect[32]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 31<br /><br />ROOT Connectionᐸ27ᐳ[31]<br />1: <br />ᐳ: 28, 29, 91, 106, 30<br />2: PgSelect[32]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access28,Access29,Object30,PgSelect32,Connection91,PgPageInfo106 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 91, 106<br /><br />ROOT __Item{2}ᐸ32ᐳ[33]"):::bucket
@@ -118,7 +118,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 34, 91, 106<br /><br />ROOT PgSelectSingle{2}ᐸpostᐳ[34]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor35,PgClassExpression36,List37,PgClassExpression39,PgClassExpression43,PgSelectSingle50,Map119 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 50, 119, 91, 106<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[50]<br />1:  / PgClassExpression[51],PgClassExpression[52],PgClassExpression[54],Map[116],Access[118],Access[115],PgSelectSingle[61],First[103],PgSelectSingle[104],PgClassExpression[105],First[108],PgSelectSingle[109],PgClassExpression[111],List[112],PgCursor[110]<br />2: __ListTransform[93]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 50, 119, 91, 106<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[50]<br />1: <br />ᐳ: 51, 52, 54, 116, 118, 115, 61, 103, 104, 105, 108, 109, 111, 112, 110<br />2: __ListTransform[93]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression51,PgClassExpression52,PgClassExpression54,PgSelectSingle61,__ListTransform93,First103,PgSelectSingle104,PgClassExpression105,First108,PgSelectSingle109,PgCursor110,PgClassExpression111,List112,Access115,Map116,Access118 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgSelectSingle{4}ᐸperson_first_postᐳ[61]"):::bucket

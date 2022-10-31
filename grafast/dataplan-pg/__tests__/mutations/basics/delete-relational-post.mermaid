@@ -105,7 +105,7 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDelete9 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgDelete{1}[9]<br />1:  / PgClassExpression[13],PgClassExpression[14]<br />2: PgSelect[15] / First[19],PgSelectSingle[20]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgDelete{1}[9]<br />1: <br />ᐳ: 13, 14<br />2: PgSelect[15]<br />ᐳ: First[19], PgSelectSingle[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13,PgClassExpression14,PgSelect15,First19,PgSelectSingle20 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[20]"):::bucket
@@ -117,7 +117,7 @@ graph TD
     Bucket5("Bucket 5 (mutationField)<br />Deps: 12, 50"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgDelete51 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 12<br /><br />ROOT PgDelete{5}[51]<br />1:  / PgClassExpression[55],PgClassExpression[56]<br />2: PgSelect[57] / First[61],PgSelectSingle[62]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 12<br /><br />ROOT PgDelete{5}[51]<br />1: <br />ᐳ: 55, 56<br />2: PgSelect[57]<br />ᐳ: First[61], PgSelectSingle[62]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 62<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]"):::bucket

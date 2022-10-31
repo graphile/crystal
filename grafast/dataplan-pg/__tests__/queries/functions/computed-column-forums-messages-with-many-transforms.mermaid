@@ -65,13 +65,13 @@ graph TD
     PgSelectSingle46 --> PgClassExpression48
 
     subgraph "Buckets for queries/functions/computed-column-forums-messages-with-many-transforms"
-    Bucket0("Bucket 0 (root)<br />1:  / Access[18],Access[19],Object[20]<br />2: PgSelect[17], PgSelect[24]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[18], Access[19], Object[20]<br />2: PgSelect[17], PgSelect[24]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value3,__Value5,PgSelect17,Access18,Access19,Object20,PgSelect24 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 24<br /><br />ROOT __Item{1}ᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item21,PgSelectSingle22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 24<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]<br />1:  / PgClassExpression[23],PgClassExpression[32]<br />2: __ListTransform[28]<br />3: __ListTransform[35] / Lambda[39]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 24<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]<br />1: <br />ᐳ: 23, 32<br />2: __ListTransform[28]<br />3: __ListTransform[35]<br />ᐳ: Lambda[39]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression23,__ListTransform28,PgClassExpression32,__ListTransform35,Lambda39 bucket2
     Bucket3("Bucket 3 (subroutine)<br />Deps: 32<br /><br />ROOT Lambda{3}[34]"):::bucket

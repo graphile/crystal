@@ -130,9 +130,16 @@ export function printPlanGraph(
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
       const isUnbatched = typeof (plan as any).unbatchedExecute === "function";
 
+      const polyPaths = pp(plan.polymorphicPaths);
+      const polyPathsIfDifferent =
+        plan.dependencies.length === 1 &&
+        pp(steps[plan.dependencies[0]].polymorphicPaths) === polyPaths
+          ? ""
+          : `\n${polyPaths}`;
+
       const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
         meta ? `\n<${meta}>` : ""
-      }\n${pp(plan.polymorphicPaths)}`;
+      }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
         plan instanceof __ItemStep
           ? ["[/", "\\]"]
@@ -293,14 +300,25 @@ function startSteps(layerPlan: LayerPlan) {
   function shortStep({ step }: { step: ExecutableStep }) {
     return `${step.constructor.name?.replace(/Step$/, "") ?? ""}[${step.id}]`;
   }
+  function shortSteps(steps: Array<{ step: ExecutableStep }> | undefined) {
+    if (!steps) {
+      return "";
+    }
+    const str = steps.map(shortStep).join(", ");
+    if (str.length < 40) {
+      return str;
+    } else {
+      return steps.map((s) => s.step.id).join(", ");
+    }
+  }
   return layerPlan.phases.length === 1
     ? ``
     : `\n${layerPlan.phases
         .map(
           (phase, i) =>
-            `${i + 1}: ${phase.normalSteps?.map(shortStep).join(", ") ?? ""}${
+            `${i + 1}: ${shortSteps(phase.normalSteps)}${
               phase.unbatchedSyncAndSafeSteps
-                ? ` / ${phase.unbatchedSyncAndSafeSteps.map(shortStep)}`
+                ? `\n>: ${shortSteps(phase.unbatchedSyncAndSafeSteps)}`
                 : ""
             }`,
         )
