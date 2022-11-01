@@ -1445,7 +1445,7 @@ export class OperationPlan {
     } else {
       const layerPlan = new LayerPlan(
         this,
-        $step.layerPlan,
+        parentLayerPlan,
         {
           type: "polymorphic",
           typeNames: allPossibleObjectTypes.map((t) => t.name),
