@@ -395,7 +395,9 @@ lateral (
     __person__."user_mac"::text as "6",
     __person_identifiers__.idx as "7"
   from "c"."person" as __person__
-  where (__person__."id" < __person_identifiers__."id0")
+  where (
+    __person__."id" < __person_identifiers__."id0"
+  )
   order by __person__."id" asc
 ) as __person_result__;
 
@@ -417,7 +419,9 @@ lateral (
     __person__."user_mac"::text as "6",
     __person_identifiers__.idx as "7"
   from "c"."person" as __person__
-  where (__person__."id" > __person_identifiers__."id0")
+  where (
+    __person__."id" > __person_identifiers__."id0"
+  )
   order by __person__."id" asc
 ) as __person_result__;
 
@@ -439,7 +443,9 @@ lateral (
     __person__."user_mac"::text as "6",
     __person_identifiers__.idx as "7"
   from "c"."person" as __person__
-  where (__person__."id" < __person_identifiers__."id0")
+  where (
+    __person__."id" < __person_identifiers__."id0"
+  )
   order by __person__."id" desc
   limit 3
 ) as __person_result__;
@@ -462,7 +468,9 @@ lateral (
     __person__."user_mac"::text as "6",
     __person_identifiers__.idx as "7"
   from "c"."person" as __person__
-  where (__person__."id" > __person_identifiers__."id0")
+  where (
+    __person__."id" > __person_identifiers__."id0"
+  )
   order by __person__."id" asc
   limit 2
 ) as __person_result__;
@@ -485,7 +493,9 @@ lateral (
     __person__."user_mac"::text as "6",
     __person_identifiers__.idx as "7"
   from "c"."person" as __person__
-  where (__person__."id" > __person_identifiers__."id0")
+  where (
+    __person__."id" > __person_identifiers__."id0"
+  )
   order by __person__."id" desc
   limit 2
 ) as __person_result__;

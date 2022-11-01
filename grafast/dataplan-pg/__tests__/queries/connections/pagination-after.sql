@@ -29,7 +29,9 @@ lateral (
   where
     (
       __messages__.archived_at is null
-    ) and (__messages__."id" > __messages_identifiers__."id0") and (
+    ) and (
+      __messages__."id" > __messages_identifiers__."id0"
+    ) and (
       true /* authorization checks */
     )
   order by __messages__."id" asc
