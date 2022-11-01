@@ -45,6 +45,10 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
+function isNotNullish<T>(v: T | null | undefined): v is T {
+  return v != null;
+}
+
 const castAlias = sql.identifier(Symbol("union"));
 
 // In future we'll allow mapping columns to different attributes/types
@@ -102,6 +106,10 @@ type PgUnionAllStepSelect<TAttributes extends string> =
       type: "expression";
       expression: SQL;
       codec: PgTypeCodec<any, any, any, any>;
+    }
+  | {
+      type: "outerExpression";
+      expression: SQL;
     };
 
 export interface PgUnionAllSourceSpec {
@@ -373,6 +381,15 @@ export class PgUnionAllStep<TAttributes extends string>
       const cloneFrom = specOrCloneFrom;
       this.spec = cloneFrom.spec;
 
+      cloneFrom.dependencies.forEach((planId, idx) => {
+        const myIdx = this.addDependency(this.getStep(planId));
+        if (myIdx !== idx) {
+          throw new Error(
+            `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
+          );
+        }
+      });
+
       this.selects = [...cloneFrom.selects];
       this.placeholders = [...cloneFrom.placeholders];
       this.queryValues = [...cloneFrom.queryValues];
@@ -381,6 +398,8 @@ export class PgUnionAllStep<TAttributes extends string>
       this.orders = [...cloneFrom.orders];
 
       this.detailsBySource = new Map(cloneFrom.detailsBySource);
+      this.contextId = cloneFrom.contextId;
+      this.executor = cloneFrom.executor;
     } else {
       const spec = specOrCloneFrom;
       this.spec = spec;
@@ -429,9 +448,7 @@ export class PgUnionAllStep<TAttributes extends string>
     return new PgUnionAllStep(this);
   }
 
-  selectAndReturnIndex<TAttribute extends TAttributes>(
-    key: TAttribute,
-  ): number {
+  select<TAttribute extends TAttributes>(key: TAttribute): number {
     if (!Object.prototype.hasOwnProperty.call(this.spec.attributes, key)) {
       throw new Error(`Attribute '${key}' unknown`);
     }
@@ -446,6 +463,23 @@ export class PgUnionAllStep<TAttributes extends string>
         type: "attribute",
         attribute: key,
         codec: this.spec.attributes[key].codec,
+      }) - 1;
+    return index;
+  }
+
+  selectAndReturnIndex(fragment: SQL): number {
+    const existingIndex = this.selects.findIndex(
+      (s) =>
+        s.type === "outerExpression" &&
+        sql.isEquivalent(s.expression, fragment),
+    );
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+    const index =
+      this.selects.push({
+        type: "outerExpression",
+        expression: fragment,
       }) - 1;
     return index;
   }
@@ -517,9 +551,7 @@ export class PgUnionAllStep<TAttributes extends string>
       );
     }
     this.orders.push({
-      fragment: sql.identifier(
-        String(this.selectAndReturnIndex(orderSpec.attribute)),
-      ),
+      fragment: sql.identifier(String(this.select(orderSpec.attribute))),
       direction: orderSpec.direction,
       codec: this.spec.attributes[orderSpec.attribute].codec,
     });
@@ -841,52 +873,64 @@ export class PgUnionAllStep<TAttributes extends string>
 
         const pk = sourceSpec.source.uniques?.find((u) => u.isPrimary === true);
         const midSelects: SQL[] = [];
-        const innerSelects = this.selects.map((s, selectIndex) => {
-          const [frag, codec] = ((): [SQL, PgTypeCodec<any, any, any, any>] => {
-            switch (s.type) {
-              case "attribute": {
-                const attr = this.spec.attributes[s.attribute];
-                // TODO: check that attr.codec is compatible with the s.codec (and if not, do the necessary casting?)
-                return [
-                  sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
-                    sourceSpec,
-                    s.attribute,
-                  )}`,
-                  attr.codec,
-                ];
-              }
-              case "type": {
-                return [sql.literal(identifier), TYPES.text];
-              }
-              case "pk": {
-                if (!pk) {
-                  throw new Error(`No PK for ${identifier} source in ${this}`);
+        const innerSelects = this.selects
+          .map((s, selectIndex) => {
+            const r = ((): [SQL, PgTypeCodec<any, any, any, any>] | null => {
+              switch (s.type) {
+                case "attribute": {
+                  const attr = this.spec.attributes[s.attribute];
+                  // TODO: check that attr.codec is compatible with the s.codec (and if not, do the necessary casting?)
+                  return [
+                    sql`${tableAlias}.${sourceSpecificExpressionFromAttributeName(
+                      sourceSpec,
+                      s.attribute,
+                    )}`,
+                    attr.codec,
+                  ];
                 }
-                return [
-                  sql`json_build_array(${sql.join(
-                    pk.columns.map(
-                      (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
-                    ),
-                    ",",
-                  )})`,
-                  TYPES.json,
-                ];
+                case "type": {
+                  return [sql.literal(identifier), TYPES.text];
+                }
+                case "pk": {
+                  if (!pk) {
+                    throw new Error(
+                      `No PK for ${identifier} source in ${this}`,
+                    );
+                  }
+                  return [
+                    sql`json_build_array(${sql.join(
+                      pk.columns.map(
+                        (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
+                      ),
+                      ",",
+                    )})`,
+                    TYPES.json,
+                  ];
+                }
+                case "expression": {
+                  return [s.expression, s.codec];
+                }
+                case "outerExpression": {
+                  // Only applies on outside
+                  return null;
+                }
+                default: {
+                  const never: never = s;
+                  throw new Error(`Couldn't match ${(never as any).type}`);
+                }
               }
-              case "expression": {
-                return [s.expression, s.codec];
-              }
-              default: {
-                const never: never = s;
-                throw new Error(`Couldn't match ${(never as any).type}`);
-              }
+            })();
+            if (!r) {
+              return r;
             }
-          })();
-          const alias = String(selectIndex);
-          const ident = sql.identifier(alias);
-          const fullIdent = sql`${tableAlias}.${ident}`;
-          midSelects.push(fullIdent);
-          return sql`${frag} as ${ident}`;
-        });
+            const [frag, codec] = r;
+            const alias = String(selectIndex);
+            const ident = sql.identifier(alias);
+            const fullIdent = sql`${tableAlias}.${ident}`;
+            midSelects.push(fullIdent);
+            return sql`${frag} as ${ident}`;
+          })
+          .filter(isNotNullish);
         midSelects.push(rowNumberIdent);
         innerSelects.push(
           sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
@@ -917,14 +961,20 @@ from (${innerQuery}) as ${tableAlias}\
       }
 
       const outerSelects = this.selects.map((select, i) => {
-        const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
-        const codec =
-          select.type === "type"
-            ? TYPES.text
-            : select.type === "pk"
-            ? TYPES.json
-            : select.codec;
-        return codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`;
+        if (select.type === "outerExpression") {
+          return sql`${select.expression} as ${sql.identifier(String(i))}`;
+        } else {
+          const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
+          const codec =
+            select.type === "type"
+              ? TYPES.text
+              : select.type === "pk"
+              ? TYPES.json
+              : select.codec;
+          return sql`${
+            codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
+          } as ${sql.identifier(String(i))}`;
+        }
       });
 
       // Union must be ordered _before_ applying `::text`/etc transforms to
@@ -1061,7 +1111,7 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
 
     const contexts = values[this.contextId];
     if (!contexts) {
-      throw new Error("No contexts");
+      throw new Error("We have no context dependency?");
     }
 
     const executionResult = await this.spec.executor.executeWithCache(

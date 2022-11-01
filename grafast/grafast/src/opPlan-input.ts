@@ -109,6 +109,13 @@ function withFieldArgsForArgumentsOrInputObject<
 
     let parentType = typeContainingFields;
     let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
+    if (!argOrField) {
+      throw new Error(
+        `Attempted to access non-existant arg '${argName}' (known args: ${Object.keys(
+          fields,
+        ).join(", ")}) at ${operationPlan.loc.join(" > ")}`,
+      );
+    }
     let type = getNullableType(argOrField.type);
 
     while (path.length > 0) {

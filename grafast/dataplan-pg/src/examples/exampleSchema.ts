@@ -3923,6 +3923,42 @@ export function makeExampleSchema(
     },
   });
 
+  const VulnerabilitiesOrderBy = new GraphQLEnumType({
+    name: "VulnerabilitiesOrderBy",
+    values: {
+      CVSS_SCORE_ASC: {
+        extensions: {
+          graphile: {
+            applyPlan: EXPORTABLE(
+              () => (step: PgUnionAllStep<any>) => {
+                step.orderBy({
+                  attribute: "cvss_score",
+                  direction: "ASC",
+                });
+              },
+              [],
+            ),
+          },
+        },
+      },
+      CVSS_SCORE_DESC: {
+        extensions: {
+          graphile: {
+            applyPlan: EXPORTABLE(
+              () => (step: PgUnionAllStep<any>) => {
+                step.orderBy({
+                  attribute: "cvss_score",
+                  direction: "DESC",
+                });
+              },
+              [],
+            ),
+          },
+        },
+      },
+    },
+  });
+
   ////////////////////////////////////////
 
   const Query = newObjectTypeBuilder<
@@ -4744,26 +4780,6 @@ export function makeExampleSchema(
               [],
             ),
           },
-          filter: {
-            type: MessageFilter,
-            applyPlan: EXPORTABLE(
-              (ClassFilterStep) =>
-                function plan(
-                  _$root: any,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
-                ) {
-                  const $messages = $connection.getSubplan();
-                  return new ClassFilterStep(
-                    $messages.wherePlan(),
-                    $messages.alias,
-                  );
-                },
-              [ClassFilterStep],
-            ),
-          },
-          includeArchived: makeIncludeArchivedArg<
-            PgConnectionPlanFromSource<typeof messageSource>
-          >(($connection) => $connection.getSubplan()),
           first: {
             type: GraphQLInt,
             applyPlan: EXPORTABLE(
@@ -4789,6 +4805,21 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          offset: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setOffset(arg.getRaw());
                   return null;
                 },
               [],
@@ -4825,21 +4856,24 @@ export function makeExampleSchema(
             ),
           },
           orderBy: {
-            type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
+            type: new GraphQLList(new GraphQLNonNull(VulnerabilitiesOrderBy)),
             applyPlan: EXPORTABLE(
-              (MessagesOrderBy, getEnumValueConfig, inspect) =>
+              (VulnerabilitiesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   arg,
                 ) {
-                  const $messages = $connection.getSubplan();
+                  const $collection = $connection.getSubplan();
                   const val = arg.getRaw().eval();
                   if (!Array.isArray(val)) {
                     throw new Error("Invalid!");
                   }
                   val.forEach((order) => {
-                    const config = getEnumValueConfig(MessagesOrderBy, order);
+                    const config = getEnumValueConfig(
+                      VulnerabilitiesOrderBy,
+                      order,
+                    );
                     const plan = config?.extensions?.graphile?.applyPlan;
                     if (typeof plan !== "function") {
                       console.error(
@@ -4851,26 +4885,23 @@ export function makeExampleSchema(
                         "Internal server error: invalid orderBy configuration",
                       );
                     }
-                    plan($messages);
+                    plan($collection);
                   });
                   return null;
                 },
-              [MessagesOrderBy, getEnumValueConfig, inspect],
+              [VulnerabilitiesOrderBy, getEnumValueConfig, inspect],
             ),
           },
         },
         plan: EXPORTABLE(
           (
             TYPES,
-            constant,
+            connection,
             firstPartyVulnerabilitiesSourceBuilder,
             pgUnionAll,
-            sql,
             thirdPartyVulnerabilitiesSourceBuilder,
           ) =>
-            function plan(_, fieldArgs) {
-              const $first = fieldArgs.getRaw("first");
-              const $offset = fieldArgs.getRaw("offset");
+            function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
@@ -4889,28 +4920,13 @@ export function makeExampleSchema(
                   },
                 },
               });
-              $vulnerabilities.orderBy({
-                attribute: "cvss_score",
-                direction: "DESC",
-              });
-              $vulnerabilities.where({
-                attribute: "cvss_score",
-                callback: (alias) =>
-                  sql`${alias} > ${$vulnerabilities.placeholder(
-                    constant(6),
-                    TYPES.float,
-                  )}`,
-              });
-              $vulnerabilities.setFirst($first);
-              $vulnerabilities.setOffset($offset);
-              return $vulnerabilities;
+              return connection($vulnerabilities);
             },
           [
             TYPES,
-            constant,
+            connection,
             firstPartyVulnerabilitiesSourceBuilder,
             pgUnionAll,
-            sql,
             thirdPartyVulnerabilitiesSourceBuilder,
           ],
         ),

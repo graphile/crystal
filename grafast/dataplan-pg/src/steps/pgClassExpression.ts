@@ -18,7 +18,7 @@ import type {
 import { PgDeleteStep } from "./pgDelete.js";
 import { PgInsertStep } from "./pgInsert.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
+import { PgUnionAllSingleStep } from "./pgUnionAll.js";
 import { PgUpdateStep } from "./pgUpdate.js";
 
 // const debugPlan = debugFactory("datasource:pg:PgClassExpressionStep:plan");
@@ -195,10 +195,11 @@ export class PgClassExpressionStep<
       !(step instanceof PgSelectSingleStep) &&
       !(step instanceof PgInsertStep) &&
       !(step instanceof PgUpdateStep) &&
-      !(step instanceof PgDeleteStep)
+      !(step instanceof PgDeleteStep) &&
+      !(step instanceof PgUnionAllSingleStep)
     ) {
       throw new Error(
-        `Expected ${step} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep`,
+        `Expected ${step} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep | PgUnionAllSingleStep`,
       );
     }
     return step;
