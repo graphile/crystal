@@ -259,7 +259,7 @@ interface SourceDetails {
   symbol: symbol;
   alias: SQL;
   conditions: SQL[];
-  orders: SQL[];
+  orders: PgOrderSpec[];
   sqlSource: SQL;
 }
 
@@ -295,6 +295,18 @@ export class PgUnionAllStep<TAttributes extends string>
   public readonly spec: PgUnionAllStepConfig<TAttributes>;
 
   private orders: Array<PgOrderSpec>;
+  /**
+   * `ordersForCursor` is the same as `orders`, but then with the type and
+   * primary key added. This ensures unique ordering, as required by cursor
+   * pagination.
+   *
+   * When the non-type, non-pk orders have the same values, then the entries
+   * will be in `type` and then `pk` order; so if we want the results "after" a
+   * particular `type`/`pk` then all identical types "before" (alphabetically)
+   * this type can be excluded; for exactly this `type` we should only include
+   * entries with `pk` higher than the given `pk`, and for all other `type`s we
+   * can include all records.
+   */
   private ordersForCursor: Array<PgOrderSpec>;
 
   /**
@@ -619,9 +631,11 @@ export class PgUnionAllStep<TAttributes extends string>
         sourceSpec,
         orderSpec.attribute,
       )}`;
-      details.orders.push(
-        sql`${ident} ${orderSpec.direction === "DESC" ? sql`desc` : sql`asc`}`,
-      );
+      details.orders.push({
+        fragment: ident,
+        direction: orderSpec.direction,
+        codec: this.spec.attributes[orderSpec.attribute].codec,
+      });
     }
     this.orders.push({
       fragment: sql.identifier(String(this.select(orderSpec.attribute))),
@@ -705,53 +719,82 @@ export class PgUnionAllStep<TAttributes extends string>
       return;
     }
 
-    const condition = (i = 0): SQL => {
-      const order = orders[i];
-      // Codec is responsible for performing validation/coercion and throwing
-      // error if value is invalid.
-      // TODO: make sure this ^ is clear in the relevant places.
-      /*
-          const sqlValue = sql`${sql.value(
-            (void 0 /* forbid relying on `this` * /, order.codec.toPg)(
-              this.placeholder(access($parsedCursorPlan, [i + 1]), sql`text`),
-            ),
-          )}::${order.codec.sqlType}`;
-          */
-      const sqlValue = this.placeholder(
-        toPg(access($parsedCursorPlan, [i + 1]), order.codec),
-        order.codec,
-      );
-      // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
-      const gt =
-        (order.direction === "ASC" && beforeOrAfter === "after") ||
-        (order.direction === "DESC" && beforeOrAfter === "before");
-
-      let fragment = sql`${order.fragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
-
-      if (i < orderCount - 1) {
-        fragment = sql`(${fragment}) or (${
-          order.fragment
-        } = ${sqlValue} and ${condition(i + 1)})`;
-      }
-
-      return sql.parens(fragment);
-    };
-
     /*
-     * We used to allow the cursor to be null or string; but we now _only_ run
-     * this code when the `evalIs(null) || evalIs(undefined)` returns false. So
-     * we know that the cursor must exist, so therefore we don't need to add
-     * this extra condition.
-    // If the cursor is null then no condition is needed
-    const cursorIsNullPlaceholder = this.placeholder(
-      lambda($parsedCursorPlan, (cursor) => cursor == null),
-      TYPES.boolean
-    );
-    const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
+    const pkOrder = orders[orderCount - 1];
+    const typeOrder = orders[orderCount - 2];
+    const mainOrders = orders.slice(0, orderCount - 2);
     */
-    const finalCondition = condition();
 
-    this.where(finalCondition);
+    for (const [identifier, sourceSpec] of Object.entries(
+      this.spec.sourceSpecs,
+    )) {
+      const details = this.detailsBySource.get(identifier)!;
+      const pk = sourceSpec.source.uniques?.find((u) => u.isPrimary === true);
+      if (!pk) {
+        throw new Error("No primary key; this should have been caught earlier");
+      }
+      const max = orderCount - 1 + pk.columns.length;
+      const pkPlaceholder = this.placeholder(
+        toPg(access($parsedCursorPlan, [orderCount - 1 + 1]), TYPES.json),
+        TYPES.json,
+      );
+      const pkColumns = sourceSpec.source.codec.columns as PgTypeColumns;
+      const condition = (i = 0): SQL => {
+        const order = details.orders[i];
+        const [orderFragment, sqlValue, direction] = (() => {
+          if (i >= orderCount - 1) {
+            // PK
+            const pkCol = pk.columns[i - (orderCount - 1)];
+            return [
+              sql`${details.alias}.${sql.identifier(pkCol)}`,
+              // TODO: this is not the correct way of casting.
+              sql`(${pkPlaceholder}->>${sql.literal(i)})::${
+                pkColumns[pkCol].codec.sqlType
+              }`,
+              "ASC", // TODO: when paginating backwards, this should be `DESC` instead.
+            ];
+          } else if (i === orderCount - 2) {
+            // Type
+            return [
+              sql.literal(identifier),
+              this.placeholder(
+                toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
+                TYPES.text,
+              ),
+              "ASC",
+            ];
+          } else {
+            return [
+              order.fragment,
+              this.placeholder(
+                toPg(access($parsedCursorPlan, [i + 1]), order.codec),
+                order.codec,
+              ),
+              order.direction,
+            ];
+          }
+        })();
+        // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+        const gt =
+          (direction === "ASC" && beforeOrAfter === "after") ||
+          (direction === "DESC" && beforeOrAfter === "before");
+
+        let fragment = sql`${orderFragment} ${
+          gt ? sql`>` : sql`<`
+        } ${sqlValue}`;
+
+        if (i < max - 1) {
+          fragment = sql`(${fragment}) or (${orderFragment} = ${sqlValue} and ${condition(
+            i + 1,
+          )})`;
+        }
+
+        return sql.parens(fragment);
+      };
+
+      const finalCondition = condition();
+      details.conditions.push(finalCondition);
+    }
   }
 
   // TODO: rename?
@@ -1111,7 +1154,18 @@ ${
     ? sql`where ${sql.join(conditions, `\nand `)}\n`
     : sql.blank
 }\
-${orders.length > 0 ? sql`order by ${sql.join(orders, `,\n`)}\n` : sql.blank}\
+${
+  orders.length > 0
+    ? sql`order by ${sql.join(
+        orders.map((orderSpec) => {
+          return sql`${orderSpec.fragment} ${
+            orderSpec.direction === "DESC" ? sql`desc` : sql`asc`
+          }`;
+        }),
+        `,\n`,
+      )}\n`
+    : sql.blank
+}\
 ${this.innerLimitSQL!}
 `;
 
