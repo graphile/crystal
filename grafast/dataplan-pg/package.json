@@ -21,7 +21,7 @@
     "test": "yarn test:install-schema && jest -i",
     "posttest": "ts-node ./scripts/exportExampleSchema.ts && node ./scripts/runExampleSchema.mjs",
     "prepack": "tsc -b",
-    "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --enable-source-maps serve-example-schema.js'"
+    "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --inspect --enable-source-maps serve-example-schema.js'"
   },
   "repository": {
     "type": "git",
