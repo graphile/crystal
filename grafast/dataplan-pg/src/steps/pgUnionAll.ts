@@ -10,8 +10,8 @@ import type {
   InputStep,
   PolymorphicStep,
 } from "grafast";
-import { __ItemStep, ModifierStep } from "grafast";
 import {
+  __ItemStep,
   $$data,
   access,
   constant,
@@ -19,6 +19,7 @@ import {
   isPromiseLike,
   lambda,
   list,
+  ModifierStep,
   polymorphicWrap,
   reverseArray,
 } from "grafast";
@@ -37,8 +38,6 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import type { PgConditionCapableParentStep } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
