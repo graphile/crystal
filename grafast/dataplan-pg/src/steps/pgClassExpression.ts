@@ -18,6 +18,7 @@ import type {
 import { PgDeleteStep } from "./pgDelete.js";
 import { PgInsertStep } from "./pgInsert.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
 import { PgUpdateStep } from "./pgUpdate.js";
 
 // const debugPlan = debugFactory("datasource:pg:PgClassExpressionStep:plan");
@@ -70,22 +71,12 @@ export class PgClassExpressionStep<
    */
   private attrIndex: number | null = null;
 
-  public readonly source: PgSource<
-    TSourceColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >;
-
   public readonly expression: SQL;
 
   constructor(
-    $table: PgClassSingleStep<
-      TSourceColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >,
+    $table:
+      | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
+      | PgUnionAllSingleStep,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
@@ -103,13 +94,6 @@ export class PgClassExpressionStep<
         `Received a non-string at index ${badStringIndex} to strings argument of ${this}.`,
       );
     }
-    // TODO: fix this TypeScript cast
-    this.source = $table.source as PgSource<
-      TSourceColumns,
-      TUniques,
-      TRelations,
-      any
-    >;
 
     const fragments: SQL[] = dependencies.map((stepOrSql, i) => {
       if (!stepOrSql) {
@@ -203,12 +187,9 @@ export class PgClassExpressionStep<
     )}` as any;
   }
 
-  public getParentStep(): PgClassSingleStep<
-    TSourceColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  > {
+  public getParentStep():
+    | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
+    | PgUnionAllSingleStep {
     const step = this.getStep(this.dependencies[this.tableId]);
     if (
       !(step instanceof PgSelectSingleStep) &&
@@ -293,7 +274,9 @@ function pgClassExpression<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
-  table: PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>,
+  table:
+    | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
+    | PgUnionAllSingleStep,
   codec: TExpressionCodec,
 ): (
   strings: TemplateStringsArray,

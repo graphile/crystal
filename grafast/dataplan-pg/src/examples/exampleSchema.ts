@@ -107,7 +107,8 @@ import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
-import { pgUnionAll } from "../steps/pgUnionAll.js";
+import type { PgUnionAllStep } from "../steps/pgUnionAll.js";
+import { pgUnionAll, PgUnionAllSingleStep } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
   withPgClientTransaction,
@@ -3845,6 +3846,83 @@ export function makeExampleSchema(
     },
   });
 
+  type VulnerabilityConnectionStep = ConnectionStep<
+    PgUnionAllSingleStep,
+    PgSelectParsedCursorStep,
+    PgUnionAllStep<any>,
+    PgUnionAllSingleStep
+  >;
+
+  const VulnerabilityEdge = newObjectTypeBuilder<
+    OurGraphQLContext,
+    PgUnionAllSingleStep
+  >(PgUnionAllSingleStep)({
+    name: "VulnerabilityEdge",
+    fields: {
+      cursor: {
+        type: GraphQLString,
+        plan: EXPORTABLE(
+          () =>
+            function plan($node) {
+              return $node.cursor();
+            },
+          [],
+        ),
+      },
+      node: {
+        type: Vulnerability,
+        plan: EXPORTABLE(
+          () =>
+            function plan($node) {
+              return $node;
+            },
+          [],
+        ),
+      },
+    },
+  });
+
+  const VulnerabilitiesConnection = newObjectTypeBuilder<
+    OurGraphQLContext,
+    VulnerabilityConnectionStep
+  >(ConnectionStep)({
+    name: "VulnerabilitiesConnection",
+    fields: {
+      edges: {
+        type: new GraphQLList(VulnerabilityEdge),
+        plan: EXPORTABLE(
+          () =>
+            function plan($connection) {
+              return $connection.edges();
+            },
+          [],
+        ),
+      },
+      pageInfo: newGraphileFieldConfigBuilder<
+        OurGraphQLContext,
+        VulnerabilityConnectionStep
+      >()({
+        type: new GraphQLNonNull(PageInfo),
+        plan: EXPORTABLE(
+          () =>
+            function plan($connection) {
+              return $connection.pageInfo() as any;
+            },
+          [],
+        ),
+      }),
+    },
+  });
+
+  const VulnerabilityCondition = newInputObjectTypeBuilder()({
+    name: "VulnerabilityCondition",
+    fields: {
+      todo: {
+        type: GraphQLString,
+      },
+    },
+  });
+
   ////////////////////////////////////////
 
   const Query = newObjectTypeBuilder<
@@ -4591,6 +4669,194 @@ export function makeExampleSchema(
           },
           offset: {
             type: GraphQLInt,
+          },
+        },
+        plan: EXPORTABLE(
+          (
+            TYPES,
+            constant,
+            firstPartyVulnerabilitiesSourceBuilder,
+            pgUnionAll,
+            sql,
+            thirdPartyVulnerabilitiesSourceBuilder,
+          ) =>
+            function plan(_, fieldArgs) {
+              const $first = fieldArgs.getRaw("first");
+              const $offset = fieldArgs.getRaw("offset");
+              // IMPORTANT: for cursor pagination, type must be part of cursor condition
+              const $vulnerabilities = pgUnionAll({
+                executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
+                attributes: {
+                  cvss_score: {
+                    codec: TYPES.float,
+                  },
+                },
+                sourceSpecs: {
+                  FirstPartyVulnerability: {
+                    source: firstPartyVulnerabilitiesSourceBuilder.get(),
+                    /* Could add attribute overrides here */
+                  },
+                  ThirdPartyVulnerability: {
+                    source: thirdPartyVulnerabilitiesSourceBuilder.get(),
+                  },
+                },
+              });
+              $vulnerabilities.orderBy({
+                attribute: "cvss_score",
+                direction: "DESC",
+              });
+              $vulnerabilities.where({
+                attribute: "cvss_score",
+                callback: (alias) =>
+                  sql`${alias} > ${$vulnerabilities.placeholder(
+                    constant(6),
+                    TYPES.float,
+                  )}`,
+              });
+              $vulnerabilities.setFirst($first);
+              $vulnerabilities.setOffset($offset);
+              return $vulnerabilities;
+            },
+          [
+            TYPES,
+            constant,
+            firstPartyVulnerabilitiesSourceBuilder,
+            pgUnionAll,
+            sql,
+            thirdPartyVulnerabilitiesSourceBuilder,
+          ],
+        ),
+      },
+      vulnerabilitiesConnection: {
+        type: VulnerabilitiesConnection,
+        args: {
+          condition: {
+            type: VulnerabilityCondition,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root: any,
+                  $connection: VulnerabilityConnectionStep,
+                ) {
+                  const $collection = $connection.getSubplan();
+                  return $collection.wherePlan();
+                },
+              [],
+            ),
+          },
+          filter: {
+            type: MessageFilter,
+            applyPlan: EXPORTABLE(
+              (ClassFilterStep) =>
+                function plan(
+                  _$root: any,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                ) {
+                  const $messages = $connection.getSubplan();
+                  return new ClassFilterStep(
+                    $messages.wherePlan(),
+                    $messages.alias,
+                  );
+                },
+              [ClassFilterStep],
+            ),
+          },
+          includeArchived: makeIncludeArchivedArg<
+            PgConnectionPlanFromSource<typeof messageSource>
+          >(($connection) => $connection.getSubplan()),
+          first: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root: any,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  val,
+                ) {
+                  $connection.setFirst(val.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          last: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setLast(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          after: {
+            type: GraphQLString,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setAfter(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          before: {
+            type: GraphQLString,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setBefore(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          orderBy: {
+            type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
+            applyPlan: EXPORTABLE(
+              (MessagesOrderBy, getEnumValueConfig, inspect) =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  const $messages = $connection.getSubplan();
+                  const val = arg.getRaw().eval();
+                  if (!Array.isArray(val)) {
+                    throw new Error("Invalid!");
+                  }
+                  val.forEach((order) => {
+                    const config = getEnumValueConfig(MessagesOrderBy, order);
+                    const plan = config?.extensions?.graphile?.applyPlan;
+                    if (typeof plan !== "function") {
+                      console.error(
+                        `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
+                          plan,
+                        )}`,
+                      );
+                      throw new Error(
+                        "Internal server error: invalid orderBy configuration",
+                      );
+                    }
+                    plan($messages);
+                  });
+                  return null;
+                },
+              [MessagesOrderBy, getEnumValueConfig, inspect],
+            ),
           },
         },
         plan: EXPORTABLE(

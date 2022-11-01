@@ -4,6 +4,7 @@ import sql from "pg-sql2";
 
 import { TYPES } from "../codecs.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
 
 /**
  * Given a PgSelectSingleStep, this will build a cursor by looking at all the
@@ -11,7 +12,7 @@ import { PgSelectSingleStep } from "./pgSelectSingle.js";
  * them.
  */
 export class PgCursorStep<
-  TStep extends PgSelectSingleStep<any, any, any, any>,
+  TStep extends PgSelectSingleStep<any, any, any, any> | PgUnionAllSingleStep,
 > extends UnbatchedExecutableStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",

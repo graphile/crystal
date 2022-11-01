@@ -10,8 +10,8 @@ import type {
   InputStep,
   PolymorphicStep,
 } from "grafast";
+import { __ItemStep, ModifierStep } from "grafast";
 import {
-  __ItemStep,
   $$data,
   access,
   constant,
@@ -26,10 +26,20 @@ import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { sql } from "pg-sql2";
 
+import type { PgTypeColumns } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgSource, PgSourceUnique } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
-import type { PgTypeCodec, PgTypedExecutableStep } from "../interfaces.js";
+import type {
+  PgOrderSpec,
+  PgTypeCodec,
+  PgTypedExecutableStep,
+} from "../interfaces.js";
+import type { PgClassExpressionStep } from "./pgClassExpression.js";
+import { pgClassExpression } from "./pgClassExpression.js";
+import type { PgConditionCapableParentStep } from "./pgCondition.js";
+import { PgConditionStep } from "./pgCondition.js";
+import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
@@ -94,11 +104,11 @@ type PgUnionAllStepSelect<TAttributes extends string> =
       codec: PgTypeCodec<any, any, any, any>;
     };
 
-interface PgUnionAllSourceSpec {
+export interface PgUnionAllSourceSpec {
   source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
 }
 
-interface PgUnionAllStepConfig<TAttributes extends string> {
+export interface PgUnionAllStepConfig<TAttributes extends string> {
   executor: PgExecutor;
   attributes: {
     [attributeName in TAttributes]: {
@@ -110,12 +120,12 @@ interface PgUnionAllStepConfig<TAttributes extends string> {
   };
 }
 
-interface PgUnionAllStepCondition<TAttributes extends string> {
+export interface PgUnionAllStepCondition<TAttributes extends string> {
   attribute: TAttributes;
   callback: (fragment: SQL) => SQL;
 }
 
-interface PgUnionAllStepOrder<TAttributes extends string> {
+export interface PgUnionAllStepOrder<TAttributes extends string> {
   attribute: TAttributes;
   direction: "ASC" | "DESC";
 }
@@ -141,7 +151,10 @@ type PgUnionAllPlaceholder = {
   symbol: symbol;
 };
 
-class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
+export class PgUnionAllSingleStep
+  extends ExecutableStep
+  implements PolymorphicStep
+{
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllSingleStep",
@@ -179,6 +192,50 @@ class PgUnionAllSingleStep extends ExecutableStep implements PolymorphicStep {
     return sourceSpec.source.get(spec);
   }
 
+  /**
+   * When selecting a connection we need to be able to get the cursor. The
+   * cursor is built from the values of the `ORDER BY` clause so that we can
+   * find nodes before/after it.
+   */
+  public cursor(): PgCursorStep<this> {
+    const cursorPlan = new PgCursorStep<this>(this);
+    return cursorPlan;
+  }
+
+  public getClassStep(): PgUnionAllStep<any> {
+    return (this.getDep(0) as any).getDep(0);
+  }
+
+  /**
+   * Returns a plan representing the result of an expression.
+   */
+  expression<
+    TExpressionColumns extends PgTypeColumns | undefined,
+    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+  >(
+    expression: SQL,
+    codec: TExpressionCodec,
+  ): PgClassExpressionStep<
+    TExpressionColumns,
+    TExpressionCodec,
+    any,
+    any,
+    any,
+    any
+  > {
+    return pgClassExpression(this, codec)`${expression}`;
+  }
+
+  /**
+   * Advanced method; rather than returning a plan it returns an index.
+   * Generally useful for PgClassExpressionStep.
+   *
+   * @internal
+   */
+  public selectAndReturnIndex(fragment: SQL): number {
+    return this.getClassStep().selectAndReturnIndex(fragment);
+  }
+
   execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
     return values[0].map((v) => {
       const type = v[this.typeKey];
@@ -214,6 +271,8 @@ export class PgUnionAllStep<TAttributes extends string>
 
   public isSyncAndSafe = false;
 
+  public alias = castAlias;
+
   private selects: PgUnionAllStepSelect<TAttributes>[];
 
   private executor!: PgExecutor;
@@ -224,7 +283,7 @@ export class PgUnionAllStep<TAttributes extends string>
   /** @internal */
   public readonly spec: PgUnionAllStepConfig<TAttributes>;
 
-  private outerOrderExpressions: SQL[];
+  private orders: Array<PgOrderSpec>;
 
   /**
    * Since this is effectively like a DataLoader it processes the data for many
@@ -319,7 +378,7 @@ export class PgUnionAllStep<TAttributes extends string>
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.queryValuesSymbol = cloneFrom.queryValuesSymbol;
-      this.outerOrderExpressions = [...cloneFrom.outerOrderExpressions];
+      this.orders = [...cloneFrom.orders];
 
       this.detailsBySource = new Map(cloneFrom.detailsBySource);
     } else {
@@ -331,7 +390,7 @@ export class PgUnionAllStep<TAttributes extends string>
       this.queryValues = [];
       this.placeholderValues = new Map();
       this.queryValuesSymbol = Symbol("union_identifier_values");
-      this.outerOrderExpressions = [];
+      this.orders = [];
 
       let first = true;
       this.detailsBySource = new Map();
@@ -370,7 +429,9 @@ export class PgUnionAllStep<TAttributes extends string>
     return new PgUnionAllStep(this);
   }
 
-  select<TAttribute extends TAttributes>(key: TAttribute): number {
+  selectAndReturnIndex<TAttribute extends TAttributes>(
+    key: TAttribute,
+  ): number {
     if (!Object.prototype.hasOwnProperty.call(this.spec.attributes, key)) {
       throw new Error(`Attribute '${key}' unknown`);
     }
@@ -455,11 +516,13 @@ export class PgUnionAllStep<TAttributes extends string>
         sql`${ident} ${orderSpec.direction === "DESC" ? sql`desc` : sql`asc`}`,
       );
     }
-    this.outerOrderExpressions.push(
-      sql`${sql.identifier(String(this.select(orderSpec.attribute)))} ${
-        orderSpec.direction === "DESC" ? sql`desc` : sql`asc`
-      }`,
-    );
+    this.orders.push({
+      fragment: sql.identifier(
+        String(this.selectAndReturnIndex(orderSpec.attribute)),
+      ),
+      direction: orderSpec.direction,
+      codec: this.spec.attributes[orderSpec.attribute].codec,
+    });
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
@@ -726,6 +789,37 @@ export class PgUnionAllStep<TAttributes extends string>
     }
   }
 
+  /**
+   * So we can quickly detect if cursors are invalid we use this digest,
+   * passing this check does not mean that the cursor is valid but it at least
+   * catches common user errors.
+   */
+  public getOrderByDigest() {
+    if (this.orders.length === 0) {
+      return "natural";
+    }
+    // The security of this hash is unimportant; the main aim is to protect the
+    // user from themself. If they bypass this, that's their problem (it will
+    // not introduce a security issue).
+    const hash = createHash("sha256");
+    hash.update(
+      JSON.stringify(
+        this.orders.map(
+          (o) =>
+            sql.compile(o.fragment, {
+              placeholderValues: this.placeholderValues,
+            }).text,
+        ),
+      ),
+    );
+    const digest = hash.digest("hex").slice(0, 10);
+    return digest;
+  }
+
+  public getOrderBy(): ReadonlyArray<PgOrderSpec> {
+    return this.orders;
+  }
+
   optimize() {
     this.planLimitAndOffset();
     return this;
@@ -823,7 +917,7 @@ from (${innerQuery}) as ${tableAlias}\
       }
 
       const outerSelects = this.selects.map((select, i) => {
-        const sqlSrc = sql`${castAlias}.${sql.identifier(String(i))}`;
+        const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
         const codec =
           select.type === "type"
             ? TYPES.text
@@ -844,8 +938,14 @@ union all
 )}
 order by${sql.indent`
 ${
-  this.outerOrderExpressions.length
-    ? sql`${sql.join(this.outerOrderExpressions, ",\n")},\n`
+  this.orders.length
+    ? sql`${sql.join(
+        this.orders.map(
+          (o) =>
+            sql`${o.fragment} ${o.direction === "DESC" ? sql`desc` : sql`asc`}`,
+        ),
+        ",\n",
+      )},\n`
     : sql.blank
 }\
 ${rowNumberIdent} asc,
@@ -858,7 +958,7 @@ ${this.limitAndOffsetSQL!}
       const innerQuery = sql`\
 select
 ${sql.indent(sql.join(outerSelects, ",\n"))}
-from (${unionQuery}) ${castAlias}
+from (${unionQuery}) ${this.alias}
 `;
       return innerQuery;
     };
@@ -948,6 +1048,10 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
     super.finalize();
   }
 
+  wherePlan(): PgUnionAllConditionStep<this> {
+    return new PgUnionAllConditionStep(this);
+  }
+
   async execute(
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
@@ -1023,4 +1127,39 @@ export function pgUnionAll<TAttributes extends string>(
   spec: PgUnionAllStepConfig<TAttributes>,
 ): PgUnionAllStep<TAttributes> {
   return new PgUnionAllStep(spec);
+}
+
+export class PgUnionAllConditionStep<
+  TParentStep extends PgUnionAllStep<any>,
+> extends ModifierStep<TParentStep> {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgUnionAllConditionStep",
+  };
+
+  private conditions: PgUnionAllStepCondition<any>[] = [];
+
+  public readonly alias: SQL;
+
+  constructor($parent: TParentStep, private isHaving = false) {
+    super($parent);
+    this.alias = $parent.alias;
+  }
+
+  where(condition: PgUnionAllStepCondition<any>): void {
+    this.conditions.push(condition);
+  }
+
+  placeholder(
+    $step: ExecutableStep<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL {
+    return this.$parent.placeholder($step, codec);
+  }
+
+  apply(): void {
+    this.conditions.forEach((condition) => {
+      this.$parent.where(condition);
+    });
+  }
 }
