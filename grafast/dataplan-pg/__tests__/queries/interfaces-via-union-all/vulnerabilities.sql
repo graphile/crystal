@@ -8,10 +8,10 @@ from (
 ) as __union_identifiers__,
 lateral (
   select
-    __union__."0"::text,
-    __union__."1",
-    __union__."2"::text,
-    __union__."3"::text
+    __union__."0"::text as "0",
+    __union__."1" as "1",
+    __union__."2"::text as "2",
+    __union__."3"::text as "3"
   from (
       select
         __first_party_vulnerability__."0",
@@ -28,7 +28,9 @@ lateral (
           row_number() over (partition by 1) as "n"
         from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerability__
         where __first_party_vulnerability__."cvss_score" > __union_identifiers__."id0"
-        order by __first_party_vulnerability__."cvss_score" desc
+        order by
+          __first_party_vulnerability__."cvss_score" desc,
+          __first_party_vulnerability__."id" asc
         limit 4
       ) as __first_party_vulnerability__
     union all
@@ -47,7 +49,9 @@ lateral (
           row_number() over (partition by 1) as "n"
         from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerability__
         where __third_party_vulnerability__."cvss_score" > __union_identifiers__."id1"
-        order by __third_party_vulnerability__."cvss_score" desc
+        order by
+          __third_party_vulnerability__."cvss_score" desc,
+          __third_party_vulnerability__."id" asc
         limit 4
       ) as __third_party_vulnerability__
     order by
