@@ -397,8 +397,23 @@ export class PgUnionAllStep<TAttributes extends string>
       this.orders = [...cloneFrom.orders];
 
       this.detailsBySource = new Map(cloneFrom.detailsBySource);
-      this.contextId = cloneFrom.contextId;
       this.executor = cloneFrom.executor;
+      this.contextId = cloneFrom.contextId;
+
+      this.isSyncAndSafe = cloneFrom.isSyncAndSafe;
+      this.alias = cloneFrom.alias;
+
+      this.first = cloneFrom.first;
+      this.last = cloneFrom.last;
+      this.fetchOneExtra = cloneFrom.fetchOneExtra;
+      this.lowerIndexStepId = cloneFrom.lowerIndexStepId;
+      this.upperIndexStepId = cloneFrom.upperIndexStepId;
+      this.limitAndOffsetId = cloneFrom.limitAndOffsetId;
+      this.offset = cloneFrom.offset;
+      this.beforeStepId = cloneFrom.beforeStepId;
+      this.afterStepId = cloneFrom.afterStepId;
+      this.limitAndOffsetSQL = cloneFrom.limitAndOffsetSQL;
+      this.innerLimitSQL = cloneFrom.innerLimitSQL;
     } else {
       const spec = specOrCloneFrom;
       this.spec = spec;

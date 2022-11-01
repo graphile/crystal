@@ -726,7 +726,8 @@ export class PgSelectStep<
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
     this.beforeStepId =
       cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
-        ? this.addDependency(
+        ? // TODO: these `addDependency` calls are redundant; we've already copied all the dependencies above!
+          this.addDependency(
             cloneFromMatchingMode.getDep(cloneFromMatchingMode.beforeStepId),
           )
         : null;
