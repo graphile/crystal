@@ -719,14 +719,6 @@ export class PgUnionAllStep<TAttributes extends string>
       return;
     }
 
-    /*
-    const pkOrder = orders[orderCount - 1];
-    const typeOrder = orders[orderCount - 2];
-    const mainOrders = orders.slice(0, orderCount - 2);
-    */
-
-    const reverse = this.shouldReverseOrder();
-
     for (const [identifier, sourceSpec] of Object.entries(
       this.spec.sourceSpecs,
     )) {
@@ -1135,7 +1127,7 @@ and ${condition(i + 1)}`}
             if (!r) {
               return r;
             }
-            const [frag, codec] = r;
+            const [frag, _codec] = r;
             const alias = String(selectIndex);
             const ident = sql.identifier(alias);
             const fullIdent = sql`${tableAlias}.${ident}`;

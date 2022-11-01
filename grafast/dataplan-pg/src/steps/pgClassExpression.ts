@@ -1,12 +1,10 @@
 import type { ExecutionExtra } from "grafast";
-import { $$data } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { $$data, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import type {
-  PgSource,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,

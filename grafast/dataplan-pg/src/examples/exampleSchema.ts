@@ -2046,6 +2046,8 @@ export function makeExampleSchema(
 
   firstPartyVulnerabilitiesSourceBuilder.build({});
   thirdPartyVulnerabilitiesSourceBuilder.build({});
+  awsApplicationsSourceBuilder.build({});
+  gcpApplicationsSourceBuilder.build({});
 
   ////////////////////////////////////////
 
