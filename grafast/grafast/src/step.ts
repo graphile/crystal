@@ -6,6 +6,7 @@ import type { LayerPlan } from "./engine/LayerPlan.js";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
+  withGlobalLayerPlan,
 } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
@@ -291,6 +292,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     if (this.metaKey === undefined) {
       this.metaKey = this.id;
     }
+  }
+
+  protected withMyLayerPlan<T>(callback: () => T): T {
+    return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
   }
 
   protected getStep(id: number): ExecutableStep {
