@@ -725,6 +725,8 @@ export class PgUnionAllStep<TAttributes extends string>
     const mainOrders = orders.slice(0, orderCount - 2);
     */
 
+    const reverse = this.shouldReverseOrder();
+
     for (const [identifier, sourceSpec] of Object.entries(
       this.spec.sourceSpecs,
     )) {
@@ -751,7 +753,7 @@ export class PgUnionAllStep<TAttributes extends string>
               sql`(${pkPlaceholder}->>${sql.literal(i)})::${
                 pkColumns[pkCol].codec.sqlType
               }`,
-              "ASC", // TODO: when paginating backwards, this should be `DESC` instead.
+              "ASC",
             ];
           } else if (i === orderCount - 2) {
             // Type
@@ -827,6 +829,8 @@ and ${condition(i + 1)}`}
    * re-reverse it in JS-land.
    */
   private shouldReverseOrder() {
+    this.locker.lockParameter("first");
+    this.locker.lockParameter("last");
     return (
       this.first == null &&
       this.last != null &&
@@ -1070,6 +1074,7 @@ and ${condition(i + 1)}`}
     const typeIdx = this.selectType();
     const rowNumberAlias = "n";
     const rowNumberIdent = sql.identifier(rowNumberAlias);
+    const reverse = this.shouldReverseOrder();
 
     const makeQuery = () => {
       const tables: SQL[] = [];
@@ -1081,6 +1086,9 @@ and ${condition(i + 1)}`}
         const { sqlSource, alias: tableAlias, conditions, orders } = details;
 
         const pk = sourceSpec.source.uniques?.find((u) => u.isPrimary === true);
+        if (!pk) {
+          throw new Error(`No PK for ${identifier} source in ${this}`);
+        }
         const midSelects: SQL[] = [];
         const innerSelects = this.selects
           .map((s, selectIndex) => {
@@ -1101,11 +1109,6 @@ and ${condition(i + 1)}`}
                   return [sql.literal(identifier), TYPES.text];
                 }
                 case "pk": {
-                  if (!pk) {
-                    throw new Error(
-                      `No PK for ${identifier} source in ${this}`,
-                    );
-                  }
                   return [
                     sql`json_build_array(${sql.join(
                       pk.columns.map(
@@ -1145,6 +1148,14 @@ and ${condition(i + 1)}`}
           sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
         );
 
+        const ascOrDesc = this.shouldReverseOrder() ? sql`desc` : sql`asc`;
+        const pkOrder = sql.join(
+          pk.columns.map(
+            (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
+          ),
+          ",\n",
+        );
+
         // Can't order individual selects in a `union all` so we're using
         // subqueries to do so.
         const innerQuery = sql.indent`
@@ -1156,18 +1167,21 @@ ${
     ? sql`where ${sql.join(conditions, `\nand `)}\n`
     : sql.blank
 }\
-${
+order by
+${sql.indent`${
   orders.length > 0
-    ? sql`order by ${sql.join(
+    ? sql`${sql.join(
         orders.map((orderSpec) => {
           return sql`${orderSpec.fragment} ${
-            orderSpec.direction === "DESC" ? sql`desc` : sql`asc`
+            Number(orderSpec.direction === "DESC") ^ Number(reverse)
+              ? sql`desc`
+              : sql`asc`
           }`;
         }),
         `,\n`,
-      )}\n`
+      )},\n`
     : sql.blank
-}\
+}${pkOrder}`}\
 ${this.innerLimitSQL!}
 `;
 
@@ -1212,14 +1226,18 @@ ${
     ? sql`${sql.join(
         this.orders.map(
           (o) =>
-            sql`${o.fragment} ${o.direction === "DESC" ? sql`desc` : sql`asc`}`,
+            sql`${o.fragment} ${
+              Number(o.direction === "DESC") ^ Number(reverse)
+                ? sql`desc`
+                : sql`asc`
+            }`,
         ),
         ",\n",
       )},\n`
     : sql.blank
 }\
 ${rowNumberIdent} asc,
-${sql.identifier(String(typeIdx))} asc\
+${sql.identifier(String(typeIdx))} ${reverse ? sql`desc` : sql`asc`}\
 `}
 ${this.limitAndOffsetSQL!}
 `;
