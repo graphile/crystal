@@ -8,6 +8,7 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
   InputStep,
+  LambdaStep,
   PolymorphicStep,
 } from "grafast";
 import {
@@ -43,6 +44,8 @@ import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
+import { toPg } from "./toPg.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
@@ -456,6 +459,21 @@ export class PgUnionAllStep<TAttributes extends string>
         });
       }
     }
+
+    this.afterLock("orderBy", () => {
+      if (this.beforeStepId != null) {
+        this.applyConditionFromCursor(
+          "before",
+          this.getDep(this.beforeStepId) as any,
+        );
+      }
+      if (this.afterStepId != null) {
+        this.applyConditionFromCursor(
+          "after",
+          this.getDep(this.afterStepId) as any,
+        );
+      }
+    });
   }
 
   connectionClone(): PgUnionAllStep<TAttributes> {
@@ -614,6 +632,85 @@ export class PgUnionAllStep<TAttributes extends string>
     // This allows us to replace the SQL that will be compiled, for example
     // when we're inlining this into a parent query.
     return sqlPlaceholder;
+  }
+
+  private applyConditionFromCursor(
+    beforeOrAfter: "before" | "after",
+    $parsedCursorPlan: LambdaStep<any, any[] | null>,
+  ): void {
+    const digest = this.getOrderByDigest();
+    const orders = this.getOrderBy();
+    const orderCount = orders.length;
+
+    // Cursor validity check; if we get inlined then this will be passed up
+    // to the parent so we can trust it.
+    this.addDependency(
+      pgValidateParsedCursor(
+        $parsedCursorPlan,
+        digest,
+        orderCount,
+        beforeOrAfter,
+      ),
+    );
+
+    if (orderCount === 0) {
+      // Natural pagination `['natural', N]`
+      const $n = access($parsedCursorPlan, [1]);
+      if (beforeOrAfter === "before") {
+        this.upperIndexStepId = this.addDependency($n);
+      } else {
+        this.lowerIndexStepId = this.addDependency($n);
+      }
+      return;
+    }
+
+    const condition = (i = 0): SQL => {
+      const order = orders[i];
+      // Codec is responsible for performing validation/coercion and throwing
+      // error if value is invalid.
+      // TODO: make sure this ^ is clear in the relevant places.
+      /*
+          const sqlValue = sql`${sql.value(
+            (void 0 /* forbid relying on `this` * /, order.codec.toPg)(
+              this.placeholder(access($parsedCursorPlan, [i + 1]), sql`text`),
+            ),
+          )}::${order.codec.sqlType}`;
+          */
+      const sqlValue = this.placeholder(
+        toPg(access($parsedCursorPlan, [i + 1]), order.codec),
+        order.codec,
+      );
+      // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+      const gt =
+        (order.direction === "ASC" && beforeOrAfter === "after") ||
+        (order.direction === "DESC" && beforeOrAfter === "before");
+
+      let fragment = sql`${order.fragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+
+      if (i < orderCount - 1) {
+        fragment = sql`(${fragment}) or (${
+          order.fragment
+        } = ${sqlValue} and ${condition(i + 1)})`;
+      }
+
+      return sql.parens(fragment);
+    };
+
+    /*
+     * We used to allow the cursor to be null or string; but we now _only_ run
+     * this code when the `evalIs(null) || evalIs(undefined)` returns false. So
+     * we know that the cursor must exist, so therefore we don't need to add
+     * this extra condition.
+    // If the cursor is null then no condition is needed
+    const cursorIsNullPlaceholder = this.placeholder(
+      lambda($parsedCursorPlan, (cursor) => cursor == null),
+      TYPES.boolean
+    );
+    const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
+    */
+    const finalCondition = condition();
+
+    this.where(finalCondition);
   }
 
   // TODO: rename?
