@@ -2044,10 +2044,26 @@ export function makeExampleSchema(
     [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
   );
 
-  firstPartyVulnerabilitiesSourceBuilder.build({});
-  thirdPartyVulnerabilitiesSourceBuilder.build({});
-  awsApplicationsSourceBuilder.build({});
-  gcpApplicationsSourceBuilder.build({});
+  const firstPartyVulnerabilitiesSource = EXPORTABLE(
+    (firstPartyVulnerabilitiesSourceBuilder) =>
+      firstPartyVulnerabilitiesSourceBuilder.build({}),
+    [firstPartyVulnerabilitiesSourceBuilder],
+  );
+  const thirdPartyVulnerabilitiesSource = EXPORTABLE(
+    (thirdPartyVulnerabilitiesSourceBuilder) =>
+      thirdPartyVulnerabilitiesSourceBuilder.build({}),
+    [thirdPartyVulnerabilitiesSourceBuilder],
+  );
+  const awsApplicationsSource = EXPORTABLE(
+    (awsApplicationsSourceBuilder) => awsApplicationsSourceBuilder.build({}),
+    [awsApplicationsSourceBuilder],
+  );
+  const gcpApplicationsSource = EXPORTABLE(
+    (gcpApplicationsSourceBuilder) => gcpApplicationsSourceBuilder.build({}),
+    [gcpApplicationsSourceBuilder],
+  );
+  awsApplicationsSource;
+  gcpApplicationsSource;
 
   ////////////////////////////////////////
 
@@ -4713,17 +4729,17 @@ export function makeExampleSchema(
           (
             TYPES,
             constant,
-            firstPartyVulnerabilitiesSourceBuilder,
+            firstPartyVulnerabilitiesSource,
             pgUnionAll,
             sql,
-            thirdPartyVulnerabilitiesSourceBuilder,
+            thirdPartyVulnerabilitiesSource,
           ) =>
             function plan(_, fieldArgs) {
               const $first = fieldArgs.getRaw("first");
               const $offset = fieldArgs.getRaw("offset");
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
-                executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
+                executor: firstPartyVulnerabilitiesSource.executor,
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
@@ -4731,11 +4747,11 @@ export function makeExampleSchema(
                 },
                 sourceSpecs: {
                   FirstPartyVulnerability: {
-                    source: firstPartyVulnerabilitiesSourceBuilder.get(),
+                    source: firstPartyVulnerabilitiesSource,
                     /* Could add attribute overrides here */
                   },
                   ThirdPartyVulnerability: {
-                    source: thirdPartyVulnerabilitiesSourceBuilder.get(),
+                    source: thirdPartyVulnerabilitiesSource,
                   },
                 },
               });
@@ -4758,10 +4774,10 @@ export function makeExampleSchema(
           [
             TYPES,
             constant,
-            firstPartyVulnerabilitiesSourceBuilder,
+            firstPartyVulnerabilitiesSource,
             pgUnionAll,
             sql,
-            thirdPartyVulnerabilitiesSourceBuilder,
+            thirdPartyVulnerabilitiesSource,
           ],
         ),
       },
@@ -4899,14 +4915,14 @@ export function makeExampleSchema(
           (
             TYPES,
             connection,
-            firstPartyVulnerabilitiesSourceBuilder,
+            firstPartyVulnerabilitiesSource,
             pgUnionAll,
-            thirdPartyVulnerabilitiesSourceBuilder,
+            thirdPartyVulnerabilitiesSource,
           ) =>
             function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
-                executor: firstPartyVulnerabilitiesSourceBuilder.get().executor,
+                executor: firstPartyVulnerabilitiesSource.executor,
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
@@ -4914,11 +4930,11 @@ export function makeExampleSchema(
                 },
                 sourceSpecs: {
                   FirstPartyVulnerability: {
-                    source: firstPartyVulnerabilitiesSourceBuilder.get(),
+                    source: firstPartyVulnerabilitiesSource,
                     /* Could add attribute overrides here */
                   },
                   ThirdPartyVulnerability: {
-                    source: thirdPartyVulnerabilitiesSourceBuilder.get(),
+                    source: thirdPartyVulnerabilitiesSource,
                   },
                 },
               });
@@ -4927,9 +4943,9 @@ export function makeExampleSchema(
           [
             TYPES,
             connection,
-            firstPartyVulnerabilitiesSourceBuilder,
+            firstPartyVulnerabilitiesSource,
             pgUnionAll,
-            thirdPartyVulnerabilitiesSourceBuilder,
+            thirdPartyVulnerabilitiesSource,
           ],
         ),
       },
