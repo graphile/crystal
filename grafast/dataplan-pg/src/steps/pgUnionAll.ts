@@ -37,6 +37,7 @@ import type {
   PgTypeCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
+import { PgLocker } from "../pgLocker.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
@@ -371,6 +372,8 @@ export class PgUnionAllStep<TAttributes extends string>
   private limitAndOffsetSQL: SQL | null = null;
   private innerLimitSQL: SQL | null = null;
 
+  private locker: PgLocker<this> = new PgLocker(this);
+
   constructor(cloneFrom: PgUnionAllStep<TAttributes>);
   constructor(spec: PgUnionAllStepConfig<TAttributes>);
   constructor(
@@ -460,7 +463,7 @@ export class PgUnionAllStep<TAttributes extends string>
       }
     }
 
-    this.afterLock("orderBy", () => {
+    this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
         this.applyConditionFromCursor(
           "before",
@@ -555,6 +558,11 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   where(whereSpec: PgUnionAllStepCondition<TAttributes>): void {
+    if (this.locker.locked) {
+      throw new Error(
+        `${this}: cannot add conditions once plan is locked ('where')`,
+      );
+    }
     for (const [identifier, sourceSpec] of Object.entries(
       this.spec.sourceSpecs,
     )) {
@@ -568,7 +576,17 @@ export class PgUnionAllStep<TAttributes extends string>
     }
   }
 
+  wherePlan(): PgUnionAllConditionStep<this> {
+    if (this.locker.locked) {
+      throw new Error(
+        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
+      );
+    }
+    return new PgUnionAllConditionStep(this);
+  }
+
   orderBy(orderSpec: PgUnionAllStepOrder<TAttributes>): void {
+    this.locker.assertParameterUnlocked("orderBy");
     for (const [identifier, sourceSpec] of Object.entries(
       this.spec.sourceSpecs,
     )) {
@@ -589,6 +607,8 @@ export class PgUnionAllStep<TAttributes extends string>
     });
   }
 
+  private assertCursorPaginationAllowed(): void {}
+
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
     $step: ExecutableStep<any>,
@@ -598,10 +618,8 @@ export class PgUnionAllStep<TAttributes extends string>
     $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
     overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
-    if (this.isOptimized) {
-      throw new Error(
-        `${this}: cannot add placeholders once plan is optimized`,
-      );
+    if (this.locker.locked) {
+      throw new Error(`${this}: cannot add placeholders once plan is locked`);
     }
     if (this.placeholders.length >= 100000) {
       throw new Error(
@@ -750,23 +768,32 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   public setFirst(first: InputStep | number): this {
+    this.locker.assertParameterUnlocked("first");
     // TODO: don't eval
     this.first = typeof first === "number" ? first : first.eval() ?? null;
+    this.locker.lockParameter("first");
     return this;
   }
 
   public setLast(last: InputStep | number): this {
+    this.assertCursorPaginationAllowed();
+    this.locker.assertParameterUnlocked("orderBy");
+    this.locker.assertParameterUnlocked("last");
     this.last = typeof last === "number" ? last : last.eval() ?? null;
+    this.locker.lockParameter("last");
     return this;
   }
 
   public setOffset(offset: InputStep | number): this {
+    this.locker.assertParameterUnlocked("offset");
     this.offset = typeof offset === "number" ? offset : offset.eval() ?? null;
     if (this.offset !== null) {
+      this.locker.lockParameter("last");
       if (this.last != null) {
         throw new Error("Cannot use 'offset' with 'last'");
       }
     }
+    this.locker.lockParameter("offset");
     return this;
   }
 
@@ -938,6 +965,7 @@ export class PgUnionAllStep<TAttributes extends string>
    * catches common user errors.
    */
   public getOrderByDigest() {
+    this.locker.lockParameter("orderBy");
     if (this.orders.length === 0) {
       return "natural";
     }
@@ -960,6 +988,7 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   public getOrderBy(): ReadonlyArray<PgOrderSpec> {
+    this.locker.lockParameter("orderBy");
     return this.orders;
   }
 
@@ -969,6 +998,7 @@ export class PgUnionAllStep<TAttributes extends string>
   }
 
   finalize() {
+    this.locker.lock();
     const typeIdx = this.selectType();
     const rowNumberAlias = "n";
     const rowNumberIdent = sql.identifier(rowNumberAlias);
@@ -1207,10 +1237,6 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
     };
 
     super.finalize();
-  }
-
-  wherePlan(): PgUnionAllConditionStep<this> {
-    return new PgUnionAllConditionStep(this);
   }
 
   async execute(
