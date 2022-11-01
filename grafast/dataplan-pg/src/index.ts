@@ -86,6 +86,7 @@ import {
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
+import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
 import { PgSubscriber } from "./PgSubscriber.js";
 import {
   pgClassExpression,
@@ -110,8 +111,6 @@ import {
   PgSelectArgumentSpec,
   pgSelectFromRecords,
   PgSelectIdentifierSpec,
-  PgSelectLockableParameter,
-  PgSelectLockCallback,
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
@@ -193,6 +192,8 @@ export {
   PgInsertStep,
   PgInterval,
   PgLine,
+  PgLockableParameter,
+  PgLockCallback,
   PgLseg,
   PgOrderSpec,
   pgPageInfo,
@@ -209,8 +210,6 @@ export {
   pgSelectFromRecord,
   pgSelectFromRecords,
   PgSelectIdentifierSpec,
-  PgSelectLockableParameter,
-  PgSelectLockCallback,
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,

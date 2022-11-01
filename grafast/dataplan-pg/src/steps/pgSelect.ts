@@ -54,6 +54,7 @@ import type {
   PgTypeCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
+import { PgLocker } from "../pgLocker.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import { PgConditionStep } from "./pgCondition.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
@@ -113,23 +114,6 @@ function isStaticInputStep(
     dep instanceof __InputObjectStep
   );
 }
-
-export type PgSelectLockableParameter =
-  | "orderBy"
-  | "first"
-  | "last"
-  | "offset"
-  | "groupBy";
-export type PgSelectLockCallback<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
-> = (step: PgSelectStep<TColumns, TUniques, TRelations, TParameters>) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgSelectStep:plan");
 // const debugExecute = debugFactory("datasource:pg:PgSelectStep:execute");
@@ -498,50 +482,11 @@ export class PgSelectStep<
     name?: string;
   } | null = null;
 
-  /**
-   * Determines if the PgSelectStep is "locked" - i.e. its
-   * FROM,JOINs,WHERE,ORDER BY,LIMIT,OFFSET cannot be changed. Note this does
-   * not prevent adding more SELECTs
-   */
-  private locked = false;
-
   // --------------------
 
-  private _beforeLock: {
-    [a in PgSelectLockableParameter]: Array<
-      PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>
-    >;
-  } = {
-    orderBy: [],
-    groupBy: [],
-    first: [],
-    last: [],
-    offset: [],
-  };
-
-  private _afterLock: {
-    [a in PgSelectLockableParameter]: Array<
-      PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>
-    >;
-  } = {
-    orderBy: [],
-    groupBy: [],
-    first: [],
-    last: [],
-    offset: [],
-  };
-
-  private _lockedParameter: {
-    [a in PgSelectLockableParameter]: false | true | string | undefined;
-  } = {
-    orderBy: false,
-    groupBy: false,
-    first: false,
-    last: false,
-    offset: false,
-  };
-
   public readonly mode: PgSelectMode;
+
+  private locker: PgLocker<this> = new PgLocker(this);
 
   constructor(options: PgSelectOptions<TColumns>);
   constructor(
@@ -606,9 +551,11 @@ export class PgSelectStep<
       // Since we're applying this to the original it doesn't make sense to
       // also apply it to the clones.
       if (this.mode === "aggregate") {
-        this.beforeLock("orderBy", () => this._lockParameter("groupBy"));
+        this.locker.beforeLock("orderBy", () =>
+          this.locker.lockParameter("groupBy"),
+        );
       } else {
-        this.beforeLock("orderBy", ensureOrderIsUnique);
+        this.locker.beforeLock("orderBy", ensureOrderIsUnique);
       }
     }
 
@@ -762,7 +709,7 @@ export class PgSelectStep<
           )
         : null;
 
-    this.afterLock("orderBy", () => {
+    this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
         this.applyConditionFromCursor(
           "before",
@@ -799,8 +746,7 @@ export class PgSelectStep<
   }
 
   public lock(): void {
-    this._lockAllParameters();
-    this.locked = true;
+    this.locker.lock();
   }
 
   public setInliningForbidden(newInliningForbidden = true): this {
@@ -813,7 +759,7 @@ export class PgSelectStep<
   }
 
   public setTrusted(newIsTrusted = true): this {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(`${this}: cannot toggle trusted once plan is locked`);
     }
     this.isTrusted = newIsTrusted;
@@ -825,32 +771,32 @@ export class PgSelectStep<
   }
 
   public setFirst(first: InputStep): this {
-    this._assertParameterUnlocked("first");
+    this.locker.assertParameterUnlocked("first");
     // TODO: don't eval
     this.first = first.eval() ?? null;
-    this._lockParameter("first");
+    this.locker.lockParameter("first");
     return this;
   }
 
   public setLast(last: InputStep): this {
     this.assertCursorPaginationAllowed();
-    this._assertParameterUnlocked("orderBy");
-    this._assertParameterUnlocked("last");
+    this.locker.assertParameterUnlocked("orderBy");
+    this.locker.assertParameterUnlocked("last");
     this.last = last.eval() ?? null;
-    this._lockParameter("last");
+    this.locker.lockParameter("last");
     return this;
   }
 
   public setOffset(offset: InputStep): this {
-    this._assertParameterUnlocked("offset");
+    this.locker.assertParameterUnlocked("offset");
     this.offset = offset.eval() ?? null;
     if (this.offset !== null) {
-      this._lockParameter("last");
+      this.locker.lockParameter("last");
       if (this.last != null) {
         throw new Error("Cannot use 'offset' with 'last'");
       }
     }
-    this._lockParameter("offset");
+    this.locker.lockParameter("offset");
     return this;
   }
 
@@ -861,7 +807,7 @@ export class PgSelectStep<
    * default.
    */
   public setUnique(newUnique = true): this {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(`${this}: cannot toggle unique once plan is locked`);
     }
     this.isUnique = newUnique;
@@ -892,7 +838,7 @@ export class PgSelectStep<
     $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
     overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
     }
     if (this.placeholders.length >= 100000) {
@@ -1044,7 +990,7 @@ export class PgSelectStep<
   }
 
   where(condition: SQL): void {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
@@ -1053,7 +999,7 @@ export class PgSelectStep<
   }
 
   wherePlan(): PgConditionStep<this> {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('wherePlan')`,
       );
@@ -1062,7 +1008,7 @@ export class PgSelectStep<
   }
 
   groupBy(group: PgGroupSpec): void {
-    this._assertParameterUnlocked("groupBy");
+    this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new Error(`Cannot add groupBy to a non-aggregate query`);
     }
@@ -1070,7 +1016,7 @@ export class PgSelectStep<
   }
 
   havingPlan(): PgConditionStep<this> {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
       );
@@ -1082,7 +1028,7 @@ export class PgSelectStep<
   }
 
   having(condition: SQL): void {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('having')`,
       );
@@ -1094,7 +1040,7 @@ export class PgSelectStep<
   }
 
   orderBy(order: PgOrderSpec): void {
-    this._assertParameterUnlocked("orderBy");
+    this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(order);
   }
 
@@ -1103,7 +1049,7 @@ export class PgSelectStep<
   }
 
   setOrderIsUnique(): void {
-    if (this.locked) {
+    if (this.locker.locked) {
       throw new Error(`${this}: cannot set order unique once plan is locked`);
     }
     this.isOrderUnique = true;
@@ -1584,7 +1530,7 @@ export class PgSelectStep<
    * catches common user errors.
    */
   public getOrderByDigest() {
-    this._lockParameter("orderBy");
+    this.locker.lockParameter("orderBy");
     if (this.orders.length === 0) {
       return "natural";
     }
@@ -1607,7 +1553,7 @@ export class PgSelectStep<
   }
 
   public getOrderBy(): ReadonlyArray<PgOrderSpec> {
-    this._lockParameter("orderBy");
+    this.locker.lockParameter("orderBy");
     return this.orders;
   }
 
@@ -1625,7 +1571,7 @@ export class PgSelectStep<
   }
 
   private buildGroupBy() {
-    this._lockParameter("groupBy");
+    this.locker.lockParameter("groupBy");
     const groups = this.groups;
     return {
       sql:
@@ -1639,7 +1585,7 @@ export class PgSelectStep<
   }
 
   private buildOrderBy({ reverse }: { reverse: boolean }) {
-    this._lockParameter("orderBy");
+    this.locker.lockParameter("orderBy");
     const orders = reverse
       ? this.orders.map((o) => ({
           ...o,
@@ -1883,7 +1829,7 @@ export class PgSelectStep<
 
     // Now we need to be able to mess with ourself, but be sure to lock again
     // at the end.
-    this.locked = false;
+    this.locker.locked = false;
 
     if (!this.isFinalized) {
       const identifiersAlias = sql.identifier(
@@ -2165,7 +2111,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       }
     }
 
-    this.locked = true;
+    this.locker.locked = true;
 
     super.finalize();
   }
@@ -2173,7 +2119,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   deduplicate(
     peers: PgSelectStep<any, any, any, any>[],
   ): PgSelectStep<TColumns, TUniques, TRelations, TParameters>[] {
-    this._lockAllParameters();
+    this.locker.lockAllParameters();
     return peers.filter((p) => {
       if (p === this) {
         return true;
@@ -2441,7 +2387,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
 
     // Now we need to be able to mess with ourself, but be sure to lock again
     // at the end.
-    this.locked = false;
+    this.locker.locked = false;
     this.streamOptions = stream;
 
     // TODO: we should serialize our `SELECT` clauses and then if any are
@@ -2568,8 +2514,8 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           );
         }
 
-        const tableWasLocked = table.locked;
-        table.locked = false;
+        const tableWasLocked = table.locker.locked;
+        table.locker.locked = false;
 
         if (
           this.isUnique &&
@@ -2731,11 +2677,11 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           }
         }
 
-        table.locked = tableWasLocked;
+        table.locker.locked = tableWasLocked;
       }
     }
 
-    this.locked = true;
+    this.locker.locked = true;
 
     return this;
   }
@@ -2821,112 +2767,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   }
 
   // --------------------
-
-  /**
-   * Performs the given call back just before the given PgSelectLockableParameter is
-   * locked.
-   *
-   * @remarks To make sure we do things in the right order (e.g. ensure all the
-   * `order by` values are established before attempting to interpret a
-   * `cursor` for `before`/`after`) we need a locking system. This locking
-   * system allows for final actions to take place _just before_ the element is
-   * locked, for example _just before_ the order is locked we might want to
-   * check that the ordering is unique, and if it is not then we may want to
-   * add the primary key to the ordering.
-   */
-  public beforeLock(
-    type: PgSelectLockableParameter,
-    callback: PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>,
-  ): void {
-    this._assertParameterUnlocked(type);
-    this._beforeLock[type].push(callback);
-  }
-
-  /**
-   * Performs the given call back just after the given PgSelectLockableParameter is
-   * locked.
-   */
-  public afterLock(
-    type: PgSelectLockableParameter,
-    callback: PgSelectLockCallback<TColumns, TUniques, TRelations, TParameters>,
-  ): void {
-    this._assertParameterUnlocked(type);
-    this._afterLock[type].push(callback);
-  }
-
-  private lockCallbacks(
-    phase: "beforeLock" | "afterLock",
-    type: PgSelectLockableParameter,
-  ) {
-    const list = phase === "beforeLock" ? this._beforeLock : this._afterLock;
-    const callbacks = list[type];
-    const l = callbacks.length;
-    if (l > 0) {
-      const toCall = callbacks.splice(0, l);
-      for (let i = 0; i < l; i++) {
-        toCall[i](this);
-      }
-      if (callbacks.length > 0) {
-        throw new Error(
-          `beforeLock callback for '${type}' caused more beforeLock callbacks to be registered`,
-        );
-      }
-    }
-  }
-
-  /**
-   * Calls all the beforeLock actions for the given parameter and then locks
-   * it.
-   */
-  private _lockParameter(type: PgSelectLockableParameter): void {
-    if (this._lockedParameter[type] !== false) {
-      return;
-    }
-    this.lockCallbacks("beforeLock", type);
-    this._lockedParameter[type] = isDev
-      ? new Error("Initially locked here").stack
-      : true;
-    this.lockCallbacks("afterLock", type);
-  }
-
-  /**
-   * Throw a helpful error if you're trying to modify something that's already
-   * locked.
-   */
-  private _assertParameterUnlocked(type: PgSelectLockableParameter): void {
-    const isLocked = this._lockedParameter[type];
-    if (isLocked !== false) {
-      if (typeof isLocked === "string") {
-        throw new Error(
-          `'${type}' has already been locked\n    ` +
-            isLocked.replace(/\n/g, "\n    ") +
-            "\n",
-        );
-      }
-      throw new Error(`'${type}' has already been locked`);
-    }
-  }
-
-  private _lockAllParameters() {
-    // // We must execute everything after `from` so we have the alias to reference
-    // this._lockParameter("from");
-    // this._lockParameter("join");
-    this._lockParameter("groupBy");
-    this._lockParameter("orderBy");
-    // // We must execute where after orderBy because cursor queries require all orderBy columns
-    // this._lockParameter("cursorComparator");
-    // this._lockParameter("whereBound");
-    // this._lockParameter("where");
-    // // 'where' -> 'whereBound' can affect 'offset'/'limit'
-    // this._lockParameter("offset");
-    // this._lockParameter("limit");
-    // this._lockParameter("first");
-    // this._lockParameter("last");
-    // // We must execute select after orderBy otherwise we cannot generate a cursor
-    // this._lockParameter("fixedSelectExpression");
-    // this._lockParameter("selectCursor");
-    // this._lockParameter("select");
-  }
 }
 
 function joinMatches(
