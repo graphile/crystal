@@ -1123,12 +1123,14 @@ export class PgSelectStep<
       let fragment = sql`${order.fragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
 
       if (i < orderCount - 1) {
-        fragment = sql`(${fragment}) or (${
-          order.fragment
-        } = ${sqlValue} and ${condition(i + 1)})`;
+        fragment = sql`(${fragment})
+or (
+${sql.indent`${order.fragment} = ${sqlValue}
+and ${condition(i + 1)}`}
+)`;
       }
 
-      return sql.parens(fragment);
+      return sql.parens(sql.indent(fragment));
     };
 
     /*

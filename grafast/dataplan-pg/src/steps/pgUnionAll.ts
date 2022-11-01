@@ -784,12 +784,14 @@ export class PgUnionAllStep<TAttributes extends string>
         } ${sqlValue}`;
 
         if (i < max - 1) {
-          fragment = sql`(${fragment}) or (${orderFragment} = ${sqlValue} and ${condition(
-            i + 1,
-          )})`;
+          fragment = sql`(${fragment})
+or (
+${sql.indent`${orderFragment} = ${sqlValue}
+and ${condition(i + 1)}`}
+)`;
         }
 
-        return sql.parens(fragment);
+        return sql.parens(sql.indent(fragment));
       };
 
       const finalCondition = condition();
