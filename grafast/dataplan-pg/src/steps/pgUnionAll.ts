@@ -295,6 +295,7 @@ export class PgUnionAllStep<TAttributes extends string>
   public readonly spec: PgUnionAllStepConfig<TAttributes>;
 
   private orders: Array<PgOrderSpec>;
+  private ordersForCursor: Array<PgOrderSpec>;
 
   /**
    * Since this is effectively like a DataLoader it processes the data for many
@@ -401,6 +402,7 @@ export class PgUnionAllStep<TAttributes extends string>
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.queryValuesSymbol = cloneFrom.queryValuesSymbol;
       this.orders = [...cloneFrom.orders];
+      this.ordersForCursor = [...cloneFrom.ordersForCursor];
 
       this.detailsBySource = new Map(cloneFrom.detailsBySource);
       this.executor = cloneFrom.executor;
@@ -430,6 +432,7 @@ export class PgUnionAllStep<TAttributes extends string>
       this.placeholderValues = new Map();
       this.queryValuesSymbol = Symbol("union_identifier_values");
       this.orders = [];
+      this.ordersForCursor = [];
 
       let first = true;
       this.detailsBySource = new Map();
@@ -464,18 +467,38 @@ export class PgUnionAllStep<TAttributes extends string>
     }
 
     this.locker.afterLock("orderBy", () => {
-      if (this.beforeStepId != null) {
-        this.applyConditionFromCursor(
-          "before",
-          this.getDep(this.beforeStepId) as any,
-        );
-      }
-      if (this.afterStepId != null) {
-        this.applyConditionFromCursor(
-          "after",
-          this.getDep(this.afterStepId) as any,
-        );
-      }
+      this.withMyLayerPlan(() => {
+        this.ordersForCursor = [
+          ...this.orders,
+          {
+            fragment: sql`${this.alias}.${sql.identifier(
+              String(this.selectType()),
+            )}`,
+            codec: TYPES.text,
+            direction: "ASC",
+          },
+          {
+            fragment: sql`${this.alias}.${sql.identifier(
+              String(this.selectPk()),
+            )}`,
+            codec: TYPES.json,
+            direction: "ASC",
+          },
+        ];
+
+        if (this.beforeStepId != null) {
+          this.applyConditionFromCursor(
+            "before",
+            this.getDep(this.beforeStepId) as any,
+          );
+        }
+        if (this.afterStepId != null) {
+          this.applyConditionFromCursor(
+            "after",
+            this.getDep(this.afterStepId) as any,
+          );
+        }
+      });
     });
   }
 
@@ -966,7 +989,7 @@ export class PgUnionAllStep<TAttributes extends string>
    */
   public getOrderByDigest() {
     this.locker.lockParameter("orderBy");
-    if (this.orders.length === 0) {
+    if (this.ordersForCursor.length === 0) {
       return "natural";
     }
     // The security of this hash is unimportant; the main aim is to protect the
@@ -975,7 +998,7 @@ export class PgUnionAllStep<TAttributes extends string>
     const hash = createHash("sha256");
     hash.update(
       JSON.stringify(
-        this.orders.map(
+        this.ordersForCursor.map(
           (o) =>
             sql.compile(o.fragment, {
               placeholderValues: this.placeholderValues,
@@ -989,7 +1012,7 @@ export class PgUnionAllStep<TAttributes extends string>
 
   public getOrderBy(): ReadonlyArray<PgOrderSpec> {
     this.locker.lockParameter("orderBy");
-    return this.orders;
+    return this.ordersForCursor;
   }
 
   optimize() {
