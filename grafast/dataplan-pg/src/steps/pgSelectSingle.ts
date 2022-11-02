@@ -1,6 +1,5 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import { list } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { list, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 

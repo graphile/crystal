@@ -1,8 +1,6 @@
 import type { ExecutionExtra } from "grafast";
-import { list, UnbatchedExecutableStep } from "grafast";
-import sql from "pg-sql2";
+import { UnbatchedExecutableStep } from "grafast";
 
-import { TYPES } from "../codecs.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
 
