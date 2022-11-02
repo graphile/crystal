@@ -738,11 +738,12 @@ export class PgUnionAllStep<TAttributes extends string>
         const [orderFragment, sqlValue, direction] = (() => {
           if (i >= orderCount - 1) {
             // PK
-            const pkCol = pk.columns[i - (orderCount - 1)];
+            const pkIndex = i - (orderCount - 1);
+            const pkCol = pk.columns[pkIndex];
             return [
               sql`${details.alias}.${sql.identifier(pkCol)}`,
               // TODO: this is not the correct way of casting.
-              sql`(${pkPlaceholder}->>${sql.literal(i)})::${
+              sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
                 pkColumns[pkCol].codec.sqlType
               }`,
               "ASC",
