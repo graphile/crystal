@@ -72,6 +72,8 @@ export class PgClassExpressionStep<
 
   public readonly expression: SQL;
 
+  private needsPolymorphicUnwrap: boolean;
+
   constructor(
     $table:
       | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
@@ -81,6 +83,7 @@ export class PgClassExpressionStep<
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
   ) {
     super();
+    this.needsPolymorphicUnwrap = $table instanceof PgUnionAllSingleStep;
     this.tableId = this.addDependency($table);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
@@ -216,7 +219,7 @@ export class PgClassExpressionStep<
   public unbatchedExecute(extra: ExecutionExtra, rawV: any): any {
     // TODO: this feels like a hack; should we really have to manually unwrap
     // PgUnionAllStep polymorphism here?
-    const v = rawV && $$data in rawV ? rawV[$$data] : rawV;
+    const v = this.needsPolymorphicUnwrap ? rawV?.[$$data] : rawV;
     if (v == null) {
       return null;
     }
