@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy()
+{
+  vulnerabilitiesConnection(orderBy: [CVSS_SCORE_ASC]) {
+    edges {
+      cursor
+      node {
+        cvssScore
+        ... on FirstPartyVulnerability {
+          id
+          name
+          teamName
+        }
+        ... on ThirdPartyVulnerability {
+          id
+          name
+          vendorName
+        }
+      }
+    }
+  }
+}
