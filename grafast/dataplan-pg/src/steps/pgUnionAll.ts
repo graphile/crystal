@@ -719,6 +719,29 @@ export class PgUnionAllStep<TAttributes extends string>
       return;
     }
 
+    const placeholders: SQL[] = [];
+    for (let i = 0; i < orderCount; i++) {
+      const order = this.orders[i];
+      if (i === orderCount - 1) {
+        // PK
+        placeholders[i] = this.placeholder(
+          toPg(access($parsedCursorPlan, [i + 1]), TYPES.json),
+          TYPES.json,
+        );
+      } else if (i === orderCount - 2) {
+        // Type
+        placeholders[i] = this.placeholder(
+          toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
+          TYPES.text,
+        );
+      } else {
+        placeholders[i] = this.placeholder(
+          toPg(access($parsedCursorPlan, [i + 1]), order.codec),
+          order.codec,
+        );
+      }
+    }
+
     for (const [identifier, sourceSpec] of Object.entries(
       this.spec.sourceSpecs,
     )) {
@@ -728,10 +751,7 @@ export class PgUnionAllStep<TAttributes extends string>
         throw new Error("No primary key; this should have been caught earlier");
       }
       const max = orderCount - 1 + pk.columns.length;
-      const pkPlaceholder = this.placeholder(
-        toPg(access($parsedCursorPlan, [orderCount - 1 + 1]), TYPES.json),
-        TYPES.json,
-      );
+      const pkPlaceholder = placeholders[orderCount - 1];
       const pkColumns = sourceSpec.source.codec.columns as PgTypeColumns;
       const condition = (i = 0): SQL => {
         const order = details.orders[i];
@@ -750,23 +770,9 @@ export class PgUnionAllStep<TAttributes extends string>
             ];
           } else if (i === orderCount - 2) {
             // Type
-            return [
-              sql.literal(identifier),
-              this.placeholder(
-                toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
-                TYPES.text,
-              ),
-              "ASC",
-            ];
+            return [sql.literal(identifier), placeholders[i], "ASC"];
           } else {
-            return [
-              order.fragment,
-              this.placeholder(
-                toPg(access($parsedCursorPlan, [i + 1]), order.codec),
-                order.codec,
-              ),
-              order.direction,
-            ];
+            return [order.fragment, placeholders[i], order.direction];
           }
         })();
         // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
