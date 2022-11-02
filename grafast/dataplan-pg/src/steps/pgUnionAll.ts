@@ -1143,9 +1143,6 @@ and ${condition(i + 1)}`}
           })
           .filter(isNotNullish);
         midSelects.push(rowNumberIdent);
-        innerSelects.push(
-          sql`row_number() over (partition by 1) as ${rowNumberIdent}`,
-        );
 
         const ascOrDesc = this.shouldReverseOrder() ? sql`desc` : sql`asc`;
         const pkOrder = sql.join(
@@ -1154,19 +1151,7 @@ and ${condition(i + 1)}`}
           ),
           ",\n",
         );
-
-        // Can't order individual selects in a `union all` so we're using
-        // subqueries to do so.
-        const innerQuery = sql.indent`
-select
-${sql.indent(sql.join(innerSelects, ",\n"))}
-from ${sqlSource} as ${tableAlias}
-${
-  conditions.length > 0
-    ? sql`where ${sql.join(conditions, `\nand `)}\n`
-    : sql.blank
-}\
-order by
+        const orderBy = sql`order by
 ${sql.indent`${
   orders.length > 0
     ? sql`${sql.join(
@@ -1180,7 +1165,24 @@ ${sql.indent`${
         `,\n`,
       )},\n`
     : sql.blank
-}${pkOrder}`}\
+}${pkOrder}`}`;
+
+        innerSelects.push(
+          sql`row_number() over (${sql.indent(orderBy)}) as ${rowNumberIdent}`,
+        );
+
+        // Can't order individual selects in a `union all` so we're using
+        // subqueries to do so.
+        const innerQuery = sql.indent`
+select
+${sql.indent(sql.join(innerSelects, ",\n"))}
+from ${sqlSource} as ${tableAlias}
+${
+  conditions.length > 0
+    ? sql`where ${sql.join(conditions, `\nand `)}\n`
+    : sql.blank
+}\
+${orderBy}\
 ${this.innerLimitSQL!}
 `;
 
