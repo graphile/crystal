@@ -1,5 +1,5 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { list, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -455,6 +455,23 @@ export class PgSelectSingleStep<
     TParameters
   > {
     return pgClassExpression(this, codec)`${expression}`;
+  }
+
+  /**
+   * @internal
+   * For use by PgCursorStep
+   */
+  public getCursorDigestAndStep(): [string, ExecutableStep] {
+    const classPlan = this.getClassStep();
+    const digest = classPlan.getOrderByDigest();
+    const orders = classPlan.getOrderBy();
+    const step = list(
+      orders.length > 0
+        ? orders.map((o) => this.expression(o.fragment, o.codec))
+        : // No ordering; so use row number
+          [this.expression(sql`row_number() over (partition by 1)`, TYPES.int)],
+    );
+    return [digest, step];
   }
 
   /**

@@ -947,6 +947,11 @@ export class PgSource<
     return;
   }
 
+  /**
+   * @deprecated Please use `.executor.context()` instead - all sources for the
+   * same executor must use the same context to allow for SQL inlining, unions,
+   * etc.
+   */
   public context(): ObjectStep<PgExecutorContextPlans> {
     return this.executor.context();
   }

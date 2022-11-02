@@ -1,0 +1,26 @@
+{
+  vulnerabilitiesConnection: {
+    edges: [
+      {
+        cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNVwiXSJd",
+        node: {
+          __typename: "FirstPartyVulnerability",
+          cvssScore: 7.2,
+          id: 5,
+          name: "Timing attack",
+          teamName: "Retention",
+        },
+      },
+      {
+        cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIlRoaXJkUGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNFwiXSJd",
+        node: {
+          __typename: "ThirdPartyVulnerability",
+          cvssScore: 7.2,
+          id: 4,
+          name: "Malware",
+          vendorName: "Frog-Render-Lib",
+        },
+      },
+    ],
+  },
+}

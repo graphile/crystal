@@ -1,0 +1,22 @@
+{
+  vulnerabilities: [
+    {
+      cvssScore: 9.1,
+      id: 2,
+      name: "XSS",
+      vendorName: "Frog-Render-Lib",
+    },
+    {
+      cvssScore: 7.7,
+      id: 3,
+      name: "Exponential backtracking",
+      teamName: "Continuity",
+    },
+    {
+      cvssScore: 7.5,
+      id: 1,
+      name: "CSRF",
+      vendorName: "98-Factor-Login",
+    },
+  ],
+}

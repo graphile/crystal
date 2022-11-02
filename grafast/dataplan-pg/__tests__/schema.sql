@@ -503,6 +503,105 @@ create trigger _500_commentable
 
 comment on table interfaces_and_unions.relational_commentables is E'@interface relational type\n@type POST relational_posts\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
 
+create table interfaces_and_unions.aws_applications (
+  id int primary key,
+  name text not null,
+  last_deployed timestamptz,
+  aws_id text
+);
+create table interfaces_and_unions.gcp_applications (
+  id int primary key,
+  name text not null,
+  last_deployed timestamptz,
+  gcp_id text
+);
+create table interfaces_and_unions.first_party_vulnerabilities (
+  id int primary key,
+  name text not null,
+  cvss_score float not null,
+  team_name text
+);
+create table interfaces_and_unions.third_party_vulnerabilities (
+  id int primary key,
+  name text not null,
+  cvss_score float not null,
+  vendor_name text
+);
+
+create table interfaces_and_unions.aws_application_first_party_vulnerabilities (
+  aws_application_id int not null references interfaces_and_unions.aws_applications,
+  first_party_vulnerability_id int not null references interfaces_and_unions.first_party_vulnerabilities,
+  primary key (aws_application_id, first_party_vulnerability_id)
+);
+create table interfaces_and_unions.aws_application_third_party_vulnerabilities (
+  aws_application_id int not null references interfaces_and_unions.aws_applications,
+  third_party_vulnerability_id int not null references interfaces_and_unions.third_party_vulnerabilities,
+  primary key (aws_application_id, third_party_vulnerability_id)
+);
+create table interfaces_and_unions.gcp_application_first_party_vulnerabilities (
+  gcp_application_id int not null references interfaces_and_unions.gcp_applications,
+  first_party_vulnerability_id int not null references interfaces_and_unions.first_party_vulnerabilities,
+  primary key (gcp_application_id, first_party_vulnerability_id)
+);
+create table interfaces_and_unions.gcp_application_third_party_vulnerabilities (
+  gcp_application_id int not null references interfaces_and_unions.gcp_applications,
+  third_party_vulnerability_id int not null references interfaces_and_unions.third_party_vulnerabilities,
+  primary key (gcp_application_id, third_party_vulnerability_id)
+);
+
+create index on interfaces_and_unions.aws_application_first_party_vulnerabilities (first_party_vulnerability_id);
+create index on interfaces_and_unions.aws_application_third_party_vulnerabilities (third_party_vulnerability_id);
+create index on interfaces_and_unions.gcp_application_first_party_vulnerabilities (first_party_vulnerability_id);
+create index on interfaces_and_unions.gcp_application_third_party_vulnerabilities (third_party_vulnerability_id);
+
+insert into interfaces_and_unions.aws_applications (id, name, last_deployed, aws_id) values
+  (1, 'AWS App 1', null, 'AWS-0001'),
+  (2, 'AWeSome', '2021-06-05T04:03:02.010Z', 'AWS-0002'); -- NO VULNERABILITIES!
+insert into interfaces_and_unions.gcp_applications (id, name, last_deployed, gcp_id) values
+  (1, 'GCP App 1', null, 'GCP_0_1'),
+  (2, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2');
+
+insert into interfaces_and_unions.first_party_vulnerabilities (id, name, cvss_score, team_name) values
+  (1, 'Off-by-one', 3.0, 'Accounting'),
+  (2, 'Index-out-of-bounds', 7.2, 'Retention'),
+  (3, 'Exponential backtracking', 7.7, 'Continuity'),
+  (4, 'Information disclosure', 7.2, 'Retention'),
+  (5, 'Timing attack', 7.2, 'Retention');
+
+insert into interfaces_and_unions.third_party_vulnerabilities (id, name, cvss_score, vendor_name) values
+  (1, 'CSRF', 7.5, '98-Factor-Login'),
+  (2, 'XSS', 9.1, 'Frog-Render-Lib'),
+  (3, 'SQL injection', 10.0, 'Eval-Sequel-Corp'),
+  (4, 'Malware', 7.2, 'Frog-Render-Lib'),
+  (5, 'License', 7.2, 'Frog-Render-Lib');
+
+insert into interfaces_and_unions.aws_application_first_party_vulnerabilities values
+  (1, 1),
+  (1, 3),
+  (1, 4),
+  (1, 5);
+insert into interfaces_and_unions.aws_application_third_party_vulnerabilities values
+  (1, 1),
+  (1, 2),
+  (1, 4),
+  (1, 5);
+insert into interfaces_and_unions.gcp_application_first_party_vulnerabilities values
+  (1, 2),
+  (2, 2),
+  (2, 3),
+  (1, 4),
+  (1, 5),
+  (2, 4),
+  (2, 5);
+insert into interfaces_and_unions.gcp_application_third_party_vulnerabilities values
+  (1, 3),
+  (2, 1),
+  (2, 3),
+  (1, 4),
+  (1, 5),
+  (2, 4),
+  (2, 5);
+
 --------------------------------------------------------------------------------
 
 -- The degenerate case of an interface, that is an interface with no shared

@@ -2,23 +2,55 @@
 title: Polymorphism
 ---
 
-# pgPolymorphic and pgSingleTablePolymorphic
+# Polymorphism in @dataplan/pg
 
-`PgPolymorphicStep` and `PgSingleTablePolymorphicStep` are step classes used
-for dealing with polymorphism (where a referenced entity may be one of a set of
-possible concrete types) in your GraphQL schema when that polymorphism is
-backed by Postgres data. For example in your application you might comment on
-an `Issue`, `PullRequest` or `Discussion` and thus the relationship between
-`Comment` and these three types is polymorphic.
+Polymorphism in PostgreSQL schemas can take many forms. In `@dataplan/pg` we've
+added a few different step classes that you can use to deal with polymorphism;
+which one you should choose depends on what shape your data is.
 
-## Usage
+In the simplest case you have a single table that represents all of your
+possible polymorphic types, perhaps using a 'type' column or similar to
+indicate the underlying type. For this style, you should use
+`pgSingleTablePolymorphic`.
+
+A slightly more complex case is having a table that defines the type as above,
+but then you join in additional data from other tables in a relational manner;
+for this you should use `pgPolymorphic`.
+
+Finally you might just have multiple separate tables that you want to represent
+with an interface or union in GraphQL; for example a `users` table and an
+`organizations` table which might both belong to the `Owner` interface. In this
+case, you're probably going to need `pgUnionAll`.
+
+See [types of polymorphism](#types-of-polymorphism) lower down for examples of these.
+
+## pgSingleTablePolymorphic
+
+`pgSingleTablePolymorphic` is useful only for the "single table" polymorphism
+style (see below) but is much simpler to use than `pgPolymorphic`.
+
+### pgSingleTablePolymorphic function
+
+The `pgSingleTablePolymorphic` function can only be used in the "single table"
+style, and accepts two arguments:
+
+1. `$typeName` - a step that resolves to the GraphQL type name of the row
+2. `$row` - a step representing the database row
+
+Here's a simplified description of the `pgSingleTablePolymorphic` function:
+
+```ts
+export function pgSingleTablePolymorphic(
+  $typePlan: ExecutableStep<string>,
+  $rowPlan: PgSelectSingleStep,
+): PgSingleTablePolymorphicStep;
+```
+
+## pgPolymorphic
 
 `pgPolymorphic` works by matching the runtime value of a "specifier" step
 against a "polymorphic type map" that defines the types supported, how to
 detect matches, and what to do when the type is matched.
-
-`pgSingleTablePolymorphic` is useful only for the "single table" polymorphism
-style (see below) but is much simpler to use.
 
 ### Polymorphic type map
 
@@ -69,22 +101,185 @@ export function pgPolymorphic(
 ): PgPolymorphicStep
 ```
 
-### pgSingleTablePolymorphic function
+## pgUnionAll
 
-The `pgSingleTablePolymorphic` function can only be used in the "single table"
-style, and accepts two arguments:
+If you can't solve your polymorphic problem with `pgSingleTablePolymorphic` or
+`pgPolymorphic` then you might need to fall back on `pgUnionAll`.
 
-1. `$typeName` - a step that resolves to the GraphQL type name of the row
-2. `$row` - a step representing the database row
+This step class uses the SQL `UNION ALL` construct to select a number of fields
+from a number of different tables that might all be part of the same union or
+interface in GraphQL. You can order by these shared fields, or apply conditions
+to them, and we'll pass these orders and conditions down to the individual
+table selects (as part of the `UNION ALL`) to ensure that we get the results in
+the most efficient manner.
 
-Here's a simplified description of the `pgSingleTablePolymorphic` function:
+### pgUnionAll function
+
+The `pgUnionAll` function accepts one argument - the "PgUnionAllStepConfig".
+This configuration object has the following entries:
+
+- `executor` - the PgExecutor to use for executing this `union all` statement
+  at runtime
+- `sourceSpecs` - details of the sources to combine in the `union all`
+  statement; this is a map from the GraphQL object type name to a configuration
+  object indicating the `source` for that type
+- `attributes` - the available common attributes (if any) as a map from the
+  attribute name to a specification object containing the `codec` to use for
+  the attribute; this is generally used with GraphQL interfaces
+
+:::note
+
+Every `source` must have the same `executor` as the pgUnionAll executor.
+
+Every `source` must have a primary key (an entry in `source.uniques` with
+`isPrimary === true`) that can be used to fetch the resulting record that
+matches the entry in the union.
+
+:::
+
+### Applying conditions
+
+Conditions can be applied to the resulting step via the `.where()` method,
+which accepts an object containing the following keys:
+
+- `attribute` - the (string) name of the attribute from the pgUnionAll
+  `attributes` to apply the condition against
+- `callback` - a callback function, invoked for each union source and passed
+  the alias for that source, that should return an SQL fragment expressing the
+  condition.
+
+:::note
+
+`callback` will be called for each entry in `sourceSpecs` since each source is
+responsible for adding its own conditions.
+
+:::
+
+### Custom ordering
+
+The order of the union can be specified via the `.orderBy()` method,
+which accepts an object containing the following keys:
+
+- `attribute` - the (string) name of the attribute from the pgUnionAll
+  `attributes` to use for ordering.
+- `direction` - either `ASC` for ascending order, or `DESC` for descending
+  order. All other values have undefined results that may change in a patch
+  release.
+
+:::note
+
+Every entry in `sourceSpecs` will be ordered, and the `union all` will be ordered again
+to ensure a stable ordering result.
+
+:::
+
+### Pagination
+
+Limit/offset pagination can be accomplished via `.setFirst($n)` and
+`.setOffset($n)`. `pgUnionAll` also implements the relevant interfaces to
+support the [`connection`](../standard-steps/connection.md) step for cursor
+pagination.
+
+### Example
 
 ```ts
-export function pgSingleTablePolymorphic(
-  $typePlan: ExecutableStep<string>,
-  $rowPlan: PgSelectSingleStep,
-): PgSingleTablePolymorphicStep;
+const $vulnerabilities = pgUnionAll({
+  executor: firstPartyVulnerabilitiesSource.executor,
+  sourceSpecs: {
+    FirstPartyVulnerability: {
+      source: firstPartyVulnerabilitiesSource,
+    },
+    ThirdPartyVulnerability: {
+      source: thirdPartyVulnerabilitiesSource,
+    },
+  },
+  attributes: {
+    cvss_score: {
+      codec: TYPES.float,
+    },
+  },
+});
+$vulnerabilities.orderBy({
+  attribute: "cvss_score",
+  direction: "DESC",
+});
+$vulnerabilities.where({
+  attribute: "cvss_score",
+  callback: (alias) =>
+    sql`${alias} > ${$vulnerabilities.placeholder(constant(6), TYPES.float)}`,
+});
+$vulnerabilities.setFirst(2);
+$vulnerabilities.setOffset(2);
 ```
+
+### pgUnionAll SQL explained
+
+Though the `UNION ALL` complicates PostgreSQL's planning and execution, we've
+put effort into building the most efficient SQL queries we can for this
+problem, whilst still supporting pagination, custom conditions and custom
+ordering. This does result in more complex SQL queries than you may be used
+to from this module. Effectively the queries look like this:
+
+```sql
+-- OUTER SELECT
+select
+  __union__."0"::text,
+  __union__."1"::text
+from (
+    -- MIDDLE SELECT
+    select
+      __first_table__."0",
+      __first_table__."1",
+      __first_table__."2",
+      "n"
+    from (
+      -- INNER SELECT
+      select
+        __first_table__."column1" as "0",
+        __first_table__."id" as "1",
+        'FirstTable' as "2",
+        row_number() over (partition by 1) as "n"
+      from first_table as __first_table__
+      where ...
+      order by __first_table__."column1"
+      limit ...
+    )
+  -- Any number of additional "middle selects" from different tables
+  -- via 'union all'
+  union all
+    select
+  ...
+  order by
+    "0" desc,
+    "n" asc,
+    "2" asc
+  limit ...
+  offset ...
+) __union__
+```
+
+We'll have as many "inner select" and "middle select" fragments as there are
+tables in the union.
+
+Each "inner select" is responsible for selecting the requisite common fields
+from each individual table, applying any conditions (into the `where` clause),
+applying the ordering (`order by` clause), and applying a limit (which will be
+the main limit plus the offset so that we can source enough rows for the
+`union all`'s limit/offset to apply).
+
+The middle select exists solely because `union all` only
+allows a single `order by` at the end of the statement, and for some reason we
+think we know better how to optimize this query than Postgres does... (Time
+will tell.) So the middle select just re-selects the relevant attributes.
+
+The `union all` statement then orders by the relevant attributes again
+(including the type name and the `row_number()` to ensure there's a stable
+order) and applies the final limit/offset.
+
+Finally the "outer select" selects the fields we need, and casts them according
+to the codecs involved. Note that we couldn't have cast them earlier since they
+were used in ordering, and casting them to text (for example) could seriously
+compromise the ordering.
 
 ## Types of polymorphism supported
 
@@ -479,3 +674,13 @@ const plans = {
   },
 };
 ```
+
+### Completely separate tables
+
+In the completely separate tables form of polymorphism, any number of tables
+can become part of a union via `pgUnionAll`. You may also, optionally, declare
+attributes that these tables have in common - this can allow you to add
+conditions and orders on these common columns. Right now these common columns
+must match name and type exactly (we don't check this, but unexpected errors
+may occur at runtime if you don't adhere to it) but there's definitely scope to
+soften these requirements - get in touch if this is something you need.

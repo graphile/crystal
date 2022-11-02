@@ -20,7 +20,6 @@ import type {
   AccessStep,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
-  ExecutableStep,
   GrafastSubscriber,
   GraphileArgumentConfig,
   ListStep,
@@ -34,6 +33,7 @@ import {
   context,
   each,
   error,
+  ExecutableStep,
   filter,
   getEnumValueConfig,
   groupBy,
@@ -51,6 +51,7 @@ import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLFloat,
   GraphQLInt,
   GraphQLInterfaceType,
   GraphQLList,
@@ -106,6 +107,8 @@ import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
+import type { PgUnionAllStep } from "../steps/pgUnionAll.js";
+import { pgUnionAll, PgUnionAllSingleStep } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
   withPgClientTransaction,
@@ -1935,6 +1938,135 @@ export function makeExampleSchema(
     ],
   );
 
+  ////////////////////////////////////////
+
+  const awsApplicationsSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.aws_applications",
+          sql`interfaces_and_unions.aws_applications`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
+            aws_id: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.aws_applications`,
+        name: "aws_applications",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const gcpApplicationsSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.gcp_applications",
+          sql`interfaces_and_unions.gcp_applications`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
+            gcp_id: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.gcp_applications`,
+        name: "gcp_applications",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const firstPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.first_party_vulnerabilities",
+          sql`interfaces_and_unions.first_party_vulnerabilities`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            cvss_score: col({ codec: TYPES.float, notNull: true }),
+            team_name: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        name: "first_party_vulnerabilities",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const thirdPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+      return new PgSourceBuilder({
+        executor,
+        selectAuth,
+        codec: recordType(
+          "interfaces_and_unions.third_party_vulnerabilities",
+          sql`interfaces_and_unions.third_party_vulnerabilities`,
+          {
+            id: col({ codec: TYPES.int, notNull: true }),
+            name: col({
+              codec: TYPES.text,
+              notNull: true,
+            }),
+            cvss_score: col({ codec: TYPES.float, notNull: true }),
+            vendor_name: col({ codec: TYPES.text, notNull: false }),
+          },
+        ),
+        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        name: "third_party_vulnerabilities",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+    },
+    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+  );
+
+  const firstPartyVulnerabilitiesSource = EXPORTABLE(
+    (firstPartyVulnerabilitiesSourceBuilder) =>
+      firstPartyVulnerabilitiesSourceBuilder.build({}),
+    [firstPartyVulnerabilitiesSourceBuilder],
+  );
+  const thirdPartyVulnerabilitiesSource = EXPORTABLE(
+    (thirdPartyVulnerabilitiesSourceBuilder) =>
+      thirdPartyVulnerabilitiesSourceBuilder.build({}),
+    [thirdPartyVulnerabilitiesSourceBuilder],
+  );
+  const awsApplicationsSource = EXPORTABLE(
+    (awsApplicationsSourceBuilder) => awsApplicationsSourceBuilder.build({}),
+    [awsApplicationsSourceBuilder],
+  );
+  const gcpApplicationsSource = EXPORTABLE(
+    (gcpApplicationsSourceBuilder) => gcpApplicationsSourceBuilder.build({}),
+    [gcpApplicationsSourceBuilder],
+  );
+  awsApplicationsSource;
+  gcpApplicationsSource;
+
+  ////////////////////////////////////////
+
   function attrField<TColumns extends PgTypeColumns>(
     attrName: keyof TColumns,
     type: GraphQLOutputType,
@@ -3629,6 +3761,224 @@ export function makeExampleSchema(
 
   ////////////////////////////////////////
 
+  const Vulnerability = new GraphQLInterfaceType({
+    name: "Vulnerability",
+    fields: {
+      cvssScore: {
+        type: GraphQLFloat,
+      },
+    },
+  });
+
+  const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
+    name: "FirstPartyVulnerability",
+    interfaces: [Vulnerability],
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("id");
+            },
+          [],
+        ),
+      },
+      name: {
+        type: new GraphQLNonNull(GraphQLString),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("name");
+            },
+          [],
+        ),
+      },
+      cvssScore: {
+        type: GraphQLFloat,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("cvss_score");
+            },
+          [],
+        ),
+      },
+      teamName: {
+        type: GraphQLString,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("team_name");
+            },
+          [],
+        ),
+      },
+    },
+  });
+
+  const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
+    name: "ThirdPartyVulnerability",
+    interfaces: [Vulnerability],
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("id");
+            },
+          [],
+        ),
+      },
+      name: {
+        type: new GraphQLNonNull(GraphQLString),
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("name");
+            },
+          [],
+        ),
+      },
+      cvssScore: {
+        type: GraphQLFloat,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("cvss_score");
+            },
+          [],
+        ),
+      },
+      vendorName: {
+        type: GraphQLString,
+        plan: EXPORTABLE(
+          () =>
+            function plan($v: any) {
+              return $v.get("vendor_name");
+            },
+          [],
+        ),
+      },
+    },
+  });
+
+  type VulnerabilityConnectionStep = ConnectionStep<
+    PgUnionAllSingleStep,
+    PgSelectParsedCursorStep,
+    PgUnionAllStep<any>,
+    PgUnionAllSingleStep
+  >;
+
+  const VulnerabilityEdge = newObjectTypeBuilder<
+    OurGraphQLContext,
+    PgUnionAllSingleStep
+  >(PgUnionAllSingleStep)({
+    name: "VulnerabilityEdge",
+    fields: {
+      cursor: {
+        type: GraphQLString,
+        plan: EXPORTABLE(
+          () =>
+            function plan($node) {
+              return $node.cursor();
+            },
+          [],
+        ),
+      },
+      node: {
+        type: Vulnerability,
+        plan: EXPORTABLE(
+          () =>
+            function plan($node) {
+              return $node;
+            },
+          [],
+        ),
+      },
+    },
+  });
+
+  const VulnerabilitiesConnection = newObjectTypeBuilder<
+    OurGraphQLContext,
+    VulnerabilityConnectionStep
+  >(ConnectionStep)({
+    name: "VulnerabilitiesConnection",
+    fields: {
+      edges: {
+        type: new GraphQLList(VulnerabilityEdge),
+        plan: EXPORTABLE(
+          () =>
+            function plan($connection) {
+              return $connection.edges();
+            },
+          [],
+        ),
+      },
+      pageInfo: newGraphileFieldConfigBuilder<
+        OurGraphQLContext,
+        VulnerabilityConnectionStep
+      >()({
+        type: new GraphQLNonNull(PageInfo),
+        plan: EXPORTABLE(
+          () =>
+            function plan($connection) {
+              return $connection.pageInfo() as any;
+            },
+          [],
+        ),
+      }),
+    },
+  });
+
+  const VulnerabilityCondition = newInputObjectTypeBuilder()({
+    name: "VulnerabilityCondition",
+    fields: {
+      todo: {
+        type: GraphQLString,
+      },
+    },
+  });
+
+  const VulnerabilitiesOrderBy = new GraphQLEnumType({
+    name: "VulnerabilitiesOrderBy",
+    values: {
+      CVSS_SCORE_ASC: {
+        extensions: {
+          graphile: {
+            applyPlan: EXPORTABLE(
+              () => (step: PgUnionAllStep<any>) => {
+                step.orderBy({
+                  attribute: "cvss_score",
+                  direction: "ASC",
+                });
+              },
+              [],
+            ),
+          },
+        },
+      },
+      CVSS_SCORE_DESC: {
+        extensions: {
+          graphile: {
+            applyPlan: EXPORTABLE(
+              () => (step: PgUnionAllStep<any>) => {
+                step.orderBy({
+                  attribute: "cvss_score",
+                  direction: "DESC",
+                });
+              },
+              [],
+            ),
+          },
+        },
+      },
+    },
+  });
+
+  ////////////////////////////////////////
+
   const Query = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValueStep<BaseGraphQLRootValue>
@@ -4364,6 +4714,241 @@ export function makeExampleSchema(
           [],
         ),
       },
+
+      vulnerabilities: {
+        type: new GraphQLList(Vulnerability),
+        args: {
+          first: {
+            type: GraphQLInt,
+          },
+          offset: {
+            type: GraphQLInt,
+          },
+        },
+        plan: EXPORTABLE(
+          (
+            TYPES,
+            constant,
+            firstPartyVulnerabilitiesSource,
+            pgUnionAll,
+            sql,
+            thirdPartyVulnerabilitiesSource,
+          ) =>
+            function plan(_, fieldArgs) {
+              const $first = fieldArgs.getRaw("first");
+              const $offset = fieldArgs.getRaw("offset");
+              // IMPORTANT: for cursor pagination, type must be part of cursor condition
+              const $vulnerabilities = pgUnionAll({
+                executor: firstPartyVulnerabilitiesSource.executor,
+                attributes: {
+                  cvss_score: {
+                    codec: TYPES.float,
+                  },
+                },
+                sourceSpecs: {
+                  FirstPartyVulnerability: {
+                    source: firstPartyVulnerabilitiesSource,
+                    /* Could add attribute overrides here */
+                  },
+                  ThirdPartyVulnerability: {
+                    source: thirdPartyVulnerabilitiesSource,
+                  },
+                },
+              });
+              $vulnerabilities.orderBy({
+                attribute: "cvss_score",
+                direction: "DESC",
+              });
+              $vulnerabilities.where({
+                attribute: "cvss_score",
+                callback: (alias) =>
+                  sql`${alias} > ${$vulnerabilities.placeholder(
+                    constant(6),
+                    TYPES.float,
+                  )}`,
+              });
+              $vulnerabilities.setFirst($first);
+              $vulnerabilities.setOffset($offset);
+              return $vulnerabilities;
+            },
+          [
+            TYPES,
+            constant,
+            firstPartyVulnerabilitiesSource,
+            pgUnionAll,
+            sql,
+            thirdPartyVulnerabilitiesSource,
+          ],
+        ),
+      },
+      vulnerabilitiesConnection: {
+        type: VulnerabilitiesConnection,
+        args: {
+          condition: {
+            type: VulnerabilityCondition,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root: any,
+                  $connection: VulnerabilityConnectionStep,
+                ) {
+                  const $collection = $connection.getSubplan();
+                  return $collection.wherePlan();
+                },
+              [],
+            ),
+          },
+          first: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root: any,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  val,
+                ) {
+                  $connection.setFirst(val.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          last: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setLast(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          offset: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setOffset(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          after: {
+            type: GraphQLString,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setAfter(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          before: {
+            type: GraphQLString,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  $connection.setBefore(arg.getRaw());
+                  return null;
+                },
+              [],
+            ),
+          },
+          orderBy: {
+            type: new GraphQLList(new GraphQLNonNull(VulnerabilitiesOrderBy)),
+            applyPlan: EXPORTABLE(
+              (VulnerabilitiesOrderBy, getEnumValueConfig, inspect) =>
+                function plan(
+                  _$root,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  arg,
+                ) {
+                  const $collection = $connection.getSubplan();
+                  const val = arg.getRaw().eval();
+                  if (!Array.isArray(val)) {
+                    throw new Error("Invalid!");
+                  }
+                  val.forEach((order) => {
+                    const config = getEnumValueConfig(
+                      VulnerabilitiesOrderBy,
+                      order,
+                    );
+                    const plan = config?.extensions?.graphile?.applyPlan;
+                    if (typeof plan !== "function") {
+                      console.error(
+                        `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
+                          plan,
+                        )}`,
+                      );
+                      throw new Error(
+                        "Internal server error: invalid orderBy configuration",
+                      );
+                    }
+                    plan($collection);
+                  });
+                  return null;
+                },
+              [VulnerabilitiesOrderBy, getEnumValueConfig, inspect],
+            ),
+          },
+        },
+        plan: EXPORTABLE(
+          (
+            TYPES,
+            connection,
+            firstPartyVulnerabilitiesSource,
+            pgUnionAll,
+            thirdPartyVulnerabilitiesSource,
+          ) =>
+            function plan() {
+              // IMPORTANT: for cursor pagination, type must be part of cursor condition
+              const $vulnerabilities = pgUnionAll({
+                executor: firstPartyVulnerabilitiesSource.executor,
+                attributes: {
+                  cvss_score: {
+                    codec: TYPES.float,
+                  },
+                },
+                sourceSpecs: {
+                  FirstPartyVulnerability: {
+                    source: firstPartyVulnerabilitiesSource,
+                    /* Could add attribute overrides here */
+                  },
+                  ThirdPartyVulnerability: {
+                    source: thirdPartyVulnerabilitiesSource,
+                  },
+                },
+              });
+              return connection($vulnerabilities);
+            },
+          [
+            TYPES,
+            connection,
+            firstPartyVulnerabilitiesSource,
+            pgUnionAll,
+            thirdPartyVulnerabilitiesSource,
+          ],
+        ),
+      },
     },
   });
 
@@ -4910,6 +5495,9 @@ export function makeExampleSchema(
       RelationalDivider,
       RelationalChecklist,
       RelationalChecklistItem,
+
+      FirstPartyVulnerability,
+      ThirdPartyVulnerability,
     ],
     extensions: {
       graphileExporter: {

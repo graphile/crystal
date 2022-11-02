@@ -127,6 +127,15 @@ import {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
 } from "./steps/pgSingleTablePolymorphic.js";
+import {
+  pgUnionAll,
+  PgUnionAllSingleStep,
+  PgUnionAllSourceSpec,
+  PgUnionAllStep,
+  PgUnionAllStepCondition,
+  PgUnionAllStepConfig,
+  PgUnionAllStepOrder,
+} from "./steps/pgUnionAll.js";
 import { pgUpdate, PgUpdateStep } from "./steps/pgUpdate.js";
 import {
   pgValidateParsedCursor,
@@ -230,6 +239,13 @@ export {
   PgTypeColumnVia,
   PgTypeColumnViaExplicit,
   PgTypedExecutableStep,
+  pgUnionAll,
+  PgUnionAllSingleStep,
+  PgUnionAllSourceSpec,
+  PgUnionAllStep,
+  PgUnionAllStepCondition,
+  PgUnionAllStepConfig,
+  PgUnionAllStepOrder,
   pgUpdate,
   PgUpdateStep,
   pgValidateParsedCursor,
@@ -287,6 +303,9 @@ exportAsMany("@dataplan/pg", {
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
   pgSingleTablePolymorphic,
+  pgUnionAll,
+  PgUnionAllSingleStep,
+  PgUnionAllStep,
   PgSingleTablePolymorphicStep,
   pgUpdate,
   PgUpdateStep,

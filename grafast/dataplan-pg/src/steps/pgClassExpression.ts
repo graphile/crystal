@@ -1,11 +1,10 @@
 import type { ExecutionExtra } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { $$data, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import type {
-  PgSource,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
@@ -18,6 +17,7 @@ import type {
 import { PgDeleteStep } from "./pgDelete.js";
 import { PgInsertStep } from "./pgInsert.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import { PgUnionAllSingleStep } from "./pgUnionAll.js";
 import { PgUpdateStep } from "./pgUpdate.js";
 
 // const debugPlan = debugFactory("datasource:pg:PgClassExpressionStep:plan");
@@ -70,27 +70,20 @@ export class PgClassExpressionStep<
    */
   private attrIndex: number | null = null;
 
-  public readonly source: PgSource<
-    TSourceColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >;
-
   public readonly expression: SQL;
 
+  private needsPolymorphicUnwrap: boolean;
+
   constructor(
-    $table: PgClassSingleStep<
-      TSourceColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >,
+    $table:
+      | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
+      | PgUnionAllSingleStep,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
   ) {
     super();
+    this.needsPolymorphicUnwrap = $table instanceof PgUnionAllSingleStep;
     this.tableId = this.addDependency($table);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
@@ -103,13 +96,6 @@ export class PgClassExpressionStep<
         `Received a non-string at index ${badStringIndex} to strings argument of ${this}.`,
       );
     }
-    // TODO: fix this TypeScript cast
-    this.source = $table.source as PgSource<
-      TSourceColumns,
-      TUniques,
-      TRelations,
-      any
-    >;
 
     const fragments: SQL[] = dependencies.map((stepOrSql, i) => {
       if (!stepOrSql) {
@@ -203,21 +189,19 @@ export class PgClassExpressionStep<
     )}` as any;
   }
 
-  public getParentStep(): PgClassSingleStep<
-    TSourceColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  > {
+  public getParentStep():
+    | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
+    | PgUnionAllSingleStep {
     const step = this.getStep(this.dependencies[this.tableId]);
     if (
       !(step instanceof PgSelectSingleStep) &&
       !(step instanceof PgInsertStep) &&
       !(step instanceof PgUpdateStep) &&
-      !(step instanceof PgDeleteStep)
+      !(step instanceof PgDeleteStep) &&
+      !(step instanceof PgUnionAllSingleStep)
     ) {
       throw new Error(
-        `Expected ${step} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep`,
+        `Expected ${step} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep | PgUnionAllSingleStep`,
       );
     }
     return step;
@@ -232,7 +216,10 @@ export class PgClassExpressionStep<
     return this;
   }
 
-  public unbatchedExecute(extra: ExecutionExtra, v: any): any {
+  public unbatchedExecute(extra: ExecutionExtra, rawV: any): any {
+    // TODO: this feels like a hack; should we really have to manually unwrap
+    // PgUnionAllStep polymorphism here?
+    const v = this.needsPolymorphicUnwrap ? rawV?.[$$data] : rawV;
     if (v == null) {
       return null;
     }
@@ -293,7 +280,9 @@ function pgClassExpression<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
-  table: PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>,
+  table:
+    | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
+    | PgUnionAllSingleStep,
   codec: TExpressionCodec,
 ): (
   strings: TemplateStringsArray,

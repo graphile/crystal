@@ -1,0 +1,16 @@
+## expect(errors).toBeFalsy()
+{
+  vulnerabilities(first: 3, offset: 1) {
+    cvssScore
+    ... on FirstPartyVulnerability {
+      id
+      name
+      teamName
+    }
+    ... on ThirdPartyVulnerability {
+      id
+      name
+      vendorName
+    }
+  }
+}
