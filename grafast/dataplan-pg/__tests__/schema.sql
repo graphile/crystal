@@ -564,27 +564,43 @@ insert into interfaces_and_unions.gcp_applications (id, name, last_deployed, gcp
 insert into interfaces_and_unions.first_party_vulnerabilities (id, name, cvss_score, team_name) values
   (1, 'Off-by-one', 3.0, 'Accounting'),
   (2, 'Index-out-of-bounds', 7.2, 'Retention'),
-  (3, 'Exponential backtracking', 7.7, 'Continuity');
+  (3, 'Exponential backtracking', 7.7, 'Continuity'),
+  (4, 'Information disclosure', 7.2, 'Retention'),
+  (5, 'Timing attack', 7.2, 'Retention');
 
 insert into interfaces_and_unions.third_party_vulnerabilities (id, name, cvss_score, vendor_name) values
   (1, 'CSRF', 7.5, '98-Factor-Login'),
   (2, 'XSS', 9.1, 'Frog-Render-Lib'),
-  (3, 'SQL injection', 10.0, 'Eval-Sequel-Corp');
+  (3, 'SQL injection', 10.0, 'Eval-Sequel-Corp'),
+  (4, 'Malware', 7.2, 'Frog-Render-Lib'),
+  (5, 'License', 7.2, 'Frog-Render-Lib');
 
 insert into interfaces_and_unions.aws_application_first_party_vulnerabilities values
   (1, 1),
-  (1, 3);
+  (1, 3),
+  (1, 4),
+  (1, 5);
 insert into interfaces_and_unions.aws_application_third_party_vulnerabilities values
   (1, 1),
-  (1, 2);
+  (1, 2),
+  (1, 4),
+  (1, 5);
 insert into interfaces_and_unions.gcp_application_first_party_vulnerabilities values
   (1, 2),
   (2, 2),
-  (2, 3);
+  (2, 3),
+  (1, 4),
+  (1, 5),
+  (2, 4),
+  (2, 5);
 insert into interfaces_and_unions.gcp_application_third_party_vulnerabilities values
   (1, 3),
   (2, 1),
-  (2, 3);
+  (2, 3),
+  (1, 4),
+  (1, 5),
+  (2, 4),
+  (2, 5);
 
 --------------------------------------------------------------------------------
 
