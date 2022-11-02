@@ -26,22 +26,10 @@ export class PgCursorStep<
 
   constructor(itemPlan: TStep) {
     super();
-    const classPlan = itemPlan.getClassStep();
     this.classSingleStepId = itemPlan.id;
-    this.digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderBy();
-    const plan = list(
-      orders.length > 0
-        ? orders.map((o) => itemPlan.expression(o.fragment, o.codec))
-        : // No ordering; so use row number
-          [
-            itemPlan.expression(
-              sql`row_number() over (partition by 1)`,
-              TYPES.int,
-            ),
-          ],
-    );
-    this.cursorValuesDepId = this.addDependency(plan);
+    const [digest, step] = itemPlan.getCursorDigestAndStep();
+    this.digest = digest;
+    this.cursorValuesDepId = this.addDependency(step);
   }
 
   public getClassSingleStep(): TStep {

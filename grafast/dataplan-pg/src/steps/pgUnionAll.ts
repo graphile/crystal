@@ -53,6 +53,8 @@ function isNotNullish<T>(v: T | null | undefined): v is T {
 }
 
 const castAlias = sql.identifier(Symbol("union"));
+const rowNumberAlias = "n";
+const rowNumberIdent = sql.identifier(rowNumberAlias);
 
 // In future we'll allow mapping columns to different attributes/types
 const sourceSpecificExpressionFromAttributeName = (
@@ -204,6 +206,22 @@ export class PgUnionAllSingleStep
   }
 
   /**
+   * @internal
+   * For use by PgCursorStep
+   */
+  public getCursorDigestAndStep(): [string, ExecutableStep] {
+    const classPlan = this.getClassStep();
+    const digest = classPlan.getOrderByDigest();
+    // TODO: this creates redundancy in the `select` (we're selecting the exact
+    // same values multiple times) - we should remove that redundancy.
+    const orders = classPlan
+      .getOrderBy()
+      .map((o) => this.expression(o.fragment, o.codec));
+    const step = list(orders);
+    return [digest, step];
+  }
+
+  /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
@@ -294,7 +312,8 @@ export class PgUnionAllStep<TAttributes extends string>
   /** @internal */
   public readonly spec: PgUnionAllStepConfig<TAttributes>;
 
-  private orders: Array<PgOrderSpec>;
+  /** @internal */
+  public orders: Array<PgOrderSpec>;
   /**
    * `ordersForCursor` is the same as `orders`, but then with the type and
    * primary key added. This ensures unique ordering, as required by cursor
@@ -567,6 +586,13 @@ export class PgUnionAllStep<TAttributes extends string>
     expression: SQL,
     codec: PgTypeCodec<any, any, any, any>,
   ): number {
+    const existingIndex = this.selects.findIndex(
+      (s) =>
+        s.type === "expression" && sql.isEquivalent(s.expression, expression),
+    );
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
     const index =
       this.selects.push({ type: "expression", expression, codec }) - 1;
     return index;
@@ -1071,8 +1097,6 @@ and ${condition(i + 1)}`}
   finalize() {
     this.locker.lock();
     const typeIdx = this.selectType();
-    const rowNumberAlias = "n";
-    const rowNumberIdent = sql.identifier(rowNumberAlias);
     const reverse = this.shouldReverseOrder();
 
     const makeQuery = () => {
