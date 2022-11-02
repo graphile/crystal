@@ -1228,8 +1228,8 @@ ${
       )},\n`
     : sql.blank
 }\
-${rowNumberIdent} asc,
-${sql.identifier(String(typeIdx))} ${reverse ? sql`desc` : sql`asc`}\
+${sql.identifier(String(typeIdx))} ${reverse ? sql`desc` : sql`asc`},
+${rowNumberIdent} asc\
 `}
 ${this.limitAndOffsetSQL!}
 `;

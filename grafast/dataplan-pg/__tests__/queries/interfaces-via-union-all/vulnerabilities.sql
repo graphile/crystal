@@ -56,8 +56,8 @@ lateral (
       ) as __third_party_vulnerability__
     order by
       "0" desc,
-      "n" asc,
-      "1" asc
+      "1" asc,
+      "n" asc
     limit 3
     offset 1
   ) __union__
