@@ -4,6 +4,7 @@
     edges {
       cursor
       node {
+        __typename
         cvssScore
         ... on FirstPartyVulnerability {
           id

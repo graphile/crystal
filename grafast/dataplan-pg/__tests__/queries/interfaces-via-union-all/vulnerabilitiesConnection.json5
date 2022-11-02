@@ -4,6 +4,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiwzLCJGaXJzdFBhcnR5VnVsbmVyYWJpbGl0eSIsIltcIjFcIl0iXQ==",
         node: {
+          __typename: "FirstPartyVulnerability",
           cvssScore: 3,
           id: 1,
           name: "Off-by-one",
@@ -13,6 +14,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiMlwiXSJd",
         node: {
+          __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
           id: 2,
           name: "Index-out-of-bounds",
@@ -22,6 +24,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNFwiXSJd",
         node: {
+          __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
           id: 4,
           name: "Information disclosure",
@@ -31,6 +34,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNVwiXSJd",
         node: {
+          __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
           id: 5,
           name: "Timing attack",
@@ -40,6 +44,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIlRoaXJkUGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNFwiXSJd",
         node: {
+          __typename: "ThirdPartyVulnerability",
           cvssScore: 7.2,
           id: 4,
           name: "Malware",
@@ -49,6 +54,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIlRoaXJkUGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNVwiXSJd",
         node: {
+          __typename: "ThirdPartyVulnerability",
           cvssScore: 7.2,
           id: 5,
           name: "License",
@@ -58,6 +64,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjUsIlRoaXJkUGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiMVwiXSJd",
         node: {
+          __typename: "ThirdPartyVulnerability",
           cvssScore: 7.5,
           id: 1,
           name: "CSRF",
@@ -67,6 +74,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw3LjcsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiM1wiXSJd",
         node: {
+          __typename: "FirstPartyVulnerability",
           cvssScore: 7.7,
           id: 3,
           name: "Exponential backtracking",
@@ -76,6 +84,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiw5LjEsIlRoaXJkUGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiMlwiXSJd",
         node: {
+          __typename: "ThirdPartyVulnerability",
           cvssScore: 9.1,
           id: 2,
           name: "XSS",
@@ -85,6 +94,7 @@
       {
         cursor: "WyJlOTAxMDBkNmIzIiwxMCwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
         node: {
+          __typename: "ThirdPartyVulnerability",
           cvssScore: 10,
           id: 3,
           name: "SQL injection",

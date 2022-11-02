@@ -16,7 +16,11 @@ from (
         __first_party_vulnerability__."cvss_score" as "0",
         'FirstPartyVulnerability' as "1",
         json_build_array((__first_party_vulnerability__."id")::text) as "2",
-        row_number() over (partition by 1) as "n"
+        row_number() over (
+          order by
+            __first_party_vulnerability__."cvss_score" asc,
+            __first_party_vulnerability__."id" asc
+        ) as "n"
       from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerability__
       order by
         __first_party_vulnerability__."cvss_score" asc,
@@ -33,7 +37,11 @@ from (
         __third_party_vulnerability__."cvss_score" as "0",
         'ThirdPartyVulnerability' as "1",
         json_build_array((__third_party_vulnerability__."id")::text) as "2",
-        row_number() over (partition by 1) as "n"
+        row_number() over (
+          order by
+            __third_party_vulnerability__."cvss_score" asc,
+            __third_party_vulnerability__."id" asc
+        ) as "n"
       from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerability__
       order by
         __third_party_vulnerability__."cvss_score" asc,
