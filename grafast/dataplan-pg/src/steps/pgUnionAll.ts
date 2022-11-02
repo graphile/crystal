@@ -1315,7 +1315,6 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
     const { text, values: rawSqlValues } = sql.compile(finalQuery, {
       placeholderValues: this.placeholderValues,
     });
-    console.log(text);
     this.finalizeResults = {
       text,
       rawSqlValues,
