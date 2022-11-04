@@ -46,7 +46,7 @@ declare global {
           foreignClass: PgClass;
           foreignColumns: PgAttribute[];
           isUnique: boolean;
-          isBackwards: boolean;
+          isReferencee: boolean;
         },
       ): string;
       singleRelation(
@@ -93,7 +93,7 @@ declare global {
             relations: GraphileConfig.PgTablesPluginSourceRelations;
           },
           pgConstraint: PgConstraint,
-          isBackwards?: boolean,
+          isReferencee?: boolean,
         ): Promise<void>;
       };
     }
@@ -132,21 +132,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           foreignClass,
           foreignColumns,
           isUnique,
-          isBackwards,
+          isReferencee,
         },
       ) {
         const { tags } = pgConstraint.getTagsAndDescription();
-        if (!isBackwards && typeof tags.fieldName === "string") {
+        if (!isReferencee && typeof tags.fieldName === "string") {
           return tags.fieldName;
         }
-        if (isBackwards && typeof tags.foreignFieldName === "string") {
+        if (isReferencee && typeof tags.foreignFieldName === "string") {
           return tags.foreignFieldName;
         }
         const remoteName = this.tableSourceName({
           databaseName,
           pgClass: foreignClass,
         });
-        const columns = !isBackwards
+        const columns = !isReferencee
           ? // We have a column referencing another table
             localColumns
           : // The other table has a constraint that references us; this is the backwards relation.
@@ -154,7 +154,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const columnNames = columns.map((col) => col.attname);
         return this.camelCase(
           `${isUnique ? remoteName : this.pluralize(remoteName)}-by-${
-            isBackwards ? "their" : "my"
+            isReferencee ? "their" : "my"
           }-${columnNames.join("-and-")}`,
         );
       },
@@ -243,23 +243,23 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     namespace: "pgRelations",
     initialState: (): State => ({}),
     helpers: {
-      async addRelation(info, event, pgConstraint, isBackwards = false) {
-        const pgClass = isBackwards
+      async addRelation(info, event, pgConstraint, isReferencee = false) {
+        const pgClass = isReferencee
           ? pgConstraint.getForeignClass()
           : pgConstraint.getClass();
-        const foreignClass = isBackwards
+        const foreignClass = isReferencee
           ? pgConstraint.getClass()
           : pgConstraint.getForeignClass();
         if (!pgClass || !foreignClass) {
           throw new Error(`Invalid introspection`);
         }
-        const localColumnNumbers = isBackwards
+        const localColumnNumbers = isReferencee
           ? pgConstraint.confkey!
           : pgConstraint.conkey!;
-        const foreignColumnNumbers = isBackwards
+        const foreignColumnNumbers = isReferencee
           ? pgConstraint.conkey!
           : pgConstraint.confkey!;
-        const isUnique = !isBackwards
+        const isUnique = !isReferencee
           ? true
           : (() => {
               // This relationship is unique if the REFERENCED table (not us!)
@@ -317,11 +317,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           foreignClass,
           foreignColumns: foreignColumns as PgAttribute[],
           isUnique,
-          isBackwards,
+          isReferencee,
         });
         const existingRelation = relations[relationName];
         const { tags } = pgConstraint.getTagsAndDescription();
-        const description = isBackwards
+        const description = isReferencee
           ? tags.backwardDescription
           : tags.forwardDescription;
         const newRelation: PgSourceRelation<any, any> = {
@@ -329,7 +329,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           remoteColumns: foreignColumns.map((c) => c!.attname),
           source: foreignSource,
           isUnique,
-          isBackwards,
+          isReferencee,
           description:
             typeof description === "string" ? description : undefined,
           extensions: {
@@ -345,7 +345,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (existingRelation) {
           const isEquivalent =
             existingRelation.isUnique === newRelation.isUnique &&
-            existingRelation.isBackwards === newRelation.isBackwards &&
+            existingRelation.isReferencee === newRelation.isReferencee &&
             arraysMatch(
               existingRelation.localColumns,
               newRelation.localColumns,
@@ -356,7 +356,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             ) &&
             existingRelation.source === newRelation.source;
           const message = `Attempted to add a ${
-            isBackwards ? "backwards" : "forwards"
+            isReferencee ? "backwards" : "forwards"
           } relation named '${relationName}' to '${pgClass.relname}' for ${
             isEquivalent ? "equivalent " : ""
           }constraint '${pgConstraint.conname}' on '${
@@ -437,7 +437,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         } = source.getRelations();
         return Object.entries(relations).reduce(
           (memo, [identifier, relation]) => {
-            if (isMutationPayload && relation.isBackwards) {
+            if (isMutationPayload && relation.isReferencee) {
               // Don't add backwards relations to mutation payloads
               return memo;
             }
@@ -447,7 +447,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               remoteColumns,
               source: otherSourceOrBuilder,
               extensions,
-              isBackwards,
+              isReferencee,
             } = relation;
             const relationTypeScope = isUnique
               ? `singularRelation`
@@ -657,7 +657,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                 defaultBehavior,
               )
             ) {
-              const fieldName = relationDetails.relation.isBackwards
+              const fieldName = relationDetails.relation.isReferencee
                 ? build.inflection.singleRelationBackwards(relationDetails)
                 : build.inflection.singleRelation(relationDetails);
               const deprecationReason =
@@ -692,7 +692,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              isBackwards &&
+              isReferencee &&
               build.behavior.matches(
                 behavior,
                 `${relationTypeScope}:connection`,
@@ -735,7 +735,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              isBackwards &&
+              isReferencee &&
               build.behavior.matches(
                 behavior,
                 `${relationTypeScope}:list`,

@@ -116,10 +116,11 @@ export interface PgSourceRelation<
   isUnique: boolean;
 
   /**
-   * If true then this is a reverse lookup, so multiple rows may be found
-   * (unless isUnique is true).
+   * If true then this is a reverse lookup (where our local columns are
+   * referenced by the remote tables remote columns, rather than the other way
+   * around), so multiple rows may be found (unless isUnique is true).
    */
-  isBackwards?: boolean;
+  isReferencee?: boolean;
 
   /**
    * Space for you to add your own metadata.

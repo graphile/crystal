@@ -15,7 +15,7 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
         }
 
         // If it's not indexed, remove the list/connection behaviors
-        if (relation.isBackwards) {
+        if (relation.isReferencee) {
           const referencedColumns = pgConstraint
             .getAttributes()!
             .map((att) => att.attname);
