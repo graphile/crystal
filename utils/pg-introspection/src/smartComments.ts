@@ -25,7 +25,7 @@ export const parseSmartComment = (
         result.description += `\n${line}`;
         return;
       }
-      const match = line.match(/^[ \t]*@[a-zA-Z][a-zA-Z0-9_]*($|\s)/);
+      const match = line.match(/^[ \t]*@([a-zA-Z][a-zA-Z0-9_]*)($|\s)(.*)$/);
       if (!match) {
         if (i === 1 && lines[0] === "") {
           result.description = "\n" + line;
@@ -34,8 +34,8 @@ export const parseSmartComment = (
         }
         return;
       }
-      const key = match[0].slice(1).trim();
-      const value = match[0] === line ? true : line.replace(match[0], "");
+      const [, key, space, rawValue] = match;
+      const value = space ? rawValue : true;
       if (key in result.tags) {
         const prev = result.tags[key] as string | true | Array<string | true>;
         if (Array.isArray(prev)) {
