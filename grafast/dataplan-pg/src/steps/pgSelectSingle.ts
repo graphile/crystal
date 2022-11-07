@@ -240,7 +240,14 @@ export class PgSelectSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(
+    const sqlExpr = pgClassExpression<
+      any,
+      any,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(
       this,
       attr === ""
         ? this.source.codec
@@ -281,7 +288,14 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    const sqlExpr = pgClassExpression(this, codec);
+    const sqlExpr = pgClassExpression<
+      TExpressionColumns,
+      TExpressionCodec,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(this, codec);
     return sqlExpr`${fragment}`;
   }
 
@@ -432,9 +446,14 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    return pgClassExpression(this, this.source.codec)`${
-      this.getClassStep().alias
-    }`;
+    return pgClassExpression<
+      TColumns,
+      PgTypeCodec<TColumns, any, any>,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(this, this.source.codec)`${this.getClassStep().alias}`;
   }
 
   /**
@@ -454,7 +473,14 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    return pgClassExpression(this, codec)`${expression}`;
+    return pgClassExpression<
+      TExpressionColumns,
+      TExpressionCodec,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(this, codec)`${expression}`;
   }
 
   /**

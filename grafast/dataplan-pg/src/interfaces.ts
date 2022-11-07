@@ -3,6 +3,8 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgTypeColumns } from "./codecs.js";
 import type {
+  PgSource,
+  PgSourceBuilder,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
@@ -47,9 +49,50 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
 /**
  * Custom metadata for a codec
  */
-export interface PgTypeCodecExtensions {
+export interface PgTypeCodecExtensions<TColumnName extends string = string> {
   description?: string;
+  polymorphism?: PgTypeCodecPolymorphism<TColumnName>;
 }
+
+export interface PgTypeCodecPolymorphismSingleTypeColumnSpec<
+  TColumnName extends string,
+> {
+  column: TColumnName;
+  isNotNull?: boolean;
+  rename?: string;
+}
+
+export interface PgTypeCodecPolymorphismSingle<TColumnName extends string> {
+  mode: "single";
+  typeColumns: readonly TColumnName[];
+  commonColumns: readonly TColumnName[];
+  types: {
+    [typeKey: string]: {
+      name: string;
+      columns: Array<PgTypeCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
+    };
+  };
+}
+
+export interface PgTypeCodecPolymorphismRelational<TColumnName extends string> {
+  mode: "relational";
+  typeColumns: readonly TColumnName[];
+  types: {
+    [typeKey: string]: {
+      references: PgSource<any, any, any, any> | PgSourceBuilder<any, any, any>;
+      // Currently assumes it's joined via PK, but we might expand that in future
+    };
+  };
+}
+
+export interface PgTypeCodecPolymorphismUnion {
+  mode: "union";
+}
+
+export type PgTypeCodecPolymorphism<TColumnName extends string> =
+  | PgTypeCodecPolymorphismSingle<TColumnName>
+  | PgTypeCodecPolymorphismRelational<TColumnName>
+  | PgTypeCodecPolymorphismUnion;
 
 /**
  * A codec for a Postgres type, tells us how to convert to-and-from Postgres
@@ -159,7 +202,7 @@ export interface PgTypeCodec<
   /**
    * Arbitrary metadata
    */
-  extensions?: Partial<PgTypeCodecExtensions>;
+  extensions?: Partial<PgTypeCodecExtensions<any>>;
 }
 
 export type PgEnumValue<TValue extends string = string> = {

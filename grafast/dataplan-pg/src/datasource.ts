@@ -219,6 +219,20 @@ export interface PgSourceOptions<
     : SQL;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
+  /**
+   * Relations to follow for shortcut references, can be polymorphic, can be many-to-many.
+   */
+  refs?: {
+    [refName: string]: {
+      graphqlType?: string;
+      singular?: boolean;
+      paths: Array<{
+        relationName: string;
+        // Could add conditions here
+      }>;
+      // Could add extra details here
+    };
+  };
   extensions?: PgSourceExtensions;
   parameters?: TParameters;
   description?: string;

@@ -42,11 +42,14 @@ const IGNORED = /\s/;
 const SPECIAL = /[\\":]/;
 const SAFE_PARAMETER_NAME = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
 
-export function parseSmartTagsOptsString(optsString: string, leading = 0) {
+export function parseSmartTagsOptsString<TParamName extends string = string>(
+  optsString: string,
+  leading = 0,
+) {
   const result = {
     args: [] as string[],
     params: Object.create(null) as {
-      [paramName: string]: string;
+      [paramName in TParamName]?: string;
     },
   };
   let leadingLeft = leading;

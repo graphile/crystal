@@ -114,7 +114,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          extensions: any;
+          extensions: PgTypeCodecExtensions;
         }) => Promise<void> | void
       >;
 
@@ -384,7 +384,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             pgClass,
           });
 
-          const extensions: Partial<PgTypeCodecExtensions> = {
+          const extensions: PgTypeCodecExtensions = {
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             tags: Object.assign(Object.create(null), {
               originalName: pgClass.relname,

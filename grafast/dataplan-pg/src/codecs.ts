@@ -125,8 +125,8 @@ export interface PgTypeColumn<TCanonical = any, TInput = TCanonical> {
   extensions?: Partial<PgTypeColumnExtensions>;
 }
 
-export type PgTypeColumns = {
-  [columnName: string]: PgTypeColumn<any>;
+export type PgTypeColumns<TColumnName extends string = string> = {
+  [columnName in TColumnName]: PgTypeColumn<any>;
 };
 
 /**

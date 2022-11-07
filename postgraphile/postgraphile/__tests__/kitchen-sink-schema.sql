@@ -1289,7 +1289,7 @@ create table polymorphic.single_table_items (
 
 
 comment on table polymorphic.single_table_items is $$
-  @interface name:SingleTableItem mode:single type:type
+  @interface mode:single type:type
   @type TOPIC name:SingleTableTopic columns:title!
   @type POST name:SingleTablePost columns:title>subject,description,note
   @type DIVIDER name:SingleTableDivider columns:title,color
@@ -1347,10 +1347,10 @@ create table polymorphic.relational_checklist_items (
   note text
 );
 
--- `name:RelationalItem` and `type:type` are the defaults; similarly the `@type` have default names too.
+-- `type:type` is the default
 comment on table polymorphic.relational_items is $$
   @interface mode:relational
-  @type TOPIC name:RelationalTopic references:relational_topics
+  @type TOPIC references:relational_topics
   @type POST references:relational_posts
   @type DIVIDER references:relational_dividers
   @type CHECKLIST references:relational_checklists
@@ -1425,7 +1425,7 @@ create index on polymorphic.gcp_application_first_party_vulnerabilities (first_p
 create index on polymorphic.gcp_application_third_party_vulnerabilities (third_party_vulnerability_id);
 
 comment on type polymorphic.applications is $$
-@interface mode:union name:Application
+@interface mode:union Application
 @ref vulnerabilities to:Vulnerability plural
 $$;
 comment on column polymorphic.applications.id is '@notNull';
@@ -1448,7 +1448,7 @@ comment on table polymorphic.gcp_application_first_party_vulnerabilities is '@om
 comment on table polymorphic.gcp_application_third_party_vulnerabilities is '@omit';
 
 comment on type polymorphic.vulnerabilities is $$
-@interface mode:union name:Vulnerability plural
+@interface mode:union Vulnerability plural
 @ref applications to:Application plural
 $$;
 

@@ -252,7 +252,14 @@ export class PgUnionAllSingleStep
     any,
     any
   > {
-    return pgClassExpression(this, codec)`${expression}`;
+    return pgClassExpression<
+      TExpressionColumns,
+      TExpressionCodec,
+      any,
+      any,
+      any,
+      any
+    >(this, codec)`${expression}`;
   }
 
   /**

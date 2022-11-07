@@ -228,7 +228,14 @@ export class PgInsertStep<
     TUniques,
     TRelations
   > {
-    return pgClassExpression(this, this.source.codec)`${this.alias}`;
+    return pgClassExpression<
+      TColumns,
+      PgTypeCodec<TColumns, any, any>,
+      TColumns,
+      TUniques,
+      TRelations,
+      undefined
+    >(this, this.source.codec)`${this.alias}`;
   }
 
   /**
