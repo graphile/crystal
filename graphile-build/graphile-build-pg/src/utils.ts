@@ -202,3 +202,42 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
   doneOne();
   return result;
 }
+
+export function parseDatabaseIdentifierFromSmartTag<
+  TExpectedLength extends number,
+>(
+  identifier: string,
+  expectedLength: TExpectedLength,
+  fallbackNamespace = "public",
+): TExpectedLength extends 1
+  ? [string]
+  : TExpectedLength extends 2
+  ? [string, string]
+  : TExpectedLength extends 3
+  ? [string, string, string]
+  : string[] {
+  const parts = identifier.split(".");
+  // TODO: parse this better!
+  if (parts.length > expectedLength || parts.length < expectedLength - 1) {
+    throw new Error(
+      "Cannot parse database identifier - it has the wrong number of parts",
+    );
+  }
+  const bits = parts.map((part) => {
+    if (part[0] === '"') {
+      if (part[part.length - 1] !== '"') {
+        throw new Error(
+          `Cannot parse database identifier; invalid quoting '${part}'`,
+        );
+      }
+      return part.slice(1, part.length - 1);
+    } else {
+      return part;
+    }
+  });
+  if (bits.length < expectedLength) {
+    return [fallbackNamespace, ...bits] as any;
+  } else {
+    return bits as any;
+  }
+}

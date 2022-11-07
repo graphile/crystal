@@ -5,8 +5,12 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import { version } from "../index.js";
-import { parseSmartTagsOptsString } from "../utils.js";
 import {
+  parseDatabaseIdentifierFromSmartTag,
+  parseSmartTagsOptsString,
+} from "../utils.js";
+import {
+  PgTypeCodecPolymorphismRelational,
   PgTypeCodecPolymorphismSingle,
   PgTypeCodecPolymorphismSingleTypeColumnSpec,
 } from "@dataplan/pg";
@@ -45,8 +49,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     namespace: "pgPolymorphism",
     helpers: {},
     hooks: {
-      pgCodecs_recordType_extensions(info, event) {
-        const { pgClass, extensions } = event;
+      async pgCodecs_recordType_extensions(info, event) {
+        const { pgClass, extensions, databaseName } = event;
         const interfaceTag =
           extensions.tags.interface ??
           pgClass.getTagsAndDescription().tags.interface;
@@ -60,7 +64,6 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             interfaceTag,
             0,
           );
-          console.dir(params);
           switch (params.mode) {
             case "single": {
               const { type = "type" } = params;
@@ -90,7 +93,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 const {
                   args: [typeValue],
                   params: { name, columns },
-                } = parseSmartTagsOptsString(typeTag, 1);
+                } = parseSmartTagsOptsString<"name" | "columns">(typeTag, 1);
                 if (!name) {
                   throw new Error(`Every type must have a name`);
                 }
@@ -112,13 +115,72 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 typeColumns: [type],
                 types,
               };
-              console.dir(extensions.polymorphism);
               break;
             }
             case "relational": {
+              const { type = "type" } = params;
+              const attr = pgClass.getAttribute({ name: type });
+              if (!attr) {
+                throw new Error(
+                  `Invalid '@interface' smart tag - there is no '${type}' column on ${
+                    pgClass.getNamespace()!.nspname
+                  }.${pgClass.relname}`,
+                );
+              }
+
+              const rawTypeTags = extensions.tags.type;
+              const typeTags = Array.isArray(rawTypeTags)
+                ? rawTypeTags.map((t) => String(t))
+                : [String(rawTypeTags)];
+
+              const types: PgTypeCodecPolymorphismRelational<any>["types"] =
+                Object.create(null);
+              for (const typeTag of typeTags) {
+                const {
+                  args: [typeValue],
+                  params: { references },
+                } = parseSmartTagsOptsString<"references">(typeTag, 1);
+                if (!references) {
+                  throw new Error(
+                    `@type of an @interface(mode:relational) must have a 'references:' parameter`,
+                  );
+                }
+                const [namespaceName, tableName] =
+                  parseDatabaseIdentifierFromSmartTag(
+                    references,
+                    2,
+                    pgClass.getNamespace()?.nspname,
+                  );
+                const referencedClass =
+                  await info.helpers.pgIntrospection.getClassByName(
+                    databaseName,
+                    namespaceName,
+                    tableName,
+                  );
+                if (!referencedClass) {
+                  throw new Error(
+                    `Could not find referenced class '${namespaceName}.${tableName}'`,
+                  );
+                }
+                types[typeValue] = {
+                  references: info.inflection.tableSourceName({
+                    databaseName,
+                    pgClass: referencedClass,
+                  }),
+                };
+              }
+
+              extensions.polymorphism = {
+                mode: "relational",
+                typeColumns: [type],
+                types,
+              };
               break;
             }
             case "union": {
+              extensions.polymorphism = {
+                mode: "union",
+              };
               break;
             }
             default: {
