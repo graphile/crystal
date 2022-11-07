@@ -21,7 +21,7 @@ export type PgClassSingleStep<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns>
+      ? PgSourceRelation<TColumns, any>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,

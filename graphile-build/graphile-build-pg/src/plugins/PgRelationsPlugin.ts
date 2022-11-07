@@ -26,7 +26,7 @@ declare global {
       source: PgSource<any, any, any, any>;
       codec: PgTypeCodec<any, any, any>;
       identifier: string;
-      relation: PgSourceRelation<any>;
+      relation: PgSourceRelation<any, any>;
     }
 
     interface ScopeObjectFieldsField {
@@ -103,7 +103,7 @@ declare global {
           databaseName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
-          relation: PgSourceRelation<any>;
+          relation: PgSourceRelation<any, any>;
         }) => Promise<void> | void
       >;
     }
@@ -324,16 +324,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const description = isReferencee
           ? tags.backwardDescription
           : tags.forwardDescription;
-        const newRelation: PgSourceRelation<any> = {
-          paths: [
-            {
-              columns: localColumns.map((c) => c!.attname),
-              relateTo: {
-                source: foreignSource,
-                columns: foreignColumns.map((c) => c!.attname),
-              },
-            },
-          ],
+        const newRelation: PgSourceRelation<any, any> = {
+          localColumns: localColumns.map((c) => c!.attname),
+          remoteColumns: foreignColumns.map((c) => c!.attname),
+          source: foreignSource,
           isUnique,
           isReferencee,
           description:
@@ -439,7 +433,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
         const relations: {
-          [identifier: string]: PgSourceRelation<any>;
+          [identifier: string]: PgSourceRelation<any, any>;
         } = source.getRelations();
         return Object.entries(relations).reduce(
           (memo, [identifier, relation]) => {
@@ -449,15 +443,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             }
             const {
               isUnique,
-              paths: [
-                {
-                  columns: localColumns,
-                  relateTo: {
-                    source: otherSourceOrBuilder,
-                    columns: remoteColumns,
-                  },
-                },
-              ],
+              localColumns,
+              remoteColumns,
+              source: otherSourceOrBuilder,
               extensions,
               isReferencee,
             } = relation;

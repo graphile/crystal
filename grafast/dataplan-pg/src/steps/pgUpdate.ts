@@ -43,7 +43,7 @@ export class PgUpdateStep<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns>
+      ? PgSourceRelation<TColumns, any>
       : never;
   },
 > extends ExecutableStep<PgSourceRow<TColumns>> {
@@ -440,7 +440,7 @@ export function pgUpdate<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns>
+      ? PgSourceRelation<TColumns, any>
       : never;
   },
 >(

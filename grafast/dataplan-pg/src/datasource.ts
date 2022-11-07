@@ -86,8 +86,12 @@ export interface PgSourceRelationExtensions {}
  */
 export interface PgSourceUniqueExtensions {}
 
-export interface PgSourceRelationPathTarget<
-  TRemoteColumns extends PgTypeColumns = PgTypeColumns,
+/**
+ * Describes a relation to another source
+ */
+export interface PgSourceRelation<
+  TLocalColumns extends PgTypeColumns,
+  TRemoteColumns extends PgTypeColumns,
 > {
   /**
    * The remote source this relation relates to.
@@ -97,36 +101,14 @@ export interface PgSourceRelationPathTarget<
     | PgSource<TRemoteColumns, any, any, any>;
 
   /**
-   * The remote columns that are joined against.
-   */
-  columns: ReadonlyArray<keyof TRemoteColumns>;
-
-  and?: PgSourceRelationPath<TRemoteColumns>;
-}
-
-export interface PgSourceRelationPath<
-  TLocalColumns extends PgTypeColumns = PgTypeColumns,
-> {
-  /**
    * The columns locally used in this relationship.
    */
-  columns: readonly (keyof TLocalColumns)[];
+  localColumns: readonly (keyof TLocalColumns)[];
 
-  relateTo: PgSourceRelationPathTarget;
-}
-
-// TODO: maybe there's a better solution to the typing story around this
-
-/**
- * Describes a relation to another source
- */
-export interface PgSourceRelation<TLocalColumns extends PgTypeColumns> {
   /**
-   * The routes that can be used to fullfil this relation. If this has more
-   * than one entry then it's probably polymorphic. If it has one entry then it
-   * may still be polymorphic for interfaces in `single` mode.
+   * The remote columns that are joined against.
    */
-  paths: PgSourceRelationPath<TLocalColumns>[];
+  remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
 
   /**
    * If true then there's at most one record this relationship will find.
@@ -211,7 +193,7 @@ export interface PgSourceOptions<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns>
+      ? PgSourceRelation<TColumns, any>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
@@ -325,7 +307,7 @@ export class PgSourceBuilder<
   build<
     TRelations extends {
       [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns>
+        ? PgSourceRelation<TColumns, any>
         : never;
     },
   >({
@@ -386,7 +368,7 @@ export class PgSource<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns>
+      ? PgSourceRelation<TColumns, any>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
