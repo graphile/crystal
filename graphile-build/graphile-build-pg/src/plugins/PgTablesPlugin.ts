@@ -576,6 +576,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               // Only apply to codecs that define columns
               return;
             }
+            if (codec.extensions?.polymorphism) {
+              // Don't build polymorphic types as objects
+              return;
+            }
 
             const tableTypeName = inflection.tableType(codec);
             const behavior = getBehavior(codec.extensions);

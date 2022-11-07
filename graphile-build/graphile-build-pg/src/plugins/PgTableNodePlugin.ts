@@ -37,6 +37,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         const tableSources = build.input.pgSources.filter((source) => {
           if (source.codec.isAnonymous) return false;
           if (!source.codec.columns) return false;
+          if (source.codec.extensions?.polymorphism) return false;
           if (source.parameters) return false;
           if (!source.uniques) return false;
           if (!source.uniques[0]) return false;

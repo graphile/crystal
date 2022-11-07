@@ -40,6 +40,7 @@ const isInsertable = (
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
+  if (source.codec.extensions?.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   const behavior = getBehavior(source.extensions);
   return build.behavior.matches(behavior, "insert", "insert") === true;
