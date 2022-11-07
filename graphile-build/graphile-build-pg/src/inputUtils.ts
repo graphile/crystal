@@ -129,7 +129,7 @@ function resolveSource<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
+      ? PgSourceRelation<TColumns>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,

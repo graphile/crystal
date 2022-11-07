@@ -60,7 +60,7 @@ export class PgSelectSingleStep<
     >,
     TRelations extends {
       [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
+        ? PgSourceRelation<TColumns>
         : never;
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
@@ -311,14 +311,7 @@ export class PgSelectSingleStep<
 
   private existingSingleRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
-  ): PgSelectSingleStep<
-    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
-      ? TRelations[TRelationName]["source"]["TColumns"]
-      : any,
-    TRelations[TRelationName]["source"]["TUniques"],
-    TRelations[TRelationName]["source"]["TRelations"],
-    TRelations[TRelationName]["source"]["TParameters"]
-  > | null {
+  ): PgSelectSingleStep<any, any, any, any> | null {
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       // check to see if we already came via this relationship
@@ -329,7 +322,7 @@ export class PgSelectSingleStep<
       if (reciprocal) {
         const reciprocalRelationName = reciprocal[0] as string;
         if (reciprocalRelationName === relationIdentifier) {
-          const reciprocalRelation: PgSourceRelation<any, any> = reciprocal[1];
+          const reciprocalRelation: PgSourceRelation<any> = reciprocal[1];
           if (reciprocalRelation.isUnique) {
             return $fromPlan;
           }
@@ -592,7 +585,7 @@ export function pgSelectFromRecord<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
+      ? PgSourceRelation<TColumns>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
@@ -625,7 +618,7 @@ export function pgSelectSingleFromRecord<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
+      ? PgSourceRelation<TColumns>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,

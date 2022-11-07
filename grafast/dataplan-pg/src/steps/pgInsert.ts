@@ -48,7 +48,7 @@ export class PgInsertStep<
     >,
     TRelations extends {
       [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
+        ? PgSourceRelation<TColumns>
         : never;
     },
   >
@@ -396,7 +396,7 @@ export function pgInsert<
   TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
+      ? PgSourceRelation<TColumns>
       : never;
   },
 >(

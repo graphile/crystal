@@ -165,7 +165,7 @@ declare global {
 declare global {
   namespace GraphileConfig {
     type PgTablesPluginSourceRelations = {
-      [identifier: string]: PgSourceRelation<any, any>;
+      [identifier: string]: PgSourceRelation<any>;
     };
 
     interface GatherHelpers {

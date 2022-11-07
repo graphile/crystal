@@ -40,7 +40,7 @@ export class PgClassExpressionStep<
     >,
     TRelations extends {
       [identifier: string]: TSourceColumns extends PgTypeColumns
-        ? PgSourceRelation<TSourceColumns, any>
+        ? PgSourceRelation<TSourceColumns>
         : never;
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
@@ -275,7 +275,7 @@ function pgClassExpression<
   >,
   TRelations extends {
     [identifier: string]: TSourceColumns extends PgTypeColumns
-      ? PgSourceRelation<TSourceColumns, any>
+      ? PgSourceRelation<TSourceColumns>
       : never;
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
