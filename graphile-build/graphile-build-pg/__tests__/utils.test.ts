@@ -25,3 +25,17 @@ test.each([
   const result = parseSmartTagsOptsString(str, 1);
   expect(result).toEqual(expected);
 });
+
+test.each([
+  [
+    "name:SingleTableItem mode:single type:type",
+    0,
+    {
+      args: [],
+      params: { name: "SingleTableItem", mode: "single", type: "type" },
+    },
+  ],
+])("%s", (str, nargs, expected) => {
+  const result = parseSmartTagsOptsString(str, nargs);
+  expect(result).toEqual(expected);
+});

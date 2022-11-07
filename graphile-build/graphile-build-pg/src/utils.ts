@@ -40,6 +40,7 @@ enum MODE {
 
 const IGNORED = /\s/;
 const SPECIAL = /[\\":]/;
+const SAFE_PARAMETER_NAME = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
 
 export function parseSmartTagsOptsString(optsString: string, leading = 0) {
   const result = {
@@ -54,6 +55,19 @@ export function parseSmartTagsOptsString(optsString: string, leading = 0) {
   let str = "";
   let name = "";
 
+  function validateParameterName(name: string) {
+    if (name in result.params) {
+      throw new Error(`Parameter '${name}' already set`);
+    }
+    if (name === "") {
+      throw new Error(`Empty parameter name not allowed`);
+    }
+    if (!SAFE_PARAMETER_NAME.test(name)) {
+      throw new Error(`Invalid parameter name`);
+    }
+    return name;
+  }
+
   function doneOne() {
     switch (mode) {
       case MODE.ARG: {
@@ -63,12 +77,12 @@ export function parseSmartTagsOptsString(optsString: string, leading = 0) {
         break;
       }
       case MODE.PARAM_NAME: {
-        result.params[str] = "";
+        result.params[validateParameterName(str)] = "";
         mode = MODE.EXPECT_PARAM_NAME;
         break;
       }
       case MODE.PARAM_VALUE: {
-        result.params[name] = str;
+        result.params[validateParameterName(name)] = str;
         mode = MODE.EXPECT_PARAM_NAME;
         break;
       }
