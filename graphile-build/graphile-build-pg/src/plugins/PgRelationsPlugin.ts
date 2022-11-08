@@ -9,11 +9,15 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { ObjectStep } from "grafast";
+import type { GraphileFieldConfig, ObjectStep } from "grafast";
 import { arraysMatch, connection } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
-import type { GraphQLObjectType } from "graphql";
+import type {
+  GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLObjectType,
+} from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
@@ -389,6 +393,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             pgClass._id,
           );
 
+        if (pgClass.relname === "relational_topics") {
+          console.dir({ constraints, foreignConstraints });
+        }
+
         for (const constraint of constraints) {
           if (constraint.contype === "f") {
             await info.helpers.pgRelations.addRelation(event, constraint);
@@ -405,214 +413,209 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
-      GraphQLObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          graphql: {
-            GraphQLList,
-            GraphQLObjectType,
-            GraphQLNonNull,
-            GraphQLUnionType,
-            GraphQLInterfaceType,
-          },
-          options: { simpleCollections },
-        } = build;
-        const {
-          Self,
-          scope: { isPgTableType, pgCodec, pgTypeSource, isMutationPayload },
-          fieldWithHooks,
-        } = context;
-        const codec = pgTypeSource?.codec ?? pgCodec;
-        // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
-        if (!(isPgTableType || isMutationPayload) || !codec) {
-          return fields;
-        }
-        // TODO: change the default so that we don't do this on
-        // isMutationPayload; only do that for V4 compat. (It's redundant vs
-        // just using the object type directly)
-        const source =
-          pgTypeSource ?? build.input.pgSources.find((s) => s.codec === codec);
-        if (!source) {
-          return fields;
-        }
-        if (source.parameters && !source.isUnique) {
-          return fields;
-        }
-        const relations: {
-          [identifier: string]: PgSourceRelation<any, any>;
-        } = source.getRelations();
-        return Object.entries(relations).reduce(
-          (memo, [identifier, relation]) => {
-            if (isMutationPayload && relation.isReferencee) {
-              // Don't add backwards relations to mutation payloads
-              return memo;
-            }
-            const {
-              isUnique,
-              localColumns,
-              remoteColumns,
-              source: otherSourceOrBuilder,
-              extensions,
-              isReferencee,
-            } = relation;
-            const relationTypeScope = isUnique
-              ? `singularRelation`
-              : `manyRelation`;
-            const otherSource =
-              otherSourceOrBuilder instanceof PgSourceBuilder
-                ? otherSourceOrBuilder.get()
-                : otherSourceOrBuilder;
-            const otherCodec = otherSource.codec;
-            const typeName = build.inflection.tableType(otherCodec);
-            const OtherType = build.getTypeByName(typeName);
-            if (
-              !OtherType ||
-              !(
-                OtherType instanceof GraphQLObjectType ||
-                OtherType instanceof GraphQLInterfaceType ||
-                OtherType instanceof GraphQLUnionType
+      GraphQLInterfaceType_fields: addRelations,
+      GraphQLObjectType_fields: addRelations,
+    },
+  },
+};
+
+function addRelations(
+  fields: GraphQLFieldConfigMap<any, any>,
+  build: GraphileBuild.Build,
+  context:
+    | GraphileBuild.ContextObjectFields
+    | GraphileBuild.ContextInterfaceFields,
+) {
+  const {
+    extend,
+    graphql: {
+      GraphQLList,
+      GraphQLObjectType,
+      GraphQLNonNull,
+      GraphQLUnionType,
+      GraphQLInterfaceType,
+    },
+    options: { simpleCollections },
+  } = build;
+  const { Self, scope, fieldWithHooks } = context;
+
+  const objectMode = context.type === "GraphQLObjectType";
+
+  const { pgCodec } = scope;
+  const isPgTableType =
+    "isPgTableType" in scope ? scope.isPgTableType : undefined;
+  const pgTypeSource = "pgTypeSource" in scope ? scope.pgTypeSource : undefined;
+  const isMutationPayload =
+    "isMutationPayload" in scope ? scope.isMutationPayload : undefined;
+  const pgPolymorphism =
+    "pgPolymorphism" in scope ? scope.pgPolymorphism : undefined;
+
+  const codec = pgTypeSource?.codec ?? pgCodec;
+  // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
+  if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
+    return fields;
+  }
+  // TODO: change the default so that we don't do this on
+  // isMutationPayload; only do that for V4 compat. (It's redundant vs
+  // just using the object type directly)
+  const source =
+    pgTypeSource ?? build.input.pgSources.find((s) => s.codec === codec);
+  if (!source) {
+    return fields;
+  }
+  if (source.parameters && !source.isUnique) {
+    return fields;
+  }
+  const relations: {
+    [identifier: string]: PgSourceRelation<any, any>;
+  } = source.getRelations();
+  return Object.entries(relations).reduce((memo, [identifier, relation]) => {
+    if (isMutationPayload && relation.isReferencee) {
+      // Don't add backwards relations to mutation payloads
+      return memo;
+    }
+    const n = Self.name === "RelationalTopic";
+    const {
+      isUnique,
+      localColumns,
+      remoteColumns,
+      source: otherSourceOrBuilder,
+      extensions,
+      isReferencee,
+    } = relation;
+    if (n) {
+      console.log(
+        identifier,
+        relation.source.name,
+        relation.localColumns,
+        relation.remoteColumns,
+      );
+    }
+    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
+    const otherSource =
+      otherSourceOrBuilder instanceof PgSourceBuilder
+        ? otherSourceOrBuilder.get()
+        : otherSourceOrBuilder;
+    const otherCodec = otherSource.codec;
+    const typeName = build.inflection.tableType(otherCodec);
+    const OtherType = build.getTypeByName(typeName);
+    if (
+      !OtherType ||
+      !(
+        OtherType instanceof GraphQLObjectType ||
+        OtherType instanceof GraphQLInterfaceType ||
+        OtherType instanceof GraphQLUnionType
+      )
+    ) {
+      return memo;
+    }
+    let fields = memo;
+    // The behavior is the relation behavior PLUS the remote table
+    // behavior. But the relation settings win.
+    const behavior =
+      getBehavior(extensions) + " " + getBehavior(otherSource.extensions);
+    const defaultBehavior = isUnique
+      ? "single -singularRelation:list -singularRelation:connection"
+      : simpleCollections === "both"
+      ? "connection list"
+      : simpleCollections === "only"
+      ? "list"
+      : "connection";
+
+    const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
+      source,
+      codec,
+      identifier,
+      relation,
+    };
+    const clean =
+      remoteColumns.every(
+        (remoteColumnName) =>
+          typeof remoteColumnName === "string" &&
+          isSafeIdentifier(remoteColumnName),
+      ) &&
+      localColumns.every(
+        (localColumnName) =>
+          typeof localColumnName === "string" &&
+          isSafeIdentifier(localColumnName),
+      );
+    const recordOrResult = isMutationPayload
+      ? `$record.get("result")`
+      : `$record`;
+    const singleRecordPlan = clean
+      ? // Optimise function for both execution and export.
+        // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          new Function(
+            "otherSource",
+            `return $record => otherSource.get({ ${remoteColumns
+              .map(
+                (remoteColumnName, i) =>
+                  `${
+                    remoteColumnName as string
+                  }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
               )
+              .join(", ")} })`,
+          ) as any,
+          [otherSource],
+        ) as any)
+      : EXPORTABLE(
+          (isMutationPayload, localColumns, otherSource, remoteColumns) =>
+            function plan(
+              $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
             ) {
-              return memo;
-            }
-            let fields = memo;
-            // The behavior is the relation behavior PLUS the remote table
-            // behavior. But the relation settings win.
-            const behavior =
-              getBehavior(extensions) +
-              " " +
-              getBehavior(otherSource.extensions);
-            const defaultBehavior = isUnique
-              ? "single -singularRelation:list -singularRelation:connection"
-              : simpleCollections === "both"
-              ? "connection list"
-              : simpleCollections === "only"
-              ? "list"
-              : "connection";
+              const $record = (
+                isMutationPayload ? ($in as ObjectStep).get("result") : $in
+              ) as PgSelectSingleStep<any, any, any, any>;
+              const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
+                memo[remoteColumnName] = $record.get(localColumns[i] as string);
+                return memo;
+              }, {});
+              return otherSource.get(spec);
+            },
+          [isMutationPayload, localColumns, otherSource, remoteColumns],
+        );
 
-            const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
-              {
-                source,
-                codec,
-                identifier,
-                relation,
-              };
-            const clean =
-              remoteColumns.every(
-                (remoteColumnName) =>
-                  typeof remoteColumnName === "string" &&
-                  isSafeIdentifier(remoteColumnName),
-              ) &&
-              localColumns.every(
-                (localColumnName) =>
-                  typeof localColumnName === "string" &&
-                  isSafeIdentifier(localColumnName),
-              );
-            const recordOrResult = isMutationPayload
-              ? `$record.get("result")`
-              : `$record`;
-            const singleRecordPlan = clean
-              ? // Optimise function for both execution and export.
-                // eslint-disable-next-line graphile-export/exhaustive-deps
-                (EXPORTABLE(
-                  new Function(
-                    "otherSource",
-                    `return $record => otherSource.get({ ${remoteColumns
-                      .map(
-                        (remoteColumnName, i) =>
-                          `${
-                            remoteColumnName as string
-                          }: ${recordOrResult}.get(${JSON.stringify(
-                            localColumns[i],
-                          )})`,
-                      )
-                      .join(", ")} })`,
-                  ) as any,
-                  [otherSource],
-                ) as any)
-              : EXPORTABLE(
-                  (
-                    isMutationPayload,
-                    localColumns,
-                    otherSource,
-                    remoteColumns,
-                  ) =>
-                    function plan(
-                      $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
-                    ) {
-                      const $record = (
-                        isMutationPayload
-                          ? ($in as ObjectStep).get("result")
-                          : $in
-                      ) as PgSelectSingleStep<any, any, any, any>;
-                      const spec = remoteColumns.reduce(
-                        (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $record.get(
-                            localColumns[i] as string,
-                          );
-                          return memo;
-                        },
-                        {},
-                      );
-                      return otherSource.get(spec);
-                    },
-                  [isMutationPayload, localColumns, otherSource, remoteColumns],
-                );
+    const listPlan = clean
+      ? // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          new Function(
+            "otherSource",
+            `return $record => otherSource.find({ ${remoteColumns
+              .map(
+                (remoteColumnName, i) =>
+                  `${
+                    remoteColumnName as string
+                  }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
+              )
+              .join(", ")} })`,
+          ) as any,
+          [otherSource],
+        ) as any)
+      : EXPORTABLE(
+          (isMutationPayload, localColumns, otherSource, remoteColumns) =>
+            function plan(
+              $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
+            ) {
+              const $record = (
+                isMutationPayload ? ($in as ObjectStep).get("result") : $in
+              ) as PgSelectSingleStep<any, any, any, any>;
+              const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
+                memo[remoteColumnName] = $record.get(localColumns[i] as string);
+                return memo;
+              }, {});
+              return otherSource.find(spec);
+            },
+          [isMutationPayload, localColumns, otherSource, remoteColumns],
+        );
 
-            const listPlan = clean
-              ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                (EXPORTABLE(
-                  new Function(
-                    "otherSource",
-                    `return $record => otherSource.find({ ${remoteColumns
-                      .map(
-                        (remoteColumnName, i) =>
-                          `${
-                            remoteColumnName as string
-                          }: ${recordOrResult}.get(${JSON.stringify(
-                            localColumns[i],
-                          )})`,
-                      )
-                      .join(", ")} })`,
-                  ) as any,
-                  [otherSource],
-                ) as any)
-              : EXPORTABLE(
-                  (
-                    isMutationPayload,
-                    localColumns,
-                    otherSource,
-                    remoteColumns,
-                  ) =>
-                    function plan(
-                      $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
-                    ) {
-                      const $record = (
-                        isMutationPayload
-                          ? ($in as ObjectStep).get("result")
-                          : $in
-                      ) as PgSelectSingleStep<any, any, any, any>;
-                      const spec = remoteColumns.reduce(
-                        (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $record.get(
-                            localColumns[i] as string,
-                          );
-                          return memo;
-                        },
-                        {},
-                      );
-                      return otherSource.find(spec);
-                    },
-                  [isMutationPayload, localColumns, otherSource, remoteColumns],
-                );
-
-            const connectionPlan = clean
-              ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                (EXPORTABLE(
-                  new Function(
-                    "otherSource",
-                    "connection",
-                    `return $record => {
+    const connectionPlan = clean
+      ? // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          new Function(
+            "otherSource",
+            "connection",
+            `return $record => {
   const $records = otherSource.find({ ${remoteColumns
     .map(
       (remoteColumnName, i) =>
@@ -623,170 +626,154 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     .join(", ")} });
   return connection($records);
 }`,
-                  ) as any,
-                  [otherSource, connection],
-                ) as any)
-              : EXPORTABLE(
-                  (
-                    connection,
-                    isMutationPayload,
-                    localColumns,
-                    otherSource,
-                    remoteColumns,
-                  ) =>
-                    function plan(
-                      $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
-                    ) {
-                      const $record = (
-                        isMutationPayload
-                          ? ($in as ObjectStep).get("result")
-                          : $in
-                      ) as PgSelectSingleStep<any, any, any, any>;
-                      const spec = remoteColumns.reduce(
-                        (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $record.get(
-                            localColumns[i] as string,
-                          );
-                          return memo;
-                        },
-                        {},
-                      );
-                      return connection(otherSource.find(spec));
-                    },
-                  [
-                    connection,
-                    isMutationPayload,
-                    localColumns,
-                    otherSource,
-                    remoteColumns,
-                  ],
-                );
-
-            if (
-              isUnique &&
-              build.behavior.matches(
-                behavior,
-                `${relationTypeScope}:single`,
-                defaultBehavior,
-              )
+          ) as any,
+          [otherSource, connection],
+        ) as any)
+      : EXPORTABLE(
+          (
+            connection,
+            isMutationPayload,
+            localColumns,
+            otherSource,
+            remoteColumns,
+          ) =>
+            function plan(
+              $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
             ) {
-              const fieldName = relationDetails.relation.isReferencee
-                ? build.inflection.singleRelationBackwards(relationDetails)
-                : build.inflection.singleRelation(relationDetails);
-              const deprecationReason =
-                tagToString(relation.extensions?.tags?.deprecated) ??
-                tagToString(relation.source.extensions?.tags?.deprecated);
-              fields = extend(
-                fields,
-                {
-                  [fieldName]: fieldWithHooks(
-                    {
-                      fieldName,
-                      fieldBehaviorScope: `${relationTypeScope}:single`,
-                      isPgSingleRelationField: true,
-                      pgRelationDetails: relationDetails,
-                    },
-                    {
-                      description:
-                        relation.description ??
-                        `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
-                          codec,
-                        )}\`.`,
-                      // TODO: handle nullability
-                      type: OtherType,
-                      plan: singleRecordPlan,
-                      deprecationReason,
-                    },
-                  ),
-                },
-                `Adding '${identifier}' single relation field to ${Self.name}`,
-                "recoverable",
-              );
-            }
-
-            if (
-              isReferencee &&
-              build.behavior.matches(
-                behavior,
-                `${relationTypeScope}:connection`,
-                defaultBehavior,
-              )
-            ) {
-              const connectionTypeName =
-                build.inflection.tableConnectionType(otherCodec);
-              const ConnectionType =
-                build.getOutputTypeByName(connectionTypeName);
-              if (ConnectionType) {
-                const fieldName =
-                  build.inflection.manyRelationConnection(relationDetails);
-                fields = extend(
-                  fields,
-                  {
-                    [fieldName]: fieldWithHooks(
-                      {
-                        fieldName,
-                        fieldBehaviorScope: `${relationTypeScope}:connection`,
-                        pgSource: otherSource,
-                        isPgFieldConnection: true,
-                        isPgManyRelationConnectionField: true,
-                        pgRelationDetails: relationDetails,
-                      },
-                      {
-                        description: `Reads and enables pagination through a set of \`${typeName}\`.`,
-                        // TODO: handle nullability
-                        type: new GraphQLNonNull(
-                          ConnectionType as GraphQLObjectType,
-                        ),
-                        plan: connectionPlan,
-                      },
-                    ),
-                  },
-                  `Adding '${identifier}' many relation connection field to ${Self.name}`,
-                  "recoverable",
-                );
-              }
-            }
-
-            if (
-              isReferencee &&
-              build.behavior.matches(
-                behavior,
-                `${relationTypeScope}:list`,
-                defaultBehavior,
-              )
-            ) {
-              const fieldName =
-                build.inflection.manyRelationList(relationDetails);
-              fields = extend(
-                fields,
-                {
-                  [fieldName]: fieldWithHooks(
-                    {
-                      fieldName,
-                      fieldBehaviorScope: `${relationTypeScope}:list`,
-                      pgSource: otherSource,
-                      isPgFieldSimpleCollection: true,
-                      isPgManyRelationListField: true,
-                      pgRelationDetails: relationDetails,
-                    },
-                    {
-                      type: new GraphQLNonNull(
-                        new GraphQLList(new GraphQLNonNull(OtherType)),
-                      ),
-                      plan: listPlan,
-                    },
-                  ),
-                },
-                `Adding '${identifier}' many relation list field to ${Self.name}`,
-                "recoverable",
-              );
-            }
-
-            return fields;
-          },
-          fields,
+              const $record = (
+                isMutationPayload ? ($in as ObjectStep).get("result") : $in
+              ) as PgSelectSingleStep<any, any, any, any>;
+              const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
+                memo[remoteColumnName] = $record.get(localColumns[i] as string);
+                return memo;
+              }, {});
+              return connection(otherSource.find(spec));
+            },
+          [
+            connection,
+            isMutationPayload,
+            localColumns,
+            otherSource,
+            remoteColumns,
+          ],
         );
-      },
-    },
-  },
-};
+
+    if (
+      isUnique &&
+      build.behavior.matches(
+        behavior,
+        `${relationTypeScope}:single`,
+        defaultBehavior,
+      )
+    ) {
+      const fieldName = relationDetails.relation.isReferencee
+        ? build.inflection.singleRelationBackwards(relationDetails)
+        : build.inflection.singleRelation(relationDetails);
+      const deprecationReason =
+        tagToString(relation.extensions?.tags?.deprecated) ??
+        tagToString(relation.source.extensions?.tags?.deprecated);
+      fields = extend(
+        fields,
+        {
+          [fieldName]: fieldWithHooks(
+            {
+              fieldName,
+              fieldBehaviorScope: `${relationTypeScope}:single`,
+              isPgSingleRelationField: true,
+              pgRelationDetails: relationDetails,
+            },
+            {
+              description:
+                relation.description ??
+                `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
+                  codec,
+                )}\`.`,
+              // TODO: handle nullability
+              type: OtherType,
+              plan: singleRecordPlan,
+              deprecationReason,
+            },
+          ),
+        },
+        `Adding '${identifier}' single relation field to ${Self.name}`,
+        "recoverable",
+      );
+    }
+
+    if (
+      isReferencee &&
+      build.behavior.matches(
+        behavior,
+        `${relationTypeScope}:connection`,
+        defaultBehavior,
+      )
+    ) {
+      const connectionTypeName =
+        build.inflection.tableConnectionType(otherCodec);
+      const ConnectionType = build.getOutputTypeByName(connectionTypeName);
+      if (ConnectionType) {
+        const fieldName =
+          build.inflection.manyRelationConnection(relationDetails);
+        fields = extend(
+          fields,
+          {
+            [fieldName]: fieldWithHooks(
+              {
+                fieldName,
+                fieldBehaviorScope: `${relationTypeScope}:connection`,
+                pgSource: otherSource,
+                isPgFieldConnection: true,
+                isPgManyRelationConnectionField: true,
+                pgRelationDetails: relationDetails,
+              },
+              {
+                description: `Reads and enables pagination through a set of \`${typeName}\`.`,
+                // TODO: handle nullability
+                type: new GraphQLNonNull(ConnectionType as GraphQLObjectType),
+                plan: connectionPlan,
+              },
+            ),
+          },
+          `Adding '${identifier}' many relation connection field to ${Self.name}`,
+          "recoverable",
+        );
+      }
+    }
+
+    if (
+      isReferencee &&
+      build.behavior.matches(
+        behavior,
+        `${relationTypeScope}:list`,
+        defaultBehavior,
+      )
+    ) {
+      const fieldName = build.inflection.manyRelationList(relationDetails);
+      fields = extend(
+        fields,
+        {
+          [fieldName]: fieldWithHooks(
+            {
+              fieldName,
+              fieldBehaviorScope: `${relationTypeScope}:list`,
+              pgSource: otherSource,
+              isPgFieldSimpleCollection: true,
+              isPgManyRelationListField: true,
+              pgRelationDetails: relationDetails,
+            },
+            {
+              type: new GraphQLNonNull(
+                new GraphQLList(new GraphQLNonNull(OtherType)),
+              ),
+              plan: listPlan,
+            },
+          ),
+        },
+        `Adding '${identifier}' many relation list field to ${Self.name}`,
+        "recoverable",
+      );
+    }
+
+    return fields;
+  }, fields);
+}
