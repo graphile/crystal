@@ -480,7 +480,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         return interfaces;
       },
       GraphQLSchema_types(types, build, _context) {
-        for (const type of types) {
+        for (const type of Object.values(build.getAllTypes())) {
           if (build.graphql.isInterfaceType(type)) {
             const scope = build.scopeByType.get(type) as
               | GraphileBuild.ScopeInterface

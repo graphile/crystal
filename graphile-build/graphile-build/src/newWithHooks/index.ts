@@ -114,18 +114,10 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             build,
             context,
           );
-          const objectyTypes = Object.values(build.getAllTypes()).filter(
-            (t) => isObjectType(t) || isInterfaceType(t) || isUnionType(t),
-          );
-          const types = !finalSpec.types
-            ? objectyTypes
-            : [
-                ...finalSpec.types,
-                ...objectyTypes.filter((t) => !finalSpec.types!.includes(t)),
-              ];
+
           finalSpec.types = builder.applyHooks(
             "GraphQLSchema_types",
-            types,
+            [...(finalSpec.types ?? [])],
             build,
             context,
           );
