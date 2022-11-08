@@ -1,5 +1,11 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import { list, UnbatchedExecutableStep } from "grafast";
+import {
+  $$concreteType,
+  arraysMatch,
+  list,
+  UnbatchedExecutableStep,
+} from "grafast";
+import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -83,18 +89,37 @@ export class PgSelectSingleStep<
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
   private _coalesceToEmptyObject = false;
+  private typeStepIndexList: number[] | null;
 
   constructor(
-    classPlan: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-    itemPlan: ExecutableStep<PgSourceRow<TColumns>>,
+    $class: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
+    $item: ExecutableStep<PgSourceRow<TColumns>>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
-    this.itemStepId = this.addDependency(itemPlan);
-    this.source = classPlan.source;
+    this.itemStepId = this.addDependency($item);
+    this.source = $class.source;
     this.pgCodec = this.source.codec;
-    this.mode = classPlan.mode;
-    this.classStepId = classPlan.id;
+    this.mode = $class.mode;
+    this.classStepId = $class.id;
+
+    const poly = this.source.codec.extensions?.polymorphism;
+    if (poly?.mode === "single") {
+      this.typeStepIndexList = poly.typeColumns.map((col) => {
+        const attr = this.source.codec.columns![col];
+        const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
+
+        return $class.selectAndReturnIndex(
+          attr.codec.castFromPg
+            ? attr.codec.castFromPg(expr)
+            : sql`${expr}::text`,
+        );
+      });
+    } else if (poly?.mode === "relational") {
+      throw new Error("TODO: handle this");
+    } else {
+      this.typeStepIndexList = null;
+    }
   }
 
   public coalesceToEmptyObject(): void {
@@ -532,8 +557,36 @@ export class PgSelectSingleStep<
       if (peer.getItemStep() !== this.getItemStep()) {
         return false;
       }
+      if (
+        peer.typeStepIndexList !== this.typeStepIndexList &&
+        (!peer.typeStepIndexList ||
+          !this.typeStepIndexList ||
+          !arraysMatch(peer.typeStepIndexList, this.typeStepIndexList))
+      ) {
+        return false;
+      }
       return true;
     });
+  }
+
+  planForType(type: GraphQLObjectType): ExecutableStep {
+    const poly = this.source.codec.extensions?.polymorphism;
+    if (poly?.mode === "single") {
+      return this;
+    } else if (poly?.mode === "relational") {
+      for (const spec of Object.values(poly.types)) {
+        if (spec.name === type.name) {
+          return this.singleRelation(spec.relationName);
+        }
+      }
+      throw new Error(
+        `${this} Could not find matching name for relational polymorphic '${type.name}'`,
+      );
+    } else {
+      throw new Error(
+        `${this}: Don't know how to plan this as polymorphic for ${type}`,
+      );
+    }
   }
 
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
@@ -585,6 +638,27 @@ export class PgSelectSingleStep<
     return this;
   }
 
+  finalize() {
+    const poly = this.source.codec.extensions?.polymorphism;
+    if (poly?.mode === "single") {
+      this.handlePolymorphism = (val) => {
+        if (val == null) return val;
+        const typeList = this.typeStepIndexList!.map((i) => val[i]);
+        const key = String(typeList);
+        const entry = poly.types[key];
+        if (entry) {
+          return Object.assign(val, { [$$concreteType]: entry.name });
+        }
+        return null;
+      };
+    } else if (poly?.mode === "relational") {
+      throw new Error("TODO: handle this");
+    }
+    return super.finalize();
+  }
+
+  handlePolymorphism?: (result: any) => any;
+
   unbatchedExecute(
     extra: ExecutionExtra,
     result: PgSourceRow<TColumns>,
@@ -605,7 +679,7 @@ export class PgSelectSingleStep<
         return this._coalesceToEmptyObject ? Object.create(null) : null;
       }
     }
-    return result;
+    return this.handlePolymorphism ? this.handlePolymorphism(result) : result;
   }
 }
 

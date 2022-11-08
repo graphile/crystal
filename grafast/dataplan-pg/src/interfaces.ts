@@ -79,8 +79,9 @@ export interface PgTypeCodecPolymorphismRelational<TColumnName extends string> {
   typeColumns: readonly TColumnName[];
   types: {
     [typeKey: string]: {
-      /** The source name */
-      references: string;
+      name: string;
+      /** The name of the relation to follow to get the related record */
+      relationName: string;
       // Currently assumes it's joined via PK, but we might expand that in future
     };
   };

@@ -176,7 +176,7 @@ function processColumn(
     description: column.description,
     type: type as GraphQLOutputType,
   };
-  if (isInterface) {
+  if (!isInterface) {
     const makePlan = () => {
       // See if there's a source to pull record types from (e.g. for relations/etc)
       if (!baseCodec.columns) {

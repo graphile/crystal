@@ -189,10 +189,36 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     `Could not find referenced class '${namespaceName}.${tableName}'`,
                   );
                 }
+                const pk = pgClass
+                  .getConstraints()
+                  .find((c) => c.contype === "p");
+                const remotePk = referencedClass
+                  .getConstraints()
+                  .find((c) => c.contype === "p");
+                const pgConstraint = referencedClass.getConstraints().find(
+                  (c) =>
+                    // TODO: this isn't safe, we should also check that the columns match up
+                    c.contype === "f" && c.confrelid === pgClass._id,
+                );
+                if (!pk || !remotePk || !pgConstraint) {
+                  throw new Error(
+                    "Could not build polymorphic reference due to missing primary key or foreign key constraint",
+                  );
+                }
                 types[typeValue] = {
-                  references: info.inflection.tableSourceName({
+                  name: info.inflection.tableSourceName({
                     databaseName,
                     pgClass: referencedClass,
+                  }),
+                  relationName: info.inflection.sourceRelationName({
+                    databaseName,
+                    isReferencee: true,
+                    isUnique: true,
+                    localClass: pgClass,
+                    localColumns: pk.getAttributes()!,
+                    foreignClass: referencedClass,
+                    foreignColumns: remotePk.getAttributes()!,
+                    pgConstraint,
                   }),
                 };
               }

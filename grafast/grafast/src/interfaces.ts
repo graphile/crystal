@@ -187,6 +187,8 @@ export const $$extensions = Symbol("extensions");
 
 /**
  * The "GraphQLObjectType" type name, useful when dealing with polymorphism.
+ *
+ * @internal
  */
 export const $$concreteType = Symbol("concreteType");
 
