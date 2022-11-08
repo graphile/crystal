@@ -48,7 +48,7 @@ export class PgSingleTablePolymorphicStep<
   private rowStepId: number;
 
   constructor(
-    $typeName: ExecutableStep<string>,
+    $typeName: ExecutableStep<string | null>,
     $row: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
   ) {
     super();
@@ -97,7 +97,7 @@ export function pgSingleTablePolymorphic<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
-  $typeName: ExecutableStep<string>,
+  $typeName: ExecutableStep<string | null>,
   $row: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
 ): PgSingleTablePolymorphicStep<TColumns, TUniques, TRelations, TParameters> {
   return new PgSingleTablePolymorphicStep($typeName, $row);
