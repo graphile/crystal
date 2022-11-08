@@ -1271,7 +1271,7 @@ create table polymorphic.single_table_items (
 
   -- Shared attributes:
   parent_id int references polymorphic.single_table_items on delete cascade,
-  root_topic_id int constraint single_table_items_parent_topic_fkey references polymorphic.single_table_items on delete cascade,
+  root_topic_id int constraint single_table_items_root_topic_fkey references polymorphic.single_table_items on delete cascade,
   author_id int not null references polymorphic.people on delete cascade,
   position bigint not null default 0,
   created_at timestamptz not null default now(),
@@ -1298,7 +1298,7 @@ comment on table polymorphic.single_table_items is $$
   @ref rootTopic to:SingleTableTopic plural via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 
-comment on constraint single_table_items_parent_topic_fkey on polymorphic.single_table_items is $$
+comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
   @behavior -*
   $$;
 
@@ -1325,7 +1325,7 @@ create table polymorphic.relational_topics (
   id int primary key references polymorphic.relational_items,
   title text not null
 );
-alter table polymorphic.relational_items add constraint relational_items_parent_topic_fkey foreign key (root_topic_id) references polymorphic.relational_topics on delete cascade;
+alter table polymorphic.relational_items add constraint relational_items_root_topic_fkey foreign key (root_topic_id) references polymorphic.relational_topics on delete cascade;
 create table polymorphic.relational_posts (
   id int primary key references polymorphic.relational_items,
   title text not null,

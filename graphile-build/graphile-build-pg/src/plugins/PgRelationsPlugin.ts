@@ -693,7 +693,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
                           codec,
                         )}\`.`,
                       // TODO: handle nullability
-                      type: OtherType as GraphQLObjectType,
+                      type: OtherType,
                       plan: singleRecordPlan,
                       deprecationReason,
                     },
