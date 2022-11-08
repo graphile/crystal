@@ -110,6 +110,7 @@ function processColumn(
     | GraphileBuild.ContextObjectFields
     | GraphileBuild.ContextInterfaceFields,
   columnName: string,
+  overrideName?: string,
 ): void {
   const {
     extend,
@@ -135,11 +136,13 @@ function processColumn(
     return;
   }
 
-  const columnFieldName = inflection.column({
-    columnName,
-    column,
-    codec: pgCodec,
-  });
+  const columnFieldName =
+    overrideName ??
+    inflection.column({
+      columnName,
+      column,
+      codec: pgCodec,
+    });
   const baseCodec = unwrapCodec(column.codec);
   const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
   const arrayOrNotType = column.codec.arrayOfCodec
@@ -375,8 +378,40 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         }
 
         for (const columnName in pgCodec.columns) {
-          const column = pgCodec.columns[columnName] as PgTypeColumn<any, any>;
-          processColumn(fields, build, context, columnName);
+          let overrideName: string | undefined = undefined;
+          if (pgPolymorphism) {
+            switch (pgPolymorphism.mode) {
+              case "single": {
+                const match = pgPolymorphicSingleTableType?.columns.find(
+                  (c) => c.column === columnName,
+                );
+                if (
+                  !pgPolymorphism.commonColumns.includes(columnName) &&
+                  !match
+                ) {
+                  continue;
+                }
+                if (match?.rename) {
+                  overrideName = match.rename;
+                }
+
+                break;
+              }
+              case "relational": {
+                break;
+              }
+              case "union": {
+                break;
+              }
+              default: {
+                const never: never = pgPolymorphism;
+                throw new Error(
+                  `Unhandled polymorphism mode ${(never as any).mode}}`,
+                );
+              }
+            }
+          }
+          processColumn(fields, build, context, columnName, overrideName);
         }
         return fields;
       },
