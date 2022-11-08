@@ -356,3 +356,143 @@ insert into ranges.range_test(
   tsrange( '2019-01-10 21:45:56.356022'::timestamp, null),
   tstzrange('2019-01-10 21:45:56.356022+00'::timestamptz, null)
 );
+
+
+--------------------------------------------------------------------------------
+
+insert into polymorphic.people (person_id, username) values
+  (1, 'Alice'),
+  (2, 'Benjie'),
+  (3, 'Caroline'),
+  (4, 'Dave'),
+  (5, 'Ellie'),
+  (6, 'Fred'),
+  (7, 'Georgina'),
+  (8, 'Harry');
+
+insert into polymorphic.single_table_items 
+  (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at,            color,   title, description, note) values
+  (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'PostGraphile version 5', null, null),
+  (2,  'TOPIC',          null,      1,         0,        '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true,                   '2020-03-26T14:00:00Z', null,    'Temporary test topic', null, null),
+  (3,  'DIVIDER',        1,         2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   'green', 'Headline features', null, null),
+  (4,  'POST',           1,         2,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Better planning', null, null),
+  (5,  'POST',           1,         2,         2,        '2020-01-28T11:02:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Easier to code', null, null),
+  (6,  'POST',           1,         2,         3,        '2020-01-28T11:03:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases'),
+  (7,  'POST',           1,         2,         4,        '2020-01-28T11:04:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Better performance', null, null),
+  (8,  'DIVIDER',        1,         2,         5,        '2020-01-28T11:05:00Z', '2021-07-30T14:24:00Z', false,                  null,                   'blue',  'Timescale', null, null),
+  (9,  'POST',           1,         2,         6,        '2020-01-28T11:06:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.'),
+  (10, 'TOPIC',          1,         2,         7,        '2020-01-28T11:07:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Notes', null, null),
+  (11, 'TOPIC',          10,        2,         0,        '2020-01-28T11:08:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Other aims', null, null),
+  (12, 'POST',           11,        2,         0,        '2020-01-28T11:09:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Fix legacy issues', null, null),
+  (13, 'POST',           11,        2,         1,        '2020-01-28T11:10:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Full TypeScript conversion', null, null),
+  (14, 'POST',           11,        2,         2,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Monorepo', null, null),
+  (15, 'POST',           2,         1,         0,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  '2020-03-26T14:00:00Z', null,    'Just a test', null, null),
+  (16, 'CHECKLIST',      4,         2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Planning goals', null, null),
+  (17, 'CHECKLIST_ITEM', 16,        2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Follows pattern of GraphQL resolver flow', null),
+  (18, 'CHECKLIST_ITEM', 16,        3,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Has an optimisation phase', null),
+  (19, 'CHECKLIST_ITEM', 16,        2,         2,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Plan deduplication at the field level', null),
+  (20, 'CHECKLIST_ITEM', 16,        2,         3,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Garbage-collection of unused plans', null),
+  (21, 'CHECKLIST_ITEM', 16,        1,         4,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Supports newest GraphQL features', null);
+
+insert into polymorphic.relational_items
+  (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at) values
+  (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (2,  'TOPIC',          null,      1,         0,        '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true,                   '2020-03-26T14:00:00Z'),
+  (3,  'DIVIDER',        1,         2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (4,  'POST',           1,         2,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (5,  'POST',           1,         2,         2,        '2020-01-28T11:02:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (6,  'POST',           1,         2,         3,        '2020-01-28T11:03:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (7,  'POST',           1,         2,         4,        '2020-01-28T11:04:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (8,  'DIVIDER',        1,         2,         5,        '2020-01-28T11:05:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (9,  'POST',           1,         2,         6,        '2020-01-28T11:06:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (10, 'TOPIC',          1,         2,         7,        '2020-01-28T11:07:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (11, 'TOPIC',          10,        2,         0,        '2020-01-28T11:08:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (12, 'POST',           11,        2,         0,        '2020-01-28T11:09:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (13, 'POST',           11,        2,         1,        '2020-01-28T11:10:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (14, 'POST',           11,        2,         2,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (15, 'POST',           2,         1,         0,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  '2020-03-26T14:00:00Z'),
+  (16, 'CHECKLIST',      4,         2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (17, 'CHECKLIST_ITEM', 16,        2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (18, 'CHECKLIST_ITEM', 16,        3,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (19, 'CHECKLIST_ITEM', 16,        2,         2,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (20, 'CHECKLIST_ITEM', 16,        2,         3,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
+  (21, 'CHECKLIST_ITEM', 16,        1,         4,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null);
+
+insert into polymorphic.relational_topics (id, title)  values
+  (1, 'PostGraphile version 5'),
+  (2, 'Temporary test topic'),
+  (10, 'Notes'),
+  (11, 'Other aims');
+
+insert into polymorphic.relational_posts (id, title, description, note)  values
+  (4, 'Better planning', null, null),
+  (5, 'Easier to code', null, null),
+  (6, 'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases'),
+  (7, 'Better performance', null, null),
+  (9, 'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.'),
+  (12, 'Fix legacy issues', null, null),
+  (13, 'Full TypeScript conversion', null, null),
+  (14, 'Monorepo', null, null),
+  (15, 'Just a test', null, null);
+
+insert into polymorphic.relational_dividers (id, title, color)  values
+  (3, 'Headline features', 'green'),
+  (8, 'Timescale', 'blue');
+
+insert into polymorphic.relational_checklists (id, title)  values
+  (16, 'Planning goals');
+
+insert into polymorphic.relational_checklist_items (id, description, note)  values
+  (17, 'Follows pattern of GraphQL resolver flow', null),
+  (18, 'Has an optimisation phase', null),
+  (19, 'Plan deduplication at the field level', null),
+  (20, 'Garbage-collection of unused plans', null),
+  (21, 'Supports newest GraphQL features', null);
+
+insert into polymorphic.aws_applications (id, name, last_deployed, aws_id) values
+  (1, 'AWS App 1', null, 'AWS-0001'),
+  (2, 'AWeSome', '2021-06-05T04:03:02.010Z', 'AWS-0002'); -- NO VULNERABILITIES!
+insert into polymorphic.gcp_applications (id, name, last_deployed, gcp_id) values
+  (1, 'GCP App 1', null, 'GCP_0_1'),
+  (2, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2');
+
+insert into polymorphic.first_party_vulnerabilities (id, name, cvss_score, team_name) values
+  (1, 'Off-by-one', 3.0, 'Accounting'),
+  (2, 'Index-out-of-bounds', 7.2, 'Retention'),
+  (3, 'Exponential backtracking', 7.7, 'Continuity'),
+  (4, 'Information disclosure', 7.2, 'Retention'),
+  (5, 'Timing attack', 7.2, 'Retention');
+
+insert into polymorphic.third_party_vulnerabilities (id, name, cvss_score, vendor_name) values
+  (1, 'CSRF', 7.5, '98-Factor-Login'),
+  (2, 'XSS', 9.1, 'Frog-Render-Lib'),
+  (3, 'SQL injection', 10.0, 'Eval-Sequel-Corp'),
+  (4, 'Malware', 7.2, 'Frog-Render-Lib'),
+  (5, 'License', 7.2, 'Frog-Render-Lib');
+
+insert into polymorphic.aws_application_first_party_vulnerabilities values
+  (1, 1),
+  (1, 3),
+  (1, 4),
+  (1, 5);
+insert into polymorphic.aws_application_third_party_vulnerabilities values
+  (1, 1),
+  (1, 2),
+  (1, 4),
+  (1, 5);
+insert into polymorphic.gcp_application_first_party_vulnerabilities values
+  (1, 2),
+  (2, 2),
+  (2, 3),
+  (1, 4),
+  (1, 5),
+  (2, 4),
+  (2, 5);
+insert into polymorphic.gcp_application_third_party_vulnerabilities values
+  (1, 3),
+  (2, 1),
+  (2, 3),
+  (1, 4),
+  (1, 5),
+  (2, 4),
+  (2, 5);
