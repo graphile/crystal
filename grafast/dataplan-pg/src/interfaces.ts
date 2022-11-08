@@ -3,8 +3,6 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgTypeColumns } from "./codecs.js";
 import type {
-  PgSource,
-  PgSourceBuilder,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,

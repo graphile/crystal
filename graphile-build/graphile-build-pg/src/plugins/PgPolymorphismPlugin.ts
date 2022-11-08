@@ -14,19 +14,15 @@ import type {
   PgTypeCodecPolymorphismSingleTypeSpec,
   PgTypeColumn,
 } from "@dataplan/pg";
+import { ExecutableStep } from "grafast";
+import type { GraphQLInterfaceType, GraphQLNamedType } from "graphql";
 
+import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import {
   parseDatabaseIdentifierFromSmartTag,
   parseSmartTagsOptsString,
 } from "../utils.js";
-import { getBehavior } from "../behavior.js";
-import { ExecutableStep } from "grafast";
-import {
-  GraphQLInterfaceType,
-  GraphQLNamedType,
-  isInterfaceType,
-} from "graphql";
 
 declare global {
   namespace GraphileConfig {
@@ -461,11 +457,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         return _;
       },
       GraphQLObjectType_interfaces(interfaces, build, context) {
-        const {
-          inflection,
-          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
-          setGraphQLTypeForPgCodec,
-        } = build;
+        const { inflection } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
           const polymorphism = codec.extensions?.polymorphism;
           if (
@@ -487,9 +479,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         }
         return interfaces;
       },
-      GraphQLSchema_types(types, build, context) {
+      GraphQLSchema_types(types, build, _context) {
         for (const type of types) {
-          if (isInterfaceType(type)) {
+          if (build.graphql.isInterfaceType(type)) {
             const scope = build.scopeByType.get(type) as
               | GraphileBuild.ScopeInterface
               | undefined;

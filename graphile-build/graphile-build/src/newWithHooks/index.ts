@@ -15,7 +15,6 @@ import type {
   GraphQLOutputType,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,
-  GraphQLType,
 } from "graphql";
 import {
   GraphQLEnumType,

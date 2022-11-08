@@ -120,7 +120,7 @@ function processColumn(
   } = build;
 
   const {
-    scope: { pgCodec, pgPolymorphism },
+    scope: { pgCodec },
   } = context;
   if (!pgCodec) {
     return;
@@ -317,13 +317,6 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLInterfaceType_fields(fields, build, context) {
         const {
-          extend,
-          graphql: { getNullableType, GraphQLNonNull, GraphQLList },
-          inflection,
-          getGraphQLTypeByPgCodec,
-        } = build;
-
-        const {
           scope: { pgCodec, pgPolymorphism },
         } = context;
 
@@ -357,13 +350,6 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          graphql: { getNullableType, GraphQLNonNull, GraphQLList },
-          inflection,
-          getGraphQLTypeByPgCodec,
-        } = build;
-
         const {
           scope: {
             pgCodec,
