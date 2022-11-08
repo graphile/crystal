@@ -48,7 +48,7 @@ export const parseSmartComment = (
       }
     });
   }
-  if (result.description === "") {
+  if (result.description?.trim() === "") {
     result.description = undefined;
   }
   return result;
