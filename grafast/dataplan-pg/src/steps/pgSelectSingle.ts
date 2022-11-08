@@ -104,7 +104,7 @@ export class PgSelectSingleStep<
     this.classStepId = $class.id;
 
     const poly = this.source.codec.extensions?.polymorphism;
-    if (poly?.mode === "single") {
+    if (poly?.mode === "single" || poly?.mode === "relational") {
       this.typeStepIndexList = poly.typeColumns.map((col) => {
         const attr = this.source.codec.columns![col];
         const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
@@ -115,8 +115,6 @@ export class PgSelectSingleStep<
             : sql`${expr}::text`,
         );
       });
-    } else if (poly?.mode === "relational") {
-      throw new Error("TODO: handle this");
     } else {
       this.typeStepIndexList = null;
     }
@@ -640,7 +638,7 @@ export class PgSelectSingleStep<
 
   finalize() {
     const poly = this.source.codec.extensions?.polymorphism;
-    if (poly?.mode === "single") {
+    if (poly?.mode === "single" || poly?.mode === "relational") {
       this.handlePolymorphism = (val) => {
         if (val == null) return val;
         const typeList = this.typeStepIndexList!.map((i) => val[i]);
@@ -651,8 +649,6 @@ export class PgSelectSingleStep<
         }
         return null;
       };
-    } else if (poly?.mode === "relational") {
-      throw new Error("TODO: handle this");
     }
     return super.finalize();
   }
