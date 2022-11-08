@@ -24,7 +24,10 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
+  isInterfaceType,
   isNamedType,
+  isObjectType,
+  isUnionType,
 } from "graphql";
 import { inspect } from "util";
 
@@ -111,12 +114,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             build,
             context,
           );
-          const allTypes = Object.values(build.getAllTypes());
+          const objectyTypes = Object.values(build.getAllTypes()).filter(
+            (t) => isObjectType(t) || isInterfaceType(t) || isUnionType(t),
+          );
           const types = !finalSpec.types
-            ? allTypes
+            ? objectyTypes
             : [
                 ...finalSpec.types,
-                ...allTypes.filter((t) => !finalSpec.types!.includes(t)),
+                ...objectyTypes.filter((t) => !finalSpec.types!.includes(t)),
               ];
           finalSpec.types = builder.applyHooks(
             "GraphQLSchema_types",
