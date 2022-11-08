@@ -5,6 +5,7 @@ import "graphile-config";
 import type {
   PgSelectSingleStep,
   PgSource,
+  PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
 } from "@dataplan/pg";
@@ -469,6 +470,19 @@ function addRelations(
   const relations: {
     [identifier: string]: PgSourceRelation<any, any>;
   } = source.getRelations();
+  const refs: PgSourceRefs = Object.create(source.refs);
+  // Make sure all relations are represented as refs (unless explicitly excluded)
+  for (const identifier in relations) {
+    if (!(identifier in refs)) {
+      refs[identifier] = {
+        paths: [
+          {
+            relationName: identifier,
+          },
+        ],
+      };
+    }
+  }
   return Object.entries(relations).reduce((memo, [identifier, relation]) => {
     if (isMutationPayload && relation.isReferencee) {
       // Don't add backwards relations to mutation payloads
