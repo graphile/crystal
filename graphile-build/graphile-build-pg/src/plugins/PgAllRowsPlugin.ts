@@ -2,8 +2,19 @@ import "graphile-build";
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSource } from "@dataplan/pg";
-import { connection } from "grafast";
+import {
+  PgSelectSingleStep,
+  pgSingleTablePolymorphic,
+  PgSource,
+  PgTypeCodecPolymorphismSingle,
+} from "@dataplan/pg";
+import {
+  connection,
+  each,
+  ExecutableStep,
+  FieldPlanResolver,
+  lambda,
+} from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
@@ -81,11 +92,74 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
+          const poly = source.codec.extensions?.polymorphism;
+
           const behavior = getBehavior([
             source.codec.extensions,
             source.extensions,
           ]);
           const defaultBehavior = "connection -list";
+
+          function makePlan(
+            useConnection = false,
+          ): FieldPlanResolver<any, any, any> {
+            if (poly) {
+              switch (poly.mode) {
+                case "single": {
+                  return EXPORTABLE(
+                    (source) =>
+                      function plan() {
+                        const poly = source.codec.extensions!
+                          .polymorphism as PgTypeCodecPolymorphismSingle<string>;
+                        const $collection = each(source.find(), (raw$item) => {
+                          const $item = raw$item as PgSelectSingleStep<
+                            any,
+                            any,
+                            any,
+                            any
+                          >;
+                          const typeStepList = poly.typeColumns.map((col) =>
+                            $item.get(col),
+                          );
+
+                          const $typeName = lambda(typeStepList, (typeList) => {
+                            const key = String(typeList);
+                            const entry = poly.types[key];
+                            if (entry) {
+                              return entry.name;
+                            }
+                            return null;
+                          });
+
+                          return pgSingleTablePolymorphic($typeName, $item);
+                        });
+                        return useConnection
+                          ? connection($collection)
+                          : $collection;
+                      },
+                    [source],
+                  );
+                  break;
+                }
+                default: {
+                  throw new Error(
+                    "TODO: write plan for this type of polymorphism",
+                  );
+                }
+              }
+            } else {
+              return EXPORTABLE(
+                (source) =>
+                  function plan() {
+                    const $collection = source.find();
+                    return useConnection
+                      ? connection($collection)
+                      : $collection;
+                  },
+                [source],
+              );
+            }
+          }
 
           if (build.behavior.matches(behavior, "query:list", defaultBehavior)) {
             const fieldName = build.inflection.allRowsList(source);
@@ -106,13 +180,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     deprecationReason: tagToString(
                       source.extensions?.tags?.deprecated,
                     ),
-                    plan: EXPORTABLE(
-                      (source) =>
-                        function plan() {
-                          return source.find();
-                        },
-                      [source],
-                    ),
+                    plan: makePlan(),
                   }),
                 ),
               },
@@ -150,13 +218,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                       deprecationReason: tagToString(
                         source.extensions?.tags?.deprecated,
                       ),
-                      plan: EXPORTABLE(
-                        (connection, source) =>
-                          function plan() {
-                            return connection(source.find());
-                          },
-                        [connection, source],
-                      ),
+                      plan: makePlan(true),
                     }),
                   ),
                 },
