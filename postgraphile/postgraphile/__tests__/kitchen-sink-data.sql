@@ -32,6 +32,24 @@ delete from a.default_value cascade;
 delete from inheritence.user_file cascade;
 delete from inheritence.file cascade;
 delete from c.issue756 cascade;
+
+delete from polymorphic.gcp_application_third_party_vulnerabilities cascade;
+delete from polymorphic.gcp_application_first_party_vulnerabilities cascade;
+delete from polymorphic.aws_application_third_party_vulnerabilities cascade;
+delete from polymorphic.aws_application_first_party_vulnerabilities cascade;
+delete from polymorphic.third_party_vulnerabilities cascade;
+delete from polymorphic.first_party_vulnerabilities cascade;
+delete from polymorphic.gcp_applications cascade;
+delete from polymorphic.aws_applications cascade;
+delete from polymorphic.relational_checklist_items cascade;
+delete from polymorphic.relational_checklists cascade;
+delete from polymorphic.relational_dividers cascade;
+delete from polymorphic.relational_posts cascade;
+delete from polymorphic.relational_topics cascade;
+delete from polymorphic.relational_items cascade;
+delete from polymorphic.single_table_items cascade;
+delete from polymorphic.people cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
