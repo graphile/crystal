@@ -12,6 +12,7 @@ export function makeSchemaBuilderHooks<
     init: [],
     finalize: [],
     GraphQLSchema: [],
+    GraphQLSchema_types: [],
     GraphQLObjectType: [],
     GraphQLObjectType_interfaces: [],
     GraphQLObjectType_fields: [],

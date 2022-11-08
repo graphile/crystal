@@ -367,6 +367,8 @@ declare global {
         behaviourOnConflict?: "throw" | "recoverable",
       ) => Obj1 & Obj2;
 
+      getAllTypes(): { [typeName: string]: GraphQLNamedType };
+
       /**
        * Useful for looking up the scope that a type was created with, e.g. for
        * debugging.
@@ -459,10 +461,14 @@ declare global {
       type: "init";
     }
 
-    interface ScopeGraphQLSchema extends Scope {}
-    interface ContextGraphQLSchema extends Context {
-      scope: ScopeGraphQLSchema;
+    interface ScopeSchema extends Scope {}
+    interface ContextSchema extends Context {
+      scope: ScopeSchema;
       type: "GraphQLSchema";
+    }
+    interface ScopeSchemaTypes extends ScopeSchema {}
+    interface ContextSchemaTypes extends ContextSchema {
+      scope: ScopeSchemaTypes;
     }
 
     interface ScopeScalar extends Scope {}
@@ -608,7 +614,8 @@ declare global {
       | Scope
       | ScopeBuild
       | ScopeInit
-      | ScopeGraphQLSchema
+      | ScopeSchema
+      | ScopeSchemaTypes
       | ScopeScalar
       | ScopeObject
       | ScopeObjectInterfaces
@@ -735,7 +742,16 @@ declare global {
        */
       GraphQLSchema: GraphileBuild.Hook<
         GraphQLSchemaConfig,
-        GraphileBuild.ContextGraphQLSchema,
+        GraphileBuild.ContextSchema,
+        TBuild
+      >[];
+
+      /**
+       * Add any types that need registering (typically polymorphic types) here
+       */
+      GraphQLSchema_types: GraphileBuild.Hook<
+        GraphQLNamedType[],
+        GraphileBuild.ContextSchemaTypes,
         TBuild
       >[];
 
@@ -922,4 +938,4 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
 // TODO: this returning `never` for non-GraphQLSchema seems wrong... why is it
 // not causing issues?
 export type ScopeForType<TType extends GraphQLNamedType | GraphQLSchema> =
-  TType extends GraphQLSchema ? GraphileBuild.ScopeGraphQLSchema : never;
+  TType extends GraphQLSchema ? GraphileBuild.ScopeSchema : never;

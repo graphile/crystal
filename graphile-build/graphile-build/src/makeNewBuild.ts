@@ -150,6 +150,9 @@ export default function makeNewBuild(
         }
       }
     },
+    getAllTypes() {
+      return allTypes;
+    },
     scopeByType,
     inflection,
     handleRecoverableError(e) {

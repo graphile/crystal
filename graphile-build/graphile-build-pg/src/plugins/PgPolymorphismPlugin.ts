@@ -4,21 +4,48 @@ import "./PgProceduresPlugin.js";
 import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
-import { version } from "../index.js";
-import {
-  parseDatabaseIdentifierFromSmartTag,
-  parseSmartTagsOptsString,
-} from "../utils.js";
-import {
+import type {
+  PgTypeCodec,
+  PgTypeCodecPolymorphism,
   PgTypeCodecPolymorphismRelational,
   PgTypeCodecPolymorphismSingle,
   PgTypeCodecPolymorphismSingleTypeColumnSpec,
 } from "@dataplan/pg";
 
+import { version } from "../index.js";
+import {
+  parseDatabaseIdentifierFromSmartTag,
+  parseSmartTagsOptsString,
+} from "../utils.js";
+import { getBehavior } from "../behavior.js";
+import { ExecutableStep } from "grafast";
+import {
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  isInterfaceType,
+} from "graphql";
+
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgPolymorphism: Record<string, never>;
+    }
+  }
+  namespace GraphileBuild {
+    interface ScopeInterface {
+      pgCodec?: PgTypeCodec<any, any, any, any>;
+      isPgPolymorphicTableType?: boolean;
+      pgPolymorphism?: PgTypeCodecPolymorphism<string>;
+    }
+    interface ScopeObject {
+      pgPolymorphism?: PgTypeCodecPolymorphism<string>;
+      pgPolymorphicSingleTableType?: {
+        typeIdentifier: string;
+        name: string;
+        columns: ReadonlyArray<
+          PgTypeCodecPolymorphismSingleTypeColumnSpec<any>
+        >;
+      };
     }
   }
 }
@@ -188,6 +215,153 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             }
           }
         }
+      },
+    },
+  },
+  schema: {
+    hooks: {
+      init(_, build, _context) {
+        const {
+          inflection,
+          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
+          setGraphQLTypeForPgCodec,
+        } = build;
+        for (const codec of build.pgCodecMetaLookup.keys()) {
+          build.recoverable(null, () => {
+            if (!codec.columns) {
+              // Only apply to codecs that define columns
+              return;
+            }
+            const polymorphism = codec.extensions?.polymorphism;
+            if (!polymorphism) {
+              // Don't build polymorphic types as objects
+              return;
+            }
+
+            const behavior = getBehavior(codec.extensions);
+            const defaultBehavior = [
+              "select",
+              "table",
+              ...(!codec.isAnonymous ? ["insert", "update"] : []),
+              ...(simpleCollections === "both"
+                ? ["connection", "list"]
+                : simpleCollections === "only"
+                ? ["list"]
+                : ["connection"]),
+            ].join(" ");
+
+            const isTable = build.behavior.matches(
+              behavior,
+              "table",
+              defaultBehavior,
+            );
+            if (!isTable || codec.isAnonymous) {
+              return;
+            }
+
+            const selectable = build.behavior.matches(
+              behavior,
+              "select",
+              defaultBehavior,
+            );
+
+            if (selectable) {
+              if (polymorphism.mode === "single") {
+                const interfaceTypeName = inflection.tableType(codec);
+                build.registerInterfaceType(
+                  interfaceTypeName,
+                  {
+                    pgCodec: codec,
+                    isPgPolymorphicTableType: true,
+                    pgPolymorphism: polymorphism,
+                  },
+                  () => ({
+                    description: codec.extensions?.description,
+                  }),
+                  `PgPolymorphismPlugin table type for ${codec.name}`,
+                );
+                setGraphQLTypeForPgCodec(codec, ["output"], interfaceTypeName);
+                build.registerCursorConnection({
+                  typeName: interfaceTypeName,
+                  connectionTypeName: inflection.tableConnectionType(codec),
+                  edgeTypeName: inflection.tableEdgeType(codec),
+                  scope: {
+                    isPgConnectionRelated: true,
+                    pgCodec: codec,
+                  },
+                  nonNullNode: pgForbidSetofFunctionsToReturnNull,
+                });
+                for (const [typeIdentifier, spec] of Object.entries(
+                  polymorphism.types,
+                )) {
+                  const tableTypeName = spec.name;
+                  build.registerObjectType(
+                    tableTypeName,
+                    {
+                      pgCodec: codec,
+                      isPgTableType: true,
+                      pgPolymorphism: polymorphism,
+                      pgPolymorphicSingleTableType: {
+                        typeIdentifier,
+                        name: spec.name,
+                        columns: spec.columns,
+                      },
+                    },
+                    // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
+                    ExecutableStep, // PgClassSingleStep<any, any, any, any>
+                    () => ({
+                      description: codec.extensions?.description,
+                      interfaces: [
+                        build.getTypeByName(
+                          interfaceTypeName,
+                        ) as GraphQLInterfaceType,
+                      ],
+                    }),
+                    `PgPolymorphismPlugin table type for ${codec.name}`,
+                  );
+                  build.registerCursorConnection({
+                    typeName: tableTypeName,
+                    connectionTypeName:
+                      inflection.connectionType(tableTypeName),
+                    edgeTypeName: inflection.edgeType(tableTypeName),
+                    scope: {
+                      isPgConnectionRelated: true,
+                      pgCodec: codec,
+                    },
+                    nonNullNode: pgForbidSetofFunctionsToReturnNull,
+                  });
+                }
+              }
+            }
+          });
+        }
+        return _;
+      },
+      GraphQLSchema_types(types, build, context) {
+        for (const type of types) {
+          if (isInterfaceType(type)) {
+            const scope = build.scopeByType.get(type) as
+              | GraphileBuild.ScopeInterface
+              | undefined;
+            if (scope) {
+              const polymorphism = scope.pgPolymorphism;
+              if (polymorphism) {
+                switch (polymorphism.mode) {
+                  case "single": {
+                    for (const type of Object.values(polymorphism.types)) {
+                      // Force the type to be built
+                      const t = build.getTypeByName(
+                        type.name,
+                      ) as GraphQLNamedType;
+                      types.push(t);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        return types;
       },
     },
   },
