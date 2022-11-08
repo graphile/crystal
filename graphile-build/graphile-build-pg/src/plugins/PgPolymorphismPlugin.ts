@@ -248,7 +248,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgTables_PgSource(info, event) {
-        const { pgClass, databaseName, source } = event;
+        const { pgClass, databaseName, source, relations } = event;
         const poly = source.codec.extensions?.polymorphism;
         if (poly?.mode === "relational") {
           // Copy common attributes to implementations
@@ -269,11 +269,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 `Invalid reference to '${spec.references}' - cannot find that table (${schemaName}.${tableName})`,
               );
             }
-            const otherSource = await info.helpers.pgCodecs.getCodecFromClass(
+            const otherCodec = await info.helpers.pgCodecs.getCodecFromClass(
               databaseName,
               pgRelatedClass._id,
             );
-            if (!otherSource) {
+            if (!otherCodec) {
               continue;
             }
             const pk = pgRelatedClass
@@ -290,7 +290,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             if (!pk || !remotePk || !pgConstraint) {
               throw new Error("Invalid relational something something");
             }
-            const relationName = info.inflection.sourceRelationName({
+            const sharedRelationName = info.inflection.sourceRelationName({
               databaseName,
               isReferencee: false,
               isUnique: true,
@@ -300,22 +300,45 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               foreignColumns: remotePk.getAttributes()!,
               pgConstraint,
             });
+
             for (const [colName, colSpec] of Object.entries(
               source.codec.columns,
             ) as Array<[string, PgTypeColumn]>) {
-              if (otherSource.columns[colName]) {
-                otherSource.columns[colName].identicalVia = relationName;
+              if (otherCodec.columns[colName]) {
+                otherCodec.columns[colName].identicalVia = sharedRelationName;
               } else {
-                otherSource.columns[colName] = {
+                otherCodec.columns[colName] = {
                   codec: colSpec.codec,
                   notNull: colSpec.notNull,
                   hasDefault: colSpec.hasDefault,
-                  via: relationName,
+                  via: sharedRelationName,
                   restrictedAccess: colSpec.restrictedAccess,
                   description: colSpec.description,
                   extensions: { ...colSpec.extensions },
                 };
               }
+            }
+
+            const otherSourceBuilder =
+              await info.helpers.pgTables.getSourceBuilder(
+                databaseName,
+                pgRelatedClass,
+              );
+            if (!(source as any)._relations) {
+              console.error(source);
+            }
+
+            for (const [relationName, relationSpec] of Object.entries(
+              relations,
+            )) {
+              otherSourceBuilder!.refs[relationName] = {
+                paths: [
+                  {
+                    relationName: sharedRelationName,
+                  },
+                  { relationName },
+                ],
+              };
             }
           }
         }

@@ -194,6 +194,7 @@ declare global {
           databaseName: string;
           pgClass: PgClass;
           source: PgSource<any, any, any>;
+          relations: PgTablesPluginSourceRelations;
         }) => Promise<void> | void
       >;
       pgTables_PgSourceBuilder_options: PluginHook<
@@ -344,6 +345,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             source,
             pgClass,
             databaseName,
+            relations,
           });
           return source;
         })();
