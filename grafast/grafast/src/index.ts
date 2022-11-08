@@ -206,7 +206,7 @@ export {
   __TrackedObjectStep,
   __ValueStep,
   $$bypassGraphQL,
-  $$concreteType, // TODO: this isn't really safe to export
+  $$concreteType, // TODO: we really oughtn't export this
   $$data,
   $$eventEmitter,
   $$extensions,
