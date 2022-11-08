@@ -8,8 +8,11 @@ import type {
   PgTypeCodec,
   PgTypeCodecPolymorphism,
   PgTypeCodecPolymorphismRelational,
+  PgTypeCodecPolymorphismRelationalTypeSpec,
   PgTypeCodecPolymorphismSingle,
   PgTypeCodecPolymorphismSingleTypeColumnSpec,
+  PgTypeCodecPolymorphismSingleTypeSpec,
+  PgTypeColumn,
 } from "@dataplan/pg";
 
 import { version } from "../index.js";
@@ -45,6 +48,10 @@ declare global {
         columns: ReadonlyArray<
           PgTypeCodecPolymorphismSingleTypeColumnSpec<any>
         >;
+      };
+      pgPolymorphicRelationalType?: {
+        typeIdentifier: string;
+        name: string;
       };
     }
   }
@@ -205,11 +212,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     "Could not build polymorphic reference due to missing primary key or foreign key constraint",
                   );
                 }
+                const codec = await info.helpers.pgCodecs.getCodecFromClass(
+                  databaseName,
+                  referencedClass._id,
+                );
                 types[typeValue] = {
-                  name: info.inflection.tableSourceName({
-                    databaseName,
-                    pgClass: referencedClass,
-                  }),
+                  name: info.inflection.tableType(codec!),
+                  references,
                   relationName: info.inflection.sourceRelationName({
                     databaseName,
                     isReferencee: true,
@@ -238,6 +247,79 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             }
             default: {
               throw new Error(`Unsupported (or not provided) @interface mode`);
+            }
+          }
+        }
+      },
+      async pgTables_PgSource(info, event) {
+        const { pgClass, databaseName, source } = event;
+        const poly = source.codec.extensions?.polymorphism;
+        if (poly?.mode === "relational") {
+          // Copy common attributes to implementations
+          for (const spec of Object.values(poly.types)) {
+            const [schemaName, tableName] = parseDatabaseIdentifierFromSmartTag(
+              spec.references,
+              2,
+              pgClass.getNamespace()!.nspname,
+            );
+            const pgRelatedClass =
+              await info.helpers.pgIntrospection.getClassByName(
+                databaseName,
+                schemaName,
+                tableName,
+              );
+            if (!pgRelatedClass) {
+              throw new Error(
+                `Invalid reference to '${spec.references}' - cannot find that table (${schemaName}.${tableName})`,
+              );
+            }
+            const otherSource = await info.helpers.pgCodecs.getCodecFromClass(
+              databaseName,
+              pgRelatedClass._id,
+            );
+            if (!otherSource) {
+              continue;
+            }
+            const pk = pgRelatedClass
+              .getConstraints()
+              .find((c) => c.contype === "p");
+            const pgConstraint = pgRelatedClass.getConstraints().find(
+              (c) =>
+                // TODO: this isn't safe, we should also check that the columns match up
+                c.contype === "f" && c.confrelid === pgClass._id,
+            );
+            const remotePk = pgClass
+              .getConstraints()
+              .find((c) => c.contype === "p");
+            if (!pk || !remotePk || !pgConstraint) {
+              throw new Error("Invalid relational something something");
+            }
+            const relationName = info.inflection.sourceRelationName({
+              databaseName,
+              isReferencee: false,
+              isUnique: true,
+              localClass: pgRelatedClass,
+              localColumns: pk.getAttributes()!,
+              foreignClass: pgClass,
+              foreignColumns: remotePk.getAttributes()!,
+              pgConstraint,
+            });
+            for (const [colName, colSpec] of Object.entries(
+              source.codec.columns,
+            ) as Array<[string, PgTypeColumn]>) {
+              if (otherSource.columns[colName]) {
+                otherSource.columns[colName].identicalVia = relationName;
+              } else {
+                otherSource.columns[colName] = {
+                  codec: colSpec.codec,
+                  notNull: colSpec.notNull,
+                  hasDefault: colSpec.hasDefault,
+                  via: relationName,
+                  restrictedAccess: colSpec.restrictedAccess,
+                  description: colSpec.description,
+                  extensions: { ...colSpec.extensions },
+                };
+              }
             }
           }
         }
@@ -292,7 +374,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             );
 
             if (selectable) {
-              if (polymorphism.mode === "single") {
+              if (
+                polymorphism.mode === "single" ||
+                polymorphism.mode === "relational"
+              ) {
                 const interfaceTypeName = inflection.tableType(codec);
                 build.registerInterfaceType(
                   interfaceTypeName,
@@ -304,7 +389,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   () => ({
                     description: codec.extensions?.description,
                   }),
-                  `PgPolymorphismPlugin table type for ${codec.name}`,
+                  `PgPolymorphismPlugin single interface type for ${codec.name}`,
                 );
                 setGraphQLTypeForPgCodec(codec, ["output"], interfaceTypeName);
                 build.registerCursorConnection({
@@ -319,32 +404,44 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 });
                 for (const [typeIdentifier, spec] of Object.entries(
                   polymorphism.types,
-                )) {
+                ) as Array<
+                  [
+                    string,
+                    (
+                      | PgTypeCodecPolymorphismSingleTypeSpec<string>
+                      | PgTypeCodecPolymorphismRelationalTypeSpec
+                    ),
+                  ]
+                >) {
                   const tableTypeName = spec.name;
-                  build.registerObjectType(
-                    tableTypeName,
-                    {
-                      pgCodec: codec,
-                      isPgTableType: true,
-                      pgPolymorphism: polymorphism,
-                      pgPolymorphicSingleTableType: {
-                        typeIdentifier,
-                        name: spec.name,
-                        columns: spec.columns,
+                  if (polymorphism.mode === "single") {
+                    build.registerObjectType(
+                      tableTypeName,
+                      {
+                        pgCodec: codec,
+                        isPgTableType: true,
+                        pgPolymorphism: polymorphism,
+                        pgPolymorphicSingleTableType: {
+                          typeIdentifier,
+                          name: spec.name,
+                          columns: (
+                            spec as PgTypeCodecPolymorphismSingleTypeSpec<string>
+                          ).columns,
+                        },
                       },
-                    },
-                    // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
-                    ExecutableStep, // PgClassSingleStep<any, any, any, any>
-                    () => ({
-                      description: codec.extensions?.description,
-                      interfaces: [
-                        build.getTypeByName(
-                          interfaceTypeName,
-                        ) as GraphQLInterfaceType,
-                      ],
-                    }),
-                    `PgPolymorphismPlugin table type for ${codec.name}`,
-                  );
+                      // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
+                      ExecutableStep, // PgClassSingleStep<any, any, any, any>
+                      () => ({
+                        description: codec.extensions?.description,
+                        interfaces: [
+                          build.getTypeByName(
+                            interfaceTypeName,
+                          ) as GraphQLInterfaceType,
+                        ],
+                      }),
+                      `PgPolymorphismPlugin single table type for ${codec.name}`,
+                    );
+                  }
                   build.registerCursorConnection({
                     typeName: tableTypeName,
                     connectionTypeName:
@@ -363,6 +460,33 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         }
         return _;
       },
+      GraphQLObjectType_interfaces(interfaces, build, context) {
+        const {
+          inflection,
+          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
+          setGraphQLTypeForPgCodec,
+        } = build;
+        for (const codec of build.pgCodecMetaLookup.keys()) {
+          const polymorphism = codec.extensions?.polymorphism;
+          if (
+            !codec.columns ||
+            !polymorphism ||
+            polymorphism.mode !== "relational"
+          ) {
+            continue;
+          }
+          const typeNames = Object.values(polymorphism.types).map(
+            (t) => t.name,
+          );
+          if (typeNames.includes(context.Self.name)) {
+            const interfaceTypeName = inflection.tableType(codec);
+            interfaces.push(
+              build.getTypeByName(interfaceTypeName) as GraphQLInterfaceType,
+            );
+          }
+        }
+        return interfaces;
+      },
       GraphQLSchema_types(types, build, context) {
         for (const type of types) {
           if (isInterfaceType(type)) {
@@ -373,6 +497,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const polymorphism = scope.pgPolymorphism;
               if (polymorphism) {
                 switch (polymorphism.mode) {
+                  case "relational":
                   case "single": {
                     for (const type of Object.values(polymorphism.types)) {
                       // Force the type to be built

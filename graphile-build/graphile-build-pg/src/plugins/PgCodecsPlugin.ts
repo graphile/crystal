@@ -98,7 +98,7 @@ declare global {
           pgCodec: PgTypeCodec<any, any, any, any>;
           pgClass?: PgClass;
           pgType: PgType;
-        }) => Promise<void>
+        }) => Promise<void> | void
       >;
 
       pgCodecs_column: PluginHook<

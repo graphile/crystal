@@ -62,28 +62,34 @@ export interface PgTypeCodecPolymorphismSingleTypeColumnSpec<
   rename?: string;
 }
 
+export interface PgTypeCodecPolymorphismSingleTypeSpec<
+  TColumnName extends string,
+> {
+  name: string;
+  columns: Array<PgTypeCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
+}
 export interface PgTypeCodecPolymorphismSingle<TColumnName extends string> {
   mode: "single";
   typeColumns: readonly TColumnName[];
   commonColumns: readonly TColumnName[];
   types: {
-    [typeKey: string]: {
-      name: string;
-      columns: Array<PgTypeCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
-    };
+    [typeKey: string]: PgTypeCodecPolymorphismSingleTypeSpec<TColumnName>;
   };
 }
 
+export interface PgTypeCodecPolymorphismRelationalTypeSpec {
+  name: string;
+  /** The name of the database table this type relates to (useful before the relations are established) */
+  references: string;
+  /** The name of the relation to follow to get the related record */
+  relationName: string;
+  // Currently assumes it's joined via PK, but we might expand that in future
+}
 export interface PgTypeCodecPolymorphismRelational<TColumnName extends string> {
   mode: "relational";
   typeColumns: readonly TColumnName[];
   types: {
-    [typeKey: string]: {
-      name: string;
-      /** The name of the relation to follow to get the related record */
-      relationName: string;
-      // Currently assumes it's joined via PK, but we might expand that in future
-    };
+    [typeKey: string]: PgTypeCodecPolymorphismRelationalTypeSpec;
   };
 }
 

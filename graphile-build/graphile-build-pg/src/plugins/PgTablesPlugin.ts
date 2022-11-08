@@ -187,14 +187,14 @@ declare global {
           pgClass: PgClass;
           sourceBuilder: PgSourceBuilder<any, any, any>;
           relations: PgTablesPluginSourceRelations;
-        }) => Promise<void>
+        }) => Promise<void> | void
       >;
       pgTables_PgSource: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
           source: PgSource<any, any, any>;
-        }) => Promise<void>
+        }) => Promise<void> | void
       >;
       pgTables_PgSourceBuilder_options: PluginHook<
         (event: {
