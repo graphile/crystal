@@ -408,7 +408,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,
-          graphql: { GraphQLList, GraphQLObjectType, GraphQLNonNull },
+          graphql: {
+            GraphQLList,
+            GraphQLObjectType,
+            GraphQLNonNull,
+            GraphQLUnionType,
+            GraphQLInterfaceType,
+          },
           options: { simpleCollections },
         } = build;
         const {
@@ -459,7 +465,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             const otherCodec = otherSource.codec;
             const typeName = build.inflection.tableType(otherCodec);
             const OtherType = build.getTypeByName(typeName);
-            if (!OtherType || !(OtherType instanceof GraphQLObjectType)) {
+            if (
+              !OtherType ||
+              !(
+                OtherType instanceof GraphQLObjectType ||
+                OtherType instanceof GraphQLInterfaceType ||
+                OtherType instanceof GraphQLUnionType
+              )
+            ) {
               return memo;
             }
             let fields = memo;
