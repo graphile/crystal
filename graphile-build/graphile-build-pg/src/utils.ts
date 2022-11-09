@@ -315,7 +315,7 @@ export class Idents {
     const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
     let ident: string | undefined = undefined;
     for (let i = 1; i < 10000; i++) {
-      let val = safe + (i > 1 ? String(i) : "");
+      const val = safe + (i > 1 ? String(i) : "");
       if (!idents.has(val)) {
         ident = val;
         break;

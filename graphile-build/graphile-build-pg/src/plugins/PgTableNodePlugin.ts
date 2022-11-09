@@ -11,9 +11,9 @@ import type { ListStep } from "grafast";
 import {
   access,
   constant,
-  list,
   evalSafeProperty,
   isSafeObjectPropertyName,
+  list,
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 

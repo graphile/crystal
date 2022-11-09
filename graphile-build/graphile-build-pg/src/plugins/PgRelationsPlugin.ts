@@ -9,22 +9,21 @@ import type {
   PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
-  PgTypeColumns,
   PgUnionAllStepConfigAttributes,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ObjectStep } from "grafast";
-import { list, object } from "grafast";
-import { evalSafeProperty } from "grafast";
-import { GraphileFieldConfig, isSafeObjectPropertyName } from "grafast";
-import { arraysMatch, connection } from "grafast";
+import {
+  arraysMatch,
+  connection,
+  evalSafeProperty,
+  isSafeObjectPropertyName,
+  list,
+  object,
+} from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
-import type {
-  GraphQLFieldConfig,
-  GraphQLFieldConfigMap,
-  GraphQLObjectType,
-} from "graphql";
+import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -584,7 +583,7 @@ function addRelations(
   } = build;
   const { Self, scope, fieldWithHooks } = context;
 
-  const objectMode = context.type === "GraphQLObjectType";
+  // const objectMode = context.type === "GraphQLObjectType";
 
   const { pgCodec } = scope;
   const isPgTableType =
@@ -856,9 +855,9 @@ function addRelations(
       } else if (!needsPgUnionAll) {
         // Definitely just one chain
         const path = paths[0];
-        function makePlanResolver(
+        const makePlanResolver = (
           mode: "singleRecord" | "list" | "connection",
-        ) {
+        ) => {
           const single = mode === "singleRecord";
           const isConnection = mode === "connection";
           try {
@@ -976,7 +975,7 @@ function addRelations(
             // TODO: fallback if unsafe
             throw new Error("TODO: implement slow mode");
           }
-        }
+        };
         const singleRecordPlan = makePlanResolver("singleRecord");
         const listPlan = makePlanResolver("list");
         const connectionPlan = makePlanResolver("connection");
