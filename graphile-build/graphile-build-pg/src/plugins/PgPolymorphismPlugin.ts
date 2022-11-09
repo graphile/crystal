@@ -13,6 +13,7 @@ import type {
   PgTypeCodecPolymorphismSingleTypeColumnSpec,
   PgTypeCodecPolymorphismSingleTypeSpec,
   PgTypeColumn,
+  PgSourceRef,
 } from "@dataplan/pg";
 import { ExecutableStep } from "grafast";
 import type { GraphQLInterfaceType, GraphQLNamedType } from "graphql";
@@ -324,21 +325,49 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 databaseName,
                 pgRelatedClass,
               );
-            if (!(source as any)._relations) {
-              console.error(source);
-            }
 
             for (const [relationName, relationSpec] of Object.entries(
               relations,
             )) {
-              otherSourceBuilder!.refs[relationName] = {
-                paths: [
-                  {
-                    relationName: sharedRelationName,
+              const behavior =
+                getBehavior(relationSpec.source.extensions) +
+                " " +
+                getBehavior(relationSpec.extensions);
+              const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
+                {
+                  source,
+                  codec: source.codec,
+                  identifier: relationName,
+                  relation: relationSpec,
+                };
+              const singleRecordFieldName = relationDetails.relation
+                .isReferencee
+                ? info.inflection.singleRelationBackwards(relationDetails)
+                : info.inflection.singleRelation(relationDetails);
+              const connectionFieldName =
+                info.inflection.manyRelationConnection(relationDetails);
+              const listFieldName =
+                info.inflection.manyRelationList(relationDetails);
+              const ref: PgSourceRef = {
+                singular: relationSpec.isUnique,
+                singleRecordFieldName,
+                listFieldName,
+                connectionFieldName,
+                extensions: {
+                  tags: {
+                    behavior,
                   },
-                  { relationName },
+                },
+                paths: [
+                  [
+                    {
+                      relationName: sharedRelationName,
+                    },
+                    { relationName },
+                  ],
                 ],
               };
+              otherSourceBuilder!.refs[relationName] = ref;
             }
           }
         }

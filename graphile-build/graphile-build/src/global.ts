@@ -373,7 +373,7 @@ declare global {
        * Useful for looking up the scope that a type was created with, e.g. for
        * debugging.
        */
-      scopeByType: Map<GraphQLType, SomeScope>;
+      scopeByType: Map<GraphQLNamedType, SomeScope>;
 
       /**
        * When a recoverable error occurs, it will be handed to this method

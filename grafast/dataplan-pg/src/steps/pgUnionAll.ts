@@ -121,13 +121,15 @@ export interface PgUnionAllSourceSpec {
   source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
 }
 
+export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
+  [attributeName in TAttributes]: {
+    codec: PgTypeCodec<any, any, any>;
+  };
+};
+
 export interface PgUnionAllStepConfig<TAttributes extends string> {
   executor: PgExecutor;
-  attributes: {
-    [attributeName in TAttributes]: {
-      codec: PgTypeCodec<any, any, any>;
-    };
-  };
+  attributes: PgUnionAllStepConfigAttributes<TAttributes>;
   sourceSpecs: {
     [sourceName: string]: PgUnionAllSourceSpec;
   };

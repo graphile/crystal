@@ -185,16 +185,27 @@ export interface PgSourceUnique<
   extensions?: PgSourceUniqueExtensions;
 }
 
+export interface PgSourceRefPathEntry {
+  relationName: string;
+  // Could add conditions here
+}
+
+export type PgSourceRefPath = PgSourceRefPathEntry[];
+export interface PgSourceRefExtensions {}
+
+export interface PgSourceRef {
+  graphqlType?: string;
+  singular?: boolean;
+  paths: Array<PgSourceRefPath>;
+  extensions?: PgSourceRefExtensions;
+  singleRecordFieldName?: string;
+  listFieldName?: string;
+  connectionFieldName?: string;
+  // Could add extra details here
+}
+
 export interface PgSourceRefs {
-  [refName: string]: {
-    graphqlType?: string;
-    singular?: boolean;
-    paths: Array<{
-      relationName: string;
-      // Could add conditions here
-    }>;
-    // Could add extra details here
-  };
+  [refName: string]: PgSourceRef;
 }
 
 /**

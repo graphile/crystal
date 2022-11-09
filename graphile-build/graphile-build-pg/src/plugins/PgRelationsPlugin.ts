@@ -5,12 +5,15 @@ import "graphile-config";
 import type {
   PgSelectSingleStep,
   PgSource,
+  PgSourceRefPath,
   PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
+  PgUnionAllStepConfigAttributes,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { GraphileFieldConfig, ObjectStep } from "grafast";
+import type { ObjectStep } from "grafast";
+import { constant, GraphileFieldConfig } from "grafast";
 import { arraysMatch, connection } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
@@ -394,10 +397,6 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             pgClass._id,
           );
 
-        if (pgClass.relname === "relational_topics") {
-          console.dir({ constraints, foreignConstraints });
-        }
-
         for (const constraint of constraints) {
           if (constraint.contype === "f") {
             await info.helpers.pgRelations.addRelation(event, constraint);
@@ -470,71 +469,85 @@ function addRelations(
   const relations: {
     [identifier: string]: PgSourceRelation<any, any>;
   } = source.getRelations();
-  const refs: PgSourceRefs = Object.create(source.refs);
-  // Make sure all relations are represented as refs (unless explicitly excluded)
-  for (const identifier in relations) {
-    if (!(identifier in refs)) {
-      refs[identifier] = {
-        paths: [
-          {
-            relationName: identifier,
-          },
-        ],
-      };
+  const refs: PgSourceRefs = source.refs;
+
+  const resolvePath = (path: PgSourceRefPath) => {
+    const result = {
+      source: source,
+      hasReferencee: false,
+      isUnique: true,
+    };
+    for (const pathEntry of path) {
+      const relation: PgSourceRelation<any, any> = result.source.getRelation(
+        pathEntry.relationName,
+      );
+      if (relation.isReferencee) {
+        result.hasReferencee = true;
+      }
+      if (!relation.isUnique) {
+        result.isUnique = false;
+      }
+      result.source =
+        relation.source instanceof PgSourceBuilder
+          ? relation.source.get()
+          : relation.source;
     }
-  }
-  return Object.entries(relations).reduce((memo, [identifier, relation]) => {
-    if (isMutationPayload && relation.isReferencee) {
-      // Don't add backwards relations to mutation payloads
-      return memo;
-    }
-    const n = Self.name === "RelationalTopic";
+    return result;
+  };
+
+  type Digest = {
+    identifier: string;
+    isReferencee: boolean;
+    isUnique: boolean;
+    behavior: string;
+    typeName: string;
+    connectionTypeName: string;
+    deprecationReason?: string;
+    singleRecordPlan: any;
+    listPlan: any;
+    connectionPlan: any;
+    singleRecordFieldName: string;
+    listFieldName: string;
+    connectionFieldName: string;
+    description?: string;
+    pgSource?: PgSource<any, any, any, any>;
+    pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
+  };
+
+  const digests: Digest[] = [];
+
+  const recordOrResult = isMutationPayload
+    ? `$record.get("result")`
+    : `$record`;
+
+  // Digest relations
+  for (const [identifier, relation] of Object.entries(relations)) {
     const {
-      isUnique,
       localColumns,
       remoteColumns,
       source: otherSourceOrBuilder,
       extensions,
       isReferencee,
     } = relation;
-    if (n) {
-      console.log(
-        identifier,
-        relation.source.name,
-        relation.localColumns,
-        relation.remoteColumns,
-      );
+    if (isMutationPayload && isReferencee) {
+      // Don't add backwards relations to mutation payloads
+      continue;
     }
-    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
     const otherSource =
       otherSourceOrBuilder instanceof PgSourceBuilder
         ? otherSourceOrBuilder.get()
         : otherSourceOrBuilder;
-    const otherCodec = otherSource.codec;
-    const typeName = build.inflection.tableType(otherCodec);
-    const OtherType = build.getTypeByName(typeName);
-    if (
-      !OtherType ||
-      !(
-        OtherType instanceof GraphQLObjectType ||
-        OtherType instanceof GraphQLInterfaceType ||
-        OtherType instanceof GraphQLUnionType
-      )
-    ) {
-      return memo;
-    }
-    let fields = memo;
     // The behavior is the relation behavior PLUS the remote table
     // behavior. But the relation settings win.
     const behavior =
-      getBehavior(extensions) + " " + getBehavior(otherSource.extensions);
-    const defaultBehavior = isUnique
-      ? "single -singularRelation:list -singularRelation:connection"
-      : simpleCollections === "both"
-      ? "connection list"
-      : simpleCollections === "only"
-      ? "list"
-      : "connection";
+      getBehavior(otherSource.extensions) + " " + getBehavior(extensions);
+    const otherCodec = otherSource.codec;
+    const typeName = build.inflection.tableType(otherCodec);
+    const connectionTypeName = build.inflection.tableConnectionType(otherCodec);
+
+    const deprecationReason =
+      tagToString(relation.extensions?.tags?.deprecated) ??
+      tagToString(relation.source.extensions?.tags?.deprecated);
 
     const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
       source,
@@ -553,9 +566,7 @@ function addRelations(
           typeof localColumnName === "string" &&
           isSafeIdentifier(localColumnName),
       );
-    const recordOrResult = isMutationPayload
-      ? `$record.get("result")`
-      : `$record`;
+
     const singleRecordPlan = clean
       ? // Optimise function for both execution and export.
         // eslint-disable-next-line graphile-export/exhaustive-deps
@@ -672,6 +683,172 @@ function addRelations(
           ],
         );
 
+    const singleRecordFieldName = relationDetails.relation.isReferencee
+      ? build.inflection.singleRelationBackwards(relationDetails)
+      : build.inflection.singleRelation(relationDetails);
+    const connectionFieldName =
+      build.inflection.manyRelationConnection(relationDetails);
+    const listFieldName = build.inflection.manyRelationList(relationDetails);
+    const digest: Digest = {
+      identifier,
+      isReferencee: relation.isReferencee ?? false,
+      behavior,
+      isUnique: relation.isUnique,
+      typeName,
+      connectionTypeName,
+      deprecationReason,
+      singleRecordPlan,
+      listPlan,
+      connectionPlan,
+      singleRecordFieldName,
+      listFieldName,
+      connectionFieldName,
+      description: relation.description,
+      pgSource: otherSource,
+      pgRelationDetails: relationDetails,
+    };
+    digests.push(digest);
+  }
+
+  // Digest refs
+  for (const [identifier, refSpec] of Object.entries(refs)) {
+    const paths = refSpec.paths.map(resolvePath);
+    if (paths.length === 0) continue;
+    const firstSource = paths[0].source;
+    const hasExactlyOneSource = paths.every((p) => p.source === firstSource);
+    const firstCodec = firstSource.codec;
+    const hasExactlyOneCodec = paths.every(
+      (p) => p.source.codec === firstCodec,
+    );
+    const hasReferencee = paths.some((p) => p.hasReferencee);
+
+    if (isMutationPayload && (paths.length !== 1 || hasReferencee)) {
+      // Don't add backwards relations to mutation payloads
+      continue;
+    }
+
+    const typeName =
+      refSpec.graphqlType ??
+      (hasExactlyOneCodec ? build.inflection.tableType(firstCodec) : null);
+    if (!typeName) {
+      continue;
+    }
+    const type = build.getTypeByName(typeName);
+    if (!type) {
+      continue;
+    }
+
+    let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
+    if (refSpec.graphqlType) {
+      // If this is a union/interface, can we find the associated codec?
+
+      const scope = build.scopeByType.get(type) as
+        | GraphileBuild.ScopeObject
+        | GraphileBuild.ScopeInterface
+        | GraphileBuild.ScopeUnion
+        | undefined
+        | null;
+      if (scope) {
+        if ("pgCodec" in scope) {
+          sharedCodec = scope.pgCodec;
+        }
+      }
+    } else if (hasExactlyOneCodec) {
+      sharedCodec = firstCodec;
+    }
+
+    // TODO: if there's only one path do we still need union?
+    const needsUnion =
+      sharedCodec?.extensions?.polymorphism?.mode === "union" ||
+      !hasExactlyOneSource;
+
+    // If we're pulling from a shared codec into a PgUnionAllStep then we can
+    // use that codec's columns as shared attributes; otherwise there are not
+    // shared attributes (equivalent to a GraphQL union).
+    const unionAttributes: PgUnionAllStepConfigAttributes<any> | undefined =
+      sharedCodec?.columns;
+
+    unionAttributes;
+
+    const isUnique = paths.every((p) => p.isUnique);
+
+    // TODO: shouldn't the ref behavior override the source behavior?
+    const behavior =
+      (hasExactlyOneSource ? getBehavior(firstSource.extensions) + " " : "") +
+      getBehavior(refSpec.extensions);
+
+    const connectionTypeName = sharedCodec
+      ? build.inflection.tableConnectionType(sharedCodec)
+      : build.inflection.connectionType(typeName);
+
+    // TODO: INFLECT THIS!
+    const singleRecordFieldName =
+      refSpec.singleRecordFieldName ?? `TODO_${identifier}_ONE`;
+    const connectionFieldName =
+      refSpec.connectionFieldName ?? `TODO_${identifier}_CONNECTION`;
+    const listFieldName = refSpec.listFieldName ?? `TODO_${identifier}_LIST`;
+    const digest: Digest = {
+      identifier,
+      isReferencee: hasReferencee,
+      isUnique,
+      behavior,
+      typeName,
+      connectionTypeName,
+      singleRecordFieldName,
+      connectionFieldName,
+      listFieldName,
+      singleRecordPlan: () => constant(null),
+      listPlan: () => constant(null),
+      connectionPlan: () => constant(null),
+    };
+    digests.push(digest);
+  }
+
+  // if (context.Self.name === "RelationalTopic") {
+  //   console.log(digests);
+  // }
+
+  return digests.reduce((memo, digest) => {
+    const {
+      isUnique,
+      behavior,
+      typeName,
+      connectionTypeName,
+      deprecationReason,
+      singleRecordFieldName,
+      listFieldName,
+      connectionFieldName,
+      singleRecordPlan,
+      listPlan,
+      connectionPlan,
+      isReferencee,
+      identifier,
+      description,
+      pgSource,
+      pgRelationDetails,
+    } = digest;
+    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
+    const OtherType = build.getTypeByName(typeName);
+    if (
+      !OtherType ||
+      !(
+        OtherType instanceof GraphQLObjectType ||
+        OtherType instanceof GraphQLInterfaceType ||
+        OtherType instanceof GraphQLUnionType
+      )
+    ) {
+      console.log(`Could not find '${typeName}'`);
+      return memo;
+    }
+    let fields = memo;
+    const defaultBehavior = isUnique
+      ? "single -singularRelation:list -singularRelation:connection"
+      : simpleCollections === "both"
+      ? "connection list"
+      : simpleCollections === "only"
+      ? "list"
+      : "connection";
+
     if (
       isUnique &&
       build.behavior.matches(
@@ -680,12 +857,7 @@ function addRelations(
         defaultBehavior,
       )
     ) {
-      const fieldName = relationDetails.relation.isReferencee
-        ? build.inflection.singleRelationBackwards(relationDetails)
-        : build.inflection.singleRelation(relationDetails);
-      const deprecationReason =
-        tagToString(relation.extensions?.tags?.deprecated) ??
-        tagToString(relation.source.extensions?.tags?.deprecated);
+      const fieldName = singleRecordFieldName;
       fields = extend(
         fields,
         {
@@ -694,14 +866,12 @@ function addRelations(
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:single`,
               isPgSingleRelationField: true,
-              pgRelationDetails: relationDetails,
+              pgRelationDetails,
             },
             {
               description:
-                relation.description ??
-                `Reads a single \`${typeName}\` that is related to this \`${build.inflection.tableType(
-                  codec,
-                )}\`.`,
+                description ??
+                `Reads a single \`${typeName}\` that is related to this \`${context.Self.name}\`.`,
               // TODO: handle nullability
               type: OtherType,
               plan: singleRecordPlan,
@@ -722,12 +892,9 @@ function addRelations(
         defaultBehavior,
       )
     ) {
-      const connectionTypeName =
-        build.inflection.tableConnectionType(otherCodec);
-      const ConnectionType = build.getOutputTypeByName(connectionTypeName);
+      const ConnectionType = build.getTypeByName(connectionTypeName);
       if (ConnectionType) {
-        const fieldName =
-          build.inflection.manyRelationConnection(relationDetails);
+        const fieldName = connectionFieldName;
         fields = extend(
           fields,
           {
@@ -735,16 +902,19 @@ function addRelations(
               {
                 fieldName,
                 fieldBehaviorScope: `${relationTypeScope}:connection`,
-                pgSource: otherSource,
+                pgSource,
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
-                pgRelationDetails: relationDetails,
+                pgRelationDetails,
               },
               {
-                description: `Reads and enables pagination through a set of \`${typeName}\`.`,
+                description:
+                  description ??
+                  `Reads and enables pagination through a set of \`${typeName}\`.`,
                 // TODO: handle nullability
                 type: new GraphQLNonNull(ConnectionType as GraphQLObjectType),
                 plan: connectionPlan,
+                deprecationReason,
               },
             ),
           },
@@ -762,7 +932,7 @@ function addRelations(
         defaultBehavior,
       )
     ) {
-      const fieldName = build.inflection.manyRelationList(relationDetails);
+      const fieldName = listFieldName;
       fields = extend(
         fields,
         {
@@ -770,16 +940,18 @@ function addRelations(
             {
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:list`,
-              pgSource: otherSource,
+              pgSource,
               isPgFieldSimpleCollection: true,
               isPgManyRelationListField: true,
-              pgRelationDetails: relationDetails,
+              pgRelationDetails,
             },
             {
+              description,
               type: new GraphQLNonNull(
                 new GraphQLList(new GraphQLNonNull(OtherType)),
               ),
               plan: listPlan,
+              deprecationReason,
             },
           ),
         },
