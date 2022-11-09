@@ -458,7 +458,8 @@ union all
 update polymorphic.relational_items
   set root_topic_id = rti
   from cte
-  where relational_items.id = cte.id;
+  where relational_items.id = cte.id
+  and cte.id != cte.rti;
 
 insert into polymorphic.relational_posts (id, title, description, note)  values
   (4, 'Better planning', null, null),
