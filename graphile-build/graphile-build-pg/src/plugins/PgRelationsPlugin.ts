@@ -450,6 +450,17 @@ function makeRelationPlans(
     )
     .join(", ")} }`;
 
+  const specFromRecord = EXPORTABLE(
+    (localColumns, remoteColumns) =>
+      ($record: PgSelectSingleStep<any, any, any, any>) => {
+        return remoteColumns.reduce((memo, remoteColumnName, i) => {
+          memo[remoteColumnName] = $record.get(localColumns[i] as string);
+          return memo;
+        }, Object.create(null));
+      },
+    [localColumns, remoteColumns],
+  );
+
   const singleRecordPlan = clean
     ? // Optimise function for both execution and export.
       // eslint-disable-next-line graphile-export/exhaustive-deps
@@ -461,20 +472,16 @@ function makeRelationPlans(
         [otherSource],
       ) as any)
     : EXPORTABLE(
-        (isMutationPayload, localColumns, otherSource, remoteColumns) =>
+        (isMutationPayload, otherSource, specFromRecord) =>
           function plan(
             $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
           ) {
             const $record = (
               isMutationPayload ? ($in as ObjectStep).get("result") : $in
             ) as PgSelectSingleStep<any, any, any, any>;
-            const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
-              memo[remoteColumnName] = $record.get(localColumns[i] as string);
-              return memo;
-            }, {});
-            return otherSource.get(spec);
+            return otherSource.get(specFromRecord($record));
           },
-        [isMutationPayload, localColumns, otherSource, remoteColumns],
+        [isMutationPayload, otherSource, specFromRecord],
       );
 
   const listPlan = clean
@@ -487,20 +494,16 @@ function makeRelationPlans(
         [otherSource],
       ) as any)
     : EXPORTABLE(
-        (isMutationPayload, localColumns, otherSource, remoteColumns) =>
+        (isMutationPayload, otherSource, specFromRecord) =>
           function plan(
             $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
           ) {
             const $record = (
               isMutationPayload ? ($in as ObjectStep).get("result") : $in
             ) as PgSelectSingleStep<any, any, any, any>;
-            const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
-              memo[remoteColumnName] = $record.get(localColumns[i] as string);
-              return memo;
-            }, {});
-            return otherSource.find(spec);
+            return otherSource.find(specFromRecord($record));
           },
-        [isMutationPayload, localColumns, otherSource, remoteColumns],
+        [isMutationPayload, otherSource, specFromRecord],
       );
 
   const connectionPlan = clean
@@ -517,32 +520,16 @@ function makeRelationPlans(
         [otherSource, connection],
       ) as any)
     : EXPORTABLE(
-        (
-          connection,
-          isMutationPayload,
-          localColumns,
-          otherSource,
-          remoteColumns,
-        ) =>
+        (connection, isMutationPayload, otherSource, specFromRecord) =>
           function plan(
             $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
           ) {
             const $record = (
               isMutationPayload ? ($in as ObjectStep).get("result") : $in
             ) as PgSelectSingleStep<any, any, any, any>;
-            const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
-              memo[remoteColumnName] = $record.get(localColumns[i] as string);
-              return memo;
-            }, {});
-            return connection(otherSource.find(spec));
+            return connection(otherSource.find(specFromRecord($record)));
           },
-        [
-          connection,
-          isMutationPayload,
-          localColumns,
-          otherSource,
-          remoteColumns,
-        ],
+        [connection, isMutationPayload, otherSource, specFromRecord],
       );
   return { singleRecordPlan, listPlan, connectionPlan };
 }
