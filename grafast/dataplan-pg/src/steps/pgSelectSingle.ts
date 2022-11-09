@@ -89,7 +89,7 @@ export class PgSelectSingleStep<
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
   private _coalesceToEmptyObject = false;
-  private typeStepIndexList: number[] | null;
+  private typeStepIndexList: number[] | null = null;
 
   constructor(
     $class: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
@@ -102,22 +102,6 @@ export class PgSelectSingleStep<
     this.pgCodec = this.source.codec;
     this.mode = $class.mode;
     this.classStepId = $class.id;
-
-    const poly = this.source.codec.extensions?.polymorphism;
-    if (poly?.mode === "single" || poly?.mode === "relational") {
-      this.typeStepIndexList = poly.typeColumns.map((col) => {
-        const attr = this.source.codec.columns![col];
-        const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
-
-        return $class.selectAndReturnIndex(
-          attr.codec.castFromPg
-            ? attr.codec.castFromPg(expr)
-            : sql`${expr}::text`,
-        );
-      });
-    } else {
-      this.typeStepIndexList = null;
-    }
   }
 
   public coalesceToEmptyObject(): void {
@@ -555,14 +539,6 @@ export class PgSelectSingleStep<
       if (peer.getItemStep() !== this.getItemStep()) {
         return false;
       }
-      if (
-        peer.typeStepIndexList !== this.typeStepIndexList &&
-        (!peer.typeStepIndexList ||
-          !this.typeStepIndexList ||
-          !arraysMatch(peer.typeStepIndexList, this.typeStepIndexList))
-      ) {
-        return false;
-      }
       return true;
     });
   }
@@ -590,6 +566,23 @@ export class PgSelectSingleStep<
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
+    const poly = this.source.codec.extensions?.polymorphism;
+    if (poly?.mode === "single" || poly?.mode === "relational") {
+      const $class = this.getClassStep();
+      this.typeStepIndexList = poly.typeColumns.map((col) => {
+        const attr = this.source.codec.columns![col];
+        const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
+
+        return $class.selectAndReturnIndex(
+          attr.codec.castFromPg
+            ? attr.codec.castFromPg(expr)
+            : sql`${expr}::text`,
+        );
+      });
+    } else {
+      this.typeStepIndexList = null;
+    }
+
     const columns = this.source.codec.columns;
     if (columns && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a

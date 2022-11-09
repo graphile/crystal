@@ -28,7 +28,7 @@ import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { tagToString } from "../utils.js";
+import { Idents, tagToString } from "../utils.js";
 import sql from "pg-sql2";
 
 declare global {
@@ -836,36 +836,7 @@ function addRelations(
 
     // Shortcut simple relation alias
     const { singleRecordPlan, listPlan, connectionPlan } = (() => {
-      const idents = new Set<string>();
       // Add forbidden names here
-      idents.add("$in");
-      idents.add("$record");
-      idents.add("$entry");
-      idents.add("$tuple");
-      idents.add("list");
-      idents.add("sql");
-
-      const identStore = new Map<string, string>();
-      const makeSafeIdentifier = (str: string): string => {
-        if (identStore.has(str)) {
-          return identStore.get(str)!;
-        }
-        const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
-        let ident: string | undefined = undefined;
-        for (let i = 1; i < 10000; i++) {
-          let val = safe + (i > 1 ? String(i) : "");
-          if (!idents.has(val)) {
-            ident = val;
-            break;
-          }
-        }
-        if (!ident) {
-          throw new Error("Too many identifiers!");
-        }
-        idents.add(ident);
-        identStore.set(str, ident);
-        return ident;
-      };
 
       if (refSpec.paths.length === 1 && refSpec.paths[0].length === 1) {
         const relation: PgSourceRelation<any, any> = source.getRelation(
@@ -884,50 +855,80 @@ function addRelations(
       } else if (!needsPgUnionAll) {
         // Definitely just one chain
         const path = paths[0];
-        const functionLines: string[] = [];
-        if (isMutationPayload) {
-          functionLines.push(`return ($in) => {`);
-          functionLines.push(`  const $record = $in.get("result");`);
-        } else {
-          functionLines.push(`return ($record) => {`);
-        }
+        function makePlanResolver(
+          mode: "singleRecord" | "list" | "connection",
+        ) {
+          const single = mode === "singleRecord";
+          const isConnection = mode === "connection";
+          try {
+            const idents = new Idents();
+            idents.forbid([
+              "$list",
+              "$in",
+              "$record",
+              "$entry",
+              "$tuple",
+              "list",
+              "sql",
+            ]);
 
-        let previousIdentifier = "$record";
-        let argNames: string[] = ["list", "object", "sql"];
-        let argValues: any[] = [list, object, sql];
-        let isStillSingular = true;
-        for (const layer of path.layers) {
-          const { localColumns, remoteColumns, source, isUnique } = layer;
-          const sourceName = makeSafeIdentifier(`${source.name}Source`);
-          argNames.push(sourceName);
-          argValues.push(source);
-          if (isStillSingular) {
-            if (!isUnique) {
-              isStillSingular = false;
+            const functionLines: string[] = [];
+            if (isMutationPayload) {
+              functionLines.push(`return ($in) => {`);
+              functionLines.push(`  const $record = $in.get("result");`);
+            } else {
+              functionLines.push(`return ($record) => {`);
             }
-            const newIdentifier = makeSafeIdentifier(
-              `$${
-                isUnique
-                  ? build.inflection.singularize(source.name)
-                  : build.inflection.pluralize(source.name)
-              }`,
-            );
-            const specString = makeSpecString(
-              previousIdentifier,
-              localColumns,
-              remoteColumns,
-            );
-            functionLines.push(
-              `  const ${newIdentifier} = ${sourceName}.${
-                isUnique ? "get" : "find"
-              }(${specString});`,
-            );
-            previousIdentifier = newIdentifier;
-          } else {
-            const newIdentifier = makeSafeIdentifier(
-              `$${build.inflection.pluralize(source.name)}`,
-            );
-            /*
+
+            let previousIdentifier = "$record";
+            let argNames: string[] = ["list", "object", "connection", "sql"];
+            let argValues: any[] = [list, object, connection, sql];
+            let isStillSingular = true;
+            for (let i = 0, l = path.layers.length; i < l; i++) {
+              const layer = path.layers[i];
+              const { localColumns, remoteColumns, source, isUnique } = layer;
+              if (
+                !(
+                  localColumns.every(isSafeObjectPropertyName) &&
+                  remoteColumns.every(isSafeObjectPropertyName)
+                )
+              ) {
+                throw new Error(
+                  "Unsafe identifier found, falling back to slow mode",
+                );
+              }
+              const sourceName = idents.makeSafeIdentifier(
+                `${source.name}Source`,
+              );
+              argNames.push(sourceName);
+              argValues.push(source);
+              if (isStillSingular) {
+                if (!isUnique) {
+                  isStillSingular = false;
+                }
+                const newIdentifier = idents.makeSafeIdentifier(
+                  `$${
+                    isUnique
+                      ? build.inflection.singularize(source.name)
+                      : build.inflection.pluralize(source.name)
+                  }`,
+                );
+                const specString = makeSpecString(
+                  previousIdentifier,
+                  localColumns,
+                  remoteColumns,
+                );
+                functionLines.push(
+                  `  const ${newIdentifier} = ${sourceName}.${
+                    isUnique ? "get" : "find"
+                  }(${specString});`,
+                );
+                previousIdentifier = newIdentifier;
+              } else {
+                const newIdentifier = idents.makeSafeIdentifier(
+                  `$${build.inflection.pluralize(source.name)}`,
+                );
+                /*
             const tupleIdentifier = makeSafeIdentifier(
               `${previousIdentifier}Tuples`,
             );
@@ -941,23 +942,44 @@ function addRelations(
             );
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
-            const specString = makeSpecString(
-              "$entry",
-              localColumns,
-              remoteColumns,
-            );
-            functionLines.push(
-              `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
-            );
-            previousIdentifier = newIdentifier;
+                const specString = makeSpecString(
+                  "$entry",
+                  localColumns,
+                  remoteColumns,
+                );
+                functionLines.push(
+                  `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
+                );
+                previousIdentifier = newIdentifier;
+              }
+            }
+
+            if (isStillSingular && !single) {
+              functionLines.push(
+                `  const $list = list([${previousIdentifier}]);`,
+              );
+              previousIdentifier = "$list";
+            }
+
+            if (isConnection) {
+              functionLines.push(`  return connection(${previousIdentifier});`);
+            } else {
+              functionLines.push(`  return ${previousIdentifier};`);
+            }
+            functionLines.push(`}`);
+            const functionBody = functionLines.join("\n");
+            console.log(functionBody);
+            return new Function(...argNames, functionBody)(...argValues);
+          } catch (e) {
+            console.error(e);
+            // TODO: fallback if unsafe
+            throw new Error("TODO: implement slow mode");
           }
         }
-
-        functionLines.push(`  return ${previousIdentifier};`);
-        functionLines.push(`}`);
-        const functionBody = functionLines.join("\n");
-        console.log(functionBody);
-        throw new Error("TODO");
+        const singleRecordPlan = makePlanResolver("singleRecord");
+        const listPlan = makePlanResolver("list");
+        const connectionPlan = makePlanResolver("connection");
+        return { singleRecordPlan, listPlan, connectionPlan };
       } else {
         throw new Error("Union not yet handled");
       }
