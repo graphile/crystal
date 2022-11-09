@@ -442,6 +442,24 @@ insert into polymorphic.relational_topics (id, title)  values
   (10, 'Notes'),
   (11, 'Other aims');
 
+with recursive cte as (
+  select
+    id as rti,
+    id
+  from polymorphic.relational_items
+  where parent_id is null
+union all
+  select
+    rti,
+    relational_items.id
+  from polymorphic.relational_items, cte
+  where relational_items.parent_id = cte.id
+)
+update polymorphic.relational_items
+  set root_topic_id = rti
+  from cte
+  where relational_items.id = cte.id;
+
 insert into polymorphic.relational_posts (id, title, description, note)  values
   (4, 'Better planning', null, null),
   (5, 'Easier to code', null, null),
