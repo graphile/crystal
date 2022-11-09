@@ -13,12 +13,15 @@ import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
+  canRepresentAsIdentifier,
+  isSafeObjectPropertyName,
+  evalSafeProperty,
   lambda,
   object,
   ObjectStep,
   specFromNodeId,
 } from "grafast";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
+import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
@@ -641,8 +644,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   uniqueMode === "keys" &&
                   uniqueColumns.every(
                     ([columnName, fieldName]) =>
-                      isSafeIdentifier(columnName) &&
-                      isSafeIdentifier(fieldName),
+                      isSafeObjectPropertyName(columnName) &&
+                      isSafeObjectPropertyName(fieldName),
                   );
 
                 /**
@@ -656,7 +659,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   ? `{ ${uniqueColumns
                       .map(
                         ([columnName, fieldName]) =>
-                          `${columnName}: args.get(['input', ${JSON.stringify(
+                          `${evalSafeProperty(
+                            columnName,
+                          )}: args.get(['input', ${JSON.stringify(
                             fieldName,
                           )}])`,
                       )

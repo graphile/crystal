@@ -8,8 +8,14 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
-import { access, constant, list } from "grafast";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
+import {
+  access,
+  constant,
+  list,
+  evalSafeProperty,
+  isSafeObjectPropertyName,
+} from "grafast";
+import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -89,8 +95,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               : tableTypeName;
 
           const clean =
-            isSafeIdentifier(identifier) &&
-            pk.every((columnName) => isSafeIdentifier(columnName));
+            isSafeObjectPropertyName(identifier) &&
+            pk.every((columnName) => isSafeObjectPropertyName(columnName));
 
           const firstSource = sources.find((s) => !s.parameters);
 
@@ -135,7 +141,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                     "access",
                     `return $list => ({ ${pk.map(
                       (columnName, index) =>
-                        `${columnName}: access($list, [${index + 1}])`,
+                        `${evalSafeProperty(columnName)}: access($list, [${
+                          index + 1
+                        }])`,
                     )} })`,
                   ) as any,
                   [access],

@@ -14,10 +14,11 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ObjectStep } from "grafast";
-import { GraphileFieldConfig } from "grafast";
+import { evalSafeProperty } from "grafast";
+import { GraphileFieldConfig, isSafeObjectPropertyName } from "grafast";
 import { arraysMatch, connection } from "grafast";
 import type { PluginHook } from "graphile-config";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
+import { EXPORTABLE } from "graphile-export";
 import type {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
@@ -433,20 +434,20 @@ function makeRelationPlans(
     remoteColumns.every(
       (remoteColumnName) =>
         typeof remoteColumnName === "string" &&
-        isSafeIdentifier(remoteColumnName),
+        isSafeObjectPropertyName(remoteColumnName),
     ) &&
     localColumns.every(
       (localColumnName) =>
         typeof localColumnName === "string" &&
-        isSafeIdentifier(localColumnName),
+        isSafeObjectPropertyName(localColumnName),
     );
 
   const specString = `{ ${remoteColumns
     .map(
       (remoteColumnName, i) =>
-        `${remoteColumnName as string}: ${recordOrResult}.get(${JSON.stringify(
-          localColumns[i],
-        )})`,
+        `${evalSafeProperty(
+          remoteColumnName as string,
+        )}: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
     )
     .join(", ")} }`;
 

@@ -49,14 +49,14 @@ import { optimize } from "./optimize/index.js";
 import { wellKnown } from "./wellKnown.js";
 
 // Do **NOT** allow variables that start with `__`!
-export const isSafeIdentifier = (key: string) =>
+export const canRepresentAsIdentifier = (key: string) =>
   /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
 function identifierOrLiteral(key: string | number) {
   if (typeof key === "number") {
     return t.numericLiteral(key);
   }
-  if (isSafeIdentifier(key)) {
+  if (canRepresentAsIdentifier(key)) {
     return t.identifier(key);
   } else {
     return t.stringLiteral(key);
