@@ -441,20 +441,22 @@ function makeRelationPlans(
         isSafeIdentifier(localColumnName),
     );
 
+  const specString = `{ ${remoteColumns
+    .map(
+      (remoteColumnName, i) =>
+        `${remoteColumnName as string}: ${recordOrResult}.get(${JSON.stringify(
+          localColumns[i],
+        )})`,
+    )
+    .join(", ")} }`;
+
   const singleRecordPlan = clean
     ? // Optimise function for both execution and export.
       // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
         new Function(
           "otherSource",
-          `return $record => otherSource.get({ ${remoteColumns
-            .map(
-              (remoteColumnName, i) =>
-                `${
-                  remoteColumnName as string
-                }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
-            )
-            .join(", ")} })`,
+          `return $record => otherSource.get(${specString})`,
         ) as any,
         [otherSource],
       ) as any)
@@ -480,14 +482,7 @@ function makeRelationPlans(
       (EXPORTABLE(
         new Function(
           "otherSource",
-          `return $record => otherSource.find({ ${remoteColumns
-            .map(
-              (remoteColumnName, i) =>
-                `${
-                  remoteColumnName as string
-                }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
-            )
-            .join(", ")} })`,
+          `return $record => otherSource.find(${specString})`,
         ) as any,
         [otherSource],
       ) as any)
@@ -515,14 +510,7 @@ function makeRelationPlans(
           "otherSource",
           "connection",
           `return $record => {
-  const $records = otherSource.find({ ${remoteColumns
-    .map(
-      (remoteColumnName, i) =>
-        `${remoteColumnName as string}: ${recordOrResult}.get(${JSON.stringify(
-          localColumns[i],
-        )})`,
-    )
-    .join(", ")} });
+  const $records = otherSource.find(${specString});
   return connection($records);
 }`,
         ) as any,
