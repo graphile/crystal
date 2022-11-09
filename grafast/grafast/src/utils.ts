@@ -944,6 +944,8 @@ const disallowedKeys = Object.keys(
   Object.getOwnPropertyDescriptors(Object.prototype),
 );
 
+// TODO: serious security vetting is needed on these!
+
 /**
  * Is safe to set as the key of a POJO (without a null prototype) and doesn't
  * include any characters that would make it unsafe in eval'd code (before or
