@@ -9,11 +9,12 @@ import type {
   PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
+  PgTypeColumns,
   PgUnionAllStepConfigAttributes,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ObjectStep } from "grafast";
-import { constant, GraphileFieldConfig } from "grafast";
+import { GraphileFieldConfig } from "grafast";
 import { arraysMatch, connection } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
@@ -419,6 +420,145 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   },
 };
 
+function makeRelationPlans(
+  localColumns: readonly string[],
+  remoteColumns: readonly string[],
+  otherSource: PgSource<any, any, any, any>,
+  isMutationPayload: boolean,
+) {
+  const recordOrResult = isMutationPayload
+    ? `$record.get("result")`
+    : `$record`;
+  const clean =
+    remoteColumns.every(
+      (remoteColumnName) =>
+        typeof remoteColumnName === "string" &&
+        isSafeIdentifier(remoteColumnName),
+    ) &&
+    localColumns.every(
+      (localColumnName) =>
+        typeof localColumnName === "string" &&
+        isSafeIdentifier(localColumnName),
+    );
+
+  const singleRecordPlan = clean
+    ? // Optimise function for both execution and export.
+      // eslint-disable-next-line graphile-export/exhaustive-deps
+      (EXPORTABLE(
+        new Function(
+          "otherSource",
+          `return $record => otherSource.get({ ${remoteColumns
+            .map(
+              (remoteColumnName, i) =>
+                `${
+                  remoteColumnName as string
+                }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
+            )
+            .join(", ")} })`,
+        ) as any,
+        [otherSource],
+      ) as any)
+    : EXPORTABLE(
+        (isMutationPayload, localColumns, otherSource, remoteColumns) =>
+          function plan(
+            $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
+          ) {
+            const $record = (
+              isMutationPayload ? ($in as ObjectStep).get("result") : $in
+            ) as PgSelectSingleStep<any, any, any, any>;
+            const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
+              memo[remoteColumnName] = $record.get(localColumns[i] as string);
+              return memo;
+            }, {});
+            return otherSource.get(spec);
+          },
+        [isMutationPayload, localColumns, otherSource, remoteColumns],
+      );
+
+  const listPlan = clean
+    ? // eslint-disable-next-line graphile-export/exhaustive-deps
+      (EXPORTABLE(
+        new Function(
+          "otherSource",
+          `return $record => otherSource.find({ ${remoteColumns
+            .map(
+              (remoteColumnName, i) =>
+                `${
+                  remoteColumnName as string
+                }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
+            )
+            .join(", ")} })`,
+        ) as any,
+        [otherSource],
+      ) as any)
+    : EXPORTABLE(
+        (isMutationPayload, localColumns, otherSource, remoteColumns) =>
+          function plan(
+            $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
+          ) {
+            const $record = (
+              isMutationPayload ? ($in as ObjectStep).get("result") : $in
+            ) as PgSelectSingleStep<any, any, any, any>;
+            const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
+              memo[remoteColumnName] = $record.get(localColumns[i] as string);
+              return memo;
+            }, {});
+            return otherSource.find(spec);
+          },
+        [isMutationPayload, localColumns, otherSource, remoteColumns],
+      );
+
+  const connectionPlan = clean
+    ? // eslint-disable-next-line graphile-export/exhaustive-deps
+      (EXPORTABLE(
+        new Function(
+          "otherSource",
+          "connection",
+          `return $record => {
+  const $records = otherSource.find({ ${remoteColumns
+    .map(
+      (remoteColumnName, i) =>
+        `${remoteColumnName as string}: ${recordOrResult}.get(${JSON.stringify(
+          localColumns[i],
+        )})`,
+    )
+    .join(", ")} });
+  return connection($records);
+}`,
+        ) as any,
+        [otherSource, connection],
+      ) as any)
+    : EXPORTABLE(
+        (
+          connection,
+          isMutationPayload,
+          localColumns,
+          otherSource,
+          remoteColumns,
+        ) =>
+          function plan(
+            $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
+          ) {
+            const $record = (
+              isMutationPayload ? ($in as ObjectStep).get("result") : $in
+            ) as PgSelectSingleStep<any, any, any, any>;
+            const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
+              memo[remoteColumnName] = $record.get(localColumns[i] as string);
+              return memo;
+            }, {});
+            return connection(otherSource.find(spec));
+          },
+        [
+          connection,
+          isMutationPayload,
+          localColumns,
+          otherSource,
+          remoteColumns,
+        ],
+      );
+  return { singleRecordPlan, listPlan, connectionPlan };
+}
+
 function addRelations(
   fields: GraphQLFieldConfigMap<any, any>,
   build: GraphileBuild.Build,
@@ -516,10 +656,6 @@ function addRelations(
 
   const digests: Digest[] = [];
 
-  const recordOrResult = isMutationPayload
-    ? `$record.get("result")`
-    : `$record`;
-
   // Digest relations
   for (const [identifier, relation] of Object.entries(relations)) {
     const {
@@ -555,134 +691,13 @@ function addRelations(
       identifier,
       relation,
     };
-    const clean =
-      remoteColumns.every(
-        (remoteColumnName) =>
-          typeof remoteColumnName === "string" &&
-          isSafeIdentifier(remoteColumnName),
-      ) &&
-      localColumns.every(
-        (localColumnName) =>
-          typeof localColumnName === "string" &&
-          isSafeIdentifier(localColumnName),
-      );
 
-    const singleRecordPlan = clean
-      ? // Optimise function for both execution and export.
-        // eslint-disable-next-line graphile-export/exhaustive-deps
-        (EXPORTABLE(
-          new Function(
-            "otherSource",
-            `return $record => otherSource.get({ ${remoteColumns
-              .map(
-                (remoteColumnName, i) =>
-                  `${
-                    remoteColumnName as string
-                  }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
-              )
-              .join(", ")} })`,
-          ) as any,
-          [otherSource],
-        ) as any)
-      : EXPORTABLE(
-          (isMutationPayload, localColumns, otherSource, remoteColumns) =>
-            function plan(
-              $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
-            ) {
-              const $record = (
-                isMutationPayload ? ($in as ObjectStep).get("result") : $in
-              ) as PgSelectSingleStep<any, any, any, any>;
-              const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
-                memo[remoteColumnName] = $record.get(localColumns[i] as string);
-                return memo;
-              }, {});
-              return otherSource.get(spec);
-            },
-          [isMutationPayload, localColumns, otherSource, remoteColumns],
-        );
-
-    const listPlan = clean
-      ? // eslint-disable-next-line graphile-export/exhaustive-deps
-        (EXPORTABLE(
-          new Function(
-            "otherSource",
-            `return $record => otherSource.find({ ${remoteColumns
-              .map(
-                (remoteColumnName, i) =>
-                  `${
-                    remoteColumnName as string
-                  }: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
-              )
-              .join(", ")} })`,
-          ) as any,
-          [otherSource],
-        ) as any)
-      : EXPORTABLE(
-          (isMutationPayload, localColumns, otherSource, remoteColumns) =>
-            function plan(
-              $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
-            ) {
-              const $record = (
-                isMutationPayload ? ($in as ObjectStep).get("result") : $in
-              ) as PgSelectSingleStep<any, any, any, any>;
-              const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
-                memo[remoteColumnName] = $record.get(localColumns[i] as string);
-                return memo;
-              }, {});
-              return otherSource.find(spec);
-            },
-          [isMutationPayload, localColumns, otherSource, remoteColumns],
-        );
-
-    const connectionPlan = clean
-      ? // eslint-disable-next-line graphile-export/exhaustive-deps
-        (EXPORTABLE(
-          new Function(
-            "otherSource",
-            "connection",
-            `return $record => {
-  const $records = otherSource.find({ ${remoteColumns
-    .map(
-      (remoteColumnName, i) =>
-        `${remoteColumnName as string}: ${recordOrResult}.get(${JSON.stringify(
-          localColumns[i],
-        )})`,
-    )
-    .join(", ")} });
-  return connection($records);
-}`,
-          ) as any,
-          [otherSource, connection],
-        ) as any)
-      : EXPORTABLE(
-          (
-            connection,
-            isMutationPayload,
-            localColumns,
-            otherSource,
-            remoteColumns,
-          ) =>
-            function plan(
-              $in: PgSelectSingleStep<any, any, any, any> | ObjectStep,
-            ) {
-              const $record = (
-                isMutationPayload ? ($in as ObjectStep).get("result") : $in
-              ) as PgSelectSingleStep<any, any, any, any>;
-              const spec = remoteColumns.reduce((memo, remoteColumnName, i) => {
-                memo[remoteColumnName] = $record.get(localColumns[i] as string);
-                return memo;
-              }, {});
-              return connection(otherSource.find(spec));
-            },
-          [
-            connection,
-            isMutationPayload,
-            localColumns,
-            otherSource,
-            remoteColumns,
-          ],
-        );
-
+    const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
+      localColumns as string[],
+      remoteColumns as string[],
+      otherSource,
+      isMutationPayload ?? false,
+    );
     const singleRecordFieldName = relationDetails.relation.isReferencee
       ? build.inflection.singleRelationBackwards(relationDetails)
       : build.inflection.singleRelation(relationDetails);
@@ -787,21 +802,55 @@ function addRelations(
     const connectionFieldName =
       refSpec.connectionFieldName ?? `TODO_${identifier}_CONNECTION`;
     const listFieldName = refSpec.listFieldName ?? `TODO_${identifier}_LIST`;
-    const digest: Digest = {
-      identifier,
-      isReferencee: hasReferencee,
-      isUnique,
-      behavior,
-      typeName,
-      connectionTypeName,
-      singleRecordFieldName,
-      connectionFieldName,
-      listFieldName,
-      singleRecordPlan: () => constant(null),
-      listPlan: () => constant(null),
-      connectionPlan: () => constant(null),
-    };
-    digests.push(digest);
+
+    // Shortcut simple relation alias
+    if (refSpec.paths.length === 1 && refSpec.paths[0].length === 1) {
+      const relation: PgSourceRelation<any, any> = source.getRelation(
+        refSpec.paths[0][0].relationName,
+      );
+      const otherSource =
+        relation.source instanceof PgSourceBuilder
+          ? relation.source.get()
+          : relation.source;
+      const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
+        relation.localColumns as string[],
+        relation.remoteColumns as string[],
+        otherSource,
+        isMutationPayload ?? false,
+      );
+      const digest: Digest = {
+        identifier,
+        isReferencee: hasReferencee,
+        isUnique,
+        behavior,
+        typeName,
+        connectionTypeName,
+        singleRecordFieldName,
+        connectionFieldName,
+        listFieldName,
+        singleRecordPlan,
+        listPlan,
+        connectionPlan,
+      };
+      digests.push(digest);
+    } else {
+      // TODO: figure out the complex plans
+      const digest: Digest = {
+        identifier,
+        isReferencee: hasReferencee,
+        isUnique,
+        behavior,
+        typeName,
+        connectionTypeName,
+        singleRecordFieldName,
+        connectionFieldName,
+        listFieldName,
+        singleRecordPlan,
+        listPlan,
+        connectionPlan,
+      };
+      digests.push(digest);
+    }
   }
 
   // if (context.Self.name === "RelationalTopic") {
