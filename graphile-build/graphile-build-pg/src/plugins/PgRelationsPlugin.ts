@@ -13,7 +13,7 @@ import type {
   PgUnionAllStepConfigAttributes,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { ObjectStep } from "grafast";
+import { list, object, ObjectStep } from "grafast";
 import { evalSafeProperty } from "grafast";
 import { GraphileFieldConfig, isSafeObjectPropertyName } from "grafast";
 import { arraysMatch, connection } from "grafast";
@@ -29,6 +29,7 @@ import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
+import sql from "pg-sql2";
 
 declare global {
   namespace GraphileBuild {
@@ -421,6 +422,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   },
 };
 
+function makeSpecString(
+  identifier: string,
+  localColumns: readonly string[],
+  remoteColumns: readonly string[],
+) {
+  return `{ ${remoteColumns
+    .map(
+      (remoteColumnName, i) =>
+        `${evalSafeProperty(
+          remoteColumnName as string,
+        )}: ${identifier}.get(${JSON.stringify(localColumns[i])})`,
+    )
+    .join(", ")} }`;
+}
+
 function makeRelationPlans(
   localColumns: readonly string[],
   remoteColumns: readonly string[],
@@ -442,14 +458,11 @@ function makeRelationPlans(
         isSafeObjectPropertyName(localColumnName),
     );
 
-  const specString = `{ ${remoteColumns
-    .map(
-      (remoteColumnName, i) =>
-        `${evalSafeProperty(
-          remoteColumnName as string,
-        )}: ${recordOrResult}.get(${JSON.stringify(localColumns[i])})`,
-    )
-    .join(", ")} }`;
+  const specString = makeSpecString(
+    recordOrResult,
+    localColumns,
+    remoteColumns,
+  );
 
   const specFromRecord = EXPORTABLE(
     (localColumns, remoteColumns) =>
@@ -602,22 +615,49 @@ function addRelations(
   } = source.getRelations();
   const refs: PgSourceRefs = source.refs;
 
+  type Layer = {
+    relationName: string;
+    localColumns: string[];
+    source: PgSource<any, any, any, any>;
+    remoteColumns: string[];
+    isUnique: boolean;
+  };
+
   const resolvePath = (path: PgSourceRefPath) => {
     const result = {
       source: source,
       hasReferencee: false,
       isUnique: true,
+      layers: [] as Layer[],
     };
     for (const pathEntry of path) {
       const relation: PgSourceRelation<any, any> = result.source.getRelation(
         pathEntry.relationName,
       );
-      if (relation.isReferencee) {
+      const {
+        isReferencee,
+        localColumns,
+        remoteColumns,
+        source: sourceOrBuilder,
+        isUnique,
+      } = relation;
+      const source =
+        sourceOrBuilder instanceof PgSourceBuilder
+          ? sourceOrBuilder.get()
+          : sourceOrBuilder;
+      if (isReferencee) {
         result.hasReferencee = true;
       }
-      if (!relation.isUnique) {
+      if (!isUnique) {
         result.isUnique = false;
       }
+      result.layers.push({
+        relationName: pathEntry.relationName,
+        localColumns: localColumns as string[],
+        remoteColumns: remoteColumns as string[],
+        source,
+        isUnique,
+      });
       result.source =
         relation.source instanceof PgSourceBuilder
           ? relation.source.get()
@@ -764,9 +804,9 @@ function addRelations(
     }
 
     // TODO: if there's only one path do we still need union?
-    const needsUnion =
+    const needsPgUnionAll =
       sharedCodec?.extensions?.polymorphism?.mode === "union" ||
-      !hasExactlyOneSource;
+      paths.length > 1;
 
     // If we're pulling from a shared codec into a PgUnionAllStep then we can
     // use that codec's columns as shared attributes; otherwise there are not
@@ -795,53 +835,149 @@ function addRelations(
     const listFieldName = refSpec.listFieldName ?? `TODO_${identifier}_LIST`;
 
     // Shortcut simple relation alias
-    if (refSpec.paths.length === 1 && refSpec.paths[0].length === 1) {
-      const relation: PgSourceRelation<any, any> = source.getRelation(
-        refSpec.paths[0][0].relationName,
-      );
-      const otherSource =
-        relation.source instanceof PgSourceBuilder
-          ? relation.source.get()
-          : relation.source;
-      const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
-        relation.localColumns as string[],
-        relation.remoteColumns as string[],
-        otherSource,
-        isMutationPayload ?? false,
-      );
-      const digest: Digest = {
-        identifier,
-        isReferencee: hasReferencee,
-        isUnique,
-        behavior,
-        typeName,
-        connectionTypeName,
-        singleRecordFieldName,
-        connectionFieldName,
-        listFieldName,
-        singleRecordPlan,
-        listPlan,
-        connectionPlan,
+    const { singleRecordPlan, listPlan, connectionPlan } = (() => {
+      const idents = new Set<string>();
+      // Add forbidden names here
+      idents.add("$in");
+      idents.add("$record");
+      idents.add("$entry");
+      idents.add("$tuple");
+      idents.add("list");
+      idents.add("sql");
+
+      const identStore = new Map<string, string>();
+      const makeSafeIdentifier = (str: string): string => {
+        if (identStore.has(str)) {
+          return identStore.get(str)!;
+        }
+        const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
+        let ident: string | undefined = undefined;
+        for (let i = 1; i < 10000; i++) {
+          let val = safe + (i > 1 ? String(i) : "");
+          if (!idents.has(val)) {
+            ident = val;
+            break;
+          }
+        }
+        if (!ident) {
+          throw new Error("Too many identifiers!");
+        }
+        idents.add(ident);
+        identStore.set(str, ident);
+        return ident;
       };
-      digests.push(digest);
-    } else {
-      // TODO: figure out the complex plans
-      const digest: Digest = {
-        identifier,
-        isReferencee: hasReferencee,
-        isUnique,
-        behavior,
-        typeName,
-        connectionTypeName,
-        singleRecordFieldName,
-        connectionFieldName,
-        listFieldName,
-        singleRecordPlan,
-        listPlan,
-        connectionPlan,
-      };
-      digests.push(digest);
-    }
+
+      if (refSpec.paths.length === 1 && refSpec.paths[0].length === 1) {
+        const relation: PgSourceRelation<any, any> = source.getRelation(
+          refSpec.paths[0][0].relationName,
+        );
+        const otherSource =
+          relation.source instanceof PgSourceBuilder
+            ? relation.source.get()
+            : relation.source;
+        return makeRelationPlans(
+          relation.localColumns as string[],
+          relation.remoteColumns as string[],
+          otherSource,
+          isMutationPayload ?? false,
+        );
+      } else if (!needsPgUnionAll) {
+        // Definitely just one chain
+        const path = paths[0];
+        const functionLines: string[] = [];
+        if (isMutationPayload) {
+          functionLines.push(`return ($in) => {`);
+          functionLines.push(`  const $record = $in.get("result");`);
+        } else {
+          functionLines.push(`return ($record) => {`);
+        }
+
+        let previousIdentifier = "$record";
+        let argNames: string[] = ["list", "object", "sql"];
+        let argValues: any[] = [list, object, sql];
+        let isStillSingular = true;
+        for (const layer of path.layers) {
+          const { localColumns, remoteColumns, source, isUnique } = layer;
+          const sourceName = makeSafeIdentifier(`${source.name}Source`);
+          argNames.push(sourceName);
+          argValues.push(source);
+          if (isStillSingular) {
+            if (!isUnique) {
+              isStillSingular = false;
+            }
+            const newIdentifier = makeSafeIdentifier(
+              `$${
+                isUnique
+                  ? build.inflection.singularize(source.name)
+                  : build.inflection.pluralize(source.name)
+              }`,
+            );
+            const specString = makeSpecString(
+              previousIdentifier,
+              localColumns,
+              remoteColumns,
+            );
+            functionLines.push(
+              `  const ${newIdentifier} = ${sourceName}.${
+                isUnique ? "get" : "find"
+              }(${specString});`,
+            );
+            previousIdentifier = newIdentifier;
+          } else {
+            const newIdentifier = makeSafeIdentifier(
+              `$${build.inflection.pluralize(source.name)}`,
+            );
+            /*
+            const tupleIdentifier = makeSafeIdentifier(
+              `${previousIdentifier}Tuples`,
+            );
+            functionLines.push(
+              `  const ${tupleIdentifier} = each(${previousIdentifier}, ($entry) => object({ ${localColumns
+                .map(
+                  (c) =>
+                    `${evalSafeProperty(c)}: $entry.get(${JSON.stringify(c)})`,
+                )
+                .join(", ")} }));`,
+            );
+            functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
+            */
+            const specString = makeSpecString(
+              "$entry",
+              localColumns,
+              remoteColumns,
+            );
+            functionLines.push(
+              `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
+            );
+            previousIdentifier = newIdentifier;
+          }
+        }
+
+        functionLines.push(`  return ${previousIdentifier};`);
+        functionLines.push(`}`);
+        const functionBody = functionLines.join("\n");
+        console.log(functionBody);
+        throw new Error("TODO");
+      } else {
+        throw new Error("Union not yet handled");
+      }
+    })();
+
+    const digest: Digest = {
+      identifier,
+      isReferencee: hasReferencee,
+      isUnique,
+      behavior,
+      typeName,
+      connectionTypeName,
+      singleRecordFieldName,
+      connectionFieldName,
+      listFieldName,
+      singleRecordPlan,
+      listPlan,
+      connectionPlan,
+    };
+    digests.push(digest);
   }
 
   // if (context.Self.name === "RelationalTopic") {
