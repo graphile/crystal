@@ -7,9 +7,10 @@ Graphile ecosystem. Find out
 ## Featured
 
 - Surge
+- Netflix
+- The Guild
 - Chad Furman
 - Qwick
-- The Guild
 - Fanatics
 - Dovetail
 - Enzuzo
