@@ -5,6 +5,7 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
+  PgSourceRef,
   PgTypeCodec,
   PgTypeCodecPolymorphism,
   PgTypeCodecPolymorphismRelational,
@@ -13,7 +14,6 @@ import type {
   PgTypeCodecPolymorphismSingleTypeColumnSpec,
   PgTypeCodecPolymorphismSingleTypeSpec,
   PgTypeColumn,
-  PgSourceRef,
 } from "@dataplan/pg";
 import { ExecutableStep } from "grafast";
 import type { GraphQLInterfaceType, GraphQLNamedType } from "graphql";

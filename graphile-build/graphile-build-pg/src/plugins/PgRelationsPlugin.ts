@@ -13,7 +13,8 @@ import type {
   PgUnionAllStepConfigAttributes,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { list, object, ObjectStep } from "grafast";
+import type { ObjectStep } from "grafast";
+import { list, object } from "grafast";
 import { evalSafeProperty } from "grafast";
 import { GraphileFieldConfig, isSafeObjectPropertyName } from "grafast";
 import { arraysMatch, connection } from "grafast";
@@ -25,11 +26,11 @@ import type {
   GraphQLObjectType,
 } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
+import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { Idents, tagToString } from "../utils.js";
-import sql from "pg-sql2";
 
 declare global {
   namespace GraphileBuild {
@@ -881,8 +882,8 @@ function addRelations(
             }
 
             let previousIdentifier = "$record";
-            let argNames: string[] = ["list", "object", "connection", "sql"];
-            let argValues: any[] = [list, object, connection, sql];
+            const argNames: string[] = ["list", "object", "connection", "sql"];
+            const argValues: any[] = [list, object, connection, sql];
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
               const layer = path.layers[i];

@@ -3,11 +3,7 @@
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import {
-  canRepresentAsIdentifier,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
-} from "../utils.js";
+import { evalSafeProperty, isSafeObjectPropertyName } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));

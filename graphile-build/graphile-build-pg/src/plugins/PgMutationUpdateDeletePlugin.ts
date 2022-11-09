@@ -13,9 +13,8 @@ import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
-  canRepresentAsIdentifier,
-  isSafeObjectPropertyName,
   evalSafeProperty,
+  isSafeObjectPropertyName,
   lambda,
   object,
   ObjectStep,

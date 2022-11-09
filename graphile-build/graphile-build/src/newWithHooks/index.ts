@@ -24,10 +24,7 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
-  isInterfaceType,
   isNamedType,
-  isObjectType,
-  isUnionType,
 } from "graphql";
 import { inspect } from "util";
 

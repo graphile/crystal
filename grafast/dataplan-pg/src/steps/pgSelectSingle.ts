@@ -1,10 +1,5 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import {
-  $$concreteType,
-  arraysMatch,
-  list,
-  UnbatchedExecutableStep,
-} from "grafast";
+import { $$concreteType, list, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
