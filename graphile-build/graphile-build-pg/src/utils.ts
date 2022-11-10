@@ -289,6 +289,52 @@ export class Idents {
     "static",
     "yield",
 
+    // Future reserved words
+    "enum",
+    "implements",
+    "interface",
+    "package",
+    "private",
+    "protected",
+    "public",
+
+    "abstract",
+    "boolean",
+    "byte",
+    "char",
+    "double",
+    "final",
+    "float",
+    "goto",
+    "int",
+    "long",
+    "native",
+    "short",
+    "synchronized",
+    "throws",
+    "transient",
+    "volatile",
+
+    // Special
+    "arguments",
+    "as",
+    "import",
+    "require",
+    "eval",
+    "Function",
+    "from",
+    "get",
+    "of",
+    "in",
+    "set",
+    "null",
+    "undefined",
+    "Math",
+    "Number",
+    "BigInt",
+    "true",
+    "false",
+
     // Confusing
     "async",
 
@@ -302,6 +348,7 @@ export class Idents {
     "constructor",
     "class",
   ]);
+
   /**
    * Don't allow using these identifiers (presumably because they're already in use.
    */
@@ -310,6 +357,7 @@ export class Idents {
       this.idents.add(identifier);
     }
   }
+
   makeSafeIdentifier(str: string): string {
     const { idents } = this;
     const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
