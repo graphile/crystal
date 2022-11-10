@@ -19,6 +19,7 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
   after: ["PgSmartCommentsPlugin"],
   before: ["PgFakeConstraintsPlugin", "PgEnumTablesPlugin"],
+  provides: ["smart-tags"],
 
   gather: {
     namespace: "pgV4SmartTags",

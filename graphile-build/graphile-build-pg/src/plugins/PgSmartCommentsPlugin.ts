@@ -28,6 +28,8 @@ export const PgSmartCommentsPlugin: GraphileConfig.Plugin = {
   name: "PgSmartCommentsPlugin",
   description: "Applies smart comments and descriptions to various resources",
   version,
+  provides: ["smart-tags"],
+
   gather: {
     namespace: "pgSmartComments",
     helpers: {},

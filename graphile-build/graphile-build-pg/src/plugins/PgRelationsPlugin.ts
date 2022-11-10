@@ -130,6 +130,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   description:
     "Creates relationships between the @dataplan/pg data sources, and mirrors these relationships into the GraphQL schema",
   version,
+  after: ["smart-tags", "PgFakeConstraintsPlugin"],
 
   inflection: {
     add: {
