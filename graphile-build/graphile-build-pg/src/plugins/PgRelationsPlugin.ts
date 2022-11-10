@@ -605,7 +605,8 @@ function addRelations(
   // just using the object type directly)
   const source =
     pgTypeSource ??
-    build.input.pgSources.find((s) => s.codec === codec && !s.parameters);
+    build.input.pgSources.find((s) => s.codec === codec && !s.parameters) ??
+    build.input.pgSources.find((s) => s.codec === codec && s.isUnique);
   if (!source) {
     return fields;
   }
@@ -1009,10 +1010,6 @@ function addRelations(
     };
     digests.push(digest);
   }
-
-  // if (context.Self.name === "RelationalTopic") {
-  //   console.log(digests);
-  // }
 
   return digests.reduce((memo, digest) => {
     const {
