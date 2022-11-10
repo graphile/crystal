@@ -166,6 +166,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
   name: "PgCodecsPlugin",
   description: "Turns PostgreSQL types into @dataplan/pg codecs",
   version: version,
+  after: ["PgIntrospectionPlugin"],
 
   inflection: {
     add: {
