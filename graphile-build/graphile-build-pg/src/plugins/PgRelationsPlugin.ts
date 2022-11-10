@@ -972,12 +972,13 @@ function addRelations(
             }
             functionLines.push(`}`);
             const functionBody = functionLines.join("\n");
-            console.log(functionBody);
             return new Function(...argNames, functionBody)(...argValues);
           } catch (e) {
             console.error(e);
             // TODO: fallback if unsafe
-            throw new Error("TODO: implement slow mode");
+            throw new Error(
+              "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: implement slow mode when identifiers are not JSON-to-JS-safe (or expand the definition of JSON-to-JS safe)",
+            );
           }
         };
         const singleRecordPlan = makePlanResolver("singleRecord");

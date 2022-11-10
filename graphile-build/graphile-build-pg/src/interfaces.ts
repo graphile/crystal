@@ -40,6 +40,9 @@ export interface PgTypeColumnTags extends PgSmartTagsDict {
 export interface PgTypeCodecTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
+  implements: string | string[];
+  interface: string;
+  name: string;
 }
 
 export interface PgSmartTagsDict {

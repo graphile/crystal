@@ -75,7 +75,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   name: "PgPolymorphismPlugin",
   description: "Adds polymorphism",
   version,
-  after: ["PgSmartCommentsPlugin", "PgV4SmartTagsPlugin"],
+  after: [
+    "PgSmartCommentsPlugin",
+    "PgV4SmartTagsPlugin",
+    "PgTablesPlugin",
+    "PgCodecsPlugin",
+  ],
   gather: {
     namespace: "pgPolymorphism",
     helpers: {},
@@ -437,7 +442,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   () => ({
                     description: codec.extensions?.description,
                   }),
-                  `PgPolymorphismPlugin single interface type for ${codec.name}`,
+                  `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );
                 setGraphQLTypeForPgCodec(codec, ["output"], interfaceTypeName);
                 build.registerCursorConnection({
@@ -502,6 +507,31 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     nonNullNode: pgForbidSetofFunctionsToReturnNull,
                   });
                 }
+              } else if (polymorphism.mode === "union") {
+                const interfaceTypeName = inflection.tableType(codec);
+                build.registerInterfaceType(
+                  interfaceTypeName,
+                  {
+                    pgCodec: codec,
+                    isPgPolymorphicTableType: true,
+                    pgPolymorphism: polymorphism,
+                  },
+                  () => ({
+                    description: codec.extensions?.description,
+                  }),
+                  `PgPolymorphismPlugin union interface type for ${codec.name}`,
+                );
+                setGraphQLTypeForPgCodec(codec, ["output"], interfaceTypeName);
+                build.registerCursorConnection({
+                  typeName: interfaceTypeName,
+                  connectionTypeName: inflection.tableConnectionType(codec),
+                  edgeTypeName: inflection.tableEdgeType(codec),
+                  scope: {
+                    isPgConnectionRelated: true,
+                    pgCodec: codec,
+                  },
+                  nonNullNode: pgForbidSetofFunctionsToReturnNull,
+                });
               }
             }
           });
@@ -510,6 +540,27 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       },
       GraphQLObjectType_interfaces(interfaces, build, context) {
         const { inflection } = build;
+        const {
+          scope: { pgCodec, isPgTableType },
+        } = context;
+        const rawImplements = pgCodec?.extensions?.tags?.implements;
+        if (rawImplements && isPgTableType) {
+          const interfaceNames = Array.isArray(rawImplements)
+            ? rawImplements
+            : [rawImplements];
+          for (const interfaceName of interfaceNames) {
+            const interfaceType = build.getTypeByName(String(interfaceName));
+            if (!interfaceType) {
+              console.error(`'${interfaceName}' type not found`);
+            } else if (!build.graphql.isInterfaceType(interfaceType)) {
+              console.error(
+                `'${interfaceName}' is not an interface type (it's a ${interfaceType.constructor.name})`,
+              );
+            } else {
+              interfaces.push(interfaceType);
+            }
+          }
+        }
         for (const codec of build.pgCodecMetaLookup.keys()) {
           const polymorphism = codec.extensions?.polymorphism;
           if (

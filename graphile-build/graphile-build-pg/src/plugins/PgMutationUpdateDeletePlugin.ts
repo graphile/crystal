@@ -620,8 +620,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     : inflection.deleteByKeysInputType(details);
 
                 const payloadType = build.getOutputTypeByName(payloadTypeName);
-                const mutationInputType =
-                  build.getInputTypeByName(inputTypeName);
+                const mutationInputType = build.getTypeByName(inputTypeName);
+                if (!mutationInputType) {
+                  return fields;
+                }
+                if (!build.graphql.isInputObjectType(mutationInputType)) {
+                  throw new Error(
+                    `Expected '${inputTypeName}' to be an input object type`,
+                  );
+                }
 
                 const uniqueColumns = (unique.columns as string[]).map(
                   (columnName) => [

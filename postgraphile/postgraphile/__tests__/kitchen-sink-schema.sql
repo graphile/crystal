@@ -1425,7 +1425,8 @@ create index on polymorphic.gcp_application_first_party_vulnerabilities (first_p
 create index on polymorphic.gcp_application_third_party_vulnerabilities (third_party_vulnerability_id);
 
 comment on type polymorphic.applications is $$
-@interface mode:union Application
+@interface mode:union
+@name Application
 @ref vulnerabilities to:Vulnerability plural
 $$;
 comment on column polymorphic.applications.id is '@notNull';
@@ -1448,7 +1449,8 @@ comment on table polymorphic.gcp_application_first_party_vulnerabilities is '@om
 comment on table polymorphic.gcp_application_third_party_vulnerabilities is '@omit';
 
 comment on type polymorphic.vulnerabilities is $$
-@interface mode:union Vulnerability plural
+@interface mode:union plural
+@name Vulnerability
 @ref applications to:Application plural
 $$;
 

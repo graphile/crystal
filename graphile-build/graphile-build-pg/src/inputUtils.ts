@@ -54,6 +54,11 @@ export function getCodecMetaLookupFromInput(
 ): PgTypeCodecMetaLookup {
   const metaLookup: PgTypeCodecMetaLookup = new Map();
   const seenSources = new Set<PgSource<any, any, any, any>>();
+  if (input.pgCodecs) {
+    for (const codec of input.pgCodecs) {
+      walkCodec(codec, metaLookup);
+    }
+  }
   for (const source of input.pgSources) {
     walkSource(resolveSource(source), metaLookup, seenSources);
   }

@@ -65,6 +65,15 @@ declare global {
       }): string;
     }
 
+    interface BuildInput {
+      /**
+       * A non-exhaustive list of codecs, please walk pgSources for more.
+       * Typically useful for the codecs that aren't linked to a source (e.g.
+       * those defining an union or interface)
+       */
+      pgCodecs?: PgTypeCodec<any, any, any, any>[];
+    }
+
     interface ScopeObject {
       isPgRangeType?: boolean;
       isPgRangeBoundType?: boolean;
@@ -734,6 +743,34 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
         return promise;
       },
+    },
+    async main(output, info) {
+      if (!output.pgCodecs) {
+        output.pgCodecs = [];
+      }
+      const codecs = new Set<PgTypeCodec<any, any, any, any>>();
+
+      for (const codecByTypeId of info.state.codecByTypeIdByDatabaseName.values()) {
+        for (const codecPromise of codecByTypeId.values()) {
+          const codec = await codecPromise;
+          if (codec) {
+            codecs.add(codec);
+          }
+        }
+      }
+
+      for (const codecByClassId of info.state.codecByClassIdByDatabaseName.values()) {
+        for (const codecPromise of codecByClassId.values()) {
+          const codec = await codecPromise;
+          if (codec) {
+            codecs.add(codec);
+          }
+        }
+      }
+
+      for (const codec of codecs) {
+        output.pgCodecs.push(codec);
+      }
     },
   },
 
