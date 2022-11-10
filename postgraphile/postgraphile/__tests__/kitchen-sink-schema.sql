@@ -1434,11 +1434,13 @@ comment on column polymorphic.applications.name is '@notNull';
 
 comment on table polymorphic.aws_applications is $$
 @implements Application
+@ref vulnerabilities to:Vulnerability plural
 @refVia vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)
 @refVia vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)
 $$;
 comment on table polymorphic.gcp_applications is $$
 @implements Application
+@ref vulnerabilities to:Vulnerability plural
 @refVia vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)
 @refVia vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)
 $$;
@@ -1460,11 +1462,13 @@ comment on column polymorphic.vulnerabilities.cvss_score is '@notNull';
 
 comment on table polymorphic.first_party_vulnerabilities is $$
 @implements Vulnerability
-@refVia vulnerabilities via:aws_application_first_party_vulnerabilities;aws_applications
-@refVia vulnerabilities via:gcp_application_first_party_vulnerabilities;gcp_applications
+@ref applications to:Application plural
+@refVia applications via:aws_application_first_party_vulnerabilities;aws_applications
+@refVia applications via:gcp_application_first_party_vulnerabilities;gcp_applications
 $$;
 comment on table polymorphic.third_party_vulnerabilities is $$
 @implements Vulnerability
-@refVia vulnerabilities via:aws_application_third_party_vulnerabilities;aws_applications
-@refVia vulnerabilities via:gcp_application_third_party_vulnerabilities;gcp_applications
+@ref applications to:Application plural
+@refVia applications via:aws_application_third_party_vulnerabilities;aws_applications
+@refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
 $$;
