@@ -603,7 +603,8 @@ function addRelations(
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
   const source =
-    pgTypeSource ?? build.input.pgSources.find((s) => s.codec === codec);
+    pgTypeSource ??
+    build.input.pgSources.find((s) => s.codec === codec && !s.parameters);
   if (!source) {
     return fields;
   }
