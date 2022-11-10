@@ -613,7 +613,9 @@ function addRelations(
   const relations: {
     [identifier: string]: PgSourceRelation<any, any>;
   } = source.getRelations();
-  const refs: PgSourceRefs = source.refs;
+
+  // Don't use refs on mutation payloads
+  const refs: PgSourceRefs = isMutationPayload ? {} : source.refs;
 
   type Layer = {
     relationName: string;
@@ -683,6 +685,7 @@ function addRelations(
     description?: string;
     pgSource?: PgSource<any, any, any, any>;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
+    relatedTypeName: string;
   };
 
   const digests: Digest[] = [];
@@ -752,6 +755,7 @@ function addRelations(
       description: relation.description,
       pgSource: otherSource,
       pgRelationDetails: relationDetails,
+      relatedTypeName: build.inflection.tableType(codec),
     };
     digests.push(digest);
   }
@@ -998,6 +1002,7 @@ function addRelations(
       singleRecordPlan,
       listPlan,
       connectionPlan,
+      relatedTypeName: context.Self.name,
     };
     digests.push(digest);
   }
@@ -1024,6 +1029,7 @@ function addRelations(
       description,
       pgSource,
       pgRelationDetails,
+      relatedTypeName,
     } = digest;
     const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
     const OtherType = build.getTypeByName(typeName);
@@ -1069,7 +1075,7 @@ function addRelations(
             {
               description:
                 description ??
-                `Reads a single \`${typeName}\` that is related to this \`${context.Self.name}\`.`,
+                `Reads a single \`${typeName}\` that is related to this \`${relatedTypeName}\`.`,
               // TODO: handle nullability
               type: OtherType,
               plan: singleRecordPlan,
