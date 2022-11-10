@@ -620,6 +620,8 @@ function addRelations(
   // Don't use refs on mutation payloads
   const refs: PgSourceRefs = isMutationPayload ? {} : source.refs;
 
+  // TODO: support refs on "@interface type:union" codecs
+
   type Layer = {
     relationName: string;
     localColumns: string[];
