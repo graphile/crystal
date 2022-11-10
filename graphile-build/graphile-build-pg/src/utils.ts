@@ -43,7 +43,7 @@ const SPECIAL = /[\\":]/;
 const SAFE_PARAMETER_NAME = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
 
 export function parseSmartTagsOptsString<TParamName extends string = string>(
-  optsString: string,
+  optsString: string | true | (string | true)[] | undefined,
   leading = 0,
 ) {
   const result = {
@@ -52,6 +52,9 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
       [paramName in TParamName]?: string;
     },
   };
+  if (typeof optsString !== "string") {
+    return result;
+  }
   let leadingLeft = leading;
   let mode: MODE = leadingLeft > 0 ? MODE.EXPECT_ARG : MODE.EXPECT_PARAM_NAME;
   let inQuotes = false;

@@ -32,6 +32,7 @@ import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
+import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
 
 // TODO: version this.
 export const defaultPreset: GraphileConfig.Preset = {
@@ -40,6 +41,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgCodecsPlugin,
     PgContextPlugin,
     PgTypesPlugin,
+    PgRefsPlugin,
     PgIntrospectionPlugin,
     PgTablesPlugin,
     PgMutationCreatePlugin,

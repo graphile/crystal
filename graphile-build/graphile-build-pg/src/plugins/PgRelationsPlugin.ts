@@ -12,7 +12,7 @@ import type {
   PgUnionAllStepConfigAttributes,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import type { ObjectStep } from "grafast";
+import { constant, ObjectStep } from "grafast";
 import {
   arraysMatch,
   connection,
@@ -991,7 +991,12 @@ function addRelations(
         const connectionPlan = makePlanResolver("connection");
         return { singleRecordPlan, listPlan, connectionPlan };
       } else {
-        throw new Error("Union not yet handled");
+        console.error("TODO: Union plan not yet handled!");
+        return {
+          singleRecordPlan: () => constant(null),
+          listPlan: () => constant(null),
+          connectionPlan: () => constant(null),
+        };
       }
     })();
 
