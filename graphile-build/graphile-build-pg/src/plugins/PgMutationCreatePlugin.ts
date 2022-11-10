@@ -50,6 +50,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   name: "PgMutationCreatePlugin",
   description: "Adds 'create' mutation for supported table-like sources",
   version: version,
+  after: ["smart-tags"],
 
   inflection: {
     add: {
