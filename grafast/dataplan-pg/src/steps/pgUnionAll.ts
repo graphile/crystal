@@ -154,7 +154,6 @@ export interface PgUnionAllStepConfig<
   TAttributes extends string,
   TTypeNames extends string,
 > {
-  executor: PgExecutor;
   attributes: PgUnionAllStepConfigAttributes<TAttributes>;
   sourceByTypeName: {
     [typeName in TTypeNames]: PgSource<
@@ -1487,7 +1486,7 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
       throw new Error("We have no context dependency?");
     }
 
-    const executionResult = await this.spec.executor.executeWithCache(
+    const executionResult = await this.executor.executeWithCache(
       contexts.map((context, i) => {
         return {
           // The context is how we'd handle different connections with different claims

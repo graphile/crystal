@@ -4739,7 +4739,6 @@ export function makeExampleSchema(
               const $offset = fieldArgs.getRaw("offset");
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
-                executor: firstPartyVulnerabilitiesSource.executor,
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
@@ -4917,7 +4916,6 @@ export function makeExampleSchema(
             function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
-                executor: firstPartyVulnerabilitiesSource.executor,
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
