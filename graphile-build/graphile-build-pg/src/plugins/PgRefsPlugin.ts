@@ -1,6 +1,19 @@
-import { PgSourceRefPath } from "@dataplan/pg";
+import {
+  PgSourceRefPath,
+  PgSourceRelation,
+  PgTypeColumn,
+  PgTypeColumns,
+  PgSource,
+  PgSourceBuilder,
+} from "@dataplan/pg";
+import { arraysMatch } from "grafast";
+import { PgClass } from "pg-introspection";
+
 import { version } from "../index.js";
-import { parseSmartTagsOptsString } from "../utils.js";
+import {
+  parseDatabaseIdentifierFromSmartTag,
+  parseSmartTagsOptsString,
+} from "../utils.js";
 
 function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
@@ -14,7 +27,14 @@ declare global {
   }
 }
 
-interface State {}
+interface State {
+  events: Array<{
+    databaseName: string;
+    pgClass: PgClass;
+    source: PgSource<any, any, any, undefined>;
+    relations: GraphileConfig.PgTablesPluginSourceRelations;
+  }>;
+}
 interface Cache {}
 
 export const PgRefsPlugin: GraphileConfig.Plugin = {
@@ -27,10 +47,38 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgRefs",
     helpers: {},
-    initialState: () => ({}),
+    initialState: () => ({ events: [] }),
     hooks: {
       async pgTables_PgSource(info, event) {
-        const { source, pgClass } = event;
+        info.state.events.push(event);
+      },
+    },
+    async main(output, info) {
+      for (const event of info.state.events) {
+        const { databaseName, source, pgClass } = event;
+
+        const getSourceForTableName = async (targetTableIdentifier: string) => {
+          const [targetSchemaName, targetTableName] =
+            parseDatabaseIdentifierFromSmartTag(
+              targetTableIdentifier,
+              2,
+              pgClass.getNamespace()?.nspname!,
+            );
+          const targetPgClass =
+            await info.helpers.pgIntrospection.getClassByName(
+              databaseName,
+              targetSchemaName,
+              targetTableName,
+            );
+          if (!targetPgClass) {
+            return null;
+          }
+          const targetSource = await info.helpers.pgCodecs.getCodecFromClass(
+            databaseName,
+            targetPgClass._id,
+          );
+          return targetSource;
+        };
 
         const { tags } = pgClass.getTagsAndDescription();
 
@@ -49,7 +97,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           if (rawRefVias) {
             throw new Error(`@refVia without matching @ref is invalid`);
           }
-          return;
+          continue;
         }
 
         const refs = rawRefs.map((ref) => parseSmartTagsOptsString(ref, 1));
@@ -80,35 +128,107 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             ...relevantVias.map((v) => v.params.via).filter(isNotNullish),
           ];
 
-          const paths = vias.map((via) => {
+          const paths: PgSourceRefPath[] = [];
+
+          if (vias.length === 0) {
+            if (!tags.interface) {
+              console.warn(`@ref ${name} has no 'via' on ${source.name}`);
+            }
+            continue;
+          }
+
+          outerLoop: for (const via of vias) {
             const path: PgSourceRefPath = [];
             const parts = via.split(";");
+            let currentSource: PgSource<any, any, any, any> = source;
             for (const rawPart of parts) {
+              type RelationEntry = [
+                string,
+                PgSourceRelation<PgTypeColumns<string>, PgTypeColumns<string>>,
+              ];
+              const relationEntries = Object.entries(
+                currentSource.getRelations(),
+              ) as Array<RelationEntry>;
               const part = rawPart.trim();
               // TODO: allow whitespace
               const matches = part.match(
                 /^\(([^)]+)\)->([^)]+)(?:\(([^)]+)\))?$/,
               );
 
+              let relationEntry: RelationEntry | undefined;
               if (matches) {
-                const [, localCols, targetTable, maybeTargetCols] = matches;
-                console.log({ localCols, targetTable, maybeTargetCols });
+                const [
+                  ,
+                  rawLocalCols,
+                  targetTableIdentifier,
+                  maybeRawTargetCols,
+                ] = matches;
+
+                // TODO: use proper identifier parsing here!
+                const localColumns = rawLocalCols
+                  .split(",")
+                  .map((t) => t.trim());
+                const maybeTargetColumns = maybeRawTargetCols
+                  ? // TODO: use proper identifier parsing here!
+                    maybeRawTargetCols.split(",").map((t) => t.trim())
+                  : null;
+
+                const targetSource = await getSourceForTableName(
+                  targetTableIdentifier,
+                );
+                if (!targetSource) {
+                  console.error(
+                    `Ref ${name} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a source for. Please be sure to indicate the schema if required.`,
+                  );
+                  continue outerLoop;
+                }
+
+                relationEntry = relationEntries.find(([, rel]) => {
+                  if (rel.source.name !== targetSource.name) {
+                    return false;
+                  }
+                  if (!arraysMatch(rel.localColumns, localColumns)) {
+                    return false;
+                  }
+                  if (!arraysMatch(rel.localColumns, localColumns)) {
+                    return false;
+                  }
+                  return true;
+                });
               } else {
-                const targetTable = part;
-                console.log({ targetTable });
+                const targetTableIdentifier = part;
+                const targetSource = await getSourceForTableName(
+                  targetTableIdentifier,
+                );
+                if (!targetSource) {
+                  console.error(
+                    `Ref ${name} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a source for. Please be sure to indicate the schema if required.`,
+                  );
+                  continue outerLoop;
+                }
+                relationEntry = relationEntries.find(([, rel]) => {
+                  return rel.source.name === targetSource.name;
+                });
+              }
+              if (relationEntry) {
+                path.push({
+                  relationName: relationEntry[0],
+                });
+                const nextSource = relationEntry[1].source;
+                currentSource =
+                  nextSource instanceof PgSourceBuilder
+                    ? nextSource.get()
+                    : nextSource;
+              } else {
+                console.warn(
+                  `Could not find matching relation for '${via}' / ${currentSource.name} -> '${rawPart}'`,
+                );
+                continue outerLoop;
               }
             }
-            console.log(via);
-            return path;
-          });
-
-          if (vias.length === 0) {
-            if (!tags.interface) {
-              // console.dir({ refs, refVias, rawRefs, rawRefVias });
-              console.warn(`@ref ${name} has no 'via' on ${source.name}`);
-            }
-            return;
+            paths.push(path);
           }
+
           if (source.refs[name]) {
             throw new Error(
               `@ref ${name} already registered in ${source.name}`,
@@ -125,7 +245,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             },
           };
         }
-      },
+      }
     },
   } as GraphileConfig.PluginGatherConfig<"pgRefs", State, Cache>,
 };
