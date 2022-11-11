@@ -214,18 +214,20 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (
           typeof details.relation.extensions?.tags.foreignFieldName === "string"
         ) {
-          return this.camelCase(
-            details.relation.extensions.tags.foreignFieldName,
+          return this.connectionField(
+            this.camelCase(details.relation.extensions.tags.foreignFieldName),
           );
         }
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(details.relation.source.codec);
         const remoteColumns = details.relation.remoteColumns as string[];
-        return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
-            details.relation.source.codec,
-            remoteColumns,
-          )}`,
+        return this.connectionField(
+          this.camelCase(
+            `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
+              details.relation.source.codec,
+              remoteColumns,
+            )}`,
+          ),
         );
       },
       manyRelationList(options, details) {
@@ -238,17 +240,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (
           typeof details.relation.extensions?.tags.foreignFieldName === "string"
         ) {
-          return this.camelCase(
-            details.relation.extensions.tags.foreignFieldName + "-list",
+          return this.listField(
+            this.camelCase(details.relation.extensions.tags.foreignFieldName),
           );
         }
         const remoteType = this.tableType(details.relation.source.codec);
         const remoteColumns = details.relation.remoteColumns as string[];
-        return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
-            details.relation.source.codec,
-            remoteColumns,
-          )}-list`,
+        return this.listField(
+          this.camelCase(
+            `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
+              details.relation.source.codec,
+              remoteColumns,
+            )}`,
+          ),
         );
       },
     },

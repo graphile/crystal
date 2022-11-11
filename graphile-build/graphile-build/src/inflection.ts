@@ -58,6 +58,16 @@ export const makeInitialInflection = () => ({
     return typeName + `Connection`;
   },
 
+  /** The name of a field that returns a connection */
+  connectionField(this: GraphileBuild.Inflection, baseName: string): string {
+    return baseName;
+  },
+
+  /** The name of a field that returns a list */
+  listField(this: GraphileBuild.Inflection, baseName: string): string {
+    return baseName + "List";
+  },
+
   /**
    * Try and make something a valid GraphQL 'Name'.
    *

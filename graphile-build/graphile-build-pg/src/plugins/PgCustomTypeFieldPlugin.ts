@@ -280,10 +280,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         return this.camelCase(this._functionName(details));
       },
       customQueryConnectionField(options, details) {
-        return this.customQueryField(details);
+        return this.connectionField(this.customQueryField(details));
       },
       customQueryListField(options, details) {
-        return this.camelCase(this.customQueryField(details) + "-list");
+        return this.listField(this.camelCase(this.customQueryField(details)));
       },
       computedColumnField(options, details) {
         const explicitName = details.source.extensions?.tags?.fieldName;
@@ -301,10 +301,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         }
       },
       computedColumnConnectionField(options, details) {
-        return this.computedColumnField(details);
+        return this.connectionField(this.computedColumnField(details));
       },
       computedColumnListField(options, details) {
-        return this.camelCase(this.computedColumnField(details) + "-list");
+        return this.listField(this.computedColumnField(details));
       },
       argument(options, details) {
         return this.camelCase(details.param.name || `arg${details.index}`);

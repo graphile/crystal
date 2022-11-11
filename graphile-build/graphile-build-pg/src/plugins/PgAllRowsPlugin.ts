@@ -44,13 +44,17 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       allRowsConnection(options, source) {
-        return this.camelCase(
-          `all-${this.pluralize(this._singularizedSourceName(source))}`,
+        return this.connectionField(
+          this.camelCase(
+            `all-${this.pluralize(this._singularizedSourceName(source))}`,
+          ),
         );
       },
       allRowsList(options, source) {
-        return this.camelCase(
-          `all-${this.pluralize(this._singularizedSourceName(source))}-list`,
+        return this.listField(
+          this.camelCase(
+            `all-${this.pluralize(this._singularizedSourceName(source))}`,
+          ),
         );
       },
     },
