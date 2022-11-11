@@ -2,19 +2,20 @@ import "graphile-build";
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import {
+import type {
   PgSelectSingleStep,
   PgSource,
   PgSourceRefPath,
   PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
-  pgUnionAll,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";
+import { pgUnionAll } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { constant, ExecutableStep, ObjectStep } from "grafast";
+import type { ExecutableStep, ObjectStep } from "grafast";
+import { constant, first } from "grafast";
 import {
   arraysMatch,
   connection,
@@ -996,54 +997,92 @@ function addRelations(
         ) => {
           const single = mode === "singleRecord";
           const isConnection = mode === "connection";
+          const attributes: PgUnionAllStepConfigAttributes<string> =
+            unionAttributes ?? {};
+          const sourceByTypeName: {
+            [typeName: string]: PgSource<any, any, any, any>;
+          } = Object.create(null);
+          const members: PgUnionAllStepMember<string>[] = [];
+          for (const path of paths) {
+            const [firstLayer, ...rest] = path.layers;
+            const memberPath: PgSourceRefPath = [];
+            let finalSource = firstLayer.source;
+            for (const layer of rest) {
+              const { relationName } = layer;
+              memberPath!.push({ relationName });
+              finalSource = layer.source;
+            }
+            const typeName = build.inflection.tableType(finalSource.codec);
+            const member: PgUnionAllStepMember<string> = {
+              source: firstLayer.source,
+              typeName,
+              path: memberPath,
+            };
+            members.push(member);
+            if (!sourceByTypeName[typeName]) {
+              sourceByTypeName[typeName] = finalSource;
+            }
+          }
           return EXPORTABLE(
-            () => ($parent: ExecutableStep<any>) => {
-              const $record = isMutationPayload
-                ? (
-                    $parent as ObjectStep<{
-                      result: PgSelectSingleStep<any, any, any, any>;
-                    }>
-                  ).get("result")
-                : ($parent as PgSelectSingleStep<any, any, any, any>);
-              const attributes: PgUnionAllStepConfigAttributes<string> =
-                unionAttributes ?? {};
-              const sourceByTypeName: {
-                [typeName: string]: PgSource<any, any, any, any>;
-              } = Object.create(null);
-              const members: PgUnionAllStepMember<string>[] = [];
-              for (const path of paths) {
-                const [firstLayer, ...rest] = path.layers;
-                const memberPath: PgSourceRefPath = [];
-                let finalSource = firstLayer.source;
-                for (const layer of rest) {
-                  const { relationName } = layer;
-                  memberPath!.push({ relationName });
-                  finalSource = layer.source;
-                }
-                const typeName = build.inflection.tableType(finalSource.codec);
-                const member: PgUnionAllStepMember<string> = {
-                  source: firstLayer.source,
-                  typeName,
-                  match: firstLayer.localColumns.reduce((memo, col, idx) => {
-                    memo[firstLayer.remoteColumns[idx]] = {
-                      step: $record.get(col),
-                    };
-                    return memo;
-                  }, Object.create(null)),
-                  path: memberPath,
-                };
-                members.push(member);
-                if (!sourceByTypeName[typeName]) {
-                  sourceByTypeName[typeName] = finalSource;
-                }
-              }
-              return pgUnionAll({
+            (
                 attributes,
-                sourceByTypeName,
+                connection,
+                first,
+                isConnection,
+                isMutationPayload,
                 members,
-              });
-            },
-            [],
+                paths,
+                pgUnionAll,
+                single,
+                sourceByTypeName,
+              ) =>
+              ($parent: ExecutableStep<any>) => {
+                const $record = isMutationPayload
+                  ? (
+                      $parent as ObjectStep<{
+                        result: PgSelectSingleStep<any, any, any, any>;
+                      }>
+                    ).get("result")
+                  : ($parent as PgSelectSingleStep<any, any, any, any>);
+                for (let i = 0, l = paths.length; i < l; i++) {
+                  const path = paths[i];
+                  const firstLayer = path.layers[0];
+                  const member = members[i];
+                  member.match = firstLayer.localColumns.reduce(
+                    (memo, col, idx) => {
+                      memo[firstLayer.remoteColumns[idx]] = {
+                        step: $record.get(col),
+                      };
+                      return memo;
+                    },
+                    Object.create(null),
+                  );
+                }
+                const $list = pgUnionAll({
+                  attributes,
+                  sourceByTypeName,
+                  members,
+                });
+                if (isConnection) {
+                  return connection($list);
+                } else if (single) {
+                  return first($list);
+                } else {
+                  return $list;
+                }
+              },
+            [
+              attributes,
+              connection,
+              first,
+              isConnection,
+              isMutationPayload,
+              members,
+              paths,
+              pgUnionAll,
+              single,
+              sourceByTypeName,
+            ],
           );
         };
         const singleRecordPlan = makePlanResolver("singleRecord");
