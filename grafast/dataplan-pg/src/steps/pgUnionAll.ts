@@ -557,7 +557,7 @@ export class PgUnionAllStep<
           }
         }
 
-        let sqlSource = currentSource.source;
+        let sqlSource = sql`${currentSource.source} as ${currentAlias}`;
 
         for (const pathEntry of path) {
           const relation: PgSourceRelation<any, any> =
@@ -580,7 +580,7 @@ export class PgUnionAllStep<
 
           const nextSqlSource: SQL = nextSource.source;
           sqlSource = sql`${sqlSource}
-inner join ${nextSqlSource}
+inner join ${nextSqlSource} as ${nextAlias}
 on (${sql.indent(
             sql.join(
               relation.localColumns.map(
@@ -1314,7 +1314,7 @@ ${sql.indent`${
         const innerQuery = sql.indent`
 select
 ${sql.indent(sql.join(innerSelects, ",\n"))}
-from ${sqlSource} as ${tableAlias}
+from ${sqlSource}
 ${
   conditions.length > 0
     ? sql`where ${sql.join(conditions, `\nand `)}\n`

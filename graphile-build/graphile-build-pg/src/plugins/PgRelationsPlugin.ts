@@ -2,17 +2,19 @@ import "graphile-build";
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
+import {
   PgSelectSingleStep,
   PgSource,
   PgSourceRefPath,
   PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
+  pgUnionAll,
   PgUnionAllStepConfigAttributes,
+  PgUnionAllStepMember,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
-import { constant, ObjectStep } from "grafast";
+import { constant, ExecutableStep, ObjectStep } from "grafast";
 import {
   arraysMatch,
   connection,
@@ -823,8 +825,6 @@ function addRelations(
     const unionAttributes: PgUnionAllStepConfigAttributes<any> | undefined =
       sharedCodec?.columns;
 
-    unionAttributes;
-
     const isUnique = paths.every((p) => p.isUnique);
 
     // TODO: shouldn't the ref behavior override the source behavior?
@@ -991,11 +991,68 @@ function addRelations(
         const connectionPlan = makePlanResolver("connection");
         return { singleRecordPlan, listPlan, connectionPlan };
       } else {
-        console.error("TODO: Union plan not yet handled!");
+        const makePlanResolver = (
+          mode: "singleRecord" | "list" | "connection",
+        ) => {
+          const single = mode === "singleRecord";
+          const isConnection = mode === "connection";
+          return EXPORTABLE(
+            () => ($parent: ExecutableStep<any>) => {
+              const $record = isMutationPayload
+                ? (
+                    $parent as ObjectStep<{
+                      result: PgSelectSingleStep<any, any, any, any>;
+                    }>
+                  ).get("result")
+                : ($parent as PgSelectSingleStep<any, any, any, any>);
+              const attributes: PgUnionAllStepConfigAttributes<string> =
+                unionAttributes ?? {};
+              const sourceByTypeName: {
+                [typeName: string]: PgSource<any, any, any, any>;
+              } = Object.create(null);
+              const members: PgUnionAllStepMember<string>[] = [];
+              for (const path of paths) {
+                const [firstLayer, ...rest] = path.layers;
+                const memberPath: PgSourceRefPath = [];
+                let finalSource = firstLayer.source;
+                for (const layer of rest) {
+                  const { relationName } = layer;
+                  memberPath!.push({ relationName });
+                  finalSource = layer.source;
+                }
+                const typeName = build.inflection.tableType(finalSource.codec);
+                const member: PgUnionAllStepMember<string> = {
+                  source: firstLayer.source,
+                  typeName,
+                  match: firstLayer.localColumns.reduce((memo, col, idx) => {
+                    memo[firstLayer.remoteColumns[idx]] = {
+                      step: $record.get(col),
+                    };
+                    return memo;
+                  }, Object.create(null)),
+                  path: memberPath,
+                };
+                members.push(member);
+                if (!sourceByTypeName[typeName]) {
+                  sourceByTypeName[typeName] = finalSource;
+                }
+              }
+              return pgUnionAll({
+                attributes,
+                sourceByTypeName,
+                members,
+              });
+            },
+            [],
+          );
+        };
+        const singleRecordPlan = makePlanResolver("singleRecord");
+        const listPlan = makePlanResolver("list");
+        const connectionPlan = makePlanResolver("connection");
         return {
-          singleRecordPlan: () => constant(null),
-          listPlan: () => constant(null),
-          connectionPlan: () => constant(null),
+          singleRecordPlan,
+          listPlan,
+          connectionPlan,
         };
       }
     })();

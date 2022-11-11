@@ -147,6 +147,7 @@ import {
   PgUnionAllStepCondition,
   PgUnionAllStepConfig,
   PgUnionAllStepConfigAttributes,
+  PgUnionAllStepMember,
   PgUnionAllStepOrder,
 } from "./steps/pgUnionAll.js";
 import { pgUpdate, PgUpdateStep } from "./steps/pgUpdate.js";
@@ -271,6 +272,7 @@ export {
   PgUnionAllStepCondition,
   PgUnionAllStepConfig,
   PgUnionAllStepConfigAttributes,
+  PgUnionAllStepMember,
   PgUnionAllStepOrder,
   pgUpdate,
   PgUpdateStep,
