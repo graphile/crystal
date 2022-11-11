@@ -3867,7 +3867,7 @@ export function makeExampleSchema(
   type VulnerabilityConnectionStep = ConnectionStep<
     PgUnionAllSingleStep,
     PgSelectParsedCursorStep,
-    PgUnionAllStep<any>,
+    PgUnionAllStep<any, any>,
     PgUnionAllSingleStep
   >;
 
@@ -3948,7 +3948,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep<any>) => {
+              () => (step: PgUnionAllStep<any, any>) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "ASC",
@@ -3963,7 +3963,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep<any>) => {
+              () => (step: PgUnionAllStep<any, any>) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "DESC",
@@ -4745,14 +4745,9 @@ export function makeExampleSchema(
                     codec: TYPES.float,
                   },
                 },
-                sourceSpecs: {
-                  FirstPartyVulnerability: {
-                    source: firstPartyVulnerabilitiesSource,
-                    /* Could add attribute overrides here */
-                  },
-                  ThirdPartyVulnerability: {
-                    source: thirdPartyVulnerabilitiesSource,
-                  },
+                sourceByTypeName: {
+                  FirstPartyVulnerability: firstPartyVulnerabilitiesSource,
+                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesSource,
                 },
               });
               $vulnerabilities.orderBy({
@@ -4928,14 +4923,9 @@ export function makeExampleSchema(
                     codec: TYPES.float,
                   },
                 },
-                sourceSpecs: {
-                  FirstPartyVulnerability: {
-                    source: firstPartyVulnerabilitiesSource,
-                    /* Could add attribute overrides here */
-                  },
-                  ThirdPartyVulnerability: {
-                    source: thirdPartyVulnerabilitiesSource,
-                  },
+                sourceByTypeName: {
+                  FirstPartyVulnerability: firstPartyVulnerabilitiesSource,
+                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesSource,
                 },
               });
               return connection($vulnerabilities);
