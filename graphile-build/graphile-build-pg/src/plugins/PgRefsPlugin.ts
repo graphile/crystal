@@ -1,13 +1,13 @@
-import {
+import type {
   PgSourceRefPath,
   PgSourceRelation,
-  PgTypeColumn,
   PgTypeColumns,
   PgSource,
-  PgSourceBuilder,
+  PgSourceRef,
 } from "@dataplan/pg";
+import { PgTypeColumn, PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
-import { PgClass } from "pg-introspection";
+import type { PgClass } from "pg-introspection";
 
 import { version } from "../index.js";
 import {
@@ -23,6 +23,22 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgRefs: Record<string, never>;
+    }
+  }
+  namespace GraphileBuild {
+    interface Inflection {
+      refSingle(
+        this: Inflection,
+        details: { ref: PgSourceRef; identifier: string },
+      ): string;
+      refList(
+        this: Inflection,
+        details: { ref: PgSourceRef; identifier: string },
+      ): string;
+      refConnection(
+        this: Inflection,
+        details: { ref: PgSourceRef; identifier: string },
+      ): string;
     }
   }
 }
@@ -43,6 +59,26 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
     "Looks for `@ref` and `@refVia` smart tags and registers the given refs",
   version: version,
   after: ["smart-tags", "PgRelationsPlugin"],
+
+  inflection: {
+    add: {
+      refSingle(stuff, { ref, identifier }) {
+        return ref.singleRecordFieldName ?? this.singularize(identifier);
+      },
+      refList(stuff, { ref, identifier }) {
+        return (
+          ref.listFieldName ??
+          this.listField(this.pluralize(this.singularize(identifier)))
+        );
+      },
+      refConnection(stuff, { ref, identifier }) {
+        return (
+          ref.connectionFieldName ??
+          this.connectionField(this.pluralize(this.singularize(identifier)))
+        );
+      },
+    },
+  },
 
   gather: {
     namespace: "pgRefs",

@@ -841,12 +841,18 @@ function addRelations(
       ? build.inflection.tableConnectionType(sharedCodec)
       : build.inflection.connectionType(typeName);
 
-    // TODO: INFLECT THIS!
-    const singleRecordFieldName =
-      refSpec.singleRecordFieldName ?? `TODO_${identifier}_ONE`;
-    const connectionFieldName =
-      refSpec.connectionFieldName ?? `TODO_${identifier}_CONNECTION`;
-    const listFieldName = refSpec.listFieldName ?? `TODO_${identifier}_LIST`;
+    const singleRecordFieldName = build.inflection.refSingle({
+      ref: refSpec,
+      identifier,
+    });
+    const connectionFieldName = build.inflection.refConnection({
+      ref: refSpec,
+      identifier,
+    });
+    const listFieldName = build.inflection.refList({
+      ref: refSpec,
+      identifier,
+    });
 
     // Shortcut simple relation alias
     const { singleRecordPlan, listPlan, connectionPlan } = (() => {
