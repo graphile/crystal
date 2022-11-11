@@ -337,7 +337,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     );
   }
 
-  protected addDependency(step: ExecutableStep): number {
+  protected addDependency(
+    step: ExecutableStep,
+    skipDeduplication = false,
+  ): number {
     if (this.isFinalized) {
       throw new Error(
         "You cannot add a dependency after the step is finalized.",
@@ -361,10 +364,16 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       }
     }
 
-    const existingIndex = this._dependencies.indexOf(step.id);
-    if (existingIndex >= 0) {
-      return existingIndex;
+    // When copying dependencies between classes, we might not want to
+    // deduplicate because we might refer to the dependency by its index. As
+    // such, we should only dedupe by default but allow opting out.
+    if (!skipDeduplication) {
+      const existingIndex = this._dependencies.indexOf(step.id);
+      if (existingIndex >= 0) {
+        return existingIndex;
+      }
     }
+
     return this._dependencies.push(step.id) - 1;
   }
 

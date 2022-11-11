@@ -540,7 +540,7 @@ export class PgSelectStep<
         throw new Error("Should not have any dependencies yet");
       }
       cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency(this.getStep(planId));
+        const myIdx = this.addDependency(this.getStep(planId), true);
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
