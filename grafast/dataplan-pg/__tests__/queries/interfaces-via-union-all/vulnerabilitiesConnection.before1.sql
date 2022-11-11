@@ -18,82 +18,82 @@ lateral (
     __union__."6"::text as "6"
   from (
       select
-        __first_party_vulnerability__."0",
-        __first_party_vulnerability__."1",
-        __first_party_vulnerability__."2",
-        __first_party_vulnerability__."6",
+        __first_party_vulnerabilities__."0",
+        __first_party_vulnerabilities__."1",
+        __first_party_vulnerabilities__."2",
+        __first_party_vulnerabilities__."6",
         "n"
       from (
         select
-          __first_party_vulnerability__."cvss_score" as "0",
+          __first_party_vulnerabilities__."cvss_score" as "0",
           'FirstPartyVulnerability' as "1",
-          json_build_array((__first_party_vulnerability__."id")::text) as "2",
+          json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
           __union_identifiers__.idx as "6",
           row_number() over (
             order by
-              __first_party_vulnerability__."cvss_score" desc,
-              __first_party_vulnerability__."id" desc
+              __first_party_vulnerabilities__."cvss_score" desc,
+              __first_party_vulnerabilities__."id" desc
           ) as "n"
-        from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerability__
+        from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
         where (
-          (__first_party_vulnerability__."cvss_score" < __union_identifiers__."id0")
+          (__first_party_vulnerabilities__."cvss_score" < __union_identifiers__."id0")
           or (
-            __first_party_vulnerability__."cvss_score" = __union_identifiers__."id0"
+            __first_party_vulnerabilities__."cvss_score" = __union_identifiers__."id0"
             and (
               ('FirstPartyVulnerability' < __union_identifiers__."id1")
               or (
                 'FirstPartyVulnerability' = __union_identifiers__."id1"
                 and (
-                  __first_party_vulnerability__."id" < (__union_identifiers__."id2"->>0)::"int4"
+                  __first_party_vulnerabilities__."id" < (__union_identifiers__."id2"->>0)::"int4"
                 )
               )
             )
           )
         )
         order by
-          __first_party_vulnerability__."cvss_score" desc,
-          __first_party_vulnerability__."id" desc
+          __first_party_vulnerabilities__."cvss_score" desc,
+          __first_party_vulnerabilities__."id" desc
         limit 2
-      ) as __first_party_vulnerability__
+      ) as __first_party_vulnerabilities__
     union all
       select
-        __third_party_vulnerability__."0",
-        __third_party_vulnerability__."1",
-        __third_party_vulnerability__."2",
-        __third_party_vulnerability__."6",
+        __third_party_vulnerabilities__."0",
+        __third_party_vulnerabilities__."1",
+        __third_party_vulnerabilities__."2",
+        __third_party_vulnerabilities__."6",
         "n"
       from (
         select
-          __third_party_vulnerability__."cvss_score" as "0",
+          __third_party_vulnerabilities__."cvss_score" as "0",
           'ThirdPartyVulnerability' as "1",
-          json_build_array((__third_party_vulnerability__."id")::text) as "2",
+          json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
           __union_identifiers__.idx as "6",
           row_number() over (
             order by
-              __third_party_vulnerability__."cvss_score" desc,
-              __third_party_vulnerability__."id" desc
+              __third_party_vulnerabilities__."cvss_score" desc,
+              __third_party_vulnerabilities__."id" desc
           ) as "n"
-        from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerability__
+        from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
         where (
-          (__third_party_vulnerability__."cvss_score" < __union_identifiers__."id0")
+          (__third_party_vulnerabilities__."cvss_score" < __union_identifiers__."id0")
           or (
-            __third_party_vulnerability__."cvss_score" = __union_identifiers__."id0"
+            __third_party_vulnerabilities__."cvss_score" = __union_identifiers__."id0"
             and (
               ('ThirdPartyVulnerability' < __union_identifiers__."id1")
               or (
                 'ThirdPartyVulnerability' = __union_identifiers__."id1"
                 and (
-                  __third_party_vulnerability__."id" < (__union_identifiers__."id2"->>0)::"int4"
+                  __third_party_vulnerabilities__."id" < (__union_identifiers__."id2"->>0)::"int4"
                 )
               )
             )
           )
         )
         order by
-          __third_party_vulnerability__."cvss_score" desc,
-          __third_party_vulnerability__."id" desc
+          __third_party_vulnerabilities__."cvss_score" desc,
+          __third_party_vulnerabilities__."id" desc
         limit 2
-      ) as __third_party_vulnerability__
+      ) as __third_party_vulnerabilities__
     order by
       "0" desc,
       "1" desc,
