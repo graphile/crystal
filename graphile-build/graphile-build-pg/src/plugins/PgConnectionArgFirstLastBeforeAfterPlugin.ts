@@ -56,14 +56,11 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
           }
 
           const codec = pgFieldCodec ?? pgSource?.codec;
-          const isSuitableSource =
-            pgSource && pgSource.codec.columns && !pgSource.isUnique;
+          const isSuitableSource = pgSource && !pgSource.isUnique;
           const isSuitableCodec =
             codec &&
             (isSuitableSource ||
-              (!pgSource &&
-                codec?.extensions?.polymorphism?.mode === "union")) &&
-            codec.columns;
+              (!pgSource && codec?.extensions?.polymorphism?.mode === "union"));
 
           if (!isSuitableCodec) {
             return args;
