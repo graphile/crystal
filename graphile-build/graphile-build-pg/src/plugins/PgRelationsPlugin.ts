@@ -12,14 +12,13 @@ import type {
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";
-import { pgUnionAll } from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
+import { PgSourceBuilder, pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import { constant, first } from "grafast";
 import {
   arraysMatch,
   connection,
   evalSafeProperty,
+  first,
   isSafeObjectPropertyName,
   list,
   object,

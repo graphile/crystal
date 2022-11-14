@@ -1,11 +1,11 @@
 import type {
+  PgSource,
+  PgSourceRef,
   PgSourceRefPath,
   PgSourceRelation,
   PgTypeColumns,
-  PgSource,
-  PgSourceRef,
 } from "@dataplan/pg";
-import { PgTypeColumn, PgSourceBuilder } from "@dataplan/pg";
+import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
 
@@ -94,11 +94,17 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         const { databaseName, source, pgClass } = event;
 
         const getSourceForTableName = async (targetTableIdentifier: string) => {
+          const nsp = pgClass.getNamespace();
+          if (!nsp) {
+            throw new Error(
+              `Couldn't determine namespace for '${pgClass.relname}'`,
+            );
+          }
           const [targetSchemaName, targetTableName] =
             parseDatabaseIdentifierFromSmartTag(
               targetTableIdentifier,
               2,
-              pgClass.getNamespace()?.nspname!,
+              nsp.nspname,
             );
           const targetPgClass =
             await info.helpers.pgIntrospection.getClassByName(
@@ -226,8 +232,10 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   if (!arraysMatch(rel.localColumns, localColumns)) {
                     return false;
                   }
-                  if (!arraysMatch(rel.localColumns, localColumns)) {
-                    return false;
+                  if (maybeTargetColumns) {
+                    if (!arraysMatch(rel.remoteColumns, maybeTargetColumns)) {
+                      return false;
+                    }
                   }
                   return true;
                 });

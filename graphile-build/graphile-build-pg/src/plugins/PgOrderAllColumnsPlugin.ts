@@ -7,8 +7,7 @@ import type {
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgUnionAllStep } from "@dataplan/pg";
-import { PgSelectStep } from "@dataplan/pg";
+import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumValueConfigMap } from "graphql";
@@ -50,7 +49,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, sql, options } = build;
+        const { extend, inflection, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;
@@ -134,6 +133,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                       applyPlan: EXPORTABLE(
                         (
                             PgSelectStep,
+                            PgUnionAllStep,
                             columnName,
                             isUnique,
                             orderByNullsLast,
@@ -160,7 +160,13 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               plan.setOrderIsUnique();
                             }
                           },
-                        [PgSelectStep, columnName, isUnique, orderByNullsLast],
+                        [
+                          PgSelectStep,
+                          PgUnionAllStep,
+                          columnName,
+                          isUnique,
+                          orderByNullsLast,
+                        ],
                       ),
                     },
                   },

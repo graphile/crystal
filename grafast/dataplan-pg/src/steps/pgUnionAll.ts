@@ -20,7 +20,6 @@ import {
   isPromiseLike,
   lambda,
   list,
-  ModifierStep,
   polymorphicWrap,
   reverseArray,
 } from "grafast";

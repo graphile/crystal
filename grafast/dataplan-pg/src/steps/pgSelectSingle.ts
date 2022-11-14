@@ -19,8 +19,7 @@ import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectMode } from "./pgSelect.js";
-import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
-import { PgSelectStep } from "./pgSelect.js";
+import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("datasource:pg:PgSelectSingleStep:plan");

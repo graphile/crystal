@@ -7,7 +7,6 @@ import type {
   PgSelectSingleStep,
   PgSelectStep,
   PgTypeColumns,
-  PgUnionAllStep,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
