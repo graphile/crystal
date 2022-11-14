@@ -60,9 +60,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
               return;
             }
 
-            const isPgUnionAllCondition =
-              codec.extensions?.polymorphism?.mode === "union";
-
             const tableTypeName = inflection.tableType(codec);
             const conditionName = inflection.conditionType(tableTypeName);
             /* const TableConditionType = */
