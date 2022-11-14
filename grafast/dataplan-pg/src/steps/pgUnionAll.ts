@@ -39,6 +39,7 @@ import type {
 import { PgSourceBuilder } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
 import type {
+  PgOrderFragmentSpec,
   PgOrderSpec,
   PgTypeCodec,
   PgTypedExecutableStep,
@@ -248,9 +249,11 @@ export class PgUnionAllSingleStep
   public getCursorDigestAndStep(): [string, ExecutableStep] {
     const classPlan = this.getClassStep();
     const digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderBy().map((o, i) => {
-      return access(this, classPlan.selectOrderValue(i));
+    const orders = classPlan.getOrderByWithoutType().map((o, i) => {
+      return access(this, [$$data, classPlan.selectOrderValue(i)]);
     });
+    // Add the type to the cursor
+    orders.push(access(this, [$$data, classPlan.selectType()]));
     const step = list(orders);
     return [digest, step];
   }
@@ -362,7 +365,9 @@ export class PgUnionAllStep<
   public readonly spec: PgUnionAllStepConfig<TAttributes, TTypeNames>;
 
   /** @internal */
-  public orders: Array<PgOrderSpec>;
+  public orders: Array<PgOrderFragmentSpec>;
+  /** The select index used to store the order value for the given order */
+  private orderSelectIndex: Array<number>;
   /**
    * `ordersForCursor` is the same as `orders`, but then with the type and
    * primary key added. This ensures unique ordering, as required by cursor
@@ -375,7 +380,7 @@ export class PgUnionAllStep<
    * entries with `pk` higher than the given `pk`, and for all other `type`s we
    * can include all records.
    */
-  private ordersForCursor: Array<PgOrderSpec>;
+  private ordersForCursor: Array<PgOrderFragmentSpec>;
 
   /**
    * Since this is effectively like a DataLoader it processes the data for many
@@ -485,6 +490,7 @@ export class PgUnionAllStep<
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.queryValuesSymbol = cloneFrom.queryValuesSymbol;
       this.orders = [...cloneFrom.orders];
+      this.orderSelectIndex = [...cloneFrom.orderSelectIndex];
       this.ordersForCursor = [...cloneFrom.ordersForCursor];
 
       this.executor = cloneFrom.executor;
@@ -528,6 +534,7 @@ export class PgUnionAllStep<
       this.placeholderValues = new Map();
       this.queryValuesSymbol = Symbol("union_identifier_values");
       this.orders = [];
+      this.orderSelectIndex = [];
       this.ordersForCursor = [];
 
       this.memberDigests = [];
@@ -727,22 +734,13 @@ on (${sql.indent(
   }
 
   selectOrderValue(orderIndex: number): number {
-    if (
-      !isFinite(orderIndex) ||
-      Math.round(orderIndex) !== orderIndex ||
-      orderIndex < 0 ||
-      orderIndex >= this.getOrderBy().length
-    ) {
+    const orders = this.getOrderByWithoutType();
+    const order = orders[orderIndex];
+    if (!order) {
       throw new Error("OOB!");
     }
-    const existingIndex = this.selects.findIndex(
-      (s) => s.type === "order" && s.orderIndex === orderIndex,
-    );
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index = this.selects.push({ type: "order", orderIndex }) - 1;
-    return index;
+    // Order is already selected
+    return this.orderSelectIndex[orderIndex];
   }
 
   listItem(itemPlan: ExecutableStep) {
@@ -802,11 +800,14 @@ on (${sql.indent(
         codec: this.spec.attributes[orderSpec.attribute].codec,
       });
     }
-    this.orders.push({
-      fragment: sql.identifier(String(this.select(orderSpec.attribute))),
-      direction: orderSpec.direction,
-      codec: this.spec.attributes[orderSpec.attribute].codec,
-    });
+    const selectedIndex = this.select(orderSpec.attribute);
+    const orderIndex =
+      this.orders.push({
+        fragment: sql.identifier(String(selectedIndex)),
+        direction: orderSpec.direction,
+        codec: this.spec.attributes[orderSpec.attribute].codec,
+      }) - 1;
+    this.orderSelectIndex[orderIndex] = selectedIndex;
   }
 
   setOrderIsUnique() {
@@ -1259,9 +1260,13 @@ and ${condition(i + 1)}`}
     return digest;
   }
 
-  public getOrderBy(): ReadonlyArray<PgOrderSpec> {
+  public getOrderBy(): ReadonlyArray<PgOrderFragmentSpec> {
     this.locker.lockParameter("orderBy");
     return this.ordersForCursor;
+  }
+  public getOrderByWithoutType(): ReadonlyArray<PgOrderFragmentSpec> {
+    this.locker.lockParameter("orderBy");
+    return this.orders;
   }
 
   optimize() {
@@ -1333,7 +1338,8 @@ and ${condition(i + 1)}`}
                   return null;
                 }
                 case "order": {
-                  const orderSpec = this.getOrderBy()[s.orderIndex];
+                  const orders = this.getOrderByWithoutType();
+                  const orderSpec = orders[s.orderIndex];
                   const [frag, codec] = getFragmentAndCodecFromOrder(
                     this.alias,
                     orderSpec,
@@ -1453,12 +1459,7 @@ ${
   this.orders.length
     ? sql`${sql.join(
         this.orders.map((o) => {
-          const [frag] = getFragmentAndCodecFromOrder(
-            this.alias,
-            o,
-            mutualCodec,
-          );
-          return sql`${frag} ${
+          return sql`${o.fragment} ${
             Number(o.direction === "DESC") ^ Number(reverse)
               ? sql`desc`
               : sql`asc`

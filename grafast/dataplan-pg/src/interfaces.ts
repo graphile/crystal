@@ -234,36 +234,39 @@ export interface PgTypedExecutableStep<
   pgCodec: TCodec;
 }
 
-/**
- * The information required to specify an entry in an 'ORDER BY' clause.
- */
-export type PgOrderSpec = (
-  | {
-      /** The expression we're ordering by. */
-      fragment: SQL;
-      /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
-      codec: PgTypeCodec<any, any, any>;
-
-      attribute?: never;
-      callback?: never;
-    }
-  | {
-      /** The attribute you're using for ordering */
-      attribute: string;
-      /** An optional expression to wrap this column with, and the type that expression returns */
-      callback?: (
-        attributeExpression: SQL,
-        attributeCodec: PgTypeCodec<any, any, any>,
-      ) => [SQL, PgTypeCodec<any, any, any>];
-
-      fragment?: never;
-      codec?: never;
-    }
-) & {
+type PgOrderCommonSpec = {
   direction: "ASC" | "DESC";
   /** `NULLS FIRST` or `NULLS LAST` or nothing */
   nulls?: "FIRST" | "LAST" | null;
 };
+
+export type PgOrderFragmentSpec = {
+  /** The expression we're ordering by. */
+  fragment: SQL;
+  /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
+  codec: PgTypeCodec<any, any, any>;
+
+  attribute?: never;
+  callback?: never;
+} & PgOrderCommonSpec;
+
+export type PgOrderAttributeSpec = {
+  /** The attribute you're using for ordering */
+  attribute: string;
+  /** An optional expression to wrap this column with, and the type that expression returns */
+  callback?: (
+    attributeExpression: SQL,
+    attributeCodec: PgTypeCodec<any, any, any>,
+  ) => [SQL, PgTypeCodec<any, any, any>];
+
+  fragment?: never;
+  codec?: never;
+} & PgOrderCommonSpec;
+
+/**
+ * The information required to specify an entry in an 'ORDER BY' clause.
+ */
+export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
 
 /**
  * The information required to specify an entry in a `GROUP BY` clause.
