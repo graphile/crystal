@@ -193,7 +193,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         const codec = pgFieldCodec ?? pgSource?.codec;
         const isSuitableSource =
           pgSource && pgSource.codec.columns && !pgSource.isUnique;
-
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
