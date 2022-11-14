@@ -1255,6 +1255,23 @@ create table polymorphic.people (
   username text not null unique
 );
 
+comment on table polymorphic.people is E'@unionMember PersonOrOrganization';
+
+create table polymorphic.organizations (
+  organization_id serial primary key,
+  name text not null unique
+);
+
+comment on table polymorphic.organizations is E'@unionMember PersonOrOrganization';
+
+create table polymorphic.log_entries (
+  id serial primary key,
+  person_id int references polymorphic.people,
+  organization_id int references polymorphic.organizations,
+  text text not null,
+  constraint owned_by_person_or_organization check (person_id is null <> organization_id is null)
+);
+
 create type polymorphic.item_type as enum (
   'TOPIC',
   'POST',

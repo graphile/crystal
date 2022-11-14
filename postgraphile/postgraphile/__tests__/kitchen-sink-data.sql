@@ -388,6 +388,30 @@ insert into polymorphic.people (person_id, username) values
   (7, 'Georgina'),
   (8, 'Harry');
 
+insert into polymorphic.organizations (organization_id, name) values
+  (1, 'Acme'),
+  (2, 'Stark Industries'),
+  (3, 'Weyland-Yutani'),
+  (4, 'Wayne Enterprises'),
+  (5, 'Cyberdyne Systems'),
+  (6, 'Umbrella Corporation'),
+  (7, 'Delos Incorporated'),
+  (8, 'Aperture Science');
+
+insert into polymorphic.log_entries (id, person_id, organization_id, text) values
+  (1, 1, null, 'Please let me in'),
+  (2, null, 6, 'Spotless safety records continue at all facilities'),
+  (3, null, 5, 'I''ll be back'),
+  (4, 4, null, 'Beer brewing complete'),
+  (5, 4, null, 'Cider brewing commencing'),
+  (6, null, 7, 'Rumours of sentient androids are greatly exaggerated'),
+  (7, null, 5, 'Rumours of robot sentience are greatly exaggerated'),
+  (8, null, 4, 'Rumours of man-shaped bats are greatly exaggerated'),
+  (9, 2, null, 'Just a few more test fixtures to write, almost there!'),
+  (10, null, 2, 'Rest in peace, Tony.'),
+  (11, null, 6, 'Please can Alice report to Raccoon City for testing'),
+  (12, null, 8, 'Hello-o! Are you still there?');
+
 insert into polymorphic.single_table_items 
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at,            color,   title, description, note) values
   (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'PostGraphile version 5', null, null),
