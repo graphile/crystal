@@ -254,6 +254,8 @@ export class PgUnionAllSingleStep
     });
     // Add the type to the cursor
     orders.push(access(this, [$$data, classPlan.selectType()]));
+    // Add the pk to the cursor
+    orders.push(access(this, [$$data, classPlan.selectPk()]));
     const step = list(orders);
     return [digest, step];
   }

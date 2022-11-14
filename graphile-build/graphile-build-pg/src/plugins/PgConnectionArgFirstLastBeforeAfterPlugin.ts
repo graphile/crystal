@@ -41,23 +41,34 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
             getTypeByName,
             graphql: { GraphQLInt },
           } = build;
-          const {
-            scope: {
-              fieldName,
-              isPgFieldConnection,
-              isPgFieldSimpleCollection,
-              pgSource,
-            },
-            Self,
-          } = context;
+          const { scope, Self } = context;
 
-          if (
-            !(isPgFieldConnection || isPgFieldSimpleCollection) ||
-            !pgSource ||
-            pgSource.isUnique
-          ) {
+          const {
+            fieldName,
+            isPgFieldConnection,
+            isPgFieldSimpleCollection,
+            pgSource,
+            pgFieldCodec,
+          } = scope;
+
+          if (!(isPgFieldConnection || isPgFieldSimpleCollection)) {
             return args;
           }
+
+          const codec = pgFieldCodec ?? pgSource?.codec;
+          const isSuitableSource =
+            pgSource && pgSource.codec.columns && !pgSource.isUnique;
+          const isSuitableCodec =
+            codec &&
+            (isSuitableSource ||
+              (!pgSource &&
+                codec?.extensions?.polymorphism?.mode === "union")) &&
+            codec.columns;
+
+          if (!isSuitableCodec) {
+            return args;
+          }
+
           const Cursor = getTypeByName("Cursor");
 
           return extend(
