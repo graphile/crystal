@@ -4754,6 +4754,7 @@ export function makeExampleSchema(
                 direction: "DESC",
               });
               $vulnerabilities.where({
+                type: "attribute",
                 attribute: "cvss_score",
                 callback: (alias) =>
                   sql`${alias} > ${$vulnerabilities.placeholder(

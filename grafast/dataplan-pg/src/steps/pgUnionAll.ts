@@ -46,6 +46,8 @@ import type {
 import { PgLocker } from "../pgLocker.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
+import type { PgWhereConditionSpec } from "./pgCondition.js";
+import { PgConditionStep } from "./pgCondition.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
@@ -58,7 +60,6 @@ function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
 }
 
-const castAlias = sql.identifier(Symbol("union"));
 const rowNumberAlias = "n";
 const rowNumberIdent = sql.identifier(rowNumberAlias);
 
@@ -345,7 +346,8 @@ export class PgUnionAllStep<
 
   public isSyncAndSafe = false;
 
-  public alias = castAlias;
+  public symbol = Symbol("union"); // TODO: add variety
+  public alias = sql.identifier(this.symbol);
 
   private selects: PgUnionAllStepSelect<TAttributes>[];
 
@@ -731,29 +733,36 @@ on (${sql.indent(
     return pgPageInfo($connectionPlan);
   }
 
-  where(whereSpec: PgUnionAllStepCondition<TAttributes>): void {
+  where(whereSpec: PgWhereConditionSpec<TAttributes>): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
     }
     for (const digest of this.memberDigests) {
-      const { alias: tableAlias } = digest;
-      const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
-        digest,
-        whereSpec.attribute,
-      )}`;
-      digest.conditions.push(whereSpec.callback(ident));
+      const { alias: tableAlias, symbol } = digest;
+      if (sql.isSQL(whereSpec)) {
+        // Merge the global where into this sub-where.
+        digest.conditions.push(
+          sql.replaceSymbol(whereSpec, this.symbol, symbol),
+        );
+      } else {
+        const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+          digest,
+          whereSpec.attribute,
+        )}`;
+        digest.conditions.push(whereSpec.callback(ident));
+      }
     }
   }
 
-  wherePlan(): PgUnionAllConditionStep<this> {
+  wherePlan(): PgConditionStep<this> {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('wherePlan')`,
       );
     }
-    return new PgUnionAllConditionStep(this);
+    return new PgConditionStep(this);
   }
 
   orderBy(orderSpec: PgUnionAllStepOrder<TAttributes>): void {
@@ -1552,39 +1561,4 @@ export function pgUnionAll<
   spec: PgUnionAllStepConfig<TAttributes, TTypeNames>,
 ): PgUnionAllStep<TAttributes, TTypeNames> {
   return new PgUnionAllStep(spec);
-}
-
-export class PgUnionAllConditionStep<
-  TParentStep extends PgUnionAllStep<any, any>,
-> extends ModifierStep<TParentStep> {
-  static $$export = {
-    moduleName: "@dataplan/pg",
-    exportName: "PgUnionAllConditionStep",
-  };
-
-  private conditions: PgUnionAllStepCondition<any>[] = [];
-
-  public readonly alias: SQL;
-
-  constructor($parent: TParentStep, private isHaving = false) {
-    super($parent);
-    this.alias = $parent.alias;
-  }
-
-  where(condition: PgUnionAllStepCondition<any>): void {
-    this.conditions.push(condition);
-  }
-
-  placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
-  ): SQL {
-    return this.$parent.placeholder($step, codec);
-  }
-
-  apply(): void {
-    this.conditions.forEach((condition) => {
-      this.$parent.where(condition);
-    });
-  }
 }
