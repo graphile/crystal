@@ -944,6 +944,84 @@ export function isEquivalent(
   }
 }
 
+function replaceSymbolInNode(
+  frag: SQLNode,
+  needle: symbol,
+  replacement: symbol,
+): SQLNode {
+  switch (frag.type) {
+    case "RAW": {
+      return frag;
+    }
+    case "IDENTIFIER": {
+      let changed = false;
+      const newNames = frag.names.map((v) => {
+        if (typeof v !== "string" && v.s === needle) {
+          changed = true;
+          return getSymbolAndName(replacement);
+        } else {
+          return v;
+        }
+      });
+      return changed ? makeIdentifierNode(newNames) : frag;
+    }
+    case "VALUE": {
+      return frag.value === (needle as any)
+        ? makeValueNode(replacement as any)
+        : frag;
+    }
+    case "INDENT": {
+      return makeIndentNode(replaceSymbol(frag.content, needle, replacement));
+    }
+    case "PARENS": {
+      return makeParensNode(
+        replaceSymbol(frag.content, needle, replacement),
+        frag.force,
+      );
+    }
+    case "SYMBOL_ALIAS": {
+      const newA = frag.a.s === needle ? replacement : frag.a.s;
+      const newB = frag.b.s === needle ? replacement : frag.b.s;
+      if (newA !== frag.a.s || newB !== frag.b.s) {
+        return makeSymbolAliasNode(newA, newB);
+      } else {
+        return frag;
+      }
+    }
+    case "PLACEHOLDER": {
+      if (frag.symbol === needle) {
+        return makePlaceholderNode(replacement, frag.fallback);
+      } else {
+        return frag;
+      }
+    }
+    default: {
+      const never: never = frag;
+      throw new Error(`Unhandled SQL type ${(never as any).type}`);
+    }
+  }
+}
+
+export function replaceSymbol(
+  frag: SQL,
+  needle: symbol,
+  replacement: symbol,
+): SQL {
+  if (Array.isArray(frag)) {
+    let changed = false;
+    const newFrag = frag.map((node) => {
+      const newNode = replaceSymbolInNode(node, needle, replacement);
+      if (newNode !== node) {
+        changed = true;
+      }
+      return newNode;
+    });
+    return changed ? newFrag : frag;
+  } else {
+    return replaceSymbolInNode(frag, needle, replacement);
+  }
+}
+
 /**
  * @internal
  */
@@ -1032,6 +1110,7 @@ export interface PgSQL {
   false: typeof falseNode;
   null: typeof nullNode;
   isSQL: typeof isSQL;
+  replaceSymbol: typeof replaceSymbol;
   sql: PgSQL;
 }
 
@@ -1056,6 +1135,7 @@ const attributes = {
   true: trueNode,
   false: falseNode,
   null: nullNode,
+  replaceSymbol,
   isSQL,
 };
 
