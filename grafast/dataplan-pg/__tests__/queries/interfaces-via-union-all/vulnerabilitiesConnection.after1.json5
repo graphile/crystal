@@ -2,7 +2,7 @@
   vulnerabilitiesConnection: {
     edges: [
       {
-        cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNVwiXSJd",
+        cursor: "WyJlOTAxMDBkNmIzIiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
         node: {
           __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
@@ -12,7 +12,7 @@
         },
       },
       {
-        cursor: "WyJlOTAxMDBkNmIzIiw3LjIsIlRoaXJkUGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiNFwiXSJd",
+        cursor: "WyJlOTAxMDBkNmIzIiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           cvssScore: 7.2,
