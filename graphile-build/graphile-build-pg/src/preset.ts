@@ -25,6 +25,7 @@ import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.j
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
 import { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
+import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
 import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.js";
 import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
@@ -32,7 +33,6 @@ import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
-import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
 
 // TODO: version this.
 export const defaultPreset: GraphileConfig.Preset = {

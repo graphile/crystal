@@ -7,6 +7,7 @@ import type {
   PgSelectSingleStep,
   PgSelectStep,
   PgTypeColumns,
+  PgUnionAllStep,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -59,7 +60,8 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
               return;
             }
 
-            // TODO: create the condition type for this type
+            const isPgUnionAllCondition =
+              codec.extensions?.polymorphism?.mode === "union";
 
             const tableTypeName = inflection.tableType(codec);
             const conditionName = inflection.conditionType(tableTypeName);
@@ -130,20 +132,23 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                                     >,
                                     val,
                                   ) {
-                                    const expression = sql`${
-                                      $condition.alias
-                                    }.${sql.identifier(columnName)}`;
                                     if (val.getRaw().evalIs(null)) {
-                                      $condition.where(
-                                        sql`${expression} is null`,
-                                      );
+                                      $condition.where({
+                                        type: "attribute",
+                                        attribute: columnName,
+                                        callback: (expression) =>
+                                          sql`${expression} is null`,
+                                      });
                                     } else {
-                                      $condition.where(
-                                        sql`${expression} = ${$condition.placeholder(
-                                          val.get(),
-                                          column.codec,
-                                        )}`,
-                                      );
+                                      $condition.where({
+                                        type: "attribute",
+                                        attribute: columnName,
+                                        callback: (expression) =>
+                                          sql`${expression} = ${$condition.placeholder(
+                                            val.get(),
+                                            column.codec,
+                                          )}`,
+                                      });
                                     }
                                   },
                                 [column, columnName, sql],
@@ -174,43 +179,50 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
       },
 
       GraphQLObjectType_fields_field_args(args, build, context) {
+        const { scope, Self } = context;
+
         const {
-          scope: {
-            fieldName,
-            fieldBehaviorScope,
-            isPgFieldConnection,
-            isPgFieldSimpleCollection,
-            pgSource,
-          },
-          Self,
-        } = context;
+          fieldName,
+          fieldBehaviorScope,
+          isPgFieldConnection,
+          isPgFieldSimpleCollection,
+          pgSource,
+          pgFieldCodec,
+        } = scope;
 
         const shouldAddCondition =
           isPgFieldConnection || isPgFieldSimpleCollection;
-        if (
-          !shouldAddCondition ||
-          !pgSource ||
-          !pgSource.codec.columns ||
-          pgSource.isUnique
-        ) {
+
+        const codec = pgFieldCodec ?? pgSource?.codec;
+        const isSuitableSource =
+          pgSource && pgSource.codec.columns && !pgSource.isUnique;
+
+        const isSuitableCodec =
+          codec &&
+          (isSuitableSource ||
+            (!pgSource && codec?.extensions?.polymorphism?.mode === "union")) &&
+          codec.columns;
+
+        if (!shouldAddCondition || !isSuitableCodec) {
           return args;
         }
 
         const behavior = getBehavior([
-          pgSource.codec.extensions,
-          pgSource.extensions,
+          scope,
+          codec?.extensions,
+          pgSource?.extensions,
         ]);
         if (
           !build.behavior.matches(
             behavior,
             fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-            pgSource.parameters ? "" : "filter",
+            pgSource?.parameters ? "" : "filter",
           )
         ) {
           return args;
         }
 
-        const tableTypeName = build.inflection.tableType(pgSource.codec);
+        const tableTypeName = build.inflection.tableType(codec);
         const tableConditionTypeName =
           build.inflection.conditionType(tableTypeName);
         const tableConditionType = build.getTypeByName(

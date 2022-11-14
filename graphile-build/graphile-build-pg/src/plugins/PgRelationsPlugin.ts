@@ -48,6 +48,7 @@ declare global {
       isPgManyRelationConnectionField?: boolean;
       isPgManyRelationListField?: boolean;
       pgRelationDetails?: PgRelationsPluginRelationDetails;
+      behavior?: string;
     }
     interface Inflection {
       sourceRelationName(
@@ -696,6 +697,7 @@ function addRelations(
     connectionFieldName: string;
     description?: string;
     pgSource?: PgSource<any, any, any, any>;
+    pgCodec: PgTypeCodec<any, any, any, any> | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
   };
@@ -766,6 +768,7 @@ function addRelations(
       connectionFieldName,
       description: relation.description,
       pgSource: otherSource,
+      pgCodec: otherSource.codec,
       pgRelationDetails: relationDetails,
       relatedTypeName: build.inflection.tableType(codec),
     };
@@ -1109,6 +1112,7 @@ function addRelations(
     const digest: Digest = {
       identifier,
       isReferencee: hasReferencee,
+      pgCodec: sharedCodec,
       isUnique,
       behavior,
       typeName,
@@ -1141,6 +1145,7 @@ function addRelations(
       identifier,
       description,
       pgSource,
+      pgCodec: pgFieldCodec,
       pgRelationDetails,
       relatedTypeName,
     } = digest;
@@ -1183,6 +1188,7 @@ function addRelations(
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:single`,
               isPgSingleRelationField: true,
+              behavior,
               pgRelationDetails,
             },
             {
@@ -1219,10 +1225,15 @@ function addRelations(
               {
                 fieldName,
                 fieldBehaviorScope: `${relationTypeScope}:connection`,
+                // TODO: rename to pgFieldSource?
                 pgSource,
+                pgFieldCodec,
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
+                // TODO: rename to pgFieldRelationDetails?
                 pgRelationDetails,
+                // TODO: rename to pgFieldBehavior?
+                behavior,
               },
               {
                 description:
@@ -1258,9 +1269,11 @@ function addRelations(
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:list`,
               pgSource,
+              pgFieldCodec,
               isPgFieldSimpleCollection: true,
               isPgManyRelationListField: true,
               pgRelationDetails,
+              behavior,
             },
             {
               description,
