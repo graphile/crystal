@@ -1139,21 +1139,26 @@ export class PgSelectStep<
             ),
           )}::${order.codec.sqlType}`;
           */
+      const [orderFragment, orderCodec] = getFragmentAndCodecFromOrder(
+        this.alias,
+        order,
+        this.source.codec,
+      );
       const sqlValue = this.placeholder(
-        toPg(access($parsedCursorPlan, [i + 1]), order.codec),
-        order.codec,
+        toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
+        orderCodec,
       );
       // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
       const gt =
         (order.direction === "ASC" && beforeOrAfter === "after") ||
         (order.direction === "DESC" && beforeOrAfter === "before");
 
-      let fragment = sql`${order.fragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+      let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
 
       if (i < orderCount - 1) {
         fragment = sql`(${fragment})
 or (
-${sql.indent`${order.fragment} = ${sqlValue}
+${sql.indent`${orderFragment} = ${sqlValue}
 and ${condition(i + 1)}`}
 )`;
       }
@@ -1570,12 +1575,16 @@ and ${condition(i + 1)}`}
     const hash = createHash("sha256");
     hash.update(
       JSON.stringify(
-        this.orders.map(
-          (o) =>
-            sql.compile(o.fragment, {
-              placeholderValues: this.placeholderValues,
-            }).text,
-        ),
+        this.orders.map((o) => {
+          const [frag] = getFragmentAndCodecFromOrder(
+            this.alias,
+            o,
+            this.source.codec,
+          );
+          return sql.compile(frag, {
+            placeholderValues: this.placeholderValues,
+          }).text;
+        }),
       ),
     );
     const digest = hash.digest("hex").slice(0, 10);
@@ -1617,27 +1626,34 @@ and ${condition(i + 1)}`}
   private buildOrderBy({ reverse }: { reverse: boolean }) {
     this.locker.lockParameter("orderBy");
     const orders = reverse
-      ? this.orders.map((o) => ({
-          ...o,
-          direction: o.direction === "ASC" ? "DESC" : "ASC",
-        }))
+      ? this.orders.map(
+          (o) =>
+            ({
+              ...o,
+              direction: o.direction === "ASC" ? "DESC" : "ASC",
+            } as PgOrderSpec),
+        )
       : this.orders;
     return {
       sql:
         orders.length > 0
           ? sql`\norder by ${sql.join(
-              orders.map(
-                (o) =>
-                  sql`${o.fragment} ${
-                    o.direction === "ASC" ? sql`asc` : sql`desc`
-                  }${
-                    o.nulls === "LAST"
-                      ? sql` nulls last`
-                      : o.nulls === "FIRST"
-                      ? sql` nulls first`
-                      : sql.blank
-                  }`,
-              ),
+              orders.map((o) => {
+                const [frag] = getFragmentAndCodecFromOrder(
+                  this.alias,
+                  o,
+                  this.source.codec,
+                );
+                return sql`${frag} ${
+                  o.direction === "ASC" ? sql`asc` : sql`desc`
+                }${
+                  o.nulls === "LAST"
+                    ? sql` nulls last`
+                    : o.nulls === "FIRST"
+                    ? sql` nulls first`
+                    : sql.blank
+                }`;
+              }),
               ", ",
             )}`
           : sql.blank,
@@ -2255,14 +2271,18 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
 
       // Check ORDERs match
       if (
-        !arraysMatch(
-          this.orders,
-          p.orders,
-          (a, b) =>
-            a.direction === b.direction &&
-            a.nulls === b.nulls &&
-            sqlIsEquivalent(a.fragment, b.fragment),
-        )
+        !arraysMatch(this.orders, p.orders, (a, b) => {
+          if (a.direction !== b.direction) return false;
+          if (a.nulls !== b.nulls) return false;
+          if (a.attribute != null) {
+            if (b.attribute !== a.attribute) return false;
+            // TODO: really should compare if the result is equivalent?
+            return a.callback === b.callback;
+          } else {
+            if (b.attribute != null) return false;
+            return sqlIsEquivalent(a.fragment, b.fragment);
+          }
+        })
       ) {
         return false;
       }
@@ -2925,4 +2945,20 @@ export function sqlFromArgDigests(
   return digests.length > 1
     ? sql.indent(sql.join(args, ",\n"))
     : sql.join(args, ", ");
+}
+
+export function getFragmentAndCodecFromOrder(
+  alias: SQL,
+  order: PgOrderSpec,
+  codec: PgTypeCodec<any, any, any, any>,
+) {
+  if (order.attribute != null) {
+    const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
+    const colCodec = codec.columns![order.attribute].codec;
+    return order.callback
+      ? order.callback(colFrag, colCodec)
+      : [colFrag, colCodec];
+  } else {
+    return [order.fragment, order.codec];
+  }
 }

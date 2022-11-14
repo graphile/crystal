@@ -52,6 +52,7 @@ import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
+import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
@@ -109,6 +110,7 @@ add.isSyncAndSafe = true;
 type PgUnionAllStepSelect<TAttributes extends string> =
   | { type: "pk" }
   | { type: "type" }
+  | { type: "order"; orderIndex: number }
   | {
       type: "attribute";
       attribute: TAttributes;
@@ -246,11 +248,9 @@ export class PgUnionAllSingleStep
   public getCursorDigestAndStep(): [string, ExecutableStep] {
     const classPlan = this.getClassStep();
     const digest = classPlan.getOrderByDigest();
-    // TODO: this creates redundancy in the `select` (we're selecting the exact
-    // same values multiple times) - we should remove that redundancy.
-    const orders = classPlan
-      .getOrderBy()
-      .map((o) => this.expression(o.fragment, o.codec));
+    const orders = classPlan.getOrderBy().map((o, i) => {
+      return access(this, classPlan.selectOrderValue(i));
+    });
     const step = list(orders);
     return [digest, step];
   }
@@ -722,6 +722,25 @@ on (${sql.indent(
     return index;
   }
 
+  selectOrderValue(orderIndex: number): number {
+    if (
+      !isFinite(orderIndex) ||
+      Math.round(orderIndex) !== orderIndex ||
+      orderIndex < 0 ||
+      orderIndex >= this.getOrderBy().length
+    ) {
+      throw new Error("OOB!");
+    }
+    const existingIndex = this.selects.findIndex(
+      (s) => s.type === "order" && s.orderIndex === orderIndex,
+    );
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+    const index = this.selects.push({ type: "order", orderIndex }) - 1;
+    return index;
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
@@ -784,6 +803,10 @@ on (${sql.indent(
       direction: orderSpec.direction,
       codec: this.spec.attributes[orderSpec.attribute].codec,
     });
+  }
+
+  setOrderIsUnique() {
+    // TODO: should we do something here to match pgSelect?
   }
 
   private assertCursorPaginationAllowed(): void {}
@@ -877,9 +900,21 @@ on (${sql.indent(
           TYPES.text,
         );
       } else {
+        // TODO: this is bad. We're getting the codec from just one of the
+        // members and assuming the type for the given column will match for
+        // all of them. We should either validate that this is the same, change
+        // the signature of `getFragmentAndCodecFromOrder` to pass all the
+        // codecs (and maybe even attribute mapping), or... I dunno... fix it
+        // some other way.
+        const mutualCodec = this.memberDigests[0].finalSource.codec;
+        const [, codec] = getFragmentAndCodecFromOrder(
+          this.alias,
+          order,
+          mutualCodec,
+        );
         identifierPlaceholders[i] = this.placeholder(
-          toPg(access($parsedCursorPlan, [i + 1]), order.codec),
-          order.codec,
+          toPg(access($parsedCursorPlan, [i + 1]), codec),
+          codec,
         );
       }
     }
@@ -916,7 +951,12 @@ on (${sql.indent(
               "ASC",
             ];
           } else {
-            return [order.fragment, identifierPlaceholders[i], order.direction];
+            const [frag] = getFragmentAndCodecFromOrder(
+              this.alias,
+              order,
+              digest.finalSource.codec,
+            );
+            return [frag, identifierPlaceholders[i], order.direction];
           }
         })();
         // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
@@ -1188,14 +1228,27 @@ and ${condition(i + 1)}`}
     // user from themself. If they bypass this, that's their problem (it will
     // not introduce a security issue).
     const hash = createHash("sha256");
+
+    // TODO: this is bad. We're getting the codec from just one of the
+    // members and assuming the type for the given column will match for
+    // all of them. We should either validate that this is the same, change
+    // the signature of `getFragmentAndCodecFromOrder` to pass all the
+    // codecs (and maybe even attribute mapping), or... I dunno... fix it
+    // some other way.
+    const mutualCodec = this.memberDigests[0].finalSource.codec;
+
     hash.update(
       JSON.stringify(
-        this.ordersForCursor.map(
-          (o) =>
-            sql.compile(o.fragment, {
-              placeholderValues: this.placeholderValues,
-            }).text,
-        ),
+        this.ordersForCursor.map((o) => {
+          const [frag] = getFragmentAndCodecFromOrder(
+            this.alias,
+            o,
+            mutualCodec,
+          );
+          return sql.compile(frag, {
+            placeholderValues: this.placeholderValues,
+          }).text;
+        }),
       ),
     );
     const digest = hash.digest("hex").slice(0, 10);
@@ -1216,6 +1269,9 @@ and ${condition(i + 1)}`}
     this.locker.lock();
     const typeIdx = this.selectType();
     const reverse = this.shouldReverseOrder();
+
+    //TODO: THIS IS UNSAFE. See "TODO: this is bad" comments.
+    const mutualCodec = this.memberDigests[0].finalSource.codec;
 
     const makeQuery = () => {
       const tables: SQL[] = [];
@@ -1272,6 +1328,15 @@ and ${condition(i + 1)}`}
                   // Only applies on outside
                   return null;
                 }
+                case "order": {
+                  const orderSpec = this.getOrderBy()[s.orderIndex];
+                  const [frag, codec] = getFragmentAndCodecFromOrder(
+                    this.alias,
+                    orderSpec,
+                    digest.finalSource.codec,
+                  );
+                  return [frag, codec];
+                }
                 default: {
                   const never: never = s;
                   throw new Error(`Couldn't match ${(never as any).type}`);
@@ -1303,7 +1368,12 @@ ${sql.indent`${
   orders.length > 0
     ? sql`${sql.join(
         orders.map((orderSpec) => {
-          return sql`${orderSpec.fragment} ${
+          const [frag] = getFragmentAndCodecFromOrder(
+            tableAlias,
+            orderSpec,
+            finalSource.codec,
+          );
+          return sql`${frag} ${
             Number(orderSpec.direction === "DESC") ^ Number(reverse)
               ? sql`desc`
               : sql`asc`
@@ -1352,6 +1422,12 @@ from (${innerQuery}) as ${tableAlias}\
               ? TYPES.text
               : select.type === "pk"
               ? TYPES.json
+              : select.type === "order"
+              ? getFragmentAndCodecFromOrder(
+                  this.alias,
+                  this.getOrderBy()[select.orderIndex],
+                  mutualCodec,
+                )[1]
               : select.codec;
           return sql`${
             codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
@@ -1372,14 +1448,18 @@ order by${sql.indent`
 ${
   this.orders.length
     ? sql`${sql.join(
-        this.orders.map(
-          (o) =>
-            sql`${o.fragment} ${
-              Number(o.direction === "DESC") ^ Number(reverse)
-                ? sql`desc`
-                : sql`asc`
-            }`,
-        ),
+        this.orders.map((o) => {
+          const [frag] = getFragmentAndCodecFromOrder(
+            this.alias,
+            o,
+            mutualCodec,
+          );
+          return sql`${frag} ${
+            Number(o.direction === "DESC") ^ Number(reverse)
+              ? sql`desc`
+              : sql`asc`
+          }`;
+        }),
         ",\n",
       )},\n`
     : sql.blank

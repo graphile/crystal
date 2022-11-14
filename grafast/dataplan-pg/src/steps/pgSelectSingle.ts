@@ -19,6 +19,7 @@ import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectMode } from "./pgSelect.js";
+import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
@@ -495,7 +496,14 @@ export class PgSelectSingleStep<
     const orders = classPlan.getOrderBy();
     const step = list(
       orders.length > 0
-        ? orders.map((o) => this.expression(o.fragment, o.codec))
+        ? orders.map((o) => {
+            const [frag, codec] = getFragmentAndCodecFromOrder(
+              this.getClassStep().alias,
+              o,
+              this.getClassStep().source.codec,
+            );
+            return this.expression(frag, codec);
+          })
         : // No ordering; so use row number
           [this.expression(sql`row_number() over (partition by 1)`, TYPES.int)],
     );
