@@ -56,6 +56,10 @@ import type {
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
+import type {
+  PgHavingConditionSpec,
+  PgWhereConditionSpec,
+} from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
@@ -989,13 +993,31 @@ export class PgSelectStep<
     return $plan;
   }
 
-  where(condition: SQL): void {
+  where(condition: PgWhereConditionSpec<keyof TColumns & string>): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
     }
-    this.conditions.push(condition);
+    if (sql.isSQL(condition)) {
+      this.conditions.push(condition);
+    } else {
+      switch (condition.type) {
+        case "attribute": {
+          this.conditions.push(
+            condition.callback(
+              sql`${this.alias}.${sql.identifier(condition.attribute)}`,
+            ),
+          );
+          break;
+        }
+        default: {
+          const never: never = condition;
+          console.error("Unsupported condition: ", never);
+          throw new Error(`Unsupported condition`);
+        }
+      }
+    }
   }
 
   wherePlan(): PgConditionStep<this> {
@@ -1027,7 +1049,7 @@ export class PgSelectStep<
     return new PgConditionStep(this, true);
   }
 
-  having(condition: SQL): void {
+  having(condition: PgHavingConditionSpec<keyof TColumns & string>): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('having')`,
@@ -1036,7 +1058,13 @@ export class PgSelectStep<
     if (this.mode !== "aggregate") {
       throw new Error(`Cannot add having to a non-aggregate query`);
     }
-    this.havingConditions.push(condition);
+    if (sql.isSQL(condition)) {
+      this.havingConditions.push(condition);
+    } else {
+      const never: never = condition;
+      console.error("Unsupported condition: ", never);
+      throw new Error(`Unsupported condition`);
+    }
   }
 
   orderBy(order: PgOrderSpec): void {
