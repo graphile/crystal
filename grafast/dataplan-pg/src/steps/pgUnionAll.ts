@@ -4,6 +4,7 @@ import type {
   __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
+  EdgeCapableStep,
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
@@ -201,7 +202,7 @@ type PgUnionAllPlaceholder = {
 
 export class PgUnionAllSingleStep
   extends ExecutableStep
-  implements PolymorphicStep
+  implements PolymorphicStep, EdgeCapableStep<any>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -266,6 +267,10 @@ export class PgUnionAllSingleStep
 
   public getClassStep(): PgUnionAllStep<string, string> {
     return (this.getDep(0) as any).getDep(0);
+  }
+
+  public node() {
+    return this;
   }
 
   /**
