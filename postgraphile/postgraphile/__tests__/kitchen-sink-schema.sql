@@ -1255,7 +1255,12 @@ create table polymorphic.people (
   username text not null unique
 );
 
-comment on table polymorphic.people is E'@unionMember PersonOrOrganization';
+comment on table polymorphic.people is $$
+  @unionMember PersonOrOrganization
+  @ref applications to:Application
+  @refVia applications via:aws_applications
+  @refVia applications via:gcp_applications
+  $$;
 
 create table polymorphic.organizations (
   organization_id serial primary key,
@@ -1392,6 +1397,8 @@ create table polymorphic.aws_applications (
   id int primary key,
   name text not null,
   last_deployed timestamptz,
+  person_id int references polymorphic.people,
+  organization_id int references polymorphic.organizations,
   aws_id text
 );
 
@@ -1399,6 +1406,8 @@ create table polymorphic.gcp_applications (
   id int primary key,
   name text not null,
   last_deployed timestamptz,
+  person_id int references polymorphic.people,
+  organization_id int references polymorphic.organizations,
   gcp_id text
 );
 
@@ -1451,6 +1460,7 @@ comment on type polymorphic.applications is $$
 @interface mode:union
 @name Application
 @ref vulnerabilities to:Vulnerability plural
+@ref owner to:UserOrOrganization singular
 $$;
 comment on column polymorphic.applications.id is '@notNull';
 comment on column polymorphic.applications.name is '@notNull';
@@ -1460,12 +1470,18 @@ comment on table polymorphic.aws_applications is $$
 @ref vulnerabilities to:Vulnerability plural
 @refVia vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)
 @refVia vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)
+@ref owner to:UserOrOrganization singular
+@refVia owner via:people
+@refVia owner via:organizations
 $$;
 comment on table polymorphic.gcp_applications is $$
 @implements Application
 @ref vulnerabilities to:Vulnerability plural
 @refVia vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)
 @refVia vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)
+@ref owner to:UserOrOrganization singular
+@refVia owner via:people
+@refVia owner via:organizations
 $$;
 
 comment on table polymorphic.aws_application_first_party_vulnerabilities is '@omit';

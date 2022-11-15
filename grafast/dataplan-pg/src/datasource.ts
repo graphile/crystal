@@ -32,6 +32,7 @@ import type {
 import { exportAs } from "./exportAs.js";
 import type {
   PgEnumTypeCodec,
+  PgRefDefinition,
   PgTypeCodec,
   PlanByUniques,
 } from "./interfaces.js";
@@ -194,14 +195,9 @@ export type PgSourceRefPath = PgSourceRefPathEntry[];
 export interface PgSourceRefExtensions {}
 
 export interface PgSourceRef {
-  graphqlType?: string;
-  singular?: boolean;
+  definition: PgRefDefinition;
   paths: Array<PgSourceRefPath>;
   extensions?: PgSourceRefExtensions;
-  singleRecordFieldName?: string;
-  listFieldName?: string;
-  connectionFieldName?: string;
-  // Could add extra details here
 }
 
 export interface PgSourceRefs {

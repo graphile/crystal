@@ -5,6 +5,8 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
+  PgRefDefinition,
+  PgSource,
   PgSourceRef,
   PgTypeCodec,
   PgTypeCodecPolymorphism,
@@ -361,7 +363,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 info.inflection.manyRelationConnection(relationDetails);
               const listFieldName =
                 info.inflection.manyRelationList(relationDetails);
-              const ref: PgSourceRef = {
+              const definition: PgRefDefinition = {
                 singular: relationSpec.isUnique,
                 singleRecordFieldName,
                 listFieldName,
@@ -371,6 +373,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     behavior,
                   },
                 },
+              };
+              const ref: PgSourceRef = {
+                definition,
                 paths: [
                   [
                     {

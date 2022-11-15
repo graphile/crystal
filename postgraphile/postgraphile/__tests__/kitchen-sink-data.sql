@@ -515,12 +515,12 @@ insert into polymorphic.relational_checklist_items (id, description, note)  valu
   (20, 'Garbage-collection of unused plans', null),
   (21, 'Supports newest GraphQL features', null);
 
-insert into polymorphic.aws_applications (id, name, last_deployed, aws_id) values
-  (1, 'AWS App 1', null, 'AWS-0001'),
-  (2, 'AWeSome', '2021-06-05T04:03:02.010Z', 'AWS-0002'); -- NO VULNERABILITIES!
-insert into polymorphic.gcp_applications (id, name, last_deployed, gcp_id) values
-  (1, 'GCP App 1', null, 'GCP_0_1'),
-  (2, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2');
+insert into polymorphic.aws_applications (id, person_id, organization_id, name, last_deployed, aws_id) values
+  (1, null, 1, 'AWS App 1', null, 'AWS-0001'),
+  (2, 2, null, 'AWeSome', '2021-06-05T04:03:02.010Z', 'AWS-0002'); -- NO VULNERABILITIES!
+insert into polymorphic.gcp_applications (id, person_id, organization_id, name, last_deployed, gcp_id) values
+  (1, null, 1, 'GCP App 1', null, 'GCP_0_1'),
+  (2, 3, null, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2');
 
 insert into polymorphic.first_party_vulnerabilities (id, name, cvss_score, team_name) values
   (1, 'Off-by-one', 3.0, 'Accounting'),

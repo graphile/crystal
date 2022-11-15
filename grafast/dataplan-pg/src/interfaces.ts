@@ -44,6 +44,19 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
   value: TFromPostgres,
 ) => TForJavaScript;
 
+export interface PgRefDefinitionExtensions {}
+export interface PgRefDefinition {
+  graphqlType?: string;
+  singular?: boolean;
+  extensions?: PgRefDefinitionExtensions;
+  singleRecordFieldName?: string;
+  listFieldName?: string;
+  connectionFieldName?: string;
+}
+export interface PgRefDefinitions {
+  [refName: string]: PgRefDefinition;
+}
+
 /**
  * Custom metadata for a codec
  */

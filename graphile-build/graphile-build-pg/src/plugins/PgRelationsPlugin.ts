@@ -796,7 +796,7 @@ function addRelations(
     }
 
     const typeName =
-      refSpec.graphqlType ??
+      refSpec.definition.graphqlType ??
       (hasExactlyOneCodec ? build.inflection.tableType(firstCodec) : null);
     if (!typeName) {
       continue;
@@ -807,7 +807,7 @@ function addRelations(
     }
 
     let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
-    if (refSpec.graphqlType) {
+    if (refSpec.definition.graphqlType) {
       // If this is a union/interface, can we find the associated codec?
 
       const scope = build.scopeByType.get(type) as
@@ -841,22 +841,22 @@ function addRelations(
     // TODO: shouldn't the ref behavior override the source behavior?
     const behavior =
       (hasExactlyOneSource ? getBehavior(firstSource.extensions) + " " : "") +
-      getBehavior(refSpec.extensions);
+      getBehavior(refSpec.definition.extensions);
 
     const connectionTypeName = sharedCodec
       ? build.inflection.tableConnectionType(sharedCodec)
       : build.inflection.connectionType(typeName);
 
     const singleRecordFieldName = build.inflection.refSingle({
-      ref: refSpec,
+      refDefinition: refSpec.definition,
       identifier,
     });
     const connectionFieldName = build.inflection.refConnection({
-      ref: refSpec,
+      refDefinition: refSpec.definition,
       identifier,
     });
     const listFieldName = build.inflection.refList({
-      ref: refSpec,
+      refDefinition: refSpec.definition,
       identifier,
     });
 
