@@ -1266,8 +1266,8 @@ comment on table polymorphic.organizations is E'@unionMember PersonOrOrganizatio
 
 create table polymorphic.log_entries (
   id serial primary key,
-  person_id int references polymorphic.people,
-  organization_id int references polymorphic.organizations,
+  person_id int references polymorphic.people on delete cascade,
+  organization_id int references polymorphic.organizations on delete cascade,
   text text not null,
   constraint owned_by_person_or_organization check ((person_id is null) <> (organization_id is null))
 );
