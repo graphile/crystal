@@ -1,0 +1,51 @@
+{
+  allPeople: {
+    edges: [
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "Cider brewing commencing",
+              id: 5,
+            },
+          ],
+          personId: 4,
+          username: "Dave",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 5,
+          username: "Ellie",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 6,
+          username: "Fred",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 7,
+          username: "Georgina",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "I'm moving to America",
+              id: 14,
+            },
+          ],
+          personId: 8,
+          username: "Harry",
+        },
+      },
+    ],
+  },
+}

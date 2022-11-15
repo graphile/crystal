@@ -412,7 +412,10 @@ insert into polymorphic.log_entries (id, person_id, organization_id, text) value
   (9, 2, null, 'Just a few more test fixtures to write, almost there!'),
   (10, null, 2, 'Rest in peace, Tony.'),
   (11, null, 6, 'Please can Alice report to Raccoon City for testing'),
-  (12, null, 8, 'Hello-o! Are you still there?');
+  (12, null, 8, 'Hello-o! Are you still there?'),
+  (13, 8, null, 'I''d like to introduce my wife'),
+  (14, 8, null, 'I''m moving to America');
+  
 
 insert into polymorphic.single_table_items 
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at,            color,   title, description, note) values
