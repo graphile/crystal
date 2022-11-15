@@ -1293,6 +1293,8 @@ function addRelations(
           `Adding '${identifier}' many relation connection field to ${Self.name}`,
           "recoverable",
         );
+      } else {
+        console.log(`Could not find connection type '${connectionTypeName}'`);
       }
     }
 
