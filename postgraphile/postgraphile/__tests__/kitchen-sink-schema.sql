@@ -1269,7 +1269,7 @@ create table polymorphic.log_entries (
   person_id int references polymorphic.people,
   organization_id int references polymorphic.organizations,
   text text not null,
-  constraint owned_by_person_or_organization check (person_id is null <> organization_id is null)
+  constraint owned_by_person_or_organization check ((person_id is null) <> (organization_id is null))
 );
 
 create type polymorphic.item_type as enum (
