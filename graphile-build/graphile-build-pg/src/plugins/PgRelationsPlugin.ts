@@ -631,17 +631,26 @@ function addRelations(
   } = source?.getRelations();
 
   // Don't use refs on mutation payloads
-  const refDefinitionList: Array<
-    [refName: string, refDefinition: PgRefDefinition, ref?: PgSourceRef]
-  > = isMutationPayload
+  const refDefinitionList: Array<{
+    refName: string;
+    refDefinition: PgRefDefinition;
+    ref?: PgSourceRef;
+    codec?: PgTypeCodec<any, any, any, any>;
+  }> = isMutationPayload
     ? []
     : source
-    ? Object.entries(source.refs).map(([refName, spec]) => [
+    ? Object.entries(source.refs).map(([refName, spec]) => ({
         refName,
-        spec.definition,
-        spec,
-      ])
-    : Object.entries(codec.extensions?.refDefinitions ?? {});
+        refDefinition: spec.definition,
+        ref: spec,
+      }))
+    : Object.entries(codec.extensions?.refDefinitions ?? {}).map(
+        ([refName, refDefinition]) => ({
+          refName,
+          refDefinition,
+          codec,
+        }),
+      );
 
   type Layer = {
     relationName: string;
@@ -795,7 +804,11 @@ function addRelations(
   }
 
   // Digest refs
-  for (const [identifier, refSpec, ref] of refDefinitionList) {
+  for (const {
+    refName: identifier,
+    refDefinition: refSpec,
+    ref,
+  } of refDefinitionList) {
     let hasReferencee;
     let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
     let behavior;
@@ -1133,6 +1146,26 @@ function addRelations(
       if (!typeName) {
         // TODO: remove this restriction
         throw new Error(`@ref on polymorphic type must declare to:TargetType`);
+      }
+      const type = build.getTypeByName(typeName);
+      if (!type) {
+        continue;
+      }
+
+      if (refSpec.graphqlType) {
+        // If this is a union/interface, can we find the associated codec?
+
+        const scope = build.scopeByType.get(type) as
+          | GraphileBuild.ScopeObject
+          | GraphileBuild.ScopeInterface
+          | GraphileBuild.ScopeUnion
+          | undefined
+          | null;
+        if (scope) {
+          if ("pgCodec" in scope) {
+            sharedCodec = scope.pgCodec;
+          }
+        }
       }
     }
 
