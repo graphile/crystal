@@ -16,7 +16,11 @@ import type {
   PgTypeColumn,
 } from "@dataplan/pg";
 import { ExecutableStep } from "grafast";
-import type { GraphQLInterfaceType, GraphQLNamedType } from "graphql";
+import type {
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  GraphQLObjectType,
+} from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -24,6 +28,10 @@ import {
   parseDatabaseIdentifierFromSmartTag,
   parseSmartTagsOptsString,
 } from "../utils.js";
+
+function isNotNullish<T>(v: T | null | undefined): v is T {
+  return v != null;
+}
 
 declare global {
   namespace GraphileConfig {
@@ -387,12 +395,22 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
           setGraphQLTypeForPgCodec,
         } = build;
+        const unionsToRegister = new Map<
+          string,
+          PgTypeCodec<any, any, any, any>[]
+        >();
         for (const codec of build.pgCodecMetaLookup.keys()) {
+          if (!codec.columns) {
+            // Only apply to codecs that define columns
+            continue;
+          }
+
+          // We're going to scan for interfaces, and then unions. Each block is
+          // separately recoverable so an interface failure doesn't cause
+          // unions to fail.
+
+          // Detect interface
           build.recoverable(null, () => {
-            if (!codec.columns) {
-              // Only apply to codecs that define columns
-              return;
-            }
             const polymorphism = codec.extensions?.polymorphism;
             if (!polymorphism) {
               // Don't build polymorphic types as objects
@@ -534,6 +552,46 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 });
               }
             }
+          });
+
+          // Detect union membership
+          build.recoverable(null, () => {
+            const rawUnionMember = codec.extensions?.tags?.unionMember;
+            if (rawUnionMember) {
+              const memberships = Array.isArray(rawUnionMember)
+                ? rawUnionMember
+                : [rawUnionMember];
+              for (const membership of memberships) {
+                // Register union
+                const unionName = membership.trim();
+                const list = unionsToRegister.get(unionName);
+                if (!list) {
+                  unionsToRegister.set(unionName, [codec]);
+                } else {
+                  list.push(codec);
+                }
+              }
+            }
+          });
+        }
+
+        for (const [unionName, codecs] of unionsToRegister.entries()) {
+          build.recoverable(null, () => {
+            build.registerUnionType(
+              unionName,
+              { isPgUnionMemberUnion: true },
+              () => ({
+                types: codecs
+                  .map(
+                    (codec) =>
+                      build.getTypeByName(build.inflection.tableType(codec)) as
+                        | GraphQLObjectType
+                        | undefined,
+                  )
+                  .filter(isNotNullish),
+              }),
+              "PgPolymorphismPlugin @unionMember unions",
+            );
           });
         }
         return _;

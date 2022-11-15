@@ -43,6 +43,7 @@ export interface PgTypeCodecTags extends PgSmartTagsDict {
   implements: string | string[];
   interface: string;
   name: string;
+  unionMember: string | string[];
 }
 
 export interface PgSmartTagsDict {

@@ -15,10 +15,6 @@ import {
   parseSmartTagsOptsString,
 } from "../utils.js";
 
-function isNotNullish<T>(a: T | null | undefined): a is T {
-  return a != null;
-}
-
 declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
@@ -165,16 +161,27 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             );
           }
           const relevantVias = refVias.filter((v) => v.args[0] === name);
-          const vias = [
-            ...(rawVia ? [rawVia] : []),
-            ...relevantVias.map((v) => v.params.via).filter(isNotNullish),
-          ];
+          const relevantViaStrings = relevantVias
+            .map((v) => v.params.via)
+            .filter((via): via is string => {
+              if (!via) {
+                console.warn(
+                  `Invalid '@refVia' detected on '${
+                    pgClass.getNamespace()!.nspname
+                  }.${pgClass.relname}'; no 'via:' parameter.`,
+                );
+                return false;
+              } else {
+                return true;
+              }
+            });
+          const vias = [...(rawVia ? [rawVia] : []), ...relevantViaStrings];
 
           const paths: PgSourceRefPath[] = [];
 
           if (vias.length === 0) {
             if (!tags.interface) {
-              console.warn(`@ref ${name} has no 'via' on ${source.name}`);
+              console.warn(`@ref ${name} has no valid 'via' on ${source.name}`);
             }
             continue;
           }

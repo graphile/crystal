@@ -181,7 +181,9 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
           } else if (char === ":") {
             if (mode !== MODE.PARAM_NAME) {
               throw new Error(
-                'The colon character (":") may not occur here; please put it in quote marks',
+                `The colon character (":") may not occur here; please put it in quote marks. (Processing ${JSON.stringify(
+                  optsString,
+                )} with ${leading} leading params)`,
               );
             } else {
               name = str;

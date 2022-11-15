@@ -12,7 +12,11 @@ import type {
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";
-import { PgSourceBuilder, pgUnionAll } from "@dataplan/pg";
+import {
+  PgSourceBuilder,
+  pgUnionAll,
+  PgUnionAllSingleStep,
+} from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import {
   arraysMatch,
@@ -1037,6 +1041,7 @@ function addRelations(
           }
           return EXPORTABLE(
             (
+                PgUnionAllSingleStep,
                 attributes,
                 connection,
                 first,
@@ -1078,12 +1083,13 @@ function addRelations(
                 if (isConnection) {
                   return connection($list);
                 } else if (single) {
-                  return first($list);
+                  return new PgUnionAllSingleStep($list, first($list));
                 } else {
                   return $list;
                 }
               },
             [
+              PgUnionAllSingleStep,
               attributes,
               connection,
               first,

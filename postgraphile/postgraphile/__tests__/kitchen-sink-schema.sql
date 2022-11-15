@@ -1272,6 +1272,12 @@ create table polymorphic.log_entries (
   constraint owned_by_person_or_organization check ((person_id is null) <> (organization_id is null))
 );
 
+comment on table polymorphic.log_entries is $$
+  @ref author to:PersonOrOrganization
+  @refVia author via:people
+  @refVia author via:organizations
+  $$;
+
 create type polymorphic.item_type as enum (
   'TOPIC',
   'POST',

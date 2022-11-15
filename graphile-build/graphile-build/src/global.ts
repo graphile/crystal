@@ -549,7 +549,9 @@ declare global {
       Self: GraphQLInterfaceType;
     }
 
-    interface ScopeUnion extends Scope {}
+    interface ScopeUnion extends Scope {
+      isPgUnionMemberUnion?: boolean;
+    }
     interface ContextUnion extends Context {
       scope: ScopeUnion;
       type: "GraphQLUnionType";
