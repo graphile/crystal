@@ -2,6 +2,11 @@ interface Application {
   id: Int!
   lastDeployed: Datetime
   name: String!
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `Application`.
+  """
+  owner: PersonOrOrganization
 }
 
 """
@@ -67,6 +72,21 @@ type AwsApplication implements Application & Node {
   """
   nodeId: ID!
 
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `AwsApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+  personId: Int
+
   """Reads and enables pagination through a set of `Vulnerability`."""
   vulnerabilities(
     """Read all values in the set after (below) this cursor."""
@@ -113,6 +133,12 @@ input AwsApplicationCondition {
 
   """Checks for equality with the object’s `name` field."""
   name: String
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
 }
 
 """An input for mutations affecting `AwsApplication`"""
@@ -121,6 +147,8 @@ input AwsApplicationInput {
   id: Int!
   lastDeployed: Datetime
   name: String!
+  organizationId: Int
+  personId: Int
 }
 
 """
@@ -131,6 +159,8 @@ input AwsApplicationPatch {
   id: Int
   lastDeployed: Datetime
   name: String
+  organizationId: Int
+  personId: Int
 }
 
 """A connection to a list of `AwsApplication` values."""
@@ -170,6 +200,10 @@ enum AwsApplicationsOrderBy {
   NAME_ASC
   NAME_DESC
   NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -209,6 +243,14 @@ type CreateAwsApplicationPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -279,6 +321,14 @@ type CreateGcpApplicationPayload {
     """The method to use when ordering `GcpApplication`."""
     orderBy: [GcpApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): GcpApplicationsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -684,6 +734,14 @@ type DeleteAwsApplicationPayload {
   deletedAwsApplicationId: ID
 
   """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
@@ -778,6 +836,14 @@ type DeleteGcpApplicationPayload {
     """The method to use when ordering `GcpApplication`."""
     orderBy: [GcpApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): GcpApplicationsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1398,6 +1464,21 @@ type GcpApplication implements Application & Node {
   """
   nodeId: ID!
 
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `GcpApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+  personId: Int
+
   """Reads and enables pagination through a set of `Vulnerability`."""
   vulnerabilities(
     """Read all values in the set after (below) this cursor."""
@@ -1444,6 +1525,12 @@ input GcpApplicationCondition {
 
   """Checks for equality with the object’s `name` field."""
   name: String
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
 }
 
 """An input for mutations affecting `GcpApplication`"""
@@ -1452,6 +1539,8 @@ input GcpApplicationInput {
   id: Int!
   lastDeployed: Datetime
   name: String!
+  organizationId: Int
+  personId: Int
 }
 
 """
@@ -1462,6 +1551,8 @@ input GcpApplicationPatch {
   id: Int
   lastDeployed: Datetime
   name: String
+  organizationId: Int
+  personId: Int
 }
 
 """A connection to a list of `GcpApplication` values."""
@@ -1501,6 +1592,10 @@ enum GcpApplicationsOrderBy {
   NAME_ASC
   NAME_DESC
   NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -1555,10 +1650,6 @@ enum LogEntriesOrderBy {
 }
 
 type LogEntry implements Node {
-  """
-  Reads a single `PersonOrOrganization` that is related to this `LogEntry`.
-  """
-  author: PersonOrOrganization
   id: Int!
 
   """
@@ -2170,6 +2261,64 @@ interface Node {
 }
 
 type Organization implements Node {
+  """Reads and enables pagination through a set of `AwsApplication`."""
+  awsApplicationsByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AwsApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsConnection!
+
+  """Reads and enables pagination through a set of `GcpApplication`."""
+  gcpApplicationsByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GcpApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsConnection!
+
   """Reads and enables pagination through a set of `LogEntry`."""
   logEntriesByOrganizationId(
     """Read all values in the set after (below) this cursor."""
@@ -2323,6 +2472,93 @@ enum PeopleOrderBy {
 }
 
 type Person implements Node {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+
+  """Reads and enables pagination through a set of `AwsApplication`."""
+  awsApplicationsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AwsApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsConnection!
+
+  """Reads and enables pagination through a set of `GcpApplication`."""
+  gcpApplicationsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GcpApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsConnection!
+
   """Reads and enables pagination through a set of `LogEntry`."""
   logEntriesByPersonId(
     """Read all values in the set after (below) this cursor."""
@@ -4197,11 +4433,6 @@ type SingleTableChecklist implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
-
-  """
-  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
-  """
-  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4255,11 +4486,6 @@ type SingleTableChecklistItem implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
-
-  """
-  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklistItem`.
-  """
-  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4311,11 +4537,6 @@ type SingleTableDivider implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
-
-  """
-  Reads a single `SingleTableTopic` that is related to this `SingleTableDivider`.
-  """
-  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4367,11 +4588,6 @@ interface SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
-
-  """
-  Reads a single `SingleTableTopic` that is related to this `SingleTableItem`.
-  """
-  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4509,11 +4725,6 @@ type SingleTablePost implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
-
-  """
-  Reads a single `SingleTableTopic` that is related to this `SingleTablePost`.
-  """
-  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4565,11 +4776,6 @@ type SingleTableTopic implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
-
-  """
-  Reads a single `SingleTableTopic` that is related to this `SingleTableTopic`.
-  """
-  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4781,6 +4987,14 @@ type UpdateAwsApplicationPayload {
   clientMutationId: String
 
   """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
@@ -4893,6 +5107,14 @@ type UpdateGcpApplicationPayload {
     """The method to use when ordering `GcpApplication`."""
     orderBy: [GcpApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): GcpApplicationsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
