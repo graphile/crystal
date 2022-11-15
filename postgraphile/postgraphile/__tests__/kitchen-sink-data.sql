@@ -48,7 +48,9 @@ delete from polymorphic.relational_posts cascade;
 delete from polymorphic.relational_topics cascade;
 delete from polymorphic.relational_items cascade;
 delete from polymorphic.single_table_items cascade;
+delete from polymorphic.log_entries cascade;
 delete from polymorphic.people cascade;
+delete from polymorphic.organizations cascade;
 
 alter table b.types enable trigger user;
 
