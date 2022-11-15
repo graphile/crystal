@@ -586,14 +586,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               unionName,
               { isPgUnionMemberUnion: true },
               () => ({
-                types: codecs
-                  .map(
-                    (codec) =>
-                      build.getTypeByName(build.inflection.tableType(codec)) as
-                        | GraphQLObjectType
-                        | undefined,
-                  )
-                  .filter(isNotNullish),
+                types: () =>
+                  codecs
+                    .map(
+                      (codec) =>
+                        build.getTypeByName(
+                          build.inflection.tableType(codec),
+                        ) as GraphQLObjectType | undefined,
+                    )
+                    .filter(isNotNullish),
               }),
               "PgPolymorphismPlugin @unionMember unions",
             );

@@ -3,8 +3,10 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgRefDefinition,
   PgSelectSingleStep,
   PgSource,
+  PgSourceRef,
   PgSourceRefPath,
   PgSourceRefs,
   PgSourceRelation,
@@ -618,20 +620,28 @@ function addRelations(
     pgTypeSource ??
     build.input.pgSources.find((s) => s.codec === codec && !s.parameters) ??
     build.input.pgSources.find((s) => s.codec === codec && s.isUnique);
-  if (!source) {
+  if (!source && !codec.extensions?.refDefinitions) {
     return fields;
   }
-  if (source.parameters && !source.isUnique) {
+  if (source && source.parameters && !source.isUnique) {
     return fields;
   }
   const relations: {
     [identifier: string]: PgSourceRelation<any, any>;
-  } = source.getRelations();
+  } = source?.getRelations();
 
   // Don't use refs on mutation payloads
-  const refs: PgSourceRefs = isMutationPayload ? {} : source.refs;
-
-  // TODO: support refs on "@interface type:union" codecs
+  const refDefinitionList: Array<
+    [refName: string, refDefinition: PgRefDefinition, ref?: PgSourceRef]
+  > = isMutationPayload
+    ? []
+    : source
+    ? Object.entries(source.refs).map(([refName, spec]) => [
+        refName,
+        spec.definition,
+        spec,
+      ])
+    : Object.entries(codec.extensions?.refDefinitions ?? {});
 
   type Layer = {
     relationName: string;
@@ -642,6 +652,9 @@ function addRelations(
   };
 
   const resolvePath = (path: PgSourceRefPath) => {
+    if (!source) {
+      throw new Error(`Cannot call resolvePath unless there's a source`);
+    }
     const result = {
       source: source,
       hasReferencee: false,
@@ -707,254 +720,252 @@ function addRelations(
 
   const digests: Digest[] = [];
 
-  // Digest relations
-  for (const [identifier, relation] of Object.entries(relations)) {
-    const {
-      localColumns,
-      remoteColumns,
-      source: otherSourceOrBuilder,
-      extensions,
-      isReferencee,
-    } = relation;
-    if (isMutationPayload && isReferencee) {
-      // Don't add backwards relations to mutation payloads
-      continue;
+  if (source) {
+    // Digest relations
+    for (const [identifier, relation] of Object.entries(relations)) {
+      const {
+        localColumns,
+        remoteColumns,
+        source: otherSourceOrBuilder,
+        extensions,
+        isReferencee,
+      } = relation;
+      if (isMutationPayload && isReferencee) {
+        // Don't add backwards relations to mutation payloads
+        continue;
+      }
+      const otherSource =
+        otherSourceOrBuilder instanceof PgSourceBuilder
+          ? otherSourceOrBuilder.get()
+          : otherSourceOrBuilder;
+      // The behavior is the relation behavior PLUS the remote table
+      // behavior. But the relation settings win.
+      const behavior =
+        getBehavior(otherSource.extensions) + " " + getBehavior(extensions);
+      const otherCodec = otherSource.codec;
+      const typeName = build.inflection.tableType(otherCodec);
+      const connectionTypeName =
+        build.inflection.tableConnectionType(otherCodec);
+
+      const deprecationReason =
+        tagToString(relation.extensions?.tags?.deprecated) ??
+        tagToString(relation.source.extensions?.tags?.deprecated);
+
+      const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
+        source,
+        codec,
+        identifier,
+        relation,
+      };
+
+      const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
+        localColumns as string[],
+        remoteColumns as string[],
+        otherSource,
+        isMutationPayload ?? false,
+      );
+      const singleRecordFieldName = relationDetails.relation.isReferencee
+        ? build.inflection.singleRelationBackwards(relationDetails)
+        : build.inflection.singleRelation(relationDetails);
+      const connectionFieldName =
+        build.inflection.manyRelationConnection(relationDetails);
+      const listFieldName = build.inflection.manyRelationList(relationDetails);
+      const digest: Digest = {
+        identifier,
+        isReferencee: relation.isReferencee ?? false,
+        behavior,
+        isUnique: relation.isUnique,
+        typeName,
+        connectionTypeName,
+        deprecationReason,
+        singleRecordPlan,
+        listPlan,
+        connectionPlan,
+        singleRecordFieldName,
+        listFieldName,
+        connectionFieldName,
+        description: relation.description,
+        pgSource: otherSource,
+        pgCodec: otherSource.codec,
+        pgRelationDetails: relationDetails,
+        relatedTypeName: build.inflection.tableType(codec),
+      };
+      digests.push(digest);
     }
-    const otherSource =
-      otherSourceOrBuilder instanceof PgSourceBuilder
-        ? otherSourceOrBuilder.get()
-        : otherSourceOrBuilder;
-    // The behavior is the relation behavior PLUS the remote table
-    // behavior. But the relation settings win.
-    const behavior =
-      getBehavior(otherSource.extensions) + " " + getBehavior(extensions);
-    const otherCodec = otherSource.codec;
-    const typeName = build.inflection.tableType(otherCodec);
-    const connectionTypeName = build.inflection.tableConnectionType(otherCodec);
-
-    const deprecationReason =
-      tagToString(relation.extensions?.tags?.deprecated) ??
-      tagToString(relation.source.extensions?.tags?.deprecated);
-
-    const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
-      source,
-      codec,
-      identifier,
-      relation,
-    };
-
-    const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
-      localColumns as string[],
-      remoteColumns as string[],
-      otherSource,
-      isMutationPayload ?? false,
-    );
-    const singleRecordFieldName = relationDetails.relation.isReferencee
-      ? build.inflection.singleRelationBackwards(relationDetails)
-      : build.inflection.singleRelation(relationDetails);
-    const connectionFieldName =
-      build.inflection.manyRelationConnection(relationDetails);
-    const listFieldName = build.inflection.manyRelationList(relationDetails);
-    const digest: Digest = {
-      identifier,
-      isReferencee: relation.isReferencee ?? false,
-      behavior,
-      isUnique: relation.isUnique,
-      typeName,
-      connectionTypeName,
-      deprecationReason,
-      singleRecordPlan,
-      listPlan,
-      connectionPlan,
-      singleRecordFieldName,
-      listFieldName,
-      connectionFieldName,
-      description: relation.description,
-      pgSource: otherSource,
-      pgCodec: otherSource.codec,
-      pgRelationDetails: relationDetails,
-      relatedTypeName: build.inflection.tableType(codec),
-    };
-    digests.push(digest);
   }
 
   // Digest refs
-  for (const [identifier, refSpec] of Object.entries(refs)) {
-    const paths = refSpec.paths.map(resolvePath);
-    if (paths.length === 0) continue;
-    const firstSource = paths[0].source;
-    const hasExactlyOneSource = paths.every((p) => p.source === firstSource);
-    const firstCodec = firstSource.codec;
-    const hasExactlyOneCodec = paths.every(
-      (p) => p.source.codec === firstCodec,
-    );
-    const hasReferencee = paths.some((p) => p.hasReferencee);
-
-    if (isMutationPayload && (paths.length !== 1 || hasReferencee)) {
-      // Don't add backwards relations to mutation payloads
-      continue;
-    }
-
-    const typeName =
-      refSpec.definition.graphqlType ??
-      (hasExactlyOneCodec ? build.inflection.tableType(firstCodec) : null);
-    if (!typeName) {
-      continue;
-    }
-    const type = build.getTypeByName(typeName);
-    if (!type) {
-      continue;
-    }
-
+  for (const [identifier, refSpec, ref] of refDefinitionList) {
+    let hasReferencee;
     let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
-    if (refSpec.definition.graphqlType) {
-      // If this is a union/interface, can we find the associated codec?
+    let behavior;
+    let typeName;
+    let singleRecordPlan;
+    let listPlan;
+    let connectionPlan;
+    if (ref && source) {
+      const paths = ref.paths.map(resolvePath);
+      if (paths.length === 0) continue;
+      const firstSource = paths[0].source;
+      const hasExactlyOneSource = paths.every((p) => p.source === firstSource);
+      const firstCodec = firstSource.codec;
+      const hasExactlyOneCodec = paths.every(
+        (p) => p.source.codec === firstCodec,
+      );
+      hasReferencee = paths.some((p) => p.hasReferencee);
 
-      const scope = build.scopeByType.get(type) as
-        | GraphileBuild.ScopeObject
-        | GraphileBuild.ScopeInterface
-        | GraphileBuild.ScopeUnion
-        | undefined
-        | null;
-      if (scope) {
-        if ("pgCodec" in scope) {
-          sharedCodec = scope.pgCodec;
-        }
+      if (isMutationPayload && (paths.length !== 1 || hasReferencee)) {
+        // Don't add backwards relations to mutation payloads
+        continue;
       }
-    } else if (hasExactlyOneCodec) {
-      sharedCodec = firstCodec;
-    }
 
-    // TODO: if there's only one path do we still need union?
-    const needsPgUnionAll =
-      sharedCodec?.extensions?.polymorphism?.mode === "union" ||
-      paths.length > 1;
+      typeName =
+        refSpec.graphqlType ??
+        (hasExactlyOneCodec ? build.inflection.tableType(firstCodec) : null);
+      if (!typeName) {
+        continue;
+      }
+      const type = build.getTypeByName(typeName);
+      if (!type) {
+        continue;
+      }
 
-    // If we're pulling from a shared codec into a PgUnionAllStep then we can
-    // use that codec's columns as shared attributes; otherwise there are not
-    // shared attributes (equivalent to a GraphQL union).
-    const unionAttributes: PgUnionAllStepConfigAttributes<any> | undefined =
-      sharedCodec?.columns;
+      if (refSpec.graphqlType) {
+        // If this is a union/interface, can we find the associated codec?
 
-    const isUnique = paths.every((p) => p.isUnique);
+        const scope = build.scopeByType.get(type) as
+          | GraphileBuild.ScopeObject
+          | GraphileBuild.ScopeInterface
+          | GraphileBuild.ScopeUnion
+          | undefined
+          | null;
+        if (scope) {
+          if ("pgCodec" in scope) {
+            sharedCodec = scope.pgCodec;
+          }
+        }
+      } else if (hasExactlyOneCodec) {
+        sharedCodec = firstCodec;
+      }
 
-    // TODO: shouldn't the ref behavior override the source behavior?
-    const behavior =
-      (hasExactlyOneSource ? getBehavior(firstSource.extensions) + " " : "") +
-      getBehavior(refSpec.definition.extensions);
+      // TODO: if there's only one path do we still need union?
+      const needsPgUnionAll =
+        sharedCodec?.extensions?.polymorphism?.mode === "union" ||
+        paths.length > 1;
 
-    const connectionTypeName = sharedCodec
-      ? build.inflection.tableConnectionType(sharedCodec)
-      : build.inflection.connectionType(typeName);
+      // If we're pulling from a shared codec into a PgUnionAllStep then we can
+      // use that codec's columns as shared attributes; otherwise there are not
+      // shared attributes (equivalent to a GraphQL union).
+      const unionAttributes: PgUnionAllStepConfigAttributes<any> | undefined =
+        sharedCodec?.columns;
 
-    const singleRecordFieldName = build.inflection.refSingle({
-      refDefinition: refSpec.definition,
-      identifier,
-    });
-    const connectionFieldName = build.inflection.refConnection({
-      refDefinition: refSpec.definition,
-      identifier,
-    });
-    const listFieldName = build.inflection.refList({
-      refDefinition: refSpec.definition,
-      identifier,
-    });
+      // const isUnique = paths.every((p) => p.isUnique);
 
-    // Shortcut simple relation alias
-    const { singleRecordPlan, listPlan, connectionPlan } = (() => {
-      // Add forbidden names here
+      // TODO: shouldn't the ref behavior override the source behavior?
+      behavior =
+        (hasExactlyOneSource ? getBehavior(firstSource.extensions) + " " : "") +
+        getBehavior(refSpec.extensions);
 
-      if (refSpec.paths.length === 1 && refSpec.paths[0].length === 1) {
-        const relation: PgSourceRelation<any, any> = source.getRelation(
-          refSpec.paths[0][0].relationName,
-        );
-        const otherSource =
-          relation.source instanceof PgSourceBuilder
-            ? relation.source.get()
-            : relation.source;
-        return makeRelationPlans(
-          relation.localColumns as string[],
-          relation.remoteColumns as string[],
-          otherSource,
-          isMutationPayload ?? false,
-        );
-      } else if (!needsPgUnionAll) {
-        // Definitely just one chain
-        const path = paths[0];
-        const makePlanResolver = (
-          mode: "singleRecord" | "list" | "connection",
-        ) => {
-          const single = mode === "singleRecord";
-          const isConnection = mode === "connection";
-          try {
-            const idents = new Idents();
-            idents.forbid([
-              "$list",
-              "$in",
-              "$record",
-              "$entry",
-              "$tuple",
-              "list",
-              "sql",
-            ]);
+      // Shortcut simple relation alias
+      ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
+        // Add forbidden names here
 
-            const functionLines: string[] = [];
-            if (isMutationPayload) {
-              functionLines.push(`return ($in) => {`);
-              functionLines.push(`  const $record = $in.get("result");`);
-            } else {
-              functionLines.push(`return ($record) => {`);
-            }
+        if (ref.paths.length === 1 && ref.paths[0].length === 1) {
+          const relation: PgSourceRelation<any, any> = source.getRelation(
+            ref.paths[0][0].relationName,
+          );
+          const otherSource =
+            relation.source instanceof PgSourceBuilder
+              ? relation.source.get()
+              : relation.source;
+          return makeRelationPlans(
+            relation.localColumns as string[],
+            relation.remoteColumns as string[],
+            otherSource,
+            isMutationPayload ?? false,
+          );
+        } else if (!needsPgUnionAll) {
+          // Definitely just one chain
+          const path = paths[0];
+          const makePlanResolver = (
+            mode: "singleRecord" | "list" | "connection",
+          ) => {
+            const single = mode === "singleRecord";
+            const isConnection = mode === "connection";
+            try {
+              const idents = new Idents();
+              idents.forbid([
+                "$list",
+                "$in",
+                "$record",
+                "$entry",
+                "$tuple",
+                "list",
+                "sql",
+              ]);
 
-            let previousIdentifier = "$record";
-            const argNames: string[] = ["list", "object", "connection", "sql"];
-            const argValues: any[] = [list, object, connection, sql];
-            let isStillSingular = true;
-            for (let i = 0, l = path.layers.length; i < l; i++) {
-              const layer = path.layers[i];
-              const { localColumns, remoteColumns, source, isUnique } = layer;
-              if (
-                !(
-                  localColumns.every(isSafeObjectPropertyName) &&
-                  remoteColumns.every(isSafeObjectPropertyName)
-                )
-              ) {
-                throw new Error(
-                  "Unsafe identifier found, falling back to slow mode",
-                );
-              }
-              const sourceName = idents.makeSafeIdentifier(
-                `${source.name}Source`,
-              );
-              argNames.push(sourceName);
-              argValues.push(source);
-              if (isStillSingular) {
-                if (!isUnique) {
-                  isStillSingular = false;
-                }
-                const newIdentifier = idents.makeSafeIdentifier(
-                  `$${
-                    isUnique
-                      ? build.inflection.singularize(source.name)
-                      : build.inflection.pluralize(source.name)
-                  }`,
-                );
-                const specString = makeSpecString(
-                  previousIdentifier,
-                  localColumns,
-                  remoteColumns,
-                );
-                functionLines.push(
-                  `  const ${newIdentifier} = ${sourceName}.${
-                    isUnique ? "get" : "find"
-                  }(${specString});`,
-                );
-                previousIdentifier = newIdentifier;
+              const functionLines: string[] = [];
+              if (isMutationPayload) {
+                functionLines.push(`return ($in) => {`);
+                functionLines.push(`  const $record = $in.get("result");`);
               } else {
-                const newIdentifier = idents.makeSafeIdentifier(
-                  `$${build.inflection.pluralize(source.name)}`,
+                functionLines.push(`return ($record) => {`);
+              }
+
+              let previousIdentifier = "$record";
+              const argNames: string[] = [
+                "list",
+                "object",
+                "connection",
+                "sql",
+              ];
+              const argValues: any[] = [list, object, connection, sql];
+              let isStillSingular = true;
+              for (let i = 0, l = path.layers.length; i < l; i++) {
+                const layer = path.layers[i];
+                const { localColumns, remoteColumns, source, isUnique } = layer;
+                if (
+                  !(
+                    localColumns.every(isSafeObjectPropertyName) &&
+                    remoteColumns.every(isSafeObjectPropertyName)
+                  )
+                ) {
+                  throw new Error(
+                    "Unsafe identifier found, falling back to slow mode",
+                  );
+                }
+                const sourceName = idents.makeSafeIdentifier(
+                  `${source.name}Source`,
                 );
-                /*
+                argNames.push(sourceName);
+                argValues.push(source);
+                if (isStillSingular) {
+                  if (!isUnique) {
+                    isStillSingular = false;
+                  }
+                  const newIdentifier = idents.makeSafeIdentifier(
+                    `$${
+                      isUnique
+                        ? build.inflection.singularize(source.name)
+                        : build.inflection.pluralize(source.name)
+                    }`,
+                  );
+                  const specString = makeSpecString(
+                    previousIdentifier,
+                    localColumns,
+                    remoteColumns,
+                  );
+                  functionLines.push(
+                    `  const ${newIdentifier} = ${sourceName}.${
+                      isUnique ? "get" : "find"
+                    }(${specString});`,
+                  );
+                  previousIdentifier = newIdentifier;
+                } else {
+                  const newIdentifier = idents.makeSafeIdentifier(
+                    `$${build.inflection.pluralize(source.name)}`,
+                  );
+                  /*
             const tupleIdentifier = makeSafeIdentifier(
               `${previousIdentifier}Tuples`,
             );
@@ -968,79 +979,129 @@ function addRelations(
             );
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
-                const specString = makeSpecString(
-                  "$entry",
-                  localColumns,
-                  remoteColumns,
-                );
+                  const specString = makeSpecString(
+                    "$entry",
+                    localColumns,
+                    remoteColumns,
+                  );
+                  functionLines.push(
+                    `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
+                  );
+                  previousIdentifier = newIdentifier;
+                }
+              }
+
+              if (isStillSingular && !single) {
                 functionLines.push(
-                  `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
+                  `  const $list = list([${previousIdentifier}]);`,
                 );
-                previousIdentifier = newIdentifier;
+                previousIdentifier = "$list";
+              }
+
+              if (isConnection) {
+                functionLines.push(
+                  `  return connection(${previousIdentifier});`,
+                );
+              } else {
+                functionLines.push(`  return ${previousIdentifier};`);
+              }
+              functionLines.push(`}`);
+              const functionBody = functionLines.join("\n");
+              return new Function(...argNames, functionBody)(...argValues);
+            } catch (e) {
+              console.error(e);
+              // TODO: fallback if unsafe
+              throw new Error(
+                "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: implement slow mode when identifiers are not JSON-to-JS-safe (or expand the definition of JSON-to-JS safe)",
+              );
+            }
+          };
+          const singleRecordPlan = makePlanResolver("singleRecord");
+          const listPlan = makePlanResolver("list");
+          const connectionPlan = makePlanResolver("connection");
+          return { singleRecordPlan, listPlan, connectionPlan };
+        } else {
+          const makePlanResolver = (
+            mode: "singleRecord" | "list" | "connection",
+          ) => {
+            const single = mode === "singleRecord";
+            const isConnection = mode === "connection";
+            const attributes: PgUnionAllStepConfigAttributes<string> =
+              unionAttributes ?? {};
+            const sourceByTypeName: {
+              [typeName: string]: PgSource<any, any, any, any>;
+            } = Object.create(null);
+            const members: PgUnionAllStepMember<string>[] = [];
+            for (const path of paths) {
+              const [firstLayer, ...rest] = path.layers;
+              const memberPath: PgSourceRefPath = [];
+              let finalSource = firstLayer.source;
+              for (const layer of rest) {
+                const { relationName } = layer;
+                memberPath!.push({ relationName });
+                finalSource = layer.source;
+              }
+              const typeName = build.inflection.tableType(finalSource.codec);
+              const member: PgUnionAllStepMember<string> = {
+                source: firstLayer.source,
+                typeName,
+                path: memberPath,
+              };
+              members.push(member);
+              if (!sourceByTypeName[typeName]) {
+                sourceByTypeName[typeName] = finalSource;
               }
             }
-
-            if (isStillSingular && !single) {
-              functionLines.push(
-                `  const $list = list([${previousIdentifier}]);`,
-              );
-              previousIdentifier = "$list";
-            }
-
-            if (isConnection) {
-              functionLines.push(`  return connection(${previousIdentifier});`);
-            } else {
-              functionLines.push(`  return ${previousIdentifier};`);
-            }
-            functionLines.push(`}`);
-            const functionBody = functionLines.join("\n");
-            return new Function(...argNames, functionBody)(...argValues);
-          } catch (e) {
-            console.error(e);
-            // TODO: fallback if unsafe
-            throw new Error(
-              "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: implement slow mode when identifiers are not JSON-to-JS-safe (or expand the definition of JSON-to-JS safe)",
-            );
-          }
-        };
-        const singleRecordPlan = makePlanResolver("singleRecord");
-        const listPlan = makePlanResolver("list");
-        const connectionPlan = makePlanResolver("connection");
-        return { singleRecordPlan, listPlan, connectionPlan };
-      } else {
-        const makePlanResolver = (
-          mode: "singleRecord" | "list" | "connection",
-        ) => {
-          const single = mode === "singleRecord";
-          const isConnection = mode === "connection";
-          const attributes: PgUnionAllStepConfigAttributes<string> =
-            unionAttributes ?? {};
-          const sourceByTypeName: {
-            [typeName: string]: PgSource<any, any, any, any>;
-          } = Object.create(null);
-          const members: PgUnionAllStepMember<string>[] = [];
-          for (const path of paths) {
-            const [firstLayer, ...rest] = path.layers;
-            const memberPath: PgSourceRefPath = [];
-            let finalSource = firstLayer.source;
-            for (const layer of rest) {
-              const { relationName } = layer;
-              memberPath!.push({ relationName });
-              finalSource = layer.source;
-            }
-            const typeName = build.inflection.tableType(finalSource.codec);
-            const member: PgUnionAllStepMember<string> = {
-              source: firstLayer.source,
-              typeName,
-              path: memberPath,
-            };
-            members.push(member);
-            if (!sourceByTypeName[typeName]) {
-              sourceByTypeName[typeName] = finalSource;
-            }
-          }
-          return EXPORTABLE(
-            (
+            return EXPORTABLE(
+              (
+                  PgUnionAllSingleStep,
+                  attributes,
+                  connection,
+                  first,
+                  isConnection,
+                  isMutationPayload,
+                  members,
+                  paths,
+                  pgUnionAll,
+                  single,
+                  sourceByTypeName,
+                ) =>
+                ($parent: ExecutableStep<any>) => {
+                  const $record = isMutationPayload
+                    ? (
+                        $parent as ObjectStep<{
+                          result: PgSelectSingleStep<any, any, any, any>;
+                        }>
+                      ).get("result")
+                    : ($parent as PgSelectSingleStep<any, any, any, any>);
+                  for (let i = 0, l = paths.length; i < l; i++) {
+                    const path = paths[i];
+                    const firstLayer = path.layers[0];
+                    const member = members[i];
+                    member.match = firstLayer.localColumns.reduce(
+                      (memo, col, idx) => {
+                        memo[firstLayer.remoteColumns[idx]] = {
+                          step: $record.get(col),
+                        };
+                        return memo;
+                      },
+                      Object.create(null),
+                    );
+                  }
+                  const $list = pgUnionAll({
+                    attributes,
+                    sourceByTypeName,
+                    members,
+                  });
+                  if (isConnection) {
+                    return connection($list);
+                  } else if (single) {
+                    return new PgUnionAllSingleStep($list, first($list));
+                  } else {
+                    return $list;
+                  }
+                },
+              [
                 PgUnionAllSingleStep,
                 attributes,
                 connection,
@@ -1052,74 +1113,52 @@ function addRelations(
                 pgUnionAll,
                 single,
                 sourceByTypeName,
-              ) =>
-              ($parent: ExecutableStep<any>) => {
-                const $record = isMutationPayload
-                  ? (
-                      $parent as ObjectStep<{
-                        result: PgSelectSingleStep<any, any, any, any>;
-                      }>
-                    ).get("result")
-                  : ($parent as PgSelectSingleStep<any, any, any, any>);
-                for (let i = 0, l = paths.length; i < l; i++) {
-                  const path = paths[i];
-                  const firstLayer = path.layers[0];
-                  const member = members[i];
-                  member.match = firstLayer.localColumns.reduce(
-                    (memo, col, idx) => {
-                      memo[firstLayer.remoteColumns[idx]] = {
-                        step: $record.get(col),
-                      };
-                      return memo;
-                    },
-                    Object.create(null),
-                  );
-                }
-                const $list = pgUnionAll({
-                  attributes,
-                  sourceByTypeName,
-                  members,
-                });
-                if (isConnection) {
-                  return connection($list);
-                } else if (single) {
-                  return new PgUnionAllSingleStep($list, first($list));
-                } else {
-                  return $list;
-                }
-              },
-            [
-              PgUnionAllSingleStep,
-              attributes,
-              connection,
-              first,
-              isConnection,
-              isMutationPayload,
-              members,
-              paths,
-              pgUnionAll,
-              single,
-              sourceByTypeName,
-            ],
-          );
-        };
-        const singleRecordPlan = makePlanResolver("singleRecord");
-        const listPlan = makePlanResolver("list");
-        const connectionPlan = makePlanResolver("connection");
-        return {
-          singleRecordPlan,
-          listPlan,
-          connectionPlan,
-        };
+              ],
+            );
+          };
+          const singleRecordPlan = makePlanResolver("singleRecord");
+          const listPlan = makePlanResolver("list");
+          const connectionPlan = makePlanResolver("connection");
+          return {
+            singleRecordPlan,
+            listPlan,
+            connectionPlan,
+          };
+        }
+      })());
+    } else {
+      hasReferencee = false;
+      behavior = getBehavior(refSpec.extensions);
+      typeName = refSpec.graphqlType;
+      if (!typeName) {
+        // TODO: remove this restriction
+        throw new Error(`@ref on polymorphic type must declare to:TargetType`);
       }
-    })();
+    }
+
+    const connectionTypeName = sharedCodec
+      ? build.inflection.tableConnectionType(sharedCodec)
+      : build.inflection.connectionType(typeName);
+
+    const singleRecordFieldName = build.inflection.refSingle({
+      refDefinition: refSpec,
+      identifier,
+    });
+    const connectionFieldName = build.inflection.refConnection({
+      refDefinition: refSpec,
+      identifier,
+    });
+    const listFieldName = build.inflection.refList({
+      refDefinition: refSpec,
+      identifier,
+    });
 
     const digest: Digest = {
       identifier,
       isReferencee: hasReferencee,
       pgCodec: sharedCodec,
-      isUnique,
-      behavior,
+      isUnique: !!refSpec.singular,
+      behavior: behavior ?? "",
       typeName,
       connectionTypeName,
       singleRecordFieldName,
