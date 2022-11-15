@@ -78,7 +78,16 @@
       },
       {
         node: {
-          logEntriesByPersonIdList: [],
+          logEntriesByPersonIdList: [
+            {
+              text: "I'd like to introduce my wife",
+              id: 13,
+            },
+            {
+              text: "I'm moving to America",
+              id: 14,
+            },
+          ],
           personId: 8,
           username: "Harry",
         },
