@@ -1,0 +1,89 @@
+{
+  allPeople: {
+    edges: [
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "Please let me in",
+              id: 1,
+            },
+          ],
+          personId: 1,
+          username: "Alice",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiwxXQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "Just a few more test fixtures to write, almost there!",
+              id: 9,
+            },
+          ],
+          personId: 2,
+          username: "Benjie",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiwyXQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 3,
+          username: "Caroline",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiwzXQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "Beer brewing complete",
+              id: 4,
+            },
+            {
+              text: "Cider brewing commencing",
+              id: 5,
+            },
+          ],
+          personId: 4,
+          username: "Dave",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw0XQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 5,
+          username: "Ellie",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw1XQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 6,
+          username: "Fred",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw2XQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 7,
+          username: "Georgina",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw3XQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 8,
+          username: "Harry",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw4XQ==",
+      },
+    ],
+  },
+}

@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allPeople {
+    edges {
+      node {
+        logEntriesByPersonIdList {
+          text
+          id
+        }
+        personId
+        username
+      }
+      cursor
+    }
+  }
+}
