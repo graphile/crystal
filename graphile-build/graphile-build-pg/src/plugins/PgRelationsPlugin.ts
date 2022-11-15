@@ -1127,7 +1127,7 @@ function addRelations(
         }
       })());
     } else {
-      hasReferencee = false;
+      hasReferencee = true;
       behavior = getBehavior(refSpec.extensions);
       typeName = refSpec.graphqlType;
       if (!typeName) {
