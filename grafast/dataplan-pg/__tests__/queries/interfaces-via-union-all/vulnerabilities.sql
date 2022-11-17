@@ -11,20 +11,18 @@ lateral (
     __union__."0"::text as "0",
     __union__."1" as "1",
     __union__."2"::text as "2",
-    __union__."3"::text as "3"
+    __union_identifiers__.idx as "3"
   from (
       select
         __first_party_vulnerabilities__."0",
         __first_party_vulnerabilities__."1",
         __first_party_vulnerabilities__."2",
-        __first_party_vulnerabilities__."3",
         "n"
       from (
         select
           __first_party_vulnerabilities__."cvss_score" as "0",
           'FirstPartyVulnerability' as "1",
           json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
-          __union_identifiers__.idx as "3",
           row_number() over (
             order by
               __first_party_vulnerabilities__."cvss_score" desc,
@@ -42,14 +40,12 @@ lateral (
         __third_party_vulnerabilities__."0",
         __third_party_vulnerabilities__."1",
         __third_party_vulnerabilities__."2",
-        __third_party_vulnerabilities__."3",
         "n"
       from (
         select
           __third_party_vulnerabilities__."cvss_score" as "0",
           'ThirdPartyVulnerability' as "1",
           json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
-          __union_identifiers__.idx as "3",
           row_number() over (
             order by
               __third_party_vulnerabilities__."cvss_score" desc,
