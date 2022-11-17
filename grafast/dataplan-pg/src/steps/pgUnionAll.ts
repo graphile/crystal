@@ -18,6 +18,7 @@ import {
   access,
   constant,
   ExecutableStep,
+  first,
   isPromiseLike,
   lambda,
   list,
@@ -38,6 +39,7 @@ import type {
 } from "../datasource.js";
 import { PgSourceBuilder } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
+import type { PgGroupSpec } from "../index.js";
 import type {
   PgOrderFragmentSpec,
   PgOrderSpec,
@@ -47,7 +49,10 @@ import type {
 import { PgLocker } from "../pgLocker.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import type { PgWhereConditionSpec } from "./pgCondition.js";
+import type {
+  PgHavingConditionSpec,
+  PgWhereConditionSpec,
+} from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
@@ -168,6 +173,7 @@ export interface PgUnionAllStepConfig<
     >;
   };
   members?: PgUnionAllStepMember<TTypeNames>[];
+  mode?: PgUnionAllMode;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -210,18 +216,28 @@ export class PgUnionAllSingleStep
     exportName: "PgUnionAllSingleStep",
   };
   public isSyncAndSafe = true;
-  private typeKey: number;
-  private pkKey: number;
+  private typeKey: number | null;
+  private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
   constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep<any>) {
     super();
     this.addDependency($item);
     this.spec = $parent.spec;
-    this.typeKey = $parent.selectType();
-    this.pkKey = $parent.selectPk();
+    if ($parent.mode === "normal") {
+      this.typeKey = $parent.selectType();
+      this.pkKey = $parent.selectPk();
+    } else {
+      this.typeKey = null;
+      this.pkKey = null;
+    }
   }
 
   planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep<any> {
+    if (this.pkKey === null || this.typeKey === null) {
+      throw new Error(
+        `${this} not polymorphic because parent isn't in normal mode`,
+      );
+    }
     const source = this.spec.sourceByTypeName[objectType.name];
     if (!source) {
       // This type isn't handled; so it should never occur
@@ -247,6 +263,9 @@ export class PgUnionAllSingleStep
    * For use by PgCursorStep
    */
   public getCursorDigestAndStep(): [string, ExecutableStep] {
+    if (this.typeKey === null) {
+      throw new Error("Forbidden since parent isn't in normal mode");
+    }
     const classPlan = this.getClassStep();
     const digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderByWithoutType().map((o, i) => {
@@ -315,11 +334,41 @@ export class PgUnionAllSingleStep
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
+  public select<
+    TExpressionColumns extends PgTypeColumns | undefined,
+    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+  >(
+    fragment: SQL,
+    codec: TExpressionCodec,
+  ): PgClassExpressionStep<
+    TExpressionColumns,
+    TExpressionCodec,
+    any,
+    any,
+    any,
+    any
+  > {
+    const sqlExpr = pgClassExpression<
+      TExpressionColumns,
+      TExpressionCodec,
+      any,
+      any,
+      any,
+      any
+    >(this, codec);
+    return sqlExpr`${fragment}`;
+  }
+
   execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
-    return values[0].map((v) => {
-      const type = v[this.typeKey];
-      return polymorphicWrap(type, v);
-    });
+    if (this.typeKey !== null) {
+      const typeKey = this.typeKey;
+      return values[0].map((v) => {
+        const type = v[typeKey];
+        return polymorphicWrap(type, v);
+      });
+    } else {
+      return values[0];
+    }
   }
 }
 
@@ -332,6 +381,8 @@ interface MemberDigest<TTypeNames extends string> {
   conditions: SQL[];
   orders: PgOrderSpec[];
 }
+
+export type PgUnionAllMode = "normal" | "aggregate";
 
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
@@ -355,8 +406,8 @@ export class PgUnionAllStep<
 
   public isSyncAndSafe = false;
 
-  public symbol = Symbol("union"); // TODO: add variety
-  public alias = sql.identifier(this.symbol);
+  public symbol: symbol;
+  public alias: SQL;
 
   private selects: PgUnionAllStepSelect<TAttributes>[];
 
@@ -405,6 +456,14 @@ export class PgUnionAllStep<
    */
   private placeholders: Array<PgUnionAllPlaceholder>;
   private placeholderValues: Map<symbol, SQL>;
+
+  // GROUP BY
+
+  private groups: Array<PgGroupSpec>;
+
+  // HAVING
+
+  private havingConditions: SQL[];
 
   // LIMIT
 
@@ -460,20 +519,31 @@ export class PgUnionAllStep<
   private limitAndOffsetSQL: SQL | null = null;
   private innerLimitSQL: SQL | null = null;
 
+  public readonly mode: PgUnionAllMode;
+
   private locker: PgLocker<this> = new PgLocker(this);
 
   private memberDigests: MemberDigest<TTypeNames>[];
 
-  constructor(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>);
+  constructor(
+    cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
+    mode?: PgUnionAllMode,
+  );
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>);
   constructor(
     specOrCloneFrom:
       | PgUnionAllStepConfig<TAttributes, TTypeNames>
       | PgUnionAllStep<TAttributes, TTypeNames>,
+    overrideMode?: PgUnionAllMode,
   ) {
     super();
     if (specOrCloneFrom instanceof PgUnionAllStep) {
       const cloneFrom = specOrCloneFrom;
+      this.symbol = cloneFrom.symbol;
+      this.alias = cloneFrom.alias;
+      this.mode = overrideMode ?? cloneFrom.mode ?? "normal";
+      const cloneFromMatchingMode =
+        cloneFrom.mode === this.mode ? cloneFrom : null;
       this.spec = cloneFrom.spec;
       this.memberDigests = cloneFrom.memberDigests;
 
@@ -486,12 +556,22 @@ export class PgUnionAllStep<
         }
       });
 
-      this.selects = [...cloneFrom.selects];
+      this.selects = cloneFromMatchingMode
+        ? [...cloneFromMatchingMode.selects]
+        : [];
       this.placeholders = [...cloneFrom.placeholders];
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.queryValuesSymbol = cloneFrom.queryValuesSymbol;
-      this.orders = [...cloneFrom.orders];
+      this.groups = cloneFromMatchingMode
+        ? [...cloneFromMatchingMode.groups]
+        : [];
+      this.havingConditions = cloneFromMatchingMode
+        ? [...cloneFromMatchingMode.havingConditions]
+        : [];
+      this.orders = cloneFromMatchingMode
+        ? [...cloneFromMatchingMode.orders]
+        : [];
       this.orderSelectIndex = [...cloneFrom.orderSelectIndex];
       this.ordersForCursor = [...cloneFrom.ordersForCursor];
 
@@ -501,19 +581,48 @@ export class PgUnionAllStep<
       this.isSyncAndSafe = cloneFrom.isSyncAndSafe;
       this.alias = cloneFrom.alias;
 
-      this.first = cloneFrom.first;
-      this.last = cloneFrom.last;
-      this.fetchOneExtra = cloneFrom.fetchOneExtra;
-      this.lowerIndexStepId = cloneFrom.lowerIndexStepId;
-      this.upperIndexStepId = cloneFrom.upperIndexStepId;
-      this.limitAndOffsetId = cloneFrom.limitAndOffsetId;
-      this.offset = cloneFrom.offset;
-      this.beforeStepId = cloneFrom.beforeStepId;
-      this.afterStepId = cloneFrom.afterStepId;
-      this.limitAndOffsetSQL = cloneFrom.limitAndOffsetSQL;
-      this.innerLimitSQL = cloneFrom.innerLimitSQL;
+      this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
+      this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
+      this.fetchOneExtra = cloneFromMatchingMode
+        ? cloneFromMatchingMode.fetchOneExtra
+        : false;
+      this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
+      this.limitAndOffsetSQL = cloneFromMatchingMode
+        ? cloneFromMatchingMode.limitAndOffsetSQL
+        : null;
+      this.innerLimitSQL = cloneFromMatchingMode
+        ? cloneFromMatchingMode.innerLimitSQL
+        : null;
+      this.beforeStepId =
+        cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
+          ? cloneFromMatchingMode.beforeStepId
+          : null;
+      this.afterStepId =
+        cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
+          ? cloneFromMatchingMode.afterStepId
+          : null;
+      this.lowerIndexStepId =
+        cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
+          ? cloneFromMatchingMode.lowerIndexStepId
+          : null;
+      this.upperIndexStepId =
+        cloneFromMatchingMode && cloneFromMatchingMode.upperIndexStepId != null
+          ? cloneFromMatchingMode.upperIndexStepId
+          : null;
+      this.limitAndOffsetId =
+        cloneFromMatchingMode && cloneFromMatchingMode.limitAndOffsetId != null
+          ? cloneFromMatchingMode.limitAndOffsetId
+          : null;
     } else {
+      this.symbol = Symbol("union"); // TODO: add variety
+      this.alias = sql.identifier(this.symbol);
       const spec = specOrCloneFrom;
+      this.mode = overrideMode ?? spec.mode ?? "normal";
+      if (this.mode === "aggregate") {
+        this.locker.beforeLock("orderBy", () =>
+          this.locker.lockParameter("groupBy"),
+        );
+      }
       this.spec = spec;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided sources.
@@ -535,6 +644,8 @@ export class PgUnionAllStep<
       this.queryValues = [];
       this.placeholderValues = new Map();
       this.queryValuesSymbol = Symbol("union_identifier_values");
+      this.groups = [];
+      this.havingConditions = [];
       this.orders = [];
       this.orderSelectIndex = [];
       this.ordersForCursor = [];
@@ -661,8 +772,11 @@ on (${sql.indent(
     });
   }
 
-  connectionClone(): PgUnionAllStep<TAttributes, TTypeNames> {
-    return new PgUnionAllStep(this);
+  connectionClone(
+    $connection: ConnectionStep<any, any, any, any>,
+    mode?: PgUnionAllMode,
+  ): PgUnionAllStep<TAttributes, TTypeNames> {
+    return new PgUnionAllStep(this, mode);
   }
 
   select<TAttribute extends TAttributes>(key: TAttribute): number {
@@ -745,6 +859,22 @@ on (${sql.indent(
     return this.orderSelectIndex[orderIndex];
   }
 
+  /**
+   * If this plan may only return one record, you can use `.singleAsRecord()`
+   * to return a plan that resolves to that record (rather than a list of
+   * records as it does currently).
+   *
+   * Beware: if you call this and the database might actually return more than
+   * one record then you're potentially in for a Bad Time.
+   */
+  singleAsRecord(): PgUnionAllSingleStep {
+    // this.setUnique(true);
+    // TODO: should this be on a clone plan? I don't currently think so since
+    // PgSelectSingleStep does not allow for `.where` divergence (since it
+    // does not support `.where`).
+    return new PgUnionAllSingleStep(this, first(this));
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
@@ -788,7 +918,48 @@ on (${sql.indent(
     return new PgConditionStep(this);
   }
 
+  groupBy(group: PgGroupSpec): void {
+    this.locker.assertParameterUnlocked("groupBy");
+    if (this.mode !== "aggregate") {
+      throw new Error(`Cannot add groupBy to a non-aggregate query`);
+    }
+    this.groups.push(group);
+  }
+
+  havingPlan(): PgConditionStep<this> {
+    if (this.locker.locked) {
+      throw new Error(
+        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
+      );
+    }
+    if (this.mode !== "aggregate") {
+      throw new Error(`Cannot add having to a non-aggregate query`);
+    }
+    return new PgConditionStep(this, true);
+  }
+
+  having(condition: PgHavingConditionSpec<string>): void {
+    if (this.locker.locked) {
+      throw new Error(
+        `${this}: cannot add having conditions once plan is locked ('having')`,
+      );
+    }
+    if (this.mode !== "aggregate") {
+      throw new Error(`Cannot add having to a non-aggregate query`);
+    }
+    if (sql.isSQL(condition)) {
+      this.havingConditions.push(condition);
+    } else {
+      const never: never = condition;
+      console.error("Unsupported condition: ", never);
+      throw new Error(`Unsupported condition`);
+    }
+  }
+
   orderBy(orderSpec: PgUnionAllStepOrder<TAttributes>): void {
+    if (this.mode === "aggregate") {
+      throw new Error(`${this}: orderBy forbidden in aggregate mode`);
+    }
     this.locker.assertParameterUnlocked("orderBy");
     for (const digest of this.memberDigests) {
       const { alias: tableAlias } = digest;
@@ -816,7 +987,13 @@ on (${sql.indent(
     // TODO: should we do something here to match pgSelect?
   }
 
-  private assertCursorPaginationAllowed(): void {}
+  private assertCursorPaginationAllowed(): void {
+    if (this.mode === "aggregate") {
+      throw new Error(
+        "Cannot use cursor pagination on an aggregate PgSelectStep",
+      );
+    }
+  }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
@@ -1278,8 +1455,9 @@ and ${condition(i + 1)}`}
 
   finalize() {
     this.locker.lock();
-    const typeIdx = this.selectType();
-    const reverse = this.shouldReverseOrder();
+    const normalMode = this.mode === "normal";
+    const typeIdx = normalMode ? this.selectType() : null;
+    const reverse = normalMode ? this.shouldReverseOrder() : null;
 
     //TODO: THIS IS UNSAFE. See "TODO: this is bad" comments.
     const mutualCodec = this.memberDigests[0].finalSource.codec;
@@ -1424,38 +1602,56 @@ from (${innerQuery}) as ${tableAlias}\
         tables.push(query);
       }
 
-      const outerSelects = this.selects.map((select, i) => {
-        if (select.type === "outerExpression") {
-          return sql`${select.expression} as ${sql.identifier(String(i))}`;
-        } else {
-          const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
-          const codec =
-            select.type === "type"
-              ? TYPES.text
-              : select.type === "pk"
-              ? TYPES.json
-              : select.type === "order"
-              ? getFragmentAndCodecFromOrder(
-                  this.alias,
-                  this.getOrderBy()[select.orderIndex],
-                  mutualCodec,
-                )[1]
-              : select.codec;
-          return sql`${
-            codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
-          } as ${sql.identifier(String(i))}`;
-        }
-      });
+      const outerSelects = this.selects
+        .map((select, i) => {
+          if (select.type === "outerExpression") {
+            return sql`${select.expression} as ${sql.identifier(String(i))}`;
+          } else if (this.mode === "normal") {
+            const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
+            const codec =
+              select.type === "type"
+                ? TYPES.text
+                : select.type === "pk"
+                ? TYPES.json
+                : select.type === "order"
+                ? getFragmentAndCodecFromOrder(
+                    this.alias,
+                    this.getOrderBy()[select.orderIndex],
+                    mutualCodec,
+                  )[1]
+                : select.codec;
+            return sql`${
+              codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
+            } as ${sql.identifier(String(i))}`;
+          } else {
+            return null;
+          }
+        })
+        .filter(isNotNullish);
 
-      // Union must be ordered _before_ applying `::text`/etc transforms to
-      // select, so we wrap this with another select.
-      const unionQuery = sql.indent`
-${sql.join(
-  tables,
-  `
-union all
-`,
+      const unionGroupBy =
+        this.mode === "aggregate" && this.groups.length > 0
+          ? sql`group by
+${sql.indent(
+  sql.join(
+    this.groups.map((g) => g.fragment),
+    ",\n",
+  ),
 )}
+`
+          : sql.blank;
+
+      const unionHaving =
+        this.mode === "aggregate" && this.havingConditions.length > 0
+          ? sql`having
+${sql.indent(sql.join(this.havingConditions, ",\n"))}
+`
+          : sql.blank;
+
+      const unionOrderBy =
+        this.mode === "aggregate"
+          ? sql.blank
+          : sql`\
 order by${sql.indent`
 ${
   this.orders.length
@@ -1474,6 +1670,18 @@ ${
 ${sql.identifier(String(typeIdx))} ${reverse ? sql`desc` : sql`asc`},
 ${rowNumberIdent} asc\
 `}
+`;
+
+      // Union must be ordered _before_ applying `::text`/etc transforms to
+      // select, so we wrap this with another select.
+      const unionQuery = sql.indent`
+${sql.join(
+  tables,
+  `
+union all
+`,
+)}
+${unionOrderBy}\
 ${this.limitAndOffsetSQL!}
 `;
 
@@ -1482,6 +1690,8 @@ ${this.limitAndOffsetSQL!}
 select
 ${sql.indent(sql.join(outerSelects, ",\n"))}
 from (${unionQuery}) ${this.alias}
+${unionGroupBy}\
+${unionHaving}\
 `;
       return innerQuery;
     };
@@ -1517,9 +1727,8 @@ from (${unionQuery}) ${this.alias}
           );
         });
 
-        const identifierIndex = this.selectExpression(
+        const identifierIndex = this.selectAndReturnIndex(
           sql`${identifiersAlias}.idx`,
-          TYPES.int, // TODO: validate
         );
 
         // IMPORTANT: this must come after the `selectExpression` call above.
