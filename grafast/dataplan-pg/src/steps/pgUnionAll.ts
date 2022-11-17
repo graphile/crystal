@@ -1602,32 +1602,32 @@ from (${innerQuery}) as ${tableAlias}\
         tables.push(query);
       }
 
-      const outerSelects = this.selects
-        .map((select, i) => {
-          if (select.type === "outerExpression") {
-            return sql`${select.expression} as ${sql.identifier(String(i))}`;
-          } else if (this.mode === "normal") {
-            const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
-            const codec =
-              select.type === "type"
-                ? TYPES.text
-                : select.type === "pk"
-                ? TYPES.json
-                : select.type === "order"
-                ? getFragmentAndCodecFromOrder(
-                    this.alias,
-                    this.getOrderBy()[select.orderIndex],
-                    mutualCodec,
-                  )[1]
-                : select.codec;
-            return sql`${
-              codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
-            } as ${sql.identifier(String(i))}`;
-          } else {
-            return null;
-          }
-        })
-        .filter(isNotNullish);
+      const outerSelects = this.selects.map((select, i) => {
+        if (select.type === "outerExpression") {
+          return sql`${select.expression} as ${sql.identifier(String(i))}`;
+        } else if (this.mode === "normal") {
+          const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
+          const codec =
+            select.type === "type"
+              ? TYPES.text
+              : select.type === "pk"
+              ? TYPES.json
+              : select.type === "order"
+              ? getFragmentAndCodecFromOrder(
+                  this.alias,
+                  this.getOrderBy()[select.orderIndex],
+                  mutualCodec,
+                )[1]
+              : select.codec;
+          return sql`${
+            codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
+          } as ${sql.identifier(String(i))}`;
+        } else {
+          // TODO: eradicate this (aggregate mode) without breaking arrayMode
+          // tuple numbering
+          return sql`null as ${sql.identifier(String(i))}`;
+        }
+      });
 
       const unionGroupBy =
         this.mode === "aggregate" && this.groups.length > 0
