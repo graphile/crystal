@@ -7,6 +7,9 @@ interface Application {
   Reads a single `PersonOrOrganization` that is related to this `Application`.
   """
   owner: PersonOrOrganization
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities: VulnerabilitiesConnection!
 }
 
 """
@@ -5734,6 +5737,8 @@ enum VulnerabilitiesOrderBy {
 }
 
 interface Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications: ApplicationsConnection!
   cvssScore: Float!
   id: Int!
   name: String!
