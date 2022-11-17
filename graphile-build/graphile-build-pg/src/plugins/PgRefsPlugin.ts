@@ -2,16 +2,14 @@ import type {
   PgRefDefinition,
   PgRefDefinitions,
   PgSource,
-  PgSourceRef,
   PgSourceRefPath,
   PgSourceRelation,
-  PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeColumns,
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
-import type { PgClass, PgSmartTagsDict } from "pg-introspection";
+import type { PgClass } from "pg-introspection";
 
 import { version } from "../index.js";
 import {
@@ -44,6 +42,7 @@ declare global {
 }
 
 declare module "@dataplan/pg" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface PgTypeCodecExtensions<TColumnName extends string> {
     /**
      * References between codecs (cannot be implemented directly, but sources
@@ -106,7 +105,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
     initialState: () => ({ sourceEvents: [] }),
     hooks: {
       async pgCodecs_PgTypeCodec(info, event) {
-        const { databaseName, pgCodec, pgClass } = event;
+        const { pgCodec, pgClass } = event;
         if (!pgClass) {
           return;
         }

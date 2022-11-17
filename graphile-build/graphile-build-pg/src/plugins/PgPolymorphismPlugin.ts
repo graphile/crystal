@@ -6,7 +6,6 @@ import "./PgTablesPlugin.js";
 
 import type {
   PgRefDefinition,
-  PgSource,
   PgSourceRef,
   PgTypeCodec,
   PgTypeCodecPolymorphism,

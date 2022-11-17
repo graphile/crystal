@@ -8,7 +8,6 @@ import type {
   PgSource,
   PgSourceRef,
   PgSourceRefPath,
-  PgSourceRefs,
   PgSourceRelation,
   PgTypeCodec,
   PgUnionAllStepConfigAttributes,
