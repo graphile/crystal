@@ -71,8 +71,7 @@ function commonFn(
   const isSuitableSource = pgSource && !pgSource.isUnique;
   const isSuitableCodec =
     codec &&
-    (isSuitableSource ||
-      (!pgSource && codec?.extensions?.polymorphism?.mode === "union"));
+    (isSuitableSource || (!pgSource && codec?.polymorphism?.mode === "union"));
 
   if (!isSuitableCodec) {
     return args;

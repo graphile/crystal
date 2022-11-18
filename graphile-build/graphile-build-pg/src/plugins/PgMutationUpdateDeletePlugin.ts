@@ -142,7 +142,7 @@ const isUpdatable = (
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
-  if (source.codec.extensions?.polymorphism) return false;
+  if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
   const behavior = getBehavior(source.extensions);
@@ -155,7 +155,7 @@ const isDeletable = (
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
-  if (source.codec.extensions?.polymorphism) return false;
+  if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
   const behavior = getBehavior(source.extensions);

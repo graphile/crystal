@@ -2,6 +2,7 @@ import "graphile-build";
 
 import type {
   PgEnumTypeCodec,
+  PgRecordTypeCodecSpec,
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeColumn,
@@ -119,11 +120,11 @@ declare global {
         }) => Promise<void> | void
       >;
 
-      pgCodecs_recordType_extensions: PluginHook<
+      pgCodecs_recordType_spec: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          extensions: PgTypeCodecExtensions;
+          spec: PgRecordTypeCodecSpec<any>;
         }) => Promise<void> | void
       >;
 
@@ -400,37 +401,21 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               originalName: pgClass.relname,
             }),
           };
-          await info.process("pgCodecs_recordType_extensions", {
+          const spec = {
+            name: codecName,
+            identifier: sql.identifier(nspName, className),
+            columns,
+            extensions,
+          };
+          await info.process("pgCodecs_recordType_spec", {
             databaseName,
             pgClass,
-            extensions,
+            spec,
           });
 
           const codec = EXPORTABLE(
-            (
-              className,
-              codecName,
-              columns,
-              extensions,
-              nspName,
-              recordType,
-              sql,
-            ) =>
-              recordType(
-                codecName,
-                sql.identifier(nspName, className),
-                columns,
-                extensions,
-              ),
-            [
-              className,
-              codecName,
-              columns,
-              extensions,
-              nspName,
-              recordType,
-              sql,
-            ],
+            (recordType, spec) => recordType(spec),
+            [recordType, spec],
           );
           info.process("pgCodecs_PgTypeCodec", {
             pgCodec: codec,

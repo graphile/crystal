@@ -62,7 +62,6 @@ export interface PgRefDefinitions {
  */
 export interface PgTypeCodecExtensions<TColumnName extends string = string> {
   description?: string;
-  polymorphism?: PgTypeCodecPolymorphism<TColumnName>;
 }
 
 export interface PgTypeCodecPolymorphismSingleTypeColumnSpec<
@@ -217,6 +216,8 @@ export interface PgTypeCodec<
    * The underlying codec that this type is a range over.
    */
   rangeOfCodec?: PgTypeCodec<undefined, any, any, undefined>;
+
+  polymorphism?: PgTypeCodecPolymorphism<any>;
 
   /**
    * Arbitrary metadata

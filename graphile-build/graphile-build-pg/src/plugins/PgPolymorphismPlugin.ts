@@ -8,6 +8,7 @@ import type {
   PgRefDefinition,
   PgSourceRef,
   PgTypeCodec,
+  PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
   PgTypeCodecPolymorphismRelational,
   PgTypeCodecPolymorphismRelationalTypeSpec,
@@ -94,8 +95,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     namespace: "pgPolymorphism",
     helpers: {},
     hooks: {
-      async pgCodecs_recordType_extensions(info, event) {
-        const { pgClass, extensions, databaseName } = event;
+      async pgCodecs_recordType_spec(info, event) {
+        const { pgClass, spec, databaseName } = event;
+        const extensions: PgTypeCodecExtensions<string> =
+          spec.extensions ?? Object.create(null);
+        if (!spec.extensions) {
+          spec.extensions = extensions;
+        }
         const interfaceTag =
           extensions.tags.interface ??
           pgClass.getTagsAndDescription().tags.interface;
@@ -154,7 +160,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const commonColumns = attributeNames.filter(
                 (n) => !specificColumns.has(n),
               );
-              extensions.polymorphism = {
+              spec.polymorphism = {
                 mode: "single",
                 commonColumns,
                 typeColumns: [type],
@@ -243,7 +249,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 };
               }
 
-              extensions.polymorphism = {
+              spec.polymorphism = {
                 mode: "relational",
                 typeColumns: [type],
                 types,
@@ -251,7 +257,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               break;
             }
             case "union": {
-              extensions.polymorphism = {
+              spec.polymorphism = {
                 mode: "union",
               };
               break;
@@ -264,7 +270,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       },
       async pgTables_PgSource(info, event) {
         const { pgClass, databaseName, source, relations } = event;
-        const poly = source.codec.extensions?.polymorphism;
+        const poly = source.codec.polymorphism;
         if (poly?.mode === "relational") {
           // Copy common attributes to implementations
           for (const spec of Object.values(poly.types)) {
@@ -415,7 +421,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
           // Detect interface
           build.recoverable(null, () => {
-            const polymorphism = codec.extensions?.polymorphism;
+            const polymorphism = codec.polymorphism;
             if (!polymorphism) {
               // Don't build polymorphic types as objects
               return;
@@ -625,7 +631,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
         }
         for (const codec of build.pgCodecMetaLookup.keys()) {
-          const polymorphism = codec.extensions?.polymorphism;
+          const polymorphism = codec.polymorphism;
           if (
             !codec.columns ||
             !polymorphism ||

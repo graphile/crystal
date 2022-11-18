@@ -867,8 +867,7 @@ function addRelations(
 
       // TODO: if there's only one path do we still need union?
       const needsPgUnionAll =
-        sharedCodec?.extensions?.polymorphism?.mode === "union" ||
-        paths.length > 1;
+        sharedCodec?.polymorphism?.mode === "union" || paths.length > 1;
 
       // If we're pulling from a shared codec into a PgUnionAllStep then we can
       // use that codec's columns as shared attributes; otherwise there are not

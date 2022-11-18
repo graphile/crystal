@@ -546,7 +546,7 @@ export class PgSelectSingleStep<
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = this.source.codec.extensions?.polymorphism;
+    const poly = this.source.codec.polymorphism;
     if (poly?.mode === "single") {
       return this;
     } else if (poly?.mode === "relational") {
@@ -568,7 +568,7 @@ export class PgSelectSingleStep<
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = this.source.codec.extensions?.polymorphism;
+    const poly = this.source.codec.polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeColumns.map((col) => {
@@ -632,7 +632,7 @@ export class PgSelectSingleStep<
   }
 
   finalize() {
-    const poly = this.source.codec.extensions?.polymorphism;
+    const poly = this.source.codec.polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       this.handlePolymorphism = (val) => {
         if (val == null) return val;

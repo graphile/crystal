@@ -195,7 +195,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
-            (!pgSource && codec?.extensions?.polymorphism?.mode === "union")) &&
+            (!pgSource && codec?.polymorphism?.mode === "union")) &&
           codec.columns;
 
         if (!shouldAddCondition || !isSuitableCodec) {

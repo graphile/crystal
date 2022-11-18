@@ -42,6 +42,7 @@ import type {
   PgEnumValue,
   PgTypeCodec,
   PgTypeCodecExtensions,
+  PgTypeCodecPolymorphism,
 } from "./interfaces.js";
 
 // TODO: optimisation: `identity` can be shortcut
@@ -343,24 +344,68 @@ function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
   };
 }
 
+export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
+  name: string;
+  identifier: SQL;
+  columns: TColumns;
+  polymorphism?: PgTypeCodecPolymorphism<any>;
+  extensions?: Partial<PgTypeCodecExtensions>;
+  isAnonymous?: boolean;
+};
+
 // TODO: Move extensions,isAnonymous into a config object for consistency with other functions in this file.
 /**
  * Returns a PgTypeCodec that represents a composite type (a type with
  * attributes).
  *
- * @param name - the name of this type
- * @param identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
- * @param columns - the attributes this composite type has
- * @param extensions - an optional object that you can use to associate arbitrary data with this type
- * @param isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
+ * name - the name of this type
+ * identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
+ * columns - the attributes this composite type has
+ * extensions - an optional object that you can use to associate arbitrary data with this type
+ * isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
  */
 export function recordType<TColumns extends PgTypeColumns>(
   name: string,
   identifier: SQL,
   columns: TColumns,
   extensions?: Partial<PgTypeCodecExtensions>,
-  isAnonymous = false,
+  isAnonymous?: boolean,
+): PgTypeCodec<TColumns, string, object>;
+export function recordType<TColumns extends PgTypeColumns>(
+  config: PgRecordTypeCodecSpec<TColumns>,
+): PgTypeCodec<TColumns, string, object>;
+export function recordType<TColumns extends PgTypeColumns>(
+  configOrName: PgRecordTypeCodecSpec<TColumns> | string,
+  identifier?: SQL,
+  columns?: TColumns,
+  extensions?: Partial<PgTypeCodecExtensions>,
+  isAnonymous?: boolean,
 ): PgTypeCodec<TColumns, string, object> {
+  if (typeof configOrName === "string") {
+    return realRecordType({
+      name: configOrName,
+      identifier: identifier!,
+      columns: columns!,
+      extensions,
+      isAnonymous,
+    });
+  } else {
+    return realRecordType(configOrName);
+  }
+}
+exportAs(recordType, "recordType");
+
+function realRecordType<TColumns extends PgTypeColumns>(
+  config: PgRecordTypeCodecSpec<TColumns>,
+) {
+  const {
+    name,
+    identifier,
+    columns,
+    polymorphism,
+    extensions,
+    isAnonymous = false,
+  } = config;
   return {
     name,
     sqlType: identifier,
@@ -368,10 +413,10 @@ export function recordType<TColumns extends PgTypeColumns>(
     fromPg: makeSQLValueToRecord(columns),
     toPg: makeRecordToSQLRawValue(columns),
     columns,
+    polymorphism,
     extensions,
   };
 }
-exportAs(recordType, "recordType");
 
 // TODO: rename to enumCodec
 // TODO: enum values should not be strings but objects so that they can have descriptions, tags, etc.
