@@ -384,11 +384,13 @@ insert into polymorphic.people (person_id, username) values
   (1, 'Alice'),
   (2, 'Benjie'),
   (3, 'Caroline'),
-  (4, 'Dave'),
+  (4, 'Dave'), -- No apps!
   (5, 'Ellie'),
   (6, 'Fred'),
   (7, 'Georgina'),
-  (8, 'Harry');
+  (8, 'Harry'),
+  (9, 'Idris'),
+  (10, 'Jem');
 
 insert into polymorphic.organizations (organization_id, name) values
   (1, 'Acme'),

@@ -93,6 +93,22 @@
         },
         cursor: "WyI5NjdkZTdmYTdlIiw4XQ==",
       },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 9,
+          username: "Idris",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw5XQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 10,
+          username: "Jem",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiwxMF0=",
+      },
     ],
   },
 }

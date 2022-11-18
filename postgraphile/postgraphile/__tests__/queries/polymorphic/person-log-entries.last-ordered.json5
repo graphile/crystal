@@ -3,25 +3,6 @@
     edges: [
       {
         node: {
-          logEntriesByPersonIdList: [
-            {
-              text: "Cider brewing commencing",
-              id: 5,
-            },
-          ],
-          personId: 4,
-          username: "Dave",
-        },
-      },
-      {
-        node: {
-          logEntriesByPersonIdList: [],
-          personId: 5,
-          username: "Ellie",
-        },
-      },
-      {
-        node: {
           logEntriesByPersonIdList: [],
           personId: 6,
           username: "Fred",
@@ -44,6 +25,20 @@
           ],
           personId: 8,
           username: "Harry",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 9,
+          username: "Idris",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 10,
+          username: "Jem",
         },
       },
     ],
