@@ -1,0 +1,43 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        personId: 1,
+        username: "Alice",
+        applications: {
+          edges: [],
+        },
+      },
+      {
+        personId: 2,
+        username: "Benjie",
+        applications: {
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 8,
+                name: "AWfulS",
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 3,
+        username: "Caroline",
+        applications: {
+          edges: [],
+        },
+      },
+      {
+        personId: 4,
+        username: "Dave",
+        applications: {
+          edges: [],
+        },
+      },
+    ],
+  },
+}
