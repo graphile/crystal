@@ -363,7 +363,7 @@
               __typename: "AwsApplication",
               awsId: "AWS-0008",
               id: 8,
-              name: "AWefulS",
+              name: "AWfulS",
               owner: {
                 __typename: "Person",
                 personId: 2,
