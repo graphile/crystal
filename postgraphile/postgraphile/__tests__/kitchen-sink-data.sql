@@ -517,17 +517,27 @@ insert into polymorphic.relational_checklist_items (id, description, note)  valu
 
 insert into polymorphic.aws_applications (id, person_id, organization_id, name, last_deployed, aws_id) values
   (1, null, 1, 'AWS App 1', null, 'AWS-0001'),
-  (2, 2, null, 'AWeSome', '2021-06-05T04:03:02.010Z', 'AWS-0002'); -- NO VULNERABILITIES!
+  (2, 2, null, 'AWeSome', '2021-06-05T04:03:02.010Z', 'AWS-0002'), -- NO VULNERABILITIES!
+  (3, null, 1, 'AWS App 3', null, 'AWS-0003'),
+  (4, 1, null, 'AWS App 4', null, 'AWS-0004'),
+  (5, 1, null, 'AWS App 5', null, 'AWS-0005'),
+  (6, 1, null, 'AWS App 6', null, 'AWS-0006'),
+  (7, null, 5, 'SAC-NORAD AI', null, 'AWSKYNET'),
+  (8, 2, null, 'AWefulS', '2021-06-05T04:03:02.010Z', 'AWS-0008');
 insert into polymorphic.gcp_applications (id, person_id, organization_id, name, last_deployed, gcp_id) values
   (1, null, 1, 'GCP App 1', null, 'GCP_0_1'),
-  (2, 3, null, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2');
+  (2, 3, null, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2'),
+  (3, 2, null, 'Great Creative Project', null, 'GCP_0_3'),
+  (4, 2, null, 'Gargantual Crap Pile', null, 'GCP_0_4'),
+  (5, 1, null, 'Gigacellerator Pro', null, 'GCP_0_5');
 
 insert into polymorphic.first_party_vulnerabilities (id, name, cvss_score, team_name) values
   (1, 'Off-by-one', 3.0, 'Accounting'),
   (2, 'Index-out-of-bounds', 7.2, 'Retention'),
   (3, 'Exponential backtracking', 7.7, 'Continuity'),
   (4, 'Information disclosure', 7.2, 'Retention'),
-  (5, 'Timing attack', 7.2, 'Retention');
+  (5, 'Timing attack', 7.2, 'Retention'),
+  (6, 'Race condition', 5.0, 'Reliability'); -- NO VULNERABLE APPS
 
 insert into polymorphic.third_party_vulnerabilities (id, name, cvss_score, vendor_name) values
   (1, 'CSRF', 7.5, '98-Factor-Login'),
@@ -536,29 +546,64 @@ insert into polymorphic.third_party_vulnerabilities (id, name, cvss_score, vendo
   (4, 'Malware', 7.2, 'Frog-Render-Lib'),
   (5, 'License', 7.2, 'Frog-Render-Lib');
 
-insert into polymorphic.aws_application_first_party_vulnerabilities values
+insert into polymorphic.aws_application_first_party_vulnerabilities (aws_application_id, first_party_vulnerability_id) values
   (1, 1),
   (1, 3),
   (1, 4),
-  (1, 5);
-insert into polymorphic.aws_application_third_party_vulnerabilities values
+  (1, 5),
+  (3, 1),
+  (3, 3),
+  (3, 4),
+  (4, 3),
+  (4, 4),
+  (5, 3),
+  (5, 5),
+  (6, 1),
+  (7, 1),
+  (7, 5),
+  (8, 3);
+insert into polymorphic.aws_application_third_party_vulnerabilities (aws_application_id, third_party_vulnerability_id) values
   (1, 1),
   (1, 2),
   (1, 4),
-  (1, 5);
-insert into polymorphic.gcp_application_first_party_vulnerabilities values
+  (1, 5),
+  (3, 1),
+  (3, 4),
+  (4, 1),
+  (5, 4),
+  (6, 2),
+  (6, 4),
+  (6, 5),
+  (7, 2),
+  (7, 4),
+  (8, 1),
+  (8, 2),
+  (8, 4),
+  (8, 5);
+insert into polymorphic.gcp_application_first_party_vulnerabilities (gcp_application_id, first_party_vulnerability_id) values
   (1, 2),
   (2, 2),
   (2, 3),
   (1, 4),
   (1, 5),
   (2, 4),
-  (2, 5);
-insert into polymorphic.gcp_application_third_party_vulnerabilities values
+  (2, 5),
+  (3, 2),
+  (4, 1),
+  (4, 3),
+  (4, 4),
+  (4, 5),
+  (5, 3);
+insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_application_id, third_party_vulnerability_id) values
   (1, 3),
   (2, 1),
   (2, 3),
   (1, 4),
   (1, 5),
   (2, 4),
-  (2, 5);
+  (2, 5),
+  (3, 3),
+  (3, 1),
+  (4, 2),
+  (5, 5),
+  (5, 4);
