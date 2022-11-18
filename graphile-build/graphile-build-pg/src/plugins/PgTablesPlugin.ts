@@ -161,6 +161,14 @@ declare global {
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
+    interface ScopeInterfaceFieldsField {
+      // TODO: put 'field' into all these names?
+      pgSource?: PgSource<any, any, any, any>;
+      pgFieldCodec?: PgTypeCodec<any, any, any>;
+      pgColumn?: PgTypeColumn<any, any>;
+      isPgFieldConnection?: boolean;
+      isPgFieldSimpleCollection?: boolean;
+    }
   }
 }
 

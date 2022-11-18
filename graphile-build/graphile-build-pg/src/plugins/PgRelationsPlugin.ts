@@ -810,6 +810,7 @@ function addRelations(
   } of refDefinitionList) {
     let hasReferencee;
     let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
+    let sharedSource: PgSource<any, any, any, any> | undefined = undefined;
     let behavior;
     let typeName;
     let singleRecordPlan;
@@ -858,6 +859,10 @@ function addRelations(
         }
       } else if (hasExactlyOneCodec) {
         sharedCodec = firstCodec;
+      }
+
+      if (hasExactlyOneSource) {
+        sharedSource = firstSource;
       }
 
       // TODO: if there's only one path do we still need union?
@@ -1189,6 +1194,7 @@ function addRelations(
       identifier,
       isReferencee: hasReferencee,
       pgCodec: sharedCodec,
+      pgSource: sharedSource,
       isUnique: !!refSpec.singular,
       behavior: behavior ?? "",
       typeName,
