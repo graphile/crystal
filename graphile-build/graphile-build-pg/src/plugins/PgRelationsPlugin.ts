@@ -13,17 +13,12 @@ import type {
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";
-import {
-  PgSourceBuilder,
-  pgUnionAll,
-  PgUnionAllSingleStep,
-} from "@dataplan/pg";
+import { PgSourceBuilder, pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import {
   arraysMatch,
   connection,
   evalSafeProperty,
-  first,
   isSafeObjectPropertyName,
   list,
   object,
@@ -1070,10 +1065,8 @@ function addRelations(
             }
             return EXPORTABLE(
               (
-                  PgUnionAllSingleStep,
                   attributes,
                   connection,
-                  first,
                   isConnection,
                   isMutationPayload,
                   members,
@@ -1112,16 +1105,14 @@ function addRelations(
                   if (isConnection) {
                     return connection($list);
                   } else if (single) {
-                    return new PgUnionAllSingleStep($list, first($list));
+                    return $list.single();
                   } else {
                     return $list;
                   }
                 },
               [
-                PgUnionAllSingleStep,
                 attributes,
                 connection,
-                first,
                 isConnection,
                 isMutationPayload,
                 members,

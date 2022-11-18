@@ -76,11 +76,13 @@ export interface PgTypeCodecPolymorphismSingleTypeSpec<
   TColumnName extends string,
 > {
   name: string;
+  // TODO: make this optional?
   columns: Array<PgTypeCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
 }
 export interface PgTypeCodecPolymorphismSingle<TColumnName extends string> {
   mode: "single";
   typeColumns: readonly TColumnName[];
+  // TODO: make this optional?
   commonColumns: readonly TColumnName[];
   types: {
     [typeKey: string]: PgTypeCodecPolymorphismSingleTypeSpec<TColumnName>;

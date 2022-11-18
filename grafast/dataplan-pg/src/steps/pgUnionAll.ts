@@ -163,7 +163,6 @@ export interface PgUnionAllStepConfig<
   TAttributes extends string,
   TTypeNames extends string,
 > {
-  attributes: PgUnionAllStepConfigAttributes<TAttributes>;
   sourceByTypeName: {
     [typeName in TTypeNames]: PgSource<
       any,
@@ -172,6 +171,7 @@ export interface PgUnionAllStepConfig<
       any
     >;
   };
+  attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
   mode?: PgUnionAllMode;
 }
@@ -780,7 +780,10 @@ on (${sql.indent(
   }
 
   select<TAttribute extends TAttributes>(key: TAttribute): number {
-    if (!Object.prototype.hasOwnProperty.call(this.spec.attributes, key)) {
+    if (
+      !this.spec.attributes ||
+      !Object.prototype.hasOwnProperty.call(this.spec.attributes, key)
+    ) {
       throw new Error(`Attribute '${key}' unknown`);
     }
     const existingIndex = this.selects.findIndex(
@@ -875,6 +878,10 @@ on (${sql.indent(
     return new PgUnionAllSingleStep(this, first(this));
   }
 
+  single() {
+    return this.singleAsRecord();
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
@@ -959,6 +966,11 @@ on (${sql.indent(
   orderBy(orderSpec: PgUnionAllStepOrder<TAttributes>): void {
     if (this.mode === "aggregate") {
       throw new Error(`${this}: orderBy forbidden in aggregate mode`);
+    }
+    if (!this.spec.attributes) {
+      throw new Error(
+        `${this}: cannot order when there's no shared attributes`,
+      );
     }
     this.locker.assertParameterUnlocked("orderBy");
     for (const digest of this.memberDigests) {
@@ -1486,6 +1498,11 @@ and ${condition(i + 1)}`}
             const r = ((): [SQL, PgTypeCodec<any, any, any, any>] | null => {
               switch (s.type) {
                 case "attribute": {
+                  if (!this.spec.attributes) {
+                    throw new Error(
+                      `${this}: cannot select an attribute when there's no shared attributes`,
+                    );
+                  }
                   const attr = this.spec.attributes[s.attribute];
                   // TODO: check that attr.codec is compatible with the s.codec (and if not, do the necessary casting?)
                   return [

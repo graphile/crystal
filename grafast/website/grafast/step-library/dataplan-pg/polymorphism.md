@@ -4,26 +4,18 @@ title: Polymorphism
 
 # Polymorphism in @dataplan/pg
 
-Polymorphism in PostgreSQL schemas can take many forms. In `@dataplan/pg` we've
-added a few different step classes that you can use to deal with polymorphism;
-which one you should choose depends on what shape your data is.
+Polymorphism in PostgreSQL schemas can take many forms. `@dataplan/pg` has two
+main ways of dealing with this polymorphism: `pgSelect` (which is polymorphic
+capable so long as all the data either comes from a single table, or a single
+table left-joined to additional tables), and `pgUnionAll` (which allows you to
+pull data from multiple different (independent) database tables via the SQL
+`UNION ALL` construct). These two step classes are similar in many ways, but
+`pgUnionAll` is much more limited in order to maintain performance even when
+dealing with complex setups.
 
-In the simplest case you have a single table that represents all of your
-possible polymorphic types, perhaps using a 'type' column or similar to
-indicate the underlying type. For this style, you should use
-`pgSingleTablePolymorphic`.
+Read on for examples of these.
 
-A slightly more complex case is having a table that defines the type as above,
-but then you join in additional data from other tables in a relational manner;
-for this you should use `pgPolymorphic`.
-
-Finally you might just have multiple separate tables that you want to represent
-with an interface or union in GraphQL; for example a `users` table and an
-`organizations` table which might both belong to the `Owner` interface. In this
-case, you're probably going to need `pgUnionAll`.
-
-See [types of polymorphism](#types-of-polymorphism) lower down for examples of these.
-
+<!--
 ## pgSingleTablePolymorphic
 
 `pgSingleTablePolymorphic` is useful only for the "single table" polymorphism
@@ -100,186 +92,7 @@ export function pgPolymorphic(
   possibleTypes: PgPolymorphicTypeMap
 ): PgPolymorphicStep
 ```
-
-## pgUnionAll
-
-If you can't solve your polymorphic problem with `pgSingleTablePolymorphic` or
-`pgPolymorphic` then you might need to fall back on `pgUnionAll`.
-
-This step class uses the SQL `UNION ALL` construct to select a number of fields
-from a number of different tables that might all be part of the same union or
-interface in GraphQL. You can order by these shared fields, or apply conditions
-to them, and we'll pass these orders and conditions down to the individual
-table selects (as part of the `UNION ALL`) to ensure that we get the results in
-the most efficient manner.
-
-### pgUnionAll function
-
-The `pgUnionAll` function accepts one argument - the "PgUnionAllStepConfig".
-This configuration object has the following entries:
-
-- `executor` - the PgExecutor to use for executing this `union all` statement
-  at runtime
-- `sourceSpecs` - details of the sources to combine in the `union all`
-  statement; this is a map from the GraphQL object type name to a configuration
-  object indicating the `source` for that type
-- `attributes` - the available common attributes (if any) as a map from the
-  attribute name to a specification object containing the `codec` to use for
-  the attribute; this is generally used with GraphQL interfaces
-
-:::note
-
-Every `source` must have the same `executor` as the pgUnionAll executor.
-
-Every `source` must have a primary key (an entry in `source.uniques` with
-`isPrimary === true`) that can be used to fetch the resulting record that
-matches the entry in the union.
-
-:::
-
-### Applying conditions
-
-Conditions can be applied to the resulting step via the `.where()` method,
-which accepts an object containing the following keys:
-
-- `attribute` - the (string) name of the attribute from the pgUnionAll
-  `attributes` to apply the condition against
-- `callback` - a callback function, invoked for each union source and passed
-  the alias for that source, that should return an SQL fragment expressing the
-  condition.
-
-:::note
-
-`callback` will be called for each entry in `sourceSpecs` since each source is
-responsible for adding its own conditions.
-
-:::
-
-### Custom ordering
-
-The order of the union can be specified via the `.orderBy()` method,
-which accepts an object containing the following keys:
-
-- `attribute` - the (string) name of the attribute from the pgUnionAll
-  `attributes` to use for ordering.
-- `direction` - either `ASC` for ascending order, or `DESC` for descending
-  order. All other values have undefined results that may change in a patch
-  release.
-
-:::note
-
-Every entry in `sourceSpecs` will be ordered, and the `union all` will be ordered again
-to ensure a stable ordering result.
-
-:::
-
-### Pagination
-
-Limit/offset pagination can be accomplished via `.setFirst($n)` and
-`.setOffset($n)`. `pgUnionAll` also implements the relevant interfaces to
-support the [`connection`](../standard-steps/connection.md) step for cursor
-pagination.
-
-### Example
-
-```ts
-const $vulnerabilities = pgUnionAll({
-  executor: firstPartyVulnerabilitiesSource.executor,
-  sourceSpecs: {
-    FirstPartyVulnerability: {
-      source: firstPartyVulnerabilitiesSource,
-    },
-    ThirdPartyVulnerability: {
-      source: thirdPartyVulnerabilitiesSource,
-    },
-  },
-  attributes: {
-    cvss_score: {
-      codec: TYPES.float,
-    },
-  },
-});
-$vulnerabilities.orderBy({
-  attribute: "cvss_score",
-  direction: "DESC",
-});
-$vulnerabilities.where({
-  attribute: "cvss_score",
-  callback: (alias) =>
-    sql`${alias} > ${$vulnerabilities.placeholder(constant(6), TYPES.float)}`,
-});
-$vulnerabilities.setFirst(2);
-$vulnerabilities.setOffset(2);
-```
-
-### pgUnionAll SQL explained
-
-Though the `UNION ALL` complicates PostgreSQL's planning and execution, we've
-put effort into building the most efficient SQL queries we can for this
-problem, whilst still supporting pagination, custom conditions and custom
-ordering. This does result in more complex SQL queries than you may be used
-to from this module. Effectively the queries look like this:
-
-```sql
--- OUTER SELECT
-select
-  __union__."0"::text,
-  __union__."1"::text
-from (
-    -- MIDDLE SELECT
-    select
-      __first_table__."0",
-      __first_table__."1",
-      __first_table__."2",
-      "n"
-    from (
-      -- INNER SELECT
-      select
-        __first_table__."column1" as "0",
-        __first_table__."id" as "1",
-        'FirstTable' as "2",
-        row_number() over (partition by 1) as "n"
-      from first_table as __first_table__
-      where ...
-      order by __first_table__."column1"
-      limit ...
-    )
-  -- Any number of additional "middle selects" from different tables
-  -- via 'union all'
-  union all
-    select
-  ...
-  order by
-    "0" desc,
-    "n" asc,
-    "2" asc
-  limit ...
-  offset ...
-) __union__
-```
-
-We'll have as many "inner select" and "middle select" fragments as there are
-tables in the union.
-
-Each "inner select" is responsible for selecting the requisite common fields
-from each individual table, applying any conditions (into the `where` clause),
-applying the ordering (`order by` clause), and applying a limit (which will be
-the main limit plus the offset so that we can source enough rows for the
-`union all`'s limit/offset to apply).
-
-The middle select exists solely because `union all` only
-allows a single `order by` at the end of the statement, and for some reason we
-think we know better how to optimize this query than Postgres does... (Time
-will tell.) So the middle select just re-selects the relevant attributes.
-
-The `union all` statement then orders by the relevant attributes again
-(including the type name and the `row_number()` to ensure there's a stable
-order) and applies the final limit/offset.
-
-Finally the "outer select" selects the fields we need, and casts them according
-to the codecs involved. Note that we couldn't have cast them earlier since they
-were used in ordering, and casting them to text (for example) could seriously
-compromise the ordering.
+-->
 
 ## Types of polymorphism supported
 
@@ -333,7 +146,39 @@ create table items (
 The `items` table contains all the information that we need for our GraphQL
 types `Topic`, `Post`, `Divider`, `Checklist` and `ChecklistItem`.
 
-This style of polymorphism can use `pgSingleTablePolymorphic`:
+This style of polymorphism can use `pgSelect` in the same way as you would with
+regular row selection, however the codec on the source your `pgSelect` uses
+must have the `polymorphic` configuration option set to `mode: "single"` for it
+to work. Something like:
+
+```ts
+itemSource.codec.polymorphic = {
+  mode: "single",
+  typeColumns: ["type"],
+  types: {
+    TOPIC: {
+      name: "Topic",
+    },
+    POST: {
+      name: "Post",
+    },
+    DIVIDER: {
+      name: "Divider",
+    },
+    CHECKLIST: {
+      name: "Checklist",
+    },
+    CHECKLIST_ITEM: {
+      name: "ChecklistItem",
+    },
+  },
+};
+```
+
+<details>
+<summary>Alternatively, if you'd rather not change your source/codec...</summary>
+
+If you'd rather not change your source/codec then you can use `pgSingleTablePolymorphic`:
 
 ```ts
 // Map the SQL 'type' values to their GraphQL equivalents
@@ -421,6 +266,8 @@ const plans = {
 
 </details>
 
+</details>
+
 ### Relational table
 
 Similar to the single table example above, the relational table has a central
@@ -483,9 +330,10 @@ create table checklist_items (
 :::info
 
 When building the `PgSource` for these tables, the subtables should have
-entries in `columns` for all of the shared columns, with `via: "item"` to
-indicate that those columns come via the 'item' relationship (replacing 'item'
-with whatever relation needs to be traversed to access the central table).
+entries in `columns` for all of the shared columns, with `via: "item"`
+(replacing `"item"` with the name of the relation that needs to be traversed to
+access the central table) to indicate that those columns come via the 'item'
+relationship.
 
 :::
 
@@ -493,12 +341,58 @@ with whatever relation needs to be traversed to access the central table).
 
 This pattern can be used to represent unions too, in this case the central
 table would probably only have the primary key and type field. However, if
-you're using this pattern to represent unions then there may be an issue in
-your GraphQL data-modelling and what you actually want is an interface.
+you're using this pattern to represent unions then this may indicate an issue
+in your GraphQL data-modelling and that what you actually want is an interface.
 
 :::
 
-This style of polymorphism would be planned via `pgPolymorphic` (note the
+This style of polymorphism can use `pgSelect` in the same way as you would with
+regular row selection, however the codec on the source your `pgSelect` uses
+must have the `polymorphic` configuration option set to `mode: "relational"`
+for it to work. Something like:
+
+```ts
+itemSource.codec.polymorphic = {
+  mode: "relational",
+  typeColumns: ["type"],
+  types: {
+    TOPIC: {
+      name: "Topic",
+      relationName: "topic",
+    },
+    POST: {
+      name: "Post",
+      relationName: "post",
+    },
+    DIVIDER: {
+      name: "Divider",
+      relationName: "divider",
+    },
+    CHECKLIST: {
+      name: "Checklist",
+      relationName: "checklist",
+    },
+    CHECKLIST_ITEM: {
+      name: "ChecklistItem",
+      relationName: "checklistItem",
+    },
+  },
+};
+```
+
+:::info
+
+The `relationName` in the above configuration is the name of the relation that
+your central source has which links to the relevant table that contains
+additional data for this type.
+
+:::
+
+<details>
+
+<summary>Alternatively, if you don't want to change your codec...</summary>
+
+This style of polymorphism could be planned via `pgPolymorphic` (note the
 `plan` method returns a step representing a row from the relevant underlying
 table):
 
@@ -537,6 +431,8 @@ const plans = {
 };
 ```
 
+</details>
+
 ### Composite type union
 
 One way to indicate a union would be to use a composite type with an attribute
@@ -558,8 +454,8 @@ create type entity as (
 This type could then be used as the return result for functions or as the type
 for a column to indicate a polymorphic relationship.
 
-This type style of polymorphism would also be planned via `pgPolymorphic`
-(note we've modelled the specifier as a tuple):
+This type style of polymorphism could be planned via `pgPolymorphic` (note
+we've modelled the specifier as a tuple):
 
 ```ts
 const entityTypeMap = {
@@ -634,7 +530,59 @@ Here we might set the rule that exactly one of `liked_person_id`,
 which is non-null would indicate which concrete type the
 `PersonFavouriteEntity` represents.
 
-Planning for this would be very similar to the composite type union above:
+We can plan this using a `pgUnionAll`:
+
+```ts
+const plans = {
+  Person: {
+    favourites($person) {
+      const $favourites = personFavouritesSource.find({
+        person_id: $person.get("id"),
+      });
+      return each($favourites, ($favourite) => {
+        const $list = pgUnionAll({
+          attributes: {},
+          sourceByTypeName: {
+            Person: personSource,
+            Post: postSource,
+            Comment: pommentSource,
+          },
+          members: [
+            {
+              typeName: "Person",
+              source: personSource,
+              match: {
+                id: $favourite.get("liked_person_id"),
+              },
+            },
+            {
+              typeName: "Post",
+              source: postSource,
+              match: {
+                id: $favourite.get("liked_post_id"),
+              },
+            },
+            {
+              typeName: "Comment",
+              source: commentSource,
+              match: {
+                id: $favourite.get("liked_comment_id"),
+              },
+            },
+          ],
+        });
+        return $list.single();
+      });
+    },
+  },
+};
+```
+
+<details>
+
+<summary>Alternatively, you could use <tt>pgPolymorphic</tt>:</summary>
+
+Planning for this could be very similar to the composite type union above:
 
 ```ts
 const personFavouriteEntityTypeMap = {
@@ -675,12 +623,26 @@ const plans = {
 };
 ```
 
+</details>
+
 ### Completely separate tables
 
-In the completely separate tables form of polymorphism, any number of tables
-can become part of a union via `pgUnionAll`. You may also, optionally, declare
-attributes that these tables have in common - this can allow you to add
-conditions and orders on these common columns. Right now these common columns
-must match name and type exactly (we don't check this, but unexpected errors
-may occur at runtime if you don't adhere to it) but there's definitely scope to
-soften these requirements - get in touch if this is something you need.
+If you have two completely different tables (let's say `users` and
+`organizations`) and you want them to partake in a GraphQL interface or union,
+you could use [pgUnionAll](./pgUnionAll.md) to plan them.
+
+```ts
+const plans = {
+  Query: {
+    allPeopleAndOrganizations() {
+      const $list = pgUnionAll({
+        sourceByTypeName: {
+          Person: personSource,
+          Organization: organizationSource,
+        },
+      });
+      return $list;
+    },
+  },
+};
+```
