@@ -124,6 +124,7 @@ export async function runTestQuery(
   config: {
     variableValues?: { [key: string]: any };
     directPg?: boolean;
+    checkErrorSnapshots?: boolean;
   },
   options: {
     callback?: (
@@ -145,7 +146,7 @@ export async function runTestQuery(
   queries: PgClientQuery[];
   extensions?: any;
 }> {
-  const { variableValues } = config;
+  const { variableValues, checkErrorSnapshots } = config;
   const { path, asString, deoptimize } = options;
   await resetSequences();
 
@@ -333,7 +334,7 @@ export async function runTestQuery(
           const { data, errors, extensions } = JSON.parse(
             stringifyPayload(result as any, asString),
           );
-          if (errors) {
+          if (!checkErrorSnapshots && errors) {
             console.error(errors[0].originalError || errors[0]);
           }
           if (options.callback) {
