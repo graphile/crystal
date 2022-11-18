@@ -1,0 +1,781 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        personId: 1,
+        username: "Alice",
+        applications: {
+          totalCount: 4,
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 4,
+              },
+            },
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 5,
+              },
+            },
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI2XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 6,
+              },
+            },
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiR2NwQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 5,
+              },
+            },
+          ],
+          nodes: [
+            {
+              __typename: "AwsApplication",
+              awsId: "AWS-0004",
+              id: 4,
+              name: "AWS App 4",
+              owner: {
+                __typename: "Person",
+                personId: 1,
+                username: "Alice",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Continuity",
+                  id: 3,
+                  cvssScore: 7.7,
+                  name: "Exponential backtracking",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Information disclosure",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "98-Factor-Login",
+                  id: 1,
+                  cvssScore: 7.5,
+                  name: "CSRF",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 3,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 7.7,
+                      id: 3,
+                      name: "Exponential backtracking",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Information disclosure",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    node: {
+                      cvssScore: 7.5,
+                      id: 1,
+                      name: "CSRF",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              __typename: "AwsApplication",
+              awsId: "AWS-0005",
+              id: 5,
+              name: "AWS App 5",
+              owner: {
+                __typename: "Person",
+                personId: 1,
+                username: "Alice",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Continuity",
+                  id: 3,
+                  cvssScore: 7.7,
+                  name: "Exponential backtracking",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "Timing attack",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Malware",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 3,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 7.7,
+                      id: 3,
+                      name: "Exponential backtracking",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "Timing attack",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Malware",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              __typename: "AwsApplication",
+              awsId: "AWS-0006",
+              id: 6,
+              name: "AWS App 6",
+              owner: {
+                __typename: "Person",
+                personId: 1,
+                username: "Alice",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Accounting",
+                  id: 1,
+                  cvssScore: 3,
+                  name: "Off-by-one",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 2,
+                  cvssScore: 9.1,
+                  name: "XSS",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Malware",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "License",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 4,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    node: {
+                      cvssScore: 3,
+                      id: 1,
+                      name: "Off-by-one",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    node: {
+                      cvssScore: 9.1,
+                      id: 2,
+                      name: "XSS",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Malware",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "License",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              __typename: "GcpApplication",
+              gcpId: "GCP_0_5",
+              id: 5,
+              name: "Gigacellerator Pro",
+              owner: {
+                __typename: "Person",
+                personId: 1,
+                username: "Alice",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Continuity",
+                  id: 3,
+                  cvssScore: 7.7,
+                  name: "Exponential backtracking",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Malware",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "License",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 3,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 7.7,
+                      id: 3,
+                      name: "Exponential backtracking",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Malware",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "License",
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 2,
+        username: "Benjie",
+        applications: {
+          totalCount: 4,
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 2,
+              },
+            },
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 8,
+              },
+            },
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiR2NwQXBwbGljYXRpb24iLCJbXCIzXCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 3,
+              },
+            },
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiR2NwQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 4,
+              },
+            },
+          ],
+          nodes: [
+            {
+              __typename: "AwsApplication",
+              awsId: "AWS-0002",
+              id: 2,
+              name: "AWeSome",
+              owner: {
+                __typename: "Person",
+                personId: 2,
+                username: "Benjie",
+              },
+              vulnerabilitiesList: [],
+              vulnerabilities: {
+                totalCount: 0,
+                edges: [],
+              },
+            },
+            {
+              __typename: "AwsApplication",
+              awsId: "AWS-0008",
+              id: 8,
+              name: "AWefulS",
+              owner: {
+                __typename: "Person",
+                personId: 2,
+                username: "Benjie",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Continuity",
+                  id: 3,
+                  cvssScore: 7.7,
+                  name: "Exponential backtracking",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "98-Factor-Login",
+                  id: 1,
+                  cvssScore: 7.5,
+                  name: "CSRF",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 2,
+                  cvssScore: 9.1,
+                  name: "XSS",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Malware",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "License",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 5,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 7.7,
+                      id: 3,
+                      name: "Exponential backtracking",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    node: {
+                      cvssScore: 7.5,
+                      id: 1,
+                      name: "CSRF",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    node: {
+                      cvssScore: 9.1,
+                      id: 2,
+                      name: "XSS",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Malware",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "License",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              __typename: "GcpApplication",
+              gcpId: "GCP_0_3",
+              id: 3,
+              name: "Great Creative Project",
+              owner: {
+                __typename: "Person",
+                personId: 2,
+                username: "Benjie",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 2,
+                  cvssScore: 7.2,
+                  name: "Index-out-of-bounds",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "98-Factor-Login",
+                  id: 1,
+                  cvssScore: 7.5,
+                  name: "CSRF",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Eval-Sequel-Corp",
+                  id: 3,
+                  cvssScore: 10,
+                  name: "SQL injection",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 3,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 2,
+                      name: "Index-out-of-bounds",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    node: {
+                      cvssScore: 7.5,
+                      id: 1,
+                      name: "CSRF",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 10,
+                      id: 3,
+                      name: "SQL injection",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              __typename: "GcpApplication",
+              gcpId: "GCP_0_4",
+              id: 4,
+              name: "Gargantual Crap Pile",
+              owner: {
+                __typename: "Person",
+                personId: 2,
+                username: "Benjie",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Accounting",
+                  id: 1,
+                  cvssScore: 3,
+                  name: "Off-by-one",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Continuity",
+                  id: 3,
+                  cvssScore: 7.7,
+                  name: "Exponential backtracking",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Information disclosure",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "Timing attack",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 2,
+                  cvssScore: 9.1,
+                  name: "XSS",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 5,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    node: {
+                      cvssScore: 3,
+                      id: 1,
+                      name: "Off-by-one",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 7.7,
+                      id: 3,
+                      name: "Exponential backtracking",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Information disclosure",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "Timing attack",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    node: {
+                      cvssScore: 9.1,
+                      id: 2,
+                      name: "XSS",
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 3,
+        username: "Caroline",
+        applications: {
+          totalCount: 1,
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 2,
+              },
+            },
+          ],
+          nodes: [
+            {
+              __typename: "GcpApplication",
+              gcpId: "GCP_0_2",
+              id: 2,
+              name: "Grand Crayon Pasta",
+              owner: {
+                __typename: "Person",
+                personId: 3,
+                username: "Caroline",
+              },
+              vulnerabilitiesList: [
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 2,
+                  cvssScore: 7.2,
+                  name: "Index-out-of-bounds",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Continuity",
+                  id: 3,
+                  cvssScore: 7.7,
+                  name: "Exponential backtracking",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Information disclosure",
+                },
+                {
+                  __typename: "FirstPartyVulnerability",
+                  teamName: "Retention",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "Timing attack",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "98-Factor-Login",
+                  id: 1,
+                  cvssScore: 7.5,
+                  name: "CSRF",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Eval-Sequel-Corp",
+                  id: 3,
+                  cvssScore: 10,
+                  name: "SQL injection",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 4,
+                  cvssScore: 7.2,
+                  name: "Malware",
+                },
+                {
+                  __typename: "ThirdPartyVulnerability",
+                  vendorName: "Frog-Render-Lib",
+                  id: 5,
+                  cvssScore: 7.2,
+                  name: "License",
+                },
+              ],
+              vulnerabilities: {
+                totalCount: 8,
+                edges: [
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 2,
+                      name: "Index-out-of-bounds",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 7.7,
+                      id: 3,
+                      name: "Exponential backtracking",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Information disclosure",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "Timing attack",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    node: {
+                      cvssScore: 7.5,
+                      id: 1,
+                      name: "CSRF",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    node: {
+                      cvssScore: 10,
+                      id: 3,
+                      name: "SQL injection",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 4,
+                      name: "Malware",
+                    },
+                  },
+                  {
+                    cursor: "WyJkZGQ0YTQzOWRlIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    node: {
+                      cvssScore: 7.2,
+                      id: 5,
+                      name: "License",
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 4,
+        username: "Dave",
+        applications: {
+          totalCount: 0,
+          edges: [],
+          nodes: [],
+        },
+      },
+    ],
+  },
+}

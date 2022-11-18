@@ -1,0 +1,82 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        personId: 1,
+        username: "Alice",
+        applications: {
+          nodes: [
+            {
+              vulnerabilities: {
+                totalCount: 3,
+              },
+            },
+            {
+              vulnerabilities: {
+                totalCount: 3,
+              },
+            },
+            {
+              vulnerabilities: {
+                totalCount: 4,
+              },
+            },
+            {
+              vulnerabilities: {
+                totalCount: 3,
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 2,
+        username: "Benjie",
+        applications: {
+          nodes: [
+            {
+              vulnerabilities: {
+                totalCount: 0,
+              },
+            },
+            {
+              vulnerabilities: {
+                totalCount: 5,
+              },
+            },
+            {
+              vulnerabilities: {
+                totalCount: 3,
+              },
+            },
+            {
+              vulnerabilities: {
+                totalCount: 5,
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 3,
+        username: "Caroline",
+        applications: {
+          nodes: [
+            {
+              vulnerabilities: {
+                totalCount: 8,
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 4,
+        username: "Dave",
+        applications: {
+          nodes: [],
+        },
+      },
+    ],
+  },
+}

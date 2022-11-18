@@ -1,0 +1,15 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allPeople(first: 4) {
+    nodes {
+      personId
+      username
+      applications {
+        totalCount
+      }
+    }
+  }
+}

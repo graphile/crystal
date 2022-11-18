@@ -1,0 +1,34 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        personId: 1,
+        username: "Alice",
+        applications: {
+          totalCount: 4,
+        },
+      },
+      {
+        personId: 2,
+        username: "Benjie",
+        applications: {
+          totalCount: 4,
+        },
+      },
+      {
+        personId: 3,
+        username: "Caroline",
+        applications: {
+          totalCount: 1,
+        },
+      },
+      {
+        personId: 4,
+        username: "Dave",
+        applications: {
+          totalCount: 0,
+        },
+      },
+    ],
+  },
+}

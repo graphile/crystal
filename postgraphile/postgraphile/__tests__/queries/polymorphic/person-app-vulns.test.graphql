@@ -1,0 +1,67 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allPeople(first: 4) {
+    nodes {
+      personId
+      username
+      applications {
+        totalCount
+        edges {
+          cursor
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          ... on AwsApplication {
+            awsId
+          }
+          ... on GcpApplication {
+            gcpId
+          }
+          id
+          name
+          owner {
+            __typename
+            ... on Person {
+              personId
+              username
+            }
+            ... on Organization {
+              organizationId
+              name
+            }
+          }
+          vulnerabilitiesList {
+            __typename
+            ... on FirstPartyVulnerability {
+              teamName
+            }
+            ... on ThirdPartyVulnerability {
+              vendorName
+            }
+            id
+            cvssScore
+            name
+          }
+          vulnerabilities {
+            totalCount
+            edges {
+              cursor
+              node {
+                cvssScore
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
