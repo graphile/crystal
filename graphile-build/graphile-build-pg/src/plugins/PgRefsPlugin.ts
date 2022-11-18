@@ -43,7 +43,7 @@ declare global {
 
 declare module "@dataplan/pg" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface PgTypeCodecExtensions<TColumnName extends string> {
+  interface PgTypeCodecExtensions {
     /**
      * References between codecs (cannot be implemented directly, but sources
      * may implement them).

@@ -97,7 +97,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     hooks: {
       async pgCodecs_recordType_spec(info, event) {
         const { pgClass, spec, databaseName } = event;
-        const extensions: PgTypeCodecExtensions<string> =
+        const extensions: PgTypeCodecExtensions =
           spec.extensions ?? Object.create(null);
         if (!spec.extensions) {
           spec.extensions = extensions;

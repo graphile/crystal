@@ -60,7 +60,7 @@ export interface PgRefDefinitions {
 /**
  * Custom metadata for a codec
  */
-export interface PgTypeCodecExtensions<TColumnName extends string = string> {
+export interface PgTypeCodecExtensions {
   description?: string;
 }
 
@@ -224,7 +224,7 @@ export interface PgTypeCodec<
   /**
    * Arbitrary metadata
    */
-  extensions?: Partial<PgTypeCodecExtensions<any>>;
+  extensions?: Partial<PgTypeCodecExtensions>;
 }
 
 export type PgEnumValue<TValue extends string = string> = {
