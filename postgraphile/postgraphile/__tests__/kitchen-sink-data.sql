@@ -525,7 +525,7 @@ insert into polymorphic.aws_applications (id, person_id, organization_id, name, 
   (5, 1, null, 'AWS App 5', null, 'AWS-0005'),
   (6, 1, null, 'AWS App 6', null, 'AWS-0006'),
   (7, null, 5, 'SAC-NORAD AI', null, 'AWSKYNET'),
-  (8, 2, null, 'AWfulS', '2021-06-05T04:03:02.010Z', 'AWS-0008');
+  (8, 2, null, 'AWfulS', '2022-07-06T05:04:03.020Z', 'AWS-0008');
 insert into polymorphic.gcp_applications (id, person_id, organization_id, name, last_deployed, gcp_id) values
   (1, null, 1, 'GCP App 1', null, 'GCP_0_1'),
   (2, 3, null, 'Grand Crayon Pasta', '2022-10-10T10:10:10.101Z', 'GCP_0_2'),
