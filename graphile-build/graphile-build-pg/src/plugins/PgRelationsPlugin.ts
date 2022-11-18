@@ -1241,7 +1241,6 @@ function addRelations(
         OtherType instanceof GraphQLUnionType
       )
     ) {
-      console.log(`Could not find '${typeName}'`);
       return memo;
     }
     let fields = memo;
