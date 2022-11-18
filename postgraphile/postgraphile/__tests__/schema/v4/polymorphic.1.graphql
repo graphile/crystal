@@ -9,7 +9,25 @@ interface Application {
   owner: PersonOrOrganization
 
   """Reads and enables pagination through a set of `Vulnerability`."""
-  vulnerabilities: VulnerabilitiesConnection!
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): VulnerabilitiesConnection!
 }
 
 """
@@ -3299,7 +3317,33 @@ type RelationalChecklist implements Node & RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
-  relationalItemsByParentId: RelationalItemsConnection!
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
 
   """
   Reads a single `RelationalPost` that is related to this `RelationalChecklist`.
@@ -3422,7 +3466,33 @@ type RelationalChecklistItem implements Node & RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
-  relationalItemsByParentId: RelationalItemsConnection!
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
 
   """
   Reads a single `RelationalPost` that is related to this `RelationalChecklistItem`.
@@ -3696,7 +3766,33 @@ type RelationalDivider implements Node & RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
-  relationalItemsByParentId: RelationalItemsConnection!
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
 
   """
   Reads a single `RelationalPost` that is related to this `RelationalDivider`.
@@ -3886,7 +3982,25 @@ interface RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
-  relationalItemsByParentId: RelationalItemsConnection!
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemsConnection!
 
   """
   Reads a single `RelationalPost` that is related to this `RelationalItem`.
@@ -4041,7 +4155,33 @@ type RelationalPost implements Node & RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
-  relationalItemsByParentId: RelationalItemsConnection!
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
 
   """
   Reads a single `RelationalPost` that is related to this `RelationalPost`.
@@ -4246,7 +4386,33 @@ type RelationalTopic implements Node & RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
-  relationalItemsByParentId: RelationalItemsConnection!
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByRootTopicId(
@@ -4599,7 +4765,25 @@ interface SingleTableItem {
   singleTableItemByParentId: SingleTableItem
 
   """Reads and enables pagination through a set of `SingleTableItem`."""
-  singleTableItemsByParentId: SingleTableItemsConnection!
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemsConnection!
   type: ItemType!
   updatedAt: Datetime!
 }
@@ -5738,7 +5922,25 @@ enum VulnerabilitiesOrderBy {
 
 interface Vulnerability {
   """Reads and enables pagination through a set of `Application`."""
-  applications: ApplicationsConnection!
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): ApplicationsConnection!
   cvssScore: Float!
   id: Int!
   name: String!
