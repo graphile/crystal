@@ -1,0 +1,23 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allPeople(first: 4) {
+    nodes {
+      personId
+      username
+      applications(orderBy: [LAST_DEPLOYED_DESC, ID_DESC]) {
+        edges {
+          cursor
+          node {
+            __typename
+            id
+            name
+            lastDeployed
+          }
+        }
+      }
+    }
+  }
+}
