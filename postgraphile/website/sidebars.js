@@ -75,6 +75,8 @@ const sidebars = {
     },
     "enums",
     "views",
+    "polymorphism",
+    "refs",
     "aggregates",
     "postgresql-indexes",
     "security",
