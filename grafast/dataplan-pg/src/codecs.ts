@@ -353,7 +353,7 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
   isAnonymous?: boolean;
 };
 
-// TODO: Move extensions,isAnonymous into a config object for consistency with other functions in this file.
+// TODO: Replace this entire function with `realRecordType` (remove overloading)
 /**
  * Returns a PgTypeCodec that represents a composite type (a type with
  * attributes).
