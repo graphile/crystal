@@ -8,6 +8,12 @@ export {
   NullabilitySpecString,
 } from "./makeChangeNullabilityPlugin.js";
 export { makeExtendSchemaPlugin } from "./makeExtendSchemaPlugin.js";
+export {
+  makeJSONPgSmartTagsPlugin,
+  makePgSmartTagsFromFilePlugin,
+  makePgSmartTagsPlugin,
+  TagsFilePlugin,
+} from "./makePgSmartTagsPlugin.js";
 export { makeProcessSchemaPlugin } from "./makeProcessSchemaPlugin.js";
 export {
   makeWrapPlansPlugin,

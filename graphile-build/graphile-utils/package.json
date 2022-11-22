@@ -48,7 +48,8 @@
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
-    "graphql": "*"
+    "graphql": "*",
+    "pg-introspection": "workspace:^"
   },
   "devDependencies": {
     "graphile-build": "workspace:^",

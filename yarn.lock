@@ -12254,6 +12254,7 @@ __metadata:
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
     graphql: "*"
+    pg-introspection: "workspace:^"
   languageName: unknown
   linkType: soft
 
