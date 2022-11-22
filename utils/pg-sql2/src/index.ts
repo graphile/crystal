@@ -1002,6 +1002,9 @@ function replaceSymbolInNode(
   }
 }
 
+/**
+ * @experimental
+ */
 export function replaceSymbol(
   frag: SQL,
   needle: symbol,
