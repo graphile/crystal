@@ -678,6 +678,26 @@ class: {
 comment on view my_view is E'@unique id\n@unique org,slug';
 ```
 
+##### @interface
+
+TODO (see Polymorphism docs)
+
+###### @type
+
+TODO (see Polymorphism docs)
+
+##### @unionMember
+
+TODO (see Polymorphism docs)
+
+##### @ref
+
+TODO (see Ref docs)
+
+###### @refVia
+
+TODO (see Ref docs)
+
 ##### Smart Tags on virtual constraints
 
 You can also add smart tags on virtual constraints, for example adding the
