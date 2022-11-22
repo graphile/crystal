@@ -12,21 +12,30 @@ export const parseSmartComment = (
 ): PgSmartTagsAndDescription => {
   const result: PgSmartTagsAndDescription = {
     tags: Object.create(null),
-    description: "",
+    description: undefined,
   };
   if (str) {
-    str.split(/\r?\n/).forEach((line) => {
-      if (result.description !== "") {
+    const lines = str.split(/\r?\n/);
+    lines.forEach((line, i) => {
+      if (i === 0 && line === "") {
+        // Ignore leading newline
+        return;
+      }
+      if (result.description !== undefined) {
         result.description += `\n${line}`;
         return;
       }
-      const match = line.match(/^@[a-zA-Z][a-zA-Z0-9_]*($|\s)/);
+      const match = line.match(/^[ \t]*@([a-zA-Z][a-zA-Z0-9_]*)($|\s)(.*)$/);
       if (!match) {
-        result.description = line;
+        if (i === 1 && lines[0] === "") {
+          result.description = "\n" + line;
+        } else {
+          result.description = line;
+        }
         return;
       }
-      const key = match[0].slice(1).trim();
-      const value = match[0] === line ? true : line.replace(match[0], "");
+      const [, key, space, rawValue] = match;
+      const value = space ? rawValue : true;
       if (key in result.tags) {
         const prev = result.tags[key] as string | true | Array<string | true>;
         if (Array.isArray(prev)) {
@@ -39,7 +48,7 @@ export const parseSmartComment = (
       }
     });
   }
-  if (result.description === "") {
+  if (result.description?.trim() === "") {
     result.description = undefined;
   }
   return result;

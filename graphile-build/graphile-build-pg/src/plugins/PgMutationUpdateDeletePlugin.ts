@@ -13,12 +13,14 @@ import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
+  evalSafeProperty,
+  isSafeObjectPropertyName,
   lambda,
   object,
   ObjectStep,
   specFromNodeId,
 } from "grafast";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
+import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
@@ -140,6 +142,7 @@ const isUpdatable = (
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
+  if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
   const behavior = getBehavior(source.extensions);
@@ -152,6 +155,7 @@ const isDeletable = (
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
+  if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
   const behavior = getBehavior(source.extensions);
@@ -162,6 +166,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
   version: version,
+  after: ["smart-tags"],
 
   inflection: {
     add: {
@@ -616,8 +621,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     : inflection.deleteByKeysInputType(details);
 
                 const payloadType = build.getOutputTypeByName(payloadTypeName);
-                const mutationInputType =
-                  build.getInputTypeByName(inputTypeName);
+                const mutationInputType = build.getTypeByName(inputTypeName);
+                if (!mutationInputType) {
+                  return fields;
+                }
+                if (!build.graphql.isInputObjectType(mutationInputType)) {
+                  throw new Error(
+                    `Expected '${inputTypeName}' to be an input object type`,
+                  );
+                }
 
                 const uniqueColumns = (unique.columns as string[]).map(
                   (columnName) => [
@@ -639,8 +651,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   uniqueMode === "keys" &&
                   uniqueColumns.every(
                     ([columnName, fieldName]) =>
-                      isSafeIdentifier(columnName) &&
-                      isSafeIdentifier(fieldName),
+                      isSafeObjectPropertyName(columnName) &&
+                      isSafeObjectPropertyName(fieldName),
                   );
 
                 /**
@@ -654,7 +666,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   ? `{ ${uniqueColumns
                       .map(
                         ([columnName, fieldName]) =>
-                          `${columnName}: args.get(['input', ${JSON.stringify(
+                          `${evalSafeProperty(
+                            columnName,
+                          )}: args.get(['input', ${JSON.stringify(
                             fieldName,
                           )}])`,
                       )

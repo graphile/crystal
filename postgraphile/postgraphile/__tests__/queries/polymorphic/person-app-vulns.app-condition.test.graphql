@@ -1,0 +1,31 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+## expect(data.allPeople.nodes[0].applications.edges).toHaveLength(0)
+## expect(data.allPeople.nodes[1].applications.edges).toHaveLength(1)
+## expect(data.allPeople.nodes[1].applications.edges[0].node.name).toEqual("AWfulS")
+## expect(data.allPeople.nodes[2].applications.edges).toHaveLength(0)
+## expect(data.allPeople.nodes[3].applications.edges).toHaveLength(0)
+
+{
+  allPeople(first: 4) {
+    nodes {
+      personId
+      username
+      applications(
+        first: 1
+        after: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=" # AwsApplication/4
+        condition: { name: "AWfulS" }
+      ) {
+        edges {
+          cursor
+          node {
+            __typename
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}

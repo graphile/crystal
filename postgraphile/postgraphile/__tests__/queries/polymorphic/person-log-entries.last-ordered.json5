@@ -1,0 +1,46 @@
+{
+  allPeople: {
+    edges: [
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 6,
+          username: "Fred",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 7,
+          username: "Georgina",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "I'm moving to America",
+              id: 14,
+            },
+          ],
+          personId: 8,
+          username: "Harry",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 9,
+          username: "Idris",
+        },
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 10,
+          username: "Jem",
+        },
+      },
+    ],
+  },
+}

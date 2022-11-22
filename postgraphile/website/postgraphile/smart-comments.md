@@ -26,13 +26,15 @@ we add a special syntax to these comments that enables PostGraphile to treat
 them as smart comments.
 
 A smart comment is made up of one or more "tags" and optionally followed by the
-remaining comment. Tags may have a string payload (which follows a the tag and a
-space, and must not contain newline characters) and are separated by newlines.
-Tags always start with an `@` symbol and must always come before the remaining
-comment, hence all smart comments start with an `@` symbol. If a tag has no
-payload then its value will be the boolean `true`, otherwise it will be a
-string. If the same tag is present more than once in a smart comment then its
-final value will become an array of the individual values for that tag.
+remaining comment. Leading spaces and tabs are ignored. If the very first line
+is blank, that is also ignored. Tags may have a string payload (which follows
+the tag and a space, and must not contain newline characters) and are separated
+by newlines (`\n` or `\r\n`). Tags always start with an `@` symbol and must
+always come before the remaining comment, hence all smart comments start with
+an `@` symbol. If a tag has no payload then its value will be the boolean
+`true`, otherwise it will be a string. If the same tag is present more than
+once in a smart comment then its final value will become an array of the
+individual values for that tag.
 
 The following text could be parsed as a smart comment (**the smart comment
 values shown are examples only, and don't have any meaning**):
@@ -66,19 +68,25 @@ more flexible in future; you might want to check out the
 
 ### Adding newlines
 
-To put newlines in smart comments we recommend the use of the
+We recommend you define smart tags using [dollar
+quoting](https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING),
+which makes adding newlines natural. We support both LF and CRLF line endings
+(and treat them the same).
+
+Traditionally we recommended the use of the
 [`E` "escape" string constants](https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS),
-wherein you can use `\n` for newlines. For example the text above could be added
-to a comment on a field via:
+wherein you can use `\n` for newlines, but that was before we made the parser less strict.
 
 ```sql
-comment on column my_schema.my_table.my_column is
-  E'@name meta\n@isImportant\n@jsonField date timestamp\n@jsonField name text\n@jsonField episode enum ONE=1 TWO=2\nThis field has a load of arbitrary tags.';
+comment on column my_schema.my_table.my_column is $$
+@name meta
+@isImportant
+@jsonField date timestamp
+@jsonField name text
+@jsonField episode enum ONE=1 TWO=2
+This field has a load of arbitrary tags.
+$$;
 ```
-
-You can use newlines verbatim but this can cause issues with some tooling,
-particularly if you have developers on both Windows and Unix-based operating
-systems.
 
 ### Applying smart tags to database entities
 

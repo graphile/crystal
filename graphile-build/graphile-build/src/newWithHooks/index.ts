@@ -100,14 +100,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
       switch (Type) {
         case GraphQLSchema: {
           const rawSpec = inSpec as GraphQLSchemaConfig;
-          const scope = (inScope || {}) as GraphileBuild.ScopeGraphQLSchema;
-          const context: GraphileBuild.ContextGraphQLSchema = {
+          const scope = (inScope || {}) as GraphileBuild.ScopeSchema;
+          const context: GraphileBuild.ContextSchema = {
             type: "GraphQLSchema",
             scope,
           };
           const finalSpec = builder.applyHooks(
             "GraphQLSchema",
             rawSpec,
+            build,
+            context,
+          );
+
+          finalSpec.types = builder.applyHooks(
+            "GraphQLSchema_types",
+            [...(finalSpec.types ?? [])],
             build,
             context,
           );

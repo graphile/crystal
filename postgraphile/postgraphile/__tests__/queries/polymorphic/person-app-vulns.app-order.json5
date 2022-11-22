@@ -1,0 +1,118 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        personId: 1,
+        username: "Alice",
+        applications: {
+          edges: [
+            {
+              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI2IiwiQXdzQXBwbGljYXRpb24iLCJbXCI2XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 6,
+                name: "AWS App 6",
+                lastDeployed: null,
+              },
+            },
+            {
+              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI1IiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 5,
+                name: "AWS App 5",
+                lastDeployed: null,
+              },
+            },
+            {
+              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI1IiwiR2NwQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 5,
+                name: "Gigacellerator Pro",
+                lastDeployed: null,
+              },
+            },
+            {
+              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI0IiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 4,
+                name: "AWS App 4",
+                lastDeployed: null,
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 2,
+        username: "Benjie",
+        applications: {
+          edges: [
+            {
+              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI0IiwiR2NwQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 4,
+                name: "Gargantual Crap Pile",
+                lastDeployed: null,
+              },
+            },
+            {
+              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCIzIiwiR2NwQXBwbGljYXRpb24iLCJbXCIzXCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 3,
+                name: "Great Creative Project",
+                lastDeployed: null,
+              },
+            },
+            {
+              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0wNy0wNlQwMTowNDowMy4wMjAwMDAtMDQwMCIsIjgiLCJBd3NBcHBsaWNhdGlvbiIsIltcIjhcIl0iXQ==",
+              node: {
+                __typename: "AwsApplication",
+                id: 8,
+                name: "AWfulS",
+                lastDeployed: "2022-07-06T01:04:03.020000-0400",
+              },
+            },
+            {
+              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMS0wNi0wNVQwMDowMzowMi4wMTAwMDAtMDQwMCIsIjIiLCJBd3NBcHBsaWNhdGlvbiIsIltcIjJcIl0iXQ==",
+              node: {
+                __typename: "AwsApplication",
+                id: 2,
+                name: "AWeSome",
+                lastDeployed: "2021-06-05T00:03:02.010000-0400",
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 3,
+        username: "Caroline",
+        applications: {
+          edges: [
+            {
+              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0xMC0xMFQwNjoxMDoxMC4xMDEwMDAtMDQwMCIsIjIiLCJHY3BBcHBsaWNhdGlvbiIsIltcIjJcIl0iXQ==",
+              node: {
+                __typename: "GcpApplication",
+                id: 2,
+                name: "Grand Crayon Pasta",
+                lastDeployed: "2022-10-10T06:10:10.101000-0400",
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 4,
+        username: "Dave",
+        applications: {
+          edges: [],
+        },
+      },
+    ],
+  },
+}

@@ -3,7 +3,7 @@
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
+import { evalSafeProperty, isSafeObjectPropertyName } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -131,17 +131,12 @@ export class ObjectStep<
       // Shortcut simple case
       return () => EMPTY_OBJECT;
     }
-    const keysAreSafe = this.keys.every(isSafeIdentifier);
+    const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
     const inner = keysAreSafe
       ? `\
   const newObj = {
 ${this.keys
-  .map(
-    (key, i) =>
-      `    ${
-        STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key
-      }: val${i}`,
-  )
+  .map((key, i) => `    ${evalSafeProperty(key)}: val${i}`)
   .join(",\n")}
   };
 `

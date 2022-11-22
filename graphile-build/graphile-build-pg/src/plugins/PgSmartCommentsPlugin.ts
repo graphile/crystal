@@ -28,6 +28,8 @@ export const PgSmartCommentsPlugin: GraphileConfig.Plugin = {
   name: "PgSmartCommentsPlugin",
   description: "Applies smart comments and descriptions to various resources",
   version,
+  provides: ["smart-tags"],
+
   gather: {
     namespace: "pgSmartComments",
     helpers: {},
@@ -61,8 +63,12 @@ export const PgSmartCommentsPlugin: GraphileConfig.Plugin = {
         applyTags(pgAttribute, column);
       },
 
-      pgCodecs_recordType_extensions(info, event) {
-        const { pgClass, extensions } = event;
+      pgCodecs_recordType_spec(info, event) {
+        const { pgClass, spec } = event;
+        const extensions = spec.extensions ?? Object.create(null);
+        if (!spec.extensions) {
+          spec.extensions = extensions;
+        }
         const typeTagsAndDescription = pgClass
           .getType()!
           .getTagsAndDescription();

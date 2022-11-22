@@ -5,14 +5,25 @@ import type { SQL } from "pg-sql2";
 
 import type { PgTypeCodec } from "../interfaces.js";
 
+export type PgWhereConditionSpec<TAttribute extends string> =
+  | SQL
+  | {
+      type: "attribute";
+      attribute: TAttribute;
+      callback: (fragment: SQL) => SQL;
+    };
+
+export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
+// | ...
+
 export interface PgConditionCapableParentStep extends BaseStep {
   alias: SQL;
   placeholder(
     $step: ExecutableStep<any>,
     codec: PgTypeCodec<any, any, any>,
   ): SQL;
-  where(condition: SQL): void;
-  having?(condition: SQL): void;
+  where(condition: PgWhereConditionSpec<any>): void;
+  having?(condition: PgHavingConditionSpec<any>): void;
 }
 
 export class PgConditionStep<
@@ -23,8 +34,8 @@ export class PgConditionStep<
     exportName: "PgConditionStep",
   };
 
-  private conditions: SQL[] = [];
-  private havingConditions: SQL[] = [];
+  private conditions: PgWhereConditionSpec<any>[] = [];
+  private havingConditions: PgHavingConditionSpec<any>[] = [];
 
   public readonly alias: SQL;
 
@@ -33,7 +44,7 @@ export class PgConditionStep<
     this.alias = $parent.alias;
   }
 
-  where(condition: SQL): void {
+  where(condition: PgWhereConditionSpec<any>): void {
     assert.equal(
       this.isHaving,
       false,
@@ -42,7 +53,7 @@ export class PgConditionStep<
     this.conditions.push(condition);
   }
 
-  having(condition: SQL): void {
+  having(condition: PgHavingConditionSpec<any>): void {
     assert.equal(
       this.isHaving,
       true,

@@ -34,7 +34,7 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  * {@page ~@dataplan/pg/steps/pgPageInfo.md}
  */
 export class PgPageInfoStep<
-    TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any>,
+    TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any, any>,
   >
   extends UnbatchedExecutableStep<any>
   implements PageInfoCapableStep
@@ -194,7 +194,7 @@ export class PgPageInfoStep<
  * {@page ~@dataplan/pg/steps/pgPageInfo.md}
  */
 export function pgPageInfo<
-  TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any>,
+  TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any, any>,
 >(
   connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>,
 ): PgPageInfoStep<TStep> {

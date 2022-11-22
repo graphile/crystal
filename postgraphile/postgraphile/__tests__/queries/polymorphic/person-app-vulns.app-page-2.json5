@@ -1,0 +1,91 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        personId: 1,
+        username: "Alice",
+        applications: {
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 5,
+                vulnerabilities: {
+                  edges: [
+                    {
+                      cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                      node: {
+                        __typename: "FirstPartyVulnerability",
+                        id: 3,
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 2,
+        username: "Benjie",
+        applications: {
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              node: {
+                __typename: "AwsApplication",
+                id: 8,
+                vulnerabilities: {
+                  edges: [
+                    {
+                      cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                      node: {
+                        __typename: "FirstPartyVulnerability",
+                        id: 3,
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 3,
+        username: "Caroline",
+        applications: {
+          edges: [
+            {
+              cursor: "WyJkZGQ0YTQzOWRlIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              node: {
+                __typename: "GcpApplication",
+                id: 2,
+                vulnerabilities: {
+                  edges: [
+                    {
+                      cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                      node: {
+                        __typename: "FirstPartyVulnerability",
+                        id: 2,
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        personId: 4,
+        username: "Dave",
+        applications: {
+          edges: [],
+        },
+      },
+    ],
+  },
+}

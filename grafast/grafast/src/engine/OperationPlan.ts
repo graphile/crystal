@@ -1417,7 +1417,9 @@ export class OperationPlan {
     $step: ExecutableStep,
     allPossibleObjectTypes: readonly GraphQLObjectType[],
   ): LayerPlan<LayerPlanReasonPolymorphic> {
-    const pathString = path.join("|");
+    // TODO: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
+    // https://github.com/benjie/postgraphile-private/issues/109
+    const pathString = `${path.join("|")}!${$step.id}`;
     const polymorphicLayerPlanByPath =
       this.polymorphicLayerPlanByPathByLayerPlan.get(parentLayerPlan) ??
       new Map();
@@ -1432,7 +1434,9 @@ export class OperationPlan {
       const { stepId, layerPlan } = prev;
       if (this.steps[stepId] !== this.steps[$step.id]) {
         throw new Error(
-          "GraphileInternalError<e01bdc40-7c89-41c6-8d84-56efa22c872a>: unexpected inconsistency when determining the polymorphic LayerPlan to use",
+          `GraphileInternalError<e01bdc40-7c89-41c6-8d84-56efa22c872a>: unexpected inconsistency when determining the polymorphic LayerPlan to use (pathString = ${pathString}, ${
+            this.steps[stepId]
+          } (${stepId}) != ${this.steps[$step.id]} (${$step.id}))`,
         );
       }
       for (const t of allPossibleObjectTypes) {

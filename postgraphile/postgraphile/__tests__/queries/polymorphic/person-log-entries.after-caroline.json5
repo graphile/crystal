@@ -1,0 +1,27 @@
+{
+  allPeople: {
+    edges: [
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "Beer brewing complete",
+              id: 4,
+            },
+          ],
+          personId: 4,
+          username: "Dave",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw0XQ==",
+      },
+      {
+        node: {
+          logEntriesByPersonIdList: [],
+          personId: 5,
+          username: "Ellie",
+        },
+        cursor: "WyI5NjdkZTdmYTdlIiw1XQ==",
+      },
+    ],
+  },
+}

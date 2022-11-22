@@ -1,5 +1,6 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import { list, UnbatchedExecutableStep } from "grafast";
+import { $$concreteType, list, UnbatchedExecutableStep } from "grafast";
+import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -18,7 +19,7 @@ import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectMode } from "./pgSelect.js";
-import { PgSelectStep } from "./pgSelect.js";
+import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("datasource:pg:PgSelectSingleStep:plan");
@@ -83,18 +84,19 @@ export class PgSelectSingleStep<
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
   private _coalesceToEmptyObject = false;
+  private typeStepIndexList: number[] | null = null;
 
   constructor(
-    classPlan: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-    itemPlan: ExecutableStep<PgSourceRow<TColumns>>,
+    $class: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
+    $item: ExecutableStep<PgSourceRow<TColumns>>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
-    this.itemStepId = this.addDependency(itemPlan);
-    this.source = classPlan.source;
+    this.itemStepId = this.addDependency($item);
+    this.source = $class.source;
     this.pgCodec = this.source.codec;
-    this.mode = classPlan.mode;
-    this.classStepId = classPlan.id;
+    this.mode = $class.mode;
+    this.classStepId = $class.id;
   }
 
   public coalesceToEmptyObject(): void {
@@ -240,7 +242,14 @@ export class PgSelectSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(
+    const sqlExpr = pgClassExpression<
+      any,
+      any,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(
       this,
       attr === ""
         ? this.source.codec
@@ -281,7 +290,14 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    const sqlExpr = pgClassExpression(this, codec);
+    const sqlExpr = pgClassExpression<
+      TExpressionColumns,
+      TExpressionCodec,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(this, codec);
     return sqlExpr`${fragment}`;
   }
 
@@ -432,9 +448,14 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    return pgClassExpression(this, this.source.codec)`${
-      this.getClassStep().alias
-    }`;
+    return pgClassExpression<
+      TColumns,
+      PgTypeCodec<TColumns, any, any>,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(this, this.source.codec)`${this.getClassStep().alias}`;
   }
 
   /**
@@ -454,7 +475,14 @@ export class PgSelectSingleStep<
     TRelations,
     TParameters
   > {
-    return pgClassExpression(this, codec)`${expression}`;
+    return pgClassExpression<
+      TExpressionColumns,
+      TExpressionCodec,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >(this, codec)`${expression}`;
   }
 
   /**
@@ -467,7 +495,14 @@ export class PgSelectSingleStep<
     const orders = classPlan.getOrderBy();
     const step = list(
       orders.length > 0
-        ? orders.map((o) => this.expression(o.fragment, o.codec))
+        ? orders.map((o) => {
+            const [frag, codec] = getFragmentAndCodecFromOrder(
+              this.getClassStep().alias,
+              o,
+              this.getClassStep().source.codec,
+            );
+            return this.expression(frag, codec);
+          })
         : // No ordering; so use row number
           [this.expression(sql`row_number() over (partition by 1)`, TYPES.int)],
     );
@@ -510,9 +545,46 @@ export class PgSelectSingleStep<
     });
   }
 
+  planForType(type: GraphQLObjectType): ExecutableStep {
+    const poly = this.source.codec.polymorphism;
+    if (poly?.mode === "single") {
+      return this;
+    } else if (poly?.mode === "relational") {
+      for (const spec of Object.values(poly.types)) {
+        if (spec.name === type.name) {
+          return this.singleRelation(spec.relationName);
+        }
+      }
+      throw new Error(
+        `${this} Could not find matching name for relational polymorphic '${type.name}'`,
+      );
+    } else {
+      throw new Error(
+        `${this}: Don't know how to plan this as polymorphic for ${type}`,
+      );
+    }
+  }
+
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
+    const poly = this.source.codec.polymorphism;
+    if (poly?.mode === "single" || poly?.mode === "relational") {
+      const $class = this.getClassStep();
+      this.typeStepIndexList = poly.typeColumns.map((col) => {
+        const attr = this.source.codec.columns![col];
+        const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
+
+        return $class.selectAndReturnIndex(
+          attr.codec.castFromPg
+            ? attr.codec.castFromPg(expr)
+            : sql`${expr}::text`,
+        );
+      });
+    } else {
+      this.typeStepIndexList = null;
+    }
+
     const columns = this.source.codec.columns;
     if (columns && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
@@ -559,6 +631,25 @@ export class PgSelectSingleStep<
     return this;
   }
 
+  finalize() {
+    const poly = this.source.codec.polymorphism;
+    if (poly?.mode === "single" || poly?.mode === "relational") {
+      this.handlePolymorphism = (val) => {
+        if (val == null) return val;
+        const typeList = this.typeStepIndexList!.map((i) => val[i]);
+        const key = String(typeList);
+        const entry = poly.types[key];
+        if (entry) {
+          return Object.assign(val, { [$$concreteType]: entry.name });
+        }
+        return null;
+      };
+    }
+    return super.finalize();
+  }
+
+  handlePolymorphism?: (result: any) => any;
+
   unbatchedExecute(
     extra: ExecutionExtra,
     result: PgSourceRow<TColumns>,
@@ -579,7 +670,7 @@ export class PgSelectSingleStep<
         return this._coalesceToEmptyObject ? Object.create(null) : null;
       }
     }
-    return result;
+    return this.handlePolymorphism ? this.handlePolymorphism(result) : result;
   }
 }
 

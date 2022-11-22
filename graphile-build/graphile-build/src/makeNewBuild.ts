@@ -45,6 +45,7 @@ export default function makeNewBuild(
   input: GraphileBuild.BuildInput,
   inflection: GraphileBuild.Inflection,
 ): GraphileBuild.BuildBase {
+  const building = new Set<string>();
   const allTypes = {
     Int: GraphQLInt,
     Float: GraphQLFloat,
@@ -150,6 +151,9 @@ export default function makeNewBuild(
         }
       }
     },
+    getAllTypes() {
+      return allTypes;
+    },
     scopeByType,
     inflection,
     handleRecoverableError(e) {
@@ -247,7 +251,12 @@ export default function makeNewBuild(
     getTypeByName(typeName) {
       if (typeName in allTypes) {
         return allTypes[typeName];
+      } else if (building.has(typeName)) {
+        throw new Error(
+          `Construction cycle detected: ${typeName} is already being built. Most likely this means that you forgot to use a callback for 'fields', 'interfaces', 'types', etc. when defining a type.`,
+        );
       } else {
+        building.add(typeName);
         const details = typeRegistry[typeName];
         if (details != null) {
           const { klass, scope, specGenerator, Step } = details;

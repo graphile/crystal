@@ -14,7 +14,8 @@ drop schema if exists
   network_types,
   named_query_builder,
   enum_tables,
-  geometry
+  geometry,
+  polymorphic
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -1244,3 +1245,269 @@ create table geometry.geom (
   polygon polygon,
   circle circle
 );
+
+--------------------------------------------------------------------------------
+
+create schema polymorphic;
+
+create table polymorphic.people (
+  person_id serial primary key,
+  username text not null unique
+);
+
+comment on table polymorphic.people is $$
+  @unionMember PersonOrOrganization
+  @ref applications to:Application
+  @refVia applications via:aws_applications
+  @refVia applications via:gcp_applications
+  $$;
+
+create table polymorphic.organizations (
+  organization_id serial primary key,
+  name text not null unique
+);
+
+comment on table polymorphic.organizations is E'@unionMember PersonOrOrganization';
+
+create table polymorphic.log_entries (
+  id serial primary key,
+  person_id int references polymorphic.people on delete cascade,
+  organization_id int references polymorphic.organizations on delete cascade,
+  text text not null,
+  constraint owned_by_person_or_organization check ((person_id is null) <> (organization_id is null))
+);
+
+comment on table polymorphic.log_entries is $$
+  @ref author to:PersonOrOrganization
+  @refVia author via:people
+  @refVia author via:organizations
+  $$;
+
+create type polymorphic.item_type as enum (
+  'TOPIC',
+  'POST',
+  'DIVIDER',
+  'CHECKLIST',
+  'CHECKLIST_ITEM'
+);
+
+create table polymorphic.single_table_items (
+  id serial primary key,
+
+  -- Rails-style polymorphic column
+  type polymorphic.item_type not null default 'POST'::polymorphic.item_type,
+
+  -- Shared attributes:
+  parent_id int references polymorphic.single_table_items on delete cascade,
+  root_topic_id int constraint single_table_items_root_topic_fkey references polymorphic.single_table_items on delete cascade,
+  author_id int not null references polymorphic.people on delete cascade,
+  position bigint not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  is_explicitly_archived bool not null default false,
+  archived_at timestamptz,
+
+  -- Attributes that may be used by one or more item subtypes.
+  title text,
+  description text,
+  note text,
+  color text
+);
+
+
+
+comment on table polymorphic.single_table_items is $$
+  @interface mode:single type:type
+  @type TOPIC name:SingleTableTopic columns:title!
+  @type POST name:SingleTablePost columns:title>subject,description,note
+  @type DIVIDER name:SingleTableDivider columns:title,color
+  @type CHECKLIST name:SingleTableChecklist columns:title
+  @type CHECKLIST_ITEM name:SingleTableChecklistItem columns:description,note
+  @ref rootTopic to:SingleTableTopic plural via:(root_topic_id)->polymorphic.single_table_items(id)
+  $$;
+
+comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
+  @behavior -*
+  $$;
+
+----------------------------------------
+
+create table polymorphic.relational_items (
+  id serial primary key,
+
+  -- This column is used to tell us which table we need to join to
+  type polymorphic.item_type not null default 'POST'::polymorphic.item_type,
+
+  -- Shared attributes (also 'id'):
+  parent_id int references polymorphic.relational_items on delete cascade,
+  root_topic_id int, -- constraint being created below
+  author_id int not null references polymorphic.people on delete cascade,
+  position bigint not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  is_explicitly_archived bool not null default false,
+  archived_at timestamptz
+);
+
+create table polymorphic.relational_topics (
+  id int primary key references polymorphic.relational_items,
+  title text not null
+);
+alter table polymorphic.relational_items add constraint relational_items_root_topic_fkey foreign key (root_topic_id) references polymorphic.relational_topics on delete cascade;
+create table polymorphic.relational_posts (
+  id int primary key references polymorphic.relational_items,
+  title text not null,
+  description text default '-- Enter description here --',
+  note text
+);
+create table polymorphic.relational_dividers (
+  id int primary key references polymorphic.relational_items,
+  title text,
+  color text
+);
+create table polymorphic.relational_checklists (
+  id int primary key references polymorphic.relational_items,
+  title text not null
+);
+create table polymorphic.relational_checklist_items (
+  id int primary key references polymorphic.relational_items,
+  description text not null,
+  note text
+);
+
+-- `type:type` is the default
+comment on table polymorphic.relational_items is $$
+  @interface mode:relational
+  @type TOPIC references:relational_topics
+  @type POST references:relational_posts
+  @type DIVIDER references:relational_dividers
+  @type CHECKLIST references:relational_checklists
+  @type CHECKLIST_ITEM references:relational_checklist_items
+  $$;
+
+----------------------------------------
+
+create type polymorphic.applications as (
+  id int,
+  name text,
+  last_deployed timestamptz
+);
+
+create table polymorphic.aws_applications (
+  id int primary key,
+  name text not null,
+  last_deployed timestamptz,
+  person_id int references polymorphic.people,
+  organization_id int references polymorphic.organizations,
+  aws_id text
+);
+
+create table polymorphic.gcp_applications (
+  id int primary key,
+  name text not null,
+  last_deployed timestamptz,
+  person_id int references polymorphic.people,
+  organization_id int references polymorphic.organizations,
+  gcp_id text
+);
+
+create type polymorphic.vulnerabilities as (
+  id int,
+  name text,
+  cvss_score float
+);
+
+create table polymorphic.first_party_vulnerabilities (
+  id int primary key,
+  name text not null,
+  cvss_score float not null,
+  team_name text
+);
+create table polymorphic.third_party_vulnerabilities (
+  id int primary key,
+  name text not null,
+  cvss_score float not null,
+  vendor_name text
+);
+
+create table polymorphic.aws_application_first_party_vulnerabilities (
+  aws_application_id int not null references polymorphic.aws_applications,
+  first_party_vulnerability_id int not null references polymorphic.first_party_vulnerabilities,
+  primary key (aws_application_id, first_party_vulnerability_id)
+);
+create table polymorphic.aws_application_third_party_vulnerabilities (
+  aws_application_id int not null references polymorphic.aws_applications,
+  third_party_vulnerability_id int not null references polymorphic.third_party_vulnerabilities,
+  primary key (aws_application_id, third_party_vulnerability_id)
+);
+create table polymorphic.gcp_application_first_party_vulnerabilities (
+  gcp_application_id int not null references polymorphic.gcp_applications,
+  first_party_vulnerability_id int not null references polymorphic.first_party_vulnerabilities,
+  primary key (gcp_application_id, first_party_vulnerability_id)
+);
+create table polymorphic.gcp_application_third_party_vulnerabilities (
+  gcp_application_id int not null references polymorphic.gcp_applications,
+  third_party_vulnerability_id int not null references polymorphic.third_party_vulnerabilities,
+  primary key (gcp_application_id, third_party_vulnerability_id)
+);
+
+create index on polymorphic.aws_application_first_party_vulnerabilities (first_party_vulnerability_id);
+create index on polymorphic.aws_application_third_party_vulnerabilities (third_party_vulnerability_id);
+create index on polymorphic.gcp_application_first_party_vulnerabilities (first_party_vulnerability_id);
+create index on polymorphic.gcp_application_third_party_vulnerabilities (third_party_vulnerability_id);
+
+comment on type polymorphic.applications is $$
+@interface mode:union
+@name Application
+@ref vulnerabilities to:Vulnerability plural
+@ref owner to:PersonOrOrganization singular
+$$;
+comment on column polymorphic.applications.id is '@notNull';
+comment on column polymorphic.applications.name is '@notNull';
+
+comment on table polymorphic.aws_applications is $$
+@implements Application
+@ref vulnerabilities to:Vulnerability plural
+@refVia vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)
+@refVia vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)
+@ref owner to:PersonOrOrganization singular
+@refVia owner via:people
+@refVia owner via:organizations
+$$;
+comment on table polymorphic.gcp_applications is $$
+@implements Application
+@ref vulnerabilities to:Vulnerability plural
+@refVia vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)
+@refVia vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)
+@ref owner to:PersonOrOrganization singular
+@refVia owner via:people
+@refVia owner via:organizations
+$$;
+
+comment on table polymorphic.aws_application_first_party_vulnerabilities is '@omit';
+comment on table polymorphic.aws_application_third_party_vulnerabilities is '@omit';
+comment on table polymorphic.gcp_application_first_party_vulnerabilities is '@omit';
+comment on table polymorphic.gcp_application_third_party_vulnerabilities is '@omit';
+
+comment on type polymorphic.vulnerabilities is $$
+@interface mode:union plural
+@name Vulnerability
+@ref applications to:Application plural
+$$;
+
+comment on column polymorphic.vulnerabilities.id is '@notNull';
+comment on column polymorphic.vulnerabilities.name is '@notNull';
+comment on column polymorphic.vulnerabilities.cvss_score is '@notNull';
+
+comment on table polymorphic.first_party_vulnerabilities is $$
+@implements Vulnerability
+@ref applications to:Application plural
+@refVia applications via:aws_application_first_party_vulnerabilities;aws_applications
+@refVia applications via:gcp_application_first_party_vulnerabilities;gcp_applications
+$$;
+comment on table polymorphic.third_party_vulnerabilities is $$
+@implements Vulnerability
+@ref applications to:Application plural
+@refVia applications via:aws_application_third_party_vulnerabilities;aws_applications
+@refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
+$$;

@@ -944,9 +944,31 @@ const disallowedKeys = Object.keys(
   Object.getOwnPropertyDescriptors(Object.prototype),
 );
 
-// Do **NOT** allow variables that start with `__`!
-export const isSafeIdentifier = (key: string) =>
+// TODO: serious security vetting is needed on these!
+
+/**
+ * Is safe to set as the key of a POJO (without a null prototype) and doesn't
+ * include any characters that would make it unsafe in eval'd code (before or
+ * after JSON.stringify).
+ */
+export const isSafeObjectPropertyName = (key: string) =>
   /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key) &&
   !disallowedKeys.includes(key);
 
-export const STARTS_WITH_NUMBER = /^[0-9]/;
+/**
+ * Can represent as an identifier rather than a string key
+ *
+ * @remarks
+ * Doesn't allow it to start with two underscores.
+ */
+export const canRepresentAsIdentifier = (key: string) =>
+  key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
+
+export const evalSafeProperty = (key: string) => {
+  if (!isSafeObjectPropertyName(key)) {
+    throw new Error(
+      `You should check 'isSafeObjectPropertyName' on this key before calling evalSafeProperty`,
+    );
+  }
+  return canRepresentAsIdentifier(key) ? key : JSON.stringify(key);
+};

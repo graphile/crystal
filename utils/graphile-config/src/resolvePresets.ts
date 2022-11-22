@@ -1,5 +1,7 @@
 import "./interfaces.js";
 
+import { sortWithBeforeAfterProvides } from "./sort.js";
+
 function inspect(a: any): string {
   // TODO: if node, use util.inspect
   return Array.isArray(a) ||
@@ -35,6 +37,14 @@ export function resolvePresets(
     const resolvedPreset = resolvePreset(preset);
     mergePreset(finalPreset, resolvedPreset);
   }
+
+  if (finalPreset.plugins) {
+    finalPreset.plugins = sortWithBeforeAfterProvides(
+      finalPreset.plugins,
+      "name",
+    );
+  }
+
   return finalPreset;
 }
 

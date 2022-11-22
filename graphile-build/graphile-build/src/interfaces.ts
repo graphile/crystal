@@ -13,6 +13,7 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
   GraphQLInterfaceType,
+  GraphQLNamedType,
   GraphQLObjectType,
   GraphQLScalarTypeConfig,
   GraphQLSchema,
@@ -239,7 +240,18 @@ declare global {
           GraphQLSchema?: PluginHook<
             GraphileBuild.Hook<
               GraphQLSchemaConfig,
-              GraphileBuild.ContextGraphQLSchema,
+              GraphileBuild.ContextSchema,
+              GraphileBuild.Build
+            >
+          >;
+
+          /**
+           * Add any types that need registering (typically polymorphic types) here
+           */
+          GraphQLSchema_types?: PluginHook<
+            GraphileBuild.Hook<
+              GraphQLNamedType[],
+              GraphileBuild.ContextSchema,
               GraphileBuild.Build
             >
           >;

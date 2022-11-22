@@ -2,6 +2,7 @@ import "graphile-build";
 
 import type {
   PgEnumTypeCodec,
+  PgRecordTypeCodecSpec,
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeColumn,
@@ -65,6 +66,15 @@ declare global {
       }): string;
     }
 
+    interface BuildInput {
+      /**
+       * A non-exhaustive list of codecs, please walk pgSources for more.
+       * Typically useful for the codecs that aren't linked to a source (e.g.
+       * those defining an union or interface)
+       */
+      pgCodecs?: PgTypeCodec<any, any, any, any>[];
+    }
+
     interface ScopeObject {
       isPgRangeType?: boolean;
       isPgRangeBoundType?: boolean;
@@ -98,7 +108,7 @@ declare global {
           pgCodec: PgTypeCodec<any, any, any, any>;
           pgClass?: PgClass;
           pgType: PgType;
-        }) => Promise<void>
+        }) => Promise<void> | void
       >;
 
       pgCodecs_column: PluginHook<
@@ -110,11 +120,11 @@ declare global {
         }) => Promise<void> | void
       >;
 
-      pgCodecs_recordType_extensions: PluginHook<
+      pgCodecs_recordType_spec: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          extensions: any;
+          spec: PgRecordTypeCodecSpec<any>;
         }) => Promise<void> | void
       >;
 
@@ -166,6 +176,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
   name: "PgCodecsPlugin",
   description: "Turns PostgreSQL types into @dataplan/pg codecs",
   version: version,
+  after: ["PgIntrospectionPlugin"],
 
   inflection: {
     add: {
@@ -384,43 +395,27 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             pgClass,
           });
 
-          const extensions: Partial<PgTypeCodecExtensions> = {
+          const extensions: PgTypeCodecExtensions = {
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             tags: Object.assign(Object.create(null), {
               originalName: pgClass.relname,
             }),
           };
-          await info.process("pgCodecs_recordType_extensions", {
+          const spec = {
+            name: codecName,
+            identifier: sql.identifier(nspName, className),
+            columns,
+            extensions,
+          };
+          await info.process("pgCodecs_recordType_spec", {
             databaseName,
             pgClass,
-            extensions,
+            spec,
           });
 
           const codec = EXPORTABLE(
-            (
-              className,
-              codecName,
-              columns,
-              extensions,
-              nspName,
-              recordType,
-              sql,
-            ) =>
-              recordType(
-                codecName,
-                sql.identifier(nspName, className),
-                columns,
-                extensions,
-              ),
-            [
-              className,
-              codecName,
-              columns,
-              extensions,
-              nspName,
-              recordType,
-              sql,
-            ],
+            (recordType, spec) => recordType(spec),
+            [recordType, spec],
           );
           info.process("pgCodecs_PgTypeCodec", {
             pgCodec: codec,
@@ -733,6 +728,34 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
         return promise;
       },
+    },
+    async main(output, info) {
+      if (!output.pgCodecs) {
+        output.pgCodecs = [];
+      }
+      const codecs = new Set<PgTypeCodec<any, any, any, any>>();
+
+      for (const codecByTypeId of info.state.codecByTypeIdByDatabaseName.values()) {
+        for (const codecPromise of codecByTypeId.values()) {
+          const codec = await codecPromise;
+          if (codec) {
+            codecs.add(codec);
+          }
+        }
+      }
+
+      for (const codecByClassId of info.state.codecByClassIdByDatabaseName.values()) {
+        for (const codecPromise of codecByClassId.values()) {
+          const codec = await codecPromise;
+          if (codec) {
+            codecs.add(codec);
+          }
+        }
+      }
+
+      for (const codec of codecs) {
+        output.pgCodecs.push(codec);
+      }
     },
   },
 

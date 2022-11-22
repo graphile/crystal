@@ -2,6 +2,7 @@ import "./interfaces.js";
 
 import type {
   PgSourceExtensions,
+  PgSourceRefExtensions,
   PgSourceRelationExtensions,
   PgTypeCodecExtensions,
 } from "@dataplan/pg";
@@ -21,7 +22,10 @@ type ArrayOrDirect<T> = Array<T> | T;
 export function getBehavior(
   extensions: ArrayOrDirect<
     | Partial<
-        PgSourceExtensions | PgSourceRelationExtensions | PgTypeCodecExtensions
+        | PgSourceExtensions
+        | PgSourceRelationExtensions
+        | PgTypeCodecExtensions
+        | PgSourceRefExtensions
       >
     | undefined
   >,
@@ -40,8 +44,10 @@ export function getBehavior(
   return behaviors.join(" ");
 
   function add(
-    behavior: (string | true)[] | string | true | null | undefined,
+    rawBehavior: (string | true)[] | string | true | null | undefined,
   ): void {
+    const behavior =
+      typeof rawBehavior === "string" ? rawBehavior.trim() : rawBehavior;
     if (!behavior) {
       return;
     }

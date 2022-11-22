@@ -154,7 +154,17 @@ declare global {
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
+      // TODO: put 'field' into all these names?
       pgSource?: PgSource<any, any, any, any>;
+      pgFieldCodec?: PgTypeCodec<any, any, any>;
+      pgColumn?: PgTypeColumn<any, any>;
+      isPgFieldConnection?: boolean;
+      isPgFieldSimpleCollection?: boolean;
+    }
+    interface ScopeInterfaceFieldsField {
+      // TODO: put 'field' into all these names?
+      pgSource?: PgSource<any, any, any, any>;
+      pgFieldCodec?: PgTypeCodec<any, any, any>;
       pgColumn?: PgTypeColumn<any, any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
@@ -187,14 +197,15 @@ declare global {
           pgClass: PgClass;
           sourceBuilder: PgSourceBuilder<any, any, any>;
           relations: PgTablesPluginSourceRelations;
-        }) => Promise<void>
+        }) => Promise<void> | void
       >;
       pgTables_PgSource: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
           source: PgSource<any, any, any>;
-        }) => Promise<void>
+          relations: PgTablesPluginSourceRelations;
+        }) => Promise<void> | void
       >;
       pgTables_PgSourceBuilder_options: PluginHook<
         (event: {
@@ -344,6 +355,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             source,
             pgClass,
             databaseName,
+            relations,
           });
           return source;
         })();
@@ -574,6 +586,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           build.recoverable(null, () => {
             if (!codec.columns) {
               // Only apply to codecs that define columns
+              return;
+            }
+            if (codec.polymorphism) {
+              // Don't build polymorphic types as objects
               return;
             }
 

@@ -2,7 +2,8 @@ import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
-import { EXPORTABLE, isSafeIdentifier } from "graphile-export";
+import { evalSafeProperty, isSafeObjectPropertyName } from "grafast";
+import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -109,8 +110,10 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                 const columnNames = Object.keys(detailsByColumnName);
                 const clean = columnNames.every(
                   (key) =>
-                    isSafeIdentifier(key) &&
-                    isSafeIdentifier(detailsByColumnName[key].graphqlName),
+                    isSafeObjectPropertyName(key) &&
+                    isSafeObjectPropertyName(
+                      detailsByColumnName[key].graphqlName,
+                    ),
                 );
                 const plan = clean
                   ? /*
@@ -127,7 +130,9 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                         `return (_$root, args) => source.get({ ${columnNames
                           .map(
                             (columnName) =>
-                              `${columnName}: args.get(${JSON.stringify(
+                              `${evalSafeProperty(
+                                columnName,
+                              )}: args.get(${JSON.stringify(
                                 detailsByColumnName[columnName].graphqlName,
                               )})`,
                           )

@@ -9,7 +9,11 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { isSafeIdentifier, STARTS_WITH_NUMBER } from "../utils.js";
+import {
+  canRepresentAsIdentifier,
+  evalSafeProperty,
+  isSafeObjectPropertyName,
+} from "../utils.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -17,7 +21,8 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   const entries = Object.entries(actualKeyByDesiredKey);
   if (
     entries.every(
-      ([key, val]) => isSafeIdentifier(key) && isSafeIdentifier(val),
+      ([key, val]) =>
+        isSafeObjectPropertyName(key) && isSafeObjectPropertyName(val),
     )
   ) {
     // We can do a fast custom conversion
@@ -26,10 +31,10 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
       `return (obj == null ? obj : { ${entries
         .map(
           ([key, val]) =>
-            `${STARTS_WITH_NUMBER.test(key) ? JSON.stringify(key) : key}: obj${
-              STARTS_WITH_NUMBER.test(val)
-                ? `[${JSON.stringify(val)}]`
-                : `.${val}`
+            `${evalSafeProperty(key)}: obj${
+              canRepresentAsIdentifier(val)
+                ? `.${val}`
+                : `[${JSON.stringify(val)}]`
             }`,
         )
         .join(", ")} })`,

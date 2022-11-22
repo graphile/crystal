@@ -82,10 +82,10 @@ async function main() {
           return this.camelCase(details.identifier);
         },
         manyRelationConnection(previous, options, details) {
-          return this.camelCase(details.identifier);
+          return this.connectionField(this.camelCase(details.identifier));
         },
         manyRelationList(previous, options, details) {
-          return this.camelCase(`${details.identifier}-list`);
+          return this.listField(this.camelCase(details.identifier));
         },
       },
     },

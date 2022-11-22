@@ -3867,7 +3867,7 @@ export function makeExampleSchema(
   type VulnerabilityConnectionStep = ConnectionStep<
     PgUnionAllSingleStep,
     PgSelectParsedCursorStep,
-    PgUnionAllStep<any>,
+    PgUnionAllStep<any, any>,
     PgUnionAllSingleStep
   >;
 
@@ -3948,7 +3948,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep<any>) => {
+              () => (step: PgUnionAllStep<any, any>) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "ASC",
@@ -3963,7 +3963,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep<any>) => {
+              () => (step: PgUnionAllStep<any, any>) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "DESC",
@@ -4739,20 +4739,14 @@ export function makeExampleSchema(
               const $offset = fieldArgs.getRaw("offset");
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
-                executor: firstPartyVulnerabilitiesSource.executor,
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
                   },
                 },
-                sourceSpecs: {
-                  FirstPartyVulnerability: {
-                    source: firstPartyVulnerabilitiesSource,
-                    /* Could add attribute overrides here */
-                  },
-                  ThirdPartyVulnerability: {
-                    source: thirdPartyVulnerabilitiesSource,
-                  },
+                sourceByTypeName: {
+                  FirstPartyVulnerability: firstPartyVulnerabilitiesSource,
+                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesSource,
                 },
               });
               $vulnerabilities.orderBy({
@@ -4760,6 +4754,7 @@ export function makeExampleSchema(
                 direction: "DESC",
               });
               $vulnerabilities.where({
+                type: "attribute",
                 attribute: "cvss_score",
                 callback: (alias) =>
                   sql`${alias} > ${$vulnerabilities.placeholder(
@@ -4922,20 +4917,14 @@ export function makeExampleSchema(
             function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
-                executor: firstPartyVulnerabilitiesSource.executor,
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
                   },
                 },
-                sourceSpecs: {
-                  FirstPartyVulnerability: {
-                    source: firstPartyVulnerabilitiesSource,
-                    /* Could add attribute overrides here */
-                  },
-                  ThirdPartyVulnerability: {
-                    source: thirdPartyVulnerabilitiesSource,
-                  },
+                sourceByTypeName: {
+                  FirstPartyVulnerability: firstPartyVulnerabilitiesSource,
+                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesSource,
                 },
               });
               return connection($vulnerabilities);

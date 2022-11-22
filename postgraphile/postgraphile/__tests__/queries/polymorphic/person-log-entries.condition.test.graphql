@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allPeople(condition: { username: "Dave" }) {
+    edges {
+      node {
+        logEntriesByPersonIdList(orderBy: TEXT_DESC) {
+          text
+          id
+        }
+        personId
+        username
+      }
+    }
+  }
+}

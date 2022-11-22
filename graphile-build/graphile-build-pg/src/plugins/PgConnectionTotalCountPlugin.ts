@@ -6,6 +6,7 @@ import type {
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
+  PgUnionAllStep,
 } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
@@ -83,10 +84,13 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                     (TYPES, sql) =>
                       (
                         $connection: ConnectionStep<
-                          PgSelectSingleStep<any, any, any, any>,
+                          | PgSelectSingleStep<any, any, any, any>
+                          | PgUnionAllStep<any, any>,
                           PgSelectParsedCursorStep,
-                          PgSelectStep<any, any, any, any>,
-                          PgSelectSingleStep<any, any, any, any>
+                          | PgSelectStep<any, any, any, any>
+                          | PgUnionAllStep<any, any>,
+                          | PgSelectSingleStep<any, any, any, any>
+                          | PgUnionAllStep<any, any>
                         >,
                       ) =>
                         $connection

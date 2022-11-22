@@ -83,7 +83,9 @@ export class PgClassExpressionStep<
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
   ) {
     super();
-    this.needsPolymorphicUnwrap = $table instanceof PgUnionAllSingleStep;
+    this.needsPolymorphicUnwrap =
+      $table instanceof PgUnionAllSingleStep &&
+      $table.getClassStep().mode === "normal";
     this.tableId = this.addDependency($table);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(

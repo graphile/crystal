@@ -26,6 +26,11 @@ export interface PgSourceRelationTags extends PgSmartTagsDict {
   deprecated: string | string[];
 }
 
+export interface PgSourceRefTags extends PgSmartTagsDict {
+  behavior: string | string[];
+  deprecated: string | string[];
+}
+
 export interface PgTypeColumnTags extends PgSmartTagsDict {
   name: string;
   behavior: string | string[];
@@ -35,6 +40,10 @@ export interface PgTypeColumnTags extends PgSmartTagsDict {
 export interface PgTypeCodecTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
+  implements: string | string[];
+  interface: string;
+  name: string;
+  unionMember: string | string[];
 }
 
 export interface PgSmartTagsDict {
@@ -63,6 +72,11 @@ declare module "@dataplan/pg" {
 
   interface PgSourceRelationExtensions {
     tags: Partial<PgSourceRelationTags>;
+    description?: string;
+  }
+
+  interface PgSourceRefExtensions {
+    tags: Partial<PgSourceRefTags>;
     description?: string;
   }
 

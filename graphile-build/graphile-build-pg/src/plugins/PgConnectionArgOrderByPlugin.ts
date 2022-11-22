@@ -104,35 +104,47 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
         } = build;
+        const { scope, Self } = context;
         const {
-          scope: {
-            fieldName,
-            isPgFieldConnection,
-            isPgFieldSimpleCollection,
-            pgSource,
-          },
-          Self,
-        } = context;
+          fieldName,
+          isPgFieldConnection,
+          isPgFieldSimpleCollection,
+          pgSource,
+          pgFieldCodec,
+        } = scope;
 
         if (!isPgFieldConnection && !isPgFieldSimpleCollection) {
           return args;
         }
 
-        if (!pgSource || !pgSource.codec.columns) {
+        const codec = pgFieldCodec ?? pgSource?.codec;
+        const isSuitableSource =
+          pgSource && pgSource.codec.columns && !pgSource.isUnique;
+        const isSuitableCodec =
+          codec &&
+          (isSuitableSource ||
+            (!pgSource && codec?.polymorphism?.mode === "union")) &&
+          codec.columns;
+
+        if (!isSuitableCodec) {
           return args;
         }
-        const behavior = getBehavior(pgSource.extensions);
+        const behavior = getBehavior([
+          scope,
+          codec?.extensions,
+          pgSource?.extensions,
+        ]);
         if (
           !build.behavior.matches(
             behavior,
             "order",
-            pgSource.parameters ? "" : "order",
+            pgSource?.parameters ? "" : "order",
           )
         ) {
           return args;
         }
 
-        const tableTypeName = inflection.tableType(pgSource.codec);
+        const tableTypeName = inflection.tableType(codec);
         const tableOrderByTypeName = inflection.orderByType(tableTypeName);
         const TableOrderByType = getTypeByName(
           tableOrderByTypeName,

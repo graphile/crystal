@@ -7,7 +7,7 @@ import type {
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSelectStep } from "@dataplan/pg";
+import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumValueConfigMap } from "graphql";
@@ -49,7 +49,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, sql, options } = build;
+        const { extend, inflection, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;
@@ -133,23 +133,22 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                       applyPlan: EXPORTABLE(
                         (
                             PgSelectStep,
-                            column,
+                            PgUnionAllStep,
                             columnName,
                             isUnique,
                             orderByNullsLast,
-                            sql,
                           ) =>
                           (plan: ExecutableStep | ModifierStep): void => {
-                            if (!(plan instanceof PgSelectStep)) {
+                            if (
+                              !(plan instanceof PgSelectStep) &&
+                              !(plan instanceof PgUnionAllStep)
+                            ) {
                               throw new Error(
-                                "Expected a PgSelectStep when applying ordering value",
+                                "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
                               );
                             }
                             plan.orderBy({
-                              codec: column.codec,
-                              fragment: sql`${plan.alias}.${sql.identifier(
-                                columnName,
-                              )}`,
+                              attribute: columnName,
                               direction: "ASC",
                               ...(orderByNullsLast != null
                                 ? {
@@ -163,11 +162,10 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                           },
                         [
                           PgSelectStep,
-                          column,
+                          PgUnionAllStep,
                           columnName,
                           isUnique,
                           orderByNullsLast,
-                          sql,
                         ],
                       ),
                     },
@@ -192,23 +190,22 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                       applyPlan: EXPORTABLE(
                         (
                             PgSelectStep,
-                            column,
+                            PgUnionAllStep,
                             columnName,
                             isUnique,
                             orderByNullsLast,
-                            sql,
                           ) =>
                           (plan: ExecutableStep | ModifierStep): void => {
-                            if (!(plan instanceof PgSelectStep)) {
+                            if (
+                              !(plan instanceof PgSelectStep) &&
+                              !(plan instanceof PgUnionAllStep)
+                            ) {
                               throw new Error(
-                                "Expected a PgSelectStep when applying ordering value",
+                                "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
                               );
                             }
                             plan.orderBy({
-                              codec: column.codec,
-                              fragment: sql`${plan.alias}.${sql.identifier(
-                                columnName,
-                              )}`,
+                              attribute: columnName,
                               direction: "DESC",
                               ...(orderByNullsLast != null
                                 ? {
@@ -222,11 +219,10 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                           },
                         [
                           PgSelectStep,
-                          column,
+                          PgUnionAllStep,
                           columnName,
                           isUnique,
                           orderByNullsLast,
-                          sql,
                         ],
                       ),
                     },

@@ -32,6 +32,7 @@ import type {
 import { exportAs } from "./exportAs.js";
 import type {
   PgEnumTypeCodec,
+  PgRefDefinition,
   PgTypeCodec,
   PlanByUniques,
 } from "./interfaces.js";
@@ -116,10 +117,11 @@ export interface PgSourceRelation<
   isUnique: boolean;
 
   /**
-   * If true then this is a reverse lookup, so multiple rows may be found
-   * (unless isUnique is true).
+   * If true then this is a reverse lookup (where our local columns are
+   * referenced by the remote tables remote columns, rather than the other way
+   * around), so multiple rows may be found (unless isUnique is true).
    */
-  isBackwards?: boolean;
+  isReferencee?: boolean;
 
   /**
    * Space for you to add your own metadata.
@@ -184,6 +186,24 @@ export interface PgSourceUnique<
   extensions?: PgSourceUniqueExtensions;
 }
 
+export interface PgSourceRefPathEntry {
+  relationName: string;
+  // Could add conditions here
+}
+
+export type PgSourceRefPath = PgSourceRefPathEntry[];
+export interface PgSourceRefExtensions {}
+
+export interface PgSourceRef {
+  definition: PgRefDefinition;
+  paths: Array<PgSourceRefPath>;
+  extensions?: PgSourceRefExtensions;
+}
+
+export interface PgSourceRefs {
+  [refName: string]: PgSourceRef;
+}
+
 /**
  * Configuration options for your PgSource
  */
@@ -218,6 +238,7 @@ export interface PgSourceOptions<
     : SQL;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
+  refs?: PgSourceRefs;
   extensions?: PgSourceExtensions;
   parameters?: TParameters;
   description?: string;
@@ -286,6 +307,7 @@ export class PgSourceBuilder<
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
   public readonly name: string;
   public readonly isVirtual: boolean;
+  public readonly refs: PgSourceRefs;
   constructor(
     private options: Omit<
       PgSourceOptions<TColumns, TUniques, any, TParameters>,
@@ -296,7 +318,10 @@ export class PgSourceBuilder<
     this.uniques = options.uniques;
     this.extensions = options.extensions;
     this.name = options.name;
-    this.isVirtual = options.isVirtual ?? false;
+    options.isVirtual = options.isVirtual ?? false;
+    this.isVirtual = options.isVirtual;
+    options.refs = options.refs ?? Object.create(null);
+    this.refs = options.refs!;
   }
 
   public toString(): string {
@@ -395,6 +420,10 @@ export class PgSource<
   >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
+  /**
+   * Relations to follow for shortcut references, can be polymorphic, can be many-to-many.
+   */
+  public refs: PgSourceRefs;
   private selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
 
   // TODO: make a public interface for this information
@@ -483,6 +512,7 @@ export class PgSource<
       source,
       uniques,
       relations,
+      refs,
       extensions,
       parameters,
       description,
@@ -507,6 +537,7 @@ export class PgSource<
       this._relations = relations || ({} as TRelations);
       this.validateRelations();
     }
+    this.refs = refs ?? Object.create(null);
     this.parameters = parameters as TParameters;
     this.description = description;
     this.isUnique = !!isUnique;
@@ -560,7 +591,7 @@ export class PgSource<
     extensions?: PgSourceExtensions;
   }): PgSource<TColumns, TUniques, TRelations, undefined> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
-    const { codec, executor, relations, selectAuth } = this._options;
+    const { codec, executor, relations, refs, selectAuth } = this._options;
     return new PgSource({
       codec,
       executor,
@@ -569,6 +600,7 @@ export class PgSource<
       source: source as any,
       uniques,
       relations,
+      refs,
       parameters: undefined,
       extensions,
       selectAuth,
@@ -606,7 +638,7 @@ export class PgSource<
       selectAuth: overrideSelectAuth,
       description,
     } = overrideOptions;
-    const { codec, executor, relations, selectAuth } = this._options;
+    const { codec, executor, relations, refs, selectAuth } = this._options;
     if (!returnsArray) {
       // This is the easy case
       return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
@@ -617,6 +649,7 @@ export class PgSource<
         source: fnSource as any,
         uniques,
         relations,
+        refs,
         parameters,
         extensions,
         isUnique: !returnsSetof,
@@ -640,6 +673,7 @@ export class PgSource<
         source: source as any,
         uniques,
         relations,
+        refs,
         parameters,
         extensions,
         isUnique: false, // set now, not unique
@@ -668,6 +702,7 @@ export class PgSource<
         source: source as any,
         uniques,
         relations,
+        refs,
         parameters,
         extensions,
         isUnique: false, // set now, not unique

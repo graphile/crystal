@@ -14,9 +14,9 @@ import {
   pgSelectSingleFromRecord,
   PgSource,
 } from "@dataplan/pg";
-import type { SetterStep } from "grafast";
+import type { GraphileFieldConfig, SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLOutputType } from "graphql";
+import type { GraphQLFieldConfigMap, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -103,6 +103,182 @@ const getSource = EXPORTABLE(
   [PgSource],
 );
 
+function processColumn(
+  fields: GraphQLFieldConfigMap<any, any>,
+  build: GraphileBuild.Build,
+  context:
+    | GraphileBuild.ContextObjectFields
+    | GraphileBuild.ContextInterfaceFields,
+  columnName: string,
+  overrideName?: string,
+): void {
+  const {
+    extend,
+    graphql: { getNullableType, GraphQLNonNull, GraphQLList },
+    inflection,
+    getGraphQLTypeByPgCodec,
+  } = build;
+
+  const {
+    scope: { pgCodec },
+  } = context;
+  if (!pgCodec) {
+    return;
+  }
+
+  const isInterface = context.type === "GraphQLInterfaceType";
+
+  const column = pgCodec.columns[columnName] as PgTypeColumn<any, any>;
+
+  const behavior = getBehavior(column.extensions);
+  if (!build.behavior.matches(behavior, "attribute:select", "select")) {
+    // Don't allow selecting this column.
+    return;
+  }
+
+  const columnFieldName =
+    overrideName ??
+    inflection.column({
+      columnName,
+      column,
+      codec: pgCodec,
+    });
+  const baseCodec = unwrapCodec(column.codec);
+  const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
+  const arrayOrNotType = column.codec.arrayOfCodec
+    ? new GraphQLList(
+        baseType, // TODO: nullability
+      )
+    : baseType;
+  if (!arrayOrNotType) {
+    console.warn(
+      `Couldn't find a 'output' variant for PgTypeCodec ${
+        pgCodec.name
+      }'s '${columnName}' column (${column.codec.name}; array=${!!column.codec
+        .arrayOfCodec}, domain=${!!column.codec.domainOfCodec}, enum=${!!(
+        column.codec as any
+      ).values})`,
+    );
+    return;
+  }
+  const type = column.notNull
+    ? new GraphQLNonNull(getNullableType(arrayOrNotType))
+    : arrayOrNotType;
+
+  if (!type) {
+    // Could not determine the type, skip this field
+    console.warn(
+      `Could not determine the type for column '${columnName}' of ${pgCodec.name}`,
+    );
+    return;
+  }
+  const fieldSpec: GraphileFieldConfig<any, any, any, any, any> = {
+    description: column.description,
+    type: type as GraphQLOutputType,
+  };
+  if (!isInterface) {
+    const makePlan = () => {
+      // See if there's a source to pull record types from (e.g. for relations/etc)
+      if (!baseCodec.columns) {
+        // Simply get the value
+        return EXPORTABLE(
+          (columnName) => ($record: PgSelectSingleStep<any, any, any, any>) => {
+            return $record.get(columnName);
+          },
+          [columnName],
+        );
+      } else {
+        const pgSources = build.input.pgSources.filter(
+          (potentialSource) =>
+            potentialSource.codec === baseCodec && !potentialSource.parameters,
+        );
+        // TODO: this is pretty horrible in the export; we should fix that.
+        if (!column.codec.arrayOfCodec) {
+          const notNull = column.notNull || column.codec.notNull;
+          // Single record from source
+          /*
+           * TODO: if we refactor `PgSelectSingleStep` we can probably
+           * optimise this to do inline selection and still join against
+           * the base table using e.g. `(table.column).attribute =
+           * joined_thing.column`
+           */
+          return EXPORTABLE(
+            (
+                baseCodec,
+                columnName,
+                getSource,
+                notNull,
+                pgSelectSingleFromRecord,
+                pgSources,
+              ) =>
+              ($record: PgSelectSingleStep<any, any, any, any>) => {
+                const $plan = $record.get(columnName);
+                const $select = pgSelectSingleFromRecord(
+                  getSource(baseCodec, pgSources, $record),
+                  $plan,
+                );
+                if (notNull) {
+                  $select.coalesceToEmptyObject();
+                }
+                $select.getClassStep().setTrusted();
+                return $select;
+              },
+            [
+              baseCodec,
+              columnName,
+              getSource,
+              notNull,
+              pgSelectSingleFromRecord,
+              pgSources,
+            ],
+          );
+        } else {
+          // Many records from source
+          /*
+           * TODO: if we refactor `PgSelectSingleStep` we can probably
+           * optimise this to do inline selection and still join against
+           * the base table using e.g. `(table.column).attribute =
+           * joined_thing.column`
+           */
+          return EXPORTABLE(
+            (
+                baseCodec,
+                columnName,
+                getSource,
+                pgSelectFromRecords,
+                pgSources,
+              ) =>
+              ($record: PgSelectSingleStep<any, any, any, any>) => {
+                const $val = $record.get(columnName);
+                const $select = pgSelectFromRecords(
+                  getSource(baseCodec, pgSources, $record),
+                  $val,
+                );
+                $select.setTrusted();
+                return $select;
+              },
+            [baseCodec, columnName, getSource, pgSelectFromRecords, pgSources],
+          );
+        }
+      }
+    };
+    fieldSpec.plan = makePlan() as any;
+  }
+  fields = extend(
+    fields,
+    {
+      [columnFieldName]: context.fieldWithHooks(
+        {
+          fieldName: columnFieldName,
+          pgColumn: column,
+        },
+        fieldSpec,
+      ),
+    },
+    `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
+  );
+}
+
 export const PgColumnsPlugin: GraphileConfig.Plugin = {
   name: "PgColumnsPlugin",
   description:
@@ -139,16 +315,48 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
+      GraphQLInterfaceType_fields(fields, build, context) {
+        const {
+          scope: { pgCodec, pgPolymorphism },
+        } = context;
+
+        if (!pgPolymorphism || !pgCodec?.columns) {
+          return fields;
+        }
+
+        for (const columnName in pgCodec.columns) {
+          switch (pgPolymorphism.mode) {
+            case "single": {
+              if (!pgPolymorphism.commonColumns.includes(columnName)) {
+                continue;
+              }
+              break;
+            }
+            case "relational": {
+              break;
+            }
+            case "union": {
+              break;
+            }
+            default: {
+              const never: never = pgPolymorphism;
+              throw new Error(
+                `Unhandled polymorphism mode ${(never as any).mode}}`,
+              );
+            }
+          }
+          processColumn(fields, build, context, columnName);
+        }
+        return fields;
+      },
       GraphQLObjectType_fields(fields, build, context) {
         const {
-          extend,
-          graphql: { getNullableType, GraphQLNonNull, GraphQLList },
-          inflection,
-          getGraphQLTypeByPgCodec,
-        } = build;
-
-        const {
-          scope: { pgCodec, isPgTableType },
+          scope: {
+            pgCodec,
+            isPgTableType,
+            pgPolymorphism,
+            pgPolymorphicSingleTableType,
+          },
         } = context;
 
         if (!isPgTableType || !pgCodec?.columns) {
@@ -156,159 +364,40 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         }
 
         for (const columnName in pgCodec.columns) {
-          const column = pgCodec.columns[columnName] as PgTypeColumn<any, any>;
-
-          const behavior = getBehavior(column.extensions);
-          if (!build.behavior.matches(behavior, "attribute:select", "select")) {
-            // Don't allow selecting this column.
-            continue;
-          }
-
-          const columnFieldName = inflection.column({
-            columnName,
-            column,
-            codec: pgCodec,
-          });
-          const baseCodec = unwrapCodec(column.codec);
-          const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
-          const arrayOrNotType = column.codec.arrayOfCodec
-            ? new GraphQLList(
-                baseType, // TODO: nullability
-              )
-            : baseType;
-          if (!arrayOrNotType) {
-            console.warn(
-              `Couldn't find a 'output' variant for PgTypeCodec ${
-                pgCodec.name
-              }'s '${columnName}' column (${column.codec.name}; array=${!!column
-                .codec.arrayOfCodec}, domain=${!!column.codec
-                .domainOfCodec}, enum=${!!(column.codec as any).values})`,
-            );
-            continue;
-          }
-          const type = column.notNull
-            ? new GraphQLNonNull(getNullableType(arrayOrNotType))
-            : arrayOrNotType;
-
-          if (!type) {
-            // Could not determine the type, skip this field
-            console.warn(
-              `Could not determine the type for column '${columnName}' of ${pgCodec.name}`,
-            );
-            continue;
-          }
-
-          const makePlan = () => {
-            // See if there's a source to pull record types from (e.g. for relations/etc)
-            if (!baseCodec.columns) {
-              // Simply get the value
-              return EXPORTABLE(
-                (columnName) =>
-                  ($record: PgSelectSingleStep<any, any, any, any>) => {
-                    return $record.get(columnName);
-                  },
-                [columnName],
-              );
-            } else {
-              const pgSources = build.input.pgSources.filter(
-                (potentialSource) =>
-                  potentialSource.codec === baseCodec &&
-                  !potentialSource.parameters,
-              );
-              // TODO: this is pretty horrible in the export; we should fix that.
-              if (!column.codec.arrayOfCodec) {
-                const notNull = column.notNull || column.codec.notNull;
-                // Single record from source
-                /*
-                 * TODO: if we refactor `PgSelectSingleStep` we can probably
-                 * optimise this to do inline selection and still join against
-                 * the base table using e.g. `(table.column).attribute =
-                 * joined_thing.column`
-                 */
-                return EXPORTABLE(
-                  (
-                      baseCodec,
-                      columnName,
-                      getSource,
-                      notNull,
-                      pgSelectSingleFromRecord,
-                      pgSources,
-                    ) =>
-                    ($record: PgSelectSingleStep<any, any, any, any>) => {
-                      const $plan = $record.get(columnName);
-                      const $select = pgSelectSingleFromRecord(
-                        getSource(baseCodec, pgSources, $record),
-                        $plan,
-                      );
-                      if (notNull) {
-                        $select.coalesceToEmptyObject();
-                      }
-                      $select.getClassStep().setTrusted();
-                      return $select;
-                    },
-                  [
-                    baseCodec,
-                    columnName,
-                    getSource,
-                    notNull,
-                    pgSelectSingleFromRecord,
-                    pgSources,
-                  ],
+          let overrideName: string | undefined = undefined;
+          if (pgPolymorphism) {
+            switch (pgPolymorphism.mode) {
+              case "single": {
+                const match = pgPolymorphicSingleTableType?.columns.find(
+                  (c) => c.column === columnName,
                 );
-              } else {
-                // Many records from source
-                /*
-                 * TODO: if we refactor `PgSelectSingleStep` we can probably
-                 * optimise this to do inline selection and still join against
-                 * the base table using e.g. `(table.column).attribute =
-                 * joined_thing.column`
-                 */
-                return EXPORTABLE(
-                  (
-                      baseCodec,
-                      columnName,
-                      getSource,
-                      pgSelectFromRecords,
-                      pgSources,
-                    ) =>
-                    ($record: PgSelectSingleStep<any, any, any, any>) => {
-                      const $val = $record.get(columnName);
-                      const $select = pgSelectFromRecords(
-                        getSource(baseCodec, pgSources, $record),
-                        $val,
-                      );
-                      $select.setTrusted();
-                      return $select;
-                    },
-                  [
-                    baseCodec,
-                    columnName,
-                    getSource,
-                    pgSelectFromRecords,
-                    pgSources,
-                  ],
+                if (
+                  !pgPolymorphism.commonColumns.includes(columnName) &&
+                  !match
+                ) {
+                  continue;
+                }
+                if (match?.rename) {
+                  overrideName = match.rename;
+                }
+
+                break;
+              }
+              case "relational": {
+                break;
+              }
+              case "union": {
+                break;
+              }
+              default: {
+                const never: never = pgPolymorphism;
+                throw new Error(
+                  `Unhandled polymorphism mode ${(never as any).mode}}`,
                 );
               }
             }
-          };
-
-          fields = extend(
-            fields,
-            {
-              [columnFieldName]: context.fieldWithHooks(
-                {
-                  fieldName: columnFieldName,
-                  pgColumn: column,
-                },
-                {
-                  description: column.description,
-                  type: type as GraphQLOutputType,
-                  plan: makePlan() as any,
-                },
-              ),
-            },
-            `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
-          );
+          }
+          processColumn(fields, build, context, columnName, overrideName);
         }
         return fields;
       },

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+export GRAPHILE_ENV=development
+export NODE_ENV=development
+export DEBUG="${DEBUG:-graphile-build:warn}"
+
+yarn nodemon \
+  --watch "../../grafast/*/dist/**/*" \
+  --watch "../../graphile-build/*/dist/**/*" \
+  --watch "../../postgraphile/*/dist/**/*" \
+  --watch "../../utils/*/dist/**/*" \
+  -x "node --enable-source-maps dist/cli-run.js -c ${1:-'pggql_test'} -s ${2:-'public'} -e"

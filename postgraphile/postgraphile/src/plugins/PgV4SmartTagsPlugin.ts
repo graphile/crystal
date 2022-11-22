@@ -17,8 +17,9 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
   description:
     "For compatibility with PostGraphile v4 schemas, this plugin attempts to convert various V4 smart tags (`@omit`, etc) and convert them to V5 behaviors",
   version: "0.0.0",
-  after: ["PgSmartCommentsPlugin", "PgEnumTablesPlugin"],
-  before: ["PgFakeConstraintsPlugin"],
+  after: ["PgSmartCommentsPlugin"],
+  before: ["PgFakeConstraintsPlugin", "PgEnumTablesPlugin"],
+  provides: ["smart-tags"],
 
   gather: {
     namespace: "pgV4SmartTags",

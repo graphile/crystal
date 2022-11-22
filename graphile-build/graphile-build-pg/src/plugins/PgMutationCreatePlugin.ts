@@ -40,6 +40,7 @@ const isInsertable = (
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
+  if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   const behavior = getBehavior(source.extensions);
   return build.behavior.matches(behavior, "insert", "insert") === true;
@@ -49,6 +50,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   name: "PgMutationCreatePlugin",
   description: "Adds 'create' mutation for supported table-like sources",
   version: version,
+  after: ["smart-tags"],
 
   inflection: {
     add: {

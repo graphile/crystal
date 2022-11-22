@@ -224,7 +224,7 @@ class SchemaBuilder<
     const schemaSpec: Partial<GraphQLSchemaConfig> = {
       directives: [...build.graphql.specifiedDirectives],
     };
-    const schemaScope: GraphileBuild.ScopeGraphQLSchema = {
+    const schemaScope: GraphileBuild.ScopeSchema = {
       __origin: `Graphile built-in`,
     };
     const tempSchema = this.newWithHooks(

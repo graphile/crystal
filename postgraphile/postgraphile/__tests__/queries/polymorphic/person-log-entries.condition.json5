@@ -1,0 +1,22 @@
+{
+  allPeople: {
+    edges: [
+      {
+        node: {
+          logEntriesByPersonIdList: [
+            {
+              text: "Cider brewing commencing",
+              id: 5,
+            },
+            {
+              text: "Beer brewing complete",
+              id: 4,
+            },
+          ],
+          personId: 4,
+          username: "Dave",
+        },
+      },
+    ],
+  },
+}

@@ -44,12 +44,75 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
   value: TFromPostgres,
 ) => TForJavaScript;
 
+export interface PgRefDefinitionExtensions {}
+export interface PgRefDefinition {
+  graphqlType?: string;
+  singular?: boolean;
+  extensions?: PgRefDefinitionExtensions;
+  singleRecordFieldName?: string;
+  listFieldName?: string;
+  connectionFieldName?: string;
+}
+export interface PgRefDefinitions {
+  [refName: string]: PgRefDefinition;
+}
+
 /**
  * Custom metadata for a codec
  */
 export interface PgTypeCodecExtensions {
   description?: string;
 }
+
+export interface PgTypeCodecPolymorphismSingleTypeColumnSpec<
+  TColumnName extends string,
+> {
+  column: TColumnName;
+  isNotNull?: boolean;
+  rename?: string;
+}
+
+export interface PgTypeCodecPolymorphismSingleTypeSpec<
+  TColumnName extends string,
+> {
+  name: string;
+  // TODO: make this optional?
+  columns: Array<PgTypeCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
+}
+export interface PgTypeCodecPolymorphismSingle<TColumnName extends string> {
+  mode: "single";
+  typeColumns: readonly TColumnName[];
+  // TODO: make this optional?
+  commonColumns: readonly TColumnName[];
+  types: {
+    [typeKey: string]: PgTypeCodecPolymorphismSingleTypeSpec<TColumnName>;
+  };
+}
+
+export interface PgTypeCodecPolymorphismRelationalTypeSpec {
+  name: string;
+  /** The name of the database table this type relates to (useful before the relations are established) */
+  references: string;
+  /** The name of the relation to follow to get the related record */
+  relationName: string;
+  // Currently assumes it's joined via PK, but we might expand that in future
+}
+export interface PgTypeCodecPolymorphismRelational<TColumnName extends string> {
+  mode: "relational";
+  typeColumns: readonly TColumnName[];
+  types: {
+    [typeKey: string]: PgTypeCodecPolymorphismRelationalTypeSpec;
+  };
+}
+
+export interface PgTypeCodecPolymorphismUnion {
+  mode: "union";
+}
+
+export type PgTypeCodecPolymorphism<TColumnName extends string> =
+  | PgTypeCodecPolymorphismSingle<TColumnName>
+  | PgTypeCodecPolymorphismRelational<TColumnName>
+  | PgTypeCodecPolymorphismUnion;
 
 /**
  * A codec for a Postgres type, tells us how to convert to-and-from Postgres
@@ -156,6 +219,8 @@ export interface PgTypeCodec<
    */
   rangeOfCodec?: PgTypeCodec<undefined, any, any, undefined>;
 
+  polymorphism?: PgTypeCodecPolymorphism<any>;
+
   /**
    * Arbitrary metadata
    */
@@ -185,18 +250,39 @@ export interface PgTypedExecutableStep<
   pgCodec: TCodec;
 }
 
-/**
- * The information required to specify an entry in an 'ORDER BY' clause.
- */
-export interface PgOrderSpec {
+type PgOrderCommonSpec = {
+  direction: "ASC" | "DESC";
+  /** `NULLS FIRST` or `NULLS LAST` or nothing */
+  nulls?: "FIRST" | "LAST" | null;
+};
+
+export type PgOrderFragmentSpec = {
   /** The expression we're ordering by. */
   fragment: SQL;
   /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
   codec: PgTypeCodec<any, any, any>;
-  direction: "ASC" | "DESC";
-  /** `NULLS FIRST` or `NULLS LAST` or nothing */
-  nulls?: "FIRST" | "LAST" | null;
-}
+
+  attribute?: never;
+  callback?: never;
+} & PgOrderCommonSpec;
+
+export type PgOrderAttributeSpec = {
+  /** The attribute you're using for ordering */
+  attribute: string;
+  /** An optional expression to wrap this column with, and the type that expression returns */
+  callback?: (
+    attributeExpression: SQL,
+    attributeCodec: PgTypeCodec<any, any, any>,
+  ) => [SQL, PgTypeCodec<any, any, any>];
+
+  fragment?: never;
+  codec?: never;
+} & PgOrderCommonSpec;
+
+/**
+ * The information required to specify an entry in an 'ORDER BY' clause.
+ */
+export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
 
 /**
  * The information required to specify an entry in a `GROUP BY` clause.
