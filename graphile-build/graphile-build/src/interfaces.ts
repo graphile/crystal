@@ -1,6 +1,7 @@
 import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
+  PromiseOrDirect,
 } from "grafast";
 import type { AsyncHooks, PluginHook } from "graphile-config";
 import type {
@@ -185,7 +186,7 @@ declare global {
       watch?: (
         info: GatherPluginContext<TState, TCache>,
         callback: () => void,
-      ) => Promise<() => void>;
+      ) => PromiseOrDirect<() => void>;
     }
 
     interface Plugin {
