@@ -965,5 +965,10 @@ export const canRepresentAsIdentifier = (key: string) =>
   key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
 export const evalSafeProperty = (key: string) => {
+  if (!isSafeObjectPropertyName(key)) {
+    throw new Error(
+      `You should check 'isSafeObjectPropertyName' on this key before calling evalSafeProperty`,
+    );
+  }
   return canRepresentAsIdentifier(key) ? key : JSON.stringify(key);
 };
