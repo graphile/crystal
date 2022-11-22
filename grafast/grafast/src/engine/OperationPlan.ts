@@ -1418,6 +1418,7 @@ export class OperationPlan {
     allPossibleObjectTypes: readonly GraphQLObjectType[],
   ): LayerPlan<LayerPlanReasonPolymorphic> {
     // TODO: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
+    // https://github.com/benjie/postgraphile-private/issues/109
     const pathString = `${path.join("|")}!${$step.id}`;
     const polymorphicLayerPlanByPath =
       this.polymorphicLayerPlanByPathByLayerPlan.get(parentLayerPlan) ??
