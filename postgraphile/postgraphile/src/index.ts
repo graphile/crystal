@@ -1,3 +1,7 @@
+// Copy the types through for our dependents
+import "graphile-build";
+import "graphile-build-pg";
+
 import type { Deferred } from "grafast";
 import { defer } from "grafast";
 import type { Grafserv, ServerParams } from "grafserv";
