@@ -45,7 +45,7 @@ export interface GrafastOptions {
     | Record<string, any>
     | (<TContext extends Record<string, any>>(
         ctx: GraphileConfig.GraphQLRequestContext,
-        currentContext: Partial<TContext>,
+        currentContext?: Partial<TContext>,
       ) => PromiseOrValue<Partial<TContext>>);
 
   /**
