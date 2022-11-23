@@ -17,7 +17,22 @@ export function withGraphileConfig<T>(
   callback: (graphileConfig: GraphileConfigModule | null) => PromiseOrValue<T>,
 ): PromiseOrValue<T> {
   if (graphileConfig === undefined) {
-    graphileConfig = import("graphile-config").then(
+    // ESM:
+    // This should be
+    //     graphileConfig = import("graphile-config").then(
+    // but that causes a segfault in jest/node when testing third party
+    // modules. So we had to convert everything to CommonJS.
+    graphileConfig = new Promise<any>((resolve, reject) => {
+      try {
+        resolve(require("graphile-config"));
+      } catch (e) {
+        if (e.code === "ERR_REQUIRE_ESM") {
+          return import(require("graphile-config")).then(resolve, reject);
+        } else {
+          reject(e);
+        }
+      }
+    }).then(
       (GC) => {
         graphileConfig = GC;
         graphileConfigLoaded = true;

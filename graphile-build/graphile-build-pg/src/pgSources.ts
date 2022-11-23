@@ -98,7 +98,16 @@ export function getWithPgClientFromPgSource(
   } else {
     const promise = (async () => {
       // TODO: We should cache imports
-      const adaptor = await import(source.adaptor);
+      let adaptor: any;
+      try {
+        adaptor = require(source.adaptor);
+      } catch (e) {
+        if (e.code === "ERR_REQUIRE_ESM") {
+          adaptor = await import(source.adaptor);
+        } else {
+          throw e;
+        }
+      }
       const factory =
         adaptor?.createWithPgClient ?? adaptor?.default?.createWithPgClient;
       if (typeof factory !== "function") {

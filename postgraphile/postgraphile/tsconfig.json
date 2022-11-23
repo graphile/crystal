@@ -7,7 +7,7 @@
 
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "nodenext",
-    "module": "nodenext"
+    "module": "commonjs"
   },
   "include": ["src"],
   "references": [
