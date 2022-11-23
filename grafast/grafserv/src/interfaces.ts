@@ -10,7 +10,7 @@ export type ContextCallback = (
 
 export interface ServerParams {
   schema: GraphQLSchema;
-  config: GraphileConfig.ResolvedPreset;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
 }
 
 export interface ServerOptions {

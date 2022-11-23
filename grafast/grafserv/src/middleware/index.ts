@@ -517,7 +517,7 @@ export function grafserv(
       ) {
         serverParams.resolve(newParamsWithHandlers);
       }
-      dynamicOptions = optionsFromConfig(newParams.config);
+      dynamicOptions = optionsFromConfig(newParams.resolvedPreset);
       serverParams = newParamsWithHandlers;
     },
   };

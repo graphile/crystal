@@ -57,11 +57,11 @@ export function makePgSources(
 export async function makeSchema(
   preset: GraphileConfig.Preset,
 ): Promise<ServerParams> {
-  const config = resolvePresets([preset]);
-  const shared = { inflection: buildInflection(config) };
-  const input = await gather(config, shared);
-  const schema = buildSchema(config, input, shared);
-  return { schema, config };
+  const resolvedPreset = resolvePresets([preset]);
+  const shared = { inflection: buildInflection(resolvedPreset) };
+  const input = await gather(resolvedPreset, shared);
+  const schema = buildSchema(resolvedPreset, input, shared);
+  return { schema, resolvedPreset };
 }
 
 /**
@@ -79,16 +79,20 @@ export async function watchSchema(
   preset: GraphileConfig.Preset,
   callback: (error: Error | null, params?: ServerParams) => void,
 ): Promise<() => void> {
-  const config = resolvePresets([preset]);
-  const shared = { inflection: buildInflection(config) };
-  const stopWatching = await watchGather(config, shared, (input, error) => {
-    if (error) {
-      callback(error);
-    } else {
-      const schema = buildSchema(config, input!, shared);
-      callback(null, { schema, config });
-    }
-  });
+  const resolvedPreset = resolvePresets([preset]);
+  const shared = { inflection: buildInflection(resolvedPreset) };
+  const stopWatching = await watchGather(
+    resolvedPreset,
+    shared,
+    (input, error) => {
+      if (error) {
+        callback(error);
+      } else {
+        const schema = buildSchema(resolvedPreset, input!, shared);
+        callback(null, { schema, resolvedPreset });
+      }
+    },
+  );
   return stopWatching;
 }
 
