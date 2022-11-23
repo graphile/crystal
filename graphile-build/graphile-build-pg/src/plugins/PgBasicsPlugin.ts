@@ -13,6 +13,7 @@ import {
   getCodecMetaLookupFromInput,
   makePgTypeCodecMeta,
 } from "../inputUtils.js";
+import { getBehavior } from "../behavior.js";
 
 declare global {
   namespace GraphileBuild {
@@ -67,6 +68,8 @@ declare global {
        * pg-sql2 access on Build to avoid duplicate module issues.
        */
       sql: typeof sql;
+
+      pgGetBehavior: typeof getBehavior;
     }
   }
 }
@@ -154,6 +157,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             hasGraphQLTypeForPgCodec,
             setGraphQLTypeForPgCodec,
             sql,
+            pgGetBehavior: getBehavior,
             // For slightly better backwards compatibility with v4.
             pgSql: sql,
           },

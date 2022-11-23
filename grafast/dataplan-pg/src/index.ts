@@ -62,6 +62,7 @@ import {
   PgSourceRowAttribute,
   PgSourceUnique,
   PgSourceUniqueExtensions,
+  resolveSource,
 } from "./datasource.js";
 import {
   PgClient,
@@ -289,6 +290,7 @@ export {
   PlanByUniques,
   rangeOfCodec,
   recordType,
+  resolveSource,
   sqlFromArgDigests,
   TempTableStep,
   toPg,
@@ -313,6 +315,7 @@ exportAsMany("@dataplan/pg", {
   TYPES,
   PgEnumSource,
   PgSource,
+  resolveSource,
   PgSourceBuilder,
   PgExecutor,
   BooleanFilterStep,

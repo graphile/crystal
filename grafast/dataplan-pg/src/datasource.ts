@@ -1072,3 +1072,21 @@ export class PgEnumSource<TValue extends string> {
   }
 }
 exportAs(PgEnumSource, "PgEnumSource");
+
+export function resolveSource<
+  TColumns extends PgTypeColumns | undefined,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgTypeColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends PgSourceParameter[] | undefined = undefined,
+>(
+  s:
+    | PgSourceBuilder<TColumns, TUniques, TParameters>
+    | PgSource<TColumns, TUniques, TRelations, TParameters>,
+): PgSource<TColumns, TUniques, TRelations, TParameters> {
+  return s instanceof PgSourceBuilder ? s.get() : s;
+}
+exportAs(resolveSource, "resolveSource");
