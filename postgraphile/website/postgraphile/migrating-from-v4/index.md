@@ -188,22 +188,32 @@ lifecycle that needs to be carefully managed - just run the query through
 `grafast` as you normally would through `graphql`.
 
 ```ts title="schema-only.js"
-import { grafast } from "grafast";
+import { grafast, hookArgs } from "grafast";
 import { makeSchema } from "postgraphile";
 import config from "./graphile.config.js";
 
 async function main() {
-  const { schema, contextCallback } = makeSchema(config);
+  const { schema, resolvedPreset } = await makeSchema(config);
 
-  const result = await grafast({
+  const args = {
     schema,
     source: /* GraphQL */ `
       query MyQuery {
         __typename
       }
     `,
-    contextValue: contextCallback(),
-  });
+  };
+
+  // Merge in the context and anything else plugins/presets want to add
+  await hookArgs(
+    args,
+    {
+      /* optional details for your context callback(s) to use */
+    },
+    resolvedPreset,
+  );
+
+  const result = await grafast(args);
 
   console.dir(result);
 }
@@ -373,6 +383,32 @@ const config = resolvePresets([preset]);
 const shared = { inflection: buildInflection(config) };
 const input = await gather(config, shared);
 const schema = buildSchema(config, input, shared);
+```
+
+## `postgraphile-core`
+
+`postgraphile-core` is no more (look ma, I'm a poet!); here's how to replace a
+few of the methods there.
+
+### `createPostGraphileSchema`
+
+Before:
+
+```js
+import { createPostGraphileSchema } from "postgraphile-core";
+
+// ...
+
+const gqlSchema = await createPostGraphileSchema(DATABASE_URL, "public", {
+  // options
+});
+```
+
+```js
+import { makeSchema } from "postgraphile";
+import config from "./graphile.config.js";
+
+const { schema, contextCallback } = await makeSchema(config);
 ```
 
 [grafast]: https://grafast.org
