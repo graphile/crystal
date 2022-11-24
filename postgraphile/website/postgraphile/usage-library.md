@@ -25,7 +25,7 @@ export const instance = postgraphile(preset);
 
 :::warning
 
-The `.getGrafserv().handler` API is likely to change before the V5.0.0 release to
+The `(await instance.getGrafserv()).handler` API is likely to change before the V5.0.0 release to
 allow for PostGraphile to be used with a wide array of JS webserver frameworks.
 
 :::
@@ -40,7 +40,7 @@ can be mounted inside one, for example in Node's HTTP server:
 import { instance } from "./instance.js";
 import { createServer } from "node:http";
 
-const grafserv = instance.getGrafserv();
+const grafserv = await instance.getGrafserv();
 const server = createServer(grafserv.handler);
 server.listen(5678);
 console.log("Server listening at http://localhost:5678");

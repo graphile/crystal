@@ -5,7 +5,6 @@ import "graphile-build-pg";
 import type { Deferred } from "grafast";
 import { defer } from "grafast";
 import type { Grafserv, ServerParams } from "grafserv";
-import { grafserv } from "grafserv";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
@@ -16,7 +15,7 @@ export { makePgSources, makeSchema } from "./schema.js";
 export { GraphileBuild, GraphileConfig };
 
 export function postgraphile(preset: GraphileConfig.Preset): {
-  getGrafserv(): Grafserv;
+  getGrafserv(): Promise<Grafserv>;
   getServerParams(): Promise<ServerParams>;
   getSchema(): Promise<GraphQLSchema>;
   release(): Promise<void>;
@@ -60,9 +59,11 @@ export function postgraphile(preset: GraphileConfig.Preset): {
   }
 
   return {
-    getGrafserv() {
+    async getGrafserv() {
       assertAlive();
       if (!server) {
+        const { grafserv } = await import("grafserv");
+
         server = grafserv(config, serverParams);
         server.onRelease(() => {
           if (!released) {
