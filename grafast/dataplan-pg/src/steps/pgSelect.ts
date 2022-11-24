@@ -932,6 +932,13 @@ export class PgSelectStep<
   }
 
   /**
+   * @experimental Please use `singleRelation` or `manyRelation` instead.
+   */
+  public join(spec: PgSelectPlanJoin) {
+    this.joins.push(spec);
+  }
+
+  /**
    * Select an SQL fragment, returning the index the result will have.
    */
   public selectAndReturnIndex(fragment: SQL): number {
