@@ -190,6 +190,10 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           );
           break;
         }
+        case "manyToMany": {
+          behavior.push("-manyToMany");
+          break;
+        }
         case "": {
           // ignore
           break;
@@ -198,8 +202,9 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           // TODO: we should give plugin authors the option of adding other
           // omits here, e.g. `@omit manyToMany`
           console.warn(
-            `Option '${part}' in '@omit' string '${omit}' not recognized.`,
+            `Option '${part}' in '@omit' string '${omit}' not recognized; assuming -${part} behavior`,
           );
+          behavior.push(`-${part}`);
           break;
         }
       }
