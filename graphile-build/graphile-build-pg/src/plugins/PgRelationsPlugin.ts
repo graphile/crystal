@@ -36,6 +36,8 @@ import { Idents, tagToString } from "../utils.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
+      // TODO: can we get away with just `source` and `relationName`? Seems the
+      // rest can be figured out from these two things?
       source: PgSource<any, any, any, any>;
       codec: PgTypeCodec<any, any, any>;
       identifier: string;
