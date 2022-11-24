@@ -49,12 +49,19 @@ export function resolvePresets(
 }
 
 function isGraphileConfigPreset(foo: unknown): foo is GraphileConfig.Preset {
-  if (typeof foo !== "object") return false;
-  if (foo === null) return false;
+  if (typeof foo !== "object" || foo === null) return false;
+
+  // Check regular prototype
   const prototype = Object.getPrototypeOf(foo);
   if (prototype === null || prototype === Object.prototype) {
     return true;
   }
+
+  // Heavier check, to allow for Jest/VM complexity (where `Object` differs)
+  if (String(foo) === "[object Object]") {
+    return true;
+  }
+
   return false;
 }
 
