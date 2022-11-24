@@ -14,9 +14,9 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
     exportName: "ProxyStep",
   };
   isSyncAndSafe = true;
-  constructor($dep: ExecutableStep<T>) {
+  constructor($dep: ExecutableStep<T>, $actualDep: ExecutableStep) {
     super();
-    this.addDependency($dep);
+    this.addDependency($actualDep);
   }
   // Publicly expose this
   public addDependency(step: ExecutableStep<any>): number {
@@ -94,7 +94,8 @@ function makeProxyHandler<T>(
  */
 export function proxy<TData, TStep extends ExecutableStep<TData>>(
   $step: TStep,
+  $actualDep: ExecutableStep = $step,
 ): TStep & { addDependency(step: ExecutableStep): number } {
-  const $proxy = new ProxyStep($step);
+  const $proxy = new ProxyStep($step, $actualDep);
   return new Proxy($proxy, makeProxyHandler($step)) as any; // Lie.
 }
