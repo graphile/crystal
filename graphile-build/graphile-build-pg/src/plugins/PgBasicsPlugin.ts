@@ -7,13 +7,13 @@ import type { PgTypeCodec } from "@dataplan/pg";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
+import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import type { PgTypeCodecMetaLookup } from "../inputUtils.js";
 import {
   getCodecMetaLookupFromInput,
   makePgTypeCodecMeta,
 } from "../inputUtils.js";
-import { getBehavior } from "../behavior.js";
 
 declare global {
   namespace GraphileBuild {
