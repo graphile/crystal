@@ -43,25 +43,31 @@ function makeProxyHandler<T>(
   $toStep: ExecutableStep<T>,
 ): ProxyHandler<ExecutableStep<T>> {
   return {
-    get(target, p, proxy) {
-      if (p in target) {
-        // Do not deduplicate the proxy-ness away!
-        if (p === "deduplicate") {
-          return () => [proxy];
-        }
-        // DO optimize the proxy-ness away, so execution doesn't need to be proxied
-        if (p === "optimize") {
-          return () => [target];
-        }
-        const val = target[p];
+    // $proxy - the ProxyStep instance
+    // p - the property being accessed
+    // proxy - the `new Proxy($proxy, ...)`
+    get($proxy, p, proxy) {
+      // Do not deduplicate the proxy-ness away!
+      if (p === "deduplicate") {
+        return () => [proxy];
+      }
+      // DO optimize the proxy-ness away, so execution doesn't need to be proxied
+      if (p === "optimize") {
+        return () => [$proxy];
+      }
+
+      if (p in $proxy) {
+        // $proxy has this property ('id', 'layerPlan', etc) - use it
+        const val = $proxy[p];
         if (typeof val === "function") {
           return function (...args: any[]) {
-            return val.apply(target, args);
+            return val.apply($proxy, args);
           };
         } else {
           return val;
         }
       } else {
+        // $proxy doesn't understand this - delegate to $toStep
         const val = $toStep[p];
         if (typeof val === "function") {
           return function (...args: any[]) {
@@ -72,21 +78,21 @@ function makeProxyHandler<T>(
         }
       }
     },
-    has(target, p) {
-      if (p in target) {
+    has($proxy, p) {
+      if (p in $proxy) {
         return true;
       } else {
         return p in $toStep;
       }
     },
-    set(target, p, newValue, receiver) {
-      if (p in target) {
-        return Reflect.set(target, p, newValue, receiver);
+    set($proxy, p, newValue, receiver) {
+      if (p in $proxy) {
+        return Reflect.set($proxy, p, newValue, receiver);
       } else {
         throw new Error(
           `Setting through a ProxyStep is currently forbidden (attempted to set '${String(
             p,
-          )}' on '${target}'`,
+          )}' on '${$proxy}'`,
         );
       }
     },
