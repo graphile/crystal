@@ -113,7 +113,7 @@ export function proxy<TData, TStep extends ExecutableStep<TData>>(
   $actualDep: ExecutableStep = $step,
 ): TStep & { addDependency(step: ExecutableStep): number } {
   const $proxy = new ProxyStep($step, $actualDep);
-  const proxy = new Proxy($proxy, makeProxyHandler($step, $actualDep)) as any; // Lie.
+  const proxy = new Proxy($proxy, makeProxyHandler($step)) as any; // Lie.
   $proxy[$$proxy] = proxy;
   return proxy;
 }
