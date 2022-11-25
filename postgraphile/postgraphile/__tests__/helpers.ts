@@ -254,7 +254,7 @@ export async function runTestQuery(
     await testPool.query(await pg11Data());
   }
 
-  const { schema, config: resolvedPreset } = await makeSchema(preset);
+  const { schema, resolvedPreset } = await makeSchema(preset);
   return withTestWithPgClient(
     testPool,
     queries,

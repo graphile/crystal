@@ -5,7 +5,7 @@ module.exports = {
   testMatch: [...rootConfig.testMatch, "**/*.test.graphql"],
   transform: {
     ...rootConfig.transform,
-    "^.+\\.graphql$": "<rootDir>/__tests__/transform-graphql.js",
+    "^.+\\.graphql$": "<rootDir>/__tests__/transform-graphql.mjs",
   },
   moduleFileExtensions: [...rootConfig.moduleFileExtensions, "graphql"],
 };
