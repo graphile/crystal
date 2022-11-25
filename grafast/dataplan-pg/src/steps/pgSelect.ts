@@ -23,6 +23,7 @@ import {
   arrayOfLength,
   ConnectionStep,
   constant,
+  deepEval,
   ExecutableStep,
   first,
   isAsyncIterable,
@@ -859,7 +860,9 @@ export class PgSelectStep<
       );
     }
 
-    const dependencyIndex = this.addDependency($step);
+    const $evalledStep = deepEval($step);
+
+    const dependencyIndex = this.addDependency($evalledStep);
     const symbol = Symbol(`step-${$step.id}`);
     const sqlPlaceholder = sql.placeholder(
       symbol,
