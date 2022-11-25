@@ -210,6 +210,8 @@ export const $$eventEmitter = Symbol("executionEventEmitter");
  */
 export const $$streamMore = Symbol("streamMore");
 
+export const $$proxy = Symbol("proxy");
+
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.

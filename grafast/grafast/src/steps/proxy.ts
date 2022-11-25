@@ -1,5 +1,6 @@
 import type { GrafastResultsList, GrafastValuesList } from "../index.js";
 import type { ExecutionExtra } from "../interfaces.js";
+import { $$proxy } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
@@ -14,9 +15,15 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
     exportName: "ProxyStep",
   };
   isSyncAndSafe = true;
+  private $depId: number;
   constructor($dep: ExecutableStep<T>, $actualDep: ExecutableStep) {
     super();
+    this.$depId = $dep.id;
     this.addDependency($actualDep);
+  }
+  public toStringMeta(): string | null {
+    const $dep = this.opPlan.dangerouslyGetStep(this.$depId);
+    return $dep.toString();
   }
   // Publicly expose this
   public addDependency(step: ExecutableStep<any>): number {
@@ -83,6 +90,9 @@ function makeProxyHandler<T>(
         );
       }
     },
+    getPrototypeOf(_$proxy) {
+      return Object.getPrototypeOf($toStep);
+    },
   };
 }
 
@@ -97,5 +107,7 @@ export function proxy<TData, TStep extends ExecutableStep<TData>>(
   $actualDep: ExecutableStep = $step,
 ): TStep & { addDependency(step: ExecutableStep): number } {
   const $proxy = new ProxyStep($step, $actualDep);
-  return new Proxy($proxy, makeProxyHandler($step)) as any; // Lie.
+  const proxy = new Proxy($proxy, makeProxyHandler($step, $actualDep)) as any; // Lie.
+  $proxy[$$proxy] = proxy;
+  return proxy;
 }

@@ -49,6 +49,7 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
+import { $$proxy } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../opPlan-input.js";
@@ -377,7 +378,7 @@ export class OperationPlan {
     ? (id, requestingStep) => {
         if (!["plan", "validate", "optimize"].includes(this.phase)) {
           throw new Error(
-            `Getting a plan during the '${this.phase}' phase is forbidden - please do so before or during the optimize phase.`,
+            `Getting a step during the '${this.phase}' phase is forbidden - please do so before or during the optimize phase.`,
           );
         }
 
@@ -388,19 +389,22 @@ export class OperationPlan {
             !requestingStep.allowMultipleOptimizations)
         ) {
           throw new Error(
-            `Optimized plan ${requestingStep} is not permitted to request other steps (requested '${id}')`,
+            `Optimized step ${requestingStep} is not permitted to request other steps (requested '${id}')`,
           );
         }
 
-        const plan = this.steps[id];
-        if (plan == null) {
+        const step = this.steps[id];
+        if (step == null) {
           throw new Error(
-            `Programming error: plan with id '${id}' no longer exists`,
+            `Programming error: step with id '${id}' no longer exists`,
           );
         }
-        return plan;
+        return step[$$proxy] ?? step;
       }
-    : (id, _requestingStep) => this.steps[id];
+    : (id, _requestingStep) => {
+        const step = this.steps[id];
+        return step[$$proxy] ?? step;
+      };
 
   /**
    * Get a plan without specifying who requested it; this disables all the
