@@ -45,7 +45,7 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
             }
             addBehaviorToTags(
               relation.extensions.tags,
-              "-list -connection -single",
+              "-list -connection -single -manyToMany",
             );
           }
         }
