@@ -53,6 +53,7 @@ function makeProxyHandler<T>(
       }
       // DO optimize the proxy-ness away, so execution doesn't need to be proxied
       if (p === "optimize") {
+        delete $proxy[$$proxy];
         return () => [$proxy];
       }
 
