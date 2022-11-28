@@ -35,8 +35,8 @@ declare global {
       _columnName(
         this: GraphileBuild.Inflection,
         details: {
+          codec: PgTypeCodec<any, any, any, any>;
           columnName: string;
-          column: PgTypeColumn;
           skipRowId?: boolean;
         },
       ): string;
@@ -60,7 +60,6 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           columnName: string;
-          column: PgTypeColumn;
           codec: PgTypeCodec<any, any, any>;
         },
       ): string;
@@ -140,7 +139,6 @@ function processColumn(
     overrideName ??
     inflection.column({
       columnName,
-      column,
       codec: pgCodec,
     });
   const baseCodec = unwrapCodec(column.codec);
@@ -288,7 +286,8 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      _columnName(options, { columnName, column }) {
+      _columnName(options, { columnName, codec }) {
+        const column = codec.columns[columnName];
         return this.coerceToGraphQLName(
           column.extensions?.tags?.name || columnName,
         );
@@ -297,8 +296,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
       _joinColumnNames(options, codec, names) {
         return names
           .map((columnName) => {
-            const column = codec.columns[columnName];
-            return this.column({ columnName, column, codec });
+            return this.column({ columnName, codec });
           })
           .join("-and-");
       },
@@ -441,7 +439,6 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               }
 
               const fieldName = inflection.column({
-                column,
                 columnName,
                 codec: pgCodec,
               });

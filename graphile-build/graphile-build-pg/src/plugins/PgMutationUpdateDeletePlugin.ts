@@ -481,7 +481,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 memo[
                                   inflection.column({
                                     columnName,
-                                    column,
                                     codec: source.codec,
                                   })
                                 ] = {
@@ -637,7 +636,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     inflection.column({
                       columnName,
                       codec: source.codec,
-                      column: source.codec.columns[columnName],
                     }),
                   ],
                 );

@@ -95,7 +95,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
 
                       const fieldName = inflection.column({
                         columnName,
-                        column,
                         codec,
                       });
                       const type = build.getGraphQLTypeByPgCodec(

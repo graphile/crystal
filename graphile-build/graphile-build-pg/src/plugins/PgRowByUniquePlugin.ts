@@ -98,7 +98,6 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                   const column = source.codec.columns[columnName];
                   const columnArgName = build.inflection.column({
                     columnName,
-                    column,
                     codec: source.codec,
                   });
                   detailsByColumnName[columnName] = {
