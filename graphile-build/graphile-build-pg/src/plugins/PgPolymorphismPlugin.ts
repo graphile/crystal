@@ -356,12 +356,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                 {
                   source,
-                  codec: source.codec,
-                  identifier: relationName,
-                  relation: relationSpec,
+                  relationName,
                 };
-              const singleRecordFieldName = relationDetails.relation
-                .isReferencee
+              const singleRecordFieldName = relationSpec.isReferencee
                 ? info.inflection.singleRelationBackwards(relationDetails)
                 : info.inflection.singleRelation(relationDetails);
               const connectionFieldName =

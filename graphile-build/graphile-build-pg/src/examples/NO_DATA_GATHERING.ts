@@ -76,16 +76,16 @@ async function main() {
     inflection: {
       replace: {
         singleRelation(previous, options, details) {
-          return this.camelCase(details.identifier);
+          return this.camelCase(details.relationName);
         },
         singleRelationBackwards(previous, options, details) {
-          return this.camelCase(details.identifier);
+          return this.camelCase(details.relationName);
         },
         manyRelationConnection(previous, options, details) {
-          return this.connectionField(this.camelCase(details.identifier));
+          return this.connectionField(this.camelCase(details.relationName));
         },
         manyRelationList(previous, options, details) {
-          return this.listField(this.camelCase(details.identifier));
+          return this.listField(this.camelCase(details.relationName));
         },
       },
     },

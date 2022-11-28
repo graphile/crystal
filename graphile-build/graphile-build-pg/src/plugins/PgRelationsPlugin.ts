@@ -36,12 +36,8 @@ import { Idents, tagToString } from "../utils.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      // TODO: can we get away with just `source` and `relationName`? Seems the
-      // rest can be figured out from these two things?
       source: PgSource<any, any, any, any>;
-      codec: PgTypeCodec<any, any, any>;
-      identifier: string;
-      relation: PgSourceRelation<any, any>;
+      relationName: string;
     }
 
     interface ScopeObjectFieldsField {
@@ -70,6 +66,10 @@ declare global {
         details: PgRelationsPluginRelationDetails,
       ): string;
       singleRelationBackwards(
+        this: Inflection,
+        details: PgRelationsPluginRelationDetails,
+      ): string;
+      _manyRelation(
         this: Inflection,
         details: PgRelationsPluginRelationDetails,
       ): string;
@@ -177,85 +177,79 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
 
       singleRelation(options, details) {
-        if (typeof details.relation.extensions?.tags.fieldName === "string") {
-          return details.relation.extensions.tags.fieldName;
+        const { source, relationName } = details;
+        const relation: PgSourceRelation<any, any> =
+          source.getRelation(relationName);
+        const codec = relation.source.codec;
+        if (typeof relation.extensions?.tags.fieldName === "string") {
+          return relation.extensions.tags.fieldName;
         }
         // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(details.relation.source.codec);
-        const localColumns = details.relation.localColumns as string[];
+        const remoteType = this.tableType(relation.source.codec);
+        const localColumns = relation.localColumns as string[];
         return this.camelCase(
-          `${remoteType}-by-${this._joinColumnNames(
-            details.codec,
-            localColumns,
-          )}`,
+          `${remoteType}-by-${this._joinColumnNames(codec, localColumns)}`,
         );
       },
       singleRelationBackwards(options, details) {
+        const { source, relationName } = details;
+        const relation: PgSourceRelation<any, any> =
+          source.getRelation(relationName);
         if (
-          typeof details.relation.extensions?.tags.foreignSingleFieldName ===
-          "string"
+          typeof relation.extensions?.tags.foreignSingleFieldName === "string"
         ) {
-          return details.relation.extensions.tags.foreignSingleFieldName;
+          return relation.extensions.tags.foreignSingleFieldName;
         }
-        if (
-          typeof details.relation.extensions?.tags.foreignFieldName === "string"
-        ) {
-          return details.relation.extensions.tags.foreignFieldName;
+        if (typeof relation.extensions?.tags.foreignFieldName === "string") {
+          return relation.extensions.tags.foreignFieldName;
         }
         // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns as string[];
+        const remoteType = this.tableType(relation.source.codec);
+        const remoteColumns = relation.remoteColumns as string[];
         return this.camelCase(
           `${remoteType}-by-${this._joinColumnNames(
-            details.relation.source.codec,
+            relation.source.codec,
+            remoteColumns,
+          )}`,
+        );
+      },
+      _manyRelation(options, details) {
+        const { source, relationName } = details;
+        const relation: PgSourceRelation<any, any> =
+          source.getRelation(relationName);
+        // E.g. users(id) references posts(author_id)
+        const remoteType = this.tableType(relation.source.codec);
+        const remoteColumns = relation.remoteColumns as string[];
+        return this.camelCase(
+          `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
+            relation.source.codec,
             remoteColumns,
           )}`,
         );
       },
       manyRelationConnection(options, details) {
-        if (
-          typeof details.relation.extensions?.tags.foreignFieldName === "string"
-        ) {
-          return this.connectionField(
-            this.camelCase(details.relation.extensions.tags.foreignFieldName),
-          );
+        const { source, relationName } = details;
+        const relation: PgSourceRelation<any, any> =
+          source.getRelation(relationName);
+        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        if (typeof baseOverride === "string") {
+          return this.connectionField(this.camelCase(baseOverride));
         }
-        // E.g. users(id) references posts(author_id)
-        const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns as string[];
-        return this.connectionField(
-          this.camelCase(
-            `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
-              details.relation.source.codec,
-              remoteColumns,
-            )}`,
-          ),
-        );
+        return this.connectionField(this._manyRelation(details));
       },
       manyRelationList(options, details) {
-        if (
-          typeof details.relation.extensions?.tags.foreignSimpleFieldName ===
-          "string"
-        ) {
-          return details.relation.extensions.tags.foreignSimpleFieldName;
+        const { source, relationName } = details;
+        const relation: PgSourceRelation<any, any> =
+          source.getRelation(relationName);
+        const override = relation.extensions?.tags.foreignSimpleFieldName;
+        if (typeof override === "string") {
+          return this.camelCase(override);
         }
-        if (
-          typeof details.relation.extensions?.tags.foreignFieldName === "string"
-        ) {
-          return this.listField(
-            this.camelCase(details.relation.extensions.tags.foreignFieldName),
-          );
+        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        if (typeof baseOverride === "string") {
+          return this.listField(this.camelCase(baseOverride));
         }
-        const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns as string[];
-        return this.listField(
-          this.camelCase(
-            `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
-              details.relation.source.codec,
-              remoteColumns,
-            )}`,
-          ),
-        );
+        return this.listField(this._manyRelation(details));
       },
     },
   },
@@ -727,7 +721,7 @@ function addRelations(
 
   if (source) {
     // Digest relations
-    for (const [identifier, relation] of Object.entries(relations)) {
+    for (const [relationName, relation] of Object.entries(relations)) {
       const {
         localColumns,
         remoteColumns,
@@ -758,9 +752,7 @@ function addRelations(
 
       const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
         source,
-        codec,
-        identifier,
-        relation,
+        relationName,
       };
 
       const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
@@ -769,14 +761,14 @@ function addRelations(
         otherSource,
         isMutationPayload ?? false,
       );
-      const singleRecordFieldName = relationDetails.relation.isReferencee
+      const singleRecordFieldName = relation.isReferencee
         ? build.inflection.singleRelationBackwards(relationDetails)
         : build.inflection.singleRelation(relationDetails);
       const connectionFieldName =
         build.inflection.manyRelationConnection(relationDetails);
       const listFieldName = build.inflection.manyRelationList(relationDetails);
       const digest: Digest = {
-        identifier,
+        identifier: relationName,
         isReferencee: relation.isReferencee ?? false,
         behavior,
         isUnique: relation.isUnique,
