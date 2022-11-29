@@ -123,6 +123,7 @@ import {
   PgPolymorphicTypeMap,
 } from "./steps/pgPolymorphic.js";
 import {
+  digestsFromArgumentSpecs,
   pgSelect,
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
@@ -172,6 +173,7 @@ import {
 export {
   BooleanFilterStep,
   ClassFilterStep,
+  digestsFromArgumentSpecs,
   domainOfCodec,
   enumType,
   getCodecByPgCatalogTypeName,
@@ -335,6 +337,7 @@ exportAsMany("@dataplan/pg", {
   pgPolymorphic,
   PgPolymorphicStep,
   pgSelect,
+  digestsFromArgumentSpecs,
   pgSelectFromRecords,
   PgSelectStep,
   sqlFromArgDigests,

@@ -595,7 +595,7 @@ export class PgSelectStep<
       }
       const queryValues: QueryValue[] = [];
       const identifierMatches: SQL[] = [];
-      const args: PgSelectArgumentDigest[] = [];
+      let args: PgSelectArgumentDigest[] = [];
       let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
         if (isDev) {
@@ -612,34 +612,10 @@ export class PgSelectStep<
         identifierMatches.push(matches(this.alias));
       });
       if (inArgs) {
-        inArgs.forEach((identifier) => {
-          if (isDev) {
-            assertSensible(identifier.step);
-          }
-          const { step, name } = identifier;
-          const codec =
-            "pgCodec" in identifier
-              ? identifier.pgCodec
-              : identifier.step.pgCodec;
-          const placeholder = this.placeholder(step, codec);
-          if (name) {
-            argIndex = null;
-            args.push({
-              name,
-              placeholder,
-            });
-          } else {
-            if (argIndex === null) {
-              throw new Error(
-                "Cannot have unnamed argument after named arguments",
-              );
-            }
-            args.push({
-              position: argIndex++,
-              placeholder,
-            });
-          }
-        });
+        const { digests: newArgs, argIndex: newArgIndex } =
+          digestsFromArgumentSpecs(this, inArgs, args, argIndex);
+        args = newArgs;
+        argIndex = newArgIndex;
       }
       this.queryValues = queryValues;
       this.identifierMatches = identifierMatches;
@@ -2960,6 +2936,45 @@ export function sqlFromArgDigests(
   return digests.length > 1
     ? sql.indent(sql.join(args, ",\n"))
     : sql.join(args, ", ");
+}
+
+export function digestsFromArgumentSpecs(
+  $placeholderable: ExecutableStep & {
+    placeholder(
+      step: ExecutableStep,
+      codec: PgTypeCodec<any, any, any, any>,
+    ): SQL;
+  },
+  specs: PgSelectArgumentSpec[],
+  digests: PgSelectArgumentDigest[] = [],
+  initialArgIndex: number | null = 0,
+): { digests: PgSelectArgumentDigest[]; argIndex: number | null } {
+  let argIndex: null | number = initialArgIndex;
+  for (const identifier of specs) {
+    if (isDev) {
+      assertSensible(identifier.step);
+    }
+    const { step, name } = identifier;
+    const codec =
+      "pgCodec" in identifier ? identifier.pgCodec : identifier.step.pgCodec;
+    const placeholder = $placeholderable.placeholder(step, codec);
+    if (name) {
+      argIndex = null;
+      digests.push({
+        name,
+        placeholder,
+      });
+    } else {
+      if (argIndex === null) {
+        throw new Error("Cannot have unnamed argument after named arguments");
+      }
+      digests.push({
+        position: argIndex++,
+        placeholder,
+      });
+    }
+  }
+  return { digests, argIndex };
 }
 
 export function getFragmentAndCodecFromOrder(
