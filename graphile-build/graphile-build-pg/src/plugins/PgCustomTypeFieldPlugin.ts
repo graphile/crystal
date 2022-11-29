@@ -30,7 +30,6 @@ import type {
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
-  GraphileFieldConfigArgumentMap,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -57,13 +56,22 @@ declare global {
       pgGetArgDetailsFromParameters(
         source: PgSource<any, any, any, any>,
         parameters?: PgSourceParameter[],
-      ): Array<{
-        graphqlArgName: string;
-        postgresArgName: string | null;
-        pgCodec: PgTypeCodec<any, any, any, any>;
-        inputType: GraphQLInputType;
-        required: boolean;
-      }>;
+      ): {
+        makeFieldArgs(): {
+          [graphqlArgName: string]: {
+            type: GraphQLInputType;
+            description?: string;
+          };
+        };
+        makeArgs(args: FieldArgs, path?: string[]): PgSelectArgumentSpec[];
+        argDetails: Array<{
+          graphqlArgName: string;
+          postgresArgName: string | null;
+          pgCodec: PgTypeCodec<any, any, any, any>;
+          inputType: GraphQLInputType;
+          required: boolean;
+        }>;
+      };
     }
 
     interface InflectionCustomFieldProcedureDetails {
@@ -146,49 +154,6 @@ declare global {
       ): string;
     }
   }
-}
-
-function getArgDetailsFromParameters(
-  build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any>,
-  parameters: PgSourceParameter[],
-) {
-  const {
-    graphql: { GraphQLList, GraphQLNonNull },
-    getGraphQLTypeByPgCodec,
-  } = build;
-  const argDetails = parameters.map((param, index) => {
-    const argName = build.inflection.argument({
-      param,
-      source,
-      index,
-    });
-    const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
-    const variant = param.extensions?.variant ?? "input";
-    const baseInputType = getGraphQLTypeByPgCodec(paramBaseCodec, variant);
-    if (!baseInputType) {
-      throw new Error(
-        `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
-      );
-    }
-
-    // Not necessarily a list type... Need to rename this
-    // variable.
-    const listType = param.codec.arrayOfCodec
-      ? new GraphQLList(baseInputType)
-      : baseInputType;
-
-    const inputType =
-      param.notNull && param.required ? new GraphQLNonNull(listType) : listType;
-    return {
-      graphqlArgName: argName,
-      postgresArgName: param.name,
-      pgCodec: param.codec,
-      inputType,
-      required: param.required,
-    };
-  });
-  return argDetails;
 }
 
 function shouldUseCustomConnection(
@@ -394,7 +359,103 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 required: param.required,
               };
             });
-            return argDetails;
+
+            // Not used for isMutation; that's handled elsewhere.
+            // This is a factory because we don't want mutations to one set
+            // of args to affect the others!
+            const makeFieldArgs = () =>
+              argDetails.reduce((memo, { inputType, graphqlArgName }) => {
+                memo[graphqlArgName] = {
+                  type: inputType,
+                };
+                return memo;
+              }, Object.create(null) as { [graphqlArgName: string]: { type: GraphQLInputType } });
+
+            const argDetailsSimple = argDetails.map(
+              ({ graphqlArgName, pgCodec, required, postgresArgName }) => ({
+                graphqlArgName,
+                postgresArgName,
+                pgCodec,
+                required,
+              }),
+            );
+            let indexAfterWhichAllArgsAreNamed = 0;
+            const argDetailsLength = argDetails.length;
+            for (let i = 0; i < argDetailsLength; i++) {
+              if (!argDetails[i].postgresArgName) {
+                indexAfterWhichAllArgsAreNamed = i + 1;
+              }
+            }
+
+            const makeArgs = EXPORTABLE(
+              (
+                  argDetailsLength,
+                  argDetailsSimple,
+                  constant,
+                  indexAfterWhichAllArgsAreNamed,
+                ) =>
+                (args: FieldArgs, path: string[] = []) => {
+                  const selectArgs: PgSelectArgumentSpec[] = [];
+
+                  let skipped = false;
+                  for (let i = 0; i < argDetailsLength; i++) {
+                    const {
+                      graphqlArgName,
+                      postgresArgName,
+                      pgCodec,
+                      required,
+                    } = argDetailsSimple[i];
+                    const $raw = args.getRaw([...path, graphqlArgName]);
+                    let step: ExecutableStep;
+                    if ($raw.evalIs(undefined)) {
+                      if (
+                        !required &&
+                        i >= indexAfterWhichAllArgsAreNamed - 1
+                      ) {
+                        skipped = true;
+                        continue;
+                      } else {
+                        step = constant(null);
+                      }
+                    } else {
+                      step = args.get([...path, graphqlArgName]);
+                    }
+
+                    if (skipped) {
+                      const name = postgresArgName;
+                      if (!name) {
+                        throw new Error(
+                          "GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed",
+                        );
+                      }
+                      selectArgs.push({
+                        step,
+                        pgCodec,
+                        name,
+                      });
+                    } else {
+                      selectArgs.push({
+                        step,
+                        pgCodec,
+                      });
+                    }
+                  }
+
+                  return selectArgs;
+                },
+              [
+                argDetailsLength,
+                argDetailsSimple,
+                constant,
+                indexAfterWhichAllArgsAreNamed,
+              ],
+            );
+
+            return {
+              argDetails,
+              makeArgs,
+              makeFieldArgs,
+            };
           };
 
           return build;
@@ -500,7 +561,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     inputTypeName,
                     { isMutationInput: true },
                     () => {
-                      const argDetails = pgGetArgDetailsFromParameters(
+                      const { argDetails } = pgGetArgDetailsFromParameters(
                         source,
                         source.parameters,
                       );
@@ -706,101 +767,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   : source.parameters.slice(1)
               ) as PgSourceParameter[];
 
-              const argDetails = pgGetArgDetailsFromParameters(
-                source,
-                remainingParameters,
-              );
-
-              // Not used for isMutation; that's handled elsewhere.
-              // This is a factory because we don't want mutations to one set
-              // of args to affect the others!
-              const makeFieldArgs = () =>
-                argDetails.reduce((memo, { inputType, graphqlArgName }) => {
-                  memo[graphqlArgName] = {
-                    type: inputType,
-                  };
-                  return memo;
-                }, {} as GraphileFieldConfigArgumentMap<any, any, any, any>);
-
-              const argDetailsSimple = argDetails.map(
-                ({ graphqlArgName, pgCodec, required, postgresArgName }) => ({
-                  graphqlArgName,
-                  postgresArgName,
-                  pgCodec,
-                  required,
-                }),
-              );
-              let indexAfterWhichAllArgsAreNamed = 0;
-              const argDetailsLength = argDetails.length;
-              for (let i = 0; i < argDetailsLength; i++) {
-                if (!argDetails[i].postgresArgName) {
-                  indexAfterWhichAllArgsAreNamed = i + 1;
-                }
-              }
-
-              const makeArgs = EXPORTABLE(
-                (
-                    argDetailsLength,
-                    argDetailsSimple,
-                    constant,
-                    indexAfterWhichAllArgsAreNamed,
-                  ) =>
-                  (args: FieldArgs, path: string[] = []) => {
-                    const selectArgs: PgSelectArgumentSpec[] = [];
-
-                    let skipped = false;
-                    for (let i = 0; i < argDetailsLength; i++) {
-                      const {
-                        graphqlArgName,
-                        postgresArgName,
-                        pgCodec,
-                        required,
-                      } = argDetailsSimple[i];
-                      const $raw = args.getRaw([...path, graphqlArgName]);
-                      let step: ExecutableStep;
-                      if ($raw.evalIs(undefined)) {
-                        if (
-                          !required &&
-                          i >= indexAfterWhichAllArgsAreNamed - 1
-                        ) {
-                          skipped = true;
-                          continue;
-                        } else {
-                          step = constant(null);
-                        }
-                      } else {
-                        step = args.get([...path, graphqlArgName]);
-                      }
-
-                      if (skipped) {
-                        const name = postgresArgName;
-                        if (!name) {
-                          throw new Error(
-                            "GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed",
-                          );
-                        }
-                        selectArgs.push({
-                          step,
-                          pgCodec,
-                          name,
-                        });
-                      } else {
-                        selectArgs.push({
-                          step,
-                          pgCodec,
-                        });
-                      }
-                    }
-
-                    return selectArgs;
-                  },
-                [
-                  argDetailsLength,
-                  argDetailsSimple,
-                  constant,
-                  indexAfterWhichAllArgsAreNamed,
-                ],
-              );
+              const { argDetails, makeArgs, makeFieldArgs } =
+                pgGetArgDetailsFromParameters(source, remainingParameters);
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<
                 any,
