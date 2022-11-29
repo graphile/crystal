@@ -41,7 +41,7 @@ import {
   stepAMayDependOnStepB,
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLOutputType } from "graphql";
+import type { GraphQLInputType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -53,6 +53,19 @@ const $$computed = Symbol("PgCustomTypeFieldPluginComputedSources");
 
 declare global {
   namespace GraphileBuild {
+    interface Build {
+      pgGetArgDetailsFromParameters(
+        source: PgSource<any, any, any, any>,
+        parameters?: PgSourceParameter[],
+      ): Array<{
+        graphqlArgName: string;
+        postgresArgName: string | null;
+        pgCodec: PgTypeCodec<any, any, any, any>;
+        inputType: GraphQLInputType;
+        required: boolean;
+      }>;
+    }
+
     interface InflectionCustomFieldProcedureDetails {
       source: PgSource<any, any, any, PgSourceParameter[]>;
     }
@@ -338,6 +351,52 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           build[$$rootQuery] = [];
           build[$$rootMutation] = [];
           build[$$computed] = new Map();
+          const {
+            graphql: { GraphQLList, GraphQLNonNull, isInputType },
+          } = build;
+          build.pgGetArgDetailsFromParameters = (
+            source,
+            parameters = source.parameters,
+          ) => {
+            const argDetails = parameters.map((param, index) => {
+              const argName = build.inflection.argument({
+                param,
+                source,
+                index,
+              });
+              const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
+              const variant = param.extensions?.variant ?? "input";
+              const baseInputType = build.getGraphQLTypeByPgCodec!(
+                paramBaseCodec,
+                variant,
+              );
+              if (!baseInputType || !isInputType(baseInputType)) {
+                throw new Error(
+                  `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
+                );
+              }
+
+              // Not necessarily a list type... Need to rename this
+              // variable.
+              const listType = param.codec.arrayOfCodec
+                ? new GraphQLList(baseInputType)
+                : baseInputType;
+
+              const inputType =
+                param.notNull && param.required
+                  ? new GraphQLNonNull(listType)
+                  : listType;
+              return {
+                graphqlArgName: argName,
+                postgresArgName: param.name,
+                pgCodec: param.codec,
+                inputType,
+                required: param.required,
+              };
+            });
+            return argDetails;
+          };
+
           return build;
         },
       },
@@ -348,6 +407,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             graphql: { GraphQLList, GraphQLString },
             inflection,
             options,
+            pgGetArgDetailsFromParameters,
           } = build;
 
           // Loop through all the sources and add them to the relevant
@@ -440,8 +500,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     inputTypeName,
                     { isMutationInput: true },
                     () => {
-                      const argDetails = getArgDetailsFromParameters(
-                        build,
+                      const argDetails = pgGetArgDetailsFromParameters(
                         source,
                         source.parameters,
                       );
@@ -615,6 +674,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           },
           inflection,
           options,
+          pgGetArgDetailsFromParameters,
         } = build;
         const {
           Self,
@@ -646,8 +706,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   : source.parameters.slice(1)
               ) as PgSourceParameter[];
 
-              const argDetails = getArgDetailsFromParameters(
-                build,
+              const argDetails = pgGetArgDetailsFromParameters(
                 source,
                 remainingParameters,
               );
