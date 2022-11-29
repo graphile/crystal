@@ -1047,6 +1047,11 @@ export class PgSelectStep<
     this.groups.push(group);
   }
 
+  getGroups(): readonly PgGroupSpec[] {
+    this.locker.lockParameter("groupBy");
+    return this.groups;
+  }
+
   havingPlan(): PgConditionStep<this> {
     if (this.locker.locked) {
       throw new Error(
