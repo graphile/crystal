@@ -28,6 +28,15 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
       _columnName(previous, options, details) {
         const { codec, columnName } = details;
         const column = codec.columns[columnName];
+        if (!column) {
+          throw new Error(
+            `Attempted to access column '${columnName}' of codec '${
+              codec.name
+            }', but it doesn't have that column (known columns: ${Object.keys(
+              codec.columns,
+            ).join(", ")})`,
+          );
+        }
         if (column.extensions?.argIndex != null && !column.extensions.argName) {
           return `arg${column.extensions.argIndex + 1}`;
         }
