@@ -87,9 +87,7 @@ class SchemaBuilder<
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
     if (this._currentPluginName) {
-      fn.displayName = `${this._currentPluginName}/${hookName}/${
-        fn.displayName || fn.name || "unnamed"
-      }`;
+      fn.displayName = `${this._currentPluginName}/schema.hooks.${hookName}`;
     }
     this.hooks[hookName].push(fn as any);
   }
