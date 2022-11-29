@@ -180,7 +180,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { source, relationName } = details;
         const relation: PgSourceRelation<any, any> =
           source.getRelation(relationName);
-        const codec = relation.source.codec;
+        //const codec = relation.source.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
@@ -188,7 +188,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const remoteType = this.tableType(relation.source.codec);
         const localColumns = relation.localColumns as string[];
         return this.camelCase(
-          `${remoteType}-by-${this._joinColumnNames(codec, localColumns)}`,
+          `${remoteType}-by-${this._joinColumnNames(
+            source.codec,
+            localColumns,
+          )}`,
         );
       },
       singleRelationBackwards(options, details) {
