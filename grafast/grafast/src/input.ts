@@ -89,6 +89,12 @@ export function inputPlan(
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
 ): InputStep {
+  if (rawInputValue === undefined && defaultValue === undefined) {
+    // TODO: this is a hack to prevent infinite recursion... This isn't really
+    // the right type for this. How SHOULD we prevent infinite recursion?
+    // Should we just return `null` and have the calling code handle?
+    return new __InputStaticLeafStep(inputType as any, undefined);
+  }
   return withGlobalLayerPlan(
     operationPlan.rootLayerPlan,
     operationPlan.rootLayerPlan.polymorphicPaths,
