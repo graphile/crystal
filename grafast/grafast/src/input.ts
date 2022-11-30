@@ -86,6 +86,7 @@ export function graphqlGetTypeForNode(
 export function inputPlan(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
+  seenTypes: Set<GraphQLInputType>,
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
 ): InputStep {
@@ -95,6 +96,13 @@ export function inputPlan(
     // Should we just return `null` and have the calling code handle?
     return new __InputStaticLeafStep(inputType as any, undefined);
   }
+
+  if (seenTypes.has(inputType)) {
+    // TODO: Stop recursion if no data
+  } else {
+    seenTypes.add(inputType);
+  }
+
   return withGlobalLayerPlan(
     operationPlan.rootLayerPlan,
     operationPlan.rootLayerPlan.polymorphicPaths,
@@ -122,6 +130,7 @@ export function inputPlan(
           operationPlan,
           variableName,
           variableType,
+          seenTypes,
           inputType,
           defaultValue,
         );
@@ -131,10 +140,15 @@ export function inputPlan(
       inputValue = inputValue ?? defaultValue;
       if (inputType instanceof GraphQLNonNull) {
         const innerType = inputType.ofType;
-        const valuePlan = inputPlan(operationPlan, innerType, inputValue);
+        const valuePlan = inputPlan(
+          operationPlan,
+          innerType,
+          seenTypes,
+          inputValue,
+        );
         return inputNonNullPlan(operationPlan, valuePlan);
       } else if (inputType instanceof GraphQLList) {
-        return new __InputListStep(inputType, inputValue);
+        return new __InputListStep(inputType, seenTypes, inputValue);
       } else if (isLeafType(inputType)) {
         if (
           inputValue?.kind === Kind.OBJECT ||
@@ -150,7 +164,7 @@ export function inputPlan(
           return new __InputStaticLeafStep(inputType, inputValue);
         }
       } else if (inputType instanceof GraphQLInputObjectType) {
-        return new __InputObjectStep(inputType, inputValue);
+        return new __InputObjectStep(inputType, seenTypes, inputValue);
       } else {
         const never: never = inputType;
         throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -173,6 +187,7 @@ function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
+  seenTypes: Set<GraphQLInputType>,
   inputType: GraphQLInputType,
   defaultValue: ValueNode | undefined = undefined,
 ): InputStep {
@@ -185,6 +200,7 @@ function inputVariablePlan(
       operationPlan,
       variableName,
       unwrappedVariableType,
+      seenTypes,
       inputType,
       defaultValue,
     );
@@ -201,7 +217,13 @@ function inputVariablePlan(
     // `defaultValue` is NOT undefined, and we know variableValue is
     // `undefined` (and always will be); we're going to loop back and pretend
     // that no value was passed in the first place (instead of the variable):
-    return inputPlan(operationPlan, inputType, undefined, defaultValue);
+    return inputPlan(
+      operationPlan,
+      inputType,
+      seenTypes,
+      undefined,
+      defaultValue,
+    );
   }
 }
 

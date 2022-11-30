@@ -22,6 +22,7 @@ export class __InputListStep extends ExecutableStep {
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
+    seenTypes: Set<GraphQLInputType>,
     private readonly inputValues: ValueNode | undefined,
   ) {
     super();
@@ -45,14 +46,24 @@ export class __InputListStep extends ExecutableStep {
         inputValueIndex++
       ) {
         const inputValue = values[inputValueIndex];
-        const innerPlan = inputPlan(this.opPlan, innerType, inputValue);
+        const innerPlan = inputPlan(
+          this.opPlan,
+          innerType,
+          seenTypes,
+          inputValue,
+        );
         this.itemPlanIds.push(innerPlan.id);
         this.addDependency(innerPlan);
       }
     }
     // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
     // `InputNonNullStep`, but maybe it's not safe any more?
-    this.outOfBoundsStepId = inputPlan(this.opPlan, innerType, undefined).id;
+    this.outOfBoundsStepId = inputPlan(
+      this.opPlan,
+      innerType,
+      seenTypes,
+      undefined,
+    ).id;
   }
 
   optimize() {

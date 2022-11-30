@@ -1600,6 +1600,7 @@ export class OperationPlan {
         const argumentPlan = inputPlan(
           this,
           argumentType,
+          new Set(),
           argumentValue?.value,
           defaultValue,
         );

@@ -1,4 +1,8 @@
-import type { GraphQLInputObjectType, ValueNode } from "graphql";
+import type {
+  GraphQLInputObjectType,
+  GraphQLInputType,
+  ValueNode,
+} from "graphql";
 
 import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
@@ -22,6 +26,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   } = Object.create(null);
   constructor(
     private inputObjectType: GraphQLInputObjectType,
+    seenTypes: Set<GraphQLInputType>,
     private inputValues: ValueNode | undefined,
   ) {
     super();
@@ -41,6 +46,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
       const step = inputPlan(
         this.opPlan,
         inputFieldType,
+        seenTypes,
         inputFieldValue?.value,
         defaultValue,
       );
