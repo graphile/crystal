@@ -351,12 +351,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             (relations, sourceBuilder) => sourceBuilder.build({ relations }),
             [relations, sourceBuilder],
           );
-          await info.process("pgTables_PgSource", {
-            source,
-            pgClass,
-            databaseName,
-            relations,
-          });
           return source;
         })();
         info.state.sourceBySourceBuilder.set(sourceBuilder, source);
@@ -553,12 +547,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       if (!output.pgSources) {
         output.pgSources = [];
       }
+      const toProcess: Array<{
+        source: PgSource<any, any, any, any>;
+        pgClass: PgClass;
+        databaseName: string;
+      }> = [];
       for (const [
-        ,
+        databaseName,
         sourceBuilderByPgClass,
       ] of info.state.sourceBuilderByPgClassByDatabase.entries()) {
         for (const [
-          ,
+          pgClass,
           sourceBuilderPromise,
         ] of sourceBuilderByPgClass.entries()) {
           const sourceBuilder = await sourceBuilderPromise;
@@ -569,7 +568,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           if (source && !source.isVirtual) {
             output.pgSources!.push(source);
           }
+          if (source) {
+            toProcess.push({ source, pgClass, databaseName });
+          }
         }
+      }
+
+      for (const entry of toProcess) {
+        await info.process("pgTables_PgSource", {
+          ...entry,
+          relations: entry.source.getRelations(),
+        });
       }
     },
   } as GraphileConfig.PluginGatherConfig<"pgTables", State, Cache>,
