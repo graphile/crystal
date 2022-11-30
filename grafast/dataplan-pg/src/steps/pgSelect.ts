@@ -2939,7 +2939,7 @@ export function sqlFromArgDigests(
 }
 
 export function digestsFromArgumentSpecs(
-  $placeholderable: ExecutableStep & {
+  $placeholderable: {
     placeholder(
       step: ExecutableStep,
       codec: PgTypeCodec<any, any, any, any>,

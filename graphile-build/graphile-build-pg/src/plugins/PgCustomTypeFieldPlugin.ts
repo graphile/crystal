@@ -17,6 +17,7 @@ import type {
   PgTypedExecutableStep,
   PgUpdateStep,
 } from "@dataplan/pg";
+import { digestsFromArgumentSpecs } from "@dataplan/pg";
 import {
   pgClassExpression,
   pgSelectSingleFromRecord,
@@ -45,6 +46,7 @@ import type { GraphQLInputType, GraphQLOutputType } from "graphql";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
+import { SQL } from "pg-sql2";
 
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
@@ -71,6 +73,18 @@ declare global {
           inputType: GraphQLInputType;
           required: boolean;
         }>;
+        makeExpression(opts: {
+          $placeholderable: {
+            placeholder(
+              $step: ExecutableStep,
+              codec: PgTypeCodec<any, any, any, any>,
+            ): SQL;
+          };
+          source: PgSource<any, any, any, any>;
+          fieldArgs: FieldArgs;
+          path?: string[];
+          initialArgs?: SQL[];
+        }): SQL;
       };
     }
 
@@ -455,6 +469,29 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               argDetails,
               makeArgs,
               makeFieldArgs,
+              makeExpression({
+                $placeholderable,
+                source,
+                fieldArgs,
+                path = [],
+                initialArgs = [],
+              }) {
+                const args = makeArgs(fieldArgs, path);
+                const { digests } = digestsFromArgumentSpecs(
+                  $placeholderable,
+                  args,
+                  initialArgs.map((a, position) => ({
+                    placeholder: a,
+                    position,
+                  })),
+                  initialArgs.length,
+                );
+                if (typeof source.source !== "function") {
+                  throw new Error("!function");
+                }
+                const src = source.source(...digests);
+                return src;
+              },
             };
           };
 
