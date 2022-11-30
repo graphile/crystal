@@ -11,69 +11,69 @@ graph TD
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access17{{"Access[17∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection20{{"Connection[20∈0]<br />ᐸ16ᐳ"}}:::plan
-    PgSelect21[["PgSelect[21∈1]<br />ᐸsimilarTable1ᐳ"]]:::plan
-    __Item22[/"__Item[22∈2]<br />ᐸ21ᐳ"\]:::itemplan
-    PgSelectSingle23{{"PgSelectSingle[23∈2]<br />ᐸsimilarTable1ᐳ"}}:::plan
-    Constant24{{"Constant[24∈1]"}}:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__similar_table1__.”id”ᐳ"}}:::plan
-    List26{{"List[26∈3]<br />ᐸ24,25ᐳ"}}:::plan
-    Lambda27{{"Lambda[27∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    Connection42{{"Connection[42∈0]<br />ᐸ38ᐳ"}}:::plan
-    PgSelect43[["PgSelect[43∈4]<br />ᐸsimilarTable1ᐳ"]]:::plan
-    __Item44[/"__Item[44∈5]<br />ᐸ43ᐳ"\]:::itemplan
-    PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸsimilarTable1ᐳ"}}:::plan
-    Constant46{{"Constant[46∈4]"}}:::plan
-    PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__similar_table1__.”id”ᐳ"}}:::plan
-    List48{{"List[48∈6]<br />ᐸ46,47ᐳ"}}:::plan
-    Lambda49{{"Lambda[49∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression50{{"PgClassExpression[50∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    PgSelect20[["PgSelect[20∈1]<br />ᐸsimilarTable1ᐳ"]]:::plan
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸsimilarTable1ᐳ"}}:::plan
+    Constant23{{"Constant[23∈1]"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__similar_table1__.”id”ᐳ"}}:::plan
+    List25{{"List[25∈3]<br />ᐸ23,24ᐳ"}}:::plan
+    Lambda26{{"Lambda[26∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    Connection40{{"Connection[40∈0]<br />ᐸ36ᐳ"}}:::plan
+    PgSelect41[["PgSelect[41∈4]<br />ᐸsimilarTable1ᐳ"]]:::plan
+    __Item42[/"__Item[42∈5]<br />ᐸ41ᐳ"\]:::itemplan
+    PgSelectSingle43{{"PgSelectSingle[43∈5]<br />ᐸsimilarTable1ᐳ"}}:::plan
+    Constant44{{"Constant[44∈4]"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__similar_table1__.”id”ᐳ"}}:::plan
+    List46{{"List[46∈6]<br />ᐸ44,45ᐳ"}}:::plan
+    Lambda47{{"Lambda[47∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    PgClassExpression48{{"PgClassExpression[48∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
 
     %% plan dependencies
+    __Value3 --> Access16
     __Value3 --> Access17
-    __Value3 --> Access18
-    Access17 & Access18 --> Object19
-    Object19 & Connection20 --> PgSelect21
-    PgSelect21 ==> __Item22
-    __Item22 --> PgSelectSingle23
-    PgSelectSingle23 --> PgClassExpression25
-    Constant24 & PgClassExpression25 --> List26
-    List26 --> Lambda27
-    PgSelectSingle23 --> PgClassExpression28
-    Object19 & Connection42 --> PgSelect43
-    PgSelect43 ==> __Item44
-    __Item44 --> PgSelectSingle45
-    PgSelectSingle45 --> PgClassExpression47
-    Constant46 & PgClassExpression47 --> List48
-    List48 --> Lambda49
-    PgSelectSingle45 --> PgClassExpression50
+    Access16 & Access17 --> Object18
+    Object18 & Connection19 --> PgSelect20
+    PgSelect20 ==> __Item21
+    __Item21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression24
+    Constant23 & PgClassExpression24 --> List25
+    List25 --> Lambda26
+    PgSelectSingle22 --> PgClassExpression27
+    Object18 & Connection40 --> PgSelect41
+    PgSelect41 ==> __Item42
+    __Item42 --> PgSelectSingle43
+    PgSelectSingle43 --> PgClassExpression45
+    Constant44 & PgClassExpression45 --> List46
+    List46 --> Lambda47
+    PgSelectSingle43 --> PgClassExpression48
 
     subgraph "Buckets for queries/v4/orderByNullsLast"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access17,Access18,Object19,Connection20,Connection42 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 19, 20<br /><br />ROOT Connectionᐸ16ᐳ[20]"):::bucket
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Connection40 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect21,Constant24 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 24<br /><br />ROOT __Item{2}ᐸ21ᐳ[22]"):::bucket
+    class Bucket1,PgSelect20,Constant23 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 23<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item22,PgSelectSingle23 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 23, 24<br /><br />ROOT PgSelectSingle{2}ᐸsimilarTable1ᐳ[23]"):::bucket
+    class Bucket2,__Item21,PgSelectSingle22 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 23<br /><br />ROOT PgSelectSingle{2}ᐸsimilarTable1ᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression25,List26,Lambda27,PgClassExpression28 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 19, 42<br /><br />ROOT Connectionᐸ38ᐳ[42]"):::bucket
+    class Bucket3,PgClassExpression24,List25,Lambda26,PgClassExpression27 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 40<br /><br />ROOT Connectionᐸ36ᐳ[40]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelect43,Constant46 bucket4
-    Bucket5("Bucket 5 (listItem)<br />Deps: 46<br /><br />ROOT __Item{5}ᐸ43ᐳ[44]"):::bucket
+    class Bucket4,PgSelect41,Constant44 bucket4
+    Bucket5("Bucket 5 (listItem)<br />Deps: 44<br /><br />ROOT __Item{5}ᐸ41ᐳ[42]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item44,PgSelectSingle45 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 45, 46<br /><br />ROOT PgSelectSingle{5}ᐸsimilarTable1ᐳ[45]"):::bucket
+    class Bucket5,__Item42,PgSelectSingle43 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 43, 44<br /><br />ROOT PgSelectSingle{5}ᐸsimilarTable1ᐳ[43]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression47,List48,Lambda49,PgClassExpression50 bucket6
+    class Bucket6,PgClassExpression45,List46,Lambda47,PgClassExpression48 bucket6
     Bucket0 --> Bucket1 & Bucket4
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
