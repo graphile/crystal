@@ -13,6 +13,7 @@ import type {
   StepStreamOptions,
   StreamableStep,
 } from "grafast";
+import { ConstantStep } from "grafast";
 import {
   __InputListStep,
   __InputObjectStep,
@@ -112,11 +113,16 @@ parseCursor.isSyncAndSafe = true; // Optimization
 
 function isStaticInputStep(
   dep: ExecutableStep,
-): dep is __InputListStep | __InputStaticLeafStep | __InputObjectStep {
+): dep is
+  | __InputListStep
+  | __InputStaticLeafStep
+  | __InputObjectStep
+  | ConstantStep<any> {
   return (
     dep instanceof __InputListStep ||
     dep instanceof __InputStaticLeafStep ||
-    dep instanceof __InputObjectStep
+    dep instanceof __InputObjectStep ||
+    dep instanceof ConstantStep
   );
 }
 
