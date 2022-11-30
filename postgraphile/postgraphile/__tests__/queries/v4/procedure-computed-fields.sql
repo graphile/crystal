@@ -25,11 +25,11 @@ select
   __frmcdc_compound_type_1_5."foo_bar"::text as "23",
   ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_5))::text as "24",
   (not (__frmcdc_compound_type_1_5 is null))::text as "25",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_6))::text as "26",
-  __frmcdc_compound_type_1_6."foo_bar"::text as "27",
-  __frmcdc_compound_type_1_6."a"::text as "28",
-  (not (__frmcdc_compound_type_1_6 is null))::text as "29",
-  __frmcdc_nested_compound_type_1_2."a"::text as "30",
+  __frmcdc_nested_compound_type_1_2."a"::text as "26",
+  __frmcdc_compound_type_1_6."a"::text as "27",
+  __frmcdc_compound_type_1_6."foo_bar"::text as "28",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_6))::text as "29",
+  (not (__frmcdc_compound_type_1_6 is null))::text as "30",
   __frmcdc_nested_compound_type_1_2."b"::text as "31",
   (not (__frmcdc_nested_compound_type_1_2 is null))::text as "32",
   __types__."nullable_nested_compound_type"::text as "33"
@@ -63,7 +63,9 @@ from (
     (ids.value->>4)::"int4" as "id4",
     (ids.value->>5)::"text" as "id5",
     (ids.value->>6)::"int4" as "id6",
-    (ids.value->>7)::"text" as "id7"
+    (ids.value->>7)::"text" as "id7",
+    (ids.value->>8)::"int4" as "id8",
+    (ids.value->>9)::"text" as "id9"
   from json_array_elements($1::json) with ordinality as ids
 ) as __post_identifiers__,
 lateral (
@@ -86,31 +88,39 @@ lateral (
       __post_identifiers__."id6",
       __post_identifiers__."id7"
     ) as "5",
-    __post__::text as "6",
+    "a"."post_headline_trimmed_no_defaults"(
+      __post_3,
+      __post_identifiers__."id8",
+      __post_identifiers__."id9"
+    ) as "6",
+    __post_3."id"::text as "7",
+    __post__::text as "8",
     "a"."post_headline_trimmed_strict"(
       __post__,
       __post_identifiers__."id4",
       __post_identifiers__."id5"
-    ) as "7",
+    ) as "9",
     "a"."post_headline_trimmed_strict"(
       __post__,
       __post_identifiers__."id3"
-    ) as "8",
-    "a"."post_headline_trimmed_strict"(__post__) as "9",
+    ) as "10",
+    "a"."post_headline_trimmed_strict"(__post__) as "11",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id1",
       __post_identifiers__."id2"
-    ) as "10",
+    ) as "12",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id0"
-    ) as "11",
-    "a"."post_headline_trimmed"(__post__) as "12",
-    __post__."headline" as "13",
-    __post_identifiers__.idx as "14"
+    ) as "13",
+    "a"."post_headline_trimmed"(__post__) as "14",
+    __post__."headline" as "15",
+    __post_identifiers__.idx as "16"
   from "a"."post" as __post__
   left outer join lateral (select (__post__).*) as __post_2
+  on TRUE
+  left outer join lateral (select (__post__).*) as __post_3
   on TRUE
   order by __post__."id" asc
 ) as __post_result__;
@@ -147,28 +157,6 @@ select
   __edge_case__."wont_cast_easy"::text as "1",
   __edge_case__."not_null_has_default"::text as "2"
 from "c"."edge_case" as __edge_case__;
-
-select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."post" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"text" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
-lateral (
-  select
-    "a"."post_headline_trimmed_no_defaults"(
-      __post__,
-      __post_identifiers__."id1",
-      __post_identifiers__."id2"
-    ) as "0",
-    __post__."id"::text as "1",
-    __post_identifiers__.idx as "2"
-  from (select (__post_identifiers__."id0").*) as __post__
-  order by __post__."id" asc
-) as __post_result__;
 
 select __post_computed_compound_type_array_result__.*
 from (
