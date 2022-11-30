@@ -3,7 +3,6 @@ import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgConditionStep } from "../index.js";
 import type { PgConditionLikeStep, PgTypeCodec } from "../interfaces.js";
 
 export class OrFilterStep extends ModifierStep<PgConditionLikeStep> {

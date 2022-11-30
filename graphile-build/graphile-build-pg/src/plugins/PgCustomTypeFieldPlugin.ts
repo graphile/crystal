@@ -17,8 +17,8 @@ import type {
   PgTypedExecutableStep,
   PgUpdateStep,
 } from "@dataplan/pg";
-import { digestsFromArgumentSpecs } from "@dataplan/pg";
 import {
+  digestsFromArgumentSpecs,
   pgClassExpression,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
@@ -42,11 +42,11 @@ import {
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputType, GraphQLOutputType } from "graphql";
+import type { SQL } from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
-import { SQL } from "pg-sql2";
 
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
@@ -804,8 +804,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   : source.parameters.slice(1)
               ) as PgSourceParameter[];
 
-              const { argDetails, makeArgs, makeFieldArgs } =
-                pgGetArgDetailsFromParameters(source, remainingParameters);
+              const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
+                source,
+                remainingParameters,
+              );
 
               const getSelectPlanFromParentAndArgs: FieldPlanResolver<
                 any,

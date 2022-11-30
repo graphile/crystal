@@ -1,4 +1,4 @@
-import type { BaseStep, ExecutableStep, ModifierStep } from "grafast";
+import type { ExecutableStep, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgTypeColumns } from "./codecs.js";
