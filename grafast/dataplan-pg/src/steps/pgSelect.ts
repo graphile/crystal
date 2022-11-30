@@ -13,7 +13,6 @@ import type {
   StepStreamOptions,
   StreamableStep,
 } from "grafast";
-import { ConstantStep } from "grafast";
 import {
   __InputListStep,
   __InputObjectStep,
@@ -24,6 +23,7 @@ import {
   arrayOfLength,
   ConnectionStep,
   constant,
+  ConstantStep,
   deepEval,
   ExecutableStep,
   first,
