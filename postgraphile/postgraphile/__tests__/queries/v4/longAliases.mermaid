@@ -23,16 +23,16 @@ graph TD
     List16{{"List[16∈1]<br />ᐸ14,15ᐳ"}}:::plan
     Lambda17{{"Lambda[17∈1]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Connection31{{"Connection[31∈1]<br />ᐸ27ᐳ"}}:::plan
-    Access53{{"Access[53∈1]<br />ᐸ12.2ᐳ"}}:::plan
-    First33{{"First[33∈1]"}}:::plan
-    PgSelectSingle34{{"PgSelectSingle[34∈1]<br />ᐸperson_friendsᐳ"}}:::plan
-    PgClassExpression35{{"PgClassExpression[35∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-    Connection48{{"Connection[48∈1]<br />ᐸ44ᐳ"}}:::plan
-    Access54{{"Access[54∈1]<br />ᐸ12.3ᐳ"}}:::plan
-    First50{{"First[50∈1]"}}:::plan
-    PgSelectSingle51{{"PgSelectSingle[51∈1]<br />ᐸperson_friendsᐳ"}}:::plan
-    PgClassExpression52{{"PgClassExpression[52∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    Connection30{{"Connection[30∈1]<br />ᐸ26ᐳ"}}:::plan
+    Access51{{"Access[51∈1]<br />ᐸ12.2ᐳ"}}:::plan
+    First32{{"First[32∈1]"}}:::plan
+    PgSelectSingle33{{"PgSelectSingle[33∈1]<br />ᐸperson_friendsᐳ"}}:::plan
+    PgClassExpression34{{"PgClassExpression[34∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    Connection46{{"Connection[46∈1]<br />ᐸ42ᐳ"}}:::plan
+    Access52{{"Access[52∈1]<br />ᐸ12.3ᐳ"}}:::plan
+    First48{{"First[48∈1]"}}:::plan
+    PgSelectSingle49{{"PgSelectSingle[49∈1]<br />ᐸperson_friendsᐳ"}}:::plan
+    PgClassExpression50{{"PgClassExpression[50∈1]<br />ᐸcount(*)ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access9
@@ -45,14 +45,14 @@ graph TD
     Constant14 & PgClassExpression15 --> List16
     List16 --> Lambda17
     PgSelectSingle13 --> PgClassExpression18
-    First12 --> Access53
-    Access53 --> First33
-    First33 --> PgSelectSingle34
-    PgSelectSingle34 --> PgClassExpression35
-    First12 --> Access54
-    Access54 --> First50
-    First50 --> PgSelectSingle51
-    PgSelectSingle51 --> PgClassExpression52
+    First12 --> Access51
+    Access51 --> First32
+    First32 --> PgSelectSingle33
+    PgSelectSingle33 --> PgClassExpression34
+    First12 --> Access52
+    Access52 --> First48
+    First48 --> PgSelectSingle49
+    PgSelectSingle49 --> PgClassExpression50
 
     subgraph "Buckets for queries/v4/longAliases"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
@@ -60,6 +60,6 @@ graph TD
     class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 12<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,Connection31,First33,PgSelectSingle34,PgClassExpression35,Connection48,First50,PgSelectSingle51,PgClassExpression52,Access53,Access54 bucket1
+    class Bucket1,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,Connection30,First32,PgSelectSingle33,PgClassExpression34,Connection46,First48,PgSelectSingle49,PgClassExpression50,Access51,Access52 bucket1
     Bucket0 --> Bucket1
     end

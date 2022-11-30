@@ -13,65 +13,65 @@ graph TD
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
     __InputStaticLeaf11{{"__InputStaticLeaf[11∈0]"}}:::plan
-    Access19{{"Access[19∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access20{{"Access[20∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object21{{"Object[21∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda23{{"Lambda[23∈0]<br />ᐸparseCursorᐳ"}}:::plan
-    Connection22{{"Connection[22∈0]<br />ᐸ18ᐳ"}}:::plan
-    PgValidateParsedCursor25["PgValidateParsedCursor[25∈1]"]:::plan
-    Access26{{"Access[26∈1]<br />ᐸ23.1ᐳ"}}:::plan
-    ToPg27["ToPg[27∈1]"]:::plan
-    PgSelect24[["PgSelect[24∈1]<br />ᐸpeopleᐳ"]]:::plan
-    __Item28[/"__Item[28∈2]<br />ᐸ24ᐳ"\]:::itemplan
-    PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸpeopleᐳ"}}:::plan
-    PgClassExpression39{{"PgClassExpression[39∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Access53{{"Access[53∈3]<br />ᐸ28.0ᐳ"}}:::plan
-    __Item44[/"__Item[44∈4]<br />ᐸ53ᐳ"\]:::itemplan
-    PgSelectSingle45{{"PgSelectSingle[45∈4]<br />ᐸlogEntriesᐳ"}}:::plan
-    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
-    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
-    PgClassExpression49{{"PgClassExpression[49∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    List52{{"List[52∈3]<br />ᐸ39ᐳ"}}:::plan
-    PgCursor50{{"PgCursor[50∈3]"}}:::plan
+    Access17{{"Access[17∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda21{{"Lambda[21∈0]<br />ᐸparseCursorᐳ"}}:::plan
+    Connection20{{"Connection[20∈0]<br />ᐸ16ᐳ"}}:::plan
+    PgValidateParsedCursor23["PgValidateParsedCursor[23∈1]"]:::plan
+    Access24{{"Access[24∈1]<br />ᐸ21.1ᐳ"}}:::plan
+    ToPg25["ToPg[25∈1]"]:::plan
+    PgSelect22[["PgSelect[22∈1]<br />ᐸpeopleᐳ"]]:::plan
+    __Item26[/"__Item[26∈2]<br />ᐸ22ᐳ"\]:::itemplan
+    PgSelectSingle27{{"PgSelectSingle[27∈2]<br />ᐸpeopleᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Access46{{"Access[46∈3]<br />ᐸ26.0ᐳ"}}:::plan
+    __Item37[/"__Item[37∈4]<br />ᐸ46ᐳ"\]:::itemplan
+    PgSelectSingle38{{"PgSelectSingle[38∈4]<br />ᐸlogEntriesᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
+    PgClassExpression40{{"PgClassExpression[40∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    List45{{"List[45∈3]<br />ᐸ32ᐳ"}}:::plan
+    PgCursor43{{"PgCursor[43∈3]"}}:::plan
 
     %% plan dependencies
-    __Value3 --> Access19
-    __Value3 --> Access20
-    Access19 & Access20 --> Object21
-    __InputStaticLeaf11 --> Lambda23
-    __InputStaticLeaf7 & Lambda23 --> Connection22
-    Lambda23 --> PgValidateParsedCursor25
-    Lambda23 --> Access26
-    Access26 --> ToPg27
-    Object21 & Connection22 & Lambda23 & PgValidateParsedCursor25 & ToPg27 --> PgSelect24
-    PgSelect24 ==> __Item28
-    __Item28 --> PgSelectSingle29
-    PgSelectSingle29 --> PgClassExpression39
-    __Item28 --> Access53
-    Access53 ==> __Item44
-    __Item44 --> PgSelectSingle45
-    PgSelectSingle45 --> PgClassExpression46
-    PgSelectSingle45 --> PgClassExpression47
-    PgSelectSingle29 --> PgClassExpression49
-    PgClassExpression39 --> List52
-    List52 --> PgCursor50
+    __Value3 --> Access17
+    __Value3 --> Access18
+    Access17 & Access18 --> Object19
+    __InputStaticLeaf11 --> Lambda21
+    __InputStaticLeaf7 & Lambda21 --> Connection20
+    Lambda21 --> PgValidateParsedCursor23
+    Lambda21 --> Access24
+    Access24 --> ToPg25
+    Object19 & Connection20 & Lambda21 & PgValidateParsedCursor23 & ToPg25 --> PgSelect22
+    PgSelect22 ==> __Item26
+    __Item26 --> PgSelectSingle27
+    PgSelectSingle27 --> PgClassExpression32
+    __Item26 --> Access46
+    Access46 ==> __Item37
+    __Item37 --> PgSelectSingle38
+    PgSelectSingle38 --> PgClassExpression39
+    PgSelectSingle38 --> PgClassExpression40
+    PgSelectSingle27 --> PgClassExpression42
+    PgClassExpression32 --> List45
+    List45 --> PgCursor43
 
     subgraph "Buckets for queries/polymorphic/person-log-entries.after-caroline"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,__InputStaticLeaf11,Connection22,Lambda23 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 22, 23<br /><br />ROOT Connectionᐸ18ᐳ[22]<br />1: PgValidateParsedCursor[25]<br />ᐳ: 19, 20, 26, 21<br />2: ToPg[27]<br />3: PgSelect[24]"):::bucket
+    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,__InputStaticLeaf11,Connection20,Lambda21 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 20, 21<br /><br />ROOT Connectionᐸ16ᐳ[20]<br />1: PgValidateParsedCursor[23]<br />ᐳ: 17, 18, 24, 19<br />2: ToPg[25]<br />3: PgSelect[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access19,Access20,Object21,PgSelect24,PgValidateParsedCursor25,Access26,ToPg27 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ24ᐳ[28]"):::bucket
+    class Bucket1,Access17,Access18,Object19,PgSelect22,PgValidateParsedCursor23,Access24,ToPg25 bucket1
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ22ᐳ[26]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item28,PgSelectSingle29 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 28<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[29]"):::bucket
+    class Bucket2,__Item26,PgSelectSingle27 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 27, 26<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[27]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression39,PgClassExpression49,PgCursor50,List52,Access53 bucket3
-    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ53ᐳ[44]"):::bucket
+    class Bucket3,PgClassExpression32,PgClassExpression42,PgCursor43,List45,Access46 bucket3
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ46ᐳ[37]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item44,PgSelectSingle45,PgClassExpression46,PgClassExpression47 bucket4
+    class Bucket4,__Item37,PgSelectSingle38,PgClassExpression39,PgClassExpression40 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
