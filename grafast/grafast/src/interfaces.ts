@@ -245,8 +245,11 @@ export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
 // TODO: rename
 export interface FieldArgs {
+  /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
   get(path?: string | string[]): ExecutableStep;
+  /** Gets the value *without* calling any `inputPlan`s */
   getRaw(path?: string | string[]): InputStep;
+  /** This also works (without path) to apply each list entry against $target */
   apply($target: ExecutableStep | ModifierStep, path?: string | string[]): void;
 }
 

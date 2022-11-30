@@ -1,4 +1,4 @@
-import type { ExecutableStep } from "grafast";
+import type { BaseStep, ExecutableStep, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgTypeColumns } from "./codecs.js";
@@ -327,3 +327,13 @@ export type PlanByUniques<
 > = TColumns extends PgTypeColumns
   ? TuplePlanMap<TColumns, TUniqueColumns[number]["columns"] & string[]>[number]
   : undefined;
+
+export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
+  alias: SQL;
+  placeholder(
+    $step: ExecutableStep,
+    codec: PgTypeCodec<any, any, any, any>,
+  ): SQL;
+  where(condition: SQL): void;
+  having(condition: SQL): void;
+};
