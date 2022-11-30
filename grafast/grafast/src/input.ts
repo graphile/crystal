@@ -22,10 +22,12 @@ import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
+import type { ConstantStep } from "./steps/index.js";
 import {
   __InputListStep,
   __InputStaticLeafStep,
   __TrackedObjectStep,
+  constant,
 } from "./steps/index.js";
 
 // TODO: should this have `__` prefix?
@@ -34,7 +36,8 @@ export type InputStep =
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafStep // .eval(), .evalIs()
   | __InputDynamicScalarStep // .eval(), .evalIs()
-  | __InputObjectStep; // .get(), .eval(), .evalHas(), .evalIs(null)
+  | __InputObjectStep // .get(), .eval(), .evalHas(), .evalIs(null)
+  | ConstantStep<undefined>; // .eval(), .evalIs()
 
 export function assertInputStep(
   itemPlan: unknown,
@@ -91,10 +94,7 @@ export function inputPlan(
   defaultValue: ValueNode | undefined = undefined,
 ): InputStep {
   if (rawInputValue === undefined && defaultValue === undefined) {
-    // TODO: this is a hack to prevent infinite recursion... This isn't really
-    // the right type for this. How SHOULD we prevent infinite recursion?
-    // Should we just return `null` and have the calling code handle?
-    return new __InputStaticLeafStep(inputType as any, undefined);
+    return constant(undefined);
   }
 
   if (seenTypes.has(inputType)) {

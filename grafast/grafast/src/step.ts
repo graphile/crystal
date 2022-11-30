@@ -543,7 +543,7 @@ export function isExecutableStep<TData = any>(
 }
 
 export function assertExecutableStep<TData>(
-  step: BaseStep | null | undefined | void,
+  step: BaseStep,
 ): asserts step is ExecutableStep<TData> {
   if (!isExecutableStep(step)) {
     throw new Error(

@@ -5,6 +5,7 @@ import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
 import { assertInputStep, inputPlan } from "../input.js";
 import { ExecutableStep } from "../step.js";
+import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
 
 /**
@@ -18,7 +19,6 @@ export class __InputListStep extends ExecutableStep {
   isSyncAndSafe = true;
 
   private itemPlanIds: number[] = [];
-  private outOfBoundsStepId: number;
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
@@ -56,14 +56,6 @@ export class __InputListStep extends ExecutableStep {
         this.addDependency(innerPlan);
       }
     }
-    // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
-    // `InputNonNullStep`, but maybe it's not safe any more?
-    this.outOfBoundsStepId = inputPlan(
-      this.opPlan,
-      innerType,
-      seenTypes,
-      undefined,
-    ).id;
   }
 
   optimize() {
@@ -99,10 +91,11 @@ export class __InputListStep extends ExecutableStep {
     );
   };
 
-  at(index: number): InputStep {
+  at(index: number): InputStep | ConstantStep<undefined> {
     const itemStepId = this.itemPlanIds[index];
-    const outOfBoundsPlan = this.getStep(this.outOfBoundsStepId);
-    const itemPlan = itemStepId ? this.getStep(itemStepId) : outOfBoundsPlan;
+    const itemPlan = itemStepId
+      ? this.getStep(itemStepId)
+      : constant(undefined);
     assertInputStep(itemPlan);
     return itemPlan;
   }

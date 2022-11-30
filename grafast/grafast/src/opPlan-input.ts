@@ -94,12 +94,14 @@ function withFieldArgsForArgumentsOrInputObject<
     const $currentObject = $current as
       | TrackedArguments
       | __TrackedObjectStep
-      | __InputObjectStep;
+      | __InputObjectStep
+      | ConstantStep<undefined>;
 
     const argName = path.shift()!;
-    let $value = ($currentObject.get as (argName: string) => InputStep)(
-      argName,
-    );
+    let $value =
+      "get" in $currentObject
+        ? ($currentObject.get as (argName: string) => InputStep)(argName)
+        : constant(undefined); /* by elimination */
 
     /*
     if ($value.evalIs(undefined)) {
