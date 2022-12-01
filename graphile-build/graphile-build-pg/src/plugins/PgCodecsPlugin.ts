@@ -75,6 +75,10 @@ declare global {
       pgCodecs?: PgTypeCodec<any, any, any, any>[];
     }
 
+    interface Build {
+      allPgCodecs: Set<PgTypeCodec<any, any, any, any>>;
+    }
+
     interface ScopeObject {
       isPgRangeType?: boolean;
       isPgRangeBoundType?: boolean;
@@ -765,6 +769,53 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
+      build(build) {
+        build.allPgCodecs = new Set();
+        function walkCodec(codec: PgTypeCodec<any, any, any, any>): void {
+          if (build.allPgCodecs!.has(codec)) {
+            return;
+          }
+          build.allPgCodecs!.add(codec);
+
+          if (codec.arrayOfCodec) {
+            walkCodec(codec.arrayOfCodec);
+          }
+
+          if (codec.columns) {
+            for (const columnName in codec.columns) {
+              const columnCodec = (codec.columns as PgTypeColumns)[columnName]
+                .codec;
+              walkCodec(columnCodec);
+            }
+          }
+
+          if (codec.domainOfCodec) {
+            walkCodec(codec.domainOfCodec);
+          }
+
+          if (codec.rangeOfCodec) {
+            walkCodec(codec.rangeOfCodec);
+          }
+        }
+
+        // Walk all the codecs, add them to build
+        for (const source of build.input.pgSources) {
+          walkCodec(source.codec);
+          if (source.parameters) {
+            for (const parameter of source.parameters) {
+              walkCodec(parameter.codec);
+            }
+          }
+        }
+        if (build.input.pgCodecs) {
+          for (const codec of build.input.pgCodecs) {
+            walkCodec(codec);
+          }
+        }
+
+        return build;
+      },
+
       init: {
         after: ["pg-standard-types"],
         provides: ["PgCodecs"],
@@ -888,8 +939,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             }
           }
 
-          // Now walk all the codecs and ensure that each on has an associated type
-          function walkCodec(
+          // Now walk over all the codecs and ensure that each on has an associated type
+          function prepareTypeForCodec(
             codec: PgTypeCodec<any, any, any, any>,
             visited: Set<PgTypeCodec<any, any, any, any>>,
           ): void {
@@ -900,7 +951,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
             // Process the inner type of list types, then exit.
             if (codec.arrayOfCodec) {
-              walkCodec(codec.arrayOfCodec, visited);
+              prepareTypeForCodec(codec.arrayOfCodec, visited);
 
               // Array codecs don't get their own type, they just use GraphQLList or connection or whatever.
               return;
@@ -911,7 +962,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               for (const columnName in codec.columns) {
                 const columnCodec = (codec.columns as PgTypeColumns)[columnName]
                   .codec;
-                walkCodec(columnCodec, visited);
+                prepareTypeForCodec(columnCodec, visited);
               }
 
               // This will be handled by PgTablesPlugin; ignore.
@@ -920,12 +971,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
             // Process the underlying type for domains (if any)
             if (codec.domainOfCodec) {
-              walkCodec(codec.domainOfCodec, visited);
+              prepareTypeForCodec(codec.domainOfCodec, visited);
             }
 
             // Process the underlying type for ranges (if any)
             if (codec.rangeOfCodec) {
-              walkCodec(codec.rangeOfCodec, visited);
+              prepareTypeForCodec(codec.rangeOfCodec, visited);
             }
 
             if (build.hasGraphQLTypeForPgCodec(codec)) {
@@ -1257,13 +1308,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
 
           const visited: Set<PgTypeCodec<any, any, any, any>> = new Set();
-          for (const source of build.input.pgSources) {
-            walkCodec(source.codec, visited);
-            if (source.parameters) {
-              for (const parameter of source.parameters) {
-                walkCodec(parameter.codec, visited);
-              }
-            }
+          for (const codec of build.allPgCodecs) {
+            prepareTypeForCodec(codec, visited);
           }
 
           return _;
