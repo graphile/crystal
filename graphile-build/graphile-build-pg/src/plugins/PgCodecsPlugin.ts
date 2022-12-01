@@ -854,6 +854,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             char: "String",
             bpchar: "String",
             varchar: "String",
+            name: "String",
             xml: inflection.builtin("XML"),
             json: inflection.builtin("JSON"),
             jsonb: inflection.builtin("JSON"),

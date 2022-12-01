@@ -802,6 +802,7 @@ export const TYPES = {
   bpchar: t<string>("1042", "bpchar", verbatim),
   varchar: t<string>("1043", "varchar", verbatim),
   text: t<string>("25", "text", verbatim),
+  name: t<string>("19", "name", verbatim),
   json: t<string>("114", "json"),
   jsonb: t<string>("3802", "jsonb"),
   xml: t<string>("142", "xml"),
@@ -902,6 +903,8 @@ export function getCodecByPgCatalogTypeName(
       return TYPES.varchar;
     case "text":
       return TYPES.text;
+    case "name":
+      return TYPES.name;
     case "uuid":
       return TYPES.uuid;
 
