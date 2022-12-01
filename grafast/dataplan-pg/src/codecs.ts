@@ -146,6 +146,7 @@ export type PgTypeColumns<TColumnName extends string = string> = {
  * @param options - the configuration options described above
  */
 function t<TFromJavaScript = any, TFromPostgres = string>(
+  oid: string | undefined,
   type: string,
   options: Cast<TFromJavaScript, TFromPostgres> = {},
 ): PgTypeCodec<undefined, TFromPostgres, TFromJavaScript> {
@@ -156,7 +157,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(
     fromPg: fromPg ?? (identity as any),
     toPg: toPg ?? (identity as any),
     columns: undefined,
-    extensions: undefined,
+    extensions: { oid: oid },
     castFromPg,
     listCastFromPg,
   };
@@ -425,7 +426,7 @@ function realRecordType<TColumns extends PgTypeColumns>(
  *
  * @param name - the name of the enum
  * @param identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
- * @param value - a list of the values that this enum can represent
+ * @param values - a list of the values that this enum can represent
  * @param extensions - an optional object that you can use to associate arbitrary data with this type
  */
 export function enumType<TValue extends string>(
@@ -788,56 +789,60 @@ const stripSubnet32 = {
  * names (those that would be found in the `pg_type` table).
  */
 export const TYPES = {
-  void: t<void>("void"), // void: 2278
-  boolean: t<boolean>("bool", { fromPg: (value) => value[0] === "t" }),
-  int2: t<number>("int2", { fromPg: parseAsInt }),
-  int: t<number>("int4", { fromPg: parseAsInt }),
-  bigint: t<string>("int8"),
-  float4: t<number>("float4", { fromPg: parseFloat }),
-  float: t<number>("float8", { fromPg: parseFloat }),
-  money: t<string>("money", viaNumeric),
-  numeric: t<string>("numeric"),
-  char: t<string>("char", verbatim),
-  bpchar: t<string>("bpchar", verbatim),
-  varchar: t<string>("varchar", verbatim),
-  text: t<string>("text", verbatim),
-  json: t<string>("json"),
-  jsonb: t<string>("jsonb"),
-  xml: t<string>("xml"),
-  citext: t<string>("citext", verbatim),
-  uuid: t<string>("uuid", verbatim),
+  void: t<void>("2278", "void"), // void: 2278
+  boolean: t<boolean>("16", "bool", { fromPg: (value) => value[0] === "t" }),
+  int2: t<number>("21", "int2", { fromPg: parseAsInt }),
+  int: t<number>("23", "int4", { fromPg: parseAsInt }),
+  bigint: t<string>("20", "int8"),
+  float4: t<number>("700", "float4", { fromPg: parseFloat }),
+  float: t<number>("701", "float8", { fromPg: parseFloat }),
+  money: t<string>("790", "money", viaNumeric),
+  numeric: t<string>("1700", "numeric"),
+  char: t<string>("18", "char", verbatim),
+  bpchar: t<string>("1042", "bpchar", verbatim),
+  varchar: t<string>("1043", "varchar", verbatim),
+  text: t<string>("25", "text", verbatim),
+  json: t<string>("114", "json"),
+  jsonb: t<string>("3802", "jsonb"),
+  xml: t<string>("142", "xml"),
+  citext: t<string>(undefined, "citext", verbatim),
+  uuid: t<string>("2950", "uuid", verbatim),
   timestamp: t<string>(
+    "1114",
     "timestamp",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.US'),
   ),
   timestamptz: t<string>(
+    "1184",
     "timestamptz",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
   ),
-  date: t<string>("date", viaDateFormat("YYYY-MM-DD")),
+  date: t<string>("1082", "date", viaDateFormat("YYYY-MM-DD")),
   time: t<string>(
+    "1083",
     "time",
     viaDateFormat("HH24:MI:SS.US", sql`date '1970-01-01' + `),
   ),
   timetz: t<string>(
+    "1266",
     "timetz",
     viaDateFormat("HH24:MI:SS.USTZHTZM", sql`date '1970-01-01' + `),
   ),
-  inet: t<string>("inet", stripSubnet32),
-  regproc: t<string>("regproc"),
-  regprocedure: t<string>("regprocedure"),
-  regoper: t<string>("regoper"),
-  regoperator: t<string>("regoperator"),
-  regclass: t<string>("regclass"),
-  regtype: t<string>("regtype"),
-  regrole: t<string>("regrole"),
-  regnamespace: t<string>("regnamespace"),
-  regconfig: t<string>("regconfig"),
-  regdictionary: t<string>("regdictionary"),
-  cidr: t<string>("cidr"),
-  macaddr: t<string>("macaddr"),
-  macaddr8: t<string>("macaddr8"),
-  interval: t<PgInterval, string>("interval", {
+  inet: t<string>("869", "inet", stripSubnet32),
+  regproc: t<string>("24", "regproc"),
+  regprocedure: t<string>("2202", "regprocedure"),
+  regoper: t<string>("2203", "regoper"),
+  regoperator: t<string>("2204", "regoperator"),
+  regclass: t<string>("2205", "regclass"),
+  regtype: t<string>("2206", "regtype"),
+  regrole: t<string>("4096", "regrole"),
+  regnamespace: t<string>("4089", "regnamespace"),
+  regconfig: t<string>("3734", "regconfig"),
+  regdictionary: t<string>("3769", "regdictionary"),
+  cidr: t<string>("650", "cidr"),
+  macaddr: t<string>("829", "macaddr"),
+  macaddr8: t<string>("774", "macaddr8"),
+  interval: t<PgInterval, string>("1186", "interval", {
     ...viaDateFormat(`YYYY_MM_DD_HH24_MI_SS.US`),
     fromPg(value: string): PgInterval {
       const parts = value.split("_").map(parseFloat);
@@ -847,19 +852,28 @@ export const TYPES = {
     },
     toPg: stringifyInterval,
   }),
-  bit: t<string>("bit"),
-  varbit: t<string>("varbit"),
-  point: t<PgPoint>("point", { fromPg: parsePoint, toPg: stringifyPoint }),
-  line: t<PgLine>("line", { fromPg: parseLine, toPg: stringifyLine }),
-  lseg: t<PgLseg>("lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
-  box: t<PgBox>("box", { fromPg: parseBox, toPg: stringifyBox }),
-  path: t<PgPath>("path", { fromPg: parsePath, toPg: stringifyPath }),
-  polygon: t<PgPolygon>("polygon", {
+  bit: t<string>("1560", "bit"),
+  varbit: t<string>("1562", "varbit"),
+  point: t<PgPoint>("600", "point", {
+    fromPg: parsePoint,
+    toPg: stringifyPoint,
+  }),
+  line: t<PgLine>("628", "line", { fromPg: parseLine, toPg: stringifyLine }),
+  lseg: t<PgLseg>("601", "lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
+  box: t<PgBox>("603", "box", { fromPg: parseBox, toPg: stringifyBox }),
+  path: t<PgPath>("602", "path", { fromPg: parsePath, toPg: stringifyPath }),
+  polygon: t<PgPolygon>("604", "polygon", {
     fromPg: parsePolygon,
     toPg: stringifyPolygon,
   }),
-  circle: t<PgCircle>("circle", { fromPg: parseCircle, toPg: stringifyCircle }),
-  hstore: t<PgHStore>("hstore", { fromPg: parseHstore, toPg: stringifyHstore }),
+  circle: t<PgCircle>("718", "circle", {
+    fromPg: parseCircle,
+    toPg: stringifyCircle,
+  }),
+  hstore: t<PgHStore>(undefined, "hstore", {
+    fromPg: parseHstore,
+    toPg: stringifyHstore,
+  }),
 } as const;
 exportAs(TYPES, "TYPES");
 
@@ -878,7 +892,7 @@ export function getCodecByPgCatalogTypeName(
 
     // TODO!
     //case "bytea":
-    //  return TYPES.bytea;
+    //  return TYPES.bytea; // oid: 17
 
     case "char":
       return TYPES.char;

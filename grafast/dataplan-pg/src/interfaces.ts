@@ -61,6 +61,7 @@ export interface PgRefDefinitions {
  * Custom metadata for a codec
  */
 export interface PgTypeCodecExtensions {
+  oid?: string;
   description?: string;
 }
 
