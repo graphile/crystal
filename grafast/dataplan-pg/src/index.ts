@@ -18,6 +18,7 @@ import {
   domainOfCodec,
   enumType,
   getCodecByPgCatalogTypeName,
+  getInnerCodec,
   isEnumCodec,
   listOfType,
   PgRecordTypeCodecSpec,
@@ -179,6 +180,7 @@ export {
   domainOfCodec,
   enumType,
   getCodecByPgCatalogTypeName,
+  getInnerCodec,
   isEnumCodec,
   listOfType,
   ManyFilterStep,
@@ -312,6 +314,7 @@ export {
 
 exportAsMany("@dataplan/pg", {
   domainOfCodec,
+  getInnerCodec,
   enumType,
   getCodecByPgCatalogTypeName,
   isEnumCodec,

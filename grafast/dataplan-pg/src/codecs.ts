@@ -996,6 +996,22 @@ export function getCodecByPgCatalogTypeName(
   return null;
 }
 
+export function getInnerCodec(
+  codec: PgTypeCodec<any, any, any, any>,
+): PgTypeCodec<any, any, any, any> {
+  if (codec.domainOfCodec) {
+    return getInnerCodec(codec.domainOfCodec);
+  }
+  if (codec.arrayOfCodec) {
+    return getInnerCodec(codec.arrayOfCodec);
+  }
+  if (codec.rangeOfCodec) {
+    return getInnerCodec(codec.rangeOfCodec);
+  }
+  return codec;
+}
+exportAs(getInnerCodec, "getInnerCodec");
+
 for (const key of Object.keys(TYPES)) {
   exportAs(TYPES[key], ["TYPES", key]);
 }
