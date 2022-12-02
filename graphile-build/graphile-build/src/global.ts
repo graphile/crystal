@@ -236,6 +236,8 @@ declare global {
        * messages more helpful.
        */
       status: {
+        /** True after 'init', false before and during. */
+        isReady: boolean;
         currentHookName: string | null | undefined;
         currentHookEvent: string | null | undefined;
       };

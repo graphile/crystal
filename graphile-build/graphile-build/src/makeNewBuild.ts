@@ -169,6 +169,7 @@ export default function makeNewBuild(
       }
     },
     status: {
+      isReady: false,
       currentHookName: null,
       currentHookEvent: null,
     },
@@ -249,6 +250,11 @@ export default function makeNewBuild(
     },
 
     getTypeByName(typeName) {
+      if (!this.status.isReady) {
+        throw new Error(
+          "Must not call build.getTypeByName before 'init' phase is complete",
+        );
+      }
       if (typeName in allTypes) {
         return allTypes[typeName];
       } else if (building.has(typeName)) {
@@ -300,6 +306,11 @@ export default function makeNewBuild(
       }
     },
     getInputTypeByName(typeName) {
+      if (!this.status.isReady) {
+        throw new Error(
+          "Must not call build.getInputTypeByName before 'init' phase is complete",
+        );
+      }
       const type = this.getTypeByName(typeName);
       if (!type || !isInputType(type)) {
         throw new Error(
@@ -311,6 +322,11 @@ export default function makeNewBuild(
       return type;
     },
     getOutputTypeByName(typeName) {
+      if (!this.status.isReady) {
+        throw new Error(
+          "Must not call build.getOutputTypeByName before 'init' phase is complete",
+        );
+      }
       const type = this.getTypeByName(typeName);
       if (!type || !isOutputType(type)) {
         throw new Error(
