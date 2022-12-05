@@ -50,11 +50,23 @@ interface LengthConstraint {
   expectedLength: number | null;
 }
 
+/**
+ * Checks if the object at the given path matches the `isEmpty` property
+ * (implying no keys). Objects are empty if and only if they exist and have no
+ * keys.
+ */
+interface IsEmptyConstraint {
+  type: "isEmpty";
+  path: (string | number)[];
+  isEmpty: boolean;
+}
+
 export type Constraint =
   | ValueConstraint
   | EqualityConstraint
   | ExistsConstraint
-  | LengthConstraint;
+  | LengthConstraint
+  | IsEmptyConstraint;
 
 function valueAtPath(
   object: unknown,
@@ -97,6 +109,13 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
     }
     case "value": {
       return value === constraint.value;
+    }
+    case "isEmpty": {
+      const isEmpty =
+        typeof value === "object" &&
+        value !== null &&
+        Object.keys(value).length === 0;
+      return isEmpty === constraint.isEmpty;
     }
     default: {
       const never: never = constraint;

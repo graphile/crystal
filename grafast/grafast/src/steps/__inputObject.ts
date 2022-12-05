@@ -136,6 +136,13 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     }
   }
 
+  evalIsEmpty(): boolean {
+    return (
+      this.inputValues?.kind === "ObjectValue" &&
+      this.inputValues.fields.length === 0
+    );
+  }
+
   // Written without consulting spec.
   evalHas(attrName: string): boolean {
     if (!this.inputValues) {

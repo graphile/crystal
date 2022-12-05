@@ -32,12 +32,12 @@ import {
 
 // TODO: should this have `__` prefix?
 export type InputStep =
-  | __TrackedObjectStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
+  | __TrackedObjectStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafStep // .eval(), .evalIs()
   | __InputDynamicScalarStep // .eval(), .evalIs()
-  | __InputObjectStep // .get(), .eval(), .evalHas(), .evalIs(null)
-  | ConstantStep<undefined>; // .eval(), .evalIs()
+  | __InputObjectStep // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
+  | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
 
 export function assertInputStep(
   itemPlan: unknown,

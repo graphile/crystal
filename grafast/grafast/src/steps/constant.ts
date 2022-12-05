@@ -28,6 +28,14 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     return this.data === value;
   }
 
+  evalIsEmpty() {
+    return (
+      typeof this.data === "object" &&
+      this.data !== null &&
+      Object.keys(this.data).length === 0
+    );
+  }
+
   unbatchedExecute() {
     return this.data;
   }

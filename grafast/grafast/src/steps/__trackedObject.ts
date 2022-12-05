@@ -165,6 +165,20 @@ export class __TrackedObjectStep<
     return pass;
   }
 
+  evalIsEmpty() {
+    const { value, path } = this;
+    const isEmpty =
+      typeof value === "object" &&
+      value !== null &&
+      Object.keys(value).length === 0;
+    this.constraints.push({
+      type: "isEmpty",
+      path,
+      isEmpty,
+    });
+    return isEmpty;
+  }
+
   /**
    * Evaluates if the current value is an object with the given key, and adds a
    * constraint to the OpPlan to ensure that all future evaluations of this
