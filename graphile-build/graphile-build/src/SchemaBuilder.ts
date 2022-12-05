@@ -208,9 +208,10 @@ class SchemaBuilder<
     );
 
     const finalBuild = Object.freeze(build) as TBuild;
+    finalBuild.status.isBuildPhaseComplete = true;
     const initContext: GraphileBuild.ContextInit = { scope: {}, type: "init" };
     this.applyHooks("init", INIT_OBJECT, finalBuild, initContext);
-    finalBuild.status.isReady = true;
+    finalBuild.status.isInitPhaseComplete = true;
     return finalBuild;
   }
 

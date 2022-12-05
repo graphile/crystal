@@ -106,7 +106,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           codec,
           situation,
         ) => {
-          if (!build.status.isReady) {
+          if (!build.status.isInitPhaseComplete) {
             throw new Error(
               `Calling build.getGraphQLTypeByPgCodec before the 'init' phase has completed is not allowed.`,
             );

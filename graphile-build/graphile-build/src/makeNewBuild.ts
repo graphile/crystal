@@ -80,6 +80,7 @@ export default function makeNewBuild(
 
   // TODO: allow registering a previously constructed type.
   function register(
+    this: GraphileBuild.BuildBase,
     klass: { new (spec: any): GraphQLNamedType },
     typeName: string,
     scope: GraphileBuild.SomeScope,
@@ -87,6 +88,9 @@ export default function makeNewBuild(
     specGenerator: () => any,
     origin: string | null | undefined,
   ) {
+    if (!this.status.isBuildPhaseComplete || this.status.isInitPhaseComplete) {
+      throw new Error("Types may only be registered in the 'init' phase");
+    }
     if (!typeName) {
       throw new Error(
         `Attempted to register a ${klass.name} with empty (or falsy) type name`,
@@ -169,7 +173,8 @@ export default function makeNewBuild(
       }
     },
     status: {
-      isReady: false,
+      isBuildPhaseComplete: false,
+      isInitPhaseComplete: false,
       currentHookName: null,
       currentHookEvent: null,
     },
@@ -179,13 +184,30 @@ export default function makeNewBuild(
     behavior: new Behavior(),
 
     registerObjectType(typeName, scope, Step, specGenerator, origin) {
-      register(GraphQLObjectType, typeName, scope, Step, specGenerator, origin);
+      register.call(
+        this,
+        GraphQLObjectType,
+        typeName,
+        scope,
+        Step,
+        specGenerator,
+        origin,
+      );
     },
     registerUnionType(typeName, scope, specGenerator, origin) {
-      register(GraphQLUnionType, typeName, scope, null, specGenerator, origin);
+      register.call(
+        this,
+        GraphQLUnionType,
+        typeName,
+        scope,
+        null,
+        specGenerator,
+        origin,
+      );
     },
     registerInterfaceType(typeName, scope, specGenerator, origin) {
-      register(
+      register.call(
+        this,
         GraphQLInterfaceType,
         typeName,
         scope,
@@ -195,7 +217,8 @@ export default function makeNewBuild(
       );
     },
     registerInputObjectType(typeName, scope, specGenerator, origin) {
-      register(
+      register.call(
+        this,
         GraphQLInputObjectType,
         typeName,
         scope,
@@ -205,13 +228,34 @@ export default function makeNewBuild(
       );
     },
     registerScalarType(typeName, scope, specGenerator, origin) {
-      register(GraphQLScalarType, typeName, scope, null, specGenerator, origin);
+      register.call(
+        this,
+        GraphQLScalarType,
+        typeName,
+        scope,
+        null,
+        specGenerator,
+        origin,
+      );
     },
     registerEnumType(typeName, scope, specGenerator, origin) {
-      register(GraphQLEnumType, typeName, scope, null, specGenerator, origin);
+      register.call(
+        this,
+        GraphQLEnumType,
+        typeName,
+        scope,
+        null,
+        specGenerator,
+        origin,
+      );
     },
 
     assertTypeName(typeName) {
+      if (!this.status.isBuildPhaseComplete) {
+        throw new Error(
+          "Must not call build.assertTypeName before 'build' phase is complete",
+        );
+      }
       if (typeName in allTypesSources) {
         return true;
       } else {
@@ -222,6 +266,11 @@ export default function makeNewBuild(
     },
 
     getTypeMetaByName(typeName) {
+      if (!this.status.isBuildPhaseComplete) {
+        throw new Error(
+          "Must not call build.getTypeMetaByName before 'build' phase is complete",
+        );
+      }
       // Meta for builtins
       switch (typeName) {
         case "String":
@@ -250,7 +299,7 @@ export default function makeNewBuild(
     },
 
     getTypeByName(typeName) {
-      if (!this.status.isReady) {
+      if (!this.status.isInitPhaseComplete) {
         throw new Error(
           "Must not call build.getTypeByName before 'init' phase is complete",
         );
@@ -306,7 +355,7 @@ export default function makeNewBuild(
       }
     },
     getInputTypeByName(typeName) {
-      if (!this.status.isReady) {
+      if (!this.status.isInitPhaseComplete) {
         throw new Error(
           "Must not call build.getInputTypeByName before 'init' phase is complete",
         );
@@ -322,7 +371,7 @@ export default function makeNewBuild(
       return type;
     },
     getOutputTypeByName(typeName) {
-      if (!this.status.isReady) {
+      if (!this.status.isInitPhaseComplete) {
         throw new Error(
           "Must not call build.getOutputTypeByName before 'init' phase is complete",
         );

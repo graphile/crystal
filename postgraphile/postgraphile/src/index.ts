@@ -4,6 +4,7 @@ import "graphile-build-pg";
 
 import type { Deferred } from "grafast";
 import { defer } from "grafast";
+// TODO: duplicate ServerParams locally to avoid the extra dependency?
 import type { Grafserv, ServerParams } from "grafserv";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";

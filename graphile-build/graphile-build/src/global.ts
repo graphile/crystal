@@ -236,8 +236,10 @@ declare global {
        * messages more helpful.
        */
       status: {
+        /** True after 'build', false before and during. */
+        isBuildPhaseComplete: boolean;
         /** True after 'init', false before and during. */
-        isReady: boolean;
+        isInitPhaseComplete: boolean;
         currentHookName: string | null | undefined;
         currentHookEvent: string | null | undefined;
       };
