@@ -522,7 +522,7 @@ export function listOfType<
         }
         if (typeof str !== "string" && typeof str !== "number") {
           throw new Error(
-            `Do not known how to encode ${inspect(
+            `Do not know how to encode ${inspect(
               str,
             )} to an array (send a PR!)`,
           );
@@ -790,7 +790,20 @@ const stripSubnet32 = {
  */
 export const TYPES = {
   void: t<void>("2278", "void"), // void: 2278
-  boolean: t<boolean>("16", "bool", { fromPg: (value) => value[0] === "t" }),
+  boolean: t<boolean>("16", "bool", {
+    fromPg: (value) => value[0] === "t",
+    toPg: (v) => {
+      if (v === true) {
+        return "t";
+      } else if (v === false) {
+        return "f";
+      } else {
+        throw new Error(
+          `${v} isn't a boolean; cowardly refusing to cast it to postgres`,
+        );
+      }
+    },
+  }),
   int2: t<number>("21", "int2", { fromPg: parseAsInt }),
   int: t<number>("23", "int4", { fromPg: parseAsInt }),
   bigint: t<string>("20", "int8"),

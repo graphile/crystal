@@ -68,7 +68,7 @@ export class PgConditionStep<
 
   placeholder(
     $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
+    codec: PgTypeCodec<any, any, any, any>,
   ): SQL {
     return this.$parent.placeholder($step, codec);
   }
