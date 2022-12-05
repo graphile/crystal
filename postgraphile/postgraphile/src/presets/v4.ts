@@ -11,6 +11,10 @@ import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
 
+export interface V4GraphileBuildOptions {
+  pgUseCustomNetworkScalars?: boolean;
+}
+
 export interface V4Options<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse,
@@ -38,9 +42,7 @@ export interface V4Options<
   subscriptions?: boolean;
   ignoreRBAC?: boolean;
 
-  graphileBuildOptions?: {
-    pgUseCustomNetworkScalars?: boolean;
-  };
+  graphileBuildOptions?: V4GraphileBuildOptions;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -127,6 +129,8 @@ function parseJWTType(type: string): [string, string] {
 export const makeV4Preset = (
   options: V4Options = {},
 ): GraphileConfig.Preset => {
+  const { pgUseCustomNetworkScalars, ...otherGraphileBuildOptions } =
+    options.graphileBuildOptions ?? {};
   return {
     plugins: [
       ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
@@ -144,8 +148,8 @@ export const makeV4Preset = (
       ...(options.skipPlugins ? options.skipPlugins.map((p) => p.name) : []),
     ],
     schema: {
-      pgUseCustomNetworkScalars:
-        options.graphileBuildOptions?.pgUseCustomNetworkScalars ?? false,
+      ...otherGraphileBuildOptions,
+      pgUseCustomNetworkScalars: pgUseCustomNetworkScalars ?? false,
       pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
         options.setofFunctionsContainNulls === false,
