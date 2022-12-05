@@ -115,6 +115,7 @@ import {
 import {
   PgConditionCapableParentStep,
   PgConditionStep,
+  PgConditionStepExtensions,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
 import { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
@@ -196,6 +197,7 @@ export {
   PgConditionCapableParentStep,
   PgConditionLikeStep,
   PgConditionStep,
+  PgConditionStepExtensions,
   PgCursorStep,
   PgDecode,
   pgDelete,

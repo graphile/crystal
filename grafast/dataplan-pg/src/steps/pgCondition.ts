@@ -16,6 +16,8 @@ export type PgWhereConditionSpec<TAttribute extends string> =
 export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
 // | ...
 
+export interface PgConditionStepExtensions {}
+
 export interface PgConditionCapableParentStep extends BaseStep {
   alias: SQL;
   placeholder(
@@ -38,6 +40,8 @@ export class PgConditionStep<
   private havingConditions: PgHavingConditionSpec<any>[] = [];
 
   public readonly alias: SQL;
+
+  public extensions: PgConditionStepExtensions = Object.create(null);
 
   constructor($parent: TParentStep, private isHaving = false) {
     super($parent);
