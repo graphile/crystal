@@ -33,6 +33,7 @@ import {
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { ModifierStep } from "../index.js";
+import { error } from "../index.js";
 import {
   __ItemStep,
   __TrackedObjectStep,
@@ -1480,87 +1481,95 @@ export class OperationPlan {
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
     deduplicate = true,
-  ): { haltTree: boolean; step: ExecutableStep<any>; fieldArgs: FieldArgs } {
+  ): { haltTree: boolean; step: ExecutableStep<any> } {
     this.loc.push(`planField(${path.join(".")})`);
+    try {
+      let _fieldArgs!: FieldArgs;
 
-    let _fieldArgs!: FieldArgs;
+      let step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
+        withFieldArgsForArguments(
+          this,
+          parentStep,
+          trackedArguments,
+          field,
+          (fieldArgs) => {
+            _fieldArgs = fieldArgs;
+            return planResolver(parentStep, fieldArgs, {
+              field,
+              schema: this.schema,
+            });
+          },
+        ),
+      );
+      let haltTree = false;
+      if (step === null || (step instanceof ConstantStep && step.isNull())) {
+        // Constantly null; do not step any further in this tree.
+        step = step || constant(null);
+        haltTree = true;
+      }
+      assertExecutableStep(step);
 
-    let step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
-      withFieldArgsForArguments(
-        this,
-        parentStep,
-        trackedArguments,
-        field,
-        (fieldArgs) => {
-          _fieldArgs = fieldArgs;
-          return planResolver(parentStep, fieldArgs, {
-            field,
-            schema: this.schema,
-          });
-        },
-      ),
-    );
-    let haltTree = false;
-    if (step === null || (step instanceof ConstantStep && step.isNull())) {
-      // Constantly null; do not step any further in this tree.
-      step = step || constant(null);
-      haltTree = true;
+      // TODO: Check SameStreamDirective still exists in @stream spec at release.
+      /*
+       * `SameStreamDirective`
+       * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+       * ensures that every field that has `@stream` must have the same
+       * `@stream` arguments; so we can just check the first node in the
+       * merged set to see our stream options. NOTE: if this changes before
+       * release then we may need to find the stream with the largest
+       * `initialCount` to figure what to do; something like:
+       *
+       *      const streamDirective = firstField.directives?.filter(
+       *        (d) => d.name.value === "stream",
+       *      ).sort(
+       *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+       *      )[0]
+       */
+      const streamDirective = fieldNodes[0].directives?.find(
+        (d) => d.name.value === "stream",
+      );
+
+      const stepOptions: StepOptions = {
+        stream:
+          !haltTree &&
+          streamDirective &&
+          isStreamableStep(step as ExecutableStep<any>)
+            ? {
+                initialCount:
+                  Number(
+                    evalDirectiveArg<number | null>(
+                      fieldNodes[0],
+                      "stream",
+                      "initialCount",
+                      this.trackedVariableValuesStep,
+                    ),
+                  ) || 0,
+              }
+            : null,
+      };
+      step._stepOptions = stepOptions;
+
+      if (deduplicate) {
+        // Now that the field has been planned (including arguments, but NOT
+        // including selection set) we can deduplicate it to see if any of its
+        // peers are identical.
+        this.deduplicateSteps();
+
+        // After deduplication, this step may have been substituted; get the
+        // updated reference.
+        step = this.steps[step.id]!;
+      }
+
+      return { step, haltTree };
+    } catch (e) {
+      const step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
+        error(e),
+      );
+      const haltTree = true;
+      return { step, haltTree };
+    } finally {
+      this.loc.pop();
     }
-    assertExecutableStep(step);
-
-    // TODO: Check SameStreamDirective still exists in @stream spec at release.
-    /*
-     * `SameStreamDirective`
-     * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
-     * ensures that every field that has `@stream` must have the same
-     * `@stream` arguments; so we can just check the first node in the
-     * merged set to see our stream options. NOTE: if this changes before
-     * release then we may need to find the stream with the largest
-     * `initialCount` to figure what to do; something like:
-     *
-     *      const streamDirective = firstField.directives?.filter(
-     *        (d) => d.name.value === "stream",
-     *      ).sort(
-     *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
-     *      )[0]
-     */
-    const streamDirective = fieldNodes[0].directives?.find(
-      (d) => d.name.value === "stream",
-    );
-
-    const stepOptions: StepOptions = {
-      stream:
-        !haltTree &&
-        streamDirective &&
-        isStreamableStep(step as ExecutableStep<any>)
-          ? {
-              initialCount:
-                Number(
-                  evalDirectiveArg<number | null>(
-                    fieldNodes[0],
-                    "stream",
-                    "initialCount",
-                    this.trackedVariableValuesStep,
-                  ),
-                ) || 0,
-            }
-          : null,
-    };
-    step._stepOptions = stepOptions;
-
-    if (deduplicate) {
-      // Now that the field has been planned (including arguments, but NOT
-      // including selection set) we can deduplicate it to see if any of its
-      // peers are identical.
-      this.deduplicateSteps();
-
-      // After deduplication, this step may have been substituted; get the
-      // updated reference.
-      step = this.steps[step.id]!;
-    }
-
-    this.loc.pop();
-    return { step, haltTree, fieldArgs: _fieldArgs };
   }
 
   /**
