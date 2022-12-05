@@ -2,6 +2,7 @@ import assert from "assert";
 import type { BaseStep, ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
+import { sql } from "pg-sql2";
 
 import type { PgTypeCodec } from "../interfaces.js";
 
@@ -43,9 +44,25 @@ export class PgConditionStep<
 
   public extensions: PgConditionStepExtensions = Object.create(null);
 
-  constructor($parent: TParentStep, private isHaving = false) {
+  constructor(
+    $parent: TParentStep,
+    private isHaving = false,
+    private mode: "PASS_THRU" | "AND" | "OR" | "NOT" = "PASS_THRU",
+  ) {
     super($parent);
     this.alias = $parent.alias;
+  }
+
+  orPlan() {
+    return new PgConditionStep(this, this.isHaving, "OR");
+  }
+
+  andPlan() {
+    return new PgConditionStep(this, this.isHaving, "AND");
+  }
+
+  notPlan() {
+    return new PgConditionStep(this, this.isHaving, "NOT");
   }
 
   where(condition: PgWhereConditionSpec<any>): void {
@@ -73,18 +90,53 @@ export class PgConditionStep<
     return this.$parent.placeholder($step, codec);
   }
 
+  private transform(conditions: PgWhereConditionSpec<any>[]): SQL {
+    const mappedConditions = conditions.map((c) => {
+      if (sql.isSQL(c)) {
+        const frag = sql.parens(c);
+        return this.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag;
+      } else {
+        switch (c.type) {
+          case "attribute": {
+            const frag = c.callback(
+              sql`${this.alias}.${sql.identifier(c.attribute)}`,
+            );
+            return this.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag;
+          }
+          default: {
+            const never: never = c;
+            throw new Error(`Unsupported condition: ` + (never as any).type);
+          }
+        }
+      }
+    });
+    const joined = sql.join(
+      mappedConditions,
+      this.mode === "OR" ? " or " : " and ",
+    );
+    return sql.parens(joined);
+  }
+
   apply(): void {
     if (this.isHaving) {
       if (!this.$parent.having) {
         throw new Error(`${this.$parent} doesn't support 'having'`);
       }
-      this.havingConditions.forEach((condition) => {
-        this.$parent.having!(condition);
-      });
+      if (this.mode === "PASS_THRU") {
+        this.havingConditions.forEach((condition) => {
+          this.$parent.having!(condition);
+        });
+      } else {
+        this.$parent.having!(this.transform(this.havingConditions));
+      }
     } else {
-      this.conditions.forEach((condition) => {
-        this.$parent.where(condition);
-      });
+      if (this.mode === "PASS_THRU") {
+        this.conditions.forEach((condition) => {
+          this.$parent.where(condition);
+        });
+      } else {
+        this.$parent.where(this.transform(this.conditions));
+      }
     }
   }
 }
