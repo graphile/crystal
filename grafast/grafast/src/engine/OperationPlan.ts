@@ -1566,6 +1566,9 @@ export class OperationPlan {
         error(e),
       );
       const haltTree = true;
+      this.modifierSteps = [];
+      // TODO: consider deleting all steps that were allocated during this. For
+      // now we'll just rely on tree-shaking.
       return { step, haltTree };
     } finally {
       this.loc.pop();
