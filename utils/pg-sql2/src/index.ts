@@ -312,7 +312,7 @@ function isSQLNode(node: unknown): node is SQLNode {
 
 function isSQL(fragment: unknown): fragment is SQL {
   return Array.isArray(fragment)
-    ? fragment.length > 0 && fragment.every((el) => isSQLNode(el))
+    ? fragment.length === 0 || fragment.every((el) => isSQLNode(el))
     : isSQLNode(fragment);
 }
 
@@ -800,7 +800,11 @@ export function indentIf(condition: boolean, fragment: SQL): SQL {
 export function parens(fragment: SQL, force = false): SQL {
   // No need to recursively wrap with parens
   if (Array.isArray(fragment)) {
-    if (fragment.length === 1) {
+    if (fragment.length === 0) {
+      throw new Error(
+        `You're wrapping an empty fragment in parens; this is likely an error. If this is deliberate, please explicitly use parenthesis.`,
+      );
+    } else if (fragment.length === 1) {
       // Pretend that the child was just a single node
       return parens(fragment[0]!, force);
     } else {
