@@ -315,12 +315,18 @@ function withFieldArgsForArgumentsOrInputObject<
         const field = fields[fieldName];
         const resolver = field.extensions.graphile?.applyPlan;
         if (resolver) {
+          const fieldType = field.type;
+          if (!("get" in $value)) {
+            throw new Error(
+              `GraphileInternalError<b68a1d2a-9315-40cc-a91b-2eca1724b752>: unexpected '${$value}'`,
+            );
+          }
           withFieldArgsForArgumentsOrInputObject(
             operationPlan,
-            currentType,
+            fieldType,
             parentPlan,
-            $value as any,
-            currentType.getFields(),
+            $value.get(fieldName),
+            isInputObjectType(fieldType) ? fieldType.getFields() : null,
             (fieldArgs) =>
               resolver($toPlan, fieldArgs, {
                 schema,
