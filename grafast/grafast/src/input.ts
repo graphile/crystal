@@ -6,6 +6,7 @@ import type {
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
+import { getNamedType, GraphQLError } from "graphql";
 import {
   assertScalarType,
   GraphQLInputObjectType,
@@ -16,13 +17,13 @@ import {
   Kind,
 } from "graphql";
 
-import * as assert from "./assert.js";
 import { withGlobalLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
 import type { ConstantStep } from "./steps/index.js";
+import { error } from "./steps/index.js";
 import {
   __InputListStep,
   __InputStaticLeafStep,
@@ -206,7 +207,30 @@ function inputVariablePlan(
     );
   }
   const typesMatch = doTypesMatch(variableType, inputType);
-  assert.ok(typesMatch, "Expected variable and input types to match");
+  if (!typesMatch) {
+    // REF: https://spec.graphql.org/draft/#IsVariableUsageAllowed()
+    if (
+      inputType instanceof GraphQLNonNull &&
+      !(variableType instanceof GraphQLNonNull)
+    ) {
+      const variablePlan = inputVariablePlan(
+        operationPlan,
+        variableName,
+        variableType,
+        seenTypes,
+        inputType.ofType,
+        defaultValue,
+      );
+      if (variablePlan.evalIs(null) || variablePlan.evalIs(undefined)) {
+        // TODO: Proper GraphQL error here
+        throw new GraphQLError(
+          `Expected non-null value of type ${inputType.ofType.toString()}`,
+        );
+      }
+      return variablePlan;
+    }
+    throw new Error("Expected variable and input types to match");
+  }
   const variableValuePlan =
     operationPlan.trackedVariableValuesStep.get(variableName);
   if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
