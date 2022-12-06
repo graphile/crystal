@@ -632,6 +632,17 @@ export abstract class ModifierStep<
     this.id = this.layerPlan._addModifierStep(this);
   }
 
+  public toString(): string {
+    const meta = this.toStringMeta();
+    return chalk.bold.blue(
+      `${this.constructor.name.replace(/Step$/, "")}${
+        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
+      }[${inspect(this.id, {
+        colors: true,
+      })}]`,
+    );
+  }
+
   /**
    * In this method, you should apply the changes to your `this.$parent` plan
    */

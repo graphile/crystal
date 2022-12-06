@@ -148,6 +148,7 @@ export class OperationPlan {
 
   private stepCount = 0;
   private modifierStepCount = 0;
+  private modifierDepthCount = 0;
   private modifierSteps: ModifierStep[] = [];
   /**
    * The full list of ExecutableSteps that this OperationPlan has created.
@@ -368,7 +369,8 @@ export class OperationPlan {
         `Creating a step during the '${this.phase}' phase is forbidden.`,
       );
     }
-    const modifierStepId = `${this.modifierStepCount++}`;
+    const modifierStepId = `${this.modifierDepthCount}-${this
+      .modifierStepCount++}`;
     this.modifierSteps.push(step);
     return modifierStepId;
   }
@@ -1635,18 +1637,27 @@ export class OperationPlan {
       0,
       this.modifierSteps.length,
     );
-    const previousCount = this.modifierStepCount;
-    this.modifierStepCount = 0;
+    const previousModifierDepthCount = this.modifierDepthCount++;
+    let result;
+    let plansToApply;
+    try {
+      const previousCount = this.modifierStepCount;
+      this.modifierStepCount = 0;
+      try {
+        result = cb();
 
-    const result = cb();
-
-    // Remove the modifier plans from opPlan and sort them ready for application.
-    const plansToApply = this.modifierSteps
-      .splice(0, this.modifierSteps.length)
-      .reverse();
-
-    // Restore previous modifiers
-    this.modifierStepCount = previousCount;
+        // Remove the modifier plans from opPlan and sort them ready for application.
+        plansToApply = this.modifierSteps
+          .splice(0, this.modifierSteps.length)
+          .reverse();
+      } finally {
+        // Restore previous modifiers
+        this.modifierStepCount = previousCount;
+      }
+    } finally {
+      // Restore previous depth
+      this.modifierDepthCount = previousModifierDepthCount;
+    }
     for (const mod of previousStack) {
       this.modifierSteps.push(mod);
     }

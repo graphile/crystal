@@ -53,6 +53,10 @@ export class PgConditionStep<
     this.alias = $parent.alias;
   }
 
+  public toStringMeta(): string {
+    return `${(this.$parent as any).id}/${this.mode}`;
+  }
+
   orPlan() {
     return new PgConditionStep(this, this.isHaving, "OR");
   }
