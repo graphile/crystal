@@ -45,11 +45,6 @@ export class __TrackedObjectStep<
   private readonly value: TData | undefined;
 
   /**
-   * For runtime (not plan-time) access to the value.
-   */
-  private readonly valuePlan: __ValueStep<TData> | AccessStep<TData>;
-
-  /**
    * A reference to the relevant
    * opPlan.variableValuesConstraints/contextConstraints/rootValueConstraints.
    *
@@ -75,7 +70,6 @@ export class __TrackedObjectStep<
     super();
     this.addDependency(valuePlan);
     this.value = value;
-    this.valuePlan = valuePlan;
     this.constraints = constraints;
     this.path = path;
   }
@@ -89,6 +83,10 @@ export class __TrackedObjectStep<
     return v;
   }
 
+  private getValuePlan() {
+    return this.getDep(0) as __ValueStep<TData> | AccessStep<TData>;
+  }
+
   /**
    * Get the named property of an object.
    */
@@ -97,7 +95,7 @@ export class __TrackedObjectStep<
   ): __TrackedObjectStep<TData[TAttribute]> {
     const { value, path, constraints } = this;
     const newValue = value?.[attrName];
-    const newValuePlan = this.valuePlan.get(attrName);
+    const newValuePlan = this.getValuePlan().get(attrName);
     const newPath = [...path, attrName];
     return new __TrackedObjectStep(
       newValue,
@@ -115,7 +113,7 @@ export class __TrackedObjectStep<
   ): __TrackedObjectStep<TData[TIndex]> {
     const { value, path, constraints } = this;
     const newValue = value?.[index];
-    const newValuePlan = this.valuePlan.at(index);
+    const newValuePlan = this.getValuePlan().at(index);
     const newPath = [...path, index];
     return new __TrackedObjectStep(
       newValue,
