@@ -83,6 +83,9 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
+        const {
+          graphql: { GraphQLList, GraphQLNonNull },
+        } = build;
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
         const getGraphQLTypeNameByPgCodec: GraphileBuild.GetGraphQLTypeNameByPgCodec =
@@ -113,7 +116,10 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           }
           if (codec.arrayOfCodec) {
             const type = getGraphQLTypeByPgCodec(codec.arrayOfCodec, situation);
-            return type ? new build.graphql.GraphQLList(type) : null;
+            const nonNull = codec.extensions?.listItemNonNull;
+            return type
+              ? new GraphQLList(nonNull ? new GraphQLNonNull(type) : type)
+              : null;
           }
           const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
           return typeName ? build.getTypeByName(typeName) ?? null : null;

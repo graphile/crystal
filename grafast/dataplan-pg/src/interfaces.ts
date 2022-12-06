@@ -63,6 +63,7 @@ export interface PgRefDefinitions {
 export interface PgTypeCodecExtensions {
   oid?: string;
   description?: string;
+  listItemNonNull?: boolean;
 }
 
 export interface PgTypeCodecPolymorphismSingleTypeColumnSpec<
