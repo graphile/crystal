@@ -103,7 +103,7 @@ export class PgConditionStep<
         }
         const frag = sql.parens(c);
         mappedConditions.push(
-          this.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag,
+          sql.indent(this.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag),
         );
         continue;
       } else {
@@ -113,7 +113,9 @@ export class PgConditionStep<
               sql`${this.alias}.${sql.identifier(c.attribute)}`,
             );
             mappedConditions.push(
-              this.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag,
+              sql.indent(
+                this.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag,
+              ),
             );
             continue;
           }
@@ -129,7 +131,7 @@ export class PgConditionStep<
     }
     const joined = sql.join(
       mappedConditions,
-      this.mode === "OR" ? " or " : " and ",
+      this.mode === "OR" ? "\nor\n" : "\nand\n",
     );
     return sql.parens(joined);
   }
