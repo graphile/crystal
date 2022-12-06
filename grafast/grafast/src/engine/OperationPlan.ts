@@ -33,11 +33,11 @@ import {
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { ModifierStep } from "../index.js";
-import { error } from "../index.js";
 import {
   __ItemStep,
   __TrackedObjectStep,
   __ValueStep,
+  error,
   ExecutableStep,
   object,
 } from "../index.js";
@@ -272,7 +272,9 @@ export class OperationPlan {
     // Now perform hoisting (and repeat deduplication)
     this.hoistSteps();
 
-    // Get rid of temporary steps before `optimize` triggers side-effects
+    // Get rid of temporary steps before `optimize` triggers side-effects.
+    // (Critical due to steps that may have been discarded due to field errors
+    // or similar)
     this.treeShakeSteps();
 
     if (isDev) {
@@ -397,7 +399,7 @@ export class OperationPlan {
         const step = this.steps[id];
         if (step == null) {
           throw new Error(
-            `Programming error: step with id '${id}' no longer exists`,
+            `Programming error: step with id '${id}' no longer exists (attempted access from ${requestingStep}). Most likely this means that ${requestingStep} has an illegal reference to this step, you should only maintain references to steps via dependencies.`,
           );
         }
         return step[$$proxy] ?? step;
@@ -1842,6 +1844,10 @@ export class OperationPlan {
     const oldPlanCount = this.stepCount;
     let step;
     while ((step = steps.pop())) {
+      if (!this.steps[step.id]) {
+        // Must have been tree-shaken away!
+        continue;
+      }
       const resultStep = processStep(step);
       const plansAdded = this.stepCount - oldPlanCount;
 
