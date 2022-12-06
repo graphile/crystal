@@ -4,8 +4,7 @@ select
   __author__.username as "2",
   __messages__."body" as "3",
   __users__."username" as "4",
-  __users__."gravatar_url" as "5",
-  __messages__."author_id" as "6"
+  __users__."gravatar_url" as "5"
 from app_public.messages as __messages__
 left outer join app_public.users as __author__
 on (__messages__."author_id" = __author__."id")

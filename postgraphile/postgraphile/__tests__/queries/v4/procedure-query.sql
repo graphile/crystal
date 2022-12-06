@@ -648,8 +648,7 @@ lateral (
 ) as __int_set_query_result__;
 
 select
-  __static_big_integer__.v::text as "0",
-  (row_number() over (partition by 1))::text as "1"
+  __static_big_integer__.v::text as "0"
 from "a"."static_big_integer"() as __static_big_integer__(v);
 
 select

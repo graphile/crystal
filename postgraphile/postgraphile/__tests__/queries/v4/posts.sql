@@ -16,7 +16,6 @@ select
   __person_2."id"::text as "10",
   __person_2."person_full_name" as "11",
   "c"."person_first_name"(__person_2) as "12",
-  __person_first_post__."author_id"::text as "13",
   (select json_agg(_) from (
     select
       (row_number() over (partition by 1))::text as "0",
@@ -24,9 +23,7 @@ select
       "c"."person_first_name"(__person_friends__) as "2",
       __person_friends__."person_full_name" as "3"
     from "c"."person_friends"(__person__) as __person_friends__
-  ) _) as "14",
-  __person__::text as "15",
-  __post__."author_id"::text as "16"
+  ) _) as "13"
 from "a"."post" as __post__
 left outer join "c"."person" as __person__
 on (__post__."author_id"::"int4" = __person__."id")

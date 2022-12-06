@@ -19,8 +19,7 @@ lateral (
         (count(*))::text as "0"
       from "c"."person_friends"(__person__) as __person_friends__
     ) _) as "3",
-    __person__::text as "4",
-    __person_identifiers__.idx as "5"
+    __person_identifiers__.idx as "4"
   from "c"."person" as __person__
   where (
     __person__."email" = __person_identifiers__."id0"

@@ -22,11 +22,9 @@ lateral (
             "c"."person_first_name"(__person_friends_2) as "2"
           from "c"."person_friends"(__person_friends__) as __person_friends_2
           limit 1
-        ) _) as "3",
-        __person_friends__::text as "4"
+        ) _) as "3"
       from "c"."person_friends"(__person__) as __person_friends__
     ) _) as "2",
-    __person__::text as "3",
     (select json_agg(_) from (
       select
         __post__."headline" as "0",
@@ -43,15 +41,14 @@ lateral (
             to_char(__post_computed_interval_set_2.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set_2(v)
           limit 1
-        ) _) as "4",
-        __post__::text as "5"
+        ) _) as "4"
       from "a"."post" as __post__
       where (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" desc
       limit 2
-    ) _) as "4",
+    ) _) as "3",
     (select json_agg(_) from (
       select
         __post_2."headline" as "0",
@@ -68,15 +65,14 @@ lateral (
             to_char(__post_computed_interval_set_4.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_2) as __post_computed_interval_set_4(v)
           limit 1
-        ) _) as "4",
-        __post_2::text as "5"
+        ) _) as "4"
       from "a"."post" as __post_2
       where (
         __person__."id"::"int4" = __post_2."author_id"
       )
       order by __post_2."id" asc
       limit 2
-    ) _) as "5",
+    ) _) as "4",
     (select json_agg(_) from (
       select
         __post_3."headline" as "0",
@@ -93,8 +89,7 @@ lateral (
             to_char(__post_computed_interval_set_6.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_3) as __post_computed_interval_set_6(v)
           limit 1
-        ) _) as "4",
-        __post_3::text as "5"
+        ) _) as "4"
       from "a"."post" as __post_3
       where
         (
@@ -103,7 +98,7 @@ lateral (
           __person__."id"::"int4" = __post_3."author_id"
         )
       order by __post_3."id" asc
-    ) _) as "6",
+    ) _) as "5",
     (select json_agg(_) from (
       select
         __post_4."headline" as "0",
@@ -120,8 +115,7 @@ lateral (
             to_char(__post_computed_interval_set_8.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
           from "a"."post_computed_interval_set"(__post_4) as __post_computed_interval_set_8(v)
           limit 1
-        ) _) as "4",
-        __post_4::text as "5"
+        ) _) as "4"
       from "a"."post" as __post_4
       where
         (
@@ -130,7 +124,7 @@ lateral (
           __person__."id"::"int4" = __post_4."author_id"
         )
       order by __post_4."id" asc
-    ) _) as "7",
+    ) _) as "6",
     (select json_agg(_) from (
       select
         __compound_key__."person_id_1"::text as "0",
@@ -140,7 +134,7 @@ lateral (
         __person__."id"::"int4" = __compound_key__."person_id_1"
       )
       order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-    ) _) as "8",
+    ) _) as "7",
     (select json_agg(_) from (
       select
         __compound_key_2."person_id_1"::text as "0",
@@ -150,7 +144,7 @@ lateral (
         __person__."id"::"int4" = __compound_key_2."person_id_2"
       )
       order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
-    ) _) as "9",
+    ) _) as "8",
     (select json_agg(_) from (
       select
         __compound_key__."person_id_1"::text as "0",
@@ -160,7 +154,7 @@ lateral (
         __person__."id"::"int4" = __compound_key__."person_id_1"
       )
       order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-    ) _) as "10",
+    ) _) as "9",
     (select json_agg(_) from (
       select
         __compound_key_2."person_id_2"::text as "0",
@@ -170,9 +164,9 @@ lateral (
         __person__."id"::"int4" = __compound_key_2."person_id_2"
       )
       order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
-    ) _) as "11",
-    __person__."id"::text as "12",
-    __person_identifiers__.idx as "13"
+    ) _) as "10",
+    __person__."id"::text as "11",
+    __person_identifiers__.idx as "12"
   from "c"."person" as __person__
   order by __person__."id" asc
 ) as __person_result__;
@@ -241,10 +235,9 @@ lateral (
           from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set_2(v)
           limit 1
         ) _) as "1",
-        __post__::text as "2",
-        __post__."author_id"::text as "3",
-        "a"."post_headline_trimmed"(__post__) as "4",
-        __post__."headline" as "5"
+        __post__."author_id"::text as "2",
+        "a"."post_headline_trimmed"(__post__) as "3",
+        __post__."headline" as "4"
       from "a"."post" as __post__
       where
         (
@@ -268,10 +261,9 @@ lateral (
           from "a"."post_computed_interval_set"(__post_2) as __post_computed_interval_set_4(v)
           limit 1
         ) _) as "1",
-        __post_2::text as "2",
-        __post_2."author_id"::text as "3",
-        "a"."post_headline_trimmed"(__post_2) as "4",
-        __post_2."headline" as "5"
+        __post_2."author_id"::text as "2",
+        "a"."post_headline_trimmed"(__post_2) as "3",
+        __post_2."headline" as "4"
       from "a"."post" as __post_2
       where
         (
@@ -295,10 +287,9 @@ lateral (
           from "a"."post_computed_interval_set"(__post_3) as __post_computed_interval_set_6(v)
           limit 1
         ) _) as "1",
-        __post_3::text as "2",
-        __post_3."author_id"::text as "3",
-        "a"."post_headline_trimmed"(__post_3) as "4",
-        __post_3."headline" as "5"
+        __post_3."author_id"::text as "2",
+        "a"."post_headline_trimmed"(__post_3) as "3",
+        __post_3."headline" as "4"
       from "a"."post" as __post_3
       where (
         __person__."id"::"int4" = __post_3."author_id"
@@ -320,10 +311,9 @@ lateral (
           from "a"."post_computed_interval_set"(__post_4) as __post_computed_interval_set_8(v)
           limit 1
         ) _) as "1",
-        __post_4::text as "2",
-        __post_4."author_id"::text as "3",
-        "a"."post_headline_trimmed"(__post_4) as "4",
-        __post_4."headline" as "5"
+        __post_4."author_id"::text as "2",
+        "a"."post_headline_trimmed"(__post_4) as "3",
+        __post_4."headline" as "4"
       from "a"."post" as __post_4
       where (
         __person__."id"::"int4" = __post_4."author_id"

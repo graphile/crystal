@@ -20,8 +20,7 @@ select
         true /* authorization checks */
       )
     order by __relational_items__."id" asc
-  ) _) as "1",
-  __people__."person_id"::text as "2"
+  ) _) as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */

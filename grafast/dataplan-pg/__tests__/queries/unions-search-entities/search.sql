@@ -51,9 +51,8 @@ lateral (
   select
     __posts__."post_id"::text as "0",
     __people__."username" as "1",
-    __posts__."author_id"::text as "2",
-    __posts__."body" as "3",
-    __posts_identifiers__.idx as "4"
+    __posts__."body" as "2",
+    __posts_identifiers__.idx as "3"
   from interfaces_and_unions.posts as __posts__
   left outer join interfaces_and_unions.people as __people__
   on (__posts__."author_id"::"int4" = __people__."person_id")
@@ -80,9 +79,7 @@ lateral (
     __posts__."post_id"::text as "2",
     __comments__."comment_id"::text as "3",
     __people__."username" as "4",
-    __comments__."post_id"::text as "5",
-    __comments__."author_id"::text as "6",
-    __comments_identifiers__.idx as "7"
+    __comments_identifiers__.idx as "5"
   from interfaces_and_unions.comments as __comments__
   left outer join interfaces_and_unions.posts as __posts__
   on (__comments__."post_id"::"int4" = __posts__."post_id")

@@ -54,8 +54,7 @@ select
     select
       to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
     from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-  ) _) as "1",
-  __post__::text as "2"
+  ) _) as "1"
 from "a"."post" as __post__
 order by __post__."id" asc
 limit 1;

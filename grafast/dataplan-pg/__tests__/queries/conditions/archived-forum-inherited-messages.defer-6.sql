@@ -13,9 +13,7 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) _) as "1",
-  __forums__."id" as "2",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3"
+  ) _) as "1"
 from app_public.forums as __forums__
 where
   (

@@ -29,11 +29,10 @@ lateral (
       __messages__."body" as "0",
       __users__."username" as "1",
       __users__."gravatar_url" as "2",
-      __messages__."author_id" as "3",
-      __messages_identifiers__.idx as "4",
+      __messages_identifiers__.idx as "3",
       row_number() over (
         order by __messages__."id" asc
-      ) as "5"
+      ) as "4"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -45,7 +44,7 @@ lateral (
       )
     order by __messages__."id" asc
   ) __stream_wrapped__
-  order by __stream_wrapped__."5"
+  order by __stream_wrapped__."4"
 ) as __messages_result__;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__

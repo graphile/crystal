@@ -81,18 +81,16 @@ lateral (
     __frmcdc_compound_type_1__."b" as "6",
     __frmcdc_compound_type_1__."a"::text as "7",
     (not (__frmcdc_compound_type_1__ is null))::text as "8",
-    __frmcdc_nested_compound_type_1__."b"::text as "9",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "10",
-    __frmcdc_compound_type_1_2."f"::text as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."d" as "13",
-    __frmcdc_compound_type_1_2."c"::text as "14",
-    __frmcdc_compound_type_1_2."b" as "15",
-    __frmcdc_compound_type_1_2."a"::text as "16",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "17",
-    __frmcdc_nested_compound_type_1__."a"::text as "18",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "19",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "20"
+    __frmcdc_compound_type_1_2."foo_bar"::text as "9",
+    __frmcdc_compound_type_1_2."f"::text as "10",
+    __frmcdc_compound_type_1_2."e"::text as "11",
+    __frmcdc_compound_type_1_2."d" as "12",
+    __frmcdc_compound_type_1_2."c"::text as "13",
+    __frmcdc_compound_type_1_2."b" as "14",
+    __frmcdc_compound_type_1_2."a"::text as "15",
+    (not (__frmcdc_compound_type_1_2 is null))::text as "16",
+    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
+    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
   from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
   left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1__
   on TRUE
@@ -600,18 +598,16 @@ from (
 lateral (
   select
     __person__."person_full_name" as "0",
-    __post__."author_id"::text as "1",
     (select json_agg(_) from (
       select
         __frmcdc_comptype_1__."is_optimised"::text as "0",
         to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
         (not (__frmcdc_comptype_1__ is null))::text as "2"
       from unnest(__post__."comptypes") as __frmcdc_comptype_1__
-    ) _) as "2",
-    __post__."comptypes"::text as "3",
-    __post__."headline" as "4",
-    __post__."id"::text as "5",
-    __post_identifiers__.idx as "6"
+    ) _) as "1",
+    __post__."headline" as "2",
+    __post__."id"::text as "3",
+    __post_identifiers__.idx as "4"
   from "a"."post" as __post__
   left outer join "c"."person" as __person__
   on (__post__."author_id"::"int4" = __person__."id")

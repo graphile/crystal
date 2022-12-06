@@ -16,8 +16,7 @@ lateral (
     __users__."gravatar_url" as "6",
     __users__."username" as "7",
     __messages__."forum_id" as "8",
-    __messages__."author_id" as "9",
-    __messages_identifiers__.idx as "10"
+    __messages_identifiers__.idx as "9"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__
   on (__messages__."forum_id"::"uuid" = __forums__."id")
@@ -50,8 +49,7 @@ lateral (
     __users__."gravatar_url" as "6",
     __users__."username" as "7",
     __messages__."forum_id" as "8",
-    __messages__."author_id" as "9",
-    __messages_identifiers__.idx as "10"
+    __messages_identifiers__.idx as "9"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__
   on (__messages__."forum_id"::"uuid" = __forums__."id")

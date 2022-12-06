@@ -102,8 +102,7 @@ select
   ) _) as "29",
   __streets_5."name" as "30",
   __properties_2."street_id"::text as "31",
-  __buildings_4."property_id"::text as "32",
-  __houses__."building_id"::text as "33",
+  __houses__."building_id"::text as "32",
   (select json_agg(_) from (
     select
       __buildings_7."name" as "0",
@@ -113,13 +112,13 @@ select
       __streets_6."name"::"text" = __buildings_7."name"
     )
     order by __buildings_7."id" asc
-  ) _) as "34",
-  __streets_6."name" as "35",
-  __streets_6."id"::text as "36",
-  __properties_3."id"::text as "37",
-  __properties_3."name_or_number" as "38",
-  __properties_3."street_id"::text as "39",
-  __houses__."property_id"::text as "40"
+  ) _) as "33",
+  __streets_6."name" as "34",
+  __streets_6."id"::text as "35",
+  __properties_3."id"::text as "36",
+  __properties_3."name_or_number" as "37",
+  __properties_3."street_id"::text as "38",
+  __houses__."property_id"::text as "39"
 from "smart_comment_relations"."houses" as __houses__
 left outer join "smart_comment_relations"."streets" as __streets__
 on (__houses__."street_id"::"int4" = __streets__."id")

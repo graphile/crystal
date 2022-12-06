@@ -14,13 +14,11 @@ lateral (
     __relational_posts__."description" as "1",
     __relational_posts__."note" as "2",
     __relational_posts_title_lower__.v as "3",
-    __relational_posts__::text as "4",
-    __relational_items__."is_explicitly_archived"::text as "5",
-    __people__."person_id"::text as "6",
-    __people__."username" as "7",
-    __relational_items__."author_id"::text as "8",
-    __relational_posts__."id"::text as "9",
-    __relational_posts_identifiers__.idx as "10"
+    __relational_items__."is_explicitly_archived"::text as "4",
+    __people__."person_id"::text as "5",
+    __people__."username" as "6",
+    __relational_posts__."id"::text as "7",
+    __relational_posts_identifiers__.idx as "8"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_posts_title_lower(__relational_posts__) as __relational_posts_title_lower__(v)
   on TRUE
@@ -53,13 +51,11 @@ lateral (
     __relational_posts__."description" as "1",
     __relational_posts__."note" as "2",
     __relational_posts_title_lower__.v as "3",
-    __relational_posts__::text as "4",
-    __relational_items__."is_explicitly_archived"::text as "5",
-    __people__."person_id"::text as "6",
-    __people__."username" as "7",
-    __relational_items__."author_id"::text as "8",
-    __relational_posts__."id"::text as "9",
-    __relational_posts_identifiers__.idx as "10"
+    __relational_items__."is_explicitly_archived"::text as "4",
+    __people__."person_id"::text as "5",
+    __people__."username" as "6",
+    __relational_posts__."id"::text as "7",
+    __relational_posts_identifiers__.idx as "8"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_posts_title_lower(__relational_posts__) as __relational_posts_title_lower__(v)
   on TRUE
@@ -90,15 +86,13 @@ lateral (
   select
     __people__."username" as "0",
     __people__."person_id"::text as "1",
-    __relational_items__."author_id"::text as "2",
-    __relational_items__."is_explicitly_archived"::text as "3",
-    __relational_posts__."id"::text as "4",
-    __relational_posts_title_lower__.v as "5",
-    __relational_posts__."title" as "6",
-    __relational_posts__."description" as "7",
-    __relational_posts__."note" as "8",
-    __relational_posts__::text as "9",
-    __relational_posts_identifiers__.idx as "10"
+    __relational_items__."is_explicitly_archived"::text as "2",
+    __relational_posts__."id"::text as "3",
+    __relational_posts_title_lower__.v as "4",
+    __relational_posts__."title" as "5",
+    __relational_posts__."description" as "6",
+    __relational_posts__."note" as "7",
+    __relational_posts_identifiers__.idx as "8"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
   on (__relational_posts__."id"::"int4" = __relational_items__."id")
