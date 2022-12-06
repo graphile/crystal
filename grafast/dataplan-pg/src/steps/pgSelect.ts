@@ -836,9 +836,9 @@ export class PgSelectStep<
 
     const codec = overrideCodec ?? ("pgCodec" in $step ? $step.pgCodec : null);
     if (!codec) {
+      console.trace(`${this}.placeholder(${$step}) call, no codec`);
       throw new Error(
-        `Step ${$step} does not contain pgCodec information, please wrap ` +
-          `it in \`pgCast\`. E.g. \`pgCast($step, TYPES.boolean)\``,
+        `Step ${$step} does not contain pgCodec information, please pass the codec explicitly to the 'placeholder' method.`,
       );
     }
 
