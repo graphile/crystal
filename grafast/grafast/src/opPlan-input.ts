@@ -75,13 +75,6 @@ function withFieldArgsForArgumentsOrInputObject<
   const schema = operationPlan.schema;
   const analyzedCoordinates: string[] = [];
 
-  // TODO: having a lot of 'is undefined' checks is expensive; instead we
-  // should optimize this so that it tracks the set of keys that are set and
-  // matches against those as a single operation.
-  if ("evalIs" in $current && $current.evalIs(undefined)) {
-    return parentPlan;
-  }
-
   const getArgOnceOnly = (inPath: string | string[]) => {
     operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
@@ -153,6 +146,13 @@ function withFieldArgsForArgumentsOrInputObject<
     return { $value, argOrField, type, parentType };
   };
 
+  function notUndefined($value: InputStep) {
+    // TODO: having a lot of 'is undefined' checks is expensive; instead we
+    // should optimize this so that it tracks the set of keys that are set and
+    // matches against those as a single operation.
+    return !("evalIs" in $value && $value.evalIs(undefined));
+  }
+
   function planArgumentOrInputField(
     details: ReturnType<typeof getArgOnceOnly>,
     $toPlan: ExecutableStep | ModifierStep | null,
@@ -173,7 +173,7 @@ function withFieldArgsForArgumentsOrInputObject<
             const arg = argOrField as GraphQLArgument;
             if ($toPlan) {
               const argResolver = arg.extensions.graphile?.applyPlan;
-              if (argResolver) {
+              if (argResolver && notUndefined($value)) {
                 return argResolver(parentPlan, $toPlan, fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLArgument,
@@ -196,7 +196,7 @@ function withFieldArgsForArgumentsOrInputObject<
             const field = argOrField as GraphQLInputField;
             if ($toPlan) {
               const fieldResolver = field.extensions.graphile?.applyPlan;
-              if (fieldResolver) {
+              if (fieldResolver && notUndefined($value)) {
                 return fieldResolver($toPlan, fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLInputField,
@@ -328,18 +328,21 @@ function withFieldArgsForArgumentsOrInputObject<
               `GraphileInternalError<b68a1d2a-9315-40cc-a91b-2eca1724b752>: unexpected '${$value}'`,
             );
           }
-          withFieldArgsForArgumentsOrInputObject(
-            operationPlan,
-            fieldType,
-            parentPlan,
-            $value.get(fieldName),
-            isInputObjectType(fieldType) ? fieldType.getFields() : null,
-            (fieldArgs) =>
-              resolver($toPlan, fieldArgs, {
-                schema,
-                entity: field,
-              }),
-          );
+          const $field = $value.get(fieldName);
+          if (notUndefined($field)) {
+            withFieldArgsForArgumentsOrInputObject(
+              operationPlan,
+              fieldType,
+              parentPlan,
+              $field,
+              isInputObjectType(fieldType) ? fieldType.getFields() : null,
+              (fieldArgs) =>
+                resolver($toPlan, fieldArgs, {
+                  schema,
+                  entity: field,
+                }),
+            );
+          }
         }
       }
       return;
