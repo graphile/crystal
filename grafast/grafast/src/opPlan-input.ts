@@ -75,6 +75,13 @@ function withFieldArgsForArgumentsOrInputObject<
   const schema = operationPlan.schema;
   const analyzedCoordinates: string[] = [];
 
+  // TODO: having a lot of 'is undefined' checks is expensive; instead we
+  // should optimize this so that it tracks the set of keys that are set and
+  // matches against those as a single operation.
+  if ("evalIs" in $current && $current.evalIs(undefined)) {
+    return parentPlan;
+  }
+
   const getArgOnceOnly = (inPath: string | string[]) => {
     operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
