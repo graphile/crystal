@@ -215,6 +215,8 @@ function newNodePostgresPgClient(
   };
 }
 
+const $$queue = Symbol("tag");
+
 async function makeNodePostgresWithPgClient_inner<T>(
   pgClient: pg.PoolClient,
   pgSettings: { [key: string]: string } | null,
@@ -241,50 +243,58 @@ async function makeNodePostgresWithPgClient_inner<T>(
       }
     }
   };
-  pgClient.on("notification", notificationCallback);
+  while (pgClient[$$queue]) {
+    await pgClient[$$queue];
+  }
+  return (pgClient[$$queue] = (async () => {
+    pgClient.on("notification", notificationCallback);
 
-  try {
-    // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
-    if (pgSettingsEntries.length > 0) {
-      await pgClient.query({
-        text: alreadyInTransaction ? "savepoint tx" : "begin",
-      });
-      try {
+    try {
+      // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
+      if (pgSettingsEntries.length > 0) {
         await pgClient.query({
-          text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el",
-          values: [JSON.stringify(pgSettingsEntries)],
+          text: alreadyInTransaction ? "savepoint tx" : "begin",
         });
+        try {
+          await pgClient.query({
+            text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el",
+            values: [JSON.stringify(pgSettingsEntries)],
+          });
+          const client = newNodePostgresPgClient(
+            pgClient,
+            subscriptions,
+            1,
+            alwaysQueue,
+            alreadyInTransaction,
+          );
+          const result = await callback(client);
+          await pgClient.query({
+            text: alreadyInTransaction ? "release savepoint tx" : "commit",
+          });
+          return result;
+        } catch (e) {
+          await pgClient.query({
+            text: alreadyInTransaction
+              ? "rollback to savepoint tx"
+              : "rollback",
+          });
+          throw e;
+        }
+      } else {
         const client = newNodePostgresPgClient(
           pgClient,
           subscriptions,
-          1,
+          0,
           alwaysQueue,
           alreadyInTransaction,
         );
-        const result = await callback(client);
-        await pgClient.query({
-          text: alreadyInTransaction ? "release savepoint tx" : "commit",
-        });
-        return result;
-      } catch (e) {
-        await pgClient.query({
-          text: alreadyInTransaction ? "rollback to savepoint tx" : "rollback",
-        });
-        throw e;
+        return await callback(client);
       }
-    } else {
-      const client = newNodePostgresPgClient(
-        pgClient,
-        subscriptions,
-        0,
-        alwaysQueue,
-        alreadyInTransaction,
-      );
-      return await callback(client);
+    } finally {
+      pgClient[$$queue] = null;
+      pgClient.removeListener("notification", notificationCallback);
     }
-  } finally {
-    pgClient.removeListener("notification", notificationCallback);
-  }
+  })());
 }
 
 /**
