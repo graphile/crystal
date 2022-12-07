@@ -6,9 +6,9 @@ import type {
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
-import { getNamedType, GraphQLError } from "graphql";
 import {
   assertScalarType,
+  GraphQLError,
   GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
@@ -23,7 +23,6 @@ import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
 import type { ConstantStep } from "./steps/index.js";
-import { error } from "./steps/index.js";
 import {
   __InputListStep,
   __InputStaticLeafStep,
