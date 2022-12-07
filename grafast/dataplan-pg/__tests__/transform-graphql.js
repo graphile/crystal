@@ -78,7 +78,7 @@ let result3;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const waitFor = async (conditionCallback, max = 1000) => {
+const waitFor = async (conditionCallback, max = 5000) => {
   let start = Date.now();
   while (!conditionCallback()) {
     if (Date.now() >= start + max) {
