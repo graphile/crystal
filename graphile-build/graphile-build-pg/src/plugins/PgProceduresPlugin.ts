@@ -409,7 +409,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const tags = { ...rawTags };
 
-          addBehaviorToTags(tags, "-filter -order");
+          addBehaviorToTags(tags, "-filter -order", true);
 
           const extensions: PgSourceExtensions = {
             tags: {
