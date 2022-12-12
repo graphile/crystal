@@ -16,13 +16,13 @@ from (
 ) as __relational_posts_identifiers__,
 lateral (
   select
-    __relational_items__."type"::text as "0",
-    __relational_items__."type2"::text as "1",
-    __relational_items__."position"::text as "2",
-    __relational_posts__."id"::text as "3",
-    __relational_posts__."title" as "4",
-    __relational_posts__."description" as "5",
-    __relational_posts__."note" as "6",
+    __relational_posts__."note" as "0",
+    __relational_posts__."description" as "1",
+    __relational_posts__."title" as "2",
+    __relational_items__."position"::text as "3",
+    __relational_items__."type2"::text as "4",
+    __relational_items__."type"::text as "5",
+    __relational_posts__."id"::text as "6",
     __relational_posts_identifiers__.idx as "7"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
@@ -45,10 +45,10 @@ from (
 ) as __relational_checklists_identifiers__,
 lateral (
   select
-    __relational_items__."type"::text as "0",
-    __relational_items__."type2"::text as "1",
-    __relational_items__."position"::text as "2",
-    __relational_checklists__."title" as "3",
+    __relational_checklists__."title" as "0",
+    __relational_items__."position"::text as "1",
+    __relational_items__."type2"::text as "2",
+    __relational_items__."type"::text as "3",
     __relational_checklists__."id"::text as "4",
     __relational_checklists_identifiers__.idx as "5"
   from interfaces_and_unions.relational_checklists as __relational_checklists__

@@ -7,36 +7,36 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    __people__."username" as "0",
     (select json_agg(_) from (
       select
-        __person_bookmarks__."id"::text as "0",
-        __people_2."username" as "1",
-        __person_bookmarks__."bookmarked_entity"::text as "2",
-        ((__person_bookmarks__."bookmarked_entity")."person_id")::text as "3",
-        ((__person_bookmarks__."bookmarked_entity")."post_id")::text as "4",
-        ((__person_bookmarks__."bookmarked_entity")."comment_id")::text as "5"
+        ((__person_bookmarks__."bookmarked_entity")."comment_id")::text as "0",
+        ((__person_bookmarks__."bookmarked_entity")."post_id")::text as "1",
+        ((__person_bookmarks__."bookmarked_entity")."person_id")::text as "2",
+        __person_bookmarks__."bookmarked_entity"::text as "3",
+        __people__."username" as "4",
+        __person_bookmarks__."id"::text as "5"
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
-      left outer join interfaces_and_unions.people as __people_2
-      on (__person_bookmarks__."person_id"::"int4" = __people_2."person_id")
+      left outer join interfaces_and_unions.people as __people__
+      on (__person_bookmarks__."person_id"::"int4" = __people__."person_id")
       where
         (
-          __people__."person_id"::"int4" = __person_bookmarks__."person_id"
+          __people_2."person_id"::"int4" = __person_bookmarks__."person_id"
         ) and (
           true /* authorization checks */
         )
       order by __person_bookmarks__."id" asc
-    ) _) as "1",
-    __people__."person_id"::text as "2",
+    ) _) as "0",
+    __people_2."username" as "1",
+    __people_2."person_id"::text as "2",
     __people_identifiers__.idx as "3"
-  from interfaces_and_unions.people as __people__
+  from interfaces_and_unions.people as __people_2
   where
     (
       true /* authorization checks */
     ) and (
-      __people__."person_id" = __people_identifiers__."id0"
+      __people_2."person_id" = __people_identifiers__."id0"
     )
-  order by __people__."person_id" asc
+  order by __people_2."person_id" asc
 ) as __people_result__;
 
 select __posts_result__.*
@@ -48,9 +48,9 @@ from (
 ) as __posts_identifiers__,
 lateral (
   select
-    __posts__."post_id"::text as "0",
+    __posts__."body" as "0",
     __people__."username" as "1",
-    __posts__."body" as "2",
+    __posts__."post_id"::text as "2",
     __posts_identifiers__.idx as "3"
   from interfaces_and_unions.posts as __posts__
   left outer join interfaces_and_unions.people as __people__

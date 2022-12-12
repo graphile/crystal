@@ -1,5 +1,4 @@
 select
-  __forums__."name" as "0",
   (select json_agg(_) from (
     select
       (count(*))::text as "0"
@@ -10,15 +9,15 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "1",
+  ) _) as "0",
   (select json_agg(_) from (
     select
-      __messages__."body" as "0",
-      __users__."username" as "1",
-      __users__."gravatar_url" as "2",
-      __messages__."id" as "3",
-      __users_2."username" as "4",
-      __users_2."gravatar_url" as "5"
+      __messages__."id" as "0",
+      __users__."gravatar_url" as "1",
+      __users__."username" as "2",
+      __messages__."body" as "3",
+      __users_2."gravatar_url" as "4",
+      __users_2."username" as "5"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -32,7 +31,8 @@ select
       )
     order by __messages__."id" desc
     limit 3
-  ) _) as "2"
+  ) _) as "1",
+  __forums__."name" as "2"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

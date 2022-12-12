@@ -1,5 +1,4 @@
 select
-  __forums__."name" as "0",
   (select json_agg(_) from (
     select
       (count(*))::text as "0"
@@ -10,9 +9,10 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "1",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
-  __forums__."id" as "3"
+  ) _) as "0",
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
+  __forums__."id" as "2",
+  __forums__."name" as "3"
 from app_public.forums as __forums__
 where
   (
@@ -37,9 +37,9 @@ lateral (
   select *
   from (
     select
-      __messages__."body" as "0",
+      __users__."gravatar_url" as "0",
       __users__."username" as "1",
-      __users__."gravatar_url" as "2",
+      __messages__."body" as "2",
       __messages_identifiers__.idx as "3",
       row_number() over (
         order by __messages__."id" asc
@@ -79,10 +79,10 @@ lateral (
   select *
   from (
     select
-      __messages__."id" as "0",
-      __messages__."body" as "1",
-      __users__."username" as "2",
-      __users__."gravatar_url" as "3",
+      __users__."gravatar_url" as "0",
+      __users__."username" as "1",
+      __messages__."body" as "2",
+      __messages__."id" as "3",
       __messages_identifiers__.idx as "4",
       row_number() over (
         order by __messages__."id" asc

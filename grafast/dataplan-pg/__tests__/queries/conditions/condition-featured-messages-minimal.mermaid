@@ -21,10 +21,10 @@ graph TD
     __InputStaticLeaf17{{"__InputStaticLeaf[17∈0]"}}:::plan
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
     PgPageInfo30{{"PgPageInfo[30∈1]"}}:::plan
-    Access37{{"Access[37∈3]<br />ᐸ15.0ᐳ"}}:::plan
-    Lambda38{{"Lambda[38∈3]"}}:::plan
+    Access38{{"Access[38∈3]<br />ᐸ15.1ᐳ"}}:::plan
+    Lambda39{{"Lambda[39∈3]"}}:::plan
     Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
-    Access39{{"Access[39∈3]<br />ᐸ15.1ᐳ"}}:::plan
+    Access37{{"Access[37∈3]<br />ᐸ15.0ᐳ"}}:::plan
     First34{{"First[34∈3]"}}:::plan
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
@@ -37,11 +37,11 @@ graph TD
     PgSelect11 ==> __Item15
     __Item15 --> PgSelectSingle16
     __InputStaticLeaf17 --> Connection28
+    __Item15 --> Access38
+    Access38 --> Lambda39
+    Lambda39 --> Lambda32
     __Item15 --> Access37
-    Access37 --> Lambda38
-    Lambda38 --> Lambda32
-    __Item15 --> Access39
-    Access39 --> First34
+    Access37 --> First34
     First34 --> PgSelectSingle35
     PgSelectSingle35 --> PgClassExpression36
 
@@ -57,7 +57,7 @@ graph TD
     class Bucket2 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 28, 30<br /><br />ROOT Connectionᐸ24ᐳ[28]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,Lambda32,First34,PgSelectSingle35,PgClassExpression36,Access37,Lambda38,Access39 bucket3
+    class Bucket3,Lambda32,First34,PgSelectSingle35,PgClassExpression36,Access37,Access38,Lambda39 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

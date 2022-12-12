@@ -44,9 +44,9 @@ from (
 ) as __mutation_out_complex_identifiers__,
 lateral (
   select
-    __mutation_out_complex__."x"::text as "0",
+    __mutation_out_complex__."z"::text as "0",
     __mutation_out_complex__."y"::text as "1",
-    __mutation_out_complex__."z"::text as "2",
+    __mutation_out_complex__."x"::text as "2",
     (not (__mutation_out_complex__ is null))::text as "3",
     __mutation_out_complex_identifiers__.idx as "4"
   from "c"."mutation_out_complex"(
@@ -64,72 +64,9 @@ from (
 ) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
+    __frmcdc_compound_type_1__."c"::text as "0",
     __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    (not (__frmcdc_compound_type_1__ is null))::text as "3",
-    __frmcdc_compound_type_1_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
-
-select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
-lateral (
-  select
-    __person__."person_full_name" as "0",
-    (select json_agg(_) from (
-      select
-        __post__."id"::text as "0"
-      from "a"."post" as __post__
-      where (
-        __person__."id"::"int4" = __post__."author_id"
-      )
-      order by __post__."id" asc
-    ) _) as "1",
-    __person__."id"::text as "2",
-    __person_identifiers__.idx as "3"
-  from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
-) as __person_result__;
-
-select __mutation_out_complex_setof_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_out_complex_setof_identifiers__,
-lateral (
-  select
-    __mutation_out_complex_setof__."x"::text as "0",
-    __mutation_out_complex_setof__."y"::text as "1",
-    __mutation_out_complex_setof__."z"::text as "2",
-    (not (__mutation_out_complex_setof__ is null))::text as "3",
-    __mutation_out_complex_setof_identifiers__.idx as "4"
-  from "c"."mutation_out_complex_setof"(
-    __mutation_out_complex_setof_identifiers__."id0",
-    __mutation_out_complex_setof_identifiers__."id1"
-  ) as __mutation_out_complex_setof__
-) as __mutation_out_complex_setof_result__;
-
-select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
+    __frmcdc_compound_type_1__."a"::text as "2",
     (not (__frmcdc_compound_type_1__ is null))::text as "3",
     __frmcdc_compound_type_1_identifiers__.idx as "4"
   from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
@@ -153,8 +90,71 @@ lateral (
       )
       order by __post__."id" asc
     ) _) as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
+    __person__."person_full_name" as "1",
+    __person__."id"::text as "2",
+    __person_identifiers__.idx as "3"
+  from (select (__person_identifiers__."id0").*) as __person__
+  order by __person__."id" asc
+) as __person_result__;
+
+select __mutation_out_complex_setof_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"int4" as "id0",
+    (ids.value->>1)::"text" as "id1"
+  from json_array_elements($1::json) with ordinality as ids
+) as __mutation_out_complex_setof_identifiers__,
+lateral (
+  select
+    __mutation_out_complex_setof__."z"::text as "0",
+    __mutation_out_complex_setof__."y"::text as "1",
+    __mutation_out_complex_setof__."x"::text as "2",
+    (not (__mutation_out_complex_setof__ is null))::text as "3",
+    __mutation_out_complex_setof_identifiers__.idx as "4"
+  from "c"."mutation_out_complex_setof"(
+    __mutation_out_complex_setof_identifiers__."id0",
+    __mutation_out_complex_setof_identifiers__."id1"
+  ) as __mutation_out_complex_setof__
+) as __mutation_out_complex_setof_result__;
+
+select __frmcdc_compound_type_1_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."compound_type" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __frmcdc_compound_type_1_identifiers__,
+lateral (
+  select
+    __frmcdc_compound_type_1__."c"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."a"::text as "2",
+    (not (__frmcdc_compound_type_1__ is null))::text as "3",
+    __frmcdc_compound_type_1_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
+) as __frmcdc_compound_type_1_result__;
+
+select __person_result__.*
+from (
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::"c"."person" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __person_identifiers__,
+lateral (
+  select
+    (select json_agg(_) from (
+      select
+        __post__."id"::text as "0"
+      from "a"."post" as __post__
+      where (
+        __person__."id"::"int4" = __post__."author_id"
+      )
+      order by __post__."id" asc
+    ) _) as "0",
+    __person__."person_full_name" as "1",
+    __person__."id"::text as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
   order by __person__."id" asc

@@ -1,9 +1,8 @@
 select
-  __forums__."name" as "0",
   (select json_agg(_) from (
     select
-      __messages__."body" as "0",
-      __messages__."author_id" as "1",
+      __messages__."author_id" as "0",
+      __messages__."body" as "1",
       __messages__."id" as "2"
     from app_public.messages as __messages__
     where
@@ -13,7 +12,8 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) _) as "1"
+  ) _) as "0",
+  __forums__."name" as "1"
 from app_public.forums as __forums__
 where
   (
@@ -32,8 +32,8 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username" as "0",
-    __users__."gravatar_url" as "1",
+    __users__."gravatar_url" as "0",
+    __users__."username" as "1",
     __users_identifiers__.idx as "2"
   from app_public.users as __users__
   where

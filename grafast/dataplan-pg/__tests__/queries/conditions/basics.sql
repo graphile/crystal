@@ -1,5 +1,4 @@
 select
-  __forums__."name" as "0",
   (select json_agg(_) from (
     select
       __messages__."body" as "0"
@@ -12,7 +11,8 @@ select
       )
     order by __messages__."id" asc
     limit 2
-  ) _) as "1"
+  ) _) as "0",
+  __forums__."name" as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

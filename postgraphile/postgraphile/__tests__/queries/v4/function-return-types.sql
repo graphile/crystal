@@ -44,12 +44,6 @@ from (
 ) as __func_out_complex_identifiers__,
 lateral (
   select
-    __func_out_complex__."x"::text as "0",
-    __frmcdc_compound_type_1__."a"::text as "1",
-    __frmcdc_compound_type_1__."b" as "2",
-    __frmcdc_compound_type_1__."c"::text as "3",
-    (not (__frmcdc_compound_type_1__ is null))::text as "4",
-    __person__."person_full_name" as "5",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
@@ -58,23 +52,29 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "6",
-    __person__."id"::text as "7",
+    ) _) as "0",
+    __person__."person_full_name" as "1",
+    __person__."id"::text as "2",
+    __frmcdc_compound_type_1__."c"::text as "3",
+    __frmcdc_compound_type_1__."b" as "4",
+    __frmcdc_compound_type_1__."a"::text as "5",
+    (not (__frmcdc_compound_type_1__ is null))::text as "6",
+    __func_out_complex__."x"::text as "7",
     (not (__func_out_complex__ is null))::text as "8",
     __func_out_complex_identifiers__.idx as "9"
   from "c"."func_out_complex"(
     __func_out_complex_identifiers__."id0",
     __func_out_complex_identifiers__."id1"
   ) as __func_out_complex__
-  left outer join lateral (select (__func_out_complex__."y").*) as __frmcdc_compound_type_1__
-  on TRUE
   left outer join lateral (select (__func_out_complex__."z").*) as __person__
+  on TRUE
+  left outer join lateral (select (__func_out_complex__."y").*) as __frmcdc_compound_type_1__
   on TRUE
 ) as __func_out_complex_result__;
 
 select
-  __func_out_out__."first_out"::text as "0",
-  __func_out_out__."second_out" as "1",
+  __func_out_out__."second_out" as "0",
+  __func_out_out__."first_out"::text as "1",
   (not (__func_out_out__ is null))::text as "2"
 from "c"."func_out_out"() as __func_out_out__;
 
@@ -87,11 +87,11 @@ from (
 ) as __func_out_out_compound_type_identifiers__,
 lateral (
   select
-    __func_out_out_compound_type__."o1"::text as "0",
-    __frmcdc_compound_type_1__."a"::text as "1",
-    __frmcdc_compound_type_1__."b" as "2",
-    __frmcdc_compound_type_1__."c"::text as "3",
-    (not (__frmcdc_compound_type_1__ is null))::text as "4",
+    __frmcdc_compound_type_1__."c"::text as "0",
+    __frmcdc_compound_type_1__."b" as "1",
+    __frmcdc_compound_type_1__."a"::text as "2",
+    (not (__frmcdc_compound_type_1__ is null))::text as "3",
+    __func_out_out_compound_type__."o1"::text as "4",
     (not (__func_out_out_compound_type__ is null))::text as "5",
     __func_out_out_compound_type_identifiers__.idx as "6"
   from "c"."func_out_out_compound_type"(__func_out_out_compound_type_identifiers__."id0") as __func_out_out_compound_type__
@@ -100,8 +100,8 @@ lateral (
 ) as __func_out_out_compound_type_result__;
 
 select
-  __func_out_out_unnamed__."column1"::text as "0",
-  __func_out_out_unnamed__."column2" as "1",
+  __func_out_out_unnamed__."column2" as "0",
+  __func_out_out_unnamed__."column1"::text as "1",
   (not (__func_out_out_unnamed__ is null))::text as "2"
 from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__;
 
@@ -114,9 +114,9 @@ select
 from "c"."func_out_unnamed"() as __func_out_unnamed__(v);
 
 select
-  __func_out_unnamed_out_out_unnamed__."column1"::text as "0",
+  __func_out_unnamed_out_out_unnamed__."o2" as "0",
   __func_out_unnamed_out_out_unnamed__."column3"::text as "1",
-  __func_out_unnamed_out_out_unnamed__."o2" as "2",
+  __func_out_unnamed_out_out_unnamed__."column1"::text as "2",
   (not (__func_out_unnamed_out_out_unnamed__ is null))::text as "3"
 from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__;
 
@@ -126,73 +126,73 @@ from (
     ids.ordinality - 1 as idx,
     (ids.value->>0)::"int4" as "id0",
     (ids.value->>1)::"text" as "id1",
-    (ids.value->>2)::"int4" as "id2",
-    (ids.value->>3)::"text" as "id3",
+    (ids.value->>2)::"text" as "id2",
+    (ids.value->>3)::"int4" as "id3",
     (ids.value->>4)::"text" as "id4"
   from json_array_elements($1::json) with ordinality as ids
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_computed_complex__."x"::text as "2",
-    __frmcdc_compound_type_1__."a"::text as "3",
-    __frmcdc_compound_type_1__."b" as "4",
-    __frmcdc_compound_type_1__."c"::text as "5",
-    (not (__frmcdc_compound_type_1__ is null))::text as "6",
-    __person_2."person_full_name" as "7",
+    __person_computed_out_out__."o2" as "0",
+    __person_computed_out_out__."o1" as "1",
+    (not (__person_computed_out_out__ is null))::text as "2",
+    "c"."person_computed_out"(__person__) as "3",
+    __person_computed_inout_out__."o" as "4",
+    __person_computed_inout_out__."ino" as "5",
+    (not (__person_computed_inout_out__ is null))::text as "6",
+    "c"."person_computed_inout"(
+      __person__,
+      __person_identifiers__."id1"
+    ) as "7",
+    __person_computed_first_arg_inout_out__."o"::text as "8",
+    __person_2."person_full_name" as "9",
+    __person_2."id"::text as "10",
+    (not (__person_computed_first_arg_inout_out__ is null))::text as "11",
+    __person_computed_first_arg_inout__."person_full_name" as "12",
+    __person_computed_first_arg_inout__."id"::text as "13",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
       from "a"."post" as __post__
       where (
-        __person_2."id"::"int4" = __post__."author_id"
+        __person_3."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "8",
-    __person_2."id"::text as "9",
-    (not (__person_computed_complex__ is null))::text as "10",
-    __person_computed_first_arg_inout__."id"::text as "11",
-    __person_computed_first_arg_inout__."person_full_name" as "12",
-    __person_computed_out_out__."o2" as "13",
-    __person_computed_out_out__."o1" as "14",
-    (not (__person_computed_out_out__ is null))::text as "15",
+    ) _) as "14",
+    __person_3."person_full_name" as "15",
     __person_3."id"::text as "16",
-    __person_3."person_full_name" as "17",
-    __person_computed_first_arg_inout_out__."o"::text as "18",
-    (not (__person_computed_first_arg_inout_out__ is null))::text as "19",
-    "c"."person_computed_out"(__person__) as "20",
-    __person_computed_inout_out__."o" as "21",
-    __person_computed_inout_out__."ino" as "22",
-    (not (__person_computed_inout_out__ is null))::text as "23",
-    "c"."person_computed_inout"(
-      __person__,
-      __person_identifiers__."id1"
-    ) as "24",
+    __frmcdc_compound_type_1__."c"::text as "17",
+    __frmcdc_compound_type_1__."b" as "18",
+    __frmcdc_compound_type_1__."a"::text as "19",
+    (not (__frmcdc_compound_type_1__ is null))::text as "20",
+    __person_computed_complex__."x"::text as "21",
+    (not (__person_computed_complex__ is null))::text as "22",
+    __person__."person_full_name" as "23",
+    __person__."id"::text as "24",
     __person_identifiers__.idx as "25"
   from "c"."person" as __person__
-  left outer join "c"."person_computed_complex"(
-    __person__,
-    __person_identifiers__."id2",
-    __person_identifiers__."id3"
-  ) as __person_computed_complex__
-  on TRUE
-  left outer join lateral (select (__person_computed_complex__."y").*) as __frmcdc_compound_type_1__
-  on TRUE
-  left outer join lateral (select (__person_computed_complex__."z").*) as __person_2
-  on TRUE
-  left outer join "c"."person_computed_first_arg_inout"(__person__) as __person_computed_first_arg_inout__
-  on TRUE
   left outer join "c"."person_computed_out_out"(__person__) as __person_computed_out_out__
-  on TRUE
-  left outer join "c"."person_computed_first_arg_inout_out"(__person__) as __person_computed_first_arg_inout_out__
-  on TRUE
-  left outer join lateral (select (__person_computed_first_arg_inout_out__."person").*) as __person_3
   on TRUE
   left outer join "c"."person_computed_inout_out"(
     __person__,
-    __person_identifiers__."id4"
+    __person_identifiers__."id2"
   ) as __person_computed_inout_out__
+  on TRUE
+  left outer join "c"."person_computed_first_arg_inout_out"(__person__) as __person_computed_first_arg_inout_out__
+  on TRUE
+  left outer join lateral (select (__person_computed_first_arg_inout_out__."person").*) as __person_2
+  on TRUE
+  left outer join "c"."person_computed_first_arg_inout"(__person__) as __person_computed_first_arg_inout__
+  on TRUE
+  left outer join "c"."person_computed_complex"(
+    __person__,
+    __person_identifiers__."id3",
+    __person_identifiers__."id4"
+  ) as __person_computed_complex__
+  on TRUE
+  left outer join lateral (select (__person_computed_complex__."z").*) as __person_3
+  on TRUE
+  left outer join lateral (select (__person_computed_complex__."y").*) as __frmcdc_compound_type_1__
   on TRUE
   where (
     __person__."id" = __person_identifiers__."id0"
@@ -308,13 +308,6 @@ from (
 ) as __func_out_complex_setof_identifiers__,
 lateral (
   select
-    (not (__func_out_complex_setof__ is null))::text as "0",
-    __func_out_complex_setof__."x"::text as "1",
-    __frmcdc_compound_type_1__."a"::text as "2",
-    __frmcdc_compound_type_1__."b" as "3",
-    __frmcdc_compound_type_1__."c"::text as "4",
-    (not (__frmcdc_compound_type_1__ is null))::text as "5",
-    __person__."person_full_name" as "6",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
@@ -323,16 +316,23 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "7",
-    __person__."id"::text as "8",
+    ) _) as "0",
+    __person__."person_full_name" as "1",
+    __person__."id"::text as "2",
+    __frmcdc_compound_type_1__."c"::text as "3",
+    __frmcdc_compound_type_1__."b" as "4",
+    __frmcdc_compound_type_1__."a"::text as "5",
+    (not (__frmcdc_compound_type_1__ is null))::text as "6",
+    __func_out_complex_setof__."x"::text as "7",
+    (not (__func_out_complex_setof__ is null))::text as "8",
     __func_out_complex_setof_identifiers__.idx as "9"
   from "c"."func_out_complex_setof"(
     __func_out_complex_setof_identifiers__."id0",
     __func_out_complex_setof_identifiers__."id1"
   ) as __func_out_complex_setof__
-  left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type_1__
-  on TRUE
   left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
+  on TRUE
+  left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type_1__
   on TRUE
 ) as __func_out_complex_setof_result__;
 
@@ -355,9 +355,9 @@ lateral (
 ) as __func_out_complex_setof_result__;
 
 select
-  (not (__func_out_out_setof__ is null))::text as "0",
+  __func_out_out_setof__."o2" as "0",
   __func_out_out_setof__."o1"::text as "1",
-  __func_out_out_setof__."o2" as "2"
+  (not (__func_out_out_setof__ is null))::text as "2"
 from "c"."func_out_out_setof"() as __func_out_out_setof__;
 
 select
@@ -389,9 +389,9 @@ from (
 ) as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
-    (not (__func_returns_table_multi_col__ is null))::text as "0",
+    __func_returns_table_multi_col__."col2" as "0",
     __func_returns_table_multi_col__."col1"::text as "1",
-    __func_returns_table_multi_col__."col2" as "2",
+    (not (__func_returns_table_multi_col__ is null))::text as "2",
     __func_returns_table_multi_col_identifiers__.idx as "3"
   from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
 ) as __func_returns_table_multi_col_result__;

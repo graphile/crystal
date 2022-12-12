@@ -7,8 +7,8 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_random_user__."username" as "0",
-    __forums_random_user__."gravatar_url" as "1",
+    __forums_random_user__."gravatar_url" as "0",
+    __forums_random_user__."username" as "1",
     __forums__."id" as "2",
     __forums_identifiers__.idx as "3"
   from app_public.forums as __forums__

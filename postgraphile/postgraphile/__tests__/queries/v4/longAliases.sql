@@ -7,18 +7,18 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."id"::text as "0",
-    __person__."email" as "1",
     (select json_agg(_) from (
       select
         (count(*))::text as "0"
       from "c"."person_friends"(__person__) as __person_friends__
-    ) _) as "2",
+    ) _) as "0",
     (select json_agg(_) from (
       select
         (count(*))::text as "0"
       from "c"."person_friends"(__person__) as __person_friends__
-    ) _) as "3",
+    ) _) as "1",
+    __person__."email" as "2",
+    __person__."id"::text as "3",
     __person_identifiers__.idx as "4"
   from "c"."person" as __person__
   where (

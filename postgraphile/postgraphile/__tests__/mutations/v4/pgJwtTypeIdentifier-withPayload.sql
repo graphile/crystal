@@ -9,9 +9,9 @@ from (
 ) as __authenticate_payload_identifiers__,
 lateral (
   select
-    __authenticate_payload__."jwt"::text as "0",
+    __authenticate_payload__."id"::text as "0",
     __authenticate_payload__."admin"::text as "1",
-    __authenticate_payload__."id"::text as "2",
+    __authenticate_payload__."jwt"::text as "2",
     (not (__authenticate_payload__ is null))::text as "3",
     __authenticate_payload_identifiers__.idx as "4"
   from "b"."authenticate_payload"(
@@ -30,8 +30,8 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
+    __person__."person_full_name" as "0",
+    __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from "c"."person" as __person__
   where (

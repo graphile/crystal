@@ -89,9 +89,9 @@ from (
 ) as __aws_applications_identifiers__,
 lateral (
   select
-    __aws_applications__."id"::text as "0",
+    to_char(__aws_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
     __aws_applications__."name" as "1",
-    to_char(__aws_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
+    __aws_applications__."id"::text as "2",
     __aws_applications_identifiers__.idx as "3"
   from "polymorphic"."aws_applications" as __aws_applications__
   where (
@@ -109,9 +109,9 @@ from (
 ) as __gcp_applications_identifiers__,
 lateral (
   select
-    __gcp_applications__."id"::text as "0",
+    to_char(__gcp_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
     __gcp_applications__."name" as "1",
-    to_char(__gcp_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
+    __gcp_applications__."id"::text as "2",
     __gcp_applications_identifiers__.idx as "3"
   from "polymorphic"."gcp_applications" as __gcp_applications__
   where (

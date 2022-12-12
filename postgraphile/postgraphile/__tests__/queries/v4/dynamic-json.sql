@@ -167,7 +167,7 @@ lateral (
 ) as __jsonb_identity_result__;
 
 select
-  __types__."json"::text as "0",
-  __types__."jsonb"::text as "1"
+  __types__."jsonb"::text as "0",
+  __types__."json"::text as "1"
 from "b"."types" as __types__
 order by __types__."id" asc;

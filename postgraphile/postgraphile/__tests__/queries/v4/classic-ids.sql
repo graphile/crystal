@@ -7,8 +7,8 @@ from (
 ) as __post_identifiers__,
 lateral (
   select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
+    __post__."headline" as "0",
+    __post__."id"::text as "1",
     __post_identifiers__.idx as "2"
   from "a"."post" as __post__
   where (

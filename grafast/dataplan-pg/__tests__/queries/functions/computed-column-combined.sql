@@ -8,9 +8,6 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_random_user__."username" as "0",
-    __forums_random_user__."gravatar_url" as "1",
-    __forums_unique_author_count__.v::text as "2",
     (select json_agg(_) from (
       select
         __forums_featured_messages__."body" as "0"
@@ -18,8 +15,11 @@ lateral (
       where (
         true /* authorization checks */
       )
-    ) _) as "3",
-    __users_most_recent_forum__."id" as "4",
+    ) _) as "0",
+    __forums_unique_author_count__.v::text as "1",
+    __users_most_recent_forum__."id" as "2",
+    __forums_random_user__."gravatar_url" as "3",
+    __forums_random_user__."username" as "4",
     __forums__."id" as "5",
     __forums_identifiers__.idx as "6"
   from app_public.forums as __forums__

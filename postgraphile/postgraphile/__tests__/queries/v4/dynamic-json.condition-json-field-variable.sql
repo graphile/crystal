@@ -7,8 +7,8 @@ from (
 ) as __my_table_identifiers__,
 lateral (
   select
-    __my_table__."id"::text as "0",
-    __my_table__."json_data"::text as "1",
+    __my_table__."json_data"::text as "0",
+    __my_table__."id"::text as "1",
     __my_table_identifiers__.idx as "2"
   from "c"."my_table" as __my_table__
   where (
@@ -26,8 +26,8 @@ from (
 ) as __my_table_identifiers__,
 lateral (
   select
-    __my_table__."id"::text as "0",
-    __my_table__."json_data"::text as "1",
+    __my_table__."json_data"::text as "0",
+    __my_table__."id"::text as "1",
     __my_table_identifiers__.idx as "2"
   from "c"."my_table" as __my_table__
   where (

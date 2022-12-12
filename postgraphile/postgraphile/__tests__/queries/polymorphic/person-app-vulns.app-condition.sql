@@ -95,8 +95,8 @@ from (
 ) as __aws_applications_identifiers__,
 lateral (
   select
-    __aws_applications__."id"::text as "0",
-    __aws_applications__."name" as "1",
+    __aws_applications__."name" as "0",
+    __aws_applications__."id"::text as "1",
     __aws_applications_identifiers__.idx as "2"
   from "polymorphic"."aws_applications" as __aws_applications__
   where (
