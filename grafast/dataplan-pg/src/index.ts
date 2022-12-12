@@ -80,7 +80,6 @@ import {
 import { BooleanFilterStep } from "./filters/booleanFilter.js";
 import { ClassFilterStep } from "./filters/classFilter.js";
 import { ManyFilterStep } from "./filters/manyFilter.js";
-import { OrFilterStep } from "./filters/orFilter.js";
 import {
   PgClassSingleStep,
   PgConditionLikeStep,
@@ -185,7 +184,6 @@ export {
   isEnumCodec,
   listOfType,
   ManyFilterStep,
-  OrFilterStep,
   PgBox,
   PgCircle,
   pgClassExpression,
@@ -332,7 +330,6 @@ exportAsMany("@dataplan/pg", {
   BooleanFilterStep,
   ClassFilterStep,
   ManyFilterStep,
-  OrFilterStep,
   PgSubscriber,
   pgClassExpression,
   PgClassExpressionStep,
