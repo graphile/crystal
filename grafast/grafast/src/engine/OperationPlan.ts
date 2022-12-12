@@ -1985,24 +1985,23 @@ export class OperationPlan {
      * - do not pass the LayerPlan of one of the dependencies
      * - do not pass a "deferred" layer plan
      */
-    const compatibleLayerPlans: LayerPlan[] = [];
+    const compatibleLayerPlans = new Set<LayerPlan>();
     let currentLayerPlan: LayerPlan | null = step.layerPlan;
-    const doNotPass = step.dependencies.map((depId) => {
+    const doNotPass = new Set<LayerPlan>();
+    for (const depId of step.dependencies) {
       if (isDev) {
         assert.ok(
           this.steps[depId] != null,
           `GraphileInternalError<825a1c5c-ad15-49fc-a340-159799061daf>: step '${depId}' has been deleted; but '${step}' depends on it. Bug in tree shaking?`,
         );
       }
-      return this.steps[depId].layerPlan;
-    });
+      doNotPass.add(this.steps[depId].layerPlan);
+    }
 
     do {
-      if (!compatibleLayerPlans.includes(currentLayerPlan)) {
-        compatibleLayerPlans.push(currentLayerPlan);
-      }
+      compatibleLayerPlans.add(currentLayerPlan);
 
-      if (doNotPass.includes(currentLayerPlan)) {
+      if (doNotPass.has(currentLayerPlan)) {
         break;
       }
       if (isDeferredLayerPlan(currentLayerPlan)) {
@@ -2021,7 +2020,7 @@ export class OperationPlan {
         continue;
       }
 
-      if (!compatibleLayerPlans.includes(potentialPeer.layerPlan)) {
+      if (!compatibleLayerPlans.has(potentialPeer.layerPlan)) {
         continue;
       }
 
