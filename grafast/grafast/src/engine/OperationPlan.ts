@@ -1791,7 +1791,9 @@ export class OperationPlan {
       /** Adds 'step' to ordered, ensuring that all step's dependencies are there first */
       const process = (step: ExecutableStep) => {
         if (ordered.has(step)) {
-          return;
+          throw new Error(
+            "Please ensure this step hasn't already been processed",
+          );
         }
         for (const depId of step.dependencies) {
           const dep = this.steps[depId];
@@ -1802,23 +1804,18 @@ export class OperationPlan {
         ordered.add(step);
       };
 
+      for (let i = 0, l = steps.length; i < l; i++) {
+        const step = steps[i];
+        if (!ordered.has(step)) {
+          process(step);
+        }
+      }
+
       // We want to `.pop()` steps from our list because that's more performant
       // than `.shift()`, so we actually sort into reverse order
       if (order === "dependencies-first") {
-        for (let i = 0, l = steps.length; i < l; i++) {
-          const step = steps[i];
-          if (!ordered.has(step)) {
-            process(step);
-          }
-        }
         steps = [...ordered].reverse();
       } else {
-        for (let i = steps.length - 1; i >= 0; i--) {
-          const step = steps[i];
-          if (!ordered.has(step)) {
-            process(step);
-          }
-        }
         steps = [...ordered];
       }
     };
