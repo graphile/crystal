@@ -142,9 +142,20 @@ export class OperationPlan {
   public layerPlans: Array<LayerPlan | null> = [];
   /** @internal */
   public rootLayerPlan: LayerPlan;
-  // Assigned during OperationPlan.planOperation(), guaranteed to exist after
-  // initialization.
+  /**
+   * Assigned during OperationPlan.planOperation(), guaranteed to exist after
+   * initialization.
+   *
+   * @internal
+   */
   public rootOutputPlan!: OutputPlan;
+  /**
+   * All the OutputPlans that were created to allow a more efficient
+   * walkOutputPlans implementation.
+   *
+   * @internal
+   */
+  public allOutputPlans: OutputPlan[] = [];
 
   private stepCount = 0;
   private modifierStepCount = 0;
@@ -1903,7 +1914,7 @@ export class OperationPlan {
 
     // Now walk through all the output plans and mark every used plan as
     // active.
-    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+    this.allOutputPlans.forEach((outputPlan) => {
       if (outputPlan.rootStepId) {
         this.markStepActive(this.steps[outputPlan.rootStepId], activeSteps);
       }
@@ -2235,7 +2246,7 @@ export class OperationPlan {
       (s) => s && s.dependencies.some((d) => this.steps[d] === step),
     );
     const dependentOutputPlans: OutputPlan[] = [];
-    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+    this.allOutputPlans.forEach((outputPlan) => {
       if (outputPlan.rootStepId) {
         if (this.steps[outputPlan.rootStepId] === step) {
           dependentOutputPlans.push(outputPlan);
@@ -2896,7 +2907,7 @@ export class OperationPlan {
     }
 
     // Populate copyPlanIds for output plans' rootStepId
-    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) => {
+    this.allOutputPlans.forEach((outputPlan) => {
       const rootPlan = this.steps[outputPlan.rootStepId];
       ensurePlanAvailableInLayer(rootPlan, outputPlan.layerPlan);
     });
@@ -2910,16 +2921,12 @@ export class OperationPlan {
 
   /** Optimizes each output plan */
   private optimizeOutputPlans(): void {
-    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) =>
-      outputPlan.optimize(),
-    );
+    this.allOutputPlans.forEach((outputPlan) => outputPlan.optimize());
   }
 
   /** Finalizes each output plan */
   private finalizeOutputPlans(): void {
-    this.walkOutputPlans(this.rootOutputPlan, (outputPlan) =>
-      outputPlan.finalize(),
-    );
+    this.allOutputPlans.forEach((outputPlan) => outputPlan.finalize());
   }
 
   private walkOutputPlans(
@@ -2992,7 +2999,7 @@ export class OperationPlan {
           "This layer plan has children... should we really be deleting it?!",
         );
       }
-      this.walkOutputPlans(this.rootOutputPlan, (o) => {
+      this.allOutputPlans.forEach((o) => {
         if (o.layerPlan === layerPlan) {
           throw new Error(
             "An output plan depends on this layer plan... should we really be deleting it?!",
