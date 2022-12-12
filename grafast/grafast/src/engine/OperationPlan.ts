@@ -1786,10 +1786,11 @@ export class OperationPlan {
 
     /** Sort steps into the order to be processed. */
     const sortSteps = () => {
-      const ordered: ExecutableStep[] = [];
+      // Sets are ordered in insertion order
+      const ordered = new Set<ExecutableStep>;
       /** Adds 'step' to ordered, ensuring that all step's dependencies are there first */
       const process = (step: ExecutableStep) => {
-        if (ordered.includes(step)) {
+        if (ordered.has(step)) {
           return;
         }
         for (const depId of step.dependencies) {
@@ -1798,7 +1799,7 @@ export class OperationPlan {
             process(dep);
           }
         }
-        ordered.push(step);
+        ordered.add(step);
       };
 
       // We want to `.pop()` steps from our list because that's more performant
@@ -1807,13 +1808,13 @@ export class OperationPlan {
         for (let i = 0, l = steps.length; i < l; i++) {
           process(steps[i]);
         }
-        ordered.reverse();
+        steps = [...ordered].reverse();
       } else {
         for (let i = steps.length - 1; i >= 0; i--) {
           process(steps[i]);
         }
+        steps = [...ordered];
       }
-      steps = ordered;
     };
 
     // DELIBERATELY shadows `fromStepId`
