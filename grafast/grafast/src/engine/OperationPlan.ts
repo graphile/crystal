@@ -2037,6 +2037,7 @@ export class OperationPlan {
           (s, i) =>
             s &&
             s.id === i &&
+            s.dependencies.length === l &&
             s.dependencies.some((depId) => this.steps[depId] === dep),
         );
         const potentialPeers = new Set(
