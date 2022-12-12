@@ -1977,7 +1977,16 @@ export class OperationPlan {
     }
   }
 
+  /**
+   * Peers are steps of the same type (but not the same step!) that are in
+   * compatible layers and have the same dependencies. Peers must not have side
+   * effects.
+   */
   private getPeers(step: ExecutableStep): ExecutableStep[] {
+    if (step.hasSideEffects) {
+      return [step];
+    }
+
     /**
      * "compatible" layer plans are calculated by walking up the layer plan tree,
      * however:
@@ -2009,41 +2018,58 @@ export class OperationPlan {
       }
     } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
 
-    const peers: ExecutableStep[] = [];
-    for (let id = 0; id < this.stepCount; id++) {
-      const potentialPeer = this.steps[id];
-      if (!potentialPeer || potentialPeer.id !== id) {
-        continue;
-      }
+    const isMaybeAPeer = (potentialPeer: ExecutableStep) =>
+      potentialPeer.id !== step.id &&
+      !potentialPeer.hasSideEffects &&
+      compatibleLayerPlans.has(potentialPeer.layerPlan) &&
+      potentialPeer.constructor === step.constructor;
 
-      if (potentialPeer.hasSideEffects) {
-        continue;
+    // Peers have the same dependencies, so an intersection of the dependencies
+    // dependents is a quick way to avoid having to scan every single step.
+    const l = step.dependencies.length;
+    if (l > 0) {
+      let allPotentialPeers!: Set<ExecutableStep>;
+      for (let i = 0, l = step.dependencies.length; i < l; i++) {
+        const depId = step.dependencies[i];
+        const dep = this.steps[depId];
+        // TODO: replace this with precomputed
+        const depDependentSteps = this.steps.filter(
+          (s, i) =>
+            s &&
+            s.id === i &&
+            s.dependencies.some((depId) => this.steps[depId] === dep),
+        );
+        const potentialPeers = new Set(
+          depDependentSteps.filter(
+            (potentialPeer) =>
+              this.steps[potentialPeer.dependencies[i]] === dep &&
+              isMaybeAPeer(potentialPeer),
+          ),
+        );
+        if (i === 0) {
+          allPotentialPeers = potentialPeers;
+        } else {
+          for (const p of allPotentialPeers) {
+            if (!potentialPeers.has(p)) {
+              allPotentialPeers.delete(p);
+              if (allPotentialPeers.size === 0) {
+                // Shortcut
+                return [step];
+              }
+            }
+          }
+        }
       }
-
-      if (!compatibleLayerPlans.has(potentialPeer.layerPlan)) {
-        continue;
-      }
-
-      // Can only merge if plan is of same type.
-      if (step.constructor !== potentialPeer.constructor) {
-        continue;
-      }
-
-      // Can only merge if the dependencies are the same.
-      if (
-        !arraysMatch(
-          step.dependencies,
-          potentialPeer.dependencies,
-          (depA, depB) => this.steps[depA] === this.steps[depB],
-        )
-      ) {
-        continue;
-      }
-
-      peers.push(potentialPeer);
+      return [step, ...allPotentialPeers];
+    } else {
+      return [
+        step,
+        ...this.steps.filter(
+          (s, i) =>
+            s && s.id === i && s.dependencies.length === 0 && isMaybeAPeer(s),
+        ),
+      ];
     }
-
-    return peers;
   }
 
   private isImmoveable(step: ExecutableStep): boolean {
