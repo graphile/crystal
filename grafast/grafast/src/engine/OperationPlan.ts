@@ -2245,59 +2245,69 @@ export class OperationPlan {
     // TODO: don't allow pushing down into mutationField?
 
     // Now find the lowest bucket that still satisfies all of it's dependents.
-    // TODO: make this calculation faster
-    const dependentSteps = this.steps.filter(
-      (s) => s && s.dependencies.some((d) => this.steps[d] === step),
-    );
-    const dependentOutputPlans: OutputPlan[] = [];
-    this.allOutputPlans.forEach((outputPlan) => {
-      if (outputPlan.rootStepId) {
+    const dependentLayerPlans = new Set<LayerPlan>();
+
+    for (const outputPlan of this.allOutputPlans) {
+      if (outputPlan.rootStepId != null) {
         if (this.steps[outputPlan.rootStepId] === step) {
-          dependentOutputPlans.push(outputPlan);
+          if (outputPlan.layerPlan === step.layerPlan) {
+            return;
+          } else {
+            dependentLayerPlans.add(outputPlan.layerPlan);
+          }
         }
       }
-    });
-    const layerPlansDirectlyDependent: LayerPlan[] = [];
+    }
+
+    // TODO: make this calculation faster
+    for (let i = 0, l = this.steps.length; i < l; i++) {
+      const s = this.steps[i];
+      if (
+        s &&
+        s.id === i &&
+        s.dependencies.some((d) => this.steps[d] === step)
+      ) {
+        if (s.layerPlan === step.layerPlan) {
+          return;
+        } else {
+          dependentLayerPlans.add(s.layerPlan);
+        }
+      }
+    }
+
     for (const layerPlan of this.layerPlans) {
       if (!layerPlan) continue;
       if (
         layerPlan.reason.type === "nullableBoundary" &&
         this.steps[layerPlan.rootStepId!] === step
       ) {
-        layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
+        dependentLayerPlans.add(layerPlan.parentLayerPlan!);
       }
 
       // Very much a copy from treeShakeSteps
       if ("parentPlanId" in layerPlan.reason) {
         if (this.steps[layerPlan.reason.parentPlanId] === step) {
-          layerPlansDirectlyDependent.push(layerPlan.parentLayerPlan!);
+          dependentLayerPlans.add(layerPlan.parentLayerPlan!);
         }
       }
       if (layerPlan.rootStepId) {
         if (this.steps[layerPlan.rootStepId] === step) {
-          layerPlansDirectlyDependent.push(layerPlan);
+          dependentLayerPlans.add(layerPlan);
         }
       }
       for (const typeRootStepId of Object.values(
         layerPlan.rootStepIdByTypeName,
       )) {
         if (this.steps[typeRootStepId] === step) {
-          layerPlansDirectlyDependent.push(layerPlan);
+          dependentLayerPlans.add(layerPlan);
         }
       }
     }
-    const dependentLayerPlans = [
-      ...new Set([
-        ...dependentSteps.map((s) => s.layerPlan),
-        ...dependentOutputPlans.map((op) => op.layerPlan),
-        ...layerPlansDirectlyDependent,
-      ]),
-    ];
-    if (dependentLayerPlans.length === 0) {
+    if (dependentLayerPlans.size === 0) {
       throw new Error(`Nothing depends on ${step}?!`);
     }
-    if (dependentLayerPlans.includes(step.layerPlan)) {
-      // Already as deep as it can go
+    if (dependentLayerPlans.has(step.layerPlan)) {
+      // Already as deep as it can go...
       return;
     }
 
@@ -2321,7 +2331,7 @@ export class OperationPlan {
       minPathLength = Math.min(path.length, minPathLength);
     }
 
-    const dependentLayerPlanCount = dependentLayerPlans.length;
+    const dependentLayerPlanCount = dependentLayerPlans.size;
 
     let deepest = step.layerPlan;
     outerloop: for (let i = 0; i < minPathLength; i++) {
