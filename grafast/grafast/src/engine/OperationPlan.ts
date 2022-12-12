@@ -1792,8 +1792,8 @@ export class OperationPlan {
         if (ordered.includes(step)) {
           return;
         }
-        const deps = step.dependencies.map((depId) => this.steps[depId]);
-        for (const dep of deps) {
+        for (const depId of step.dependencies) {
+          const dep = this.steps[depId];
           if (steps.includes(dep)) {
             process(dep);
           }
