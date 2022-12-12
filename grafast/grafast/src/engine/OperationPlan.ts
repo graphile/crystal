@@ -1790,7 +1790,7 @@ export class OperationPlan {
       const ordered = new Set<ExecutableStep>();
       /** Adds 'step' to ordered, ensuring that all step's dependencies are there first */
       const process = (step: ExecutableStep) => {
-        if (ordered.has(step)) {
+        if (isDev && ordered.has(step)) {
           throw new Error(
             "Please ensure this step hasn't already been processed",
           );
