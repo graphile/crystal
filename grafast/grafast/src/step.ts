@@ -232,7 +232,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * Just for mermaid
    * @internal
    */
-  public dependentPlans: Array<ExecutableStep> = [];
+  public dependentSteps: Array<ExecutableStep> = [];
 
   /**
    * Every layer plan has exactly one parent step. This is the reverse relationship.

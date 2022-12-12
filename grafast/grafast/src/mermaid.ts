@@ -208,7 +208,7 @@ export function printPlanGraph(
         } else {
           if (
             concise &&
-            plan.dependentPlans.length === 0 &&
+            plan.dependentSteps.length === 0 &&
             depNodes.length === 1
           ) {
             // Try alternating the nodes so they render closer together

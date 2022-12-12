@@ -2661,7 +2661,7 @@ export class OperationPlan {
           // Overwrite the dependency id with its resolved ID so we don't need
           // to look it up in executeBucket
           (step.dependencies as number[])[i] = dep.id;
-          dep.dependentPlans.push(step);
+          dep.dependentSteps.push(step);
           if (dep.layerPlan === step.layerPlan) {
             dep.sameLayerDependentPlans.push(step);
             step._sameLayerDependencies.push(dep.id);
