@@ -159,7 +159,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * The step that represents the root value. How this is used depends on the
    * OutputPlanMode.
    */
-  public rootStepId: number;
+  public readonly rootStep: ExecutableStep;
 
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
@@ -220,8 +220,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     locationDetails: LocationDetails,
   ) {
     this.locationDetails = locationDetails;
-    this.rootStepId = rootStep.id;
-    layerPlan.operationPlan.stepTracker.addOutputPlan(this, rootStep);
+    this.rootStep = rootStep;
+    layerPlan.operationPlan.stepTracker.addOutputPlan(this);
   }
 
   public print(): string {
@@ -262,7 +262,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   toString() {
-    return `OutputPlan<${this.type.mode}∈${this.layerPlan.id}!${this.rootStepId}>`;
+    return `OutputPlan<${this.type.mode}∈${this.layerPlan.id}!${this.rootStep.id}>`;
   }
 
   addChild(
@@ -417,14 +417,17 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
 
   optimize(): void {
     const $root = this.layerPlan.operationPlan.dangerouslyGetStep(
-      this.rootStepId,
+      this.rootStep.id,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
       const expression = $root.unbatchedExecute![expressionSymbol];
       if (expression && expression.length > 0) {
         // @ts-ignore
         const $parent: ExecutableStep<any> = $root.getDep(0);
-        this.rootStepId = $parent.id;
+        this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
+          this,
+          $parent,
+        );
         this.processRoot = new Function(
           "value",
           `return value${expression};`,
@@ -434,10 +437,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   finalize(): void {
-    this.rootStepId = this.layerPlan.operationPlan.dangerouslyGetStep(
-      this.rootStepId,
-    ).id;
-
     // Build the executor
     switch (this.type.mode) {
       case "null": {
@@ -744,7 +743,7 @@ function makeExecutor<TAsString extends boolean>(
   mutablePath,
   bucket,
   bucketIndex,
-  rawBucketRootValue = bucket.store.get(this.rootStepId)[bucketIndex]
+  rawBucketRootValue = bucket.store.get(this.rootStep.id)[bucketIndex]
 ) {
   const bucketRootValue = this.processRoot ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}\
@@ -784,7 +783,7 @@ function makeExecuteChildPlanCode(
       }
       const fieldResult = ${childOutputPlan}.${
       asString ? "executeString" : "execute"
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
       if (fieldResult == ${asString ? '"null"' : "null"}) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
@@ -797,7 +796,7 @@ function makeExecuteChildPlanCode(
       asString ? '"null"' : "null"
     } : ${childOutputPlan}.${
       asString ? "executeString" : "execute"
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStepId === this.rootStepId ? rawBucketRootValue : undefined);
+    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
         const error = coerceError(e, ${locationDetails}, mutablePath.slice(1));

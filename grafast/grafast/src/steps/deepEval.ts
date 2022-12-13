@@ -45,7 +45,7 @@ export class DeepEvalStep extends ExecutableStep {
       this.layerPlan,
       {
         type: "subroutine",
-        parentPlanId: this.id,
+        parentStep: this,
       },
       listPlan.polymorphicPaths,
     );
@@ -74,7 +74,7 @@ export class DeepEvalStep extends ExecutableStep {
         return $newListItem;
       },
     );
-    this.subroutineLayer.rootStepId = itemPlan.id;
+    this.subroutineLayer.setRootStep(itemPlan);
 
     this.opPlan.finishSubroutine(this, this.subroutineLayer);
   }
@@ -152,7 +152,7 @@ export class DeepEvalStep extends ExecutableStep {
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const depResults = store.get(childLayerPlan.rootStepId!)!;
+    const depResults = store.get(childLayerPlan.rootStep!.id)!;
 
     return listValues.map((list: any, originalIndex: number) => {
       if (list == null) {

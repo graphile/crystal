@@ -253,7 +253,7 @@ export function executePreemptive(
 
   const store: Bucket["store"] = new Map();
   store.set(-1, requestIndex);
-  store.set(operationPlan.rootLayerPlan.rootStepId!, requestIndex);
+  store.set(operationPlan.rootLayerPlan.rootStep!.id, requestIndex);
   store.set(operationPlan.variableValuesStep.id, vars);
   store.set(operationPlan.contextStep.id, ctxs);
   store.set(operationPlan.rootValueStep.id, rvs);
@@ -291,7 +291,7 @@ export function executePreemptive(
       store.set(depId, []);
     }
 
-    store.set(layerPlan.rootStepId!, [payload]);
+    store.set(layerPlan.rootStep!.id, [payload]);
     for (const depId of layerPlan.copyPlanIds) {
       store.get(depId)![newBucketIndex] =
         rootBucket.store.get(depId)![bucketIndex];
@@ -333,9 +333,10 @@ export function executePreemptive(
     // Later we'll need to loop
 
     // If it's a subscription we need to use the stream
-    const rootValueList = rootBucket.layerPlan.rootStepId
-      ? rootBucket.store.get(rootBucket.layerPlan.rootStepId)
-      : null;
+    const rootValueList =
+      rootBucket.layerPlan.rootStep!.id != null
+        ? rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)
+        : null;
     const bucketRootValue = rootValueList?.[0];
     if (isGrafastError(bucketRootValue)) {
       // Something major went wrong!
@@ -640,7 +641,7 @@ async function processStream(
       directLayerPlanChild = parent;
     }
 
-    const listItemStepId = directLayerPlanChild.rootStepId!;
+    const listItemStepId = directLayerPlanChild.rootStep!.id;
     const listItemStepIdList: any[] = [];
     store.set(listItemStepId, listItemStepIdList);
 

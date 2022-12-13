@@ -253,8 +253,10 @@ export function printPlanGraph(
                 .join(", ")}\n`
             : ""
         }${pp(layerPlan.polymorphicPaths)}${
-          layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
-            ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
+          layerPlan.rootStep != null && layerPlan.reason.type !== "root"
+            ? `\nROOT ${operationPlan.dangerouslyGetStep(
+                layerPlan.rootStep.id,
+              )}`
             : ""
         }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
       )}):::bucket`,

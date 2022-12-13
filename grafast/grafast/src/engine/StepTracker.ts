@@ -1,6 +1,12 @@
 import { isDev } from "../dev.js";
 import type { ExecutableStep } from "../step";
-import type { LayerPlan } from "./LayerPlan";
+import type {
+  LayerPlan,
+  LayerPlanReasonListItem,
+  LayerPlanReasonNullableField,
+  LayerPlanReasonPolymorphic,
+  LayerPlanReasonSubroutine,
+} from "./LayerPlan";
 import type { OutputPlan } from "./OutputPlan";
 
 /**
@@ -33,14 +39,19 @@ export class StepTracker {
     [stepId: number]: ExecutableStep;
   } = [];
 
-  private rootStepByOutputPlan = new Map<OutputPlan, ExecutableStep>();
-  private outputPlansByRootStep = new Map<ExecutableStep, OutputPlan[]>();
-
-  private rootStepByLayerPlan = new Map<LayerPlan, ExecutableStep>();
-  private layerPlansByRootStep = new Map<ExecutableStep, LayerPlan[]>();
-
-  private parentStepByLayerPlan = new Map<LayerPlan, ExecutableStep>();
-  private layerPlansByParentStep = new Map<ExecutableStep, LayerPlan[]>();
+  private outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
+  private layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
+  private layerPlansByParentStep = new Map<
+    ExecutableStep,
+    Set<
+      LayerPlan<
+        | LayerPlanReasonNullableField
+        | LayerPlanReasonListItem
+        | LayerPlanReasonPolymorphic
+        | LayerPlanReasonSubroutine
+      >
+    >
+  >();
 
   /** @internal */
   public layerPlans: Array<LayerPlan | null> = [];
@@ -56,9 +67,9 @@ export class StepTracker {
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     this.stepById[stepId] = $step;
-    this.outputPlansByRootStep.set($step, []);
-    this.layerPlansByRootStep.set($step, []);
-    this.layerPlansByParentStep.set($step, []);
+    this.outputPlansByRootStep.set($step, new Set());
+    this.layerPlansByRootStep.set($step, new Set());
+    this.layerPlansByParentStep.set($step, new Set());
     return stepId;
   }
 
@@ -66,15 +77,44 @@ export class StepTracker {
    * @internal
    */
   public addLayerPlan(layerPlan: LayerPlan) {
-    return this.layerPlans.push(layerPlan) - 1;
+    const id = this.layerPlans.push(layerPlan) - 1;
+    switch (layerPlan.reason.type) {
+      case "root":
+      case "subscription":
+      case "mutationField":
+      case "defer": {
+        break;
+      }
+      case "nullableBoundary":
+      case "listItem":
+      case "polymorphic":
+      case "subroutine": {
+        this.layerPlansByParentStep
+          .get(layerPlan.reason.parentStep)!
+          .add(
+            layerPlan as LayerPlan<
+              | LayerPlanReasonNullableField
+              | LayerPlanReasonListItem
+              | LayerPlanReasonPolymorphic
+              | LayerPlanReasonSubroutine
+            >,
+          );
+        break;
+      }
+      default: {
+        const never: never = layerPlan.reason;
+        throw new Error(`Unexpected layerPlan reason ${(never as any).type}`);
+      }
+    }
+    return id;
   }
 
   /**
    * @internal
    */
-  public addOutputPlan(outputPlan: OutputPlan, $root: ExecutableStep): void {
+  public addOutputPlan(outputPlan: OutputPlan): void {
     this.allOutputPlans.push(outputPlan);
-    this.setOutputPlanRootStep(outputPlan, $root);
+    this.outputPlansByRootStep.get(outputPlan.rootStep)!.add(outputPlan);
   }
 
   /**
@@ -136,64 +176,29 @@ export class StepTracker {
     return dependencyIndex;
   }
 
-  public getStepDependencies(
-    $step: ExecutableStep,
-  ): ReadonlyArray<ExecutableStep> {
-    return $step.dependencies;
-  }
-
   public setOutputPlanRootStep(
     outputPlan: OutputPlan,
     $dependency: ExecutableStep,
   ) {
-    const $existing = this.rootStepByOutputPlan.get(outputPlan);
+    const $existing = outputPlan.rootStep;
     if ($existing) {
-      throw new Error(`Root step replacement not yet supported`);
+      // TODO: Cleanup, tree shake, etc
+      this.outputPlansByRootStep.get($existing)!.delete(outputPlan);
     }
-    this.rootStepByOutputPlan.set(outputPlan, $dependency);
-    this.outputPlansByRootStep.get($dependency)!.push(outputPlan);
-  }
-
-  public getOutputPlanRootStep(
-    outputPlan: OutputPlan,
-  ): ExecutableStep | undefined {
-    return this.rootStepByOutputPlan.get(outputPlan);
+    (outputPlan.rootStep as any) = $dependency;
+    this.outputPlansByRootStep.get($dependency)!.add(outputPlan);
   }
 
   public setLayerPlanRootStep(
     layerPlan: LayerPlan,
     $dependency: ExecutableStep,
   ) {
-    const $existing = this.rootStepByLayerPlan.get(layerPlan);
+    const $existing = layerPlan.rootStep;
     if ($existing) {
       throw new Error(`Root step replacement not yet supported`);
     }
-    this.rootStepByLayerPlan.set(layerPlan, $dependency);
-    this.layerPlansByRootStep.get($dependency)!.push(layerPlan);
-  }
-
-  public getLayerPlanRootStep(
-    layerPlan: LayerPlan,
-  ): ExecutableStep | undefined {
-    return this.rootStepByLayerPlan.get(layerPlan);
-  }
-
-  public setLayerPlanParentStep(
-    layerPlan: LayerPlan,
-    $dependency: ExecutableStep,
-  ) {
-    const $existing = this.parentStepByLayerPlan.get(layerPlan);
-    if ($existing) {
-      throw new Error(`Parent step replacement not yet supported`);
-    }
-    this.parentStepByLayerPlan.set(layerPlan, $dependency);
-    this.layerPlansByParentStep.get($dependency)!.push(layerPlan);
-  }
-
-  public getLayerPlanParentStep(
-    layerPlan: LayerPlan,
-  ): ExecutableStep | undefined {
-    return this.parentStepByLayerPlan.get(layerPlan);
+    (layerPlan.rootStep as any) = $dependency;
+    this.layerPlansByRootStep.get($dependency)!.add(layerPlan);
   }
 
   /** @internal */
@@ -220,10 +225,10 @@ export class StepTracker {
       const outputPlansByReplacementStep =
         this.outputPlansByRootStep.get($replacement)!;
       for (const outputPlan of outputPlans) {
-        this.rootStepByOutputPlan.set(outputPlan, $replacement);
-        outputPlansByReplacementStep.push(outputPlan);
+        (outputPlan.rootStep as any) = $replacement;
+        outputPlansByReplacementStep.add(outputPlan);
       }
-      this.outputPlansByRootStep.set($original, []);
+      this.outputPlansByRootStep.set($original, new Set());
     }
 
     {
@@ -232,10 +237,10 @@ export class StepTracker {
       const layerPlansByReplacementRootStep =
         this.layerPlansByRootStep.get($replacement)!;
       for (const layerPlan of layerPlans) {
-        this.rootStepByLayerPlan.set(layerPlan, $replacement);
-        layerPlansByReplacementRootStep.push(layerPlan);
+        (layerPlan.rootStep as any) = $replacement;
+        layerPlansByReplacementRootStep.add(layerPlan);
       }
-      this.layerPlansByRootStep.set($original, []);
+      this.layerPlansByRootStep.set($original, new Set());
     }
 
     // TODO: had to add the code ensuring all the layer plan parentPlanId's
@@ -247,10 +252,10 @@ export class StepTracker {
       const layerPlansByReplacementParentStep =
         this.layerPlansByParentStep.get($replacement)!;
       for (const layerPlan of layerPlans) {
-        this.parentStepByLayerPlan.set(layerPlan, $replacement);
-        layerPlansByReplacementParentStep.push(layerPlan);
+        (layerPlan.reason.parentStep as any) = $replacement;
+        layerPlansByReplacementParentStep.add(layerPlan);
       }
-      this.layerPlansByParentStep.set($original, []);
+      this.layerPlansByParentStep.set($original, new Set());
     }
 
     // TODO: ensure side-effect plans are handled nicely
@@ -288,9 +293,9 @@ export class StepTracker {
       if (
         dependents.size === 0 &&
         !$dependency.hasSideEffects &&
-        this.outputPlansByRootStep.get($dependency)!.length === 0 &&
-        this.layerPlansByRootStep.get($dependency)!.length === 0 &&
-        this.layerPlansByParentStep.get($dependency)!.length === 0
+        this.outputPlansByRootStep.get($dependency)!.size === 0 &&
+        this.layerPlansByRootStep.get($dependency)!.size === 0 &&
+        this.layerPlansByParentStep.get($dependency)!.size === 0
       ) {
         // Nothing depends on $dependency and it has no side effects - we can get rid of it!
         this.eradicate($dependency);
