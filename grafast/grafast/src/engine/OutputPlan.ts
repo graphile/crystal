@@ -221,7 +221,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   ) {
     this.locationDetails = locationDetails;
     this.rootStepId = rootStep.id;
-    layerPlan.operationPlan.allOutputPlans.push(this);
+    layerPlan.operationPlan.stepTracker.addOutputPlan(this, rootStep);
   }
 
   public print(): string {

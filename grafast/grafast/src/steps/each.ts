@@ -59,7 +59,7 @@ export function each<
     }`,
     optimize(this) {
       const layerPlan = this.subroutineLayer;
-      const rootStep = this.opPlan.dangerouslyGetStep(layerPlan.rootStepId!);
+      const rootStep = this.opPlan.stepTracker.getLayerPlanRootStep(layerPlan);
       if (
         rootStep instanceof __ItemStep &&
         this.opPlan.dangerouslyGetStep(rootStep.dependencies[0]).layerPlan !==

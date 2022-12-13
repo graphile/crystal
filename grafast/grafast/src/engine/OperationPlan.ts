@@ -68,7 +68,6 @@ import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import {
-  arraysMatch,
   defaultValueToValueNode,
   findVariableNamesUsed,
   isTypePlanned,
@@ -140,8 +139,6 @@ export class OperationPlan {
   public loc: string[] = [];
 
   /** @internal */
-  public layerPlans: Array<LayerPlan | null> = [];
-  /** @internal */
   public rootLayerPlan: LayerPlan;
   /**
    * Assigned during OperationPlan.planOperation(), guaranteed to exist after
@@ -150,19 +147,13 @@ export class OperationPlan {
    * @internal
    */
   public rootOutputPlan!: OutputPlan;
-  /**
-   * All the OutputPlans that were created to allow a more efficient
-   * walkOutputPlans implementation.
-   *
-   * @internal
-   */
-  public allOutputPlans: OutputPlan[] = [];
 
   private modifierStepCount = 0;
   private modifierDepthCount = 0;
   private modifierSteps: ModifierStep[] = [];
 
-  private readonly stepTracker = new StepTracker();
+  /** @internal */
+  public readonly stepTracker = new StepTracker();
 
   private maxDeduplicatedStepId = -1;
   private maxValidatedStepId = -1;
@@ -308,7 +299,7 @@ export class OperationPlan {
     // this.preparePrefetches();
 
     const allMetaKeys = new Set<string | number | symbol>();
-    for (const step of this.stepTracker.steps) {
+    for (const step of this.stepTracker.activeSteps) {
       allMetaKeys.add(step.metaKey);
     }
     const allMetaKeysList = [...allMetaKeys];
@@ -328,7 +319,7 @@ export class OperationPlan {
    * @internal
    */
   public addLayerPlan(layerPlan: LayerPlan) {
-    return this.layerPlans.push(layerPlan) - 1;
+    return this.stepTracker.addLayerPlan(layerPlan);
   }
 
   /**
@@ -1081,7 +1072,7 @@ export class OperationPlan {
           );
           const deferredOutputPlan = new OutputPlan(
             deferredLayerPlan,
-            this.stepTracker.getOutputPlanRootStep(outputPlan),
+            this.stepTracker.getOutputPlanRootStep(outputPlan)!,
             {
               mode: "object",
               deferLabel: deferred.label,
@@ -1239,7 +1230,7 @@ export class OperationPlan {
         const match = parentLayerPlan.children.find(
           (clp) =>
             clp.reason.type === "nullableBoundary" &&
-            this.stepTracker.getLayerPlanParentStep(cpp) === $step,
+            this.stepTracker.getLayerPlanParentStep(clp) === $step,
         );
         if (match) {
           objectLayerPlan = match;
@@ -1739,12 +1730,12 @@ export class OperationPlan {
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutableStep<any>) => ExecutableStep<any>,
   ): void {
-    if (fromStepId === this.stepCount) {
+    if (fromStepId === this.stepTracker.stepCount) {
       // Nothing to do since there are no plans to process
       return;
     }
 
-    let previousStepCount = this.stepCount;
+    let previousStepCount = this.stepTracker.stepCount;
     let steps: ExecutableStep[] = [];
 
     /** Sort steps into the order to be processed. */
@@ -1758,7 +1749,7 @@ export class OperationPlan {
             "Please ensure this step hasn't already been processed",
           );
         }
-        for (const dep of this.stepTracker.getStepDependenies(step)) {
+        for (const dep of this.stepTracker.getStepDependencies(step)) {
           if (!ordered.has(dep) && steps.includes(dep)) {
             process(dep);
           }
@@ -1820,17 +1811,17 @@ export class OperationPlan {
         this.replaceStep(step, replacementStep);
       }
 
-      if (this.stepCount > previousStepCount) {
+      if (this.stepTracker.stepCount > previousStepCount) {
         // We've generated new steps; they must be processed too!
         const firstNewStepId = previousStepCount;
-        previousStepCount = this.stepCount;
+        previousStepCount = this.stepTracker.stepCount;
         processStepsFrom(firstNewStepId);
       }
 
       return replacementStep;
     };
 
-    const oldPlanCount = this.stepCount;
+    const oldPlanCount = this.stepTracker.stepCount;
     let step;
     while ((step = steps.pop())) {
       if (!this.stepTracker.activeSteps.has(step)) {
@@ -1838,10 +1829,10 @@ export class OperationPlan {
         continue;
       }
       const resultStep = processStep(step);
-      const plansAdded = this.stepCount - oldPlanCount;
+      const plansAdded = this.stepTracker.stepCount - oldPlanCount;
 
       // NOTE: whilst processing steps new steps may be added, thus we must loop
-      // ascending and we must re-evaluate this.stepCount on each loop
+      // ascending and we must re-evaluate this.stepTracker.stepCount on each loop
       // iteration.
       if (isDev && plansAdded > 100000) {
         throw new Error(
@@ -1850,7 +1841,7 @@ export class OperationPlan {
       }
     }
 
-    if (this.phase !== "plan" && this.stepCount > oldPlanCount) {
+    if (this.phase !== "plan" && this.stepTracker.stepCount > oldPlanCount) {
       // Any time new steps are added we should validate them. All plans are
       // validated once "plan" is finished, so no need to do it here for that
       // phase.
@@ -1878,7 +1869,7 @@ export class OperationPlan {
     const compatibleLayerPlans = new Set<LayerPlan>();
     let currentLayerPlan: LayerPlan | null = step.layerPlan;
     const doNotPass = new Set<LayerPlan>();
-    for (const dep of this.stepTracker.getStepDependenies(step)) {
+    for (const dep of this.stepTracker.getStepDependencies(step)) {
       doNotPass.add(dep.layerPlan);
     }
 
@@ -1904,17 +1895,19 @@ export class OperationPlan {
     const l = step.dependencies.length;
     if (l > 0) {
       let allPotentialPeers!: Set<ExecutableStep>;
-      for (const dep of this.stepTracker.getStepDependenies(step)) {
+      const deps = this.stepTracker.getStepDependencies(step);
+      for (let i = 0, l = deps.length; i < l; i++) {
+        const dep = deps[i];
         // TODO: replace this with precomputed
-        const depDependentSteps = this.stepTracker.activeSteps.filter(
+        const depDependentSteps = [...this.stepTracker.activeSteps].filter(
           (s) =>
             s.dependencies.length === l &&
-            this.stepTracker.getStepDependenies(s).inludes(dep),
+            this.stepTracker.getStepDependencies(s).includes(dep),
         );
         const potentialPeers = new Set(
           depDependentSteps.filter(
             (potentialPeer) =>
-              this.stepTracker.getStepDependenies(potentialPeer)[i] === dep &&
+              this.stepTracker.getStepDependencies(potentialPeer)[i] === dep &&
               isMaybeAPeer(potentialPeer),
           ),
         );
@@ -1936,7 +1929,7 @@ export class OperationPlan {
     } else {
       return [
         step,
-        ...this.stepTracker.activeSteps.filter(
+        ...[...this.stepTracker.activeSteps].filter(
           (s) => s.dependencies.length === 0 && isMaybeAPeer(s),
         ),
       ];
@@ -1951,7 +1944,7 @@ export class OperationPlan {
       return true;
     }
     // TODO:perf: we should calculate this _once only_ rather than for every step!
-    const subroutineParentSteps = this.layerPlans
+    const subroutineParentSteps = this.stepTracker.layerPlans
       .filter(
         (p): p is LayerPlan<LayerPlanReasonSubroutine> =>
           !!(p && p.reason.type === "subroutine"),
@@ -2006,7 +1999,7 @@ export class OperationPlan {
       }
       case "nullableBoundary": {
         // Safe to hoist _unless_ it depends on the root step of the nullableBoundary.
-        const $root = this.stepTracker.getLayerPlanParentStep(step.layerPlan);
+        const $root = this.stepTracker.getLayerPlanParentStep(step.layerPlan)!;
         if (this.stepTracker.getStepDependencies(step).includes($root)) {
           return;
         } else {
@@ -2143,7 +2136,7 @@ export class OperationPlan {
     // Now find the lowest bucket that still satisfies all of it's dependents.
     const dependentLayerPlans = new Set<LayerPlan>();
 
-    for (const outputPlan of this.allOutputPlans) {
+    for (const outputPlan of this.stepTracker.allOutputPlans) {
       const outputPlanRootStep =
         this.stepTracker.getOutputPlanRootStep(outputPlan);
       if (outputPlanRootStep) {
@@ -2168,7 +2161,7 @@ export class OperationPlan {
       }
     }
 
-    for (const layerPlan of this.layerPlans) {
+    for (const layerPlan of this.stepTracker.layerPlans) {
       if (!layerPlan) continue;
       if (
         layerPlan.reason.type === "nullableBoundary" &&
@@ -2423,7 +2416,7 @@ export class OperationPlan {
       "dependencies-first",
       (step) => this.deduplicateStep(step),
     );
-    this.maxDeduplicatedStepId = this.stepCount - 1;
+    this.maxDeduplicatedStepId = this.stepTracker.stepCount - 1;
   }
 
   private hoistSteps() {
@@ -2534,7 +2527,7 @@ export class OperationPlan {
 
   /** Finalizes each step */
   private finalizeSteps(): void {
-    const initialStepCount = this.stepCount;
+    const initialStepCount = this.stepTracker.stepCount;
     assert.strictEqual(
       this.modifierSteps.length,
       0,
@@ -2545,13 +2538,13 @@ export class OperationPlan {
       assertFinalized(step);
       if (isDev) {
         assert.strictEqual(
-          this.stepCount,
+          this.stepTracker.stepCount,
           initialStepCount,
           `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
         );
       }
       step._sameLayerDependencies = [];
-      for (const dep of this.stepTracker.getStepDependenies(step)) {
+      for (const dep of this.stepTracker.getStepDependencies(step)) {
         if (dep.layerPlan === step.layerPlan) {
           dep.sameLayerDependentPlans.push(step);
           step._sameLayerDependencies.push(dep.id);
@@ -2585,11 +2578,13 @@ export class OperationPlan {
       }
     };
 
-    for (const layerPlan of this.layerPlans) {
+    for (const layerPlan of this.stepTracker.layerPlans) {
       if (!layerPlan) {
         continue;
       }
-      layerPlan.steps = this.allSteps.filter((s) => s.layerPlan === layerPlan);
+      layerPlan.steps = [...this.stepTracker.activeSteps].filter(
+        (s) => s.layerPlan === layerPlan,
+      );
       layerPlan.pendingSteps = layerPlan.steps.filter((s) => !($$noExec in s));
       const sideEffectSteps = layerPlan.pendingSteps.filter(
         (s) => s.hasSideEffects,
@@ -2740,20 +2735,20 @@ export class OperationPlan {
       }
 
       if (layerPlan.rootStepId) {
-        const $root = this.stepTracker.getLayerPlanRootStep(layerPlan);
+        const $root = this.stepTracker.getLayerPlanRootStep(layerPlan)!;
         layerPlan.rootStepId = $root.id;
         ensurePlanAvailableInLayer($root, layerPlan);
       }
 
       // Copy polymorphic parentPlanId
       if (layerPlan.reason.type === "polymorphic") {
-        const parentStep = this.stepTracker.getLayerPlanParentStep(layerPlan);
+        const parentStep = this.stepTracker.getLayerPlanParentStep(layerPlan)!;
         ensurePlanAvailableInLayer(parentStep, layerPlan);
       }
 
       // Ensure list is accessible in parent layerPlan
       if (layerPlan.reason.type === "listItem") {
-        const parentStep = this.stepTracker.getLayerPlanParentStep(layerPlan);
+        const parentStep = this.stepTracker.getLayerPlanParentStep(layerPlan)!;
         ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
       }
 
@@ -2769,12 +2764,14 @@ export class OperationPlan {
         case "subroutine":
         case "polymorphic":
         case "listItem": {
-          const parentStep = this.stepTracker.getLayerPlanParentStep(layerPlan);
+          const parentStep =
+            this.stepTracker.getLayerPlanParentStep(layerPlan)!;
           reason.parentPlanId = parentStep.id;
           break;
         }
         case "nullableBoundary": {
-          const parentStep = this.stepTracker.getLayerPlanParentStep(layerPlan);
+          const parentStep =
+            this.stepTracker.getLayerPlanParentStep(layerPlan)!;
           reason.parentStepId = parentStep.id;
           break;
         }
@@ -2790,12 +2787,12 @@ export class OperationPlan {
     }
 
     // Populate copyPlanIds for output plans' rootStepId
-    this.allOutputPlans.forEach((outputPlan) => {
-      const rootPlan = this.stepTracker.getOutputPlanRootStep(outputPlan);
+    this.stepTracker.allOutputPlans.forEach((outputPlan) => {
+      const rootPlan = this.stepTracker.getOutputPlanRootStep(outputPlan)!;
       ensurePlanAvailableInLayer(rootPlan, outputPlan.layerPlan);
     });
 
-    for (const layerPlan of this.layerPlans) {
+    for (const layerPlan of this.stepTracker.layerPlans) {
       if (layerPlan) {
         layerPlan.finalize();
       }
@@ -2804,12 +2801,16 @@ export class OperationPlan {
 
   /** Optimizes each output plan */
   private optimizeOutputPlans(): void {
-    this.allOutputPlans.forEach((outputPlan) => outputPlan.optimize());
+    this.stepTracker.allOutputPlans.forEach((outputPlan) =>
+      outputPlan.optimize(),
+    );
   }
 
   /** Finalizes each output plan */
   private finalizeOutputPlans(): void {
-    this.allOutputPlans.forEach((outputPlan) => outputPlan.finalize());
+    this.stepTracker.allOutputPlans.forEach((outputPlan) =>
+      outputPlan.finalize(),
+    );
   }
 
   private walkOutputPlans(
@@ -2840,7 +2841,7 @@ export class OperationPlan {
    */
   printPlanGraph(options: PrintPlanGraphOptions = {}): string {
     return printPlanGraph(this, options, {
-      steps: [...this.stepTracker.allSteps],
+      steps: [...this.stepTracker.activeSteps],
     });
   }
 
@@ -2851,7 +2852,7 @@ export class OperationPlan {
     // Now find anything that these plans are dependent on and make ourself
     // dependent on them.
     const process = (lp: LayerPlan, known: LayerPlan[]) => {
-      for (const step of this.stepTracker.allSteps) {
+      for (const step of this.stepTracker.activeSteps) {
         if (step.layerPlan === lp) {
           for (const dep of this.stepTracker.getStepDependencies(step)) {
             if (!known.includes(dep.layerPlan)) {
@@ -2873,43 +2874,14 @@ export class OperationPlan {
    *
    * @internal
    */
-  deleteLayerPlan(layerPlan: LayerPlan) {
-    if (isDev) {
-      // TODO: validate assertions
-      if (layerPlan.children.length > 0) {
-        throw new Error(
-          "This layer plan has children... should we really be deleting it?!",
-        );
-      }
-      this.allOutputPlans.forEach((o) => {
-        if (o.layerPlan === layerPlan) {
-          throw new Error(
-            "An output plan depends on this layer plan... should we really be deleting it?!",
-          );
-        }
-      });
-    }
-    this.layerPlans[layerPlan.id] = null;
-    // Remove layerPlan from its parent
-    if (layerPlan.parentLayerPlan) {
-      const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
-      if (idx >= 0) {
-        layerPlan.parentLayerPlan.children.splice(idx, 1);
-      }
-    }
-    // Remove all plans in this layer
-    for (const step of this.stepTracker.allSteps) {
-      if (step.layerPlan === layerPlan) {
-        this.steps[id] = null as any;
-      }
-    }
+  public deleteLayerPlan(layerPlan: LayerPlan) {
+    this.stepTracker.deleteLayerPlan(layerPlan);
   }
 
   getStepsByMetaKey(metaKey: string | number | symbol): ExecutableStep[] {
     const matches: ExecutableStep[] = [];
-    for (let id = 0, l = this.steps.length; id < l; id++) {
-      const step = this.steps[id];
-      if (step && step.id === id && step.metaKey === metaKey) {
+    for (const step of this.stepTracker.activeSteps) {
+      if (step.metaKey === metaKey) {
         matches.push(step);
       }
     }
@@ -2920,9 +2892,8 @@ export class OperationPlan {
     new (...args: any[]): TClass;
   }): TClass[] {
     const matches: TClass[] = [];
-    for (let id = 0, l = this.steps.length; id < l; id++) {
-      const step = this.steps[id];
-      if (step && step.id === id && step instanceof klass) {
+    for (const step of this.stepTracker.activeSteps) {
+      if (step instanceof klass) {
         matches.push(step);
       }
     }

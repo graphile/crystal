@@ -1,3 +1,4 @@
+import { isDev } from "../dev";
 import type { ExecutableStep } from "../step";
 import type { LayerPlan } from "./LayerPlan";
 import type { OutputPlan } from "./OutputPlan";
@@ -10,8 +11,10 @@ import type { OutputPlan } from "./OutputPlan";
  * such that the replaced step simply evaporates.
  */
 export class StepTracker {
-  private stepCount = 0;
-  private activeSteps = new Set<ExecutableStep>();
+  /** @internal */
+  public stepCount = 0;
+  /** @internal */
+  public activeSteps = new Set<ExecutableStep>();
   private stepById: {
     [stepId: number]: ExecutableStep;
   } = [];
@@ -31,6 +34,16 @@ export class StepTracker {
   private parentStepByLayerPlan = new Map<LayerPlan, ExecutableStep>();
   private layerPlansByParentStep = new Map<ExecutableStep, LayerPlan[]>();
 
+  /** @internal */
+  public layerPlans: Array<LayerPlan | null> = [];
+  /**
+   * All the OutputPlans that were created to allow a more efficient
+   * walkOutputPlans implementation.
+   *
+   * @internal
+   */
+  public allOutputPlans: OutputPlan[] = [];
+
   public addStep($step: ExecutableStep): number {
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
@@ -41,6 +54,59 @@ export class StepTracker {
     this.layerPlansByRootStep.set($step, []);
     this.layerPlansByParentStep.set($step, []);
     return stepId;
+  }
+
+  /**
+   * @internal
+   */
+  public addLayerPlan(layerPlan: LayerPlan) {
+    return this.layerPlans.push(layerPlan) - 1;
+  }
+
+  /**
+   * @internal
+   */
+  public addOutputPlan(outputPlan: OutputPlan, $root: ExecutableStep): void {
+    this.allOutputPlans.push(outputPlan);
+    this.setOutputPlanRootStep(outputPlan, $root);
+  }
+
+  /**
+   * HIGHLY EXPERIMENTAL!
+   *
+   * @internal
+   */
+  public deleteLayerPlan(layerPlan: LayerPlan) {
+    if (isDev) {
+      // TODO: validate assertions
+      if (layerPlan.children.length > 0) {
+        throw new Error(
+          "This layer plan has children... should we really be deleting it?!",
+        );
+      }
+      this.allOutputPlans.forEach((o) => {
+        if (o.layerPlan === layerPlan) {
+          throw new Error(
+            "An output plan depends on this layer plan... should we really be deleting it?!",
+          );
+        }
+      });
+    }
+    this.layerPlans[layerPlan.id] = null;
+    // Remove layerPlan from its parent
+    if (layerPlan.parentLayerPlan) {
+      const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
+      if (idx >= 0) {
+        layerPlan.parentLayerPlan.children.splice(idx, 1);
+      }
+    }
+    // Remove all plans in this layer
+    for (const step of this.activeSteps) {
+      if (step.layerPlan === layerPlan) {
+        this.stepById[step.id] = null as any;
+        this.eradicate(step);
+      }
+    }
   }
 
   public getStepById(id: number): ExecutableStep {
@@ -63,7 +129,7 @@ export class StepTracker {
     return dependencyIndex;
   }
 
-  public getStepDependenies(
+  public getStepDependencies(
     $step: ExecutableStep,
   ): ReadonlyArray<ExecutableStep> {
     return this.dependenciesByStep.get($step)!;
@@ -139,6 +205,7 @@ export class StepTracker {
           $replacement;
         replacementDependents.add({ step: $dependent, dependencyIndex });
       }
+      this.dependentsByStep.set($original, new Set());
     }
 
     {
@@ -150,6 +217,7 @@ export class StepTracker {
         this.rootStepByOutputPlan.set(outputPlan, $replacement);
         outputPlansByReplacementStep.push(outputPlan);
       }
+      this.outputPlansByRootStep.set($original, []);
     }
 
     {
@@ -161,6 +229,7 @@ export class StepTracker {
         this.rootStepByLayerPlan.set(layerPlan, $replacement);
         layerPlansByReplacementRootStep.push(layerPlan);
       }
+      this.layerPlansByRootStep.set($original, []);
     }
 
     // TODO: had to add the code ensuring all the layer plan parentPlanId's
@@ -175,6 +244,7 @@ export class StepTracker {
         this.parentStepByLayerPlan.set(layerPlan, $replacement);
         layerPlansByReplacementParentStep.push(layerPlan);
       }
+      this.layerPlansByParentStep.set($original, []);
     }
 
     // TODO: ensure side-effect plans are handled nicely
@@ -194,6 +264,10 @@ export class StepTracker {
    * then they can also be eradicated.
    */
   private eradicate($original: ExecutableStep) {
+    // TODO: first eradicate everything that depends on this step - steps,
+    // layer plans, output plans. (NOTE: if this call has come from replaceStep
+    // then there shouldn't be any dependents).
+
     // Since this step is being removed, it doesn't need its dependencies any more
     const oldDependencies = this.dependenciesByStep.get($original)!;
     this.dependenciesByStep.delete($original);
