@@ -151,6 +151,12 @@ export abstract class BaseStep {
       );
     }
   }
+
+  public destroy(): void {
+    // TODO: should we do something to deliberately break this class, such as
+    // deleting all its properties? That would ensure anything that tried to
+    // use it after it was destroyed would end up in error.
+  }
 }
 
 /**
