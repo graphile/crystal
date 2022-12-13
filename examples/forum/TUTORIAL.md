@@ -85,7 +85,7 @@ Run the following query to make sure things are working smoothly:
 It’s way easier to install PostGraphile. If you have npm, you practically have PostGraphile as well.
 
 ```
-$ npm install -g PostGraphile
+$ npm install -g postgraphile
 ```
 
 To run PostGraphile, you’ll use the same URL that you used for `psql`:
@@ -519,7 +519,7 @@ This function will create a user and their account, but how will we log the user
 
 ### Postgres Roles
 
-When a user logs in, we want them to make their queries using a specific PostGraphile role. Using that role we can define rules that restrict what data the user may access. So what roles do we need to define for our forum example? Remember when we were connecting to Postgres and we used a URL like `postgres://localhost:5432/mydb`? Well, when you use a connection string like that, you are logging into Postgres using your computer account’s username and no password. Say your computer account username is `buddy`, then connecting with the URL `postgres://localhost:5432/mydb`, would be the same as connecting with the URL `postgres://buddy@localhost:5432/mydb`. If you wanted to connect to your Postgres database with a password it would look like `postgres://buddy:password@localhost:5432/mydb`. When you run Postgres locally, this account will probably be the superuser. So when you run `PostGraphile -c postgres://localhost:5432/mydb`, you are running PostGraphile with superuser privileges. To change that let’s create a role that PostGraphile can use to connect to our database:
+When a user logs in, we want them to make their queries using a specific PostGraphile role. Using that role we can define rules that restrict what data the user may access. So what roles do we need to define for our forum example? Remember when we were connecting to Postgres and we used a URL like `postgres://localhost:5432/mydb`? Well, when you use a connection string like that, you are logging into Postgres using your computer account’s username and no password. Say your computer account username is `buddy`, then connecting with the URL `postgres://localhost:5432/mydb`, would be the same as connecting with the URL `postgres://buddy@localhost:5432/mydb`. If you wanted to connect to your Postgres database with a password it would look like `postgres://buddy:password@localhost:5432/mydb`. When you run Postgres locally, this account will probably be the superuser. So when you run `postgraphile -c postgres://localhost:5432/mydb`, you are running PostGraphile with superuser privileges. To change that let’s create a role that PostGraphile can use to connect to our database:
 
 ```sql
 create role forum_example_postgraphile login password 'xyz';
@@ -535,13 +535,13 @@ When a user who does not have a JWT token makes a request to Postgres, we do not
 
 ```sql
 create role forum_example_anonymous;
-grant forum_example_anonymous to forum_example_PostGraphile;
+grant forum_example_anonymous to forum_example_postgraphile;
 ```
 
 Here we use [`CREATE ROLE`](https://www.postgresql.org/docs/current/static/sql-createrole.html) again. This role cannot login so it does not have the `login` option, or a password. We also use the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command to grant access to the `forum_example_anonymous` role to the `forum_example_postgraphile` role. Now, the `forum_example_postgraphile` role can control and become the `forum_example_anonymous` role. If we did not use that grant, we could not change into the `forum_example_anonymous` role in PostGraphile. Now we will start our server like so:
 
 ```bash
-PostGraphile \
+postgraphile \
   --connection postgres://forum_example_postgraphile:xyz@localhost:5432/mydb \
   --default-role forum_example_anonymous
 ```
@@ -814,7 +814,7 @@ postgraphile \
 
 ## How to use the system
 
-Congralations your PostGraphile system is up and running, lets go ahead and use it!
+Congralations your Graphophile system is up and running, lets go ahead and use it!
 
 First thing is to make sure you have populated the database with the demo data provided, the script is here:
 https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
@@ -822,7 +822,7 @@ https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
 
 ### Query All Table Records
 
-PostGraphile smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
+Postgraphile smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
 
 ```
 query {
@@ -841,7 +841,7 @@ query {
 
 ## Query a Table Record By Id
 
-PostGraphile smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
+Postgraphile smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
 
 ```{
   postById(id: 4) {
@@ -853,7 +853,7 @@ PostGraphile smarts allow you to query tables by Primary Key. All tables can be 
 
 ## Query a Function for Search Results
 
-PostGraphile smarts allow you to query Functions that can return single/scalar or multiple/setof records:
+Postgraphile smarts allow you to query Functions that can return single/scalar or multiple/setof records:
 
 ```{
   searchPosts(search: "circuit", first: 5) {
@@ -936,7 +936,7 @@ After getting a feel for writing mutations we realise we need to understand how 
 
 **Getting a Json Web Token (JWT)**
  
-Since we specified **"--default-role forum_example_anonymous"** when starting PostGraphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the ```forum_example.post``` table:
+Since we specified **"--default-role forum_example_anonymous"** when starting Graphphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the ```forum_example.post``` table:
 
 ```
 grant INSERT, update, delete on table forum_example.post to forum_example_person;
