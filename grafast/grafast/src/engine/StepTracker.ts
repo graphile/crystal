@@ -221,7 +221,8 @@ export class StepTracker {
     }
     const $existing = layerPlan.rootStep;
     if ($existing) {
-      throw new Error(`Root step replacement not yet supported`);
+      // TODO: Cleanup, tree shake, etc
+      this.layerPlansByRootStep.get($existing)!.delete(layerPlan);
     }
     (layerPlan.rootStep as any) = $dependency;
     this.layerPlansByRootStep.get($dependency)!.add(layerPlan);
