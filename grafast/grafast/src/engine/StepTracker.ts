@@ -173,6 +173,16 @@ export class StepTracker {
     $dependent: ExecutableStep,
     $dependency: ExecutableStep,
   ): number {
+    if (!this.activeSteps.has($dependent)) {
+      throw new Error(
+        `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
+      );
+    }
+    if (!this.activeSteps.has($dependency)) {
+      throw new Error(
+        `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted!`,
+      );
+    }
     const dependencyIndex =
       writeableArray($dependent.dependencies).push($dependency) - 1;
     writeableSet($dependency.dependents).add({
@@ -186,6 +196,11 @@ export class StepTracker {
     outputPlan: OutputPlan,
     $dependency: ExecutableStep,
   ) {
+    if (!this.activeSteps.has($dependency)) {
+      throw new Error(
+        `Cannot add ${$dependency} to ${outputPlan} because it's deleted`,
+      );
+    }
     const $existing = outputPlan.rootStep;
     if ($existing) {
       // TODO: Cleanup, tree shake, etc
@@ -199,6 +214,11 @@ export class StepTracker {
     layerPlan: LayerPlan,
     $dependency: ExecutableStep,
   ) {
+    if (!this.activeSteps.has($dependency)) {
+      throw new Error(
+        `Cannot add ${$dependency} to ${layerPlan} because it's deleted`,
+      );
+    }
     const $existing = layerPlan.rootStep;
     if ($existing) {
       throw new Error(`Root step replacement not yet supported`);
@@ -214,6 +234,7 @@ export class StepTracker {
   ): void {
     if (!this.activeSteps.has($original)) {
       // TODO: should this be an error?
+      // console.warn(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
       // Already handled
       return;
     }

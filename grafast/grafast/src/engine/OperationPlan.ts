@@ -487,7 +487,9 @@ export class OperationPlan {
     if (!rootType) {
       throw new Error("No mutation type found in schema");
     }
+
     this.deduplicateSteps();
+
     const locationDetails: LocationDetails = {
       node: this.operation.selectionSet.selections,
       parentTypeName: null,
@@ -621,14 +623,18 @@ export class OperationPlan {
         () => new __ItemStep(subscribeStep),
       );
       subscriptionEventLayerPlan.setRootStep($__item);
-      const streamItemPlan = hasItemPlan(subscribeStep)
+      let streamItemPlan = hasItemPlan(subscribeStep)
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             () => subscribeStep.itemPlan($__item),
           )
         : $__item;
+
+      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
       this.deduplicateSteps();
+      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
+
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
         this.rootValueStep,
@@ -648,7 +654,9 @@ export class OperationPlan {
       // TODO: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
       const subscribeStep = this.trackedRootValueStep;
       this.rootLayerPlan.setRootStep(subscribeStep);
+
       this.deduplicateSteps();
+
       const subscriptionEventLayerPlan = new LayerPlan(
         this,
         this.rootLayerPlan,
@@ -1468,11 +1476,15 @@ export class OperationPlan {
     objectType: GraphQLObjectType,
     fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
-    parentStep: ExecutableStep,
+    rawParentStep: ExecutableStep,
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep<any> } {
+    // The step may have been de-duped whilst sibling steps were planned
+    // TODO: this should be handled in the parent?
+    const parentStep = this.stepTracker.getStepById(rawParentStep.id);
+
     this.loc.push(`planField(${path.join(".")})`);
     try {
       let _fieldArgs!: FieldArgs;
