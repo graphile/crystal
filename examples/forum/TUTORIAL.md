@@ -814,7 +814,7 @@ postgraphile \
 
 ## How to use the system
 
-Congralations your Graphophile system is up and running, lets go ahead and use it!
+Congralations your PostGraphile system is up and running, lets go ahead and use it!
 
 First thing is to make sure you have populated the database with the demo data provided, the script is here:
 https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
@@ -822,7 +822,7 @@ https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
 
 ### Query All Table Records
 
-Postgraphile smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
+PostGraphile smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
 
 ```
 query {
@@ -841,7 +841,7 @@ query {
 
 ## Query a Table Record By Id
 
-Postgraphile smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
+PostGraphile smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
 
 ```{
   postById(id: 4) {
@@ -853,7 +853,7 @@ Postgraphile smarts allow you to query tables by Primary Key. All tables can be 
 
 ## Query a Function for Search Results
 
-Postgraphile smarts allow you to query Functions that can return single/scalar or multiple/setof records:
+PostGraphile smarts allow you to query Functions that can return single/scalar or multiple/setof records:
 
 ```{
   searchPosts(search: "circuit", first: 5) {
@@ -936,7 +936,7 @@ After getting a feel for writing mutations we realise we need to understand how 
 
 **Getting a Json Web Token (JWT)**
  
-Since we specified **"--default-role forum_example_anonymous"** when starting Graphphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the ```forum_example.post``` table:
+Since we specified **"--default-role forum_example_anonymous"** when starting PostGraphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the ```forum_example.post``` table:
 
 ```
 grant INSERT, update, delete on table forum_example.post to forum_example_person;
