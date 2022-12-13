@@ -89,9 +89,7 @@ export class ListStep<
   public at<TIndex extends keyof TPlanTuple>(
     index: TIndex,
   ): TPlanTuple[TIndex] {
-    return this.getStep(
-      this.dependencies[index as number],
-    ) as TPlanTuple[TIndex];
+    return this.getDep(index as number) as TPlanTuple[TIndex];
   }
 }
 

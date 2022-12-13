@@ -126,7 +126,7 @@ export class PgSelectSingleStep<
   }
 
   private getItemStep(): ExecutableStep<PgSourceRow<TColumns>> {
-    const plan = this.getStep(this.dependencies[this.itemStepId]);
+    const plan = this.getDep(this.itemStepId);
     return plan;
   }
 

@@ -215,7 +215,7 @@ ${inner}
         )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
-    return this.getStep(this.dependencies[index]) as TPlans[TKey];
+    return this.getDep(index) as TPlans[TKey];
   }
 }
 

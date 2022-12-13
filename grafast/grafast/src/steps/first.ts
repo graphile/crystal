@@ -38,7 +38,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
     const parent = this.getDep(0);
     // The first of a list plan is just the first dependency of the list plan.
     if (parent instanceof ListStep) {
-      return this.getStep(parent.dependencies[0]);
+      return parent.getDep(0);
     }
     return this;
   }

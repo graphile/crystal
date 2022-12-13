@@ -78,14 +78,12 @@ export class PgPolymorphicStep<
   }
 
   itemPlan(): TItemStep {
-    const plan = this.getStep(this.dependencies[this.itemStepId]);
+    const plan = this.getDep(this.itemStepId);
     return plan as any;
   }
 
   typeSpecifierPlan(): TTypeSpecifierStep {
-    const plan = this.getStep(
-      this.dependencies[this.typeSpecifierStepId],
-    ) as TTypeSpecifierStep;
+    const plan = this.getDep(this.typeSpecifierStepId) as TTypeSpecifierStep;
     return plan;
   }
 

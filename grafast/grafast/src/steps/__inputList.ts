@@ -18,7 +18,7 @@ export class __InputListStep extends ExecutableStep {
   };
   isSyncAndSafe = true;
 
-  private itemPlanIds: number[] = [];
+  private itemCount = 0;
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
@@ -52,8 +52,8 @@ export class __InputListStep extends ExecutableStep {
           seenTypes,
           inputValue,
         );
-        this.itemPlanIds.push(innerPlan.id);
         this.addDependency(innerPlan);
+        this.itemCount++;
       }
     }
   }
@@ -63,15 +63,13 @@ export class __InputListStep extends ExecutableStep {
     if (inputValues?.kind === "NullValue") {
       return constant(null);
     } else {
-      const itemPlansLength = this.itemPlanIds.length;
       const list: any[] = [];
       for (
         let itemPlanIndex = 0;
-        itemPlanIndex < itemPlansLength;
+        itemPlanIndex < this.itemCount;
         itemPlanIndex++
       ) {
-        const itemStepId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.opPlan.dangerouslyGetStep(itemStepId);
+        const itemPlan = this.getDep(itemPlanIndex);
         assertInputStep(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;
@@ -92,10 +90,8 @@ export class __InputListStep extends ExecutableStep {
   };
 
   at(index: number): InputStep | ConstantStep<undefined> {
-    const itemStepId = this.itemPlanIds[index];
-    const itemPlan = itemStepId
-      ? this.getStep(itemStepId)
-      : constant(undefined);
+    const itemPlan =
+      index < this.itemCount ? this.getDep(index) : constant(undefined);
     assertInputStep(itemPlan);
     return itemPlan;
   }
@@ -104,15 +100,13 @@ export class __InputListStep extends ExecutableStep {
     if (this.inputValues?.kind === "NullValue") {
       return null;
     }
-    const itemPlansLength = this.itemPlanIds.length;
     const list: any[] = [];
     for (
       let itemPlanIndex = 0;
-      itemPlanIndex < itemPlansLength;
+      itemPlanIndex < this.itemCount;
       itemPlanIndex++
     ) {
-      const itemStepId = this.itemPlanIds[itemPlanIndex];
-      const itemPlan = this.getStep(itemStepId);
+      const itemPlan = this.getDep(itemPlanIndex);
       assertInputStep(itemPlan);
       const value = itemPlan.eval();
       list[itemPlanIndex] = value;

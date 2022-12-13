@@ -194,7 +194,7 @@ export class PgClassExpressionStep<
   public getParentStep():
     | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
     | PgUnionAllSingleStep {
-    const step = this.getStep(this.dependencies[this.tableId]);
+    const step = this.getDep(this.tableId);
     if (
       !(step instanceof PgSelectSingleStep) &&
       !(step instanceof PgInsertStep) &&
