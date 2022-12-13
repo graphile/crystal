@@ -14,7 +14,7 @@ export class StepTracker {
   private activeSteps = new Set<ExecutableStep>();
   private stepById: {
     [stepId: number]: ExecutableStep;
-  } = Object.create(null);
+  } = [];
 
   private dependenciesByStep = new Map<ExecutableStep, ExecutableStep[]>();
   private dependentsByStep = new Map<
