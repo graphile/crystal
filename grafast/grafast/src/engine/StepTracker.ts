@@ -11,7 +11,10 @@ import type { OutputPlan } from "./OutputPlan";
  */
 export class StepTracker {
   private stepCount = 0;
-  private steps = new Set<ExecutableStep>();
+  private activeSteps = new Set<ExecutableStep>();
+  private stepById: {
+    [stepId: number]: ExecutableStep;
+  } = Object.create(null);
 
   private dependenciesByStep = new Map<ExecutableStep, ExecutableStep[]>();
   private dependentsByStep = new Map<
@@ -30,13 +33,22 @@ export class StepTracker {
 
   public addStep($step: ExecutableStep): number {
     const stepId = this.stepCount++;
-    this.steps.add($step);
+    this.activeSteps.add($step);
+    this.stepById[stepId] = $step;
     this.dependenciesByStep.set($step, []);
     this.dependentsByStep.set($step, new Set());
     this.outputPlansByRootStep.set($step, []);
     this.layerPlansByRootStep.set($step, []);
     this.layerPlansByParentStep.set($step, []);
     return stepId;
+  }
+
+  public getStepById(id: number): ExecutableStep {
+    const step = this.stepById[id];
+    if (!step) {
+      throw new Error(`Illegal step access? Step with id ${id} doesn't exist`);
+    }
+    return step;
   }
 
   public addStepDependency(
@@ -116,6 +128,8 @@ export class StepTracker {
     $original: ExecutableStep,
     $replacement: ExecutableStep,
   ): void {
+    this.stepById[$original.id] = $replacement;
+
     {
       // Transfer step dependents of $original to $replacement
       const dependents = this.dependentsByStep.get($original)!;
@@ -149,6 +163,9 @@ export class StepTracker {
       }
     }
 
+    // TODO: had to add the code ensuring all the layer plan parentPlanId's
+    // existed to fix polymorphism, but it feels wrong. Should we be doing
+    // something different?
     {
       // Convert parent step of layer plans from $original to $replacement
       const layerPlans = this.layerPlansByParentStep.get($original)!;
@@ -159,6 +176,9 @@ export class StepTracker {
         layerPlansByReplacementParentStep.push(layerPlan);
       }
     }
+
+    // TODO: ensure side-effect plans are handled nicely
+    // TODO: ensure plans in 'subprocedure' layerPlans are marked active
 
     // Remove this step (and perform localized tree-shaking)
     this.eradicate($original);
@@ -202,6 +222,7 @@ export class StepTracker {
     this.layerPlansByRootStep.delete($original);
     this.layerPlansByParentStep.delete($original);
     this.dependentsByStep.delete($original);
-    this.steps.delete($original);
+    this.activeSteps.delete($original);
+    $original.destroy();
   }
 }
