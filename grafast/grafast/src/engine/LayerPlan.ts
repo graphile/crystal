@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
+import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -10,6 +11,7 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
+import { stripAnsi } from "../stripAnsi.js";
 import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -353,6 +355,23 @@ ${inner}
       // new arrays and looping.
 
       this.newBucket = this.makeNewBucketCallback(`\
+${
+  isDev
+    ? `/*
+makeNewBucketCallback called for LayerPlan with id: ${this.id}.
+Reason type: ${this.reason.type}
+Copy step ids: ${copyStepIds}
+Copy steps:
+- ${copyStepIds
+        .map((id) =>
+          stripAnsi(String(this.operationPlan.stepTracker.getStepById(id))),
+        )
+        .join("\n- ")}
+Root step: ${stripAnsi(String(this.rootStep))}
+*/
+`
+    : ``
+}\
   const itemStepId = ${this.rootStep!.id};
   const nullableStepStore = parentBucket.store.get(itemStepId);
 
