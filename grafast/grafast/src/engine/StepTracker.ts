@@ -1,4 +1,5 @@
 import { isDev } from "../dev.js";
+import type { OperationPlan } from "../index.js";
 import type { ExecutableStep } from "../step";
 import type {
   LayerPlan,
@@ -62,6 +63,8 @@ export class StepTracker {
    * @internal
    */
   public allOutputPlans: OutputPlan[] = [];
+
+  constructor(private readonly operationPlan: OperationPlan) {}
 
   public addStep($step: ExecutableStep): number {
     const stepId = this.stepCount++;
@@ -155,9 +158,11 @@ export class StepTracker {
     }
   }
 
-  public getStepById(id: number): ExecutableStep {
+  public getStepById(id: number): ExecutableStep;
+  public getStepById(id: number, allowUnset: true): ExecutableStep | null;
+  public getStepById(id: number, allowUnset = false): ExecutableStep | null {
     const step = this.stepById[id];
-    if (!step) {
+    if (!step && !allowUnset) {
       throw new Error(`Illegal step access? Step with id ${id} doesn't exist`);
     }
     return step;
@@ -206,6 +211,11 @@ export class StepTracker {
     $original: ExecutableStep,
     $replacement: ExecutableStep,
   ): void {
+    if (!this.activeSteps.has($original)) {
+      // TODO: should this be an error?
+      // Already handled
+      return;
+    }
     this.stepById[$original.id] = $replacement;
 
     {
@@ -222,6 +232,9 @@ export class StepTracker {
     {
       // Convert root step of output plans from $original to $replacement
       const outputPlans = this.outputPlansByRootStep.get($original)!;
+      if (!outputPlans) {
+        throw new Error(`No outputPlans for ${$original}?!`);
+      }
       const outputPlansByReplacementStep =
         this.outputPlansByRootStep.get($replacement)!;
       for (const outputPlan of outputPlans) {
@@ -265,6 +278,28 @@ export class StepTracker {
     this.eradicate($original);
   }
 
+  public treeShakeSteps() {
+    for (const $step of this.activeSteps) {
+      if (this.isNotNeeded($step)) {
+        this.stepById[$step.id] = null as any;
+        this.eradicate($step);
+      }
+    }
+  }
+
+  /**
+   * Return true if this step can be tree-shaken.
+   */
+  private isNotNeeded($step: ExecutableStep): boolean {
+    return (
+      $step.dependents.size === 0 &&
+      !$step.hasSideEffects &&
+      this.outputPlansByRootStep.get($step)!.size === 0 &&
+      this.layerPlansByRootStep.get($step)!.size === 0 &&
+      this.layerPlansByParentStep.get($step)!.size === 0
+    );
+  }
+
   /**
    * ONLY CALL THIS IF NOTHING DEPENDS ON $original! It's intended to be called
    * from `replaceStep` or from itself.
@@ -290,13 +325,7 @@ export class StepTracker {
           dependents.delete(dependent);
         }
       }
-      if (
-        dependents.size === 0 &&
-        !$dependency.hasSideEffects &&
-        this.outputPlansByRootStep.get($dependency)!.size === 0 &&
-        this.layerPlansByRootStep.get($dependency)!.size === 0 &&
-        this.layerPlansByParentStep.get($dependency)!.size === 0
-      ) {
+      if (this.isNotNeeded($dependency)) {
         // Nothing depends on $dependency and it has no side effects - we can get rid of it!
         this.eradicate($dependency);
       }

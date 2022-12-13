@@ -131,8 +131,10 @@ export class OperationPlan {
    * 7. ready
    *
    * Once in 'ready' state we can execute the plan.
+   *
+   * @internal
    */
-  private phase: OperationPlanPhase = "init";
+  public phase: OperationPlanPhase = "init";
   /**
    * Gets updated as we work our way through the plan, useful for making errors more helpful.
    */
@@ -153,7 +155,7 @@ export class OperationPlan {
   private modifierSteps: ModifierStep[] = [];
 
   /** @internal */
-  public readonly stepTracker = new StepTracker();
+  public readonly stepTracker = new StepTracker(this);
 
   private maxDeduplicatedStepId = -1;
   private maxValidatedStepId = -1;
@@ -266,6 +268,11 @@ export class OperationPlan {
     // Now perform hoisting (and repeat deduplication)
     this.hoistSteps();
 
+    // Get rid of temporary steps before `optimize` triggers side-effects.
+    // (Critical due to steps that may have been discarded due to field errors
+    // or similar.)
+    this.stepTracker.treeShakeSteps();
+
     if (isDev) {
       this.phase = "validate";
       // Helpfully check steps don't do forbidden things.
@@ -279,6 +286,9 @@ export class OperationPlan {
 
     // Replace access plans with direct access, etc
     this.optimizeOutputPlans();
+
+    // Get rid of steps that are no longer needed after optimising
+    this.stepTracker.treeShakeSteps();
 
     // Now shove steps as deep down as they can go (opposite of hoist)
     this.pushDownSteps();
@@ -1706,11 +1716,11 @@ export class OperationPlan {
 
   private replaceSteps(
     originalSteps: ExecutableStep[],
-    replaceStep: ExecutableStep,
+    $replacement: ExecutableStep,
   ): void {
-    for (const originalStep of originalSteps) {
-      if (originalStep !== replaceStep) {
-        this.replaceStep(originalStep, replaceStep);
+    for (const $original of originalSteps) {
+      if ($original !== $replacement) {
+        this.replaceStep($original, $replacement);
       }
     }
   }
@@ -1775,7 +1785,7 @@ export class OperationPlan {
     const processStepsFrom = (fromStepId: number) => {
       // TODO: improve!
       for (let stepId = fromStepId; stepId < previousStepCount; stepId++) {
-        const step = this.stepTracker.getStepById(stepId);
+        const step = this.stepTracker.getStepById(stepId, true);
         if (step && step.id === stepId) {
           steps.push(step);
         }
@@ -1896,17 +1906,13 @@ export class OperationPlan {
       const deps = step.dependencies;
       for (let i = 0, l = deps.length; i < l; i++) {
         const dep = deps[i];
-        // TODO: replace this with precomputed
-        const depDependentSteps = [...this.stepTracker.activeSteps].filter(
-          (s) => s.dependencies.length === l && s.dependencies.includes(dep),
+        const dependents = [...dep.dependents].filter(
+          (d) =>
+            d.dependencyIndex === i &&
+            d.step.dependencies.length === l &&
+            isMaybeAPeer(d.step),
         );
-        const potentialPeers = new Set(
-          depDependentSteps.filter(
-            (potentialPeer) =>
-              potentialPeer.dependencies[i] === dep &&
-              isMaybeAPeer(potentialPeer),
-          ),
-        );
+        const potentialPeers = new Set(dependents.map((d) => d.step));
         if (i === 0) {
           allPotentialPeers = potentialPeers;
         } else {
@@ -2302,7 +2308,7 @@ export class OperationPlan {
       }
     }
 
-    const allEquivalentSteps = [step, ...equivalentSteps];
+    const allEquivalentSteps = [...new Set([step, ...equivalentSteps])];
 
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
     let minDepth = Infinity;
@@ -2336,6 +2342,9 @@ export class OperationPlan {
     }
 
     const { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps } = result;
+    if (allEquivalentSteps.length === 1 && allEquivalentSteps[0] === step) {
+      return step;
+    }
     assert.strictEqual(
       layersAtMinDepth.length,
       1,
