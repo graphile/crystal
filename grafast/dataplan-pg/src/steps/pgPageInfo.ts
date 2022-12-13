@@ -52,7 +52,7 @@ export class PgPageInfoStep<
     connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>,
   ) {
     super();
-    this.connectionStepId = connectionPlan.id;
+    this.connectionStepId = this.addDependency(connectionPlan);
   }
 
   /**
@@ -66,11 +66,9 @@ export class PgPageInfoStep<
     TStep,
     any
   > {
-    const plan = this.getStep(this.connectionStepId);
+    const plan = this.getDep(this.connectionStepId);
     if (!(plan instanceof ConnectionStep)) {
-      throw new Error(
-        `Expected ${this.connectionStepId} (${plan}) to be a ConnectionStep`,
-      );
+      throw new Error(`Expected ${plan} to be a ConnectionStep`);
     }
     return plan as ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>;
   }
