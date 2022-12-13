@@ -1,7 +1,21 @@
-import { isDev } from "../dev";
+import { isDev } from "../dev.js";
 import type { ExecutableStep } from "../step";
 import type { LayerPlan } from "./LayerPlan";
 import type { OutputPlan } from "./OutputPlan";
+
+/**
+ * We want everything else to treat things like `dependencies` as read only,
+ * however we ourselves want to be able to write to them, so we can use
+ * writeable for this.
+ *
+ * @internal
+ */
+function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
+  return a as any;
+}
+function writeableSet<T>(a: ReadonlySet<T>): Set<T> {
+  return a as any;
+}
 
 /**
  * This class keeps track of all of our steps, and the dependencies between
@@ -18,12 +32,6 @@ export class StepTracker {
   private stepById: {
     [stepId: number]: ExecutableStep;
   } = [];
-
-  private dependenciesByStep = new Map<ExecutableStep, ExecutableStep[]>();
-  private dependentsByStep = new Map<
-    ExecutableStep,
-    Set<{ step: ExecutableStep; dependencyIndex: number }>
-  >();
 
   private rootStepByOutputPlan = new Map<OutputPlan, ExecutableStep>();
   private outputPlansByRootStep = new Map<ExecutableStep, OutputPlan[]>();
@@ -48,8 +56,6 @@ export class StepTracker {
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     this.stepById[stepId] = $step;
-    this.dependenciesByStep.set($step, []);
-    this.dependentsByStep.set($step, new Set());
     this.outputPlansByRootStep.set($step, []);
     this.layerPlansByRootStep.set($step, []);
     this.layerPlansByParentStep.set($step, []);
@@ -122,17 +128,18 @@ export class StepTracker {
     $dependency: ExecutableStep,
   ): number {
     const dependencyIndex =
-      this.dependenciesByStep.get($dependent)!.push($dependency) - 1;
-    this.dependentsByStep
-      .get($dependency)!
-      .add({ step: $dependent, dependencyIndex });
+      writeableArray($dependent.dependencies).push($dependency) - 1;
+    writeableSet($dependency.dependents).add({
+      step: $dependent,
+      dependencyIndex,
+    });
     return dependencyIndex;
   }
 
   public getStepDependencies(
     $step: ExecutableStep,
   ): ReadonlyArray<ExecutableStep> {
-    return this.dependenciesByStep.get($step)!;
+    return $step.dependencies;
   }
 
   public setOutputPlanRootStep(
@@ -198,14 +205,13 @@ export class StepTracker {
 
     {
       // Transfer step dependents of $original to $replacement
-      const dependents = this.dependentsByStep.get($original)!;
-      const replacementDependents = this.dependentsByStep.get($replacement)!;
+      const dependents = $original.dependents;
+      const replacementDependents = writeableSet($replacement.dependents);
       for (const { step: $dependent, dependencyIndex } of dependents) {
-        this.dependenciesByStep.get($dependent)![dependencyIndex] =
-          $replacement;
+        writeableArray($dependent.dependencies)[dependencyIndex] = $replacement;
         replacementDependents.add({ step: $dependent, dependencyIndex });
       }
-      this.dependentsByStep.set($original, new Set());
+      writeableSet($original.dependents).clear();
     }
 
     {
@@ -269,12 +275,11 @@ export class StepTracker {
     // then there shouldn't be any dependents).
 
     // Since this step is being removed, it doesn't need its dependencies any more
-    const oldDependencies = this.dependenciesByStep.get($original)!;
-    this.dependenciesByStep.delete($original);
+    const oldDependencies = $original.dependencies;
     for (const $dependency of oldDependencies) {
       // $dependency is no longer a dependent of $original, since we're getting
       // rid of $original
-      const dependents = this.dependentsByStep.get($dependency)!;
+      const dependents = writeableSet($dependency.dependents);
       for (const dependent of dependents) {
         if (dependent.step === $original) {
           dependents.delete(dependent);
@@ -295,7 +300,6 @@ export class StepTracker {
     this.outputPlansByRootStep.delete($original);
     this.layerPlansByRootStep.delete($original);
     this.layerPlansByParentStep.delete($original);
-    this.dependentsByStep.delete($original);
     this.activeSteps.delete($original);
     $original.destroy();
   }

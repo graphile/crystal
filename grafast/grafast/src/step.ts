@@ -205,18 +205,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
-   * The ids for plans this plan will need data from in order to execute. NOTE:
-   * it's important we use the id and not the plan here otherwise when we swap
-   * out plans during optimisation things will go awry.
-   *
-   * @internal
+   * The plan this plan will need data from in order to execute.
    */
-  private readonly _dependencies: number[] = [];
-
-  /**
-   * The ids for plans this plan will need data from in order to execute.
-   */
-  public readonly dependencies: ReadonlyArray<number> = this._dependencies;
+  public readonly dependencies: ReadonlyArray<ExecutableStep> = [];
 
   /**
    * The ids of the dependencies of this step that are in the same layer as it
@@ -238,7 +229,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * Just for mermaid
    * @internal
    */
-  public dependentSteps: Array<ExecutableStep> = [];
+  public dependents: ReadonlySet<{
+    step: ExecutableStep;
+    dependencyIndex: number;
+  }> = new Set();
 
   /**
    * Every layer plan has exactly one parent step. This is the reverse relationship.
@@ -308,8 +302,8 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.layerPlan.getStep(id, this);
   }
 
-  protected getDep(depId: number): ExecutableStep {
-    return this.getStep(this.dependencies[depId]);
+  public getDep(depId: number): ExecutableStep {
+    return this.dependencies[depId];
   }
 
   /**
@@ -374,13 +368,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.
     if (!skipDeduplication) {
-      const existingIndex = this._dependencies.indexOf(step.id);
+      const existingIndex = this.dependencies.indexOf(step);
       if (existingIndex >= 0) {
         return existingIndex;
       }
     }
 
-    return this._dependencies.push(step.id) - 1;
+    return this.opPlan.stepTracker.addStepDependency(this, step);
   }
 
   /**

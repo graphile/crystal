@@ -858,8 +858,7 @@ export function stepADependsOnStepB(
     throw new Error("Invalid call to stepADependsOnStepB");
   }
   // Depth-first search for match
-  for (const depId of stepA.dependencies) {
-    const dep = stepA.layerPlan.operationPlan.dangerouslyGetStep(depId);
+  for (const dep of stepA.dependencies) {
     if (dep === stepB) {
       return true;
     }

@@ -340,8 +340,8 @@ export function executeBucket(
             const storeEntry = bucket.store.get(step.id)!;
             try {
               const deps: any = [];
-              for (const depId of step.dependencies) {
-                const depVal = bucket.store.get(depId)![dataIndex];
+              for (const $dep of step.dependencies) {
+                const depVal = bucket.store.get($dep.id)![dataIndex];
                 if (bucket.hasErrors && isGrafastError(depVal)) {
                   storeEntry[dataIndex] = depVal;
                   continue stepLoop;
@@ -617,8 +617,8 @@ export function executeBucket(
       const depCount = step.dependencies.length;
       if (depCount > 0 || sideEffectPlanIdsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
-          const depId = step.dependencies[i];
-          dependencies[i] = store.get(depId)!;
+          const $dep = step.dependencies[i];
+          dependencies[i] = store.get($dep.id)!;
         }
         if (sideEffectPlanIdsWithErrors !== null) {
           for (const sideEffectPlanId of sideEffectPlanIdsWithErrors) {

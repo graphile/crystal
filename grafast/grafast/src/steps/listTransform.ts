@@ -171,9 +171,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.opPlan.dangerouslyGetStep(
-      this.dependencies[this.listPlanDepId],
-    ) as TListStep;
+    return this.dependencies[this.listPlanDepId] as TListStep;
   }
 
   deduplicate(

@@ -26,9 +26,7 @@ export class ListStep<
   }
 
   toStringMeta() {
-    return this.dependencies
-      .map((id) => this.opPlan.dangerouslyGetStep(id).id)
-      .join(",");
+    return this.dependencies.map(($dep) => $dep.id).join(",");
   }
 
   // Could be used to reduce the number of unique values returned

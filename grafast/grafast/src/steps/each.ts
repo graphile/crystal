@@ -62,8 +62,7 @@ export function each<
       const rootStep = this.opPlan.stepTracker.getLayerPlanRootStep(layerPlan);
       if (
         rootStep instanceof __ItemStep &&
-        this.opPlan.dangerouslyGetStep(rootStep.dependencies[0]).layerPlan !==
-          layerPlan
+        rootStep.dependencies[0].layerPlan !== layerPlan
       ) {
         // We don't do anything; replace ourself with our parent
         this.opPlan.deleteLayerPlan(layerPlan);
