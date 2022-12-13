@@ -36,7 +36,8 @@ export class StepTracker {
   public stepCount = 0;
   /** @internal */
   public activeSteps = new Set<ExecutableStep>();
-  private stepById: {
+  /** @internal */
+  public stepById: {
     [stepId: number]: ExecutableStep;
   } = [];
 

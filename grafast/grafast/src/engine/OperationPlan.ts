@@ -2809,7 +2809,7 @@ export class OperationPlan {
    */
   printPlanGraph(options: PrintPlanGraphOptions = {}): string {
     return printPlanGraph(this, options, {
-      steps: [...this.stepTracker.activeSteps],
+      steps: this.stepTracker.stepById,
     });
   }
 

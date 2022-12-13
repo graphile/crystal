@@ -88,7 +88,7 @@ export function printPlanGraph(
   {
     steps,
   }: {
-    steps: ExecutableStep[];
+    steps: { [stepId: number]: ExecutableStep };
   },
 ): string {
   const color = (i: number) => {
