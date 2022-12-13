@@ -1392,7 +1392,6 @@ export class OperationPlan {
           new Set([newPolymorphicPath]),
           () => $step.planForType(type),
         );
-        polymorphicLayerPlan.rootStepIdByTypeName[type.name] = $root.id;
         const objectOutputPlan = new OutputPlan(
           polymorphicLayerPlan,
           $root,
@@ -1942,11 +1941,6 @@ export class OperationPlan {
       if (layerPlan.rootStepId) {
         this.markStepActive(this.steps[layerPlan.rootStepId], activeSteps);
       }
-      for (const typeRootStepId of Object.values(
-        layerPlan.rootStepIdByTypeName,
-      )) {
-        this.markStepActive(this.steps[typeRootStepId], activeSteps);
-      }
     }
 
     // Finally, we can't throw away mutation steps!
@@ -2318,13 +2312,6 @@ export class OperationPlan {
       }
       if (layerPlan.rootStepId) {
         if (this.steps[layerPlan.rootStepId] === step) {
-          dependentLayerPlans.add(layerPlan);
-        }
-      }
-      for (const typeRootStepId of Object.values(
-        layerPlan.rootStepIdByTypeName,
-      )) {
-        if (this.steps[typeRootStepId] === step) {
           dependentLayerPlans.add(layerPlan);
         }
       }
@@ -2894,13 +2881,6 @@ export class OperationPlan {
       if (layerPlan.rootStepId) {
         const $root = this.steps[layerPlan.rootStepId];
         layerPlan.rootStepId = $root.id;
-        ensurePlanAvailableInLayer($root, layerPlan);
-      }
-      for (const [typeName, typeRootStepId] of Object.entries(
-        layerPlan.rootStepIdByTypeName,
-      )) {
-        const $root = this.steps[typeRootStepId];
-        layerPlan.rootStepIdByTypeName[typeName] = $root.id;
         ensurePlanAvailableInLayer($root, layerPlan);
       }
 
