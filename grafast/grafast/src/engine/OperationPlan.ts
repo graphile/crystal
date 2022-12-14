@@ -139,7 +139,9 @@ export class OperationPlan {
   /**
    * Gets updated as we work our way through the plan, useful for making errors more helpful.
    */
-  public loc: string[] = [];
+  public loc: string[] | null = isDev
+    ? []
+    : null /* forbid loc in production */;
 
   /** @internal */
   public rootLayerPlan: LayerPlan;
@@ -435,11 +437,13 @@ export class OperationPlan {
       }
     } catch (e) {
       // TODO: raise this somewhere critical
-      console.error(
-        `Error occurred during query planning (at ${this.loc.join(" > ")}): \n${
-          e.stack || e
-        }`,
-      );
+      if (this.loc) {
+        console.error(
+          `Error occurred during query planning (at ${this.loc.join(
+            " > ",
+          )}): \n${e.stack || e}`,
+        );
+      }
       throw new Error(`Failed to plan this query.`);
     }
   }
@@ -448,7 +452,7 @@ export class OperationPlan {
    * Plans a GraphQL query operation.
    */
   private planQuery(): void {
-    this.loc.push("planQuery()");
+    if (this.loc) this.loc.push("planQuery()");
     const rootType = this.queryType;
     if (!rootType) {
       throw new Error("No query type found in schema");
@@ -477,14 +481,14 @@ export class OperationPlan {
       rootType,
       this.operation.selectionSet.selections,
     );
-    this.loc.pop();
+    if (this.loc) this.loc.pop();
   }
 
   /**
    * Implements the `PlanOpPlanMutation` algorithm.
    */
   private planMutation(): void {
-    this.loc.push("planMutation()");
+    if (this.loc) this.loc.push("planMutation()");
     const rootType = this.mutationType;
     if (!rootType) {
       throw new Error("No mutation type found in schema");
@@ -517,14 +521,14 @@ export class OperationPlan {
       this.operation.selectionSet.selections,
       true,
     );
-    this.loc.pop();
+    if (this.loc) this.loc.pop();
   }
 
   /**
    * Implements the `PlanOpPlanSubscription` algorithm.
    */
   private planSubscription(): void {
-    this.loc.push("planSubscription");
+    if (this.loc) this.loc.push("planSubscription");
     const rootType = this.subscriptionType;
     if (!rootType) {
       throw new Error("No subscription type found in schema");
@@ -695,7 +699,7 @@ export class OperationPlan {
         "GraphileInternalError<2335c655-c656-4e5d-b8f4-d649340bfaea>: using a GraphQL subscribe isn't yet supported",
       );
     }
-    this.loc.pop();
+    if (this.loc) this.loc.pop();
   }
 
   /**
@@ -752,11 +756,12 @@ export class OperationPlan {
     isMutation = false,
     customRecurse: null | ((nextUp: () => void) => void) = null,
   ) {
-    this.loc.push(
-      `planSelectionSet(${objectType.name} @ ${
-        outputPlan.layerPlan.id
-      } @ ${path.join(".")} @ ${polymorphicPath})`,
-    );
+    if (this.loc)
+      this.loc.push(
+        `planSelectionSet(${objectType.name} @ ${
+          outputPlan.layerPlan.id
+        } @ ${path.join(".")} @ ${polymorphicPath})`,
+      );
     interface NextUp {
       outputPlan: OutputPlan;
       haltTree: boolean;
@@ -1119,7 +1124,7 @@ export class OperationPlan {
       });
     }
 
-    this.loc.pop();
+    if (this.loc) this.loc.pop();
   }
 
   // Similar to the old 'planFieldReturnType'
@@ -1487,7 +1492,7 @@ export class OperationPlan {
     // TODO: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
 
-    this.loc.push(`planField(${path.join(".")})`);
+    if (this.loc) this.loc.push(`planField(${path.join(".")})`);
     try {
       let _fieldArgs!: FieldArgs;
 
@@ -1576,7 +1581,7 @@ export class OperationPlan {
       // now we'll just rely on tree-shaking.
       return { step, haltTree };
     } finally {
-      this.loc.pop();
+      if (this.loc) this.loc.pop();
     }
   }
 
@@ -1792,7 +1797,6 @@ export class OperationPlan {
       if (replacementStep != step) {
         this.replaceStep(step, replacementStep);
       }
-
 
       return replacementStep;
     };
@@ -2504,10 +2508,8 @@ export class OperationPlan {
     for (const step of this.stepTracker.activeSteps) {
       step.finalize();
       assertFinalized(step);
-      if (isDev) {
-        assert.strictEqual(
-          this.stepTracker.stepCount,
-          initialStepCount,
+      if (isDev && this.stepTracker.stepCount !== initialStepCount) {
+        throw new Error(
           `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
         );
       }

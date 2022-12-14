@@ -370,14 +370,8 @@ ${
     ? `/*
 makeNewBucketCallback called for LayerPlan with id: ${this.id}.
 Reason type: ${this.reason.type}
+Root step: ${this.rootStep?.id}
 Copy step ids: ${copyStepIds}
-Copy steps:
-- ${copyStepIds
-        .map((id) =>
-          stripAnsi(String(this.operationPlan.stepTracker.getStepById(id))),
-        )
-        .join("\n- ")}
-Root step: ${stripAnsi(String(this.rootStep))}
 */
 `
     : ``
