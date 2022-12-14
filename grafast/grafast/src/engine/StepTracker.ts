@@ -35,6 +35,9 @@ export class StepTracker {
   public stepById: {
     [stepId: number]: ExecutableStep;
   } = [];
+  public aliasesById: {
+    [stepId: number]: Set<number>;
+  } = [];
 
   private outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
   private layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
@@ -66,6 +69,7 @@ export class StepTracker {
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     this.stepById[stepId] = $step;
+    this.aliasesById[stepId] = new Set([stepId]);
     this.outputPlansByRootStep.set($step, new Set());
     this.layerPlansByRootStep.set($step, new Set());
     this.layerPlansByParentStep.set($step, new Set());
@@ -247,11 +251,11 @@ export class StepTracker {
     }
 
     // Replace all references to $original with $replacement
-    for (const id in this.stepById) {
-      if (this.stepById[id] === $original) {
-        this.stepById[id] = $replacement;
-      }
+    for (const id of this.aliasesById[$original.id]) {
+      this.stepById[id] = $replacement;
+      this.aliasesById[$replacement.id].add(id);
     }
+    this.aliasesById[$original.id].clear();
 
     {
       // Transfer step dependents of $original to $replacement
@@ -276,7 +280,7 @@ export class StepTracker {
         (outputPlan.rootStep as any) = $replacement;
         outputPlansByReplacementStep.add(outputPlan);
       }
-      this.outputPlansByRootStep.set($original, new Set());
+      this.outputPlansByRootStep.get($original)!.clear();
     }
 
     {
@@ -288,7 +292,7 @@ export class StepTracker {
         (layerPlan.rootStep as any) = $replacement;
         layerPlansByReplacementRootStep.add(layerPlan);
       }
-      this.layerPlansByRootStep.set($original, new Set());
+      this.layerPlansByRootStep.get($original)!.clear();
     }
 
     // TODO: had to add the code ensuring all the layer plan parentPlanId's
@@ -303,7 +307,7 @@ export class StepTracker {
         (layerPlan.reason.parentStep as any) = $replacement;
         layerPlansByReplacementParentStep.add(layerPlan);
       }
-      this.layerPlansByParentStep.set($original, new Set());
+      this.layerPlansByParentStep.get($original)!.clear();
     }
 
     // TODO: ensure side-effect plans are handled nicely
@@ -352,6 +356,7 @@ export class StepTracker {
       // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
       this.stepById[$original.id] = null as any;
     }
+    this.aliasesById[$original.id] = null as any;
 
     // Since this step is being removed, it doesn't need its dependencies any more
     const oldDependencies = $original.dependencies;
