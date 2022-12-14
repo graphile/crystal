@@ -77,9 +77,6 @@ export class StepTracker {
     this.stepsWithNoDependencies.add($step);
     this.stepById[stepId] = $step;
     this.aliasesById[stepId] = new Set([stepId]);
-    this.outputPlansByRootStep.set($step, new Set());
-    this.layerPlansByRootStep.set($step, new Set());
-    this.layerPlansByParentStep.set($step, new Set());
     return stepId;
   }
 
@@ -100,9 +97,17 @@ export class StepTracker {
       case "listItem":
       case "polymorphic":
       case "subroutine": {
-        this.layerPlansByParentStep
-          .get(layerPlan.reason.parentStep)!
-          .add(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+        const store = this.layerPlansByParentStep.get(
+          layerPlan.reason.parentStep,
+        )!;
+        if (store) {
+          store.add(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+        } else {
+          this.layerPlansByParentStep.set(
+            layerPlan.reason.parentStep,
+            new Set([layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>]),
+          );
+        }
         break;
       }
       default: {
@@ -119,7 +124,15 @@ export class StepTracker {
   public addOutputPlan(outputPlan: OutputPlan): void {
     this.assertPhaseNot("finalize");
     this.allOutputPlans.push(outputPlan);
-    this.outputPlansByRootStep.get(outputPlan.rootStep)!.add(outputPlan);
+    const store = this.outputPlansByRootStep.get(outputPlan.rootStep);
+    if (store) {
+      store.add(outputPlan);
+    } else {
+      this.outputPlansByRootStep.set(
+        outputPlan.rootStep,
+        new Set([outputPlan]),
+      );
+    }
   }
 
   /**
@@ -227,10 +240,15 @@ export class StepTracker {
     const $existing = outputPlan.rootStep;
     if ($existing) {
       // TODO: Cleanup, tree shake, etc
-      this.outputPlansByRootStep.get($existing)!.delete(outputPlan);
+      this.outputPlansByRootStep.get($existing)?.delete(outputPlan);
     }
     (outputPlan.rootStep as any) = $dependency;
-    this.outputPlansByRootStep.get($dependency)!.add(outputPlan);
+    const store = this.outputPlansByRootStep.get($dependency);
+    if (store) {
+      store.add(outputPlan);
+    } else {
+      this.outputPlansByRootStep.set($dependency, new Set([outputPlan]));
+    }
   }
 
   public setLayerPlanRootStep(
@@ -249,7 +267,12 @@ export class StepTracker {
       this.layerPlansByRootStep.get($existing)!.delete(layerPlan);
     }
     (layerPlan.rootStep as any) = $dependency;
-    this.layerPlansByRootStep.get($dependency)!.add(layerPlan);
+    const store = this.layerPlansByRootStep.get($dependency);
+    if (store) {
+      store.add(layerPlan);
+    } else {
+      this.layerPlansByRootStep.set($dependency, new Set([layerPlan]));
+    }
   }
 
   /** @internal */
@@ -285,29 +308,44 @@ export class StepTracker {
 
     {
       // Convert root step of output plans from $original to $replacement
-      const outputPlans = this.outputPlansByRootStep.get($original)!;
-      if (!outputPlans) {
-        throw new Error(`No outputPlans for ${$original}?!`);
+      const outputPlans = this.outputPlansByRootStep.get($original);
+      if (outputPlans) {
+        let outputPlansByReplacementStep =
+          this.outputPlansByRootStep.get($replacement);
+        if (!outputPlansByReplacementStep) {
+          outputPlansByReplacementStep = new Set();
+          this.outputPlansByRootStep.set(
+            $replacement,
+            outputPlansByReplacementStep,
+          );
+        }
+        for (const outputPlan of outputPlans) {
+          (outputPlan.rootStep as any) = $replacement;
+          outputPlansByReplacementStep.add(outputPlan);
+        }
+        outputPlans.clear();
       }
-      const outputPlansByReplacementStep =
-        this.outputPlansByRootStep.get($replacement)!;
-      for (const outputPlan of outputPlans) {
-        (outputPlan.rootStep as any) = $replacement;
-        outputPlansByReplacementStep.add(outputPlan);
-      }
-      this.outputPlansByRootStep.get($original)!.clear();
     }
 
     {
       // Convert root step of layer plans from $original to $replacement
       const layerPlans = this.layerPlansByRootStep.get($original)!;
-      const layerPlansByReplacementRootStep =
-        this.layerPlansByRootStep.get($replacement)!;
-      for (const layerPlan of layerPlans) {
-        (layerPlan.rootStep as any) = $replacement;
-        layerPlansByReplacementRootStep.add(layerPlan);
+      if (layerPlans) {
+        let layerPlansByReplacementRootStep =
+          this.layerPlansByRootStep.get($replacement);
+        if (!layerPlansByReplacementRootStep) {
+          layerPlansByReplacementRootStep = new Set();
+          this.layerPlansByRootStep.set(
+            $replacement,
+            layerPlansByReplacementRootStep,
+          );
+        }
+        for (const layerPlan of layerPlans) {
+          (layerPlan.rootStep as any) = $replacement;
+          layerPlansByReplacementRootStep.add(layerPlan);
+        }
+        layerPlans.clear();
       }
-      this.layerPlansByRootStep.get($original)!.clear();
     }
 
     // TODO: had to add the code ensuring all the layer plan parentPlanId's
@@ -315,14 +353,23 @@ export class StepTracker {
     // something different?
     {
       // Convert parent step of layer plans from $original to $replacement
-      const layerPlans = this.layerPlansByParentStep.get($original)!;
-      const layerPlansByReplacementParentStep =
-        this.layerPlansByParentStep.get($replacement)!;
-      for (const layerPlan of layerPlans) {
-        (layerPlan.reason.parentStep as any) = $replacement;
-        layerPlansByReplacementParentStep.add(layerPlan);
+      const layerPlans = this.layerPlansByParentStep.get($original);
+      if (layerPlans) {
+        let layerPlansByReplacementParentStep =
+          this.layerPlansByParentStep.get($replacement);
+        if (!layerPlansByReplacementParentStep) {
+          layerPlansByReplacementParentStep = new Set();
+          this.layerPlansByParentStep.set(
+            $replacement,
+            layerPlansByReplacementParentStep,
+          );
+        }
+        for (const layerPlan of layerPlans) {
+          (layerPlan.reason.parentStep as any) = $replacement;
+          layerPlansByReplacementParentStep.add(layerPlan);
+        }
+        layerPlans.clear();
       }
-      this.layerPlansByParentStep.get($original)!.clear();
     }
 
     // TODO: ensure side-effect plans are handled nicely
@@ -344,12 +391,15 @@ export class StepTracker {
    * Return true if this step can be tree-shaken.
    */
   private isNotNeeded($step: ExecutableStep): boolean {
+    const s1 = this.outputPlansByRootStep.get($step);
+    const s2 = this.layerPlansByRootStep.get($step);
+    const s3 = this.layerPlansByParentStep.get($step);
     return (
       $step.dependents.size === 0 &&
       !$step.hasSideEffects &&
-      this.outputPlansByRootStep.get($step)!.size === 0 &&
-      this.layerPlansByRootStep.get($step)!.size === 0 &&
-      this.layerPlansByParentStep.get($step)!.size === 0
+      (!s1 || s1.size === 0) &&
+      (!s2 || s2.size === 0) &&
+      (!s3 || s3.size === 0)
     );
   }
 
@@ -396,24 +446,24 @@ export class StepTracker {
     }
 
     if (isDev) {
-      const outputPlansByRoot = this.outputPlansByRootStep.get($original)!;
-      if (outputPlansByRoot.size !== 0) {
+      const outputPlansByRoot = this.outputPlansByRootStep.get($original);
+      if (outputPlansByRoot && outputPlansByRoot.size !== 0) {
         throw new Error(
           `${$original} eradicated, but it is needed by ${[
             ...outputPlansByRoot,
           ]}`,
         );
       }
-      const layerPlansByRoot = this.layerPlansByRootStep.get($original)!;
-      if (layerPlansByRoot.size !== 0) {
+      const layerPlansByRoot = this.layerPlansByRootStep.get($original);
+      if (layerPlansByRoot && layerPlansByRoot.size !== 0) {
         throw new Error(
           `${$original} eradicated, but it is needed by ${[
             ...layerPlansByRoot,
           ]}`,
         );
       }
-      const layerPlansByParent = this.layerPlansByParentStep.get($original)!;
-      if (layerPlansByParent.size !== 0) {
+      const layerPlansByParent = this.layerPlansByParentStep.get($original);
+      if (layerPlansByParent && layerPlansByParent.size !== 0) {
         throw new Error(
           `${$original} eradicated, but it is needed by ${[
             ...layerPlansByParent,

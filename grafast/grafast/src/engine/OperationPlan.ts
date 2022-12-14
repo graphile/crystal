@@ -1935,9 +1935,10 @@ export class OperationPlan {
     }
     // TODO:perf: we should calculate this _once only_ rather than for every step!
     const layerPlansWithParentStep =
-      this.stepTracker.layerPlansByParentStep.get(step)!;
+      this.stepTracker.layerPlansByParentStep.get(step);
     const hasSubroutinesWithParentStep =
-      layerPlansWithParentStep?.size > 0 &&
+      layerPlansWithParentStep &&
+      layerPlansWithParentStep.size > 0 &&
       [...layerPlansWithParentStep].some((l) => l.reason.type === "subroutine");
     if (hasSubroutinesWithParentStep) {
       // Don't hoist steps that are the root of a subroutine
@@ -2125,13 +2126,14 @@ export class OperationPlan {
     // Now find the lowest bucket that still satisfies all of it's dependents.
     const dependentLayerPlans = new Set<LayerPlan>();
 
-    for (const outputPlan of this.stepTracker.outputPlansByRootStep.get(
-      step,
-    )!) {
-      if (outputPlan.layerPlan === step.layerPlan) {
-        return;
-      } else {
-        dependentLayerPlans.add(outputPlan.layerPlan);
+    const outputPlans = this.stepTracker.outputPlansByRootStep.get(step);
+    if (outputPlans) {
+      for (const outputPlan of outputPlans) {
+        if (outputPlan.layerPlan === step.layerPlan) {
+          return;
+        } else {
+          dependentLayerPlans.add(outputPlan.layerPlan);
+        }
       }
     }
 
@@ -2143,21 +2145,26 @@ export class OperationPlan {
       }
     }
 
-    for (const layerPlan of this.stepTracker.layerPlansByParentStep.get(
-      step,
-    )!) {
-      if (layerPlan.parentLayerPlan === step.layerPlan) {
-        return;
-      } else {
-        dependentLayerPlans.add(layerPlan.parentLayerPlan!);
+    const layerPlansByParent =
+      this.stepTracker.layerPlansByParentStep.get(step);
+    if (layerPlansByParent) {
+      for (const layerPlan of layerPlansByParent) {
+        if (layerPlan.parentLayerPlan === step.layerPlan) {
+          return;
+        } else {
+          dependentLayerPlans.add(layerPlan.parentLayerPlan!);
+        }
       }
     }
 
-    for (const layerPlan of this.stepTracker.layerPlansByRootStep.get(step)!) {
-      if (layerPlan === step.layerPlan) {
-        return;
-      } else {
-        dependentLayerPlans.add(layerPlan);
+    const layerPlansByRoot = this.stepTracker.layerPlansByRootStep.get(step);
+    if (layerPlansByRoot) {
+      for (const layerPlan of layerPlansByRoot) {
+        if (layerPlan === step.layerPlan) {
+          return;
+        } else {
+          dependentLayerPlans.add(layerPlan);
+        }
       }
     }
 
