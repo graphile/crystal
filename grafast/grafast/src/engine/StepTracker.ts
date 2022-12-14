@@ -7,6 +7,7 @@ import type {
   LayerPlanReasonNullableField,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
+  LayerPlanReasonsWithParentStep,
 } from "./LayerPlan";
 import type { OperationPlanPhase } from "./OperationPlan.js";
 import type { OutputPlan } from "./OutputPlan";
@@ -46,14 +47,7 @@ export class StepTracker {
   private layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
   private layerPlansByParentStep = new Map<
     ExecutableStep,
-    Set<
-      LayerPlan<
-        | LayerPlanReasonNullableField
-        | LayerPlanReasonListItem
-        | LayerPlanReasonPolymorphic
-        | LayerPlanReasonSubroutine
-      >
-    >
+    Set<LayerPlan<LayerPlanReasonsWithParentStep>>
   >();
 
   /** @internal */
@@ -104,14 +98,7 @@ export class StepTracker {
       case "subroutine": {
         this.layerPlansByParentStep
           .get(layerPlan.reason.parentStep)!
-          .add(
-            layerPlan as LayerPlan<
-              | LayerPlanReasonNullableField
-              | LayerPlanReasonListItem
-              | LayerPlanReasonPolymorphic
-              | LayerPlanReasonSubroutine
-            >,
-          );
+          .add(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
         break;
       }
       default: {

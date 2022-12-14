@@ -121,6 +121,16 @@ export type LayerPlanReason =
   | LayerPlanReasonPolymorphic
   | LayerPlanReasonSubroutine;
 
+// The `A extends any ? ... : never` tells TypeScript to make this
+// distributive. TypeScript can be a bit arcane.
+export type HasParent<A extends LayerPlanReason> = A extends any
+  ? A extends { parentStep: ExecutableStep }
+    ? A
+    : never
+  : never;
+
+export type LayerPlanReasonsWithParentStep = HasParent<LayerPlanReason>;
+
 /** @internal */
 export interface LayerPlanPhase {
   /**
