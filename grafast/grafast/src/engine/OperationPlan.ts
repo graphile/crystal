@@ -82,6 +82,8 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
+const EMPTY_ARRAY: readonly never[] = Object.freeze([]);
+
 export const POLYMORPHIC_ROOT_PATH = "";
 const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
   POLYMORPHIC_ROOT_PATH,
@@ -2255,15 +2257,9 @@ export class OperationPlan {
     }
 
     const peers = this.getPeers(step);
-
-    // TODO: should we keep this optimisation, or should we remove it so that
-    // plans that are "smarter" than us can return replacement plans even if
-    // they're not peers?
-    if (peers.length === 0) {
-      return null;
-    }
-
-    const equivalentSteps = step.deduplicate(peers);
+    const equivalentSteps = step.deduplicate(
+      peers.length === 1 ? EMPTY_ARRAY : peers,
+    );
     if (equivalentSteps.length === 0) {
       // No equivalents, we're the original
       return null;

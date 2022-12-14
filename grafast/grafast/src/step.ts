@@ -388,7 +388,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * If you need to transform the peer to be equivalent you should do so via
    * the `deduplicatedWith` callback later.
    */
-  public deduplicate(_peers: ExecutableStep[]): ExecutableStep[] {
+  public deduplicate(
+    _peers: readonly ExecutableStep[],
+  ): readonly ExecutableStep[] {
     return [];
   }
 
