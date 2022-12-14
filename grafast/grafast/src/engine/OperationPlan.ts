@@ -294,8 +294,8 @@ export class OperationPlan {
 
     this.phase = "finalize";
 
-    // Get rid of steps that are no longer needed after optimising (we
-    // shouldn't see any new steps or dependencies after here)
+    // Get rid of steps that are no longer needed after optimising outputPlans
+    // (we shouldn't see any new steps or dependencies after here)
     this.stepTracker.treeShakeSteps();
 
     // Now shove steps as deep down as they can go (opposite of hoist)
