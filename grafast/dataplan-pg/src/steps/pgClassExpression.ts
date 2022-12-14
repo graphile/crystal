@@ -249,11 +249,11 @@ export class PgClassExpressionStep<
       parentPlan instanceof PgSelectSingleStep
         ? parentPlan.getClassStep()
         : null;
+    const options = {
+      symbolSubstitutes: (classPlan as any)?._symbolSubstitutes,
+    };
     return peers.filter(
-      (p) =>
-        sql.isEquivalent(this.expression, p.expression, {
-          symbolSubstitutes: (classPlan as any)?._symbolSubstitutes,
-        }),
+      (p) => sql.isEquivalent(this.expression, p.expression, options),
       // TODO: when we defer placeholders until finalize we'll need to do additional comparison here
     );
   }

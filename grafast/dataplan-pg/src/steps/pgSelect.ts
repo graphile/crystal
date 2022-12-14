@@ -935,10 +935,12 @@ export class PgSelectStep<
     // about the rows.
 
     // Optimisation: if we're already selecting this fragment, return the existing one.
+    const options = {
+      symbolSubstitutes: this._symbolSubstitutes,
+    };
+    // TODO: performance of this sucks at planning time
     const index = this.selects.findIndex((frag) =>
-      sql.isEquivalent(frag, fragment, {
-        symbolSubstitutes: this._symbolSubstitutes,
-      }),
+      sql.isEquivalent(frag, fragment, options),
     );
     if (index >= 0) {
       return index;
@@ -2189,6 +2191,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       // check the symbol or alias matches. We do need to factor the different
       // symbols into SQL equivalency checks though.
       const symbolSubstitutes = new Map<symbol, symbol>();
+      const options = { symbolSubstitutes };
       if (typeof this.symbol === "symbol" && typeof p.symbol === "symbol") {
         if (this.symbol !== p.symbol) {
           symbolSubstitutes.set(this.symbol, p.symbol);
@@ -2222,7 +2225,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       }
 
       const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
-        sql.isEquivalent(a, b, { symbolSubstitutes });
+        sql.isEquivalent(a, b, options);
 
       // Check trusted matches
       if (p.trusted !== this.trusted) {
