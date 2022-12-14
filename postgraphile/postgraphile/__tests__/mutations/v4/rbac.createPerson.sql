@@ -3,12 +3,12 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 insert into "c"."person" as __person__ ("person_full_name", "aliases", "about", "email", "site") values ($1::"varchar", $2::"text"[], $3::"text", $4::"b"."email", $5::"b"."wrapped_url") returning
-  __person__."site"::text as "0",
-  __person__."email" as "1",
-  __person__."about" as "2",
-  __person__."aliases"::text as "3",
-  __person__."person_full_name" as "4",
-  __person__."id"::text as "5";
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."aliases"::text as "2",
+  __person__."about" as "3",
+  __person__."email" as "4",
+  __person__."site"::text as "5";
 
 commit; /*fake*/
 

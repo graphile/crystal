@@ -26,12 +26,12 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__relation...scription”ᐳ"}}:::plan
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    Map101{{"Map[101∈3]<br />ᐸ20:{”0”:3}ᐳ"}}:::plan
+    Map95{{"Map[95∈3]<br />ᐸ20:{”0”:7}ᐳ"}}:::plan
     PgSelectSingle31{{"PgSelectSingle[31∈3]<br />ᐸtextᐳ"}}:::plan
     PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
-    Map99{{"Map[99∈3]<br />ᐸ20:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map93{{"Map[93∈3]<br />ᐸ20:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle39{{"PgSelectSingle[39∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
-    Map97{{"Map[97∈3]<br />ᐸ39:{”0”:0,”1”:1}ᐳ"}}:::plan
+    Map91{{"Map[91∈3]<br />ᐸ39:{”0”:0,”1”:1}ᐳ"}}:::plan
     PgSelectSingle46{{"PgSelectSingle[46∈3]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgClassExpression48{{"PgClassExpression[48∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
@@ -46,12 +46,12 @@ graph TD
     PgClassExpression64{{"PgClassExpression[64∈7]<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
     PgClassExpression65{{"PgClassExpression[65∈7]<br />ᐸ__relation...scription”ᐳ"}}:::plan
     PgClassExpression66{{"PgClassExpression[66∈7]<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    Map95{{"Map[95∈7]<br />ᐸ62:{”0”:3}ᐳ"}}:::plan
+    Map101{{"Map[101∈7]<br />ᐸ62:{”0”:7}ᐳ"}}:::plan
     PgSelectSingle73{{"PgSelectSingle[73∈7]<br />ᐸtextᐳ"}}:::plan
     PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
-    Map93{{"Map[93∈7]<br />ᐸ62:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map99{{"Map[99∈7]<br />ᐸ62:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle81{{"PgSelectSingle[81∈7]<br />ᐸrelational_itemsᐳ"}}:::plan
-    Map91{{"Map[91∈7]<br />ᐸ81:{”0”:0,”1”:1}ᐳ"}}:::plan
+    Map97{{"Map[97∈7]<br />ᐸ81:{”0”:0,”1”:1}ᐳ"}}:::plan
     PgSelectSingle88{{"PgSelectSingle[88∈7]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression89{{"PgClassExpression[89∈8]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgClassExpression90{{"PgClassExpression[90∈8]<br />ᐸ__people__.”username”ᐳ"}}:::plan
@@ -70,13 +70,13 @@ graph TD
     PgSelectSingle20 --> PgClassExpression22
     PgSelectSingle20 --> PgClassExpression23
     PgSelectSingle20 --> PgClassExpression24
-    PgSelectSingle20 --> Map101
-    Map101 --> PgSelectSingle31
+    PgSelectSingle20 --> Map95
+    Map95 --> PgSelectSingle31
     PgSelectSingle31 --> PgClassExpression32
-    PgSelectSingle20 --> Map99
-    Map99 --> PgSelectSingle39
-    PgSelectSingle39 --> Map97
-    Map97 --> PgSelectSingle46
+    PgSelectSingle20 --> Map93
+    Map93 --> PgSelectSingle39
+    PgSelectSingle39 --> Map91
+    Map91 --> PgSelectSingle46
     PgSelectSingle46 --> PgClassExpression47
     PgSelectSingle46 --> PgClassExpression48
     Object12 & __InputStaticLeaf50 --> PgDelete51
@@ -89,13 +89,13 @@ graph TD
     PgSelectSingle62 --> PgClassExpression64
     PgSelectSingle62 --> PgClassExpression65
     PgSelectSingle62 --> PgClassExpression66
-    PgSelectSingle62 --> Map95
-    Map95 --> PgSelectSingle73
+    PgSelectSingle62 --> Map101
+    Map101 --> PgSelectSingle73
     PgSelectSingle73 --> PgClassExpression74
-    PgSelectSingle62 --> Map93
-    Map93 --> PgSelectSingle81
-    PgSelectSingle81 --> Map91
-    Map91 --> PgSelectSingle88
+    PgSelectSingle62 --> Map99
+    Map99 --> PgSelectSingle81
+    PgSelectSingle81 --> Map97
+    Map97 --> PgSelectSingle88
     PgSelectSingle88 --> PgClassExpression89
     PgSelectSingle88 --> PgClassExpression90
 
@@ -111,7 +111,7 @@ graph TD
     class Bucket2,PgClassExpression13,PgClassExpression14,PgSelect15,First19,PgSelectSingle20 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[20]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgSelectSingle31,PgClassExpression32,PgSelectSingle39,PgSelectSingle46,Map97,Map99,Map101 bucket3
+    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgSelectSingle31,PgClassExpression32,PgSelectSingle39,PgSelectSingle46,Map91,Map93,Map95 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[46]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression47,PgClassExpression48 bucket4
@@ -123,7 +123,7 @@ graph TD
     class Bucket6,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 62<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgSelectSingle88,Map91,Map93,Map95 bucket7
+    class Bucket7,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgSelectSingle88,Map97,Map99,Map101 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 88<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[88]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression89,PgClassExpression90 bucket8

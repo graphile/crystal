@@ -1,4 +1,5 @@
 select
+  __forums__."name" as "0",
   (select json_agg(_) from (
     select
       (count(*))::text as "0"
@@ -9,10 +10,9 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "0",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1",
+  ) _) as "1",
   __forums__."id" as "2",
-  __forums__."name" as "3"
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3"
 from app_public.forums as __forums__
 where
   (
@@ -37,13 +37,14 @@ lateral (
   select *
   from (
     select
-      __users__."gravatar_url" as "0",
+      __messages__."body" as "0",
       __users__."username" as "1",
-      __messages__."body" as "2",
-      __messages_identifiers__.idx as "3",
+      __users__."gravatar_url" as "2",
+      __messages__."author_id" as "3",
+      __messages_identifiers__.idx as "4",
       row_number() over (
         order by __messages__."id" asc
-      ) as "4"
+      ) as "5"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -55,7 +56,7 @@ lateral (
       )
     order by __messages__."id" asc
   ) __stream_wrapped__
-  order by __stream_wrapped__."4"
+  order by __stream_wrapped__."5"
 ) as __messages_result__;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
@@ -79,14 +80,15 @@ lateral (
   select *
   from (
     select
-      __users__."gravatar_url" as "0",
-      __users__."username" as "1",
-      __messages__."body" as "2",
-      __messages__."id" as "3",
-      __messages_identifiers__.idx as "4",
+      __messages__."id" as "0",
+      __messages__."body" as "1",
+      __users__."username" as "2",
+      __users__."gravatar_url" as "3",
+      __messages__."author_id" as "4",
+      __messages_identifiers__.idx as "5",
       row_number() over (
         order by __messages__."id" asc
-      ) as "5"
+      ) as "6"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -98,7 +100,7 @@ lateral (
       )
     order by __messages__."id" asc
   ) __stream_wrapped__
-  order by __stream_wrapped__."5"
+  order by __stream_wrapped__."6"
 ) as __messages_result__;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_1__

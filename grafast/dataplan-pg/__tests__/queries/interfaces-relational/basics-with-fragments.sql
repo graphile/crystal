@@ -1,14 +1,15 @@
 select
+  __people__."username" as "0",
   (select json_agg(_) from (
     select
-      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
-      __relational_items__."is_explicitly_archived"::text as "1",
-      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
-      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3",
-      __relational_items__."position"::text as "4",
-      __relational_items__."type2"::text as "5",
-      __relational_items__."id"::text as "6",
-      __relational_items__."type"::text as "7"
+      __relational_items__."type"::text as "0",
+      __relational_items__."id"::text as "1",
+      __relational_items__."type2"::text as "2",
+      __relational_items__."position"::text as "3",
+      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",
+      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "5",
+      __relational_items__."is_explicitly_archived"::text as "6",
+      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "7"
     from interfaces_and_unions.relational_items as __relational_items__
     where
       (
@@ -17,8 +18,8 @@ select
         true /* authorization checks */
       )
     order by __relational_items__."id" asc
-  ) _) as "0",
-  __people__."username" as "1"
+  ) _) as "1",
+  __people__."person_id"::text as "2"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
@@ -56,9 +57,9 @@ from (
 ) as __relational_posts_identifiers__,
 lateral (
   select
-    __relational_posts__."note" as "0",
+    __relational_posts__."title" as "0",
     __relational_posts__."description" as "1",
-    __relational_posts__."title" as "2",
+    __relational_posts__."note" as "2",
     __relational_posts__."id"::text as "3",
     __relational_posts_identifiers__.idx as "4"
   from interfaces_and_unions.relational_posts as __relational_posts__
@@ -80,8 +81,8 @@ from (
 ) as __relational_dividers_identifiers__,
 lateral (
   select
-    __relational_dividers__."color" as "0",
-    __relational_dividers__."title" as "1",
+    __relational_dividers__."title" as "0",
+    __relational_dividers__."color" as "1",
     __relational_dividers__."id"::text as "2",
     __relational_dividers_identifiers__.idx as "3"
   from interfaces_and_unions.relational_dividers as __relational_dividers__
@@ -125,8 +126,8 @@ from (
 ) as __relational_checklist_items_identifiers__,
 lateral (
   select
-    __relational_checklist_items__."note" as "0",
-    __relational_checklist_items__."description" as "1",
+    __relational_checklist_items__."description" as "0",
+    __relational_checklist_items__."note" as "1",
     __relational_checklist_items_identifiers__.idx as "2"
   from interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
   where

@@ -1,10 +1,11 @@
 select
+  __people__."username" as "0",
   (select json_agg(_) from (
     select
-      __relational_items__."type2"::text as "0",
-      __relational_items__."parent_id"::text as "1",
-      __relational_items__."id"::text as "2",
-      __relational_items__."type"::text as "3"
+      __relational_items__."type"::text as "0",
+      __relational_items__."id"::text as "1",
+      __relational_items__."parent_id"::text as "2",
+      __relational_items__."type2"::text as "3"
     from interfaces_and_unions.relational_items as __relational_items__
     where
       (
@@ -13,8 +14,8 @@ select
         true /* authorization checks */
       )
     order by __relational_items__."id" asc
-  ) _) as "0",
-  __people__."username" as "1"
+  ) _) as "1",
+  __people__."person_id"::text as "2"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
@@ -51,9 +52,9 @@ from (
 ) as __relational_items_identifiers__,
 lateral (
   select
-    __relational_items__."type2"::text as "0",
+    __relational_items__."type"::text as "0",
     __relational_items__."id"::text as "1",
-    __relational_items__."type"::text as "2",
+    __relational_items__."type2"::text as "2",
     __relational_items_identifiers__.idx as "3"
   from interfaces_and_unions.relational_items as __relational_items__
   where

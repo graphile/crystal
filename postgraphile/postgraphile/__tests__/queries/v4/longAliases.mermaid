@@ -25,12 +25,12 @@ graph TD
     Lambda17{{"Lambda[17∈1]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__person__.”email”ᐳ"}}:::plan
     Connection30{{"Connection[30∈1]<br />ᐸ26ᐳ"}}:::plan
-    Access52{{"Access[52∈1]<br />ᐸ12.1ᐳ"}}:::plan
+    Access51{{"Access[51∈1]<br />ᐸ12.2ᐳ"}}:::plan
     First32{{"First[32∈1]"}}:::plan
     PgSelectSingle33{{"PgSelectSingle[33∈1]<br />ᐸperson_friendsᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     Connection46{{"Connection[46∈1]<br />ᐸ42ᐳ"}}:::plan
-    Access51{{"Access[51∈1]<br />ᐸ12.0ᐳ"}}:::plan
+    Access52{{"Access[52∈1]<br />ᐸ12.3ᐳ"}}:::plan
     First48{{"First[48∈1]"}}:::plan
     PgSelectSingle49{{"PgSelectSingle[49∈1]<br />ᐸperson_friendsᐳ"}}:::plan
     PgClassExpression50{{"PgClassExpression[50∈1]<br />ᐸcount(*)ᐳ"}}:::plan
@@ -46,12 +46,12 @@ graph TD
     Constant14 & PgClassExpression15 --> List16
     List16 --> Lambda17
     PgSelectSingle13 --> PgClassExpression18
-    First12 --> Access52
-    Access52 --> First32
+    First12 --> Access51
+    Access51 --> First32
     First32 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression34
-    First12 --> Access51
-    Access51 --> First48
+    First12 --> Access52
+    Access52 --> First48
     First48 --> PgSelectSingle49
     PgSelectSingle49 --> PgClassExpression50
 

@@ -7,9 +7,9 @@ from (
 ) as __entity_search_identifiers__,
 lateral (
   select
-    __entity_search__."comment_id"::text as "0",
+    __entity_search__."person_id"::text as "0",
     __entity_search__."post_id"::text as "1",
-    __entity_search__."person_id"::text as "2",
+    __entity_search__."comment_id"::text as "2",
     (not (__entity_search__ is null))::text as "3",
     __entity_search_identifiers__.idx as "4"
   from interfaces_and_unions.search("query" := __entity_search_identifiers__."id0") as __entity_search__
@@ -27,8 +27,8 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    __people__."username" as "0",
-    __people__."person_id"::text as "1",
+    __people__."person_id"::text as "0",
+    __people__."username" as "1",
     __people_identifiers__.idx as "2"
   from interfaces_and_unions.people as __people__
   where
@@ -49,10 +49,11 @@ from (
 ) as __posts_identifiers__,
 lateral (
   select
-    __posts__."body" as "0",
+    __posts__."post_id"::text as "0",
     __people__."username" as "1",
-    __posts__."post_id"::text as "2",
-    __posts_identifiers__.idx as "3"
+    __posts__."author_id"::text as "2",
+    __posts__."body" as "3",
+    __posts_identifiers__.idx as "4"
   from interfaces_and_unions.posts as __posts__
   left outer join interfaces_and_unions.people as __people__
   on (__posts__."author_id"::"int4" = __people__."person_id")
@@ -74,17 +75,19 @@ from (
 ) as __comments_identifiers__,
 lateral (
   select
-    __comments__."body" as "0",
-    __posts__."body" as "1",
-    __posts__."post_id"::text as "2",
-    __people__."username" as "3",
-    __comments__."comment_id"::text as "4",
-    __comments_identifiers__.idx as "5"
+    __comments__."comment_id"::text as "0",
+    __people__."username" as "1",
+    __comments__."author_id"::text as "2",
+    __posts__."post_id"::text as "3",
+    __posts__."body" as "4",
+    __comments__."post_id"::text as "5",
+    __comments__."body" as "6",
+    __comments_identifiers__.idx as "7"
   from interfaces_and_unions.comments as __comments__
-  left outer join interfaces_and_unions.posts as __posts__
-  on (__comments__."post_id"::"int4" = __posts__."post_id")
   left outer join interfaces_and_unions.people as __people__
   on (__comments__."author_id"::"int4" = __people__."person_id")
+  left outer join interfaces_and_unions.posts as __posts__
+  on (__comments__."post_id"::"int4" = __posts__."post_id")
   where
     (
       true /* authorization checks */

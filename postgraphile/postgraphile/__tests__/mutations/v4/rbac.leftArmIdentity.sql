@@ -11,10 +11,10 @@ from (
 ) as __left_arm_identity_identifiers__,
 lateral (
   select
-    __left_arm_identity__."mood" as "0",
-    __left_arm_identity__."length_in_metres"::text as "1",
-    __left_arm_identity__."person_id"::text as "2",
-    __left_arm_identity__."id"::text as "3",
+    __left_arm_identity__."id"::text as "0",
+    __left_arm_identity__."person_id"::text as "1",
+    __left_arm_identity__."length_in_metres"::text as "2",
+    __left_arm_identity__."mood" as "3",
     __left_arm_identity_identifiers__.idx as "4"
   from "c"."left_arm_identity"(__left_arm_identity_identifiers__."id0") as __left_arm_identity__
 ) as __left_arm_identity_result__;

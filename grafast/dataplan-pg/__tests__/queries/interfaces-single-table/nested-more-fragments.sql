@@ -1,20 +1,21 @@
 select
+  __people__."username" as "0",
   (select json_agg(_) from (
     select
-      __single_table_items__."color" as "0",
-      __single_table_items__."note" as "1",
-      __single_table_items__."description" as "2",
-      __single_table_items__."title" as "3",
-      to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",
-      __single_table_items__."is_explicitly_archived"::text as "5",
-      to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "6",
-      to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "7",
-      __single_table_items__."position"::text as "8",
-      __single_table_items__."author_id"::text as "9",
-      __single_table_items__."type2"::text as "10",
-      __single_table_items__."id"::text as "11",
-      __single_table_items__."parent_id"::text as "12",
-      __single_table_items__."type"::text as "13"
+      __single_table_items__."type"::text as "0",
+      __single_table_items__."parent_id"::text as "1",
+      __single_table_items__."id"::text as "2",
+      __single_table_items__."type2"::text as "3",
+      __single_table_items__."author_id"::text as "4",
+      __single_table_items__."position"::text as "5",
+      to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "6",
+      to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "7",
+      __single_table_items__."is_explicitly_archived"::text as "8",
+      to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "9",
+      __single_table_items__."title" as "10",
+      __single_table_items__."description" as "11",
+      __single_table_items__."note" as "12",
+      __single_table_items__."color" as "13"
     from interfaces_and_unions.single_table_items as __single_table_items__
     where
       (
@@ -23,8 +24,8 @@ select
         true /* authorization checks */
       )
     order by __single_table_items__."id" asc
-  ) _) as "0",
-  __people__."username" as "1"
+  ) _) as "1",
+  __people__."person_id"::text as "2"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
@@ -40,18 +41,18 @@ from (
 ) as __single_table_items_identifiers__,
 lateral (
   select
-    __single_table_items__."color" as "0",
-    __single_table_items__."note" as "1",
-    __single_table_items__."description" as "2",
-    __single_table_items__."title" as "3",
-    to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",
-    __single_table_items__."is_explicitly_archived"::text as "5",
-    to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "6",
-    to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "7",
-    __single_table_items__."position"::text as "8",
-    __single_table_items__."author_id"::text as "9",
-    __single_table_items__."type2"::text as "10",
-    __single_table_items__."type"::text as "11",
+    __single_table_items__."type"::text as "0",
+    __single_table_items__."type2"::text as "1",
+    __single_table_items__."author_id"::text as "2",
+    __single_table_items__."position"::text as "3",
+    to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",
+    to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "5",
+    __single_table_items__."is_explicitly_archived"::text as "6",
+    to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "7",
+    __single_table_items__."title" as "8",
+    __single_table_items__."description" as "9",
+    __single_table_items__."note" as "10",
+    __single_table_items__."color" as "11",
     __single_table_items_identifiers__.idx as "12"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where

@@ -29,9 +29,9 @@ graph TD
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__frmcdc_jwt_token_1__ᐳ"}}:::plan
     PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
     PgClassExpression38{{"PgClassExpression[38∈1]<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
-    PgSelect30[["PgSelect[30∈2]<br />ᐸpersonᐳ"]]:::plan
-    First34{{"First[34∈2]"}}:::plan
-    PgSelectSingle35{{"PgSelectSingle[35∈2]<br />ᐸpersonᐳ"}}:::plan
+    PgSelect30[["PgSelect[30∈1]<br />ᐸpersonᐳ"]]:::plan
+    First34{{"First[34∈1]"}}:::plan
+    PgSelectSingle35{{"PgSelectSingle[35∈1]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
@@ -64,19 +64,19 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf10,__InputStaticLeaf11,Access13,Access14,Object15 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect[12]<br />2: <br />ᐳ: 16, 17, 18, 38"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 9, 10, 11<br /><br />1: PgSelect[12]<br />2: <br />ᐳ: 16, 17, 18, 38<br />3: PgSelect[30]<br />ᐳ: First[34], PgSelectSingle[35]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18,PgClassExpression38 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 38, 18, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
+    class Bucket1,PgSelect12,First16,PgSelectSingle17,Object18,PgSelect30,First34,PgSelectSingle35,PgClassExpression38 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 17, 15, 35, 38<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect30,First34,PgSelectSingle35 bucket2
+    class Bucket2 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 15, 35, 38<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[17]<br />1: <br />ᐳ: 19, 28<br />2: PgSelect[20]<br />ᐳ: 24, 25, 26"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgSelect20,First24,PgSelectSingle25,PgClassExpression26,PgClassExpression28 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[35]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression36,PgClassExpression37 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[35]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression45,PgClassExpression46 bucket5
     Bucket0 --> Bucket1

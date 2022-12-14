@@ -104,10 +104,10 @@ from (
 ) as __first_party_vulnerabilities_identifiers__,
 lateral (
   select
-    __first_party_vulnerabilities__."team_name" as "0",
-    __first_party_vulnerabilities__."name" as "1",
-    __first_party_vulnerabilities__."id"::text as "2",
-    __first_party_vulnerabilities__."cvss_score"::text as "3",
+    __first_party_vulnerabilities__."cvss_score"::text as "0",
+    __first_party_vulnerabilities__."id"::text as "1",
+    __first_party_vulnerabilities__."name" as "2",
+    __first_party_vulnerabilities__."team_name" as "3",
     __first_party_vulnerabilities_identifiers__.idx as "4"
   from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
   where
@@ -128,10 +128,10 @@ from (
 ) as __third_party_vulnerabilities_identifiers__,
 lateral (
   select
-    __third_party_vulnerabilities__."vendor_name" as "0",
-    __third_party_vulnerabilities__."name" as "1",
-    __third_party_vulnerabilities__."id"::text as "2",
-    __third_party_vulnerabilities__."cvss_score"::text as "3",
+    __third_party_vulnerabilities__."cvss_score"::text as "0",
+    __third_party_vulnerabilities__."id"::text as "1",
+    __third_party_vulnerabilities__."name" as "2",
+    __third_party_vulnerabilities__."vendor_name" as "3",
     __third_party_vulnerabilities_identifiers__.idx as "4"
   from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
   where

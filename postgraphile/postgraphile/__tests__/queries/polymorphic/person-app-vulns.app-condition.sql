@@ -1,6 +1,6 @@
 select
-  __people__."username" as "0",
-  __people__."person_id"::text as "1"
+  __people__."person_id"::text as "0",
+  __people__."username" as "1"
 from "polymorphic"."people" as __people__
 order by __people__."person_id" asc
 limit 4;
@@ -95,8 +95,8 @@ from (
 ) as __aws_applications_identifiers__,
 lateral (
   select
-    __aws_applications__."name" as "0",
-    __aws_applications__."id"::text as "1",
+    __aws_applications__."id"::text as "0",
+    __aws_applications__."name" as "1",
     __aws_applications_identifiers__.idx as "2"
   from "polymorphic"."aws_applications" as __aws_applications__
   where (

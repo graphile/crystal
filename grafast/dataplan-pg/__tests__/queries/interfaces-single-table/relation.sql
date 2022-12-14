@@ -7,9 +7,9 @@ from (
 ) as __single_table_items_identifiers__,
 lateral (
   select
-    __single_table_items__."id"::text as "0",
+    __single_table_items__."type"::text as "0",
     __single_table_items__."parent_id"::text as "1",
-    __single_table_items__."type"::text as "2",
+    __single_table_items__."id"::text as "2",
     __single_table_items_identifiers__.idx as "3"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
@@ -30,8 +30,8 @@ from (
 ) as __single_table_items_identifiers__,
 lateral (
   select
-    __single_table_items__."author_id"::text as "0",
-    __single_table_items__."type"::text as "1",
+    __single_table_items__."type"::text as "0",
+    __single_table_items__."author_id"::text as "1",
     __single_table_items_identifiers__.idx as "2"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
