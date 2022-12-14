@@ -276,11 +276,11 @@ function makeIndentNode(content: SQL): SQLIndentNode {
   return Object.freeze({ type: "INDENT", content, [$$trusted]: true as const });
 }
 
-function makeParensNode(content: SQL, force = false): SQLParensNode {
+function makeParensNode(content: SQL, force?: boolean): SQLParensNode {
   return Object.freeze({
     type: "PARENS",
     content,
-    force,
+    force: force ?? false,
     [$$trusted]: true as const,
   });
 }
@@ -316,7 +316,7 @@ function isSQL(fragment: unknown): fragment is SQL {
     : isSQLNode(fragment);
 }
 
-function enforceValidNode(node: unknown, where = ""): SQLNode {
+function enforceValidNode(node: unknown, where?: string): SQLNode {
   if (isSQLNode(node)) {
     return node;
   }
@@ -335,11 +335,12 @@ function enforceValidNode(node: unknown, where = ""): SQLNode {
  */
 export function compile(
   sql: SQL,
-  { placeholderValues }: { placeholderValues?: Map<symbol, SQL> } = {},
+  options?: { placeholderValues?: Map<symbol, SQL> },
 ): {
   text: string;
   values: SQLRawValue[];
 } {
+  const placeholderValues = options?.placeholderValues;
   /**
    * Values hold the JavaScript values that are represented in the query string
    * by placeholders. They are eager because they were provided before compile
@@ -797,7 +798,7 @@ export function indentIf(condition: boolean, fragment: SQL): SQL {
  * Wraps the given fragment in parens if necessary (or if forced, e.g. for a
  * subquery or maybe stylistically a join condition).
  */
-export function parens(fragment: SQL, force = false): SQL {
+export function parens(fragment: SQL, force?: boolean): SQL {
   // No need to recursively wrap with parens
   if (Array.isArray(fragment)) {
     if (fragment.length === 0) {
@@ -852,7 +853,7 @@ export function placeholder(
 export function arraysMatch<T>(
   array1: ReadonlyArray<T>,
   array2: ReadonlyArray<T>,
-  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
+  comparator?: (val1: T, val2: T) => boolean,
 ): boolean {
   if (array1 === array2) return true;
   const l = array1.length;
@@ -860,7 +861,9 @@ export function arraysMatch<T>(
     return false;
   }
   for (let i = 0; i < l; i++) {
-    if (!comparator(array1[i]!, array2[i]!)) {
+    if (
+      comparator ? !comparator(array1[i]!, array2[i]!) : array1[i] !== array2[i]
+    ) {
       return false;
     }
   }
@@ -870,14 +873,14 @@ export function arraysMatch<T>(
 export function isEquivalent(
   sql1: SQL | symbol,
   sql2: SQL | symbol,
-  options: {
+  options?: {
     symbolSubstitutes?: Map<symbol, symbol>;
-  } = {},
+  },
 ): boolean {
   if (sql1 === sql2) {
     return true;
   }
-  const { symbolSubstitutes } = options;
+  const symbolSubstitutes = options?.symbolSubstitutes;
   if (typeof sql1 === "symbol") {
     if (symbolSubstitutes?.has(sql1)) {
       return symbolSubstitutes.get(sql1) === sql2;
